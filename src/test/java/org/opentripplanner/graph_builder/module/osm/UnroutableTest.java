@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -39,11 +39,8 @@ public class UnroutableTest {
 
     URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
     File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), StandardCharsets.UTF_8));
-    OpenStreetMapProvider provider = new OpenStreetMapProvider(osmDataFile, true);
-    OpenStreetMapModule osmBuilder = OpenStreetMapModuleBuilder
-      .of(provider, graph)
-      .withAreaVisibility(true)
-      .build();
+    OsmProvider provider = new OsmProvider(osmDataFile, true);
+    OsmModule osmBuilder = OsmModuleBuilder.of(provider, graph).withAreaVisibility(true).build();
     osmBuilder.buildGraph();
   }
 

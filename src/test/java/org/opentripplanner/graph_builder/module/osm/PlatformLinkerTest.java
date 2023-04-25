@@ -7,7 +7,7 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.module.FakeGraph;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -33,9 +33,9 @@ public class PlatformLinkerTest {
       )
     );
 
-    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
+    OsmProvider provider = new OsmProvider(file, false);
 
-    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
+    OsmModule osmModule = OsmModuleBuilder
       .of(provider, gg)
       .withPlatformEntriesLinking(true)
       .build();

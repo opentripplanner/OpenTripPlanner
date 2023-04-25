@@ -22,8 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.CreativeNamer;
@@ -44,7 +43,7 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
-public class OpenStreetMapModuleTest {
+public class OsmModuleTest {
 
   @Test
   public void testGraphBuilder() {
@@ -55,12 +54,9 @@ public class OpenStreetMapModuleTest {
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), StandardCharsets.UTF_8)
     );
 
-    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
+    OsmProvider provider = new OsmProvider(file, true);
 
-    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
-      .of(provider, gg)
-      .withAreaVisibility(true)
-      .build();
+    OsmModule osmModule = OsmModuleBuilder.of(provider, gg).withAreaVisibility(true).build();
 
     osmModule.buildGraph();
 
@@ -120,11 +116,8 @@ public class OpenStreetMapModuleTest {
         StandardCharsets.UTF_8
       )
     );
-    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, true);
-    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
-      .of(provider, gg)
-      .withAreaVisibility(true)
-      .build();
+    OsmProvider provider = new OsmProvider(file, true);
+    OsmModule osmModule = OsmModuleBuilder.of(provider, gg).withAreaVisibility(true).build();
 
     osmModule.buildGraph();
 
@@ -317,9 +310,9 @@ public class OpenStreetMapModuleTest {
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
       .map(f -> new File(getClass().getResource(f).getFile()))
-      .map(f -> new OpenStreetMapProvider(f, false))
+      .map(f -> new OsmProvider(f, false))
       .toList();
-    var module = OpenStreetMapModuleBuilder
+    var module = OsmModuleBuilder
       .of(providers, graph)
       .withStaticParkAndRide(true)
       .withStaticBikeParkAndRide(true)
@@ -347,9 +340,9 @@ public class OpenStreetMapModuleTest {
         StandardCharsets.UTF_8
       )
     );
-    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
+    OsmProvider provider = new OsmProvider(file, false);
 
-    OpenStreetMapModule loader = OpenStreetMapModuleBuilder
+    OsmModule loader = OsmModuleBuilder
       .of(provider, graph)
       .withAreaVisibility(!skipVisibility)
       .build();

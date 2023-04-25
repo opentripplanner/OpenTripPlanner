@@ -19,14 +19,14 @@ import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModuleBuilder;
+import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.osm.OsmModuleBuilder;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -153,8 +153,8 @@ public class ConstantsForTests {
       // Add street data from OSM
       {
         File osmFile = new File(PORTLAND_CENTRAL_OSM);
-        OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, false);
-        OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
+        OsmProvider osmProvider = new OsmProvider(osmFile, false);
+        OsmModule osmModule = OsmModuleBuilder
           .of(osmProvider, graph)
           .withStaticParkAndRide(true)
           .withStaticBikeParkAndRide(true)
@@ -198,8 +198,8 @@ public class ConstantsForTests {
       var transitModel = new TransitModel(stopModel, deduplicator);
       // Add street data from OSM
       File osmFile = new File(osmPath);
-      OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, true);
-      OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(osmProvider, graph).build();
+      OsmProvider osmProvider = new OsmProvider(osmFile, true);
+      OsmModule osmModule = OsmModuleBuilder.of(osmProvider, graph).build();
       osmModule.buildGraph();
       return new TestOtpModel(graph, transitModel);
     } catch (Exception e) {
@@ -250,8 +250,8 @@ public class ConstantsForTests {
       {
         File osmFile = new File(OSLO_EAST_OSM);
 
-        OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, false);
-        OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(osmProvider, graph).build();
+        OsmProvider osmProvider = new OsmProvider(osmFile, false);
+        OsmModule osmModule = OsmModuleBuilder.of(osmProvider, graph).build();
         osmModule.buildGraph();
       }
       // Add transit data from Netex

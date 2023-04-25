@@ -8,9 +8,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModuleBuilder;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.osm.OsmModuleBuilder;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -71,8 +71,8 @@ public class PruneNoThruIslandsTest {
       var transitModel = new TransitModel(new StopModel(), deduplicator);
       // Add street data from OSM
       File osmFile = new File(osmPath);
-      OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, true);
-      OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder
+      OsmProvider osmProvider = new OsmProvider(osmFile, true);
+      OsmModule osmModule = OsmModuleBuilder
         .of(osmProvider, graph)
         .withCustomNamer(new TestCustomNamer())
         .build();

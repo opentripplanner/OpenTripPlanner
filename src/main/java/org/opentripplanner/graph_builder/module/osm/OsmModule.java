@@ -23,7 +23,7 @@ import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
@@ -53,9 +53,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Builds a street graph from OpenStreetMap data.
  */
-public class OpenStreetMapModule implements GraphBuilderModule {
+public class OsmModule implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OpenStreetMapModule.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OsmModule.class);
 
   private final Map<Vertex, Double> elevationData = new HashMap<>();
 
@@ -63,16 +63,16 @@ public class OpenStreetMapModule implements GraphBuilderModule {
   /**
    * Providers of OSM data.
    */
-  private final List<OpenStreetMapProvider> providers;
+  private final List<OsmProvider> providers;
   private final Graph graph;
   private final DataImportIssueStore issueStore;
-  private final OpenStreetMapOptions options;
+  private final OsmOptions options;
 
-  public OpenStreetMapModule(
-    Collection<OpenStreetMapProvider> providers,
+  public OsmModule(
+    Collection<OsmProvider> providers,
     Graph graph,
     DataImportIssueStore issueStore,
-    OpenStreetMapOptions options
+    OsmOptions options
   ) {
     this.providers = List.copyOf(providers);
     this.graph = graph;
@@ -82,9 +82,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   @Override
   public void buildGraph() {
-    OSMDatabase osmdb = new OSMDatabase(issueStore, options.boardingAreaRefTags());
+    OsmDatabase osmdb = new OsmDatabase(issueStore, options.boardingAreaRefTags());
     Handler handler = new Handler(graph, osmdb, issueStore, options, elevationData);
-    for (OpenStreetMapProvider provider : providers) {
+    for (OsmProvider provider : providers) {
       LOG.info("Gathering OSM from provider: {}", provider);
       LOG.info(
         "Using OSM way configuration from {}.",
@@ -101,7 +101,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
   @Override
   public void checkInputs() {
-    for (OpenStreetMapProvider provider : providers) {
+    for (OsmProvider provider : providers) {
       provider.checkInputs();
     }
   }
@@ -120,7 +120,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private final Graph graph;
 
-    private final OSMDatabase osmdb;
+    private final OsmDatabase osmdb;
     private final DataImportIssueStore issueStore;
     private final Map<Vertex, Double> elevationData;
 
@@ -129,7 +129,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     private final HashMap<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
     // track OSM nodes that will become graph vertices because they appear in multiple OSM ways
     private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
-    private final OpenStreetMapOptions options;
+    private final OsmOptions options;
     /**
      * The bike safety factor of the safest street
      */
@@ -142,9 +142,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     // TODO Decouple this class further, decrease the number of constructor parameters.
     public Handler(
       Graph graph,
-      OSMDatabase osmdb,
+      OsmDatabase osmdb,
       DataImportIssueStore issueStore,
-      OpenStreetMapOptions options,
+      OsmOptions options,
       Map<Vertex, Double> elevationData
     ) {
       this.graph = graph;
@@ -349,7 +349,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         if (node.isBarrier()) {
           BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
           bv.setBarrierPermissions(
-            OSMFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions)
+            OsmFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions)
           );
           iv = bv;
         }
@@ -447,14 +447,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       WAY:for (OSMWay way : osmdb.getWays()) {
         WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
         setWayName(way);
-        StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(
+        StreetTraversalPermission permissions = OsmFilter.getPermissionsForWay(
           way,
           wayData.getPermission(),
           options.banDiscouragedWalking(),
           options.banDiscouragedBiking(),
           issueStore
         );
-        if (!OSMFilter.isWayRoutable(way) || permissions.allowsNothing()) continue;
+        if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) continue;
 
         // handle duplicate nodes in OSM ways
         // this is a workaround for crappy OSM data quality
@@ -856,7 +856,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       StreetEdge street = null, backStreet = null;
       double length = getGeometryLengthMeters(geometry);
 
-      var permissionPair = OSMFilter.getPermissions(permissions, way);
+      var permissionPair = OsmFilter.getPermissions(permissions, way);
       var permissionsFront = permissionPair.main();
       var permissionsBack = permissionPair.back();
 
@@ -925,7 +925,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         back
       );
       street.setCarSpeed(carSpeed);
-      street.setLink(OSMFilter.isLink(way));
+      street.setLink(OsmFilter.isLink(way));
 
       if (!way.hasTag("name") && !way.hasTag("ref")) {
         street.setHasBogusName(true);

@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 
-public class OpenStreetMapModuleBuilder {
+public class OsmModuleBuilder {
 
-  private final Collection<OpenStreetMapProvider> providers;
+  private final Collection<OsmProvider> providers;
   private final Graph graph;
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
@@ -23,78 +23,75 @@ public class OpenStreetMapModuleBuilder {
   private boolean banDiscouragedBiking = false;
   private int maxAreaNodes;
 
-  private OpenStreetMapModuleBuilder(Collection<OpenStreetMapProvider> providers, Graph graph) {
+  private OsmModuleBuilder(Collection<OsmProvider> providers, Graph graph) {
     this.providers = providers;
     this.graph = graph;
   }
 
-  public static OpenStreetMapModuleBuilder of(
-    Collection<OpenStreetMapProvider> providers,
-    Graph graph
-  ) {
-    return new OpenStreetMapModuleBuilder(providers, graph);
+  public static OsmModuleBuilder of(Collection<OsmProvider> providers, Graph graph) {
+    return new OsmModuleBuilder(providers, graph);
   }
 
-  public static OpenStreetMapModuleBuilder of(OpenStreetMapProvider provider, Graph graph) {
-    return new OpenStreetMapModuleBuilder(List.of(provider), graph);
+  public static OsmModuleBuilder of(OsmProvider provider, Graph graph) {
+    return new OsmModuleBuilder(List.of(provider), graph);
   }
 
-  public OpenStreetMapModuleBuilder withBoardingAreaRefTags(Set<String> boardingAreaRefTags) {
+  public OsmModuleBuilder withBoardingAreaRefTags(Set<String> boardingAreaRefTags) {
     this.boardingAreaRefTags = boardingAreaRefTags;
     return this;
   }
 
-  public OpenStreetMapModuleBuilder setIssueStore(DataImportIssueStore issueStore) {
+  public OsmModuleBuilder setIssueStore(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
     return this;
   }
 
-  public OpenStreetMapModuleBuilder withCustomNamer(CustomNamer customNamer) {
+  public OsmModuleBuilder withCustomNamer(CustomNamer customNamer) {
     this.customNamer = customNamer;
     return this;
   }
 
-  public OpenStreetMapModuleBuilder withAreaVisibility(boolean areaVisibility) {
+  public OsmModuleBuilder withAreaVisibility(boolean areaVisibility) {
     this.areaVisibility = areaVisibility;
     return this;
   }
 
-  public OpenStreetMapModuleBuilder withPlatformEntriesLinking(boolean platformEntriesLinking) {
+  public OsmModuleBuilder withPlatformEntriesLinking(boolean platformEntriesLinking) {
     this.platformEntriesLinking = platformEntriesLinking;
     return this;
   }
 
-  public OpenStreetMapModuleBuilder withStaticParkAndRide(boolean staticParkAndRide) {
+  public OsmModuleBuilder withStaticParkAndRide(boolean staticParkAndRide) {
     this.staticParkAndRide = staticParkAndRide;
     return this;
   }
 
-  public OpenStreetMapModuleBuilder withStaticBikeParkAndRide(boolean staticBikeParkAndRide) {
+  public OsmModuleBuilder withStaticBikeParkAndRide(boolean staticBikeParkAndRide) {
     this.staticBikeParkAndRide = staticBikeParkAndRide;
     return this;
   }
 
-  public OpenStreetMapModuleBuilder withBanDiscouragedWalking(boolean banDiscouragedWalking) {
+  public OsmModuleBuilder withBanDiscouragedWalking(boolean banDiscouragedWalking) {
     this.banDiscouragedWalking = banDiscouragedWalking;
     return this;
   }
 
-  public OpenStreetMapModuleBuilder withBanDiscouragedBiking(boolean banDiscouragedBiking) {
+  public OsmModuleBuilder withBanDiscouragedBiking(boolean banDiscouragedBiking) {
     this.banDiscouragedBiking = banDiscouragedBiking;
     return this;
   }
 
-  public OpenStreetMapModuleBuilder withMaxAreaNodes(int maxAreaNodes) {
+  public OsmModuleBuilder withMaxAreaNodes(int maxAreaNodes) {
     this.maxAreaNodes = maxAreaNodes;
     return this;
   }
 
-  public OpenStreetMapModule build() {
-    return new OpenStreetMapModule(
+  public OsmModule build() {
+    return new OsmModule(
       providers,
       graph,
       issueStore,
-      new OpenStreetMapOptions(
+      new OsmOptions(
         boardingAreaRefTags,
         customNamer,
         maxAreaNodes,

@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -39,13 +39,13 @@ public class WalkableAreaBuilderTest {
     final int maxAreaNodes = 5;
 
     final Set<String> boardingAreaRefTags = Set.of();
-    final OSMDatabase osmdb = new OSMDatabase(DataImportIssueStore.NOOP, boardingAreaRefTags);
+    final OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP, boardingAreaRefTags);
 
-    final OpenStreetMapModule.Handler handler = new OpenStreetMapModule.Handler(
+    final OsmModule.Handler handler = new OsmModule.Handler(
       graph,
       osmdb,
       DataImportIssueStore.NOOP,
-      new OpenStreetMapOptions(
+      new OsmOptions(
         boardingAreaRefTags,
         null,
         maxAreaNodes,
@@ -60,7 +60,7 @@ public class WalkableAreaBuilderTest {
     );
 
     final File file = new File(testInfo.getTestClass().get().getResource(osmFile).getFile());
-    new OpenStreetMapProvider(file, true).readOSM(osmdb);
+    new OsmProvider(file, true).readOSM(osmdb);
     osmdb.postLoad();
 
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(

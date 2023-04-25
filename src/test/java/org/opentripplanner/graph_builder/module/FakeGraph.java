@@ -5,15 +5,13 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModuleBuilder;
+import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.osm.OsmModuleBuilder;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
@@ -42,9 +40,9 @@ public class FakeGraph {
     var transitModel = new TransitModel(stopModel, deduplicator);
 
     File file = getFileForResource("columbus.osm.pbf");
-    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
+    OsmProvider provider = new OsmProvider(file, false);
 
-    OpenStreetMapModule osmModule = OpenStreetMapModuleBuilder.of(provider, gg).build();
+    OsmModule osmModule = OsmModuleBuilder.of(provider, gg).build();
 
     osmModule.buildGraph();
     return new TestOtpModel(gg, transitModel);

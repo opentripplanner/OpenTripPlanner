@@ -11,8 +11,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModuleBuilder;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.graph_builder.module.osm.OsmModuleBuilder;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
@@ -72,7 +72,7 @@ class OsmBoardingLocationsModuleTest {
     var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(new StopModel(), deduplicator);
 
-    var provider = new OpenStreetMapProvider(file, false);
+    var provider = new OsmProvider(file, false);
     var floatingBusVertex = new TransitStopVertexBuilder()
       .withGraph(graph)
       .withStop(floatingBusStop)
@@ -86,7 +86,7 @@ class OsmBoardingLocationsModuleTest {
       new NonLocalizedString("bus stop not connected to street network"),
       Set.of(floatingBusVertex.getStop().getId().getId())
     );
-    var osmModule = OpenStreetMapModuleBuilder
+    var osmModule = OsmModuleBuilder
       .of(provider, graph)
       .withBoardingAreaRefTags(Set.of("ref", "ref:IFOPT"))
       .withAreaVisibility(areaVisibility)

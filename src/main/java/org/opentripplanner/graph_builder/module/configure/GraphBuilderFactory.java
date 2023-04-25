@@ -22,7 +22,7 @@ import org.opentripplanner.graph_builder.module.geometry.CalculateWorldEnvelopeM
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -35,7 +35,7 @@ import org.opentripplanner.transit.service.TransitModel;
 public interface GraphBuilderFactory {
   //DataImportIssueStore issueStore();
   GraphBuilder graphBuilder();
-  OpenStreetMapModule openStreetMapModule();
+  OsmModule openStreetMapModule();
   GtfsModule gtfsModule();
   NetexModule netexModule();
   TimeZoneAdjusterModule timeZoneAdjusterModule();
