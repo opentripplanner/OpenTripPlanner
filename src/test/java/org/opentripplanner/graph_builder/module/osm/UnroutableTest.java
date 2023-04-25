@@ -40,7 +40,7 @@ public class UnroutableTest {
     URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
     File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), StandardCharsets.UTF_8));
     OsmProvider provider = new OsmProvider(osmDataFile, true);
-    OsmModule osmBuilder = OsmModuleBuilder.of(provider, graph).withAreaVisibility(true).build();
+    OsmModule osmBuilder = OsmModule.of(provider, graph).withAreaVisibility(true).build();
     osmBuilder.buildGraph();
   }
 

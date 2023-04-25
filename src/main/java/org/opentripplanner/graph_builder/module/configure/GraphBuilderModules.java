@@ -27,7 +27,6 @@ import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryIm
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.graph_builder.module.osm.OsmModuleBuilder;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
@@ -67,7 +66,7 @@ public class GraphBuilderModules {
       );
     }
 
-    return OsmModuleBuilder
+    return OsmModule
       .of(providers, graph)
       .withCustomNamer(config.customNamer)
       .withAreaVisibility(config.areaVisibility)

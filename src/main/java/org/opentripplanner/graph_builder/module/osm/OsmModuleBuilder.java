@@ -1,13 +1,15 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 
+/**
+ * Builder for the {@link OsmModule}
+ */
 public class OsmModuleBuilder {
 
   private final Collection<OsmProvider> providers;
@@ -23,17 +25,9 @@ public class OsmModuleBuilder {
   private boolean banDiscouragedBiking = false;
   private int maxAreaNodes;
 
-  private OsmModuleBuilder(Collection<OsmProvider> providers, Graph graph) {
+  OsmModuleBuilder(Collection<OsmProvider> providers, Graph graph) {
     this.providers = providers;
     this.graph = graph;
-  }
-
-  public static OsmModuleBuilder of(Collection<OsmProvider> providers, Graph graph) {
-    return new OsmModuleBuilder(providers, graph);
-  }
-
-  public static OsmModuleBuilder of(OsmProvider provider, Graph graph) {
-    return new OsmModuleBuilder(List.of(provider), graph);
   }
 
   public OsmModuleBuilder withBoardingAreaRefTags(Set<String> boardingAreaRefTags) {

@@ -35,10 +35,7 @@ public class PlatformLinkerTest {
 
     OsmProvider provider = new OsmProvider(file, false);
 
-    OsmModule osmModule = OsmModuleBuilder
-      .of(provider, gg)
-      .withPlatformEntriesLinking(true)
-      .build();
+    OsmModule osmModule = OsmModule.of(provider, gg).withPlatformEntriesLinking(true).build();
 
     osmModule.buildGraph();
 

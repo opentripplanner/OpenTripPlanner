@@ -80,6 +80,14 @@ public class OsmModule implements GraphBuilderModule {
     this.options = options;
   }
 
+  public static OsmModuleBuilder of(Collection<OsmProvider> providers, Graph graph) {
+    return new OsmModuleBuilder(providers, graph);
+  }
+
+  public static OsmModuleBuilder of(OsmProvider provider, Graph graph) {
+    return of(List.of(provider), graph);
+  }
+
   @Override
   public void buildGraph() {
     OsmDatabase osmdb = new OsmDatabase(issueStore, options.boardingAreaRefTags());

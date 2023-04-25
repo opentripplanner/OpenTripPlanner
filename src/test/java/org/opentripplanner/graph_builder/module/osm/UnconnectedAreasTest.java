@@ -156,7 +156,7 @@ public class UnconnectedAreasTest {
     File file = new File(fileUrl.getFile());
 
     OsmProvider provider = new OsmProvider(file, false);
-    OsmModule loader = OsmModuleBuilder
+    OsmModule loader = OsmModule
       .of(provider, graph)
       .setIssueStore(issueStore)
       .withAreaVisibility(true)

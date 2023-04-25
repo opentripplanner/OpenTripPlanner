@@ -55,7 +55,7 @@ public class TriangleInequalityTest {
       )
     );
     OsmProvider provider = new OsmProvider(file, true);
-    OsmModule osmModule = OsmModuleBuilder.of(provider, graph).withAreaVisibility(true).build();
+    OsmModule osmModule = OsmModule.of(provider, graph).withAreaVisibility(true).build();
     osmModule.buildGraph();
   }
 

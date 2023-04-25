@@ -56,7 +56,7 @@ public class OsmModuleTest {
 
     OsmProvider provider = new OsmProvider(file, true);
 
-    OsmModule osmModule = OsmModuleBuilder.of(provider, gg).withAreaVisibility(true).build();
+    OsmModule osmModule = OsmModule.of(provider, gg).withAreaVisibility(true).build();
 
     osmModule.buildGraph();
 
@@ -117,7 +117,7 @@ public class OsmModuleTest {
       )
     );
     OsmProvider provider = new OsmProvider(file, true);
-    OsmModule osmModule = OsmModuleBuilder.of(provider, gg).withAreaVisibility(true).build();
+    OsmModule osmModule = OsmModule.of(provider, gg).withAreaVisibility(true).build();
 
     osmModule.buildGraph();
 
@@ -312,7 +312,7 @@ public class OsmModuleTest {
       .map(f -> new File(getClass().getResource(f).getFile()))
       .map(f -> new OsmProvider(f, false))
       .toList();
-    var module = OsmModuleBuilder
+    var module = OsmModule
       .of(providers, graph)
       .withStaticParkAndRide(true)
       .withStaticBikeParkAndRide(true)
@@ -342,10 +342,7 @@ public class OsmModuleTest {
     );
     OsmProvider provider = new OsmProvider(file, false);
 
-    OsmModule loader = OsmModuleBuilder
-      .of(provider, graph)
-      .withAreaVisibility(!skipVisibility)
-      .build();
+    OsmModule loader = OsmModule.of(provider, graph).withAreaVisibility(!skipVisibility).build();
 
     loader.buildGraph();
 
