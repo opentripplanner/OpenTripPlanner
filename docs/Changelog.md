@@ -7,6 +7,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 - Generate static documentation for GTFS GraphQL API [#5069](https://github.com/opentripplanner/OpenTripPlanner/pull/5069)
 - Create a valid area even when it has too many vertices [#5019](https://github.com/opentripplanner/OpenTripPlanner/pull/5019)
+- Constant speed street routing [#5057](https://github.com/opentripplanner/OpenTripPlanner/pull/5057)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

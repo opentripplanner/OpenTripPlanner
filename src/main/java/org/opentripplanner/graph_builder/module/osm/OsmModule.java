@@ -921,8 +921,7 @@ public class OsmModule implements GraphBuilderModule {
       String label = "way " + way.getId() + " from " + index;
       label = label.intern();
       I18NString name = getNameForWay(way, label);
-
-      float carSpeed = way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, back);
+      float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
       StreetEdge street = new StreetEdge(
         startEndpoint,
