@@ -33,12 +33,10 @@ public class Validator {
     validate(index.quayIdByStopPointRef, new PassengerStopAssignmentQuayNotFound());
     validate(index.serviceJourneyById, new JourneyPatternNotFoundInSJ());
     validate(index.serviceJourneyById, new JourneyPatternSJMismatch());
-    validate(index.serviceJourneyById, ServiceJourneyMissingPassingTime::new);
-    validate(index.serviceJourneyById, ServiceJourneyInconsistentPassingTime::new);
     validate(index.serviceJourneyById, ServiceJourneyNonIncreasingPassingTime::new);
     validate(index.datedServiceJourneys, new DSJOperatingDayNotFound());
     validate(index.datedServiceJourneys, new DSJServiceJourneyNotFound());
-    validate(index.serviceJourneyInterchangeById, new InterchangeServiceJourneyNotFound());
+    validate(index.serviceJourneyInterchangeById, InterchangeServiceJourneyNotFound::new);
   }
 
   /**

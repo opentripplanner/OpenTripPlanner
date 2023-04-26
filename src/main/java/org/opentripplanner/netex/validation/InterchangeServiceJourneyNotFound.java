@@ -5,7 +5,8 @@ import org.opentripplanner.netex.issues.ObjectNotFound;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceJourneyInterchange;
 
-class InterchangeServiceJourneyNotFound extends AbstractHMapValidationRule<String, ServiceJourneyInterchange> {
+class InterchangeServiceJourneyNotFound
+  extends AbstractHMapValidationRule<String, ServiceJourneyInterchange> {
 
   private String missingFromServiceJourneyId;
   private String missingToServiceJourneyId;
@@ -28,10 +29,17 @@ class InterchangeServiceJourneyNotFound extends AbstractHMapValidationRule<Strin
 
   @Override
   public DataImportIssue logMessage(String dsjId, ServiceJourneyInterchange interchange) {
-    String targetFieldName = missingFromServiceJourneyId != null ? "FromJourneyRef" : "ToJourneyRef";
-    String missingServiceJourneyId = missingFromServiceJourneyId != null ? missingFromServiceJourneyId : missingToServiceJourneyId;
-    return new ObjectNotFound("ServiceJourneyInterchange", interchange.getId(), targetFieldName, missingServiceJourneyId);
+    String targetFieldName = missingFromServiceJourneyId != null
+      ? "FromJourneyRef"
+      : "ToJourneyRef";
+    String missingServiceJourneyId = missingFromServiceJourneyId != null
+      ? missingFromServiceJourneyId
+      : missingToServiceJourneyId;
+    return new ObjectNotFound(
+      "ServiceJourneyInterchange",
+      interchange.getId(),
+      targetFieldName,
+      missingServiceJourneyId
+    );
   }
-
-
 }

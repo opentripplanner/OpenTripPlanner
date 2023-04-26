@@ -6,10 +6,12 @@ import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.rutebanken.netex.model.EntityStructure;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
@@ -33,38 +35,100 @@ public class ServiceJourneyHelper {
     return timetabledPassingTime.getPointInJourneyPatternRef().getValue().getRef();
   }
 
+  public static Map<String, String> getScheduledStopPointIdByStopPointId(
+    JourneyPattern_VersionStructure journeyPattern
+  ) {
+    return journeyPattern
+      .getPointsInSequence()
+      .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          EntityStructure::getId,
+          p -> ((StopPointInJourneyPattern) p).getScheduledStopPointRef().getValue().getRef()
+        )
+      );
+  }
+
   /**
    * Return the elapsed time since midnight for a given local time, taking into account the day
    * offset.
    */
-  public static Duration getElapsedTimeSinceMidnight(LocalTime time, BigInteger dayOffset) {
-    return getElapsedTimeSinceMidnight(time, getDayOffset(dayOffset));
+  public static int elapsedTimeSinceMidnight(LocalTime time, BigInteger dayOffset) {
+    return elapsedTimeSinceMidnight(time, getDayOffset(dayOffset));
   }
 
-  private static Duration getElapsedTimeSinceMidnight(LocalTime time, int dayOffset) {
-    return Duration.between(LocalTime.MIDNIGHT, time).plus(Duration.ofDays(dayOffset));
+  private static int elapsedTimeSinceMidnight(LocalTime time, int dayOffset) {
+    return (int) Duration
+      .between(LocalTime.MIDNIGHT, time)
+      .plus(Duration.ofDays(dayOffset))
+      .toSeconds();
+  }
+
+  public static int normalizedDepartureTime(TimetabledPassingTime timetabledPassingTime) {
+    Objects.requireNonNull(timetabledPassingTime.getDepartureTime());
+    return elapsedTimeSinceMidnight(
+      timetabledPassingTime.getDepartureTime(),
+      timetabledPassingTime.getDepartureDayOffset()
+    );
+  }
+
+  public static int normalizedArrivalTime(TimetabledPassingTime timetabledPassingTime) {
+    Objects.requireNonNull(timetabledPassingTime.getArrivalTime());
+    return elapsedTimeSinceMidnight(
+      timetabledPassingTime.getArrivalTime(),
+      timetabledPassingTime.getArrivalDayOffset()
+    );
+  }
+
+  public static int normalizedEarliestDepartureTime(TimetabledPassingTime timetabledPassingTime) {
+    Objects.requireNonNull(timetabledPassingTime.getEarliestDepartureTime());
+    return elapsedTimeSinceMidnight(
+      timetabledPassingTime.getEarliestDepartureTime(),
+      timetabledPassingTime.getEarliestDepartureDayOffset()
+    );
+  }
+
+  public static int normalizedLatestArrivalTime(TimetabledPassingTime timetabledPassingTime) {
+    Objects.requireNonNull(timetabledPassingTime.getLatestArrivalTime());
+    return elapsedTimeSinceMidnight(
+      timetabledPassingTime.getLatestArrivalTime(),
+      timetabledPassingTime.getLatestArrivalDayOffset()
+    );
   }
 
   /**
    * Return the elapsed time since midnight for a given departure time, taking into account the day
-   * offset. Fallback to arrival time if departure time is missing. Return null if neither the
-   * departure time nor the arrival time are set (which is the case for flex stops).
+   * offset. Fallback to arrival time if departure time is missing.
    */
-  public static Duration getElapsedDepartureOrArrivalTimeSinceMidnight(
-    TimetabledPassingTime timetabledPassingTime
-  ) {
+  public static int normalizedDepartureOrArrivalTime(TimetabledPassingTime timetabledPassingTime) {
     if (timetabledPassingTime.getDepartureTime() != null) {
-      return getElapsedTimeSinceMidnight(
+      return elapsedTimeSinceMidnight(
         timetabledPassingTime.getDepartureTime(),
         timetabledPassingTime.getDepartureDayOffset()
       );
-    } else if (timetabledPassingTime.getArrivalTime() != null) {
-      return getElapsedTimeSinceMidnight(
+    } else {
+      return elapsedTimeSinceMidnight(
         timetabledPassingTime.getArrivalTime(),
         timetabledPassingTime.getArrivalDayOffset()
       );
     }
-    return null;
+  }
+
+  /**
+   * Return the elapsed time since midnight for a given arrival time, taking into account the day
+   * offset. Fallback to departure time if arrival time is missing.
+   */
+  public static int normalizedArrivalOrDepartureTime(TimetabledPassingTime timetabledPassingTime) {
+    if (timetabledPassingTime.getArrivalTime() != null) {
+      return elapsedTimeSinceMidnight(
+        timetabledPassingTime.getArrivalTime(),
+        timetabledPassingTime.getArrivalDayOffset()
+      );
+    } else return elapsedTimeSinceMidnight(
+      timetabledPassingTime.getDepartureTime(),
+      timetabledPassingTime.getDepartureDayOffset()
+    );
   }
 
   /**
