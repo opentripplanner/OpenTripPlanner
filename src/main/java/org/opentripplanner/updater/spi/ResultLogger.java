@@ -35,7 +35,7 @@ public class ResultLogger {
         .forEach(key -> {
           var value = errorIndex.get(key);
           var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
-          LOG.error(
+          LOG.warn(
             "[{} {}] {} failures of {}: {}",
             keyValue("feedId", feedId),
             keyValue("type", type),
