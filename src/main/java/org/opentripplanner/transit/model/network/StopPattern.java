@@ -133,7 +133,10 @@ public final class StopPattern implements Serializable {
     return stops.length;
   }
 
-  public boolean isAllStopsCancelled() {
+  /**
+   * Checks that all stops ar non-routable.
+   */
+  public boolean isAllStopsNonRoutable() {
     return (
       Arrays.stream(pickups).allMatch(PickDrop::isNotRoutable) &&
       Arrays.stream(dropoffs).allMatch(PickDrop::isNotRoutable)

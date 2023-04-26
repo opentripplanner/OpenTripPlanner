@@ -90,23 +90,23 @@ msgstr "Bicicleta y Transporte Público"
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:325
 msgid "Rented Bicycle"
-msgstr "Alquiler bicicleta"
+msgstr "Bicicleta de alquiler"
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:327
 msgid "Transit & Rented Bicycle"
-msgstr "Transporte Público y Alquiler de bicicleta"
+msgstr "Transporte Público y Bicicleta de alquiler"
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:329
 msgid "Rented Scooter"
-msgstr ""
+msgstr "Patinete de alquiler"
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:331
 #, fuzzy
 msgid "Transit & Rented Scooter"
-msgstr "Transporte Público y Alquiler de bicicleta"
+msgstr "Transporte Público y Patinete de alquiler"
 
 #. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:333

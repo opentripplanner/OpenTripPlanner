@@ -223,6 +223,10 @@ public class TripPatternForDate implements Comparable<TripPatternForDate> {
     TripTimes first,
     TripTimes last
   ) {
+    if (first.getTrip().getRoute().getFlexibleLineType() != null) {
+      // do not validate running period for flexible trips
+      return;
+    }
     if (startOfRunningPeriod.isAfter(endOfRunningPeriod)) {
       LOG.warn(
         "Could not construct as start of the running period {} in trip {} is after the end {} in trip {}",

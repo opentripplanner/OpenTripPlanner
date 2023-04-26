@@ -159,7 +159,7 @@ public class AtlantaFareService extends DefaultFareService {
     public float getTotal() {
       int total = 0;
       for (ItineraryFares f : fares) {
-        total += f.getFare(fareType).cents();
+        total += f.getFare(fareType).amount();
       }
       return (float) total / 100;
     }

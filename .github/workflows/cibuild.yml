@@ -86,7 +86,7 @@ jobs:
       LOCAL_BRANCH: local-pages
       REMOTE_BRANCH: main
       TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
-      MASTER_BRANCH_VERSION: 2.3.0
+      MASTER_BRANCH_VERSION: 2.4.0
 
     steps:
 
@@ -104,21 +104,26 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r docs/requirements.txt
         
-      - name: Build documentation
+
+      - name: Build main documentation
         if: github.event_name == 'pull_request'
         run: mkdocs build
-        
-      - name: Deploy docs to Github pages
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Build GTFS GraphQL API documentation
+        run: |
+          npm install -g @magidoc/cli@3.6.4
+          magidoc generate
+
+      - name: Deploy compiled HTML to Github pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
         run: |
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
           
-          # mkdocs/mike generates a new sitemap.xml.gz for every commit even if the docs have not changed
-          # this configures the date of the change to be the date when the docs haven been changed last
-          # https://github.com/jimporter/mike/issues/103#issuecomment-1453878471
-          export SOURCE_DATE_EPOCH=`git log -1 --format=%ct docs`
-
           # mike, the versioning plugin for mkdocs, expects there to be a local branch to push to so
           # we are cloning one here and commit to it
           # mike has support for specifing the origin but then it tries to rebase the _local_ gh-pages
@@ -136,6 +141,14 @@ jobs:
           else
             mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
           fi
+          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
+          
+          # commit and push the GraphQL documentation
+          git checkout $LOCAL_BRANCH
+          mkdir -p api
+          mv target/magidoc/api/ api/dev-2.x/
+          git add api
+          git commit -am "Add Magidoc GraphQL documentation"
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   graphql-code-generation:
@@ -181,25 +194,6 @@ jobs:
           CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
           CONTAINER_REGISTRY_USER: otpbot
           CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-        run: |
-          # we give the container two tags
-          #   - "latest"
-          #   - a string like "2.3_2022-12-12T21-38"
-          
-          version_with_snapshot=`mvn -q help:evaluate -Dexpression=project.version -q -DforceStdout`
-          version=${version_with_snapshot/-SNAPSHOT/}
-          image_date=`date +%Y-%m-%dT%H-%M`
-          image_version="${version}_${image_date}"
-          
-          mvn --batch-mode -P prettierSkip compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,$image_version
-
-      # March '23: we temporarily publish to both Dockerhub and Github Container Registry as the
-      # Dockerhub free team registry is going away
-      - name: Build container image with Jib, push to Github Container Registry 
-        env:
-          CONTAINER_REPO: ghcr.io/opentripplanner/opentripplanner
-          CONTAINER_REGISTRY_USER: ${{ github.repository_owner }}
-          CONTAINER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # we give the container two tags
           #   - "latest"

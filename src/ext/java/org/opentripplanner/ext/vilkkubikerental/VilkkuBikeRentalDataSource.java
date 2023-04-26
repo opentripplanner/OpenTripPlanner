@@ -8,7 +8,7 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.updater.GenericXmlDataSource;
+import org.opentripplanner.updater.spi.GenericXmlDataSource;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +29,8 @@ public class VilkkuBikeRentalDataSource
 
   private final String network;
 
+  private final boolean overloadingAllowed;
+
   /**
    * Initialize VilkkuBikeRentalDataSource.
    *
@@ -37,6 +39,7 @@ public class VilkkuBikeRentalDataSource
   public VilkkuBikeRentalDataSource(VilkkuBikeRentalDataSourceParameters config) {
     super(config.url(), stationXpath);
     network = config.network();
+    overloadingAllowed = config.overloadingAllowed();
   }
 
   @Override
@@ -65,6 +68,7 @@ public class VilkkuBikeRentalDataSource
       Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.spacesAvailable);
     station.spacesDisabled = 0;
     station.capacity = 0;
+    station.overloadingAllowed = overloadingAllowed;
 
     // all stations in feed are considered operational
     station.isInstalled = true;

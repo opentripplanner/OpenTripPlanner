@@ -20,11 +20,11 @@ abstract class AbstractTable {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractTable.class);
 
-  private final SkipFunction skipFunction;
+  private final SkipNodes skipNodes;
   private int rootLevel = 0;
 
-  public AbstractTable(SkipFunction skipFunction) {
-    this.skipFunction = skipFunction;
+  public AbstractTable(SkipNodes skipNodes) {
+    this.skipNodes = skipNodes;
   }
 
   abstract List<String> headers();
@@ -49,7 +49,7 @@ abstract class AbstractTable {
 
       addRow(node, table, it);
 
-      if (skip(it)) {
+      if (skipNodes.skipDetails(it) || skipNodes.skipDetailsForNestedElements(it)) {
         continue;
       }
       if (!it.type().isComplex()) {
@@ -93,12 +93,9 @@ abstract class AbstractTable {
     if (info.isTypeQualifier()) {
       parameter += " = " + info.toMarkdownString(node.typeQualifier());
     }
-    if (skipFunction.skip(info)) {
-      parameter =
-        skipFunction
-          .linkToDoc(info)
-          .map(link -> MarkdownFormatter.linkToDoc(info.name(), link))
-          .orElse(info.name());
+    var link = skipNodes.linkOverview(info);
+    if (link.isPresent()) {
+      parameter = MarkdownFormatter.linkToDoc(info.name(), link.get());
     } else if (info.printDetails()) {
       parameter = MarkdownFormatter.linkToAnchor(parameter, anchor(node, parameter));
     }
@@ -117,9 +114,5 @@ abstract class AbstractTable {
     }
     var defaultValue = info.type().quote(info.defaultValue());
     return escapeInTable(code(defaultValue));
-  }
-
-  private boolean skip(NodeInfo info) {
-    return skipFunction.skip(info);
   }
 }

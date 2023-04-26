@@ -1,16 +1,17 @@
 package org.opentripplanner.updater.vehicle_rental.datasources.params;
 
-import java.util.Map;
 import javax.annotation.Nonnull;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 
 public record GbfsVehicleRentalDataSourceParameters(
   String url,
   String language,
   boolean allowKeepingRentedVehicleAtDestination,
-  Map<String, String> httpHeaders,
+  HttpHeaders httpHeaders,
   String network,
-  boolean geofencingZones
+  boolean geofencingZones,
+  boolean overloadingAllowed
 )
   implements VehicleRentalDataSourceParameters {
   @Nonnull

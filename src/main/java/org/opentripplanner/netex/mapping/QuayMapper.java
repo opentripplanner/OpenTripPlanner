@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.netex.issues.QuayWithoutCoordinates;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -71,7 +70,11 @@ class QuayMapper {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(parameters.quay.getCentroid());
 
     if (coordinate == null) {
-      issueStore.add(new QuayWithoutCoordinates(parameters.quay.getId()));
+      issueStore.add(
+        "QuayWithoutCoordinates",
+        "Quay %s does not contain any coordinates.",
+        parameters.quay.getId()
+      );
       return null;
     }
 

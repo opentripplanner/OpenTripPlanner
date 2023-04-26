@@ -33,9 +33,9 @@ import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.UpdateResult;
-import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -382,7 +382,6 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
         var f = saveResultOnGraph.execute((graph, transitModel) -> {
           var results = snapshotSource.applyEstimatedTimetable(
-            transitModel,
             fuzzyTripMatcher,
             entityResolver,
             feedId,

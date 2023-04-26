@@ -6,8 +6,6 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndW
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -80,9 +78,10 @@ public class F03_AccessEgressWithRidesBoardAndAlightSlackTest implements RaptorT
     return RaptorModuleTestCase
       .of()
       // TODO - Alight slack is missing
-      .add(TC_MIN_DURATION, "[0:00 0:08:30 8m30s 2tx]")
+      //.add(TC_MIN_DURATION, "[0:00 0:08:30 8m30s 2tx]")
       // TODO - Board slack is missing
-      .add(TC_MIN_DURATION_REV, "[0:01:50 0:10 8m10s 2tx]")
+      //.add(TC_MIN_DURATION_REV, "[0:01:50 0:10 8m10s 2tx]")
+      .addMinDuration("8m40s", TX_2, T00_00, T00_10)
       .add(standard(), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)
       .build();

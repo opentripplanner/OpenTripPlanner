@@ -10,15 +10,22 @@ docs_dir: docs
 site_dir: target/mkdocs
 strict: true
 
+plugins:
+    - "no-sitemap"
+    - search
+
 theme:
     name: material
     features:
         - toc.integrate
         - content.code.copy
+        - search.suggest
+        - search.highlight
     palette:
         primary: blue
         accent: blue
         scheme: default
+
 
 extra:
     version:
@@ -38,13 +45,12 @@ markdown_extensions:
 nav:
 - Home: 'index.md'
 - About:
+    - Product Overview: 'Product-Overview.md'
     - Governance: 'Governance.md'
     - History: 'History.md'
     - Presentations: 'Presentations.md'
     - Deployments: 'Deployments.md'
     - Changelog: 'Changelog.md'
-    - Comparing OTP2 to OTP1: 'Version-Comparison.md'
-    - OTP2 Migration Guide: 'OTP2-MigrationGuide.md'
     - Visual Identity: 'Visual-Identity.md'
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
@@ -55,16 +61,19 @@ nav:
         - Introduction: 'Configuration.md'
         - Build: 'BuildConfiguration.md'
         - "Boarding Locations": 'BoardingLocations.md'
+        - "Street Graph Pruning": 'IslandPruning.md'
         - Router: 'RouterConfiguration.md'
         - Accessibility: 'Accessibility.md'
         - "Route Request": 'RouteRequest.md'
         - "Realtime Updaters" : 'UpdaterConfig.md'
         - "Routing Modes" : "RoutingModes.md"
-        - "Street Graph Pruning": 'IslandPruning.md'
+        - "Logging" : "Logging.md"
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
+    - Comparing OTP2 to OTP1: 'Version-Comparison.md'
+    - OTP2 Migration Guide: 'OTP2-MigrationGuide.md'  
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
     - Interfaces and Data Sources: 'Interfaces-Data-Sources.md'
@@ -96,3 +105,4 @@ nav:
     - Travel Time Isochrones: 'sandbox/TravelTime.md'
     - IBI Accessibility Score: 'sandbox/IBIAccessibilityScore.md'
     - Fares: 'sandbox/Fares.md'
+    - Ride Hailing: 'sandbox/RideHailing.md'

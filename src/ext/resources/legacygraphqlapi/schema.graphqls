@@ -1340,6 +1340,57 @@ type Itinerary {
     systemNotices: [SystemNotice]!
 }
 
+"A currency"
+type Currency {
+    "ISO-4217 currency code, for example `USD` or `EUR`."
+    code: String!
+    """Fractional digits of this currency. A value of 2 would express that in this currency
+    100 minor units make up one major unit.
+
+    Expressed more concretely: 100 Euro-cents make up one Euro.
+
+    Note: Some currencies don't even have any fractional digits, for example the Japanese Yen.
+
+    See also https://en.wikipedia.org/wiki/ISO_4217#Minor_unit_fractions
+    """
+    digits: Int!
+}
+
+"An amount of money."
+type Money {
+    "The currency of this money amount."
+    currency: Currency!
+    """
+    Money amount in cents. **Note:** this value is dependent on the currency used,
+    as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
+    """
+    amount: Int!
+}
+
+""""
+An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
+"""
+scalar Duration
+
+type RideHailingProvider {
+    "The ID of the ride hailing provider."
+    id: String!
+}
+
+"An estimate for a ride on a hailed vehicle, like an Uber car."
+type RideHailingEstimate {
+    "The provider of the ride hailing service."
+    provider: RideHailingProvider!
+    "The lower bound of the price estimate of this ride."
+    minPrice: Money!
+    "The upper bound of the price estimate of this ride."
+    maxPrice: Money!
+    "The estimated time it takes for the vehicle to arrive."
+    arrival: Duration!
+    "The name of the ride, ie. UberX"
+    productName: String
+}
+
 type Leg {
     """
     The date and time when this leg begins. Format: Unix timestamp in milliseconds.
@@ -1487,6 +1538,9 @@ type Leg {
         destinationModesWithParentStation: [TransitMode!]
 
         ): [Leg!]
+
+    "Estimate of a hailed ride like Uber."
+    rideHailingEstimate: RideHailingEstimate
 }
 
 """A span of time."""
@@ -1516,7 +1570,6 @@ enum LocationType {
     STATION
     ENTRANCE
 }
-
 """Long type"""
 scalar Long
 
@@ -2068,7 +2121,10 @@ enum Qualifier {
     EGRESS,
 
     """The mode is used for the direct street search."""
-    DIRECT
+    DIRECT,
+
+    """Hailing a ride, for example via an app like Uber."""
+    HAIL
 }
 
 type QueryType {

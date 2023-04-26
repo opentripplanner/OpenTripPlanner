@@ -177,11 +177,13 @@ public class NetexBundle implements Closeable {
   private void loadSingeFileEntry(String fileDescription, DataSource entry) {
     try {
       LOG.info("reading entity {}: {}", fileDescription, entry.name());
-
+      issueStore.startProcessingSource(entry.name());
       PublicationDeliveryStructure doc = xmlParser.parseXmlDoc(entry.asInputStream());
       NetexDocumentParser.parseAndPopulateIndex(index, doc, ignoreFareFrame);
     } catch (JAXBException e) {
       throw new RuntimeException(e.getMessage(), e);
+    } finally {
+      issueStore.stopProcessingSource();
     }
   }
 }

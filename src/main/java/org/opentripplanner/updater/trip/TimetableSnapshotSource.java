@@ -21,6 +21,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import de.mfdz.MfdzRealtimeExtensions;
 import java.text.ParseException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -61,9 +62,9 @@ import org.opentripplanner.transit.service.TransitEditorService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
-import org.opentripplanner.updater.ResultLogger;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
-import org.opentripplanner.updater.UpdateResult;
+import org.opentripplanner.updater.spi.ResultLogger;
+import org.opentripplanner.updater.spi.UpdateResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +110,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern → Timetable map and indexing the new Timetables.
    */
-  private final int maxSnapshotFrequencyMs;
+  private final Duration maxSnapshotFrequency;
 
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
@@ -143,8 +144,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   /**
-   * Constructor is package local to allow unit-tests to provide their own clock, not using
-   * system time.
+   * Constructor is package local to allow unit-tests to provide their own clock, not using system
+   * time.
    */
   TimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
@@ -156,7 +157,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
     this.deduplicator = transitModel.getDeduplicator();
     this.serviceCodes = transitModel.getServiceCodes();
-    this.maxSnapshotFrequencyMs = parameters.maxSnapshotFrequencyMs();
+    this.maxSnapshotFrequency = parameters.maxSnapshotFrequency();
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.localDateNow = localDateNow;
 
@@ -198,10 +199,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * feed when matching IDs.
    *
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
-   *                                     if these stops are given the NO_DATA flag.
-   * @param fullDataset true if the list with updates represent all updates that are active right
-   *                    now, i.e. all previous updates should be disregarded
-   * @param updates     GTFS-RT TripUpdate's that should be applied atomically
+   *                                      if these stops are given the NO_DATA flag.
+   * @param fullDataset                   true if the list with updates represent all updates that
+   *                                      are active right now, i.e. all previous updates should be
+   *                                      disregarded
+   * @param updates                       GTFS-RT TripUpdate's that should be applied atomically
    */
   public UpdateResult applyTripUpdates(
     GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
@@ -332,18 +334,17 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     var updateResult = UpdateResult.ofResults(results);
 
     if (fullDataset) {
-      logUpdateResult(feedId, updates.size(), failuresByRelationship, updateResult);
+      logUpdateResult(feedId, failuresByRelationship, updateResult);
     }
     return updateResult;
   }
 
   private static void logUpdateResult(
     String feedId,
-    int updates,
     Map<TripDescriptor.ScheduleRelationship, Integer> failuresByRelationship,
     UpdateResult updateResult
   ) {
-    ResultLogger.logUpdateResult(feedId, "trip-updates", updates, updateResult);
+    ResultLogger.logUpdateResult(feedId, "gtfs-rt-trip-updates", updateResult);
 
     if (!failuresByRelationship.isEmpty()) {
       LOG.info("[feedId: {}] Failures by scheduleRelationship {}", feedId, failuresByRelationship);
@@ -360,7 +361,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
     final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequencyMs) {
+    if (force || now - lastSnapshotTime > maxSnapshotFrequency.toMillis()) {
       if (force || buffer.isDirty()) {
         LOG.debug("Committing {}", buffer);
         snapshot = buffer.commit(transitLayerUpdater, force);
@@ -653,9 +654,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    * Handle GTFS-RT TripUpdate message containing an ADDED trip.
    *
    * @param stopTimeUpdates GTFS-RT stop time updates
-   * @param tripDescriptor GTFS-RT TripDescriptor
-   * @param stops          the stops of each StopTimeUpdate in the TripUpdate message
-   * @param serviceDate    service date for added trip
+   * @param tripDescriptor  GTFS-RT TripDescriptor
+   * @param stops           the stops of each StopTimeUpdate in the TripUpdate message
+   * @param serviceDate     service date for added trip
    * @return empty Result if successful or one containing an error
    */
   private Result<UpdateSuccess, UpdateError> handleAddedTrip(
@@ -790,11 +791,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Add a (new) trip to the graph and the buffer
    *
-   * @param trip          trip
+   * @param trip              trip
    * @param vehicleDescriptor accessibility information of the vehicle
-   * @param stops         list of stops corresponding to stop time updates
-   * @param serviceDate   service date of trip
-   * @param realTimeState real-time state of new trip
+   * @param stops             list of stops corresponding to stop time updates
+   * @param serviceDate       service date of trip
+   * @param realTimeState     real-time state of new trip
    * @return empty Result if successful or one containing an error
    */
   private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(

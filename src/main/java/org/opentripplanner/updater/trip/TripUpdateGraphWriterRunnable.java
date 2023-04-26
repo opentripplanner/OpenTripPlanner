@@ -8,7 +8,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.updater.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateResult;
 
 class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 

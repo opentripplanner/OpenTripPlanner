@@ -13,6 +13,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.DebugRequest;
+import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
@@ -31,7 +32,7 @@ import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.ReverseRaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
 import org.opentripplanner.raptor.rangeraptor.transit.SlackProviderAdapter;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 
@@ -62,7 +63,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
   /** Lazy initialized */
-  private CostCalculator<T> costCalculator = null;
+  private RaptorCostCalculator<T> costCalculator = null;
 
   public SearchContext(
     RaptorRequest<T> request,
@@ -110,6 +111,10 @@ public class SearchContext<T extends RaptorTripSchedule> {
     return request.searchDirection();
   }
 
+  public MultiCriteriaRequest<T> multiCriteria() {
+    return request.multiCriteria();
+  }
+
   public RaptorTransitDataProvider<T> transit() {
     return transit;
   }
@@ -142,7 +147,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   @Nullable
-  public CostCalculator<T> costCalculator() {
+  public RaptorCostCalculator<T> costCalculator() {
     if (costCalculator == null) {
       this.costCalculator = transit.multiCriteriaCostCalculator();
     }

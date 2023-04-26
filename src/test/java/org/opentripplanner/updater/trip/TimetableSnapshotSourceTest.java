@@ -23,6 +23,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -112,7 +113,7 @@ public class TimetableSnapshotSourceTest {
   public void testGetSnapshotWithMaxSnapshotFrequencyCleared()
     throws InvalidProtocolBufferException {
     var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT.withMaxSnapshotFrequencyMs(-1),
+      TimetableSnapshotSourceParameters.DEFAULT.withMaxSnapshotFrequency(Duration.ofMillis(-1)),
       transitModel
     );
 
@@ -1130,7 +1131,7 @@ public class TimetableSnapshotSourceTest {
     var updater = new TimetableSnapshotSource(
       TimetableSnapshotSourceParameters.DEFAULT
         .withPurgeExpiredData(purgeExpiredData)
-        .withMaxSnapshotFrequencyMs(maxSnapshotFrequency),
+        .withMaxSnapshotFrequency(Duration.ofMillis(maxSnapshotFrequency)),
       transitModel,
       clock::get
     );

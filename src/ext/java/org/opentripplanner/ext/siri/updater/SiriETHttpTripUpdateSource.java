@@ -3,10 +3,9 @@ package org.opentripplanner.ext.siri.updater;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
-import java.util.Map;
 import java.util.UUID;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
-import org.opentripplanner.framework.collection.MapUtils;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -14,7 +13,7 @@ import uk.org.siri.siri20.Siri;
 public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriETHttpTripUpdateSource.class);
-  private final Map<String, String> requestHeaders;
+
   /**
    * Feed id that is used to match trip ids in the TripUpdates
    */
@@ -26,6 +25,8 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private final int timeout;
   private final int previewIntervalMillis;
+  private final HttpHeaders requestHeaders;
+
   /**
    * True iff the last list with updates represent all updates that are active right now, i.e. all
    * previous updates should be disregarded
@@ -36,11 +37,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   public SiriETHttpTripUpdateSource(Parameters parameters) {
     this.feedId = parameters.getFeedId();
     this.url = parameters.getUrl();
-    this.requestHeaders =
-      MapUtils.combine(
-        parameters.headers(),
-        Map.of("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-ET"))
-      );
+    this.requestHeaders = parameters.httpRequestHeaders();
 
     this.requestorRef =
       parameters.getRequestorRef() == null || parameters.getRequestorRef().isEmpty()
@@ -66,7 +63,12 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
       creating = System.currentTimeMillis() - t1;
       t1 = System.currentTimeMillis();
 
-      InputStream is = SiriHttpUtils.postData(url, etServiceRequest, timeout, requestHeaders);
+      InputStream is = SiriHttpUtils.postData(
+        url,
+        etServiceRequest,
+        timeout,
+        requestHeaders.asMap()
+      );
       if (is != null) {
         // Decode message
         fetching = System.currentTimeMillis() - t1;
@@ -130,6 +132,6 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
     int getPreviewIntervalMinutes();
 
-    Map<String, String> headers();
+    HttpHeaders httpRequestHeaders();
   }
 }

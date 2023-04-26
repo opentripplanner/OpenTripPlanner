@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.updater.spi.HttpHeaders;
 
 class SmooveBikeRentalDataSourceTest {
 
@@ -18,7 +18,7 @@ class SmooveBikeRentalDataSourceTest {
         "file:src/ext-test/resources/smoovebikerental/smoove.json",
         null,
         true,
-        Map.of()
+        HttpHeaders.empty()
       )
     );
     assertTrue(source.update());
@@ -38,7 +38,7 @@ class SmooveBikeRentalDataSourceTest {
     assertEquals(60.167913, hamn.getLatitude());
     assertEquals(11, hamn.getSpacesAvailable());
     assertEquals(1, hamn.getVehiclesAvailable());
-    assertTrue(hamn.isAllowOverloading());
+    assertTrue(hamn.overloadingAllowed());
     assertTrue(hamn.isAllowDropoff());
     assertTrue(hamn.isAllowPickup());
     assertTrue(hamn.allowDropoffNow());
@@ -84,7 +84,7 @@ class SmooveBikeRentalDataSourceTest {
         "file:src/ext-test/resources/smoovebikerental/smoove.json",
         null,
         false,
-        Map.of()
+        HttpHeaders.empty()
       )
     );
     assertTrue(source.update());
@@ -92,7 +92,7 @@ class SmooveBikeRentalDataSourceTest {
 
     VehicleRentalPlace hamn = rentalStations.get(0);
     assertEquals(11, hamn.getSpacesAvailable());
-    assertFalse(hamn.isAllowOverloading());
+    assertFalse(hamn.overloadingAllowed());
     // spaces available and overloading is not allowed
     assertTrue(hamn.allowDropoffNow());
 

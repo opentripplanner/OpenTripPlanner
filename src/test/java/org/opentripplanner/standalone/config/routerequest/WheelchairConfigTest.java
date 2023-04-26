@@ -72,12 +72,11 @@ class WheelchairConfigTest {
     AccessibilityPreferences expected
   ) {
     var nodeAdapter = newNodeAdapterForTest(json);
-    var subject = WheelchairConfig.mapAccessibilityPreferences(
-      nodeAdapter,
-      defaultValue,
-      defaultCost
-    );
-    assertEquals(expected, subject);
+    var builder = defaultValue.copyOfWithDefaultCosts(defaultCost);
+
+    WheelchairConfig.mapAccessibilityPreferences(nodeAdapter, builder);
+
+    assertEquals(expected, builder.build());
   }
 
   @Test
@@ -88,8 +87,10 @@ class WheelchairConfigTest {
 
     assertThrows(
       IllegalStateException.class,
-      () ->
-        WheelchairConfig.mapAccessibilityPreferences(nodeAdapter, ofOnlyAccessible(), DEFAULT_COSTS)
+      () -> {
+        var builder = ofOnlyAccessible().copyOfWithDefaultCosts(DEFAULT_COSTS);
+        WheelchairConfig.mapAccessibilityPreferences(nodeAdapter, builder);
+      }
     );
   }
 }

@@ -96,7 +96,7 @@ public class ModifiedTripBuilder {
 
     StopPattern stopPattern = createStopPattern(pattern, calls, entityResolver);
 
-    if (cancellation || stopPattern.isAllStopsCancelled()) {
+    if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       LOG.debug("Trip is cancelled");
       newTimes.cancelTrip();
       return Result.success(new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate));

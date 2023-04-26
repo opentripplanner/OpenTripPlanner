@@ -118,8 +118,8 @@ When creating and building on a pull request, please do the following:
   reverted configuration changes.
 
 In turn, in order to prevent OTP2 from turning into a "
-big-ball-of-mud" (https://en.wikipedia.org/wiki/Big_ball_of_mud) and ensure development does grind
-to a halt, the maintainers of the project will:
+big-ball-of-mud" (https://en.wikipedia.org/wiki/Big_ball_of_mud) and ensure development does not
+grind to a halt, the maintainers of the project will:
 
 - Keep an eye out for features which are not core, and suggest that they be Sandbox features.
 - Ask for example use cases for new functionality to make sure OTP is the right place to implement

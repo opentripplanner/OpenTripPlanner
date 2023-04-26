@@ -1,19 +1,19 @@
 package org.opentripplanner.ext.smoovebikerental;
 
-import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
 
 /**
- * @param allowOverloading Do the stations in the network allow overloading (ignoring available spaces)
+ * @param overloadingAllowed Do the stations in the network allow overloading (ignoring available spaces)
  */
 public record SmooveBikeRentalDataSourceParameters(
   String url,
   String network,
-  boolean allowOverloading,
-  @Nonnull Map<String, String> httpHeaders
+  boolean overloadingAllowed,
+  HttpHeaders httpHeaders
 )
   implements VehicleRentalDataSourceParameters {
   /**
@@ -24,10 +24,6 @@ public record SmooveBikeRentalDataSourceParameters(
   @Nullable
   public String getNetwork(String defaultValue) {
     return network == null || network.isEmpty() ? defaultValue : network;
-  }
-
-  public boolean isAllowOverloading() {
-    return allowOverloading;
   }
 
   @Nonnull

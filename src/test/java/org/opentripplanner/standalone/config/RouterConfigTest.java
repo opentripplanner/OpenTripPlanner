@@ -48,10 +48,37 @@ class RouterConfigTest {
     assertEquals(DEFAULT_TIMEOUT, RouterConfig.parseStreetRoutingTimeout(c, DEFAULT_TIMEOUT));
 
     // New format: 33 seconds
-    c = createNodeAdaptor("{streetRoutingTimeout: '33s'}");
+    c =
+      createNodeAdaptor(
+        """
+      {
+        "streetRoutingTimeout": "33s",
+        "transit": {
+          "transferCacheRequests": [
+            {
+              "mode": "WALK"
+            }
+          ]
+        }
+      }
+      """
+      );
+    var routerConfig = new RouterConfig(c, false);
+
+    final Duration expected = Duration.ofSeconds(33);
     assertEquals(
-      Duration.ofSeconds(33),
-      RouterConfig.parseStreetRoutingTimeout(c, DEFAULT_TIMEOUT)
+      expected,
+      routerConfig.routingRequestDefaults().preferences().street().routingTimeout()
+    );
+    assertEquals(
+      expected,
+      routerConfig
+        .transitTuningConfig()
+        .transferCacheRequests()
+        .get(0)
+        .preferences()
+        .street()
+        .routingTimeout()
     );
   }
 

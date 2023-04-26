@@ -4,6 +4,8 @@ import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATI
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.stream.IntStream;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -149,6 +151,18 @@ public class TestTripSchedule implements TripSchedule {
       return this;
     }
 
+    public TestTripSchedule.Builder copy() {
+      var b = new TestTripSchedule.Builder();
+      b.pattern = pattern;
+      b.arrivalTimes = arrivalTimes;
+      b.departureTimes = departureTimes;
+      b.arrivalDepartureOffset = arrivalDepartureOffset;
+      b.transitReluctanceIndex = transitReluctanceIndex;
+      b.wheelchairBoarding = wheelchairBoarding;
+      b.originalPattern = originalPattern;
+      return b;
+    }
+
     public TestTripSchedule.Builder pattern(String name, int... stops) {
       return pattern(TestTripPattern.pattern(name, stops));
     }
@@ -199,6 +213,26 @@ public class TestTripSchedule implements TripSchedule {
     }
 
     /**
+     * Shift all arrival/departure times by the given {@code offset}. Be careful, this
+     * method change the builder instance, use {@link #copy()} if you need the original.
+     * <p>
+     * Offset unit is seconds.
+     */
+    public TestTripSchedule.Builder shiftTimes(int offset) {
+      if (arrivalTimes == departureTimes) {
+        arrivalTimes = departureTimes = IntUtils.shiftArray(offset, arrivalTimes);
+      } else {
+        if (arrivalTimes != null) {
+          arrivalTimes = IntUtils.shiftArray(offset, arrivalTimes);
+        }
+        if (departureTimes != null) {
+          departureTimes = IntUtils.shiftArray(offset, departureTimes);
+        }
+      }
+      return this;
+    }
+
+    /**
      * Set the transit-reluctance-index.
      * <p>
      * The default is 0.
@@ -211,6 +245,13 @@ public class TestTripSchedule implements TripSchedule {
     public TestTripSchedule.Builder wheelchairBoarding(Accessibility wcb) {
       this.wheelchairBoarding = wcb;
       return this;
+    }
+
+    public TestTripSchedule.Builder[] repeat(int nTimes, int everySeconds) {
+      return IntStream
+        .range(0, nTimes)
+        .mapToObj(i -> copy().shiftTimes(i * everySeconds))
+        .toArray(Builder[]::new);
     }
 
     public TestTripSchedule build() {
