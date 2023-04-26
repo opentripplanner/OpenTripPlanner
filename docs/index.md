@@ -21,12 +21,13 @@ OTP.
 
 Several versions of this documentation are built and published automatically for different branches
 of OTP. Each of these has a different stable URL, and you may switch between these versions using
-the selector in the lower right of the published documentation.
+the selector in the upper left of the published documentation.
 
 
 **Releases**
  
-- [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.2 (the git master branch)
+- [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.3 (the git master branch)
+- [v2.2.0](http://docs.opentripplanner.org/en/v2.2.0) - Version 2.2
 - [v2.1.0](http://docs.opentripplanner.org/en/v2.1.0) - Version 2.1
 - [v2.0.0](http://docs.opentripplanner.org/en/v2.0.0) - Version 2.0
 - [v1.5.0](http://docs.opentripplanner.org/en/v1.5.0) - Stable 1.x release
