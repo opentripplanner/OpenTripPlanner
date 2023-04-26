@@ -23,6 +23,7 @@ import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -66,13 +67,13 @@ public class OsmModule implements GraphBuilderModule {
   private final List<OsmProvider> providers;
   private final Graph graph;
   private final DataImportIssueStore issueStore;
-  private final OsmOptions options;
+  private final OsmProcessingParameters options;
 
   public OsmModule(
     Collection<OsmProvider> providers,
     Graph graph,
     DataImportIssueStore issueStore,
-    OsmOptions options
+    OsmProcessingParameters options
   ) {
     this.providers = List.copyOf(providers);
     this.graph = graph;
@@ -137,7 +138,7 @@ public class OsmModule implements GraphBuilderModule {
     private final HashMap<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
     // track OSM nodes that will become graph vertices because they appear in multiple OSM ways
     private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
-    private final OsmOptions options;
+    private final OsmProcessingParameters options;
     /**
      * The bike safety factor of the safest street
      */
@@ -152,7 +153,7 @@ public class OsmModule implements GraphBuilderModule {
       Graph graph,
       OsmDatabase osmdb,
       DataImportIssueStore issueStore,
-      OsmOptions options,
+      OsmProcessingParameters options,
       Map<Vertex, Double> elevationData
     ) {
       this.graph = graph;

@@ -35,7 +35,7 @@ import org.opentripplanner.transit.service.TransitModel;
 public interface GraphBuilderFactory {
   //DataImportIssueStore issueStore();
   GraphBuilder graphBuilder();
-  OsmModule openStreetMapModule();
+  OsmModule osmModule();
   GtfsModule gtfsModule();
   NetexModule netexModule();
   TimeZoneAdjusterModule timeZoneAdjusterModule();

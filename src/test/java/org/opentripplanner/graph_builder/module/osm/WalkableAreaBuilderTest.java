@@ -19,6 +19,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.routing.graph.Graph;
@@ -45,7 +46,7 @@ public class WalkableAreaBuilderTest {
       graph,
       osmdb,
       DataImportIssueStore.NOOP,
-      new OsmOptions(
+      new OsmProcessingParameters(
         boardingAreaRefTags,
         null,
         maxAreaNodes,
