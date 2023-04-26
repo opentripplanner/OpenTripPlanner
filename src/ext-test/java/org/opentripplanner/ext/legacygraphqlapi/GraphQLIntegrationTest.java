@@ -39,6 +39,7 @@ import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -114,7 +115,11 @@ class GraphQLIntegrationTest {
       .carHail(D10m, E)
       .build();
 
-    var railLeg = i1.getTransitLeg(2);
+    i1.setAccessibilityScore(0.5f);
+
+    ScheduledTransitLeg railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
+    railLeg.withAccessibilityScore(.3f);
+
     var alert = TransitAlert
       .of(id("an-alert"))
       .withHeaderText(new NonLocalizedString("A header"))

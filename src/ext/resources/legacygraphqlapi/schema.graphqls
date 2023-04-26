@@ -1338,6 +1338,15 @@ type Itinerary {
     This make it possible to inspect the itinerary-filter-chain.
     """
     systemNotices: [SystemNotice]!
+
+    """
+    A sandbox features that computes a numeric accessibility score between 0 and 1.
+
+    The closer the value is to 1 the better the wheelchair-accessibility of this itinerary is.
+
+    More information is available at https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/
+    """
+    accessibilityScore: Float
 }
 
 "A currency"
@@ -1541,6 +1550,15 @@ type Leg {
 
     "Estimate of a hailed ride like Uber."
     rideHailingEstimate: RideHailingEstimate
+
+    """
+    A sandbox features that computes a numeric accessibility score between 0 and 1.
+
+    The closer the value is to 1 the better the wheelchair-accessibility of this leg is.
+
+    More information is available at https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/
+    """
+    accessibilityScore: Float
 }
 
 """A span of time."""
