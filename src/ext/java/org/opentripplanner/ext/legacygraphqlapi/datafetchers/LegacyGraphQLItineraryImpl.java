@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.legacygraphqlapi.mapping.FloatToDoubleMapper;
+import org.opentripplanner.ext.legacygraphqlapi.mapping.NumberMapper;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -98,8 +98,7 @@ public class LegacyGraphQLItineraryImpl
 
   @Override
   public DataFetcher<Double> accessibilityScore() {
-    return environment ->
-      FloatToDoubleMapper.toDouble(getSource(environment).getAccessibilityScore());
+    return environment -> NumberMapper.toDouble(getSource(environment).getAccessibilityScore());
   }
 
   private Itinerary getSource(DataFetchingEnvironment environment) {

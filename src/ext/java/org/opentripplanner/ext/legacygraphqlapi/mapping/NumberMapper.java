@@ -3,9 +3,9 @@ package org.opentripplanner.ext.legacygraphqlapi.mapping;
 import javax.annotation.Nullable;
 
 /**
- * Maps a nullable {@link Float} to a nullable {@link Double}.
+ * Maps a nullable {@link Nullable} to a nullable {@link Double}.
  */
-public class FloatToDoubleMapper {
+public class NumberMapper {
 
   @Nullable
   public static Double toDouble(@Nullable Number input) {
