@@ -27,6 +27,11 @@ import org.opentripplanner.transit.service.TransitService;
 
 public abstract class FlexAccessEgressTemplate {
 
+  /**
+   * We do not want extremely short flex trips, they will normally be dominated in the
+   * routing later. We set an absolute min duration to 10 seconds (167m with 60 km/t).
+   */
+  private static final int MIN_FLEX_TRIP_DURATION_SECONDS = 10;
   protected final NearbyStop accessEgress;
   protected final FlexTrip trip;
   public final int fromStopIndex;
@@ -101,7 +106,9 @@ public abstract class FlexAccessEgressTemplate {
         .filter(transfer -> getFinalStop(transfer) != null)
         .map(transfer -> {
           List<Edge> edges = getTransferEdges(transfer);
-          return getFlexAccessEgress(edges, getFlexVertex(edges.get(0)), getFinalStop(transfer));
+          Vertex flexVertex = getFlexVertex(edges.get(0));
+          RegularStop finalStop = getFinalStop(transfer);
+          return getFlexAccessEgress(edges, flexVertex, finalStop);
         })
         .filter(Objects::nonNull);
     }
@@ -182,6 +189,11 @@ public abstract class FlexAccessEgressTemplate {
     }
 
     var durations = calculateFlexPathDurations(flexEdge, state);
+
+    // Drop short trips(<10s)
+    if (durations.trip() < MIN_FLEX_TRIP_DURATION_SECONDS) {
+      return null;
+    }
 
     return new FlexAccessEgress(
       stop,
