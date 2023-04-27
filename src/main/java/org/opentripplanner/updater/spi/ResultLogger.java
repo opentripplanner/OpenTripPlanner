@@ -2,7 +2,6 @@ package org.opentripplanner.updater.spi;
 
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.model.UpdateError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
