@@ -84,7 +84,13 @@ public class UnknownTransitPathLeg implements Leg {
   }
 
   @Override
-  public void setFareProducts(List<FareProductUse> products) {}
+  public void setFareProducts(List<FareProductUse> products) {
+    throw new UnsupportedOperationException(
+      "Setting the fare products on a leg of type %s is unsupported.".formatted(
+          this.getClass().getSimpleName()
+        )
+    );
+  }
 
   @Override
   public List<FareProductUse> fareProducts() {
