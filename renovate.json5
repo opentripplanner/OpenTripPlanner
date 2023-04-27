@@ -69,6 +69,7 @@
         "org.mockito:mockito-core",
         "com.tngtech.archunit:archunit",
         "org.apache.maven.plugins:maven-surefire-plugin",
+        "org.jacoco:jacoco-maven-plugin", // coverage plugin
         "org.apache.commons:commons-compress", // only used by tests
         "ch.qos.logback:logback-classic"
       ],
