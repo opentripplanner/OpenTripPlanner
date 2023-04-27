@@ -6,8 +6,8 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.ext.fares.model.FareProductUse;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;

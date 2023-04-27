@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.fares;
 
-import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.framework.collection.ListUtils;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.core.ItineraryFares;
 

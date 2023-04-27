@@ -16,8 +16,8 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.ext.fares.model.FareProductUse;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.transit.model.basic.Money;
 

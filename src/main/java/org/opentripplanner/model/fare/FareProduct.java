@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.fares.model;
+package org.opentripplanner.model.fare;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -22,6 +23,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * @param category Rider category, for example seniors or students
  * @param medium   Medium to "hold" the fare, like "cash", "HSL app" or
  */
+@Sandbox
 public record FareProduct(
   FeedScopedId id,
   String name,

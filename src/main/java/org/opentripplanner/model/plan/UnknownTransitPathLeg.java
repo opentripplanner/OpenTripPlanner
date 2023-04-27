@@ -5,9 +5,9 @@ import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**

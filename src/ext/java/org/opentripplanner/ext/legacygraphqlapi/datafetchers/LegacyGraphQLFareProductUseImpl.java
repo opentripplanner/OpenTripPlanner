@@ -2,9 +2,9 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.ext.fares.model.FareProductUse;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductUse;
 
 public class LegacyGraphQLFareProductUseImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLFareProductUse {
