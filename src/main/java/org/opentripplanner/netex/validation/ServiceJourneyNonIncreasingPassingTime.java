@@ -3,10 +3,10 @@ package org.opentripplanner.netex.validation;
 import static org.opentripplanner.netex.support.ServiceJourneyHelper.getOrderedPassingTimes;
 import static org.opentripplanner.netex.support.ServiceJourneyHelper.getPatternId;
 import static org.opentripplanner.netex.support.ServiceJourneyHelper.getScheduledStopPointIdByStopPointId;
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedArrivalOrDepartureTime;
 import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedArrivalTime;
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedDepartureOrArrivalTime;
+import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedArrivalTimeOrElseDepartureTime;
 import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedDepartureTime;
+import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedDepartureTimeOrElseArrivalTime;
 import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedEarliestDepartureTime;
 import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedLatestArrivalTime;
 
@@ -19,7 +19,15 @@ import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
- * Ensure that passing times are increasing along the service journey. Flexible stops are ignored.
+ * Ensure that passing times are increasing along the service journey.
+ * The validator checks first that individual TimetabledPassingTimes are valid, i.e:
+ * - a fixed stop has either arrivalTime or departureTime specified, and arrivalTime < departureTime
+ * - a flex stop has both earliestDepartureTime and latestArrivalTime specified, and earliestDepartureTime < latestArrivalTime
+ * The validator then checks that successive stops have increasing times, taking into account 4 different cases:
+ * - a fixed stop followed by a fixed stop
+ * - a flex stop followed by a flex stop
+ * - a fixed stop followed by a flex stop
+ * - a flex stop followed by a fixed stop
  */
 class ServiceJourneyNonIncreasingPassingTime
   extends AbstractHMapValidationRule<String, ServiceJourney> {
@@ -101,6 +109,9 @@ class ServiceJourneyNonIncreasingPassingTime
     return Status.OK;
   }
 
+  /**
+   * A passing time is valid if it is both complete and consistent.
+   */
   private boolean isValidTimetabledPassingTime(
     TimetabledPassingTime timetabledPassingTime,
     ServiceJourneyInfo serviceJourneyInfo
@@ -118,6 +129,11 @@ class ServiceJourneyNonIncreasingPassingTime
     return true;
   }
 
+  /**
+   * A passing time on a fixed stop is complete if either arrival or departure time is present.
+   * A passing time on a flex stop is complete if both earliest departure time and latest arrival time are present.
+   *
+   */
   private boolean hasCompletePassingTime(
     TimetabledPassingTime timetabledPassingTime,
     ServiceJourneyInfo serviceJourneyInfo
@@ -134,6 +150,11 @@ class ServiceJourneyNonIncreasingPassingTime
     );
   }
 
+  /**
+   * A passing time on a fixed stop is consistent if departure time is after arrival time.
+   * A passing time on a flex stop is consistent  if latest arrival time is after earliest departure time.
+   *
+   */
   private boolean hasConsistentPassingTime(
     TimetabledPassingTime timetabledPassingTime,
     ServiceJourneyInfo serviceJourneyInfo
@@ -164,14 +185,17 @@ class ServiceJourneyNonIncreasingPassingTime
     }
   }
 
+  /**
+   * Fixed stop followed by a fixed stop: check that arrivalTime(n+1) > departureTime(n)
+   */
   private boolean isValidFixedStopFollowedByFixedStop(
     TimetabledPassingTime previousTimetabledPassingTime,
     TimetabledPassingTime currentTimetabledPassingTime
   ) {
-    int currentArrivalOrDepartureTime = normalizedArrivalOrDepartureTime(
+    int currentArrivalOrDepartureTime = normalizedArrivalTimeOrElseDepartureTime(
       currentTimetabledPassingTime
     );
-    int previousDepartureOrArrivalTime = normalizedDepartureOrArrivalTime(
+    int previousDepartureOrArrivalTime = normalizedDepartureTimeOrElseArrivalTime(
       previousTimetabledPassingTime
     );
     if (currentArrivalOrDepartureTime < previousDepartureOrArrivalTime) {
@@ -182,6 +206,10 @@ class ServiceJourneyNonIncreasingPassingTime
     return true;
   }
 
+  /**
+   * Flex stop followed by a flex stop: check that earliestDepartureTime(n+1) > earliestDepartureTime(n)
+   * and latestArrivalTime(n+1) > latestArrivalTime(n)
+   */
   private boolean isValidFlexStopFollowedByFlexStop(
     TimetabledPassingTime previousTimetabledPassingTime,
     TimetabledPassingTime currentTimetabledPassingTime
@@ -206,11 +234,14 @@ class ServiceJourneyNonIncreasingPassingTime
     return true;
   }
 
+  /**
+   * Fixed stop followed by a flex stop: check that earliestDepartureTime(n+1) > departureTime(n)
+   */
   private boolean isValidFixedStopFollowedByFlexStop(
     TimetabledPassingTime previousTimetabledPassingTime,
     TimetabledPassingTime currentTimetabledPassingTime
   ) {
-    int previousDepartureOrArrivalTime = normalizedDepartureOrArrivalTime(
+    int previousDepartureOrArrivalTime = normalizedDepartureTimeOrElseArrivalTime(
       previousTimetabledPassingTime
     );
 
@@ -226,12 +257,15 @@ class ServiceJourneyNonIncreasingPassingTime
     return true;
   }
 
+  /**
+   * Flex stop followed by a fixed stop: check that arrivalTime(n+1) > latestArrivalTime(n)
+   */
   private boolean isValidFlexStopFollowedByFixedStop(
     TimetabledPassingTime previousTimetabledPassingTime,
     TimetabledPassingTime currentTimetabledPassingTime
   ) {
     int previousLatestArrivalTime = normalizedLatestArrivalTime(previousTimetabledPassingTime);
-    int currentArrivalOrDepartureTime = normalizedArrivalOrDepartureTime(
+    int currentArrivalOrDepartureTime = normalizedArrivalTimeOrElseDepartureTime(
       currentTimetabledPassingTime
     );
 
@@ -273,10 +307,20 @@ class ServiceJourneyNonIncreasingPassingTime
     }
   }
 
+  /**
+   * Utility class for holding metadata for a given service journey.
+   */
   private class ServiceJourneyInfo {
 
+    /**
+     * List of timetabledPassingTimes in stop point order.
+     */
     private final List<TimetabledPassingTime> orderedTimetabledPassingTimes;
-    private final Map<TimetabledPassingTime, Boolean> flexibleStops;
+
+    /**
+     * Map a timetabledPassingTime to true if its stop is flexible, false otherwise.
+     */
+    private final Map<TimetabledPassingTime, Boolean> stopFlexibility;
 
     public ServiceJourneyInfo(ServiceJourney serviceJourney) {
       JourneyPattern_VersionStructure journeyPattern = index
@@ -286,7 +330,7 @@ class ServiceJourneyNonIncreasingPassingTime
       Map<String, String> scheduledStopPointIdByStopPointId = getScheduledStopPointIdByStopPointId(
         journeyPattern
       );
-      this.flexibleStops =
+      this.stopFlexibility =
         serviceJourney
           .getPassingTimes()
           .getTimetabledPassingTime()
@@ -297,12 +341,11 @@ class ServiceJourneyNonIncreasingPassingTime
               timetabledPassingTime ->
                 index
                   .getFlexibleStopPlaceByStopPointRef()
-                  .lookup(
+                  .containsKey(
                     scheduledStopPointIdByStopPointId.get(
                       timetabledPassingTime.getPointInJourneyPatternRef().getValue().getRef()
                     )
-                  ) !=
-                null
+                  )
             )
           );
     }
@@ -312,7 +355,7 @@ class ServiceJourneyNonIncreasingPassingTime
     }
 
     public boolean hasFlexStop(TimetabledPassingTime timetabledPassingTime) {
-      return flexibleStops.get(timetabledPassingTime);
+      return stopFlexibility.get(timetabledPassingTime);
     }
 
     public boolean hasFixedStop(TimetabledPassingTime timetabledPassingTime) {

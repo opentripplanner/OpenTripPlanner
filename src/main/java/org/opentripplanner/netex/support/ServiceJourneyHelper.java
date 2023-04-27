@@ -101,7 +101,9 @@ public class ServiceJourneyHelper {
    * Return the elapsed time since midnight for a given departure time, taking into account the day
    * offset. Fallback to arrival time if departure time is missing.
    */
-  public static int normalizedDepartureOrArrivalTime(TimetabledPassingTime timetabledPassingTime) {
+  public static int normalizedDepartureTimeOrElseArrivalTime(
+    TimetabledPassingTime timetabledPassingTime
+  ) {
     if (timetabledPassingTime.getDepartureTime() != null) {
       return elapsedTimeSinceMidnight(
         timetabledPassingTime.getDepartureTime(),
@@ -119,7 +121,9 @@ public class ServiceJourneyHelper {
    * Return the elapsed time since midnight for a given arrival time, taking into account the day
    * offset. Fallback to departure time if arrival time is missing.
    */
-  public static int normalizedArrivalOrDepartureTime(TimetabledPassingTime timetabledPassingTime) {
+  public static int normalizedArrivalTimeOrElseDepartureTime(
+    TimetabledPassingTime timetabledPassingTime
+  ) {
     if (timetabledPassingTime.getArrivalTime() != null) {
       return elapsedTimeSinceMidnight(
         timetabledPassingTime.getArrivalTime(),
