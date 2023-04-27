@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.ItineraryFares;
 
 /**
@@ -22,6 +23,8 @@ public class FaresToItineraryMapper {
 
     i
       .getLegs()
+      .stream()
+      .filter(ScheduledTransitLeg.class::isInstance)
       .forEach(l -> {
         var legInstances = fares.getLegProducts().get(l);
         l.setFareProducts(ListUtils.combine(itineraryInstances, legInstances));
