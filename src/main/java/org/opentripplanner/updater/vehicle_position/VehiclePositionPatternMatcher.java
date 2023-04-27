@@ -239,7 +239,10 @@ public class VehiclePositionPatternMatcher {
       }
     }
     // but if stop_id isn't there we try current_stop_sequence
-    else if (vehiclePosition.hasCurrentStopSequence()) {
+    else if (
+      vehiclePosition.hasCurrentStopSequence() &&
+      validStopSequence(vehiclePosition, stopsOnVehicleTrip)
+    ) {
       var stop = stopsOnVehicleTrip.get(vehiclePosition.getCurrentStopSequence());
       newPosition.setStop(stop);
     }
@@ -247,6 +250,16 @@ public class VehiclePositionPatternMatcher {
     newPosition.setTrip(trip);
 
     return newPosition.build();
+  }
+
+  /**
+   * Checks that the current_stop_sequence can actually be found in the pattern.
+   */
+  private static boolean validStopSequence(
+    VehiclePosition vehiclePosition,
+    List<StopLocation> stopsOnVehicleTrip
+  ) {
+    return vehiclePosition.getCurrentStopSequence() < stopsOnVehicleTrip.size() - 1;
   }
 
   private record TemporalDistance(LocalDate date, long distance) {}
