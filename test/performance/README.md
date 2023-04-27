@@ -40,6 +40,8 @@ Data used:
 - Norwegian NeTEx data
 - Norway OSM data
 
+Contact: [T.Gran, Entur](https://github.com/t2gran)
+
 [build-config](norway/build-config.json)
 
 If the link above do not work you should be able to find it on the ENTUR web:
