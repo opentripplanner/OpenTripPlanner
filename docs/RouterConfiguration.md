@@ -39,7 +39,6 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
 | [server](#server)                                                                         |        `object`       | Configuration for router server.                                                                  | *Optional* |               |  2.4  |
 |    [apiProcessingTimeout](#server_apiProcessingTimeout)                                   |       `duration`      | Maximum processing time for an API request                                                        | *Optional* | `"PT-1S"`     |  2.4  |
-|    [requestLogFile](#server_requestLogFile)                                               |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
 |    [maxSnapshotFrequency](#timetableUpdates_maxSnapshotFrequency)                         |       `duration`      | How long a snapshot should be cached.                                                             | *Optional* | `"PT1S"`      |  2.2  |
 |    purgeExpiredData                                                                       |       `boolean`       | Should expired realtime data be purged from the graph. Apply to GTFS-RT and Siri updates.         | *Optional* | `true`        |  2.2  |
@@ -119,38 +118,6 @@ This timeout limits the server-side processing time for a given API request.
 This does not include network latency nor waiting time in the HTTP server thread pool.
 The default value is `-1s` (no timeout).
 The timeout is applied to all APIs (REST, Transmodel , Legacy GraphQL).
-
-
-<h3 id="server_requestLogFile">requestLogFile</h3>
-
-**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
-**Path:** /server 
-
-The path of the log file for the requests.
-
-You can log some characteristics of trip planning requests in a file for later analysis. Some
-transit agencies and operators find this information useful for identifying existing or unmet
-transportation demand. Logging will be performed only if you specify a log file name in the router
-config.
-
-Each line in the resulting log file will look like this:
-
-```
-2016-04-19T18:23:13.486 0:0:0:0:0:0:0:1 ARRIVE 2016-04-07T00:17 WALK,BUS,CABLE_CAR,TRANSIT,BUSISH 45.559737193889966 -122.64999389648438 45.525592487765635 -122.39044189453124 6095 3 5864 3 6215 3
-```
-
-The fields separated by whitespace are (in order):
-
-1. Date and time the request was received
-2. IP address of the user
-3. Arrive or depart search
-4. The arrival or departure time
-5. A comma-separated list of all transport modes selected
-6. Origin latitude and longitude
-7. Destination latitude and longitude
-
-Finally, for each itinerary returned to the user, there is a travel duration in seconds and the
-number of transit vehicles used in that itinerary.
 
 
 <h3 id="timetableUpdates_maxSnapshotFrequency">maxSnapshotFrequency</h3>
