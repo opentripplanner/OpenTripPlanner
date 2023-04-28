@@ -69,7 +69,7 @@ of this type:
 - `stationTransfers`. Since v2.0
 - `stopClusterMode`. Since v2.0
 - `useTransfersTxt`. Since v2.1
-
+- `extraEdgesStopPlatformLink`. Since v2.0
 
 Since v2.2, `osmWayPropertySet` was renamed `osmTagMapping` and is part of the individual osm 
 source. The driving direction and intersection cost model were decoupled for the tag mapping and can
