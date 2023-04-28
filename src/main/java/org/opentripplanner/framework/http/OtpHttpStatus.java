@@ -16,10 +16,10 @@ public enum OtpHttpStatus {
   }
 
   public int statusCode() {
-    return this.code;
+    return code;
   }
 
   public String reasonPhrase() {
-    return this.reason;
+    return reason;
   }
 }
