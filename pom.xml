@@ -606,7 +606,6 @@
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
             <version>7.3</version>
-            <scope>runtime</scope>
         </dependency>
 
         <!-- dependency injection -->
