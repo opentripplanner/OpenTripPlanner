@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -359,25 +360,20 @@ public class PruneIslands implements GraphBuilderModule {
           continue;
         }
         State[] states = e.traverse(s0);
-        if (states.length > 1) {
-          throw new IllegalStateException(
-            "Expected single state returned from edge %s but received %s".formatted(
-                e,
-                states.length
-              )
-          );
-        }
         if (State.isEmpty(states)) {
           continue;
         }
-        Vertex out = states[0].getVertex();
+        Arrays
+          .stream(states)
+          .map(State::getVertex)
+          .forEach(out -> {
+            var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());
+            vertexList.add(out);
 
-        var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());
-        vertexList.add(out);
-
-        // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
-        vertexList = neighborsForVertex.computeIfAbsent(out, k -> new ArrayList<>());
-        vertexList.add(gv);
+            // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
+            vertexList = neighborsForVertex.computeIfAbsent(out, k -> new ArrayList<>());
+            vertexList.add(gv);
+          });
       }
     }
   }
