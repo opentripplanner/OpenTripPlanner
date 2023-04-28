@@ -36,7 +36,6 @@ public class Validator {
     validate(index.serviceJourneyById, ServiceJourneyNonIncreasingPassingTime::new);
     validate(index.datedServiceJourneys, new DSJOperatingDayNotFound());
     validate(index.datedServiceJourneys, new DSJServiceJourneyNotFound());
-    validate(index.serviceJourneyInterchangeById, InterchangeServiceJourneyNotFound::new);
   }
 
   /**

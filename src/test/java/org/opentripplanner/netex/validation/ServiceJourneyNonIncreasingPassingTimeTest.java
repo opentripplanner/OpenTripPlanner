@@ -17,7 +17,7 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 class ServiceJourneyNonIncreasingPassingTimeTest {
 
   @Test
-  void testValidateServiceJourneyWithFixedStop() {
+  void testValidateServiceJourneyWithRegularStop() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -36,7 +36,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFixedStopMissingTime() {
+  void testValidateServiceJourneyWithRegularStopMissingTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -59,7 +59,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFixedStopInconsistentTime() {
+  void testValidateServiceJourneyWithRegularStopInconsistentTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -81,7 +81,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFlexibleStop() {
+  void testValidateServiceJourneyWithAreaStop() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -113,7 +113,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFlexibleStopMissingTimeWindow() {
+  void testValidateServiceJourneyWithAreaStopMissingTimeWindow() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -145,7 +145,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFlexibleStopInconsistentTimeWindow() {
+  void testValidateServiceJourneyWithAreaStopInconsistentTimeWindow() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -184,7 +184,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFixedStopFollowedByFixedStopNonIncreasingTime() {
+  void testValidateServiceJourneyWithRegularStopFollowedByRegularStopNonIncreasingTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -207,7 +207,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFixedStopFollowedByFlexStop() {
+  void testValidateServiceJourneyWithRegularStopFollowedByStopArea() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -238,7 +238,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFixedStopFollowedByFlexStopNonIncreasingTime() {
+  void testValidateServiceJourneyWithRegularStopFollowedByStopAreaNonIncreasingTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -269,7 +269,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFlexStopFollowedByFixedStop() {
+  void testValidateServiceJourneyWithStopAreaFollowedByRegularStop() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -300,7 +300,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFlexStopFollowedByFlexStop() {
+  void testValidateServiceJourneyWithStopAreaFollowedByStopArea() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -341,7 +341,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFlexStopFollowedByFlexStopNonIncreasingTime() {
+  void testValidateServiceJourneyWithStopAreaFollowedByStopAreaNonIncreasingTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();
@@ -383,7 +383,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   }
 
   @Test
-  void testValidateServiceJourneyWithFlexStopFollowedByFixedStopNonIncreasingTime() {
+  void testValidateServiceJourneyWithStopAreaFollowedByRegularStopNonIncreasingTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
     ServiceJourney serviceJourney = getServiceJourney(sample);
     JourneyPattern journeyPattern = sample.getJourneyPattern();

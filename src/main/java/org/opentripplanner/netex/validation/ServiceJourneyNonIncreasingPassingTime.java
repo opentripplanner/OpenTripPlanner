@@ -21,13 +21,13 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 /**
  * Ensure that passing times are increasing along the service journey.
  * The validator checks first that individual TimetabledPassingTimes are valid, i.e:
- * - a fixed stop has either arrivalTime or departureTime specified, and arrivalTime < departureTime
- * - a flex stop has both earliestDepartureTime and latestArrivalTime specified, and earliestDepartureTime < latestArrivalTime
+ * - a regular stop has either arrivalTime or departureTime specified, and arrivalTime < departureTime
+ * - an area stop has both earliestDepartureTime and latestArrivalTime specified, and earliestDepartureTime < latestArrivalTime
  * The validator then checks that successive stops have increasing times, taking into account 4 different cases:
- * - a fixed stop followed by a fixed stop
- * - a flex stop followed by a flex stop
- * - a fixed stop followed by a flex stop
- * - a flex stop followed by a fixed stop
+ * - a regular stop followed by a regular stop
+ * - an area stop followed by an area stop
+ * - a regular stop followed by an area stop
+ * - an area stop followed by a regular stop
  */
 class ServiceJourneyNonIncreasingPassingTime
   extends AbstractHMapValidationRule<String, ServiceJourney> {
@@ -54,10 +54,10 @@ class ServiceJourneyNonIncreasingPassingTime
       }
 
       if (
-        serviceJourneyInfo.hasFixedStop(previousTimetabledPassingTime) &&
-        serviceJourneyInfo.hasFixedStop(currentTimetabledPassingTime) &&
+        serviceJourneyInfo.hasRegularStop(previousTimetabledPassingTime) &&
+        serviceJourneyInfo.hasRegularStop(currentTimetabledPassingTime) &&
         (
-          !isValidFixedStopFollowedByFixedStop(
+          !isValidRegularStopFollowedByRegularStop(
             previousTimetabledPassingTime,
             currentTimetabledPassingTime
           )
@@ -66,23 +66,10 @@ class ServiceJourneyNonIncreasingPassingTime
         return Status.DISCARD;
       }
       if (
-        serviceJourneyInfo.hasFlexStop(previousTimetabledPassingTime) &&
-        serviceJourneyInfo.hasFlexStop(currentTimetabledPassingTime) &&
+        serviceJourneyInfo.hasAreaStop(previousTimetabledPassingTime) &&
+        serviceJourneyInfo.hasAreaStop(currentTimetabledPassingTime) &&
         (
-          !isValidFlexStopFollowedByFlexStop(
-            previousTimetabledPassingTime,
-            currentTimetabledPassingTime
-          )
-        )
-      ) {
-        return Status.DISCARD;
-      }
-
-      if (
-        serviceJourneyInfo.hasFixedStop(previousTimetabledPassingTime) &&
-        serviceJourneyInfo.hasFlexStop(currentTimetabledPassingTime) &&
-        (
-          !isValidFixedStopFollowedByFlexStop(
+          !isValidAreaStopFollowedByAreaStop(
             previousTimetabledPassingTime,
             currentTimetabledPassingTime
           )
@@ -92,10 +79,23 @@ class ServiceJourneyNonIncreasingPassingTime
       }
 
       if (
-        serviceJourneyInfo.hasFlexStop(previousTimetabledPassingTime) &&
-        serviceJourneyInfo.hasFixedStop(currentTimetabledPassingTime) &&
+        serviceJourneyInfo.hasRegularStop(previousTimetabledPassingTime) &&
+        serviceJourneyInfo.hasAreaStop(currentTimetabledPassingTime) &&
         (
-          !isValidFlexStopFollowedByFixedStop(
+          !isValidRegularStopFollowedByAreaStop(
+            previousTimetabledPassingTime,
+            currentTimetabledPassingTime
+          )
+        )
+      ) {
+        return Status.DISCARD;
+      }
+
+      if (
+        serviceJourneyInfo.hasAreaStop(previousTimetabledPassingTime) &&
+        serviceJourneyInfo.hasRegularStop(currentTimetabledPassingTime) &&
+        (
+          !isValidAreaStopFollowedByRegularStop(
             previousTimetabledPassingTime,
             currentTimetabledPassingTime
           )
@@ -130,15 +130,15 @@ class ServiceJourneyNonIncreasingPassingTime
   }
 
   /**
-   * A passing time on a fixed stop is complete if either arrival or departure time is present.
-   * A passing time on a flex stop is complete if both earliest departure time and latest arrival time are present.
+   * A passing time on a regular stop is complete if either arrival or departure time is present.
+   * A passing time on a area stop is complete if both earliest departure time and latest arrival time are present.
    *
    */
   private boolean hasCompletePassingTime(
     TimetabledPassingTime timetabledPassingTime,
     ServiceJourneyInfo serviceJourneyInfo
   ) {
-    if (serviceJourneyInfo.hasFixedStop(timetabledPassingTime)) {
+    if (serviceJourneyInfo.hasRegularStop(timetabledPassingTime)) {
       return (
         timetabledPassingTime.getArrivalTime() != null ||
         timetabledPassingTime.getDepartureTime() != null
@@ -151,8 +151,8 @@ class ServiceJourneyNonIncreasingPassingTime
   }
 
   /**
-   * A passing time on a fixed stop is consistent if departure time is after arrival time.
-   * A passing time on a flex stop is consistent  if latest arrival time is after earliest departure time.
+   * A passing time on a regular stop is consistent if departure time is after arrival time.
+   * A passing time on a area stop is consistent  if latest arrival time is after earliest departure time.
    *
    */
   private boolean hasConsistentPassingTime(
@@ -160,7 +160,7 @@ class ServiceJourneyNonIncreasingPassingTime
     ServiceJourneyInfo serviceJourneyInfo
   ) {
     if (
-      serviceJourneyInfo.hasFixedStop(timetabledPassingTime) &&
+      serviceJourneyInfo.hasRegularStop(timetabledPassingTime) &&
       (
         timetabledPassingTime.getArrivalTime() == null ||
         timetabledPassingTime.getDepartureTime() == null
@@ -169,7 +169,7 @@ class ServiceJourneyNonIncreasingPassingTime
       return true;
     }
     if (
-      serviceJourneyInfo.hasFixedStop(timetabledPassingTime) &&
+      serviceJourneyInfo.hasRegularStop(timetabledPassingTime) &&
       timetabledPassingTime.getArrivalTime() != null &&
       timetabledPassingTime.getDepartureTime() != null
     ) {
@@ -186,9 +186,9 @@ class ServiceJourneyNonIncreasingPassingTime
   }
 
   /**
-   * Fixed stop followed by a fixed stop: check that arrivalTime(n+1) > departureTime(n)
+   * regular stop followed by a regular stop: check that arrivalTime(n+1) > departureTime(n)
    */
-  private boolean isValidFixedStopFollowedByFixedStop(
+  private boolean isValidRegularStopFollowedByRegularStop(
     TimetabledPassingTime previousTimetabledPassingTime,
     TimetabledPassingTime currentTimetabledPassingTime
   ) {
@@ -200,17 +200,17 @@ class ServiceJourneyNonIncreasingPassingTime
     );
     if (currentArrivalOrDepartureTime < previousDepartureOrArrivalTime) {
       invalidTimetabledPassingTime = currentTimetabledPassingTime;
-      errorMessage = "non-increasing time between fixed stops";
+      errorMessage = "non-increasing time between regular stops";
       return false;
     }
     return true;
   }
 
   /**
-   * Flex stop followed by a flex stop: check that earliestDepartureTime(n+1) > earliestDepartureTime(n)
+   * area stop followed by a area stop: check that earliestDepartureTime(n+1) > earliestDepartureTime(n)
    * and latestArrivalTime(n+1) > latestArrivalTime(n)
    */
-  private boolean isValidFlexStopFollowedByFlexStop(
+  private boolean isValidAreaStopFollowedByAreaStop(
     TimetabledPassingTime previousTimetabledPassingTime,
     TimetabledPassingTime currentTimetabledPassingTime
   ) {
@@ -228,16 +228,16 @@ class ServiceJourneyNonIncreasingPassingTime
       currentLatestArrivalTime < previousLatestArrivalTime
     ) {
       invalidTimetabledPassingTime = currentTimetabledPassingTime;
-      errorMessage = "non-increasing time between flex stops";
+      errorMessage = "non-increasing time between area stops";
       return false;
     }
     return true;
   }
 
   /**
-   * Fixed stop followed by a flex stop: check that earliestDepartureTime(n+1) > departureTime(n)
+   * regular stop followed by a area stop: check that earliestDepartureTime(n+1) > departureTime(n)
    */
-  private boolean isValidFixedStopFollowedByFlexStop(
+  private boolean isValidRegularStopFollowedByAreaStop(
     TimetabledPassingTime previousTimetabledPassingTime,
     TimetabledPassingTime currentTimetabledPassingTime
   ) {
@@ -251,16 +251,16 @@ class ServiceJourneyNonIncreasingPassingTime
 
     if (currentEarliestDepartureTime < previousDepartureOrArrivalTime) {
       invalidTimetabledPassingTime = currentTimetabledPassingTime;
-      errorMessage = "non-increasing time between fixed stop and flex stop";
+      errorMessage = "non-increasing time between regular stop and area stop";
       return false;
     }
     return true;
   }
 
   /**
-   * Flex stop followed by a fixed stop: check that arrivalTime(n+1) > latestArrivalTime(n)
+   * area stop followed by a regular stop: check that arrivalTime(n+1) > latestArrivalTime(n)
    */
-  private boolean isValidFlexStopFollowedByFixedStop(
+  private boolean isValidAreaStopFollowedByRegularStop(
     TimetabledPassingTime previousTimetabledPassingTime,
     TimetabledPassingTime currentTimetabledPassingTime
   ) {
@@ -271,7 +271,7 @@ class ServiceJourneyNonIncreasingPassingTime
 
     if (currentArrivalOrDepartureTime < previousLatestArrivalTime) {
       invalidTimetabledPassingTime = currentTimetabledPassingTime;
-      errorMessage = "non-increasing time between flex stop and fixed stop";
+      errorMessage = "non-increasing time between area stop and regular stop";
       return false;
     }
     return true;
@@ -318,7 +318,7 @@ class ServiceJourneyNonIncreasingPassingTime
     private final List<TimetabledPassingTime> orderedTimetabledPassingTimes;
 
     /**
-     * Map a timetabledPassingTime to true if its stop is flexible, false otherwise.
+     * Map a timetabledPassingTime to true if its stop is a stop area, false otherwise.
      */
     private final Map<TimetabledPassingTime, Boolean> stopFlexibility;
 
@@ -354,12 +354,12 @@ class ServiceJourneyNonIncreasingPassingTime
       return orderedTimetabledPassingTimes;
     }
 
-    public boolean hasFlexStop(TimetabledPassingTime timetabledPassingTime) {
+    public boolean hasAreaStop(TimetabledPassingTime timetabledPassingTime) {
       return stopFlexibility.get(timetabledPassingTime);
     }
 
-    public boolean hasFixedStop(TimetabledPassingTime timetabledPassingTime) {
-      return !hasFlexStop(timetabledPassingTime);
+    public boolean hasRegularStop(TimetabledPassingTime timetabledPassingTime) {
+      return !hasAreaStop(timetabledPassingTime);
     }
   }
 }
