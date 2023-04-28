@@ -1,9 +1,8 @@
-package org.opentripplanner.astar;
+package org.opentripplanner.street.search.state;
 
 import java.util.Collection;
 import java.util.Optional;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.search.state.State;
 
 /**
  * This is a very reduced version of the A* algorithm: from an initial state a number of edges
