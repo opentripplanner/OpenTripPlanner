@@ -29,7 +29,7 @@ public abstract class FlexAccessEgressTemplate {
 
   /**
    * We do not want extremely short flex trips, they will normally be dominated in the
-   * routing later. We set an absolute min duration to 10 seconds (167m with 60 km/t).
+   * routing later. We set an absolute min duration to 10 seconds (167m with 60 km/h).
    */
   private static final int MIN_FLEX_TRIP_DURATION_SECONDS = 10;
   protected final NearbyStop accessEgress;
