@@ -2,16 +2,15 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.astar.EdgeTraverser;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 
 public class Transfer {
@@ -76,7 +75,7 @@ public class Transfer {
     StateEditor se = new StateEditor(edges.get(0).getFromVertex(), request);
     se.setTimeSeconds(0);
 
-    var state = miniAstar(se.makeState(), edges);
+    var state = EdgeTraverser.traverseEdges(se.makeState(), edges);
 
     return state.map(s ->
       new DefaultRaptorTransfer(
@@ -86,26 +85,5 @@ public class Transfer {
         this
       )
     );
-  }
-
-  public static Optional<State> miniAstar(final State s, Collection<Edge> edges) {
-    var state = s;
-    for (Edge e : edges) {
-      var afterTraversal = e.traverse(state);
-      if (afterTraversal.length > 1) {
-        throw new IllegalStateException(
-          "Expected only a single state returned from edge %s but received %s".formatted(
-              e,
-              afterTraversal.length
-            )
-        );
-      }
-      if (State.isEmpty(afterTraversal)) {
-        return Optional.empty();
-      } else {
-        state = afterTraversal[0];
-      }
-    }
-    return Optional.ofNullable(state);
   }
 }

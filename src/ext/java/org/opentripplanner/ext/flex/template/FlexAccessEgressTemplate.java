@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.astar.EdgeTraverser;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
@@ -14,7 +15,6 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PathTransfer;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
@@ -174,7 +174,7 @@ public abstract class FlexAccessEgressTemplate {
       return null;
     }
 
-    final var finalStateOpt = Transfer.miniAstar(afterFlexState[0], transferEdges);
+    final var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], transferEdges);
 
     return finalStateOpt
       .map(finalState -> {

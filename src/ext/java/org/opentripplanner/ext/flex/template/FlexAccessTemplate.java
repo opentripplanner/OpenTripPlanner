@@ -5,6 +5,7 @@ import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.astar.EdgeTraverser;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
@@ -13,7 +14,6 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.PathTransfer;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
@@ -57,7 +57,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
 
     final State[] afterFlexState = flexEdge.traverse(accessEgress.state);
 
-    var finalStateOpt = Transfer.miniAstar(afterFlexState[0], egressEdges);
+    var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], egressEdges);
 
     return finalStateOpt
       .map(finalState -> {
