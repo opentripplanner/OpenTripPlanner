@@ -48,15 +48,9 @@ public record FareProduct(
       .of(FareProduct.class)
       .addStr("id", id.toString())
       .addObj("amount", amount);
-    if (duration != null) {
-      builder.addDuration("duration", duration);
-    }
-    if (category != null) {
-      builder.addObj("category", category);
-    }
-    if (medium != null) {
-      builder.addObj("medium", medium);
-    }
+    builder.addDuration("duration", duration);
+    builder.addObj("category", category);
+    builder.addObj("medium", medium);
 
     return builder.toString();
   }
