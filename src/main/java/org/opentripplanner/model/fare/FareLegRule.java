@@ -1,9 +1,10 @@
-package org.opentripplanner.ext.fares.model;
+package org.opentripplanner.model.fare;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.framework.lang.Sandbox;
 
+@Sandbox
 public record FareLegRule(
   @Nullable String legGroupId,
   @Nullable String networkId,

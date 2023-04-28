@@ -1,10 +1,11 @@
-package org.opentripplanner.ext.fares.model;
+package org.opentripplanner.model.fare;
 
 import java.time.Duration;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.framework.lang.Sandbox;
 
+@Sandbox
 public record FareTransferRule(
   @Nullable String fromLegGroup,
   @Nullable String toLegGroup,

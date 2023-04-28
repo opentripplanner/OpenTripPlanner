@@ -1,12 +1,13 @@
-package org.opentripplanner.ext.fares.model;
+package org.opentripplanner.model.fare;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 
+@Sandbox
 public record LegProducts(
   Leg leg,
   Optional<ScheduledTransitLeg> nextLeg,

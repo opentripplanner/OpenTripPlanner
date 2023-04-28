@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.ItineraryFares;
 
 public class LegacyGraphQLItineraryImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLItinerary {

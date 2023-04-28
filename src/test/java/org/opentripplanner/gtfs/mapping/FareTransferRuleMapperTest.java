@@ -76,7 +76,7 @@ class FareTransferRuleMapperTest {
     return fareProduct;
   }
 
-  private org.opentripplanner.ext.fares.model.FareTransferRule map(
+  private org.opentripplanner.model.fare.FareTransferRule map(
     FareProduct fareProduct,
     FareTransferRule rule
   ) {

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.core;
+package org.opentripplanner.model.fare;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
@@ -11,16 +11,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.fares.model.LegProducts;
+import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.core.FareComponent;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 
 /**
+ *
  * ItineraryFares is a set of fares for different legs, rider categories or fare media.
  */
+@Sandbox
 public class ItineraryFares {
 
   /**

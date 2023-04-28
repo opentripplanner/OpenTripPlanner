@@ -175,11 +175,7 @@ public class StreetLeg implements Leg {
 
   @Override
   public void setFareProducts(List<FareProductUse> products) {
-    throw new UnsupportedOperationException(
-      "Setting the fare products on a leg of type %s is unsupported.".formatted(
-          this.getClass().getSimpleName()
-        )
-    );
+    throw new UnsupportedOperationException();
   }
 
   @Override

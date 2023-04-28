@@ -6,8 +6,8 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapNullableId;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Objects;
-import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.model.fare.FareTransferRule;
 
 public class FareTransferRuleMapper {
 
