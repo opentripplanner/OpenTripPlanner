@@ -14,7 +14,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArri
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
  * The responsibility of this class is to play the {@link Heuristics} role. It wrap the internal
@@ -27,7 +27,7 @@ public class HeuristicsAdapter implements Heuristics {
   private final SingleCriteriaStopArrivals bestNumOfTransfers;
   private final TIntObjectMap<List<RaptorAccessEgress>> egressPaths;
   private final TransitCalculator<?> calculator;
-  private final CostCalculator<?> costCalculator;
+  private final RaptorCostCalculator<?> costCalculator;
   private final int nStops;
   private final int originDepartureTime;
   private final AggregatedResults aggregatedResults;
@@ -36,7 +36,7 @@ public class HeuristicsAdapter implements Heuristics {
     int nStops,
     EgressPaths egressPaths,
     RaptorTransitCalculator<?> calculator,
-    CostCalculator<?> costCalculator,
+    RaptorCostCalculator<?> costCalculator,
     SingleCriteriaStopArrivals bestOverallTimes,
     SingleCriteriaStopArrivals bestTransitTimes,
     SingleCriteriaStopArrivals bestNTransfers

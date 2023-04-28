@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -10,13 +10,12 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +38,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * set the headsigns array to null to save space. Field is private to force use of the getter
    * method which does the necessary fallbacks.
    */
-  private final I18NString[] headsigns;
+  private I18NString[] headsigns;
   /**
    * Contains a list of via names for each stop. This field provides info about intermediate stops
    * between current stop and final trip destination. This is 2D array since there can be more than
@@ -182,6 +181,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     this.realTimeState = object.realTimeState;
     this.timepoints = object.timepoints;
     this.wheelchairAccessibility = object.wheelchairAccessibility;
+    this.occupancyStatus = object.occupancyStatus;
   }
 
   /**
@@ -236,7 +236,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * trip down the line.
    */
   public int sortIndex() {
-    return getArrivalTime(0);
+    return getDepartureTime(0);
   }
 
   /** @return the time in seconds after midnight that the vehicle arrives at the stop. */
@@ -305,7 +305,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     return stopRealTimeStates[stop] == StopRealTimeState.NO_DATA;
   }
 
-  // TODO OTP2 - Unused, but will be used by Transmodel API
   public boolean isPredictionInaccurate(int stop) {
     if (stopRealTimeStates == null) {
       return false;
@@ -382,7 +381,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    *
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
-  public Result<?, UpdateError> validateNonIncreasingTimes() {
+  public Optional<ValidationError> validateNonIncreasingTimes() {
     final int nStops = scheduledArrivalTimes.length;
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
@@ -390,14 +389,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       final int dep = getDepartureTime(s);
 
       if (dep < arr) {
-        return Result.failure(new UpdateError(getTrip().getId(), NEGATIVE_DWELL_TIME, s));
+        return Optional.of(new ValidationError(NEGATIVE_DWELL_TIME, s));
       }
       if (prevDep > arr) {
-        return Result.failure(new UpdateError(getTrip().getId(), NEGATIVE_HOP_TIME, s));
+        return Optional.of(new ValidationError(NEGATIVE_HOP_TIME, s));
       }
       prevDep = dep;
     }
-    return Result.success();
+    return Optional.empty();
   }
 
   /** Cancel this entire trip */
@@ -592,6 +591,21 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     }
   }
 
+  public void setHeadsign(int index, I18NString headsign) {
+    if (headsigns == null) {
+      if (headsign.equals(trip.getHeadsign())) {
+        return;
+      }
+
+      this.headsigns = new I18NString[scheduledArrivalTimes.length];
+      this.headsigns[index] = headsign;
+      return;
+    }
+
+    prepareForRealTimeUpdates();
+    headsigns[index] = headsign;
+  }
+
   /**
    * Create 2D String array for via names for each stop in sequence.
    *
@@ -635,6 +649,10 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       this.departureTimes = Arrays.copyOf(scheduledDepartureTimes, scheduledDepartureTimes.length);
       this.stopRealTimeStates = new StopRealTimeState[arrivalTimes.length];
       this.occupancyStatus = new OccupancyStatus[arrivalTimes.length];
+      if (headsigns != null) {
+        headsigns = Arrays.copyOf(headsigns, headsigns.length);
+      }
+
       for (int i = 0; i < arrivalTimes.length; i++) {
         arrivalTimes[i] += timeShift;
         departureTimes[i] += timeShift;

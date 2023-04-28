@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.entur.gbfs.v2_3.free_bike_status.GBFSFreeBikeStatus;
 import org.entur.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
@@ -30,6 +29,7 @@ import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.updater.spi.HttpHeaders;
 
 /**
  * This tests that {@link GbfsFeedLoader} handles loading of different versions of GBFS correctly,
@@ -45,7 +45,7 @@ class GbfsFeedLoaderTest {
   void getV22FeedWithExplicitLanguage() {
     GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
-      Map.of(),
+      HttpHeaders.empty(),
       LANGUAGE_NB
     );
 
@@ -56,7 +56,7 @@ class GbfsFeedLoaderTest {
   void getV22FeedWithNoLanguage() {
     GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
-      Map.of(),
+      HttpHeaders.empty(),
       null
     );
 
@@ -70,7 +70,7 @@ class GbfsFeedLoaderTest {
       () ->
         new GbfsFeedLoader(
           "file:src/test/resources/gbfs/lillestrombysykkel/gbfs.json",
-          Map.of(),
+          HttpHeaders.empty(),
           LANGUAGE_EN
         )
     );
@@ -80,7 +80,7 @@ class GbfsFeedLoaderTest {
   void getV10FeedWithExplicitLanguage() {
     GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/helsinki/gbfs.json",
-      Map.of(),
+      HttpHeaders.empty(),
       LANGUAGE_EN
     );
 
@@ -100,7 +100,7 @@ class GbfsFeedLoaderTest {
     while (reader.readRecord()) {
       try {
         String url = reader.get("Auto-Discovery URL");
-        new GbfsFeedLoader(url, Map.of(), null).update();
+        new GbfsFeedLoader(url, HttpHeaders.empty(), null).update();
       } catch (Exception e) {
         exceptions.add(e);
       }
@@ -114,14 +114,19 @@ class GbfsFeedLoaderTest {
   @Test
   @Disabled
   void testSpin() {
-    new GbfsFeedLoader("https://gbfs.spin.pm/api/gbfs/v2_2/edmonton/gbfs", Map.of(), null).update();
+    new GbfsFeedLoader(
+      "https://gbfs.spin.pm/api/gbfs/v2_2/edmonton/gbfs",
+      HttpHeaders.empty(),
+      null
+    )
+      .update();
   }
 
   @Test
   void geofencingZones() {
     GbfsFeedLoader loader = new GbfsFeedLoader(
       "file:src/test/resources/gbfs/tieroslo/gbfs.json",
-      Map.of(),
+      HttpHeaders.empty(),
       LANGUAGE_EN
     );
 

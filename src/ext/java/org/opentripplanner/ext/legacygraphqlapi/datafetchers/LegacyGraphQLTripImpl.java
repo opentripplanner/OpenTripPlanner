@@ -21,6 +21,7 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -55,7 +56,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment -> {
       TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
       var args = new LegacyGraphQLTypes.LegacyGraphQLTripAlertsArgs(environment.getArguments());
-      Iterable<LegacyGraphQLTypes.LegacyGraphQLTripAlertType> types = args.getLegacyGraphQLTypes();
+      List<LegacyGraphQLTypes.LegacyGraphQLTripAlertType> types = args.getLegacyGraphQLTypes();
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
@@ -362,7 +363,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<String> tripHeadsign() {
     return environment ->
-      LegacyGraphQLUtils.getTranslation(getSource(environment).getHeadsign(), environment);
+      GraphQLUtils.getTranslation(getSource(environment).getHeadsign(), environment);
   }
 
   @Override

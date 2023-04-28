@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -25,7 +24,8 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.UpdateResult;
+import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
@@ -89,11 +89,11 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       startTime = Instant.now();
       LOG.info("Fetching initial Siri ET data from {}, timeout is {}ms", uri, timeout);
 
-      HashMap<String, String> headers = new HashMap<>();
-      headers.put("Accept", "application/xml");
+      // Maybe put this in the config?
+      HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
 
       final long t1 = System.currentTimeMillis();
-      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), headers);
+      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.asMap());
       final long t2 = System.currentTimeMillis();
 
       if (data == null) {
@@ -122,31 +122,16 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         return;
       }
 
-      var f = super.saveResultOnGraph.execute((graph, transitModel) -> {
-        try {
-          long t1 = System.currentTimeMillis();
-          var result = snapshotSource.applyEstimatedTimetable(
-            transitModel,
-            fuzzyTripMatcher(),
-            entityResolver(),
-            feedId,
-            false,
-            updates
-          );
-          recordMetrics.accept(result);
-
-          LOG.info(
-            "Azure ET updater initialized after {} ms: [time since startup: {}]",
-            (System.currentTimeMillis() - t1),
-            DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
-          );
-          setPrimed(true);
-        } catch (Exception e) {
-          LOG.error("Could not process history: {}", e.getMessage());
-        }
+      super.saveResultOnGraph.execute((graph, transitModel) -> {
+        snapshotSource.applyEstimatedTimetable(
+          fuzzyTripMatcher(),
+          entityResolver(),
+          feedId,
+          false,
+          updates
+        );
       });
-      f.get();
-    } catch (JAXBException | XMLStreamException | ExecutionException | InterruptedException e) {
+    } catch (JAXBException | XMLStreamException e) {
       LOG.error(e.getLocalizedMessage(), e);
     }
   }
@@ -160,26 +145,30 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         return;
       }
 
-      super.saveResultOnGraph.execute((graph, transitModel) -> {
-        long t1 = System.currentTimeMillis();
-        var result = snapshotSource.applyEstimatedTimetable(
-          transitModel,
-          fuzzyTripMatcher(),
-          entityResolver(),
-          feedId,
-          false,
-          updates
-        );
-        recordMetrics.accept(result);
+      var f = super.saveResultOnGraph.execute((graph, transitModel) -> {
+        try {
+          long t1 = System.currentTimeMillis();
+          var result = snapshotSource.applyEstimatedTimetable(
+            fuzzyTripMatcher(),
+            entityResolver(),
+            feedId,
+            false,
+            updates
+          );
+          recordMetrics.accept(result);
 
-        setPrimed(true);
-        LOG.info(
-          "Azure ET updater initialized after {} ms: [time since startup: {}]",
-          (System.currentTimeMillis() - t1),
-          DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
-        );
+          setPrimed(true);
+          LOG.info(
+            "Azure ET updater initialized after {} ms: [time since startup: {}]",
+            (System.currentTimeMillis() - t1),
+            DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
+          );
+        } catch (Exception e) {
+          LOG.error("Could not process ET history", e);
+        }
       });
-    } catch (JAXBException | XMLStreamException e) {
+      f.get();
+    } catch (JAXBException | XMLStreamException | ExecutionException | InterruptedException e) {
       LOG.error(e.getLocalizedMessage(), e);
     }
   }

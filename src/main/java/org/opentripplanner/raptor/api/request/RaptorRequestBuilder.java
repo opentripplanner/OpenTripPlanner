@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.api.request;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
@@ -28,6 +29,8 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
   private final DebugRequestBuilder debug;
   private SearchDirection searchDirection;
 
+  private MultiCriteriaRequest<T> multiCriteria;
+
   // Performance monitoring
   private RaptorTimers performanceTimers;
 
@@ -50,6 +53,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     // Algorithm
     this.profile = defaults.profile();
     this.optimizations.addAll(defaults.optimizations());
+    this.multiCriteria = defaults.multiCriteria();
 
     // Timer
     this.performanceTimers = defaults.performanceTimers();
@@ -99,6 +103,17 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
 
   public RaptorRequestBuilder<T> disableOptimization(Optimization optimization) {
     this.optimizations.remove(optimization);
+    return this;
+  }
+
+  public MultiCriteriaRequest<T> multiCriteria() {
+    return multiCriteria;
+  }
+
+  public RaptorRequestBuilder<T> withMultiCriteria(Consumer<MultiCriteriaRequest.Builder<T>> body) {
+    var builder = this.multiCriteria.copyOf();
+    body.accept(builder);
+    this.multiCriteria = builder.build();
     return this;
   }
 

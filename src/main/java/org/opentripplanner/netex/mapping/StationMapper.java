@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,6 +13,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
 import org.rutebanken.netex.model.LocaleStructure;
@@ -29,20 +31,30 @@ class StationMapper {
   private final ZoneId defaultTimeZone;
 
   private final boolean noTransfersOnIsolatedStops;
+  private final EntityById<Station> stationsById;
 
   StationMapper(
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
     ZoneId defaultTimeZone,
-    boolean noTransfersOnIsolatedStops
+    boolean noTransfersOnIsolatedStops,
+    EntityById<Station> stationsById
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
     this.defaultTimeZone = defaultTimeZone;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
+    this.stationsById = stationsById;
   }
 
   Station map(StopPlace stopPlace) {
+    return stationsById.computeIfAbsent(
+      idFactory.createId(stopPlace.getId()),
+      ignored -> mapStopPlaceToStation(stopPlace)
+    );
+  }
+
+  Station mapStopPlaceToStation(StopPlace stopPlace) {
     var builder = Station
       .of(idFactory.createId(stopPlace.getId()))
       .withName(resolveName(stopPlace))
@@ -55,7 +67,7 @@ class StationMapper {
         Optional
           .ofNullable(stopPlace.getLocale())
           .map(LocaleStructure::getTimeZone)
-          .map(ZoneId::of)
+          .map(zoneId -> ofZoneId(stopPlace.getId(), zoneId))
           .orElse(defaultTimeZone)
       );
 
@@ -66,6 +78,20 @@ class StationMapper {
     }
 
     return builder.build();
+  }
+
+  private ZoneId ofZoneId(String stopPlaceId, String zoneId) {
+    try {
+      return ZoneId.of(zoneId);
+    } catch (DateTimeException e) {
+      issueStore.add(
+        "InvalidTimeZone",
+        "Invalid ID for ZoneOffset at StopPlace with ID: %s and value %s",
+        stopPlaceId,
+        zoneId
+      );
+    }
+    return null;
   }
 
   private I18NString resolveName(StopPlace stopPlace) {
@@ -92,8 +118,8 @@ class StationMapper {
   }
 
   /**
-   * Map the centroid to coordinate, if not present the mean coordinate for the
-   * child quays is returned. If the station do not have any quays an exception is thrown.
+   * Map the centroid to coordinate, if not present the mean coordinate for the child quays is
+   * returned. If the station do not have any quays an exception is thrown.
    */
   private WgsCoordinate mapCoordinate(StopPlace stopPlace) {
     if (stopPlace.getCentroid() != null) {
@@ -106,7 +132,7 @@ class StationMapper {
       );
       List<WgsCoordinate> coordinates = new ArrayList<>();
       for (Object it : stopPlace.getQuays().getQuayRefOrQuay()) {
-        if (it instanceof Quay quay) {
+        if (it instanceof Quay quay && quay.getCentroid() != null) {
           coordinates.add(WgsCoordinateMapper.mapToDomain(quay.getCentroid()));
         }
       }

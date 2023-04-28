@@ -5,7 +5,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -151,7 +150,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final boolean banDiscouragedWalking;
   public final boolean banDiscouragedBiking;
-  public final double maxTransferDurationSeconds;
+  public final Duration maxTransferDuration;
   public final Boolean extraEdgesStopPlatformLink;
   public final NetexFeedParameters netexDefaults;
   public final GtfsFeedParameters gtfsDefaults;
@@ -311,14 +310,14 @@ all of the elevation values in the street edges.
             """
         )
         .asInt(1000);
-    maxTransferDurationSeconds =
+    maxTransferDuration =
       root
-        .of("maxTransferDurationSeconds")
+        .of("maxTransferDuration")
         .since(V2_1)
         .summary(
           "Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph."
         )
-        .asDouble((double) Duration.ofMinutes(30).toSeconds());
+        .asDuration(Duration.ofMinutes(30));
     maxStopToShapeSnapDistance =
       root
         .of("maxStopToShapeSnapDistance")
@@ -505,7 +504,7 @@ recommended.
         .summary(
           "Visibility calculations for an area will not be done if there are more nodes than this limit."
         )
-        .asInt(500);
+        .asInt(150);
     maxElevationPropagationMeters =
       root
         .of("maxElevationPropagationMeters")
@@ -649,7 +648,7 @@ Netex data is also often supplied in a ZIP file.
     transferRequests = TransferRequestConfig.map(root, "transferRequests");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      root.logAllUnusedParameters(LOG::warn);
+      root.logAllWarnings(LOG::warn);
     }
   }
 

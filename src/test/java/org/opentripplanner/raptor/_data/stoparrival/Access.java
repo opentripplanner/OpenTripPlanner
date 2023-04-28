@@ -1,6 +1,9 @@
 package org.opentripplanner.raptor._data.stoparrival;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.view.AccessPathView;
 
@@ -22,12 +25,17 @@ public class Access extends AbstractStopArrival {
   }
 
   @Override
-  public boolean arrivedByAccess() {
-    return true;
+  public PathLegType arrivedBy() {
+    return ACCESS;
   }
 
   @Override
   public AccessPathView accessPath() {
     return () -> access;
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return access.stopReachedOnBoard();
   }
 }

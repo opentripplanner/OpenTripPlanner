@@ -73,7 +73,7 @@ public class OtpTransitServiceBuilderTest {
   public void testGetRoutes() {
     Collection<Route> routes = subject.getRoutes().values();
 
-    assertEquals(18, routes.size());
+    assertEquals(19, routes.size());
     assertEquals("Route{agency:1 BUS 1}", first(routes).toString());
   }
 

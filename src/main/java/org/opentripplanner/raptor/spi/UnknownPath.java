@@ -66,8 +66,8 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
   }
 
   @Override
-  public int generalizedCost() {
-    return CostCalculator.ZERO_COST;
+  public int c1() {
+    return RaptorCostCalculator.ZERO_COST;
   }
 
   @Override
@@ -119,9 +119,9 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
   public String toString() {
     PathStringBuilder pathBuilder = new PathStringBuilder(null);
     if (departureTime == 0 && arrivalTime == 0) {
-      pathBuilder.summary(generalizedCost());
+      pathBuilder.summary(c1());
     } else {
-      pathBuilder.summary(startTime(), endTime(), numberOfTransfers, generalizedCost());
+      pathBuilder.summary(startTime(), endTime(), numberOfTransfers, c1());
     }
     return pathBuilder.toString();
   }

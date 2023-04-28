@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import java.util.Iterator;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.DefaultRangeRaptorWorker;
@@ -40,13 +39,6 @@ public interface RaptorWorkerState<T extends RaptorTripSchedule> {
    * Return TRUE if a stop is reached by transit or transfer in the previous round.
    */
   boolean isStopReachedInPreviousRound(int stopIndex);
-
-  /**
-   * Add access path to state. This should be called in the matching round and appropriate place in
-   * the algorithm according to the {@link RaptorAccessEgress#numberOfRides()} and {@link
-   * RaptorAccessEgress#stopReachedOnBoard()}.
-   */
-  void setAccessToStop(RaptorAccessEgress accessPath, int iterationDepartureTime);
 
   /**
    * Update state with a new transfer.

@@ -5,10 +5,11 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
-import java.util.Map;
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
 import org.opentripplanner.ext.vilkkubikerental.VilkkuBikeRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.updaters.HttpHeadersConfig;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.VehicleRentalDataSourceParameters;
@@ -42,18 +43,19 @@ public class VehicleRentalSourceFactory {
         allowKeepingRentedVehicleAtDestination(),
         headers(),
         network(),
-        geofencingZones()
+        geofencingZones(),
+        overloadingAllowed()
       );
       case SMOOVE -> new SmooveBikeRentalDataSourceParameters(
         url(),
         network(),
-        allowOverloading(),
+        overloadingAllowed(),
         headers()
       );
       case VILKKU -> new VilkkuBikeRentalDataSourceParameters(
         url(),
         network(),
-        allowOverloading(),
+        overloadingAllowed(),
         headers()
       );
     };
@@ -63,12 +65,8 @@ public class VehicleRentalSourceFactory {
     return c.of("language").since(V2_1).summary("TODO").asString(null);
   }
 
-  private Map<String, String> headers() {
-    return c
-      .of("headers")
-      .since(V1_5)
-      .summary("HTTP headers to add to the request. Any header key, value can be inserted.")
-      .asStringMap();
+  private HttpHeaders headers() {
+    return HttpHeadersConfig.headers(c, V1_5);
   }
 
   private String url() {
@@ -107,9 +105,9 @@ public class VehicleRentalSourceFactory {
       .asBoolean(false);
   }
 
-  private boolean allowOverloading() {
+  private boolean overloadingAllowed() {
     return c
-      .of("allowOverloading")
+      .of("overloadingAllowed")
       .since(V2_2)
       .summary("Allow leaving vehicles at a station even though there are no free slots.")
       .asBoolean(false);

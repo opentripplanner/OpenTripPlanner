@@ -11,7 +11,7 @@
   "license": "LGPL-3.0",
   "dependencies": {
     "@graphql-codegen/add": "4.0.1",
-    "@graphql-codegen/cli": "3.2.1",
+    "@graphql-codegen/cli": "3.2.2",
     "@graphql-codegen/java": "3.3.6",
     "@graphql-codegen/java-resolvers": "2.3.6",
     "graphql": "16.6.0"

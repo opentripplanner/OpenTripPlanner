@@ -17,12 +17,20 @@ on:
 jobs:
   build-linux:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       # Starting in v2.2 checkout action fetches all tags when fetch-depth=0, for auto-versioning.
       - uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 0
-          
+
+      # nodejs is needed because the dynamic download of it via the prettier maven plugin often
+      # times out
+      # Example: https://github.com/opentripplanner/OpenTripPlanner/actions/runs/4490450225/jobs/7897533439
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       # Java setup step completes very fast, no need to run in a preconfigured docker container
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -32,7 +40,13 @@ jobs:
           cache: maven
 
       - name: Prepare coverage agent, build and test
-        run: mvn --batch-mode --update-snapshots jacoco:prepare-agent verify jacoco:report -P prettierCheck
+        # these are split into two steps because otherwise maven keeps long-running HTTP connections
+        # to Maven Central open which then hang during the package phase because the Azure (Github Actions)
+        # NAT drops them
+        # https://github.com/actions/runner-images/issues/1499
+        run: |
+          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node
+          mvn --batch-mode package -Dmaven.test.skip -P prettierSkip
 
       - name: Send coverage data to codecov.io
         if: github.repository_owner == 'opentripplanner'
@@ -44,9 +58,10 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/dev-1.x' || github.ref == 'refs/heads/dev-2.x')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierCheck -P deployGitHub
+        run: mvn --batch-mode deploy --settings maven-settings.xml -DskipTests -DGITHUB_REPOSITORY=$GITHUB_REPOSITORY -P prettierSkip -P deployGitHub
 
   build-windows:
+    timeout-minutes: 20
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
@@ -71,7 +86,7 @@ jobs:
       LOCAL_BRANCH: local-pages
       REMOTE_BRANCH: main
       TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
-      MASTER_BRANCH_VERSION: 2.3.0
+      MASTER_BRANCH_VERSION: 2.4.0
 
     steps:
 
@@ -89,16 +104,26 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r docs/requirements.txt
         
-      - name: Build documentation
+
+      - name: Build main documentation
         if: github.event_name == 'pull_request'
         run: mkdocs build
-        
-      - name: Deploy docs to Github pages
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Build GTFS GraphQL API documentation
+        run: |
+          npm install -g @magidoc/cli@3.6.4
+          magidoc generate
+
+      - name: Deploy compiled HTML to Github pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
         run: |
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
-
+          
           # mike, the versioning plugin for mkdocs, expects there to be a local branch to push to so
           # we are cloning one here and commit to it
           # mike has support for specifing the origin but then it tries to rebase the _local_ gh-pages
@@ -116,6 +141,14 @@ jobs:
           else
             mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
           fi
+          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
+          
+          # commit and push the GraphQL documentation
+          git checkout $LOCAL_BRANCH
+          mkdir -p api
+          rsync -r --delete target/magidoc/api/ api/dev-2.x/
+          git add api
+          git commit -am "Add Magidoc GraphQL documentation"
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   graphql-code-generation:
@@ -146,10 +179,6 @@ jobs:
     needs:
       - build-windows
       - build-linux
-    env:
-      CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
-      CONTAINER_REGISTRY_USER: otpbot
-      CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v3.1.0
         with:
@@ -161,10 +190,13 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Build container image with Jib, push to Dockerhub
+        env:
+          CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
+          CONTAINER_REGISTRY_USER: otpbot
+          CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: |
-          # we give the container three tags
+          # we give the container two tags
           #   - "latest"
-          #   - the git SHA1
           #   - a string like "2.3_2022-12-12T21-38"
           
           version_with_snapshot=`mvn -q help:evaluate -Dexpression=project.version -q -DforceStdout`
@@ -172,4 +204,4 @@ jobs:
           image_date=`date +%Y-%m-%dT%H-%M`
           image_version="${version}_${image_date}"
           
-          mvn --batch-mode -P prettierSkip compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,${{ github.sha }},$image_version
+          mvn --batch-mode -P prettierSkip compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,$image_version

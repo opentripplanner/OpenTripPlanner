@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.updaters.HttpHeadersConfig;
 
 public class VehicleRentalServiceDirectoryFetcherConfig {
 
@@ -40,7 +41,7 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
         .summary("Json tag name for the network name for each source.")
         .asString("id"),
       c.of("language").since(NA).summary("Language code.").asString(null),
-      c.of("headers").since(NA).summary("Http headers.").asStringMap()
+      HttpHeadersConfig.headers(c, NA)
     );
   }
 }

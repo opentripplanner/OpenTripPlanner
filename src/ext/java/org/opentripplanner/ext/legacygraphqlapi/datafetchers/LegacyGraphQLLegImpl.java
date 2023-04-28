@@ -5,12 +5,13 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.LocalDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.ridehailing.model.RideEstimate;
+import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
@@ -179,6 +180,18 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
+  public DataFetcher<RideEstimate> rideHailingEstimate() {
+    return environment -> {
+      Leg leg = getSource(environment);
+      if (leg instanceof RideHailingLeg rhl) {
+        return rhl.rideEstimate();
+      } else {
+        return null;
+      }
+    };
+  }
+
+  @Override
   public DataFetcher<Route> route() {
     return environment -> getSource(environment).getRoute();
   }
@@ -245,8 +258,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
         boolean limitToExactOriginStop =
           originModesWithParentStation == null ||
           !(
-            StreamSupport
-              .stream(originModesWithParentStation.spliterator(), false)
+            originModesWithParentStation
+              .stream()
               .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString)
               .toList()
               .contains(originalLeg.getMode().name())
@@ -255,8 +268,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
         boolean limitToExactDestinationStop =
           destinationModesWithParentStation == null ||
           !(
-            StreamSupport
-              .stream(destinationModesWithParentStation.spliterator(), false)
+            destinationModesWithParentStation
+              .stream()
               .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString)
               .toList()
               .contains(originalLeg.getMode().name())

@@ -1,12 +1,12 @@
 package org.opentripplanner.model;
 
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_STOP_SEQUENCE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
@@ -29,6 +29,8 @@ import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
+import org.opentripplanner.updater.spi.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,7 +148,7 @@ public class Timetable implements Serializable {
    * @param updateServiceDate             service date of trip update
    * @param backwardsDelayPropagationType Defines when delays are propagated to previous stops and
    *                                      if these stops are given the NO_DATA flag
-   * @return {@link Result<TripTimesPatch,  UpdateError >} contains either a new copy of updated
+   * @return {@link Result<TripTimesPatch,   UpdateError  >} contains either a new copy of updated
    * TripTimes after TripUpdate has been applied on TripTimes of trip with the id specified in the
    * trip descriptor of the TripUpdate and a list of stop indices that have been skipped with the
    * realtime update; or an error if something went wrong
@@ -256,8 +258,12 @@ public class Timetable implements Serializable {
               newTimes.updateArrivalTime(i, (int) (arrival.getTime() - today));
               delay = newTimes.getArrivalDelay(i);
             } else {
-              LOG.error("Arrival time at index {} is erroneous.", i);
-              return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME));
+              LOG.debug(
+                "Arrival time at index {} of trip {} has neither a delay nor a time.",
+                i,
+                feedScopedTripId
+              );
+              return Result.failure(new UpdateError(feedScopedTripId, INVALID_ARRIVAL_TIME, i));
             }
           } else if (delay != null) {
             newTimes.updateArrivalDelay(i, delay);
@@ -279,8 +285,12 @@ public class Timetable implements Serializable {
               newTimes.updateDepartureTime(i, (int) (departure.getTime() - today));
               delay = newTimes.getDepartureDelay(i);
             } else {
-              LOG.error("Departure time at index {} is erroneous.", i);
-              return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME));
+              LOG.debug(
+                "Departure time at index {} of trip {} has neither a delay nor a time.",
+                i,
+                feedScopedTripId
+              );
+              return Result.failure(new UpdateError(feedScopedTripId, INVALID_DEPARTURE_TIME, i));
             }
           } else if (delay != null) {
             newTimes.updateDepartureDelay(i, delay);
@@ -328,14 +338,14 @@ public class Timetable implements Serializable {
       }
     }
 
-    var result = newTimes.validateNonIncreasingTimes();
-    if (result.isFailure()) {
+    var error = newTimes.validateNonIncreasingTimes();
+    if (error.isPresent()) {
       LOG.debug(
         "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {} after stop index {}.",
         tripId,
-        result.failureValue().stopIndex()
+        error.get().stopIndex()
       );
-      return Result.failure(result.failureValue());
+      return TripTimesValidationMapper.toResult(newTimes.getTrip().getId(), error.get());
     }
 
     if (tripUpdate.hasVehicle()) {

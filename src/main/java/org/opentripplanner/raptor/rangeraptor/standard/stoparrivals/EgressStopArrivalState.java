@@ -64,6 +64,14 @@ final class EgressStopArrivalState<T extends RaptorTripSchedule>
   }
 
   @Override
+  void setAccessTime(int time, boolean isBestTimeOverall, boolean onBoard) {
+    super.setAccessTime(time, isBestTimeOverall, onBoard);
+    for (RaptorAccessEgress egressPath : egressPaths) {
+      callback.newDestinationArrival(round, time, onBoard, egressPath);
+    }
+  }
+
+  @Override
   public String toString() {
     var builder = ToStringBuilder
       .of(EgressStopArrivalState.class)

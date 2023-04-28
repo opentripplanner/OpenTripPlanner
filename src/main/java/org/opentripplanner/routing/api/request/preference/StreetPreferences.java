@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -28,13 +29,13 @@ import org.opentripplanner.street.search.intersection_model.IntersectionTraversa
 public final class StreetPreferences implements Serializable {
 
   public static StreetPreferences DEFAULT = new StreetPreferences();
-
   private final double turnReluctance;
   private final DrivingDirection drivingDirection;
   private final ElevatorPreferences elevator;
   private final IntersectionTraversalModel intersectionTraversalModel;
   private final DurationForEnum<StreetMode> maxAccessEgressDuration;
   private final DurationForEnum<StreetMode> maxDirectDuration;
+  private final Duration routingTimeout;
 
   private StreetPreferences() {
     this.turnReluctance = 1.0;
@@ -44,6 +45,7 @@ public final class StreetPreferences implements Serializable {
     this.maxAccessEgressDuration =
       DurationForEnum.of(StreetMode.class).withDefault(ofMinutes(45)).build();
     this.maxDirectDuration = DurationForEnum.of(StreetMode.class).withDefault(ofHours(4)).build();
+    this.routingTimeout = Duration.ofSeconds(5);
   }
 
   private StreetPreferences(Builder builder) {
@@ -53,6 +55,7 @@ public final class StreetPreferences implements Serializable {
     this.intersectionTraversalModel = requireNonNull(builder.intersectionTraversalModel);
     this.maxDirectDuration = requireNonNull(builder.maxDirectDuration);
     this.maxAccessEgressDuration = requireNonNull(builder.maxAccessEgressDuration.build());
+    this.routingTimeout = requireNonNull(builder.routingTimeout);
   }
 
   public static Builder of() {
@@ -91,6 +94,16 @@ public final class StreetPreferences implements Serializable {
     return maxDirectDuration;
   }
 
+  /**
+   * The preferred way to limit the search is to limit the distance for each street mode(WALK, BIKE,
+   * CAR). So the default timeout for a street search is set quite high. This is used to abort the
+   * search if the max distance is not reached within the timeout.
+   */
+  @Nonnull
+  public Duration routingTimeout() {
+    return routingTimeout;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -100,6 +113,7 @@ public final class StreetPreferences implements Serializable {
       DoubleUtils.doubleEquals(that.turnReluctance, turnReluctance) &&
       drivingDirection == that.drivingDirection &&
       elevator.equals(that.elevator) &&
+      routingTimeout.equals(that.routingTimeout) &&
       intersectionTraversalModel == that.intersectionTraversalModel &&
       maxAccessEgressDuration.equals(that.maxAccessEgressDuration) &&
       maxDirectDuration.equals(that.maxDirectDuration)
@@ -112,6 +126,7 @@ public final class StreetPreferences implements Serializable {
       turnReluctance,
       drivingDirection,
       elevator,
+      routingTimeout,
       intersectionTraversalModel,
       maxAccessEgressDuration,
       maxDirectDuration
@@ -124,6 +139,7 @@ public final class StreetPreferences implements Serializable {
       .of(StreetPreferences.class)
       .addNum("turnReluctance", turnReluctance, DEFAULT.turnReluctance)
       .addEnum("drivingDirection", drivingDirection, DEFAULT.drivingDirection)
+      .addDuration("routingTimeout", routingTimeout, DEFAULT.routingTimeout())
       .addObj("elevator", elevator, DEFAULT.elevator)
       .addObj(
         "intersectionTraversalModel",
@@ -144,6 +160,7 @@ public final class StreetPreferences implements Serializable {
     private IntersectionTraversalModel intersectionTraversalModel;
     private DurationForEnum.Builder<StreetMode> maxAccessEgressDuration;
     private DurationForEnum<StreetMode> maxDirectDuration;
+    private Duration routingTimeout;
 
     public Builder(StreetPreferences original) {
       this.original = original;
@@ -153,6 +170,7 @@ public final class StreetPreferences implements Serializable {
       this.intersectionTraversalModel = original.intersectionTraversalModel;
       this.maxAccessEgressDuration = original.maxAccessEgressDuration.copyOf();
       this.maxDirectDuration = original.maxDirectDuration;
+      this.routingTimeout = original.routingTimeout;
     }
 
     public StreetPreferences original() {
@@ -198,6 +216,11 @@ public final class StreetPreferences implements Serializable {
     ) {
       this.maxDirectDuration =
         this.maxDirectDuration.copyOf().withDefault(defaultValue).withValues(valuePerMode).build();
+      return this;
+    }
+
+    public Builder withRoutingTimeout(Duration routingTimeout) {
+      this.routingTimeout = routingTimeout;
       return this;
     }
 

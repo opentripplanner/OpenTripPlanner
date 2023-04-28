@@ -1,5 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.path;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.EGRESS;
+
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
@@ -31,7 +34,7 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   private final RaptorAccessEgress egress;
   private final int arrivalTime;
   private final int numberOfTransfers;
-  private final int cost;
+  private final int c1;
 
   public DestinationArrival(
     RaptorAccessEgress egress,
@@ -43,7 +46,7 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
     this.egress = egress;
     this.arrivalTime = arrivalTime;
     this.numberOfTransfers = previous.round() - 1;
-    this.cost = previous.cost() + additionalCost;
+    this.c1 = previous.c1() + additionalCost;
   }
 
   @Override
@@ -62,13 +65,23 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   }
 
   @Override
-  public int cost() {
-    return cost;
+  public int c1() {
+    return c1;
+  }
+
+  @Override
+  public int c2() {
+    return previous.c2();
   }
 
   @Override
   public ArrivalView<T> previous() {
     return previous;
+  }
+
+  @Override
+  public PathLegType arrivedBy() {
+    return EGRESS;
   }
 
   @Override
@@ -79,6 +92,11 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   @Override
   public EgressPathView egressPath() {
     return () -> egress;
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return false;
   }
 
   @Override

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -63,15 +62,12 @@ public class RouteRequestTransitDataProviderFilterTest {
     0,
     10
   );
-  private static final WheelchairPreferences RELAXED_ACCESSIBILITY = new WheelchairPreferences(
-    RELAXED_ACCESSIBILITY_PREFERENCE,
-    RELAXED_ACCESSIBILITY_PREFERENCE,
-    RELAXED_ACCESSIBILITY_PREFERENCE,
-    DEFAULT_ACCESSIBILITY.inaccessibleStreetReluctance(),
-    DEFAULT_ACCESSIBILITY.maxSlope(),
-    DEFAULT_ACCESSIBILITY.slopeExceededReluctance(),
-    DEFAULT_ACCESSIBILITY.stairsReluctance()
-  );
+  private static final WheelchairPreferences RELAXED_ACCESSIBILITY = WheelchairPreferences
+    .of()
+    .withTrip(RELAXED_ACCESSIBILITY_PREFERENCE)
+    .withStop(RELAXED_ACCESSIBILITY_PREFERENCE)
+    .withElevator(RELAXED_ACCESSIBILITY_PREFERENCE)
+    .build();
 
   static Stream<Arguments> wheelchairCases = Stream.of(
     Arguments.of(Accessibility.POSSIBLE, DEFAULT_ACCESSIBILITY),
@@ -703,7 +699,11 @@ public class RouteRequestTransitDataProviderFilterTest {
       .build()
       .getRoutingTripPattern();
 
-    TripTimes tripTimes = Mockito.mock(TripTimes.class);
+    TripTimes tripTimes = new TripTimes(
+      TransitModelForTest.trip("1").withRoute(route).build(),
+      List.of(new StopTime()),
+      new Deduplicator()
+    );
 
     return new TripPatternForDate(tripPattern, List.of(tripTimes), List.of(), LocalDate.now());
   }

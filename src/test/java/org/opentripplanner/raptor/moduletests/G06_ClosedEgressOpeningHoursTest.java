@@ -1,13 +1,10 @@
 package org.opentripplanner.raptor.moduletests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION;
-import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.TC_MIN_DURATION_REV;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.multiCriteria;
 import static org.opentripplanner.raptor.moduletests.support.RaptorModuleTestConfig.standard;
 
@@ -24,7 +21,6 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
-import org.opentripplanner.raptor.spi.UnknownPathString;
 
 /*
  * FEATURE UNDER TEST
@@ -56,13 +52,12 @@ public class G06_ClosedEgressOpeningHoursTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var expMinDuration = UnknownPathString.of("10m", 0);
     var expected = "A ~ BUS R1 0:05 0:10 ~ E ~ Walk 5m [0:05 0:15 10m 0tx $1500]";
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, expMinDuration.departureAt(T00_00))
-      .add(TC_MIN_DURATION_REV, expMinDuration.arrivalAt(T00_30))
+      .withRequest(r -> r.searchParams().addAccessPaths(walk(STOP_B, D2m)))
+      .addMinDuration("10m", TX_0, T00_00, T00_30)
       .add(standard(), PathUtils.withoutCost(expected))
       .add(multiCriteria(), expected)
       .build();
@@ -71,11 +66,6 @@ public class G06_ClosedEgressOpeningHoursTest implements RaptorTestConstants {
   @ParameterizedTest
   @MethodSource("testCases")
   void verifyNo(RaptorModuleTestCase testCase) {
-    requestBuilder.searchParams().addAccessPaths(walk(STOP_B, D2m));
-    var request = testCase.withConfig(requestBuilder);
-
-    var response = raptorService.route(request, data);
-
-    assertEquals(testCase.expected(), pathsToString(response));
+    assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 }

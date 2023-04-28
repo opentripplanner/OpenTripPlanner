@@ -4,6 +4,7 @@ import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparato
 
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
+import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
@@ -12,9 +13,10 @@ import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.ForwardPathMapper;
 import org.opentripplanner.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.raptor.rangeraptor.path.ReversePathMapper;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
+import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 
 /**
  * This class is responsible for creating a a result collector - the set of paths.
@@ -51,7 +53,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
 
   private DestinationArrivalPaths<T> createDestArrivalPaths(boolean includeCost) {
     return new DestinationArrivalPaths<>(
-      paretoComparator(ctx.searchParams(), includeCost, ctx.searchDirection()),
+      createPathParetoComparator(includeCost),
       ctx.calculator(),
       includeCost ? ctx.costCalculator() : null,
       ctx.slackProvider(),
@@ -59,6 +61,16 @@ public class PathConfig<T extends RaptorTripSchedule> {
       ctx.debugFactory(),
       ctx.stopNameResolver(),
       ctx.lifeCycle()
+    );
+  }
+
+  private ParetoComparator<RaptorPath<T>> createPathParetoComparator(boolean includeCost) {
+    return paretoComparator(
+      includeCost,
+      ctx.searchParams().timetable(),
+      ctx.searchParams().preferLateArrival(),
+      ctx.searchDirection(),
+      ctx.multiCriteria().relaxC1AtDestination()
     );
   }
 
@@ -78,7 +90,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
     RaptorProfile profile,
     SearchDirection searchDirection,
     RaptorSlackProvider slackProvider,
-    CostCalculator<S> costCalculator,
+    RaptorCostCalculator<S> costCalculator,
     RaptorStopNameResolver stopNameResolver,
     RaptorPathConstrainedTransferSearch<S> txConstraintsSearch,
     WorkerLifeCycle lifeCycle

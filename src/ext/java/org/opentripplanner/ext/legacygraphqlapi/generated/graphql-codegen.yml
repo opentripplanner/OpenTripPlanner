@@ -8,6 +8,7 @@ generates:
       - java
     config:
       className: LegacyGraphQLTypes
+      listType: List
   LegacyGraphQLDataFetchers.java:
     plugins:
       - add:
@@ -24,6 +25,7 @@ config:
     Long: Long
     Polyline: String
     GeoJson: org.locationtech.jts.geom.Geometry
+    Duration: java.time.Duration
   mappers:
     AbsoluteDirection: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection#LegacyGraphQLAbsoluteDirection
     Agency: org.opentripplanner.transit.model.organization.Agency#Agency
@@ -96,3 +98,7 @@ config:
     PropulsionType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType
     RentalVehicleType: org.opentripplanner.service.vehiclerental.model.RentalVehicleType#RentalVehicleType
     OpeningHours: org.opentripplanner.model.calendar.openinghours.OHCalendar#OHCalendar
+    RideHailingEstimate: org.opentripplanner.ext.ridehailing.model.RideEstimate#RideEstimate
+    RideHailingProvider: org.opentripplanner.ext.legacygraphqlapi.model.RideHailingProvider#RideHailingProvider
+    Money: org.opentripplanner.transit.model.basic.Money#Money
+    Currency: java.util.Currency#Currency

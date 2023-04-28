@@ -10,7 +10,6 @@ import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_ET_GOOGLE_PUBSUB_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_ET_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_SX_UPDATER;
-import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.SIRI_VM_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.STOP_TIME_UPDATER;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.VEHICLE_PARKING;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.VEHICLE_POSITIONS;
@@ -27,7 +26,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
-import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdaterParameters;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
@@ -39,7 +37,6 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.PollingTripUp
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETGooglePubsubUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriETUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXUpdaterConfig;
-import org.opentripplanner.standalone.config.routerconfig.updaters.SiriVMUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleRentalUpdaterConfig;
@@ -126,7 +123,7 @@ public class UpdatersConfig implements UpdatersParameters {
           "Throttles the potentially resource-consuming task of duplicating a TripPattern → Timetable map and indexing the new Timetables. " +
           "Applies to GTFS-RT and Siri updates."
         )
-        .asInt(dflt.maxSnapshotFrequencyMs()),
+        .asDuration(dflt.maxSnapshotFrequency()),
       c
         .of("purgeExpiredData")
         .since(V2_2)
@@ -192,11 +189,6 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<SiriVMUpdaterParameters> getSiriVMUpdaterParameters() {
-    return getParameters(SIRI_VM_UPDATER);
-  }
-
-  @Override
   public List<WebsocketGtfsRealtimeUpdaterParameters> getWebsocketGtfsRealtimeUpdaterParameters() {
     return getParameters(WEBSOCKET_GTFS_RT_UPDATER);
   }
@@ -245,7 +237,6 @@ public class UpdatersConfig implements UpdatersParameters {
     WINKKI_POLLING_UPDATER(WFSNotePollingGraphUpdaterConfig::create),
     SIRI_ET_UPDATER(SiriETUpdaterConfig::create),
     SIRI_ET_GOOGLE_PUBSUB_UPDATER(SiriETGooglePubsubUpdaterConfig::create),
-    SIRI_VM_UPDATER(SiriVMUpdaterConfig::create),
     SIRI_SX_UPDATER(SiriSXUpdaterConfig::create),
     SIRI_AZURE_ET_UPDATER(SiriAzureETUpdaterConfig::create),
     SIRI_AZURE_SX_UPDATER(SiriAzureSXUpdaterConfig::create);

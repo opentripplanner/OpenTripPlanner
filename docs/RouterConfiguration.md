@@ -35,25 +35,29 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |-------------------------------------------------------------------------------------------|:---------------------:|---------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |  2.1  |
 | [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
-| [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |   na  |
+| [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |  2.2  |
 | [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |  2.1  |
+| [rideHailingServices](sandbox/RideHailing.md)                                             |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                         | *Optional* |               |  2.3  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
+|    [maxSnapshotFrequency](#timetableUpdates_maxSnapshotFrequency)                         |       `duration`      | How long a snapshot should be cached.                                                             | *Optional* | `"PT1S"`      |  2.2  |
+|    purgeExpiredData                                                                       |       `boolean`       | Should expired realtime data be purged from the graph. Apply to GTFS-RT and Siri updates.         | *Optional* | `true`        |  2.2  |
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                   | *Optional* |               |   na  |
 |    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                     | *Optional* | `60`          |   na  |
 |    [maxNumberOfTransfers](#transit_maxNumberOfTransfers)                                  |       `integer`       | This parameter is used to allocate enough memory space for Raptor.                                | *Optional* | `12`          |   na  |
 |    [scheduledTripBinarySearchThreshold](#transit_scheduledTripBinarySearchThreshold)      |       `integer`       | This threshold is used to determine when to perform a binary trip schedule search.                | *Optional* | `50`          |   na  |
 |    [searchThreadPoolSize](#transit_searchThreadPoolSize)                                  |       `integer`       | Split a travel search in smaller jobs and run them in parallel to improve performance.            | *Optional* | `0`           |   na  |
 |    [transferCacheMaxSize](#transit_transferCacheMaxSize)                                  |       `integer`       | The maximum number of distinct transfers parameters to cache pre-calculated transfers for.        | *Optional* | `25`          |   na  |
-|    [dynamicSearchWindow](#transit_dynamicSearchWindow)                                    |        `object`       | The dynamic search window coefficients used to calculate the EDT, LAT and SW.                     | *Optional* |               |   na  |
-|       [maxWinTimeMinutes](#transit_dynamicSearchWindow_maxWinTimeMinutes)                 |       `integer`       | Upper limit for the search-window calculation.                                                    | *Optional* | `180`         |   na  |
-|       [minTransitTimeCoefficient](#transit_dynamicSearchWindow_minTransitTimeCoefficient) |        `double`       | The coefficient to multiply with `minTransitTime`.                                                | *Optional* | `0.5`         |   na  |
-|       [minWaitTimeCoefficient](#transit_dynamicSearchWindow_minWaitTimeCoefficient)       |        `double`       | The coefficient to multiply with `minWaitTime`.                                                   | *Optional* | `0.5`         |   na  |
-|       [minWinTimeMinutes](#transit_dynamicSearchWindow_minWinTimeMinutes)                 |       `integer`       | The constant minimum number of minutes for a raptor-search-window.                                | *Optional* | `40`          |   na  |
-|       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                            | *Optional* | `10`          |   na  |
+|    [dynamicSearchWindow](#transit_dynamicSearchWindow)                                    |        `object`       | The dynamic search window coefficients used to calculate the EDT, LAT and SW.                     | *Optional* |               |  2.1  |
+|       [maxWindow](#transit_dynamicSearchWindow_maxWindow)                                 |       `duration`      | Upper limit for the search-window calculation.                                                    | *Optional* | `"PT3H"`      |  2.2  |
+|       [minTransitTimeCoefficient](#transit_dynamicSearchWindow_minTransitTimeCoefficient) |        `double`       | The coefficient to multiply with `minTransitTime`.                                                | *Optional* | `0.5`         |  2.1  |
+|       [minWaitTimeCoefficient](#transit_dynamicSearchWindow_minWaitTimeCoefficient)       |        `double`       | The coefficient to multiply with `minWaitTime`.                                                   | *Optional* | `0.5`         |  2.1  |
+|       [minWindow](#transit_dynamicSearchWindow_minWindow)                                 |       `duration`      | The constant minimum duration for a raptor-search-window.                                         | *Optional* | `"PT40M"`     |  2.2  |
+|       [stepMinutes](#transit_dynamicSearchWindow_stepMinutes)                             |       `integer`       | Used to set the steps the search-window is rounded to.                                            | *Optional* | `10`          |  2.1  |
 |    [pagingSearchWindowAdjustments](#transit_pagingSearchWindowAdjustments)                |      `duration[]`     | The provided array of durations is used to increase the search-window for the next/previous page. | *Optional* |               |   na  |
-|    [stopTransferCost](#transit_stopTransferCost)                                          | `enum map of integer` | Use this to set a stop transfer cost for the given transfer priority                              | *Optional* |               |   na  |
-| transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |   na  |
+|    [stopTransferCost](#transit_stopTransferCost)                                          | `enum map of integer` | Use this to set a stop transfer cost for the given transfer priority                              | *Optional* |               |  2.0  |
+|    [transferCacheRequests](#transit_transferCacheRequests)                                |       `object[]`      | Routing requests to use for pre-filling the stop-to-stop transfer cache.                          | *Optional* |               |  2.3  |
+| transmodelApi                                                                             |        `object`       | Configuration for the Transmodel GraphQL API.                                                     | *Optional* |               |  2.1  |
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                           | *Optional* | `false`       |   na  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                       | *Optional* |               |   na  |
 | [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                        | *Optional* |               |  1.5  |
@@ -64,7 +68,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    updaterNetworkName                                                                     |        `string`       | Json tag name for the network name for each source.                                               | *Optional* | `"id"`        |   na  |
 |    updaterUrlName                                                                         |        `string`       | Json tag name for endpoint urls for each source.                                                  | *Optional* | `"url"`       |   na  |
 |    url                                                                                    |         `uri`         | Endpoint for the VehicleRentalServiceDirectory                                                    | *Required* |               |   na  |
-|    [headers](#vehicleRentalServiceDirectory_headers)                                      |    `map of string`    | Http headers.                                                                                     | *Optional* |               |   na  |
+|    [headers](#vehicleRentalServiceDirectory_headers)                                      |    `map of string`    | HTTP headers to add to the request. Any header key, value can be inserted.                        | *Optional* |               |   na  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -126,7 +130,7 @@ number of transit vehicles used in that itinerary.
 
 <h3 id="streetRoutingTimeout">streetRoutingTimeout</h3>
 
-**Since version:** `na` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`   
+**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`   
 **Path:** / 
 
 The maximum time a street routing request is allowed to take before returning a timeout.
@@ -142,6 +146,15 @@ search-window.
 
 The search aborts after this duration and any paths found are returned to the client.
 
+
+<h3 id="timetableUpdates_maxSnapshotFrequency">maxSnapshotFrequency</h3>
+
+**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT1S"`   
+**Path:** /timetableUpdates 
+
+How long a snapshot should be cached.
+
+If a timetable snapshot is requested less than this number of milliseconds after the previous snapshot, then return the same instance. Throttles the potentially resource-consuming task of duplicating a TripPattern → Timetable map and indexing the new Timetables. Applies to GTFS-RT and Siri updates.
 
 <h3 id="transit">transit</h3>
 
@@ -216,7 +229,7 @@ The maximum number of distinct transfers parameters to cache pre-calculated tran
 
 <h3 id="transit_dynamicSearchWindow">dynamicSearchWindow</h3>
 
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.1` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** /transit 
 
 The dynamic search window coefficients used to calculate the EDT, LAT and SW.
@@ -243,18 +256,18 @@ The `round_N(...)` method rounds the input to the closest multiplication of N.
 
 The 3 coefficients above are:
 
- - `C` is parameter: `minWinTimeMinutes`
+ - `C` is parameter: `minWindow`
  - `T` is parameter: `minTransitTimeCoefficient`
  - `W` is parameter: `minWaitTimeCoefficient`
  - `N` is parameter: `stepMinutes`
 
 In addition there is an upper bound on the calculation of the search window:
-`maxWinTimeMinutes`.
+`maxWindow`.
 
 
-<h3 id="transit_dynamicSearchWindow_maxWinTimeMinutes">maxWinTimeMinutes</h3>
+<h3 id="transit_dynamicSearchWindow_maxWindow">maxWindow</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `180`   
+**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT3H"`   
 **Path:** /transit/dynamicSearchWindow 
 
 Upper limit for the search-window calculation.
@@ -262,15 +275,13 @@ Upper limit for the search-window calculation.
 Long search windows consumes a lot of resources and may take a long time. Use this parameter to
 tune the desired maximum search time.
 
-This is the parameter that affect the response time most, the downside is that a search is only
+This is the parameter that affects the response time most, the downside is that a search is only
 guaranteed to be pareto-optimal within a search-window.
-
-The default is 3 hours. The unit is minutes.
 
 
 <h3 id="transit_dynamicSearchWindow_minTransitTimeCoefficient">minTransitTimeCoefficient</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`   
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`   
 **Path:** /transit/dynamicSearchWindow 
 
 The coefficient to multiply with `minTransitTime`.
@@ -279,25 +290,25 @@ Use a value between `0.0` and `3.0`. Using `0.0` will eliminate the `minTransitT
 
 <h3 id="transit_dynamicSearchWindow_minWaitTimeCoefficient">minWaitTimeCoefficient</h3>
 
-**Since version:** `na` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`   
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.5`   
 **Path:** /transit/dynamicSearchWindow 
 
 The coefficient to multiply with `minWaitTime`.
 
 Use a value between `0.0` and `1.0`. Using `0.0` will eliminate the `minWaitTime` from the dynamic raptor-search-window calculation.
 
-<h3 id="transit_dynamicSearchWindow_minWinTimeMinutes">minWinTimeMinutes</h3>
+<h3 id="transit_dynamicSearchWindow_minWindow">minWindow</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `40`   
+**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT40M"`   
 **Path:** /transit/dynamicSearchWindow 
 
-The constant minimum number of minutes for a raptor-search-window. 
+The constant minimum duration for a raptor-search-window. 
 
 Use a value between 20 and 180 minutes in a normal deployment.
 
 <h3 id="transit_dynamicSearchWindow_stepMinutes">stepMinutes</h3>
 
-**Since version:** `na` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10`   
+**Since version:** `2.1` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `10`   
 **Path:** /transit/dynamicSearchWindow 
 
 Used to set the steps the search-window is rounded to.
@@ -327,7 +338,7 @@ for more info."
 
 <h3 id="transit_stopTransferCost">stopTransferCost</h3>
 
-**Since version:** `na` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.0` ∙ **Type:** `enum map of integer` ∙ **Cardinality:** `Optional`   
 **Path:** /transit   
 **Enum keys:** `discouraged` | `allowed` | `recommended` | `preferred`
 
@@ -352,6 +363,31 @@ Use values in a range from `0` to `100 000`. **All key/value pairs are required 
 `stopTransferCost` is listed.**
 
 
+<h3 id="transit_transferCacheRequests">transferCacheRequests</h3>
+
+**Since version:** `2.3` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
+**Path:** /transit ∙ **See:** [RouteRequest.md](RouteRequest.md) 
+
+Routing requests to use for pre-filling the stop-to-stop transfer cache.
+
+If not set, the default behavior is to cache stop-to-stop transfers using the default route request
+(`routingDefaults`). Use this to change the default or specify more than one `RouteRequest`.
+
+**Example**
+
+```JSON
+// router-config.json
+{
+  "transit": {
+    "transferCacheRequests": [
+      { "modes": "WALK"                                                     },
+      { "modes": "WALK",    "wheelchairAccessibility": { "enabled": true  } }
+    ]
+  }
+}
+```
+
+
 <h3 id="transmodelApi_hideFeedId">hideFeedId</h3>
 
 **Since version:** `na` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
@@ -373,7 +409,7 @@ Used to group requests when monitoring OTP.
 **Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /vehicleRentalServiceDirectory 
 
-Http headers.
+HTTP headers to add to the request. Any header key, value can be inserted.
 
 
 <!-- PARAMETERS-DETAILS END -->
@@ -387,7 +423,7 @@ Http headers.
 ```JSON
 // router-config.json
 {
-  "configVersion" : "v2.2.0-EN000121",
+  "configVersion" : "v2.3.0-EN000121",
   "streetRoutingTimeout" : "5s",
   "routingDefaults" : {
     "walkSpeed" : 1.3,
@@ -468,7 +504,16 @@ Http headers.
         "onlyConsiderAccessible" : false,
         "unknownCost" : 600,
         "inaccessibleCost" : 3600
-      }
+      },
+      "elevator" : {
+        "onlyConsiderAccessible" : false,
+        "unknownCost" : 20,
+        "inaccessibleCost" : 3600
+      },
+      "inaccessibleStreetReluctance" : 25,
+      "maxSlope" : 0.083,
+      "slopeExceededReluctance" : 1,
+      "stairsReluctance" : 100
     }
   },
   "flex" : {
@@ -482,15 +527,26 @@ Http headers.
     "dynamicSearchWindow" : {
       "minTransitTimeCoefficient" : 0.5,
       "minWaitTimeCoefficient" : 0.5,
-      "minWinTimeMinutes" : 60,
-      "maxWinTimeMinutes" : 300
+      "minWindow" : "1h",
+      "maxWindow" : "5h"
     },
     "stopTransferCost" : {
       "DISCOURAGED" : 1500,
       "ALLOWED" : 75,
       "RECOMMENDED" : 30,
       "PREFERRED" : 0
-    }
+    },
+    "transferCacheRequests" : [
+      {
+        "modes" : "WALK"
+      },
+      {
+        "modes" : "WALK",
+        "wheelchairAccessibility" : {
+          "enabled" : true
+        }
+      }
+    ]
   },
   "vehicleRentalServiceDirectory" : {
     "url" : "https://entur.no/bikeRentalServiceDirectory",
@@ -556,6 +612,10 @@ Http headers.
       "expansionFactor" : 0.25
     }
   ],
+  "timetableUpdates" : {
+    "purgeExpiredData" : false,
+    "maxSnapshotFrequency" : "2s"
+  },
   "updaters" : [
     {
       "type" : "real-time-alerts",
@@ -638,6 +698,15 @@ Http headers.
       "type" : "websocket-gtfs-rt-updater"
     },
     {
+      "type" : "siri-et-updater",
+      "url" : "https://example.com/some/path",
+      "feedId" : "feed_id",
+      "timeoutSec" : 30,
+      "headers" : {
+        "Authorization" : "Some-Token"
+      }
+    },
+    {
       "type" : "siri-azure-sx-updater",
       "topic" : "some_topic",
       "servicebus-url" : "service_bus_url",
@@ -649,6 +718,14 @@ Http headers.
         "toDateTime" : "P1D",
         "timeout" : 300000
       }
+    }
+  ],
+  "rideHailingServices" : [
+    {
+      "type" : "uber-car-hailing",
+      "clientId" : "secret-id",
+      "clientSecret" : "very-secret",
+      "wheelchairAccessibleRideType" : "car"
     }
   ]
 }

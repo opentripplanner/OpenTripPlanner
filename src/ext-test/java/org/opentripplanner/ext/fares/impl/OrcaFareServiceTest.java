@@ -61,7 +61,7 @@ public class OrcaFareServiceTest {
   private static void calculateFare(List<Leg> legs, FareType fareType, float expectedFareInCents) {
     ItineraryFares fare = new ItineraryFares();
     orcaFareService.populateFare(fare, null, fareType, legs, null);
-    Assertions.assertEquals(expectedFareInCents, fare.getFare(fareType).cents());
+    Assertions.assertEquals(expectedFareInCents, fare.getFare(fareType).amount());
   }
 
   private static void assertLegFareEquals(
@@ -83,7 +83,7 @@ public class OrcaFareServiceTest {
     if (rideCost.isEmpty()) {
       Assertions.fail("Missing leg fare product.");
     }
-    Assertions.assertEquals(fare, rideCost.get().amount().cents());
+    Assertions.assertEquals(fare, rideCost.get().amount().amount());
 
     var transfer = legFareProducts
       .stream()

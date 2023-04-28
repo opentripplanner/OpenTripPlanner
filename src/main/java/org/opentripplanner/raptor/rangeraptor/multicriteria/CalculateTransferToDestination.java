@@ -13,7 +13,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSetEventListener;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class CalculateTransferToDestination<T extends RaptorTripSchedule>
+class CalculateTransferToDestination<T extends RaptorTripSchedule>
   implements ParetoSetEventListener<ArrivalView<T>> {
 
   private final List<RaptorAccessEgress> egressPaths;
@@ -36,15 +36,30 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
    */
   @Override
   public void notifyElementAccepted(ArrivalView<T> newElement) {
-    if (newElement.arrivedByTransit()) {
-      for (RaptorAccessEgress egress : egressPaths) {
-        destinationArrivals.add(newElement, egress);
-      }
-    } else if (newElement.arrivedByTransfer()) {
-      for (RaptorAccessEgress egress : egressPaths) {
-        if (egress.stopReachedOnBoard()) {
-          destinationArrivals.add(newElement, egress);
+    switch (newElement.arrivedBy()) {
+      case TRANSIT -> addOnBoardStopArrivalToDestination(newElement);
+      case TRANSFER -> addOnStreetArrivalToDestination(newElement);
+      case ACCESS -> {
+        if (newElement.arrivedOnBoard()) {
+          addOnBoardStopArrivalToDestination(newElement);
+        } else {
+          addOnStreetArrivalToDestination(newElement);
         }
+      }
+      case EGRESS -> throw new IllegalArgumentException();
+    }
+  }
+
+  private void addOnBoardStopArrivalToDestination(ArrivalView<T> newElement) {
+    for (RaptorAccessEgress egress : egressPaths) {
+      destinationArrivals.add(newElement, egress);
+    }
+  }
+
+  private void addOnStreetArrivalToDestination(ArrivalView<T> newElement) {
+    for (RaptorAccessEgress egress : egressPaths) {
+      if (egress.stopReachedOnBoard()) {
+        destinationArrivals.add(newElement, egress);
       }
     }
   }

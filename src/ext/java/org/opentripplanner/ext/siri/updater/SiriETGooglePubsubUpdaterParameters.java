@@ -11,7 +11,9 @@ public record SiriETGooglePubsubUpdaterParameters(
   @Nonnull String configRef,
   @Nullable String feedId,
   String type,
-  String projectName,
+  @Deprecated String projectName,
+  String subscriptionProjectName,
+  String topicProjectName,
   String topicName,
   @Nullable String dataInitializationUrl,
   Duration reconnectPeriod,
@@ -25,7 +27,17 @@ public record SiriETGooglePubsubUpdaterParameters(
 
   public SiriETGooglePubsubUpdaterParameters {
     Objects.requireNonNull(type);
-    Objects.requireNonNull(projectName);
+
+    if (subscriptionProjectName == null && topicProjectName == null) {
+      // New config-parameters not yet in use
+      // TODO: Remove deprecated `projectName` when config is updated
+      Objects.requireNonNull(projectName);
+      subscriptionProjectName = projectName;
+      topicProjectName = projectName;
+    }
+
+    Objects.requireNonNull(subscriptionProjectName);
+    Objects.requireNonNull(topicProjectName);
     Objects.requireNonNull(topicName);
     Objects.requireNonNull(reconnectPeriod);
     Objects.requireNonNull(initialGetDataTimeout);
@@ -40,6 +52,8 @@ public record SiriETGooglePubsubUpdaterParameters(
       .addObj("feedId", feedId, null)
       .addObj("type", type)
       .addObj("projectName", projectName)
+      .addObj("subscriptionProjectName", subscriptionProjectName, projectName)
+      .addObj("topicProjectName", topicProjectName, projectName)
       .addObj("topicName", topicName)
       .addDuration("reconnectPeriod", reconnectPeriod, RECONNECT_PERIOD)
       .addDuration("initialGetDataTimeout", initialGetDataTimeout, INITIAL_GET_DATA_TIMEOUT)
@@ -50,17 +64,7 @@ public record SiriETGooglePubsubUpdaterParameters(
   }
 
   @Override
-  public String getUrl() {
+  public String url() {
     return dataInitializationUrl;
-  }
-
-  @Override
-  public String configRef() {
-    return configRef;
-  }
-
-  @Override
-  public String getFeedId() {
-    return feedId;
   }
 }

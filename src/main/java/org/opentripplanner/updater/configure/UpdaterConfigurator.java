@@ -6,7 +6,6 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.ext.siri.updater.SiriETGooglePubsubUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
-import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
@@ -16,10 +15,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.street_note.WinkkiPollingGraphUpdater;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.PollingTripUpdater;
@@ -171,9 +170,6 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
       updaters.add(new SiriSXUpdater(configItem, transitModel));
-    }
-    for (var configItem : updatersParameters.getSiriVMUpdaterParameters()) {
-      updaters.add(new SiriVMUpdater(provideSiriTimetableSnapshot(), configItem, transitModel));
     }
     for (var configItem : updatersParameters.getWebsocketGtfsRealtimeUpdaterParameters()) {
       updaters.add(

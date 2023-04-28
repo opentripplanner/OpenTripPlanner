@@ -10,7 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 
@@ -21,8 +21,8 @@ public class OpenStreetMapParserTest {
     File osmFile = new File(
       URLDecoder.decode(getClass().getResource("map.osm.pbf").getPath(), StandardCharsets.UTF_8)
     );
-    OpenStreetMapProvider pr = new OpenStreetMapProvider(osmFile, true);
-    OSMDatabase osmdb = new OSMDatabase(DataImportIssueStore.NOOP, Set.of());
+    OsmProvider pr = new OsmProvider(osmFile, true);
+    OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP, Set.of());
 
     pr.readOSM(osmdb);
 

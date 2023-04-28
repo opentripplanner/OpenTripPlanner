@@ -66,4 +66,9 @@ public class McRaptorWorkerResult<T extends RaptorTripSchedule> implements Rapto
       }
     };
   }
+
+  @Override
+  public boolean isDestinationReached() {
+    return !paths.isEmpty();
+  }
 }

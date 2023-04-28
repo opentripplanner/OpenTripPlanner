@@ -35,7 +35,6 @@ public class StreetLeg implements Leg {
   private final Boolean walkingBike;
   private final Boolean rentedVehicle;
   private final String vehicleRentalNetwork;
-
   private final Float accessibilityScore;
 
   public StreetLeg(StreetLegBuilder builder) {

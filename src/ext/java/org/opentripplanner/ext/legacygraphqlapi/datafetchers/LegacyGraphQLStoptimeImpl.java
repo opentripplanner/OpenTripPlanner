@@ -2,8 +2,8 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
@@ -36,7 +36,7 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   @Override
   public DataFetcher<String> headsign() {
     return environment ->
-      LegacyGraphQLUtils.getTranslation(getSource(environment).getHeadsign(), environment);
+      GraphQLUtils.getTranslation(getSource(environment).getHeadsign(), environment);
   }
 
   @Override

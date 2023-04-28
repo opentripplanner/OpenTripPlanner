@@ -1,17 +1,21 @@
 package org.opentripplanner.standalone.config;
 
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.List;
+import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.routerconfig.RideHailingServicesConfig;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.routerconfig.UpdatersConfig;
 import org.opentripplanner.standalone.config.routerconfig.VectorTileConfig;
@@ -27,7 +31,6 @@ import org.slf4j.LoggerFactory;
  */
 public class RouterConfig implements Serializable {
 
-  private static final Duration DEFAULT_STREET_ROUTING_TIMEOUT = Duration.ofSeconds(5);
   private static final Logger LOG = LoggerFactory.getLogger(RouterConfig.class);
 
   public static final RouterConfig DEFAULT = new RouterConfig(
@@ -43,10 +46,10 @@ public class RouterConfig implements Serializable {
   private final String configVersion;
   private final String requestLogFile;
   private final TransmodelAPIConfig transmodelApi;
-  private final Duration streetRoutingTimeout;
   private final RouteRequest routingRequestDefaults;
   private final TransitRoutingConfig transitConfig;
   private final UpdatersParameters updatersParameters;
+  private final RideHailingServicesConfig rideHailingConfig;
   private final VectorTileConfig vectorTileLayers;
   private final FlexConfig flexConfig;
 
@@ -101,20 +104,24 @@ number of transit vehicles used in that itinerary.
       new TransmodelAPIConfig(
         root
           .of("transmodelApi")
-          .since(NA)
+          .since(V2_1)
           .summary("Configuration for the Transmodel GraphQL API.")
           .asObject()
       );
-    this.streetRoutingTimeout = parseStreetRoutingTimeout(root);
-    this.transitConfig = new TransitRoutingConfig("transit", root);
     this.routingRequestDefaults =
-      RouteRequestConfig.mapDefaultRouteRequest(root, "routingDefaults");
+      RouteRequestConfig.mapDefaultRouteRequest(
+        root,
+        "routingDefaults",
+        parseStreetRoutingTimeout(root, StreetPreferences.DEFAULT.routingTimeout())
+      );
+    this.transitConfig = new TransitRoutingConfig("transit", root, routingRequestDefaults);
     this.updatersParameters = new UpdatersConfig(root);
+    this.rideHailingConfig = new RideHailingServicesConfig(root);
     this.vectorTileLayers = VectorTileConfig.mapVectorTilesParameters(root, "vectorTileLayers");
     this.flexConfig = new FlexConfig(root, "flex");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      root.logAllUnusedParameters(LOG::warn);
+      root.logAllWarnings(LOG::warn);
     }
   }
 
@@ -139,15 +146,6 @@ number of transit vehicles used in that itinerary.
     return requestLogFile;
   }
 
-  /**
-   * The preferred way to limit the search is to limit the distance for each street mode(WALK, BIKE,
-   * CAR). So the default timeout for a street search is set quite high. This is used to abort the
-   * search if the max distance is not reached within the timeout.
-   */
-  public Duration streetRoutingTimeout() {
-    return streetRoutingTimeout;
-  }
-
   public TransmodelAPIConfig transmodelApi() {
     return transmodelApi;
   }
@@ -162,6 +160,10 @@ number of transit vehicles used in that itinerary.
 
   public UpdatersParameters updaterConfig() {
     return updatersParameters;
+  }
+
+  public List<RideHailingServiceParameters> rideHailingServiceParameters() {
+    return rideHailingConfig.rideHailingServiceParameters();
   }
 
   public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
@@ -198,10 +200,10 @@ number of transit vehicles used in that itinerary.
    *
    * @since 2.2 - The support for the old format can be removed in version > 2.2.
    */
-  static Duration parseStreetRoutingTimeout(NodeAdapter adapter) {
+  static Duration parseStreetRoutingTimeout(NodeAdapter adapter, Duration defaultValue) {
     return adapter
       .of("streetRoutingTimeout")
-      .since(NA)
+      .since(V2_2)
       .summary(
         "The maximum time a street routing request is allowed to take before returning a timeout."
       )
@@ -219,6 +221,6 @@ search-window.
 The search aborts after this duration and any paths found are returned to the client.
 """
       )
-      .asDuration(DEFAULT_STREET_ROUTING_TIMEOUT);
+      .asDuration(defaultValue);
   }
 }

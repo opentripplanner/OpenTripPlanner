@@ -18,10 +18,10 @@ import org.asynchttpclient.ws.WebSocketListener;
 import org.asynchttpclient.ws.WebSocketUpgradeHandler;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.updater.UpdateResult;
-import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,8 +82,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     TransitModel transitModel
   ) {
     this.configRef = parameters.configRef();
-    this.url = parameters.getUrl();
-    this.feedId = parameters.getFeedId();
+    this.url = parameters.url();
+    this.feedId = parameters.feedId();
     this.reconnectPeriodSec = parameters.getReconnectPeriodSec();
     this.backwardsDelayPropagationType = parameters.getBackwardsDelayPropagationType();
     this.snapshotSource = snapshotSource;

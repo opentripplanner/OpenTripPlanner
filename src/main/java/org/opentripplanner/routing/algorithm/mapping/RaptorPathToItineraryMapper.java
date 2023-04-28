@@ -126,7 +126,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     Itinerary itinerary = new Itinerary(legs);
 
     // Map general itinerary fields
-    itinerary.setGeneralizedCost(toOtpDomainCost(path.generalizedCost()));
+    itinerary.setGeneralizedCost(toOtpDomainCost(path.c1()));
     itinerary.setArrivedAtDestinationWithRentedVehicle(
       mapped != null && mapped.isArrivedAtDestinationWithRentedVehicle()
     );

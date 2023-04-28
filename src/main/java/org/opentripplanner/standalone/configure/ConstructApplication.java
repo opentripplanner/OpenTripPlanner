@@ -6,8 +6,10 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
@@ -66,16 +68,15 @@ public class ConstructApplication {
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
-    GraphBuilderDataSources graphBuilderDataSources
+    GraphBuilderDataSources graphBuilderDataSources,
+    DataImportIssueSummary issueSummary
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
 
     // We create the optional GraphVisualizer here, because it would be significant more complex to
     // use Dagger DI to do it - passing in a parameter to enable it or not.
-    var graphVisualizer = cli.visualize
-      ? new GraphVisualizer(graph, config.routerConfig().streetRoutingTimeout())
-      : null;
+    var graphVisualizer = cli.visualize ? new GraphVisualizer(graph) : null;
 
     this.factory =
       DaggerConstructApplicationFactory
@@ -85,6 +86,7 @@ public class ConstructApplication {
         .transitModel(transitModel)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
+        .dataImportIssueSummary(issueSummary)
         .build();
   }
 
@@ -150,6 +152,8 @@ public class ConstructApplication {
 
     initEllipsoidToGeoidDifference();
 
+    initializeTransferCache(routerConfig().transitTuningConfig(), transitModel());
+
     if (OTPFeature.SandboxAPITransmodelApi.isOn()) {
       TransmodelAPI.setUp(
         routerConfig().transmodelApi(),
@@ -197,8 +201,37 @@ public class ConstructApplication {
     );
   }
 
+  public static void initializeTransferCache(
+    TransitTuningParameters transitTuningConfig,
+    TransitModel transitModel
+  ) {
+    var transferCacheRequests = transitTuningConfig.transferCacheRequests();
+    if (!transferCacheRequests.isEmpty()) {
+      var progress = ProgressTracker.track(
+        "Creating initial raptor transfer cache",
+        1,
+        transferCacheRequests.size()
+      );
+
+      LOG.info(progress.startMessage());
+
+      transferCacheRequests.forEach(request -> {
+        transitModel.getTransitLayer().getRaptorTransfersForRequest(request);
+
+        //noinspection Convert2MethodRef
+        progress.step(s -> LOG.info(s));
+      });
+
+      LOG.info(progress.completeMessage());
+    }
+  }
+
   public TransitModel transitModel() {
     return factory.transitModel();
+  }
+
+  public DataImportIssueSummary dataImportIssueSummary() {
+    return factory.dataImportIssueSummary();
   }
 
   public VehiclePositionRepository vehiclePositionRepository() {

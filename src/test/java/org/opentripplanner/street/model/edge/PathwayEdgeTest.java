@@ -3,7 +3,6 @@ package org.opentripplanner.street.model.edge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.routing.api.request.preference.AccessibilityPreferences.ofOnlyAccessible;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -198,15 +197,16 @@ class PathwayEdgeTest {
 
     req.withPreferences(preferences ->
       preferences.withWheelchair(
-        new WheelchairPreferences(
-          ofOnlyAccessible(),
-          ofOnlyAccessible(),
-          ofOnlyAccessible(),
-          25,
-          0.08,
-          1,
-          25
-        )
+        WheelchairPreferences
+          .of()
+          .withTripOnlyAccessible()
+          .withStopOnlyAccessible()
+          .withElevatorOnlyAccessible()
+          .withInaccessibleStreetReluctance(25)
+          .withMaxSlope(0.08)
+          .withSlopeExceededReluctance(1)
+          .withStairsReluctance(25)
+          .build()
       )
     );
 

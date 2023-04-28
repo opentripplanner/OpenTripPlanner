@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
@@ -128,20 +129,12 @@ public class RoutingWorker {
       request.journey().direct().mode() == StreetMode.FLEXIBLE;
 
     ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
-      request.itinerariesSortOrder(),
-      request.preferences().itineraryFilter(),
-      request.numItineraries(),
+      request,
+      serverContext,
       filterOnLatestDepartureTime(),
       emptyDirectModeHandler.removeWalkAllTheWayResults() ||
       removeWalkAllTheWayResultsFromDirectFlex,
-      request.maxNumberOfItinerariesCropHead(),
-      it -> firstRemovedItinerary = it,
-      request.wheelchair(),
-      request.preferences().wheelchair().maxSlope(),
-      serverContext.graph().getFareService(),
-      minBikeParkingDistance(request),
-      serverContext.transitService().getTransitAlertService(),
-      serverContext.transitService()::getMultiModalStationForStation
+      it -> firstRemovedItinerary = it
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
@@ -178,17 +171,12 @@ public class RoutingWorker {
     );
   }
 
-  private static double minBikeParkingDistance(RouteRequest request) {
-    var modes = request.journey().modes();
-    boolean hasBikePark = List
-      .of(modes.accessMode, modes.egressMode)
-      .contains(StreetMode.BIKE_TO_PARK);
-
-    double minBikeParkingDistance = 0;
-    if (hasBikePark) {
-      minBikeParkingDistance = request.preferences().itineraryFilter().minBikeParkingDistance();
+  private List<RideHailingService> rideHailingServices() {
+    if (request.journey().modes().contains(StreetMode.CAR_HAILING)) {
+      return serverContext.rideHailingServices();
+    } else {
+      return List.of();
     }
-    return minBikeParkingDistance;
   }
 
   private static AdditionalSearchDays createAdditionalSearchDays(
@@ -197,9 +185,7 @@ public class RoutingWorker {
     RouteRequest request
   ) {
     var searchDateTime = ZonedDateTime.ofInstant(request.dateTime(), zoneId);
-    var maxWindow = Duration.ofMinutes(
-      raptorTuningParameters.dynamicSearchWindowCoefficients().maxWinTimeMinutes()
-    );
+    var maxWindow = raptorTuningParameters.dynamicSearchWindowCoefficients().maxWindow();
 
     return new AdditionalSearchDays(
       request.arriveBy(),
@@ -326,8 +312,8 @@ public class RoutingWorker {
   ) {
     var c = raptorTuningParameters.dynamicSearchWindowCoefficients();
     return new PagingSearchWindowAdjuster(
-      c.minWinTimeMinutes(),
-      c.maxWinTimeMinutes(),
+      c.minWindow(),
+      c.maxWindow(),
       transitTuningParameters.pagingSearchWindowAdjustments()
     );
   }

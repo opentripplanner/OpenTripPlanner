@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.datastore.api.CompositeDataSource;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
@@ -52,14 +53,18 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       if (!deleteReportDirectoryAndContent()) {
         return;
       }
-      LOG.info("Creating data import issue log");
-
       List<Bucket> buckets = partitionIssues(issueStore.listIssues(), maxNumberOfIssuesPerFile);
       List<BucketKey> keys = buckets.stream().map(Bucket::key).sorted().toList();
+
+      var progress = ProgressTracker.track("Creating data import issue report", 50, buckets.size());
+
+      LOG.info(progress.startMessage());
 
       for (Bucket bucket : buckets) {
         boolean addGeoJSONLink = new GeoJsonWriter(reportDirectory, bucket).writeFile();
         new HTMLWriter(reportDirectory, bucket, keys, addGeoJSONLink).writeFile();
+        //noinspection Convert2MethodRef
+        progress.step(m -> LOG.info(m));
       }
 
       try {
@@ -68,8 +73,8 @@ public class DataImportIssueReporter implements GraphBuilderModule {
       } catch (Exception e) {
         LOG.error("Index file couldn't be created:{}", e.getMessage());
       }
-
-      LOG.info("Data import issue logs are in {}", reportDirectory.path());
+      LOG.info(progress.completeMessage());
+      LOG.info("Data import issue report is in {}", reportDirectory.path());
     } catch (Exception e) {
       // If the issue report fails due to a remote storage or network problem, then we log
       // the error an CONTINUE with the graph build process. Preventing OTP from saving the

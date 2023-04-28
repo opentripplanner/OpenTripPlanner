@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.updater.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 public class TripUpdateMetrics {
@@ -17,8 +17,8 @@ public class TripUpdateMetrics {
     this.baseTags =
       List.of(
         Tag.of("configRef", parameters.configRef()),
-        Tag.of("url", parameters.getUrl()),
-        Tag.of("feedId", parameters.getFeedId())
+        Tag.of("url", parameters.url()),
+        Tag.of("feedId", parameters.feedId())
       );
   }
 

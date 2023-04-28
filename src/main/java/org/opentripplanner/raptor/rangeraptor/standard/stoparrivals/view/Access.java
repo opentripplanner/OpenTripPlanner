@@ -1,9 +1,13 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
+
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.AccessPathView;
 import org.opentripplanner.raptor.api.view.ArrivalView;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 final class Access<T extends RaptorTripSchedule>
   extends StopArrivalViewAdapter<T>
@@ -19,6 +23,16 @@ final class Access<T extends RaptorTripSchedule>
   }
 
   @Override
+  public int c1() {
+    return RaptorCostCalculator.ZERO_COST;
+  }
+
+  @Override
+  public int c2() {
+    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
+  }
+
+  @Override
   public int arrivalTime() {
     return arrivalTime;
   }
@@ -29,8 +43,8 @@ final class Access<T extends RaptorTripSchedule>
   }
 
   @Override
-  public boolean arrivedByAccess() {
-    return true;
+  public PathLegType arrivedBy() {
+    return ACCESS;
   }
 
   @Override
@@ -41,5 +55,10 @@ final class Access<T extends RaptorTripSchedule>
   @Override
   public RaptorAccessEgress access() {
     return access;
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return access.stopReachedOnBoard();
   }
 }

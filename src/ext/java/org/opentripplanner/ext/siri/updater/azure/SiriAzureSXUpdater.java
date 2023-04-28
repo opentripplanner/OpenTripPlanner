@@ -13,7 +13,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -26,6 +25,7 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,10 +89,11 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       LOG.info("Fetching initial Siri SX data from {}, timeout is {}ms", uri, timeout);
 
       final long t1 = System.currentTimeMillis();
-      HashMap<String, String> headers = new HashMap<>();
-      headers.put("Accept", "application/xml");
 
-      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), headers);
+      // Maybe put this in the config?
+      HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
+
+      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.asMap());
       final long t2 = System.currentTimeMillis();
 
       if (data == null) {
@@ -166,7 +167,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
           );
           setPrimed(true);
         } catch (Exception e) {
-          LOG.error("Could not process history: {}", e.getMessage());
+          LOG.error("Could not process SX history", e);
         }
       });
       f.get();

@@ -1,0 +1,15 @@
+{
+  "dataImportReport": true,
+  "extraEdgesStopPlatformLink": true,
+  "transitModelTimeZone": "Europe/Berlin",
+  "platformEntriesLinking": true,
+  "subwayAccessTime": 0,
+  "netexDefaults": {
+    "groupFilePattern": "(.*)_.*\\.xml",
+    "feedId": "HH"
+  },
+  "osmDefaults": {
+    "osmTagMapping": "germany",
+    "timeZone": "Europe/Berlin"
+  }
+}

@@ -55,6 +55,7 @@ public interface PlanTestConstants {
   int T11_32 = time("11:32");
   int T11_33 = time("11:33");
   int T11_50 = time("11:50");
+  int T11_55 = time("11:55");
 
   // Stop/Places
   Place A = place("A", 5.0, 8.0);

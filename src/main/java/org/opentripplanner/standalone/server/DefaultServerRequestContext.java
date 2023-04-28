@@ -1,10 +1,11 @@
 package org.opentripplanner.standalone.server;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Duration;
+import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
@@ -29,11 +30,11 @@ import org.slf4j.Logger;
 @HttpRequestScoped
 public class DefaultServerRequestContext implements OtpServerRequestContext {
 
+  private final List<RideHailingService> rideHailingServices;
   private RouteRequest routeRequest = null;
   private final Graph graph;
   private final TransitService transitService;
   private final TransitRoutingConfig transitRoutingConfig;
-  private final Duration streetRoutingTimeout;
   private final RouteRequest routeRequestDefaults;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
@@ -53,7 +54,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     Graph graph,
     TransitService transitService,
     TransitRoutingConfig transitRoutingConfig,
-    Duration streetRoutingTimeout,
     RouteRequest routeRequestDefaults,
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
@@ -63,13 +63,13 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     VehiclePositionService vehiclePositionService,
     VehicleRentalService vehicleRentalService,
+    List<RideHailingService> rideHailingServices,
     TraverseVisitor traverseVisitor,
     FlexConfig flexConfig
   ) {
     this.graph = graph;
     this.transitService = transitService;
     this.transitRoutingConfig = transitRoutingConfig;
-    this.streetRoutingTimeout = streetRoutingTimeout;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
     this.requestLogger = requestLogger;
@@ -81,6 +81,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.routeRequestDefaults = routeRequestDefaults;
     this.worldEnvelopeService = worldEnvelopeService;
     this.vehiclePositionService = vehiclePositionService;
+    this.rideHailingServices = rideHailingServices;
   }
 
   /**
@@ -89,7 +90,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   public static DefaultServerRequestContext create(
     TransitRoutingConfig transitRoutingConfig,
     RouteRequest routeRequestDefaults,
-    Duration streetRoutingTimeout,
     RaptorConfig<TripSchedule> raptorConfig,
     Graph graph,
     TransitService transitService,
@@ -99,6 +99,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehiclePositionService vehiclePositionService,
     VehicleRentalService vehicleRentalService,
     FlexConfig flexConfig,
+    List<RideHailingService> rideHailingServices,
     @Nullable TraverseVisitor traverseVisitor,
     @Nullable String requestLogFile
   ) {
@@ -106,7 +107,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       graph,
       transitService,
       transitRoutingConfig,
-      streetRoutingTimeout,
       routeRequestDefaults,
       meterRegistry,
       raptorConfig,
@@ -116,6 +116,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       worldEnvelopeService,
       vehiclePositionService,
       vehicleRentalService,
+      rideHailingServices,
       traverseVisitor,
       flexConfig
     );
@@ -184,8 +185,8 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public Duration streetRoutingTimeout() {
-    return streetRoutingTimeout;
+  public List<RideHailingService> rideHailingServices() {
+    return rideHailingServices;
   }
 
   @Override

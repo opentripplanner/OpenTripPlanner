@@ -60,6 +60,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
   private final OptimizedPathTail<TestTripSchedule> subject = new OptimizedPathTail<>(
     SLACK_PROVIDER,
     BasicPathTestCase.COST_CALCULATOR,
+    0,
     waitTimeCalc,
     stopBoardAlightCost,
     2.0,
@@ -137,7 +138,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     subject.addTransitAndTransferLeg(t1, tx12);
     subject.access(orgPath.accessLeg().access());
 
-    var path = subject.build(0);
+    var path = subject.build();
 
     // We have replaced the first transfer with a 2 minute walk
     var expPath =

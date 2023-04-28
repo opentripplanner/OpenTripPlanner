@@ -17,7 +17,7 @@ public class JsonAssertions {
     try {
       var act = MAPPER.readTree(actual);
       var exp = MAPPER.readTree(expected);
-      assertEquals(JsonSupport.prettyPrint(act), JsonSupport.prettyPrint(exp));
+      assertEquals(JsonSupport.prettyPrint(exp), JsonSupport.prettyPrint(act));
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

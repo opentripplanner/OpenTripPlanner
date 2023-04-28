@@ -28,12 +28,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.ext.transmodelapi.TransmodelGraphQLUtils;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -123,15 +123,12 @@ public class StopPlaceType {
           .newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> {
-            I18NString description =
-              ((MonoOrMultiModalStation) environment.getSource()).getDescription();
-            if (description != null) {
-              Locale locale = TransmodelGraphQLUtils.getLocale(environment);
-              return (description.toString(locale));
-            }
-            return null;
-          })
+          .dataFetcher(environment ->
+            GraphQLUtils.getTranslation(
+              ((MonoOrMultiModalStation) environment.getSource()).getDescription(),
+              environment
+            )
+          )
           .build()
       )
       .field(
@@ -339,9 +336,7 @@ public class StopPlaceType {
             GraphQLArgument
               .newArgument()
               .name("includeCancelledTrips")
-              .description(
-                "Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED"
-              )
+              .description("Indicates that realtime-cancelled trips should also be included.")
               .type(Scalars.GraphQLBoolean)
               .defaultValue(false)
               .build()

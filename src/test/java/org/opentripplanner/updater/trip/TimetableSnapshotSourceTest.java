@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.trip.BackwardsDelayPropagationType.REQUIRED_NO_DATA;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.NotSame;
 import static org.opentripplanner.updater.trip.TimetableSnapshotSourceTest.SameAssert.Same;
@@ -22,6 +23,7 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import de.mfdz.MfdzRealtimeExtensions.StopTimePropertiesExtension.DropOffPickupType;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -39,7 +41,6 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.UpdateSuccess.WarningType;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -50,6 +51,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.spi.UpdateSuccess.WarningType;
 
 public class TimetableSnapshotSourceTest {
 
@@ -111,7 +113,7 @@ public class TimetableSnapshotSourceTest {
   public void testGetSnapshotWithMaxSnapshotFrequencyCleared()
     throws InvalidProtocolBufferException {
     var updater = new TimetableSnapshotSource(
-      TimetableSnapshotSourceParameters.DEFAULT.withMaxSnapshotFrequencyMs(-1),
+      TimetableSnapshotSourceParameters.DEFAULT.withMaxSnapshotFrequency(Duration.ofMillis(-1)),
       transitModel
     );
 
@@ -572,6 +574,48 @@ public class TimetableSnapshotSourceTest {
       assertEquals(80, originalTripTimesForToday.getDepartureDelay(1));
       assertEquals(90, originalTripTimesForToday.getArrivalDelay(2));
       assertEquals(90, originalTripTimesForToday.getDepartureDelay(2));
+    }
+
+    /**
+     * This test just asserts that trip with start date that is outside the service period doesn't
+     * throw an exception and is ignored instead.
+     */
+    @Test
+    public void invalidTripDate() {
+      // GIVEN
+
+      String scheduledTripId = "1.1";
+
+      var serviceDateOutsideService = SERVICE_DATE.minusYears(10);
+      var builder = new TripUpdateBuilder(
+        scheduledTripId,
+        serviceDateOutsideService,
+        SCHEDULED,
+        transitModel.getTimeZone()
+      )
+        .addDelayedStopTime(1, 0)
+        .addDelayedStopTime(2, 60, 80)
+        .addDelayedStopTime(3, 90, 90);
+
+      var tripUpdate = builder.build();
+
+      var updater = defaultUpdater();
+
+      // WHEN
+      var result = updater.applyTripUpdates(
+        TRIP_MATCHER_NOOP,
+        REQUIRED_NO_DATA,
+        fullDataset,
+        List.of(tripUpdate),
+        feedId
+      );
+
+      // THEN
+      final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+      assertNull(snapshot);
+      assertEquals(1, result.failed());
+      var errors = result.failures();
+      assertEquals(1, errors.get(NO_SERVICE_ON_DATE).size());
     }
 
     @Test
@@ -1087,7 +1131,7 @@ public class TimetableSnapshotSourceTest {
     var updater = new TimetableSnapshotSource(
       TimetableSnapshotSourceParameters.DEFAULT
         .withPurgeExpiredData(purgeExpiredData)
-        .withMaxSnapshotFrequencyMs(maxSnapshotFrequency),
+        .withMaxSnapshotFrequency(Duration.ofMillis(maxSnapshotFrequency)),
       transitModel,
       clock::get
     );

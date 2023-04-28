@@ -4,20 +4,21 @@ import java.util.BitSet;
 import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 
-public class PatternCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
+public class PatternCostCalculator<T extends DefaultTripSchedule>
+  implements RaptorCostCalculator<T> {
 
   public static final double DEFAULT_ROUTE_RELUCTANCE = 1.0;
   public static final double UNPREFERRED_ROUTE_RELUCTANCE = 2.0;
 
-  private final CostCalculator<T> delegate;
+  private final RaptorCostCalculator<T> delegate;
   private final BitSet unpreferredPatterns;
   private final DoubleAlgorithmFunction unpreferredCost;
 
   public PatternCostCalculator(
-    @Nonnull CostCalculator<T> delegate,
+    @Nonnull RaptorCostCalculator<T> delegate,
     @Nonnull BitSet unpreferredPatterns,
     @Nonnull DoubleAlgorithmFunction unpreferredCost
   ) {

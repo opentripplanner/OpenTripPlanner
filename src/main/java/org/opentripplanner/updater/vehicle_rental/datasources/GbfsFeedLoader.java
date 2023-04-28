@@ -14,7 +14,8 @@ import org.entur.gbfs.v2_3.gbfs.GBFSFeed;
 import org.entur.gbfs.v2_3.gbfs.GBFSFeedName;
 import org.entur.gbfs.v2_3.gbfs.GBFSFeeds;
 import org.opentripplanner.framework.io.HttpUtils;
-import org.opentripplanner.updater.UpdaterConstructionException;
+import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,13 +30,13 @@ public class GbfsFeedLoader {
   private static final ObjectMapper objectMapper = new ObjectMapper();
   /** One updater per feed type(?) */
   private final Map<GBFSFeedName, GBFSFeedUpdater<?>> feedUpdaters = new HashMap<>();
-  private final Map<String, String> httpHeaders;
+  private final HttpHeaders httpHeaders;
 
   static {
     objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
   }
 
-  public GbfsFeedLoader(String url, Map<String, String> httpHeaders, String languageCode) {
+  public GbfsFeedLoader(String url, HttpHeaders httpHeaders, String languageCode) {
     this.httpHeaders = httpHeaders;
     URI uri;
     try {
@@ -44,16 +45,15 @@ public class GbfsFeedLoader {
       throw new UpdaterConstructionException("Invalid url " + url);
     }
 
-    if (!url.endsWith("gbfs.json")) {
-      LOG.warn(
-        "GBFS autoconfiguration url {} does not end with gbfs.json. Make sure it follows the specification, if you get any errors using it.",
-        url
-      );
-    }
-
     // Fetch autoconfiguration file
     GBFS data = fetchFeed(uri, httpHeaders, GBFS.class);
     if (data == null) {
+      if (!url.endsWith("gbfs.json")) {
+        LOG.warn(
+          "GBFS autoconfiguration url {} does not end with gbfs.json. Make sure it follows the specification, if you get any errors using it.",
+          url
+        );
+      }
       throw new UpdaterConstructionException(
         "Could not fetch the feed auto-configuration file from " + uri
       );
@@ -124,8 +124,8 @@ public class GbfsFeedLoader {
 
   /* private static methods */
 
-  private static <T> T fetchFeed(URI uri, Map<String, String> httpHeaders, Class<T> clazz) {
-    try (InputStream is = HttpUtils.openInputStream(uri, httpHeaders);) {
+  private static <T> T fetchFeed(URI uri, HttpHeaders httpHeaders, Class<T> clazz) {
+    try (InputStream is = HttpUtils.openInputStream(uri, httpHeaders.asMap());) {
       if (is == null) {
         LOG.warn("Failed to get data from url {}", uri);
         return null;

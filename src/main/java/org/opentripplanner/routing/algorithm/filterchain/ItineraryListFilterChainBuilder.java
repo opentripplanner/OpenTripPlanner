@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
+import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
@@ -69,6 +70,9 @@ public class ItineraryListFilterChainBuilder {
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
+
+  @Sandbox
+  private ItineraryListFilter rideHailingFilter;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -275,6 +279,11 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withRideHailingFilter(ItineraryListFilter filter) {
+    this.rideHailingFilter = filter;
+    return this;
+  }
+
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
@@ -287,7 +296,7 @@ public class ItineraryListFilterChainBuilder {
 
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
-      filters.add(new SameFirstOrLastTripFilter());
+      filters.add(new DeletionFlaggingFilter(new SameFirstOrLastTripFilter()));
     }
 
     if (minBikeParkingDistance > 0) {
@@ -384,6 +393,10 @@ public class ItineraryListFilterChainBuilder {
 
     // Do the final itineraries sort
     filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
+
+    if (rideHailingFilter != null) {
+      filters.add(rideHailingFilter);
+    }
 
     return new ItineraryListFilterChain(filters, debug);
   }

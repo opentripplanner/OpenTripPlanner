@@ -118,6 +118,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [slopeExceededReluctance](#rd_wheelchairAccessibility_slopeExceededReluctance)                    |        `double`        | How much streets with high slope should be avoided.                                                                                | *Optional* | `1.0`                    |  2.2  |
 |    [stairsReluctance](#rd_wheelchairAccessibility_stairsReluctance)                                  |        `double`        | How much stairs should be avoided.                                                                                                 | *Optional* | `100.0`                  |  2.2  |
 |    elevator                                                                                          |        `object`        | Configuration for when to use inaccessible elevators.                                                                              | *Optional* |                          |  2.2  |
+|       inaccessibleCost                                                                               |        `integer`       | The cost to add when traversing an entity which is know to be inaccessible.                                                        | *Optional* | `3600`                   |  2.2  |
+|       onlyConsiderAccessible                                                                         |        `boolean`       | Whether to only use this entity if it is explicitly marked as wheelchair accessible.                                               | *Optional* | `false`                  |  2.2  |
+|       unknownCost                                                                                    |        `integer`       | The cost to add when traversing an entity with unknown accessibility information.                                                  | *Optional* | `20`                     |  2.2  |
 |    stop                                                                                              |        `object`        | Configuration for when to use inaccessible stops.                                                                                  | *Optional* |                          |  2.2  |
 |       inaccessibleCost                                                                               |        `integer`       | The cost to add when traversing an entity which is know to be inaccessible.                                                        | *Optional* | `3600`                   |  2.2  |
 |       onlyConsiderAccessible                                                                         |        `boolean`       | Whether to only use this entity if it is explicitly marked as wheelchair accessible.                                               | *Optional* | `true`                   |  2.2  |
@@ -179,7 +182,7 @@ The driving direction to use in the intersection traversal calculation
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"simple"`   
 **Path:** /routingDefaults   
-**Enum values:** `norway` | `simple`
+**Enum values:** `norway` | `simple` | `constant`
 
 The model that computes the costs of turns.
 
@@ -584,7 +587,7 @@ The unit is cost unit per second of time difference.
 
 **Since version:** `2.1` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
 
 Limit access/egress per street mode.
 
@@ -596,7 +599,7 @@ done because some street modes searches are much more resource intensive than ot
 
 **Since version:** `2.2` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `flexible`
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
 
 Limit direct route duration per street mode.
 

@@ -133,6 +133,16 @@ public final class StopPattern implements Serializable {
     return stops.length;
   }
 
+  /**
+   * Checks that all stops ar non-routable.
+   */
+  public boolean isAllStopsNonRoutable() {
+    return (
+      Arrays.stream(pickups).allMatch(PickDrop::isNotRoutable) &&
+      Arrays.stream(dropoffs).allMatch(PickDrop::isNotRoutable)
+    );
+  }
+
   /** Find the given stop position in the sequence, return -1 if not found. */
   int findStopPosition(StopLocation stop) {
     for (int i = 0; i < stops.length; ++i) {
@@ -291,11 +301,13 @@ public final class StopPattern implements Serializable {
     public final StopLocation[] stops;
     public final PickDrop[] pickups;
     public final PickDrop[] dropoffs;
+    private final StopPattern original;
 
     public StopPatternBuilder(StopPattern original) {
       stops = Arrays.copyOf(original.stops, original.stops.length);
       pickups = Arrays.copyOf(original.pickups, original.pickups.length);
       dropoffs = Arrays.copyOf(original.dropoffs, original.dropoffs.length);
+      this.original = original;
     }
 
     /**
@@ -312,7 +324,19 @@ public final class StopPattern implements Serializable {
     }
 
     public StopPattern build() {
-      return new StopPattern(stops, pickups, dropoffs);
+      boolean sameStops = Arrays.equals(stops, original.stops);
+      boolean sameDropoffs = Arrays.equals(dropoffs, original.dropoffs);
+      boolean samePickups = Arrays.equals(pickups, original.pickups);
+
+      if (sameStops && samePickups && sameDropoffs) {
+        return original;
+      }
+
+      StopLocation[] newStops = sameStops ? original.stops : stops;
+      PickDrop[] newPickups = samePickups ? original.pickups : pickups;
+      PickDrop[] newDropoffs = sameDropoffs ? original.dropoffs : dropoffs;
+
+      return new StopPattern(newStops, newPickups, newDropoffs);
     }
   }
 }

@@ -44,10 +44,10 @@ public class NodeAdapterTest {
 
     // Both the root(subject) and the child should report an empty list of unused parameters
     var up = new ArrayList<>();
-    subject.logAllUnusedParameters(up::add);
+    subject.logAllWarnings(up::add);
     assertEquals(List.of(), up);
 
-    child.logAllUnusedParameters(up::add);
+    child.logAllWarnings(up::add);
     assertEquals(List.of(), up);
   }
 
@@ -174,7 +174,16 @@ public class NodeAdapterTest {
 
     // Then expect an error when value 'NONE_EXISTING_ENUM_VALUE' is not in the set of legal
     // values: ['A', 'B', 'C']
-    assertThrows(OtpAppException.class, () -> subject.of("key").asEnum(AnEnum.B));
+    assertEquals(AnEnum.B, subject.of("key").asEnum(AnEnum.B));
+
+    // Verify logging
+    final StringBuilder log = new StringBuilder();
+    subject.logAllWarnings(log::append);
+    assertEquals(
+      "The enum value 'NONE_EXISTING_ENUM_VALUE' is not legal. " +
+      "Expected one of [A, B, A_B_C]. Parameter: key. Source: Test.",
+      log.toString()
+    );
   }
 
   @Test
@@ -193,15 +202,21 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asEnumMapWithUnknownValue() {
-    NodeAdapter subject = newNodeAdapterForTest("{ key : { unknown : 7 } }");
-    assertThrows(
-      OtpAppException.class,
-      () -> subject.of("key").asEnumMap(AnEnum.class, Double.class)
-    );
+  public void asEnumMapWithUnknownKey() {
+    NodeAdapter subject = newNodeAdapterForTest("{ enumMap : { unknown : 7 } }");
 
-    // Assert unknown parameter is logged at warning level and with full pathname
-    assertEquals("Unexpected config parameter: 'key.unknown:7' in 'Test'", unusedParams(subject));
+    subject.of("enumMap").asEnumMap(AnEnum.class, Double.class);
+
+    final StringBuilder log = new StringBuilder();
+    subject.logAllWarnings(m -> log.append(m).append("\n"));
+
+    assertEquals(
+      """
+      Unexpected config parameter: 'enumMap.unknown:7' in 'Test'
+      The enum value 'unknown' is not legal. Expected one of [A, B, A_B_C]. Parameter: enumMap. Source: Test.
+      """.stripIndent(),
+      log.toString()
+    );
   }
 
   @Test
@@ -493,13 +508,13 @@ public class NodeAdapterTest {
     assertTrue(subject.of("foo").asObject().of("a").asBoolean());
 
     // Then: expect 'b' to be unused
-    subject.logAllUnusedParameters(buf::append);
+    subject.logAllWarnings(buf::append);
     assertEquals("Unexpected config parameter: 'foo.b:false' in 'Test'", buf.toString());
   }
 
   private static String unusedParams(NodeAdapter subject) {
     var buf = new StringBuilder();
-    subject.logAllUnusedParameters(m -> buf.append('\n').append(m));
+    subject.logAllWarnings(m -> buf.append('\n').append(m));
     return buf.isEmpty() ? NON_UNUSED_PARAMETERS : buf.substring(1);
   }
 
