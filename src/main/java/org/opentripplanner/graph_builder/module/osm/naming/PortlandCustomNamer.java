@@ -95,7 +95,7 @@ public class PortlandCustomNamer implements WayNamer {
   }
 
   @Override
-  public void postprocess(Graph graph) {
+  public void postprocess() {
     for (StreetEdge e : nameByOrigin) {
       nameAccordingToOrigin(e, 15);
     }

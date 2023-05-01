@@ -7,7 +7,6 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.naming.PortlandCustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -22,7 +21,7 @@ public interface WayNamer {
 
   void nameWithEdge(OSMWithTags way, StreetEdge edge);
 
-  void postprocess(Graph graph);
+  void postprocess();
 
   default I18NString getNameForWay(OSMWithTags way, @Nonnull String id) {
     var name = name(way);

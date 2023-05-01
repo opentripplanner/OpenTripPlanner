@@ -166,7 +166,7 @@ public class OsmModule implements GraphBuilderModule {
 
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
 
-    params.wayNamer().postprocess(graph);
+    params.wayNamer().postprocess();
 
     normalizer.applySafetyFactors();
   }
