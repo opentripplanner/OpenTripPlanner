@@ -91,7 +91,7 @@ public class OsmModule implements GraphBuilderModule {
     osmdb.postLoad();
 
     LOG.info("Building street graph from OSM");
-    doBuildGraph();
+    build();
     graph.hasStreets = true;
   }
 
@@ -108,7 +108,7 @@ public class OsmModule implements GraphBuilderModule {
 
   private record StreetEdgePair(StreetEdge main, StreetEdge back) {}
 
-  public void doBuildGraph() {
+  public void build() {
     var parkingProcessor = new ParkingProcessor(
       graph,
       issueStore,
@@ -161,12 +161,7 @@ public class OsmModule implements GraphBuilderModule {
       graph.getVehicleParkingService().updateVehicleParking(parkingLots, List.of());
     }
 
-    var elevatorProcessor = new ElevatorProcessor(
-      issueStore,
-      osmdb,
-      vertexGenerator.multiLevelNodes(),
-      vertexGenerator.intersectionNodes()
-    );
+    var elevatorProcessor = new ElevatorProcessor(issueStore, osmdb, vertexGenerator);
     elevatorProcessor.buildElevatorEdges(graph);
 
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);

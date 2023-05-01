@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.services.osm.WayNamer;
 
 /**
  * @param boardingAreaRefTags    The ref tags to extract boarding locations from.
- * @param wayNamer            Allows for arbitrary custom naming of edges.
+ * @param wayNamer               Controls naming of edges.
  * @param maxAreaNodes           Maximum number of nodes of an area to try to generate visibility
  *                               lines from.
  * @param areaVisibility         Whether to create visibility lines crossing walkable areas.
