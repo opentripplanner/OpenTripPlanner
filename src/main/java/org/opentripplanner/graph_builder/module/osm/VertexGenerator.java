@@ -19,9 +19,9 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 
-public class VertexGenerator {
+class VertexGenerator {
 
-  public static final String nodeLabelFormat = "osm:node:%d";
+  private static final String nodeLabelFormat = "osm:node:%d";
   private static final String levelnodeLabelFormat = nodeLabelFormat + ":level:%s";
   // track OSM nodes that will become graph vertices because they appear in multiple OSM ways
   private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
@@ -49,7 +49,7 @@ public class VertexGenerator {
    * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
    * {@link OsmBoardingLocationVertex}
    */
-  protected IntersectionVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
+  IntersectionVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
     // If the node should be decomposed to multiple levels,
     // use the numeric level because it is unique, the human level may not be (although
     // it will likely lead to some head-scratching if it is not).

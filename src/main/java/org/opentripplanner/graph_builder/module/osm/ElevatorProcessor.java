@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
@@ -44,9 +45,9 @@ class ElevatorProcessor {
   private final VertexGenerator vertexGenerator;
 
   public ElevatorProcessor(
-    DataImportIssueStore issueStore,
-    OsmDatabase osmdb,
-    VertexGenerator vertexGenerator
+    @Nonnull DataImportIssueStore issueStore,
+    @Nonnull OsmDatabase osmdb,
+    @Nonnull VertexGenerator vertexGenerator
   ) {
     this.issueStore = issueStore;
     this.osmdb = osmdb;
