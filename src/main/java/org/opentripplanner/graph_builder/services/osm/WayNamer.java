@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.services.osm;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -42,25 +41,14 @@ public interface WayNamer {
         .of(parameterName)
         .summary("A custom OSM namer to use.")
         .since(OtpVersion.V2_0)
-        .asObject();
-      return fromConfig(osmNaming.rawNode());
+        .asString(null);
+      return fromConfig(osmNaming);
     }
 
     /**
      * Create a custom namer if needed, return null if not found / by default.
      */
-    public static WayNamer fromConfig(JsonNode config) {
-      String type = null;
-      if (config == null) {
-        /* Empty block, fallback to default */
-        return null;
-      } else if (config.isTextual()) {
-        /* Simplest form: { osmNaming : "portland" } */
-        type = config.asText();
-      } else if (config.has("type")) {
-        /* Custom namer with a type: { osmNaming : { type : "foobar", param1 : 42 } } */
-        type = config.path("type").asText(null);
-      }
+    public static WayNamer fromConfig(String type) {
       if (type == null) {
         return new DefaultNamer();
       }

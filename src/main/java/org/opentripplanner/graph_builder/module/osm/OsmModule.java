@@ -43,7 +43,6 @@ public class OsmModule implements GraphBuilderModule {
 
   private final Map<Vertex, Double> elevationData = new HashMap<>();
 
-  // Private members that are only read or written internally.
   /**
    * Providers of OSM data.
    */

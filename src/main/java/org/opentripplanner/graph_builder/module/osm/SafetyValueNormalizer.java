@@ -16,6 +16,13 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.vertex.Vertex;
 
+/**
+ * Normalization of the safety values is desirable because that means that the heuristic
+ * can somewhat accurately predict the remaining cost of the path and won't prune out
+ * optimal paths.
+ * <p>
+ * Further reading: https://github.com/opentripplanner/OpenTripPlanner/issues/4442
+ */
 class SafetyValueNormalizer {
 
   private final Graph graph;
