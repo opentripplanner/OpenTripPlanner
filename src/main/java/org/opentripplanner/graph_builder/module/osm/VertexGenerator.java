@@ -39,10 +39,6 @@ public class VertexGenerator {
     this.boardingAreaRefTags = boardingAreaRefTags;
   }
 
-  public Map<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes() {
-    return multiLevelNodes;
-  }
-
   /**
    * Make or get a shared vertex for flat intersections, or one vertex per level for multilevel
    * nodes like elevators. When there is an elevator or other Z-dimension discontinuity, a single
@@ -123,6 +119,39 @@ public class VertexGenerator {
     return iv;
   }
 
+  Map<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes() {
+    return multiLevelNodes;
+  }
+
+  void initIntersectionNodes() {
+    Set<Long> possibleIntersectionNodes = new HashSet<>();
+    for (OSMWay way : osmdb.getWays()) {
+      TLongList nodes = way.getNodeRefs();
+      nodes.forEach(node -> {
+        if (possibleIntersectionNodes.contains(node)) {
+          intersectionNodes.put(node, null);
+        } else {
+          possibleIntersectionNodes.add(node);
+        }
+        return true;
+      });
+    }
+    // Intersect ways at area boundaries if needed.
+    for (Area area : Iterables.concat(
+      osmdb.getWalkableAreas(),
+      osmdb.getParkAndRideAreas(),
+      osmdb.getBikeParkingAreas()
+    )) {
+      for (Ring outerRing : area.outermostRings) {
+        intersectAreaRingNodes(possibleIntersectionNodes, outerRing);
+      }
+    }
+  }
+
+  Map<Long, IntersectionVertex> intersectionNodes() {
+    return intersectionNodes;
+  }
+
   /**
    * Record the level of the way for this node, e.g. if the way is at level 5, mark that this node
    * is active at level 5.
@@ -161,31 +190,6 @@ public class VertexGenerator {
     return vertices.get(level);
   }
 
-  void initIntersectionNodes() {
-    Set<Long> possibleIntersectionNodes = new HashSet<>();
-    for (OSMWay way : osmdb.getWays()) {
-      TLongList nodes = way.getNodeRefs();
-      nodes.forEach(node -> {
-        if (possibleIntersectionNodes.contains(node)) {
-          intersectionNodes.put(node, null);
-        } else {
-          possibleIntersectionNodes.add(node);
-        }
-        return true;
-      });
-    }
-    // Intersect ways at area boundaries if needed.
-    for (Area area : Iterables.concat(
-      osmdb.getWalkableAreas(),
-      osmdb.getParkAndRideAreas(),
-      osmdb.getBikeParkingAreas()
-    )) {
-      for (Ring outerRing : area.outermostRings) {
-        intersectAreaRingNodes(possibleIntersectionNodes, outerRing);
-      }
-    }
-  }
-
   private void intersectAreaRingNodes(Set<Long> possibleIntersectionNodes, Ring outerRing) {
     for (OSMNode node : outerRing.nodes) {
       long nodeId = node.getId();
@@ -197,9 +201,5 @@ public class VertexGenerator {
     }
 
     outerRing.getHoles().forEach(hole -> intersectAreaRingNodes(possibleIntersectionNodes, hole));
-  }
-
-  Map<Long, IntersectionVertex> intersectionNodes() {
-    return intersectionNodes;
   }
 }
