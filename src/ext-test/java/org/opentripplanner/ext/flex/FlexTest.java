@@ -23,11 +23,11 @@ import org.opentripplanner.transit.service.TransitModel;
 
 public abstract class FlexTest {
 
-  protected static final String ASPEN_GTFS = "/flex/aspen-flex-on-demand.gtfs.zip";
-  protected static final String COBB_FLEX_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
+  protected static final String ASPEN_GTFS = "/flex/aspen-flex-on-demand.gtfs";
+  protected static final String COBB_FLEX_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs";
   protected static final String COBB_BUS_30_GTFS = "/flex/cobblinc-bus-30-only.gtfs.zip";
   protected static final String MARTA_BUS_856_GTFS = "/flex/marta-bus-856-only.gtfs.zip";
-  protected static final String LINCOLN_COUNTY_GBFS = "/flex/lincoln-county-flex.gtfs.zip";
+  protected static final String LINCOLN_COUNTY_GTFS = "/flex/lincoln-county-flex.gtfs";
   protected static final String COBB_OSM = "/flex/cobb-county.filtered.osm.pbf";
 
   protected static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator();
