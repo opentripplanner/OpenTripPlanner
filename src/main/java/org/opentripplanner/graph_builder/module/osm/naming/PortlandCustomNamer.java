@@ -1,6 +1,7 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.naming;
 
 import java.util.HashSet;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -44,25 +45,26 @@ public class PortlandCustomNamer implements CustomNamer {
   private final HashSet<StreetEdge> nameByDestination = new HashSet<>();
 
   @Override
-  public String name(OSMWithTags way, String defaultName) {
+  public I18NString name(OSMWithTags way) {
+    var defaultName = way.getAssumedName();
     if (!way.hasTag("name")) {
       // this is already a generated name, so there's no need to add any
       // additional data
       return defaultName;
     }
     if (way.isTag("footway", "sidewalk") || way.isTag("path", "sidewalk")) {
-      if (isStreet(defaultName)) {
-        return sidewalk(defaultName);
+      if (isStreet(defaultName.toString())) {
+        return NonLocalizedString.ofNullable(sidewalk(defaultName.toString()));
       }
     }
     String highway = way.getTag("highway");
     if ("footway".equals(highway) || "path".equals(highway) || "cycleway".equals(highway)) {
-      if (!isObviouslyPath(defaultName)) {
-        return path(defaultName);
+      if (!isObviouslyPath(defaultName.toString())) {
+        return NonLocalizedString.ofNullable(path(defaultName.toString()));
       }
     }
     if ("pedestrian".equals(highway)) {
-      return pedestrianStreet(defaultName);
+      return NonLocalizedString.ofNullable(pedestrianStreet(defaultName.toString()));
     }
     return defaultName;
   }

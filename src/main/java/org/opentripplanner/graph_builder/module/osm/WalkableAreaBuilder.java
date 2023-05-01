@@ -26,6 +26,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmModule.Handler;
+import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
@@ -87,12 +88,14 @@ public class WalkableAreaBuilder {
 
   private final List<OsmVertex> platformLinkingEndpoints;
   private final Set<String> boardingLocationRefTags;
+  private final CustomNamer namer;
   private final SafetyValueNormalizer normalizer;
 
   public WalkableAreaBuilder(
     Graph graph,
     OsmDatabase osmdb,
     Handler handler,
+    CustomNamer namer,
     SafetyValueNormalizer normalizer,
     DataImportIssueStore issueStore,
     int maxAreaNodes,
@@ -102,6 +105,7 @@ public class WalkableAreaBuilder {
     this.graph = graph;
     this.osmdb = osmdb;
     this.handler = handler;
+    this.namer = namer;
     this.normalizer = normalizer;
     this.issueStore = issueStore;
     this.maxAreaNodes = maxAreaNodes;
@@ -507,7 +511,7 @@ public class WalkableAreaBuilder {
         startEndpoint.getLabel() +
         " to " +
         endEndpoint.getLabel();
-      I18NString name = handler.getNameForWay(areaEntity, label);
+      I18NString name = namer.getNameForWay(areaEntity, label);
 
       AreaEdge street = new AreaEdge(
         startEndpoint,
@@ -538,7 +542,7 @@ public class WalkableAreaBuilder {
         endEndpoint.getLabel() +
         " to " +
         startEndpoint.getLabel();
-      name = handler.getNameForWay(areaEntity, label);
+      name = namer.getNameForWay(areaEntity, label);
 
       AreaEdge backStreet = new AreaEdge(
         endEndpoint,
@@ -645,7 +649,7 @@ public class WalkableAreaBuilder {
       OSMWithTags areaEntity = area.parent;
 
       String id = "way (area) " + areaEntity.getId() + " (splitter linking)";
-      I18NString name = handler.getNameForWay(areaEntity, id);
+      I18NString name = namer.getNameForWay(areaEntity, id);
       namedArea.setName(name);
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {

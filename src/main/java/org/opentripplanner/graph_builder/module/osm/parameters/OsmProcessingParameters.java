@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm.parameters;
 
+import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 
@@ -27,4 +28,9 @@ public record OsmProcessingParameters(
   boolean staticBikeParkAndRide,
   boolean banDiscouragedWalking,
   boolean banDiscouragedBiking
-) {}
+) {
+  public OsmProcessingParameters {
+    Objects.requireNonNull(boardingAreaRefTags);
+    Objects.requireNonNull(customNamer);
+  }
+}

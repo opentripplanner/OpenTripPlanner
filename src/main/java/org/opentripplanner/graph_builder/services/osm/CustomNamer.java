@@ -1,7 +1,10 @@
 package org.opentripplanner.graph_builder.services.osm;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.graph_builder.module.osm.PortlandCustomNamer;
+import javax.annotation.Nonnull;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.module.osm.naming.PortlandCustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -14,11 +17,20 @@ import org.opentripplanner.street.model.edge.StreetEdge;
  * @author novalis
  */
 public interface CustomNamer {
-  String name(OSMWithTags way, String defaultName);
+  I18NString name(OSMWithTags way);
 
   void nameWithEdge(OSMWithTags way, StreetEdge edge);
 
   void postprocess(Graph graph);
+
+  default I18NString getNameForWay(OSMWithTags way, @Nonnull String id) {
+    var name = name(way);
+
+    if (name == null) {
+      name = new NonLocalizedString(id);
+    }
+    return name;
+  }
 
   class CustomNamerFactory {
 

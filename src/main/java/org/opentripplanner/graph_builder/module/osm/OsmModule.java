@@ -177,7 +177,7 @@ public class OsmModule implements GraphBuilderModule {
       initIntersectionNodes();
 
       buildBasicGraph();
-      buildWalkableAreas(!options.areaVisibility(), options.platformEntriesLinking());
+      buildWalkableAreas(!options.areaVisibility());
 
       if (options.staticParkAndRide()) {
         List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
@@ -206,25 +206,9 @@ public class OsmModule implements GraphBuilderModule {
 
       TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
 
-      if (options.customNamer() != null) {
-        options.customNamer().postprocess(graph);
-      }
+      options.customNamer().postprocess(graph);
 
       normalizer.applySafetyFactors();
-    }
-
-    // TODO Set this to private once WalkableAreaBuilder is gone
-    protected I18NString getNameForWay(OSMWithTags way, String id) {
-      I18NString name = way.getAssumedName();
-
-      if (options.customNamer() != null && name != null) {
-        name = new NonLocalizedString(options.customNamer().name(way, name.toString()));
-      }
-
-      if (name == null) {
-        name = new NonLocalizedString(id);
-      }
-      return name;
     }
 
     /**
@@ -327,7 +311,7 @@ public class OsmModule implements GraphBuilderModule {
       return AreaGroup.groupAreas(areasLevels);
     }
 
-    private void buildWalkableAreas(boolean skipVisibility, boolean platformEntriesLinking) {
+    private void buildWalkableAreas(boolean skipVisibility) {
       if (skipVisibility) {
         LOG.info(
           "Skipping visibility graph construction for walkable areas and using just area rings for edges."
@@ -340,6 +324,7 @@ public class OsmModule implements GraphBuilderModule {
         graph,
         osmdb,
         this,
+        options.customNamer(),
         normalizer,
         issueStore,
         options.maxAreaNodes(),
@@ -693,7 +678,7 @@ public class OsmModule implements GraphBuilderModule {
     ) {
       String label = "way " + way.getId() + " from " + index;
       label = label.intern();
-      I18NString name = getNameForWay(way, label);
+      I18NString name = options.customNamer().getNameForWay(way, label);
       float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
       StreetEdge street = new StreetEdge(

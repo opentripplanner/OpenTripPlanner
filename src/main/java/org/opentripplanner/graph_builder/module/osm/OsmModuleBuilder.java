@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -17,7 +18,7 @@ public class OsmModuleBuilder {
   private final Graph graph;
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
-  private CustomNamer customNamer;
+  private CustomNamer customNamer =new DefaultNamer();
   private boolean areaVisibility = false;
   private boolean platformEntriesLinking = false;
   private boolean staticParkAndRide = false;
