@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm.naming;
 import java.util.HashSet;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.graph_builder.services.osm.WayNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -15,7 +15,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
  *
  * @author novalis
  */
-public class PortlandCustomNamer implements CustomNamer {
+public class PortlandCustomNamer implements WayNamer {
 
   public static String[] STREET_SUFFIXES = {
     "Avenue",

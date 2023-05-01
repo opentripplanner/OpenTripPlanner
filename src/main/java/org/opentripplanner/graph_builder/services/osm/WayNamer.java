@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.naming.PortlandCustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.graph.Graph;
@@ -16,7 +17,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
  *
  * @author novalis
  */
-public interface CustomNamer {
+public interface WayNamer {
   I18NString name(OSMWithTags way);
 
   void nameWithEdge(OSMWithTags way, StreetEdge edge);
@@ -32,12 +33,12 @@ public interface CustomNamer {
     return name;
   }
 
-  class CustomNamerFactory {
+  class WayNamerFactory {
 
     /**
      * Create a custom namer if needed, return null if not found / by default.
      */
-    public static CustomNamer fromConfig(NodeAdapter root, String parameterName) {
+    public static WayNamer fromConfig(NodeAdapter root, String parameterName) {
       var osmNaming = root
         .of(parameterName)
         .summary("A custom OSM namer to use.")
@@ -49,7 +50,7 @@ public interface CustomNamer {
     /**
      * Create a custom namer if needed, return null if not found / by default.
      */
-    public static CustomNamer fromConfig(JsonNode config) {
+    public static WayNamer fromConfig(JsonNode config) {
       String type = null;
       if (config == null) {
         /* Empty block, fallback to default */
@@ -62,7 +63,7 @@ public interface CustomNamer {
         type = config.path("type").asText(null);
       }
       if (type == null) {
-        return null;
+        return new DefaultNamer();
       }
 
       return switch (type) {

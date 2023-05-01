@@ -75,7 +75,7 @@ public class AdaptivePruningTest {
       OsmProvider osmProvider = new OsmProvider(osmFile, true);
       OsmModule osmModule = OsmModule
         .of(osmProvider, graph)
-        .withCustomNamer(new TestCustomNamer())
+        .withCustomNamer(new TestNamer())
         .build();
 
       osmModule.buildGraph();

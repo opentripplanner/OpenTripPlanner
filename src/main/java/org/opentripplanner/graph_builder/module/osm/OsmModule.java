@@ -171,7 +171,7 @@ public class OsmModule implements GraphBuilderModule {
 
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
 
-    params.customNamer().postprocess(graph);
+    params.wayNamer().postprocess(graph);
 
     normalizer.applySafetyFactors();
   }
@@ -209,7 +209,7 @@ public class OsmModule implements GraphBuilderModule {
       graph,
       osmdb,
       vertexGenerator,
-      params.customNamer(),
+      params.wayNamer(),
       normalizer,
       issueStore,
       params.maxAreaNodes(),
@@ -405,7 +405,6 @@ public class OsmModule implements GraphBuilderModule {
     if (!way.hasTag("name")) {
       I18NString creativeName = way.getOsmProvider().getWayPropertySet().getCreativeNameForWay(way);
       if (creativeName != null) {
-        //way.addTag("otp:gen_name", creativeName);
         way.setCreativeName(creativeName);
       }
     }
@@ -520,7 +519,7 @@ public class OsmModule implements GraphBuilderModule {
   ) {
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
-    I18NString name = params.customNamer().getNameForWay(way, label);
+    I18NString name = params.wayNamer().getNameForWay(way, label);
     float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
     StreetEdge street = new StreetEdge(
@@ -554,7 +553,7 @@ public class OsmModule implements GraphBuilderModule {
       issueStore.add(new StreetCarSpeedZero(way));
     }
 
-    params.customNamer().nameWithEdge(way, street);
+    params.wayNamer().nameWithEdge(way, street);
 
     return street;
   }
