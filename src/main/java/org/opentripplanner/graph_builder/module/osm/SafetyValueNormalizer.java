@@ -56,29 +56,23 @@ class SafetyValueNormalizer {
             area.setWalkSafetyMultiplier(area.getWalkSafetyMultiplier() / bestWalkSafety);
           }
         }
-        if (!(e instanceof StreetEdge)) {
-          continue;
-        }
-        StreetEdge pse = (StreetEdge) e;
-
-        if (!seenEdges.contains(e)) {
-          seenEdges.add(e);
-          pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
-          pse.setWalkSafetyFactor(pse.getWalkSafetyFactor() / bestWalkSafety);
-        }
+        process(seenEdges, e);
       }
       for (Edge e : vertex.getIncoming()) {
-        if (!(e instanceof StreetEdge)) {
-          continue;
-        }
-        StreetEdge pse = (StreetEdge) e;
-
-        if (!seenEdges.contains(e)) {
-          seenEdges.add(e);
-          pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
-          pse.setWalkSafetyFactor(pse.getWalkSafetyFactor() / bestWalkSafety);
-        }
+        process(seenEdges, e);
       }
+    }
+  }
+
+  private void process(HashSet<Edge> seenEdges, Edge e) {
+    if (!(e instanceof StreetEdge pse)) {
+      return;
+    }
+
+    if (!seenEdges.contains(e)) {
+      seenEdges.add(e);
+      pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
+      pse.setWalkSafetyFactor(pse.getWalkSafetyFactor() / bestWalkSafety);
     }
   }
 
