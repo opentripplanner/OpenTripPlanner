@@ -18,6 +18,8 @@ import org.opentripplanner.street.model.vertex.Vertex;
 
 class SafetyValueNormalizer {
 
+  private final Graph graph;
+  private final DataImportIssueStore issueStore;
   /**
    * The bike safety factor of the safest street
    */
@@ -26,8 +28,6 @@ class SafetyValueNormalizer {
    * The walk safety factor of the safest street
    */
   private float bestWalkSafety = 1.0f;
-  private final Graph graph;
-  private final DataImportIssueStore issueStore;
 
   SafetyValueNormalizer(Graph graph, DataImportIssueStore issueStore) {
     this.graph = graph;
@@ -64,19 +64,7 @@ class SafetyValueNormalizer {
     }
   }
 
-  private void process(HashSet<Edge> seenEdges, Edge e) {
-    if (!(e instanceof StreetEdge pse)) {
-      return;
-    }
-
-    if (!seenEdges.contains(e)) {
-      seenEdges.add(e);
-      pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
-      pse.setWalkSafetyFactor(pse.getWalkSafetyFactor() / bestWalkSafety);
-    }
-  }
-
-  public void applyWayProperties(
+  void applyWayProperties(
     StreetEdge street,
     StreetEdge backStreet,
     WayProperties wayData,
@@ -132,6 +120,18 @@ class SafetyValueNormalizer {
       backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
       backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
       backStreet.setWalkNoThruTraffic(walkNoThrough);
+    }
+  }
+
+  private void process(HashSet<Edge> seenEdges, Edge e) {
+    if (!(e instanceof StreetEdge pse)) {
+      return;
+    }
+
+    if (!seenEdges.contains(e)) {
+      seenEdges.add(e);
+      pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
+      pse.setWalkSafetyFactor(pse.getWalkSafetyFactor() / bestWalkSafety);
     }
   }
 }
