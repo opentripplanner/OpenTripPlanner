@@ -18,7 +18,7 @@ public class OsmModuleBuilder {
   private final Graph graph;
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
-  private CustomNamer customNamer =new DefaultNamer();
+  private CustomNamer customNamer = new DefaultNamer();
   private boolean areaVisibility = false;
   private boolean platformEntriesLinking = false;
   private boolean staticParkAndRide = false;

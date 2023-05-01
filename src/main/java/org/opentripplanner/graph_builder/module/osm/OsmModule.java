@@ -2,21 +2,17 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import com.google.common.collect.Iterables;
 import gnu.trove.iterator.TLongIterator;
-import gnu.trove.list.TLongList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
@@ -33,11 +29,7 @@ import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.BarrierVertex;
-import org.opentripplanner.street.model.vertex.ExitVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
-import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
-import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,52 +106,49 @@ public class OsmModule implements GraphBuilderModule {
 
   protected static class Handler {
 
-    private static final String nodeLabelFormat = "osm:node:%d";
-
-    private static final String levelnodeLabelFormat = nodeLabelFormat + ":level:%s";
-
     private final Graph graph;
 
     private final OsmDatabase osmdb;
     private final DataImportIssueStore issueStore;
     private final Map<Vertex, Double> elevationData;
 
-    // track OSM nodes which are decomposed into multiple graph vertices because they are
-    // elevators. later they will be iterated over to build ElevatorEdges between them.
-    private final HashMap<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
-    // track OSM nodes that will become graph vertices because they appear in multiple OSM ways
-    private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
-    private final OsmProcessingParameters options;
+    private final OsmProcessingParameters params;
     private final SafetyValueNormalizer normalizer;
+    private final VertexGenerator vertexGenerator;
 
     public Handler(
       Graph graph,
       OsmDatabase osmdb,
       DataImportIssueStore issueStore,
-      OsmProcessingParameters options,
+      OsmProcessingParameters params,
       Map<Vertex, Double> elevationData
     ) {
       this.graph = graph;
       this.osmdb = osmdb;
       this.issueStore = issueStore;
-      this.options = options;
+      this.params = params;
       this.elevationData = elevationData;
       this.normalizer = new SafetyValueNormalizer(graph, issueStore);
+      this.vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags());
     }
 
     public void buildGraph() {
-      var parkingProcessor = new ParkingProcessor(graph, issueStore, this::getVertexForOsmNode);
+      var parkingProcessor = new ParkingProcessor(
+        graph,
+        issueStore,
+        vertexGenerator::getVertexForOsmNode
+      );
 
       var parkingLots = new ArrayList<VehicleParking>();
 
-      if (options.staticParkAndRide()) {
+      if (params.staticParkAndRide()) {
         var carParkingNodes = parkingProcessor.buildParkAndRideNodes(
           osmdb.getCarParkingNodes(),
           true
         );
         parkingLots.addAll(carParkingNodes);
       }
-      if (options.staticBikeParkAndRide()) {
+      if (params.staticBikeParkAndRide()) {
         var bikeParkingNodes = parkingProcessor.buildParkAndRideNodes(
           osmdb.getBikeParkingNodes(),
           false
@@ -174,18 +163,18 @@ public class OsmModule implements GraphBuilderModule {
       )) setWayName(area.parent);
 
       // figure out which nodes that are actually intersections
-      initIntersectionNodes();
+      vertexGenerator.initIntersectionNodes();
 
       buildBasicGraph();
-      buildWalkableAreas(!options.areaVisibility());
+      buildWalkableAreas(!params.areaVisibility());
 
-      if (options.staticParkAndRide()) {
+      if (params.staticParkAndRide()) {
         List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
         var carParkingAreas = parkingProcessor.buildParkAndRideAreas(areaGroups);
         parkingLots.addAll(carParkingAreas);
         LOG.info("Created {} car P+R areas.", carParkingAreas.size());
       }
-      if (options.staticBikeParkAndRide()) {
+      if (params.staticBikeParkAndRide()) {
         List<AreaGroup> areaGroups = groupAreas(osmdb.getBikeParkingAreas());
         var bikeParkingAreas = parkingProcessor.buildBikeParkAndRideAreas(areaGroups);
         parkingLots.addAll(bikeParkingAreas);
@@ -199,96 +188,16 @@ public class OsmModule implements GraphBuilderModule {
       var elevatorProcessor = new ElevatorProcessor(
         issueStore,
         osmdb,
-        multiLevelNodes,
-        intersectionNodes
+        vertexGenerator.multiLevelNodes(),
+        vertexGenerator.intersectionNodes()
       );
       elevatorProcessor.buildElevatorEdges(graph);
 
       TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
 
-      options.customNamer().postprocess(graph);
+      params.customNamer().postprocess(graph);
 
       normalizer.applySafetyFactors();
-    }
-
-    /**
-     * Make or get a shared vertex for flat intersections, or one vertex per level for multilevel
-     * nodes like elevators. When there is an elevator or other Z-dimension discontinuity, a single
-     * node can appear in several ways at different levels.
-     *
-     * @param node The node to fetch a label for.
-     * @param way  The way it is connected to (for fetching level information).
-     * @return vertex The graph vertex. This is not always an OSM vertex; it can also be a
-     * {@link OsmBoardingLocationVertex}
-     */
-    protected IntersectionVertex getVertexForOsmNode(OSMNode node, OSMWithTags way) {
-      // If the node should be decomposed to multiple levels,
-      // use the numeric level because it is unique, the human level may not be (although
-      // it will likely lead to some head-scratching if it is not).
-      IntersectionVertex iv = null;
-      if (node.isMultiLevel()) {
-        // make a separate node for every level
-        return recordLevel(node, way);
-      }
-      // single-level case
-      long nid = node.getId();
-      iv = intersectionNodes.get(nid);
-      if (iv == null) {
-        Coordinate coordinate = node.getCoordinate();
-        String label = String.format(nodeLabelFormat, node.getId());
-        String highway = node.getTag("highway");
-        if ("motorway_junction".equals(highway)) {
-          String ref = node.getTag("ref");
-          if (ref != null) {
-            ExitVertex ev = new ExitVertex(graph, label, coordinate.x, coordinate.y, nid);
-            ev.setExitName(ref);
-            iv = ev;
-          }
-        }
-
-        /* If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. */
-        if (node.isBoardingLocation()) {
-          var refs = node.getMultiTagValues(options.boardingAreaRefTags());
-          if (!refs.isEmpty()) {
-            String name = node.getTag("name");
-            iv =
-              new OsmBoardingLocationVertex(
-                graph,
-                label,
-                coordinate.x,
-                coordinate.y,
-                NonLocalizedString.ofNullable(name),
-                refs
-              );
-          }
-        }
-
-        if (node.isBarrier()) {
-          BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
-          bv.setBarrierPermissions(
-            OsmFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions)
-          );
-          iv = bv;
-        }
-
-        if (iv == null) {
-          iv =
-            new OsmVertex(
-              graph,
-              label,
-              coordinate.x,
-              coordinate.y,
-              node.getId(),
-              new NonLocalizedString(label),
-              node.hasHighwayTrafficLight(),
-              node.hasCrossingTrafficLight()
-            );
-        }
-
-        intersectionNodes.put(nid, iv);
-      }
-
-      return iv;
     }
 
     /**
@@ -323,13 +232,13 @@ public class OsmModule implements GraphBuilderModule {
       WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
         graph,
         osmdb,
-        this,
-        options.customNamer(),
+        vertexGenerator,
+        params.customNamer(),
         normalizer,
         issueStore,
-        options.maxAreaNodes(),
-        options.platformEntriesLinking(),
-        options.boardingAreaRefTags()
+        params.maxAreaNodes(),
+        params.platformEntriesLinking(),
+        params.boardingAreaRefTags()
       );
       if (skipVisibility) {
         for (AreaGroup group : areaGroups) {
@@ -369,8 +278,8 @@ public class OsmModule implements GraphBuilderModule {
         StreetTraversalPermission permissions = OsmFilter.getPermissionsForWay(
           way,
           wayData.getPermission(),
-          options.banDiscouragedWalking(),
-          options.banDiscouragedBiking(),
+          params.banDiscouragedWalking(),
+          params.banDiscouragedBiking(),
           issueStore
         );
         if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) continue;
@@ -447,7 +356,7 @@ public class OsmModule implements GraphBuilderModule {
           }
 
           if (
-            intersectionNodes.containsKey(endNode) ||
+            vertexGenerator.intersectionNodes().containsKey(endNode) ||
             i == nodes.size() - 2 ||
             nodes.subList(0, i).contains(nodes.get(i)) ||
             osmEndNode.hasTag("ele") ||
@@ -470,7 +379,7 @@ public class OsmModule implements GraphBuilderModule {
           if (startEndpoint == null) { // first iteration on this way
             // make or get a shared vertex for flat intersections,
             // one vertex per level for multilevel nodes like elevators
-            startEndpoint = getVertexForOsmNode(osmStartNode, way);
+            startEndpoint = vertexGenerator.getVertexForOsmNode(osmStartNode, way);
             String ele = segmentStartOSMNode.getTag("ele");
             if (ele != null) {
               Double elevation = ElevationUtils.parseEleTag(ele);
@@ -482,7 +391,7 @@ public class OsmModule implements GraphBuilderModule {
             startEndpoint = endEndpoint;
           }
 
-          endEndpoint = getVertexForOsmNode(osmEndNode, way);
+          endEndpoint = vertexGenerator.getVertexForOsmNode(osmEndNode, way);
           String ele = osmEndNode.getTag("ele");
           if (ele != null) {
             Double elevation = ElevationUtils.parseEleTag(ele);
@@ -563,44 +472,6 @@ public class OsmModule implements GraphBuilderModule {
       }
     }
 
-    private void initIntersectionNodes() {
-      Set<Long> possibleIntersectionNodes = new HashSet<>();
-      for (OSMWay way : osmdb.getWays()) {
-        TLongList nodes = way.getNodeRefs();
-        nodes.forEach(node -> {
-          if (possibleIntersectionNodes.contains(node)) {
-            intersectionNodes.put(node, null);
-          } else {
-            possibleIntersectionNodes.add(node);
-          }
-          return true;
-        });
-      }
-      // Intersect ways at area boundaries if needed.
-      for (Area area : Iterables.concat(
-        osmdb.getWalkableAreas(),
-        osmdb.getParkAndRideAreas(),
-        osmdb.getBikeParkingAreas()
-      )) {
-        for (Ring outerRing : area.outermostRings) {
-          intersectAreaRingNodes(possibleIntersectionNodes, outerRing);
-        }
-      }
-    }
-
-    private void intersectAreaRingNodes(Set<Long> possibleIntersectionNodes, Ring outerRing) {
-      for (OSMNode node : outerRing.nodes) {
-        long nodeId = node.getId();
-        if (possibleIntersectionNodes.contains(nodeId)) {
-          intersectionNodes.put(nodeId, null);
-        } else {
-          possibleIntersectionNodes.add(nodeId);
-        }
-      }
-
-      outerRing.getHoles().forEach(hole -> intersectAreaRingNodes(possibleIntersectionNodes, hole));
-    }
-
     /**
      * Handle oneway streets, cycleways, and other per-mode and universal access controls. See
      * http://wiki.openstreetmap.org/wiki/Bicycle for various scenarios, along with
@@ -678,7 +549,7 @@ public class OsmModule implements GraphBuilderModule {
     ) {
       String label = "way " + way.getId() + " from " + index;
       label = label.intern();
-      I18NString name = options.customNamer().getNameForWay(way, label);
+      I18NString name = params.customNamer().getNameForWay(way, label);
       float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
       StreetEdge street = new StreetEdge(
@@ -712,49 +583,9 @@ public class OsmModule implements GraphBuilderModule {
         issueStore.add(new StreetCarSpeedZero(way));
       }
 
-      if (options.customNamer() != null) {
-        options.customNamer().nameWithEdge(way, street);
-      }
+      params.customNamer().nameWithEdge(way, street);
 
       return street;
-    }
-
-    /**
-     * Record the level of the way for this node, e.g. if the way is at level 5, mark that this node
-     * is active at level 5.
-     *
-     * @param way  the way that has the level
-     * @param node the node to record for
-     * @author mattwigway
-     */
-    private OsmVertex recordLevel(OSMNode node, OSMWithTags way) {
-      OSMLevel level = osmdb.getLevelForWay(way);
-      Map<OSMLevel, OsmVertex> vertices;
-      long nodeId = node.getId();
-      if (multiLevelNodes.containsKey(nodeId)) {
-        vertices = multiLevelNodes.get(nodeId);
-      } else {
-        vertices = new HashMap<>();
-        multiLevelNodes.put(nodeId, vertices);
-      }
-      if (!vertices.containsKey(level)) {
-        Coordinate coordinate = node.getCoordinate();
-        String label = String.format(levelnodeLabelFormat, node.getId(), level.shortName);
-        OsmVertex vertex = new OsmVertex(
-          graph,
-          label,
-          coordinate.x,
-          coordinate.y,
-          node.getId(),
-          new NonLocalizedString(label),
-          false,
-          false
-        );
-        vertices.put(level, vertex);
-
-        return vertex;
-      }
-      return vertices.get(level);
     }
   }
 }

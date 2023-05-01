@@ -9,16 +9,13 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 public class DefaultNamer implements CustomNamer {
 
   @Override
-  public I18NString name(OSMWithTags way ) {
+  public I18NString name(OSMWithTags way) {
     return way.getAssumedName();
   }
 
   @Override
-  public void nameWithEdge(OSMWithTags way, StreetEdge edge) {
-  }
+  public void nameWithEdge(OSMWithTags way, StreetEdge edge) {}
 
   @Override
-  public void postprocess(Graph graph) {
-
-  }
+  public void postprocess(Graph graph) {}
 }
