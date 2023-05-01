@@ -87,11 +87,13 @@ public class WalkableAreaBuilder {
 
   private final List<OsmVertex> platformLinkingEndpoints;
   private final Set<String> boardingLocationRefTags;
+  private final SafetyValueNormalizer normalizer;
 
   public WalkableAreaBuilder(
     Graph graph,
     OsmDatabase osmdb,
     Handler handler,
+    SafetyValueNormalizer normalizer,
     DataImportIssueStore issueStore,
     int maxAreaNodes,
     boolean platformEntriesLinking,
@@ -100,6 +102,7 @@ public class WalkableAreaBuilder {
     this.graph = graph;
     this.osmdb = osmdb;
     this.handler = handler;
+    this.normalizer = normalizer;
     this.issueStore = issueStore;
     this.maxAreaNodes = maxAreaNodes;
     this.platformEntriesLinking = platformEntriesLinking;
@@ -567,7 +570,7 @@ public class WalkableAreaBuilder {
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
-      handler.applyWayProperties(
+      normalizer.applyWayProperties(
         street,
         backStreet,
         wayPropertiesCache.get(areaEntity),

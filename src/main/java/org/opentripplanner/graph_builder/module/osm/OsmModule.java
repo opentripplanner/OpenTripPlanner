@@ -19,9 +19,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.issues.StreetCarSpeedZero;
-import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -29,19 +27,12 @@ import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.TurnRestriction;
-import org.opentripplanner.street.model.edge.AreaEdge;
-import org.opentripplanner.street.model.edge.AreaEdgeList;
-import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.ExitVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -139,16 +130,8 @@ public class OsmModule implements GraphBuilderModule {
     // track OSM nodes that will become graph vertices because they appear in multiple OSM ways
     private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
     private final OsmProcessingParameters options;
-    /**
-     * The bike safety factor of the safest street
-     */
-    private float bestBikeSafety = 1.0f;
-    /**
-     * The walk safety factor of the safest street
-     */
-    private float bestWalkSafety = 1.0f;
+    private final SafetyValueNormalizer normalizer;
 
-    // TODO Decouple this class further, decrease the number of constructor parameters.
     public Handler(
       Graph graph,
       OsmDatabase osmdb,
@@ -161,6 +144,7 @@ public class OsmModule implements GraphBuilderModule {
       this.issueStore = issueStore;
       this.options = options;
       this.elevationData = elevationData;
+      this.normalizer = new SafetyValueNormalizer(graph, issueStore);
     }
 
     public void buildGraph() {
@@ -220,73 +204,13 @@ public class OsmModule implements GraphBuilderModule {
       );
       elevatorProcessor.buildElevatorEdges(graph);
 
-      unifyTurnRestrictions();
+      TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
 
       if (options.customNamer() != null) {
         options.customNamer().postprocess(graph);
       }
 
-      applySafetyFactors(graph);
-    }
-
-    // TODO Set this to private once WalkableAreaBuilder is gone
-    protected void applyWayProperties(
-      StreetEdge street,
-      StreetEdge backStreet,
-      WayProperties wayData,
-      OSMWithTags way
-    ) {
-      OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
-
-      Set<StreetNoteAndMatcher> notes = way.getOsmProvider().getWayPropertySet().getNoteForWay(way);
-
-      boolean motorVehicleNoThrough = tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(
-        way
-      );
-      boolean bicycleNoThrough = tagMapperForWay.isBicycleNoThroughTrafficExplicitlyDisallowed(way);
-      boolean walkNoThrough = tagMapperForWay.isWalkNoThroughTrafficExplicitlyDisallowed(way);
-
-      if (street != null) {
-        double bicycleSafety = wayData.getBicycleSafetyFeatures().forward();
-        street.setBicycleSafetyFactor((float) bicycleSafety);
-        if (bicycleSafety < bestBikeSafety) {
-          bestBikeSafety = (float) bicycleSafety;
-        }
-        double walkSafety = wayData.getWalkSafetyFeatures().forward();
-        street.setWalkSafetyFactor((float) walkSafety);
-        if (walkSafety < bestWalkSafety) {
-          bestWalkSafety = (float) walkSafety;
-        }
-        if (notes != null) {
-          for (var it : notes) {
-            graph.streetNotesService.addStaticNote(street, it.note(), it.matcher());
-          }
-        }
-        street.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
-        street.setBicycleNoThruTraffic(bicycleNoThrough);
-        street.setWalkNoThruTraffic(walkNoThrough);
-      }
-
-      if (backStreet != null) {
-        double bicycleSafety = wayData.getBicycleSafetyFeatures().back();
-        if (bicycleSafety < bestBikeSafety) {
-          bestBikeSafety = (float) bicycleSafety;
-        }
-        backStreet.setBicycleSafetyFactor((float) bicycleSafety);
-        double walkSafety = wayData.getWalkSafetyFeatures().back();
-        if (walkSafety < bestWalkSafety) {
-          bestWalkSafety = (float) walkSafety;
-        }
-        backStreet.setWalkSafetyFactor((float) walkSafety);
-        if (notes != null) {
-          for (var it : notes) {
-            graph.streetNotesService.addStaticNote(backStreet, it.note(), it.matcher());
-          }
-        }
-        backStreet.setMotorVehicleNoThruTraffic(motorVehicleNoThrough);
-        backStreet.setBicycleNoThruTraffic(bicycleNoThrough);
-        backStreet.setWalkNoThruTraffic(walkNoThrough);
-      }
+      normalizer.applySafetyFactors();
     }
 
     // TODO Set this to private once WalkableAreaBuilder is gone
@@ -326,7 +250,7 @@ public class OsmModule implements GraphBuilderModule {
       long nid = node.getId();
       iv = intersectionNodes.get(nid);
       if (iv == null) {
-        Coordinate coordinate = getCoordinate(node);
+        Coordinate coordinate = node.getCoordinate();
         String label = String.format(nodeLabelFormat, node.getId());
         String highway = node.getTag("highway");
         if ("motorway_junction".equals(highway)) {
@@ -416,6 +340,7 @@ public class OsmModule implements GraphBuilderModule {
         graph,
         osmdb,
         this,
+        normalizer,
         issueStore,
         options.maxAreaNodes(),
         options.platformEntriesLinking(),
@@ -533,7 +458,7 @@ public class OsmModule implements GraphBuilderModule {
            * the only processing we do on other nodes is to accumulate their geometry
            */
           if (segmentCoordinates.size() == 0) {
-            segmentCoordinates.add(getCoordinate(osmStartNode));
+            segmentCoordinates.add(osmStartNode.getCoordinate());
           }
 
           if (
@@ -544,7 +469,7 @@ public class OsmModule implements GraphBuilderModule {
             osmEndNode.isBoardingLocation() ||
             osmEndNode.isBarrier()
           ) {
-            segmentCoordinates.add(getCoordinate(osmEndNode));
+            segmentCoordinates.add(osmEndNode.getCoordinate());
 
             geometry =
               GeometryUtils
@@ -552,7 +477,7 @@ public class OsmModule implements GraphBuilderModule {
                 .createLineString(segmentCoordinates.toArray(new Coordinate[0]));
             segmentCoordinates.clear();
           } else {
-            segmentCoordinates.add(getCoordinate(osmEndNode));
+            segmentCoordinates.add(osmEndNode.getCoordinate());
             continue;
           }
 
@@ -591,7 +516,7 @@ public class OsmModule implements GraphBuilderModule {
 
           StreetEdge street = streets.main;
           StreetEdge backStreet = streets.back;
-          applyWayProperties(street, backStreet, wayData, way);
+          normalizer.applyWayProperties(street, backStreet, wayData, way);
 
           applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
           startNode = endNode;
@@ -615,101 +540,6 @@ public class OsmModule implements GraphBuilderModule {
         if (creativeName != null) {
           //way.addTag("otp:gen_name", creativeName);
           way.setCreativeName(creativeName);
-        }
-      }
-    }
-
-    private void unifyTurnRestrictions() {
-      // Note that usually when the from or to way is not found, it's because OTP has already
-      // filtered that way. So many missing edges are not really problems worth issuing warnings on.
-      for (Long fromWay : osmdb.getTurnRestrictionWayIds()) {
-        for (TurnRestrictionTag restrictionTag : osmdb.getFromWayTurnRestrictions(fromWay)) {
-          if (restrictionTag.possibleFrom.isEmpty()) {
-            issueStore.add(
-              new TurnRestrictionBad(restrictionTag.relationOSMID, "No from edge found")
-            );
-            continue;
-          }
-          if (restrictionTag.possibleTo.isEmpty()) {
-            issueStore.add(
-              new TurnRestrictionBad(restrictionTag.relationOSMID, "No to edge found")
-            );
-            continue;
-          }
-          for (StreetEdge from : restrictionTag.possibleFrom) {
-            if (from == null) {
-              issueStore.add(
-                new TurnRestrictionBad(restrictionTag.relationOSMID, "from-edge is null")
-              );
-              continue;
-            }
-            for (StreetEdge to : restrictionTag.possibleTo) {
-              if (to == null) {
-                issueStore.add(
-                  new TurnRestrictionBad(restrictionTag.relationOSMID, "to-edge is null")
-                );
-                continue;
-              }
-              int angleDiff = from.getOutAngle() - to.getInAngle();
-              if (angleDiff < 0) {
-                angleDiff += 360;
-              }
-              switch (restrictionTag.direction) {
-                case LEFT:
-                  if (angleDiff >= 160) {
-                    issueStore.add(
-                      new TurnRestrictionBad(
-                        restrictionTag.relationOSMID,
-                        "Left turn restriction is not on edges which turn left"
-                      )
-                    );
-                    continue; // not a left turn
-                  }
-                  break;
-                case RIGHT:
-                  if (angleDiff <= 200) {
-                    issueStore.add(
-                      new TurnRestrictionBad(
-                        restrictionTag.relationOSMID,
-                        "Right turn restriction is not on edges which turn right"
-                      )
-                    );
-                    continue; // not a right turn
-                  }
-                  break;
-                case U:
-                  if ((angleDiff <= 150 || angleDiff > 210)) {
-                    issueStore.add(
-                      new TurnRestrictionBad(
-                        restrictionTag.relationOSMID,
-                        "U-turn restriction is not on U-turn"
-                      )
-                    );
-                    continue; // not a U turn
-                  }
-                  break;
-                case STRAIGHT:
-                  if (angleDiff >= 30 && angleDiff < 330) {
-                    issueStore.add(
-                      new TurnRestrictionBad(
-                        restrictionTag.relationOSMID,
-                        "Straight turn restriction is not on edges which go straight"
-                      )
-                    );
-                    continue; // not straight
-                  }
-                  break;
-              }
-              TurnRestriction restriction = new TurnRestriction(
-                from,
-                to,
-                restrictionTag.type,
-                restrictionTag.modes,
-                restrictionTag.time
-              );
-              from.addTurnRestriction(restriction);
-            }
-          }
         }
       }
     }
@@ -784,63 +614,6 @@ public class OsmModule implements GraphBuilderModule {
       }
 
       outerRing.getHoles().forEach(hole -> intersectAreaRingNodes(possibleIntersectionNodes, hole));
-    }
-
-    /**
-     * The safest bike lane should have a safety weight no lower than the time weight of a flat
-     * street. This method divides the safety lengths by the length ratio of the safest street,
-     * ensuring this property.
-     * <p>
-     * TODO Move this away, this is common to all street builders.
-     */
-    private void applySafetyFactors(Graph graph) {
-      issueStore.add(
-        new Graphwide("Multiplying all bike safety values by " + (1 / bestBikeSafety))
-      );
-      issueStore.add(
-        new Graphwide("Multiplying all walk safety values by " + (1 / bestWalkSafety))
-      );
-      HashSet<Edge> seenEdges = new HashSet<>();
-      HashSet<AreaEdgeList> seenAreas = new HashSet<>();
-      for (Vertex vertex : graph.getVertices()) {
-        for (Edge e : vertex.getOutgoing()) {
-          if (e instanceof AreaEdge) {
-            AreaEdgeList areaEdgeList = ((AreaEdge) e).getArea();
-            if (seenAreas.contains(areaEdgeList)) continue;
-            seenAreas.add(areaEdgeList);
-            for (NamedArea area : areaEdgeList.getAreas()) {
-              area.setBicycleSafetyMultiplier(area.getBicycleSafetyMultiplier() / bestBikeSafety);
-              area.setWalkSafetyMultiplier(area.getWalkSafetyMultiplier() / bestWalkSafety);
-            }
-          }
-          if (!(e instanceof StreetEdge)) {
-            continue;
-          }
-          StreetEdge pse = (StreetEdge) e;
-
-          if (!seenEdges.contains(e)) {
-            seenEdges.add(e);
-            pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
-            pse.setWalkSafetyFactor(pse.getWalkSafetyFactor() / bestWalkSafety);
-          }
-        }
-        for (Edge e : vertex.getIncoming()) {
-          if (!(e instanceof StreetEdge)) {
-            continue;
-          }
-          StreetEdge pse = (StreetEdge) e;
-
-          if (!seenEdges.contains(e)) {
-            seenEdges.add(e);
-            pse.setBicycleSafetyFactor(pse.getBicycleSafetyFactor() / bestBikeSafety);
-            pse.setWalkSafetyFactor(pse.getWalkSafetyFactor() / bestWalkSafety);
-          }
-        }
-      }
-    }
-
-    private Coordinate getCoordinate(OSMNode osmNode) {
-      return new Coordinate(osmNode.lon, osmNode.lat);
     }
 
     /**
@@ -980,7 +753,7 @@ public class OsmModule implements GraphBuilderModule {
         multiLevelNodes.put(nodeId, vertices);
       }
       if (!vertices.containsKey(level)) {
-        Coordinate coordinate = getCoordinate(node);
+        Coordinate coordinate = node.getCoordinate();
         String label = String.format(levelnodeLabelFormat, node.getId(), level.shortName);
         OsmVertex vertex = new OsmVertex(
           graph,

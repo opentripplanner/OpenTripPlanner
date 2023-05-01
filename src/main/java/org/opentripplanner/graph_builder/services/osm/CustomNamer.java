@@ -20,8 +20,6 @@ public interface CustomNamer {
 
   void postprocess(Graph graph);
 
-  void configure();
-
   class CustomNamerFactory {
 
     /**
@@ -55,17 +53,12 @@ public interface CustomNamer {
         return null;
       }
 
-      CustomNamer retval;
-      switch (type) {
-        case "portland":
-          retval = new PortlandCustomNamer();
-          break;
-        default:
-          throw new IllegalArgumentException(String.format("Unknown osmNaming type: '%s'", type));
-      }
-      // Configure the namer
-      retval.configure();
-      return retval;
+      return switch (type) {
+        case "portland" -> new PortlandCustomNamer();
+        default -> throw new IllegalArgumentException(
+          String.format("Unknown osmNaming type: '%s'", type)
+        );
+      };
     }
   }
 }

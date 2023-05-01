@@ -17,7 +17,4 @@ class TestCustomNamer implements CustomNamer {
 
   @Override
   public void postprocess(Graph graph) {}
-
-  @Override
-  public void configure() {}
 }

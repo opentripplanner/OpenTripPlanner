@@ -68,6 +68,7 @@ public class WalkableAreaBuilderTest {
       graph,
       osmdb,
       handler,
+      new SafetyValueNormalizer(graph, DataImportIssueStore.NOOP),
       DataImportIssueStore.NOOP,
       maxAreaNodes,
       platformEntriesLinking,

@@ -95,16 +95,11 @@ public class PortlandCustomNamer implements CustomNamer {
   @Override
   public void postprocess(Graph graph) {
     for (StreetEdge e : nameByOrigin) {
-      nameAccordingToOrigin(graph, e, 15);
+      nameAccordingToOrigin(e, 15);
     }
     for (StreetEdge e : nameByDestination) {
-      nameAccordingToDestination(graph, e, 15);
+      nameAccordingToDestination(e, 15);
     }
-  }
-
-  @Override
-  public void configure() {
-    // No configuration needed.
   }
 
   private boolean isStreet(String defaultName) {
@@ -146,13 +141,13 @@ public class PortlandCustomNamer implements CustomNamer {
     return name;
   }
 
-  private String nameAccordingToDestination(Graph graph, StreetEdge e, int maxDepth) {
+  private static String nameAccordingToDestination(StreetEdge e, int maxDepth) {
     if (maxDepth == 0) {
       return null;
     }
     for (StreetEdge out : e.getToVertex().getOutgoingStreetEdges()) {
       if (out.hasBogusName()) {
-        String name = nameAccordingToDestination(graph, out, maxDepth - 1);
+        String name = nameAccordingToDestination(out, maxDepth - 1);
         if (name == null) {
           continue;
         }
@@ -167,13 +162,13 @@ public class PortlandCustomNamer implements CustomNamer {
     return null;
   }
 
-  private String nameAccordingToOrigin(Graph graph, StreetEdge e, int maxDepth) {
+  private static String nameAccordingToOrigin(StreetEdge e, int maxDepth) {
     if (maxDepth == 0) {
       return null;
     }
     for (StreetEdge in : e.getFromVertex().getIncomingStreetEdges()) {
       if (in.hasBogusName()) {
-        String name = nameAccordingToOrigin(graph, in, maxDepth - 1);
+        String name = nameAccordingToOrigin(in, maxDepth - 1);
         if (name == null) {
           continue;
         }

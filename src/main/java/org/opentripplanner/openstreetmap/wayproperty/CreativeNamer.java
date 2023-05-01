@@ -16,23 +16,13 @@ public class CreativeNamer {
    * <p>
    * For example, "Highway with surface {{surface}}" might become "Highway with surface gravel"
    */
-  private String creativeNamePattern;
+  private final String creativeNamePattern;
 
   public CreativeNamer(String pattern) {
     this.creativeNamePattern = pattern;
   }
 
-  public CreativeNamer() {}
-
   public I18NString generateCreativeName(OSMWithTags way) {
     return LocalizedStringMapper.getInstance().map(creativeNamePattern, way);
-  }
-
-  public String getCreativeNamePattern() {
-    return creativeNamePattern;
-  }
-
-  public void setCreativeNamePattern(String creativeNamePattern) {
-    this.creativeNamePattern = creativeNamePattern;
   }
 }
