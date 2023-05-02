@@ -64,6 +64,8 @@ Data used:
 - NeTEx data
 - Hamburg metropolitan area OSM data
 
+Contact: [Geofox Team](mailto:Geofox-team@hbt.de)
+
 [build-config](hamburg/build-config.json)
  
 ### Germany

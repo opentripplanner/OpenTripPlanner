@@ -16,13 +16,13 @@
   "transitFeeds": [
     {
       "type": "netex",
-      "source": "https://geofoxdata.blob.core.windows.net/opentripplanner/NeTEx_Hamburg.zip",
+      "source": "https://otp-performance.leonard.io/data/hamburg/NeTEx_Hamburg.zip",
       "feedId": "HH"
     }
   ],
   "osm": [
     {
-      "source": "https://geofoxdata.blob.core.windows.net/opentripplanner/hvv_cropped.osm.pbf"
+      "source": "https://otp-performance.leonard.io/data/hamburg/hvv_cropped.osm.pbf"
     }
   ]
 }
