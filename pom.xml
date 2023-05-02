@@ -60,7 +60,7 @@
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>29.0</geotools.version>
         <google.dagger.version>2.45</google.dagger.version>
-        <jackson.version>2.14.2</jackson.version>
+        <jackson.version>2.15.0</jackson.version>
         <jersey.version>3.1.1</jersey.version>
         <junit.version>5.9.3</junit.version>
         <micrometer.version>1.10.6</micrometer.version>
