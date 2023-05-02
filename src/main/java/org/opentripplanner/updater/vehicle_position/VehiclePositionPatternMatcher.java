@@ -188,7 +188,7 @@ public class VehiclePositionPatternMatcher {
   private static RealtimeVehiclePosition mapVehiclePosition(
     VehiclePosition vehiclePosition,
     List<StopLocation> stopsOnVehicleTrip,
-    Trip trip
+    TripTimes tripTimes
   ) {
     var newPosition = RealtimeVehiclePosition.builder();
 
@@ -208,7 +208,7 @@ public class VehiclePositionPatternMatcher {
 
     if (vehiclePosition.hasVehicle()) {
       var vehicle = vehiclePosition.getVehicle();
-      var id = new FeedScopedId(trip.getId().getFeedId(), vehicle.getId());
+      var id = new FeedScopedId(tripTimes.getTrip().getId().getFeedId(), vehicle.getId());
       newPosition
         .setVehicleId(id)
         .setLabel(Optional.ofNullable(vehicle.getLabel()).orElse(vehicle.getLicensePlate()));
@@ -234,20 +234,24 @@ public class VehiclePositionPatternMatcher {
         LOG.warn(
           "Stop ID {} is not in trip {}. Not setting stopRelationship.",
           vehiclePosition.getStopId(),
-          trip.getId()
+          tripTimes.getTrip().getId()
         );
       }
     }
     // but if stop_id isn't there we try current_stop_sequence
-    else if (
-      vehiclePosition.hasCurrentStopSequence() &&
-      validStopSequence(vehiclePosition, stopsOnVehicleTrip)
-    ) {
-      var stop = stopsOnVehicleTrip.get(vehiclePosition.getCurrentStopSequence());
-      newPosition.setStop(stop);
+    else if (vehiclePosition.hasCurrentStopSequence()) {
+      tripTimes
+        .stopIndexOfGtfsSequence(vehiclePosition.getCurrentStopSequence())
+        .stream()
+        .forEach(stopIndex -> {
+          if (validStopIndex(stopIndex, stopsOnVehicleTrip)) {
+            var stop = stopsOnVehicleTrip.get(stopIndex);
+            newPosition.setStop(stop);
+          }
+        });
     }
 
-    newPosition.setTrip(trip);
+    newPosition.setTrip(tripTimes.getTrip());
 
     return newPosition.build();
   }
@@ -255,11 +259,8 @@ public class VehiclePositionPatternMatcher {
   /**
    * Checks that the current_stop_sequence can actually be found in the pattern.
    */
-  private static boolean validStopSequence(
-    VehiclePosition vehiclePosition,
-    List<StopLocation> stopsOnVehicleTrip
-  ) {
-    return vehiclePosition.getCurrentStopSequence() < stopsOnVehicleTrip.size() - 1;
+  private static boolean validStopIndex(int stopIndex, List<StopLocation> stopsOnVehicleTrip) {
+    return stopIndex < stopsOnVehicleTrip.size() - 1;
   }
 
   private record TemporalDistance(LocalDate date, long distance) {}
@@ -322,7 +323,11 @@ public class VehiclePositionPatternMatcher {
     }
 
     // Add position to pattern
-    var newPosition = mapVehiclePosition(vehiclePosition, pattern.getStops(), trip);
+    var newPosition = mapVehiclePosition(
+      vehiclePosition,
+      pattern.getStops(),
+      pattern.getScheduledTimetable().getTripTimes(trip)
+    );
 
     return Result.success(new PatternAndVehiclePosition(pattern, newPosition));
   }

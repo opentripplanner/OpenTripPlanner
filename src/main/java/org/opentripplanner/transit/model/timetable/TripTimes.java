@@ -11,6 +11,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalInt;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
@@ -109,7 +110,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    */
   private RealTimeState realTimeState = RealTimeState.SCHEDULED;
 
-  public Accessibility wheelchairAccessibility;
+  private Accessibility wheelchairAccessibility;
 
   /**
    * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing. The
@@ -471,8 +472,24 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   /** Just to create uniform getter-syntax across the whole public interface of TripTimes. */
-  public int getOriginalGtfsStopSequence(final int stop) {
+  public int gtfsSequenceOfStopIndex(final int stop) {
     return originalGtfsStopSequence[stop];
+  }
+
+  /**
+   * Returns the 0-based stop sequence of the giving
+   */
+  public OptionalInt stopIndexOfGtfsSequence(int stopSequence) {
+    if (originalGtfsStopSequence == null) {
+      return OptionalInt.empty();
+    }
+    for (int i = 0; i < originalGtfsStopSequence.length; i++) {
+      var sequence = originalGtfsStopSequence[i];
+      if (sequence == stopSequence) {
+        return OptionalInt.of(i);
+      }
+    }
+    return OptionalInt.empty();
   }
 
   /** @return whether or not stopIndex is considered a timepoint in this TripTimes. */

@@ -264,7 +264,7 @@ public class ScheduledTransitLeg implements TransitLeg {
         ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, tripTimes.getArrivalTime(i)),
         ServiceDateUtils.toZonedDateTime(serviceDate, zoneId, tripTimes.getDepartureTime(i)),
         i,
-        tripTimes.getOriginalGtfsStopSequence(i)
+        tripTimes.gtfsSequenceOfStopIndex(i)
       );
       visits.add(visit);
     }
@@ -329,12 +329,12 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   @Override
   public Integer getBoardingGtfsStopSequence() {
-    return tripTimes.getOriginalGtfsStopSequence(boardStopPosInPattern);
+    return tripTimes.gtfsSequenceOfStopIndex(boardStopPosInPattern);
   }
 
   @Override
   public Integer getAlightGtfsStopSequence() {
-    return tripTimes.getOriginalGtfsStopSequence(alightStopPosInPattern);
+    return tripTimes.gtfsSequenceOfStopIndex(alightStopPosInPattern);
   }
 
   @Override

@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -26,6 +27,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class VehiclePositionsMatcherTest {
@@ -68,16 +70,8 @@ public class VehiclePositionsMatcherTest {
     var service = new DefaultVehiclePositionService();
     var trip = TransitModelForTest.trip(tripId).build();
     var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
-    var stopPattern = new StopPattern(stopTimes);
 
-    var pattern = TripPattern
-      .of(TransitModelForTest.id(tripId))
-      .withStopPattern(stopPattern)
-      .withRoute(ROUTE)
-      .build();
-    pattern
-      .getScheduledTimetable()
-      .addTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()));
+    TripPattern pattern = tripPattern(trip, stopTimes);
 
     var tripForId = Map.of(scopedTripId, trip);
     var patternForTrip = Map.of(trip, pattern);
@@ -123,24 +117,12 @@ public class VehiclePositionsMatcherTest {
     var trip1 = TransitModelForTest.trip(tripId1).build();
     var trip2 = TransitModelForTest.trip(tripId2).build();
 
-    var stopPattern1 = new StopPattern(
-      List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip1, 2))
-    );
+    var stopTimes1 = List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip1, 2));
 
-    var stopPattern2 = new StopPattern(
-      List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip2, 2))
-    );
+    var stopTime2 = List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip2, 2));
 
-    var pattern1 = TripPattern
-      .of(TransitModelForTest.id(tripId1))
-      .withStopPattern(stopPattern1)
-      .withRoute(ROUTE)
-      .build();
-    var pattern2 = TripPattern
-      .of(TransitModelForTest.id(tripId2))
-      .withStopPattern(stopPattern2)
-      .withRoute(ROUTE)
-      .build();
+    var pattern1 = tripPattern(trip1, stopTimes1);
+    var pattern2 = tripPattern(trip2, stopTime2);
 
     var tripForId = Map.of(scopedTripId1, trip1, scopedTripId2, trip2);
 
@@ -219,6 +201,19 @@ public class VehiclePositionsMatcherTest {
     var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
 
     assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
+  }
+
+  private static TripPattern tripPattern(Trip trip, List<StopTime> stopTimes) {
+    var stopPattern = new StopPattern(stopTimes);
+    var pattern = TripPattern
+      .of(trip.getId())
+      .withStopPattern(stopPattern)
+      .withRoute(ROUTE)
+      .build();
+    pattern
+      .getScheduledTimetable()
+      .addTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()));
+    return pattern;
   }
 
   private static VehiclePosition vehiclePosition(String tripId1) {

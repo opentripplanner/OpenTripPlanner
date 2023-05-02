@@ -56,7 +56,7 @@ public class TripTimesTest {
       stopTime.setStop(stop);
       stopTime.setArrivalTime(i * 60);
       stopTime.setDepartureTime(i * 60);
-      stopTime.setStopSequence(i);
+      stopTime.setStopSequence(i * 10);
       stopTimes.add(stopTime);
     }
 
@@ -148,6 +148,19 @@ public class TripTimesTest {
     assertFalse(updatedTripTimesA.isNoDataStop(0));
     assertTrue(updatedTripTimesA.isNoDataStop(1));
     assertFalse(updatedTripTimesA.isNoDataStop(2));
+  }
+
+  @Test
+  void gtfsSequence() {
+    var stopIndex = originalTripTimes.stopIndexOfGtfsSequence(40);
+    assertTrue(stopIndex.isPresent());
+    assertEquals(4, stopIndex.getAsInt());
+  }
+
+  @Test
+  void unknownGtfsSequence() {
+    var stopIndex = originalTripTimes.stopIndexOfGtfsSequence(4);
+    assertTrue(stopIndex.isEmpty());
   }
 
   @Test
