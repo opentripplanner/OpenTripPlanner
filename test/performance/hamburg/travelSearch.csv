@@ -1,0 +1,231 @@
+testCaseId,description,departure,fromLat,fromLon,toLat,toLon,origin,destination,modes,category
+1,Ahrensburg to Stade (transit),10:00,53.671926,10.234838,53.5960704,9.4775887,Ahrensburg,Stade,TRANSIT|WALK,transit
+2,Ahrensburg to Bad Oldesloe (transit),10:00,53.671926,10.234838,53.8052678,10.3822381,Ahrensburg,Bad Oldesloe,TRANSIT|WALK,transit
+3,Ahrensburg to Henstedt-Ulzburg (transit),10:00,53.671926,10.234838,53.7952480,9.9822267,Ahrensburg,Henstedt-Ulzburg,TRANSIT|WALK,transit
+4,Ahrensburg to Elmshorn (transit),10:00,53.671926,10.234838,53.7542251,9.6592636,Ahrensburg,Elmshorn,TRANSIT|WALK,transit
+5,Ahrensburg to Pinneberg (transit),10:00,53.671926,10.234838,53.6550342,9.7976864,Ahrensburg,Pinneberg,TRANSIT|WALK,transit
+6,Ahrensburg to Buchholz (transit),10:00,53.671926,10.234838,53.3243628,9.8749387,Ahrensburg,Buchholz,TRANSIT|WALK,transit
+7,Ahrensburg to HH Hbf (transit),10:00,53.671926,10.234838,53.5531993,10.0064364,Ahrensburg,HH Hbf,TRANSIT|WALK,transit
+8,Ahrensburg to HH Flughafen (transit),10:00,53.671926,10.234838,53.6326466,10.0066778,Ahrensburg,HH Flughafen,TRANSIT|WALK,transit
+9,Ahrensburg to HH Landungsbrücken (S) (transit),10:00,53.671926,10.234838,53.5462334,9.9711435,Ahrensburg,HH Landungsbrücken (S),TRANSIT|WALK,transit
+10,Ahrensburg to HH Harburg (transit),10:00,53.671926,10.234838,53.4557227,9.9917669,Ahrensburg,HH Harburg,TRANSIT|WALK,transit
+11,Ahrensburg to HH Schlump (transit),10:00,53.671926,10.234838,53.5675879,9.9700757,Ahrensburg,HH Schlump,TRANSIT|WALK,transit
+12,Ahrensburg to HH Kirschenallee (transit),10:00,53.671926,10.234838,53.6246134,10.0726482,Ahrensburg,HH Kirschenallee,TRANSIT|WALK,transit
+13,Ahrensburg to HH Wasserturm (transit),10:00,53.671926,10.234838,53.6196717,10.0500744,Ahrensburg,HH Wasserturm,TRANSIT|WALK,transit
+14,Ahrensburg to HH Finkenwerder (transit),10:00,53.671926,10.234838,53.5364482,9.8789390,Ahrensburg,HH Finkenwerder,TRANSIT|WALK,transit
+15,Ahrensburg to HH Mümmelmannsberg (transit),10:00,53.671926,10.234838,53.5281075,10.1500277,Ahrensburg,HH Mümmelmannsberg,TRANSIT|WALK,transit
+16,Stade to Ahrensburg (transit),10:00,53.5960704,9.4775887,53.671926,10.234838,Stade,Ahrensburg,TRANSIT|WALK,transit
+17,Stade to Bad Oldesloe (transit),10:00,53.5960704,9.4775887,53.8052678,10.3822381,Stade,Bad Oldesloe,TRANSIT|WALK,transit
+18,Stade to Henstedt-Ulzburg (transit),10:00,53.5960704,9.4775887,53.7952480,9.9822267,Stade,Henstedt-Ulzburg,TRANSIT|WALK,transit
+19,Stade to Elmshorn (transit),10:00,53.5960704,9.4775887,53.7542251,9.6592636,Stade,Elmshorn,TRANSIT|WALK,transit
+20,Stade to Pinneberg (transit),10:00,53.5960704,9.4775887,53.6550342,9.7976864,Stade,Pinneberg,TRANSIT|WALK,transit
+22,Stade to HH Hbf (transit),10:00,53.5960704,9.4775887,53.5531993,10.0064364,Stade,HH Hbf,TRANSIT|WALK,transit
+23,Stade to HH Flughafen (transit),10:00,53.5960704,9.4775887,53.6326466,10.0066778,Stade,HH Flughafen,TRANSIT|WALK,transit
+24,Stade to HH Landungsbrücken (S) (transit),10:00,53.5960704,9.4775887,53.5462334,9.9711435,Stade,HH Landungsbrücken (S),TRANSIT|WALK,transit
+25,Stade to HH Harburg (transit),10:00,53.5960704,9.4775887,53.4557227,9.9917669,Stade,HH Harburg,TRANSIT|WALK,transit
+26,Stade to HH Schlump (transit),10:00,53.5960704,9.4775887,53.5675879,9.9700757,Stade,HH Schlump,TRANSIT|WALK,transit
+27,Stade to HH Kirschenallee (transit),10:00,53.5960704,9.4775887,53.6246134,10.0726482,Stade,HH Kirschenallee,TRANSIT|WALK,transit
+28,Stade to HH Wasserturm (transit),10:00,53.5960704,9.4775887,53.6196717,10.0500744,Stade,HH Wasserturm,TRANSIT|WALK,transit
+29,Stade to HH Finkenwerder (transit),10:00,53.5960704,9.4775887,53.5364482,9.8789390,Stade,HH Finkenwerder,TRANSIT|WALK,transit
+30,Stade to HH Mümmelmannsberg (transit),10:00,53.5960704,9.4775887,53.5281075,10.1500277,Stade,HH Mümmelmannsberg,TRANSIT|WALK,transit
+31,Bad Oldesloe to Ahrensburg (transit),10:00,53.8052678,10.3822381,53.671926,10.234838,Bad Oldesloe,Ahrensburg,TRANSIT|WALK,transit
+32,Bad Oldesloe to Stade (transit),10:00,53.8052678,10.3822381,53.5960704,9.4775887,Bad Oldesloe,Stade,TRANSIT|WALK,transit
+33,Bad Oldesloe to Henstedt-Ulzburg (transit),10:00,53.8052678,10.3822381,53.7952480,9.9822267,Bad Oldesloe,Henstedt-Ulzburg,TRANSIT|WALK,transit
+34,Bad Oldesloe to Elmshorn (transit),10:00,53.8052678,10.3822381,53.7542251,9.6592636,Bad Oldesloe,Elmshorn,TRANSIT|WALK,transit
+35,Bad Oldesloe to Pinneberg (transit),10:00,53.8052678,10.3822381,53.6550342,9.7976864,Bad Oldesloe,Pinneberg,TRANSIT|WALK,transit
+36,Bad Oldesloe to Buchholz (transit),10:00,53.8052678,10.3822381,53.3243628,9.8749387,Bad Oldesloe,Buchholz,TRANSIT|WALK,transit
+37,Bad Oldesloe to HH Hbf (transit),10:00,53.8052678,10.3822381,53.5531993,10.0064364,Bad Oldesloe,HH Hbf,TRANSIT|WALK,transit
+38,Bad Oldesloe to HH Flughafen (transit),10:00,53.8052678,10.3822381,53.6326466,10.0066778,Bad Oldesloe,HH Flughafen,TRANSIT|WALK,transit
+39,Bad Oldesloe to HH Landungsbrücken (S) (transit),10:00,53.8052678,10.3822381,53.5462334,9.9711435,Bad Oldesloe,HH Landungsbrücken (S),TRANSIT|WALK,transit
+40,Bad Oldesloe to HH Harburg (transit),10:00,53.8052678,10.3822381,53.4557227,9.9917669,Bad Oldesloe,HH Harburg,TRANSIT|WALK,transit
+41,Bad Oldesloe to HH Schlump (transit),10:00,53.8052678,10.3822381,53.5675879,9.9700757,Bad Oldesloe,HH Schlump,TRANSIT|WALK,transit
+42,Bad Oldesloe to HH Kirschenallee (transit),10:00,53.8052678,10.3822381,53.6246134,10.0726482,Bad Oldesloe,HH Kirschenallee,TRANSIT|WALK,transit
+43,Bad Oldesloe to HH Wasserturm (transit),10:00,53.8052678,10.3822381,53.6196717,10.0500744,Bad Oldesloe,HH Wasserturm,TRANSIT|WALK,transit
+44,Bad Oldesloe to HH Finkenwerder (transit),10:00,53.8052678,10.3822381,53.5364482,9.8789390,Bad Oldesloe,HH Finkenwerder,TRANSIT|WALK,transit
+45,Bad Oldesloe to HH Mümmelmannsberg (transit),10:00,53.8052678,10.3822381,53.5281075,10.1500277,Bad Oldesloe,HH Mümmelmannsberg,TRANSIT|WALK,transit
+46,Henstedt-Ulzburg to Ahrensburg (transit),10:00,53.7952480,9.9822267,53.671926,10.234838,Henstedt-Ulzburg,Ahrensburg,TRANSIT|WALK,transit
+47,Henstedt-Ulzburg to Stade (transit),10:00,53.7952480,9.9822267,53.5960704,9.4775887,Henstedt-Ulzburg,Stade,TRANSIT|WALK,transit
+49,Henstedt-Ulzburg to Elmshorn (transit),10:00,53.7952480,9.9822267,53.7542251,9.6592636,Henstedt-Ulzburg,Elmshorn,TRANSIT|WALK,transit
+50,Henstedt-Ulzburg to Pinneberg (transit),10:00,53.7952480,9.9822267,53.6550342,9.7976864,Henstedt-Ulzburg,Pinneberg,TRANSIT|WALK,transit
+51,Henstedt-Ulzburg to Buchholz (transit),10:00,53.7952480,9.9822267,53.3243628,9.8749387,Henstedt-Ulzburg,Buchholz,TRANSIT|WALK,transit
+52,Henstedt-Ulzburg to HH Hbf (transit),10:00,53.7952480,9.9822267,53.5531993,10.0064364,Henstedt-Ulzburg,HH Hbf,TRANSIT|WALK,transit
+53,Henstedt-Ulzburg to HH Flughafen (transit),10:00,53.7952480,9.9822267,53.6326466,10.0066778,Henstedt-Ulzburg,HH Flughafen,TRANSIT|WALK,transit
+54,Henstedt-Ulzburg to HH Landungsbrücken (S) (transit),10:00,53.7952480,9.9822267,53.5462334,9.9711435,Henstedt-Ulzburg,HH Landungsbrücken (S),TRANSIT|WALK,transit
+55,Henstedt-Ulzburg to HH Harburg (transit),10:00,53.7952480,9.9822267,53.4557227,9.9917669,Henstedt-Ulzburg,HH Harburg,TRANSIT|WALK,transit
+56,Henstedt-Ulzburg to HH Schlump (transit),10:00,53.7952480,9.9822267,53.5675879,9.9700757,Henstedt-Ulzburg,HH Schlump,TRANSIT|WALK,transit
+57,Henstedt-Ulzburg to HH Kirschenallee (transit),10:00,53.7952480,9.9822267,53.6246134,10.0726482,Henstedt-Ulzburg,HH Kirschenallee,TRANSIT|WALK,transit
+58,Henstedt-Ulzburg to HH Wasserturm (transit),10:00,53.7952480,9.9822267,53.6196717,10.0500744,Henstedt-Ulzburg,HH Wasserturm,TRANSIT|WALK,transit
+59,Henstedt-Ulzburg to HH Finkenwerder (transit),10:00,53.7952480,9.9822267,53.5364482,9.8789390,Henstedt-Ulzburg,HH Finkenwerder,TRANSIT|WALK,transit
+60,Henstedt-Ulzburg to HH Mümmelmannsberg (transit),10:00,53.7952480,9.9822267,53.5281075,10.1500277,Henstedt-Ulzburg,HH Mümmelmannsberg,TRANSIT|WALK,transit
+61,Elmshorn to Ahrensburg (transit),10:00,53.7542251,9.6592636,53.671926,10.234838,Elmshorn,Ahrensburg,TRANSIT|WALK,transit
+62,Elmshorn to Stade (transit),10:00,53.7542251,9.6592636,53.5960704,9.4775887,Elmshorn,Stade,TRANSIT|WALK,transit
+63,Elmshorn to Bad Oldesloe (transit),10:00,53.7542251,9.6592636,53.8052678,10.3822381,Elmshorn,Bad Oldesloe,TRANSIT|WALK,transit
+64,Elmshorn to Henstedt-Ulzburg (transit),10:00,53.7542251,9.6592636,53.7952480,9.9822267,Elmshorn,Henstedt-Ulzburg,TRANSIT|WALK,transit
+65,Elmshorn to Pinneberg (transit),10:00,53.7542251,9.6592636,53.6550342,9.7976864,Elmshorn,Pinneberg,TRANSIT|WALK,transit
+66,Elmshorn to Buchholz (transit),10:00,53.7542251,9.6592636,53.3243628,9.8749387,Elmshorn,Buchholz,TRANSIT|WALK,transit
+67,Elmshorn to HH Hbf (transit),10:00,53.7542251,9.6592636,53.5531993,10.0064364,Elmshorn,HH Hbf,TRANSIT|WALK,transit
+68,Elmshorn to HH Flughafen (transit),10:00,53.7542251,9.6592636,53.6326466,10.0066778,Elmshorn,HH Flughafen,TRANSIT|WALK,transit
+69,Elmshorn to HH Landungsbrücken (S) (transit),10:00,53.7542251,9.6592636,53.5462334,9.9711435,Elmshorn,HH Landungsbrücken (S),TRANSIT|WALK,transit
+70,Elmshorn to HH Harburg (transit),10:00,53.7542251,9.6592636,53.4557227,9.9917669,Elmshorn,HH Harburg,TRANSIT|WALK,transit
+71,Elmshorn to HH Schlump (transit),10:00,53.7542251,9.6592636,53.5675879,9.9700757,Elmshorn,HH Schlump,TRANSIT|WALK,transit
+72,Elmshorn to HH Kirschenallee (transit),10:00,53.7542251,9.6592636,53.6246134,10.0726482,Elmshorn,HH Kirschenallee,TRANSIT|WALK,transit
+73,Elmshorn to HH Wasserturm (transit),10:00,53.7542251,9.6592636,53.6196717,10.0500744,Elmshorn,HH Wasserturm,TRANSIT|WALK,transit
+74,Elmshorn to HH Finkenwerder (transit),10:00,53.7542251,9.6592636,53.5364482,9.8789390,Elmshorn,HH Finkenwerder,TRANSIT|WALK,transit
+75,Elmshorn to HH Mümmelmannsberg (transit),10:00,53.7542251,9.6592636,53.5281075,10.1500277,Elmshorn,HH Mümmelmannsberg,TRANSIT|WALK,transit
+76,Pinneberg to Ahrensburg (transit),10:00,53.6550342,9.7976864,53.671926,10.234838,Pinneberg,Ahrensburg,TRANSIT|WALK,transit
+77,Pinneberg to Stade (transit),10:00,53.6550342,9.7976864,53.5960704,9.4775887,Pinneberg,Stade,TRANSIT|WALK,transit
+78,Pinneberg to Bad Oldesloe (transit),10:00,53.6550342,9.7976864,53.8052678,10.3822381,Pinneberg,Bad Oldesloe,TRANSIT|WALK,transit
+79,Pinneberg to Henstedt-Ulzburg (transit),10:00,53.6550342,9.7976864,53.7952480,9.9822267,Pinneberg,Henstedt-Ulzburg,TRANSIT|WALK,transit
+80,Pinneberg to Elmshorn (transit),10:00,53.6550342,9.7976864,53.7542251,9.6592636,Pinneberg,Elmshorn,TRANSIT|WALK,transit
+81,Pinneberg to Buchholz (transit),10:00,53.6550342,9.7976864,53.3243628,9.8749387,Pinneberg,Buchholz,TRANSIT|WALK,transit
+82,Pinneberg to HH Hbf (transit),10:00,53.6550342,9.7976864,53.5531993,10.0064364,Pinneberg,HH Hbf,TRANSIT|WALK,transit
+83,Pinneberg to HH Flughafen (transit),10:00,53.6550342,9.7976864,53.6326466,10.0066778,Pinneberg,HH Flughafen,TRANSIT|WALK,transit
+84,Pinneberg to HH Landungsbrücken (S) (transit),10:00,53.6550342,9.7976864,53.5462334,9.9711435,Pinneberg,HH Landungsbrücken (S),TRANSIT|WALK,transit
+85,Pinneberg to HH Harburg (transit),10:00,53.6550342,9.7976864,53.4557227,9.9917669,Pinneberg,HH Harburg,TRANSIT|WALK,transit
+86,Pinneberg to HH Schlump (transit),10:00,53.6550342,9.7976864,53.5675879,9.9700757,Pinneberg,HH Schlump,TRANSIT|WALK,transit
+87,Pinneberg to HH Kirschenallee (transit),10:00,53.6550342,9.7976864,53.6246134,10.0726482,Pinneberg,HH Kirschenallee,TRANSIT|WALK,transit
+88,Pinneberg to HH Wasserturm (transit),10:00,53.6550342,9.7976864,53.6196717,10.0500744,Pinneberg,HH Wasserturm,TRANSIT|WALK,transit
+89,Pinneberg to HH Finkenwerder (transit),10:00,53.6550342,9.7976864,53.5364482,9.8789390,Pinneberg,HH Finkenwerder,TRANSIT|WALK,transit
+90,Pinneberg to HH Mümmelmannsberg (transit),10:00,53.6550342,9.7976864,53.5281075,10.1500277,Pinneberg,HH Mümmelmannsberg,TRANSIT|WALK,transit
+91,Buchholz to Ahrensburg (transit),10:00,53.3243628,9.8749387,53.671926,10.234838,Buchholz,Ahrensburg,TRANSIT|WALK,transit
+92,Buchholz to Stade (transit),10:00,53.3243628,9.8749387,53.5960704,9.4775887,Buchholz,Stade,TRANSIT|WALK,transit
+93,Buchholz to Bad Oldesloe (transit),10:00,53.3243628,9.8749387,53.8052678,10.3822381,Buchholz,Bad Oldesloe,TRANSIT|WALK,transit
+94,Buchholz to Henstedt-Ulzburg (transit),10:00,53.3243628,9.8749387,53.7952480,9.9822267,Buchholz,Henstedt-Ulzburg,TRANSIT|WALK,transit
+95,Buchholz to Elmshorn (transit),10:00,53.3243628,9.8749387,53.7542251,9.6592636,Buchholz,Elmshorn,TRANSIT|WALK,transit
+96,Buchholz to Pinneberg (transit),10:00,53.3243628,9.8749387,53.6550342,9.7976864,Buchholz,Pinneberg,TRANSIT|WALK,transit
+97,Buchholz to HH Hbf (transit),10:00,53.3243628,9.8749387,53.5531993,10.0064364,Buchholz,HH Hbf,TRANSIT|WALK,transit
+98,Buchholz to HH Flughafen (transit),10:00,53.3243628,9.8749387,53.6326466,10.0066778,Buchholz,HH Flughafen,TRANSIT|WALK,transit
+99,Buchholz to HH Landungsbrücken (S) (transit),10:00,53.3243628,9.8749387,53.5462334,9.9711435,Buchholz,HH Landungsbrücken (S),TRANSIT|WALK,transit
+100,Buchholz to HH Harburg (transit),10:00,53.3243628,9.8749387,53.4557227,9.9917669,Buchholz,HH Harburg,TRANSIT|WALK,transit
+101,Buchholz to HH Schlump (transit),10:00,53.3243628,9.8749387,53.5675879,9.9700757,Buchholz,HH Schlump,TRANSIT|WALK,transit
+102,Buchholz to HH Kirschenallee (transit),10:00,53.3243628,9.8749387,53.6246134,10.0726482,Buchholz,HH Kirschenallee,TRANSIT|WALK,transit
+103,Buchholz to HH Wasserturm (transit),10:00,53.3243628,9.8749387,53.6196717,10.0500744,Buchholz,HH Wasserturm,TRANSIT|WALK,transit
+104,Buchholz to HH Finkenwerder (transit),10:00,53.3243628,9.8749387,53.5364482,9.8789390,Buchholz,HH Finkenwerder,TRANSIT|WALK,transit
+105,Buchholz to HH Mümmelmannsberg (transit),10:00,53.3243628,9.8749387,53.5281075,10.1500277,Buchholz,HH Mümmelmannsberg,TRANSIT|WALK,transit
+106,HH Hbf to Ahrensburg (transit),10:00,53.5531993,10.0064364,53.671926,10.234838,HH Hbf,Ahrensburg,TRANSIT|WALK,transit
+107,HH Hbf to Stade (transit),10:00,53.5531993,10.0064364,53.5960704,9.4775887,HH Hbf,Stade,TRANSIT|WALK,transit
+108,HH Hbf to Bad Oldesloe (transit),10:00,53.5531993,10.0064364,53.8052678,10.3822381,HH Hbf,Bad Oldesloe,TRANSIT|WALK,transit
+109,HH Hbf to Henstedt-Ulzburg (transit),10:00,53.5531993,10.0064364,53.7952480,9.9822267,HH Hbf,Henstedt-Ulzburg,TRANSIT|WALK,transit
+110,HH Hbf to Elmshorn (transit),10:00,53.5531993,10.0064364,53.7542251,9.6592636,HH Hbf,Elmshorn,TRANSIT|WALK,transit
+111,HH Hbf to Pinneberg (transit),10:00,53.5531993,10.0064364,53.6550342,9.7976864,HH Hbf,Pinneberg,TRANSIT|WALK,transit
+113,HH Hbf to HH Flughafen (transit),10:00,53.5531993,10.0064364,53.6326466,10.0066778,HH Hbf,HH Flughafen,TRANSIT|WALK,transit
+114,HH Hbf to HH Landungsbrücken (S) (transit),10:00,53.5531993,10.0064364,53.5462334,9.9711435,HH Hbf,HH Landungsbrücken (S),TRANSIT|WALK,transit
+115,HH Hbf to HH Harburg (transit),10:00,53.5531993,10.0064364,53.4557227,9.9917669,HH Hbf,HH Harburg,TRANSIT|WALK,transit
+116,HH Hbf to HH Schlump (transit),10:00,53.5531993,10.0064364,53.5675879,9.9700757,HH Hbf,HH Schlump,TRANSIT|WALK,transit
+117,HH Hbf to HH Kirschenallee (transit),10:00,53.5531993,10.0064364,53.6246134,10.0726482,HH Hbf,HH Kirschenallee,TRANSIT|WALK,transit
+118,HH Hbf to HH Wasserturm (transit),10:00,53.5531993,10.0064364,53.6196717,10.0500744,HH Hbf,HH Wasserturm,TRANSIT|WALK,transit
+119,HH Hbf to HH Finkenwerder (transit),10:00,53.5531993,10.0064364,53.5364482,9.8789390,HH Hbf,HH Finkenwerder,TRANSIT|WALK,transit
+120,HH Hbf to HH Mümmelmannsberg (transit),10:00,53.5531993,10.0064364,53.5281075,10.1500277,HH Hbf,HH Mümmelmannsberg,TRANSIT|WALK,transit
+121,HH Flughafen to Ahrensburg (transit),10:00,53.6326466,10.0066778,53.671926,10.234838,HH Flughafen,Ahrensburg,TRANSIT|WALK,transit
+122,HH Flughafen to Stade (transit),10:00,53.6326466,10.0066778,53.5960704,9.4775887,HH Flughafen,Stade,TRANSIT|WALK,transit
+123,HH Flughafen to Bad Oldesloe (transit),10:00,53.6326466,10.0066778,53.8052678,10.3822381,HH Flughafen,Bad Oldesloe,TRANSIT|WALK,transit
+124,HH Flughafen to Henstedt-Ulzburg (transit),10:00,53.6326466,10.0066778,53.7952480,9.9822267,HH Flughafen,Henstedt-Ulzburg,TRANSIT|WALK,transit
+125,HH Flughafen to Elmshorn (transit),10:00,53.6326466,10.0066778,53.7542251,9.6592636,HH Flughafen,Elmshorn,TRANSIT|WALK,transit
+126,HH Flughafen to Pinneberg (transit),10:00,53.6326466,10.0066778,53.6550342,9.7976864,HH Flughafen,Pinneberg,TRANSIT|WALK,transit
+128,HH Flughafen to HH Hbf (transit),10:00,53.6326466,10.0066778,53.5531993,10.0064364,HH Flughafen,HH Hbf,TRANSIT|WALK,transit
+129,HH Flughafen to HH Landungsbrücken (S) (transit),10:00,53.6326466,10.0066778,53.5462334,9.9711435,HH Flughafen,HH Landungsbrücken (S),TRANSIT|WALK,transit
+130,HH Flughafen to HH Harburg (transit),10:00,53.6326466,10.0066778,53.4557227,9.9917669,HH Flughafen,HH Harburg,TRANSIT|WALK,transit
+131,HH Flughafen to HH Schlump (transit),10:00,53.6326466,10.0066778,53.5675879,9.9700757,HH Flughafen,HH Schlump,TRANSIT|WALK,transit
+132,HH Flughafen to HH Kirschenallee (transit),10:00,53.6326466,10.0066778,53.6246134,10.0726482,HH Flughafen,HH Kirschenallee,TRANSIT|WALK,transit
+133,HH Flughafen to HH Wasserturm (transit),10:00,53.6326466,10.0066778,53.6196717,10.0500744,HH Flughafen,HH Wasserturm,TRANSIT|WALK,transit
+134,HH Flughafen to HH Finkenwerder (transit),10:00,53.6326466,10.0066778,53.5364482,9.8789390,HH Flughafen,HH Finkenwerder,TRANSIT|WALK,transit
+135,HH Flughafen to HH Mümmelmannsberg (transit),10:00,53.6326466,10.0066778,53.5281075,10.1500277,HH Flughafen,HH Mümmelmannsberg,TRANSIT|WALK,transit
+136,HH Landungsbrücken (S) to Ahrensburg (transit),10:00,53.5462334,9.9711435,53.671926,10.234838,HH Landungsbrücken (S),Ahrensburg,TRANSIT|WALK,transit
+137,HH Landungsbrücken (S) to Stade (transit),10:00,53.5462334,9.9711435,53.5960704,9.4775887,HH Landungsbrücken (S),Stade,TRANSIT|WALK,transit
+138,HH Landungsbrücken (S) to Bad Oldesloe (transit),10:00,53.5462334,9.9711435,53.8052678,10.3822381,HH Landungsbrücken (S),Bad Oldesloe,TRANSIT|WALK,transit
+139,HH Landungsbrücken (S) to Henstedt-Ulzburg (transit),10:00,53.5462334,9.9711435,53.7952480,9.9822267,HH Landungsbrücken (S),Henstedt-Ulzburg,TRANSIT|WALK,transit
+140,HH Landungsbrücken (S) to Elmshorn (transit),10:00,53.5462334,9.9711435,53.7542251,9.6592636,HH Landungsbrücken (S),Elmshorn,TRANSIT|WALK,transit
+141,HH Landungsbrücken (S) to Pinneberg (transit),10:00,53.5462334,9.9711435,53.6550342,9.7976864,HH Landungsbrücken (S),Pinneberg,TRANSIT|WALK,transit
+143,HH Landungsbrücken (S) to HH Hbf (transit),10:00,53.5462334,9.9711435,53.5531993,10.0064364,HH Landungsbrücken (S),HH Hbf,TRANSIT|WALK,transit
+144,HH Landungsbrücken (S) to HH Flughafen (transit),10:00,53.5462334,9.9711435,53.6326466,10.0066778,HH Landungsbrücken (S),HH Flughafen,TRANSIT|WALK,transit
+145,HH Landungsbrücken (S) to HH Harburg (transit),10:00,53.5462334,9.9711435,53.4557227,9.9917669,HH Landungsbrücken (S),HH Harburg,TRANSIT|WALK,transit
+146,HH Landungsbrücken (S) to HH Schlump (transit),10:00,53.5462334,9.9711435,53.5675879,9.9700757,HH Landungsbrücken (S),HH Schlump,TRANSIT|WALK,transit
+147,HH Landungsbrücken (S) to HH Kirschenallee (transit),10:00,53.5462334,9.9711435,53.6246134,10.0726482,HH Landungsbrücken (S),HH Kirschenallee,TRANSIT|WALK,transit
+148,HH Landungsbrücken (S) to HH Wasserturm (transit),10:00,53.5462334,9.9711435,53.6196717,10.0500744,HH Landungsbrücken (S),HH Wasserturm,TRANSIT|WALK,transit
+149,HH Landungsbrücken (S) to HH Finkenwerder (transit),10:00,53.5462334,9.9711435,53.5364482,9.8789390,HH Landungsbrücken (S),HH Finkenwerder,TRANSIT|WALK,transit
+150,HH Landungsbrücken (S) to HH Mümmelmannsberg (transit),10:00,53.5462334,9.9711435,53.5281075,10.1500277,HH Landungsbrücken (S),HH Mümmelmannsberg,TRANSIT|WALK,transit
+151,HH Harburg to Ahrensburg (transit),10:00,53.4557227,9.9917669,53.671926,10.234838,HH Harburg,Ahrensburg,TRANSIT|WALK,transit
+152,HH Harburg to Stade (transit),10:00,53.4557227,9.9917669,53.5960704,9.4775887,HH Harburg,Stade,TRANSIT|WALK,transit
+153,HH Harburg to Bad Oldesloe (transit),10:00,53.4557227,9.9917669,53.8052678,10.3822381,HH Harburg,Bad Oldesloe,TRANSIT|WALK,transit
+154,HH Harburg to Henstedt-Ulzburg (transit),10:00,53.4557227,9.9917669,53.7952480,9.9822267,HH Harburg,Henstedt-Ulzburg,TRANSIT|WALK,transit
+155,HH Harburg to Elmshorn (transit),10:00,53.4557227,9.9917669,53.7542251,9.6592636,HH Harburg,Elmshorn,TRANSIT|WALK,transit
+156,HH Harburg to Pinneberg (transit),10:00,53.4557227,9.9917669,53.6550342,9.7976864,HH Harburg,Pinneberg,TRANSIT|WALK,transit
+158,HH Harburg to HH Hbf (transit),10:00,53.4557227,9.9917669,53.5531993,10.0064364,HH Harburg,HH Hbf,TRANSIT|WALK,transit
+159,HH Harburg to HH Flughafen (transit),10:00,53.4557227,9.9917669,53.6326466,10.0066778,HH Harburg,HH Flughafen,TRANSIT|WALK,transit
+160,HH Harburg to HH Landungsbrücken (S) (transit),10:00,53.4557227,9.9917669,53.5462334,9.9711435,HH Harburg,HH Landungsbrücken (S),TRANSIT|WALK,transit
+161,HH Harburg to HH Schlump (transit),10:00,53.4557227,9.9917669,53.5675879,9.9700757,HH Harburg,HH Schlump,TRANSIT|WALK,transit
+162,HH Harburg to HH Kirschenallee (transit),10:00,53.4557227,9.9917669,53.6246134,10.0726482,HH Harburg,HH Kirschenallee,TRANSIT|WALK,transit
+163,HH Harburg to HH Wasserturm (transit),10:00,53.4557227,9.9917669,53.6196717,10.0500744,HH Harburg,HH Wasserturm,TRANSIT|WALK,transit
+164,HH Harburg to HH Finkenwerder (transit),10:00,53.4557227,9.9917669,53.5364482,9.8789390,HH Harburg,HH Finkenwerder,TRANSIT|WALK,transit
+165,HH Harburg to HH Mümmelmannsberg (transit),10:00,53.4557227,9.9917669,53.5281075,10.1500277,HH Harburg,HH Mümmelmannsberg,TRANSIT|WALK,transit
+166,HH Schlump to Ahrensburg (transit),10:00,53.5675879,9.9700757,53.671926,10.234838,HH Schlump,Ahrensburg,TRANSIT|WALK,transit
+167,HH Schlump to Stade (transit),10:00,53.5675879,9.9700757,53.5960704,9.4775887,HH Schlump,Stade,TRANSIT|WALK,transit
+168,HH Schlump to Bad Oldesloe (transit),10:00,53.5675879,9.9700757,53.8052678,10.3822381,HH Schlump,Bad Oldesloe,TRANSIT|WALK,transit
+169,HH Schlump to Henstedt-Ulzburg (transit),10:00,53.5675879,9.9700757,53.7952480,9.9822267,HH Schlump,Henstedt-Ulzburg,TRANSIT|WALK,transit
+170,HH Schlump to Elmshorn (transit),10:00,53.5675879,9.9700757,53.7542251,9.6592636,HH Schlump,Elmshorn,TRANSIT|WALK,transit
+171,HH Schlump to Pinneberg (transit),10:00,53.5675879,9.9700757,53.6550342,9.7976864,HH Schlump,Pinneberg,TRANSIT|WALK,transit
+173,HH Schlump to HH Hbf (transit),10:00,53.5675879,9.9700757,53.5531993,10.0064364,HH Schlump,HH Hbf,TRANSIT|WALK,transit
+174,HH Schlump to HH Flughafen (transit),10:00,53.5675879,9.9700757,53.6326466,10.0066778,HH Schlump,HH Flughafen,TRANSIT|WALK,transit
+175,HH Schlump to HH Landungsbrücken (S) (transit),10:00,53.5675879,9.9700757,53.5462334,9.9711435,HH Schlump,HH Landungsbrücken (S),TRANSIT|WALK,transit
+176,HH Schlump to HH Harburg (transit),10:00,53.5675879,9.9700757,53.4557227,9.9917669,HH Schlump,HH Harburg,TRANSIT|WALK,transit
+177,HH Schlump to HH Kirschenallee (transit),10:00,53.5675879,9.9700757,53.6246134,10.0726482,HH Schlump,HH Kirschenallee,TRANSIT|WALK,transit
+178,HH Schlump to HH Wasserturm (transit),10:00,53.5675879,9.9700757,53.6196717,10.0500744,HH Schlump,HH Wasserturm,TRANSIT|WALK,transit
+179,HH Schlump to HH Finkenwerder (transit),10:00,53.5675879,9.9700757,53.5364482,9.8789390,HH Schlump,HH Finkenwerder,TRANSIT|WALK,transit
+180,HH Schlump to HH Mümmelmannsberg (transit),10:00,53.5675879,9.9700757,53.5281075,10.1500277,HH Schlump,HH Mümmelmannsberg,TRANSIT|WALK,transit
+181,HH Kirschenallee to Ahrensburg (transit),10:00,53.6246134,10.0726482,53.671926,10.234838,HH Kirschenallee,Ahrensburg,TRANSIT|WALK,transit
+182,HH Kirschenallee to Stade (transit),10:00,53.6246134,10.0726482,53.5960704,9.4775887,HH Kirschenallee,Stade,TRANSIT|WALK,transit
+183,HH Kirschenallee to Bad Oldesloe (transit),10:00,53.6246134,10.0726482,53.8052678,10.3822381,HH Kirschenallee,Bad Oldesloe,TRANSIT|WALK,transit
+184,HH Kirschenallee to Henstedt-Ulzburg (transit),10:00,53.6246134,10.0726482,53.7952480,9.9822267,HH Kirschenallee,Henstedt-Ulzburg,TRANSIT|WALK,transit
+185,HH Kirschenallee to Elmshorn (transit),10:00,53.6246134,10.0726482,53.7542251,9.6592636,HH Kirschenallee,Elmshorn,TRANSIT|WALK,transit
+186,HH Kirschenallee to Pinneberg (transit),10:00,53.6246134,10.0726482,53.6550342,9.7976864,HH Kirschenallee,Pinneberg,TRANSIT|WALK,transit
+188,HH Kirschenallee to HH Hbf (transit),10:00,53.6246134,10.0726482,53.5531993,10.0064364,HH Kirschenallee,HH Hbf,TRANSIT|WALK,transit
+189,HH Kirschenallee to HH Flughafen (transit),10:00,53.6246134,10.0726482,53.6326466,10.0066778,HH Kirschenallee,HH Flughafen,TRANSIT|WALK,transit
+190,HH Kirschenallee to HH Landungsbrücken (S) (transit),10:00,53.6246134,10.0726482,53.5462334,9.9711435,HH Kirschenallee,HH Landungsbrücken (S),TRANSIT|WALK,transit
+191,HH Kirschenallee to HH Harburg (transit),10:00,53.6246134,10.0726482,53.4557227,9.9917669,HH Kirschenallee,HH Harburg,TRANSIT|WALK,transit
+192,HH Kirschenallee to HH Schlump (transit),10:00,53.6246134,10.0726482,53.5675879,9.9700757,HH Kirschenallee,HH Schlump,TRANSIT|WALK,transit
+193,HH Kirschenallee to HH Wasserturm (transit),10:00,53.6246134,10.0726482,53.6196717,10.0500744,HH Kirschenallee,HH Wasserturm,TRANSIT|WALK,transit
+194,HH Kirschenallee to HH Finkenwerder (transit),10:00,53.6246134,10.0726482,53.5364482,9.8789390,HH Kirschenallee,HH Finkenwerder,TRANSIT|WALK,transit
+195,HH Kirschenallee to HH Mümmelmannsberg (transit),10:00,53.6246134,10.0726482,53.5281075,10.1500277,HH Kirschenallee,HH Mümmelmannsberg,TRANSIT|WALK,transit
+196,HH Wasserturm to Ahrensburg (transit),10:00,53.6196717,10.0500744,53.671926,10.234838,HH Wasserturm,Ahrensburg,TRANSIT|WALK,transit
+197,HH Wasserturm to Stade (transit),10:00,53.6196717,10.0500744,53.5960704,9.4775887,HH Wasserturm,Stade,TRANSIT|WALK,transit
+198,HH Wasserturm to Bad Oldesloe (transit),10:00,53.6196717,10.0500744,53.8052678,10.3822381,HH Wasserturm,Bad Oldesloe,TRANSIT|WALK,transit
+199,HH Wasserturm to Henstedt-Ulzburg (transit),10:00,53.6196717,10.0500744,53.7952480,9.9822267,HH Wasserturm,Henstedt-Ulzburg,TRANSIT|WALK,transit
+200,HH Wasserturm to Elmshorn (transit),10:00,53.6196717,10.0500744,53.7542251,9.6592636,HH Wasserturm,Elmshorn,TRANSIT|WALK,transit
+201,HH Wasserturm to Pinneberg (transit),10:00,53.6196717,10.0500744,53.6550342,9.7976864,HH Wasserturm,Pinneberg,TRANSIT|WALK,transit
+203,HH Wasserturm to HH Hbf (transit),10:00,53.6196717,10.0500744,53.5531993,10.0064364,HH Wasserturm,HH Hbf,TRANSIT|WALK,transit
+204,HH Wasserturm to HH Flughafen (transit),10:00,53.6196717,10.0500744,53.6326466,10.0066778,HH Wasserturm,HH Flughafen,TRANSIT|WALK,transit
+205,HH Wasserturm to HH Landungsbrücken (S) (transit),10:00,53.6196717,10.0500744,53.5462334,9.9711435,HH Wasserturm,HH Landungsbrücken (S),TRANSIT|WALK,transit
+206,HH Wasserturm to HH Harburg (transit),10:00,53.6196717,10.0500744,53.4557227,9.9917669,HH Wasserturm,HH Harburg,TRANSIT|WALK,transit
+207,HH Wasserturm to HH Schlump (transit),10:00,53.6196717,10.0500744,53.5675879,9.9700757,HH Wasserturm,HH Schlump,TRANSIT|WALK,transit
+208,HH Wasserturm to HH Kirschenallee (transit),10:00,53.6196717,10.0500744,53.6246134,10.0726482,HH Wasserturm,HH Kirschenallee,TRANSIT|WALK,transit
+209,HH Wasserturm to HH Finkenwerder (transit),10:00,53.6196717,10.0500744,53.5364482,9.8789390,HH Wasserturm,HH Finkenwerder,TRANSIT|WALK,transit
+210,HH Wasserturm to HH Mümmelmannsberg (transit),10:00,53.6196717,10.0500744,53.5281075,10.1500277,HH Wasserturm,HH Mümmelmannsberg,TRANSIT|WALK,transit
+211,HH Finkenwerder to Ahrensburg (transit),10:00,53.5364482,9.8789390,53.671926,10.234838,HH Finkenwerder,Ahrensburg,TRANSIT|WALK,transit
+212,HH Finkenwerder to Stade (transit),10:00,53.5364482,9.8789390,53.5960704,9.4775887,HH Finkenwerder,Stade,TRANSIT|WALK,transit
+213,HH Finkenwerder to Bad Oldesloe (transit),10:00,53.5364482,9.8789390,53.8052678,10.3822381,HH Finkenwerder,Bad Oldesloe,TRANSIT|WALK,transit
+214,HH Finkenwerder to Henstedt-Ulzburg (transit),10:00,53.5364482,9.8789390,53.7952480,9.9822267,HH Finkenwerder,Henstedt-Ulzburg,TRANSIT|WALK,transit
+215,HH Finkenwerder to Elmshorn (transit),10:00,53.5364482,9.8789390,53.7542251,9.6592636,HH Finkenwerder,Elmshorn,TRANSIT|WALK,transit
+216,HH Finkenwerder to Pinneberg (transit),10:00,53.5364482,9.8789390,53.6550342,9.7976864,HH Finkenwerder,Pinneberg,TRANSIT|WALK,transit
+218,HH Finkenwerder to HH Hbf (transit),10:00,53.5364482,9.8789390,53.5531993,10.0064364,HH Finkenwerder,HH Hbf,TRANSIT|WALK,transit
+219,HH Finkenwerder to HH Flughafen (transit),10:00,53.5364482,9.8789390,53.6326466,10.0066778,HH Finkenwerder,HH Flughafen,TRANSIT|WALK,transit
+220,HH Finkenwerder to HH Landungsbrücken (S) (transit),10:00,53.5364482,9.8789390,53.5462334,9.9711435,HH Finkenwerder,HH Landungsbrücken (S),TRANSIT|WALK,transit
+221,HH Finkenwerder to HH Harburg (transit),10:00,53.5364482,9.8789390,53.4557227,9.9917669,HH Finkenwerder,HH Harburg,TRANSIT|WALK,transit
+222,HH Finkenwerder to HH Schlump (transit),10:00,53.5364482,9.8789390,53.5675879,9.9700757,HH Finkenwerder,HH Schlump,TRANSIT|WALK,transit
+223,HH Finkenwerder to HH Kirschenallee (transit),10:00,53.5364482,9.8789390,53.6246134,10.0726482,HH Finkenwerder,HH Kirschenallee,TRANSIT|WALK,transit
+224,HH Finkenwerder to HH Wasserturm (transit),10:00,53.5364482,9.8789390,53.6196717,10.0500744,HH Finkenwerder,HH Wasserturm,TRANSIT|WALK,transit
+225,HH Finkenwerder to HH Mümmelmannsberg (transit),10:00,53.5364482,9.8789390,53.5281075,10.1500277,HH Finkenwerder,HH Mümmelmannsberg,TRANSIT|WALK,transit
+226,HH Mümmelmannsberg to Ahrensburg (transit),10:00,53.5281075,10.1500277,53.671926,10.234838,HH Mümmelmannsberg,Ahrensburg,TRANSIT|WALK,transit
+227,HH Mümmelmannsberg to Stade (transit),10:00,53.5281075,10.1500277,53.5960704,9.4775887,HH Mümmelmannsberg,Stade,TRANSIT|WALK,transit
+228,HH Mümmelmannsberg to Bad Oldesloe (transit),10:00,53.5281075,10.1500277,53.8052678,10.3822381,HH Mümmelmannsberg,Bad Oldesloe,TRANSIT|WALK,transit
+229,HH Mümmelmannsberg to Henstedt-Ulzburg (transit),10:00,53.5281075,10.1500277,53.7952480,9.9822267,HH Mümmelmannsberg,Henstedt-Ulzburg,TRANSIT|WALK,transit
+230,HH Mümmelmannsberg to Elmshorn (transit),10:00,53.5281075,10.1500277,53.7542251,9.6592636,HH Mümmelmannsberg,Elmshorn,TRANSIT|WALK,transit
+231,HH Mümmelmannsberg to Pinneberg (transit),10:00,53.5281075,10.1500277,53.6550342,9.7976864,HH Mümmelmannsberg,Pinneberg,TRANSIT|WALK,transit
+232,HH Mümmelmannsberg to Buchholz (transit),10:00,53.5281075,10.1500277,53.3243628,9.8749387,HH Mümmelmannsberg,Buchholz,TRANSIT|WALK,transit
+233,HH Mümmelmannsberg to HH Hbf (transit),10:00,53.5281075,10.1500277,53.5531993,10.0064364,HH Mümmelmannsberg,HH Hbf,TRANSIT|WALK,transit
+234,HH Mümmelmannsberg to HH Flughafen (transit),10:00,53.5281075,10.1500277,53.6326466,10.0066778,HH Mümmelmannsberg,HH Flughafen,TRANSIT|WALK,transit
+235,HH Mümmelmannsberg to HH Landungsbrücken (S) (transit),10:00,53.5281075,10.1500277,53.5462334,9.9711435,HH Mümmelmannsberg,HH Landungsbrücken (S),TRANSIT|WALK,transit
+236,HH Mümmelmannsberg to HH Harburg (transit),10:00,53.5281075,10.1500277,53.4557227,9.9917669,HH Mümmelmannsberg,HH Harburg,TRANSIT|WALK,transit
+237,HH Mümmelmannsberg to HH Schlump (transit),10:00,53.5281075,10.1500277,53.5675879,9.9700757,HH Mümmelmannsberg,HH Schlump,TRANSIT|WALK,transit
+238,HH Mümmelmannsberg to HH Kirschenallee (transit),10:00,53.5281075,10.1500277,53.6246134,10.0726482,HH Mümmelmannsberg,HH Kirschenallee,TRANSIT|WALK,transit
+239,HH Mümmelmannsberg to HH Wasserturm (transit),10:00,53.5281075,10.1500277,53.6196717,10.0500744,HH Mümmelmannsberg,HH Wasserturm,TRANSIT|WALK,transit
+240,HH Mümmelmannsberg to HH Finkenwerder (transit),10:00,53.5281075,10.1500277,53.5364482,9.8789390,HH Mümmelmannsberg,HH Finkenwerder,TRANSIT|WALK,transit

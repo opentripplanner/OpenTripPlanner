@@ -1,6 +1,5 @@
 {
   "dataImportReport": true,
-  "extraEdgesStopPlatformLink": true,
   "transitModelTimeZone": "Europe/Berlin",
   "platformEntriesLinking": true,
   "subwayAccessTime": 0,

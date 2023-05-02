@@ -86,7 +86,7 @@ public class GraphBuilder implements Runnable {
     graphBuilder.hasTransitData = hasTransitData;
 
     if (hasOsm) {
-      graphBuilder.addModule(factory.openStreetMapModule());
+      graphBuilder.addModule(factory.osmModule());
     }
 
     if (hasGtfs) {

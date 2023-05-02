@@ -52,6 +52,18 @@ public class VehiclePositionsMatcherTest {
     testVehiclePositions(posWithoutServiceDate);
   }
 
+  @Test
+  void invalidStopSequence() {
+    var posWithInvalidSequence = VehiclePosition
+      .newBuilder()
+      .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
+      // there are 3 stops in the pattern so a current_stop_sequence of 3 would go off the end of
+      // the trip
+      .setCurrentStopSequence(3)
+      .build();
+    testVehiclePositions(posWithInvalidSequence);
+  }
+
   private void testVehiclePositions(VehiclePosition pos) {
     var service = new DefaultVehiclePositionService();
     var trip = TransitModelForTest.trip(tripId).build();

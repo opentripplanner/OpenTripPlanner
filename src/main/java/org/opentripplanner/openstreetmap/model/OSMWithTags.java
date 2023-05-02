@@ -14,7 +14,8 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.openstreetmap.api.OSMProvider;
+import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
@@ -30,7 +31,7 @@ public class OSMWithTags {
 
   protected I18NString creativeName;
 
-  private OSMProvider osmProvider;
+  private OsmProvider osmProvider;
 
   public static boolean isFalse(String tagValue) {
     return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
@@ -189,7 +190,7 @@ public class OSMWithTags {
 
   /**
    * Returns a name-like value for an entity (if one exists). The otp: namespaced tags are created
-   * by {@link org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule}
+   * by {@link OsmModule}
    */
   public I18NString getAssumedName() {
     if (tags == null) {
@@ -448,11 +449,11 @@ public class OSMWithTags {
       .collect(Collectors.toSet());
   }
 
-  public OSMProvider getOsmProvider() {
+  public OsmProvider getOsmProvider() {
     return osmProvider;
   }
 
-  public void setOsmProvider(OSMProvider provider) {
+  public void setOsmProvider(OsmProvider provider) {
     this.osmProvider = provider;
   }
 

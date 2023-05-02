@@ -16,7 +16,6 @@
   },
   "banDiscouragedWalking": false,
   "banDiscouragedBiking": false,
-  "extraEdgesStopPlatformLink": true,
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
   "boardingLocationTags": [],

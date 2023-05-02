@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.io.File;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
@@ -9,10 +8,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.services.osm.CustomNamer;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -73,30 +70,12 @@ public class PruneNoThruIslandsTest {
       var transitModel = new TransitModel(new StopModel(), deduplicator);
       // Add street data from OSM
       File osmFile = new File(osmPath);
-      OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, true);
-      OpenStreetMapModule osmModule = new OpenStreetMapModule(
-        List.of(osmProvider),
-        Set.of(),
-        graph,
-        DataImportIssueStore.NOOP,
-        false
-      );
-      osmModule.customNamer =
-        new CustomNamer() {
-          @Override
-          public String name(OSMWithTags way, String defaultName) {
-            return String.valueOf(way.getId());
-          }
+      OsmProvider osmProvider = new OsmProvider(osmFile, true);
+      OsmModule osmModule = OsmModule
+        .of(osmProvider, graph)
+        .withCustomNamer(new TestCustomNamer())
+        .build();
 
-          @Override
-          public void nameWithEdge(OSMWithTags way, StreetEdge edge) {}
-
-          @Override
-          public void postprocess(Graph graph) {}
-
-          @Override
-          public void configure() {}
-        };
       osmModule.buildGraph();
 
       transitModel.index();

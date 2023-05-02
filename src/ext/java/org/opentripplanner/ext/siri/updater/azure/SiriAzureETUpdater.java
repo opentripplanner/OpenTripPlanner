@@ -124,7 +124,6 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
 
       super.saveResultOnGraph.execute((graph, transitModel) -> {
         snapshotSource.applyEstimatedTimetable(
-          transitModel,
           fuzzyTripMatcher(),
           entityResolver(),
           feedId,
@@ -150,7 +149,6 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
         try {
           long t1 = System.currentTimeMillis();
           var result = snapshotSource.applyEstimatedTimetable(
-            transitModel,
             fuzzyTripMatcher(),
             entityResolver(),
             feedId,
