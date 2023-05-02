@@ -13,21 +13,24 @@ import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.ExitVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 
+/**
+ * Tracks the generation of vertices and returns an existing instance if a vertex is encountered
+ * more than once.
+ */
 class VertexGenerator {
 
   private static final String nodeLabelFormat = "osm:node:%d";
   private static final String levelnodeLabelFormat = nodeLabelFormat + ":level:%s";
-  // track OSM nodes that will become graph vertices because they appear in multiple OSM ways
+
   private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
 
-  // track OSM nodes which are decomposed into multiple graph vertices because they are
-  // elevators. later they will be iterated over to build ElevatorEdges between them.
   private final HashMap<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
   private final OsmDatabase osmdb;
   private final Graph graph;
@@ -119,6 +122,10 @@ class VertexGenerator {
     return iv;
   }
 
+  /**
+   * Tracks OSM nodes which are decomposed into multiple graph vertices because they are
+   * elevators. They can then be iterated over to build {@link ElevatorEdge} between them.
+   */
   Map<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes() {
     return multiLevelNodes;
   }
@@ -148,6 +155,9 @@ class VertexGenerator {
     }
   }
 
+  /**
+   * Track OSM nodes that will become graph vertices because they appear in multiple OSM ways
+   */
   Map<Long, IntersectionVertex> intersectionNodes() {
     return intersectionNodes;
   }

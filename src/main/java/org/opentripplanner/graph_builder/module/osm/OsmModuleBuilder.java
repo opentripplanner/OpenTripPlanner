@@ -5,7 +5,7 @@ import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
-import org.opentripplanner.graph_builder.services.osm.WayNamer;
+import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -18,7 +18,7 @@ public class OsmModuleBuilder {
   private final Graph graph;
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
-  private WayNamer wayNamer = new DefaultNamer();
+  private EdgeNamer edgeNamer = new DefaultNamer();
   private boolean areaVisibility = false;
   private boolean platformEntriesLinking = false;
   private boolean staticParkAndRide = false;
@@ -42,8 +42,8 @@ public class OsmModuleBuilder {
     return this;
   }
 
-  public OsmModuleBuilder withCustomNamer(WayNamer wayNamer) {
-    this.wayNamer = wayNamer;
+  public OsmModuleBuilder withEdgeNamer(EdgeNamer edgeNamer) {
+    this.edgeNamer = edgeNamer;
     return this;
   }
 
@@ -89,7 +89,7 @@ public class OsmModuleBuilder {
       issueStore,
       new OsmProcessingParameters(
         boardingAreaRefTags,
-        wayNamer,
+        edgeNamer,
         maxAreaNodes,
         areaVisibility,
         platformEntriesLinking,

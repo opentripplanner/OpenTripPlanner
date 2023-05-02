@@ -17,6 +17,8 @@ import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 /**
+ * Normalizes bike & walk safety values so that the lowest one is no lower than 1.0.
+ * <p>
  * Normalization of the safety values is desirable because that means that the heuristic
  * can somewhat accurately predict the remaining cost of the path and won't prune out
  * optimal paths.
@@ -63,10 +65,10 @@ class SafetyValueNormalizer {
             area.setWalkSafetyMultiplier(area.getWalkSafetyMultiplier() / bestWalkSafety);
           }
         }
-        process(seenEdges, e);
+        applyFactors(seenEdges, e);
       }
       for (Edge e : vertex.getIncoming()) {
-        process(seenEdges, e);
+        applyFactors(seenEdges, e);
       }
     }
   }
@@ -130,7 +132,7 @@ class SafetyValueNormalizer {
     }
   }
 
-  private void process(HashSet<Edge> seenEdges, Edge e) {
+  private void applyFactors(HashSet<Edge> seenEdges, Edge e) {
     if (!(e instanceof StreetEdge pse)) {
       return;
     }

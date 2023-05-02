@@ -25,7 +25,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.services.osm.WayNamer;
+import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
@@ -86,14 +86,14 @@ public class WalkableAreaBuilder {
 
   private final List<OsmVertex> platformLinkingEndpoints;
   private final Set<String> boardingLocationRefTags;
-  private final WayNamer namer;
+  private final EdgeNamer namer;
   private final SafetyValueNormalizer normalizer;
 
   public WalkableAreaBuilder(
     Graph graph,
     OsmDatabase osmdb,
     VertexGenerator vertexBuilder,
-    WayNamer namer,
+    EdgeNamer namer,
     SafetyValueNormalizer normalizer,
     DataImportIssueStore issueStore,
     int maxAreaNodes,

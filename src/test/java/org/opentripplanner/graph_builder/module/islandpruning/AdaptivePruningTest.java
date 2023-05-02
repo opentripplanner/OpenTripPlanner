@@ -73,10 +73,7 @@ public class AdaptivePruningTest {
       // Add street data from OSM
       File osmFile = new File(osmPath);
       OsmProvider osmProvider = new OsmProvider(osmFile, true);
-      OsmModule osmModule = OsmModule
-        .of(osmProvider, graph)
-        .withCustomNamer(new TestNamer())
-        .build();
+      OsmModule osmModule = OsmModule.of(osmProvider, graph).withEdgeNamer(new TestNamer()).build();
 
       osmModule.buildGraph();
 

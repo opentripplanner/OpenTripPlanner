@@ -107,7 +107,7 @@ public class OsmModule implements GraphBuilderModule {
 
   private record StreetEdgePair(StreetEdge main, StreetEdge back) {}
 
-  public void build() {
+  private void build() {
     var parkingProcessor = new ParkingProcessor(
       graph,
       issueStore,
@@ -165,7 +165,7 @@ public class OsmModule implements GraphBuilderModule {
 
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
 
-    params.wayNamer().postprocess();
+    params.edgeNamer().postprocess();
 
     normalizer.applySafetyFactors();
   }
@@ -203,7 +203,7 @@ public class OsmModule implements GraphBuilderModule {
       graph,
       osmdb,
       vertexGenerator,
-      params.wayNamer(),
+      params.edgeNamer(),
       normalizer,
       issueStore,
       params.maxAreaNodes(),
@@ -513,7 +513,7 @@ public class OsmModule implements GraphBuilderModule {
   ) {
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
-    I18NString name = params.wayNamer().getNameForWay(way, label);
+    I18NString name = params.edgeNamer().getNameForWay(way, label);
     float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
     StreetEdge street = new StreetEdge(
@@ -547,7 +547,7 @@ public class OsmModule implements GraphBuilderModule {
       issueStore.add(new StreetCarSpeedZero(way));
     }
 
-    params.wayNamer().nameWithEdge(way, street);
+    params.edgeNamer().recordEdge(way, street);
 
     return street;
   }

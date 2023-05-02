@@ -11,15 +11,25 @@ import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**
- * For when CreativeNamePicker/WayPropertySet is just not powerful enough.
- *
- * @author novalis
+ * Interface responsible for naming edges of the street graph. It allows you to write your own
+ * implementation if the default is for some reason not powerful enough.
  */
-public interface WayNamer {
+public interface EdgeNamer {
+  /**
+   * Get the edge name from an OSM way.
+   */
   I18NString name(OSMWithTags way);
 
-  void nameWithEdge(OSMWithTags way, StreetEdge edge);
+  /**
+   * Callback function for each way/edge combination so that more complicated names can be built
+   * in the post-processing step.
+   */
+  void recordEdge(OSMWithTags way, StreetEdge edge);
 
+  /**
+   * Called after each edge has been named to build a more complex name out of the relationships
+   * tracked in {@link EdgeNamer#recordEdge(OSMWithTags, StreetEdge)}.
+   */
   void postprocess();
 
   default I18NString getNameForWay(OSMWithTags way, @Nonnull String id) {
@@ -36,7 +46,7 @@ public interface WayNamer {
     /**
      * Create a custom namer if needed, return null if not found / by default.
      */
-    public static WayNamer fromConfig(NodeAdapter root, String parameterName) {
+    public static EdgeNamer fromConfig(NodeAdapter root, String parameterName) {
       var osmNaming = root
         .of(parameterName)
         .summary("A custom OSM namer to use.")
@@ -48,7 +58,7 @@ public interface WayNamer {
     /**
      * Create a custom namer if needed, return null if not found / by default.
      */
-    public static WayNamer fromConfig(String type) {
+    public static EdgeNamer fromConfig(String type) {
       if (type == null) {
         return new DefaultNamer();
       }

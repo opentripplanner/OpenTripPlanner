@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module.osm.naming;
 
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.graph_builder.services.osm.WayNamer;
+import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
-public class DefaultNamer implements WayNamer {
+public class DefaultNamer implements EdgeNamer {
 
   @Override
   public I18NString name(OSMWithTags way) {
@@ -13,7 +13,7 @@ public class DefaultNamer implements WayNamer {
   }
 
   @Override
-  public void nameWithEdge(OSMWithTags way, StreetEdge edge) {}
+  public void recordEdge(OSMWithTags way, StreetEdge edge) {}
 
   @Override
   public void postprocess() {}
