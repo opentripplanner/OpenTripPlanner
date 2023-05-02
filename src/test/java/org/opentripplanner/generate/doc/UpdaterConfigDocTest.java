@@ -32,7 +32,8 @@ public class UpdaterConfigDocTest {
   private static final Set<String> SKIP_UPDATERS = Set.of(
     "siri-azure-sx-updater",
     "vehicle-parking",
-    "siri-et-updater"
+    "siri-et-updater",
+    "siri-sx-updater"
   );
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
   public static final ObjectMapper mapper = new ObjectMapper();

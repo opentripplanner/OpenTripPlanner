@@ -73,6 +73,56 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 <!-- siri-et-updater END -->
 
+### Siri-SX via HTTPS
+
+<!-- siri-sx-updater BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Config Parameter               |       Type      | Summary                                                                                                |  Req./Opt. | Default Value | Since |
+|--------------------------------|:---------------:|--------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "siri-sx-updater"       |      `enum`     | The type of the updater.                                                                               | *Required* |               |  1.5  |
+| blockReadinessUntilInitialized |    `boolean`    | Whether catching up with the updates should block the readiness check from returning a 'ready' result. | *Optional* | `false`       |  2.0  |
+| earlyStartSec                  |    `integer`    | TODO                                                                                                   | *Optional* | `-1`          |  2.0  |
+| feedId                         |     `string`    | The ID of the feed to apply the updates to.                                                            | *Required* |               |  2.0  |
+| frequencySec                   |    `integer`    | How often the updates should be retrieved.                                                             | *Optional* | `60`          |  2.0  |
+| requestorRef                   |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
+| timeoutSec                     |    `integer`    | The HTTP timeout to download the updates.                                                              | *Optional* | `15`          |  2.0  |
+| url                            |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
+| [headers](#u__9__headers)      | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
+
+
+##### Parameter details
+
+<h4 id="u__9__headers">headers</h4>
+
+**Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
+**Path:** /updaters/[9] 
+
+HTTP headers to add to the request. Any header key, value can be inserted.
+
+
+
+##### Example configuration
+
+```JSON
+// router-config.json
+{
+  "updaters" : [
+    {
+      "type" : "siri-sx-updater",
+      "url" : "https://example.com/some/path",
+      "feedId" : "feed_id",
+      "timeoutSec" : 30,
+      "headers" : {
+        "Key" : "Value"
+      }
+    }
+  ]
+}
+```
+
+<!-- siri-sx-updater END -->
+
 ## Changelog
 
 - Initial version of SIRI updater (October 2019)
