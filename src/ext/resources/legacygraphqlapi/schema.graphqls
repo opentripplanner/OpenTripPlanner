@@ -1340,11 +1340,12 @@ type Itinerary {
     systemNotices: [SystemNotice]!
 
     """
-    A sandbox features that computes a numeric accessibility score between 0 and 1.
+    Computes a numeric accessibility score between 0 and 1.
 
     The closer the value is to 1 the better the wheelchair-accessibility of this itinerary is.
+    A value of `null` means that no score has been computed, not that the leg is inaccessible.
 
-    More information is available at https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/
+    More information is available in the [feature documentation](https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/).
     """
     accessibilityScore: Float
 }
@@ -1552,11 +1553,12 @@ type Leg {
     rideHailingEstimate: RideHailingEstimate
 
     """
-    A sandbox features that computes a numeric accessibility score between 0 and 1.
+    Computes a numeric accessibility score between 0 and 1.
 
     The closer the value is to 1 the better the wheelchair-accessibility of this leg is.
+    A value of `null` means that no score has been computed, not that the itinerary is inaccessible.
 
-    More information is available at https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/
+    More information is available in the [feature documentation](https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/).
     """
     accessibilityScore: Float
 }
