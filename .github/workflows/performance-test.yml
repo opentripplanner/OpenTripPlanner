@@ -32,6 +32,10 @@ jobs:
             jfr-delay: "35s"
             profile: core
 
+          - location: hamburg # German city
+            iterations: 1
+            jfr-delay: "50s"
+
           - location: skanetrafiken
             iterations: 1
             jfr-delay: "50s"
