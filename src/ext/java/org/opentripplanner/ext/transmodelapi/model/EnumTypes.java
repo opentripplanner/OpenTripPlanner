@@ -87,7 +87,7 @@ public class EnumTypes {
     .value("undefined", "undefined", "Severity is undefined.")
     .build();
 
-  public static final GraphQLEnumType stopConditionEnum = GraphQLEnumType
+  public static final GraphQLEnumType STOP_CONDITION_ENUM = GraphQLEnumType
     .newEnum()
     .name("StopCondition") //SIRI - RoutePointTypeEnumeration
     .value(
@@ -371,7 +371,7 @@ public class EnumTypes {
     public static GraphQLEnumType bookingMethodEnum = TransmodelIndexGraphQLSchema.createEnum("BookingMethod", BookingArrangement.BookingMethodEnum.values(), (t -> t.name()));
 */
 
-  public static final GraphQLEnumType filterPlaceTypeEnum = GraphQLEnumType
+  public static final GraphQLEnumType FILTER_PLACE_TYPE_ENUM = GraphQLEnumType
     .newEnum()
     .name("FilterPlaceType")
     .value("quay", TransmodelPlaceType.QUAY, "Quay")
