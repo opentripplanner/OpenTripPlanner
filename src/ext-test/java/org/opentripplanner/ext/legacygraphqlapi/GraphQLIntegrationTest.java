@@ -148,7 +148,6 @@ class GraphQLIntegrationTest {
     i1.setFare(fares);
     FaresToItineraryMapper.addFaresToLegs(fares, i1);
 
-
     i1.setAccessibilityScore(0.5f);
 
     railLeg.withAccessibilityScore(.3f);
