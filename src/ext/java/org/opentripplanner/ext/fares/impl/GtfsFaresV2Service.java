@@ -139,7 +139,7 @@ public final class GtfsFaresV2Service implements Serializable {
 
     return (
       feedIdsInItinerary.size() == 1 &&
-      pwt.transferRules().stream().anyMatch(r -> r.fareProduct().amount().amount() == 0)
+      pwt.transferRules().stream().anyMatch(r -> r.fareProduct().price().amount() == 0)
     );
   }
 

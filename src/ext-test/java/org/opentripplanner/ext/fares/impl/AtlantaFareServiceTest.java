@@ -219,7 +219,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
     assertEquals(1, fareProducts.size());
     var fp = fareProducts.get(0);
-    assertEquals(Money.usDollars((int) expectedFareInCents), fp.amount());
+    assertEquals(Money.usDollars((int) expectedFareInCents), fp.price());
   }
 
   private static Leg getLeg(String agencyId, long startTimeMins) {

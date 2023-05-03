@@ -53,7 +53,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
         .getItineraryProducts()
         .stream()
         .filter(fp -> fp.name().equals(type.name()))
-        .map(FareProduct::amount)
+        .map(FareProduct::price)
         .toList();
       assertEquals(List.of(expected), prices);
     }

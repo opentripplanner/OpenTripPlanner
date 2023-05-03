@@ -28,7 +28,7 @@ public class LegacyGraphQLFareProductImpl
 
   @Override
   public DataFetcher<Money> price() {
-    return env -> getSource(env).amount();
+    return env -> getSource(env).price();
   }
 
   @Override

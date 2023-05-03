@@ -87,7 +87,7 @@ public class OrcaFareServiceTest {
     if (rideCost.isEmpty()) {
       Assertions.fail("Missing leg fare product.");
     }
-    Assertions.assertEquals(fare, rideCost.get().amount().amount());
+    Assertions.assertEquals(fare, rideCost.get().price().amount());
 
     var transfer = legFareProducts
       .stream()

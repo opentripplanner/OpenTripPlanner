@@ -16,10 +16,10 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * <p>
  * It may be valid for the entirety of an itinerary or just for some of its legs.
  *
- * @param id       Identity for the
+ * @param id       Identity of the product
  * @param name     Human-readable name of the product
- * @param amount   Price
- * @param duration Maximum duration of the product, if null then unlimited duration
+ * @param price    The price of the fare product
+ * @param duration Maximum period of time that the product can be used, if null then unlimited duration
  * @param category Rider category, for example seniors or students
  * @param medium   Medium to "hold" the fare, like "cash", "HSL app" or
  */
@@ -27,7 +27,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public record FareProduct(
   FeedScopedId id,
   String name,
-  Money amount,
+  Money price,
   @Nullable Duration duration,
   @Nullable RiderCategory category,
   @Nullable FareMedium medium
@@ -35,7 +35,7 @@ public record FareProduct(
   public FareProduct {
     Objects.requireNonNull(id);
     Objects.requireNonNull(name);
-    Objects.requireNonNull(amount);
+    Objects.requireNonNull(price);
   }
 
   public boolean coversDuration(Duration journeyDuration) {
@@ -47,7 +47,7 @@ public record FareProduct(
     var builder = ToStringBuilder
       .of(FareProduct.class)
       .addStr("id", id.toString())
-      .addObj("amount", amount);
+      .addObj("amount", price);
     builder.addDuration("duration", duration);
     builder.addObj("category", category);
     builder.addObj("medium", medium);
@@ -70,8 +70,8 @@ public record FareProduct(
     buf
       .append(startTime.toEpochSecond())
       .append(id)
-      .append(amount.currency().getCurrencyCode())
-      .append(amount.amount());
+      .append(price.currency().getCurrencyCode())
+      .append(price.amount());
 
     if (duration != null) {
       buf.append(duration.toSeconds());
