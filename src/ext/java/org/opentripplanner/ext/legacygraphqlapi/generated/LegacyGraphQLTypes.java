@@ -1544,7 +1544,7 @@ public class LegacyGraphQLTypes {
     private Boolean ignoreRealtimeUpdates;
     private List<LegacyGraphQLInputCoordinatesInput> intermediatePlaces;
     private Double itineraryFiltering;
-    private Integer keepingRentedVehicleAtDestinationCost;
+    private Integer keepingRentedBicycleAtDestinationCost;
     private String locale;
     private Integer maxPreTransitTime;
     private Integer maxTransfers;
@@ -1615,8 +1615,8 @@ public class LegacyGraphQLTypes {
             (List<LegacyGraphQLInputCoordinatesInput>) args.get("intermediatePlaces");
         }
         this.itineraryFiltering = (Double) args.get("itineraryFiltering");
-        this.keepingRentedVehicleAtDestinationCost =
-          (Integer) args.get("keepingRentedVehicleAtDestinationCost");
+        this.keepingRentedBicycleAtDestinationCost =
+          (Integer) args.get("keepingRentedBicycleAtDestinationCost");
         this.locale = (String) args.get("locale");
         this.maxPreTransitTime = (Integer) args.get("maxPreTransitTime");
         this.maxTransfers = (Integer) args.get("maxTransfers");
@@ -1783,8 +1783,8 @@ public class LegacyGraphQLTypes {
       return this.itineraryFiltering;
     }
 
-    public Integer getLegacyGraphQLKeepingRentedVehicleAtDestinationCost() {
-      return this.keepingRentedVehicleAtDestinationCost;
+    public Integer getLegacyGraphQLKeepingRentedBicycleAtDestinationCost() {
+      return this.keepingRentedBicycleAtDestinationCost;
     }
 
     public String getLegacyGraphQLLocale() {
@@ -2045,10 +2045,10 @@ public class LegacyGraphQLTypes {
       this.itineraryFiltering = itineraryFiltering;
     }
 
-    public void setLegacyGraphQLKeepingRentedVehicleAtDestinationCost(
-      Integer keepingRentedVehicleAtDestinationCost
+    public void setLegacyGraphQLKeepingRentedBicycleAtDestinationCost(
+      Integer keepingRentedBicycleAtDestinationCost
     ) {
-      this.keepingRentedVehicleAtDestinationCost = keepingRentedVehicleAtDestinationCost;
+      this.keepingRentedBicycleAtDestinationCost = keepingRentedBicycleAtDestinationCost;
     }
 
     public void setLegacyGraphQLLocale(String locale) {
