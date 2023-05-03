@@ -3,6 +3,7 @@ package org.opentripplanner.updater.vehicle_position;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.stopTime;
 
+import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.VehiclePosition;
 import java.time.Duration;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.test.support.VariableSource;
@@ -50,6 +52,9 @@ public class VehiclePositionsMatcherTest {
       .newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
       .setStopId("stop-1")
+      .setPosition(
+        GtfsRealtime.Position.newBuilder().setLatitude(1).setLongitude(1).setBearing(30).build()
+      )
       .build();
     testVehiclePositions(posWithoutServiceDate);
   }
@@ -101,6 +106,9 @@ public class VehiclePositionsMatcherTest {
       .newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
       .setCurrentStopSequence(99)
+      .setPosition(
+        GtfsRealtime.Position.newBuilder().setLatitude(1).setLongitude(1).setBearing(30).build()
+      )
       .build();
     testVehiclePositions(posWithInvalidSequence);
   }
@@ -137,7 +145,10 @@ public class VehiclePositionsMatcherTest {
     var vehiclePositions = service.getVehiclePositions(pattern);
     assertEquals(1, vehiclePositions.size());
 
-    assertEquals(tripId, vehiclePositions.get(0).trip().getId().getId());
+    var parsedPos = vehiclePositions.get(0);
+    assertEquals(tripId, parsedPos.trip().getId().getId());
+    assertEquals(new WgsCoordinate(1, 1), parsedPos.coordinates());
+    assertEquals(30, parsedPos.heading());
 
     // if we have an empty list of updates then clear the positions from the previous update
     matcher.applyVehiclePositionUpdates(List.of());
@@ -260,6 +271,9 @@ public class VehiclePositionsMatcherTest {
       .newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId1).setStartDate("20220314").build())
       .setStopId("stop-1")
+      .setPosition(
+        GtfsRealtime.Position.newBuilder().setLatitude(1).setLongitude(1).setBearing(30).build()
+      )
       .build();
   }
 }
