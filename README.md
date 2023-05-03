@@ -1,6 +1,8 @@
 ## Overview
 
 [![Join the chat at https://gitter.im/opentripplanner/OpenTripPLanner](https://badges.gitter.im/opentripplanner/OpenTripPlanner.svg)](https://gitter.im/opentripplanner/OpenTripPlanner)
+[![codecov](https://codecov.io/gh/opentripplanner/OpenTripPlanner/branch/dev-2.x/graph/badge.svg?token=ak4PbIKgZ1)](https://codecov.io/gh/opentripplanner/OpenTripPlanner)
+[![Docker Pulls](https://img.shields.io/docker/pulls/opentripplanner/opentripplanner)](https://hub.docker.com/r/opentripplanner/opentripplanner)
 
 OpenTripPlanner (OTP) is an open source multi-modal trip planner, focusing on travel by scheduled
 public transportation in combination with bicycling, walking, and mobility services including bike
@@ -39,7 +41,6 @@ the [main documentation](http://docs.opentripplanner.org/en/dev-2.x/), including
 
 ## Development
 
-[![codecov](https://codecov.io/gh/opentripplanner/OpenTripPlanner/branch/dev-2.x/graph/badge.svg?token=ak4PbIKgZ1)](https://codecov.io/gh/opentripplanner/OpenTripPlanner)
 
 OpenTripPlanner is a collaborative project incorporating code, translation, and documentation from
 contributors around the world. We welcome new contributions.
