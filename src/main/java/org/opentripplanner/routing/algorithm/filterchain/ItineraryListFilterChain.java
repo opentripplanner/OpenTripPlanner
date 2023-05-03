@@ -57,8 +57,11 @@ public class ItineraryListFilterChain {
           .stream()
           .anyMatch(notice -> notice.tag.equals(LatestDepartureTimeFilter.TAG));
       if (result.stream().allMatch(isOnStreetAllTheWay.or(isWorseThanStreet))) {
-        var nonTransitIsWalking = result.stream().flatMap(Itinerary::getStreetLegs).allMatch(StreetLeg::isWalkingLeg);
-        if(nonTransitIsWalking) {
+        var nonTransitIsWalking = result
+          .stream()
+          .flatMap(Itinerary::getStreetLegs)
+          .allMatch(StreetLeg::isWalkingLeg);
+        if (nonTransitIsWalking) {
           routingErrors.add(new RoutingError(WALKING_BETTER_THAN_TRANSIT, null));
         }
       } else if (result.stream().allMatch(isOnStreetAllTheWay.or(isOutsideSearchWindow))) {

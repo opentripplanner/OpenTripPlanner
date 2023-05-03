@@ -16,10 +16,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -310,6 +312,52 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
         .build();
       assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
+    }
+  }
+
+  @Nested
+  class WalkingBetterThanTransit {
+
+    ItineraryListFilterChain chain = new ItineraryListFilterChain(
+      List.of(new DeleteAllFilter()),
+      false
+    );
+
+    @Test
+    public void walkingReturnsError() {
+      var walk = newItinerary(A, T11_06).walk(D12m, E).build();
+      var bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
+      chain.filter(List.of(walk, bus));
+      var errors = chain.getRoutingErrors();
+      assertEquals(1, errors.size());
+
+      var error = errors.get(0);
+      assertEquals(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, error.code);
+    }
+
+    @Test
+    public void cyclingReturnsNoError() {
+      var bike = newItinerary(A, T11_06).bicycle(T11_05, T11_55, E).build();
+      var bus = newItinerary(A).bus(21, T11_06, T11_28, E).build();
+      chain.filter(List.of(bike, bus));
+      var errors = chain.getRoutingErrors();
+      assertEquals(0, errors.size());
+    }
+
+    private class DeleteAllFilter implements ItineraryListFilter {
+
+      @Override
+      public List<Itinerary> filter(List<Itinerary> itineraries) {
+        itineraries.forEach(i ->
+          i.flagForDeletion(
+            new SystemNotice(
+              RemoveTransitIfStreetOnlyIsBetterFilter.TAG,
+              "This itinerary is marked as deleted."
+            )
+          )
+        );
+        return itineraries;
+      }
     }
   }
 }
