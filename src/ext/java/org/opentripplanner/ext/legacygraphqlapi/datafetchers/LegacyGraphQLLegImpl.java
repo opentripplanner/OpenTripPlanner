@@ -10,6 +10,7 @@ import org.opentripplanner.api.mapping.LocalDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.legacygraphqlapi.mapping.NumberMapper;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.model.BookingInfo;
@@ -297,5 +298,10 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
         return res;
       } else return null;
     };
+  }
+
+  @Override
+  public DataFetcher<Double> accessibilityScore() {
+    return environment -> NumberMapper.toDouble(getSource(environment).accessibilityScore());
   }
 }

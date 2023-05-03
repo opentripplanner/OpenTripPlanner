@@ -1,8 +1,8 @@
 package org.opentripplanner.updater.vehicle_position;
 
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -27,8 +27,6 @@ import java.util.stream.Stream;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopStatus;
@@ -39,7 +37,9 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.ResultLogger;
+import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -239,7 +239,10 @@ public class VehiclePositionPatternMatcher {
       }
     }
     // but if stop_id isn't there we try current_stop_sequence
-    else if (vehiclePosition.hasCurrentStopSequence()) {
+    else if (
+      vehiclePosition.hasCurrentStopSequence() &&
+      validStopSequence(vehiclePosition, stopsOnVehicleTrip)
+    ) {
       var stop = stopsOnVehicleTrip.get(vehiclePosition.getCurrentStopSequence());
       newPosition.setStop(stop);
     }
@@ -247,6 +250,16 @@ public class VehiclePositionPatternMatcher {
     newPosition.setTrip(trip);
 
     return newPosition.build();
+  }
+
+  /**
+   * Checks that the current_stop_sequence can actually be found in the pattern.
+   */
+  private static boolean validStopSequence(
+    VehiclePosition vehiclePosition,
+    List<StopLocation> stopsOnVehicleTrip
+  ) {
+    return vehiclePosition.getCurrentStopSequence() < stopsOnVehicleTrip.size() - 1;
   }
 
   private record TemporalDistance(LocalDate date, long distance) {}

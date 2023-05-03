@@ -48,7 +48,7 @@ public class ConstructApplicationModule {
       routerConfig.flexConfig(),
       rideHailingServices,
       traverseVisitor,
-      routerConfig.requestLogFile()
+      routerConfig.server().requestLogFile()
     );
   }
 

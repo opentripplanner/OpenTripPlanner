@@ -27,7 +27,6 @@ Sections follow that describe particular settings in more depth.
 | [dataImportReport](#dataImportReport)                                    |  `boolean`  | Generate nice HTML report of Graph errors/warnings                                                                                                             | *Optional* | `false`                           |  2.0  |
 | [distanceBetweenElevationSamples](#distanceBetweenElevationSamples)      |   `double`  | The distance between elevation samples in meters.                                                                                                              | *Optional* | `10.0`                            |  2.0  |
 | embedRouterConfig                                                        |  `boolean`  | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire.                                                   | *Optional* | `true`                            |  2.0  |
-| extraEdgesStopPlatformLink                                               |  `boolean`  | Add extra edges when linking a stop to a platform, to prevent detours along the platform edge.                                                                 | *Optional* | `false`                           |  2.0  |
 | [graph](#graph)                                                          |    `uri`    | URI to the graph object file for reading and writing.                                                                                                          | *Optional* |                                   |  2.0  |
 | [gsCredentials](#gsCredentials)                                          |   `string`  | Local file system path to Google Cloud Platform service accounts credentials file.                                                                             | *Optional* |                                   |  2.0  |
 | [includeEllipsoidToGeoidDifference](#includeEllipsoidToGeoidDifference)  |  `boolean`  | Include the Ellipsoid to Geoid difference in the calculations of every point along every StreetWithElevationEdge.                                              | *Optional* | `false`                           |  2.0  |
@@ -966,7 +965,7 @@ the local filesystem.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /osm/[0]   
-**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland`
+**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constantspeed`
 
 The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.
 
@@ -974,7 +973,7 @@ The named set of mapping rules applied when parsing OSM tags. Overrides the valu
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /osmDefaults   
-**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland`
+**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constantspeed`
 
 The named set of mapping rules applied when parsing OSM tags.
 

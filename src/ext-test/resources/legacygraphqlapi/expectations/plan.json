@@ -6,6 +6,7 @@
           "startTime" : 1580641200000,
           "endTime" : 1580644800000,
           "generalizedCost" : 4072,
+          "accessibilityScore" : 0.5,
           "legs" : [
             {
               "mode" : "WALK",
@@ -28,7 +29,8 @@
               "generalizedCost" : 40,
               "alerts" : [ ],
               "rideHailingEstimate" : null,
-              "fareProducts" : [ ]
+              "fareProducts" : [ ],
+              "accessibilityScore" : null
             },
             {
               "mode" : "BUS",
@@ -112,7 +114,8 @@
                     }
                   }
                 }
-              ]
+              ],
+              "accessibilityScore" : null
             },
             {
               "mode" : "RAIL",
@@ -200,7 +203,8 @@
                     }
                   }
                 }
-              ]
+              ],
+              "accessibilityScore" : null
             },
             {
               "mode" : "CAR",
@@ -243,7 +247,8 @@
                 },
                 "arrival" : "PT10M"
               },
-              "fareProducts" : [ ]
+              "fareProducts" : [ ],
+              "accessibilityScore" : null
             }
           ],
           "fares" : [

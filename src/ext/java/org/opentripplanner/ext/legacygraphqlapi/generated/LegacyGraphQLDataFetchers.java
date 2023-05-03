@@ -347,6 +347,8 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLItinerary {
+    public DataFetcher<Double> accessibilityScore();
+
     public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle();
 
     public DataFetcher<Long> duration();
@@ -375,6 +377,8 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLLeg {
+    public DataFetcher<Double> accessibilityScore();
+
     public DataFetcher<Agency> agency();
 
     public DataFetcher<Iterable<TransitAlert>> alerts();

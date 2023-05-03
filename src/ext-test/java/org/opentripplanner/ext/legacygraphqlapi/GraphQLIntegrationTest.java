@@ -44,6 +44,7 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -127,7 +128,7 @@ class GraphQLIntegrationTest {
       .carHail(D10m, E)
       .build();
     var busLeg = i1.getTransitLeg(1);
-    var railLeg = i1.getTransitLeg(2);
+    ScheduledTransitLeg railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
     fares.addFare(FareType.regular, Money.euros(310));
@@ -146,6 +147,11 @@ class GraphQLIntegrationTest {
 
     i1.setFare(fares);
     FaresToItineraryMapper.addFaresToLegs(fares, i1);
+
+
+    i1.setAccessibilityScore(0.5f);
+
+    railLeg.withAccessibilityScore(.3f);
 
     var alert = TransitAlert
       .of(id("an-alert"))

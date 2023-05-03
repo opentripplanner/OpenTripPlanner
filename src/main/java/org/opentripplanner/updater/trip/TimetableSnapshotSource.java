@@ -1,17 +1,17 @@
 package org.opentripplanner.updater.trip;
 
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_DUPLICATED;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_UNSCHEDULED;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_TRIP_FOR_CANCELLATION_FOUND;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_UPDATES;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_VALID_STOPS;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_ARRIVAL_TIME;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_DEPARTURE_TIME;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_DUPLICATED;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_IMPLEMENTED_UNSCHEDULED;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_TRIP_FOR_CANCELLATION_FOUND;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_UPDATES;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VALID_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_ALREADY_EXISTS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimaps;
@@ -42,8 +42,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -64,7 +62,9 @@ import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.spi.ResultLogger;
+import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

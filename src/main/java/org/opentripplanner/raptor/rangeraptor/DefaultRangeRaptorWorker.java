@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor;
 
 import java.util.Collection;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -134,6 +135,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
       // the arrival time given departure at minute t + 1.
       final IntIterator it = calculator.rangeRaptorMinutes();
       while (it.hasNext()) {
+        OTPRequestTimeoutException.checkForTimeout();
         // Run the raptor search for this particular iteration departure time
         iterationDepartureTime = it.next();
         lifeCycle.setupIteration(iterationDepartureTime);

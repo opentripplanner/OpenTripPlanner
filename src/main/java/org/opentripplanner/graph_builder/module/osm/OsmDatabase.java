@@ -52,9 +52,9 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDatabase {
+public class OsmDatabase {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OsmDatabase.class);
 
   private final DataImportIssueStore issueStore;
 
@@ -130,7 +130,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
   public boolean noZeroLevels = true;
   private final Set<String> boardingAreaRefTags;
 
-  public OSMDatabase(DataImportIssueStore issueStore, Set<String> boardingAreaRefTags) {
+  public OsmDatabase(DataImportIssueStore issueStore, Set<String> boardingAreaRefTags) {
     this.issueStore = issueStore;
     this.boardingAreaRefTags = boardingAreaRefTags;
   }
@@ -211,7 +211,6 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
     return waysNodeIds.contains(nodeId);
   }
 
-  @Override
   public void addNode(OSMNode node) {
     if (node.isBikeParking()) {
       bikeParkingNodes.put(node.getId(), node);
@@ -235,7 +234,6 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
     nodesById.put(node.getId(), node);
   }
 
-  @Override
   public void addWay(OSMWay way) {
     /* only add ways once */
     long wayId = way.getId();
@@ -250,7 +248,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
     /* filter out ways that are not relevant for routing */
     if (
       !(
-        OSMFilter.isWayRoutable(way) ||
+        OsmFilter.isWayRoutable(way) ||
         way.isParkAndRide() ||
         way.isBikeParking() ||
         way.isBoardingLocation()
@@ -290,7 +288,6 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
     waysById.put(wayId, way);
   }
 
-  @Override
   public void addRelation(OSMRelation relation) {
     if (relationsById.containsKey(relation.getId())) {
       return;
@@ -298,7 +295,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
 
     if (
       relation.isTag("type", "multipolygon") &&
-      (OSMFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide()) ||
+      (OsmFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide()) ||
       relation.isBikeParking()
     ) {
       // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
@@ -306,7 +303,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
       // mark the ways for preservation here, and deal with the details once we have
       // the ways loaded.
       if (
-        !OSMFilter.isWayRoutable(relation) && !relation.isParkAndRide() && !relation.isBikeParking()
+        !OsmFilter.isWayRoutable(relation) && !relation.isParkAndRide() && !relation.isBikeParking()
       ) {
         return;
       }
@@ -317,7 +314,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
     } else if (
       !(relation.isTag("type", "restriction")) &&
       !(relation.isTag("type", "route") && relation.isTag("route", "road")) &&
-      !(relation.isTag("type", "multipolygon") && OSMFilter.isOsmEntityRoutable(relation)) &&
+      !(relation.isTag("type", "multipolygon") && OsmFilter.isOsmEntityRoutable(relation)) &&
       !(relation.isTag("type", "level_map")) &&
       !(
         relation.isTag("type", "public_transport") &&
@@ -334,12 +331,10 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
     relationsById.put(relation.getId(), relation);
   }
 
-  @Override
   public void doneFirstPhaseRelations() {
     // nothing to do here
   }
 
-  @Override
   public void doneSecondPhaseWays() {
     // This copies relevant tags to the ways (highway=*) where it doesn't exist, so that
     // the way purging keeps the needed way around.
@@ -355,7 +350,6 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
     markNodesForKeeping(areaWaysById.valueCollection(), areaNodeIds);
   }
 
-  @Override
   public void doneThirdPhaseNodes() {
     processMultipolygonRelations();
     processSingleWayAreas();
@@ -744,7 +738,7 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
         !(
           relation.isTag("type", "multipolygon") &&
           (
-            OSMFilter.isOsmEntityRoutable(relation) ||
+            OsmFilter.isOsmEntityRoutable(relation) ||
             relation.isParkAndRide() ||
             relation.isBikeParking()
           )
@@ -819,12 +813,12 @@ public class OSMDatabase implements org.opentripplanner.openstreetmap.spi.OSMDat
    * Handler for a new Area (single way area or multipolygon relations)
    */
   private void newArea(Area area) {
-    StreetTraversalPermission permissions = OSMFilter.getPermissionsForEntity(
+    StreetTraversalPermission permissions = OsmFilter.getPermissionsForEntity(
       area.parent,
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
     );
     if (
-      OSMFilter.isOsmEntityRoutable(area.parent) && permissions != StreetTraversalPermission.NONE
+      OsmFilter.isOsmEntityRoutable(area.parent) && permissions != StreetTraversalPermission.NONE
     ) {
       walkableAreas.add(area);
     }

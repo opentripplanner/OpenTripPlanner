@@ -1,12 +1,10 @@
 package org.opentripplanner.standalone.config;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeForTest;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
-import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -35,61 +33,18 @@ class RouterConfigTest {
   }
 
   @Test
-  void parseStreetRoutingTimeout() {
-    var DEFAULT_TIMEOUT = RouterConfig.DEFAULT
-      .routingRequestDefaults()
-      .preferences()
-      .street()
-      .routingTimeout();
-    NodeAdapter c;
-
-    // Fall back to default 5 seconds
-    c = createNodeAdaptor("{}");
-    assertEquals(DEFAULT_TIMEOUT, RouterConfig.parseStreetRoutingTimeout(c, DEFAULT_TIMEOUT));
-
-    // New format: 33 seconds
-    c =
-      createNodeAdaptor(
-        """
+  void testSemanticValidation() {
+    // apiProcessingTimeout must be greater then streetRoutingTimeout
+    var root = createNodeAdaptor(
+      """
       {
-        "streetRoutingTimeout": "33s",
-        "transit": {
-          "transferCacheRequests": [
-            {
-              "mode": "WALK"
-            }
-          ]
-        }
+        server: { apiProcessingTimeout : "1s" },
+        routingDefaults: { streetRoutingTimeout: "17s" }
       }
       """
-      );
-    var routerConfig = new RouterConfig(c, false);
-
-    final Duration expected = Duration.ofSeconds(33);
-    assertEquals(
-      expected,
-      routerConfig.routingRequestDefaults().preferences().street().routingTimeout()
     );
-    assertEquals(
-      expected,
-      routerConfig
-        .transitTuningConfig()
-        .transferCacheRequests()
-        .get(0)
-        .preferences()
-        .street()
-        .routingTimeout()
-    );
-  }
-
-  @Test
-  void parseStreetRoutingTimeoutWithIllegalFormat() {
-    Duration defaultTimeout = Duration.ZERO;
-    final var c = createNodeAdaptor("{streetRoutingTimeout: 'Hi'}");
-    assertThrows(
-      OtpAppException.class,
-      () -> RouterConfig.parseStreetRoutingTimeout(c, defaultTimeout)
-    );
+    //
+    assertThrows(OtpAppException.class, () -> new RouterConfig(root, false));
   }
 
   private static NodeAdapter createNodeAdaptor(String jsonText) {
