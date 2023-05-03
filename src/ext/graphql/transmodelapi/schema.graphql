@@ -835,8 +835,8 @@ type QueryType {
     transferSlack: Int = 120,
     "When setting the BicycleOptimisationMethod to 'triangle', use these values to tell the routing engine how important each of the factors is compared to the others. All values should add up to 1."
     triangleFactors: TriangleFactors,
-    "Whether or not bike rental availability information will be used to plan bike rental trips."
-    useBikeRentalAvailabilityInformation: Boolean = false,
+    "Whether or not vehicle rental availability information will be used to plan vehicle rental trips."
+    useVehicleRentalAvailabilityInformation: Boolean = false,
     "Wait cost is multiplied by this value. Setting this to a value lower than 1 indicates that waiting is better than staying on a vehicle. This should never be set higher than walkReluctance, since that would lead to walking down a line to avoid waiting."
     waitReluctance: Float = 1.0,
     "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
@@ -923,14 +923,6 @@ type RoutingParameters {
   bikeParkCost: Int
   "Time to park a bike."
   bikeParkTime: Int
-  "Cost to drop-off a rented bike."
-  bikeRentalDropOffCost: Int
-  "Time to drop-off a rented bike."
-  bikeRentalDropOffTime: Int
-  "Cost to rent a bike."
-  bikeRentalPickupCost: Int
-  "Time to rent a bike."
-  bikeRentalPickupTime: Int
   "Max bike speed along streets, in meters per second"
   bikeSpeed: Float
   "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also apply to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
@@ -992,6 +984,14 @@ type RoutingParameters {
   transferSlack: Int
   "Multiplicative factor on expected turning time."
   turnReluctance: Float
+  "Cost to drop-off a rented vehicle."
+  vehicleRentalDropOffCost: Int
+  "Time to drop-off a rented vehicle."
+  vehicleRentalDropOffTime: Int
+  "Cost to rent a vehicle."
+  vehicleRentalPickupCost: Int
+  "Time to rent a vehicle."
+  vehicleRentalPickupTime: Int
   "How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier."
   waitReluctance: Float
   "This prevents unnecessary transfers by adding a cost for boarding a vehicle."

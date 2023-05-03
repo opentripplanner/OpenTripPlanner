@@ -104,7 +104,7 @@ class PreferencesMapper {
     });
     preferences.withRental(rental ->
       callWith.argument(
-        "useBikeRentalAvailabilityInformation",
+        "useVehicleRentalAvailabilityInformation",
         rental::withUseAvailabilityInformation
       )
     );

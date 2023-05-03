@@ -345,11 +345,11 @@ public abstract class RoutingResource {
   @QueryParam("walkSafetyFactor")
   protected Double walkSafetyFactor;
 
-  @QueryParam("allowKeepingRentedBicycleAtDestination")
-  protected Boolean allowKeepingRentedBicycleAtDestination;
+  @QueryParam("allowKeepingRentedVehicleAtDestination")
+  protected Boolean allowKeepingRentedVehicleAtDestination;
 
-  @QueryParam("keepingRentedBicycleAtDestinationCost")
-  protected Double keepingRentedBicycleAtDestinationCost;
+  @QueryParam("keepingRentedVehicleAtDestinationCost")
+  protected Double keepingRentedVehicleAtDestinationCost;
 
   @QueryParam("allowedVehicleRentalNetworks")
   protected Set<String> allowedVehicleRentalNetworks;
@@ -742,7 +742,7 @@ public abstract class RoutingResource {
       {
         var rental = journey.rental();
         setIfNotNull(
-          allowKeepingRentedBicycleAtDestination,
+          allowKeepingRentedVehicleAtDestination,
           rental::setAllowArrivingInRentedVehicleAtDestination
         );
         setIfNotNull(allowedVehicleRentalNetworks, rental::setAllowedNetworks);

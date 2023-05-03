@@ -85,7 +85,7 @@ public final class VehicleRentalPreferences implements Serializable {
   }
 
   /**
-   * The cost of arriving at the destination with the rented bicycle, to discourage doing so.
+   * The cost of arriving at the destination with the rented vehicle, to discourage doing so.
    *
    * @see VehicleRentalRequest#allowArrivingInRentedVehicleAtDestination()
    */

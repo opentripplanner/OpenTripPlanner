@@ -332,9 +332,9 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
-          .name("useBikeRentalAvailabilityInformation")
+          .name("useVehicleRentalAvailabilityInformation")
           .description(
-            "Whether or not bike rental availability information will be used to plan bike " +
+            "Whether or not vehicle rental availability information will be used to plan vehicle " +
             "rental trips."
           )
           .type(Scalars.GraphQLBoolean)

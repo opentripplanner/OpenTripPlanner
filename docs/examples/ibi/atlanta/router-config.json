@@ -3,14 +3,14 @@
     "bikeTriangleSafetyFactor": 0.4,
     "bikeTriangleSlopeFactor": 0.3,
     "bikeTriangleTimeFactor": 0.3,
-    "bikeRentalPickupTime": 180,
-    "bikeRentalPickupCost": 850,
     "itineraryFilters": {
       // only show non-transit (ie. walking) when it's at least as good as the transit option
       "nonTransitGeneralizedCostLimit": "0 + 1.0 x",
       // add IBI accessibility score between 0 and 1
       "accessibilityScore": true
     },
+    "vehicleRentalPickupTime": 180,
+    "vehicleRentalPickupCost": 850,
     // use stop and trip with unknown wheelchair accessibility during routing
     "wheelchairAccessibility": {
       "trip": {

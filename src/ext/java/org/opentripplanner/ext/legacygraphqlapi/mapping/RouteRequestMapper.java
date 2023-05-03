@@ -95,7 +95,7 @@ public class RouteRequestMapper {
       });
       preferences.withRental(rental -> {
         callWith.argument(
-          "keepingRentedBicycleAtDestinationCost",
+          "keepingRentedVehicleAtDestinationCost",
           rental::withArrivingInRentalVehicleAtDestinationCost
         );
         rental.withUseAvailabilityInformation(request.isTripPlannedForNow());

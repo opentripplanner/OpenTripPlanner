@@ -502,47 +502,47 @@ ferries, where the check-in process needs to be done in good time before ride.
     builder
       .withDropoffCost(
         c
-          .of("bikeRentalDropoffCost")
+          .of("vehicleRentalDropoffCost")
           .since(V2_0)
-          .summary("Cost to drop-off a rented bike.")
+          .summary("Cost to drop-off a rented vehicle.")
           .asInt(dft.dropoffCost())
       )
       .withDropoffTime(
         c
-          .of("bikeRentalDropoffTime")
+          .of("vehicleRentalDropoffTime")
           .since(V2_0)
-          .summary("Time to drop-off a rented bike.")
+          .summary("Time to drop-off a rented vehicle.")
           .asInt(dft.dropoffTime())
       )
       .withPickupCost(
         c
-          .of("bikeRentalPickupCost")
+          .of("vehicleRentalPickupCost")
           .since(V2_0)
-          .summary("Cost to rent a bike.")
+          .summary("Cost to rent a vehicle.")
           .asInt(dft.pickupCost())
       )
       .withPickupTime(
         c
-          .of("bikeRentalPickupTime")
+          .of("vehicleRentalPickupTime")
           .since(V2_0)
-          .summary("Time to rent a bike.")
+          .summary("Time to rent a vehicle.")
           .asInt(dft.pickupTime())
       )
       .withUseAvailabilityInformation(
         c
-          .of("useBikeRentalAvailabilityInformation")
+          .of("useVehicleRentalAvailabilityInformation")
           .since(V2_0)
           .summary(
-            "Whether or not bike rental availability information will be used to plan bike rental trips."
+            "Whether or not vehicle rental availability information will be used to plan vehicle rental trips."
           )
           .asBoolean(dft.useAvailabilityInformation())
       )
       .withArrivingInRentalVehicleAtDestinationCost(
         c
-          .of("keepingRentedBicycleAtDestinationCost")
+          .of("keepingRentedVehicleAtDestinationCost")
           .since(V2_2)
           .summary(
-            "The cost of arriving at the destination with the rented bicycle, to discourage doing so."
+            "The cost of arriving at the destination with the rented vehicle, to discourage doing so."
           )
           .asDouble(dft.arrivingInRentalVehicleAtDestinationCost())
       );

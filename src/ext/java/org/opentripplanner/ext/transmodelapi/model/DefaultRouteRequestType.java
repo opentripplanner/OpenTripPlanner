@@ -181,8 +181,8 @@ public class DefaultRouteRequestType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
-          .name("bikeRentalPickupTime")
-          .description("Time to rent a bike.")
+          .name("vehicleRentalPickupTime")
+          .description("Time to rent a vehicle.")
           .type(Scalars.GraphQLInt)
           .dataFetcher(env -> preferences.rental().pickupTime())
           .build()
@@ -190,8 +190,8 @@ public class DefaultRouteRequestType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
-          .name("bikeRentalPickupCost")
-          .description("Cost to rent a bike.")
+          .name("vehicleRentalPickupCost")
+          .description("Cost to rent a vehicle.")
           .type(Scalars.GraphQLInt)
           .dataFetcher(env -> preferences.rental().pickupCost())
           .build()
@@ -199,8 +199,8 @@ public class DefaultRouteRequestType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
-          .name("bikeRentalDropOffTime")
-          .description("Time to drop-off a rented bike.")
+          .name("vehicleRentalDropOffTime")
+          .description("Time to drop-off a rented vehicle.")
           .type(Scalars.GraphQLInt)
           .dataFetcher(env -> preferences.rental().dropoffTime())
           .build()
@@ -208,8 +208,8 @@ public class DefaultRouteRequestType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
-          .name("bikeRentalDropOffCost")
-          .description("Cost to drop-off a rented bike.")
+          .name("vehicleRentalDropOffCost")
+          .description("Cost to drop-off a rented vehicle.")
           .type(Scalars.GraphQLInt)
           .dataFetcher(env -> preferences.rental().dropoffCost())
           .build()
