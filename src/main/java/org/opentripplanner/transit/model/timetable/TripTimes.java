@@ -471,13 +471,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     timeShift += duration.toSeconds();
   }
 
-  /** Just to create uniform getter-syntax across the whole public interface of TripTimes. */
+  /**
+   * Returns the GTFS sequence number of the given 0-based stop index.
+   */
   public int gtfsSequenceOfStopIndex(final int stop) {
     return originalGtfsStopSequence[stop];
   }
 
   /**
-   * Returns the 0-based stop sequence of the giving
+   * Returns the 0-based stop index of the given GTFS sequence number.
    */
   public OptionalInt stopIndexOfGtfsSequence(int stopSequence) {
     if (originalGtfsStopSequence == null) {

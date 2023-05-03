@@ -55,13 +55,52 @@ public class VehiclePositionsMatcherTest {
   }
 
   @Test
+  public void sequenceId() {
+    var service = new DefaultVehiclePositionService();
+
+    var tripId = "trip1";
+    var scopedTripId = TransitModelForTest.id(tripId);
+    var trip1 = TransitModelForTest.trip(tripId).build();
+
+    var stopTimes = List.of(stopTime(trip1, 10), stopTime(trip1, 20), stopTime(trip1, 30));
+    var pattern1 = tripPattern(trip1, stopTimes);
+
+    var tripForId = Map.of(scopedTripId, trip1);
+    var patternForTrip = Map.of(trip1, pattern1);
+
+    // Map positions to trips in feed
+    VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
+      TransitModelForTest.FEED_ID,
+      tripForId::get,
+      patternForTrip::get,
+      (id, time) -> patternForTrip.get(id),
+      service,
+      zoneId
+    );
+
+    var pos = VehiclePosition
+      .newBuilder()
+      .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
+      .setCurrentStopSequence(20)
+      .build();
+
+    var positions = List.of(pos);
+
+    // Execute the same match-to-pattern step as the runner
+    matcher.applyVehiclePositionUpdates(positions);
+
+    // ensure that gtfs-rt was matched to an OTP pattern correctly
+    assertEquals(1, service.getVehiclePositions(pattern1).size());
+    var nextStop = service.getVehiclePositions(pattern1).get(0).stop().stop();
+    assertEquals("F:stop-20", nextStop.getId().toString());
+  }
+
+  @Test
   void invalidStopSequence() {
     var posWithInvalidSequence = VehiclePosition
       .newBuilder()
       .setTrip(TripDescriptor.newBuilder().setTripId(tripId).build())
-      // there are 3 stops in the pattern so a current_stop_sequence of 3 would go off the end of
-      // the trip
-      .setCurrentStopSequence(3)
+      .setCurrentStopSequence(99)
       .build();
     testVehiclePositions(posWithInvalidSequence);
   }

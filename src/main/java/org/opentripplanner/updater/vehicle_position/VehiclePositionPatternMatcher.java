@@ -242,8 +242,7 @@ public class VehiclePositionPatternMatcher {
     else if (vehiclePosition.hasCurrentStopSequence()) {
       tripTimes
         .stopIndexOfGtfsSequence(vehiclePosition.getCurrentStopSequence())
-        .stream()
-        .forEach(stopIndex -> {
+        .ifPresent(stopIndex -> {
           if (validStopIndex(stopIndex, stopsOnVehicleTrip)) {
             var stop = stopsOnVehicleTrip.get(stopIndex);
             newPosition.setStop(stop);
@@ -257,7 +256,7 @@ public class VehiclePositionPatternMatcher {
   }
 
   /**
-   * Checks that the current_stop_sequence can actually be found in the pattern.
+   * Checks that the stop index can actually be found in the pattern.
    */
   private static boolean validStopIndex(int stopIndex, List<StopLocation> stopsOnVehicleTrip) {
     return stopIndex < stopsOnVehicleTrip.size() - 1;

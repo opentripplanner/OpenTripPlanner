@@ -152,6 +152,12 @@ public class TripTimesTest {
 
   @Test
   void gtfsSequence() {
+    var stopIndex = originalTripTimes.gtfsSequenceOfStopIndex(2);
+    assertEquals(20, stopIndex);
+  }
+
+  @Test
+  void stopIndexOfGtfsSequence() {
     var stopIndex = originalTripTimes.stopIndexOfGtfsSequence(40);
     assertTrue(stopIndex.isPresent());
     assertEquals(4, stopIndex.getAsInt());
