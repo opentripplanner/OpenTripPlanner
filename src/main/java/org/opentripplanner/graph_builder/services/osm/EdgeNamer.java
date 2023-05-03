@@ -41,7 +41,7 @@ public interface EdgeNamer {
     return name;
   }
 
-  class WayNamerFactory {
+  class EdgeNamerFactory {
 
     /**
      * Create a custom namer if needed, return null if not found / by default.

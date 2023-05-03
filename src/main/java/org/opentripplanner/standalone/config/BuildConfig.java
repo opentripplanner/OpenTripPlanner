@@ -632,7 +632,7 @@ Netex data is also often supplied in a ZIP file.
 
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root, "fares");
-    edgeNamer = EdgeNamer.WayNamerFactory.fromConfig(root, "osmNaming");
+    edgeNamer = EdgeNamer.EdgeNamerFactory.fromConfig(root, "osmNaming");
     dataOverlay = DataOverlayConfigMapper.map(root, "dataOverlay");
 
     transferRequests = TransferRequestConfig.map(root, "transferRequests");
