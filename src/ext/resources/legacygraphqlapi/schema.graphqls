@@ -2821,7 +2821,7 @@ type QueryType {
         The cost of arriving at the destination with the rented vehicle, to discourage doing so.
         Default value: 0.
         """
-        keepingRentedVehicleAtDestinationCost: Int
+        keepingRentedBicycleAtDestinationCost: Int
 
         """
         Invariant: `boardSlack + alightSlack <= transferSlack`. Default value: 0
