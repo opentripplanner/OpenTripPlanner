@@ -16,20 +16,19 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * <p>
  * It may be valid for the entirety of an itinerary or just for some of its legs.
  *
- * @param id               Identity of the product
- * @param name             Human-readable name of the product
- * @param price            The price of the fare product
- * @param validityDuration Maximum duration that the product is valid for, if null then unlimited
- *                         duration.
- * @param category         Rider category, for example seniors or students
- * @param medium           Medium to "hold" the fare, like "cash", "HSL app" or
+ * @param id       Identity of the product
+ * @param name     Human-readable name of the product
+ * @param price    The price of the fare product
+ * @param validity Maximum duration that the product is valid for, if null then unlimited duration.
+ * @param category Rider category, for example seniors or students
+ * @param medium   Medium to "hold" the fare, like "cash", "HSL app" or
  */
 @Sandbox
 public record FareProduct(
   FeedScopedId id,
   String name,
   Money price,
-  @Nullable Duration validityDuration,
+  @Nullable Duration validity,
   @Nullable RiderCategory category,
   @Nullable FareMedium medium
 ) {
@@ -40,10 +39,7 @@ public record FareProduct(
   }
 
   public boolean coversDuration(Duration journeyDuration) {
-    return (
-      Objects.nonNull(validityDuration) &&
-      validityDuration.toSeconds() > journeyDuration.toSeconds()
-    );
+    return (Objects.nonNull(validity) && validity.toSeconds() > journeyDuration.toSeconds());
   }
 
   @Override
@@ -52,7 +48,7 @@ public record FareProduct(
       .of(FareProduct.class)
       .addStr("id", id.toString())
       .addObj("amount", price);
-    builder.addDuration("duration", validityDuration);
+    builder.addDuration("duration", validity);
     builder.addObj("category", category);
     builder.addObj("medium", medium);
 
@@ -77,8 +73,8 @@ public record FareProduct(
       .append(price.currency().getCurrencyCode())
       .append(price.amount());
 
-    if (validityDuration != null) {
-      buf.append(validityDuration.toSeconds());
+    if (validity != null) {
+      buf.append(validity.toSeconds());
     }
     if (medium != null) {
       buf.append(medium.id()).append(medium.name());
