@@ -203,7 +203,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
     int sleepPeriod = 1000;
     int attemptCounter = 1;
-    while (!isPrimed()) { // Retrying until data is initialized successfully
+    boolean otpIsShuttingDown = false;
+    while (!isPrimed() && !otpIsShuttingDown) { // Retrying until data is initialized successfully
       try {
         initializeData(dataInitializationUrl, receiver);
       } catch (Exception e) {
@@ -219,13 +220,17 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         try {
           Thread.sleep(sleepPeriod);
         } catch (InterruptedException interruptedException) {
-          //Ignore
+          Thread.currentThread().interrupt();
+          otpIsShuttingDown = true;
+          LOG.info(
+            "OTP is shutting down, cancelling initialization of SIRI ET Google PubSub Updater."
+          );
         }
       }
     }
 
     Subscriber subscriber = null;
-    while (true) {
+    while (!otpIsShuttingDown) {
       try {
         subscriber = Subscriber.newBuilder(subscription.getName(), receiver).build();
         subscriber.startAsync().awaitRunning();
@@ -239,7 +244,11 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       try {
         Thread.sleep(reconnectPeriod.toMillis());
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        Thread.currentThread().interrupt();
+        otpIsShuttingDown = true;
+        LOG.info(
+          "OTP is shutting down, cancelling attempt to reconnect SIRI ET Google PubSub Updater."
+        );
       }
     }
   }
@@ -395,7 +404,10 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         if (!isPrimed()) {
           try {
             f.get();
-          } catch (InterruptedException | ExecutionException e) {
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+          } catch (ExecutionException e) {
             throw new RuntimeException(e);
           }
         }

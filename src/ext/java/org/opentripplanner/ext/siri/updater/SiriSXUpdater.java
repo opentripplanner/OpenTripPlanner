@@ -86,7 +86,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   }
 
   @Override
-  protected void runPolling() {
+  protected void runPolling() throws InterruptedException {
     try {
       boolean moreData = false;
       do {
@@ -112,11 +112,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
       LOG.info("Caught timeout - retry no. {} after {} millis", retryCount, sleepTime);
 
-      try {
-        Thread.sleep(sleepTime);
-      } catch (InterruptedException ex) {
-        //Ignore
-      }
+      Thread.sleep(sleepTime);
 
       // Creating new requestorRef so all data is refreshed
       requestorRef = originalRequestorRef + "-retry-" + retryCount;
