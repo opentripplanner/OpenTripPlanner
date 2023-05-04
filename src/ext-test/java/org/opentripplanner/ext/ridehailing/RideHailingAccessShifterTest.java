@@ -4,6 +4,7 @@ import static graphql.Assert.assertTrue;
 import static java.time.Duration.ZERO;
 import static java.time.Duration.ofMinutes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.ext.ridehailing.RideHailingAccessShifter.arrivalDelay;
 import static org.opentripplanner.ext.ridehailing.TestRideHailingService.DEFAULT_ARRIVAL_DURATION;
 
 import java.time.Duration;
@@ -56,14 +57,14 @@ class RideHailingAccessShifterTest {
 
   @ParameterizedTest
   @VariableSource("testCases")
-  void arrivalDelay(Instant searchTime, Duration expectedArrival) {
+  void testArrivalDelay(Instant searchTime, Duration expectedArrival) {
     var req = new RouteRequest();
     req.setTo(FROM);
     req.setFrom(TO);
     req.setDateTime(searchTime);
     req.journey().setModes(RequestModes.of().withAccessMode(StreetMode.CAR_HAILING).build());
 
-    var result = RideHailingAccessShifter.arrivalDelay(req, List.of(service), TIME);
+    var result = arrivalDelay(req, List.of(service), TIME);
 
     assertTrue(result.isSuccess());
     var actualArrival = result.successValue();

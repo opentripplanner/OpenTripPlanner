@@ -46,7 +46,7 @@ public class RideHailingAccessShifter {
         // only time-shift access legs on a car
         // (there could be walk-only accesses if you're close to the stop)
         if (isAccess && ae.containsDriving()) {
-          var duration = RideHailingAccessShifter.arrivalDelay(services, request, now);
+          var duration = fetchArrivalDelay(services, request, now);
           if (duration.isSuccess()) {
             return new RideHailingAccessAdapter(ae, duration.successValue());
           } else {
@@ -82,7 +82,7 @@ public class RideHailingAccessShifter {
     }
   }
 
-  private static Result<Duration, Error> arrivalDelay(
+  private static Result<Duration, Error> fetchArrivalDelay(
     List<RideHailingService> services,
     RouteRequest request,
     Instant now
