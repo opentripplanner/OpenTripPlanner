@@ -48,7 +48,7 @@ class RideHailingAccessShifterTest {
     Arguments.of(TIME.plus(ofMinutes(1)), ofMinutes(9)),
     // only shift by 7 minutes because we are wanting to leave in 3 minutes
     Arguments.of(TIME.plus(ofMinutes(3)), ofMinutes(7)),
-    // no shifting because it's in the future
+    // no shifting because it's far in the future
     Arguments.of(TIME.plus(ofMinutes(15)), ZERO),
     Arguments.of(TIME.plus(ofMinutes(30)), ZERO),
     Arguments.of(TIME.plus(ofMinutes(40)), ZERO)

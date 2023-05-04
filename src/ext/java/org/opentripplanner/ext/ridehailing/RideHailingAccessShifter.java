@@ -64,7 +64,7 @@ public class RideHailingAccessShifter {
 
   /**
    * When you start a car hailing search for right now (which is common) you cannot assume to leave
-   * straight away but have to take into account the duration it takes for the hailing vehicle to
+   * right away but have to take into account the duration it takes for the hailing vehicle to
    * arrive.
    * <p>
    * This method shifts the departure time by the appropriate amount so that the correct
