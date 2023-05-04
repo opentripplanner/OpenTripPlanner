@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.OSMFilter;
+import org.opentripplanner.graph_builder.module.osm.OsmFilter;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
@@ -330,10 +330,10 @@ public class OSMWayTest {
     WayPropertySet wayPropertySet = new WayPropertySet();
     WayProperties wayData = wayPropertySet.getDataForWay(way);
 
-    StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(
+    StreetTraversalPermission permissions = OsmFilter.getPermissionsForWay(
       way,
       wayData.getPermission()
     );
-    return OSMFilter.getPermissions(permissions, way);
+    return OsmFilter.getPermissions(permissions, way);
   }
 }

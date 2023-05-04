@@ -25,7 +25,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
+import org.opentripplanner.graph_builder.module.osm.OsmModule.Handler;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
@@ -74,7 +74,7 @@ public class WalkableAreaBuilder {
 
   private final Graph graph;
 
-  private final OSMDatabase osmdb;
+  private final OsmDatabase osmdb;
 
   private final Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
@@ -90,7 +90,7 @@ public class WalkableAreaBuilder {
 
   public WalkableAreaBuilder(
     Graph graph,
-    OSMDatabase osmdb,
+    OsmDatabase osmdb,
     Handler handler,
     DataImportIssueStore issueStore,
     int maxAreaNodes,
@@ -296,13 +296,6 @@ public class WalkableAreaBuilder {
         }
       }
 
-      // FIXME: temporary hard limit on size of
-      // areas to prevent way explosion
-      if (polygon.getNumPoints() > maxAreaNodes) {
-        issueStore.add(new AreaTooComplicated(group, visibilityNodes.size(), maxAreaNodes));
-        continue;
-      }
-
       if (edgeList.visibilityVertices.size() == 0) {
         issueStore.add(new UnconnectedArea(group));
         // Area is not connected to graph. Remove it immediately before it causes any trouble.
@@ -314,13 +307,34 @@ public class WalkableAreaBuilder {
 
       createNamedAreas(edgeList, ring, group.areas);
 
+      if (visibilityNodes.size() > maxAreaNodes) {
+        issueStore.add(new AreaTooComplicated(group, visibilityNodes.size(), maxAreaNodes));
+      }
+
+      // if area is too complex, consider only part of visibility nodes
+      // so that at least some edges passing through the area is added
+      // otherwise routing can use only area boundary edges
+      float skip_ratio = (float) maxAreaNodes / (float) visibilityNodes.size();
+      int i = 0;
+      float sum_i = 0;
       for (OSMNode nodeI : visibilityNodes) {
+        sum_i += skip_ratio;
+        if (Math.floor(sum_i) < i + 1) {
+          continue;
+        }
+        i = (int) Math.floor(sum_i);
         IntersectionVertex startEndpoint = handler.getVertexForOsmNode(nodeI, areaEntity);
         if (startingNodes.contains(nodeI)) {
           startingVertices.add(startEndpoint);
         }
-
+        int j = 0;
+        float sum_j = 0;
         for (OSMNode nodeJ : visibilityNodes) {
+          sum_j += skip_ratio;
+          if (Math.floor(sum_j) < j + 1) {
+            continue;
+          }
+          j = (int) Math.floor(sum_j);
           NodeEdge edge = new NodeEdge(nodeI, nodeJ);
           if (alreadyAddedEdges.contains(edge)) continue;
 
@@ -468,7 +482,7 @@ public class WalkableAreaBuilder {
       Area area = intersects.get(0);
       OSMWithTags areaEntity = area.parent;
 
-      StreetTraversalPermission areaPermissions = OSMFilter.getPermissionsForEntity(
+      StreetTraversalPermission areaPermissions = OsmFilter.getPermissionsForEntity(
         areaEntity,
         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
       );
@@ -512,7 +526,7 @@ public class WalkableAreaBuilder {
         street.setWheelchairAccessible(false);
       }
 
-      street.setLink(OSMFilter.isLink(areaEntity));
+      street.setLink(OsmFilter.isLink(areaEntity));
 
       label =
         "way (area) " +
@@ -543,7 +557,7 @@ public class WalkableAreaBuilder {
         backStreet.setWheelchairAccessible(false);
       }
 
-      backStreet.setLink(OSMFilter.isLink(areaEntity));
+      backStreet.setLink(OsmFilter.isLink(areaEntity));
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
         WayProperties wayData = areaEntity
@@ -650,7 +664,7 @@ public class WalkableAreaBuilder {
 
       namedArea.setOriginalEdges(intersection);
 
-      StreetTraversalPermission permission = OSMFilter.getPermissionsForEntity(
+      StreetTraversalPermission permission = OsmFilter.getPermissionsForEntity(
         areaEntity,
         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
       );

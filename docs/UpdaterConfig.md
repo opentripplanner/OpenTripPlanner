@@ -377,23 +377,8 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 ## Other updaters in sandboxes
 
-### Vehicle parking
-
-Vehicle parking options and configuration is documented in
-its [sandbox documentation](sandbox/VehicleParking.md).
-
-<!-- INSERT: vehicle-parking -->
-
-
-### SIRI SX updater for Azure Service Bus
-
-This is a Sandbox updater, see [sandbox documentation](sandbox/SiriAzureUpdater.md).
-
-<!-- INSERT: siri-azure-sx-updater -->
-
-
-### Vehicle Rental Service Directory configuration
-
-To configure and url for
-the [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md).
+- [Vehicle parking](sandbox/VehicleParking.md)
+- [Siri over HTTP](sandbox/SiriUpdater.md)
+- [Siri over Azure Message Bus](sandbox/SiriAzureUpdater.md)
+- [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)
 

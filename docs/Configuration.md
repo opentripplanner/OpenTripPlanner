@@ -175,7 +175,7 @@ text inserted is valid JSON (starts with `{` and ends with `}`).
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
 
-Here is an example including variable substitution, assuming version 2.2.0 of OTP:
+Here is an example including variable substitution, assuming version 2.3.0 of OTP:
 
 ```JSON
 // build-config.json
@@ -199,7 +199,7 @@ The result will look like this:
 {
       "transitFeeds": [
         {
-          "source": "netex-v2.2.0.obj"
+          "source": "netex-v2.3.0.obj"
         }
       ]
 } 
@@ -242,6 +242,7 @@ Here is a list of all features which can be toggled on/off and their default val
 | `GoogleCloudStorage`                 | Enable Google Cloud Storage integration.                                                                                                                                                                  |                    |    ✓️   |
 | `RealtimeResolver`                   | When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with realtime data                                                                                                |                    |    ✓️   |
 | `ReportApi`                          | Enable the report API.                                                                                                                                                                                    |                    |    ✓️   |
+| `RestAPIPassInDefaultConfigAsJson`   | Enable a default RouteRequest to be passed in as JSON on the REST API - FOR DEBUGGING ONLY!                                                                                                               |                    |         |
 | `SandboxAPIGeocoder`                 | Enable the Geocoder API.                                                                                                                                                                                  |                    |    ✓️   |
 | `SandboxAPILegacyGraphQLApi`         | Enable (GTFS) GraphQL API.                                                                                                                                                                                |                    |    ✓️   |
 | `SandboxAPIMapboxVectorTilesApi`     | Enable Mapbox vector tiles API.                                                                                                                                                                           |                    |    ✓️   |

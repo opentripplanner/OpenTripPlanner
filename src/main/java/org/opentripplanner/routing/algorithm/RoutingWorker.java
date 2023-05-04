@@ -9,10 +9,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.concurrent.InterruptibleExecutor;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
@@ -100,16 +101,15 @@ public class RoutingWorker {
     var routingErrors = Collections.synchronizedSet(new HashSet<RoutingError>());
 
     if (OTPFeature.ParallelRouting.isOn()) {
+      List<Callable<Object>> tasks = List.of(
+        () -> routeDirectStreet(itineraries, routingErrors),
+        () -> routeDirectFlex(itineraries, routingErrors),
+        () -> routeTransit(itineraries, routingErrors)
+      );
       try {
-        CompletableFuture
-          .allOf(
-            CompletableFuture.runAsync(() -> routeDirectStreet(itineraries, routingErrors)),
-            CompletableFuture.runAsync(() -> routeDirectFlex(itineraries, routingErrors)),
-            CompletableFuture.runAsync(() -> routeTransit(itineraries, routingErrors))
-          )
-          .join();
-      } catch (CompletionException e) {
-        RoutingValidationException.unwrapAndRethrowCompletionException(e);
+        InterruptibleExecutor.execute(tasks);
+      } catch (ExecutionException e) {
+        RoutingValidationException.unwrapAndRethrowExecutionException(e);
       }
     } else {
       // Direct street routing
@@ -217,7 +217,7 @@ public class RoutingWorker {
     return null;
   }
 
-  private void routeDirectStreet(
+  private Void routeDirectStreet(
     List<Itinerary> itineraries,
     Collection<RoutingError> routingErrors
   ) {
@@ -229,14 +229,15 @@ public class RoutingWorker {
     } finally {
       debugTimingAggregator.finishedDirectStreetRouter();
     }
+    return null;
   }
 
-  private void routeDirectFlex(
+  private Void routeDirectFlex(
     List<Itinerary> itineraries,
     Collection<RoutingError> routingErrors
   ) {
     if (!OTPFeature.FlexRouting.isOn()) {
-      return;
+      return null;
     }
 
     debugTimingAggregator.startedDirectFlexRouter();
@@ -247,9 +248,10 @@ public class RoutingWorker {
     } finally {
       debugTimingAggregator.finishedDirectFlexRouter();
     }
+    return null;
   }
 
-  private void routeTransit(List<Itinerary> itineraries, Collection<RoutingError> routingErrors) {
+  private Void routeTransit(List<Itinerary> itineraries, Collection<RoutingError> routingErrors) {
     debugTimingAggregator.startedTransitRouting();
     try {
       var transitResults = TransitRouter.route(
@@ -266,6 +268,7 @@ public class RoutingWorker {
     } finally {
       debugTimingAggregator.finishedTransitRouter();
     }
+    return null;
   }
 
   private Duration calculateSearchWindowNextSearch(List<Itinerary> itineraries) {

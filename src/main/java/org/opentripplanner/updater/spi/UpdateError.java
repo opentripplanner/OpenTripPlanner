@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.updater.spi;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;

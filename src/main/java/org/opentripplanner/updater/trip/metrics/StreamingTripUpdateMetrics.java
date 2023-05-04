@@ -8,9 +8,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.model.UpdateSuccess;
+import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
 
 /**

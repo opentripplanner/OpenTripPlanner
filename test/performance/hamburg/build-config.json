@@ -1,0 +1,27 @@
+{
+  "transitModelTimeZone": "Europe/Berlin",
+  "transitServiceStart": "2023-01-01",
+  "transitServiceEnd": "2023-12-01",
+  "platformEntriesLinking": true,
+  "subwayAccessTime": 0,
+  "netexDefaults": {
+    "groupFilePattern": "(.*)\\/.*\\.xml",
+    "feedId": "HH"
+  },
+  "osmDefaults": {
+    "osmTagMapping": "germany",
+    "timeZone": "Europe/Berlin"
+  },
+  "transitFeeds": [
+    {
+      "type": "netex",
+      "source": "https://otp-performance.leonard.io/data/hamburg/NeTEx_Hamburg.zip",
+      "feedId": "HH"
+    }
+  ],
+  "osm": [
+    {
+      "source": "https://otp-performance.leonard.io/data/hamburg/hvv_cropped.osm.pbf"
+    }
+  ]
+}

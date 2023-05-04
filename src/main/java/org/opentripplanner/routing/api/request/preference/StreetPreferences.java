@@ -29,7 +29,6 @@ import org.opentripplanner.street.search.intersection_model.IntersectionTraversa
 public final class StreetPreferences implements Serializable {
 
   public static StreetPreferences DEFAULT = new StreetPreferences();
-
   private final double turnReluctance;
   private final DrivingDirection drivingDirection;
   private final ElevatorPreferences elevator;

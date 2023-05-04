@@ -44,7 +44,7 @@ public class TestServerContext {
       routerConfig.flexConfig(),
       List.of(),
       null,
-      routerConfig.requestLogFile()
+      routerConfig.server().requestLogFile()
     );
     creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());
     return context;

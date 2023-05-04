@@ -54,7 +54,9 @@
     {
       "description": "in order to keep review burden low, don't update these quite so frequently",
       "matchPackageNames": [
-        "mkdocs-material",
+        "mkdocs-material"
+      ],
+      "matchPackagePrefixes": [
         "org.apache.lucene:"
       ],
       "extends": [
@@ -65,12 +67,15 @@
       "description": "automatically merge test and logging dependencies",
       "matchPackageNames": [
         "org.mockito:mockito-core",
-        "org.junit.jupiter:",
         "com.tngtech.archunit:archunit",
         "org.apache.maven.plugins:maven-surefire-plugin",
+        "org.jacoco:jacoco-maven-plugin", // coverage plugin
         "org.apache.commons:commons-compress", // only used by tests
-        "org.slf4j:",
         "ch.qos.logback:logback-classic"
+      ],
+      "matchPackagePrefixes": [
+        "org.junit.jupiter:",
+        "org.slf4j:"
       ],
       "automerge": true,
       "schedule": "after 11pm and before 5am every weekday"

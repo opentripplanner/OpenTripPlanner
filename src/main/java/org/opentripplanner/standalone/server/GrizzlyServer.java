@@ -4,6 +4,7 @@ import jakarta.ws.rs.core.Application;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
+import java.time.Duration;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpHandler;
@@ -28,6 +29,7 @@ public class GrizzlyServer {
   /** The command line parameters, including things like port number and content directories. */
   private final CommandLineParameters params;
   private final Application app;
+  private final Duration httpTransactionTimeout;
 
   static {
     // Remove existing handlers attached to the j.u.l root logger
@@ -37,9 +39,14 @@ public class GrizzlyServer {
   }
 
   /** Construct a Grizzly server with the given IoC injector and command line parameters. */
-  public GrizzlyServer(CommandLineParameters params, Application app) {
+  public GrizzlyServer(
+    CommandLineParameters params,
+    Application app,
+    Duration httpTransactionTimeout
+  ) {
     this.params = params;
     this.app = app;
+    this.httpTransactionTimeout = httpTransactionTimeout;
   }
 
   /**
@@ -100,6 +107,7 @@ public class GrizzlyServer {
       cc.setCompressionMinSize(50000); // the min number of bytes to compress
       cc.setCompressableMimeTypes("application/json", "text/json"); // the mime types to compress
       listener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
+      listener.setTransactionTimeout((int) httpTransactionTimeout.toSeconds());
       httpServer.addListener(listener);
     }
 

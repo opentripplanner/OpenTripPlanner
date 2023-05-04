@@ -42,15 +42,13 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * `git add pom.xml`
     * `git commit -m "prepare release x.y.z"`
 * Run a test build of the release locally, without deploying it
-    * `mvn clean install site -Prelease`
-      The current version of ENUNCIATE does not support Java 17 "out of the box", use 
-      `export MAVEN_OPTS="--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED"`
-      to ignore the problem.
+    * `mvn clean install -Prelease`
     * The `install` goal will sign the Maven artifacts so you need the GPG signing certificate set
       up
     * You can also use the `package` goal instead of the `install` goal to avoid signing if you
       don't have the GPG certificate installed.
     * All tests should pass
+    * Run `MAVEN_OPTS="--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED" mvn com.webcohesion.enunciate:enunciate-maven-plugin:docs`
     * This build will also create Enunciate API docs and Javadoc with the correct non-snapshot
       version number
 * Deploy the documentation to AWS S3

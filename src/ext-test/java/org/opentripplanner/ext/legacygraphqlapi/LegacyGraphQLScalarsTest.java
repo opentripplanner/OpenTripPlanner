@@ -44,9 +44,7 @@ class LegacyGraphQLScalarsTest {
 
     var jsonNode = ObjectMappers
       .ignoringExtraFields()
-      .readTree(
-        "{\"type\":\"Polygon\",\"coordinates\":[[[0.0,0.0],[1.0,1.0],[2.0,2.0],[0.0,0.0]]]}"
-      );
-    assertEquals(jsonNode, geoJson);
+      .readTree("{\"type\":\"Polygon\",\"coordinates\":[[[0,0],[1,1],[2,2],[0,0]]]}");
+    assertEquals(jsonNode.toString(), geoJson.toString());
   }
 }

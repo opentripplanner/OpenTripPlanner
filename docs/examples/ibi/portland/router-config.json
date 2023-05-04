@@ -1,5 +1,4 @@
 {
-  "streetRoutingTimeout": "7s",
   "routingDefaults": {
     "maxJourneyDuration": "6h",
     "boardSlack": "0s",
@@ -9,7 +8,8 @@
     "walkReluctance": 1.75,
     "stairsReluctance": 1.65,
     "numItineraries": 3,
-    "geoidElevation": true
+    "geoidElevation": true,
+    "streetRoutingTimeout": "7s"
   },
   "transit": {
     "maxNumberOfTransfers": 4
