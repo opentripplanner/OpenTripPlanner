@@ -9,6 +9,7 @@ import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME
 import static org.opentripplanner.model.plan.TestItineraryBuilder.BUS_ROUTE;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
+import static org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile.ofDebugEnabled;
 
 import java.time.Instant;
 import java.util.List;
@@ -243,7 +244,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     return new ItineraryListFilterChainBuilder(sortOrder)
       .withMaxNumberOfItineraries(numOfItineraries)
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
-      .withDebugEnabled(debug);
+      .withDebugEnabled(ofDebugEnabled(debug));
   }
 
   @Nested

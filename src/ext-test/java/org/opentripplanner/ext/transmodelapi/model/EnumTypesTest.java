@@ -26,7 +26,7 @@ class EnumTypesTest {
   void createFromDocumentedEnum() {
     var res = EnumTypes.createFromDocumentedEnum(
       "oof",
-      List.of(map("Ih", Foo.Hi), map("Rab", Foo.Bar))
+      List.of(EnumTypes.map("Ih", Foo.Hi), EnumTypes.map("Rab", Foo.Bar))
     );
 
     assertEquals("oof", res.getName());

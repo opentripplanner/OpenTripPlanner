@@ -35,6 +35,7 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSame
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.street.search.TraverseMode;
@@ -52,7 +53,7 @@ public class ItineraryListFilterChainBuilder {
   private final SortOrder sortOrder;
   private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
 
-  private boolean debug = false;
+  private ItineraryFilterDebugProfile debug = ItineraryFilterDebugProfile.OFF;
   private int maxNumberOfItineraries = NOT_SET;
   private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
   private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
@@ -202,7 +203,7 @@ public class ItineraryListFilterChainBuilder {
    * This will NOT delete itineraries, but tag them as deleted using the {@link
    * Itinerary#getSystemNotices()}.
    */
-  public ItineraryListFilterChainBuilder withDebugEnabled(boolean value) {
+  public ItineraryListFilterChainBuilder withDebugEnabled(ItineraryFilterDebugProfile value) {
     this.debug = value;
     return this;
   }
@@ -399,7 +400,9 @@ public class ItineraryListFilterChainBuilder {
       filters.add(rideHailingFilter);
     }
 
-    return new ItineraryListFilterChain(filters, debug);
+    var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
+
+    return new ItineraryListFilterChain(filters, debugHandler);
   }
 
   public ItineraryListFilterChainBuilder withTransitAlerts(

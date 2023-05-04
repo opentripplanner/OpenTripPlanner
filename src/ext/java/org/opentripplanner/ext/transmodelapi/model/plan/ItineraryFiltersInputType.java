@@ -7,6 +7,7 @@ import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLNonNull;
 import java.util.Map;
 import java.util.function.Consumer;
+import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
@@ -16,6 +17,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
 
 public class ItineraryFiltersInputType {
 
+  private static final String DEBUG = "debug";
   private static final String MIN_SAFE_TRANSFER_TIME_FACTOR = "minSafeTransferTimeFactor";
   private static final String TRANSIT_GENERALIZED_COST_LIMIT = "transitGeneralizedCostLimit";
   private static final String GROUP_SIMILARITY_KEEP_ONE = "groupSimilarityKeepOne";
@@ -138,6 +140,20 @@ public class ItineraryFiltersInputType {
           .defaultValue(dft.groupedOtherThanSameLegsMaxCostMultiplier())
           .build()
       )
+      .field(
+        GraphQLInputObjectField
+          .newInputObjectField()
+          .type(EnumTypes.ITINERARY_FILTER_DEBUG_PROFILE)
+          .name(DEBUG)
+          .description(
+            """
+            Use this parameter to debug the itinerary-filter-chain. The default is `off`
+            (itineraries are filtered and not returned). For all other values the unwanted
+            itineraries are returned with a system notice, and not deleted."""
+          )
+          .defaultValue(dft.debug())
+          .build()
+      )
       .build();
   }
 
@@ -171,6 +187,7 @@ public class ItineraryFiltersInputType {
           )
         )
     );
+    setField(callWith, DEBUG, builder::withDebug);
   }
 
   private static <T> void setField(

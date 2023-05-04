@@ -14,6 +14,7 @@ import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alternativelegs.AlternativeLegsFilter;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -137,6 +138,16 @@ public class EnumTypes {
     .value("interchangeAllowed", 0, "Third highest priority interchange.")
     .value("noInterchange", -1, "Interchange not allowed.")
     .build();
+
+  public static final GraphQLEnumType ITINERARY_FILTER_DEBUG_PROFILE = createFromDocumentedEnum(
+    "ItineraryFilterDebugProfile",
+    List.of(
+      map("off", ItineraryFilterDebugProfile.OFF),
+      map("listAll", ItineraryFilterDebugProfile.LIST_ALL),
+      map("limitToSearchWindow", ItineraryFilterDebugProfile.LIMIT_TO_SEARCH_WINDOW),
+      map("limitToNumOfItineraries", ItineraryFilterDebugProfile.LIMIT_TO_NUM_OF_ITINERARIES)
+    )
+  );
 
   public static final GraphQLEnumType LEG_MODE = GraphQLEnumType
     .newEnum()

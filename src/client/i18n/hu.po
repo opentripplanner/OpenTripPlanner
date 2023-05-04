@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-05-03 15:43+0200\n"
+"POT-Creation-Date: 2023-05-04 10:12+0200\n"
 "PO-Revision-Date: 2022-01-30 17:59+0100\n"
 "Last-Translator: \n"
 "Language: hu\n"
@@ -137,6 +137,18 @@ msgstr "Csak autó"
 
 #: src/client/js/otp/config.js:354
 msgid "Car hailing and transit"
+msgstr ""
+
+#: src/client/js/otp/config.js:357
+msgid "Limit to "
+msgstr ""
+
+#: src/client/js/otp/config.js:360
+msgid "Off"
+msgstr ""
+
+#: src/client/js/otp/config.js:361
+msgid "Show all"
 msgstr ""
 
 #. Context menu
@@ -291,7 +303,7 @@ msgid "Multimodal Trip Planner"
 msgstr "Multimodális utazástervező"
 
 #. Widget title
-#: src/client/js/otp/modules/multimodal/MultimodalPlannerModule.js:156
+#: src/client/js/otp/modules/multimodal/MultimodalPlannerModule.js:159
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:44
 msgid "Itineraries"
 msgstr "Útvonaltervek"
@@ -1265,73 +1277,73 @@ msgstr "Most"
 msgid "Wheelchair accessible trip:"
 msgstr "Akadálymentes utazás:"
 
-#. label for checkbox
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:466
-msgid "Show Filtered Itineraries:"
-msgstr "Szűrt útvonaltervek megjelenítése:"
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:464
+#, fuzzy
+msgid "Debug itineraries filter"
+msgstr "Útvonaltervek"
 
 #. Label for dropdown Travel by: [mode of transport]
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:516
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:530
 msgid "Travel by"
 msgstr "Közlekedési eszköz:"
 
 #. label Preferred Routes: (routes/None)
 #. widget title
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:597
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:608
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:611
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:622
 msgid "Preferred Routes"
 msgstr "Előnyben részesített útvonalak"
 
 #. button to edit Preffered public transport Routes
 #. buton edit Banned public transport routes
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:599
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:708
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:613
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:722
 msgid "Edit"
 msgstr "Szerkesztés"
 
 #. Words in brackets when no Preffered public transport route is set
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:601
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:676
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:711
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:771
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:615
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:690
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:725
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:785
 msgid "None"
 msgstr "Nincs"
 
 #. Label for Weight slider  to set to preffered public
 #. transport routes
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:604
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:618
 msgid "Weight"
 msgstr "Súly"
 
 #. label Banned public transport Routes: (routes/None)
 #. (Routes you don't want to take)
 #. Widget title
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:711
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:717
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:725
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:731
 msgid "Banned routes"
 msgstr "Kerülendő útvonalak"
 
 #. In Bike share planner radio button: <Use>: My Own Bike A shared bike
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:859
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:873
 msgid "Use"
 msgstr "Használt kerékpár:"
 
 #. In Bike share planner radio button: Use: <My Own Bike> A shared bike
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:861
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:875
 msgid "My Own Bike"
 msgstr "saját"
 
 #. In Bike share planner radio button: Use: My Own Bike <A Shared bike>
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:863
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:877
 msgid "A Shared Bike"
 msgstr "bérelt"
 
 #. button to send query for trip planning
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1004
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1018
 msgid "Plan Your Trip"
 msgstr "Tervezze meg utazását"
 
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1066
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1080
 msgid "Additional parameters"
 msgstr "További beállítások"
 

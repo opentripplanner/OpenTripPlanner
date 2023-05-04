@@ -7,7 +7,6 @@ import static org.opentripplanner.routing.api.response.RoutingErrorCode.WALKING_
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
@@ -16,14 +15,16 @@ import org.opentripplanner.routing.api.response.RoutingError;
 public class ItineraryListFilterChain {
 
   private final List<ItineraryListFilter> filters;
-
-  private final boolean debug;
+  private final DeleteResultHandler debugHandler;
 
   private final List<RoutingError> routingErrors = new ArrayList<>();
 
-  public ItineraryListFilterChain(List<ItineraryListFilter> filters, boolean debug) {
+  public ItineraryListFilterChain(
+    List<ItineraryListFilter> filters,
+    DeleteResultHandler debugHandler
+  ) {
+    this.debugHandler = debugHandler;
     this.filters = filters;
-    this.debug = debug;
   }
 
   public List<Itinerary> filter(List<Itinerary> itineraries) {
@@ -61,14 +62,7 @@ public class ItineraryListFilterChain {
         routingErrors.add(new RoutingError(NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, DATE_TIME));
       }
     }
-
-    if (debug) {
-      return result;
-    }
-    return result
-      .stream()
-      .filter(Predicate.not(Itinerary::isFlaggedForDeletion))
-      .collect(Collectors.toList());
+    return debugHandler.filter(result);
   }
 
   public List<RoutingError> getRoutingErrors() {
