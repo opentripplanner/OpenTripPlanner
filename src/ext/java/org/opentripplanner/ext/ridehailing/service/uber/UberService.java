@@ -45,7 +45,7 @@ public class UberService extends CachingRideHailingService {
   private final String timeEstimateUri;
   private final String priceEstimateUri;
   private final List<String> bannedTypes;
-  private final String wheelchairAccessibleRideType;
+  private final String wheelchairAccessibleProductId;
 
   public UberService(RideHailingServiceParameters config) {
     this(
@@ -57,8 +57,8 @@ public class UberService extends CachingRideHailingService {
       ),
       DEFAULT_PRICE_ESTIMATE_URI,
       DEFAULT_TIME_ESTIMATE_URI,
-      config.bannedRideTypes(),
-      config.wheelchairAccessibleRideType()
+      config.bannedProductIds(),
+      config.wheelchairProductId()
     );
   }
 
@@ -67,13 +67,13 @@ public class UberService extends CachingRideHailingService {
     String priceEstimateUri,
     String timeEstimateUri,
     List<String> bannedTypes,
-    String wheelchairAccessibleRideType
+    String wheelchairAccessibleProductId
   ) {
     this.oauthService = oauthService;
     this.priceEstimateUri = priceEstimateUri;
     this.timeEstimateUri = timeEstimateUri;
     this.bannedTypes = bannedTypes;
-    this.wheelchairAccessibleRideType = wheelchairAccessibleRideType;
+    this.wheelchairAccessibleProductId = wheelchairAccessibleProductId;
   }
 
   @Override
@@ -171,7 +171,7 @@ public class UberService extends CachingRideHailingService {
 
   private boolean filterRides(Ride a, boolean wheelchairAccessible) {
     if (wheelchairAccessible) {
-      return a.rideType().equals(wheelchairAccessibleRideType);
+      return a.rideType().equals(wheelchairAccessibleProductId);
     } else {
       return !bannedTypes.contains(a.rideType());
     }

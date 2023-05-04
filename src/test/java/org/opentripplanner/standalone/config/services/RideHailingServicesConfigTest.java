@@ -19,8 +19,8 @@ public class RideHailingServicesConfigTest {
         new RideHailingServiceParameters(
           "secret-id",
           "very-secret",
-          "car",
-          List.of("type1", "type2", "type3")
+          "545de0c4-659f-49c6-be65-0d5e448dffd5",
+          List.of("1196d0dd-423b-4a81-a1d8-615367d3a365", "f58761e5-8dd5-4940-a472-872f1236c596")
         )
       ),
       c.rideHailingServiceParameters()

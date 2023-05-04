@@ -8,6 +8,6 @@ import java.util.List;
 public record RideHailingServiceParameters(
   String clientId,
   String clientSecret,
-  String wheelchairAccessibleRideType,
-  List<String> bannedRideTypes
+  String wheelchairProductId,
+  List<String> bannedProductIds
 ) {}
