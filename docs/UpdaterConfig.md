@@ -280,7 +280,7 @@ partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.
 | Config Parameter                                                                      |       Type      | Summary                                                                         |  Req./Opt. | Default Value | Since |
 |---------------------------------------------------------------------------------------|:---------------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "vehicle-rental"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |  1.5  |
-| [allowKeepingRentedBicycleAtDestination](#u_1_allowKeepingRentedBicycleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |  2.1  |
+| [allowKeepingRentedVehicleAtDestination](#u_1_allowKeepingRentedVehicleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |  2.1  |
 | frequencySec                                                                          |    `integer`    | How often the data should be updated in seconds.                                | *Optional* | `60`          |  1.5  |
 | [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                 | *Optional* | `false`       |  2.3  |
 | language                                                                              |     `string`    | TODO                                                                            | *Optional* |               |  2.1  |
@@ -293,7 +293,7 @@ partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.
 
 ##### Parameter details
 
-<h4 id="u_1_allowKeepingRentedBicycleAtDestination">allowKeepingRentedBicycleAtDestination</h4>
+<h4 id="u_1_allowKeepingRentedVehicleAtDestination">allowKeepingRentedVehicleAtDestination</h4>
 
 **Since version:** `2.1` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** /updaters/[1] 
