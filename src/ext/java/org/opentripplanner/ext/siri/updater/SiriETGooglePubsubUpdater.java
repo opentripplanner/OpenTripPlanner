@@ -370,7 +370,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
               .get(0)
               .getEstimatedVehicleJourneies()
               .size();
-        } catch (Throwable t) {
+        } catch (Exception e) {
           //ignore
         }
         long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
