@@ -2,7 +2,10 @@ package org.opentripplanner.ext.transmodelapi.model;
 
 import graphql.schema.GraphQLEnumType;
 import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.function.Function;
+import org.opentripplanner.framework.doc.DocumentedEnum;
 import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
@@ -479,7 +482,7 @@ public class EnumTypes {
     )
     .build();
 
-  private static <T extends Enum<?>> GraphQLEnumType createEnum(
+  static <T extends Enum<?>> GraphQLEnumType createEnum(
     String name,
     T[] values,
     Function<T, String> mapping
@@ -488,4 +491,49 @@ public class EnumTypes {
     Arrays.stream(values).forEach(type -> enumBuilder.value(mapping.apply(type), type));
     return enumBuilder.build();
   }
+
+  @SuppressWarnings("unchecked")
+  static <E extends Enum<E>> GraphQLEnumType createFromDocumentedEnum(
+    String typeName,
+    List<DocumentedEnumMapping<E>> mappings
+  ) {
+    var builder = GraphQLEnumType.newEnum().name(typeName);
+    var enObj = mappings.get(0).internal;
+    var enumType = (Class<E>) enObj.castToEnum().getClass();
+    var mappedValues = EnumSet.noneOf(enumType);
+
+    builder.description(enObj.typeDescription());
+
+    for (var it : mappings) {
+      builder.value(it.apiName, it.internal, it.internal.enumValueDescription());
+      E enumValue = it.internal.castToEnum();
+      if (mappedValues.contains(enumValue)) {
+        var existing = mappings
+          .stream()
+          .filter(e -> e.internal == enumValue)
+          .findFirst()
+          .orElse(null);
+        throw new IllegalStateException("Enum value mapped twice: " + it + " and " + existing);
+      }
+      mappedValues.add(enumValue);
+    }
+    var missed = EnumSet.complementOf(mappedValues);
+
+    if (!missed.isEmpty()) {
+      throw new IllegalStateException("Mapping is missing for: " + missed);
+    }
+    return builder.build();
+  }
+
+  static <E extends Enum<E>> DocumentedEnumMapping<E> map(
+    String apiName,
+    DocumentedEnum<E> internal
+  ) {
+    return new DocumentedEnumMapping<>(apiName, internal);
+  }
+
+  private record DocumentedEnumMapping<E extends Enum<E>>(
+    String apiName,
+    DocumentedEnum<E> internal
+  ) {}
 }
