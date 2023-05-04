@@ -45,6 +45,10 @@ public class UberService extends CachingRideHailingService {
   private final String timeEstimateUri;
   private final String priceEstimateUri;
   private final List<String> bannedTypes;
+  /**
+   * Only a single product ID can be classified as wheelchair-accessible, but it would not
+   * be hard to change it, should the need arise.
+   */
   private final String wheelchairAccessibleProductId;
 
   public UberService(RideHailingServiceParameters config) {
