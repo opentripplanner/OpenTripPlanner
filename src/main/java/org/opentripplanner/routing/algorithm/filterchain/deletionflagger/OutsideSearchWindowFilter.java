@@ -4,13 +4,19 @@ import java.time.Instant;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 
-public class LatestDepartureTimeFilter implements ItineraryDeletionFlagger {
+/**
+ * This filter will remove all itineraries that is outside the search-window. In some
+ * cases the access is time-shifted after the end of the search-window. These results
+ * should appear again when paging to the next page. Hence, this filter will remove
+ * such itineraries.
+ */
+public class OutsideSearchWindowFilter implements ItineraryDeletionFlagger {
 
-  public static final String TAG = "latest-departure-time-limit";
+  public static final String TAG = "outside-search-window";
 
   private final Instant limit;
 
-  public LatestDepartureTimeFilter(Instant latestDepartureTime) {
+  public OutsideSearchWindowFilter(Instant latestDepartureTime) {
     this.limit = latestDepartureTime;
   }
 

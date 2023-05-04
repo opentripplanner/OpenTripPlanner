@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
-public class LatestDepartureTimeFilterTest implements PlanTestConstants {
+public class OutsideSearchWindowFilterTest implements PlanTestConstants {
 
   @Test
   public void filterOnLatestDepartureTime() {
@@ -21,11 +21,11 @@ public class LatestDepartureTimeFilterTest implements PlanTestConstants {
     // When:
     assertTrue(
       DeletionFlaggerTestHelper
-        .process(List.of(it), new LatestDepartureTimeFilter(time.minusSeconds(1)))
+        .process(List.of(it), new OutsideSearchWindowFilter(time.minusSeconds(1)))
         .isEmpty()
     );
     assertFalse(
-      DeletionFlaggerTestHelper.process(List.of(it), new LatestDepartureTimeFilter(time)).isEmpty()
+      DeletionFlaggerTestHelper.process(List.of(it), new OutsideSearchWindowFilter(time)).isEmpty()
     );
   }
 }

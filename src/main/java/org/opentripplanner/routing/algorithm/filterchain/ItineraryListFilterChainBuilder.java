@@ -15,10 +15,10 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
@@ -47,6 +47,7 @@ import org.opentripplanner.transit.model.site.Station;
 public class ItineraryListFilterChainBuilder {
 
   private static final int NOT_SET = -1;
+  public static final String MAX_NUMBER_OF_ITINERARIES_TAG = "number-of-itineraries-filter";
 
   private final SortOrder sortOrder;
   private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
@@ -207,8 +208,8 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * Max departure time. This is a absolute filter on the itinerary departure time from the origin.
-   * The filter is ignored if the value is {@code null}.
+   * Max departure time(end of search-window). This is an absolute filter on the itinerary
+   * departure time from the origin. The filter is ignored if the value is {@code null}.
    */
   public ItineraryListFilterChainBuilder withLatestDepartureTimeLimit(
     Instant latestDepartureTimeLimit
@@ -355,7 +356,7 @@ public class ItineraryListFilterChainBuilder {
 
       if (latestDepartureTimeLimit != null) {
         filters.add(
-          new DeletionFlaggingFilter(new LatestDepartureTimeFilter(latestDepartureTimeLimit))
+          new DeletionFlaggingFilter(new OutsideSearchWindowFilter(latestDepartureTimeLimit))
         );
       }
 
@@ -382,7 +383,7 @@ public class ItineraryListFilterChainBuilder {
       filters.add(
         new DeletionFlaggingFilter(
           new MaxLimitFilter(
-            "number-of-itineraries-filter",
+            MAX_NUMBER_OF_ITINERARIES_TAG,
             maxNumberOfItineraries,
             maxNumberOfItinerariesCrop,
             maxLimitReachedSubscriber
