@@ -34,15 +34,8 @@ class DeleteResultHandler {
         .collect(Collectors.toList());
       case LIMIT_TO_SEARCH_WINDOW -> itineraries
         .stream()
-        .filter(this::inSearchWindow)
+        .filter(Predicate.not(OutsideSearchWindowFilter::taggedBy))
         .collect(Collectors.toList());
     };
-  }
-
-  private boolean inSearchWindow(Itinerary itinerary) {
-    return itinerary
-      .getSystemNotices()
-      .stream()
-      .noneMatch(it -> OutsideSearchWindowFilter.TAG.equals(it.tag));
   }
 }

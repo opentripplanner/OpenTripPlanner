@@ -34,4 +34,11 @@ public class OutsideSearchWindowFilter implements ItineraryDeletionFlagger {
   public boolean skipAlreadyFlaggedItineraries() {
     return false;
   }
+
+  /**
+   * Return {@code true} if given {@code itinerary} is tagged by this filter.
+   */
+  public static boolean taggedBy(Itinerary itinerary) {
+    return itinerary.hasSystemNoticeTag(TAG);
+  }
 }

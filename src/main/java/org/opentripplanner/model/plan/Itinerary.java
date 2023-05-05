@@ -176,6 +176,14 @@ public class Itinerary {
     return !getSystemNotices().isEmpty();
   }
 
+  /**
+   * Utility method to check if one of the attached system notices matches the
+   * given {@code tag}.
+   */
+  public boolean hasSystemNoticeTag(String tag) {
+    return systemNotices.stream().map(n -> n.tag).anyMatch(tag::equals);
+  }
+
   public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
     Duration duration = Duration.between(firstLeg().getStartTime(), afterTime);
     List<Leg> timeShiftedLegs = getLegs()

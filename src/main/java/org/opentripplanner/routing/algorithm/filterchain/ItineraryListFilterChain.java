@@ -51,14 +51,11 @@ public class ItineraryListFilterChain {
           .getSystemNotices()
           .stream()
           .anyMatch(notice -> notice.tag.equals(RemoveTransitIfStreetOnlyIsBetterFilter.TAG));
-      Predicate<Itinerary> isOutsideSearchWindow = it ->
-        it
-          .getSystemNotices()
-          .stream()
-          .anyMatch(notice -> notice.tag.equals(OutsideSearchWindowFilter.TAG));
       if (result.stream().allMatch(isOnStreetAllTheWay.or(isWorseThanStreet))) {
         routingErrors.add(new RoutingError(WALKING_BETTER_THAN_TRANSIT, null));
-      } else if (result.stream().allMatch(isOnStreetAllTheWay.or(isOutsideSearchWindow))) {
+      } else if (
+        result.stream().allMatch(isOnStreetAllTheWay.or(OutsideSearchWindowFilter::taggedBy))
+      ) {
         routingErrors.add(new RoutingError(NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, DATE_TIME));
       }
     }
