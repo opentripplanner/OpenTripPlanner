@@ -1,22 +1,10 @@
 package org.opentripplanner.netex.validation;
 
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.getOrderedPassingTimes;
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.getPatternId;
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.getScheduledStopPointIdByStopPointId;
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedArrivalTime;
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedArrivalTimeOrElseDepartureTime;
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedDepartureTime;
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedDepartureTimeOrElseArrivalTime;
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedEarliestDepartureTime;
-import static org.opentripplanner.netex.support.ServiceJourneyHelper.normalizedLatestArrivalTime;
-
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
+import org.opentripplanner.netex.support.ServiceJourneyInfo;
+import org.opentripplanner.netex.support.TimetabledPassingTimeInfo;
 import org.rutebanken.netex.model.ServiceJourney;
-import org.rutebanken.netex.model.TimetabledPassingTime;
 
 /**
  * Ensure that passing times are increasing along the service journey.
@@ -41,79 +29,58 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
 class ServiceJourneyNonIncreasingPassingTime
   extends AbstractHMapValidationRule<String, ServiceJourney> {
 
-  private TimetabledPassingTime invalidTimetabledPassingTime;
+  private TimetabledPassingTimeInfo invalidTimetabledPassingTimeInfo;
   private ErrorType errorType;
 
   @Override
   public Status validate(ServiceJourney sj) {
-    ServiceJourneyInfo serviceJourneyInfo = new ServiceJourneyInfo(sj);
-    List<TimetabledPassingTime> orderedTimetabledPassingTimes = serviceJourneyInfo.getOrderedTimetabledPassingTimes();
+    ServiceJourneyInfo serviceJourneyInfo = new ServiceJourneyInfo(sj, index);
+    List<TimetabledPassingTimeInfo> orderedPassingTimes = serviceJourneyInfo.orderedTimetabledPassingTimeInfos();
 
-    if (!isValidTimetabledPassingTime(orderedTimetabledPassingTimes.get(0), serviceJourneyInfo)) {
+    if (!isValidTimetabledPassingTimeInfo(orderedPassingTimes.get(0))) {
       return Status.DISCARD;
     }
 
-    TimetabledPassingTime previousTimetabledPassingTime = orderedTimetabledPassingTimes.get(0);
+    TimetabledPassingTimeInfo previousPassingTime = orderedPassingTimes.get(0);
 
-    for (int i = 1; i < orderedTimetabledPassingTimes.size(); i++) {
-      TimetabledPassingTime currentTimetabledPassingTime = orderedTimetabledPassingTimes.get(i);
+    for (int i = 1; i < orderedPassingTimes.size(); i++) {
+      TimetabledPassingTimeInfo currentPassingTime = orderedPassingTimes.get(i);
 
-      if (!isValidTimetabledPassingTime(currentTimetabledPassingTime, serviceJourneyInfo)) {
+      if (!isValidTimetabledPassingTimeInfo(currentPassingTime)) {
         return Status.DISCARD;
       }
 
       if (
-        serviceJourneyInfo.hasRegularStop(previousTimetabledPassingTime) &&
-        serviceJourneyInfo.hasRegularStop(currentTimetabledPassingTime) &&
-        (
-          !isValidRegularStopFollowedByRegularStop(
-            previousTimetabledPassingTime,
-            currentTimetabledPassingTime
-          )
-        )
+        (previousPassingTime.hasRegularStop() && currentPassingTime.hasRegularStop()) &&
+        (!isValidRegularStopFollowedByRegularStop(previousPassingTime, currentPassingTime))
       ) {
         return Status.DISCARD;
       }
       if (
-        serviceJourneyInfo.hasAreaStop(previousTimetabledPassingTime) &&
-        serviceJourneyInfo.hasAreaStop(currentTimetabledPassingTime) &&
-        (
-          !isValidAreaStopFollowedByAreaStop(
-            previousTimetabledPassingTime,
-            currentTimetabledPassingTime
-          )
-        )
+        previousPassingTime.hasAreaStop() &&
+        currentPassingTime.hasAreaStop() &&
+        (!isValidAreaStopFollowedByAreaStop(previousPassingTime, currentPassingTime))
       ) {
         return Status.DISCARD;
       }
 
       if (
-        serviceJourneyInfo.hasRegularStop(previousTimetabledPassingTime) &&
-        serviceJourneyInfo.hasAreaStop(currentTimetabledPassingTime) &&
-        (
-          !isValidRegularStopFollowedByAreaStop(
-            previousTimetabledPassingTime,
-            currentTimetabledPassingTime
-          )
-        )
+        (previousPassingTime.hasRegularStop()) &&
+        currentPassingTime.hasAreaStop() &&
+        (!isValidRegularStopFollowedByAreaStop(previousPassingTime, currentPassingTime))
       ) {
         return Status.DISCARD;
       }
 
       if (
-        serviceJourneyInfo.hasAreaStop(previousTimetabledPassingTime) &&
-        serviceJourneyInfo.hasRegularStop(currentTimetabledPassingTime) &&
-        (
-          !isValidAreaStopFollowedByRegularStop(
-            previousTimetabledPassingTime,
-            currentTimetabledPassingTime
-          )
-        )
+        previousPassingTime.hasAreaStop() &&
+        currentPassingTime.hasRegularStop() &&
+        (!isValidAreaStopFollowedByRegularStop(previousPassingTime, currentPassingTime))
       ) {
         return Status.DISCARD;
       }
 
-      previousTimetabledPassingTime = currentTimetabledPassingTime;
+      previousPassingTime = currentPassingTime;
     }
     return Status.OK;
   }
@@ -121,94 +88,33 @@ class ServiceJourneyNonIncreasingPassingTime
   /**
    * A passing time is valid if it is both complete and consistent.
    */
-  private boolean isValidTimetabledPassingTime(
-    TimetabledPassingTime timetabledPassingTime,
-    ServiceJourneyInfo serviceJourneyInfo
+  private boolean isValidTimetabledPassingTimeInfo(
+    TimetabledPassingTimeInfo timetabledPassingTimeInfo
   ) {
-    if (!hasCompletePassingTime(timetabledPassingTime, serviceJourneyInfo)) {
-      invalidTimetabledPassingTime = timetabledPassingTime;
-      errorType = ErrorType.INCOMPLETE;
+    if (!timetabledPassingTimeInfo.hasCompletePassingTime()) {
+      invalidTimetabledPassingTimeInfo = timetabledPassingTimeInfo;
+      errorType = ServiceJourneyNonIncreasingPassingTime.ErrorType.INCOMPLETE;
       return false;
     }
-    if (!hasConsistentPassingTime(timetabledPassingTime, serviceJourneyInfo)) {
-      invalidTimetabledPassingTime = timetabledPassingTime;
-      errorType = ErrorType.INCONSISTENT;
+    if (!timetabledPassingTimeInfo.hasConsistentPassingTime()) {
+      invalidTimetabledPassingTimeInfo = timetabledPassingTimeInfo;
+      errorType = ServiceJourneyNonIncreasingPassingTime.ErrorType.INCONSISTENT;
       return false;
     }
     return true;
   }
 
   /**
-   * A passing time on a regular stop is complete if either arrival or departure time is present. A
-   * passing time on an area stop is complete if both earliest departure time and latest arrival
-   * time are present.
-   */
-  private boolean hasCompletePassingTime(
-    TimetabledPassingTime timetabledPassingTime,
-    ServiceJourneyInfo serviceJourneyInfo
-  ) {
-    if (serviceJourneyInfo.hasRegularStop(timetabledPassingTime)) {
-      return (
-        timetabledPassingTime.getArrivalTime() != null ||
-        timetabledPassingTime.getDepartureTime() != null
-      );
-    }
-    return (
-      timetabledPassingTime.getLatestArrivalTime() != null &&
-      timetabledPassingTime.getEarliestDepartureTime() != null
-    );
-  }
-
-  /**
-   * A passing time on a regular stop is consistent if departure time is after arrival time. A
-   * passing time on an area stop is consistent if latest arrival time is after earliest departure
-   * time.
-   */
-  private boolean hasConsistentPassingTime(
-    TimetabledPassingTime timetabledPassingTime,
-    ServiceJourneyInfo serviceJourneyInfo
-  ) {
-    if (
-      serviceJourneyInfo.hasRegularStop(timetabledPassingTime) &&
-      (
-        timetabledPassingTime.getArrivalTime() == null ||
-        timetabledPassingTime.getDepartureTime() == null
-      )
-    ) {
-      return true;
-    }
-    if (
-      serviceJourneyInfo.hasRegularStop(timetabledPassingTime) &&
-      timetabledPassingTime.getArrivalTime() != null &&
-      timetabledPassingTime.getDepartureTime() != null
-    ) {
-      return (
-        normalizedDepartureTime(timetabledPassingTime) >=
-        normalizedArrivalTime((timetabledPassingTime))
-      );
-    } else {
-      return (
-        normalizedLatestArrivalTime(timetabledPassingTime) >=
-        normalizedEarliestDepartureTime(timetabledPassingTime)
-      );
-    }
-  }
-
-  /**
    * Regular stop followed by a regular stop: check that arrivalTime(n+1) > departureTime(n)
    */
   private boolean isValidRegularStopFollowedByRegularStop(
-    TimetabledPassingTime previousTimetabledPassingTime,
-    TimetabledPassingTime currentTimetabledPassingTime
+    TimetabledPassingTimeInfo previousPassingTime,
+    TimetabledPassingTimeInfo currentPassingTime
   ) {
-    int currentArrivalOrDepartureTime = normalizedArrivalTimeOrElseDepartureTime(
-      currentTimetabledPassingTime
-    );
-    int previousDepartureOrArrivalTime = normalizedDepartureTimeOrElseArrivalTime(
-      previousTimetabledPassingTime
-    );
+    int currentArrivalOrDepartureTime = currentPassingTime.normalizedArrivalTimeOrElseDepartureTime();
+    int previousDepartureOrArrivalTime = previousPassingTime.normalizedDepartureTimeOrElseArrivalTime();
     if (currentArrivalOrDepartureTime < previousDepartureOrArrivalTime) {
-      invalidTimetabledPassingTime = currentTimetabledPassingTime;
+      invalidTimetabledPassingTimeInfo = currentPassingTime;
       errorType = ErrorType.NON_INCREASING;
       return false;
     }
@@ -220,23 +126,19 @@ class ServiceJourneyNonIncreasingPassingTime
    * earliestDepartureTime(n) and latestArrivalTime(n+1) > latestArrivalTime(n)
    */
   private boolean isValidAreaStopFollowedByAreaStop(
-    TimetabledPassingTime previousTimetabledPassingTime,
-    TimetabledPassingTime currentTimetabledPassingTime
+    TimetabledPassingTimeInfo previousPassingTime,
+    TimetabledPassingTimeInfo currentPassingTime
   ) {
-    int previousEarliestDepartureTime = normalizedEarliestDepartureTime(
-      previousTimetabledPassingTime
-    );
-    int currentEarliestDepartureTime = normalizedEarliestDepartureTime(
-      currentTimetabledPassingTime
-    );
-    int previousLatestArrivalTime = normalizedLatestArrivalTime(previousTimetabledPassingTime);
-    int currentLatestArrivalTime = normalizedLatestArrivalTime(currentTimetabledPassingTime);
+    int previousEarliestDepartureTime = previousPassingTime.normalizedEarliestDepartureTime();
+    int currentEarliestDepartureTime = currentPassingTime.normalizedEarliestDepartureTime();
+    int previousLatestArrivalTime = previousPassingTime.normalizedLatestArrivalTime();
+    int currentLatestArrivalTime = currentPassingTime.normalizedLatestArrivalTime();
 
     if (
       currentEarliestDepartureTime < previousEarliestDepartureTime ||
       currentLatestArrivalTime < previousLatestArrivalTime
     ) {
-      invalidTimetabledPassingTime = currentTimetabledPassingTime;
+      invalidTimetabledPassingTimeInfo = currentPassingTime;
       errorType = ErrorType.NON_INCREASING;
       return false;
     }
@@ -248,19 +150,13 @@ class ServiceJourneyNonIncreasingPassingTime
    * departureTime(n)
    */
   private boolean isValidRegularStopFollowedByAreaStop(
-    TimetabledPassingTime previousTimetabledPassingTime,
-    TimetabledPassingTime currentTimetabledPassingTime
+    TimetabledPassingTimeInfo previousPassingTime,
+    TimetabledPassingTimeInfo currentPassingTime
   ) {
-    int previousDepartureOrArrivalTime = normalizedDepartureTimeOrElseArrivalTime(
-      previousTimetabledPassingTime
-    );
-
-    int currentEarliestDepartureTime = normalizedEarliestDepartureTime(
-      currentTimetabledPassingTime
-    );
-
+    int previousDepartureOrArrivalTime = previousPassingTime.normalizedDepartureTimeOrElseArrivalTime();
+    int currentEarliestDepartureTime = currentPassingTime.normalizedEarliestDepartureTime();
     if (currentEarliestDepartureTime < previousDepartureOrArrivalTime) {
-      invalidTimetabledPassingTime = currentTimetabledPassingTime;
+      invalidTimetabledPassingTimeInfo = currentPassingTime;
       errorType = ErrorType.NON_INCREASING;
       return false;
     }
@@ -271,16 +167,14 @@ class ServiceJourneyNonIncreasingPassingTime
    * Area stop followed by a regular stop: check that arrivalTime(n+1) > latestArrivalTime(n)
    */
   private boolean isValidAreaStopFollowedByRegularStop(
-    TimetabledPassingTime previousTimetabledPassingTime,
-    TimetabledPassingTime currentTimetabledPassingTime
+    TimetabledPassingTimeInfo previousPassingTime,
+    TimetabledPassingTimeInfo currentPassingTime
   ) {
-    int previousLatestArrivalTime = normalizedLatestArrivalTime(previousTimetabledPassingTime);
-    int currentArrivalOrDepartureTime = normalizedArrivalTimeOrElseDepartureTime(
-      currentTimetabledPassingTime
-    );
+    int previousLatestArrivalTime = previousPassingTime.normalizedLatestArrivalTime();
+    int currentArrivalOrDepartureTime = currentPassingTime.normalizedArrivalTimeOrElseDepartureTime();
 
     if (currentArrivalOrDepartureTime < previousLatestArrivalTime) {
-      invalidTimetabledPassingTime = currentTimetabledPassingTime;
+      invalidTimetabledPassingTimeInfo = currentPassingTime;
       errorType = ErrorType.NON_INCREASING;
       return false;
     }
@@ -297,7 +191,7 @@ class ServiceJourneyNonIncreasingPassingTime
             "ServiceJourney has %s. ServiceJourney will be skipped. ServiceJourney = %s, TimetabledPassingTime = %s",
             errorType.message,
             sj.getId(),
-            invalidTimetabledPassingTime.getId()
+            invalidTimetabledPassingTimeInfo.getId()
           )
         );
       }
@@ -323,62 +217,6 @@ class ServiceJourneyNonIncreasingPassingTime
     ErrorType(String type, String message) {
       this.type = type;
       this.message = message;
-    }
-  }
-
-  /**
-   * Utility class for holding metadata for a given service journey.
-   */
-  private class ServiceJourneyInfo {
-
-    /**
-     * List of timetabledPassingTimes in stop point order.
-     */
-    private final List<TimetabledPassingTime> orderedTimetabledPassingTimes;
-
-    /**
-     * Map a timetabledPassingTime to true if its stop is a stop area, false otherwise.
-     */
-    private final Map<TimetabledPassingTime, Boolean> stopFlexibility;
-
-    public ServiceJourneyInfo(ServiceJourney serviceJourney) {
-      JourneyPattern_VersionStructure journeyPattern = index
-        .getJourneyPatternsById()
-        .lookup(getPatternId(serviceJourney));
-      this.orderedTimetabledPassingTimes = getOrderedPassingTimes(journeyPattern, serviceJourney);
-      Map<String, String> scheduledStopPointIdByStopPointId = getScheduledStopPointIdByStopPointId(
-        journeyPattern
-      );
-      this.stopFlexibility =
-        serviceJourney
-          .getPassingTimes()
-          .getTimetabledPassingTime()
-          .stream()
-          .collect(
-            Collectors.toMap(
-              timetabledPassingTime -> timetabledPassingTime,
-              timetabledPassingTime ->
-                index
-                  .getFlexibleStopPlaceByStopPointRef()
-                  .containsKey(
-                    scheduledStopPointIdByStopPointId.get(
-                      timetabledPassingTime.getPointInJourneyPatternRef().getValue().getRef()
-                    )
-                  )
-            )
-          );
-    }
-
-    public List<TimetabledPassingTime> getOrderedTimetabledPassingTimes() {
-      return orderedTimetabledPassingTimes;
-    }
-
-    public boolean hasAreaStop(TimetabledPassingTime timetabledPassingTime) {
-      return stopFlexibility.get(timetabledPassingTime);
-    }
-
-    public boolean hasRegularStop(TimetabledPassingTime timetabledPassingTime) {
-      return !hasAreaStop(timetabledPassingTime);
     }
   }
 }
