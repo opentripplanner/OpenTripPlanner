@@ -48,7 +48,7 @@ public class GeocoderResource {
    * @param stops        Search for stops, either by name or stop code
    * @param clusters     Search for clusters by their name
    * @param corners      Search for street corners using at least one of the street names
-   * @return list of results in in the format expected by GeocoderBuiltin.js in the OTP Leaflet
+   * @return list of results in the format expected by GeocoderBuiltin.js in the OTP Leaflet
    * client
    */
   @GET
@@ -63,6 +63,14 @@ public class GeocoderResource {
       .status(Response.Status.OK)
       .entity(query(query, autocomplete, stops, clusters, corners))
       .build();
+  }
+
+  @GET
+  @Path("stopClusters")
+  public Response stopClusters(@QueryParam("query") String query) {
+    var clusters = LuceneIndex.forServer(serverContext).queryStopClusters(query, true).toList();
+
+    return Response.status(Response.Status.OK).entity(clusters).build();
   }
 
   private List<SearchResult> query(
@@ -107,7 +115,7 @@ public class GeocoderResource {
   private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
     return LuceneIndex
       .forServer(serverContext)
-      .findStopLocationGroups(query, autocomplete)
+      .queryStopLocationGroups(query, autocomplete)
       .map(sc ->
         new SearchResult(
           sc.getCoordinate().latitude(),

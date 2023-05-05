@@ -1,15 +1,18 @@
 package org.opentripplanner.ext.geocoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.station;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.stop;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -17,31 +20,59 @@ import org.opentripplanner.transit.service.TransitModel;
 class LuceneIndexTest {
 
   static Graph graph = new Graph();
-  StopLocation ALEXANDERPLATZ_BUS = TransitModelForTest
-    .stop("Alexanderplatz Bus")
+  static Station BERLIN_HAUPTBAHNHOF_STATION = station("Hauptbahnhof")
+    .withCoordinate(52.52495, 13.36952)
+    .build();
+  static Station ALEXANDERPLATZ_STATION = station("Alexanderplatz")
     .withCoordinate(52.52277, 13.41046)
     .build();
-  StopLocation ALEXANDERPLATZ_RAIL = TransitModelForTest
-    .stop("Alexanderplatz S-Bahn")
-    .withCoordinate(52.52157, 13.41123)
+  static RegularStop ALEXANDERPLATZ_BUS = stop("Alexanderplatz Bus")
+    .withCoordinate(52.52277, 13.41046)
+    .withParentStation(ALEXANDERPLATZ_STATION)
     .build();
-  StopLocation LICHTERFELDE_OST = TransitModelForTest
-    .stop("Lichterfelde Ost")
+  static RegularStop ALEXANDERPLATZ_RAIL = stop("Alexanderplatz S-Bahn")
+    .withCoordinate(52.52157, 13.41123)
+    .withParentStation(ALEXANDERPLATZ_STATION)
+    .build();
+  static RegularStop LICHTERFELDE_OST = stop("Lichterfelde Ost")
     .withCoordinate(52.42986, 13.32808)
     .build();
 
-  @Test
-  void deduplication() {
+  static LuceneIndex index;
+
+  @BeforeAll
+  static void setup() {
     var stopModel = StopModel.of();
     List
       .of(ALEXANDERPLATZ_BUS, ALEXANDERPLATZ_RAIL, LICHTERFELDE_OST)
-      .forEach(sl -> stopModel.withRegularStop((RegularStop) sl));
+      .forEach(stopModel::withRegularStop);
+    List.of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION).forEach(stopModel::withStation);
     var transitModel = new TransitModel(stopModel.build(), new Deduplicator());
-    transitModel.initTimeZone(ZoneIds.BERLIN);
-    transitModel.index();
     var transitService = new DefaultTransitService(transitModel);
-    var index = new LuceneIndex(graph, transitService);
-    var result = index.queryStopLocations("lich", true).toList();
-    assertEquals(List.of(LICHTERFELDE_OST), result);
+    index = new LuceneIndex(graph, transitService);
+  }
+
+  @Test
+  void stopLocations() {
+    var result1 = index.queryStopLocations("lich", true).toList();
+    assertEquals(List.of(LICHTERFELDE_OST), result1);
+
+    var result2 = index.queryStopLocations("alexan", true).collect(Collectors.toSet());
+    assertEquals(Set.of(ALEXANDERPLATZ_BUS, ALEXANDERPLATZ_RAIL), result2);
+  }
+
+  @Test
+  void stopLocationGroups() {
+    var result1 = index.queryStopLocationGroups("alex", true).toList();
+    assertEquals(List.of(ALEXANDERPLATZ_STATION), result1);
+
+    var result2 = index.queryStopLocationGroups("haupt", true).toList();
+    assertEquals(List.of(BERLIN_HAUPTBAHNHOF_STATION), result2);
+  }
+
+  @Test
+  void stopClusters() {
+    var result1 = index.queryStopClusters("alex", true).toList();
+    assertEquals(List.of(LuceneIndex.StopCluster.of(ALEXANDERPLATZ_STATION)), result1);
   }
 }
