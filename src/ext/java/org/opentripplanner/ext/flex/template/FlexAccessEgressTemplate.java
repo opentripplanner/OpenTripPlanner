@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.ext.flex.FlexServiceDate;
@@ -165,6 +166,7 @@ public abstract class FlexAccessEgressTemplate {
   /**
    * Get the FlexTripEdge for the flex ride.
    */
+  @Nullable
   protected abstract FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
 
   protected FlexAccessEgress getFlexAccessEgress(
@@ -172,7 +174,12 @@ public abstract class FlexAccessEgressTemplate {
     Vertex flexVertex,
     RegularStop stop
   ) {
-    FlexTripEdge flexEdge = getFlexEdge(flexVertex, transferStop);
+    var flexEdge = getFlexEdge(flexVertex, transferStop);
+
+    // Drop none routable and  very short(<10s) trips
+    if (flexEdge == null || flexEdge.getTimeInSeconds() < MIN_FLEX_TRIP_DURATION_SECONDS) {
+      return null;
+    }
 
     // this code is a little repetitive but needed as a performance improvement. previously
     // the flex path was checked before this method was called. this meant that every path
@@ -189,11 +196,6 @@ public abstract class FlexAccessEgressTemplate {
     }
 
     var durations = calculateFlexPathDurations(flexEdge, state);
-
-    // Drop short trips(<10s)
-    if (durations.trip() < MIN_FLEX_TRIP_DURATION_SECONDS) {
-      return null;
-    }
 
     return new FlexAccessEgress(
       stop,

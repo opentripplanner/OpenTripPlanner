@@ -62,6 +62,17 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   }
 
   protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop) {
+    var flexPath = calculator.calculateFlexPath(
+      flexFromVertex,
+      accessEgress.state.getVertex(),
+      fromStopIndex,
+      toStopIndex
+    );
+
+    if (flexPath == null) {
+      return null;
+    }
+
     return new FlexTripEdge(
       flexFromVertex,
       accessEgress.state.getVertex(),
@@ -69,7 +80,7 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
       accessEgress.stop,
       trip,
       this,
-      calculator
+      flexPath
     );
   }
 

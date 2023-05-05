@@ -7,20 +7,21 @@ import org.opentripplanner.framework.time.DurationUtils;
  * contain access and egress "parts" - a walk part in the beginning and/or at the end. It has
  * method for mapping between the flex-trip-times and the router(OTP) time.
  * <p>
- * If the {@code access/egress} is empty the duration is zero. The flex-trip duration must be
- * at least 1 second.
+ * If the {@code access/egress} is empty the duration is zero. The flex-trip duration must be at
+ * least 1 second. This is just a sanity check, there might be bussiness rules elsewhere
+ * restricting this futher.
  *
- * @param access          The duration of the walking in the beginning of the Flex path. Should be
- *                        zero or a positive number. Zero means that the path start with the flex
- *                        trip, there is no access.
- * @param trip            The duration of the flex ride. Should be a positive number.
- * @param egress          The duration of the walking at the end of the Flex path. Should be zero
- *                        or a positive number. Zero means that the path ends after the flex trip,
- *                        there is no egress.
+ * @param access The duration of the walking in the beginning of the Flex path. Should be
+ *               zero or a positive number. Zero means that the path start with the flex
+ *               trip, there is no access.
+ * @param trip   The duration of the flex ride. Should be a positive number.
+ * @param egress The duration of the walking at the end of the Flex path. Should be zero
+ *               or a positive number. Zero means that the path ends after the flex trip,
+ *               there is no egress.
  * @param offset The flex trip times is using service-time(noon minus 12 hours) as
- *                        "midnight", the {@code offset} is the duration from router
- *                        midnight to service-time midnight. This is used to handle
- *                        day-light-saving-time adjustments.
+ *               "midnight", the {@code offset} is the duration from router midnight
+ *               to service-time midnight. This is used to handle day-light-saving-time
+ *               adjustments.
  */
 public record FlexPathDurations(int access, int trip, int egress, int offset) {
   public FlexPathDurations {
