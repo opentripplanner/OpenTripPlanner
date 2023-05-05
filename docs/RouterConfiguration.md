@@ -641,7 +641,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "sourceType" : "gbfs",
       "language" : "en",
       "frequencySec" : 60,
-      "allowKeepingRentedBicycleAtDestination" : false,
+      "allowKeepingRentedVehicleAtDestination" : false,
       "geofencingZones" : false,
       "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
       "headers" : {
