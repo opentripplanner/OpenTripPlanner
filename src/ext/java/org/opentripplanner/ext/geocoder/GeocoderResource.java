@@ -68,7 +68,7 @@ public class GeocoderResource {
   @GET
   @Path("stopClusters")
   public Response stopClusters(@QueryParam("query") String query) {
-    var clusters = LuceneIndex.forServer(serverContext).queryStopClusters(query, true).toList();
+    var clusters = LuceneIndex.forServer(serverContext).queryStopClusters(query).toList();
 
     return Response.status(Response.Status.OK).entity(clusters).build();
   }

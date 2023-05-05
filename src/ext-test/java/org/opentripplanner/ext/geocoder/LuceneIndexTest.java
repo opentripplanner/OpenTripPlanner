@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -26,6 +28,12 @@ class LuceneIndexTest {
   static Station ALEXANDERPLATZ_STATION = station("Alexanderplatz")
     .withCoordinate(52.52277, 13.41046)
     .build();
+
+  // in Atlanta, not Berlin - testing the space
+  static Station FIVE_POINTS_STATION = station("Five Points")
+    .withCoordinate(33.753899, -84.39156)
+    .build();
+
   static RegularStop ALEXANDERPLATZ_BUS = stop("Alexanderplatz Bus")
     .withCoordinate(52.52277, 13.41046)
     .withParentStation(ALEXANDERPLATZ_STATION)
@@ -46,7 +54,9 @@ class LuceneIndexTest {
     List
       .of(ALEXANDERPLATZ_BUS, ALEXANDERPLATZ_RAIL, LICHTERFELDE_OST)
       .forEach(stopModel::withRegularStop);
-    List.of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION).forEach(stopModel::withStation);
+    List
+      .of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION)
+      .forEach(stopModel::withStation);
     var transitModel = new TransitModel(stopModel.build(), new Deduplicator());
     var transitService = new DefaultTransitService(transitModel);
     index = new LuceneIndex(graph, transitService);
@@ -71,8 +81,25 @@ class LuceneIndexTest {
   }
 
   @Test
+  void stopLocationGroupsWithSpace() {
+    var result1 = index.queryStopLocationGroups("five points", true).toList();
+    assertEquals(List.of(FIVE_POINTS_STATION), result1);
+  }
+
+  @Test
   void stopClusters() {
-    var result1 = index.queryStopClusters("alex", true).toList();
+    var result1 = index.queryStopClusters("alex").toList();
     assertEquals(List.of(LuceneIndex.StopCluster.of(ALEXANDERPLATZ_STATION)), result1);
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    strings = {
+      "five", "five ", "five p", "five po", "five poi", "five poin", "five point", "five points",
+    }
+  )
+  void stopClustersWithSpace(String query) {
+    var result = index.queryStopClusters(query).toList();
+    assertEquals(List.of(LuceneIndex.StopCluster.of(FIVE_POINTS_STATION)), result);
   }
 }
