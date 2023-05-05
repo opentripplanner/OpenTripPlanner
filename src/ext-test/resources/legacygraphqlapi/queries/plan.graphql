@@ -19,6 +19,7 @@
             startTime
             endTime
             generalizedCost
+            accessibilityScore
             legs {
                 mode
                 from {
@@ -79,6 +80,7 @@
                     }
                     arrival
                 }
+                accessibilityScore
             }
         }
     }

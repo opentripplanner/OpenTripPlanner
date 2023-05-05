@@ -1,6 +1,8 @@
 {
-  "configVersion": "v2.2.0-EN000121",
-  "streetRoutingTimeout": "5s",
+  "configVersion": "v2.3.0-EN000121",
+  "server": {
+    "apiProcessingTimeout" : "7s"
+  },
   "routingDefaults": {
     "walkSpeed": 1.3,
     "bikeSpeed": 5,
@@ -61,6 +63,7 @@
       "routes": ["HSL:456"]
     },
     "unpreferredCost": "600 + 2.0 x",
+    "streetRoutingTimeout": "5s",
     "transferOptimization": {
       "optimizeTransferWaitTime": true,
       "minSafeWaitTimeFactor": 5.0,
@@ -86,7 +89,7 @@
       },
       "inaccessibleStreetReluctance": 25,
       "maxSlope": 0.083,
-      "slopeExceededReluctance":  1,
+      "slopeExceededReluctance": 1,
       "stairsReluctance": 100
     }
   },
@@ -182,6 +185,10 @@
       "expansionFactor": 0.25
     }
   ],
+  "timetableUpdates": {
+    "purgeExpiredData": false,
+    "maxSnapshotFrequency": "2s"
+  },
   "updaters": [
     // GTFS-RT service alerts (frequent polling)
     {
@@ -255,7 +262,7 @@
         "Authorization": "A-Token"
       }
     },
-    // Polling for GTFS-RT Vehicle Positions - output can be fetched via trip pattern GraphQL APIss
+    // Polling for GTFS-RT Vehicle Positions - output can be fetched via trip pattern GraphQL API
     {
       "type": "vehicle-positions",
       "url": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
@@ -277,6 +284,16 @@
       "timeoutSec": 30,
       "headers": {
         "Authorization": "Some-Token"
+      }
+    },
+    // Siri-SX over HTTP
+    {
+      "type": "siri-sx-updater",
+      "url": "https://example.com/some/path",
+      "feedId": "feed_id",
+      "timeoutSec": 30,
+      "headers": {
+        "Key": "Value"
       }
     },
     // SIRI SX updater for Azure Service Bus

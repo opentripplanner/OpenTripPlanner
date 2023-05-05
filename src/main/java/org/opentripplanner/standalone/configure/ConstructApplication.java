@@ -99,7 +99,11 @@ public class ConstructApplication {
    * this method is called.
    */
   public GrizzlyServer createGrizzlyServer() {
-    return new GrizzlyServer(cli, createApplication());
+    return new GrizzlyServer(
+      cli,
+      createApplication(),
+      routerConfig().server().apiProcessingTimeout()
+    );
   }
 
   /**

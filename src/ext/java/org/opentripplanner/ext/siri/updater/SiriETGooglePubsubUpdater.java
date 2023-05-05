@@ -382,7 +382,6 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
         var f = saveResultOnGraph.execute((graph, transitModel) -> {
           var results = snapshotSource.applyEstimatedTimetable(
-            transitModel,
             fuzzyTripMatcher,
             entityResolver,
             feedId,

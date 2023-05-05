@@ -3,6 +3,7 @@ package org.opentripplanner.routing.error;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.response.RoutingError;
 
@@ -19,12 +20,17 @@ public class RoutingValidationException extends RuntimeException {
   }
 
   public static void unwrapAndRethrowCompletionException(CompletionException e) {
-    if (e.getCause() instanceof RoutingValidationException) {
-      throw (RoutingValidationException) e.getCause();
-    } else if (e.getCause() instanceof RuntimeException) {
-      throw (RuntimeException) e.getCause();
+    if (e.getCause() instanceof RuntimeException cause) {
+      throw cause;
     }
     throw e;
+  }
+
+  public static void unwrapAndRethrowExecutionException(ExecutionException e) {
+    if (e.getCause() instanceof RuntimeException cause) {
+      throw cause;
+    }
+    throw new RuntimeException(e);
   }
 
   public List<RoutingError> getRoutingErrors() {

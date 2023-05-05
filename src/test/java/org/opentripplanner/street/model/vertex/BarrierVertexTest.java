@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.module.osm.OSMFilter;
+import org.opentripplanner.graph_builder.module.osm.OsmFilter;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -31,35 +31,35 @@ public class BarrierVertexTest {
     String label = "simpleBarrier";
     BarrierVertex bv = new BarrierVertex(graph, label, simpleBarier.lon, simpleBarier.lat, 0);
     bv.setBarrierPermissions(
-      OSMFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
+      OsmFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
 
     simpleBarier.addTag("foot", "yes");
     bv.setBarrierPermissions(
-      OSMFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
+      OsmFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
     simpleBarier.addTag("bicycle", "yes");
     bv.setBarrierPermissions(
-      OSMFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
+      OsmFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
     simpleBarier.addTag("access", "no");
     bv.setBarrierPermissions(
-      OSMFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
+      OsmFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
 
     simpleBarier.addTag("motor_vehicle", "no");
     bv.setBarrierPermissions(
-      OSMFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
+      OsmFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
 
     simpleBarier.addTag("bicycle", "no");
     bv.setBarrierPermissions(
-      OSMFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
+      OsmFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN, bv.getBarrierPermissions());
 
@@ -68,7 +68,7 @@ public class BarrierVertexTest {
     complexBarrier.addTag("access", "no");
 
     bv.setBarrierPermissions(
-      OSMFilter.getPermissionsForEntity(complexBarrier, BarrierVertex.defaultBarrierPermissions)
+      OsmFilter.getPermissionsForEntity(complexBarrier, BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.NONE, bv.getBarrierPermissions());
 
@@ -77,7 +77,7 @@ public class BarrierVertexTest {
     noBikeBollard.addTag("bicycle", "no");
 
     bv.setBarrierPermissions(
-      OSMFilter.getPermissionsForEntity(noBikeBollard, BarrierVertex.defaultBarrierPermissions)
+      OsmFilter.getPermissionsForEntity(noBikeBollard, BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN, bv.getBarrierPermissions());
 
@@ -86,7 +86,7 @@ public class BarrierVertexTest {
     accessBarrier.addTag("access", "no");
 
     bv.setBarrierPermissions(
-      OSMFilter.getPermissionsForEntity(accessBarrier, BarrierVertex.defaultBarrierPermissions)
+      OsmFilter.getPermissionsForEntity(accessBarrier, BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.NONE, bv.getBarrierPermissions());
   }

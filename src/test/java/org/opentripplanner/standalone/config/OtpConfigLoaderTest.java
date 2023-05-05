@@ -53,13 +53,13 @@ public class OtpConfigLoaderTest {
   public void loadRouterConfig() throws IOException {
     // Given:
     File file = new File(tempDir, ROUTER_CONFIG_FILENAME);
-    Files.writeString(file.toPath(), "{requestLogFile : \"aFile.txt\"}", UTF_8);
+    Files.writeString(file.toPath(), "{ server: { requestLogFile: \"aFile.txt\" } }", UTF_8);
 
     // when:
     RouterConfig params = new OtpConfigLoader(tempDir).loadRouterConfig();
 
     // then:
-    assertEquals("aFile.txt", params.requestLogFile());
+    assertEquals("aFile.txt", params.server().requestLogFile());
   }
 
   @Test
@@ -68,7 +68,7 @@ public class OtpConfigLoaderTest {
     RouterConfig res = new OtpConfigLoader(tempDir).loadRouterConfig();
 
     // then: expect missing node
-    assertNull(res.requestLogFile(), "Expect deafult value(null)");
+    assertNull(res.server().requestLogFile(), "Expect default value(null)");
   }
 
   /**

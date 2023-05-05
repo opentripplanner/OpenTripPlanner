@@ -151,7 +151,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final boolean banDiscouragedWalking;
   public final boolean banDiscouragedBiking;
   public final Duration maxTransferDuration;
-  public final Boolean extraEdgesStopPlatformLink;
   public final NetexFeedParameters netexDefaults;
   public final GtfsFeedParameters gtfsDefaults;
 
@@ -258,15 +257,6 @@ public class BuildConfig implements OtpDataStoreConfig {
           "configured over the wire."
         )
         .asBoolean(true);
-    extraEdgesStopPlatformLink =
-      root
-        .of("extraEdgesStopPlatformLink")
-        .since(V2_0)
-        .summary(
-          "Add extra edges when linking a stop to a platform, to prevent detours along the " +
-          "platform edge."
-        )
-        .asBoolean(false);
     includeEllipsoidToGeoidDifference =
       root
         .of("includeEllipsoidToGeoidDifference")
@@ -504,7 +494,7 @@ recommended.
         .summary(
           "Visibility calculations for an area will not be done if there are more nodes than this limit."
         )
-        .asInt(500);
+        .asInt(150);
     maxElevationPropagationMeters =
       root
         .of("maxElevationPropagationMeters")

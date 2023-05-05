@@ -14,12 +14,14 @@ public enum Message {
   // id field is loosely based on HTTP error codes http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
   PLAN_OK(200),
   SYSTEM_ERROR(500),
+
+  PROCESSING_TIMEOUT(422),
+
   GRAPH_UNAVAILABLE(503),
 
   OUTSIDE_BOUNDS(400),
   PATH_NOT_FOUND(404),
   NO_TRANSIT_TIMES(406),
-  REQUEST_TIMEOUT(408),
   BOGUS_PARAMETER(413),
   GEOCODE_FROM_NOT_FOUND(440),
   GEOCODE_TO_NOT_FOUND(450),

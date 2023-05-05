@@ -29,19 +29,19 @@ public class SiriConfigDocTest {
   private static final File OUT_FILE = new File(DOCS_ROOT, "sandbox/SiriUpdater.md");
 
   private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
-  private static final Set<String> INCLUDE_UPDATERS = Set.of("siri-et-updater");
+  private static final Set<String> INCLUDE_UPDATERS = Set.of("siri-et-updater", "siri-sx-updater");
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
   public static final ObjectMapper mapper = new ObjectMapper();
 
   /**
-   * NOTE! This test updates the {@code docs/sandbox/SiriUpdator.md} document based on the latest
+   * NOTE! This test updates the {@code docs/sandbox/SiriUpdater.md} document based on the latest
    * version of the code.
    */
   @Test
   public void updateSiriDoc() {
     NodeAdapter node = readUpdaterConfig();
 
-    // Read and close inout file (same as output file)
+    // Read and close input file (same as output file)
     String template = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 

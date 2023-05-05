@@ -6,7 +6,9 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.framework.http.OtpHttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +34,15 @@ public class OTPExceptionMapper implements ExceptionMapper<Exception> {
       return Response
         .status(Response.Status.INTERNAL_SERVER_ERROR)
         .entity("OTP Application error: " + ex.getMessage())
+        .type("text/plain")
+        .build();
+    }
+    if (ex instanceof OTPRequestTimeoutException) {
+      return Response
+        .status(
+          Response.Status.fromStatusCode(OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY.statusCode())
+        )
+        .entity("OTP API Processing Timeout")
         .type("text/plain")
         .build();
     }
