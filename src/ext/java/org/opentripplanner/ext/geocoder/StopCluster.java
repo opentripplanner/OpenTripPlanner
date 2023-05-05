@@ -16,12 +16,7 @@ import org.opentripplanner.transit.model.site.StopLocationsGroup;
  *  - if a stop has a parent station only the parent is returned
  *  - if stops are closer than 10 meters to each and have an identical name, only one is returned
  */
-public record StopCluster(
-  FeedScopedId id,
-  @Nullable String code,
-  String name,
-  Coordinate coordinate
-) {
+record StopCluster(FeedScopedId id, @Nullable String code, String name, Coordinate coordinate) {
   public static StopCluster of(StopLocationsGroup g) {
     return new StopCluster(
       g.getId(),

@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.geocoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.station;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.stop;
 
@@ -34,16 +35,22 @@ class LuceneIndexTest {
     .withCoordinate(33.753899, -84.39156)
     .build();
 
-  static RegularStop ALEXANDERPLATZ_BUS = stop("Alexanderplatz Bus")
+  static RegularStop ALEXANDERPLATZ_BUS_1 = stop("Alexanderplatz Bus")
     .withCoordinate(52.52277, 13.41046)
     .withParentStation(ALEXANDERPLATZ_STATION)
     .build();
+
   static RegularStop ALEXANDERPLATZ_RAIL = stop("Alexanderplatz S-Bahn")
     .withCoordinate(52.52157, 13.41123)
     .withParentStation(ALEXANDERPLATZ_STATION)
     .build();
-  static RegularStop LICHTERFELDE_OST = stop("Lichterfelde Ost")
+  static RegularStop LICHTERFELDE_OST_1 = stop("Lichterfelde Ost")
+    .withId(id("lichterfelde-gleis-1"))
     .withCoordinate(52.42986, 13.32808)
+    .build();
+  static RegularStop LICHTERFELDE_OST_2 = stop("Lichterfelde Ost")
+    .withId(id("lichterfelde-gleis-2"))
+    .withCoordinate(52.42985, 13.32807)
     .build();
 
   static LuceneIndex index;
@@ -52,7 +59,7 @@ class LuceneIndexTest {
   static void setup() {
     var stopModel = StopModel.of();
     List
-      .of(ALEXANDERPLATZ_BUS, ALEXANDERPLATZ_RAIL, LICHTERFELDE_OST)
+      .of(ALEXANDERPLATZ_BUS_1, ALEXANDERPLATZ_RAIL, LICHTERFELDE_OST_1, LICHTERFELDE_OST_2)
       .forEach(stopModel::withRegularStop);
     List
       .of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION)
@@ -65,10 +72,11 @@ class LuceneIndexTest {
   @Test
   void stopLocations() {
     var result1 = index.queryStopLocations("lich", true).toList();
-    assertEquals(List.of(LICHTERFELDE_OST), result1);
+    assertEquals(1, result1.size());
+    assertEquals(LICHTERFELDE_OST_1.getName().toString(), result1.get(0).getName().toString());
 
     var result2 = index.queryStopLocations("alexan", true).collect(Collectors.toSet());
-    assertEquals(Set.of(ALEXANDERPLATZ_BUS, ALEXANDERPLATZ_RAIL), result2);
+    assertEquals(Set.of(ALEXANDERPLATZ_BUS_1, ALEXANDERPLATZ_RAIL), result2);
   }
 
   @Test
@@ -90,6 +98,13 @@ class LuceneIndexTest {
   void stopClusters() {
     var result1 = index.queryStopClusters("alex").toList();
     assertEquals(List.of(StopCluster.of(ALEXANDERPLATZ_STATION)), result1);
+  }
+
+  @Test
+  void deduplicatedStopClusters() {
+    var result = index.queryStopClusters("lich").toList();
+    assertEquals(1, result.size());
+    assertEquals(LICHTERFELDE_OST_1.getName().toString(), result.get(0).name());
   }
 
   @ParameterizedTest

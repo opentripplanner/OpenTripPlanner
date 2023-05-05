@@ -3,13 +3,9 @@ package org.opentripplanner.ext.geocoder;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.apache.lucene.analysis.Analyzer;
@@ -65,11 +61,6 @@ public class LuceneIndex implements Serializable {
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
 
-  public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-    Set<Object> seen = ConcurrentHashMap.newKeySet();
-    return t -> seen.add(keyExtractor.apply(t));
-  }
-
   public LuceneIndex(Graph graph, TransitService transitService) {
     this.graph = graph;
     this.transitService = transitService;
@@ -90,9 +81,6 @@ public class LuceneIndex implements Serializable {
       ) {
         transitService
           .listStopLocations()
-          .stream()
-          .filter(distinctByKey(sl -> sl.getCoordinate().roundToApproximate10m()))
-          .filter(distinctByKey(StopLocation::getName))
           .forEach(stopLocation ->
             addToIndex(
               directoryWriter,
@@ -119,10 +107,11 @@ public class LuceneIndex implements Serializable {
             )
           );
 
-        buildStopClusters(
-          transitService.listStopLocations(),
-          transitService.listStopLocationGroups()
-        )
+        StopClusters
+          .generateStopClusters(
+            transitService.listStopLocations(),
+            transitService.listStopLocationGroups()
+          )
           .forEach(stopCluster -> {
             addToIndex(
               directoryWriter,
@@ -158,19 +147,6 @@ public class LuceneIndex implements Serializable {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  private static Stream<StopCluster> buildStopClusters(
-    Collection<StopLocation> stopLocations,
-    Collection<StopLocationsGroup> stopLocationsGroups
-  ) {
-    var stops = stopLocations
-      .stream()
-      .filter(sl -> sl.getParentStation() == null)
-      .flatMap(sl -> StopCluster.of(sl).stream());
-    var stations = stopLocationsGroups.stream().map(StopCluster::of);
-
-    return Stream.concat(stops, stations);
   }
 
   public static synchronized LuceneIndex forServer(OtpServerRequestContext serverContext) {
