@@ -219,6 +219,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
       .newSingleThreadExecutor()
       .submit(() -> {
         boolean otpIsShuttingDown = false;
+
         while (!otpIsShuttingDown) {
           try {
             if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {

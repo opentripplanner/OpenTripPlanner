@@ -188,6 +188,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     int sleepPeriod = 1000;
     int attemptCounter = 1;
     boolean otpIsShuttingDown = false;
+
     while (!otpIsShuttingDown) {
       try {
         initializeData(dataInitializationUrl, messageConsumer);

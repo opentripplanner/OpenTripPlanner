@@ -204,6 +204,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     int sleepPeriod = 1000;
     int attemptCounter = 1;
     boolean otpIsShuttingDown = false;
+
     while (!isPrimed() && !otpIsShuttingDown) { // Retrying until data is initialized successfully
       try {
         initializeData(dataInitializationUrl, receiver);
@@ -230,6 +231,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     }
 
     Subscriber subscriber = null;
+
     while (!otpIsShuttingDown) {
       try {
         subscriber = Subscriber.newBuilder(subscription.getName(), receiver).build();
