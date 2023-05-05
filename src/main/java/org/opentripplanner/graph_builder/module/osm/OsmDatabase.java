@@ -36,6 +36,7 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
+import org.opentripplanner.openstreetmap.issues.MalformedLevelMap;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -1010,8 +1011,14 @@ public class OsmDatabase {
    * Process an OSM level map.
    */
   private void processLevelMap(OSMRelation relation) {
+    var levelsTag = relation.getTag("levels");
+    if (levelsTag == null || levelsTag.isEmpty()) {
+      issueStore.add(new MalformedLevelMap(relation));
+      return;
+    }
+
     Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(
-      relation.getTag("levels"),
+      levelsTag,
       Source.LEVEL_MAP,
       true,
       issueStore
