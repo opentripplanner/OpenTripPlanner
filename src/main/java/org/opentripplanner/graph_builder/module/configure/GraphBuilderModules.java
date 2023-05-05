@@ -26,7 +26,7 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
@@ -34,7 +34,7 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfigure;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
@@ -48,16 +48,16 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static OpenStreetMapModule provideOpenStreetMapModule(
+  static OsmModule provideOpenStreetMapModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
     DataImportIssueStore issueStore
   ) {
-    List<OpenStreetMapProvider> providers = new ArrayList<>();
+    List<OsmProvider> providers = new ArrayList<>();
     for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
       providers.add(
-        new OpenStreetMapProvider(
+        new OsmProvider(
           osmConfiguredDataSource.dataSource(),
           osmConfiguredDataSource.config().osmTagMapper(),
           osmConfiguredDataSource.config().timeZone(),
@@ -66,13 +66,19 @@ public class GraphBuilderModules {
       );
     }
 
-    return new OpenStreetMapModule(
-      config,
-      providers,
-      config.boardingLocationTags,
-      graph,
-      issueStore
-    );
+    return OsmModule
+      .of(providers, graph)
+      .withCustomNamer(config.customNamer)
+      .withAreaVisibility(config.areaVisibility)
+      .withPlatformEntriesLinking(config.platformEntriesLinking)
+      .withStaticParkAndRide(config.staticParkAndRide)
+      .withStaticBikeParkAndRide(config.staticBikeParkAndRide)
+      .withBanDiscouragedWalking(config.banDiscouragedWalking)
+      .withBanDiscouragedBiking(config.banDiscouragedBiking)
+      .withMaxAreaNodes(config.maxAreaNodes)
+      .withBoardingAreaRefTags(config.boardingLocationTags)
+      .withIssueStore(issueStore)
+      .build();
   }
 
   @Provides
@@ -162,7 +168,7 @@ public class GraphBuilderModules {
     BuildConfig config,
     GraphBuilderDataSources dataSources,
     Graph graph,
-    OpenStreetMapModule osmModule,
+    OsmModule osmModule,
     DataImportIssueStore issueStore
   ) {
     List<ElevationModule> result = new ArrayList<>();
@@ -291,7 +297,7 @@ public class GraphBuilderModules {
     Graph graph,
     DataImportIssueStore issueStore,
     ElevationGridCoverageFactory it,
-    OpenStreetMapModule osmModule,
+    OsmModule osmModule,
     File cacheDirectory
   ) {
     var cachedElevationsFile = new File(cacheDirectory, "cached_elevations.obj");

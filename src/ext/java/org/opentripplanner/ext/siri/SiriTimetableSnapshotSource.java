@@ -1,12 +1,12 @@
 package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_MONITORED;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_TRIP_ID;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_MONITORED;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_TRIP_ID;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -18,8 +18,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -30,7 +28,9 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;

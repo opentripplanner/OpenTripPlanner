@@ -25,7 +25,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
+import org.opentripplanner.graph_builder.module.osm.OsmModule.Handler;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
@@ -74,7 +74,7 @@ public class WalkableAreaBuilder {
 
   private final Graph graph;
 
-  private final OSMDatabase osmdb;
+  private final OsmDatabase osmdb;
 
   private final Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
@@ -90,7 +90,7 @@ public class WalkableAreaBuilder {
 
   public WalkableAreaBuilder(
     Graph graph,
-    OSMDatabase osmdb,
+    OsmDatabase osmdb,
     Handler handler,
     DataImportIssueStore issueStore,
     int maxAreaNodes,
@@ -482,7 +482,7 @@ public class WalkableAreaBuilder {
       Area area = intersects.get(0);
       OSMWithTags areaEntity = area.parent;
 
-      StreetTraversalPermission areaPermissions = OSMFilter.getPermissionsForEntity(
+      StreetTraversalPermission areaPermissions = OsmFilter.getPermissionsForEntity(
         areaEntity,
         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
       );
@@ -526,7 +526,7 @@ public class WalkableAreaBuilder {
         street.setWheelchairAccessible(false);
       }
 
-      street.setLink(OSMFilter.isLink(areaEntity));
+      street.setLink(OsmFilter.isLink(areaEntity));
 
       label =
         "way (area) " +
@@ -557,7 +557,7 @@ public class WalkableAreaBuilder {
         backStreet.setWheelchairAccessible(false);
       }
 
-      backStreet.setLink(OSMFilter.isLink(areaEntity));
+      backStreet.setLink(OsmFilter.isLink(areaEntity));
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
         WayProperties wayData = areaEntity
@@ -664,7 +664,7 @@ public class WalkableAreaBuilder {
 
       namedArea.setOriginalEdges(intersection);
 
-      StreetTraversalPermission permission = OSMFilter.getPermissionsForEntity(
+      StreetTraversalPermission permission = OsmFilter.getPermissionsForEntity(
         areaEntity,
         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
       );

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -10,13 +10,12 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -382,7 +381,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    *
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
-  public Result<?, UpdateError> validateNonIncreasingTimes() {
+  public Optional<ValidationError> validateNonIncreasingTimes() {
     final int nStops = scheduledArrivalTimes.length;
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
@@ -390,14 +389,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       final int dep = getDepartureTime(s);
 
       if (dep < arr) {
-        return Result.failure(new UpdateError(getTrip().getId(), NEGATIVE_DWELL_TIME, s));
+        return Optional.of(new ValidationError(NEGATIVE_DWELL_TIME, s));
       }
       if (prevDep > arr) {
-        return Result.failure(new UpdateError(getTrip().getId(), NEGATIVE_HOP_TIME, s));
+        return Optional.of(new ValidationError(NEGATIVE_HOP_TIME, s));
       }
       prevDep = dep;
     }
-    return Result.success();
+    return Optional.empty();
   }
 
   /** Cancel this entire trip */

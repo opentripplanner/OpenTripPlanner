@@ -683,6 +683,15 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       }
     },
     {
+      "type" : "siri-sx-updater",
+      "url" : "https://example.com/some/path",
+      "feedId" : "feed_id",
+      "timeoutSec" : 30,
+      "headers" : {
+        "Key" : "Value"
+      }
+    },
+    {
       "type" : "siri-azure-sx-updater",
       "topic" : "some_topic",
       "servicebus-url" : "service_bus_url",

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -33,6 +32,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.spi.UpdateError;
 import uk.org.siri.siri20.DepartureBoardingActivityEnumeration;
 
 class ModifiedTripBuilderTest {

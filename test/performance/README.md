@@ -40,6 +40,8 @@ Data used:
 - Norwegian NeTEx data
 - Norway OSM data
 
+Contact: [T.Gran, Entur](https://github.com/t2gran)
+
 [build-config](norway/build-config.json)
 
 If the link above do not work you should be able to find it on the ENTUR web:
@@ -55,6 +57,18 @@ Data used:
 - BW OSM data
 
 [build-config](baden-wuerttemberg/build-config.json)
+ 
+### Hamburg, Germany
+
+[📊 Dashboard](https://otp-performance.leonard.io/d/9sXJ43gVk/otp-performance?orgId=1&var-category=transit&var-branch_fixed=dev-2.x&var-location=hamburg&var-branch=dev-2.x&from=1658872800000&to=now)
+
+Data used:
+- NeTEx data
+- Hamburg metropolitan area OSM data
+
+Contact: [Geofox Team](mailto:Geofox-team@hbt.de)
+
+[build-config](hamburg/build-config.json)
  
 ### Germany
 

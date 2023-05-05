@@ -22,6 +22,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
