@@ -34,11 +34,12 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | Config Parameter                                                                          |          Type         | Summary                                                                                           |  Req./Opt. | Default Value | Since |
 |-------------------------------------------------------------------------------------------|:---------------------:|---------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | [configVersion](#configVersion)                                                           |        `string`       | Deployment version of the *router-config.json*.                                                   | *Optional* |               |  2.1  |
-| [requestLogFile](#requestLogFile)                                                         |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
-| [streetRoutingTimeout](#streetRoutingTimeout)                                             |       `duration`      | The maximum time a street routing request is allowed to take before returning a timeout.          | *Optional* | `"PT5S"`      |  2.2  |
 | [flex](sandbox/Flex.md)                                                                   |        `object`       | Configuration for flex routing.                                                                   | *Optional* |               |  2.1  |
 | [rideHailingServices](sandbox/RideHailing.md)                                             |       `object[]`      | Configuration for interfaces to external ride hailing services like Uber.                         | *Optional* |               |  2.3  |
 | [routingDefaults](RouteRequest.md)                                                        |        `object`       | The default parameters for the routing query.                                                     | *Optional* |               |  2.0  |
+| [server](#server)                                                                         |        `object`       | Configuration for router server.                                                                  | *Optional* |               |  2.4  |
+|    [apiProcessingTimeout](#server_apiProcessingTimeout)                                   |       `duration`      | Maximum processing time for an API request                                                        | *Optional* | `"PT-1S"`     |  2.4  |
+|    [requestLogFile](#server_requestLogFile)                                               |        `string`       | The path of the log file for the requests.                                                        | *Optional* |               |  2.0  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                      | *Optional* |               |  2.2  |
 |    [maxSnapshotFrequency](#timetableUpdates_maxSnapshotFrequency)                         |       `duration`      | How long a snapshot should be cached.                                                             | *Optional* | `"PT1S"`      |  2.2  |
 |    purgeExpiredData                                                                       |       `boolean`       | Should expired realtime data be purged from the graph. Apply to GTFS-RT and Siri updates.         | *Optional* | `true`        |  2.2  |
@@ -96,10 +97,34 @@ or format check on the version and it can be any string.
 Be aware that OTP uses the config embedded in the loaded graph if no new config is provided.
 
 
-<h3 id="requestLogFile">requestLogFile</h3>
+<h3 id="server">server</h3>
+
+**Since version:** `2.4` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Configuration for router server.
+
+These parameters are used to configure the router server. Many parameters are specific to a
+domain, these are set tin the routing request.
+
+
+<h3 id="server_apiProcessingTimeout">apiProcessingTimeout</h3>
+
+**Since version:** `2.4` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT-1S"`   
+**Path:** /server 
+
+Maximum processing time for an API request
+
+This timeout limits the server-side processing time for a given API request.
+This does not include network latency nor waiting time in the HTTP server thread pool.
+The default value is `-1s` (no timeout).
+The timeout is applied to all APIs (REST, Transmodel , Legacy GraphQL).
+
+
+<h3 id="server_requestLogFile">requestLogFile</h3>
 
 **Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
-**Path:** / 
+**Path:** /server 
 
 The path of the log file for the requests.
 
@@ -126,25 +151,6 @@ The fields separated by whitespace are (in order):
 
 Finally, for each itinerary returned to the user, there is a travel duration in seconds and the
 number of transit vehicles used in that itinerary.
-
-
-<h3 id="streetRoutingTimeout">streetRoutingTimeout</h3>
-
-**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`   
-**Path:** / 
-
-The maximum time a street routing request is allowed to take before returning a timeout.
-
-In OTP1 path searches sometimes took a long time to complete. With the new Raptor algorithm this is not
-the case anymore. The street part of the routing may still take a long time if searching very long
-distances. You can set the street routing timeout to avoid tying up server resources on pointless
-searches and ensure that your users receive a timely response. You can also limit the max distance
-to search for WALK, BIKE and CAR. When a search times out, a WARN level log entry is made with
-information that can help identify problematic searches and improve our routing methods. There are
-no timeouts for the transit part of the routing search, instead configure a reasonable dynamic
-search-window.
-
-The search aborts after this duration and any paths found are returned to the client.
 
 
 <h3 id="timetableUpdates_maxSnapshotFrequency">maxSnapshotFrequency</h3>
@@ -423,8 +429,10 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 ```JSON
 // router-config.json
 {
-  "configVersion" : "v2.2.0-EN000121",
-  "streetRoutingTimeout" : "5s",
+  "configVersion" : "v2.3.0-EN000121",
+  "server" : {
+    "apiProcessingTimeout" : "7s"
+  },
   "routingDefaults" : {
     "walkSpeed" : 1.3,
     "bikeSpeed" : 5,
@@ -488,6 +496,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       ]
     },
     "unpreferredCost" : "600 + 2.0 x",
+    "streetRoutingTimeout" : "5s",
     "transferOptimization" : {
       "optimizeTransferWaitTime" : true,
       "minSafeWaitTimeFactor" : 5.0,
@@ -704,6 +713,15 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "timeoutSec" : 30,
       "headers" : {
         "Authorization" : "Some-Token"
+      }
+    },
+    {
+      "type" : "siri-sx-updater",
+      "url" : "https://example.com/some/path",
+      "feedId" : "feed_id",
+      "timeoutSec" : 30,
+      "headers" : {
+        "Key" : "Value"
       }
     },
     {

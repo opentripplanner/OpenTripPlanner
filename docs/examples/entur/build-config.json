@@ -16,7 +16,6 @@
   "banDiscouragedWalking": false,
   "banDiscouragedBiking": false,
   "maxTransferDuration": "30m",
-  "extraEdgesStopPlatformLink": true,
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
   "streetGraph": "gs://${OTP_GCS_BUCKET}/${OTP_GCS_BASE_GRAPH_PATH}",

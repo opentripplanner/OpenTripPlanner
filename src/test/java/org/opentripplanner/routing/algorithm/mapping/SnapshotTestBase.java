@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import au.com.origin.snapshots.serializers.SerializerType;
 import au.com.origin.snapshots.serializers.SnapshotSerializer;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
@@ -37,6 +37,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.api.mapping.ItineraryMapper;
+import org.opentripplanner.api.model.ApiLeg;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
@@ -373,15 +374,7 @@ public abstract class SnapshotTestBase {
       objectMapper.registerModule(new JavaTimeModule());
       objectMapper.registerModule(new Jdk8Module());
 
-      objectMapper.setVisibility(
-        objectMapper
-          .getSerializationConfig()
-          .getDefaultVisibilityChecker()
-          .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
-          .withGetterVisibility(JsonAutoDetect.Visibility.NONE)
-          .withSetterVisibility(JsonAutoDetect.Visibility.NONE)
-          .withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
-      );
+      objectMapper.addMixIn(ApiLeg.class, ApiLegMixin.class);
 
       pp =
         new DefaultPrettyPrinter("") {
@@ -417,5 +410,15 @@ public abstract class SnapshotTestBase {
     public String getOutputFormat() {
       return SerializerType.JSON.name();
     }
+  }
+
+  /**
+   * To exclude {@link ApiLeg#getDuration()} from being deserialized because the returned number
+   * is non-constant making it impossible to assert.
+   */
+  private abstract static class ApiLegMixin {
+
+    @JsonIgnore
+    abstract double getDuration();
   }
 }

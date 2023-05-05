@@ -8,7 +8,8 @@ public enum OtpVersion {
   V2_0("2.0"),
   V2_1("2.1"),
   V2_2("2.2"),
-  V2_3("2.3");
+  V2_3("2.3"),
+  V2_4("2.4");
 
   private final String text;
 

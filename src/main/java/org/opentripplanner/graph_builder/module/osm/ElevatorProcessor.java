@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Contains the logic for extracting elevator data from OSM and converting it to edges.
  * <p>
- * I depends heavily on the idiosyncratic processing of the OSM data in {@link OpenStreetMapModule}
+ * I depends heavily on the idiosyncratic processing of the OSM data in {@link OsmModule}
  * which is the reason this is not a public class.
  */
 class ElevatorProcessor {
@@ -41,13 +41,13 @@ class ElevatorProcessor {
 
   private final DataImportIssueStore issueStore;
   private final Map<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes;
-  private final OSMDatabase osmdb;
+  private final OsmDatabase osmdb;
 
   private final Map<Long, IntersectionVertex> intersectionNodes;
 
   public ElevatorProcessor(
     DataImportIssueStore issueStore,
-    OSMDatabase osmdb,
+    OsmDatabase osmdb,
     Map<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes,
     Map<Long, IntersectionVertex> intersectionNodes
   ) {

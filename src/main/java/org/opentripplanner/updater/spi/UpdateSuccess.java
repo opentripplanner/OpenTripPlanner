@@ -1,4 +1,4 @@
-package org.opentripplanner.model;
+package org.opentripplanner.updater.spi;
 
 import java.util.Arrays;
 import java.util.Collection;

@@ -12,8 +12,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.openstreetmap.api.OSMProvider;
-import org.opentripplanner.openstreetmap.spi.OSMDatabase;
+import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapperSource;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
@@ -24,9 +23,9 @@ import org.slf4j.LoggerFactory;
  * Parser for the OpenStreetMap PBF format. Parses files in three passes: First the relations, then
  * the ways, then the nodes are also loaded.
  */
-public class OpenStreetMapProvider implements OSMProvider {
+public class OsmProvider {
 
-  private static final Logger LOG = LoggerFactory.getLogger(OpenStreetMapProvider.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OsmProvider.class);
 
   private final DataSource source;
   private final boolean cacheDataInMem;
@@ -41,11 +40,11 @@ public class OpenStreetMapProvider implements OSMProvider {
   private byte[] cachedBytes = null;
 
   /** For tests */
-  public OpenStreetMapProvider(File file, boolean cacheDataInMem) {
+  public OsmProvider(File file, boolean cacheDataInMem) {
     this(new FileDataSource(file, FileType.OSM), OsmTagMapperSource.DEFAULT, null, cacheDataInMem);
   }
 
-  public OpenStreetMapProvider(
+  public OsmProvider(
     DataSource dataSource,
     OsmTagMapperSource tagMapperSource,
     ZoneId zoneId,
@@ -59,7 +58,7 @@ public class OpenStreetMapProvider implements OSMProvider {
     this.cacheDataInMem = cacheDataInMem;
   }
 
-  public void readOSM(OSMDatabase osmdb) {
+  public void readOSM(OsmDatabase osmdb) {
     try {
       OpenStreetMapParser parser = new OpenStreetMapParser(osmdb, this);
 
@@ -79,7 +78,7 @@ public class OpenStreetMapProvider implements OSMProvider {
   @Override
   public String toString() {
     return ToStringBuilder
-      .of(OpenStreetMapProvider.class)
+      .of(OsmProvider.class)
       .addObj("source", source)
       .addBool("cacheDataInMem", cacheDataInMem)
       .toString();
@@ -126,7 +125,6 @@ public class OpenStreetMapProvider implements OSMProvider {
     return track(phase, source.size(), source.asInputStream());
   }
 
-  @Override
   public ZoneId getZoneId() {
     if (zoneId == null) {
       if (!hasWarnedAboutMissingTimeZone) {
@@ -142,12 +140,10 @@ public class OpenStreetMapProvider implements OSMProvider {
     return zoneId;
   }
 
-  @Override
   public OsmTagMapper getOsmTagMapper() {
     return osmTagMapper;
   }
 
-  @Override
   public WayPropertySet getWayPropertySet() {
     return wayPropertySet;
   }

@@ -1,8 +1,9 @@
 package org.opentripplanner.updater.spi;
 
+import static net.logstash.logback.argument.StructuredArguments.keyValue;
+
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.model.UpdateError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +19,7 @@ public class ResultLogger {
     var totalUpdates = updateResult.successful() + updateResult.failed();
     if (totalUpdates > 0) {
       LOG.info(
-        "[feedId: {}, type={}] {} of {} update messages were applied successfully (success rate: {}%)",
+        "[feedId={}, type={}] {} of {} update messages were applied successfully (success rate: {}%)",
         feedId,
         type,
         updateResult.successful(),
@@ -33,17 +34,17 @@ public class ResultLogger {
         .forEach(key -> {
           var value = errorIndex.get(key);
           var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
-          LOG.error(
-            "[feedId: {}, type={}] {} failures of type {}: {}",
-            feedId,
-            type,
+          LOG.warn(
+            "[{} {}] {} failures of {}: {}",
+            keyValue("feedId", feedId),
+            keyValue("type", type),
             value.size(),
-            key,
+            keyValue("errorType", key),
             tripIds
           );
         });
     } else {
-      LOG.info("[feedId: {}, type={}] Feed did not contain any updates", feedId, type);
+      LOG.info("[feedId={}, type={}] Feed did not contain any updates", feedId, type);
     }
   }
 }

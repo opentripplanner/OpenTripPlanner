@@ -26,6 +26,10 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 
 <!-- INSERT: siri-et-updater -->
 
+### Siri-SX via HTTPS
+
+<!-- INSERT: siri-sx-updater -->
+
 ## Changelog
 
 - Initial version of SIRI updater (October 2019)

@@ -9,7 +9,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 /**
  *
  */
-public class OSMFilter {
+public class OsmFilter {
 
   /**
    * Determines whether this OSM way is considered routable. The majority of routable ways are those

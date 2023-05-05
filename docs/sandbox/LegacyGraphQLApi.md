@@ -37,6 +37,9 @@ curl --request POST \
   --header 'OTPTimeout: 180000' \
   --data '{"query":"query stops {\n  stops {\n    gtfsId\n    name\n  }\n}\n","operationName":"stops"}'
 ```
+## Schema documentation
+
+Available at [https://docs.opentripplanner.org/](https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/)
 
 ## Built-in API client
 
