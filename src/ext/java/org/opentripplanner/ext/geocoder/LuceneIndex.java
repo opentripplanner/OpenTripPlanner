@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -39,8 +38,7 @@ import org.apache.lucene.search.suggest.document.ContextSuggestField;
 import org.apache.lucene.search.suggest.document.FuzzyCompletionQuery;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
-import org.opentripplanner.ext.geocoder.LuceneIndex.StopCluster.Coordinate;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.ext.geocoder.StopCluster.Coordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
@@ -331,39 +329,6 @@ public class LuceneIndex implements Serializable {
       }
     } catch (IOException ex) {
       throw new RuntimeException(ex);
-    }
-  }
-
-  public record StopCluster(
-    FeedScopedId id,
-    @Nullable String code,
-    String name,
-    Coordinate coordinate
-  ) {
-    record Coordinate(double lat, double lon) {}
-    public static StopCluster of(StopLocationsGroup g) {
-      return new StopCluster(
-        g.getId(),
-        null,
-        g.getName().toString(),
-        toCoordinate(g.getCoordinate())
-      );
-    }
-    static Optional<StopCluster> of(StopLocation sl) {
-      return Optional
-        .ofNullable(sl.getName())
-        .map(name ->
-          new StopCluster(
-            sl.getId(),
-            sl.getCode(),
-            name.toString(),
-            toCoordinate(sl.getCoordinate())
-          )
-        );
-    }
-
-    private static Coordinate toCoordinate(WgsCoordinate c) {
-      return new Coordinate(c.latitude(), c.longitude());
     }
   }
 }

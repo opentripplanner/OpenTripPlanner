@@ -89,7 +89,7 @@ class LuceneIndexTest {
   @Test
   void stopClusters() {
     var result1 = index.queryStopClusters("alex").toList();
-    assertEquals(List.of(LuceneIndex.StopCluster.of(ALEXANDERPLATZ_STATION)), result1);
+    assertEquals(List.of(StopCluster.of(ALEXANDERPLATZ_STATION)), result1);
   }
 
   @ParameterizedTest
@@ -100,6 +100,6 @@ class LuceneIndexTest {
   )
   void stopClustersWithSpace(String query) {
     var result = index.queryStopClusters(query).toList();
-    assertEquals(List.of(LuceneIndex.StopCluster.of(FIVE_POINTS_STATION)), result);
+    assertEquals(List.of(StopCluster.of(FIVE_POINTS_STATION)), result);
   }
 }
