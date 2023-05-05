@@ -5,9 +5,12 @@ import java.util.Optional;
 import org.opentripplanner.street.model.edge.Edge;
 
 /**
- * This is a very reduced version of the A* algorithm: from an initial state a number of edges
- * are traversed in sequential order. It doesn't take into account he potential other paths that
- * are possible.
+ * This is a very reduced version of the A* algorithm: from an initial state a number of edges are
+ * traversed in sequential order. It doesn't take into account the potential other paths that are
+ * possible.
+ * <p>
+ * This is not a general search algorithm! It's only useful for calculating cost and time of
+ * traversing a predetermined set of edges.
  */
 public class EdgeTraverser {
 
