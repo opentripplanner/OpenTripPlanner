@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.sandbox;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import java.util.Collection;
 import java.util.Set;
@@ -15,9 +16,15 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
   private final boolean hideFeedId;
   private final Collection<String> tracingHeaderTags;
 
-  public TransmodelAPIConfig(NodeAdapter node) {
+  public TransmodelAPIConfig(String parameterName, NodeAdapter root) {
+    var c = root
+      .of("transmodelApi")
+      .since(V2_1)
+      .summary("Configuration for the Transmodel GraphQL API.")
+      .asObject();
+
     hideFeedId =
-      node
+      c
         .of("hideFeedId")
         .since(NA)
         .summary("Hide the FeedId in all API output, and add it to input.")
@@ -27,7 +34,7 @@ public class TransmodelAPIConfig implements TransmodelAPIParameters {
         )
         .asBoolean(false);
     tracingHeaderTags =
-      node
+      c
         .of("tracingHeaderTags")
         .since(NA)
         .summary("Used to group requests when monitoring OTP.")

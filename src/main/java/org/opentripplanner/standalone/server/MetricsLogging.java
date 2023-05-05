@@ -19,6 +19,8 @@ import jakarta.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ForkJoinPool;
+import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.concurrent.InterruptibleExecutor;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -84,6 +86,15 @@ public class MetricsLogging {
         raptorConfig.threadPool(),
         "raptorHeuristics",
         List.of(Tag.of("pool", "raptorHeuristics"))
+      )
+        .bindTo(Metrics.globalRegistry);
+    }
+
+    if (OTPFeature.ParallelRouting.isOn()) {
+      new ExecutorServiceMetrics(
+        InterruptibleExecutor.threadPool(),
+        "interruptibleExecutor",
+        List.of(Tag.of("pool", "interruptibleExecutor"))
       )
         .bindTo(Metrics.globalRegistry);
     }

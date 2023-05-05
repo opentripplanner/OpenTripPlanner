@@ -38,8 +38,8 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   public SiriSXUpdater(SiriSXUpdaterParameters config, TransitModel transitModel) {
     super(config);
     // TODO: add options to choose different patch services
-    this.url = config.getUrl();
-    this.requestorRef = config.getRequestorRef();
+    this.url = config.url();
+    this.requestorRef = config.requestorRef();
 
     if (requestorRef == null || requestorRef.isEmpty()) {
       requestorRef = "otp-" + UUID.randomUUID().toString();
@@ -48,7 +48,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     //Keeping original requestorRef use as base for updated requestorRef to be used in retries
     this.originalRequestorRef = requestorRef;
 
-    int timeoutSec = config.getTimeoutSec();
+    int timeoutSec = config.timeoutSec();
     if (timeoutSec > 0) {
       this.timeout = 1000 * timeoutSec;
     }
@@ -59,11 +59,11 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
     this.updateHandler =
       new SiriAlertsUpdateHandler(
-        config.getFeedId(),
+        config.feedId(),
         transitModel,
         transitAlertService,
         SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel)),
-        config.getEarlyStartSec()
+        config.earlyStartSec()
       );
     LOG.info(
       "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",

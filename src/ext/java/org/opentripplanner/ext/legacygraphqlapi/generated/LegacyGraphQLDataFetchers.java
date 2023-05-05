@@ -274,7 +274,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Double> lon();
   }
 
-  /** An amount of money. */
+  /** A currency */
   public interface LegacyGraphQLCurrency {
     public DataFetcher<String> code();
 
@@ -316,6 +316,8 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLItinerary {
+    public DataFetcher<Double> accessibilityScore();
+
     public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle();
 
     public DataFetcher<Long> duration();
@@ -344,6 +346,8 @@ public class LegacyGraphQLDataFetchers {
   }
 
   public interface LegacyGraphQLLeg {
+    public DataFetcher<Double> accessibilityScore();
+
     public DataFetcher<Agency> agency();
 
     public DataFetcher<Iterable<TransitAlert>> alerts();

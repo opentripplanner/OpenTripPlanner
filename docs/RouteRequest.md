@@ -67,6 +67,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [searchWindow](#rd_searchWindow)                                                                     |       `duration`       | The duration of the search-window.                                                                                                 | *Optional* |                          |  2.0  |
 | stairsReluctance                                                                                     |        `double`        | Used instead of walkReluctance for stairs.                                                                                         | *Optional* | `2.0`                    |  2.0  |
 | [stairsTimeFactor](#rd_stairsTimeFactor)                                                             |        `double`        | How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.                        | *Optional* | `3.0`                    |  2.1  |
+| [streetRoutingTimeout](#rd_streetRoutingTimeout)                                                     |       `duration`       | The maximum time a street routing request is allowed to take before returning the results.                                         | *Optional* | `"PT5S"`                 |  2.2  |
 | [transferPenalty](#rd_transferPenalty)                                                               |        `integer`       | An additional penalty added to boardings after the first.                                                                          | *Optional* | `0`                      |  2.0  |
 | [transferSlack](#rd_transferSlack)                                                                   |        `integer`       | The extra time needed to make a safe transfer in seconds.                                                                          | *Optional* | `120`                    |  2.0  |
 | turnReluctance                                                                                       |        `double`        | Multiplicative factor on expected turning time.                                                                                    | *Optional* | `1.0`                    |  2.0  |
@@ -302,6 +303,20 @@ How much more time does it take to walk a flight of stairs compared to walking a
 
 Default value is based on: Fujiyama, T., & Tyler, N. (2010). Predicting the walking
 speed of pedestrians on stairs. Transportation Planning and Technology, 33(2), 177–202.
+
+
+<h3 id="rd_streetRoutingTimeout">streetRoutingTimeout</h3>
+
+**Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`   
+**Path:** /routingDefaults 
+
+The maximum time a street routing request is allowed to take before returning the results.
+
+The street search(AStar) aborts after this duration and any paths found are returned to the client.
+The street part of the routing may take a long time if searching very long distances. You can set
+the street routing timeout to avoid tying up server resources on pointless searches and ensure that
+your users receive a timely response. You can also limit the max duration. There are is also a
+'apiProcessingTimeout'. Make sure the street timeout is less than the 'apiProcessingTimeout'.
 
 
 <h3 id="rd_transferPenalty">transferPenalty</h3>

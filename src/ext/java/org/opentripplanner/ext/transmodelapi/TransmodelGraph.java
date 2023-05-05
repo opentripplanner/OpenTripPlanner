@@ -4,6 +4,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.GraphQLError;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.execution.instrumentation.ChainedInstrumentation;
 import graphql.execution.instrumentation.Instrumentation;
@@ -12,19 +13,18 @@ import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
+import org.opentripplanner.ext.transmodelapi.support.OTPProcessingTimeoutGraphQLException;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.http.OtpHttpStatus;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class TransmodelGraph {
-
-  static final Logger LOG = LoggerFactory.getLogger(TransmodelGraph.class);
 
   private final GraphQLSchema indexSchema;
 
@@ -94,10 +94,17 @@ class TransmodelGraph {
       maxResolves,
       tracingTags
     );
-
-    return Response
-      .status(Response.Status.OK)
-      .entity(GraphQLResponseSerializer.serialize(result))
-      .build();
+    List<GraphQLError> errors = result.getErrors();
+    if (errors.stream().anyMatch(OTPProcessingTimeoutGraphQLException.class::isInstance)) {
+      return Response
+        .status(OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY.statusCode())
+        .entity(GraphQLResponseSerializer.serialize(result))
+        .build();
+    } else {
+      return Response
+        .status(Response.Status.OK)
+        .entity(GraphQLResponseSerializer.serialize(result))
+        .build();
+    }
   }
 }

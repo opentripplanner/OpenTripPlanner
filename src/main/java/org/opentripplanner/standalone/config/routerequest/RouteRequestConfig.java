@@ -35,21 +35,14 @@ public class RouteRequestConfig {
 
   private static final String WHEELCHAIR_ACCESSIBILITY = "wheelchairAccessibility";
 
-  public static RouteRequest mapDefaultRouteRequest(
-    NodeAdapter root,
-    String parameterName,
-    Duration streetRoutingTimeout
-  ) {
+  public static RouteRequest mapDefaultRouteRequest(String parameterName, NodeAdapter root) {
     var c = root
       .of(parameterName)
       .since(V2_0)
       .summary("The default parameters for the routing query.")
       .description("Most of these are overridable through the various API endpoints.")
       .asObject();
-    var routeRequest = mapRouteRequest(c);
-    routeRequest.withPreferences(p -> p.withStreet(s -> s.withRoutingTimeout(streetRoutingTimeout))
-    );
-    return routeRequest;
+    return mapRouteRequest(c);
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c) {
@@ -664,6 +657,25 @@ do not exist."
           .since(V2_2)
           .summary("The model that computes the costs of turns.")
           .asEnum(dft.intersectionTraversalModel())
+      )
+      .withRoutingTimeout(
+        c
+          .of("streetRoutingTimeout")
+          .since(V2_2)
+          .summary(
+            "The maximum time a street routing request is allowed to take before returning the " +
+            "results."
+          )
+          .description(
+            """
+The street search(AStar) aborts after this duration and any paths found are returned to the client.
+The street part of the routing may take a long time if searching very long distances. You can set
+the street routing timeout to avoid tying up server resources on pointless searches and ensure that
+your users receive a timely response. You can also limit the max duration. There are is also a
+'apiProcessingTimeout'. Make sure the street timeout is less than the 'apiProcessingTimeout'.
+            """
+          )
+          .asDuration(dft.routingTimeout())
       );
   }
 
