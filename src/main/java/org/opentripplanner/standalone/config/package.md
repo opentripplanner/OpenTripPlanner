@@ -117,9 +117,9 @@ var dft = [injected configuration object];
 GraphQLArgument.newArgument().name("foo").defaultValue(dft.foo())
 ```
 
-This show how the API get the default value from the configured value, and how we fall back to a
+This show how the API gets the default value from the configured value, and how we fall back to a
 static value set in code, if no configuration is available. There are some cases with are more 
-complicated than this, but this is the general pattern for do it. This also make the default 
+complicated than this, but this is the general pattern for doing it. This also makes the default 
 value available in the configuration and API documentation. An important note is that in the 
 API we show the configured value as the default.
 
