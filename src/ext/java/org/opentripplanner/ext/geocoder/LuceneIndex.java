@@ -256,7 +256,14 @@ public class LuceneIndex implements Serializable {
       if (autocomplete) {
         var completionQuery = new FuzzyCompletionQuery(
           analyzer,
-          new Term(SUGGEST, analyzer.normalize(SUGGEST, searchTerms))
+          new Term(SUGGEST, analyzer.normalize(SUGGEST, searchTerms)),
+          null,
+          2,
+          true,
+          4,
+          3,
+          true,
+          3
         );
         var query = new ContextQuery(completionQuery);
         query.addContext(type.getSimpleName());
