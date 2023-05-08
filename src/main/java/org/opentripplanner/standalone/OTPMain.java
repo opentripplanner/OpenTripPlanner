@@ -225,6 +225,7 @@ public class OTPMain {
       raptorConfig.shutdown();
       WeakCollectionCleaner.DEFAULT.exit();
       DeferredAuthorityFactory.exit();
+      LOG.info("OTP shutdown: resources released...");
     });
     Runtime.getRuntime().addShutdownHook(hook);
   }

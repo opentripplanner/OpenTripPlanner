@@ -70,8 +70,11 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         Thread.sleep(pollingPeriodSeconds * 1000);
       }
     } catch (InterruptedException e) {
-      // When updater is interrupted
-      LOG.error("Polling updater {} was interrupted and is stopping.", this.getClass().getName());
+      Thread.currentThread().interrupt();
+      LOG.info(
+        "OTP is shutting down, polling updater {} was interrupted and is stopping.",
+        this.getClass().getName()
+      );
     }
   }
 
