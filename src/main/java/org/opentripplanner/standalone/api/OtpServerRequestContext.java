@@ -24,7 +24,6 @@ import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TransitService;
-import org.slf4j.Logger;
 
 /**
  * The purpose of this class is to allow APIs (HTTP Resources) to access the OTP Server Context.
@@ -94,12 +93,6 @@ public interface OtpServerRequestContext {
   List<RideHailingService> rideHailingServices();
 
   MeterRegistry meterRegistry();
-
-  /**
-   * Separate logger for incoming requests. This should be handled with a Logback logger rather than
-   * something simple like a PrintStream because requests come in multi-threaded.
-   */
-  Logger requestLogger();
 
   /** Inspector/debug services */
   TileRendererManager tileRendererManager();
