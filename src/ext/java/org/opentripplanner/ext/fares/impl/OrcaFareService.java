@@ -449,7 +449,7 @@ public class OrcaFareService extends DefaultFareService {
         // If using Orca (free transfers), the total fare should be equivalent to the
         // most expensive leg of the journey.
         // If the new fare is more than the current ORCA amount, the transfer is extended.
-        if (legFare.cents() > orcaFareDiscount.cents()) {
+        if (legFare.amount() > orcaFareDiscount.amount()) {
           freeTransferStartTime = leg.getStartTime();
           // Note: on first leg, discount will be 0 meaning no transfer was applied.
           addLegFareProduct(leg, fare, fareType, legFare.minus(orcaFareDiscount), orcaFareDiscount);
@@ -461,7 +461,7 @@ public class OrcaFareService extends DefaultFareService {
             fare,
             fareType,
             Money.usDollars(0),
-            legFare.cents() != 0 ? orcaFareDiscount : Money.usDollars(0)
+            legFare.amount() != 0 ? orcaFareDiscount : Money.usDollars(0)
           );
         }
       } else if (usesOrca(fareType) && !inFreeTransferWindow) {
@@ -496,7 +496,7 @@ public class OrcaFareService extends DefaultFareService {
       }
     }
     cost = cost.plus(orcaFareDiscount);
-    if (cost.cents() < Integer.MAX_VALUE) {
+    if (cost.amount() < Integer.MAX_VALUE) {
       fare.addFare(fareType, cost);
       return true;
     } else {
@@ -509,7 +509,6 @@ public class OrcaFareService extends DefaultFareService {
    * @param leg The leg to create a fareproduct for
    * @param itineraryFares The itinerary fares to store the fare product in
    * @param fareType Fare type (split into container and rider category)
-   * @param currency Fare currency
    * @param totalFare Total fare paid after transfer
    * @param transferDiscount Transfer discount applied
    */
@@ -533,7 +532,7 @@ public class OrcaFareService extends DefaultFareService {
     var fareProduct = new FareProduct(id, "rideCost", totalFare, duration, riderCategory, medium);
     itineraryFares.addFareProduct(leg, fareProduct);
     // If a transfer was used, then also add a transfer fare product.
-    if (transferDiscount.cents() > 0) {
+    if (transferDiscount.amount() > 0) {
       var transferFareProduct = new FareProduct(
         id,
         "transfer",

@@ -25,7 +25,6 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -35,7 +34,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 public class AtlantaFareServiceTest implements PlanTestConstants {
 
   public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(349);
-  public static final float DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.cents();
+  public static final float DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.amount();
   public static final Currency USD = Currency.getInstance("USD");
   private static AtlantaFareService atlFareService;
 

@@ -164,7 +164,7 @@ public class HSLFareServiceImpl extends DefaultFareService {
             }
           }
           Money newFare = getFarePrice(attribute, fareType);
-          if (newFare.cents() < bestFare.cents()) {
+          if (newFare.lessThan(bestFare)) {
             bestAttribute = attribute;
             bestFare = newFare;
           }

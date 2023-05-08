@@ -18,7 +18,6 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 
 public class AtlantaFareService extends DefaultFareService {
@@ -391,7 +390,7 @@ public class AtlantaFareService extends DefaultFareService {
     for (ATLTransfer transfer : transfers) {
       cost += transfer.getTotal();
     }
-    var money = Money.ofFractionalAmount(currency, cost)
+    var money = Money.ofFractionalAmount(currency, cost);
     var fareProduct = new FareProduct(
       new FeedScopedId(FEED_ID, fareType.name()),
       fareType.name(),

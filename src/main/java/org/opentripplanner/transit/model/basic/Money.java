@@ -18,12 +18,12 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
   public Money {
     Objects.requireNonNull(currency);
   }
-  public static Money euros(int cents) {
-    return new Money(Currency.getInstance("EUR"), cents);
+  public static Money euros(int amount) {
+    return new Money(Currency.getInstance("EUR"), amount);
   }
 
-  public static Money usDollars(int cents) {
-    return new Money(USD, cents);
+  public static Money usDollars(int amount) {
+    return new Money(USD, amount);
   }
 
   /**
@@ -41,7 +41,7 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
   }
 
   /**
-   * Take a fractional amount of money, ie 1.5 and convert it to cents using the number of default
+   * Take a fractional amount of money, ie 1.5 and convert it to amount using the number of default
    * fraction digits of the currency.
    */
   public static Money ofFractionalAmount(Currency currency, float cost) {
@@ -49,8 +49,8 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
     if (currency != null) {
       fractionDigits = currency.getDefaultFractionDigits();
     }
-    int cents = (int) Math.round(cost * Math.pow(10, fractionDigits));
-    return new Money(currency, cents);
+    int amount = (int) Math.round(cost * Math.pow(10, fractionDigits));
+    return new Money(currency, amount);
   }
 
   @Override
@@ -89,27 +89,27 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
    * Subtract the money amount from this instance and return the result.
    */
   public Money minus(Money other) {
-    return op(other, o -> new Money(currency, cents - o.cents));
+    return op(other, o -> new Money(currency, amount - o.amount));
   }
 
   /**
    * Add another money amoutn to this instance and return it.
    */
   public Money plus(Money other) {
-    return op(other, o -> new Money(currency, cents + o.cents));
+    return op(other, o -> new Money(currency, amount + o.amount));
   }
 
   public boolean greaterThan(Money other) {
-    return booleanOp(other, cents > other.cents);
+    return booleanOp(other, amount > other.amount);
   }
 
   public boolean lessThan(Money other) {
-    return booleanOp(other, cents < other.cents);
+    return booleanOp(other, amount < other.amount);
   }
 
-  private boolean booleanOp(Money other, boolean cents) {
+  private boolean booleanOp(Money other, boolean amount) {
     if (currency.equals(other.currency)) {
-      return cents;
+      return amount;
     } else {
       throw new IllegalArgumentException(
         "Cannot perform operations on %s and %s because they have unequal currency.".formatted(

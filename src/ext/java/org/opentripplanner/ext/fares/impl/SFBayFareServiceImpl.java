@@ -12,7 +12,7 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

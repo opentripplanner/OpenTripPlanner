@@ -12,8 +12,8 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.basic.Money;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This calculator is maintained by IBI Group.
@@ -85,16 +85,16 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
 
       currentTransferWindowCost = Money.max(currentTransferWindowCost, rideCost.orElse(zero));
     }
-      fare.addFare(fareType, cost);
-      var fp = new FareProduct(
-        new FeedScopedId("fares", fareType.name()),
-        fareType.name(),
-        cost,
-        null,
-        null,
-        null
-      );
-      fare.addItineraryProducts(List.of(fp));
+    fare.addFare(fareType, cost);
+    var fp = new FareProduct(
+      new FeedScopedId("fares", fareType.name()),
+      fareType.name(),
+      cost,
+      null,
+      null,
+      null
+    );
+    fare.addItineraryProducts(List.of(fp));
     cost = cost.plus(currentTransferWindowCost);
     fare.addFare(fareType, cost);
     return cost.greaterThan(zero);

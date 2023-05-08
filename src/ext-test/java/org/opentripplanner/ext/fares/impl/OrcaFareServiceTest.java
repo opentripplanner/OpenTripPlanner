@@ -37,7 +37,6 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -50,7 +49,7 @@ public class OrcaFareServiceTest {
   public static final Currency USD = Currency.getInstance("USD");
   private static TestOrcaFareService orcaFareService;
   public static final Money DEFAULT_TEST_RIDE_PRICE = Money.usDollars(349);
-  private static final int DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.cents();
+  private static final int DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.amount();
 
   @BeforeAll
   public static void setUpClass() {
