@@ -17,13 +17,14 @@ import org.opentripplanner.api.model.ApiFareQualifier;
 import org.opentripplanner.api.model.ApiItineraryFares;
 import org.opentripplanner.api.model.ApiLegProducts;
 import org.opentripplanner.api.model.ApiMoney;
-import org.opentripplanner.ext.fares.model.FareContainer;
-import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.ext.fares.model.RiderCategory;
+import org.opentripplanner.model.fare.FareMedium;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareComponent;
-import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.model.basic.Money;
 
 public class FareMapper {
@@ -49,7 +50,7 @@ public class FareMapper {
 
   private List<ApiLegProducts> toApiLegProducts(
     Itinerary itinerary,
-    Multimap<Leg, FareProduct> legProducts
+    Multimap<Leg, FareProductUse> legProducts
   ) {
     if (legProducts.isEmpty()) {
       return null;
@@ -60,24 +61,31 @@ public class FareMapper {
         .map(leg -> {
           var index = itinerary.getLegIndex(leg);
           // eventually we want to implement products that span multiple legs (but not the entire itinerary)
-          return new ApiLegProducts(List.of(index), toApiFareProducts(legProducts.get(leg)));
+          return new ApiLegProducts(
+            List.of(index),
+            instancesToApiFareProducts(legProducts.get(leg))
+          );
         })
         .toList();
     }
   }
 
-  private static ApiFareQualifier toApiFareQualifier(@Nullable FareContainer nullable) {
+  private static ApiFareQualifier toApiFareQualifier(@Nullable FareMedium nullable) {
     return Optional
       .ofNullable(nullable)
-      .map(c -> new ApiFareQualifier(c.id(), c.name()))
+      .map(c -> new ApiFareQualifier(c.id().getId(), c.name()))
       .orElse(null);
   }
 
   private static ApiFareQualifier toApiFareQualifier(@Nullable RiderCategory nullable) {
     return Optional
       .ofNullable(nullable)
-      .map(c -> new ApiFareQualifier(c.id(), c.name()))
+      .map(c -> new ApiFareQualifier(c.id().getId(), c.name()))
       .orElse(null);
+  }
+
+  private List<ApiFareProduct> instancesToApiFareProducts(Collection<FareProductUse> product) {
+    return toApiFareProducts(product.stream().map(FareProductUse::product).toList());
   }
 
   private List<ApiFareProduct> toApiFareProducts(Collection<FareProduct> product) {
@@ -88,8 +96,8 @@ public class FareMapper {
           new ApiFareProduct(
             p.id().toString(),
             p.name(),
-            toApiMoney(p.amount()),
-            toApiFareQualifier(p.container()),
+            toApiMoney(p.price()),
+            toApiFareQualifier(p.medium()),
             toApiFareQualifier(p.category())
           )
         )
@@ -99,10 +107,10 @@ public class FareMapper {
 
   private Map<String, List<ApiFareComponent>> toApiFareComponents(ItineraryFares fare) {
     return fare
-      .getTypes()
+      .getFareTypes()
       .stream()
       .map(key -> {
-        var money = fare.getDetails(key).stream().map(this::toApiFareComponent).toList();
+        var money = fare.getComponents(key).stream().map(this::toApiFareComponent).toList();
         return new SimpleEntry<>(key, money);
       })
       .collect(Collectors.toMap(e -> e.getKey().name(), Entry::getValue));
@@ -110,7 +118,7 @@ public class FareMapper {
 
   private Map<String, ApiMoney> toApiMoneys(ItineraryFares fare) {
     return fare
-      .getTypes()
+      .getFareTypes()
       .stream()
       .map(key -> {
         var money = toApiMoney(fare.getFare(key));
@@ -133,6 +141,6 @@ public class FareMapper {
   }
 
   private ApiFareComponent toApiFareComponent(FareComponent m) {
-    return new ApiFareComponent(m.fareId(), m.name(), toApiMoney(m.price()), m.routes());
+    return new ApiFareComponent(m.fareId(), null, toApiMoney(m.price()), m.routes());
   }
 }
