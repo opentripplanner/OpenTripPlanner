@@ -43,8 +43,7 @@ public class TestServerContext {
       createVehicleRentalService(),
       routerConfig.flexConfig(),
       List.of(),
-      null,
-      routerConfig.server().requestLogFile()
+      null
     );
     creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());
     return context;

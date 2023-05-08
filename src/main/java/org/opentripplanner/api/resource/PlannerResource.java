@@ -8,8 +8,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.RoutingResource;
@@ -19,10 +17,8 @@ import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.http.OtpHttpStatus;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,45 +105,6 @@ public class PlannerResource extends RoutingResource {
       response.setError(error);
     }
 
-    /* Log this request if such logging is enabled. */
-    logRequest(grizzlyRequest, request, serverContext, res);
-
     return Response.ok().entity(response).build();
-  }
-
-  private void logRequest(
-    Request grizzlyRequest,
-    RouteRequest request,
-    OtpServerRequestContext serverContext,
-    RoutingResponse res
-  ) {
-    if (request != null && serverContext != null && serverContext.requestLogger() != null) {
-      StringBuilder sb = new StringBuilder();
-      String clientIpAddress = grizzlyRequest.getRemoteAddr();
-      //sb.append(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-      sb.append(clientIpAddress);
-      sb.append(' ');
-      sb.append(request.arriveBy() ? "ARRIVE" : "DEPART");
-      sb.append(' ');
-      sb.append(LocalDateTime.ofInstant(request.dateTime(), ZoneId.systemDefault()));
-      sb.append(' ');
-      sb.append(request.journey().transit().filters());
-      sb.append(' ');
-      sb.append(request.from().lat);
-      sb.append(' ');
-      sb.append(request.from().lng);
-      sb.append(' ');
-      sb.append(request.to().lat);
-      sb.append(' ');
-      sb.append(request.to().lng);
-      sb.append(' ');
-      if (res != null) {
-        for (Itinerary it : res.getTripPlan().itineraries) {
-          sb.append(it.getDuration());
-          sb.append(' ');
-        }
-      }
-      serverContext.requestLogger().info(sb.toString());
-    }
   }
 }
