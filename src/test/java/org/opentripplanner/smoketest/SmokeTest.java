@@ -18,7 +18,7 @@ import java.util.List;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.smoketest.util.GraphQLClient;
 import org.opentripplanner.smoketest.util.RestClient;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
