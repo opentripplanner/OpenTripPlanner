@@ -26,6 +26,7 @@ import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
@@ -1012,7 +1013,7 @@ public class OsmDatabase {
    */
   private void processLevelMap(OSMRelation relation) {
     var levelsTag = relation.getTag("levels");
-    if (levelsTag == null || levelsTag.isEmpty()) {
+    if (!StringUtils.hasValue(levelsTag)) {
       issueStore.add(new MalformedLevelMap(relation));
       return;
     }
