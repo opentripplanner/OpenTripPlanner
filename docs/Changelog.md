@@ -11,6 +11,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove dead build configuration parameter (extraEdgesStopPlatformLink) [#5080](https://github.com/opentripplanner/OpenTripPlanner/pull/5080)
 - Configure HTTP WebServer Transaction timeouts [#5047](https://github.com/opentripplanner/OpenTripPlanner/pull/5047)
 - Add Fares v2 to GraphQL API [#4917](https://github.com/opentripplanner/OpenTripPlanner/pull/4917)
+- Improve Graph updaters shutdown [#5092](https://github.com/opentripplanner/OpenTripPlanner/pull/5092)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
