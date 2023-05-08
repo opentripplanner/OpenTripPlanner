@@ -37,7 +37,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
     Assertions.assertArrayEquals(
       expectedFareIds.toArray(),
       fareService
-        .getCost(i)
+        .calculateFares(i)
         .getComponents(FareType.regular)
         .stream()
         .map(FareComponent::fareId)

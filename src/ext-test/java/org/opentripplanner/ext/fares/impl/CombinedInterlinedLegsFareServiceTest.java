@@ -61,7 +61,7 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
       List.of(AIRPORT_TO_CITY_CENTER_SET, INSIDE_CITY_CENTER_SET)
     );
 
-    var fare = service.getCost(itinerary);
+    var fare = service.calculateFares(itinerary);
     assertNotNull(fare);
 
     var price = fare.getFare(FareType.regular);

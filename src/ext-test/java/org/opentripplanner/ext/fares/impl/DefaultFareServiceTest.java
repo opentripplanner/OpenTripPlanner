@@ -25,7 +25,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var service = new DefaultFareService();
     service.addFareRules(FareType.regular, List.of());
     var itin = newItinerary(A, T11_00).bus(1, T11_05, T11_12, B).build();
-    var fare = service.getCost(itin);
+    var fare = service.calculateFares(itin);
     assertNull(fare);
   }
 
@@ -36,7 +36,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var itin = newItinerary(Place.forStop(AIRPORT_STOP), T11_00)
       .bus(1, T11_00, T11_12, Place.forStop(CITY_CENTER_A_STOP))
       .build();
-    var fare = service.getCost(itin);
+    var fare = service.calculateFares(itin);
     assertNotNull(fare);
 
     var price = fare.getFare(FareType.regular);
@@ -63,7 +63,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       )
       .build();
 
-    var fare = service.getCost(itin);
+    var fare = service.calculateFares(itin);
     assertNotNull(fare);
 
     var price = fare.getFare(FareType.regular);

@@ -88,7 +88,7 @@ public class DefaultFareService implements FareService {
   }
 
   @Override
-  public ItineraryFares getCost(Itinerary itinerary) {
+  public ItineraryFares calculateFares(Itinerary itinerary) {
     var fareLegs = itinerary
       .getLegs()
       .stream()

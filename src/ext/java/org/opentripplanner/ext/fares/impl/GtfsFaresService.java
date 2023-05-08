@@ -8,8 +8,8 @@ import org.opentripplanner.routing.fares.FareService;
 public record GtfsFaresService(DefaultFareService faresV1, GtfsFaresV2Service faresV2)
   implements FareService {
   @Override
-  public ItineraryFares getCost(Itinerary itinerary) {
-    var fare = Objects.requireNonNullElse(faresV1.getCost(itinerary), ItineraryFares.empty());
+  public ItineraryFares calculateFares(Itinerary itinerary) {
+    var fare = Objects.requireNonNullElse(faresV1.calculateFares(itinerary), ItineraryFares.empty());
     var products = faresV2.getProducts(itinerary);
     fare.addItineraryProducts(products.itineraryProducts());
     if (products.itineraryProducts().isEmpty()) {
