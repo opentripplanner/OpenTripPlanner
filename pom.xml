@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>99</otp.serialization.version.id>
+        <otp.serialization.version.id>100</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>29.0</geotools.version>
         <google.dagger.version>2.46</google.dagger.version>
@@ -267,7 +267,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0</version>
                 <configuration>
                     <!-- we have to fork the JVM during tests so that the argLine is passed along -->
                     <forkCount>3</forkCount>

@@ -1,10 +1,10 @@
-package org.opentripplanner.graph_builder.module.osm;
+package org.opentripplanner.graph_builder.module.osm.naming;
 
 import java.util.HashSet;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 /**
@@ -14,7 +14,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
  *
  * @author novalis
  */
-public class PortlandCustomNamer implements CustomNamer {
+public class PortlandCustomNamer implements EdgeNamer {
 
   public static String[] STREET_SUFFIXES = {
     "Avenue",
@@ -44,31 +44,32 @@ public class PortlandCustomNamer implements CustomNamer {
   private final HashSet<StreetEdge> nameByDestination = new HashSet<>();
 
   @Override
-  public String name(OSMWithTags way, String defaultName) {
+  public I18NString name(OSMWithTags way) {
+    var defaultName = way.getAssumedName();
     if (!way.hasTag("name")) {
       // this is already a generated name, so there's no need to add any
       // additional data
       return defaultName;
     }
     if (way.isTag("footway", "sidewalk") || way.isTag("path", "sidewalk")) {
-      if (isStreet(defaultName)) {
-        return sidewalk(defaultName);
+      if (isStreet(defaultName.toString())) {
+        return NonLocalizedString.ofNullable(sidewalk(defaultName.toString()));
       }
     }
     String highway = way.getTag("highway");
     if ("footway".equals(highway) || "path".equals(highway) || "cycleway".equals(highway)) {
-      if (!isObviouslyPath(defaultName)) {
-        return path(defaultName);
+      if (!isObviouslyPath(defaultName.toString())) {
+        return NonLocalizedString.ofNullable(path(defaultName.toString()));
       }
     }
     if ("pedestrian".equals(highway)) {
-      return pedestrianStreet(defaultName);
+      return NonLocalizedString.ofNullable(pedestrianStreet(defaultName.toString()));
     }
     return defaultName;
   }
 
   @Override
-  public void nameWithEdge(OSMWithTags way, StreetEdge edge) {
+  public void recordEdge(OSMWithTags way, StreetEdge edge) {
     if (!edge.hasBogusName()) {
       return; // this edge already has a real name so there is nothing to do
     }
@@ -93,18 +94,13 @@ public class PortlandCustomNamer implements CustomNamer {
   }
 
   @Override
-  public void postprocess(Graph graph) {
+  public void postprocess() {
     for (StreetEdge e : nameByOrigin) {
-      nameAccordingToOrigin(graph, e, 15);
+      nameAccordingToOrigin(e, 15);
     }
     for (StreetEdge e : nameByDestination) {
-      nameAccordingToDestination(graph, e, 15);
+      nameAccordingToDestination(e, 15);
     }
-  }
-
-  @Override
-  public void configure() {
-    // No configuration needed.
   }
 
   private boolean isStreet(String defaultName) {
@@ -146,13 +142,13 @@ public class PortlandCustomNamer implements CustomNamer {
     return name;
   }
 
-  private String nameAccordingToDestination(Graph graph, StreetEdge e, int maxDepth) {
+  private static String nameAccordingToDestination(StreetEdge e, int maxDepth) {
     if (maxDepth == 0) {
       return null;
     }
     for (StreetEdge out : e.getToVertex().getOutgoingStreetEdges()) {
       if (out.hasBogusName()) {
-        String name = nameAccordingToDestination(graph, out, maxDepth - 1);
+        String name = nameAccordingToDestination(out, maxDepth - 1);
         if (name == null) {
           continue;
         }
@@ -167,13 +163,13 @@ public class PortlandCustomNamer implements CustomNamer {
     return null;
   }
 
-  private String nameAccordingToOrigin(Graph graph, StreetEdge e, int maxDepth) {
+  private static String nameAccordingToOrigin(StreetEdge e, int maxDepth) {
     if (maxDepth == 0) {
       return null;
     }
     for (StreetEdge in : e.getFromVertex().getIncomingStreetEdges()) {
       if (in.hasBogusName()) {
-        String name = nameAccordingToOrigin(graph, in, maxDepth - 1);
+        String name = nameAccordingToOrigin(in, maxDepth - 1);
         if (name == null) {
           continue;
         }

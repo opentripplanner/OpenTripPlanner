@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.fares.impl;
 
 import java.util.Objects;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.fares.FareService;
 
 public record GtfsFaresService(DefaultFareService faresV1, GtfsFaresV2Service faresV2)

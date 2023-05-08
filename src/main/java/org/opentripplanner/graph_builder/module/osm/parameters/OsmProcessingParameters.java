@@ -1,11 +1,12 @@
 package org.opentripplanner.graph_builder.module.osm.parameters;
 
+import java.util.Objects;
 import java.util.Set;
-import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 
 /**
  * @param boardingAreaRefTags    The ref tags to extract boarding locations from.
- * @param customNamer            Allows for arbitrary custom naming of edges.
+ * @param edgeNamer              Controls naming of edges.
  * @param maxAreaNodes           Maximum number of nodes of an area to try to generate visibility
  *                               lines from.
  * @param areaVisibility         Whether to create visibility lines crossing walkable areas.
@@ -19,7 +20,7 @@ import org.opentripplanner.graph_builder.services.osm.CustomNamer;
  */
 public record OsmProcessingParameters(
   Set<String> boardingAreaRefTags,
-  CustomNamer customNamer,
+  EdgeNamer edgeNamer,
   int maxAreaNodes,
   boolean areaVisibility,
   boolean platformEntriesLinking,
@@ -27,4 +28,9 @@ public record OsmProcessingParameters(
   boolean staticBikeParkAndRide,
   boolean banDiscouragedWalking,
   boolean banDiscouragedBiking
-) {}
+) {
+  public OsmProcessingParameters {
+    boardingAreaRefTags = Set.copyOf(Objects.requireNonNull(boardingAreaRefTags));
+    Objects.requireNonNull(edgeNamer);
+  }
+}

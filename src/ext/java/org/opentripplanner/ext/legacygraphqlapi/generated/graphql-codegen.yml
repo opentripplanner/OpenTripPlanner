@@ -100,5 +100,9 @@ config:
     OpeningHours: org.opentripplanner.model.calendar.openinghours.OHCalendar#OHCalendar
     RideHailingEstimate: org.opentripplanner.ext.ridehailing.model.RideEstimate#RideEstimate
     RideHailingProvider: org.opentripplanner.ext.legacygraphqlapi.model.RideHailingProvider#RideHailingProvider
-    Money: org.opentripplanner.transit.model.basic.Money#Money
     Currency: java.util.Currency#Currency
+    Money: org.opentripplanner.transit.model.basic.Money#Money
+    FareProductUse: org.opentripplanner.model.fare.FareProductUse#FareProductUse
+    FareProduct: org.opentripplanner.model.fare.FareProduct#FareProduct
+    FareMedium: org.opentripplanner.model.fare.FareMedium#FareMedium
+    RiderCategory: org.opentripplanner.model.fare.RiderCategory#RiderCategory
