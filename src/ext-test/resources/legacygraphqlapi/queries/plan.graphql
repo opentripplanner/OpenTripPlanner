@@ -80,7 +80,42 @@
                     }
                     arrival
                 }
+                fareProducts {
+                    id
+                    product {
+                        id
+                        name
+                        price {
+                            currency {
+                                digits
+                                code
+                            }
+                            amount
+                        }
+                        riderCategory {
+                            id
+                            name
+                        }
+                        medium {
+                            id
+                            name
+                        }
+                    }
+                }
                 accessibilityScore
+            }
+            fares {
+                type
+                cents
+                currency
+                components {
+                    currency
+                    cents
+                    fareId
+                    routes {
+                       gtfsId
+                    }
+                }
             }
         }
     }

@@ -3,9 +3,11 @@ package org.opentripplanner.model.plan;
 import static org.opentripplanner.model.plan.Itinerary.UNKNOWN;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
@@ -79,6 +81,16 @@ public class UnknownTransitPathLeg implements Leg {
   @Override
   public int getGeneralizedCost() {
     return RaptorCostCalculator.ZERO_COST;
+  }
+
+  @Override
+  public void setFareProducts(List<FareProductUse> products) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public List<FareProductUse> fareProducts() {
+    return List.of();
   }
 
   public int getNumberOfTransfers() {

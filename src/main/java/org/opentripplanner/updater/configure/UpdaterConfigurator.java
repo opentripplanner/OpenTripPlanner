@@ -112,6 +112,7 @@ public class UpdaterConfigurator {
     if (updaterManager != null) {
       LOG.info("Stopping updater manager with {} updaters.", updaterManager.numberOfUpdaters());
       updaterManager.stop();
+      LOG.info("Stopped updater manager");
     }
   }
 

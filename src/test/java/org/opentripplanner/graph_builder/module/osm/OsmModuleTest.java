@@ -259,8 +259,7 @@ public class OsmModuleTest {
     way.addTag("cycleway", "lane");
     way.addTag("access", "no");
 
-    CreativeNamer namer = new CreativeNamer();
-    namer.setCreativeNamePattern(
+    CreativeNamer namer = new CreativeNamer(
       "Highway with cycleway {cycleway} and access {access} and morx {morx}"
     );
     assertEquals(

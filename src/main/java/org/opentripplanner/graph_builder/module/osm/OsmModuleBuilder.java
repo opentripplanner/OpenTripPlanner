@@ -3,8 +3,9 @@ package org.opentripplanner.graph_builder.module.osm;
 import java.util.Collection;
 import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
-import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -17,7 +18,7 @@ public class OsmModuleBuilder {
   private final Graph graph;
   private Set<String> boardingAreaRefTags = Set.of();
   private DataImportIssueStore issueStore = DataImportIssueStore.NOOP;
-  private CustomNamer customNamer;
+  private EdgeNamer edgeNamer = new DefaultNamer();
   private boolean areaVisibility = false;
   private boolean platformEntriesLinking = false;
   private boolean staticParkAndRide = false;
@@ -41,8 +42,8 @@ public class OsmModuleBuilder {
     return this;
   }
 
-  public OsmModuleBuilder withCustomNamer(CustomNamer customNamer) {
-    this.customNamer = customNamer;
+  public OsmModuleBuilder withEdgeNamer(EdgeNamer edgeNamer) {
+    this.edgeNamer = edgeNamer;
     return this;
   }
 
@@ -88,7 +89,7 @@ public class OsmModuleBuilder {
       issueStore,
       new OsmProcessingParameters(
         boardingAreaRefTags,
-        customNamer,
+        edgeNamer,
         maxAreaNodes,
         areaVisibility,
         platformEntriesLinking,

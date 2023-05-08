@@ -68,7 +68,7 @@ public class GraphBuilderModules {
 
     return OsmModule
       .of(providers, graph)
-      .withCustomNamer(config.customNamer)
+      .withEdgeNamer(config.edgeNamer)
       .withAreaVisibility(config.areaVisibility)
       .withPlatformEntriesLinking(config.platformEntriesLinking)
       .withStaticParkAndRide(config.staticParkAndRide)

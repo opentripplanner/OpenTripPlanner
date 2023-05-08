@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.mapping.NumberMapper;
 import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.ItineraryFares;
 
 public class LegacyGraphQLItineraryImpl
   implements LegacyGraphQLDataFetchers.LegacyGraphQLItinerary {
@@ -48,13 +48,13 @@ public class LegacyGraphQLItineraryImpl
         return null;
       }
       return fare
-        .getTypes()
+        .getFareTypes()
         .stream()
         .map(fareKey -> {
           Map<String, Object> result = new HashMap<>();
           result.put("name", fareKey);
           result.put("fare", fare.getFare(fareKey));
-          result.put("details", fare.getDetails(fareKey));
+          result.put("details", fare.getComponents(fareKey));
           return result;
         })
         .collect(Collectors.toList());

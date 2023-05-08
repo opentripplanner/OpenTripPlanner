@@ -2,6 +2,7 @@
   "osmDefaults": {
     "osmTagMapping": "portland"
   },
+  "osmNaming": "portland",
   "transitFeeds": [
     {
       "type": "gtfs",
