@@ -77,30 +77,6 @@ Or this alternative form that could allow additional configuration
 }
 ```
 
-```JSON
-// build-config.json
-{
-  "fares": {
-    // Combine two fares by simply adding them
-    "combinationStrategy": "additive",
-    // First fare to combine
-    "fare0": "new-york",
-    // Second fare to combine
-    "fare1": {
-      "type": "vehicle-rental-time-based",
-      "currency": "USD",
-      "prices": {
-          // For trip shorter than 30', $4 fare
-          "30":   4.00,
-          // For trip shorter than 1h, $6 fare
-          "1:00": 6.00
-      }
-    }
-    // We could also add fareFoo, fareBar...
-  }
-}
-```
-
 Turning the fare service _off_, this will ignore any fare data in the provided GTFS data.
 
 ```JSON
@@ -134,10 +110,6 @@ The current list of custom fare type is:
 - `orca` (no parameters)
 - `off` (no parameters)
 
-The current list of `combinationStrategy` is:
-
-- `additive` - simply adds all sub-fares.
- 
 ## Removed fare calculators
 
 The following calculators used to be part of the OTP codebase but since their maintainership
