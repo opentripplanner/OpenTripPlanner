@@ -1,8 +1,5 @@
-package org.opentripplanner.model.fare;
+package org.opentripplanner.ext.fares.model;
 
-import org.opentripplanner.framework.lang.Sandbox;
-
-@Sandbox
 public class Distance {
 
   private final double meters;

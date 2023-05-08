@@ -60,14 +60,6 @@ public class ItineraryFares {
   @Deprecated
   private final Map<FareType, Money> fares = new HashMap<>();
 
-  public ItineraryFares(ItineraryFares aFare) {
-    if (aFare != null) {
-      itineraryProducts.addAll(aFare.itineraryProducts);
-    }
-  }
-
-  public ItineraryFares() {}
-
   public static ItineraryFares empty() {
     return new ItineraryFares();
   }
@@ -195,22 +187,6 @@ public class ItineraryFares {
       .addObj("itineraryProducts", itineraryProducts)
       .addObj("legProducts", legProducts)
       .toString();
-  }
-
-  /**
-   * Add a complex set of fare products for a specific leg;
-   */
-  public void addLegProducts(Collection<LegProducts> legProducts) {
-    legProducts.forEach(lp -> {
-      var time = lp.leg().getStartTime();
-      var products = lp
-        .products()
-        .stream()
-        .map(LegProducts.ProductWithTransfer::product)
-        .map(fp -> new FareProductUse(fp.uniqueInstanceId(time), fp))
-        .toList();
-      this.legProducts.putAll(lp.leg(), products);
-    });
   }
 
   /**
