@@ -121,6 +121,8 @@ they were [removed](https://github.com/opentripplanner/OpenTripPlanner/pull/4273
 
 The NYC fare calculator was removed in [#4694](https://github.com/opentripplanner/OpenTripPlanner/pull/4694).
 
+The `MultipleFareService` was removed in [#5100](https://github.com/opentripplanner/OpenTripPlanner/pull/5100).
+
 If you were using these calculators, you're welcome to re-add them to the code base and become their
 maintainer.
 
