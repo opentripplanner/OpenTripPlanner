@@ -28,10 +28,18 @@ public class Money implements Comparable<Money> {
     this.amount = minorUnitAmount;
   }
 
+  /**
+   * Creates a Euro money object, mostly used in tests.
+   * @param amount Amount in fractional euro, so 1.5 for 1.50 EUR
+   */
   public static Money euros(float amount) {
     return Money.ofFractionalAmount(Currency.getInstance("EUR"), amount);
   }
 
+  /**
+   * Creates a US dollar money object, mostly used in tests.
+   * @param amount Amount in fractional dollars, so 1.5 for 1.50 USD
+   */
   public static Money usDollars(float amount) {
     return Money.ofFractionalAmount(USD, amount);
   }
@@ -94,6 +102,11 @@ public class Money implements Comparable<Money> {
       .divide(divisor, RoundingMode.HALF_UP);
   }
 
+  /**
+   * The amount in the minor currency unit, so 1.50 EUR will be represented as 150.
+   * <p>
+   * If the currency doesn't have a minor unit (like Japanese Yen) it is just the amount.
+   */
   public int minorUnitAmount() {
     return amount;
   }
