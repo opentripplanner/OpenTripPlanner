@@ -32,9 +32,12 @@ public class TransitPriorityGroup32n {
     };
   }
 
-  /** To groups dominate each other if they are different. */
+  /**
+   * Left dominate right, if right contains a group witch does not exist in left. Left
+   * do NOT dominate right if they are equals or left is a super set of right.
+   */
   public static boolean dominate(int left, int right) {
-    return left != right;
+    return ((left ^ right) & right) != 0;
   }
 
   @Override

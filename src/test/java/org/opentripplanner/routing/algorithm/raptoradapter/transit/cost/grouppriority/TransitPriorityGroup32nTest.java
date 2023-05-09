@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppr
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
@@ -51,6 +52,12 @@ class TransitPriorityGroup32nTest {
     assertFalse(subjct.dominanceFunction().leftDominateRight(GROUP_0, GROUP_0));
     assertFalse(subjct.dominanceFunction().leftDominateRight(GROUP_31, GROUP_31));
     assertFalse(subjct.dominanceFunction().leftDominateRight(GROUP_1 | GROUP_2, GROUP_1 | GROUP_2));
+
+    assertTrue(subjct.dominanceFunction().leftDominateRight(GROUP_0, GROUP_1));
+    assertFalse(subjct.dominanceFunction().leftDominateRight(GROUP_1, GROUP_0));
+
+    assertTrue(subjct.dominanceFunction().leftDominateRight(GROUP_1, GROUP_1 | GROUP_2));
+    assertFalse(subjct.dominanceFunction().leftDominateRight(GROUP_1 | GROUP_2, GROUP_1));
   }
 
   static void assertEqualsHex(int expected, int actual) {
