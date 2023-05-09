@@ -28,6 +28,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
@@ -37,7 +38,6 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
-import org.opentripplanner.openstreetmap.issues.MalformedLevelMap;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -1014,7 +1014,11 @@ public class OsmDatabase {
   private void processLevelMap(OSMRelation relation) {
     var levelsTag = relation.getTag("levels");
     if (!StringUtils.hasValue(levelsTag)) {
-      issueStore.add(new MalformedLevelMap(relation));
+      issueStore.add(Issue.issue(
+        "InvalidLevelMap",
+        "Could not parse level map for osm relation %d as it was malformed. Skipped.",
+        relation.getId()
+      ));
       return;
     }
 
