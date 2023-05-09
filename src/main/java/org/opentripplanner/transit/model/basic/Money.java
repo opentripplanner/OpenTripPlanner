@@ -13,11 +13,17 @@ import javax.annotation.Nonnull;
  * @param currency The currency of the money.
  * @param amount   The actual currency value in the minor unit, so 1 Euro is represented as 100.
  */
-public record Money(Currency currency, int amount) implements Comparable<Money> {
+public class Money implements Comparable<Money> {
+
   public static final Currency USD = Currency.getInstance("USD");
-  public Money {
-    Objects.requireNonNull(currency);
+  private final Currency currency;
+  private final int amount;
+
+  public Money(@Nonnull Currency currency, int minorUnitAmount) {
+    this.currency = Objects.requireNonNull(currency);
+    this.amount = minorUnitAmount;
   }
+
   public static Money euros(float amount) {
     return Money.ofFractionalAmount(Currency.getInstance("EUR"), amount);
   }
@@ -51,6 +57,20 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
     return new Money(currency, amount);
   }
 
+  /**
+   * Does this instance contain a non-zero amount.
+   */
+  public boolean isNonZero() {
+    return amount > 0f;
+  }
+
+  /**
+   * Is the mount in this instance zero.
+   */
+  public boolean isZero() {
+    return amount == 0f;
+  }
+
   @Override
   public int compareTo(Money m) {
     if (m.currency != currency) {
@@ -62,13 +82,16 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
   /**
    * The amount in the major currency unit, so USD 3.10 is represented as 3.1 (not 310!).
    */
-  public double fractionalAmount() {
+  public BigDecimal fractionalAmount() {
     int fractionDigits = currency.getDefaultFractionDigits();
     var divisor = BigDecimal.valueOf(Math.pow(10, fractionDigits));
     return new BigDecimal(amount)
       .setScale(fractionDigits, RoundingMode.HALF_UP)
-      .divide(divisor, RoundingMode.HALF_UP)
-      .doubleValue();
+      .divide(divisor, RoundingMode.HALF_UP);
+  }
+
+  public int minorUnitAmount() {
+    return amount;
   }
 
   public String localize(Locale loc) {
@@ -97,12 +120,25 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
     return op(other, o -> new Money(currency, amount + o.amount));
   }
 
+  /**
+   * Does this instance represent a larger amount than the one passed in?
+   */
   public boolean greaterThan(Money other) {
     return booleanOp(other, amount > other.amount);
   }
 
+  /**
+   * Does this instance represent a smaller amount than the one passed in?
+   */
   public boolean lessThan(Money other) {
     return booleanOp(other, amount < other.amount);
+  }
+
+  /**
+   * The currency of this instance.
+   */
+  public Currency currency() {
+    return currency;
   }
 
   private boolean booleanOp(Money other, boolean amount) {
@@ -129,6 +165,15 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
             other
           )
       );
+    }
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof Money other) {
+      return other.amount == this.amount && other.currency == this.currency;
+    } else {
+      return false;
     }
   }
 }

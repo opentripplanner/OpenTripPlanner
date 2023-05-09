@@ -14,7 +14,7 @@ public class LegacyGraphQLfareComponentImpl
 
   @Override
   public DataFetcher<Integer> cents() {
-    return environment -> getSource(environment).price().amount();
+    return environment -> getSource(environment).price().minorUnitAmount();
   }
 
   @Override

@@ -449,7 +449,7 @@ public class OrcaFareService extends DefaultFareService {
         // If using Orca (free transfers), the total fare should be equivalent to the
         // most expensive leg of the journey.
         // If the new fare is more than the current ORCA amount, the transfer is extended.
-        if (legFare.amount() > orcaFareDiscount.amount()) {
+        if (legFare.greaterThan(orcaFareDiscount)) {
           freeTransferStartTime = leg.getStartTime();
           // Note: on first leg, discount will be 0 meaning no transfer was applied.
           addLegFareProduct(leg, fare, fareType, legFare.minus(orcaFareDiscount), orcaFareDiscount);
@@ -461,7 +461,7 @@ public class OrcaFareService extends DefaultFareService {
             fare,
             fareType,
             Money.usDollars(0),
-            legFare.amount() != 0 ? orcaFareDiscount : Money.usDollars(0)
+            legFare.isNonZero() ? orcaFareDiscount : Money.usDollars(0)
           );
         }
       } else if (usesOrca(fareType) && !inFreeTransferWindow) {
@@ -496,7 +496,7 @@ public class OrcaFareService extends DefaultFareService {
       }
     }
     cost = cost.plus(orcaFareDiscount);
-    if (cost.amount() < Integer.MAX_VALUE) {
+    if (cost.fractionalAmount().floatValue() < Float.MAX_VALUE) {
       fare.addFare(fareType, cost);
       return true;
     } else {
@@ -532,7 +532,7 @@ public class OrcaFareService extends DefaultFareService {
     var fareProduct = new FareProduct(id, "rideCost", totalFare, duration, riderCategory, medium);
     itineraryFares.addFareProduct(leg, fareProduct);
     // If a transfer was used, then also add a transfer fare product.
-    if (transferDiscount.amount() > 0) {
+    if (transferDiscount.isNonZero()) {
       var transferFareProduct = new FareProduct(
         id,
         "transfer",

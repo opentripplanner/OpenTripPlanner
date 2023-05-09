@@ -49,7 +49,7 @@ public class OrcaFareServiceTest {
   public static final Currency USD = Currency.getInstance("USD");
   private static TestOrcaFareService orcaFareService;
   public static final Money DEFAULT_TEST_RIDE_PRICE = Money.usDollars(3.49f);
-  private static final int DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.amount();
+  private static final int DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.minorUnitAmount();
 
   @BeforeAll
   public static void setUpClass() {
@@ -89,7 +89,7 @@ public class OrcaFareServiceTest {
     if (rideCost.isEmpty()) {
       Assertions.fail("Missing leg fare product.");
     }
-    Assertions.assertEquals(fare, rideCost.get().price().amount());
+    Assertions.assertEquals(fare, rideCost.get().price().minorUnitAmount());
 
     var transfer = legFareProducts
       .stream()

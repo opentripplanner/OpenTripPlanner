@@ -41,20 +41,21 @@ class MoneyTest {
   }
 
   static Stream<Arguments> amountCases = Stream.of(
-    of(oneDollar, 1.0d),
-    of(threeEuroTwelve, 3.12d),
-    of(Money.euros(999.99f), 999.99d),
-    of(hundredNOK, 100.0d),
+    of(oneDollar, 1.0f),
+    of(threeEuroTwelve, 3.12f),
+    of(Money.euros(3.1f), 3.1f),
+    of(Money.euros(999.99f), 999.99f),
+    of(hundredNOK, 100.0f),
     // Yen doesn't have fractional digits
-    of(yen(1000), 1000d),
-    of(yen(9999), 9999d)
+    of(yen(1000), 1000f),
+    of(yen(9999), 9999f)
   );
 
   @ParameterizedTest
   @VariableSource("amountCases")
-  void fractionalAmount(Money money, double expected) {
-    var localized = money.fractionalAmount();
-    assertEquals(expected, localized);
+  void fractionalAmount(Money money, float expected) {
+    var fractionalAmount = money.fractionalAmount();
+    assertEquals(expected, fractionalAmount.floatValue());
   }
 
   private static Money yen(int amount) {

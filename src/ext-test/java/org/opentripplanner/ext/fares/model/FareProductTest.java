@@ -29,21 +29,21 @@ class FareProductTest {
   static FareMedium MEDIUM = new FareMedium(new FeedScopedId("1", "app"), "App");
 
   static Stream<Arguments> testCases = Stream.of(
-    Arguments.of(fareProduct(null, null, null), ZDT, "b18a083d-ee82-3c83-af07-2b8bb11bff9e"),
+    Arguments.of(fareProduct(null, null, null), ZDT, "1ef42792-8f41-349f-8bfa-8864930fc50d"),
     Arguments.of(
       fareProduct(null, null, null),
       ZDT.plusHours(1),
-      "2a60adcf-3e56-338a-ab7d-8407a3bc529b"
+      "8d8177ca-bbcd-3c1e-9651-cf6fd749fac3"
     ),
     Arguments.of(
       fareProduct(Duration.ofHours(2), CATEGORY, null),
       ZDT,
-      "ca4a45b5-b837-34d8-b987-4e06fa5a3317"
+      "ec757263-3fee-32dc-856d-5035856b656d"
     ),
     Arguments.of(
       fareProduct(Duration.ofHours(2), CATEGORY, MEDIUM),
       ZDT,
-      "b59e7eef-c118-37b1-8f53-bf2a97c5dae9"
+      "86b3d1ca-1145-3c36-aa1f-8f2a685234b5"
     )
   );
 

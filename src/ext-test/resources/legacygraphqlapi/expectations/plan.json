@@ -55,7 +55,7 @@
               "rideHailingEstimate" : null,
               "fareProducts" : [
                 {
-                  "id" : "5d8f889c-42cb-3bcc-89d5-480b995c78c8",
+                  "id" : "16a6377f-d937-3c23-910b-cd0d6ce76069",
                   "product" : {
                     "id" : "F:day-pass",
                     "name" : "day-pass",
@@ -77,7 +77,7 @@
                   }
                 },
                 {
-                  "id" : "6bd27c98-c0ee-3f62-b606-bbacf2e1f41b",
+                  "id" : "02156010-a7cd-396d-8c03-e050c7ff3364",
                   "product" : {
                     "id" : "F:AB",
                     "name" : "regular",
@@ -93,7 +93,7 @@
                   }
                 },
                 {
-                  "id" : "09bb5f2b-6af9-3355-8b5d-5e93a27ce280",
+                  "id" : "db816d5f-0ead-369a-b691-2c00c842300d",
                   "product" : {
                     "id" : "F:single-ticket",
                     "name" : "single-ticket",
@@ -160,7 +160,7 @@
               "rideHailingEstimate" : null,
               "fareProducts" : [
                 {
-                  "id" : "5d8f889c-42cb-3bcc-89d5-480b995c78c8",
+                  "id" : "16a6377f-d937-3c23-910b-cd0d6ce76069",
                   "product" : {
                     "id" : "F:day-pass",
                     "name" : "day-pass",
@@ -182,7 +182,7 @@
                   }
                 },
                 {
-                  "id" : "46190ddd-93b0-3136-adb7-a18394f8b0ef",
+                  "id" : "96275328-7da6-363a-9991-3a3140a27457",
                   "product" : {
                     "id" : "F:single-ticket",
                     "name" : "single-ticket",

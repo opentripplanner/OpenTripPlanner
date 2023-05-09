@@ -163,12 +163,12 @@ public class AtlantaFareService extends DefaultFareService {
       return true;
     }
 
-    public float getTotal() {
-      int total = 0;
+    public Money getTotal() {
+      Money total = Money.usDollars(0);
       for (ItineraryFares f : fares) {
-        total += f.getFare(fareType).amount();
+        total = total.plus(f.getFare(fareType));
       }
-      return (float) total / 100;
+      return total;
     }
   }
 
@@ -386,21 +386,20 @@ public class AtlantaFareService extends DefaultFareService {
       }
     }
 
-    float cost = 0;
+    Money cost = Money.usDollars(0);
     for (ATLTransfer transfer : transfers) {
-      cost += transfer.getTotal();
+      cost = cost.plus(transfer.getTotal());
     }
-    var money = Money.ofFractionalAmount(currency, cost);
     var fareProduct = new FareProduct(
       new FeedScopedId(FEED_ID, fareType.name()),
       fareType.name(),
-      money,
+      cost,
       null,
       null,
       null
     );
     fare.addItineraryProducts(List.of(fareProduct));
-    fare.addFare(fareType, money);
+    fare.addFare(fareType, cost);
 
     return true;
   }

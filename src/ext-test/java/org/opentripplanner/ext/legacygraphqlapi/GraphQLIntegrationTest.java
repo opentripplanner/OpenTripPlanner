@@ -131,10 +131,10 @@ class GraphQLIntegrationTest {
     ScheduledTransitLeg railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
-    fares.addFare(FareType.regular, Money.euros(3.10f));
+    fares.addFare(FareType.regular, Money.euros(3.1f));
     fares.addFareComponent(
       FareType.regular,
-      List.of(new FareComponent(id("AB"), Money.euros(3.10f), List.of(busLeg)))
+      List.of(new FareComponent(id("AB"), Money.euros(3.1f), List.of(busLeg)))
     );
 
     var dayPass = fareProduct("day-pass");

@@ -46,14 +46,14 @@ class ItineraryFaresTest {
     fares.addFareProduct(railLeg, railTicketB);
 
     assertEquals(
-      List.of(new FareProductUse("606b5587-d460-3b2a-bf83-fa0bc03c24f3", busTicket)),
+      List.of(new FareProductUse("5ea38236-fc0e-354d-8c52-ce26d41b809d", busTicket)),
       fares.getLegProducts().get(busLeg)
     );
 
     assertEquals(
       List.of(
-        new FareProductUse("5ac59bb6-56fa-31c9-9f2b-915797a22763", railTicketA),
-        new FareProductUse("73f4c43f-b237-36d6-bc0a-2fc3aad98780", railTicketB)
+        new FareProductUse("731c3818-8743-319d-a9cb-27cc87b49ddf", railTicketA),
+        new FareProductUse("277b46dd-3efe-36c0-a20d-1efe74469384", railTicketB)
       ),
       fares.getLegProducts().get(railLeg)
     );
