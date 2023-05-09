@@ -41,7 +41,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var price = fare.getFare(FareType.regular);
 
-    assertEquals(Money.usDollars(1000), price);
+    assertEquals(Money.usDollars(10), price);
   }
 
   @Test
@@ -68,6 +68,6 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var price = fare.getFare(FareType.regular);
 
-    assertEquals(Money.usDollars(2000), price);
+    assertEquals(Money.usDollars(20), price);
   }
 }

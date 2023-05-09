@@ -33,8 +33,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 public class AtlantaFareServiceTest implements PlanTestConstants {
 
-  public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(349);
-  public static final float DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.amount();
+  public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
   public static final Currency USD = Currency.getInstance("USD");
   private static AtlantaFareService atlFareService;
 
@@ -47,47 +46,47 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   @Test
   public void fromMartaTransfers() {
     List<Leg> rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(XPRESS_AGENCY_ID, 1));
-    calculateFare(rides, 349);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
 
     rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(GCT_AGENCY_ID, 1));
-    calculateFare(rides, 349);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
 
     // to GCT Express
     rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(GCT_AGENCY_ID, "101", 1));
-    calculateFare(rides, 349);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
 
     rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(COBB_AGENCY_ID, 1));
-    calculateFare(rides, 349);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
 
     // To Cobb Express
     rides = List.of(getLeg(MARTA_AGENCY_ID, 0), getLeg(COBB_AGENCY_ID, "101", 1));
-    calculateFare(rides, 349);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
   }
 
   @Test
   void nullShortName() {
     var legs = List.of(getLeg(GCT_AGENCY_ID, null, 1));
-    calculateFare(legs, 349);
+    calculateFare(legs, usDollars(3.49f));
   }
 
   @Test
   public void fromCobbTransfers() {
     List<Leg> rides = List.of(getLeg(COBB_AGENCY_ID, 0), getLeg(MARTA_AGENCY_ID, 1));
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
 
     // Local to express
     rides = List.of(getLeg(COBB_AGENCY_ID, 0), getLeg(COBB_AGENCY_ID, "101", 1));
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + 100);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1)));
 
     rides = List.of(getLeg(COBB_AGENCY_ID, 0), getLeg(XPRESS_AGENCY_ID, 1));
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + 150);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1.5f)));
 
     // Express to local
     rides = List.of(getLeg(COBB_AGENCY_ID, "101", 0), getLeg(COBB_AGENCY_ID, 1));
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + 100);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1)));
 
     rides = List.of(getLeg(COBB_AGENCY_ID, "101", 0), getLeg(GCT_AGENCY_ID, "102", 1));
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2 + 300);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE).plus(usDollars(3)));
 
     // Local to circulator to express
     rides =
@@ -96,13 +95,13 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(COBB_AGENCY_ID, "BLUE", 1),
         getLeg(COBB_AGENCY_ID, "101", 1)
       );
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + 100);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1)));
   }
 
   @Test
   public void fromGctTransfers() {
     List<Leg> rides = List.of(getLeg(GCT_AGENCY_ID, 0), getLeg(MARTA_AGENCY_ID, 1));
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
   }
 
   @Test
@@ -115,7 +114,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       getLeg(MARTA_AGENCY_ID, 4),
       getLeg(MARTA_AGENCY_ID, 5)
     );
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE));
 
     rides =
       List.of(
@@ -126,7 +125,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(MARTA_AGENCY_ID, 4),
         getLeg(COBB_AGENCY_ID, 5)
       );
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE));
 
     rides =
       List.of(
@@ -135,7 +134,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(MARTA_AGENCY_ID, 2),
         getLeg(MARTA_AGENCY_ID, 3)
       );
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
 
     rides =
       List.of(
@@ -146,7 +145,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         // new transfer - only got 3 from GCT
         getLeg(MARTA_AGENCY_ID, 4)
       );
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE));
 
     rides =
       List.of(
@@ -156,7 +155,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(GCT_AGENCY_ID, 3),
         getLeg(GCT_AGENCY_ID, 4)
       );
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE);
   }
 
   @Test
@@ -167,7 +166,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       getLeg(MARTA_AGENCY_ID, 181),
       getLeg(MARTA_AGENCY_ID, 179)
     );
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE));
 
     rides =
       List.of(
@@ -177,12 +176,12 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(MARTA_AGENCY_ID, 181 + 178),
         getLeg(MARTA_AGENCY_ID, 181 + 179)
       );
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS * 2);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE));
   }
 
   @Test
   public void useStreetcar() {
-    final float STREETCAR_PRICE = DEFAULT_RIDE_PRICE_IN_CENTS - 100f;
+    var STREETCAR_PRICE = DEFAULT_TEST_RIDE_PRICE.minus(usDollars(1));
     List<Leg> rides = List.of(
       getLeg(MARTA_AGENCY_ID, 0),
       getLeg(MARTA_AGENCY_ID, "atlsc", 1),
@@ -190,7 +189,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       getLeg(MARTA_AGENCY_ID, 3),
       getLeg(MARTA_AGENCY_ID, 4)
     );
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + STREETCAR_PRICE);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(STREETCAR_PRICE));
 
     rides =
       List.of(
@@ -198,7 +197,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
         getLeg(MARTA_AGENCY_ID, "atlsc", 1),
         getLeg(COBB_AGENCY_ID, "101", 2)
       );
-    calculateFare(rides, DEFAULT_RIDE_PRICE_IN_CENTS + 100 + STREETCAR_PRICE);
+    calculateFare(rides, DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1)).plus(STREETCAR_PRICE));
   }
 
   /**
@@ -207,10 +206,10 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
    * default fare is applied a test substitute {@link AtlantaFareServiceTest#DEFAULT_TEST_RIDE_PRICE} is
    * used. This will be the same for all cash fare types except when overriden above.
    */
-  private static void calculateFare(List<Leg> rides, float expectedFareInCents) {
+  private static void calculateFare(List<Leg> rides, Money expectedFare) {
     ItineraryFares fare = new ItineraryFares();
     atlFareService.populateFare(fare, USD, FareType.electronicRegular, rides, null);
-    assertEquals(expectedFareInCents, fare.getFare(FareType.electronicRegular).amount());
+    assertEquals(expectedFare, fare.getFare(FareType.electronicRegular));
 
     var fareProducts = fare
       .getItineraryProducts()
@@ -220,7 +219,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
     assertEquals(1, fareProducts.size());
     var fp = fareProducts.get(0);
-    assertEquals(Money.usDollars((int) expectedFareInCents), fp.price());
+    assertEquals(expectedFare, fp.price());
   }
 
   private static Leg getLeg(String agencyId, long startTimeMins) {
@@ -283,9 +282,9 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
 
       // Testing, return default test ride price.
       return switch (routeShortName) {
-        case "101" -> DEFAULT_TEST_RIDE_PRICE.plus(usDollars(100));
-        case "102" -> DEFAULT_TEST_RIDE_PRICE.plus(usDollars(200));
-        case "atlsc" -> DEFAULT_TEST_RIDE_PRICE.minus(usDollars(100));
+        case "101" -> DEFAULT_TEST_RIDE_PRICE.plus(usDollars(1));
+        case "102" -> DEFAULT_TEST_RIDE_PRICE.plus(usDollars(2));
+        case "atlsc" -> DEFAULT_TEST_RIDE_PRICE.minus(usDollars(1));
         case "blue" -> usDollars(0);
         default -> DEFAULT_TEST_RIDE_PRICE; // free circulator
       };

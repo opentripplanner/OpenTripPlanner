@@ -18,12 +18,12 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
   public Money {
     Objects.requireNonNull(currency);
   }
-  public static Money euros(int amount) {
-    return new Money(Currency.getInstance("EUR"), amount);
+  public static Money euros(float amount) {
+    return Money.ofFractionalAmount(Currency.getInstance("EUR"), amount);
   }
 
-  public static Money usDollars(int amount) {
-    return new Money(USD, amount);
+  public static Money usDollars(float amount) {
+    return Money.ofFractionalAmount(USD, amount);
   }
 
   /**
@@ -44,12 +44,10 @@ public record Money(Currency currency, int amount) implements Comparable<Money> 
    * Take a fractional amount of money, ie 1.5 and convert it to amount using the number of default
    * fraction digits of the currency.
    */
-  public static Money ofFractionalAmount(Currency currency, float cost) {
-    int fractionDigits = 2;
-    if (currency != null) {
-      fractionDigits = currency.getDefaultFractionDigits();
-    }
-    int amount = (int) Math.round(cost * Math.pow(10, fractionDigits));
+  public static Money ofFractionalAmount(@Nonnull Currency currency, float fractionalAmount) {
+    Objects.requireNonNull(currency);
+    var fractionDigits = currency.getDefaultFractionDigits();
+    int amount = (int) Math.round(fractionalAmount * Math.pow(10, fractionDigits));
     return new Money(currency, amount);
   }
 

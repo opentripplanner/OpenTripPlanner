@@ -48,7 +48,7 @@ public class OrcaFareServiceTest {
 
   public static final Currency USD = Currency.getInstance("USD");
   private static TestOrcaFareService orcaFareService;
-  public static final Money DEFAULT_TEST_RIDE_PRICE = Money.usDollars(349);
+  public static final Money DEFAULT_TEST_RIDE_PRICE = Money.usDollars(3.49f);
   private static final int DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.amount();
 
   @BeforeAll
@@ -66,7 +66,7 @@ public class OrcaFareServiceTest {
   private static void calculateFare(List<Leg> legs, FareType fareType, float expectedFareInCents) {
     ItineraryFares fare = new ItineraryFares();
     orcaFareService.populateFare(fare, USD, fareType, legs, null);
-    Assertions.assertEquals(expectedFareInCents, fare.getFare(fareType).amount());
+    Assertions.assertEquals(Money.usDollars(expectedFareInCents / 100), fare.getFare(fareType));
   }
 
   private static void assertLegFareEquals(

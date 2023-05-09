@@ -26,8 +26,8 @@ class RideHailingFilterTest implements PlanTestConstants {
   public static final RideEstimate RIDE_ESTIMATE = new RideEstimate(
     UBER,
     Duration.ofMinutes(15),
-    Money.usDollars(1500),
-    Money.usDollars(3000),
+    Money.usDollars(15),
+    Money.usDollars(30),
     "foo",
     "UberX",
     false

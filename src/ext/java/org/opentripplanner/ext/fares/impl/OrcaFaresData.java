@@ -277,9 +277,9 @@ class OrcaFaresData {
       name,
       Map.of(
         FareType.regular,
-        Money.usDollars((int) (100 * regularFare)),
+        Money.usDollars(regularFare),
         FareType.senior,
-        Money.usDollars((int) (100 * seniorFare))
+        Money.usDollars(seniorFare)
       )
     );
   }

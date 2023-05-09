@@ -24,10 +24,10 @@ public class SFBayFareServiceImpl extends DefaultFareService {
 
   public static final int SFMTA_TRANSFER_DURATION = 60 * 90;
   public static final int BART_TRANSFER_DURATION = 60 * 60;
-  public static final Money SFMTA_BASE_FARE = Money.usDollars(200);
-  public static final Money CABLE_CAR_FARE = Money.usDollars(500);
-  public static final Money AIRBART_FARE = Money.usDollars(300);
-  public static final Money SFMTA_BART_TRANSFER_FARE = Money.usDollars(175);
+  public static final Money SFMTA_BASE_FARE = Money.usDollars(2);
+  public static final Money CABLE_CAR_FARE = Money.usDollars(5);
+  public static final Money AIRBART_FARE = Money.usDollars(3);
+  public static final Money SFMTA_BART_TRANSFER_FARE = Money.usDollars(1.75f);
   public static final Set<String> SFMTA_BART_TRANSFER_STOPS = new HashSet<>(
     Arrays.asList("EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY")
   );

@@ -241,10 +241,10 @@ public class OrcaFareService extends DefaultFareService {
   private Money getRegularFare(FareType fareType, RideType rideType, Money defaultFare, Leg leg) {
     Route route = leg.getRoute();
     return switch (rideType) {
-      case KC_WATER_TAXI_VASHON_ISLAND -> Money.usDollars(575);
-      case KC_WATER_TAXI_WEST_SEATTLE -> Money.usDollars(500);
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> Money.usDollars(200);
-      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> Money.usDollars(1000);
+      case KC_WATER_TAXI_VASHON_ISLAND -> Money.usDollars(5.75f);
+      case KC_WATER_TAXI_WEST_SEATTLE -> Money.usDollars(5f);
+      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> Money.usDollars(2f);
+      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> Money.usDollars(10f);
       case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
         route.getLongName(),
         fareType,
@@ -256,7 +256,7 @@ public class OrcaFareService extends DefaultFareService {
         defaultFare,
         rideType
       );
-      case SOUND_TRANSIT_BUS -> Money.usDollars(325);
+      case SOUND_TRANSIT_BUS -> Money.usDollars(3.25f);
       default -> defaultFare;
     };
   }
@@ -292,18 +292,18 @@ public class OrcaFareService extends DefaultFareService {
    */
   private Money getLiftFare(RideType rideType, Money defaultFare, Route route) {
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> Money.usDollars(125);
-      case COMM_TRANS_COMMUTER_EXPRESS -> Money.usDollars(200);
-      case KC_WATER_TAXI_VASHON_ISLAND -> Money.usDollars(450);
-      case KC_WATER_TAXI_WEST_SEATTLE -> Money.usDollars(375);
-      case KITSAP_TRANSIT -> Money.usDollars(100);
+      case COMM_TRANS_LOCAL_SWIFT -> Money.usDollars(1.25f);
+      case COMM_TRANS_COMMUTER_EXPRESS -> Money.usDollars(2f);
+      case KC_WATER_TAXI_VASHON_ISLAND -> Money.usDollars(4.5f);
+      case KC_WATER_TAXI_WEST_SEATTLE -> Money.usDollars(3.75f);
+      case KITSAP_TRANSIT -> Money.usDollars(1f);
       case KC_METRO,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
         SOUND_TRANSIT_SOUNDER,
         EVERETT_TRANSIT,
-        SEATTLE_STREET_CAR -> Money.usDollars(150);
+        SEATTLE_STREET_CAR -> Money.usDollars(1.5f);
       case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
         route.getLongName(),
         FareType.electronicSpecial,
@@ -323,27 +323,27 @@ public class OrcaFareService extends DefaultFareService {
     Route route
   ) {
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> Money.usDollars(125);
-      case COMM_TRANS_COMMUTER_EXPRESS -> Money.usDollars(200);
-      case EVERETT_TRANSIT, SKAGIT_TRANSIT -> Money.usDollars(50);
+      case COMM_TRANS_LOCAL_SWIFT -> Money.usDollars(1.25f);
+      case COMM_TRANS_COMMUTER_EXPRESS -> Money.usDollars(2f);
+      case EVERETT_TRANSIT, SKAGIT_TRANSIT -> Money.usDollars(0.5f);
       case PIERCE_COUNTY_TRANSIT, SEATTLE_STREET_CAR, KITSAP_TRANSIT -> fareType.equals( // Pierce, Seattle Streetcar, and Kitsap only provide discounted senior fare for orca.
           FareType.electronicSenior
         )
-        ? Money.usDollars(100)
+        ? Money.usDollars(1f)
         : defaultFare;
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> fareType.equals(FareType.electronicSenior) // Kitsap only provide discounted senior fare for orca.
-        ? Money.usDollars(100)
-        : Money.usDollars(200);
-      case KC_WATER_TAXI_VASHON_ISLAND -> Money.usDollars(300);
-      case KC_WATER_TAXI_WEST_SEATTLE -> Money.usDollars(250);
+        ? Money.usDollars(1f)
+        : Money.usDollars(2f);
+      case KC_WATER_TAXI_VASHON_ISLAND -> Money.usDollars(3f);
+      case KC_WATER_TAXI_WEST_SEATTLE -> Money.usDollars(2.5f);
       case KC_METRO,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
-        SOUND_TRANSIT_SOUNDER -> Money.usDollars(100);
+        SOUND_TRANSIT_SOUNDER -> Money.usDollars(1f);
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> fareType.equals(FareType.electronicSenior)
-        ? Money.usDollars(500)
-        : Money.usDollars(1000);
+        ? Money.usDollars(5f)
+        : Money.usDollars(10f);
       // Discount specific to Skagit transit and not Orca.
       case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
         route.getLongName(),

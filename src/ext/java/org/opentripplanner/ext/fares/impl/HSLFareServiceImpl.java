@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 public class HSLFareServiceImpl extends DefaultFareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
-  public static final Money MAX_PRICE = Money.euros(Integer.MAX_VALUE);
+  public static final Money MAX_PRICE = Money.euros(999999f);
 
   @Override
   protected boolean shouldCombineInterlinedLegs(

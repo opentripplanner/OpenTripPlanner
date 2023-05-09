@@ -60,7 +60,7 @@ class FareProductTest {
     return new FareProduct(
       new FeedScopedId("fares", "daypass"),
       "day pass",
-      Money.euros(1_000),
+      Money.euros(10),
       duration,
       cat,
       medium

@@ -24,7 +24,7 @@ class FareProductMapperTest {
     var internal = mapper.map(gtfs);
 
     assertEquals(internal.validity(), Duration.ofDays(31));
-    assertEquals(internal.price(), Money.usDollars(100));
+    assertEquals(internal.price(), Money.usDollars(1));
     assertEquals(internal.price().amount(), 100);
   }
 
