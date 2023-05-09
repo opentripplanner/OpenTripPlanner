@@ -18,7 +18,10 @@ import org.opentripplanner.transit.model.basic.Money;
 
 class MoneyTest {
 
-  private static final Money hundredNOK = new Money(Currency.getInstance("NOK"), 10000);
+  private static final Money hundredNOK = Money.ofFractionalAmount(
+    Currency.getInstance("NOK"),
+    100
+  );
   private static final Money oneDollar = Money.usDollars(1);
   private static final Money twoDollars = Money.usDollars(2);
   static Money threeEuroTwelve = Money.euros(3.12f);
@@ -59,7 +62,7 @@ class MoneyTest {
   }
 
   private static Money yen(int amount) {
-    return new Money(Currency.getInstance("JPY"), amount);
+    return Money.ofFractionalAmount(Currency.getInstance("JPY"), amount);
   }
 
   @Test

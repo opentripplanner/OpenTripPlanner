@@ -39,7 +39,7 @@ class TimeBasedVehicleRentalFareService implements FareService, Serializable {
       .sum();
 
     ItineraryFares fare = ItineraryFares.empty();
-    fare.addFare(FareType.regular, new Money(currency, totalCost));
+    fare.addFare(FareType.regular, Money.ofFractionalAmount(currency, totalCost));
     return fare;
   }
 

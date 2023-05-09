@@ -48,7 +48,7 @@ public class FaresIntegrationTest {
     var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
     ItineraryFares fare = getFare(from, to, start, serverContext);
-    assertEquals(fare.getFare(FareType.regular), new Money(USD, 425));
+    assertEquals(fare.getFare(FareType.regular), Money.usDollars(4.25f));
   }
 
   @Test
@@ -79,7 +79,7 @@ public class FaresIntegrationTest {
 
     ItineraryFares fare = getFare(from, to, startTime, serverContext);
 
-    assertEquals(new Money(USD, 200), fare.getFare(FareType.regular));
+    assertEquals(Money.usDollars(2), fare.getFare(FareType.regular));
 
     // long trip
 
@@ -116,7 +116,7 @@ public class FaresIntegrationTest {
 
     var serverContext = TestServerContext.createServerContext(graph, transitModel);
 
-    Money tenUSD = new Money(USD, 1000);
+    Money tenUSD = Money.usDollars(10);
 
     var dateTime = LocalDateTime
       .of(2009, 8, 7, 0, 0, 0)

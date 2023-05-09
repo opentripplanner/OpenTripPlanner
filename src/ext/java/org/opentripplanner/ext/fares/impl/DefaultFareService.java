@@ -337,7 +337,7 @@ public class DefaultFareService implements FareService {
       // each diagonal
       for (int j = 0; j < legs.size() - i; j++) {
         FareAndId UNKNOWN = new FareAndId(
-          new Money(currency, 999_000),
+          Money.ofFractionalAmount(currency, 999f),
           new FeedScopedId("max", "max")
         );
         FareAndId best = getBestFareAndId(fareType, legs.subList(j, j + i + 1), fareRules)

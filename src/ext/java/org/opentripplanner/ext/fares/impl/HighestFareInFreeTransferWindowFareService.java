@@ -12,7 +12,6 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
-import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -56,7 +55,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
-    var zero = new Money(currency, 0);
+    var zero = Money.ofFractionalAmount(currency, 0);
     Money cost = zero;
     Money currentTransferWindowCost = zero;
     // The initial value of -1 indicates that the free transfer window end time has not yet been set

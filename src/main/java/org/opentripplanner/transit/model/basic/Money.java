@@ -10,8 +10,7 @@ import java.util.function.Function;
 import javax.annotation.Nonnull;
 
 /**
- * @param currency The currency of the money.
- * @param amount   The actual currency value in the minor unit, so 1 Euro is represented as 100.
+ * Represents an amount of money.
  */
 public class Money implements Comparable<Money> {
 
@@ -19,7 +18,12 @@ public class Money implements Comparable<Money> {
   private final Currency currency;
   private final int amount;
 
-  public Money(@Nonnull Currency currency, int minorUnitAmount) {
+  /**
+   *
+   * @param currency The currency of the money amount
+   * @param minorUnitAmount The amount in the smaller currency unit, so for 1.50 EUR pass 150.
+   */
+  private Money(@Nonnull Currency currency, int minorUnitAmount) {
     this.currency = Objects.requireNonNull(currency);
     this.amount = minorUnitAmount;
   }
