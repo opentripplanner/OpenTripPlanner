@@ -48,7 +48,7 @@ public class FaresFilterTest implements PlanTestConstants {
     var busLeg = filtered.get(0).getTransitLeg(1);
 
     assertEquals(
-      List.of(new FareProductUse("b15b0280-c4eb-3a50-92a1-edd852a6b281", fp)),
+      List.of(new FareProductUse("c1a04702-1fb6-32d4-ba02-483bf68111ed", fp)),
       busLeg.fareProducts()
     );
   }
