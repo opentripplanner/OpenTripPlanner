@@ -1014,11 +1014,13 @@ public class OsmDatabase {
   private void processLevelMap(OSMRelation relation) {
     var levelsTag = relation.getTag("levels");
     if (!StringUtils.hasValue(levelsTag)) {
-      issueStore.add(Issue.issue(
-        "InvalidLevelMap",
-        "Could not parse level map for osm relation %d as it was malformed. Skipped.",
-        relation.getId()
-      ));
+      issueStore.add(
+        Issue.issue(
+          "InvalidLevelMap",
+          "Could not parse level map for osm relation %d as it was malformed. Skipped.",
+          relation.getId()
+        )
+      );
       return;
     }
 
