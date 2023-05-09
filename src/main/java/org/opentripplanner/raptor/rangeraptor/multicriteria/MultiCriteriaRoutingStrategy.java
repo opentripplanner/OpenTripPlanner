@@ -65,15 +65,13 @@ public final class MultiCriteriaRoutingStrategy<
   @Override
   public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
     for (R ride : patternRides) {
-
       // THIS IS WHERE WE NEED TO CHANGE C2
-//      int c2 = ride.c2();
-//      int c2Stop = c2StopValues[stopIndex];
-//
-//      if(c2 + 1 == c2Stop) {
-//        c2 = c2Stop;
-//      }
-
+      //      int c2 = ride.c2();
+      //      int c2Stop = c2StopValues[stopIndex];
+      //
+      //      if(c2 + 1 == c2Stop) {
+      //        c2 = c2Stop;
+      //      }
 
       state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
