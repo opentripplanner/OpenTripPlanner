@@ -2,7 +2,8 @@ package org.opentripplanner.netex.support;
 
 import static org.opentripplanner.netex.support.ServiceJourneyHelper.elapsedTimeSinceMidnight;
 
-import java.util.Map;
+import java.math.BigInteger;
+import java.time.LocalTime;
 import java.util.Objects;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
@@ -16,19 +17,26 @@ public class TimetabledPassingTimeInfo {
   /**
    * Map a timetabledPassingTime to true if its stop is a stop area, false otherwise.
    */
-  private final Map<TimetabledPassingTime, Boolean> stopFlexibility;
+  private final boolean stopIsFlexibleArea;
   private final TimetabledPassingTime timetabledPassingTime;
 
-  public TimetabledPassingTimeInfo(
+  private TimetabledPassingTimeInfo(
     TimetabledPassingTime timetabledPassingTime,
-    Map<TimetabledPassingTime, Boolean> stopFlexibility
+    boolean stopIsFlexibleArea
   ) {
-    this.stopFlexibility = stopFlexibility;
+    this.stopIsFlexibleArea = stopIsFlexibleArea;
     this.timetabledPassingTime = timetabledPassingTime;
   }
 
+  public static TimetabledPassingTimeInfo of(
+    TimetabledPassingTime timetabledPassingTime,
+    boolean stopIsFlexibleArea
+  ) {
+    return new TimetabledPassingTimeInfo(timetabledPassingTime, stopIsFlexibleArea);
+  }
+
   public boolean hasAreaStop() {
-    return stopFlexibility.get(timetabledPassingTime);
+    return stopIsFlexibleArea;
   }
 
   public boolean hasRegularStop() {
@@ -42,15 +50,9 @@ public class TimetabledPassingTimeInfo {
    */
   public boolean hasCompletePassingTime() {
     if (hasRegularStop()) {
-      return (
-        timetabledPassingTime.getArrivalTime() != null ||
-        timetabledPassingTime.getDepartureTime() != null
-      );
+      return hasArrivalTime() || hasDepartureTime();
     }
-    return (
-      timetabledPassingTime.getLatestArrivalTime() != null &&
-      timetabledPassingTime.getEarliestDepartureTime() != null
-    );
+    return (hasLatestArrivalTime() && hasEarliestDepartureTime());
   }
 
   /**
@@ -59,23 +61,13 @@ public class TimetabledPassingTimeInfo {
    * time.
    */
   public boolean hasConsistentPassingTime() {
-    if (
-      hasRegularStop() &&
-      (
-        timetabledPassingTime.getArrivalTime() == null ||
-        timetabledPassingTime.getDepartureTime() == null
-      )
-    ) {
+    if (hasRegularStop() && (arrivalTime() == null || departureTime() == null)) {
       return true;
     }
-    if (
-      hasRegularStop() &&
-      timetabledPassingTime.getArrivalTime() != null &&
-      timetabledPassingTime.getDepartureTime() != null
-    ) {
-      return (normalizedDepartureTime() >= normalizedArrivalTime());
+    if (hasRegularStop() && hasArrivalTime() && hasDepartureTime()) {
+      return normalizedDepartureTime() >= normalizedArrivalTime();
     } else {
-      return (normalizedLatestArrivalTime() >= normalizedEarliestDepartureTime());
+      return normalizedLatestArrivalTime() >= normalizedEarliestDepartureTime();
     }
   }
 
@@ -84,11 +76,8 @@ public class TimetabledPassingTimeInfo {
    * the day offset.
    */
   public int normalizedDepartureTime() {
-    Objects.requireNonNull(timetabledPassingTime.getDepartureTime());
-    return elapsedTimeSinceMidnight(
-      timetabledPassingTime.getDepartureTime(),
-      timetabledPassingTime.getDepartureDayOffset()
-    );
+    Objects.requireNonNull(departureTime());
+    return elapsedTimeSinceMidnight(departureTime(), departureDayOffset());
   }
 
   /**
@@ -96,11 +85,8 @@ public class TimetabledPassingTimeInfo {
    * the day offset.
    */
   public int normalizedArrivalTime() {
-    Objects.requireNonNull(timetabledPassingTime.getArrivalTime());
-    return elapsedTimeSinceMidnight(
-      timetabledPassingTime.getArrivalTime(),
-      timetabledPassingTime.getArrivalDayOffset()
-    );
+    Objects.requireNonNull(arrivalTime());
+    return elapsedTimeSinceMidnight(arrivalTime(), arrivalDayOffset());
   }
 
   /**
@@ -108,11 +94,8 @@ public class TimetabledPassingTimeInfo {
    * account the day offset.
    */
   public int normalizedEarliestDepartureTime() {
-    Objects.requireNonNull(timetabledPassingTime.getEarliestDepartureTime());
-    return elapsedTimeSinceMidnight(
-      timetabledPassingTime.getEarliestDepartureTime(),
-      timetabledPassingTime.getEarliestDepartureDayOffset()
-    );
+    Objects.requireNonNull(earliestDepartureTime());
+    return elapsedTimeSinceMidnight(earliestDepartureTime(), earliestDepartureDayOffset());
   }
 
   /**
@@ -120,11 +103,8 @@ public class TimetabledPassingTimeInfo {
    * account the day offset.
    */
   public int normalizedLatestArrivalTime() {
-    Objects.requireNonNull(timetabledPassingTime.getLatestArrivalTime());
-    return elapsedTimeSinceMidnight(
-      timetabledPassingTime.getLatestArrivalTime(),
-      timetabledPassingTime.getLatestArrivalDayOffset()
-    );
+    Objects.requireNonNull(latestArrivalTime());
+    return elapsedTimeSinceMidnight(latestArrivalTime(), latestArrivalDayOffset());
   }
 
   /**
@@ -132,16 +112,10 @@ public class TimetabledPassingTimeInfo {
    * the day offset. Fallback to arrival time if departure time is missing.
    */
   public int normalizedDepartureTimeOrElseArrivalTime() {
-    if (timetabledPassingTime.getDepartureTime() != null) {
-      return elapsedTimeSinceMidnight(
-        timetabledPassingTime.getDepartureTime(),
-        timetabledPassingTime.getDepartureDayOffset()
-      );
+    if (hasDepartureTime()) {
+      return elapsedTimeSinceMidnight(departureTime(), departureDayOffset());
     } else {
-      return elapsedTimeSinceMidnight(
-        timetabledPassingTime.getArrivalTime(),
-        timetabledPassingTime.getArrivalDayOffset()
-      );
+      return elapsedTimeSinceMidnight(arrivalTime(), arrivalDayOffset());
     }
   }
 
@@ -150,18 +124,60 @@ public class TimetabledPassingTimeInfo {
    * the day offset. Fallback to departure time if arrival time is missing.
    */
   public int normalizedArrivalTimeOrElseDepartureTime() {
-    if (timetabledPassingTime.getArrivalTime() != null) {
-      return elapsedTimeSinceMidnight(
-        timetabledPassingTime.getArrivalTime(),
-        timetabledPassingTime.getArrivalDayOffset()
-      );
-    } else return elapsedTimeSinceMidnight(
-      timetabledPassingTime.getDepartureTime(),
-      timetabledPassingTime.getDepartureDayOffset()
-    );
+    if (hasArrivalTime()) {
+      return elapsedTimeSinceMidnight(arrivalTime(), arrivalDayOffset());
+    } else return elapsedTimeSinceMidnight(departureTime(), departureDayOffset());
   }
 
   public Object getId() {
     return timetabledPassingTime.getId();
+  }
+
+  private LocalTime arrivalTime() {
+    return timetabledPassingTime.getArrivalTime();
+  }
+
+  private boolean hasArrivalTime() {
+    return arrivalTime() != null;
+  }
+
+  private BigInteger arrivalDayOffset() {
+    return timetabledPassingTime.getArrivalDayOffset();
+  }
+
+  private LocalTime latestArrivalTime() {
+    return timetabledPassingTime.getLatestArrivalTime();
+  }
+
+  private boolean hasLatestArrivalTime() {
+    return latestArrivalTime() != null;
+  }
+
+  private BigInteger latestArrivalDayOffset() {
+    return timetabledPassingTime.getLatestArrivalDayOffset();
+  }
+
+  private LocalTime departureTime() {
+    return timetabledPassingTime.getDepartureTime();
+  }
+
+  private boolean hasDepartureTime() {
+    return departureTime() != null;
+  }
+
+  private BigInteger departureDayOffset() {
+    return timetabledPassingTime.getDepartureDayOffset();
+  }
+
+  private LocalTime earliestDepartureTime() {
+    return timetabledPassingTime.getEarliestDepartureTime();
+  }
+
+  private boolean hasEarliestDepartureTime() {
+    return earliestDepartureTime() != null;
+  }
+
+  private BigInteger earliestDepartureDayOffset() {
+    return timetabledPassingTime.getEarliestDepartureDayOffset();
   }
 }

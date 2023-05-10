@@ -51,7 +51,10 @@ public class ServiceJourneyInfo {
         )
       )
       .map(timetabledPassingTime ->
-        new TimetabledPassingTimeInfo(timetabledPassingTime, stopFlexibility)
+        TimetabledPassingTimeInfo.of(
+          timetabledPassingTime,
+          stopFlexibility.get(timetabledPassingTime)
+        )
       )
       .toList();
   }
