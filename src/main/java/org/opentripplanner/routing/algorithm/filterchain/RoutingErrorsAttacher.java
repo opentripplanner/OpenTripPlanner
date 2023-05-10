@@ -13,9 +13,21 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestD
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.api.response.RoutingError;
 
-public class RoutingErrorsAttacher {
+/**
+ * Computes {@link org.opentripplanner.routing.api.response.RoutingError} instances from itinerary
+ * before and after they have been through the filter chain.
+ */
+class RoutingErrorsAttacher {
 
-  public static List<RoutingError> computeErrors(
+  /**
+   * Computes error codes from the itineraries.
+   *
+   * @param originalItineraries The original result of the routing before the filter chain.
+   * @param filteredItineraries The itineraries after being run through the filter chain so they
+   *                            have the {@link org.opentripplanner.model.SystemNotice}s to look up
+   *                            the error from.
+   */
+  static List<RoutingError> computeErrors(
     List<Itinerary> originalItineraries,
     List<Itinerary> filteredItineraries
   ) {
