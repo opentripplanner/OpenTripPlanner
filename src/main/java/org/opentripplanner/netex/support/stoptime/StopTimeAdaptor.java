@@ -13,16 +13,6 @@ public sealed interface StopTimeAdaptor permits AbstractStopTimeAdaptor {
   }
 
   /**
-   * Return true if the stop is a flexible area.
-   */
-  boolean hasAreaStop();
-
-  /**
-   * Return true if the stop is a regular stop (used by both scheduled and flex services).
-   */
-  boolean hasRegularStop();
-
-  /**
    * A passing time on a regular stop is complete if either arrival or departure time is present. A
    * passing time on an area stop is complete if both earliest departure time and latest arrival
    * time are present.

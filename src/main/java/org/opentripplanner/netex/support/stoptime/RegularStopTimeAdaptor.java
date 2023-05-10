@@ -11,13 +11,8 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  */
 final class RegularStopTimeAdaptor extends AbstractStopTimeAdaptor {
 
-  protected RegularStopTimeAdaptor(TimetabledPassingTime timetabledPassingTime) {
+  RegularStopTimeAdaptor(TimetabledPassingTime timetabledPassingTime) {
     super(timetabledPassingTime);
-  }
-
-  @Override
-  public boolean hasRegularStop() {
-    return true;
   }
 
   @Override
@@ -58,7 +53,7 @@ final class RegularStopTimeAdaptor extends AbstractStopTimeAdaptor {
    * Return the elapsed time in second between midnight and the departure time, taking into account
    * the day offset.
    */
-  protected int normalizedDepartureTime() {
+  private int normalizedDepartureTime() {
     return elapsedTimeSinceMidnight(departureTime(), departureDayOffset());
   }
 
@@ -66,7 +61,7 @@ final class RegularStopTimeAdaptor extends AbstractStopTimeAdaptor {
    * Return the elapsed time in second between midnight and the arrival time, taking into account
    * the day offset.
    */
-  protected int normalizedArrivalTime() {
+  private int normalizedArrivalTime() {
     return elapsedTimeSinceMidnight(arrivalTime(), arrivalDayOffset());
   }
 

@@ -11,13 +11,8 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  */
 final class AreaStopTimeAdaptor extends AbstractStopTimeAdaptor {
 
-  protected AreaStopTimeAdaptor(TimetabledPassingTime timetabledPassingTime) {
+  AreaStopTimeAdaptor(TimetabledPassingTime timetabledPassingTime) {
     super(timetabledPassingTime);
-  }
-
-  @Override
-  public boolean hasRegularStop() {
-    return false;
   }
 
   @Override
