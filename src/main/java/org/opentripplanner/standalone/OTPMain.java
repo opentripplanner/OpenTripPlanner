@@ -202,7 +202,6 @@ public class OTPMain {
             throwable
           );
         }
-        logLocationOfRequestLog(app.routerConfig().server().requestLogFile());
       }
     }
   }
@@ -225,16 +224,9 @@ public class OTPMain {
       raptorConfig.shutdown();
       WeakCollectionCleaner.DEFAULT.exit();
       DeferredAuthorityFactory.exit();
+      LOG.info("OTP shutdown: resources released...");
     });
     Runtime.getRuntime().addShutdownHook(hook);
-  }
-
-  private static void logLocationOfRequestLog(String requestLogFile) {
-    if (requestLogFile != null) {
-      LOG.info("Logging incoming requests at '{}'", requestLogFile);
-    } else {
-      LOG.info("Incoming requests will not be logged.");
-    }
   }
 
   private static void setOtpConfigVersionsOnServerInfo(ConstructApplication app) {

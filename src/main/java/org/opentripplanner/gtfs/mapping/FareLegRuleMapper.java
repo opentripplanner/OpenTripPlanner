@@ -2,11 +2,11 @@ package org.opentripplanner.gtfs.mapping;
 
 import java.util.Collection;
 import java.util.Objects;
-import org.opentripplanner.ext.fares.model.Distance;
-import org.opentripplanner.ext.fares.model.FareDistance;
-import org.opentripplanner.ext.fares.model.FareLegRule;
-import org.opentripplanner.ext.fares.model.FareProduct;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.model.fare.Distance;
+import org.opentripplanner.model.fare.FareDistance;
+import org.opentripplanner.model.fare.FareLegRule;
+import org.opentripplanner.model.fare.FareProduct;
 
 public final class FareLegRuleMapper {
 

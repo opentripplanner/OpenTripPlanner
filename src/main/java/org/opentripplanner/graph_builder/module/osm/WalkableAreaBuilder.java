@@ -25,7 +25,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.OsmModule.Handler;
+import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
@@ -78,8 +78,7 @@ public class WalkableAreaBuilder {
 
   private final Map<OSMWithTags, WayProperties> wayPropertiesCache = new HashMap<>();
 
-  // This is an awful hack, but this class (WalkableAreaBuilder) ought to be rewritten.
-  private final Handler handler;
+  private final VertexGenerator vertexBuilder;
 
   private final HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<>();
 
@@ -87,11 +86,15 @@ public class WalkableAreaBuilder {
 
   private final List<OsmVertex> platformLinkingEndpoints;
   private final Set<String> boardingLocationRefTags;
+  private final EdgeNamer namer;
+  private final SafetyValueNormalizer normalizer;
 
   public WalkableAreaBuilder(
     Graph graph,
     OsmDatabase osmdb,
-    Handler handler,
+    VertexGenerator vertexBuilder,
+    EdgeNamer namer,
+    SafetyValueNormalizer normalizer,
     DataImportIssueStore issueStore,
     int maxAreaNodes,
     boolean platformEntriesLinking,
@@ -99,7 +102,9 @@ public class WalkableAreaBuilder {
   ) {
     this.graph = graph;
     this.osmdb = osmdb;
-    this.handler = handler;
+    this.vertexBuilder = vertexBuilder;
+    this.namer = namer;
+    this.normalizer = normalizer;
     this.issueStore = issueStore;
     this.maxAreaNodes = maxAreaNodes;
     this.platformEntriesLinking = platformEntriesLinking;
@@ -224,7 +229,7 @@ public class WalkableAreaBuilder {
         Collection<OSMNode> nodes = osmdb.getStopsInArea(area.parent);
         if (nodes != null) {
           for (OSMNode node : nodes) {
-            var vertex = handler.getVertexForOsmNode(node, areaEntity);
+            var vertex = vertexBuilder.getVertexForOsmNode(node, areaEntity);
             platformLinkingVertices.add(vertex);
             visibilityNodes.add(node);
             startingNodes.add(node);
@@ -265,12 +270,12 @@ public class WalkableAreaBuilder {
             // area or a convex point, i.e. the angle is over 180 degrees.
             if (outerRing.isNodeConvex(i)) {
               visibilityNodes.add(node);
-              edgeList.visibilityVertices.add(handler.getVertexForOsmNode(node, areaEntity));
+              edgeList.visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }
             if (isStartingNode(node, osmWayIds)) {
               visibilityNodes.add(node);
               startingNodes.add(node);
-              edgeList.visibilityVertices.add(handler.getVertexForOsmNode(node, areaEntity));
+              edgeList.visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }
           }
           for (Ring innerRing : outerRing.getHoles()) {
@@ -284,12 +289,16 @@ public class WalkableAreaBuilder {
               // For holes, the internal angle is calculated, so we must swap the sign
               if (!innerRing.isNodeConvex(j)) {
                 visibilityNodes.add(node);
-                edgeList.visibilityVertices.add(handler.getVertexForOsmNode(node, areaEntity));
+                edgeList.visibilityVertices.add(
+                  vertexBuilder.getVertexForOsmNode(node, areaEntity)
+                );
               }
               if (isStartingNode(node, osmWayIds)) {
                 visibilityNodes.add(node);
                 startingNodes.add(node);
-                edgeList.visibilityVertices.add(handler.getVertexForOsmNode(node, areaEntity));
+                edgeList.visibilityVertices.add(
+                  vertexBuilder.getVertexForOsmNode(node, areaEntity)
+                );
               }
             }
           }
@@ -323,7 +332,7 @@ public class WalkableAreaBuilder {
           continue;
         }
         i = (int) Math.floor(sum_i);
-        IntersectionVertex startEndpoint = handler.getVertexForOsmNode(nodeI, areaEntity);
+        IntersectionVertex startEndpoint = vertexBuilder.getVertexForOsmNode(nodeI, areaEntity);
         if (startingNodes.contains(nodeI)) {
           startingVertices.add(startEndpoint);
         }
@@ -338,7 +347,7 @@ public class WalkableAreaBuilder {
           NodeEdge edge = new NodeEdge(nodeI, nodeJ);
           if (alreadyAddedEdges.contains(edge)) continue;
 
-          IntersectionVertex endEndpoint = handler.getVertexForOsmNode(nodeJ, areaEntity);
+          IntersectionVertex endEndpoint = vertexBuilder.getVertexForOsmNode(nodeJ, areaEntity);
 
           Coordinate[] coordinates = new Coordinate[] {
             startEndpoint.getCoordinate(),
@@ -446,8 +455,8 @@ public class WalkableAreaBuilder {
       return Set.of();
     }
     alreadyAddedEdges.add(nodeEdge);
-    IntersectionVertex startEndpoint = handler.getVertexForOsmNode(node, area.parent);
-    IntersectionVertex endEndpoint = handler.getVertexForOsmNode(nextNode, area.parent);
+    IntersectionVertex startEndpoint = vertexBuilder.getVertexForOsmNode(node, area.parent);
+    IntersectionVertex endEndpoint = vertexBuilder.getVertexForOsmNode(nextNode, area.parent);
 
     return createSegments(startEndpoint, endEndpoint, List.of(area), edgeList);
   }
@@ -504,7 +513,7 @@ public class WalkableAreaBuilder {
         startEndpoint.getLabel() +
         " to " +
         endEndpoint.getLabel();
-      I18NString name = handler.getNameForWay(areaEntity, label);
+      I18NString name = namer.getNameForWay(areaEntity, label);
 
       AreaEdge street = new AreaEdge(
         startEndpoint,
@@ -535,7 +544,7 @@ public class WalkableAreaBuilder {
         endEndpoint.getLabel() +
         " to " +
         startEndpoint.getLabel();
-      name = handler.getNameForWay(areaEntity, label);
+      name = namer.getNameForWay(areaEntity, label);
 
       AreaEdge backStreet = new AreaEdge(
         endEndpoint,
@@ -567,7 +576,7 @@ public class WalkableAreaBuilder {
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
-      handler.applyWayProperties(
+      normalizer.applyWayProperties(
         street,
         backStreet,
         wayPropertiesCache.get(areaEntity),
@@ -642,7 +651,7 @@ public class WalkableAreaBuilder {
       OSMWithTags areaEntity = area.parent;
 
       String id = "way (area) " + areaEntity.getId() + " (splitter linking)";
-      I18NString name = handler.getNameForWay(areaEntity, id);
+      I18NString name = namer.getNameForWay(areaEntity, id);
       namedArea.setName(name);
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {

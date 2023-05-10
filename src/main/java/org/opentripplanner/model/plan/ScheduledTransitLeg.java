@@ -21,6 +21,7 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.plan.legreference.ScheduledTransitLegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -57,8 +58,9 @@ public class ScheduledTransitLeg implements TransitLeg {
   protected final LocalDate serviceDate;
   protected final ZoneId zoneId;
   private double distanceMeters;
-  private double directDistanceMeters;
+  private final double directDistanceMeters;
   private final Float accessibilityScore;
+  private List<FareProductUse> fareProducts = List.of();
 
   public ScheduledTransitLeg(
     TripTimes tripTimes,
@@ -354,6 +356,16 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   public void addAlert(TransitAlert alert) {
     transitAlerts.add(alert);
+  }
+
+  @Override
+  public void setFareProducts(List<FareProductUse> products) {
+    this.fareProducts = List.copyOf(products);
+  }
+
+  @Override
+  public List<FareProductUse> fareProducts() {
+    return fareProducts;
   }
 
   @Override

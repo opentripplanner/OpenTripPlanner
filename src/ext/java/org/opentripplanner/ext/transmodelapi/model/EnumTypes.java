@@ -467,6 +467,11 @@ public class EnumTypes {
       "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
     )
     .value(
+      "processingTimeout",
+      RoutingErrorCode.PROCESSING_TIMEOUT,
+      "The routing request timed out."
+    )
+    .value(
       "systemError",
       RoutingErrorCode.SYSTEM_ERROR,
       "An unknown error happened during the search. The details have been logged to the server logs"

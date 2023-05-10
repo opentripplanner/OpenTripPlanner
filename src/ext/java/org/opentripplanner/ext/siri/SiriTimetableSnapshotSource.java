@@ -221,12 +221,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
       /* commit */
       return addTripToGraphAndBuffer(result.successValue(), journey, entityResolver);
-    } catch (Throwable t) {
+    } catch (Exception e) {
       LOG.warn(
         "{} EstimatedJourney {} failed.",
         shouldAddNewTrip ? "Adding" : "Updating",
         DebugString.of(journey),
-        t
+        e
       );
       return Result.failure(UpdateError.noTripId(UNKNOWN));
     }

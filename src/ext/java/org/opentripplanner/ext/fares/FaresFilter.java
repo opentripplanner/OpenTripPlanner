@@ -6,6 +6,9 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.fares.FareService;
 
+/**
+ * Computes the fares of an itinerary and adds them.
+ */
 public record FaresFilter(FareService fareService) implements ItineraryListFilter {
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
@@ -15,6 +18,7 @@ public record FaresFilter(FareService fareService) implements ItineraryListFilte
         var fare = fareService.getCost(i);
         if (Objects.nonNull(fare)) {
           i.setFare(fare);
+          FaresToItineraryMapper.addFaresToLegs(fare, i);
         }
       })
       .toList();
