@@ -1589,8 +1589,16 @@ type Leg {
     """
     interlineWithPreviousLeg: Boolean
 
+    """
+    Special booking information for the drop off stop of this leg if, for example, it needs
+    to be booked in advance. This could be due to a flexible or on-demand service.
+    """
     dropOffBookingInfo: BookingInfo
 
+    """
+    Special booking information for the pick up stop of this leg if, for example, it needs
+    to be booked in advance. This could be due to a flexible or on-demand service.
+    """
     pickupBookingInfo: BookingInfo
 
     """Applicable alerts for this leg."""
@@ -1992,29 +2000,52 @@ enum PickupDropoffType {
     COORDINATE_WITH_DRIVER
 }
 
+"Contact information for booking an on-demand or flexible service."
 type ContactInfo {
+    "Name of the person to contact"
     contactPerson: String
+    "Phone number to contact"
     phoneNumber: String
+    "Email to contact"
     eMail: String
+    "Fax number to contact"
     faxNumber: String
+    "URL containing general information about the service"
     infoUrl: String
+    "URL to the booking systems of the service"
     bookingUrl: String
+    "Additional notes about the contacting the service provider"
     additionalDetails: String
 }
 
+"Temporal restriction for a booking"
 type BookingTime {
+    "Time of the booking"
     time: String
+    "How many days before the booking"
     daysPrior: Int
 }
 
+"""
+Booking information for a stop time which has special requirements to use, like calling ahead or
+using an app.
+"""
 type BookingInfo {
+    "Contact information for reaching the service provider"
     contactInfo: ContactInfo
+    "When is the earliest time the service can be booked."
     earliestBookingTime: BookingTime
+    "When is the latest time the service can be booked"
     latestBookingTime: BookingTime
+    "Minimum number of seconds before travel to make the request"
     minimumBookingNoticeSeconds: Long
+    "Maximum number of seconds before travel to make the request"
     maximumBookingNoticeSeconds: Long
+    "A general message for those booking the service"
     message: String
+    "A message specific to the pick up"
     pickupMessage: String
+    "A message specific to the drop off"
     dropOffMessage: String
 }
 
