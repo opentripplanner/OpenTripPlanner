@@ -199,7 +199,7 @@ public abstract class FlexAccessEgressTemplate {
 
         return new FlexAccessEgress(
           stop,
-      durations,
+          durations,
           fromStopIndex,
           toStopIndex,
           trip,

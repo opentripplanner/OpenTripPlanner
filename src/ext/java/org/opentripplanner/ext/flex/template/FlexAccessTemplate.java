@@ -71,12 +71,12 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
         int timeShift;
 
         if (arriveBy) {
-      int lastStopArrivalTime = flexDurations.mapToFlexTripArrivalTime(departureTime);
+          int lastStopArrivalTime = flexDurations.mapToFlexTripArrivalTime(departureTime);
           int latestArrivalTime = trip.latestArrivalTime(
             lastStopArrivalTime,
             fromStopIndex,
             toStopIndex,
-        flexDurations.trip()
+            flexDurations.trip()
           );
 
           if (latestArrivalTime == MISSING_VALUE) {
@@ -84,20 +84,21 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
           }
 
           // Shift from departing at departureTime to arriving at departureTime
-      timeShift = flexDurations.mapToRouterArrivalTime(latestArrivalTime) - flexDurations.total();
+          timeShift =
+            flexDurations.mapToRouterArrivalTime(latestArrivalTime) - flexDurations.total();
         } else {
-      int firstStopDepartureTime = flexDurations.mapToFlexTripDepartureTime(departureTime);
+          int firstStopDepartureTime = flexDurations.mapToFlexTripDepartureTime(departureTime);
           int earliestDepartureTime = trip.earliestDepartureTime(
             firstStopDepartureTime,
             fromStopIndex,
             toStopIndex,
-        flexDurations.trip()
+            flexDurations.trip()
           );
 
           if (earliestDepartureTime == MISSING_VALUE) {
             return null;
           }
-      timeShift = flexDurations.mapToRouterDepartureTime(earliestDepartureTime);
+          timeShift = flexDurations.mapToRouterDepartureTime(earliestDepartureTime);
         }
 
         ZonedDateTime startTime = startOfTime.plusSeconds(timeShift);
