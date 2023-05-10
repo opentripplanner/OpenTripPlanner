@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 
 /**
- * This filter will remove all itineraries that is outside the search-window. In some
+ * This filter will remove all itineraries that are outside the search-window. In some
  * cases the access is time-shifted after the end of the search-window. These results
  * should appear again when paging to the next page. Hence, this filter will remove
  * such itineraries.

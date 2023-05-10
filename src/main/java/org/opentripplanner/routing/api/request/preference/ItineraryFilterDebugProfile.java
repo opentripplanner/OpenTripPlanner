@@ -3,7 +3,7 @@ package org.opentripplanner.routing.api.request.preference;
 import org.opentripplanner.framework.doc.DocumentedEnum;
 
 /**
- * This enum control the number of itineraries returned with debug information - itineraries
+ * This enum controls the number of itineraries returned with debug information - itineraries
  * deleted by the itinerary filter chain. When listing all itineraries, including the deleted
  * ones, the filter-chain sometimes return too many itineraries for practical usage.
  */
@@ -19,7 +19,7 @@ public enum ItineraryFilterDebugProfile implements DocumentedEnum<ItineraryFilte
     """
     Only return the requested number of itineraries, counting both actual and deleted ones.
     The top `numItineraries` using the request sort order is returned. This does not work
-    with paging, itineraries after the limit, but inside the search-window is skipped when
+    with paging, itineraries after the limit, but inside the search-window are skipped when
     moving to the next page."""
   );
 
