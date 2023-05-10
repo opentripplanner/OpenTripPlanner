@@ -27,7 +27,7 @@ public class FreeEdge extends Edge {
     StateEditor s1 = s0.edit(this);
     s1.incrementWeight(1);
     s1.setBackMode(null);
-    return State.ofNullable(s1.makeState());
+    return s1.makeStateArray();
   }
 
   @Override

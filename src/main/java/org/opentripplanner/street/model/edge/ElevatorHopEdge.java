@@ -123,7 +123,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
         ? this.travelTime
         : (int) (preferences.street().elevator().hopTime() * this.levels)
     );
-    return State.ofNullable(s1.makeState());
+    return s1.makeStateArray();
   }
 
   @Override

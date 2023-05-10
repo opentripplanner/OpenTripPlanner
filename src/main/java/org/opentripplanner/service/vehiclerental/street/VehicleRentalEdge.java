@@ -151,7 +151,7 @@ public class VehicleRentalEdge extends Edge {
       pickedUp ? preferences.rental().pickupTime() : preferences.rental().dropoffTime()
     );
     s1.setBackMode(null);
-    return State.ofNullable(s1.makeState());
+    return s1.makeStateArray();
   }
 
   @Override

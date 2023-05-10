@@ -45,7 +45,7 @@ public class StreetVehicleRentalLink extends Edge {
     //assume bike rental stations are more-or-less on-street
     s1.incrementWeight(1);
     s1.setBackMode(null);
-    return State.ofNullable(s1.makeState());
+    return s1.makeStateArray();
   }
 
   @Override

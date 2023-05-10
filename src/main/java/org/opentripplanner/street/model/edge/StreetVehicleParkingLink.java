@@ -61,7 +61,7 @@ public class StreetVehicleParkingLink extends Edge {
 
     s1.incrementWeight(1);
     s1.setBackMode(null);
-    return State.ofNullable(s1.makeState());
+    return s1.makeStateArray();
   }
 
   private boolean traversalBanned(

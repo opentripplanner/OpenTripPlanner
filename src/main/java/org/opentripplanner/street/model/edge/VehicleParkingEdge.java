@@ -119,7 +119,7 @@ public class VehicleParkingEdge extends Edge {
 
     addUnpreferredTagCost(request.parking(), s0e);
 
-    return State.ofNullable(s0e.makeState());
+    return s0e.makeStateArray();
   }
 
   private State[] traversePark(State s0) {
@@ -162,7 +162,7 @@ public class VehicleParkingEdge extends Edge {
 
     addUnpreferredTagCost(s0.getRequest().parking(), s0e);
 
-    return State.ofNullable(s0e.makeState());
+    return s0e.makeStateArray();
   }
 
   private void addUnpreferredTagCost(VehicleParkingRequest req, StateEditor s0e) {

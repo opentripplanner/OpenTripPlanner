@@ -40,6 +40,6 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
       s1.incrementWeight(s0.getPreferences().rental().arrivingInRentalVehicleAtDestinationCost());
     }
 
-    return State.ofNullable(s1.makeState());
+    return s1.makeStateArray();
   }
 }

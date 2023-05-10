@@ -490,7 +490,7 @@ public class StreetEdge
       if (dropOff != null) {
         dropOffAfterDriving(s0, dropOff);
         // Only the walk state is returned, since traversing by car was not possible
-        return State.ofNullable(dropOff.makeState());
+        return dropOff.makeStateArray();
       }
     }
 

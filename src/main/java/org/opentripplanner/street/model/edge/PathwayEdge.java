@@ -125,7 +125,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       s1.incrementWeight(1);
     }
 
-    return State.ofNullable(s1.makeState());
+    return s1.makeStateArray();
   }
 
   @Override

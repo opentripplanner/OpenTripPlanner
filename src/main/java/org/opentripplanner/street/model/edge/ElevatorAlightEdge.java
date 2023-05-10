@@ -55,7 +55,7 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
   public State[] traverse(State s0) {
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
     s1.incrementWeight(1);
-    return State.ofNullable(s1.makeState());
+    return s1.makeStateArray();
   }
 
   /**

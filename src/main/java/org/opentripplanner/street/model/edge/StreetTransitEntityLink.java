@@ -136,7 +136,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     int streetToStopTime = getStreetToStopTime();
     s1.incrementTimeInSeconds(streetToStopTime);
     s1.incrementWeight(STEL_TRAVERSE_COST + streetToStopTime);
-    return State.ofNullable(s1.makeState());
+    return s1.makeStateArray();
   }
 
   public I18NString getName() {

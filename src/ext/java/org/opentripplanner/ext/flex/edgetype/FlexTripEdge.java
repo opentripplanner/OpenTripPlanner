@@ -56,7 +56,7 @@ public class FlexTripEdge extends Edge {
     editor.incrementTimeInSeconds(timeInSeconds);
     editor.incrementWeight(timeInSeconds);
     editor.resetEnteredNoThroughTrafficArea();
-    return State.ofNullable(editor.makeState());
+    return editor.makeStateArray();
   }
 
   @Override
