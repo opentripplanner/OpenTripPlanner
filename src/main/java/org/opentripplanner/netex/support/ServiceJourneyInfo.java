@@ -33,7 +33,7 @@ public class ServiceJourneyInfo {
   /**
    * Sort the timetabled passing times according to their order in the journey pattern.
    */
-  public List<TimetabledPassingTimeInfo> orderedTimetabledPassingTimeInfos() {
+  public List<AbstractStopTimeAdaptor> orderedTimetabledPassingTimeInfos() {
     Map<TimetabledPassingTime, Boolean> stopFlexibility = stopFlexibility();
 
     Map<String, Integer> stopPointIdToOrder = journeyPattern
@@ -51,7 +51,7 @@ public class ServiceJourneyInfo {
         )
       )
       .map(timetabledPassingTime ->
-        TimetabledPassingTimeInfo.of(
+        AbstractStopTimeAdaptor.of(
           timetabledPassingTime,
           stopFlexibility.get(timetabledPassingTime)
         )

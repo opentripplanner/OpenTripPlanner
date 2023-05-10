@@ -2,8 +2,8 @@ package org.opentripplanner.netex.validation;
 
 import java.util.List;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.netex.support.AbstractStopTimeAdaptor;
 import org.opentripplanner.netex.support.ServiceJourneyInfo;
-import org.opentripplanner.netex.support.TimetabledPassingTimeInfo;
 import org.rutebanken.netex.model.ServiceJourney;
 
 /**
@@ -29,22 +29,22 @@ import org.rutebanken.netex.model.ServiceJourney;
 class ServiceJourneyNonIncreasingPassingTime
   extends AbstractHMapValidationRule<String, ServiceJourney> {
 
-  private TimetabledPassingTimeInfo invalidTimetabledPassingTimeInfo;
+  private AbstractStopTimeAdaptor invalidTimetabledPassingTimeInfo;
   private ErrorType errorType;
 
   @Override
   public Status validate(ServiceJourney sj) {
     ServiceJourneyInfo serviceJourneyInfo = new ServiceJourneyInfo(sj, index);
-    List<TimetabledPassingTimeInfo> orderedPassingTimes = serviceJourneyInfo.orderedTimetabledPassingTimeInfos();
+    List<AbstractStopTimeAdaptor> orderedPassingTimes = serviceJourneyInfo.orderedTimetabledPassingTimeInfos();
 
     if (!isValidTimetabledPassingTimeInfo(orderedPassingTimes.get(0))) {
       return Status.DISCARD;
     }
 
-    TimetabledPassingTimeInfo previousPassingTime = orderedPassingTimes.get(0);
+    AbstractStopTimeAdaptor previousPassingTime = orderedPassingTimes.get(0);
 
     for (int i = 1; i < orderedPassingTimes.size(); i++) {
-      TimetabledPassingTimeInfo currentPassingTime = orderedPassingTimes.get(i);
+      AbstractStopTimeAdaptor currentPassingTime = orderedPassingTimes.get(i);
 
       if (!isValidTimetabledPassingTimeInfo(currentPassingTime)) {
         return Status.DISCARD;
@@ -89,7 +89,7 @@ class ServiceJourneyNonIncreasingPassingTime
    * A passing time is valid if it is both complete and consistent.
    */
   private boolean isValidTimetabledPassingTimeInfo(
-    TimetabledPassingTimeInfo timetabledPassingTimeInfo
+    AbstractStopTimeAdaptor timetabledPassingTimeInfo
   ) {
     if (!timetabledPassingTimeInfo.hasCompletePassingTime()) {
       invalidTimetabledPassingTimeInfo = timetabledPassingTimeInfo;
@@ -108,8 +108,8 @@ class ServiceJourneyNonIncreasingPassingTime
    * Regular stop followed by a regular stop: check that arrivalTime(n+1) > departureTime(n)
    */
   private boolean isValidRegularStopFollowedByRegularStop(
-    TimetabledPassingTimeInfo previousPassingTime,
-    TimetabledPassingTimeInfo currentPassingTime
+    AbstractStopTimeAdaptor previousPassingTime,
+    AbstractStopTimeAdaptor currentPassingTime
   ) {
     int currentArrivalOrDepartureTime = currentPassingTime.normalizedArrivalTimeOrElseDepartureTime();
     int previousDepartureOrArrivalTime = previousPassingTime.normalizedDepartureTimeOrElseArrivalTime();
@@ -126,8 +126,8 @@ class ServiceJourneyNonIncreasingPassingTime
    * earliestDepartureTime(n) and latestArrivalTime(n+1) > latestArrivalTime(n)
    */
   private boolean isValidAreaStopFollowedByAreaStop(
-    TimetabledPassingTimeInfo previousPassingTime,
-    TimetabledPassingTimeInfo currentPassingTime
+    AbstractStopTimeAdaptor previousPassingTime,
+    AbstractStopTimeAdaptor currentPassingTime
   ) {
     int previousEarliestDepartureTime = previousPassingTime.normalizedEarliestDepartureTime();
     int currentEarliestDepartureTime = currentPassingTime.normalizedEarliestDepartureTime();
@@ -150,8 +150,8 @@ class ServiceJourneyNonIncreasingPassingTime
    * departureTime(n)
    */
   private boolean isValidRegularStopFollowedByAreaStop(
-    TimetabledPassingTimeInfo previousPassingTime,
-    TimetabledPassingTimeInfo currentPassingTime
+    AbstractStopTimeAdaptor previousPassingTime,
+    AbstractStopTimeAdaptor currentPassingTime
   ) {
     int previousDepartureOrArrivalTime = previousPassingTime.normalizedDepartureTimeOrElseArrivalTime();
     int currentEarliestDepartureTime = currentPassingTime.normalizedEarliestDepartureTime();
@@ -167,8 +167,8 @@ class ServiceJourneyNonIncreasingPassingTime
    * Area stop followed by a regular stop: check that arrivalTime(n+1) > latestArrivalTime(n)
    */
   private boolean isValidAreaStopFollowedByRegularStop(
-    TimetabledPassingTimeInfo previousPassingTime,
-    TimetabledPassingTimeInfo currentPassingTime
+    AbstractStopTimeAdaptor previousPassingTime,
+    AbstractStopTimeAdaptor currentPassingTime
   ) {
     int previousLatestArrivalTime = previousPassingTime.normalizedLatestArrivalTime();
     int currentArrivalOrDepartureTime = currentPassingTime.normalizedArrivalTimeOrElseDepartureTime();

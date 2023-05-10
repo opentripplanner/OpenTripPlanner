@@ -12,7 +12,7 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  * for passing times comparison.
  * Passing times are exposed as seconds since midnight, taking into account the day offset.
  */
-public class TimetabledPassingTimeInfo implements StopTimeAdaptor {
+public class AbstractStopTimeAdaptor implements StopTimeAdaptor {
 
   /**
    * Map a timetabledPassingTime to true if its stop is a stop area, false otherwise.
@@ -20,7 +20,7 @@ public class TimetabledPassingTimeInfo implements StopTimeAdaptor {
   private final boolean stopIsFlexibleArea;
   private final TimetabledPassingTime timetabledPassingTime;
 
-  private TimetabledPassingTimeInfo(
+  private AbstractStopTimeAdaptor(
     TimetabledPassingTime timetabledPassingTime,
     boolean stopIsFlexibleArea
   ) {
@@ -28,11 +28,11 @@ public class TimetabledPassingTimeInfo implements StopTimeAdaptor {
     this.timetabledPassingTime = timetabledPassingTime;
   }
 
-  public static TimetabledPassingTimeInfo of(
+  public static AbstractStopTimeAdaptor of(
     TimetabledPassingTime timetabledPassingTime,
     boolean stopIsFlexibleArea
   ) {
-    return new TimetabledPassingTimeInfo(timetabledPassingTime, stopIsFlexibleArea);
+    return new AbstractStopTimeAdaptor(timetabledPassingTime, stopIsFlexibleArea);
   }
 
   @Override
