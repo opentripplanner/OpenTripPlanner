@@ -7,7 +7,9 @@ public interface StopTimeAdaptor {
     TimetabledPassingTime timetabledPassingTime,
     boolean stopIsFlexibleArea
   ) {
-    return new AbstractStopTimeAdaptor(timetabledPassingTime, stopIsFlexibleArea);
+    return stopIsFlexibleArea
+      ? new AreaStopTimeAdaptor(timetabledPassingTime)
+      : new RegularStopTimeAdaptor(timetabledPassingTime);
   }
 
   /**
@@ -36,13 +38,13 @@ public interface StopTimeAdaptor {
 
   /**
    * Return the elapsed time in second between midnight and the earliest departure time, taking into
-   * account the day offset.
+   * account the day offset. Only valid for area-stops, throw an exception if not.
    */
   int normalizedEarliestDepartureTime();
 
   /**
    * Return the elapsed time in second between midnight and the latest arrival time, taking into
-   * account the day offset.
+   * account the day offset. Only valid for area-stops, throw an exception if not.
    */
   int normalizedLatestArrivalTime();
 
