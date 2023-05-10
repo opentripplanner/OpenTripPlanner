@@ -504,7 +504,7 @@ convenient when tuning the itinerary-filter-chain.
    (the requested search-window may differ).
  - `limit-to-num-of-itineraries` Only return the requested number of itineraries, counting both actual and deleted ones.
    The top `numItineraries` using the request sort order is returned. This does not work
-   with paging, itineraries after the limit, but inside the search-window is skipped when
+   with paging, itineraries after the limit, but inside the search-window are skipped when
    moving to the next page.
 
 

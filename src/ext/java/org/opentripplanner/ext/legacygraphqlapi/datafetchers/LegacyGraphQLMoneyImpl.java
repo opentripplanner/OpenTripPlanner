@@ -9,8 +9,8 @@ import org.opentripplanner.transit.model.basic.Money;
 public class LegacyGraphQLMoneyImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLMoney {
 
   @Override
-  public DataFetcher<Integer> amount() {
-    return env -> getSource(env).amount();
+  public DataFetcher<Double> amount() {
+    return env -> getSource(env).fractionalAmount();
   }
 
   @Override

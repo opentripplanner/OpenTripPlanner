@@ -17,7 +17,6 @@ import org.apache.lucene.codecs.PostingsFormat;
 import org.apache.lucene.codecs.lucene95.Lucene95Codec;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.document.StoredField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.DirectoryReader;
@@ -32,10 +31,12 @@ import org.apache.lucene.search.suggest.document.Completion90PostingsFormat;
 import org.apache.lucene.search.suggest.document.CompletionAnalyzer;
 import org.apache.lucene.search.suggest.document.ContextQuery;
 import org.apache.lucene.search.suggest.document.ContextSuggestField;
-import org.apache.lucene.search.suggest.document.PrefixCompletionQuery;
+import org.apache.lucene.search.suggest.document.FuzzyCompletionQuery;
 import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
+import org.opentripplanner.ext.geocoder.StopCluster.Coordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -51,7 +52,8 @@ public class LuceneIndex implements Serializable {
   private static final String SUGGEST = "suggest";
   private static final String NAME = "name";
   private static final String CODE = "code";
-  private static final String COORDINATE = "coordinate";
+  private static final String LAT = "latitude";
+  private static final String LON = "longitude";
 
   private final Graph graph;
 
@@ -105,6 +107,23 @@ public class LuceneIndex implements Serializable {
             )
           );
 
+        StopClusters
+          .generateStopClusters(
+            transitService.listStopLocations(),
+            transitService.listStopLocationGroups()
+          )
+          .forEach(stopCluster -> {
+            addToIndex(
+              directoryWriter,
+              StopCluster.class,
+              stopCluster.id().toString(),
+              new NonLocalizedString(stopCluster.name()),
+              stopCluster.code(),
+              stopCluster.coordinate().lat(),
+              stopCluster.coordinate().lon()
+            );
+          });
+
         graph
           .getVertices()
           .stream()
@@ -147,7 +166,7 @@ public class LuceneIndex implements Serializable {
       .map(document -> transitService.getStopLocation(FeedScopedId.parseId(document.get(ID))));
   }
 
-  public Stream<StopLocationsGroup> findStopLocationGroups(String query, boolean autocomplete) {
+  public Stream<StopLocationsGroup> queryStopLocationGroups(String query, boolean autocomplete) {
     return matchingDocuments(StopLocationsGroup.class, query, autocomplete)
       .map(document -> transitService.getStopLocationsGroup(FeedScopedId.parseId(document.get(ID)))
       );
@@ -156,6 +175,28 @@ public class LuceneIndex implements Serializable {
   public Stream<StreetVertex> queryStreetVertices(String query, boolean autocomplete) {
     return matchingDocuments(StreetVertex.class, query, autocomplete)
       .map(document -> (StreetVertex) graph.getVertex(document.get(ID)));
+  }
+
+  /**
+   * Return all "stop clusters" for a given query.
+   * <p>
+   * Stop clusters are defined as follows.
+   * <p>
+   *  - If a stop has a parent station, only the parent is returned.
+   *  - If two stops have the same name *and* are less than 10 meters from each other, only
+   *    one of those is chosen at random and returned.
+   */
+  public Stream<StopCluster> queryStopClusters(String query) {
+    return matchingDocuments(StopCluster.class, query, true).map(LuceneIndex::toStopCluster);
+  }
+
+  private static StopCluster toStopCluster(Document document) {
+    var id = FeedScopedId.parseId(document.get(ID));
+    var name = document.get(NAME);
+    var code = document.get(CODE);
+    var lat = document.getField(LAT).numericValue().doubleValue();
+    var lon = document.getField(LON).numericValue().doubleValue();
+    return new StopCluster(id, code, name, new Coordinate(lat, lon));
   }
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
@@ -191,7 +232,8 @@ public class LuceneIndex implements Serializable {
     document.add(new TextField(TYPE, typeName, Store.YES));
     document.add(new TextField(NAME, Objects.toString(name), Store.YES));
     document.add(new ContextSuggestField(SUGGEST, Objects.toString(name), 1, typeName));
-    document.add(new LatLonPoint(COORDINATE, latitude, longitude));
+    document.add(new StoredField(LAT, latitude));
+    document.add(new StoredField(LON, longitude));
 
     if (code != null) {
       document.add(new TextField(CODE, code, Store.YES));
@@ -212,9 +254,16 @@ public class LuceneIndex implements Serializable {
   ) {
     try {
       if (autocomplete) {
-        var completionQuery = new PrefixCompletionQuery(
+        var completionQuery = new FuzzyCompletionQuery(
           analyzer,
-          new Term(SUGGEST, analyzer.normalize(SUGGEST, searchTerms))
+          new Term(SUGGEST, analyzer.normalize(SUGGEST, searchTerms)),
+          null,
+          2,
+          true,
+          4,
+          3,
+          true,
+          3
         );
         var query = new ContextQuery(completionQuery);
         query.addContext(type.getSimpleName());

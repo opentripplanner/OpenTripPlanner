@@ -5,10 +5,13 @@ import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.transit.model.basic.Money;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This calculator is maintained by IBI Group.
@@ -80,7 +83,19 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       currentTransferWindowCost = Float.max(currentTransferWindowCost, rideCost);
     }
     cost += currentTransferWindowCost;
-    if (cost < Float.POSITIVE_INFINITY) fare.addFare(fareType, getMoney(currency, cost));
+    if (cost < Float.POSITIVE_INFINITY) {
+      final Money money = getMoney(currency, cost);
+      fare.addFare(fareType, money);
+      var fp = new FareProduct(
+        new FeedScopedId("fares", fareType.name()),
+        fareType.name(),
+        money,
+        null,
+        null,
+        null
+      );
+      fare.addItineraryProducts(List.of(fp));
+    }
     return cost > 0 && cost < Float.POSITIVE_INFINITY;
   }
 

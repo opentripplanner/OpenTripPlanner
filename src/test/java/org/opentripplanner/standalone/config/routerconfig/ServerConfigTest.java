@@ -20,7 +20,6 @@ public class ServerConfigTest {
     var config = new ServerConfig("server", root);
 
     assertEquals(SERVER_DEFAULT.apiProcessingTimeout(), config.apiProcessingTimeout());
-    assertEquals(SERVER_DEFAULT.requestLogFile(), config.requestLogFile());
   }
 
   @Test
@@ -29,7 +28,6 @@ public class ServerConfigTest {
       """
       {
         server: {
-          requestLogFile : "req-log-file",
           apiProcessingTimeout : "7s"
         }
       }
@@ -38,7 +36,6 @@ public class ServerConfigTest {
     var config = new ServerConfig("server", root);
 
     assertEquals(Duration.ofSeconds(7), config.apiProcessingTimeout());
-    assertEquals("req-log-file", config.requestLogFile());
   }
 
   private static NodeAdapter createNodeAdaptor(String jsonText) {

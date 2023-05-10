@@ -210,20 +210,23 @@ public class TestItineraryBuilder implements PlanTestConstants {
       FlexConfig.DEFAULT
     );
 
-    var edge = new FlexTripEdge(
-      new SimpleConcreteVertex(
-        null,
-        "v1",
-        lastPlace.coordinate.latitude(),
-        lastPlace.coordinate.longitude()
-      ),
-      new SimpleConcreteVertex(null, "v2", to.coordinate.latitude(), to.coordinate.longitude()),
-      lastPlace.stop,
-      to.stop,
-      flexTrip,
-      template,
-      new DirectFlexPathCalculator()
+    var fromv = new SimpleConcreteVertex(
+      null,
+      "v1",
+      lastPlace.coordinate.latitude(),
+      lastPlace.coordinate.longitude()
     );
+    var tov = new SimpleConcreteVertex(
+      null,
+      "v2",
+      to.coordinate.latitude(),
+      to.coordinate.longitude()
+    );
+
+    var flexPath = new DirectFlexPathCalculator()
+      .calculateFlexPath(fromv, tov, template.fromStopIndex, template.toStopIndex);
+
+    var edge = new FlexTripEdge(fromv, tov, lastPlace.stop, to.stop, flexTrip, template, flexPath);
 
     FlexibleTransitLeg leg = new FlexibleTransitLeg(edge, newTime(start), newTime(end), legCost);
 

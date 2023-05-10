@@ -11,7 +11,6 @@ Some loggers useful for debugging.
 
 - `TRANSFERS_EXPORT`: Dump transfers to _transfers-debug.csv_ file.
 - `DATA_IMPORT_ISSUES`: Write issues to debug lag as well as to the issue report.
-- `REQ_LOG`: Router request log. Enable with `requestLogFile` config parameter in build config.
 - `org.opentripplanner.raptor.RaptorService`: Debug Raptor request and response
 
 ## Format

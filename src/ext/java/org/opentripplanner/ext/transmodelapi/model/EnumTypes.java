@@ -293,26 +293,6 @@ public class EnumTypes {
     .newEnum()
     .name("RoutingErrorCode")
     .value(
-      "noTransitConnection",
-      RoutingErrorCode.NO_TRANSIT_CONNECTION,
-      "No transit connection was found between the origin and destination withing the operating day or the next day"
-    )
-    .value(
-      "noTransitConnectionInSearchWindow",
-      RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
-      "Transit connection was found, but it was outside the search window, see metadata for the next search window"
-    )
-    .value(
-      "outsideServicePeriod",
-      RoutingErrorCode.OUTSIDE_SERVICE_PERIOD,
-      "The date specified is outside the range of data currently loaded into the system"
-    )
-    .value(
-      "outsideBounds",
-      RoutingErrorCode.OUTSIDE_BOUNDS,
-      "The coordinates are outside the bounds of the data currently loaded into the system"
-    )
-    .value(
       "locationNotFound",
       RoutingErrorCode.LOCATION_NOT_FOUND,
       "The specified location is not close to any streets or transit stops"
@@ -323,14 +303,39 @@ public class EnumTypes {
       "No stops are reachable from the location specified. You can try searching using a different access or egress mode"
     )
     .value(
-      "walkingBetterThanTransit",
-      RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT,
-      "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
+      "noTransitConnection",
+      RoutingErrorCode.NO_TRANSIT_CONNECTION,
+      "No transit connection was found between the origin and destination withing the operating day or the next day"
+    )
+    .value(
+      "noTransitConnectionInSearchWindow",
+      RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
+      "Transit connection was found, but it was outside the search window, see metadata for the next search window"
+    )
+    .value(
+      "outsideBounds",
+      RoutingErrorCode.OUTSIDE_BOUNDS,
+      "The coordinates are outside the bounds of the data currently loaded into the system"
+    )
+    .value(
+      "outsideServicePeriod",
+      RoutingErrorCode.OUTSIDE_SERVICE_PERIOD,
+      "The date specified is outside the range of data currently loaded into the system"
+    )
+    .value(
+      "processingTimeout",
+      RoutingErrorCode.PROCESSING_TIMEOUT,
+      "The routing request timed out."
     )
     .value(
       "systemError",
       RoutingErrorCode.SYSTEM_ERROR,
       "An unknown error happened during the search. The details have been logged to the server logs"
+    )
+    .value(
+      "walkingBetterThanTransit",
+      RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT,
+      "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
     )
     .build();
 
@@ -482,14 +487,14 @@ public class EnumTypes {
       "There is no accessibility information for the stopPlace/quay."
     )
     .value(
-      "possible",
-      Accessibility.POSSIBLE,
-      "Boarding wheelchair-accessible serviceJourneys is possible at this stopPlace/quay."
-    )
-    .value(
       "notPossible",
       Accessibility.NOT_POSSIBLE,
       "Wheelchair boarding/alighting is not possible at this stop."
+    )
+    .value(
+      "possible",
+      Accessibility.POSSIBLE,
+      "Boarding wheelchair-accessible serviceJourneys is possible at this stopPlace/quay."
     )
     .build();
 

@@ -6,10 +6,10 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.model.basic.Money;
 
 class FareMapperTest implements PlanTestConstants {

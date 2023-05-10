@@ -23,9 +23,7 @@ import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
-import org.opentripplanner.standalone.configure.RequestLoggerFactory;
 import org.opentripplanner.transit.service.TransitService;
-import org.slf4j.Logger;
 
 @HttpRequestScoped
 public class DefaultServerRequestContext implements OtpServerRequestContext {
@@ -38,7 +36,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final RouteRequest routeRequestDefaults;
   private final MeterRegistry meterRegistry;
   private final RaptorConfig<TripSchedule> raptorConfig;
-  private final Logger requestLogger;
   private final TileRendererManager tileRendererManager;
   private final VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers;
   private final FlexConfig flexConfig;
@@ -57,7 +54,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     RouteRequest routeRequestDefaults,
     MeterRegistry meterRegistry,
     RaptorConfig<TripSchedule> raptorConfig,
-    Logger requestLogger,
     TileRendererManager tileRendererManager,
     VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers,
     WorldEnvelopeService worldEnvelopeService,
@@ -72,7 +68,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.transitRoutingConfig = transitRoutingConfig;
     this.meterRegistry = meterRegistry;
     this.raptorConfig = raptorConfig;
-    this.requestLogger = requestLogger;
     this.tileRendererManager = tileRendererManager;
     this.vectorTileLayers = vectorTileLayers;
     this.vehicleRentalService = vehicleRentalService;
@@ -100,8 +95,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleRentalService vehicleRentalService,
     FlexConfig flexConfig,
     List<RideHailingService> rideHailingServices,
-    @Nullable TraverseVisitor traverseVisitor,
-    @Nullable String requestLogFile
+    @Nullable TraverseVisitor traverseVisitor
   ) {
     return new DefaultServerRequestContext(
       graph,
@@ -110,7 +104,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       routeRequestDefaults,
       meterRegistry,
       raptorConfig,
-      RequestLoggerFactory.createLogger(requestLogFile),
       new TileRendererManager(graph, routeRequestDefaults.preferences()),
       vectorTileLayers,
       worldEnvelopeService,
@@ -192,11 +185,6 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public MeterRegistry meterRegistry() {
     return meterRegistry;
-  }
-
-  @Override
-  public Logger requestLogger() {
-    return requestLogger;
   }
 
   @Override

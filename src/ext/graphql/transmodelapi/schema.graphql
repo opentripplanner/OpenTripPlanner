@@ -1441,7 +1441,7 @@ enum ItineraryFilterDebugProfile {
   """
   Only return the requested number of itineraries, counting both actual and deleted ones.
   The top `numItineraries` using the request sort order is returned. This does not work
-  with paging, itineraries after the limit, but inside the search-window is skipped when
+  with paging, itineraries after the limit, but inside the search-window are skipped when
   moving to the next page.
   """
   limitToNumOfItineraries
@@ -1561,6 +1561,8 @@ enum RoutingErrorCode {
   outsideBounds
   "The date specified is outside the range of data currently loaded into the system"
   outsideServicePeriod
+  "The routing request timed out."
+  processingTimeout
   "An unknown error happened during the search. The details have been logged to the server logs"
   systemError
   "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"

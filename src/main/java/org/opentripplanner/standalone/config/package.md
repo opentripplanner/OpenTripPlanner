@@ -17,7 +17,7 @@ The design goals are:
   default values instead of making a parameter required.
 - Encapsulate config parsing, so parsing and error handling is consistent - and stay consistent over
   time(maintenance).
-- Configuration should be injected into OTP components/modules in using inversion-of-control. Each
+- Configuration should be injected into OTP components/modules using inversion-of-control. Each
   module should define the needed config as an interface(or simple Java class). This ensures
   type-safety and provides a consistent way to document needed configuration for each module.
 - For Sandbox modules the configuration loading should be put in the
@@ -76,6 +76,53 @@ or into the POJO.
 
 The 2 approaches are almost identical, but the interface is a bit more "pure" with respect to the
 responsibilities, while the POJO approach saves a few lines of code.
+
+## Default values - in code, config and APIs
+
+We prefer optional parameters using default values over required parameters in APIs and in the 
+configuration. Most API request parameters have default values defined in config. So, lets 
+illustrate the prefered way of doing this.
+
+We define a parameter for a feature inside the domain module. This is also where we define the 
+static "global" default value. This makes the default value available, not only to the domain,
+configuration and APIs - but in tests as well.
+
+```Java
+package o.o.mydomain.mysubdomain;
+
+class MyComponentParameters(foo : String = "BAR")
+```
+
+Then, in the configuration we used the default for documentation and to set the configuration 
+"default".
+
+```Java
+package o.o.standalone.config.mydomain;
+
+class MyComponentConfig {
+  final String foo;
+
+  MyComponentConfig(NodeAdapter c) {
+    var dft = new MyComponentParameters();
+    this.foo = c.of("fo").asString(dft.foo());
+    :
+```
+
+Last, we use the configured value in the API - both for documentation and as the default value 
+for the api input parameter:
+
+```Java
+var dft = [injected configuration object];
+:
+GraphQLArgument.newArgument().name("foo").defaultValue(dft.foo())
+```
+
+This show how the API gets the default value from the configured value, and how we fall back to a
+static value set in code, if no configuration is available. There are some cases with are more 
+complicated than this, but this is the general pattern for doing it. This also makes the default 
+value available in the configuration and API documentation. An important note is that in the 
+API we show the configured value as the default.
+
 
 ## Examples
 

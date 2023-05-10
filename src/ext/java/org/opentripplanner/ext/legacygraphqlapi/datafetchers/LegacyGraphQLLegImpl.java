@@ -15,6 +15,7 @@ import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
@@ -78,6 +79,11 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<Long> endTime() {
     return environment -> getSource(environment).getEndTime().toInstant().toEpochMilli();
+  }
+
+  @Override
+  public DataFetcher<Iterable<FareProductUse>> fareProducts() {
+    return environment -> getSource(environment).fareProducts();
   }
 
   @Override

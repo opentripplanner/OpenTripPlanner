@@ -10,7 +10,6 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOW
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -221,12 +220,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
       /* commit */
       return addTripToGraphAndBuffer(result.successValue(), journey, entityResolver);
-    } catch (Throwable t) {
+    } catch (Exception e) {
       LOG.warn(
         "{} EstimatedJourney {} failed.",
         shouldAddNewTrip ? "Adding" : "Updating",
         DebugString.of(journey),
-        t
+        e
       );
       return Result.failure(UpdateError.noTripId(UNKNOWN));
     }

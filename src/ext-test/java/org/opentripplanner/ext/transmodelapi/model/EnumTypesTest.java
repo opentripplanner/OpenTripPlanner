@@ -2,11 +2,14 @@ package org.opentripplanner.ext.transmodelapi.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.ROUTING_ERROR_CODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.map;
 
+import java.util.EnumSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.doc.DocumentedEnum;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 
 class EnumTypesTest {
 
@@ -70,6 +73,15 @@ class EnumTypesTest {
   void testMap() {
     Object mapping = map("iH", Foo.Hi);
     assertEquals("DocumentedEnumMapping[apiName=iH, internal=Hi]", mapping.toString());
+  }
+
+  @Test
+  void assertAllRoutingErrorCodesAreMapped() {
+    var expected = EnumSet.allOf(RoutingErrorCode.class);
+    var values = EnumSet.copyOf(
+      ROUTING_ERROR_CODE.getValues().stream().map(it -> (RoutingErrorCode) it.getValue()).toList()
+    );
+    assertEquals(expected, values);
   }
 
   private enum Foo implements DocumentedEnum<Foo> {
