@@ -20,6 +20,7 @@ import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.RoutingErrorsAttacher;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
@@ -139,7 +140,8 @@ public class RoutingWorker {
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
 
-    routingErrors.addAll(filterChain.getRoutingErrors());
+    var errors = RoutingErrorsAttacher.computeErrors(itineraries, filteredItineraries);
+    routingErrors.addAll(errors);
 
     if (LOG.isDebugEnabled()) {
       LOG.debug(
