@@ -12,7 +12,7 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  * for passing times comparison.
  * Passing times are exposed as seconds since midnight, taking into account the day offset.
  */
-public class TimetabledPassingTimeInfo {
+public class TimetabledPassingTimeInfo implements StopTimeAdaptor {
 
   /**
    * Map a timetabledPassingTime to true if its stop is a stop area, false otherwise.
@@ -35,19 +35,17 @@ public class TimetabledPassingTimeInfo {
     return new TimetabledPassingTimeInfo(timetabledPassingTime, stopIsFlexibleArea);
   }
 
+  @Override
   public boolean hasAreaStop() {
     return stopIsFlexibleArea;
   }
 
+  @Override
   public boolean hasRegularStop() {
     return !hasAreaStop();
   }
 
-  /**
-   * A passing time on a regular stop is complete if either arrival or departure time is present. A
-   * passing time on an area stop is complete if both earliest departure time and latest arrival
-   * time are present.
-   */
+  @Override
   public boolean hasCompletePassingTime() {
     if (hasRegularStop()) {
       return hasArrivalTime() || hasDepartureTime();
@@ -55,11 +53,7 @@ public class TimetabledPassingTimeInfo {
     return (hasLatestArrivalTime() && hasEarliestDepartureTime());
   }
 
-  /**
-   * A passing time on a regular stop is consistent if departure time is after arrival time. A
-   * passing time on an area stop is consistent if latest arrival time is after earliest departure
-   * time.
-   */
+  @Override
   public boolean hasConsistentPassingTime() {
     if (hasRegularStop() && (arrivalTime() == null || departureTime() == null)) {
       return true;
@@ -71,46 +65,19 @@ public class TimetabledPassingTimeInfo {
     }
   }
 
-  /**
-   * Return the elapsed time in second between midnight and the departure time, taking into account
-   * the day offset.
-   */
-  public int normalizedDepartureTime() {
-    Objects.requireNonNull(departureTime());
-    return elapsedTimeSinceMidnight(departureTime(), departureDayOffset());
-  }
-
-  /**
-   * Return the elapsed time in second between midnight and the arrival time, taking into account
-   * the day offset.
-   */
-  public int normalizedArrivalTime() {
-    Objects.requireNonNull(arrivalTime());
-    return elapsedTimeSinceMidnight(arrivalTime(), arrivalDayOffset());
-  }
-
-  /**
-   * Return the elapsed time in second between midnight and the earliest departure time, taking into
-   * account the day offset.
-   */
+  @Override
   public int normalizedEarliestDepartureTime() {
     Objects.requireNonNull(earliestDepartureTime());
     return elapsedTimeSinceMidnight(earliestDepartureTime(), earliestDepartureDayOffset());
   }
 
-  /**
-   * Return the elapsed time in second between midnight and the latest arrival time, taking into
-   * account the day offset.
-   */
+  @Override
   public int normalizedLatestArrivalTime() {
     Objects.requireNonNull(latestArrivalTime());
     return elapsedTimeSinceMidnight(latestArrivalTime(), latestArrivalDayOffset());
   }
 
-  /**
-   * Return the elapsed time in second between midnight and the departure time, taking into account
-   * the day offset. Fallback to arrival time if departure time is missing.
-   */
+  @Override
   public int normalizedDepartureTimeOrElseArrivalTime() {
     if (hasDepartureTime()) {
       return elapsedTimeSinceMidnight(departureTime(), departureDayOffset());
@@ -119,18 +86,34 @@ public class TimetabledPassingTimeInfo {
     }
   }
 
-  /**
-   * Return the elapsed time in second between midnight and the arrival time, taking into account
-   * the day offset. Fallback to departure time if arrival time is missing.
-   */
+  @Override
   public int normalizedArrivalTimeOrElseDepartureTime() {
     if (hasArrivalTime()) {
       return elapsedTimeSinceMidnight(arrivalTime(), arrivalDayOffset());
     } else return elapsedTimeSinceMidnight(departureTime(), departureDayOffset());
   }
 
-  public Object getId() {
+  @Override
+  public Object timetabledPassingTimeId() {
     return timetabledPassingTime.getId();
+  }
+
+  /**
+   * Return the elapsed time in second between midnight and the departure time, taking into account
+   * the day offset.
+   */
+  protected int normalizedDepartureTime() {
+    Objects.requireNonNull(departureTime());
+    return elapsedTimeSinceMidnight(departureTime(), departureDayOffset());
+  }
+
+  /**
+   * Return the elapsed time in second between midnight and the arrival time, taking into account
+   * the day offset.
+   */
+  protected int normalizedArrivalTime() {
+    Objects.requireNonNull(arrivalTime());
+    return elapsedTimeSinceMidnight(arrivalTime(), arrivalDayOffset());
   }
 
   private LocalTime arrivalTime() {

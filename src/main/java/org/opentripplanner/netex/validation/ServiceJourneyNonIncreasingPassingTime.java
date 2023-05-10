@@ -191,7 +191,7 @@ class ServiceJourneyNonIncreasingPassingTime
             "ServiceJourney has %s. ServiceJourney will be skipped. ServiceJourney = %s, TimetabledPassingTime = %s",
             errorType.message,
             sj.getId(),
-            invalidTimetabledPassingTimeInfo.getId()
+            invalidTimetabledPassingTimeInfo.timetabledPassingTimeId()
           )
         );
       }
