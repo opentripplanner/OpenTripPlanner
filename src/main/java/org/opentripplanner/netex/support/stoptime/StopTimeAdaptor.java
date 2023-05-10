@@ -1,8 +1,23 @@
-package org.opentripplanner.netex.support;
+package org.opentripplanner.netex.support.stoptime;
+
+import org.rutebanken.netex.model.TimetabledPassingTime;
 
 public interface StopTimeAdaptor {
+  static AbstractStopTimeAdaptor of(
+    TimetabledPassingTime timetabledPassingTime,
+    boolean stopIsFlexibleArea
+  ) {
+    return new AbstractStopTimeAdaptor(timetabledPassingTime, stopIsFlexibleArea);
+  }
+
+  /**
+   * Return true if the stop is a flexible area.
+   */
   boolean hasAreaStop();
 
+  /**
+   * Return true if the stop is a regular stop (used by both scheduled and flex services).
+   */
   boolean hasRegularStop();
 
   /**

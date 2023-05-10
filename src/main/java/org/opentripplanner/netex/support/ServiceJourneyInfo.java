@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
+import org.opentripplanner.netex.support.stoptime.AbstractStopTimeAdaptor;
 import org.rutebanken.netex.model.EntityStructure;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.ServiceJourney;

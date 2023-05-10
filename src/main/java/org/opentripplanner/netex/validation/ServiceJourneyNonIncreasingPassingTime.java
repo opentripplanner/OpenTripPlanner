@@ -2,8 +2,8 @@ package org.opentripplanner.netex.validation;
 
 import java.util.List;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
-import org.opentripplanner.netex.support.AbstractStopTimeAdaptor;
 import org.opentripplanner.netex.support.ServiceJourneyInfo;
+import org.opentripplanner.netex.support.stoptime.AbstractStopTimeAdaptor;
 import org.rutebanken.netex.model.ServiceJourney;
 
 /**

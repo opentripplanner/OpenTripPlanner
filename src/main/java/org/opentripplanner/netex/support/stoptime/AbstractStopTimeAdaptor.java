@@ -1,4 +1,4 @@
-package org.opentripplanner.netex.support;
+package org.opentripplanner.netex.support.stoptime;
 
 import static org.opentripplanner.netex.support.ServiceJourneyHelper.elapsedTimeSinceMidnight;
 
@@ -20,19 +20,12 @@ public class AbstractStopTimeAdaptor implements StopTimeAdaptor {
   private final boolean stopIsFlexibleArea;
   private final TimetabledPassingTime timetabledPassingTime;
 
-  private AbstractStopTimeAdaptor(
+  protected AbstractStopTimeAdaptor(
     TimetabledPassingTime timetabledPassingTime,
     boolean stopIsFlexibleArea
   ) {
     this.stopIsFlexibleArea = stopIsFlexibleArea;
     this.timetabledPassingTime = timetabledPassingTime;
-  }
-
-  public static AbstractStopTimeAdaptor of(
-    TimetabledPassingTime timetabledPassingTime,
-    boolean stopIsFlexibleArea
-  ) {
-    return new AbstractStopTimeAdaptor(timetabledPassingTime, stopIsFlexibleArea);
   }
 
   @Override
