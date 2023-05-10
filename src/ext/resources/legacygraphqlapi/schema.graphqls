@@ -2724,35 +2724,6 @@ type QueryType {
         pageCursor: String
 
         """
-        The maximum distance (in meters) the user is willing to walk per walking
-        section. If the only transport mode allowed is `WALK`, then the value of
-        this argument is ignored.
-        Default: 2000m
-        Maximum value: 15000m
-        **Note:** If this argument has a relatively small value and only some
-        transport modes are allowed (e.g. `WALK` and `RAIL`), it is possible to get
-        an itinerary which has (useless) back and forth public transport legs to
-        avoid walking too long distances.
-
-        DEPRECATED - Use walkReluctance instead
-        """
-        maxWalkDistance: Float @deprecated(reason: "Does nothing. Use walkReluctance instead.")
-
-        """
-        The maximum time (in seconds) of pre-transit travel when using
-        drive-to-transit (park and ride or kiss and ride). Default value: 1800.
-
-        DEPRECATED - Use walkReluctance or future reluctance parameters for other modes
-        """
-        maxPreTransitTime: Int
-
-        """
-        How expensive it is to drive a car when car&parking, increase this value to
-        make car driving legs shorter. Default value: 1.
-        """
-        carParkCarLegWeight: Float
-
-        """
         How easily bad itineraries are filtered from results. Value 0 (default)
         disables filtering. Itineraries are filtered if they are worse than another
         one in some respect (e.g. more walking) by more than the percentage of
@@ -2791,13 +2762,6 @@ type QueryType {
         walkReluctance: Float
 
         """
-        How much more reluctant is the user to walk on streets with car traffic allowed. Default value: 1.0
-
-        Deprecated, use walkSafetyFactor instead.
-        """
-        walkOnStreetReluctance: Float @deprecated(reason: "Use walkSafetyFactor instead")
-
-        """
         How much worse is waiting for a transit vehicle than being on a transit
         vehicle, as a multiplier. The default value treats wait and on-vehicle time
         as the same. It may be tempting to set this higher than walkReluctance (as
@@ -2809,14 +2773,6 @@ type QueryType {
         neighboring stop patterns, this problem could disappear. Default value: 1.0.
         """
         waitReluctance: Float
-
-        """
-        How much less bad is waiting at the beginning of the trip (replaces
-        `waitReluctance` on the first boarding). Default value: 0.4
-
-        Deprecated, not used, the timetable-view replaces this functionality.
-        """
-        waitAtBeginningFactor: Float @deprecated(reason: "Removed in OTP 2")
 
         """
         Max walk speed along streets, in meters per second. Default value: 1.33
@@ -2899,12 +2855,6 @@ type QueryType {
         transferPenalty: Int
 
         """
-        This argument has no use for itinerary planning and will be removed later.
-        ~~When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.~~
-        """
-        batch: Boolean @deprecated(reason: "Removed in OTP 2")
-
-        """
         List of transportation modes that the user is willing to use. Default: `["WALK","TRANSIT"]`
         """
         transportModes: [TransportMode]
@@ -2918,9 +2868,6 @@ type QueryType {
         Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, but does NOT delete them when this is enabled.
         """
         debugItineraryFilter: Boolean
-
-        """Is bike rental allowed? Default value: false"""
-        allowBikeRental: Boolean @deprecated(reason: "Rental is specified by modes")
 
         """
         Whether arriving at the destination with a rented (station) bicycle is allowed without
@@ -2979,22 +2926,6 @@ type QueryType {
         startTransitTripId: String
 
         """
-        No effect on itinerary planning, adjust argument `time` instead to get later departures.
-        ~~The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.~~
-        """
-        claimInitialWait: Long @deprecated(reason: "Removed in OTP 2")
-
-        """
-        **Consider this argument experimental** – setting this argument to true
-        causes timeouts and unoptimal routes in many cases.
-        When true, reverse optimize (find alternative transportation mode, which
-        still arrives to the destination in time) this search on the fly after
-        processing each transit leg, rather than reverse-optimizing the entire path
-        when it's done. Default value: false.
-        """
-        reverseOptimizeOnTheFly: Boolean @deprecated(reason: "Removed in OTP 2")
-
-        """
         When false, return itineraries using canceled trips. Default value: true.
         """
         omitCanceled: Boolean = true
@@ -3003,13 +2934,6 @@ type QueryType {
         When true, realtime updates are ignored during this search. Default value: false
         """
         ignoreRealtimeUpdates: Boolean
-
-        """
-        Only useful for testing and troubleshooting.
-        ~~If true, the remaining weight heuristic is disabled. Currently only
-        implemented for the long distance path service. Default value: false.~~
-        """
-        disableRemainingWeightHeuristic: Boolean @deprecated(reason: "Removed in OTP 2.2")
 
         """
         Two-letter language code (ISO 639-1) used for returned text.
@@ -3027,20 +2951,6 @@ type QueryType {
 
         """Tuning parameter for the search algorithm, mainly useful for testing."""
         heuristicStepsPerMainStep: Int
-
-        """
-        Whether legs should be compacted by performing a reversed search.
-        **Experimental argument, will be removed!**
-        """
-        compactLegsByReversedSearch: Boolean @deprecated(reason: "Removed in OTP 2")
-
-        """
-        Which vehicle rental networks can be used. By default, all networks are allowed.
-
-        Deprecated: Use `allowedVehicleRentalNetworks` instead.
-        """
-        allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedVehicleRentalNetworks instead")
-
         """
         Which vehicle rental networks can be used. By default, all networks are allowed.
         """
@@ -3059,6 +2969,82 @@ type QueryType {
 
         "Preferences for vehicle parking"
         parking: VehicleParkingInput
+
+        ## Deprecated fields, none of these have any effect on the routing anymore
+
+        """
+        The maximum distance (in meters) the user is willing to walk per walking
+        section. If the only transport mode allowed is `WALK`, then the value of
+        this argument is ignored.
+        Default: 2000m
+        Maximum value: 15000m
+        **Note:** If this argument has a relatively small value and only some
+        transport modes are allowed (e.g. `WALK` and `RAIL`), it is possible to get
+        an itinerary which has (useless) back and forth public transport legs to
+        avoid walking too long distances.
+        """
+        maxWalkDistance: Float @deprecated(reason: "Does nothing. Use walkReluctance instead.")
+
+        """
+        How much more reluctant is the user to walk on streets with car traffic allowed. Default value: 1.0
+        """
+        walkOnStreetReluctance: Float @deprecated(reason: "Use `walkSafetyFactor` instead")
+
+        """
+        How much less bad is waiting at the beginning of the trip (replaces
+        `waitReluctance` on the first boarding). Default value: 0.4
+        """
+        waitAtBeginningFactor: Float @deprecated(reason: "Removed in OTP 2, the timetable-view replaces this functionality.")
+        """
+        This argument has no use for itinerary planning and will be removed later.
+        When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.
+        """
+        batch: Boolean @deprecated(reason: "Removed in OTP 2")
+
+        """Is bike rental allowed? Default value: false"""
+        allowBikeRental: Boolean @deprecated(reason: "Rental is specified by modes")
+
+        """
+        No effect on itinerary planning, adjust argument `time` instead to get later departures.
+        ~~The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.~~
+        """
+        claimInitialWait: Long @deprecated(reason: "Removed in OTP 2")
+
+        """
+        **Consider this argument experimental** – setting this argument to true
+        causes timeouts and unoptimal routes in many cases.
+        When true, reverse optimize (find alternative transportation mode, which
+        still arrives to the destination in time) this search on the fly after
+        processing each transit leg, rather than reverse-optimizing the entire path
+        when it's done. Default value: false.
+        """
+        reverseOptimizeOnTheFly: Boolean @deprecated(reason: "Removed in OTP 2")
+
+        """
+        If true, the remaining weight heuristic is disabled. Currently only
+        implemented for the long distance path service.
+        """
+        disableRemainingWeightHeuristic: Boolean @deprecated(reason: "Removed in OTP 2.2")
+
+        """
+        Whether legs should be compacted by performing a reversed search.
+        """
+        compactLegsByReversedSearch: Boolean @deprecated(reason: "Removed in OTP 2")
+
+        """
+        Which vehicle rental networks can be used. By default, all networks are allowed.
+        """
+        allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedVehicleRentalNetworks instead")
+        """
+        The maximum time (in seconds) of pre-transit travel when using
+        drive-to-transit (park and ride or kiss and ride). Default value: 1800.
+        """
+        maxPreTransitTime: Int @deprecated(reason: "Use walkReluctance or future reluctance parameters for other modes")
+        """
+        How expensive it is to drive a car when car&parking, increase this value to
+        make car driving legs shorter. Default value: 1.
+        """
+        carParkCarLegWeight: Float @deprecated(reason: "Use `carReluctance` instead.")
     ): Plan @async
 }
 
