@@ -12,6 +12,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Configure HTTP WebServer Transaction timeouts [#5047](https://github.com/opentripplanner/OpenTripPlanner/pull/5047)
 - Add Fares v2 to GraphQL API [#4917](https://github.com/opentripplanner/OpenTripPlanner/pull/4917)
 - Improve Graph updaters shutdown [#5092](https://github.com/opentripplanner/OpenTripPlanner/pull/5092)
+- Add deduplicated  to geocoding sandbox API [#5084](https://github.com/opentripplanner/OpenTripPlanner/pull/5084)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
