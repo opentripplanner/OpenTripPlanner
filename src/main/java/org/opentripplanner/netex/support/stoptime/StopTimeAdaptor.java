@@ -3,7 +3,7 @@ package org.opentripplanner.netex.support.stoptime;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 public interface StopTimeAdaptor {
-  static AbstractStopTimeAdaptor of(
+  static StopTimeAdaptor of(
     TimetabledPassingTime timetabledPassingTime,
     boolean stopIsFlexibleArea
   ) {

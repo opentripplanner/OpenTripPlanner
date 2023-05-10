@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.netex.index.api.NetexEntityIndexReadOnlyView;
-import org.opentripplanner.netex.support.stoptime.AbstractStopTimeAdaptor;
+import org.opentripplanner.netex.support.stoptime.StopTimeAdaptor;
 import org.rutebanken.netex.model.EntityStructure;
 import org.rutebanken.netex.model.JourneyPattern_VersionStructure;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -34,7 +34,7 @@ public class ServiceJourneyInfo {
   /**
    * Sort the timetabled passing times according to their order in the journey pattern.
    */
-  public List<AbstractStopTimeAdaptor> orderedTimetabledPassingTimeInfos() {
+  public List<StopTimeAdaptor> orderedTimetabledPassingTimeInfos() {
     Map<TimetabledPassingTime, Boolean> stopFlexibility = stopFlexibility();
 
     Map<String, Integer> stopPointIdToOrder = journeyPattern
@@ -52,10 +52,7 @@ public class ServiceJourneyInfo {
         )
       )
       .map(timetabledPassingTime ->
-        AbstractStopTimeAdaptor.of(
-          timetabledPassingTime,
-          stopFlexibility.get(timetabledPassingTime)
-        )
+        StopTimeAdaptor.of(timetabledPassingTime, stopFlexibility.get(timetabledPassingTime))
       )
       .toList();
   }

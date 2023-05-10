@@ -12,7 +12,7 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  * for passing times comparison.
  * Passing times are exposed as seconds since midnight, taking into account the day offset.
  */
-public class AbstractStopTimeAdaptor implements StopTimeAdaptor {
+class AbstractStopTimeAdaptor implements StopTimeAdaptor {
 
   /**
    * Map a timetabledPassingTime to true if its stop is a stop area, false otherwise.
