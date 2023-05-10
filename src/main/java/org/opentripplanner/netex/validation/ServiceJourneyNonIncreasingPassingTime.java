@@ -36,147 +36,36 @@ class ServiceJourneyNonIncreasingPassingTime
   public Status validate(ServiceJourney sj) {
     ServiceJourneyInfo serviceJourneyInfo = new ServiceJourneyInfo(sj, index);
     List<StopTimeAdaptor> orderedPassingTimes = serviceJourneyInfo.orderedTimetabledPassingTimeInfos();
+    int lastIndex = orderedPassingTimes.size() - 1;
 
-    if (!isValidTimetabledPassingTimeInfo(orderedPassingTimes.get(0))) {
-      return Status.DISCARD;
-    }
+    for (int i = 0; true; i++) {
+      var current = orderedPassingTimes.get(i);
 
-    StopTimeAdaptor previousPassingTime = orderedPassingTimes.get(0);
-
-    for (int i = 1; i < orderedPassingTimes.size(); i++) {
-      StopTimeAdaptor currentPassingTime = orderedPassingTimes.get(i);
-
-      if (!isValidTimetabledPassingTimeInfo(currentPassingTime)) {
+      if (!current.isComplete()) {
+        invalidTimetabledPassingTimeInfo = current;
+        errorType = ErrorType.INCOMPLETE;
         return Status.DISCARD;
       }
 
-      if (
-        (previousPassingTime.hasRegularStop() && currentPassingTime.hasRegularStop()) &&
-        (!isValidRegularStopFollowedByRegularStop(previousPassingTime, currentPassingTime))
-      ) {
-        return Status.DISCARD;
-      }
-      if (
-        previousPassingTime.hasAreaStop() &&
-        currentPassingTime.hasAreaStop() &&
-        (!isValidAreaStopFollowedByAreaStop(previousPassingTime, currentPassingTime))
-      ) {
+      if (!current.isConsistent()) {
+        invalidTimetabledPassingTimeInfo = current;
+        errorType = ErrorType.INCONSISTENT;
         return Status.DISCARD;
       }
 
-      if (
-        (previousPassingTime.hasRegularStop()) &&
-        currentPassingTime.hasAreaStop() &&
-        (!isValidRegularStopFollowedByAreaStop(previousPassingTime, currentPassingTime))
-      ) {
-        return Status.DISCARD;
+      // Break out of the loop if last element processed
+      if (i == lastIndex) {
+        break;
       }
 
-      if (
-        previousPassingTime.hasAreaStop() &&
-        currentPassingTime.hasRegularStop() &&
-        (!isValidAreaStopFollowedByRegularStop(previousPassingTime, currentPassingTime))
-      ) {
+      // Validate increasing times for i (current) and i+1 (next)
+      if (!current.isStopTimesIncreasing(orderedPassingTimes.get(i + 1))) {
+        invalidTimetabledPassingTimeInfo = current;
+        errorType = ErrorType.NON_INCREASING;
         return Status.DISCARD;
       }
-
-      previousPassingTime = currentPassingTime;
     }
     return Status.OK;
-  }
-
-  /**
-   * A passing time is valid if it is both complete and consistent.
-   */
-  private boolean isValidTimetabledPassingTimeInfo(StopTimeAdaptor timetabledPassingTimeInfo) {
-    if (!timetabledPassingTimeInfo.hasCompletePassingTime()) {
-      invalidTimetabledPassingTimeInfo = timetabledPassingTimeInfo;
-      errorType = ServiceJourneyNonIncreasingPassingTime.ErrorType.INCOMPLETE;
-      return false;
-    }
-    if (!timetabledPassingTimeInfo.hasConsistentPassingTime()) {
-      invalidTimetabledPassingTimeInfo = timetabledPassingTimeInfo;
-      errorType = ServiceJourneyNonIncreasingPassingTime.ErrorType.INCONSISTENT;
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Regular stop followed by a regular stop: check that arrivalTime(n+1) > departureTime(n)
-   */
-  private boolean isValidRegularStopFollowedByRegularStop(
-    StopTimeAdaptor previousPassingTime,
-    StopTimeAdaptor currentPassingTime
-  ) {
-    int currentArrivalOrDepartureTime = currentPassingTime.normalizedArrivalTimeOrElseDepartureTime();
-    int previousDepartureOrArrivalTime = previousPassingTime.normalizedDepartureTimeOrElseArrivalTime();
-    if (currentArrivalOrDepartureTime < previousDepartureOrArrivalTime) {
-      invalidTimetabledPassingTimeInfo = currentPassingTime;
-      errorType = ErrorType.NON_INCREASING;
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Area stop followed by an area stop: check that earliestDepartureTime(n+1) >
-   * earliestDepartureTime(n) and latestArrivalTime(n+1) > latestArrivalTime(n)
-   */
-  private boolean isValidAreaStopFollowedByAreaStop(
-    StopTimeAdaptor previousPassingTime,
-    StopTimeAdaptor currentPassingTime
-  ) {
-    int previousEarliestDepartureTime = previousPassingTime.normalizedEarliestDepartureTime();
-    int currentEarliestDepartureTime = currentPassingTime.normalizedEarliestDepartureTime();
-    int previousLatestArrivalTime = previousPassingTime.normalizedLatestArrivalTime();
-    int currentLatestArrivalTime = currentPassingTime.normalizedLatestArrivalTime();
-
-    if (
-      currentEarliestDepartureTime < previousEarliestDepartureTime ||
-      currentLatestArrivalTime < previousLatestArrivalTime
-    ) {
-      invalidTimetabledPassingTimeInfo = currentPassingTime;
-      errorType = ErrorType.NON_INCREASING;
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Regular stop followed by an area stop: check that earliestDepartureTime(n+1) >
-   * departureTime(n)
-   */
-  private boolean isValidRegularStopFollowedByAreaStop(
-    StopTimeAdaptor previousPassingTime,
-    StopTimeAdaptor currentPassingTime
-  ) {
-    int previousDepartureOrArrivalTime = previousPassingTime.normalizedDepartureTimeOrElseArrivalTime();
-    int currentEarliestDepartureTime = currentPassingTime.normalizedEarliestDepartureTime();
-    if (currentEarliestDepartureTime < previousDepartureOrArrivalTime) {
-      invalidTimetabledPassingTimeInfo = currentPassingTime;
-      errorType = ErrorType.NON_INCREASING;
-      return false;
-    }
-    return true;
-  }
-
-  /**
-   * Area stop followed by a regular stop: check that arrivalTime(n+1) > latestArrivalTime(n)
-   */
-  private boolean isValidAreaStopFollowedByRegularStop(
-    StopTimeAdaptor previousPassingTime,
-    StopTimeAdaptor currentPassingTime
-  ) {
-    int previousLatestArrivalTime = previousPassingTime.normalizedLatestArrivalTime();
-    int currentArrivalOrDepartureTime = currentPassingTime.normalizedArrivalTimeOrElseDepartureTime();
-
-    if (currentArrivalOrDepartureTime < previousLatestArrivalTime) {
-      invalidTimetabledPassingTimeInfo = currentPassingTime;
-      errorType = ErrorType.NON_INCREASING;
-      return false;
-    }
-    return true;
   }
 
   @Override

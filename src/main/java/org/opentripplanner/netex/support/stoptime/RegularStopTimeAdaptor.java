@@ -9,7 +9,7 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  * for passing times comparison.
  * Passing times are exposed as seconds since midnight, taking into account the day offset.
  */
-class RegularStopTimeAdaptor extends AbstractStopTimeAdaptor {
+final class RegularStopTimeAdaptor extends AbstractStopTimeAdaptor {
 
   protected RegularStopTimeAdaptor(TimetabledPassingTime timetabledPassingTime) {
     super(timetabledPassingTime);
@@ -21,12 +21,12 @@ class RegularStopTimeAdaptor extends AbstractStopTimeAdaptor {
   }
 
   @Override
-  public boolean hasCompletePassingTime() {
+  public boolean isComplete() {
     return hasArrivalTime() || hasDepartureTime();
   }
 
   @Override
-  public boolean hasConsistentPassingTime() {
+  public boolean isConsistent() {
     return (
       arrivalTime() == null ||
       departureTime() == null ||
