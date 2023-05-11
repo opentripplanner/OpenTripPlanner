@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -190,4 +191,25 @@ public interface TransitService {
   Collection<AreaStop> findAreaStops(Envelope envelope);
 
   GraphUpdaterStatus getUpdaterStatus();
+
+  /**
+   * For a {@link StopLocationsGroup} get all child stops and get their modes.
+   * <p>
+   * The mode is either taken from {@link StopLocation#getGtfsVehicleType()} (if non-null)
+   * or from the list of patterns that use the stop location.
+   * <p>
+   * The returning stream may contain duplicates (one for each pattern)and must be further processed
+   * before being sent to the APIs.
+   */
+  Stream<TransitMode> getModesOfStopsLocationGroup(StopLocationsGroup station);
+  /**
+   * For a {@link StopLocation} its modes.
+   * <p>
+   * The mode is either taken from {@link StopLocation#getGtfsVehicleType()} (if non-null)
+   * or from the list of patterns that use the stop location.
+   * <p>
+   * The returning stream may contain duplicates (one mode per pattern) and must be further processed
+   * before being sent to the APIs.
+   */
+  Stream<TransitMode> getModesOfStopLocation(StopLocation stop);
 }

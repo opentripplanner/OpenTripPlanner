@@ -12,6 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
@@ -566,6 +567,20 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public GraphUpdaterStatus getUpdaterStatus() {
     return transitModel.getUpdaterManager();
+  }
+
+  @Override
+  public Stream<TransitMode> getModesOfStopsLocationGroup(StopLocationsGroup station) {
+    return station.getChildStops().stream().flatMap(this::getModesOfStopLocation);
+  }
+
+  @Override
+  public Stream<TransitMode> getModesOfStopLocation(StopLocation stop) {
+    if (stop.getGtfsVehicleType() != null) {
+      return Stream.of(stop.getGtfsVehicleType());
+    } else {
+      return getPatternsForStop(stop).stream().map(TripPattern::getMode);
+    }
   }
 
   @Override

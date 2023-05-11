@@ -428,13 +428,9 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       getValue(
         environment,
         stop -> {
-          if (stop.getGtfsVehicleType() != null) {
-            return stop.getGtfsVehicleType().name();
-          }
-          return getTransitService(environment)
-            .getPatternsForStop(stop)
-            .stream()
-            .map(TripPattern::getMode)
+          TransitService transitService = getTransitService(environment);
+          return transitService
+            .getModesOfStopLocation(stop)
             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
             .entrySet()
             .stream()
@@ -445,12 +441,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
         },
         station -> {
           TransitService transitService = getTransitService(environment);
-          return station
-            .getChildStops()
-            .stream()
-            .flatMap(stop ->
-              transitService.getPatternsForStop(stop).stream().map(TripPattern::getMode)
-            )
+          var modes = transitService.getModesOfStopsLocationGroup(station);
+          return modes
             .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
             .entrySet()
             .stream()

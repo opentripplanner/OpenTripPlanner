@@ -3,6 +3,7 @@ package org.opentripplanner.ext.geocoder;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -54,6 +55,7 @@ public class LuceneIndex implements Serializable {
   private static final String CODE = "code";
   private static final String LAT = "latitude";
   private static final String LON = "longitude";
+  private static final String MODE = "mode";
 
   private final Graph graph;
 
@@ -72,6 +74,7 @@ public class LuceneIndex implements Serializable {
 
     var directory = new ByteBuffersDirectory();
 
+    var stopClusterMapper = new StopClusterMapper(transitService);
     try {
       try (
         var directoryWriter = new IndexWriter(
@@ -89,7 +92,8 @@ public class LuceneIndex implements Serializable {
               stopLocation.getName(),
               stopLocation.getCode(),
               stopLocation.getCoordinate().latitude(),
-              stopLocation.getCoordinate().longitude()
+              stopLocation.getCoordinate().longitude(),
+              Set.of()
             )
           );
 
@@ -103,16 +107,17 @@ public class LuceneIndex implements Serializable {
               stopLocationsGroup.getName(),
               null,
               stopLocationsGroup.getCoordinate().latitude(),
-              stopLocationsGroup.getCoordinate().longitude()
+              stopLocationsGroup.getCoordinate().longitude(),
+              Set.of()
             )
           );
 
-        StopClusters
+        stopClusterMapper
           .generateStopClusters(
             transitService.listStopLocations(),
             transitService.listStopLocationGroups()
           )
-          .forEach(stopCluster -> {
+          .forEach(stopCluster ->
             addToIndex(
               directoryWriter,
               StopCluster.class,
@@ -120,9 +125,10 @@ public class LuceneIndex implements Serializable {
               new NonLocalizedString(stopCluster.name()),
               stopCluster.code(),
               stopCluster.coordinate().lat(),
-              stopCluster.coordinate().lon()
-            );
-          });
+              stopCluster.coordinate().lon(),
+              stopCluster.modes()
+            )
+          );
 
         graph
           .getVertices()
@@ -137,7 +143,8 @@ public class LuceneIndex implements Serializable {
               streetVertex.getIntersectionName(),
               streetVertex.getLabel(),
               streetVertex.getLat(),
-              streetVertex.getLon()
+              streetVertex.getLon(),
+              Set.of()
             )
           );
       }
@@ -196,7 +203,8 @@ public class LuceneIndex implements Serializable {
     var code = document.get(CODE);
     var lat = document.getField(LAT).numericValue().doubleValue();
     var lon = document.getField(LON).numericValue().doubleValue();
-    return new StopCluster(id, code, name, new Coordinate(lat, lon));
+    var modes = Arrays.asList(document.getValues(MODE));
+    return new StopCluster(id, code, name, new Coordinate(lat, lon), modes);
   }
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {
@@ -223,7 +231,8 @@ public class LuceneIndex implements Serializable {
     I18NString name,
     @Nullable String code,
     double latitude,
-    double longitude
+    double longitude,
+    Collection<String> modes
   ) {
     String typeName = type.getSimpleName();
 
@@ -238,6 +247,10 @@ public class LuceneIndex implements Serializable {
     if (code != null) {
       document.add(new TextField(CODE, code, Store.YES));
       document.add(new ContextSuggestField(SUGGEST, code, 1, typeName));
+    }
+
+    for (var mode : modes) {
+      document.add(new TextField(MODE, mode, Store.YES));
     }
 
     try {
