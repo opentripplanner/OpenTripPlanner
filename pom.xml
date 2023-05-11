@@ -56,14 +56,14 @@
 
 
     <properties>
-        <otp.serialization.version.id>101</otp.serialization.version.id>
+        <otp.serialization.version.id>102</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>29.0</geotools.version>
         <google.dagger.version>2.46</google.dagger.version>
         <jackson.version>2.15.0</jackson.version>
         <jersey.version>3.1.1</jersey.version>
         <junit.version>5.9.3</junit.version>
-        <micrometer.version>1.10.6</micrometer.version>
+        <micrometer.version>1.11.0</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
         <logback.version>1.4.7</logback.version>
@@ -1049,7 +1049,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.0.1</version>
+                        <version>3.1.0</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

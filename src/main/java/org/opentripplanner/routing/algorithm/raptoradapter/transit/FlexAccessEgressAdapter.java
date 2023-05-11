@@ -14,8 +14,8 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
 
   public FlexAccessEgressAdapter(FlexAccessEgress flexAccessEgress, boolean isEgress) {
     super(
-      flexAccessEgress.stop.getIndex(),
-      isEgress ? flexAccessEgress.lastState.reverse() : flexAccessEgress.lastState
+      flexAccessEgress.stop().getIndex(),
+      isEgress ? flexAccessEgress.lastState().reverse() : flexAccessEgress.lastState()
     );
     this.flexAccessEgress = flexAccessEgress;
   }
@@ -38,7 +38,7 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
 
   @Override
   public boolean stopReachedOnBoard() {
-    return flexAccessEgress.directToStop;
+    return flexAccessEgress.stopReachedOnBoard();
   }
 
   @Override
