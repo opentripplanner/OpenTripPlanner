@@ -85,10 +85,11 @@ public class SimpleIntersectionTraversalCalculator
   }
 
   /**
-   * Expected time it takes to continue straight without a stop light.
+   * Expected time it takes to continue straight without a stop light. This used to be higher, but
+   * it caused unrealistically slow car travel.
    */
   public double getExpectedStraightNoLightTimeSec() {
-    return 5.0;
+    return 0.0;
   }
 
   /**
