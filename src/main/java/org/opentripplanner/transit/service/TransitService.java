@@ -198,18 +198,20 @@ public interface TransitService {
    * The mode is either taken from {@link StopLocation#getGtfsVehicleType()} (if non-null)
    * or from the list of patterns that use the stop location.
    * <p>
-   * The returning stream may contain duplicates (one for each pattern)and must be further processed
-   * before being sent to the APIs.
+   * The returning stream is ordered by the number of occurrences of the mode in the child stops.
+   * So, if more patterns of mode BUS than RAIL visit the group, the result will be [BUS,RAIL].
    */
-  Stream<TransitMode> getModesOfStopsLocationGroup(StopLocationsGroup station);
+  Stream<TransitMode> getModesOfStopLocationsGroup(StopLocationsGroup station);
   /**
-   * For a {@link StopLocation} its modes.
+   * For a {@link StopLocation} return its modes.
    * <p>
    * The mode is either taken from {@link StopLocation#getGtfsVehicleType()} (if non-null)
    * or from the list of patterns that use the stop location.
    * <p>
-   * The returning stream may contain duplicates (one mode per pattern) and must be further processed
-   * before being sent to the APIs.
+   * If {@link StopLocation#getGtfsVehicleType()} is null the returning stream is ordered by the number
+   * of occurrences of the mode in the stop.
+   * <p>
+   * So, if more patterns of mode BUS than RAIL visit the stop, the result will be [BUS,RAIL].
    */
   Stream<TransitMode> getModesOfStopLocation(StopLocation stop);
 }

@@ -102,7 +102,7 @@ class LuceneIndexTest {
     var transitService = new DefaultTransitService(transitModel) {
       private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap
         .<StopLocation, TransitMode>builder()
-        .putAll(WESTHAFEN, FERRY, FERRY, FERRY, BUS, BUS)
+        .putAll(WESTHAFEN, FERRY, BUS)
         .build();
 
       @Override

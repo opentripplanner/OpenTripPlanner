@@ -55,7 +55,7 @@ class StopClusterMapper {
   }
 
   StopCluster map(StopLocationsGroup g) {
-    var modes = transitService.getModesOfStopsLocationGroup(g).map(Enum::name).distinct().toList();
+    var modes = transitService.getModesOfStopLocationsGroup(g).map(Enum::name).toList();
     return new StopCluster(
       g.getId(),
       null,
@@ -69,7 +69,7 @@ class StopClusterMapper {
     return Optional
       .ofNullable(sl.getName())
       .map(name -> {
-        var modes = transitService.getModesOfStopLocation(sl).map(Enum::name).distinct().toList();
+        var modes = transitService.getModesOfStopLocation(sl).map(Enum::name).toList();
         return new StopCluster(
           sl.getId(),
           sl.getCode(),

@@ -9,9 +9,13 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
@@ -570,12 +574,21 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Stream<TransitMode> getModesOfStopsLocationGroup(StopLocationsGroup station) {
-    return station.getChildStops().stream().flatMap(this::getModesOfStopLocation);
+  public Stream<TransitMode> getModesOfStopLocationsGroup(StopLocationsGroup station) {
+    return sortByOccurenceAndReduce(
+      station.getChildStops().stream().flatMap(this::getPatternModesOfStop)
+    );
   }
 
   @Override
   public Stream<TransitMode> getModesOfStopLocation(StopLocation stop) {
+    return sortByOccurenceAndReduce(getPatternModesOfStop(stop));
+  }
+
+  /**
+   * For each pattern visiting this {@link StopLocation} return its {@link TransitMode}
+   */
+  private Stream<TransitMode> getPatternModesOfStop(StopLocation stop) {
     if (stop.getGtfsVehicleType() != null) {
       return Stream.of(stop.getGtfsVehicleType());
     } else {
@@ -591,5 +604,21 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public boolean transitFeedCovers(Instant dateTime) {
     return transitModel.transitFeedCovers(dateTime);
+  }
+
+  /**
+   * Take a stream of T, count the occurrences of each value and return it in order of frequency
+   * from high to low.
+   * <p>
+   * Example: [a,b,b,c,c,c] will return [c,b,a]
+   */
+  private static <T> Stream<T> sortByOccurenceAndReduce(Stream<T> input) {
+    return input
+      .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+      .entrySet()
+      .stream()
+      // a bit tricky to read: reverse the order so that the higher numbers come first
+      .sorted(Comparator.comparing(entry -> -entry.getValue()))
+      .map(Map.Entry::getKey);
   }
 }
