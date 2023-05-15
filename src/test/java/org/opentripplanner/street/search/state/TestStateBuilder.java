@@ -50,8 +50,11 @@ public class TestStateBuilder {
     var to = StreetModelForTest.intersectionVertex(count, count);
 
     var edge = StreetModelForTest.streetEdge(from, to);
-
-    currentState = edge.traverse(currentState);
+    var states = edge.traverse(currentState);
+    if (states.length != 1) {
+      throw new IllegalStateException("Only single state transitions are supported.");
+    }
+    currentState = states[0];
     return this;
   }
 
