@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.transmodelapi;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -21,6 +20,7 @@ import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.ext.transmodelapi.support.OTPProcessingTimeoutGraphQLException;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.framework.http.OtpHttpStatus;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
@@ -32,9 +32,7 @@ class TransmodelGraph {
 
   TransmodelGraph(GraphQLSchema schema) {
     this.threadPool =
-      Executors.newCachedThreadPool(
-        new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-%d").build()
-      );
+      Executors.newCachedThreadPool(OtpRequestThreadFactory.of("transmodel-api-%d"));
     this.indexSchema = schema;
   }
 

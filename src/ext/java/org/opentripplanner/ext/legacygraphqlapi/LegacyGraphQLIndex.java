@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
 import com.google.common.io.Resources;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -86,6 +85,7 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLservic
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstepImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstopAtDistanceImpl;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +96,7 @@ class LegacyGraphQLIndex {
   private static final GraphQLSchema indexSchema = buildSchema();
 
   static final ExecutorService threadPool = Executors.newCachedThreadPool(
-    new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-%d").build()
+    OtpRequestThreadFactory.of("gtfs-api-%d")
   );
 
   protected static GraphQLSchema buildSchema() {
