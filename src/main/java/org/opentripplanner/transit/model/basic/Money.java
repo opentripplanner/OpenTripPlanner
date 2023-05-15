@@ -15,6 +15,7 @@ import javax.annotation.Nonnull;
 public class Money implements Comparable<Money> {
 
   public static final Currency USD = Currency.getInstance("USD");
+  public static final Money ZERO_USD = Money.usDollars(0);
   private final Currency currency;
   private final int amount;
 
@@ -135,6 +136,13 @@ public class Money implements Comparable<Money> {
    */
   public Money plus(Money other) {
     return op(other, o -> new Money(currency, amount + o.amount));
+  }
+
+  /**
+   * Multiplies the amount with the multiplicator.
+   */
+  public Money times(int multiplicator) {
+    return new Money(this.currency, amount * multiplicator);
   }
 
   /**
