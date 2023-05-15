@@ -261,9 +261,9 @@ class OrcaFaresData {
       name,
       Map.of(
         FareType.regular,
-        Money.ofFractionalAmount(USD, regularFare),
+        Money.usDollars(regularFare),
         FareType.electronicRegular,
-        Money.ofFractionalAmount(USD, electronicRegularFare)
+        Money.usDollars(electronicRegularFare)
       )
     );
   }
