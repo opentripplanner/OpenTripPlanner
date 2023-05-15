@@ -1,7 +1,15 @@
 {
   "configVersion": "v2.3.0-EN000121",
   "server": {
-    "apiProcessingTimeout" : "7s"
+    "apiProcessingTimeout": "7s",
+    "traceParameters": [
+      {
+        "httpRequestHeader": "X-Correlation-ID",
+        "httpResponseHeader": "X-Correlation-ID",
+        "logKey": "correlationId",
+        "generateIdIfMissing": true
+      }
+    ]
   },
   "routingDefaults": {
     "walkSpeed": 1.3,
