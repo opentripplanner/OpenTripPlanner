@@ -6,6 +6,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
+import static org.opentripplanner.standalone.config.routerequest.VehicleRentalConfig.setVehicleRental;
 import static org.opentripplanner.standalone.config.routerequest.WheelchairConfig.mapWheelchairPreferences;
 
 import java.time.Duration;
@@ -21,10 +22,8 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
-import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -55,21 +54,11 @@ public class RouteRequestConfig {
     }
 
     RouteRequest request = dft.clone();
-    VehicleRentalRequest vehicleRental = request.journey().rental();
     VehicleParkingRequest vehicleParking = request.journey().parking();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
 
-    vehicleRental.setAllowedNetworks(
-      c
-        .of("allowedVehicleRentalNetworks")
-        .since(V2_1)
-        .summary(
-          "The vehicle rental networks which may be used. If empty all networks may be used."
-        )
-        .asStringSet(vehicleRental.allowedNetworks())
-    );
     request.setArriveBy(
       c
         .of("arriveBy")
@@ -77,29 +66,6 @@ public class RouteRequestConfig {
         .summary("Whether the trip should depart or arrive at the specified date and time.")
         .asBoolean(dft.arriveBy())
     );
-
-    vehicleRental.setBannedNetworks(
-      c
-        .of("bannedVehicleRentalNetworks")
-        .since(V2_1)
-        .summary(
-          "he vehicle rental networks which may not be used. If empty, no networks are banned."
-        )
-        .asStringSet(vehicleRental.bannedNetworks())
-    );
-
-    request
-      .journey()
-      .rental()
-      .setAllowArrivingInRentedVehicleAtDestination(
-        c
-          .of("allowKeepingRentedBicycleAtDestination")
-          .since(V2_2)
-          .summary(
-            "If a vehicle should be allowed to be kept at the end of a station-based rental."
-          )
-          .asBoolean(request.journey().rental().allowArrivingInRentedVehicleAtDestination())
-      );
 
     request.setLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
 
@@ -241,6 +207,7 @@ travel time `x` (in seconds).
 
     // Map preferences
     request.withPreferences(preferences -> mapPreferences(c, preferences));
+    request.withPreferences(preferences -> setVehicleRental(c, request, preferences));
 
     return request;
   }
@@ -248,7 +215,6 @@ travel time `x` (in seconds).
   private static void mapPreferences(NodeAdapter c, RoutingPreferences.Builder preferences) {
     preferences.withTransit(it -> mapTransitPreferences(c, it));
     preferences.withBike(it -> mapBikePreferences(c, it));
-    preferences.withRental(it -> mapRentalPreferences(c, it));
     preferences.withStreet(it -> mapStreetPreferences(c, it));
     preferences.withCar(it -> mapCarPreferences(c, it));
     preferences.withSystem(it -> mapSystemPreferences(c, it));
@@ -491,60 +457,6 @@ ferries, where the check-in process needs to be done in good time before ride.
             "How bad is it to walk the bicycle up/down a flight of stairs compared to taking a detour."
           )
           .asDouble(dft.stairsReluctance())
-      );
-  }
-
-  private static void mapRentalPreferences(
-    NodeAdapter c,
-    VehicleRentalPreferences.Builder builder
-  ) {
-    var dft = builder.original();
-    builder
-      .withDropoffCost(
-        c
-          .of("vehicleRentalDropoffCost")
-          .since(V2_0)
-          .summary("Cost to drop-off a rented vehicle.")
-          .asInt(dft.dropoffCost())
-      )
-      .withDropoffTime(
-        c
-          .of("vehicleRentalDropoffTime")
-          .since(V2_0)
-          .summary("Time to drop-off a rented vehicle.")
-          .asInt(dft.dropoffTime())
-      )
-      .withPickupCost(
-        c
-          .of("vehicleRentalPickupCost")
-          .since(V2_0)
-          .summary("Cost to rent a vehicle.")
-          .asInt(dft.pickupCost())
-      )
-      .withPickupTime(
-        c
-          .of("vehicleRentalPickupTime")
-          .since(V2_0)
-          .summary("Time to rent a vehicle.")
-          .asInt(dft.pickupTime())
-      )
-      .withUseAvailabilityInformation(
-        c
-          .of("useVehicleRentalAvailabilityInformation")
-          .since(V2_0)
-          .summary(
-            "Whether or not vehicle rental availability information will be used to plan vehicle rental trips."
-          )
-          .asBoolean(dft.useAvailabilityInformation())
-      )
-      .withArrivingInRentalVehicleAtDestinationCost(
-        c
-          .of("keepingRentedVehicleAtDestinationCost")
-          .since(V2_2)
-          .summary(
-            "The cost of arriving at the destination with the rented vehicle, to discourage doing so."
-          )
-          .asDouble(dft.arrivingInRentalVehicleAtDestinationCost())
       );
   }
 
