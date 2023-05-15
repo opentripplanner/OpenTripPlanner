@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.api.response.RoutingError;
 
@@ -50,11 +50,6 @@ class RoutingErrorsAttacher {
           .getSystemNotices()
           .stream()
           .anyMatch(notice -> notice.tag.equals(RemoveTransitIfStreetOnlyIsBetterFilter.TAG));
-      Predicate<Itinerary> isOutsideSearchWindow = it ->
-        it
-          .getSystemNotices()
-          .stream()
-          .anyMatch(notice -> notice.tag.equals(LatestDepartureTimeFilter.TAG));
       if (filteredItineraries.stream().allMatch(isOnStreetAllTheWay.or(isWorseThanStreet))) {
         var nonTransitIsWalking = filteredItineraries
           .stream()
@@ -64,7 +59,9 @@ class RoutingErrorsAttacher {
           routingErrors.add(new RoutingError(WALKING_BETTER_THAN_TRANSIT, null));
         }
       } else if (
-        filteredItineraries.stream().allMatch(isOnStreetAllTheWay.or(isOutsideSearchWindow))
+        filteredItineraries
+          .stream()
+          .allMatch(isOnStreetAllTheWay.or(OutsideSearchWindowFilter::taggedBy))
       ) {
         routingErrors.add(new RoutingError(NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW, DATE_TIME));
       }
