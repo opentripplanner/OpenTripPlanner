@@ -452,22 +452,10 @@ public class DefaultRouteRequestType {
           .newFieldDefinition()
           .name("debugItineraryFilter")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(env -> preferences.itineraryFilter().debug())
+          .deprecate("Use `itineraryFilter.debug` instead.")
+          .dataFetcher(env -> preferences.itineraryFilter().debug().debugEnabled())
           .build()
       )
-      /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("rideAndKiss")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> defaults.rideAndKiss)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("useTraffic")
-                        .description("Should traffic congestion be considered when driving?")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> defaults.useTraffic)
-                        .build())
-                 */
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()

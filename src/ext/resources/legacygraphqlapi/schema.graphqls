@@ -898,37 +898,37 @@ type elevationProfileComponent {
 }
 
 type fare {
-    type: String
+    type: String @deprecated
 
     """ISO 4217 currency code"""
-    currency: String
+    currency: String @deprecated
 
     """
     Fare price in cents. **Note:** this value is dependent on the currency used,
     as one cent is not necessarily ¹/₁₀₀ of the basic monerary unit.
     """
-    cents: Int
+    cents: Int @deprecated
 
     """Components which this fare is composed of"""
-    components: [fareComponent]
+    components: [fareComponent] @deprecated
 }
 
 """Component of the fare (i.e. ticket) for a part of the itinerary"""
 type fareComponent {
     """ID of the ticket type. Corresponds to `fareId` in **TicketType**."""
-    fareId: String
+    fareId: String @deprecated
 
     """ISO 4217 currency code"""
-    currency: String
+    currency: String @deprecated
 
     """
     Fare price in cents. **Note:** this value is dependent on the currency used,
     as one cent is not necessarily ¹/₁₀₀ of the basic monerary unit.
     """
-    cents: Int
+    cents: Int @deprecated
 
     """List of routes which use this fare component"""
-    routes: [Route]
+    routes: [Route] @deprecated
 }
 
 """
@@ -1279,6 +1279,75 @@ type RoutingError {
     description: String!
 }
 
+"Category of riders a fare product applies to, for example students or pensioners."
+type RiderCategory {
+    "ID of the category"
+    id: String!
+    "Human readable name of the category."
+    name: String
+}
+
+"""
+A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'.
+"""
+type FareMedium {
+    "ID of the medium"
+    id: String!
+    "Human readable name of the medium."
+    name: String
+}
+
+"A container for both a fare product (a ticket) and its relationship to the itinerary."
+type FareProductUse {
+    """
+    Identifier local to the itinerary that allows to cross-reference and deduplicate
+    fare products that span more than one leg.
+
+    If you want to uniquely identify the fare product itself (not its use) use the product's `id`.
+
+    ### Example: Day pass
+
+    When a day pass is valid for all three legs in the itinerary it will appear
+    for each leg but with the same use-`id`.
+
+    *It is the responsibility of the API consumers to display the day pass as a product for the
+    entire itinerary rather than three day passes!*
+
+    ### Example: Several single tickets
+
+    If you have two legs and need to buy two single tickets they will appear in each leg with the
+    same `product.id` but different use-`id`.
+    """
+    id: String!
+
+    "The purchasable fare product"
+    product: FareProduct
+}
+
+"A fare product (a ticket) to be bought by a passenger"
+type FareProduct {
+    "Identifier for the fare product."
+    id: String!
+
+    """
+    Human readable name of the product, for example example "Day pass" or "Single ticket".
+    """
+    name: String!
+
+    "The price of the product"
+    price: Money!
+
+    "The category of riders this product applies to, for example students or pensioners."
+    riderCategory: RiderCategory
+
+    """
+    The 'medium' that this product applies to, for example "Oyster Card" or "Berlin Ticket App".
+
+    This communicates to riders that a specific way of buying or keeping this product is required.
+    """
+    medium: FareMedium
+}
+
 type Itinerary {
     """
     Time when the user leaves from the origin. Format: Unix timestamp in milliseconds.
@@ -1313,8 +1382,11 @@ type Itinerary {
     """
     legs: [Leg]!
 
-    """Information about the fares for this itinerary"""
-    fares: [fare]
+    """
+    Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
+    will be removed in the future.
+    """
+    fares: [fare] @deprecated(reason: "Use the leg's `fareProducts`.")
 
     """
     How much elevation is gained, in total, over the course of the itinerary, in meters.
@@ -1371,10 +1443,9 @@ type Money {
     "The currency of this money amount."
     currency: Currency!
     """
-    Money amount in cents. **Note:** this value is dependent on the currency used,
-    as one cent is not necessarily ¹/₁₀₀ of the basic monetary unit.
+    Money as a fractional amount, so 3.10 USD is represented as `3.1`.
     """
-    amount: Int!
+    amount: Float!
 }
 
 """"
@@ -1561,6 +1632,15 @@ type Leg {
     More information is available in the [feature documentation](https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/).
     """
     accessibilityScore: Float
+
+    """
+    Fare products are purchasable tickets which may have an optional fare container or rider
+    category that limits who can buy them or how.
+
+    Please read the documentation of `id` very carefully to learn how a single fare product
+    that applies to multiple legs can appear several times.
+    """
+    fareProducts: [FareProductUse]
 }
 
 """A span of time."""

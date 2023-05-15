@@ -353,3 +353,12 @@ otp.config.modes = {
     "CARPOOL,WALK"             : _tr("Carpool"),
     "CAR_HAIL,TRANSIT,WALK"    : _tr("Car hailing and transit")
 };
+
+let limitTo = _tr("Limit to ");
+
+otp.config.debugItinerarys = {
+    "OFF"      : _tr('Off'),
+    "LIST_ALL" : _tr('Show all'),
+    "LIMIT_TO_NUM_OF_ITINERARIES" : limitTo + '<code>numItineraries</code>',
+    "LIMIT_TO_SEARCH_WINDOW" : limitTo + '<code>searchWindow</code>'
+};

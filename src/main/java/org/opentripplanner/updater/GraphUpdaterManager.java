@@ -218,7 +218,9 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
     Executors
       .newSingleThreadExecutor()
       .submit(() -> {
-        while (true) {
+        boolean otpIsShuttingDown = false;
+
+        while (!otpIsShuttingDown) {
           try {
             if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
               LOG.info("OTP UPDATERS INITIALIZED - OTP is ready for routing!");
@@ -226,6 +228,10 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
             }
             //noinspection BusyWait
             Thread.sleep(1000);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            otpIsShuttingDown = true;
+            LOG.info("OTP is shutting down, cancelling wait for updaters readiness.");
           } catch (Exception e) {
             LOG.error(e.getMessage(), e);
           }

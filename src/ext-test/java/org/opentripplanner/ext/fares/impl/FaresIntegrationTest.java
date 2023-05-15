@@ -15,11 +15,12 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.basic.Money;
@@ -130,7 +131,7 @@ public class FaresIntegrationTest {
 
     var fare = getFare(from, to, dateTime, serverContext);
 
-    var fareComponents = fare.getDetails(FareType.regular);
+    var fareComponents = fare.getComponents(FareType.regular);
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price(), tenUSD);
     assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "AB"));
@@ -149,7 +150,7 @@ public class FaresIntegrationTest {
     to = GenericLocation.fromStopId("Destination", feedId, "C");
     fare = getFare(from, to, dateTime, serverContext);
 
-    fareComponents = fare.getDetails(FareType.regular);
+    fareComponents = fare.getComponents(FareType.regular);
     assertEquals(fareComponents.size(), 2);
     assertEquals(fareComponents.get(0).price(), tenUSD);
     assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "AB"));
@@ -163,7 +164,7 @@ public class FaresIntegrationTest {
     to = GenericLocation.fromStopId("Destination", feedId, "D");
     fare = getFare(from, to, dateTime, serverContext);
 
-    fareComponents = fare.getDetails(FareType.regular);
+    fareComponents = fare.getComponents(FareType.regular);
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price(), tenUSD);
     assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "BD"));
@@ -175,7 +176,7 @@ public class FaresIntegrationTest {
     to = GenericLocation.fromStopId("Destination", feedId, "G");
     fare = getFare(from, to, dateTime, serverContext);
 
-    fareComponents = fare.getDetails(FareType.regular);
+    fareComponents = fare.getComponents(FareType.regular);
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price(), tenUSD);
     assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "EG"));
@@ -187,7 +188,7 @@ public class FaresIntegrationTest {
     to = GenericLocation.fromStopId("Destination", feedId, "E");
     fare = getFare(from, to, dateTime, serverContext);
 
-    fareComponents = fare.getDetails(FareType.regular);
+    fareComponents = fare.getComponents(FareType.regular);
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price(), tenUSD);
     assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "CD"));
@@ -198,7 +199,7 @@ public class FaresIntegrationTest {
     to = GenericLocation.fromStopId("Destination", feedId, "G");
     fare = getFare(from, to, dateTime, serverContext);
 
-    fareComponents = fare.getDetails(FareType.regular);
+    fareComponents = fare.getComponents(FareType.regular);
     assertEquals(fareComponents.size(), 1);
     assertEquals(fareComponents.get(0).price(), tenUSD);
     assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "EG"));
@@ -210,7 +211,7 @@ public class FaresIntegrationTest {
     to = GenericLocation.fromStopId("Destination", feedId, "D");
     fare = getFare(from, to, dateTime, serverContext);
 
-    fareComponents = fare.getDetails(FareType.regular);
+    fareComponents = fare.getComponents(FareType.regular);
     assertEquals(fareComponents.size(), 2);
     assertEquals(fareComponents.get(0).price(), tenUSD);
     assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "AB"));
@@ -242,7 +243,9 @@ public class FaresIntegrationTest {
     request.setDateTime(time);
     request.setFrom(from);
     request.setTo(to);
-    request.withPreferences(p -> p.withItineraryFilter(it -> it.withDebug(true)));
+    request.withPreferences(p ->
+      p.withItineraryFilter(it -> it.withDebug(ItineraryFilterDebugProfile.LIST_ALL))
+    );
 
     var result = serverContext.routingService().route(request);
 

@@ -47,8 +47,7 @@ public class ConstructApplicationModule {
       vehicleRentalService,
       routerConfig.flexConfig(),
       rideHailingServices,
-      traverseVisitor,
-      routerConfig.server().requestLogFile()
+      traverseVisitor
     );
   }
 

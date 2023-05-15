@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
@@ -14,6 +15,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
@@ -41,9 +43,20 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     float expectedFare
   ) {
     var fares = fareService.getCost(i);
-    assertEquals(Money.usDollars(Math.round(expectedFare * 100)), fares.getFare(FareType.regular));
+    final Money expected = Money.usDollars(Math.round(expectedFare * 100));
+    assertEquals(expected, fares.getFare(FareType.regular));
 
-    fares.getTypes().forEach(t -> assertEquals(List.of(), fares.getDetails(t)));
+    for (var type : fares.getFareTypes()) {
+      assertTrue(fares.getComponents(type).isEmpty());
+
+      var prices = fares
+        .getItineraryProducts()
+        .stream()
+        .filter(fp -> fp.name().equals(type.name()))
+        .map(FareProduct::price)
+        .toList();
+      assertEquals(List.of(expected), prices);
+    }
   }
 
   private static List<Arguments> createTestCases() {

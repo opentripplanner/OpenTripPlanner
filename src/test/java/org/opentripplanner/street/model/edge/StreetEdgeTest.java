@@ -90,7 +90,7 @@ public class StreetEdgeTest {
       .build();
 
     State s0 = new State(v1, options);
-    State s1 = e1.traverse(s0);
+    State s1 = e1.traverse(s0)[0];
 
     // Should use the speed on the edge.
     double expectedWeight = e1.getDistanceMeters() / options.preferences().walk().speed();
@@ -105,7 +105,7 @@ public class StreetEdgeTest {
     e1.setCarSpeed(10.0f);
 
     State s0 = new State(v1, StreetSearchRequest.copyOf(proto).withMode(StreetMode.CAR).build());
-    State s1 = e1.traverse(s0);
+    State s1 = e1.traverse(s0)[0];
 
     // Should use the speed on the edge.
     double expectedWeight = e1.getDistanceMeters() / e1.getCarSpeed();
@@ -153,16 +153,16 @@ public class StreetEdgeTest {
     forward.withPreferences(p -> p.withBike(it -> it.withSpeed(3.0f)));
 
     State s0 = new State(v0, forward.withMode(StreetMode.BIKE).build());
-    State s1 = e0.traverse(s0);
-    State s2 = e1.traverse(s1);
+    State s1 = e0.traverse(s0)[0];
+    State s2 = e1.traverse(s1)[0];
 
     StreetSearchRequestBuilder reverse = StreetSearchRequest.copyOf(proto);
     reverse.withArriveBy(true);
     reverse.withPreferences(p -> p.withBike(it -> it.withSpeed(3.0f)));
 
     State s3 = new State(v2, reverse.withMode(StreetMode.BIKE).build());
-    State s4 = e1.traverse(s3);
-    State s5 = e0.traverse(s4);
+    State s4 = e1.traverse(s3)[0];
+    State s5 = e0.traverse(s4)[0];
 
     assertEquals(88, s2.getElapsedTimeSeconds());
     assertEquals(88, s5.getElapsedTimeSeconds());
@@ -189,15 +189,15 @@ public class StreetEdgeTest {
     StreetSearchRequestBuilder forward = StreetSearchRequest.copyOf(proto);
 
     State s0 = new State(v0, forward.withMode(StreetMode.BIKE).build());
-    State s1 = e0.traverse(s0);
-    State s2 = e1.traverse(s1);
+    State s1 = e0.traverse(s0)[0];
+    State s2 = e1.traverse(s1)[0];
 
     StreetSearchRequestBuilder reverse = StreetSearchRequest.copyOf(proto);
     reverse.withArriveBy(true);
 
     State s3 = new State(v2, reverse.withMode(StreetMode.BIKE).build());
-    State s4 = e1.traverse(s3);
-    State s5 = e0.traverse(s4);
+    State s4 = e1.traverse(s3)[0];
+    State s5 = e0.traverse(s4)[0];
 
     assertEquals(57, s2.getElapsedTimeSeconds());
     assertEquals(57, s5.getElapsedTimeSeconds());
@@ -216,17 +216,17 @@ public class StreetEdgeTest {
     noPenalty.withPreferences(p -> p.withBike(it -> it.withSwitchTime(0).withSwitchCost(0)));
 
     State s0 = new State(v0, noPenalty.withMode(StreetMode.BIKE).build());
-    State s1 = e0.traverse(s0);
-    State s2 = e1.traverse(s1);
-    State s3 = e2.traverse(s2);
+    State s1 = e0.traverse(s0)[0];
+    State s2 = e1.traverse(s1)[0];
+    State s3 = e2.traverse(s2)[0];
 
     StreetSearchRequestBuilder withPenalty = StreetSearchRequest.copyOf(proto);
     withPenalty.withPreferences(p -> p.withBike(it -> it.withSwitchTime(42).withSwitchCost(23)));
 
     State s4 = new State(v0, withPenalty.withMode(StreetMode.BIKE).build());
-    State s5 = e0.traverse(s4);
-    State s6 = e1.traverse(s5);
-    State s7 = e2.traverse(s6);
+    State s5 = e0.traverse(s4)[0];
+    State s6 = e1.traverse(s5)[0];
+    State s7 = e2.traverse(s6)[0];
 
     assertNull(s0.getBackMode());
     assertEquals(TraverseMode.WALK, s1.getBackMode());
@@ -270,7 +270,7 @@ public class StreetEdgeTest {
 
     e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes(), null));
 
-    assertNotNull(e0.traverse(e1.traverse(state)));
+    assertNotNull(e0.traverse(e1.traverse(state)[0])[0]);
   }
 
   @Test
@@ -345,7 +345,7 @@ public class StreetEdgeTest {
     );
 
     State startState = new State(v1, request.build());
-    State result = testStreet.traverse(startState);
+    State result = testStreet.traverse(startState)[0];
     double timeWeight = result.getWeight();
     double expectedTimeWeight = slopeSpeedLength / SPEED;
     assertEquals(expectedTimeWeight, result.getWeight(), DELTA);
@@ -354,7 +354,7 @@ public class StreetEdgeTest {
       p.withBike(bike -> bike.withOptimizeTriangle(it -> it.withSlope(1)))
     );
     startState = new State(v1, request.build());
-    result = testStreet.traverse(startState);
+    result = testStreet.traverse(startState)[0];
     double slopeWeight = result.getWeight();
     double expectedSlopeWeight = slopeWorkLength / SPEED;
     assertEquals(expectedSlopeWeight, slopeWeight, DELTA);
@@ -365,7 +365,7 @@ public class StreetEdgeTest {
       p.withBike(bike -> bike.withOptimizeTriangle(it -> it.withSafety(1)))
     );
     startState = new State(v1, request.build());
-    result = testStreet.traverse(startState);
+    result = testStreet.traverse(startState)[0];
     double slopeSafety = costs.slopeSafetyCost;
     double safetyWeight = result.getWeight();
     double expectedSafetyWeight = (trueLength * 0.74 + slopeSafety) / SPEED;
@@ -375,7 +375,7 @@ public class StreetEdgeTest {
       p.withBike(bike -> bike.withOptimizeTriangle(it -> it.withTime(1).withSlope(1).withSafety(1)))
     );
     startState = new State(v1, request.build());
-    result = testStreet.traverse(startState);
+    result = testStreet.traverse(startState)[0];
     double expectedWeight = timeWeight * 0.33 + slopeWeight * 0.33 + safetyWeight * 0.34;
     assertEquals(expectedWeight, result.getWeight(), DELTA);
   }

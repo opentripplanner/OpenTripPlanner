@@ -71,7 +71,10 @@
         "org.apache.maven.plugins:maven-surefire-plugin",
         "org.jacoco:jacoco-maven-plugin", // coverage plugin
         "org.apache.commons:commons-compress", // only used by tests
-        "ch.qos.logback:logback-classic"
+        "ch.qos.logback:logback-classic",
+        // maven plugins
+        "org.codehaus.mojo:build-helper-maven-plugin",
+        "org.apache.maven.plugins:maven-gpg-plugin"
       ],
       "matchPackagePrefixes": [
         "org.junit.jupiter:",

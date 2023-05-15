@@ -6,7 +6,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
-import org.opentripplanner.ext.vilkkubikerental.VilkkuBikeRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.HttpHeadersConfig;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -47,12 +46,6 @@ public class VehicleRentalSourceFactory {
         overloadingAllowed()
       );
       case SMOOVE -> new SmooveBikeRentalDataSourceParameters(
-        url(),
-        network(),
-        overloadingAllowed(),
-        headers()
-      );
-      case VILKKU -> new VilkkuBikeRentalDataSourceParameters(
         url(),
         network(),
         overloadingAllowed(),

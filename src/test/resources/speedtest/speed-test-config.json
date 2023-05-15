@@ -6,7 +6,7 @@
   "routingDefaults": {
     "itineraryFilters" : {
       // We do not want the filter chain to remove itineraries
-      "debug": true
+      "debug": "LIST_ALL"
     }
   }
 }

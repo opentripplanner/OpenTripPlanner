@@ -187,7 +187,9 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   private void initializeData() {
     int sleepPeriod = 1000;
     int attemptCounter = 1;
-    while (true) {
+    boolean otpIsShuttingDown = false;
+
+    while (!otpIsShuttingDown) {
       try {
         initializeData(dataInitializationUrl, messageConsumer);
         break;
@@ -202,8 +204,10 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
         );
         try {
           Thread.sleep(sleepPeriod);
-        } catch (InterruptedException interruptedException) {
-          //Ignore
+        } catch (InterruptedException ie) {
+          Thread.currentThread().interrupt();
+          otpIsShuttingDown = true;
+          LOG.info("OTP is shutting down, cancelling attempt to initialize Azure SIRI Updater.");
         }
       }
     }
@@ -251,8 +255,9 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
       try {
         // Choosing an arbitrary amount of time to wait until trying again.
         TimeUnit.SECONDS.sleep(5);
-      } catch (InterruptedException e2) {
-        LOG.error("Unable to sleep for period of time");
+      } catch (InterruptedException ie) {
+        Thread.currentThread().interrupt();
+        LOG.info("OTP is shutting down, stopping processing of ServiceBus error messages");
       }
     } else {
       LOG.error(e.getLocalizedMessage(), e);

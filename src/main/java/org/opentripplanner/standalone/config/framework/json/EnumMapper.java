@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.framework.json;
 
 import java.util.Arrays;
 import java.util.Optional;
+import org.opentripplanner.framework.doc.DocumentedEnum;
 
 public class EnumMapper {
 
@@ -27,5 +28,27 @@ public class EnumMapper {
 
   public static String kebabCase(String input) {
     return input.toLowerCase().replace('_', '-');
+  }
+
+  /**
+   * Used to create a list of all values with description of each value witch can be included
+   * in documentation. The list will look like this:
+   * ```
+   *  - `on` Turn on.
+   *  - `off` Turn off.
+   * ```
+   */
+  @SuppressWarnings("rawtypes")
+  public static <T extends DocumentedEnum> String docEnumValueList(T[] enumValues) {
+    var buf = new StringBuilder();
+    for (T it : enumValues) {
+      buf
+        .append(" - `")
+        .append(toString((Enum) it))
+        .append("` ")
+        .append(it.enumValueDescription().replace("\n", "\n   ").trim())
+        .append("\n");
+    }
+    return buf.toString();
   }
 }
