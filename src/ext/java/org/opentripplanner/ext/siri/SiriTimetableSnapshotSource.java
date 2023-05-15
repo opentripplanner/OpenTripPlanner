@@ -10,7 +10,6 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOW
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,7 +21,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDateBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -382,15 +380,20 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     LOG.debug("Applied realtime data for trip {} on {}", trip, serviceDate);
 
+
+    /*
+      This causes the DatedServiceJourney-ID supplied in planned data to be replaced with the id
+      from realtime-data.
+     */
     // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
-    TripOnServiceDateBuilder tripOnServiceDateBuilder = entityResolver.createTripOnServiceDateBuilder(
-      estimatedVehicleJourney
-    );
-    if (tripOnServiceDateBuilder != null) {
-      buffer.addLastAddedTripOnServiceDate(
-        tripOnServiceDateBuilder.withTrip(trip).withServiceDate(serviceDate).build()
-      );
-    }
+    //    TripOnServiceDateBuilder tripOnServiceDateBuilder = entityResolver.createTripOnServiceDateBuilder(
+    //      estimatedVehicleJourney
+    //    );
+    //    if (tripOnServiceDateBuilder != null) {
+    //      buffer.addLastAddedTripOnServiceDate(
+    //        tripOnServiceDateBuilder.withTrip(trip).withServiceDate(serviceDate).build()
+    //      );
+    //    }
 
     return result;
   }
