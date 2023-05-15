@@ -42,7 +42,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              3
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2282,
       "legs": [
@@ -519,7 +541,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              1
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 1803,
       "legs": [
@@ -848,7 +892,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              1
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2235,
       "legs": [
@@ -1177,7 +1243,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              3
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2282,
       "legs": [
@@ -1654,7 +1742,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              1
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2235,
       "legs": [
@@ -1983,7 +2093,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.accessBikeRe
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              3
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2282,
       "legs": [
@@ -2994,7 +3126,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              1
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2305,
       "legs": [
@@ -3375,7 +3529,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              1
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2465,
       "legs": [
@@ -3782,7 +3958,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              1
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2396,
       "legs": [
@@ -4163,7 +4361,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              1
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2787,
       "legs": [
@@ -4622,7 +4842,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              1
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2305,
       "legs": [
@@ -5003,7 +5245,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol": "$"
             }
           }
-        }
+        },
+        "legProducts": [
+          {
+            "legIndices": [
+              1
+            ],
+            "products": [
+              {
+                "amount": {
+                  "cents": 200,
+                  "currency": {
+                    "currency": "USD",
+                    "currencyCode": "USD",
+                    "defaultFractionDigits": 2,
+                    "symbol": "$"
+                  }
+                },
+                "id": "prt:8",
+                "name": "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost": 2525,
       "legs": [

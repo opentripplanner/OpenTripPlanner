@@ -3,71 +3,93 @@ package org.opentripplanner.ext.flex;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 
-public class FlexAccessEgress {
+public final class FlexAccessEgress {
 
-  public final RegularStop stop;
-  public final int preFlexTime;
-  public final int flexTime;
-  public final int postFlexTime;
+  private final RegularStop stop;
+  private final FlexPathDurations pathDurations;
   private final int fromStopIndex;
   private final int toStopIndex;
-  private final int differenceFromStartOfTime;
   private final FlexTrip trip;
-  public final State lastState;
-  public final boolean directToStop;
+  private final State lastState;
+  private final boolean stopReachedOnBoard;
 
   public FlexAccessEgress(
     RegularStop stop,
-    int preFlexTime,
-    int flexTime,
-    int postFlexTime,
+    FlexPathDurations pathDurations,
     int fromStopIndex,
     int toStopIndex,
-    int differenceFromStartOfTime,
     FlexTrip trip,
     State lastState,
-    boolean directToStop
+    boolean stopReachedOnBoard
   ) {
     this.stop = stop;
-    this.preFlexTime = preFlexTime;
-    this.flexTime = flexTime;
-    this.postFlexTime = postFlexTime;
+    this.pathDurations = pathDurations;
     this.fromStopIndex = fromStopIndex;
     this.toStopIndex = toStopIndex;
-    this.differenceFromStartOfTime = differenceFromStartOfTime;
     this.trip = trip;
     this.lastState = lastState;
-    this.directToStop = directToStop;
+    this.stopReachedOnBoard = stopReachedOnBoard;
+  }
+
+  public RegularStop stop() {
+    return stop;
+  }
+
+  public FlexTrip trip() {
+    return trip;
+  }
+
+  public State lastState() {
+    return lastState;
+  }
+
+  public boolean stopReachedOnBoard() {
+    return stopReachedOnBoard;
   }
 
   public int earliestDepartureTime(int departureTime) {
-    int requestedTransitDepartureTime = departureTime + preFlexTime - differenceFromStartOfTime;
-    int earliestAvailableTransitDepartureTime = trip.earliestDepartureTime(
-      requestedTransitDepartureTime,
+    int requestedDepartureTime = pathDurations.mapToFlexTripDepartureTime(departureTime);
+    int earliestDepartureTime = trip.earliestDepartureTime(
+      requestedDepartureTime,
       fromStopIndex,
       toStopIndex,
-      flexTime
+      pathDurations.trip()
     );
-    if (earliestAvailableTransitDepartureTime == MISSING_VALUE) {
+    if (earliestDepartureTime == MISSING_VALUE) {
       return MISSING_VALUE;
     }
-    return earliestAvailableTransitDepartureTime - preFlexTime + differenceFromStartOfTime;
+    return pathDurations.mapToRouterDepartureTime(earliestDepartureTime);
   }
 
   public int latestArrivalTime(int arrivalTime) {
-    int requestedTransitArrivalTime = arrivalTime - postFlexTime - differenceFromStartOfTime;
-    int latestAvailableTransitArrivalTime = trip.latestArrivalTime(
-      requestedTransitArrivalTime,
+    int requestedArrivalTime = pathDurations.mapToFlexTripArrivalTime(arrivalTime);
+    int latestArrivalTime = trip.latestArrivalTime(
+      requestedArrivalTime,
       fromStopIndex,
       toStopIndex,
-      flexTime
+      pathDurations.trip()
     );
-    if (latestAvailableTransitArrivalTime == MISSING_VALUE) {
+    if (latestArrivalTime == MISSING_VALUE) {
       return MISSING_VALUE;
     }
-    return latestAvailableTransitArrivalTime + postFlexTime + differenceFromStartOfTime;
+    return pathDurations.mapToRouterArrivalTime(latestArrivalTime);
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(FlexAccessEgress.class)
+      .addNum("fromStopIndex", fromStopIndex)
+      .addNum("toStopIndex", toStopIndex)
+      .addObj("durations", pathDurations)
+      .addObj("stop", stop)
+      .addObj("trip", trip)
+      .addObj("lastState", lastState)
+      .addBoolIfTrue("stopReachedOnBoard", stopReachedOnBoard)
+      .toString();
   }
 }

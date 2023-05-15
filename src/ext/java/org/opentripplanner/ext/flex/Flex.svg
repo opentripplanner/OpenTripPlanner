@@ -70,12 +70,6 @@
         <path d="M-0.18721971213817598 -0.4827246218919754 C165.4790613955731 1.372916695438675, 329.6030603987922 1.9749660461772003, 777.2671379119158 0.13758358657360079 M0.20308449119329453 -0.10852560847997667 C203.69688090799318 0.9426429519891972, 408.1107197442267 1.221503377938294, 778.20772254318 -0.10168065875768661 M779.0702781751752 1.9212313815951347 C778.7887211890296 39.99069656568027, 779.5497606844978 80.14621369068337, 778.9937775209546 165.68549524992704 M778.4581806026399 -0.6406924687325954 C777.9028899768334 58.340616937364395, 779.4171093801003 117.88809226753365, 777.4560390077531 165.5097245015204 M777.4544560462236 165.09858851134777 C505.69210548615956 165.29717725901273, 232.88844938410324 166.50912040857938, 0.6221986800432205 165.07982811629773 M777.9086122736335 164.47384181171657 C527.529807247725 164.90565629848686, 277.41899386 164.5162397468969, -0.05267069488763809 164.46023082882166 M1.8772416189312935 164.85753118246794 C-0.7314104150292405 100.9824248258359, 0.9348262239935866 34.401866503871844, -1.061792604625225 -1.7908178642392159 M0.10437768325209618 164.94249201193452 C-0.19893938884735696 119.43409383230755, -0.816883987045294 75.95401977987785, -0.38019341602921486 -0.3163851462304592"
                 stroke="#000000" stroke-width="1" fill="none"></path>
     </g>
-    <g>
-        <g transform="translate(930.55859375 374.8569804623723) rotate(0 0.6693338066340857 32.45749252736567)">
-            <path d="M-0.9499124810099602 1.174629168212414 C-0.5013650953769382 11.620585225025813, 1.6407178282739245 53.365809436639154, 2.2885800942780405 63.740355886518955"
-                    stroke="#000000" stroke-width="1.5" fill="none" stroke-dasharray="12 8"></path>
-        </g>
-    </g>
     <g transform="translate(805.92578125 445.8765117123723) rotate(0 70.5 24)">
         <text x="141" y="19" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000"
                 text-anchor="end" style="white-space: pre;" direction="ltr">transferStop
@@ -142,18 +136,6 @@
                 text-anchor="middle" style="white-space: pre;" direction="ltr">finalStop
         </text>
     </g>
-    <g>
-        <g transform="translate(1293.26171875 377.7554179623723) rotate(0 1.2642858788370859 43.8585010960698)">
-            <path d="M0.6132697150111197 -0.8575866982340812 C1.0638406003514924 14.08790081689755, 1.7866778736313185 73.91904430737098, 1.9153020426630973 88.5745888903737"
-                    stroke="#000000" stroke-width="1.5" fill="none" stroke-dasharray="12 8"></path>
-        </g>
-    </g>
-    <g>
-        <g transform="translate(484.5 88.81010546237229) rotate(0 1.818787269294262 89.33418235331774)">
-            <path d="M0.22540126293897633 1.1443633273243903 C0.6546011969447136 30.739013134936492, 3.107507948577404 148.13936286320288, 3.4121732756495478 177.52400137931107"
-                    stroke="#000000" stroke-width="1.5" fill="none" stroke-dasharray="12 8"></path>
-        </g>
-    </g>
     <g transform="translate(266.33203125 49.56791796237229) rotate(0 111.5 12)">
         <text x="111.5" y="19" font-family="Cascadia, Segoe UI Emoji" font-size="20px"
                 fill="#000000" text-anchor="middle" style="white-space: pre;" direction="ltr">
@@ -165,24 +147,6 @@
                 fill="#000000" text-anchor="middle" style="white-space: pre;" direction="ltr">
             lastStateBeforeFlex
         </text>
-    </g>
-    <g>
-        <g transform="translate(996.06640625 781.4272929623723) rotate(0 0.2358535053133437 44.58109087496996)">
-            <path d="M0.3572479292750359 0.714794035255909 C0.43460002392530445 15.633223648369313, -0.03594750910997391 74.05513150244951, 0.1478758379817009 88.44738771468401"
-                    stroke="#000000" stroke-width="1.5" fill="none" stroke-dasharray="12 8"></path>
-        </g>
-    </g>
-    <g>
-        <g transform="translate(929.73046875 513.4858867123723) rotate(0 0.5891437278866078 62.69464424103495)">
-            <path d="M0.9361476615071298 -0.8162313893437385 C1.1506171102325122 20.049205116927624, 0.3884378467996916 104.93668828457595, 0.20554248839616784 126.20551987141371"
-                    stroke="#000000" stroke-width="1.5" fill="none" stroke-dasharray="12 8"></path>
-        </g>
-    </g>
-    <g>
-        <g transform="translate(1295.61328125 518.6538554623723) rotate(0 0.07413210421793792 57.34525583237411)">
-            <path d="M0.13692461997270589 -0.11166929751634602 C0.14781028777360924 18.85521882822116, 0.010221071541309468 95.70543291221063, 0.011339588463306516 114.80218096226454"
-                    stroke="#000000" stroke-width="1.5" fill="none" stroke-dasharray="12 8"></path>
-        </g>
     </g>
     <g>
         <g transform="translate(250.94140625 9.868699212372292) rotate(0 502.0321629956365 0.7563686177134628)">
@@ -209,20 +173,6 @@
         </g>
         <g transform="translate(1306.05859375 937.7124492123723) rotate(0 -548.5230691626668 -8.095769838988758)">
             <path d="M-1069.982765573115 -6.841898178870737 C-1075.8441026113321 -8.545052414005479, -1082.0104236439122 -11.792694889456993, -1098.7622025281191 -15.52667233645916"
-                    stroke="#000000" stroke-width="1.5" fill="none"></path>
-        </g>
-    </g>
-    <g>
-        <g transform="translate(1627.261139580797 24.309132978059665) rotate(0 -0.31691841418091826 447.32739576710367)">
-            <path d="M-0.7028442665934562 -0.5955927327275276 C-0.6624953675089272 148.71817054057485, -0.00014852872391196703 745.790647788066, 0.06900743823171074 895.2503842669348"
-                    stroke="#000000" stroke-width="1.5" fill="none" stroke-dasharray="12 8"></path>
-        </g>
-        <g transform="translate(1627.261139580797 24.309132978059665) rotate(0 -0.31691841418091826 447.32739576710367)">
-            <path d="M-11.207365931320762 866.6400268894571 C-7.534311350188027 874.1536081384744, -3.0767898585323055 881.6712807060483, -0.04136938918709343 895.2505479338388"
-                    stroke="#000000" stroke-width="1.5" fill="none"></path>
-        </g>
-        <g transform="translate(1627.261139580797 24.309132978059665) rotate(0 -0.31691841418091826 447.32739576710367)">
-            <path d="M9.313835768076459 866.6231983869593 C7.126435500216751 874.0213920472885, 5.723590800391792 881.5438704341577, -0.04136938918709343 895.2505479338388"
                     stroke="#000000" stroke-width="1.5" fill="none"></path>
         </g>
     </g>
@@ -268,32 +218,32 @@
     </g>
     <g transform="translate(244.140625 80.87260546237229) rotate(0 64.5 12)">
         <text x="64.5" y="19" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000"
-                text-anchor="middle" style="white-space: pre;" direction="ltr">preFlexTime
+                text-anchor="middle" style="white-space: pre;" direction="ltr">accessDuration
         </text>
     </g>
     <g transform="translate(664.3828125 84.87260546237229) rotate(0 47 12)">
         <text x="47" y="19" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000"
-                text-anchor="middle" style="white-space: pre;" direction="ltr">flexTime
+                text-anchor="middle" style="white-space: pre;" direction="ltr">flexTripDuration
         </text>
     </g>
     <g transform="translate(1048.73046875 81.27885546237229) rotate(0 70.5 12)">
         <text x="70.5" y="19" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000"
-                text-anchor="middle" style="white-space: pre;" direction="ltr">postFlexTime
+                text-anchor="middle" style="white-space: pre;" direction="ltr">egressDuration
         </text>
     </g>
     <g transform="translate(283.6484375 776.7163554623723) rotate(0 70.5 12)">
         <text x="70.5" y="19" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000"
-                text-anchor="middle" style="white-space: pre;" direction="ltr">postFlexTime
+                text-anchor="middle" style="white-space: pre;" direction="ltr">egressDuration
         </text>
     </g>
     <g transform="translate(667.53125 772.0288554623723) rotate(0 47 12)">
         <text x="47" y="19" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000"
-                text-anchor="middle" style="white-space: pre;" direction="ltr">flexTime
+                text-anchor="middle" style="white-space: pre;" direction="ltr">flexTripDuration
         </text>
     </g>
     <g transform="translate(1072.125 780.3804179623723) rotate(0 64.5 12)">
         <text x="64.5" y="19" font-family="Cascadia, Segoe UI Emoji" font-size="20px" fill="#000000"
-                text-anchor="middle" style="white-space: pre;" direction="ltr">preFlexTime
+                text-anchor="middle" style="white-space: pre;" direction="ltr">accessDuration
         </text>
     </g>
     <g transform="translate(45.92578125 303.1147929623723) rotate(0 35 12)">

@@ -25,6 +25,10 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
+import org.opentripplanner.model.fare.FareMedium;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
@@ -300,6 +304,33 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
   }
 
+  /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
+  public interface LegacyGraphQLFareMedium {
+    public DataFetcher<String> id();
+
+    public DataFetcher<String> name();
+  }
+
+  /** A fare product (a ticket) to be bought by a passenger */
+  public interface LegacyGraphQLFareProduct {
+    public DataFetcher<String> id();
+
+    public DataFetcher<FareMedium> medium();
+
+    public DataFetcher<String> name();
+
+    public DataFetcher<Money> price();
+
+    public DataFetcher<RiderCategory> riderCategory();
+  }
+
+  /** A container for both a fare product (a ticket) and its relationship to the itinerary. */
+  public interface LegacyGraphQLFareProductUse {
+    public DataFetcher<String> id();
+
+    public DataFetcher<FareProduct> product();
+  }
+
   /** A feed provides routing data (stops, routes, timetables, etc.) from one or more public transport agencies. */
   public interface LegacyGraphQLFeed {
     public DataFetcher<Iterable<Agency>> agencies();
@@ -366,6 +397,8 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Long> endTime();
 
+    public DataFetcher<Iterable<FareProductUse>> fareProducts();
+
     public DataFetcher<StopArrival> from();
 
     public DataFetcher<Integer> generalizedCost();
@@ -429,7 +462,7 @@ public class LegacyGraphQLDataFetchers {
 
   /** An amount of money. */
   public interface LegacyGraphQLMoney {
-    public DataFetcher<Integer> amount();
+    public DataFetcher<Double> amount();
 
     public DataFetcher<Currency> currency();
   }
@@ -690,6 +723,13 @@ public class LegacyGraphQLDataFetchers {
 
   public interface LegacyGraphQLRideHailingProvider {
     public DataFetcher<String> id();
+  }
+
+  /** Category of riders a fare product applies to, for example students or pensioners. */
+  public interface LegacyGraphQLRiderCategory {
+    public DataFetcher<String> id();
+
+    public DataFetcher<String> name();
   }
 
   /**

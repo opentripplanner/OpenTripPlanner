@@ -159,7 +159,7 @@ public class ScheduledDeviatedTrip
     int departureTime,
     int fromStopIndex,
     int toStopIndex,
-    int flexTime
+    int flexTripDurationSeconds
   ) {
     int stopTime = MISSING_VALUE;
     for (int i = fromStopIndex; stopTime == MISSING_VALUE && i >= 0; i--) {
@@ -174,7 +174,12 @@ public class ScheduledDeviatedTrip
   }
 
   @Override
-  public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime) {
+  public int latestArrivalTime(
+    int arrivalTime,
+    int fromStopIndex,
+    int toStopIndex,
+    int flexTripDurationSeconds
+  ) {
     int stopTime = MISSING_VALUE;
     for (int i = toStopIndex; stopTime == MISSING_VALUE && i < stopTimes.length; i++) {
       stopTime = stopTimes[i].arrivalTime;

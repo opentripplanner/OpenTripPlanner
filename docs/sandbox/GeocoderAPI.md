@@ -3,21 +3,32 @@
 ## Contact Info
 
 - realCity, Hungary
-
-## Changelog
-
-- Initial version (June 2021)
-- Updated to use Lucene (March 2022)
+- Leonard Ehrenfried, [mail@leonard.io](mailto:mail@leonard.io)
 
 ## Documentation
 
-This adds the required `geocode` API required for Stop and From/To searches in the debug client
-using Lucene to index and search.
+This sandbox feature implements geocoding endpoints for a number of use cases.
 
-To enable this you need to add the feature `SandboxAPIGeocoder` in `otp-config.json`.
+To enable this you need to add the feature to `otp-config.json`. 
 
-The API endpoint is available at `/otp/routers/{routerId}/geocode`, and supports the following query
-string parameters:
+```json
+// otp-config.json
+{
+  "otpFeatures": {
+    "SandboxAPIGeocoder": true
+  }
+}
+```
+
+### Endpoints
+
+#### Debug UI
+
+The required geocode API for Stop and From/To searches in the debug client.
+
+Path: `/otp/routers/{routerId}/geocode`
+
+It supports the following URL parameters:
 
 | Parameter      | Description                                                      |
 |----------------|------------------------------------------------------------------|
@@ -26,3 +37,25 @@ string parameters:
 | `stops`        | Search for stops, either by name or stop code                    |
 | `clusters`     | Search for clusters by their name                                |
 | `corners`      | Search for street corners using at least one of the street names |
+
+#### Stop clusters
+
+A stop cluster is a deduplicated groups of stops. This means that for any stop that has a parent
+station only the parent is returned and for stops that have identical names and are very close
+to each other, only one is returned.
+
+This is useful for a general purpose fuzzy "stop" search.
+
+Path: `/otp/routers/{routerId}/geocode/stopClusters`
+
+It supports the following URL parameters:
+
+| Parameter      | Description                                                      |
+|----------------|------------------------------------------------------------------|
+| `query`        | The query string we want to geocode                              |
+
+## Changelog
+
+- Initial version (June 2021)
+- Updated to use Lucene (March 2022)
+- Add stop clusters (May 2023)
