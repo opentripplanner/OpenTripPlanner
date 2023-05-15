@@ -361,7 +361,7 @@ public class OrcaFareService extends DefaultFareService {
    * Youth ride free in Washington.
    */
   private Money getYouthFare() {
-    return usDollars(0);
+    return Money.ZERO_USD;
   }
 
   /**
@@ -398,7 +398,7 @@ public class OrcaFareService extends DefaultFareService {
     // Route long name is reversed for the reverse direction on a single WSF route
     return (fares != null && fares.get(wsfFareType) != null)
       ? fares.get(wsfFareType)
-      : usDollars(0);
+      : Money.ZERO_USD;
   }
 
   /**
@@ -430,8 +430,8 @@ public class OrcaFareService extends DefaultFareService {
     Collection<FareRuleSet> fareRules
   ) {
     ZonedDateTime freeTransferStartTime = null;
-    Money cost = usDollars(0);
-    Money orcaFareDiscount = usDollars(0);
+    Money cost = Money.ZERO_USD;
+    Money orcaFareDiscount = Money.ZERO_USD;
     for (Leg leg : legs) {
       RideType rideType = classify(leg.getRoute(), leg.getTrip().getId().getId());
       boolean ridePermitsFreeTransfers = permitsFreeTransfers(rideType);
@@ -442,7 +442,7 @@ public class OrcaFareService extends DefaultFareService {
       Optional<Money> singleLegPrice = getRidePrice(leg, fareType, fareRules);
       Money legFare = singleLegPrice
         .map(slp -> getLegFare(fareType, rideType, slp, leg))
-        .orElse(usDollars(0));
+        .orElse(Money.ZERO_USD);
       boolean inFreeTransferWindow = inFreeTransferWindow(
         freeTransferStartTime,
         leg.getStartTime()
@@ -462,8 +462,8 @@ public class OrcaFareService extends DefaultFareService {
             leg,
             fare,
             fareType,
-            usDollars(0),
-            legFare.isNonZero() ? orcaFareDiscount : usDollars(0)
+            Money.ZERO_USD,
+            legFare.isNonZero() ? orcaFareDiscount : Money.ZERO_USD
           );
         }
       } else if (usesOrca(fareType) && !inFreeTransferWindow) {
@@ -488,12 +488,12 @@ public class OrcaFareService extends DefaultFareService {
           // The previous Orca fare has been applied to the total cost. Also, the non-free transfer cost has
           // also been applied to the total cost. Therefore, the next Orca cost for the next free-transfer
           // window needs to be reset to 0 so that it is not applied after looping through all rides.
-          orcaFareDiscount = usDollars(0);
+          orcaFareDiscount = Money.ZERO_USD;
         }
-        addLegFareProduct(leg, fare, fareType, legFare, usDollars(0));
+        addLegFareProduct(leg, fare, fareType, legFare, Money.ZERO_USD);
       } else {
         // If not using Orca, add the agency's default price for this leg.
-        addLegFareProduct(leg, fare, fareType, legFare, usDollars(0));
+        addLegFareProduct(leg, fare, fareType, legFare, Money.ZERO_USD);
         cost = cost.plus(legFare);
       }
     }

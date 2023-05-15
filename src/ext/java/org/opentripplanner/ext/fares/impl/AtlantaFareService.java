@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.opentripplanner.transit.model.basic.Money.usDollars;
+
 import com.google.common.collect.Lists;
 import java.time.Duration;
 import java.time.ZoneId;
@@ -145,7 +147,7 @@ public class AtlantaFareService extends DefaultFareService {
         lastFareWithTransfer = defaultFare;
         return true;
       } else if (transferClassification.type.equals(TransferType.TRANSFER_PAY_DIFFERENCE)) {
-        Money newCost = Money.usDollars(0);
+        Money newCost = Money.ZERO_USD;
         if (defaultFare.greaterThan(lastFareWithTransfer)) {
           newCost = defaultFare.minus(lastFareWithTransfer);
         }
@@ -153,10 +155,7 @@ public class AtlantaFareService extends DefaultFareService {
         lastFareWithTransfer = defaultFare;
         return true;
       } else if (transferClassification.type.equals(TransferType.TRANSFER_WITH_UPCHARGE)) {
-        fare.addFare(
-          fareType,
-          Money.ofFractionalAmount(currency, (float) transferClassification.upcharge / 100)
-        );
+        fare.addFare(fareType, transferClassification.upcharge);
         lastFareWithTransfer = defaultFare;
         return true;
       }
@@ -164,7 +163,7 @@ public class AtlantaFareService extends DefaultFareService {
     }
 
     public Money getTotal() {
-      Money total = Money.usDollars(0);
+      Money total = Money.ZERO_USD;
       for (ItineraryFares f : fares) {
         total = total.plus(f.getFare(fareType));
       }
@@ -177,13 +176,13 @@ public class AtlantaFareService extends DefaultFareService {
    * values are not available therefore the default test price is used instead.
    */
   protected Money getLegPrice(Leg leg, FareType fareType, Collection<FareRuleSet> fareRules) {
-    return calculateCost(fareType, Lists.newArrayList(leg), fareRules).orElse(Money.usDollars(0));
+    return calculateCost(fareType, Lists.newArrayList(leg), fareRules).orElse(Money.ZERO_USD);
   }
 
   private static class TransferMeta {
 
     public final TransferType type;
-    public final int upcharge;
+    public final Money upcharge;
     public final boolean payOnExit;
 
     /**
@@ -192,14 +191,14 @@ public class AtlantaFareService extends DefaultFareService {
      * @param upcharge Upcharge for the transfer in cents
      * @param payOnExit Whether the fare is charged at end of leg
      */
-    public TransferMeta(TransferType type, int upcharge, boolean payOnExit) {
+    public TransferMeta(TransferType type, Money upcharge, boolean payOnExit) {
       this.type = type;
       this.upcharge = upcharge;
       this.payOnExit = payOnExit;
     }
 
     public TransferMeta(TransferType type) {
-      this(type, 0, false);
+      this(type, Money.ZERO_USD, false);
     }
   }
 
@@ -316,9 +315,21 @@ public class AtlantaFareService extends DefaultFareService {
             GCT_EXPRESS_Z1,
             GCT_EXPRESS_Z2,
             XPRESS_AFTERNOON,
-            XPRESS_MORNING -> new TransferMeta(TransferType.FREE_TRANSFER, 0, payOnExit);
-          case COBB_LOCAL -> new TransferMeta(TransferType.TRANSFER_WITH_UPCHARGE, 150, payOnExit);
-          case GCT_LOCAL -> new TransferMeta(TransferType.TRANSFER_WITH_UPCHARGE, 100, payOnExit);
+            XPRESS_MORNING -> new TransferMeta(
+            TransferType.FREE_TRANSFER,
+            Money.ZERO_USD,
+            payOnExit
+          );
+          case COBB_LOCAL -> new TransferMeta(
+            TransferType.TRANSFER_WITH_UPCHARGE,
+            usDollars(1.50f),
+            payOnExit
+          );
+          case GCT_LOCAL -> new TransferMeta(
+            TransferType.TRANSFER_WITH_UPCHARGE,
+            usDollars(1),
+            payOnExit
+          );
           default -> new TransferMeta(TransferType.END_TRANSFER);
         };
       case GCT_LOCAL:
@@ -386,7 +397,7 @@ public class AtlantaFareService extends DefaultFareService {
       }
     }
 
-    Money cost = Money.usDollars(0);
+    Money cost = Money.ZERO_USD;
     for (ATLTransfer transfer : transfers) {
       cost = cost.plus(transfer.getTotal());
     }

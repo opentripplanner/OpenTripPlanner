@@ -32,7 +32,6 @@ public class SFBayFareServiceImpl extends DefaultFareService {
     Arrays.asList("EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY")
   );
   public static final String SFMTA_BART_FREE_TRANSFER_STOP = "DALY";
-  public static final Money ZERO_DOLLARS = Money.usDollars(0);
 
   public SFBayFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
     addFareRules(FareType.regular, regularFareRules);
@@ -47,7 +46,7 @@ public class SFBayFareServiceImpl extends DefaultFareService {
     Long sfmtaTransferIssued = null;
     Long alightedBart = null;
     String alightedBartStop = null;
-    Money cost = ZERO_DOLLARS;
+    Money cost = Money.ZERO_USD;
     String agencyId = null;
     for (var ride : rides) {
       agencyId = ride.getRoute().getId().getFeedId();
@@ -61,7 +60,7 @@ public class SFBayFareServiceImpl extends DefaultFareService {
       } else { // non-BART agency
         if (bartBlock != null) {
           // finalize outstanding bart block, if any
-          cost = cost.plus(calculateCost(fareType, bartBlock, fareRules).orElse(ZERO_DOLLARS));
+          cost = cost.plus(calculateCost(fareType, bartBlock, fareRules).orElse(Money.ZERO_USD));
           bartBlock = null;
         }
         if (agencyId.equals("SFMTA")) {
@@ -99,7 +98,7 @@ public class SFBayFareServiceImpl extends DefaultFareService {
     }
     if (bartBlock != null) {
       // finalize outstanding bart block, if any
-      cost = cost.plus(calculateCost(fareType, bartBlock, fareRules).orElse(ZERO_DOLLARS));
+      cost = cost.plus(calculateCost(fareType, bartBlock, fareRules).orElse(Money.ZERO_USD));
     }
     return cost;
   }
