@@ -10,7 +10,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -19,7 +18,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.osm.parameters.OsmProcessingParameters;
+import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.routing.graph.Graph;
@@ -42,24 +41,6 @@ public class WalkableAreaBuilderTest {
     final Set<String> boardingAreaRefTags = Set.of();
     final OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP, boardingAreaRefTags);
 
-    final OsmModule.Handler handler = new OsmModule.Handler(
-      graph,
-      osmdb,
-      DataImportIssueStore.NOOP,
-      new OsmProcessingParameters(
-        boardingAreaRefTags,
-        null,
-        maxAreaNodes,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false
-      ),
-      new HashMap<>()
-    );
-
     final File file = new File(testInfo.getTestClass().get().getResource(osmFile).getFile());
     new OsmProvider(file, true).readOSM(osmdb);
     osmdb.postLoad();
@@ -67,7 +48,9 @@ public class WalkableAreaBuilderTest {
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
       graph,
       osmdb,
-      handler,
+      new VertexGenerator(osmdb, graph, Set.of()),
+      new DefaultNamer(),
+      new SafetyValueNormalizer(graph, DataImportIssueStore.NOOP),
       DataImportIssueStore.NOOP,
       maxAreaNodes,
       platformEntriesLinking,

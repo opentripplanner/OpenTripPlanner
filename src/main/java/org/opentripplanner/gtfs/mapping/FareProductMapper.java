@@ -6,9 +6,9 @@ import java.util.Currency;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import org.opentripplanner.ext.fares.model.FareContainer;
-import org.opentripplanner.ext.fares.model.FareProduct;
-import org.opentripplanner.ext.fares.model.RiderCategory;
+import org.opentripplanner.model.fare.FareMedium;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -58,7 +58,7 @@ public class FareProductMapper {
       return null;
     } else {
       return new RiderCategory(
-        riderCategory.getId().getId(),
+        AgencyAndIdMapper.mapAgencyAndId(riderCategory.getId()),
         riderCategory.getName(),
         riderCategory.getEligibilityUrl()
       );
@@ -80,11 +80,11 @@ public class FareProductMapper {
     };
   }
 
-  private static FareContainer toInternalModel(org.onebusaway.gtfs.model.FareContainer c) {
+  private static FareMedium toInternalModel(org.onebusaway.gtfs.model.FareContainer c) {
     if (c == null) {
       return null;
     } else {
-      return new FareContainer(c.getId().getId(), c.getName());
+      return new FareMedium(AgencyAndIdMapper.mapAgencyAndId(c.getId()), c.getName());
     }
   }
 }

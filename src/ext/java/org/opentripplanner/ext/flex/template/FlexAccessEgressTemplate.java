@@ -6,7 +6,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -19,6 +21,7 @@ import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -26,6 +29,11 @@ import org.opentripplanner.transit.service.TransitService;
 
 public abstract class FlexAccessEgressTemplate {
 
+  /**
+   * We do not want extremely short flex trips, they will normally be dominated in the
+   * routing later. We set an absolute min duration to 10 seconds (167m with 60 km/h).
+   */
+  private static final int MIN_FLEX_TRIP_DURATION_SECONDS = 10;
   protected final NearbyStop accessEgress;
   protected final FlexTrip trip;
   public final int fromStopIndex;
@@ -100,7 +108,9 @@ public abstract class FlexAccessEgressTemplate {
         .filter(transfer -> getFinalStop(transfer) != null)
         .map(transfer -> {
           List<Edge> edges = getTransferEdges(transfer);
-          return getFlexAccessEgress(edges, getFlexVertex(edges.get(0)), getFinalStop(transfer));
+          Vertex flexVertex = getFlexVertex(edges.get(0));
+          RegularStop finalStop = getFinalStop(transfer);
+          return getFlexAccessEgress(edges, flexVertex, finalStop);
         })
         .filter(Objects::nonNull);
     }
@@ -147,49 +157,56 @@ public abstract class FlexAccessEgressTemplate {
   protected abstract Vertex getFlexVertex(Edge edge);
 
   /**
-   * Get the times in seconds, before during and after the flex ride.
+   * Break down the time spent on flex ride/path in access, trip and egress.
    */
-  protected abstract int[] getFlexTimes(FlexTripEdge flexEdge, State state);
+  protected abstract FlexPathDurations calculateFlexPathDurations(
+    FlexTripEdge flexEdge,
+    State state
+  );
 
   /**
    * Get the FlexTripEdge for the flex ride.
    */
+  @Nullable
   protected abstract FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
 
+  @Nullable
   protected FlexAccessEgress getFlexAccessEgress(
     List<Edge> transferEdges,
     Vertex flexVertex,
     RegularStop stop
   ) {
-    FlexTripEdge flexEdge = getFlexEdge(flexVertex, transferStop);
+    var flexEdge = getFlexEdge(flexVertex, transferStop);
+
+    // Drop none routable and  very short(<10s) trips
+    if (flexEdge == null || flexEdge.getTimeInSeconds() < MIN_FLEX_TRIP_DURATION_SECONDS) {
+      return null;
+    }
 
     // this code is a little repetitive but needed as a performance improvement. previously
     // the flex path was checked before this method was called. this meant that every path
     // was traversed twice leading to a noticeable slowdown.
-    State state = flexEdge.traverse(accessEgress.state);
-    if (state == null) {
+    final var afterFlexState = flexEdge.traverse(accessEgress.state);
+    if (State.isEmpty(afterFlexState)) {
       return null;
     }
-    for (Edge e : transferEdges) {
-      state = e.traverse(state);
-      if (state == null) {
-        return null;
-      }
-    }
 
-    int[] times = getFlexTimes(flexEdge, state);
+    final var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], transferEdges);
 
-    return new FlexAccessEgress(
-      stop,
-      times[0],
-      times[1],
-      times[2],
-      fromStopIndex,
-      toStopIndex,
-      secondsFromStartOfTime,
-      trip,
-      state,
-      transferEdges.isEmpty()
-    );
+    return finalStateOpt
+      .map(finalState -> {
+        var durations = calculateFlexPathDurations(flexEdge, finalState);
+
+        return new FlexAccessEgress(
+          stop,
+          durations,
+          fromStopIndex,
+          toStopIndex,
+          trip,
+          finalState,
+          transferEdges.isEmpty()
+        );
+      })
+      .orElse(null);
   }
 }

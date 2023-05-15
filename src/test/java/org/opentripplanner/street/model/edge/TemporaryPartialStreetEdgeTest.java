@@ -89,10 +89,10 @@ public class TemporaryPartialStreetEdgeTest {
 
     // Traverse both the partial and parent edges.
     State s0 = new State(v1, request);
-    State s1 = e1.traverse(s0);
+    State s1 = e1.traverse(s0)[0];
 
     State partialS0 = new State(v1, request);
-    State partialS1 = pEdge1.traverse(partialS0);
+    State partialS1 = pEdge1.traverse(partialS0)[0];
 
     // Traversal of original and partial edges should yield the same results.
     assertEquals(s1.getTimeSeconds(), partialS1.getTimeSeconds());
@@ -100,8 +100,8 @@ public class TemporaryPartialStreetEdgeTest {
     assertEquals(s1.getWeight(), partialS1.getWeight(), 0.0);
 
     // Now traverse the second partial/parent edge pair.
-    State s2 = e2.traverse(s1);
-    State partialS2 = pEdge2.traverse(partialS1);
+    State s2 = e2.traverse(s1)[0];
+    State partialS2 = pEdge2.traverse(partialS1)[0];
 
     // Same checks as above.
     assertEquals(s2.getTimeSeconds(), partialS2.getTimeSeconds());
@@ -144,19 +144,19 @@ public class TemporaryPartialStreetEdgeTest {
 
     State s0 = new State(v1, request);
     s0.getRequest().setIntersectionTraversalCalculator(calculator);
-    State s1 = e1.traverse(s0);
-    State s2 = e2.traverse(s1);
-    State s3 = e3.traverse(s2);
+    State s1 = e1.traverse(s0)[0];
+    State s2 = e2.traverse(s1)[0];
+    State s3 = e3.traverse(s2)[0];
 
     Edge partialE2First = end.getIncoming().iterator().next();
     Edge partialE2Second = start.getOutgoing().iterator().next();
 
     State partialS0 = new State(v1, request);
     partialS0.getRequest().setIntersectionTraversalCalculator(calculator);
-    State partialS1 = e1.traverse(partialS0);
-    State partialS2A = partialE2First.traverse(partialS1);
-    State partialS2B = partialE2Second.traverse(partialS2A);
-    State partialS3 = e3.traverse(partialS2B);
+    State partialS1 = e1.traverse(partialS0)[0];
+    State partialS2A = partialE2First.traverse(partialS1)[0];
+    State partialS2B = partialE2Second.traverse(partialS2A)[0];
+    State partialS3 = e3.traverse(partialS2B)[0];
 
     // Should start at the same time.
     assertEquals(s0.getTimeSeconds(), partialS0.getTimeSeconds());
@@ -171,16 +171,16 @@ public class TemporaryPartialStreetEdgeTest {
 
     State s0NoCost = new State(v1, request);
     s0NoCost.getRequest().setIntersectionTraversalCalculator(calculator);
-    State s1NoCost = e1.traverse(s0NoCost);
-    State s2NoCost = e2.traverse(s1NoCost);
-    State s3NoCost = e3.traverse(s2NoCost);
+    State s1NoCost = e1.traverse(s0NoCost)[0];
+    State s2NoCost = e2.traverse(s1NoCost)[0];
+    State s3NoCost = e3.traverse(s2NoCost)[0];
 
     State partialS0NoCost = new State(v1, request);
     partialS0NoCost.getRequest().setIntersectionTraversalCalculator(calculator);
-    State partialS1NoCost = e1.traverse(partialS0NoCost);
-    State partialS2ANoCost = partialE2First.traverse(partialS1NoCost);
-    State partialS2BNoCost = partialE2Second.traverse(partialS2ANoCost);
-    State partialS3NoCost = e3.traverse(partialS2BNoCost);
+    State partialS1NoCost = e1.traverse(partialS0NoCost)[0];
+    State partialS2ANoCost = partialE2First.traverse(partialS1NoCost)[0];
+    State partialS2BNoCost = partialE2Second.traverse(partialS2ANoCost)[0];
+    State partialS3NoCost = e3.traverse(partialS2BNoCost)[0];
 
     // Time and cost should be the same up to a rounding difference.
     assertTrue(Math.abs(s3NoCost.getTimeSeconds() - partialS3NoCost.getTimeSeconds()) <= 1);

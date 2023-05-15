@@ -1,6 +1,8 @@
 package org.opentripplanner.street.search.state;
 
 import java.util.Set;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -92,12 +94,14 @@ public class StateEditor {
   /* PUBLIC METHODS */
 
   /**
+   *
    * Why can a state editor only be used once? If you modify some component of state with and
    * editor, use the editor to create a new state, and then make more modifications, these
    * modifications will be applied to the previously created state. Reusing the state editor to make
    * several states would modify an existing state somewhere earlier in the search, messing up the
    * shortest path tree.
    */
+  @Nullable
   public State makeState() {
     // check that this editor has not been used already
     if (spawned) throw new IllegalStateException("A StateEditor can only be used once.");
@@ -127,6 +131,15 @@ public class StateEditor {
     }
     spawned = true;
     return child;
+  }
+
+  /**
+   * Calls {@link StateEditor#makeState()} and wraps the result in an array of {@link State}.
+   * If the state is null, then a zero-length array is returned.
+   */
+  @Nonnull
+  public State[] makeStateArray() {
+    return State.ofNullable(makeState());
   }
 
   public String toString() {

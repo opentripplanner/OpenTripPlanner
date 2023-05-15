@@ -9,8 +9,8 @@ import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputTyp
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 class PreferencesMapper {
@@ -99,7 +99,10 @@ class PreferencesMapper {
       );
     });
     preferences.withItineraryFilter(itineraryFilter -> {
-      callWith.argument("debugItineraryFilter", itineraryFilter::withDebug);
+      callWith.argument(
+        "debugItineraryFilter",
+        (Boolean v) -> itineraryFilter.withDebug(ItineraryFilterDebugProfile.ofDebugEnabled(v))
+      );
       ItineraryFiltersInputType.mapToRequest(environment, callWith, itineraryFilter);
     });
     preferences.withRental(rental ->

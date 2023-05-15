@@ -43,6 +43,8 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 public class FlexIntegrationTest {
 
+  public static final GenericLocation OUTSIDE_FLEX_ZONE = new GenericLocation(33.7552, -84.4631);
+  public static final GenericLocation INSIDE_FLEX_ZONE = new GenericLocation(33.8694, -84.6233);
   static Instant dateTime = ZonedDateTime
     .parse("2021-12-02T12:00:00-05:00[America/New_York]")
     .toInstant();
@@ -76,10 +78,7 @@ public class FlexIntegrationTest {
 
   @Test
   void shouldReturnARouteTransferringFromBusToFlex() {
-    var from = new GenericLocation(33.7552, -84.4631);
-    var to = new GenericLocation(33.8694, -84.6233);
-
-    var itin = getItinerary(from, to, 4);
+    var itin = getItinerary(OUTSIDE_FLEX_ZONE, INSIDE_FLEX_ZONE, 4);
 
     assertEquals(4, itin.getLegs().size());
 
@@ -102,6 +101,8 @@ public class FlexIntegrationTest {
       flex.getFrom().name.toString()
     );
     assertEquals("Destination (part of Flex Zone 2)", flex.getTo().name.toString());
+    assertEquals("2021-12-02T14:30-05:00[America/New_York]", flex.getStartTime().toString());
+    assertEquals("2021-12-02T15:00-05:00[America/New_York]", flex.getEndTime().toString());
   }
 
   @Test
@@ -131,6 +132,8 @@ public class FlexIntegrationTest {
     assertEquals(BUS, finalFlex.getMode());
     assertEquals("Zone 2", finalFlex.getRoute().getShortName());
     assertTrue(finalFlex.isFlexibleTrip());
+    assertEquals("2021-12-02T15:00-05:00[America/New_York]", finalFlex.getStartTime().toString());
+    assertEquals("2021-12-02T15:30-05:00[America/New_York]", finalFlex.getEndTime().toString());
   }
 
   @Test

@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.OptionalInt;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
@@ -40,26 +41,22 @@ class ElevatorProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(ElevatorProcessor.class);
 
   private final DataImportIssueStore issueStore;
-  private final Map<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes;
   private final OsmDatabase osmdb;
-
-  private final Map<Long, IntersectionVertex> intersectionNodes;
+  private final VertexGenerator vertexGenerator;
 
   public ElevatorProcessor(
-    DataImportIssueStore issueStore,
-    OsmDatabase osmdb,
-    Map<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes,
-    Map<Long, IntersectionVertex> intersectionNodes
+    @Nonnull DataImportIssueStore issueStore,
+    @Nonnull OsmDatabase osmdb,
+    @Nonnull VertexGenerator vertexGenerator
   ) {
     this.issueStore = issueStore;
     this.osmdb = osmdb;
-    this.multiLevelNodes = multiLevelNodes;
-    this.intersectionNodes = intersectionNodes;
+    this.vertexGenerator = vertexGenerator;
   }
 
   public void buildElevatorEdges(Graph graph) {
     /* build elevator edges */
-    for (Long nodeId : multiLevelNodes.keySet()) {
+    for (Long nodeId : vertexGenerator.multiLevelNodes().keySet()) {
       OSMNode node = osmdb.getNode(nodeId);
       // this allows skipping levels, e.g., an elevator that stops
       // at floor 0, 2, 3, and 5.
@@ -67,7 +64,7 @@ class ElevatorProcessor {
       // subscript it so we can loop over it in twos. Assumedly, it will stay
       // sorted when we convert it to an Array.
       // The objects are Integers, but toArray returns Object[]
-      Map<OSMLevel, OsmVertex> vertices = multiLevelNodes.get(nodeId);
+      Map<OSMLevel, OsmVertex> vertices = vertexGenerator.multiLevelNodes().get(nodeId);
 
       /*
        * first, build FreeEdges to disconnect from the graph, GenericVertices to serve as attachment points, and ElevatorBoard and
@@ -113,7 +110,8 @@ class ElevatorProcessor {
       List<Long> nodes = Arrays
         .stream(elevatorWay.getNodeRefs().toArray())
         .filter(nodeRef ->
-          intersectionNodes.containsKey(nodeRef) && intersectionNodes.get(nodeRef) != null
+          vertexGenerator.intersectionNodes().containsKey(nodeRef) &&
+          vertexGenerator.intersectionNodes().get(nodeRef) != null
         )
         .boxed()
         .toList();
@@ -121,7 +119,7 @@ class ElevatorProcessor {
       ArrayList<Vertex> onboardVertices = new ArrayList<>();
       for (int i = 0; i < nodes.size(); i++) {
         Long node = nodes.get(i);
-        var sourceVertex = intersectionNodes.get(node);
+        var sourceVertex = vertexGenerator.intersectionNodes().get(node);
         String sourceVertexLabel = sourceVertex.getLabel();
         String levelName = elevatorWay.getId() + " / " + i;
         createElevatorVertices(

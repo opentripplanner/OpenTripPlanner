@@ -10,7 +10,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
-import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.StateEditor;
 
 public class Transfer {
@@ -75,15 +75,9 @@ public class Transfer {
     StateEditor se = new StateEditor(edges.get(0).getFromVertex(), request);
     se.setTimeSeconds(0);
 
-    State s = se.makeState();
-    for (Edge e : edges) {
-      s = e.traverse(s);
-      if (s == null) {
-        return Optional.empty();
-      }
-    }
+    var state = EdgeTraverser.traverseEdges(se.makeState(), edges);
 
-    return Optional.of(
+    return state.map(s ->
       new DefaultRaptorTransfer(
         this.toStop,
         (int) s.getElapsedTimeSeconds(),
