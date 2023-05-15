@@ -33,34 +33,35 @@ public class StreetVehicleParkingLink extends Edge {
     return ToStringBuilder.of(this.getClass()).addObj("fromv", fromv).addObj("tov", tov).toString();
   }
 
-  public State traverse(State s0) {
+  @Override
+  public State[] traverse(State s0) {
     // Disallow traversing two StreetBikeParkLinks in a row.
     // Prevents router using bike rental stations as shortcuts to get around
     // turn restrictions.
     if (s0.getBackEdge() instanceof StreetVehicleParkingLink) {
-      return null;
+      return State.empty();
     }
 
     var entrance = vehicleParkingEntranceVertex.getParkingEntrance();
     if (s0.getNonTransitMode() == TraverseMode.CAR) {
       if (!entrance.isCarAccessible()) {
-        return null;
+        return State.empty();
       }
     } else if (!entrance.isWalkAccessible()) {
-      return null;
+      return State.empty();
     }
 
     var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
     final VehicleParkingRequest parkingRequest = s0.getRequest().parking();
     if (traversalBanned(parkingRequest, vehicleParking)) {
-      return null;
+      return State.empty();
     }
 
     StateEditor s1 = s0.edit(this);
 
     s1.incrementWeight(1);
     s1.setBackMode(null);
-    return s1.makeState();
+    return s1.makeStateArray();
   }
 
   private boolean traversalBanned(

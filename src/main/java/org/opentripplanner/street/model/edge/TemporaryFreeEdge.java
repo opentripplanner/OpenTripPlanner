@@ -27,7 +27,7 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
   }
 
   @Override
-  public State traverse(State s0) {
+  public State[] traverse(State s0) {
     StateEditor s1 = s0.edit(this);
     s1.incrementWeight(1);
     s1.setBackMode(null);
@@ -40,6 +40,6 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
       s1.incrementWeight(s0.getPreferences().rental().arrivingInRentalVehicleAtDestinationCost());
     }
 
-    return s1.makeState();
+    return s1.makeStateArray();
   }
 }

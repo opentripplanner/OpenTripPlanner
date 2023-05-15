@@ -1,7 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model.basic.Accessibility.NOT_POSSIBLE;
 import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 import static org.opentripplanner.transit.model.basic.Accessibility.POSSIBLE;
@@ -54,26 +54,26 @@ class StreetTransitEntityLinkTest {
   @Test
   void disallowInaccessibleStop() {
     var afterTraversal = traverse(inaccessibleStop, true);
-    assertNull(afterTraversal);
+    assertTrue(State.isEmpty(afterTraversal));
   }
 
   @Test
   void allowAccessibleStop() {
-    State afterTraversal = traverse(accessibleStop, true);
+    var afterTraversal = traverse(accessibleStop, true);
 
-    assertNotNull(afterTraversal);
+    assertFalse(State.isEmpty(afterTraversal));
   }
 
   @Test
   void unknownStop() {
     var afterTraversal = traverse(unknownStop, false);
-    assertNotNull(afterTraversal);
+    assertFalse(State.isEmpty(afterTraversal));
 
     var afterStrictTraversal = traverse(unknownStop, true);
-    assertNull(afterStrictTraversal);
+    assertTrue(State.isEmpty(afterStrictTraversal));
   }
 
-  private State traverse(RegularStop stop, boolean onlyAccessible) {
+  private State[] traverse(RegularStop stop, boolean onlyAccessible) {
     var from = new SimpleVertex(graph, "A", 10, 10);
     var to = new TransitStopVertexBuilder()
       .withGraph(graph)

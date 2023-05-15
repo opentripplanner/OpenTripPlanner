@@ -1,7 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -29,96 +30,96 @@ class VehicleRentalEdgeTest {
   public void testRentingWithAvailableVehicles() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3);
 
-    State s1 = rent();
+    var s1 = rent();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
   public void testRentingWithNoAvailableVehicles() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 0, 3);
 
-    State s1 = rent();
+    var s1 = rent();
 
-    assertNull(s1);
+    assertTrue(State.isEmpty(s1));
   }
 
   @Test
   public void testRentingWithNoAvailableVehiclesAndNoRealtimeUsage() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 0, 3, false, true, false);
 
-    State s1 = rent();
+    var s1 = rent();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
   public void testReturningWithAvailableSpaces() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3);
 
-    State s1 = rentAndDropOff();
+    var s1 = rentAndDropOff();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
   public void testReturningWithNoAvailableSpaces() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0);
 
-    State s1 = rentAndDropOff();
+    var s1 = rentAndDropOff();
 
-    assertNull(s1);
+    assertTrue(State.isEmpty(s1));
   }
 
   @Test
   public void testReturningWithNoAvailableSpacesAndOverloading() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, true, true, true);
 
-    State s1 = rentAndDropOff();
+    var s1 = rentAndDropOff();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
   public void testReturningWithNoAvailableSpacesAndNoRealtimeUsage() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, false, true, false);
 
-    State s1 = rentAndDropOff();
+    var s1 = rentAndDropOff();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
   public void testRentingFromClosedStation() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, true, false, true);
 
-    State s1 = rent();
+    var s1 = rent();
 
-    assertNull(s1);
+    assertTrue(State.isEmpty(s1));
   }
 
   @Test
   public void testReturningToClosedStation() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, true, true, true);
 
-    State s1 = rent();
+    var s1 = rent();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
 
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, true, false, true);
 
-    State s2 = dropOff(s1);
+    var s2 = dropOff(s1[0]);
 
-    assertNull(s2);
+    assertTrue(State.isEmpty(s2));
   }
 
   @Test
   public void testReturningAndReturningToClosedStationWithNoRealtimeUsage() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, false, true, false);
 
-    State s1 = rentAndDropOff();
+    var s1 = rentAndDropOff();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   private void initEdgeAndRequest(StreetMode mode, int vehicles, int spaces) {
@@ -179,16 +180,25 @@ class VehicleRentalEdgeTest {
     return station;
   }
 
-  private State rent() {
+  private State[] rent() {
     return vehicleRentalEdge.traverse(new State(vertex, request));
   }
 
-  private State rentAndDropOff() {
-    var s0 = vehicleRentalEdge.traverse(new State(vertex, request));
+  private State[] rentAndDropOff() {
+    var s0 = singleState(vehicleRentalEdge.traverse(new State(vertex, request)));
     return vehicleRentalEdge.traverse(s0);
   }
 
-  private State dropOff(State s0) {
+  private State[] dropOff(State s0) {
     return vehicleRentalEdge.traverse(s0);
+  }
+
+  private static State singleState(State[] resultingStates) {
+    if (resultingStates.length == 1) {
+      return resultingStates[0];
+    } else {
+      fail("Expected a single state from traverse() method but received " + resultingStates.length);
+      return null;
+    }
   }
 }

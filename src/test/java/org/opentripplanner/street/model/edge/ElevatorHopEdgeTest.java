@@ -2,7 +2,6 @@ package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.stream.Stream;
@@ -51,8 +50,8 @@ class ElevatorHopEdgeTest {
         )
       );
 
-    State result = traverse(wheelchair, req.build());
-    assertNull(result);
+    var result = traverse(wheelchair, req.build());
+    assertTrue(State.isEmpty(result));
   }
 
   static Stream<Arguments> all = Stream.of(
@@ -68,17 +67,17 @@ class ElevatorHopEdgeTest {
   @VariableSource("all")
   public void allowByDefault(Accessibility wheelchair, double expectedCost) {
     var req = StreetSearchRequest.of().build();
-    var result = traverse(wheelchair, req);
+    var result = traverse(wheelchair, req)[0];
     assertNotNull(result);
     assertTrue(result.weight > 1);
 
     req = StreetSearchRequest.copyOf(req).withWheelchair(true).build();
-    var wheelchairResult = traverse(wheelchair, req);
+    var wheelchairResult = traverse(wheelchair, req)[0];
     assertNotNull(wheelchairResult);
     assertEquals(expectedCost, wheelchairResult.weight);
   }
 
-  private State traverse(Accessibility wheelchair, StreetSearchRequest req) {
+  private State[] traverse(Accessibility wheelchair, StreetSearchRequest req) {
     var edge = new ElevatorHopEdge(from, to, StreetTraversalPermission.ALL, wheelchair);
     var state = new State(from, req);
 

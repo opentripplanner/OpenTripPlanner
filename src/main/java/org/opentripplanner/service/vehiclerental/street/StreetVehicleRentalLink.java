@@ -28,23 +28,24 @@ public class StreetVehicleRentalLink extends Edge {
     return "StreetVehicleRentalLink(" + fromv + " -> " + tov + ")";
   }
 
-  public State traverse(State s0) {
+  @Override
+  public State[] traverse(State s0) {
     // Disallow traversing two StreetBikeRentalLinks in a row.
     // This prevents the router from using bike rental stations as shortcuts to get around
     // turn restrictions.
     if (s0.getBackEdge() instanceof StreetVehicleRentalLink) {
-      return null;
+      return State.empty();
     }
 
     if (vehicleRentalPlaceVertex.getStation().networkIsNotAllowed(s0.getRequest().rental())) {
-      return null;
+      return State.empty();
     }
 
     StateEditor s1 = s0.edit(this);
     //assume bike rental stations are more-or-less on-street
     s1.incrementWeight(1);
     s1.setBackMode(null);
-    return s1.makeState();
+    return s1.makeStateArray();
   }
 
   @Override
