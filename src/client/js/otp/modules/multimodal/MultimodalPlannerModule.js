@@ -74,8 +74,11 @@ otp.modules.multimodal.MultimodalPlannerModule =
         if(otp.config.showWheelchairOption === undefined || otp.config.showWheelchairOption === true) {
           modeSelector.addModeControl(new otp.widgets.tripoptions.WheelChairSelector(this.optionsWidget));
         }
-        modeSelector.addModeControl(new otp.widgets.tripoptions.DebugItineraryFiltersSelector(this.optionsWidget));
         modeSelector.refreshModeControls();
+
+        this.optionsWidget.addVerticalSpace(12, true);
+        let debugItinerariesSelector = new otp.widgets.tripoptions.DebugItineraryFiltersSelector(this.optionsWidget);
+        this.optionsWidget.addControl("debugItineraries", debugItinerariesSelector, true);
 
         this.optionsWidget.addSeparator();
         this.optionsWidget.addControl("additionalParameters", new otp.widgets.tripoptions.AdditionalTripParameters(this.optionsWidget))
