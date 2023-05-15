@@ -18,6 +18,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
@@ -242,7 +243,9 @@ public class FaresIntegrationTest {
     request.setDateTime(time);
     request.setFrom(from);
     request.setTo(to);
-    request.withPreferences(p -> p.withItineraryFilter(it -> it.withDebug(true)));
+    request.withPreferences(p ->
+      p.withItineraryFilter(it -> it.withDebug(ItineraryFilterDebugProfile.LIST_ALL))
+    );
 
     var result = serverContext.routingService().route(request);
 

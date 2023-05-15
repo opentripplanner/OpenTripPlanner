@@ -20,6 +20,7 @@ import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter;
@@ -100,9 +101,13 @@ public class RouteRequestMapper {
         );
         rental.withUseAvailabilityInformation(request.isTripPlannedForNow());
       });
+      // TODO Add support for all debug filter variants
       callWith.argument(
         "debugItineraryFilter",
-        (Boolean v) -> preferences.withItineraryFilter(it -> it.withDebug(v))
+        (Boolean v) ->
+          preferences.withItineraryFilter(it ->
+            it.withDebug(ItineraryFilterDebugProfile.ofDebugEnabled(v))
+          )
       );
       preferences.withTransit(tr -> {
         callWith.argument("boardSlack", tr::withDefaultBoardSlackSec);

@@ -74,6 +74,7 @@ public class GtfsRealtimeTripUpdateSource {
     return updates;
   }
 
+  @Override
   public String toString() {
     return ToStringBuilder
       .of(this.getClass())

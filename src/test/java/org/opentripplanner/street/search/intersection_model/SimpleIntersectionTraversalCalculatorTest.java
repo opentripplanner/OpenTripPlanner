@@ -339,8 +339,8 @@ public class SimpleIntersectionTraversalCalculatorTest {
       toSpeed
     );
 
-    // Cost with default values = 5.0
-    assertEquals(5, traversalCost, 0.0);
+    // Cost with default values = 0.0
+    assertEquals(0, traversalCost, 0.0);
   }
 
   @Test

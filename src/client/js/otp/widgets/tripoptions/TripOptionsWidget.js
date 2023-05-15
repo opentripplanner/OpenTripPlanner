@@ -458,40 +458,54 @@ otp.widgets.tripoptions.WheelChairSelector =
 });
 
 //** Debug Itineraries Filters **//
-otp.widgets.tripoptions.DebugItineraryFiltersSelector = otp.Class(
-    otp.widgets.tripoptions.TripOptionsWidgetControl,
-    {
-        id: null,
-        //TRANSLATORS: label for checkbox
-        label: _tr("Show Filtered Itineraries:"),
+otp.widgets.tripoptions.DebugItineraryFiltersSelector =
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+        id                :  null,
+        label             : _tr("Debug itineraries filter"),
+        debugOptions      : otp.config.debugItinerarys,
+        debugControls     : null,
+        controlPadding    : "8px",
 
-        initialize: function (tripWidget) {
-
+        initialize : function(tripWidget) {
             otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+            this.id = tripWidget.id+"-debugSelector";
+            this.debugControls = [];
 
-            this.id = tripWidget.id;
+            var html = "<div class='notDraggable'>" + this.label + ": ";
+            html += '<select id="'+this.id+'">';
+            _.each(this.debugOptions, function(text) {
+                html += '<option>'+text+'</option>';
+            });
+            html += '</select>';
+            html += '<div id="'+this.id+'-widgets" style="overflow: hidden;"></div>';
+            html += "</div>";
 
-            ich['otp-tripOptions-debug-filters']({
-                widgetId: this.id,
-                label: this.label,
-            }).appendTo(this.$());
-
+            $(html).appendTo(this.$());
         },
-        doAfterLayout: function () {
-            var this_ = this;
 
-            $("#" + this.id + "-debug-filters-input").change(function () {
-                this_.tripWidget.module.debugItineraryFilter = this.checked;
+        doAfterLayout : function() {
+            let this_ = this;
+            $("#"+this.id).change(function() {
+                this_.tripWidget.inputChanged({
+                    debugItineraryFilter : _.keys(this_.debugOptions)[this.selectedIndex],
+                });
             });
         },
-        restorePlan: function (data) {
-            var checked = data.queryParams.debugItineraryFilter === true || data.queryParams.debugItineraryFilter === 'true';
-            this.tripWidget.module.debugItineraryFilter = checked;
-            $("#" + this.id + "-debug-filters-input").prop("checked", checked);
-        },
-        isApplicableForMode : function(mode) { return true; }
-    }
-);
+
+        restorePlan : function(data) {
+            let i = 0;
+            for(debugOption in this.debugOptions) {
+                if(debugOption === data.queryParams.debugItineraryFilter) {
+                    this.tripWidget.module.debugItineraryFilter = data.queryParams.debugItineraryFilter;
+                    $('#'+this.id+' option:eq('+i+')').prop('selected', true);
+                }
+                i++;
+            }
+            for(i = 0; i < this.debugControls.length; i++) {
+                this.debugControls[i].restorePlan(data);
+            }
+        }
+    });
 
 
 //** ModeSelector **//

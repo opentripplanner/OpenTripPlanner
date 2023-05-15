@@ -1,8 +1,8 @@
 package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
@@ -75,13 +75,13 @@ class StreetVehicleParkingLinkTest {
 
     var result = traverse(streetVertex, edge, req.build());
     if (shouldTraverse) {
-      assertNotNull(result);
+      assertFalse(State.isEmpty(result));
     } else {
-      assertNull(result);
+      assertTrue(State.isEmpty(result));
     }
   }
 
-  private State traverse(Vertex fromV, Edge edge, StreetSearchRequest request) {
+  private State[] traverse(Vertex fromV, Edge edge, StreetSearchRequest request) {
     var state = new State(fromV, request);
 
     assertEquals(0, state.weight);

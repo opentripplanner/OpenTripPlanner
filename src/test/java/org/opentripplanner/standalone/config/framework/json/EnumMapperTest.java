@@ -4,8 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.doc.DocumentedEnum;
 
 class EnumMapperTest {
+
+  public static final String DESCRIPTION_OF_THE_TYPE = "Description of the type";
 
   @Test
   void mapToEnum() {
@@ -31,8 +34,38 @@ class EnumMapperTest {
     assertEquals("boo-boo", EnumMapper.toString(Foo.BOO_BOO));
   }
 
-  enum Foo {
-    Bar,
-    BOO_BOO,
+  @Test
+  void docEnumValueList() {
+    assertEquals(
+      """
+        - `bar` This is Bar
+        - `boo-boo` This is Boo
+          Boo
+       """,
+      EnumMapper.docEnumValueList(Foo.values())
+    );
+  }
+
+  enum Foo implements DocumentedEnum<Foo> {
+    Bar("This is Bar"),
+    BOO_BOO("""
+      This is Boo
+      Boo""");
+
+    private final String doc;
+
+    Foo(String doc) {
+      this.doc = doc;
+    }
+
+    @Override
+    public String typeDescription() {
+      return DESCRIPTION_OF_THE_TYPE;
+    }
+
+    @Override
+    public String enumValueDescription() {
+      return doc;
+    }
   }
 }

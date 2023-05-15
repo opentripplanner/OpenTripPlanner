@@ -946,7 +946,7 @@ type RoutingParameters {
   "Max car speed along streets, in meters per second"
   carSpeed: Float
   compactLegsByReversedSearch: Boolean @deprecated
-  debugItineraryFilter: Boolean
+  debugItineraryFilter: Boolean @deprecated
   "Option to disable the default filtering of GTFS-RT alerts by time."
   disableAlertFiltering: Boolean @deprecated
   "If true, the remaining weight heuristic is disabled."
@@ -1121,7 +1121,17 @@ type StopToStopGeometry {
   toQuay: Quay
 }
 
-"A system notice is used to tag elements with system information for debugging or other system related purpose. One use-case is to run a routing search with 'itineraryFilters.debug: true'. This will then tag itineraries instead of removing them from the result. This make it possible to inspect the itinerary-filter-chain. A SystemNotice only have english text, because the primary user are technical staff, like testers and developers."
+"""
+A system notice is used to tag elements with system information for debugging or other
+system related purpose. One use-case is to run a routing search with
+`itineraryFilters.debug=listAll`. This will then tag itineraries instead of removing
+them from the result. This make it possible to inspect the itinerary-filter-chain. A
+SystemNotice only have english text, because the primary user are technical staff, like
+testers and developers.
+
+**NOTE!** _A SystemNotice is for debugging the system, avoid putting logic on it in the
+client. The tags and usage may change without notice._
+"""
 type SystemNotice {
   tag: String
   text: String
@@ -1423,6 +1433,29 @@ enum InterchangeWeighting {
   recommendedInterchange
 }
 
+"""
+Enable this to attach a system notice to itineraries instead of removing them. This is very
+convenient when tuning the itinerary-filter-chain.
+"""
+enum ItineraryFilterDebugProfile {
+  """
+  Only return the requested number of itineraries, counting both actual and deleted ones.
+  The top `numItineraries` using the request sort order is returned. This does not work
+  with paging, itineraries after the limit, but inside the search-window are skipped when
+  moving to the next page.
+  """
+  limitToNumOfItineraries
+  """
+  Return all itineraries, including deleted ones, inside the actual search-window used
+  (the requested search-window may differ).
+  """
+  limitToSearchWindow
+  "List all itineraries, including all deleted itineraries."
+  listAll
+  "By default, the debug itinerary filters is turned off."
+  off
+}
+
 enum Locale {
   no
   us
@@ -1528,6 +1561,8 @@ enum RoutingErrorCode {
   outsideBounds
   "The date specified is outside the range of data currently loaded into the system"
   outsideServicePeriod
+  "The routing request timed out."
+  processingTimeout
   "An unknown error happened during the search. The details have been logged to the server logs"
   systemError
   "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
@@ -1820,6 +1855,12 @@ input InputWhiteListed {
 
 "Parameters for the OTP Itinerary Filter Chain. These parameters SHOULD be configured on the server side and should not be used by the client. They are made available here to be able to experiment and tune the server."
 input ItineraryFilters {
+  """
+  Use this parameter to debug the itinerary-filter-chain. The default is `off`
+  (itineraries are filtered and not returned). For all other values the unwanted
+  itineraries are returned with a system notice, and not deleted.
+  """
+  debug: ItineraryFilterDebugProfile = off
   groupSimilarityKeepNumOfItineraries: Float = 0.68 @deprecated
   "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."
   groupSimilarityKeepOne: Float = 0.85

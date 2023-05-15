@@ -24,6 +24,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
@@ -629,7 +630,7 @@ public abstract class RoutingResource {
   private Boolean disableAlertFiltering;
 
   @QueryParam("debugItineraryFilter")
-  protected Boolean debugItineraryFilter;
+  protected ItineraryFilterDebugProfile debugItineraryFilter;
 
   @QueryParam("groupSimilarityKeepOne")
   Double groupSimilarityKeepOne;

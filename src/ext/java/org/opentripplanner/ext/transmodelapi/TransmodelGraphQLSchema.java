@@ -4,9 +4,9 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 import static org.opentripplanner.ext.transmodelapi.mapping.SeverityMapper.getTransmodelSeverity;
 import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.FILTER_PLACE_TYPE_ENUM;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MULTI_MODAL_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.filterPlaceTypeEnum;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import graphql.Scalars;
@@ -847,7 +847,7 @@ public class TransmodelGraphQLSchema {
               .name("filterByPlaceTypes")
               .description("Only include places of given types if set. Default accepts all types")
               .defaultValue(Arrays.asList(TransmodelPlaceType.values()))
-              .type(new GraphQLList(filterPlaceTypeEnum))
+              .type(new GraphQLList(FILTER_PLACE_TYPE_ENUM))
               .build()
           )
           .argument(
