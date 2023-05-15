@@ -22,7 +22,7 @@ class RideHailingServicesModuleTest {
               "type": "uber-car-hailing",
               "clientId": "secret-id",
               "clientSecret": "very-secret",
-              "wheelchairAccessibleProductId": "car"
+              "wheelchairAccessibleProductId": "product-id-accessible-by-wheelchair"
             }
           ]
       }
