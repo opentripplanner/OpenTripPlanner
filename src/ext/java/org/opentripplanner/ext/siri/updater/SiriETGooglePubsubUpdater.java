@@ -73,6 +73,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
   private static final AtomicLong UPDATE_COUNTER = new AtomicLong(0);
   private static final AtomicLong SIZE_COUNTER = new AtomicLong(0);
+  private static final String SUBSCRIPTION_PREFIX = "siri-et-";
   /**
    * The URL used to fetch all initial updates
    */
@@ -128,11 +129,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     this.snapshotSource = timetableSnapshot;
 
     // set subscriber
-    String subscriptionId = System.getenv("HOSTNAME");
-    if (subscriptionId == null || subscriptionId.isEmpty()) {
-      subscriptionId = "otp-" + UUID.randomUUID();
-    }
-
+    String subscriptionId = buildSubscriptionId();
     String subscriptionProjectName = config.subscriptionProjectName();
     String topicProjectName = config.topicProjectName();
 
@@ -245,6 +242,20 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       // Handling cornercase when instance is being shut down before it has been initialized
       LOG.info("Instance is already shutting down - cleaning up immediately.", e);
       teardown();
+    }
+  }
+
+  /**
+   * Build a unique name for the subscription.
+   * This ensures that if the subscription is not properly deleted during shutdown,
+   * a restarted instance will get a fresh subscription.
+   */
+  private static String buildSubscriptionId() {
+    String hostname = System.getenv("HOSTNAME");
+    if (hostname == null || hostname.isEmpty()) {
+      return SUBSCRIPTION_PREFIX + "otp-" + UUID.randomUUID();
+    } else {
+      return SUBSCRIPTION_PREFIX + hostname + '-' + Instant.now().toEpochMilli();
     }
   }
 
