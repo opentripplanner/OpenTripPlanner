@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.flex.edgetype;
 
+import java.util.Objects;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
-import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -28,7 +28,7 @@ public class FlexTripEdge extends Edge {
     StopLocation s2,
     FlexTrip trip,
     FlexAccessEgressTemplate flexTemplate,
-    FlexPathCalculator calculator
+    FlexPath flexPath
   ) {
     // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
     // The first parameter in Vertex constructor is graph. If it is null, the vertex isn't added to it.
@@ -39,13 +39,7 @@ public class FlexTripEdge extends Edge {
     this.flexTemplate = flexTemplate;
     this.fromv = v1;
     this.tov = v2;
-    this.flexPath =
-      calculator.calculateFlexPath(
-        fromv,
-        tov,
-        flexTemplate.fromStopIndex,
-        flexTemplate.toStopIndex
-      );
+    this.flexPath = Objects.requireNonNull(flexPath);
   }
 
   public int getTimeInSeconds() {
@@ -53,11 +47,7 @@ public class FlexTripEdge extends Edge {
   }
 
   @Override
-  public State traverse(State s0) {
-    if (this.flexPath == null) {
-      // not routable
-      return null;
-    }
+  public State[] traverse(State s0) {
     StateEditor editor = s0.edit(this);
     editor.setBackMode(TraverseMode.FLEX);
     // TODO: decide good value
@@ -66,7 +56,7 @@ public class FlexTripEdge extends Edge {
     editor.incrementTimeInSeconds(timeInSeconds);
     editor.incrementWeight(timeInSeconds);
     editor.resetEnteredNoThroughTrafficArea();
-    return editor.makeState();
+    return editor.makeStateArray();
   }
 
   @Override

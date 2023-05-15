@@ -76,10 +76,11 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
   }
 
-  public State traverse(State s0) {
+  @Override
+  public State[] traverse(State s0) {
     StateEditor s1 = createEditorForWalking(s0, this);
     if (s1 == null) {
-      return null;
+      return State.empty();
     }
 
     RoutingPreferences preferences = s0.getPreferences();
@@ -124,7 +125,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       s1.incrementWeight(1);
     }
 
-    return s1.makeState();
+    return s1.makeStateArray();
   }
 
   @Override

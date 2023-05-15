@@ -9,20 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.street.search.state.StateEditor;
 
 public class StreetMatcherTest {
 
@@ -156,96 +147,8 @@ public class StreetMatcherTest {
       StreetVertex vA = (StreetVertex) graph.getVertex(vLabels[i]);
       StreetVertex vB = (StreetVertex) graph.getVertex(vLabels[i + 1]);
 
-      new SimpleEdge(vA, vB);
-      new SimpleEdge(vB, vA);
-    }
-  }
-
-  /* TODO explain why this exists and is "simple" */
-  private static class SimpleEdge extends StreetEdge {
-
-    public SimpleEdge(StreetVertex v1, StreetVertex v2) {
-      super(v1, v2, null, (NonLocalizedString) null, 0, null, false);
-    }
-
-    @Override
-    public boolean canTraverse(TraverseModeSet modes) {
-      return true;
-    }
-
-    @Override
-    public PackedCoordinateSequence getElevationProfile() {
-      return null;
-    }
-
-    public boolean isElevationFlattened() {
-      return false;
-    }
-
-    public String toString() {
-      return "SimpleEdge(" + fromv + ", " + tov + ")";
-    }
-
-    @Override
-    public State traverse(State s0) {
-      double d = getDistanceMeters();
-      TraverseMode mode = s0.getNonTransitMode();
-      int t = (int) (d / s0.getRequest().preferences().getSpeed(mode, false));
-      StateEditor s1 = s0.edit(this);
-      s1.incrementTimeInSeconds(t);
-      s1.incrementWeight(d);
-      return s1.makeState();
-    }
-
-    @Override
-    public I18NString getName() {
-      return null;
-    }
-
-    @Override
-    public LineString getGeometry() {
-      return gf.createLineString(new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate() });
-    }
-
-    @Override
-    public double getDistanceMeters() {
-      return SphericalDistanceLibrary.distance(
-        getFromVertex().getCoordinate(),
-        getToVertex().getCoordinate()
-      );
-    }
-
-    @Override
-    public boolean isWheelchairAccessible() {
-      return true;
-    }
-
-    @Override
-    public StreetTraversalPermission getPermission() {
-      return StreetTraversalPermission.ALL;
-    }
-
-    @Override
-    public boolean isMotorVehicleNoThruTraffic() {
-      return false;
-    }
-
-    @Override
-    public float getCarSpeed() {
-      return 11.2f;
-    }
-
-    @Override
-    public void setCarSpeed(float carSpeed) {}
-
-    @Override
-    public int getInAngle() {
-      return 0;
-    }
-
-    @Override
-    public int getOutAngle() {
-      return 0;
+      StreetModelForTest.streetEdge(vA, vB);
+      StreetModelForTest.streetEdge(vB, vA);
     }
   }
 }

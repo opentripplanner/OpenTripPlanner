@@ -62,7 +62,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         } catch (InterruptedException e) {
           throw e;
         } catch (Exception e) {
-          LOG.error("Error while running polling updater of type {}", configRef, e);
+          LOG.error("Error while running polling updater {}", this, e);
           // TODO Should we cancel the task? Or after n consecutive failures? cancel();
         } finally {
           primed = true;

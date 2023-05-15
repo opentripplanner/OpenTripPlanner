@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,8 +28,6 @@ import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
-import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
-import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -360,18 +359,21 @@ public class PruneIslands implements GraphBuilderModule {
         ) {
           continue;
         }
-        State s1 = e.traverse(s0);
-        if (s1 == null) {
+        State[] states = e.traverse(s0);
+        if (State.isEmpty(states)) {
           continue;
         }
-        Vertex out = s1.getVertex();
+        Arrays
+          .stream(states)
+          .map(State::getVertex)
+          .forEach(out -> {
+            var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());
+            vertexList.add(out);
 
-        var vertexList = neighborsForVertex.computeIfAbsent(gv, k -> new ArrayList<>());
-        vertexList.add(out);
-
-        // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
-        vertexList = neighborsForVertex.computeIfAbsent(out, k -> new ArrayList<>());
-        vertexList.add(gv);
+            // note: this assumes that edges are bi-directional. Maybe explicit state traversal is needed for CAR mode.
+            vertexList = neighborsForVertex.computeIfAbsent(out, k -> new ArrayList<>());
+            vertexList.add(gv);
+          });
       }
     }
   }

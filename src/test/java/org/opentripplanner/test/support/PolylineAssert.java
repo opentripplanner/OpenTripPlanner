@@ -20,7 +20,7 @@ public class PolylineAssert {
       "Actual:    " +
       makeUrl(actual) +
       "\n";
-    assertEquals(actual, expected, reason);
+    assertEquals(expected, actual, reason);
   }
 
   private static String toBase64(String line) {

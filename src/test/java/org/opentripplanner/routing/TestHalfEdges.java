@@ -541,11 +541,10 @@ public class TestHalfEdges {
     // traverse the FreeEdge from the StreetLocation to the new IntersectionVertex
     StreetSearchRequestBuilder req = StreetSearchRequest.of();
     State traversedOne = new State(start, req.build());
-    State currentState;
     for (Edge e : start.getOutgoing()) {
-      currentState = e.traverse(traversedOne);
-      if (currentState != null) {
-        traversedOne = currentState;
+      var states = e.traverse(traversedOne);
+      if (!State.isEmpty(states)) {
+        traversedOne = states[0];
         break;
       }
     }
@@ -586,9 +585,9 @@ public class TestHalfEdges {
 
     traversedOne = new State(start, req.build());
     for (Edge e : start.getOutgoing()) {
-      currentState = e.traverse(traversedOne);
-      if (currentState != null) {
-        traversedOne = currentState;
+      var states = e.traverse(traversedOne);
+      if (!State.isEmpty(states)) {
+        traversedOne = states[0];
         break;
       }
     }
