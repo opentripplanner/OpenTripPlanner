@@ -328,6 +328,10 @@ public class DefaultFareService implements FareService {
     Collection<FareRuleSet> fareRules
   ) {
     FareSearch r = new FareSearch(legs.size());
+    final FareAndId UNKNOWN = new FareAndId(
+      Money.ofFractionalAmount(currency, 999f),
+      new FeedScopedId("max", "max")
+    );
 
     // Dynamic algorithm to calculate fare cost.
     // This is a modified Floyd-Warshall algorithm, a key thing to remember is that
@@ -336,10 +340,6 @@ public class DefaultFareService implements FareService {
     for (int i = 0; i < legs.size(); i++) {
       // each diagonal
       for (int j = 0; j < legs.size() - i; j++) {
-        FareAndId UNKNOWN = new FareAndId(
-          Money.ofFractionalAmount(currency, 999f),
-          new FeedScopedId("max", "max")
-        );
         FareAndId best = getBestFareAndId(fareType, legs.subList(j, j + i + 1), fareRules)
           .orElse(UNKNOWN);
         Money cost = best.fare();
