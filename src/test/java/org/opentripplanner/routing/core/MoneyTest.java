@@ -76,6 +76,11 @@ class MoneyTest {
   }
 
   @Test
+  void times() {
+    assertEquals(Money.usDollars(4), oneDollar.times(4));
+  }
+
+  @Test
   void greaterThan() {
     assertTrue(twoDollars.greaterThan(oneDollar));
     assertFalse(oneDollar.greaterThan(oneDollar));

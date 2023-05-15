@@ -30,7 +30,7 @@ public class Money implements Comparable<Money> {
   }
 
   /**
-   * Creates a Euro money object, mostly used in tests.
+   * Creates a Euro money object.
    * @param amount Amount in fractional euro, so 1.5 for 1.50 EUR
    */
   public static Money euros(float amount) {
@@ -132,7 +132,7 @@ public class Money implements Comparable<Money> {
   }
 
   /**
-   * Add another money amoutn to this instance and return it.
+   * Add another money amount to this instance and return it.
    */
   public Money plus(Money other) {
     return op(other, o -> new Money(currency, amount + o.amount));
@@ -166,24 +166,19 @@ public class Money implements Comparable<Money> {
     return currency;
   }
 
-  private boolean booleanOp(Money other, boolean amount) {
-    if (currency.equals(other.currency)) {
-      return amount;
-    } else {
-      throw new IllegalArgumentException(
-        "Cannot perform operations on %s and %s because they have unequal currency.".formatted(
-            this,
-            other
-          )
-      );
-    }
+  private boolean booleanOp(Money other, boolean result) {
+    checkCurrencyOrThrow(other);
+    return result;
   }
 
   @Nonnull
   private Money op(Money other, Function<Money, Money> op) {
-    if (currency.equals(other.currency)) {
-      return op.apply(other);
-    } else {
+    checkCurrencyOrThrow(other);
+    return op.apply(other);
+  }
+
+  private void checkCurrencyOrThrow(Money other) {
+    if (!currency.equals(other.currency)) {
       throw new IllegalArgumentException(
         "Cannot perform operations on %s and %s because they have unequal currency.".formatted(
             this,
