@@ -450,9 +450,11 @@ HTTP headers to add to the request. Any header key, value can be inserted.
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
-    "vehicleRentalPickupCost" : 120,
-    "vehicleRentalDropoffTime" : 30,
-    "vehicleRentalDropoffCost" : 30,
+    "vehicleRental" : {
+      "pickupCost" : 120,
+      "dropOffTime" : 30,
+      "dropOffCost" : 30
+    },
     "bikeParkTime" : 60,
     "bikeParkCost" : 120,
     "carDropoffTime" : 120,

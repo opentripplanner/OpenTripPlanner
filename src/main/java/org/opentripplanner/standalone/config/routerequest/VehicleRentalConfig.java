@@ -12,10 +12,8 @@ import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class VehicleRentalConfig {
-  static void mapRentalPreferences(
-    NodeAdapter c,
-    VehicleRentalPreferences.Builder builder
-  ) {
+
+  static void mapRentalPreferences(NodeAdapter c, VehicleRentalPreferences.Builder builder) {
     var dft = builder.original();
     builder
       .withDropoffCost(
@@ -33,18 +31,10 @@ public class VehicleRentalConfig {
           .asInt(dft.dropoffTime())
       )
       .withPickupCost(
-        c
-          .of("pickupCost")
-          .since(V2_0)
-          .summary("Cost to rent a vehicle.")
-          .asInt(dft.pickupCost())
+        c.of("pickupCost").since(V2_0).summary("Cost to rent a vehicle.").asInt(dft.pickupCost())
       )
       .withPickupTime(
-        c
-          .of("pickupTime")
-          .since(V2_0)
-          .summary("Time to rent a vehicle.")
-          .asInt(dft.pickupTime())
+        c.of("pickupTime").since(V2_0).summary("Time to rent a vehicle.").asInt(dft.pickupTime())
       )
       .withUseAvailabilityInformation(
         c
@@ -102,8 +92,11 @@ public class VehicleRentalConfig {
       );
   }
 
-  static void setVehicleRental(NodeAdapter c, RouteRequest request,
-                               RoutingPreferences.Builder preferences) {
+  static void setVehicleRental(
+    NodeAdapter c,
+    RouteRequest request,
+    RoutingPreferences.Builder preferences
+  ) {
     var vehicleRental = c
       .of("vehicleRental")
       .since(V2_3)
