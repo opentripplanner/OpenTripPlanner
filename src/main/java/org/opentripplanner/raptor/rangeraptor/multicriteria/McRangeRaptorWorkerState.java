@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -189,9 +190,11 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   private void addStopArrival(McStopArrival<T> arrival) {
-    if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {
-      return;
-    }
+    // TODO: 2023-05-17 via pass through: this is a problem
+    //  we need to figure out how to perform heuristic optimization for via searches
+    //    if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {
+    //      return;
+    //    }
     arrivals.addStopArrival(arrival);
   }
 

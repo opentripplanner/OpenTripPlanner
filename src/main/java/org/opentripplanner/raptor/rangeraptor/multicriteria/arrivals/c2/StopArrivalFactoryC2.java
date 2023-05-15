@@ -24,6 +24,7 @@ public class StopArrivalFactoryC2<T extends RaptorTripSchedule> implements McSto
     int stopArrivalTime,
     int c1
   ) {
+    // TODO: 2023-05-11 pass through via: Probably we should include c2 here as well
     return new TransitStopArrivalC2<>(
       ride.prevArrival(),
       alightStop,

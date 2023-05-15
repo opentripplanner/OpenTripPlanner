@@ -13,7 +13,11 @@ public interface PatternRideFactory<T extends RaptorTripSchedule, R extends Patt
     int boardTime,
     int boardCost1,
     int relativeCost1,
-    T trip
+    T trip,
+    // TODO: 2023-05-15 via pass through: this is temporary. We need to figure out how to inject
+    //  c2 value for via stops inside ride
+
+    int c2
   );
 
   /**

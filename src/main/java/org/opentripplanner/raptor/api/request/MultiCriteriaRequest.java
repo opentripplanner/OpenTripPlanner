@@ -21,17 +21,22 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   private final RaptorTransitPriorityGroupCalculator transitPriorityCalculator;
 
   @Nullable
+  private final RaptorTransitViaRequest transitViaRequest;
+
+  @Nullable
   private final Double relaxCostAtDestination;
 
   private MultiCriteriaRequest() {
     this.relaxC1 = RelaxFunction.NORMAL;
     this.transitPriorityCalculator = null;
+    this.transitViaRequest = null;
     this.relaxCostAtDestination = null;
   }
 
   public MultiCriteriaRequest(Builder<T> builder) {
     this.relaxC1 = Objects.requireNonNull(builder.relaxC1());
     this.transitPriorityCalculator = builder.transitPriorityCalculator();
+    this.transitViaRequest = builder.transitViaRequest();
     this.relaxCostAtDestination = builder.relaxCostAtDestination();
   }
 
@@ -71,6 +76,10 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return Optional.ofNullable(transitPriorityCalculator);
   }
 
+  public Optional<RaptorTransitViaRequest> transitViaRequest() {
+    return Optional.ofNullable(transitViaRequest);
+  }
+
   /**
    * Whether to accept non-optimal trips if they are close enough - if and only if they represent an
    * optimal path for their given iteration. In other words this slack only relaxes the pareto
@@ -101,6 +110,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return (
       Objects.equals(relaxC1, that.relaxC1) &&
       Objects.equals(transitPriorityCalculator, that.transitPriorityCalculator) &&
+      Objects.equals(transitViaRequest, that.transitViaRequest) &&
       Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination)
     );
   }
@@ -125,6 +135,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     private final MultiCriteriaRequest<T> original;
     private RelaxFunction relaxC1;
     private RaptorTransitPriorityGroupCalculator transitPriorityCalculator = null;
+    private RaptorTransitViaRequest transitViaRequest = null;
     private Double relaxCostAtDestination = null;
 
     public Builder(MultiCriteriaRequest<T> original) {
@@ -149,6 +160,17 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
 
     public Builder<T> withTransitPriorityCalculator(RaptorTransitPriorityGroupCalculator value) {
       transitPriorityCalculator = value;
+      return this;
+    }
+
+    @Nullable
+    public RaptorTransitViaRequest transitViaRequest() {
+      return transitViaRequest;
+    }
+
+    @Nullable
+    public Builder<T> withTransitViaRequest(RaptorTransitViaRequest value) {
+      transitViaRequest = value;
       return this;
     }
 

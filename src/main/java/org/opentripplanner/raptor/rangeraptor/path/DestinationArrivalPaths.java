@@ -89,6 +89,11 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     } else {
       RaptorPath<T> path = pathMapper.mapToPath(destArrival);
 
+      // TODO: 2023-05-17 via pass through: somewhere here we should filter out all paths without via
+      if (path.c2() == 0) {
+        return;
+      }
+
       assertGeneralizedCostIsCalculatedCorrectByMapper(destArrival, path);
 
       boolean added = paths.add(path);

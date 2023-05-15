@@ -4,6 +4,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.view.ArrivalView;
+import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.path.PathBuilder;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
@@ -69,7 +70,13 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
       arrival = arrival.previous();
     }
 
-    return pathBuilder.build();
+    var path = pathBuilder.build();
+
+    // TODO: 2023-05-11 via pass through: this is only for testing purpose
+    //  figure out better way to populate path with c2
+    ((Path<T>) path).setC2(destinationArrival.c2());
+
+    return path;
   }
 
   private static BoardAndAlightTimeSearch forwardSearch(boolean useApproximateTimeSearch) {

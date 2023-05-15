@@ -27,7 +27,9 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
     @Nullable final DominanceFunction c2DominanceFunction
   ) {
     if (relaxC1.isNormal()) {
-      return createFactoryC1();
+      return c2DominanceFunction == null
+        ? createFactoryC1()
+        : createFactoryC1AndC2(c2DominanceFunction);
     }
 
     return c2DominanceFunction == null
@@ -48,6 +50,31 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
       public ParetoComparator<T> compareArrivalTimeRoundCostAndOnBoardArrival() {
         return (l, r) ->
           McStopArrival.compareBase(l, r) || McStopArrival.compareArrivedOnBoard(l, r);
+      }
+    };
+  }
+
+  private static <
+    T extends McStopArrival<?>
+  > ArrivalParetoSetComparatorFactory<T> createFactoryC1AndC2(
+    DominanceFunction c2DominanceFunction
+  ) {
+    // TODO: 2023-05-19 via pass through: is this right?
+    return new ArrivalParetoSetComparatorFactory<T>() {
+      @Override
+      public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
+        return (l, r) ->
+          c2DominanceFunction.leftDominateRight(l.c2(), r.c2()) || McStopArrival.compareBase(l, r);
+      }
+
+      @Override
+      public ParetoComparator<T> compareArrivalTimeRoundCostAndOnBoardArrival() {
+        return (
+          (l, r) ->
+            c2DominanceFunction.leftDominateRight(l.c2(), r.c2()) ||
+            McStopArrival.compareBase(l, r) ||
+            McStopArrival.compareArrivedOnBoard(l, r)
+        );
       }
     };
   }
@@ -76,6 +103,7 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
     DominanceFunction c2DominanceFunction
   ) {
     return new ArrivalParetoSetComparatorFactory<>() {
+      // TODO: 2023-05-19 via pass through: is this right?
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
         // If c2 dominates, then a slack is added to arrival-time and cost (c1)
