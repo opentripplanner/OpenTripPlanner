@@ -315,7 +315,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
       ACCESS_COST,
       leg2.asTransitLeg()
     );
-    return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST);
+    return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST, 0);
   }
 
   public static RaptorPath<TestTripSchedule> flexTripAsPath() {
@@ -351,7 +351,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
       ACCESS_COST,
       leg2.asTransitLeg()
     );
-    return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST);
+    return new Path<>(RAPTOR_ITERATION_START_TIME, leg1, TOTAL_COST, 0);
   }
 
   public static List<Integer> basicTripStops() {

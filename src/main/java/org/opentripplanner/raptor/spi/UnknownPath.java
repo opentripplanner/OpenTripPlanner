@@ -71,6 +71,11 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
   }
 
   @Override
+  public int c2() {
+    return RaptorCostCalculator.ZERO_COST;
+  }
+
+  @Override
   public AccessPathLeg<T> accessLeg() {
     return null;
   }

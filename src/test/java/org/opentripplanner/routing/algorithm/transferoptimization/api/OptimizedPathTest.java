@@ -54,7 +54,8 @@ class OptimizedPathTest implements RaptorTestConstants {
       generalizedCost,
       transferPriorityCost,
       waitTimeOptimizedCost,
-      breakTieCost
+      breakTieCost,
+      0
     );
 
     assertEquals(generalizedCost, path.c1());

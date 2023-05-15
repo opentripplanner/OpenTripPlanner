@@ -244,6 +244,9 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private UnknownPathFactory<T> unknownPathFactory() {
+    // TODO: 2023-05-11 via pass trough: this one is not using generalizedCost (c1)
+    //  so that's probably not the implementation that should be changed
+
     return oneOf(
       new UnknownPathFactory<>(
         resolveBestTimes(),

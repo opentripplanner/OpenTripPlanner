@@ -198,7 +198,7 @@ public class PathTest implements RaptorTestConstants {
       access.generalizedCost(),
       leg2.asTransitLeg()
     );
-    RaptorPath<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST);
+    RaptorPath<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST, 0);
     assertEquals(0, path.numberOfTransfers());
   }
 
@@ -255,7 +255,7 @@ public class PathTest implements RaptorTestConstants {
       access.generalizedCost(),
       leg2.asTransitLeg()
     );
-    RaptorPath<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST);
+    RaptorPath<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST, 0);
     assertEquals(1, path.numberOfTransfers());
   }
 }
