@@ -56,6 +56,10 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
    */
   int c1();
 
+  int c2();
+
+  // TODO: 2023-05-11 via pass through: Do we need to include c2 here?
+
   /**
    * The first leg/path of this journey - which is linked to the next and so on. The leg can contain
    * sub-legs, for example: walk-flex-walk.
@@ -179,5 +183,12 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
     RaptorPath<T> r
   ) {
     return l.c1() < relax.relax(r.c1());
+  }
+
+  static <T extends RaptorTripSchedule> boolean compareC2(
+    RaptorPath<T> l,
+    RaptorPath<T> r
+  ) {
+    return l.c2() < r.c2();
   }
 }

@@ -154,20 +154,43 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
    * Currently "transit-priority-groups" is the only feature using two multi-criteria(c2).
    */
   private boolean includeC2() {
-    return mcRequest().transitPriorityCalculator().isPresent();
+    // TODO: 2023-05-11 via pass through: this is for testing only
+    return true;
+
+    // TODO: 2023-05-11 via pass through: check for via searches here
+//    return mcRequest().transitPriorityCalculator().isPresent();
   }
 
   private PatternRideFactory<T, PatternRideC2<T>> createPatternRideC2Factory() {
-    return new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator());
+    // TODO: 2023-05-15 via pass through: this is just for testing
+    return (prevArrival, boardStopIndex, boardPos, boardTime, boardCost1, relativeCost1, trip) -> {
+      return new PatternRideC2<>(
+        prevArrival,
+        boardStopIndex,
+        boardPos,
+        boardTime,
+        boardCost1,
+        relativeCost1,
+        prevArrival.c2(),
+        trip.tripSortIndex(),
+        trip
+      );
+    };
+
+    // TODO: 2023-05-15 via pass through: we probably need different factory here
+//    return new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator());
   }
 
   @Nullable
   private DominanceFunction dominanceFunctionC2() {
+    // TODO: 2023-05-15 vi pass through: this is just for testing
+    return (left, right) -> left > right;
+
     // transit-priority-groups is the only feature using two multi-criteria(c2).
-    return mcRequest()
-      .transitPriorityCalculator()
-      .map(RaptorTransitPriorityGroupCalculator::dominanceFunction)
-      .orElse(null);
+//    return mcRequest()
+//      .transitPriorityCalculator()
+//      .map(RaptorTransitPriorityGroupCalculator::dominanceFunction)
+//      .orElse(null);
   }
 
   @Nullable

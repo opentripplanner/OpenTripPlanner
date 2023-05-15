@@ -36,6 +36,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
   private int transferPriorityCost = TransferConstraint.ZERO_COST;
   private int waitTimeOptimizedCost = TransferWaitTimeCostCalculator.ZERO_COST;
   private int generalizedCost = RaptorCostCalculator.ZERO_COST;
+  private int c2 = RaptorCostCalculator.ZERO_COST;
 
   public OptimizedPathTail(
     RaptorSlackProvider slackProvider,
@@ -132,7 +133,8 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
       generalizedCost,
       transferPriorityCost,
       waitTimeOptimizedCost,
-      breakTieCost()
+      breakTieCost(),
+      c2
     );
   }
 

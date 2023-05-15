@@ -64,6 +64,8 @@ public final class MultiCriteriaRoutingStrategy<
 
   @Override
   public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
+    // TODO: 2023-05-11 pass through via: add extra c2 to the ride
+
     for (R ride : patternRides) {
       // THIS IS WHERE WE NEED TO CHANGE C2
       //      int c2 = ride.c2();

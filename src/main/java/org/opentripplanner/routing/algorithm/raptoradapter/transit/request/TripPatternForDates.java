@@ -174,7 +174,7 @@ public class TripPatternForDates
   @Override
   public int priorityGroupId() {
     // TODO C2 - Implement this.
-    throw new UnsupportedOperationException();
+    return -1;
   }
 
   public int transitReluctanceFactorIndex() {

@@ -32,7 +32,8 @@ public class OptimizedPath<T extends RaptorTripSchedule>
       originalPath.c1(),
       priorityCost(originalPath),
       NEUTRAL_COST,
-      NEUTRAL_COST
+      NEUTRAL_COST,
+      originalPath.c2()
     );
   }
 
@@ -42,9 +43,10 @@ public class OptimizedPath<T extends RaptorTripSchedule>
     int generalizedCost,
     int transferPriorityCost,
     int waitTimeOptimizedCost,
-    int breakTieCost
+    int breakTieCost,
+    int c2
   ) {
-    super(iterationStartTime, accessPathLeg, generalizedCost);
+    super(iterationStartTime, accessPathLeg, generalizedCost, c2);
     this.transferPriorityCost = transferPriorityCost;
     this.waitTimeOptimizedCost = waitTimeOptimizedCost;
     this.breakTieCost = breakTieCost;

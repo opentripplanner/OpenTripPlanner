@@ -23,17 +23,21 @@ import org.opentripplanner.raptor.api.path.TransitPathLeg;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
+  // TODO: 2023-05-11 via pass through: figure out how to inject c2 here
 
   private final int iterationDepartureTime;
   private final int startTime;
   private final int endTime;
   private final int numberOfTransfers;
   private final int generalizedCost;
+  // TODO: 2023-05-11 via pass through: this should be final
+  private int c2;
   private final AccessPathLeg<T> accessLeg;
   private final EgressPathLeg<T> egressPathLeg;
 
   /** @see #dummyPath(int, int, int, int, int) */
   private Path(
+    // TODO: 2023-05-11 via pass trough: NOT THIS ONE
     int iterationDepartureTime,
     int startTime,
     int endTime,
@@ -47,9 +51,12 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this.generalizedCost = generalizedCost;
     this.accessLeg = null;
     this.egressPathLeg = null;
+    this.c2 = 0;
   }
 
-  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost) {
+  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost, int c2) {
+    // TODO: 2023-05-11 via pass trough: NOT THIS ONE
+
     this.iterationDepartureTime = iterationDepartureTime;
     this.startTime = accessLeg.fromTime();
     this.generalizedCost = generalizedCost;
@@ -57,15 +64,18 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this.egressPathLeg = findEgressLeg(accessLeg);
     this.numberOfTransfers = countNumberOfTransfers(accessLeg, egressPathLeg);
     this.endTime = egressPathLeg.toTime();
+    this.c2 = c2;
   }
 
   public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg) {
-    this(iterationDepartureTime, accessLeg, accessLeg.generalizedCostTotal());
+    // TODO: 2023-05-11 via pass through: here w need to in some way include c2
+
+    this(iterationDepartureTime, accessLeg, accessLeg.generalizedCostTotal(), 0);
   }
 
   /** Copy constructor */
   protected Path(RaptorPath<T> original) {
-    this(original.rangeRaptorIterationDepartureTime(), original.accessLeg(), original.c1());
+    this(original.rangeRaptorIterationDepartureTime(), original.accessLeg(), original.c1(), original.c2());
   }
 
   /**
@@ -115,6 +125,17 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   @Override
   public final int c1() {
     return generalizedCost;
+  }
+
+  @Override
+  public int c2() {
+    return c2;
+  }
+
+  // TODO: 2023-05-11 via pass through: get rid of this setter
+  //  c2 should be injected through constructor
+  public void setC2(int c2) {
+    this.c2 = c2;
   }
 
   @Override

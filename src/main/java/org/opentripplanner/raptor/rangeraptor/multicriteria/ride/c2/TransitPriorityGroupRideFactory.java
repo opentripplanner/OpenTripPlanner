@@ -56,9 +56,11 @@ public class TransitPriorityGroupRideFactory<T extends RaptorTripSchedule>
    * Currently transit-priority-group is the only usage of c2
    */
   private int calculateC2(int c2) {
-    return transitPriorityGroupCalculator.mergeTransitPriorityGroupIds(
-      c2,
-      currentPatternGroupPriority
-    );
+    // TODO: 2023-05-11 via pass through: fix
+    return 0;
+//    return transitPriorityGroupCalculator.mergeTransitPriorityGroupIds(
+//      c2,
+//      currentPatternGroupPriority
+//    );
   }
 }

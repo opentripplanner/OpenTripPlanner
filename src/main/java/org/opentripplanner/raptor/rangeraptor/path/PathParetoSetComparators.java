@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.path;
 
 import static org.opentripplanner.raptor.api.path.RaptorPath.compareArrivalTime;
 import static org.opentripplanner.raptor.api.path.RaptorPath.compareC1;
+import static org.opentripplanner.raptor.api.path.RaptorPath.compareC2;
 import static org.opentripplanner.raptor.api.path.RaptorPath.compareDepartureTime;
 import static org.opentripplanner.raptor.api.path.RaptorPath.compareDuration;
 import static org.opentripplanner.raptor.api.path.RaptorPath.compareIterationDepartureTime;
@@ -29,6 +30,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  * destination, because Range Raptor works in iterations backwards in time.
  */
 public class PathParetoSetComparators {
+  // TODO: 2023-05-11 via pass through: probably here we should include new comparator for c2
 
   /** Prevent this utility class from instantiation. */
   private PathParetoSetComparators() {}
@@ -43,37 +45,42 @@ public class PathParetoSetComparators {
     SearchDirection searchDirection,
     RelaxFunction relaxC1
   ) {
-    boolean includeRelaxedCost = includeCost && !relaxC1.isNormal();
-    boolean preferLatestDeparture = preferLateArrival != searchDirection.isInReverse();
 
-    if (includeRelaxedCost) {
-      if (includeTimetable) {
-        return comparatorTimetableAndRelaxedC1(relaxC1);
-      }
-      if (preferLateArrival) {
-        return comparatorDepartureTimeAndRelaxedC1(relaxC1);
-      } else {
-        return comparatorArrivalTimeAndRelaxedC1(relaxC1);
-      }
-    }
+    // TODO: 2023-05-11 via pass trough: this is temporary for testing
 
-    if (includeCost) {
-      if (includeTimetable) {
-        return comparatorTimetableAndC1();
-      }
-      if (preferLatestDeparture) {
-        return comparatorDepartureTimeAndC1();
-      }
-      return comparatorWithC1();
-    }
+    return comparatorArrivalTimeAndC1AndC2();
 
-    if (includeTimetable) {
-      return comparatorTimetable();
-    }
-    if (preferLatestDeparture) {
-      return comparatorStandardDepartureTime();
-    }
-    return comparatorStandardArrivalTime();
+//    boolean includeRelaxedCost = includeCost && !relaxC1.isNormal();
+//    boolean preferLatestDeparture = preferLateArrival != searchDirection.isInReverse();
+//
+//    if (includeRelaxedCost) {
+//      if (includeTimetable) {
+//        return comparatorTimetableAndRelaxedC1(relaxC1);
+//      }
+//      if (preferLateArrival) {
+//        return comparatorDepartureTimeAndRelaxedC1(relaxC1);
+//      } else {
+//        return comparatorArrivalTimeAndRelaxedC1(relaxC1);
+//      }
+//    }
+//
+//    if (includeCost) {
+//      if (includeTimetable) {
+//        return comparatorTimetableAndC1();
+//      }
+//      if (preferLatestDeparture) {
+//        return comparatorDepartureTimeAndC1();
+//      }
+//      return comparatorWithC1();
+//    }
+//
+//    if (includeTimetable) {
+//      return comparatorTimetable();
+//    }
+//    if (preferLatestDeparture) {
+//      return comparatorStandardDepartureTime();
+//    }
+//    return comparatorStandardArrivalTime();
   }
 
   public static <
@@ -157,5 +164,14 @@ public class PathParetoSetComparators {
       compareNumberOfTransfers(l, r) ||
       compareDuration(l, r) ||
       compareC1(relaxCost, l, r);
+  }
+
+  public static <T extends RaptorTripSchedule> ParetoComparator<RaptorPath<T>> comparatorArrivalTimeAndC1AndC2() {
+    return (l, r) ->
+      compareDepartureTime(l, r) ||
+        compareNumberOfTransfers(l, r) ||
+        compareDuration(l, r) ||
+        compareC1(l, r) ||
+        compareC2(l, r);
   }
 }

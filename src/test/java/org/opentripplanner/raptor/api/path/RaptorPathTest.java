@@ -91,6 +91,9 @@ class RaptorPathTest {
     int c1
   )
     implements RaptorPath<TestTripSchedule> {
+
+    // TODO: 2023-05-11 via pass through: what should we do with c2 here?
+
     @Override
     public int numberOfTransfersExAccessEgress() {
       return -1;
@@ -136,6 +139,11 @@ class RaptorPathTest {
     @Override
     public String toString(RaptorStopNameResolver stopNameTranslator) {
       return null;
+    }
+
+    @Override
+    public int c2() {
+      return 0;
     }
   }
 }
