@@ -17,9 +17,13 @@ import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class TransmodelGraph {
 
+  private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraph.class);
+  private static final int MAX_ERROR_TO_RETURN = 25;
   private final GraphQLSchema indexSchema;
 
   final ExecutorService threadPool;
@@ -67,6 +71,21 @@ class TransmodelGraph {
       .root(serverContext)
       .variables(variables)
       .build();
-    return graphQL.execute(executionInput);
+
+    var result = graphQL.execute(executionInput);
+    result = limitMaxNumberOfErrors(result);
+    return result;
+  }
+
+  /**
+   * Reduce the number of errors returned down to limit
+   */
+  private ExecutionResult limitMaxNumberOfErrors(ExecutionResult result) {
+    var errors = result.getErrors();
+    if (errors.size() > MAX_ERROR_TO_RETURN) {
+      final var errorsShortList = errors.stream().limit(MAX_ERROR_TO_RETURN).toList();
+      result = result.transform(b -> b.errors(errorsShortList));
+    }
+    return result;
   }
 }
