@@ -73,7 +73,7 @@ public class VehicleRentalConfig {
         .of("bannedNetworks")
         .since(V2_1)
         .summary(
-          "he vehicle rental networks which may not be used. If empty, no networks are banned."
+          "The vehicle rental networks which may not be used. If empty, no networks are banned."
         )
         .asStringSet(vehicleRentalRequest.bannedNetworks())
     );
