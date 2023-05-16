@@ -206,18 +206,18 @@ travel time `x` (in seconds).
       );
 
     // Map preferences
-    request.withPreferences(preferences -> mapPreferences(c, preferences));
-    request.withPreferences(preferences -> setVehicleRental(c, request, preferences));
+    request.withPreferences(preferences -> mapPreferences(c, request, preferences));
 
     return request;
   }
 
-  private static void mapPreferences(NodeAdapter c, RoutingPreferences.Builder preferences) {
+  private static void mapPreferences(NodeAdapter c, RouteRequest request, RoutingPreferences.Builder preferences) {
     preferences.withTransit(it -> mapTransitPreferences(c, it));
     preferences.withBike(it -> mapBikePreferences(c, it));
     preferences.withStreet(it -> mapStreetPreferences(c, it));
     preferences.withCar(it -> mapCarPreferences(c, it));
     preferences.withSystem(it -> mapSystemPreferences(c, it));
+    preferences.withRental(it -> setVehicleRental(c, request, it));
     preferences.withTransfer(it -> mapTransferPreferences(c, it));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
     preferences.withWheelchair(it -> mapWheelchairPreferences(c, it, WHEELCHAIR_ACCESSIBILITY));

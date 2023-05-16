@@ -95,14 +95,14 @@ public class VehicleRentalConfig {
   static void setVehicleRental(
     NodeAdapter c,
     RouteRequest request,
-    RoutingPreferences.Builder preferences
+    VehicleRentalPreferences.Builder preferences
   ) {
     var vehicleRental = c
       .of("vehicleRental")
       .since(V2_3)
       .summary("Vehicle rental options")
       .asObject();
-    preferences.withRental(it -> mapRentalPreferences(vehicleRental, it));
+    mapRentalPreferences(vehicleRental, preferences);
     setVehicleRentalRequestOptions(vehicleRental, request);
   }
 }
