@@ -428,10 +428,16 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       return getValue(
         environment,
         stop ->
-          transitService.getModesOfStopLocation(stop).findFirst().map(Enum::toString).orElse(null),
+          transitService
+            .getModesOfStopLocation(stop)
+            .stream()
+            .findFirst()
+            .map(Enum::toString)
+            .orElse(null),
         station ->
           transitService
             .getModesOfStopLocationsGroup(station)
+            .stream()
             .findFirst()
             .map(Enum::toString)
             .orElse(null)

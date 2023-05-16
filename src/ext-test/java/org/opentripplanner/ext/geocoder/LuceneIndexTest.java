@@ -12,7 +12,6 @@ import com.google.common.collect.Multimap;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -106,11 +105,11 @@ class LuceneIndexTest {
         .build();
 
       @Override
-      public Stream<TransitMode> getModesOfStopLocation(StopLocation stop) {
+      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
         if (stop.getGtfsVehicleType() != null) {
-          return Stream.of(stop.getGtfsVehicleType());
+          return List.of(stop.getGtfsVehicleType());
         } else {
-          return modes.get(stop).stream();
+          return List.copyOf(modes.get(stop));
         }
       }
     };

@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.parallel.Execution;
@@ -169,8 +168,8 @@ class GraphQLIntegrationTest {
 
     var transitService = new DefaultTransitService(transitModel) {
       @Override
-      public Stream<TransitMode> getModesOfStopLocation(StopLocation stop) {
-        return Stream.of(BUS, FERRY);
+      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+        return List.of(BUS, FERRY);
       }
     };
     context =

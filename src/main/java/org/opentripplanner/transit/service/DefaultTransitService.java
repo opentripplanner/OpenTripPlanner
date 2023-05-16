@@ -574,15 +574,16 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Stream<TransitMode> getModesOfStopLocationsGroup(StopLocationsGroup station) {
+  public List<TransitMode> getModesOfStopLocationsGroup(StopLocationsGroup station) {
     return sortByOccurenceAndReduce(
       station.getChildStops().stream().flatMap(this::getPatternModesOfStop)
-    );
+    )
+      .toList();
   }
 
   @Override
-  public Stream<TransitMode> getModesOfStopLocation(StopLocation stop) {
-    return sortByOccurenceAndReduce(getPatternModesOfStop(stop));
+  public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+    return sortByOccurenceAndReduce(getPatternModesOfStop(stop)).toList();
   }
 
   /**

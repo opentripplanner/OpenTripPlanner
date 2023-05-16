@@ -57,19 +57,19 @@ class DefaultTransitServiceTest {
 
   @Test
   void modeFromGtfsVehicleType() {
-    var modes = service.getModesOfStopLocation(STOP_A).toList();
+    var modes = service.getModesOfStopLocation(STOP_A);
     assertEquals(List.of(TRAM), modes);
   }
 
   @Test
   void modeFromPatterns() {
-    var modes = service.getModesOfStopLocation(STOP_B).toList();
+    var modes = service.getModesOfStopLocation(STOP_B);
     assertEquals(List.of(RAIL, FERRY), modes);
   }
 
   @Test
   void stationModes() {
-    var modes = service.getModesOfStopLocationsGroup(STATION).toList();
+    var modes = service.getModesOfStopLocationsGroup(STATION);
     assertEquals(List.of(RAIL, FERRY, TRAM), modes);
   }
 }

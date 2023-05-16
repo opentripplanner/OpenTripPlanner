@@ -201,7 +201,7 @@ public interface TransitService {
    * The returning stream is ordered by the number of occurrences of the mode in the child stops.
    * So, if more patterns of mode BUS than RAIL visit the group, the result will be [BUS,RAIL].
    */
-  Stream<TransitMode> getModesOfStopLocationsGroup(StopLocationsGroup station);
+  List<TransitMode> getModesOfStopLocationsGroup(StopLocationsGroup station);
   /**
    * For a {@link StopLocation} return its modes.
    * <p>
@@ -213,5 +213,5 @@ public interface TransitService {
    * <p>
    * So, if more patterns of mode BUS than RAIL visit the stop, the result will be [BUS,RAIL].
    */
-  Stream<TransitMode> getModesOfStopLocation(StopLocation stop);
+  List<TransitMode> getModesOfStopLocation(StopLocation stop);
 }
