@@ -1,6 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashSet;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
@@ -209,8 +213,6 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
         while (stop.hasNext()) {
           int stopPos = stop.next();
           int stopIndex = pattern.stopIndex(stopPos);
-
-          System.out.println("stopIndex: " + stopIndex + ", stopName: " + transitData.stopNameResolver().apply(stopIndex));
 
           // attempt to alight if we're on board, this is done above the board search
           // so that we don't alight on first stop boarded

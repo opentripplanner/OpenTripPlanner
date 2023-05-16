@@ -69,7 +69,7 @@ public record PatternRideC1<T extends RaptorTripSchedule>(
   // Pareto vector: [relativeCost, tripSortIndex]
 
   public static <T extends RaptorTripSchedule> PatternRideFactory<T, PatternRideC1<T>> factory() {
-    return (prevArrival, boardStopIndex, boardPos, boardTime, boardCost1, relativeCost1, trip) ->
+    return (prevArrival, boardStopIndex, boardPos, boardTime, boardCost1, relativeCost1, trip, c2) ->
       new PatternRideC1<>(
         prevArrival,
         boardStopIndex,

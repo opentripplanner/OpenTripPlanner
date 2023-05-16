@@ -2,6 +2,8 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -9,6 +11,7 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.PatternRideC2;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
@@ -64,9 +67,52 @@ public final class MultiCriteriaRoutingStrategy<
 
   @Override
   public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
+
+    // Helsingborg C
+    var indexes = new HashSet<Integer>() {{
+        add(1984);
+        add(1985);
+        add(1953);
+        add(1987);
+        add(1956);
+        add(1988);
+        add(1957);
+        add(1958);
+        add(1959);
+        add(1963);
+        add(1964);
+        add(1965);
+        add(1967);
+        add(1968);
+        add(1972);
+        add(1975);
+        add(1978);
+        add(1979);
+        add(1981);
+        add(1982);
+        add(1983);
+    }};
+
     // TODO: 2023-05-11 pass through via: add extra c2 to the ride
 
     for (R ride : patternRides) {
+      if (ride.c2() == 0 && indexes.contains(stopIndex)) {
+        System.out.println("Reached Helsingborg C. Adding extra c2 value");
+        ride = patternRideFactory.createPatternRide(
+          ride.prevArrival(),
+          ride.boardStopIndex(),
+          ride.boardPos(),
+          ride.boardTime(),
+          ride.boardC1(),
+          ride.relativeC1(),
+          ride.trip(),
+          1
+        );
+
+        var result = patternRides.add(ride);
+        System.out.println("Added new element: " + result);
+      }
+
       // THIS IS WHERE WE NEED TO CHANGE C2
       //      int c2 = ride.c2();
       //      int c2Stop = c2StopValues[stopIndex];
@@ -130,7 +176,8 @@ public final class MultiCriteriaRoutingStrategy<
       boardTime,
       boardC1,
       relativeBoardC1,
-      trip
+      trip,
+      prevArrival.c2()
     );
     patternRides.add(ride);
   }
