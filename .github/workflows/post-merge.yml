@@ -31,6 +31,7 @@ jobs:
           mv $TEMP_FILE $FILE
           git add $FILE
           git commit -m "Add changelog entry for #${NUMBER} [ci skip]"
+          git pull --rebase origin dev-2.x
           git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
         env:
           # Use environment variables to prevent injection attack
