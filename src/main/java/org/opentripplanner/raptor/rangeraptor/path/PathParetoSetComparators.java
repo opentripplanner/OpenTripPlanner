@@ -123,6 +123,7 @@ public class PathParetoSetComparators {
   public static <
     T extends RaptorTripSchedule
     > ParetoComparator<RaptorPath<T>> comparatorTimetableAndC2() {
+    System.out.println("*****");
     return (l, r) ->
       compareIterationDepartureTime(l, r) ||
         compareArrivalTime(l, r) ||
@@ -195,13 +196,17 @@ public class PathParetoSetComparators {
     public static <
     T extends RaptorTripSchedule
     > ParetoComparator<RaptorPath<T>> comparatorTimetableAndC1AndC2() {
-    return (l, r) ->
-      compareIterationDepartureTime(l, r) ||
+    return (l, r) -> {
+      System.out.println("left: " + l);
+      System.out.println("right: " + r);
+
+      return compareIterationDepartureTime(l, r) ||
         compareArrivalTime(l, r) ||
         compareNumberOfTransfers(l, r) ||
         compareDuration(l, r) ||
         compareC1(l, r)||
         compareC2(l, r);
+    };
   }
 
     public static <

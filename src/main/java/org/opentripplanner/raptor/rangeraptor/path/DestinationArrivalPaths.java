@@ -78,6 +78,8 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   }
 
   public void add(ArrivalView<T> stopArrival, RaptorAccessEgress egressPath) {
+    // TODO: 2023-05-16 via pass through: HERE
+
     var destArrival = createDestinationArrivalView(stopArrival, egressPath);
 
     if (destArrival == null) {
