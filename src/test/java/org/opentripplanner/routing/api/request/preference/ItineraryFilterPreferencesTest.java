@@ -13,7 +13,7 @@ class ItineraryFilterPreferencesTest {
 
   private static final boolean ACCESSIBILITY_SCORE = true;
   private static final double BIKE_RENTAL_DISTANCE_RATIO = 0.37;
-  private static final boolean DEBUG = true;
+  private static final ItineraryFilterDebugProfile DEBUG = ItineraryFilterDebugProfile.LIST_ALL;
   private static final boolean FILTER_ITINERARIES_WITH_SAME_FIRST_OR_LAST_TRIP = true;
   private static final double GROUPED_OTHER_THAN_SAME_LEGS_MAX_COST_MULTIPLIER = 4.0;
   private static final double GROUP_SIMILARITY_KEEP_ONE = 0.8;
@@ -125,7 +125,7 @@ class ItineraryFilterPreferencesTest {
       "ItineraryFilterPreferences{" +
       "accessibilityScore, " +
       "bikeRentalDistanceRatio: 0.37, " +
-      "debug, " +
+      "debug: LIST_ALL, " +
       "filterItinerariesWithSameFirstOrLastTrip, " +
       "groupedOtherThanSameLegsMaxCostMultiplier: 4.0, " +
       "groupSimilarityKeepOne: 0.8, " +

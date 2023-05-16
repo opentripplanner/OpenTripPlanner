@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config.routerequest;
 
+import static org.opentripplanner.standalone.config.framework.json.EnumMapper.docEnumValueList;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
@@ -7,6 +8,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
@@ -72,11 +74,9 @@ itineraries that are at least double in cost for the non-grouped legs.
         c
           .of("debug")
           .since(V2_0)
-          .summary(
-            "Enable this to attach a system notice to itineraries instead of removing them. This " +
-            "is very convenient when tuning the filters."
-          )
-          .asBoolean(dft.debug())
+          .summary(ItineraryFilterDebugProfile.OFF.typeDescription())
+          .description(docEnumValueList(ItineraryFilterDebugProfile.values()))
+          .asEnum(dft.debug())
       )
       .withGroupSimilarityKeepOne(
         c

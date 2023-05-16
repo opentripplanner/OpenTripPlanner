@@ -470,7 +470,7 @@ public class TripQuery {
             "instead of removing them. This is very convenient when tuning the filters."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(preferences.itineraryFilter().debug())
+          .defaultValue(preferences.itineraryFilter().debug().debugEnabled())
           .build()
       )
       .argument(
