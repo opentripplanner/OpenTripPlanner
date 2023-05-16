@@ -49,9 +49,7 @@ public class OTPExceptionMapper implements ExceptionMapper<Exception> {
     }
     if (ex instanceof JsonParseException) {
       return Response
-        .status(
-          Response.Status.BAD_REQUEST
-        )
+        .status(Response.Status.BAD_REQUEST)
         .entity(ex.getMessage())
         .type("text/plain")
         .build();
