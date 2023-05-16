@@ -18,6 +18,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use correct GTFS sequence number in vehicle position matcher [#5090](https://github.com/opentripplanner/OpenTripPlanner/pull/5090)
 - Fix SIRI ET PubSub updater shutdown [#5104](https://github.com/opentripplanner/OpenTripPlanner/pull/5104)
 - OSM: Break out of processing a malformed level map [#5096](https://github.com/opentripplanner/OpenTripPlanner/pull/5096)
+- Create unique SIRI-ET PubSub subscription [#5118](https://github.com/opentripplanner/OpenTripPlanner/pull/5118)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
