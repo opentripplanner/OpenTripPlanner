@@ -9,8 +9,6 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  * comparison. Passing times are exposed as seconds since midnight, taking into account the day
  * offset.
  * <p>
- * This class does not take Daylight Saving Time transitions into account, this is an error and
- * should be fixed. See https://github.com/opentripplanner/OpenTripPlanner/issues/5109
  */
 abstract sealed class AbstractStopTimeAdaptor
   implements StopTimeAdaptor
