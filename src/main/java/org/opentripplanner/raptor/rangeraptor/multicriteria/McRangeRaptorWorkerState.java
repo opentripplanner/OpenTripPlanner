@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -190,7 +191,33 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
   private void addStopArrival(McStopArrival<T> arrival) {
     if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {
-      return;
+      var indexes = new HashSet<Integer>() {{
+        add(1984);
+        add(1985);
+        add(1953);
+        add(1987);
+        add(1956);
+        add(1988);
+        add(1957);
+        add(1958);
+        add(1959);
+        add(1963);
+        add(1964);
+        add(1965);
+        add(1967);
+        add(1968);
+        add(1972);
+        add(1975);
+        add(1978);
+        add(1979);
+        add(1981);
+        add(1982);
+        add(1983);
+      }};
+
+      if (!indexes.contains(arrival.stop())) {
+        return;
+      }
     }
     arrivals.addStopArrival(arrival);
   }

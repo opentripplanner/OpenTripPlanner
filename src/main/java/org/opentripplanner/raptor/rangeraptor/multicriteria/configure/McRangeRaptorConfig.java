@@ -163,7 +163,11 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private PatternRideFactory<T, PatternRideC2<T>> createPatternRideC2Factory() {
     // TODO: 2023-05-15 via pass through: this is just for testing
-    return (prevArrival, boardStopIndex, boardPos, boardTime, boardCost1, relativeCost1, trip) -> {
+    return (prevArrival, boardStopIndex, boardPos, boardTime, boardCost1, relativeCost1, trip, c2) -> {
+      if (c2 != 0) {
+        System.out.println("create pattern ride with c2 value " + c2);
+      }
+
       return new PatternRideC2<>(
         prevArrival,
         boardStopIndex,
@@ -171,7 +175,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         boardTime,
         boardCost1,
         relativeCost1,
-        prevArrival.c2(),
+        c2,
         trip.tripSortIndex(),
         trip
       );
@@ -184,7 +188,12 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   @Nullable
   private DominanceFunction dominanceFunctionC2() {
     // TODO: 2023-05-15 vi pass through: this is just for testing
-    return (left, right) -> left > right;
+    return (left, right) -> {
+      if ( left != 0 || right != 0) {
+        System.out.println("left: " + left + " | right: " + right);
+      }
+      return left > right;
+    };
 
     // transit-priority-groups is the only feature using two multi-criteria(c2).
 //    return mcRequest()
