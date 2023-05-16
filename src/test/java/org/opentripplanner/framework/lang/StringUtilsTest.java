@@ -1,22 +1,38 @@
 package org.opentripplanner.framework.lang;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner.test.support.VariableSource;
 
 class StringUtilsTest {
 
+  static final Stream<Arguments> hasValueTestCases = Stream.of(
+    Arguments.of("Text", TRUE),
+    Arguments.of("T", TRUE),
+    Arguments.of(null, FALSE),
+    Arguments.of("", FALSE),
+    Arguments.of("\t\n", FALSE)
+  );
+
+  @ParameterizedTest
+  @VariableSource("hasValueTestCases")
+  void hasValue(String input, Boolean hasValue) {
+    assertEquals(hasValue, StringUtils.hasValue(input));
+    assertEquals(!hasValue, StringUtils.hasNoValue(input));
+    assertEquals(!hasValue, StringUtils.hasNoValueOrNullAsString(input));
+  }
+
   @Test
-  void hasValue() {
-    assertTrue(StringUtils.hasValue("Text"));
-    assertTrue(StringUtils.hasValue(" T "));
-    assertFalse(StringUtils.hasValue(null));
-    assertFalse(StringUtils.hasValue(""));
-    assertFalse(StringUtils.hasValue(" "));
-    assertFalse(StringUtils.hasValue("\n\t"));
+  void hasNoValueOrNullAsString() {
+    assertTrue(StringUtils.hasNoValueOrNullAsString("null"));
   }
 
   @Test
