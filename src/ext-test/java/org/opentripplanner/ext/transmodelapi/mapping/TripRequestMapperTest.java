@@ -57,6 +57,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           new DefaultVehicleRentalService(),
           RouterConfig.DEFAULT.flexConfig(),
           List.of(),
+          null,
           null
         ),
         null,
