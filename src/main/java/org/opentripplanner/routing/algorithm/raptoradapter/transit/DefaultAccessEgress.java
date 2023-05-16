@@ -56,21 +56,6 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     return lastState;
   }
 
-  /**
-   * Whether the street path contains any driving.
-   */
-  public boolean containsDriving() {
-    var state = lastState;
-    while (state != null) {
-      if (state.getNonTransitMode().isDriving()) {
-        return true;
-      } else {
-        state = state.getBackState();
-      }
-    }
-    return false;
-  }
-
   @Override
   public String toString() {
     return asString(true) + (lastState != null ? " (" + lastState + ")" : "");

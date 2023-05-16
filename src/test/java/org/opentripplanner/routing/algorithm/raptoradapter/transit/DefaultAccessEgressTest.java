@@ -12,13 +12,13 @@ class DefaultAccessEgressTest {
   void containsDriving() {
     var state = TestStateBuilder.ofDriving().streetEdge().streetEdge().streetEdge().build();
     var access = new DefaultAccessEgress(0, state);
-    assertTrue(access.containsDriving());
+    assertTrue(access.getLastState().containsDriving());
   }
 
   @Test
   void walking() {
     var state = TestStateBuilder.ofWalking().streetEdge().streetEdge().streetEdge().build();
     var access = new DefaultAccessEgress(0, state);
-    assertFalse(access.containsDriving());
+    assertFalse(access.getLastState().containsDriving());
   }
 }

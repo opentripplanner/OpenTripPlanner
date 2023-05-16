@@ -1,6 +1,8 @@
 package org.opentripplanner.street.search.state;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
@@ -23,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -88,5 +91,17 @@ class StateTest {
 
   private static StreetSearchRequest req(StreetMode streetMode, boolean arriveBy) {
     return StreetSearchRequest.of().withMode(streetMode).withArriveBy(arriveBy).build();
+  }
+
+  @Test
+  void containsDriving() {
+    var state = TestStateBuilder.ofDriving().streetEdge().streetEdge().streetEdge().build();
+    assertTrue(state.containsDriving());
+  }
+
+  @Test
+  void walking() {
+    var state = TestStateBuilder.ofWalking().streetEdge().streetEdge().streetEdge().build();
+    assertFalse(state.containsDriving());
   }
 }

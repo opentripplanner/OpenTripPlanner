@@ -421,6 +421,21 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return stateData.insideNoRentalDropOffArea;
   }
 
+  /**
+   * Whether the street path contains any driving.
+   */
+  public boolean containsDriving() {
+    var state = this;
+    while (state != null) {
+      if (state.getNonTransitMode().isDriving()) {
+        return true;
+      } else {
+        state = state.getBackState();
+      }
+    }
+    return false;
+  }
+
   protected State clone() {
     State ret;
     try {
