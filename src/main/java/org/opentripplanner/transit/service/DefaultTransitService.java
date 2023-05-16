@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -575,7 +574,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public List<TransitMode> getModesOfStopLocationsGroup(StopLocationsGroup station) {
-    return sortByOccurenceAndReduce(
+    return sortByOccurrenceAndReduce(
       station.getChildStops().stream().flatMap(this::getPatternModesOfStop)
     )
       .toList();
@@ -583,7 +582,7 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
-    return sortByOccurenceAndReduce(getPatternModesOfStop(stop)).toList();
+    return sortByOccurrenceAndReduce(getPatternModesOfStop(stop)).toList();
   }
 
   /**
@@ -613,13 +612,12 @@ public class DefaultTransitService implements TransitEditorService {
    * <p>
    * Example: [a,b,b,c,c,c] will return [c,b,a]
    */
-  private static <T> Stream<T> sortByOccurenceAndReduce(Stream<T> input) {
+  private static <T> Stream<T> sortByOccurrenceAndReduce(Stream<T> input) {
     return input
       .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
       .entrySet()
       .stream()
-      // a bit tricky to read: reverse the order so that the higher numbers come first
-      .sorted(Comparator.comparing(entry -> -entry.getValue()))
+      .sorted(Map.Entry.<T, Long>comparingByValue().reversed())
       .map(Map.Entry::getKey);
   }
 }
