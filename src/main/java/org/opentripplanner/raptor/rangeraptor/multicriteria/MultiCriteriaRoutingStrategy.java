@@ -70,6 +70,7 @@ public final class MultiCriteriaRoutingStrategy<
 
     // Helsingborg C
     var indexes = new HashSet<Integer>() {{
+        add(3);
         add(1984);
         add(1985);
         add(1953);

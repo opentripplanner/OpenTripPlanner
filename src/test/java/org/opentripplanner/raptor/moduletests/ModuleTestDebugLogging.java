@@ -29,7 +29,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
  */
 public final class ModuleTestDebugLogging {
 
-  private static final boolean DEBUG = false;
+  private static final boolean DEBUG = true;
 
   static void setupDebugLogging(
     TestTransitData data,
