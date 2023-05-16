@@ -52,7 +52,6 @@ public class OrcaFareServiceTest {
   private static final Money ONE_DOLLAR = usDollars(1f);
   private static TestOrcaFareService orcaFareService;
   public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
-  private static final int DEFAULT_RIDE_PRICE_IN_CENTS = DEFAULT_TEST_RIDE_PRICE.minorUnitAmount();
 
   @BeforeAll
   public static void setUpClass() {
