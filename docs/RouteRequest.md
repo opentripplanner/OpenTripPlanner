@@ -112,7 +112,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    pickupTime                                                                                        |        `integer`       | Time to rent a vehicle.                                                                                                                        | *Optional* | `60`                     |  2.0  |
 |    useAvailabilityInformation                                                                        |        `boolean`       | Whether or not vehicle rental availability information will be used to plan vehicle rental trips.                                              | *Optional* | `false`                  |  2.0  |
 |    [allowedNetworks](#rd_vehicleRental_allowedNetworks)                                              |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                              | *Optional* |                          |  2.1  |
-|    [bannedNetworks](#rd_vehicleRental_bannedNetworks)                                                |       `string[]`       | he vehicle rental networks which may not be used. If empty, no networks are banned.                                                            | *Optional* |                          |  2.1  |
+|    [bannedNetworks](#rd_vehicleRental_bannedNetworks)                                                |       `string[]`       | The vehicle rental networks which may not be used. If empty, no networks are banned.                                                           | *Optional* |                          |  2.1  |
 | wheelchairAccessibility                                                                              |        `object`        | See [Wheelchair Accessibility](Accessibility.md)                                                                                               | *Optional* |                          |  2.2  |
 |    enabled                                                                                           |        `boolean`       | Enable wheelchair accessibility.                                                                                                               | *Optional* | `false`                  |  2.0  |
 |    inaccessibleStreetReluctance                                                                      |        `double`        | The factor to multiply the cost of traversing a street edge that is not wheelchair-accessible.                                                 | *Optional* | `25.0`                   |  2.2  |
@@ -777,7 +777,7 @@ The vehicle rental networks which may be used. If empty all networks may be used
 **Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults/vehicleRental 
 
-he vehicle rental networks which may not be used. If empty, no networks are banned.
+The vehicle rental networks which may not be used. If empty, no networks are banned.
 
 <h3 id="rd_wheelchairAccessibility_maxSlope">maxSlope</h3>
 
