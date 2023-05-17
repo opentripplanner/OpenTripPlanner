@@ -211,7 +211,11 @@ travel time `x` (in seconds).
     return request;
   }
 
-  private static void mapPreferences(NodeAdapter c, RouteRequest request, RoutingPreferences.Builder preferences) {
+  private static void mapPreferences(
+    NodeAdapter c,
+    RouteRequest request,
+    RoutingPreferences.Builder preferences
+  ) {
     preferences.withTransit(it -> mapTransitPreferences(c, it));
     preferences.withBike(it -> mapBikePreferences(c, it));
     preferences.withStreet(it -> mapStreetPreferences(c, it));
