@@ -123,7 +123,6 @@ public class PathParetoSetComparators {
   public static <
     T extends RaptorTripSchedule
     > ParetoComparator<RaptorPath<T>> comparatorTimetableAndC2() {
-    System.out.println("*****");
     return (l, r) ->
       compareIterationDepartureTime(l, r) ||
         compareArrivalTime(l, r) ||
@@ -197,14 +196,30 @@ public class PathParetoSetComparators {
     T extends RaptorTripSchedule
     > ParetoComparator<RaptorPath<T>> comparatorTimetableAndC1AndC2() {
     return (l, r) -> {
-      System.out.println("left: " + l);
-      System.out.println("right: " + r);
+      var sb = new StringBuilder();
+      var iterationDepartureTimeResult = compareIterationDepartureTime(l, r);
+      var arrivalTimeResult = compareArrivalTime(l, r);
+      var numberOfTransfersResult = compareNumberOfTransfers(l, r);
+      var durationResult = compareDuration(l, r);
+      var c1Result = compareC1(l, r);
+      var c2Result = compareC2(l, r);
+
+      sb.append("left: " + l + "\n")
+        .append("right: " + r + "\n")
+        .append("iterationDepartureTimeResult: " + iterationDepartureTimeResult + "\n")
+        .append("arrivalTimeResult: " + arrivalTimeResult + "\n")
+        .append("numberOfTransfersResult: " + numberOfTransfersResult + "\n")
+        .append("durationResult: " + durationResult + "\n")
+        .append("c1Result: " + c1Result + "\n")
+        .append("c2Result: " + c2Result);
+
+//      System.out.println(sb);
 
       return compareIterationDepartureTime(l, r) ||
         compareArrivalTime(l, r) ||
         compareNumberOfTransfers(l, r) ||
         compareDuration(l, r) ||
-        compareC1(l, r)||
+        compareC1(l, r) ||
         compareC2(l, r);
     };
   }

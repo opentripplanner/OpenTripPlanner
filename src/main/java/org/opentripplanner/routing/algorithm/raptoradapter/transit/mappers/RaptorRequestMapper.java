@@ -128,6 +128,8 @@ public class RaptorRequestMapper {
       .addEgressPaths(egressPaths);
 
     var raptorDebugging = request.journey().transit().raptorDebugging();
+//    raptorDebugging.withStops("1984,1985,1953,1987,1956,1988,1957,1958,1959,1963,1964,1965,1967,1968,1972,1975,1978,1979,1981,1982,1983");
+
 
     if (raptorDebugging.isEnabled()) {
       var debug = builder.debug();

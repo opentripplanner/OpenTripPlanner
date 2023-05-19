@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.concurrent.InterruptibleExecutor;
 import org.opentripplanner.model.plan.Itinerary;
@@ -155,7 +156,6 @@ public class TransitRouter {
     );
 
     List<Itinerary> itineraries = paths.stream().map(itineraryMapper::createItinerary).toList();
-
     debugTimingAggregator.finishedItineraryCreation();
 
     return new TransitRouterResult(itineraries, transitResponse.requestUsed().searchParams());

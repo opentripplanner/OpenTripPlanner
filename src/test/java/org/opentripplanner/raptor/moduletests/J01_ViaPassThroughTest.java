@@ -77,9 +77,8 @@ public class J01_ViaPassThroughTest {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var path =
-      "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R2 0:05 0:10 ~ C ~ Walk 30s " +
-        "[0:01:10 0:10:40 9m30s 1tx $1230]";
+    var path = "Walk 30s ~ A ~ BUS R1 0:02 0:20 ~ E ~ Walk 30s [0:01:30 0:20:30 19m 0tx $1800]\n" +
+      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m 0tx $3600]";
     return RaptorModuleTestCase
       .of()
 //      .addMinDuration("9m30s", TX_1, T00_00, T00_30)

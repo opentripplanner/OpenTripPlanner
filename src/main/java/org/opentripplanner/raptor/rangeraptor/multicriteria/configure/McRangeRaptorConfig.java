@@ -79,6 +79,17 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     PatternRideFactory<T, R> factory,
     ParetoComparator<R> patternRideComparator
   ) {
+
+    // TODO: 2023-05-19 via pass through: this temporary solution for adding "via" stops
+    var STOP_NAME = "Helsingborg C";
+
+    for (int i = 0; i < 16734; i++) {
+      if (STOP_NAME.equals(context.stopNameResolver().apply(i).split("\\(")[0])) {
+//        System.out.println("adding index: " + i);
+        MultiCriteriaRoutingStrategy.indexes.add(i);
+      }
+    }
+
     return new MultiCriteriaRoutingStrategy<>(
       state,
       context.createTimeBasedBoardingSupport(),
@@ -165,7 +176,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     // TODO: 2023-05-15 via pass through: this is just for testing
     return (prevArrival, boardStopIndex, boardPos, boardTime, boardCost1, relativeCost1, trip, c2) -> {
       if (c2 != 0) {
-        System.out.println("create pattern ride with c2 value " + c2);
+//        System.out.println("create pattern ride with c2 value " + c2);
       }
 
       return new PatternRideC2<>(
@@ -190,7 +201,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     // TODO: 2023-05-15 vi pass through: this is just for testing
     return (left, right) -> {
       if ( left != 0 || right != 0) {
-        System.out.println("left: " + left + " | right: " + right);
+//        System.out.println("left: " + left + " | right: " + right);
       }
       return left > right;
     };

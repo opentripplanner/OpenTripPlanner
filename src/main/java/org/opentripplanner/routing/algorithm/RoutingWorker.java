@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.concurrent.InterruptibleExecutor;
@@ -137,8 +138,7 @@ public class RoutingWorker {
       it -> firstRemovedItinerary = it
     );
 
-//    List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
-    List<Itinerary> filteredItineraries = itineraries;
+    List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
 
     routingErrors.addAll(filterChain.getRoutingErrors());
 

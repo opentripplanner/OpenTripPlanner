@@ -189,9 +189,7 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
     RaptorPath<T> l,
     RaptorPath<T> r
   ) {
-    System.out.println("l.c2: " + l.c2());
-    System.out.println("r.c2: " + r.c2());
 
-    return l.c2() < r.c2();
+    return l.c2() > r.c2();
   }
 }
