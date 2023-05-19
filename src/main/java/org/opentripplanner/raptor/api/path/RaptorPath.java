@@ -58,7 +58,6 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
 
   int c2();
 
-  // TODO: 2023-05-11 via pass through: Do we need to include c2 here?
 
   /**
    * The first leg/path of this journey - which is linked to the next and so on. The leg can contain

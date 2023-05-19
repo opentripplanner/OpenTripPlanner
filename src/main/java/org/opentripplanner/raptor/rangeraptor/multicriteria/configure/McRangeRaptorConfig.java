@@ -81,6 +81,8 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   ) {
 
     // TODO: 2023-05-19 via pass through: this temporary solution for adding "via" stops
+    //  we should use context.multiCriteria().transitViaRequest()
+    //  and we should not inject stop indexes like that
     var STOP_NAME = "Helsingborg C";
 
     for (int i = 0; i < 16734; i++) {
@@ -148,7 +150,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private DestinationArrivalPaths<T> createDestinationArrivalPaths() {
     if (paths == null) {
-      paths = pathConfig.createDestArrivalPathsWithGeneralizedCost();
+      paths = pathConfig.createDestArrivalPaths(true, includeC2());
     }
     return paths;
   }
@@ -165,21 +167,14 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
    * Currently "transit-priority-groups" is the only feature using two multi-criteria(c2).
    */
   private boolean includeC2() {
-    // TODO: 2023-05-11 via pass through: this is for testing only
-    return true;
-
-    // TODO: 2023-05-11 via pass through: check for via searches here
-//    return mcRequest().transitPriorityCalculator().isPresent();
+    return mcRequest().transitViaRequest().isPresent() ||
+      mcRequest().transitPriorityCalculator().isPresent();
   }
 
   private PatternRideFactory<T, PatternRideC2<T>> createPatternRideC2Factory() {
-    // TODO: 2023-05-15 via pass through: this is just for testing
-    return (prevArrival, boardStopIndex, boardPos, boardTime, boardCost1, relativeCost1, trip, c2) -> {
-      if (c2 != 0) {
-//        System.out.println("create pattern ride with c2 value " + c2);
-      }
-
-      return new PatternRideC2<>(
+    if (mcRequest().transitViaRequest().isPresent()) {
+      // TODO: 2023-05-19 via pass through: probably this should not be a lambda
+      return (prevArrival, boardStopIndex, boardPos, boardTime, boardCost1, relativeCost1, trip, c2) -> new PatternRideC2<>(
         prevArrival,
         boardStopIndex,
         boardPos,
@@ -190,27 +185,27 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
         trip.tripSortIndex(),
         trip
       );
-    };
-
-    // TODO: 2023-05-15 via pass through: we probably need different factory here
-//    return new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator());
+    } else if (mcRequest().transitPriorityCalculator().isPresent()) {
+      return new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator());
+    } else {
+      // TODO: 2023-05-19 via poss through: not sure if we should cover for this case
+      return null;
+    }
   }
 
   @Nullable
   private DominanceFunction dominanceFunctionC2() {
-    // TODO: 2023-05-15 vi pass through: this is just for testing
-    return (left, right) -> {
-      if ( left != 0 || right != 0) {
-//        System.out.println("left: " + left + " | right: " + right);
-      }
-      return left > right;
-    };
-
-    // transit-priority-groups is the only feature using two multi-criteria(c2).
-//    return mcRequest()
-//      .transitPriorityCalculator()
-//      .map(RaptorTransitPriorityGroupCalculator::dominanceFunction)
-//      .orElse(null);
+    if (mcRequest().transitViaRequest().isPresent()) {
+      return mcRequest().transitViaRequest().get().dominanceFunction();
+    } else if (mcRequest().transitPriorityCalculator().isPresent()) {
+      return mcRequest()
+        .transitPriorityCalculator()
+        .map(RaptorTransitPriorityGroupCalculator::dominanceFunction)
+        .orElse(null);
+    } else {
+      // TODO: 2023-05-19 via poss through: not sure if we should cover for this case
+      return null;
+    }
   }
 
   @Nullable

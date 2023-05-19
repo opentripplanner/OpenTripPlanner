@@ -35,42 +35,35 @@ public class PathConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create a new {@link DestinationArrivalPaths}. The generalized cost is included in the pareto
-   * set criteria and will be generated for each leg and a total for the path.
+   * Create a new {@link DestinationArrivalPaths}.
+   * @param includeGeneralizedCost whether to include generalized cost in the pareto set criteria.
+   *                               It will be generated for each leg and a total for the path.
+   * @param includeC2Cost whether to include c2 cost in the pareto set criteria.
+   *                      It will be generated for each leg and a total for the path.
    */
-  public DestinationArrivalPaths<T> createDestArrivalPathsWithGeneralizedCost() {
-    return createDestArrivalPaths(true);
-  }
-
-  /**
-   * Create a new {@link DestinationArrivalPaths} without generalized-cost.
-   */
-  public DestinationArrivalPaths<T> createDestArrivalPathsWithoutGeneralizedCost() {
-    return createDestArrivalPaths(false);
-  }
-
-  /* private members */
-
-  private DestinationArrivalPaths<T> createDestArrivalPaths(boolean includeCost) {
+  public DestinationArrivalPaths<T> createDestArrivalPaths(boolean includeGeneralizedCost, boolean includeC2Cost) {
     return new DestinationArrivalPaths<>(
-      createPathParetoComparator(includeCost),
+      createPathParetoComparator(includeGeneralizedCost, includeC2Cost),
       ctx.calculator(),
-      includeCost ? ctx.costCalculator() : null,
+      includeGeneralizedCost ? ctx.costCalculator() : null,
       ctx.slackProvider(),
-      createPathMapper(includeCost),
+      createPathMapper(includeGeneralizedCost),
       ctx.debugFactory(),
       ctx.stopNameResolver(),
       ctx.lifeCycle()
     );
   }
 
-  private ParetoComparator<RaptorPath<T>> createPathParetoComparator(boolean includeCost) {
+  /* private members */
+
+  private ParetoComparator<RaptorPath<T>> createPathParetoComparator(boolean includeCost, boolean includeC2) {
     return paretoComparator(
       includeCost,
       ctx.searchParams().timetable(),
       ctx.searchParams().preferLateArrival(),
       ctx.searchDirection(),
-      ctx.multiCriteria().relaxC1AtDestination()
+      ctx.multiCriteria().relaxC1AtDestination(),
+      includeC2
     );
   }
 

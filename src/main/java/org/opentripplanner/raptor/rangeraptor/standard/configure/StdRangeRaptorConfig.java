@@ -174,7 +174,8 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private DestinationArrivalPaths<T> destinationArrivalPaths() {
-    var destinationArrivalPaths = pathConfig.createDestArrivalPathsWithoutGeneralizedCost();
+    // TODO: 2023-05-19 via pass through: Since this is range raptor, no C2?
+    var destinationArrivalPaths = pathConfig.createDestArrivalPaths(false, false);
 
     // Add egressArrivals to stops and bind them to the destination arrival paths. The
     // adapter notify the destination on each new egress stop arrival.
@@ -244,8 +245,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private UnknownPathFactory<T> unknownPathFactory() {
-    // TODO: 2023-05-11 via pass trough: this one is not using generalizedCost (c1)
-    //  so that's probably not the implementation that should be changed
+    // TODO: 2023-05-19 via pass through: since this is range raptor; we probably do not want c2 here
 
     return oneOf(
       new UnknownPathFactory<>(
@@ -260,7 +260,8 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
           ctx.searchParams().timetable(),
           ctx.searchParams().preferLateArrival(),
           ctx.searchDirection(),
-          RelaxFunction.NORMAL
+          RelaxFunction.NORMAL,
+          false
         ),
         ctx.lifeCycle()
       ),

@@ -34,7 +34,6 @@ public class TransitPriorityGroupRideFactory<T extends RaptorTripSchedule>
     T trip,
     int c2
   ) {
-    c2 = calculateC2(c2);
     return new PatternRideC2<>(
       prevArrival,
       boardStopIndex,
@@ -57,11 +56,9 @@ public class TransitPriorityGroupRideFactory<T extends RaptorTripSchedule>
    * Currently transit-priority-group is the only usage of c2
    */
   private int calculateC2(int c2) {
-    // TODO: 2023-05-11 via pass through: fix
-    return 0;
-//    return transitPriorityGroupCalculator.mergeTransitPriorityGroupIds(
-//      c2,
-//      currentPatternGroupPriority
-//    );
+    return transitPriorityGroupCalculator.mergeTransitPriorityGroupIds(
+      c2,
+      currentPatternGroupPriority
+    );
   }
 }

@@ -44,8 +44,6 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
   @Override
   public RaptorPath<T> mapToPath(final DestinationArrival<T> destinationArrival) {
-    // TODO: 2023-05-11 via pass through: do we need to include c2 here?
-
     var pathBuilder = PathBuilder.headPathBuilder(
       slackProvider,
       iterationDepartureTime,
@@ -76,7 +74,6 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
     // TODO: 2023-05-11 via pass through: this is only for testing purpose
     //  figure out better way to populate path with c2
-//    System.out.println("forward mapper c2 is: " + destinationArrival.c2());
     ((Path<T>) path).setC2(destinationArrival.c2());
 
     return path;

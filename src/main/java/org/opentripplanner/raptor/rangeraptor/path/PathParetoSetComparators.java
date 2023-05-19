@@ -30,8 +30,6 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  * destination, because Range Raptor works in iterations backwards in time.
  */
 public class PathParetoSetComparators {
-  // TODO: 2023-05-11 via pass through: probably here we should include new comparator for c2
-
   /** Prevent this utility class from instantiation. */
   private PathParetoSetComparators() {}
 
@@ -43,7 +41,8 @@ public class PathParetoSetComparators {
     boolean includeTimetable,
     boolean preferLateArrival,
     SearchDirection searchDirection,
-    RelaxFunction relaxC1
+    RelaxFunction relaxC1,
+    boolean useC2
   ) {
 
     boolean includeRelaxedCost = includeCost && !relaxC1.isNormal();
@@ -51,36 +50,67 @@ public class PathParetoSetComparators {
 
     if (includeRelaxedCost) {
       if (includeTimetable) {
-        return comparatorTimetableAndRelaxedC1AndC2(relaxC1);
+        if (useC2) {
+          return comparatorTimetableAndRelaxedC1AndC2(relaxC1);
+        } else {
+          return comparatorTimetableAndRelaxedC1(relaxC1);
+        }
       }
       if (preferLateArrival) {
-        return comparatorDepartureTimeAndRelaxedC1AndC2(relaxC1);
+        if (useC2) {
+          return comparatorDepartureTimeAndRelaxedC1AndC2(relaxC1);
+        } else {
+          return comparatorDepartureTimeAndRelaxedC1(relaxC1);
+        }
       } else {
-        return comparatorArrivalTimeAndRelaxedC1AndC2(relaxC1);
+        if (useC2) {
+          return comparatorArrivalTimeAndRelaxedC1AndC2(relaxC1);
+        } else {
+          return comparatorArrivalTimeAndRelaxedC1(relaxC1);
+        }
       }
     }
 
     if (includeCost) {
       if (includeTimetable) {
-        return comparatorTimetableAndC1AndC2();
+        if (useC2) {
+          return comparatorTimetableAndC1AndC2();
+        } else {
+          return comparatorTimetableAndC1();
+        }
       }
       if (preferLatestDeparture) {
-        return comparatorDepartureTimeAndC1AndC2();
+        if (useC2) {
+          return comparatorDepartureTimeAndC1AndC2();
+        } else {
+          return comparatorDepartureTimeAndC1();
+        }
       }
-      return comparatorWithC1AndC2();
+      if (useC2) {
+        return comparatorWithC1AndC2();
+      } else {
+        return comparatorWithC1();
+      }
     }
 
     if (includeTimetable) {
-      return comparatorTimetableAndC2();
-//      return comparatorTimetable();
+      if (useC2) {
+        return comparatorTimetableAndC2();
+      } else {
+        return comparatorTimetable();
+      }
     }
     if (preferLatestDeparture) {
-      return comparatorStandardDepartureTimeAndC2();
-//      return comparatorStandardDepartureTime();
+      if (useC2) {
+        return comparatorStandardDepartureTimeAndC2();
+      } else {
+        return comparatorStandardDepartureTime();
+      }
     }
-    return comparatorStandardArrivalTimeAndC2();
-
-//    return comparatorStandardArrivalTime();
+    if (useC2) {
+      return comparatorStandardArrivalTimeAndC2();
+    }
+    return comparatorStandardArrivalTime();
   }
 
   public static <
@@ -195,33 +225,12 @@ public class PathParetoSetComparators {
     public static <
     T extends RaptorTripSchedule
     > ParetoComparator<RaptorPath<T>> comparatorTimetableAndC1AndC2() {
-    return (l, r) -> {
-      var sb = new StringBuilder();
-      var iterationDepartureTimeResult = compareIterationDepartureTime(l, r);
-      var arrivalTimeResult = compareArrivalTime(l, r);
-      var numberOfTransfersResult = compareNumberOfTransfers(l, r);
-      var durationResult = compareDuration(l, r);
-      var c1Result = compareC1(l, r);
-      var c2Result = compareC2(l, r);
-
-      sb.append("left: " + l + "\n")
-        .append("right: " + r + "\n")
-        .append("iterationDepartureTimeResult: " + iterationDepartureTimeResult + "\n")
-        .append("arrivalTimeResult: " + arrivalTimeResult + "\n")
-        .append("numberOfTransfersResult: " + numberOfTransfersResult + "\n")
-        .append("durationResult: " + durationResult + "\n")
-        .append("c1Result: " + c1Result + "\n")
-        .append("c2Result: " + c2Result);
-
-//      System.out.println(sb);
-
-      return compareIterationDepartureTime(l, r) ||
+    return (l, r) -> compareIterationDepartureTime(l, r) ||
         compareArrivalTime(l, r) ||
         compareNumberOfTransfers(l, r) ||
         compareDuration(l, r) ||
         compareC1(l, r) ||
         compareC2(l, r);
-    };
   }
 
     public static <

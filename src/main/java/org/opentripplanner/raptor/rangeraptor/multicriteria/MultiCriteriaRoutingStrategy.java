@@ -159,6 +159,7 @@ public final class MultiCriteriaRoutingStrategy<
       boardC1,
       relativeBoardC1,
       trip,
+      // TODO: 2023-05-19 via pass through: this is a problem since we cannot call c2() on AccessStopArrival
       prevArrival.c2()
     );
     patternRides.add(ride);

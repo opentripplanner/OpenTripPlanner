@@ -12,6 +12,7 @@ import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.Optimization;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
+import org.opentripplanner.raptor.api.request.RaptorTransitViaRequest;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -105,6 +106,10 @@ public class RaptorRequestMapper {
         .raptor()
         .relaxGeneralizedCostAtDestination()
         .ifPresent(mcBuilder::withRelaxCostAtDestination);
+
+      // TODO: 2023-05-19 via pass through: this is hardcoded right now
+      //  we need to figure out how to map stop ids to stop indexes
+        mcBuilder.withTransitViaRequest(new RaptorTransitViaRequest());
     });
 
     for (Optimization optimization : preferences.transit().raptor().optimizations()) {
@@ -128,7 +133,6 @@ public class RaptorRequestMapper {
       .addEgressPaths(egressPaths);
 
     var raptorDebugging = request.journey().transit().raptorDebugging();
-//    raptorDebugging.withStops("1984,1985,1953,1987,1956,1988,1957,1958,1959,1963,1964,1965,1967,1968,1972,1975,1978,1979,1981,1982,1983");
 
 
     if (raptorDebugging.isEnabled()) {
