@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+GIT_REMOTE_REPO="`git remote -v  | grep "entur/OpenTripPlanner" | grep "push" | awk '{print $1;}'`"
+MASTER_BRANCH=otp2_entur_develop
+TAGS_FILE=target/git-entur-tags.txt
+DRY_RUN=""
+
+function main() {
+    setup "$@"
+    listAllTags
+    mergeInOldReleaseWithNoChanges
+    setPomVersion
+    tagRelease
+    pushToRemote
+}
+
+function setup() {
+    echo ""
+    echo "git fetch ${GIT_REMOTE_REPO}"
+    git fetch ${GIT_REMOTE_REPO}
+
+    echo "Verify current branch is ${MASTER_BRANCH} "
+    git status | grep -q "On branch ${MASTER_BRANCH}"
+
+    if [[ "${1+x}" == "--dryRun" ]] ; then
+       DRY_RUN="--dryRun"
+    fi
+}
+
+function listAllTags() {
+    ## List all Entur tags to allow the UpdatePomVersion java program find the next version number
+    echo ""
+    echo "Dump all entur tags to ${TAGS_FILE}"
+    git tag -l | grep entur > ${TAGS_FILE}
+}
+
+function setPomVersion() {
+    echo ""
+    echo "Update pom.xml with new version"
+    javac -d target/classes src/main/java/EnturUpdatePomVersion.java
+
+    VERSION="`java -cp target/classes EnturUpdatePomVersion ${TAGS_FILE}`"
+    echo ""
+    echo "New version set: ${VERSION}"
+    echo ""
+
+    ## Verify everything builds and tests run
+    echo ""
+    mvn clean test
+
+    ## Add [ci skip] here before moving this to the CI server
+    echo ""
+    echo "Add and commit pom.xml"
+    git commit -m "Version ${VERSION}" pom.xml
+}
+
+function mergeInOldReleaseWithNoChanges() {
+    echo ""
+    echo "Merge the old version of '${GIT_REMOTE_REPO}' into the new version. This only keep "
+    echo "a reference to the old version, the resulting tree of the merge is that of the new"
+    echo "branch head, effectively ignoring all changes from the old release."
+    git merge -s ours "${GIT_REMOTE_REPO}/${MASTER_BRANCH}" -m "Merge old release into '${MASTER_BRANCH}' - NO CHANGES COPIED OVER"
+}
+
+
+function tagRelease() {
+    echo ""
+    echo "Tag version ${VERSION}"
+    git tag -a v${VERSION} -m "Version ${VERSION}"
+}
+
+function pushToRemote() {
+    echo ""
+    echo "Push pom.xml and new tag"
+    if [[ -z "${DRY_RUN}" ]] ; then
+        git push -f ${GIT_REMOTE_REPO} "v${VERSION}" ${MASTER_BRANCH}
+    else
+        echo "Skip: push -f ${GIT_REMOTE_REPO} "v${VERSION}" ${MASTER_BRANCH}   (--dryRun)"
+    fi
+}
+
+main "$@"
