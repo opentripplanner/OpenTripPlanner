@@ -294,7 +294,7 @@ public class VehiclePositionPatternMatcher {
 
     var tripId = vehiclePosition.getTrip().getTripId();
 
-    if (!StringUtils.hasValue(tripId)) {
+    if (StringUtils.hasNoValue(tripId)) {
       return Result.failure(UpdateError.noTripId(UpdateError.UpdateErrorType.NO_TRIP_ID));
     }
 
