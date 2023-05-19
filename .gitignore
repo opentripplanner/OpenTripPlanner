@@ -6,6 +6,7 @@
 .project
 .pydevproject
 .settings
+.prepare_release.tmp
 .sonar
 .nvmrc
 *~
