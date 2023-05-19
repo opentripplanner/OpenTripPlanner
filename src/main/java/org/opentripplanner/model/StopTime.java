@@ -234,6 +234,10 @@ public final class StopTime implements Comparable<StopTime> {
     this.farePeriodId = farePeriodId;
   }
 
+  public boolean isFlexWindowStartSet() {
+    return flexWindowStart != MISSING_VALUE;
+  }
+
   public int getFlexWindowStart() {
     return flexWindowStart;
   }
@@ -242,12 +246,20 @@ public final class StopTime implements Comparable<StopTime> {
     this.flexWindowStart = flexWindowStart;
   }
 
+  public boolean isFlexWindowEndSet() {
+    return flexWindowEnd != MISSING_VALUE;
+  }
+
   public int getFlexWindowEnd() {
     return flexWindowEnd;
   }
 
   public void setFlexWindowEnd(int flexWindowEnd) {
     this.flexWindowEnd = flexWindowEnd;
+  }
+
+  public boolean isFlexWindowSet() {
+    return isFlexWindowStartSet() && isFlexWindowEndSet();
   }
 
   /** Get either the start of the flex window or the departure time, whichever is set */

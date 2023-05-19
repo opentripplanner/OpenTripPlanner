@@ -4,12 +4,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 /**
@@ -23,7 +22,7 @@ class TripPatternMapperResult {
    */
   final ArrayListMultimap<String, String> scheduledStopPointsIndex = ArrayListMultimap.create();
 
-  final Map<Trip, List<StopTime>> tripStopTimes = new HashMap<>();
+  final TripStopTimes tripStopTimes = new TripStopTimes();
 
   final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 

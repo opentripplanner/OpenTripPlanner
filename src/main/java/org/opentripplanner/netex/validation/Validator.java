@@ -1,10 +1,9 @@
 package org.opentripplanner.netex.validation;
 
+import java.util.function.Supplier;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.netex.index.hierarchy.AbstractHierarchicalMap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Validate input NeTEx entities, especially relations. The validation step is mainly there to
@@ -17,8 +16,6 @@ import org.slf4j.LoggerFactory;
  * removed, then validating A -> B, should also remove A.
  */
 public class Validator {
-
-  private static final Logger LOG = LoggerFactory.getLogger(Validator.class);
 
   private final NetexEntityIndex index;
   private final DataImportIssueStore issueStore;
@@ -36,12 +33,13 @@ public class Validator {
     validate(index.quayIdByStopPointRef, new PassengerStopAssignmentQuayNotFound());
     validate(index.serviceJourneyById, new JourneyPatternNotFoundInSJ());
     validate(index.serviceJourneyById, new JourneyPatternSJMismatch());
+    validate(index.serviceJourneyById, ServiceJourneyNonIncreasingPassingTime::new);
     validate(index.datedServiceJourneys, new DSJOperatingDayNotFound());
     validate(index.datedServiceJourneys, new DSJServiceJourneyNotFound());
   }
 
   /**
-   * Validate a set of entities for a given rule.
+   * Validate a set of entities for a given stateless rule.
    */
   private <K, V> void validate(
     AbstractHierarchicalMap<K, V> map,
@@ -49,5 +47,15 @@ public class Validator {
   ) {
     rule.setup(index.readOnlyView());
     map.validate(rule, issueStore::add);
+  }
+
+  /**
+   * Validate a set of entities for a given stateful rule.
+   */
+  private <K, V> void validate(
+    AbstractHierarchicalMap<K, V> map,
+    Supplier<AbstractHMapValidationRule<K, V>> ruleSupplier
+  ) {
+    map.validate(() -> ruleSupplier.get().setup(index.readOnlyView()), issueStore::add);
   }
 }

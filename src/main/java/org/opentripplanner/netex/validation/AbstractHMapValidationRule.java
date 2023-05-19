@@ -7,7 +7,8 @@ abstract class AbstractHMapValidationRule<K, V> implements HMapValidationRule<K,
 
   protected NetexEntityIndexReadOnlyView index;
 
-  void setup(NetexEntityIndexReadOnlyView index) {
+  AbstractHMapValidationRule<K, V> setup(NetexEntityIndexReadOnlyView index) {
     this.index = index;
+    return this;
   }
 }

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -255,11 +256,19 @@ class TripPatternMapper {
       );
 
     TripPattern tripPattern = tripPatternBuilder.build();
+
+    validateStopTimes();
+
     createTripTimes(trips, tripPattern);
 
     result.tripPatterns.put(stopPattern, tripPattern);
 
     return result;
+  }
+
+  private void validateStopTimes() {
+    new ValidateAndInterpolateStopTimesForEachTrip(result.tripStopTimes, false, false, issueStore)
+      .run();
   }
 
   private void mapDatedServiceJourney(
