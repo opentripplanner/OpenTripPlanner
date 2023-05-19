@@ -20,6 +20,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - OSM: Break out of processing a malformed level map [#5096](https://github.com/opentripplanner/OpenTripPlanner/pull/5096)
 - Create unique SIRI-ET PubSub subscription [#5118](https://github.com/opentripplanner/OpenTripPlanner/pull/5118)
 - Handle JsonParseException [#5121](https://github.com/opentripplanner/OpenTripPlanner/pull/5121)
+- Add modes to geocoding  [#5115](https://github.com/opentripplanner/OpenTripPlanner/pull/5115)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
