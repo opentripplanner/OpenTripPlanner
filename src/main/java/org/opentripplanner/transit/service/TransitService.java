@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -190,4 +191,27 @@ public interface TransitService {
   Collection<AreaStop> findAreaStops(Envelope envelope);
 
   GraphUpdaterStatus getUpdaterStatus();
+
+  /**
+   * For a {@link StopLocationsGroup} get all child stops and get their modes.
+   * <p>
+   * The mode is either taken from {@link StopLocation#getGtfsVehicleType()} (if non-null)
+   * or from the list of patterns that use the stop location.
+   * <p>
+   * The returning stream is ordered by the number of occurrences of the mode in the child stops.
+   * So, if more patterns of mode BUS than RAIL visit the group, the result will be [BUS,RAIL].
+   */
+  List<TransitMode> getModesOfStopLocationsGroup(StopLocationsGroup station);
+  /**
+   * For a {@link StopLocation} return its modes.
+   * <p>
+   * The mode is either taken from {@link StopLocation#getGtfsVehicleType()} (if non-null)
+   * or from the list of patterns that use the stop location.
+   * <p>
+   * If {@link StopLocation#getGtfsVehicleType()} is null the returning stream is ordered by the number
+   * of occurrences of the mode in the stop.
+   * <p>
+   * So, if more patterns of mode BUS than RAIL visit the stop, the result will be [BUS,RAIL].
+   */
+  List<TransitMode> getModesOfStopLocation(StopLocation stop);
 }
