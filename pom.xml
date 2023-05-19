@@ -61,7 +61,7 @@
         <geotools.version>29.0</geotools.version>
         <google.dagger.version>2.46.1</google.dagger.version>
         <jackson.version>2.15.1</jackson.version>
-        <jersey.version>3.1.1</jersey.version>
+        <jersey.version>3.1.2</jersey.version>
         <junit.version>5.9.3</junit.version>
         <micrometer.version>1.11.0</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
