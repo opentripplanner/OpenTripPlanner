@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>120</otp.serialization.version.id>
+        <otp.serialization.version.id>EN-0051</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>29.2</geotools.version>
         <google.dagger.version>2.48</google.dagger.version>
@@ -84,11 +84,11 @@
     </properties>
 
     <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>OpenTripPlanner Maven Repository on Github Packages</name>
-            <url>https://maven.pkg.github.com/${GITHUB_REPOSITORY}/</url>
-        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>entur2-snapshots</name>
+            <url>https://entur2.jfrog.io/entur2/libs-snapshot-local</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <build>
