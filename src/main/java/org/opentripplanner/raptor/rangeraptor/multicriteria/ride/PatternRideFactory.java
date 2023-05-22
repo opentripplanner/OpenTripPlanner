@@ -4,7 +4,6 @@ import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 
-@FunctionalInterface
 public interface PatternRideFactory<T extends RaptorTripSchedule, R extends PatternRide<T>> {
   R createPatternRide(
     McStopArrival<T> prevArrival,
@@ -13,12 +12,10 @@ public interface PatternRideFactory<T extends RaptorTripSchedule, R extends Patt
     int boardTime,
     int boardCost1,
     int relativeCost1,
-    T trip,
-    // TODO: 2023-05-15 via pass through: this is temporary. We need to figure out how to inject
-    //  c2 value for via stops inside ride
-
-    int c2
+    T trip
   );
+
+  R createPatternRide(R ride, int c2);
 
   // TODO: 2023-05-22 via pass through: create method createPatternRide(ride, c2)
 

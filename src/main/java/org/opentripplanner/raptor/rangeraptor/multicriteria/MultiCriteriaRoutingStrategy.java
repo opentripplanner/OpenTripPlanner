@@ -75,33 +75,8 @@ public final class MultiCriteriaRoutingStrategy<
 
     for (R ride : patternRides) {
       if (ride.c2() == 0 && indexes.contains(stopIndex)) {
-//        System.out.println("Reached Helsingborg C. Adding extra c2 value");
-        ride = patternRideFactory.createPatternRide(
-          ride.prevArrival(),
-          ride.boardStopIndex(),
-          ride.boardPos(),
-          ride.boardTime(),
-          ride.boardC1(),
-          ride.relativeC1(),
-          ride.trip(),
-          1
-        );
-
-        var result = patternRides.add(ride);
-        if (ride.c2() != 0) {
-//          System.out.println("Ride with via: ");
-//          System.out.println(ride);
-//          System.out.println("Added new element: " + result);
-        }
+        ride = patternRideFactory.createPatternRide(ride,1);
       }
-
-      // THIS IS WHERE WE NEED TO CHANGE C2
-      //      int c2 = ride.c2();
-      //      int c2Stop = c2StopValues[stopIndex];
-      //
-      //      if(c2 + 1 == c2Stop) {
-      //        c2 = c2Stop;
-      //      }
 
       state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
@@ -158,9 +133,7 @@ public final class MultiCriteriaRoutingStrategy<
       boardTime,
       boardC1,
       relativeBoardC1,
-      trip,
-      // TODO: 2023-05-19 via pass through: this is a problem since we cannot call c2() on AccessStopArrival
-      prevArrival.c2()
+      trip
     );
     patternRides.add(ride);
   }
