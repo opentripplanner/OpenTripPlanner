@@ -418,9 +418,11 @@ HTTP headers to add to the request. Any header key, value can be inserted.
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
-    "bikeRentalPickupCost" : 120,
-    "bikeRentalDropoffTime" : 30,
-    "bikeRentalDropoffCost" : 30,
+    "vehicleRental" : {
+      "pickupCost" : 120,
+      "dropOffTime" : 30,
+      "dropOffCost" : 30
+    },
     "bikeParkTime" : 60,
     "bikeParkCost" : 120,
     "carDropoffTime" : 120,
@@ -609,7 +611,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "sourceType" : "gbfs",
       "language" : "en",
       "frequencySec" : 60,
-      "allowKeepingRentedBicycleAtDestination" : false,
+      "allowKeepingRentedVehicleAtDestination" : false,
       "geofencingZones" : false,
       "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
       "headers" : {
