@@ -106,7 +106,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         legs.add(transitLeg);
       }
       // Map transfer leg
-      else if (pathLeg.isTransferLeg()) {
+      else if (pathLeg.isTransferLeg() && !staySeatedInTransferFrom(transitLeg)) {
         legs.addAll(
           mapTransferLeg(
             pathLeg.asTransferLeg(),
@@ -325,5 +325,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private ZonedDateTime createZonedDateTime(int timeInSeconds) {
     return transitSearchTimeZero.plusSeconds(timeInSeconds);
+  }
+
+  private boolean staySeatedInTransferFrom(Leg transitLeg) {
+    return (
+      transitLeg != null &&
+      transitLeg.getTransferToNextLeg() != null &&
+      transitLeg.getTransferToNextLeg().getTransferConstraint().isStaySeated()
+    );
   }
 }
