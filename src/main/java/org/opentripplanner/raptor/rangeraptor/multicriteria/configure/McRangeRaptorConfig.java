@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
+import java.util.BitSet;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;

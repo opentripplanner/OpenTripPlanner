@@ -55,6 +55,8 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private boolean reachedCurrentRound = false;
   private int iterationDepartureTime = -1;
 
+  // TODO: 2023-05-22 via pass through: we need to inject expected c2 value here
+  //  so that we can determine whether we should filter out results with c2 == 0
   public DestinationArrivalPaths(
     ParetoComparator<RaptorPath<T>> paretoComparator,
     RaptorTransitCalculator<T> transitCalculator,
@@ -84,15 +86,11 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
       return;
     }
 
-    if (transitCalculator.exceedsTimeLimit(destArrival.arrivalTime())) {
+    // TODO: 2023-05-17 via pass through: somewhere here we should filter out all paths without via
+    if (transitCalculator.exceedsTimeLimit(destArrival.arrivalTime()) && destArrival.c2() != 0) {
       debugRejectByTimeLimitOptimization(destArrival);
     } else {
       RaptorPath<T> path = pathMapper.mapToPath(destArrival);
-
-      // TODO: 2023-05-17 via pass through: somewhere here we should filter out all paths without via
-      if (path.c2() == 0) {
-        return;
-      }
 
       assertGeneralizedCostIsCalculatedCorrectByMapper(destArrival, path);
 
