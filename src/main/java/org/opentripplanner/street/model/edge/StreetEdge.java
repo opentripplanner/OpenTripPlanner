@@ -702,8 +702,6 @@ public class StreetEdge
     flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
   }
 
-
-
   /**
    * The edge is part of an osm way, which is of type link
    */

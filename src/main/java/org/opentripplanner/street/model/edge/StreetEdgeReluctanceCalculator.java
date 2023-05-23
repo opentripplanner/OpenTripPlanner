@@ -20,7 +20,7 @@ class StreetEdgeReluctanceCalculator {
   ) {
     if (edgeIsStairs) {
       return pref.walk().stairsReluctance();
-    }  else {
+    } else {
       return switch (traverseMode) {
         case WALK -> walkingBike ? pref.bike().walkingReluctance() : pref.walk().reluctance();
         case BICYCLE -> pref.bike().reluctance();

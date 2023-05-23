@@ -163,7 +163,11 @@ public class OsmModule implements GraphBuilderModule {
     var elevatorProcessor = new ElevatorProcessor(issueStore, osmdb, vertexGenerator);
     elevatorProcessor.buildElevatorEdges(graph);
 
-    var escalatorProcessor = new EscalatorProcessor(issueStore, osmdb, vertexGenerator.intersectionNodes());
+    var escalatorProcessor = new EscalatorProcessor(
+      issueStore,
+      osmdb,
+      vertexGenerator.intersectionNodes()
+    );
     escalatorProcessor.buildEscalatorEdges();
 
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
@@ -255,7 +259,9 @@ public class OsmModule implements GraphBuilderModule {
         params.banDiscouragedBiking(),
         issueStore
       );
-      if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) continue;
+      if (
+        !OsmFilter.isWayRoutable(way) || permissions.allowsNothing() || way.hasTag("conveying")
+      ) continue;
 
       // handle duplicate nodes in OSM ways
       // this is a workaround for crappy OSM data quality

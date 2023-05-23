@@ -50,16 +50,22 @@ class EscalatorProcessor {
         .toList();
 
       for (int i = 0; i < nodes.size() - 1; i++) {
-        edges.add(new EscalatorEdge(intersectionNodes.get(nodes.get(i)), intersectionNodes.get(nodes.get(i + 1))));
-
+        edges.add(
+          new EscalatorEdge(
+            intersectionNodes.get(nodes.get(i)),
+            intersectionNodes.get(nodes.get(i + 1))
+          )
+        );
       }
     }
     System.out.println("Number of escalators: " + edges.size());
   }
 
   private boolean isEscalatorWay(OSMWay osmWay) {
-    return "steps".equals(osmWay.getTag("highway")) &&
+    return (
+      "steps".equals(osmWay.getTag("highway")) &&
       osmWay.getTag("conveying") != null &&
-      Set.of("yes", "forward", "backward", "reversible").contains(osmWay.getTag("conveying"));
+      Set.of("yes", "forward", "backward", "reversible").contains(osmWay.getTag("conveying"))
+    );
   }
 }
