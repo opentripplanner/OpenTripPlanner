@@ -118,6 +118,7 @@ This timeout limits the server-side processing time for a given API request.
 This does not include network latency nor waiting time in the HTTP server thread pool.
 The default value is `-1s` (no timeout).
 The timeout is applied to all APIs (REST, Transmodel , Legacy GraphQL).
+The timeout is not enforced when the parallel routing OTP feature is in use.
 
 
 <h3 id="timetableUpdates_maxSnapshotFrequency">maxSnapshotFrequency</h3>
@@ -417,9 +418,11 @@ HTTP headers to add to the request. Any header key, value can be inserted.
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
-    "bikeRentalPickupCost" : 120,
-    "bikeRentalDropoffTime" : 30,
-    "bikeRentalDropoffCost" : 30,
+    "vehicleRental" : {
+      "pickupCost" : 120,
+      "dropOffTime" : 30,
+      "dropOffCost" : 30
+    },
     "bikeParkTime" : 60,
     "bikeParkCost" : 120,
     "carDropoffTime" : 120,
@@ -608,7 +611,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "sourceType" : "gbfs",
       "language" : "en",
       "frequencySec" : 60,
-      "allowKeepingRentedBicycleAtDestination" : false,
+      "allowKeepingRentedVehicleAtDestination" : false,
       "geofencingZones" : false,
       "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
       "headers" : {

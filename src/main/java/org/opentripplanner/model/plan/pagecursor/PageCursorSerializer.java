@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Base64;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.model.plan.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +51,7 @@ final class PageCursorSerializer {
 
   @Nullable
   public static PageCursor decode(String cursor) {
-    if (cursor == null || cursor.isBlank()) {
+    if (StringUtils.hasNoValueOrNullAsString(cursor)) {
       return null;
     }
     try {
@@ -73,9 +74,9 @@ final class PageCursorSerializer {
     } catch (Exception e) {
       String details = e.getMessage();
       if (details != null && !details.isBlank()) {
-        LOG.error("Unable to decode page cursor: '{}'. Details: {}", cursor, details);
+        LOG.warn("Unable to decode page cursor: '{}'. Details: {}", cursor, details);
       } else {
-        LOG.error("Unable to decode page cursor: '{}'.", cursor);
+        LOG.warn("Unable to decode page cursor: '{}'.", cursor);
       }
       return null;
     }

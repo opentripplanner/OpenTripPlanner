@@ -11,6 +11,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -177,6 +178,13 @@ public class ItineraryTest implements PlanTestConstants {
 
     assertEquals(0, itinerary.getLegIndex(leg));
     assertEquals(0, itinerary.getLegIndex(oneHourLater));
+  }
+
+  @Test
+  public void hasSystemTag() {
+    var subject = newItinerary(A).bus(1, T11_04, T11_14, B).build();
+    subject.flagForDeletion(new SystemNotice("MY-TAG", "Text"));
+    assertTrue(subject.hasSystemNoticeTag("MY-TAG"));
   }
 
   private void assertSameLocation(Place expected, Place actual) {

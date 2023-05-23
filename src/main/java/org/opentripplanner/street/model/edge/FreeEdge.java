@@ -23,11 +23,11 @@ public class FreeEdge extends Edge {
   }
 
   @Override
-  public State traverse(State s0) {
+  public State[] traverse(State s0) {
     StateEditor s1 = s0.edit(this);
     s1.incrementWeight(1);
     s1.setBackMode(null);
-    return s1.makeState();
+    return s1.makeStateArray();
   }
 
   @Override

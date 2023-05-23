@@ -29,7 +29,7 @@ otp.modules.planner.defaultQueryParams = {
     triangleTimeFactor              : 0.333,
     triangleSlopeFactor             : 0.333,
     triangleSafetyFactor            : 0.334,
-    debugItineraryFilter            : false,
+    debugItineraryFilter            : null,
 };
 
 otp.modules.planner.PlannerModule =
@@ -356,7 +356,7 @@ otp.modules.planner.PlannerModule =
             if(this.numItineraries) queryParams.numItineraries = this.numItineraries;
             if(this.minTransferTime) queryParams.minTransferTime = this.minTransferTime;
             if(this.showIntermediateStops) queryParams.showIntermediateStops = this.showIntermediateStops;
-            if(this.debugItineraryFilter !== null) _.extend(queryParams, { debugItineraryFilter : this.debugItineraryFilter });
+            if(this.debugItineraryFilter) queryParams.debugItineraryFilter = this.debugItineraryFilter;
 
             if(otp.config.routerId !== undefined) {
                 queryParams.routerId = otp.config.routerId;

@@ -215,7 +215,13 @@ public class ParameterBuilder {
   public <T extends Enum<T>> T asEnum(T defaultValue) {
     info.withEnum((Class<? extends Enum<?>>) defaultValue.getClass());
     setInfoOptional(defaultValue);
-    return parseOptionalEnum(build().asText(), (Class<T>) defaultValue.getClass())
+
+    var node = build();
+
+    if (node.isMissingNode()) {
+      return defaultValue;
+    }
+    return parseOptionalEnum(node.asText(), (Class<T>) defaultValue.getClass())
       .orElse(defaultValue);
   }
 

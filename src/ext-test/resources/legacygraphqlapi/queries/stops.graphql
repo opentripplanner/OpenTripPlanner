@@ -4,5 +4,6 @@
         lat
         lon
         name
+        vehicleMode
     }
 }

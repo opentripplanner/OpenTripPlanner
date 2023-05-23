@@ -10,7 +10,6 @@ import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOW
 
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;

@@ -26,7 +26,9 @@ import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
@@ -1010,8 +1012,20 @@ public class OsmDatabase {
    * Process an OSM level map.
    */
   private void processLevelMap(OSMRelation relation) {
+    var levelsTag = relation.getTag("levels");
+    if (!StringUtils.hasValue(levelsTag)) {
+      issueStore.add(
+        Issue.issue(
+          "InvalidLevelMap",
+          "Could not parse level map for osm relation %d as it was malformed. Skipped.",
+          relation.getId()
+        )
+      );
+      return;
+    }
+
     Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(
-      relation.getTag("levels"),
+      levelsTag,
       Source.LEVEL_MAP,
       true,
       issueStore

@@ -161,7 +161,7 @@ public class NodeAdapterTest {
     assertEquals(AnEnum.A, subject.of("a").asEnum(AnEnum.B), "Get existing property");
     assertEquals(AnEnum.A_B_C, subject.of("abc").asEnum(AnEnum.A_B_C), "Get existing property");
     assertEquals(AnEnum.B, subject.of("missing-key").asEnum(AnEnum.B), "Get default value");
-    // Then requiered
+    // Then required
     assertEquals(AnEnum.A, subject.of("a").asEnum(AnEnum.class), "Get existing property");
     assertEquals(AnEnum.A_B_C, subject.of("abc").asEnum(AnEnum.A_B_C), "Get existing property");
     assertThrows(OtpAppException.class, () -> subject.of("missing-key").asEnum(AnEnum.class));
@@ -170,18 +170,35 @@ public class NodeAdapterTest {
   @Test
   public void asEnumWithIllegalPropertySet() {
     // Given
-    NodeAdapter subject = newNodeAdapterForTest("{ key : 'NONE_EXISTING_ENUM_VALUE' }");
+    NodeAdapter subject = newNodeAdapterForTest(
+      """
+      {
+        key : 'NONE_EXISTING_ENUM_VALUE',
+        skim : {
+          albin : 'NONE_EXISTING_ENUM_VALUE'
+        }
+      }
+    """
+    );
+
+    NodeAdapter child = subject.of("skim").asObject();
 
     // Then expect an error when value 'NONE_EXISTING_ENUM_VALUE' is not in the set of legal
     // values: ['A', 'B', 'C']
     assertEquals(AnEnum.B, subject.of("key").asEnum(AnEnum.B));
+    assertEquals(AnEnum.A, child.of("albin").asEnum(AnEnum.A));
 
     // Verify logging
     final StringBuilder log = new StringBuilder();
-    subject.logAllWarnings(log::append);
+    subject.logAllWarnings(m -> log.append(m).append('\n'));
     assertEquals(
-      "The enum value 'NONE_EXISTING_ENUM_VALUE' is not legal. " +
-      "Expected one of [A, B, A_B_C]. Parameter: key. Source: Test.",
+      """
+        {error-message} Parameter: skim.albin. Source: Test.
+        {error-message} Parameter: key. Source: Test.
+        """.replace(
+          "{error-message}",
+          "The enum value 'NONE_EXISTING_ENUM_VALUE' is not legal. Expected one of [A, B, A_B_C]."
+        ),
       log.toString()
     );
   }

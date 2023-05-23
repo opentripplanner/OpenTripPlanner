@@ -57,14 +57,14 @@ public class CarRoutingTest {
     );
     var hindenburgStrUnderConstruction = model.index().graph();
 
-    var gueltsteinerStr = new GenericLocation(48.59240, 8.87024);
+    var gueltsteinerStr = new GenericLocation(48.59386, 8.87088);
     var aufDemGraben = new GenericLocation(48.59487, 8.87133);
 
     var polyline = computePolyline(hindenburgStrUnderConstruction, gueltsteinerStr, aufDemGraben);
 
     assertThatPolylinesAreEqual(
       polyline,
-      "ouqgH}mcu@gAE]U}BaA]Q}@]uAs@[SAm@Ee@AUEi@XEQkBQ?Bz@Dt@Dh@@TGBC@KBSHGx@"
+      "s~qgH}qcu@[MuAs@[SAm@Ee@AUEi@XEQkBQ?Bz@Dt@Dh@@TGBC@KBSHGx@"
     );
   }
 

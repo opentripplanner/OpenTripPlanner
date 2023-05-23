@@ -21,6 +21,7 @@ import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -169,6 +170,7 @@ public abstract class FlexAccessEgressTemplate {
   @Nullable
   protected abstract FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
 
+  @Nullable
   protected FlexAccessEgress getFlexAccessEgress(
     List<Edge> transferEdges,
     Vertex flexVertex,
@@ -184,27 +186,27 @@ public abstract class FlexAccessEgressTemplate {
     // this code is a little repetitive but needed as a performance improvement. previously
     // the flex path was checked before this method was called. this meant that every path
     // was traversed twice leading to a noticeable slowdown.
-    State state = flexEdge.traverse(accessEgress.state);
-    if (state == null) {
+    final var afterFlexState = flexEdge.traverse(accessEgress.state);
+    if (State.isEmpty(afterFlexState)) {
       return null;
     }
-    for (Edge e : transferEdges) {
-      state = e.traverse(state);
-      if (state == null) {
-        return null;
-      }
-    }
 
-    var durations = calculateFlexPathDurations(flexEdge, state);
+    final var finalStateOpt = EdgeTraverser.traverseEdges(afterFlexState[0], transferEdges);
 
-    return new FlexAccessEgress(
-      stop,
-      durations,
-      fromStopIndex,
-      toStopIndex,
-      trip,
-      state,
-      transferEdges.isEmpty()
-    );
+    return finalStateOpt
+      .map(finalState -> {
+        var durations = calculateFlexPathDurations(flexEdge, finalState);
+
+        return new FlexAccessEgress(
+          stop,
+          durations,
+          fromStopIndex,
+          toStopIndex,
+          trip,
+          finalState,
+          transferEdges.isEmpty()
+        );
+      })
+      .orElse(null);
   }
 }
