@@ -242,6 +242,13 @@ public class OpenStreetMapModule implements GraphBuilderModule {
       );
       elevatorProcessor.buildElevatorEdges(graph);
 
+      var escalatorProcessor = new EscalatorProcessor(
+        issueStore,
+        osmdb,
+        intersectionNodes
+      ) ;
+      escalatorProcessor.buildEscalatorEdges();
+
       unifyTurnRestrictions();
 
       if (customNamer != null) {
@@ -962,16 +969,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         street.setHasBogusName(true);
       }
 
-      if (way.isEscalator()) {
-        street.setEscalator(true);
-      } else {
-        street.setStairs(way.isSteps());
-      }
       boolean steps = way.isSteps();
-      //      street.setStairs(steps);
-      //
-      //      boolean escalator = way.isEscalator();
-      //      street.setEscalator(escalator);
+      street.setStairs(steps);
+
       /* TODO: This should probably generalized somehow? */
       if ((way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair")))) {
         street.setWheelchairAccessible(false);
