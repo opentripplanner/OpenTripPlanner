@@ -18,7 +18,6 @@ import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +53,7 @@ public class OrcaFareServiceTest {
   private static final Money FERRY_FARE = usDollars(6.10f);
   private static final Money HALF_FERRY_FARE = usDollars(3.05f);
   private static final Money ORCA_REGULAR_FARE = usDollars(2.50f);
+  private static final Money ORCA_SPECIAL_FARE = usDollars(1.50f);
   private static TestOrcaFareService orcaFareService;
   public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
 
@@ -215,27 +215,27 @@ public class OrcaFareServiceTest {
       getLeg(KITSAP_TRANSIT_AGENCY_ID, 120),
       getLeg(WASHINGTON_STATE_FERRIES_AGENCY_ID, 150, "Fauntleroy-VashonIsland")
     );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(4).plus(usDollars(6.10f)));
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(4).plus(FERRY_FARE));
     calculateFare(
       rides,
       FareType.senior,
-      DEFAULT_TEST_RIDE_PRICE.times(3).plus(usDollars(.50f)).plus(usDollars(3.05f))
+      DEFAULT_TEST_RIDE_PRICE.times(3).plus(usDollars(.50f)).plus(HALF_FERRY_FARE)
     );
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(
       rides,
       FareType.electronicSpecial,
-      ONE_DOLLAR.plus(DEFAULT_TEST_RIDE_PRICE).plus(ONE_DOLLAR).plus(usDollars(6.10f))
+      ONE_DOLLAR.plus(DEFAULT_TEST_RIDE_PRICE).plus(ONE_DOLLAR).plus(FERRY_FARE)
     );
     calculateFare(
       rides,
       FareType.electronicRegular,
-      DEFAULT_TEST_RIDE_PRICE.times(3).plus(usDollars(6.10f))
+      DEFAULT_TEST_RIDE_PRICE.times(3).plus(FERRY_FARE)
     );
     calculateFare(
       rides,
       FareType.electronicSenior,
-      ONE_DOLLAR.plus(usDollars(0.5f)).plus(ONE_DOLLAR).plus(usDollars(3.05f))
+      ONE_DOLLAR.plus(usDollars(0.5f)).plus(ONE_DOLLAR).plus(HALF_FERRY_FARE)
     );
     calculateFare(rides, FareType.electronicYouth, ZERO_USD);
   }
@@ -333,7 +333,6 @@ public class OrcaFareServiceTest {
     List<Leg> rides = List.of(
       getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Roosevelt Station", "Int'l Dist/Chinatown")
     );
-    var ORCA_SPECIAL_FARE = usDollars(1.50f);
 
     calculateFare(rides, regular, ORCA_REGULAR_FARE);
     calculateFare(rides, FareType.senior, ONE_DOLLAR);
@@ -364,7 +363,7 @@ public class OrcaFareServiceTest {
     calculateFare(rides, regular, usDollars(4.25f));
     calculateFare(rides, FareType.senior, ONE_DOLLAR);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, usDollars(1.50f));
+    calculateFare(rides, FareType.electronicSpecial, ORCA_SPECIAL_FARE);
     calculateFare(rides, FareType.electronicRegular, usDollars(4.25f));
     calculateFare(rides, FareType.electronicSenior, ONE_DOLLAR);
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
@@ -376,7 +375,7 @@ public class OrcaFareServiceTest {
     calculateFare(rides, regular, usDollars(5.00f));
     calculateFare(rides, FareType.senior, ONE_DOLLAR);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, usDollars(1.50f));
+    calculateFare(rides, FareType.electronicSpecial, ORCA_SPECIAL_FARE);
     calculateFare(rides, FareType.electronicRegular, usDollars(5.00f));
     calculateFare(rides, FareType.electronicSenior, ONE_DOLLAR);
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
@@ -442,10 +441,10 @@ public class OrcaFareServiceTest {
       getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 60, "Roosevelt Station", "Angle Lake Station"), // 3.25, should extend transfer
       getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 140, "Int'l Dist/Chinatown", "Angle Lake Station") // 3.00, should be free under extended transfer
     );
-    calculateFare(rides, regular, usDollars(2.50f).plus(usDollars(3.25f)).plus(usDollars(3.00f)));
+    calculateFare(rides, regular, ORCA_REGULAR_FARE.plus(usDollars(3.25f)).plus(usDollars(3.00f)));
     calculateFare(rides, FareType.senior, usDollars(3));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, usDollars(1.50f).times(2));
+    calculateFare(rides, FareType.electronicSpecial, ORCA_SPECIAL_FARE.times(2));
     calculateFare(rides, FareType.electronicRegular, usDollars(3.25f)); // transfer extended on second leg
     calculateFare(rides, FareType.electronicSenior, TWO_DOLLARS);
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
