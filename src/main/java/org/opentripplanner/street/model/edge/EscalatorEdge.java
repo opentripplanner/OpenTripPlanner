@@ -12,16 +12,17 @@ public class EscalatorEdge extends Edge{
   }
 
   @Override
-  public State traverse(State s0) {
+  public State[] traverse(State s0) {
+    // Only allow traversal by walking
     if(s0.getNonTransitMode() == TraverseMode.WALK ) {
       var s1 = s0.edit(this);
       var time =  getDistanceMeters() / s0.getPreferences().walk().speed();
       s1.incrementWeight(s0.getPreferences().walk().escalatorReluctance() * time);
       s1.incrementTimeInSeconds((int) Math.round(time));
       s1.incrementWalkDistance(getDistanceMeters());
-     return s1.makeState();
+     return s1.makeStateArray();
     }
-    else return null;
+    else return State.empty();
   }
 
   @Override

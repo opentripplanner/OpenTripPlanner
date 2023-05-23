@@ -19,13 +19,13 @@ class EscalatorProcessor {
 
   private final DataImportIssueStore issueStore;
 
-  private final OSMDatabase osmdb;
+  private final OsmDatabase osmdb;
 
   private final Map<Long, IntersectionVertex> intersectionNodes;
 
   public EscalatorProcessor(
     DataImportIssueStore issueStore,
-    OSMDatabase osmdb,
+    OsmDatabase osmdb,
     Map<Long, IntersectionVertex> intersectionNodes
   ) {
     this.issueStore = issueStore;

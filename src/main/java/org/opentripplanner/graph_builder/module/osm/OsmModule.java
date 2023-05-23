@@ -163,6 +163,9 @@ public class OsmModule implements GraphBuilderModule {
     var elevatorProcessor = new ElevatorProcessor(issueStore, osmdb, vertexGenerator);
     elevatorProcessor.buildElevatorEdges(graph);
 
+    var escalatorProcessor = new EscalatorProcessor(issueStore, osmdb, vertexGenerator.intersectionNodes());
+    escalatorProcessor.buildEscalatorEdges();
+
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
 
     params.edgeNamer().postprocess();
