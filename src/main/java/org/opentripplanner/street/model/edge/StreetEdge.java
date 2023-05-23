@@ -65,7 +65,6 @@ public class StreetEdge
   private static final int WALK_NOTHRUTRAFFIC = 8;
   private static final int CLASS_LINK = 9;
 
-  private static final int ESCALATOR_FLAG_INDEX = 10;
   private StreetEdgeCostExtension costExtension;
   /** back, roundabout, stairs, ... */
   private short flags;
@@ -708,14 +707,7 @@ public class StreetEdge
     flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
   }
 
-  public boolean isEscalator() {
-    return BitSetUtils.get(flags, ESCALATOR_FLAG_INDEX);
-  }
 
-  public void setEscalator(boolean escalator) {
-    permission = StreetTraversalPermission.PEDESTRIAN;
-    flags = BitSetUtils.set(flags, ESCALATOR_FLAG_INDEX, escalator);
-  }
 
   /**
    * The edge is part of an osm way, which is of type link
@@ -1107,10 +1099,6 @@ public class StreetEdge
       }
     }
 
-    if (isEscalator() && traverseMode == TraverseMode.WALK && walkingBike) {
-      return null;
-    }
-
     var s1 = createEditor(s0, this, traverseMode, walkingBike);
 
     if (isTraversalBlockedByNoThruTraffic(traverseMode, backEdge, s0, s1)) {
@@ -1241,8 +1229,7 @@ public class StreetEdge
         preferences,
         traverseMode,
         walkingBike,
-        isStairs(),
-        isEscalator()
+        isStairs()
       );
     return new TraversalCosts(time, weight);
   }
@@ -1282,8 +1269,7 @@ public class StreetEdge
       pref,
       TraverseMode.BICYCLE,
       false,
-      isStairs(),
-      isEscalator()
+      isStairs()
     );
     weight *= reluctance;
     return new TraversalCosts(time, weight);
@@ -1332,8 +1318,7 @@ public class StreetEdge
           preferences,
           traverseMode,
           walkingBike,
-          isStairs(),
-          isEscalator()
+          isStairs()
         );
     }
 
