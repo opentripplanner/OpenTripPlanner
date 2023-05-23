@@ -2,7 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
@@ -143,7 +143,8 @@ class StreetEdgeGeofencingTest {
 
       var result = restrictedEdge.traverse(editor.makeState());
 
-      assertNull(result);
+      assertTrue(State.isEmpty(result));
+      assertNotNull(result);
     }
 
     @Test
@@ -161,7 +162,9 @@ class StreetEdgeGeofencingTest {
       V2.addRentalRestriction(NO_TRAVERSAL);
       var intialState = initialState(V2, network, true);
       var result = edge.traverse(intialState);
-      assertNull(result);
+
+      assertTrue(State.isEmpty(result));
+      assertNotNull(result);
     }
 
     @Test
