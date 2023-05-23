@@ -6,6 +6,7 @@ import static org.opentripplanner.ext.fares.impl.AtlantaFareService.GCT_AGENCY_I
 import static org.opentripplanner.ext.fares.impl.AtlantaFareService.MARTA_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.AtlantaFareService.XPRESS_AGENCY_ID;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.transit.model.basic.Money.USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import java.util.Collection;
@@ -34,7 +35,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 public class AtlantaFareServiceTest implements PlanTestConstants {
 
   public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
-  public static final Currency USD = Currency.getInstance("USD");
   private static AtlantaFareService atlFareService;
 
   @BeforeAll

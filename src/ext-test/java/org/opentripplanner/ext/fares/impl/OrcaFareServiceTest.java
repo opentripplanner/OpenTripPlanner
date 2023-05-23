@@ -12,6 +12,7 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.routing.core.FareType.regular;
+import static org.opentripplanner.transit.model.basic.Money.USD;
 import static org.opentripplanner.transit.model.basic.Money.ZERO_USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
@@ -48,7 +49,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 public class OrcaFareServiceTest {
 
-  public static final Currency USD = Currency.getInstance("USD");
   private static final Money ONE_DOLLAR = usDollars(1f);
   private static final Money TWO_DOLLARS = usDollars(2);
   private static final Money FERRY_FARE = usDollars(6.10f);
