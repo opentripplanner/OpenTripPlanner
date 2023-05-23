@@ -29,7 +29,7 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  * transfer. In these cases the transfer-slack should be ignored and the connection should be
  * possible.
  */
-public class E02_GuaranteedTransferTest implements RaptorTestConstants {
+public class E02_GuaranteedWalkTransferTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
