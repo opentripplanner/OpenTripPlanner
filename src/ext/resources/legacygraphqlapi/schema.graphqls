@@ -2724,15 +2724,6 @@ type QueryType {
         pageCursor: String
 
         """
-        How easily bad itineraries are filtered from results. Value 0 (default)
-        disables filtering. Itineraries are filtered if they are worse than another
-        one in some respect (e.g. more walking) by more than the percentage of
-        filtering level, which is calculated by dividing 100% by the value of this
-        argument (e.g. `itineraryFiltering = 0.5` → 200% worse itineraries are filtered).
-        """
-        itineraryFiltering: Float
-
-        """
         A multiplier for how bad biking is, compared to being in transit for equal
         lengths of time. Default value: 2.0
         """
@@ -2805,9 +2796,6 @@ type QueryType {
         to the destination at the specified time (true). Default value: false.
         """
         arriveBy: Boolean
-
-        """An ordered list of intermediate locations to be visited."""
-        intermediatePlaces: [InputCoordinates]
 
         """
         List of routes and agencies which are given higher preference when planning the itinerary
@@ -2915,17 +2903,6 @@ type QueryType {
         startTransitStopId: String
 
         """
-        ID of the trip on which the itinerary starts. This argument can be used to
-        plan itineraries when the user is already onboard a vehicle. When using this
-        argument, arguments `time` and `from` should be set based on a vehicle
-        position message received from the vehicle running the specified trip.
-        **Note:** this argument only takes into account the route and estimated
-        travel time of the trip (and therefore arguments `time` and `from` must be
-        used correctly to get meaningful itineraries).
-        """
-        startTransitTripId: String
-
-        """
         When false, return itineraries using canceled trips. Default value: true.
         """
         omitCanceled: Boolean = true
@@ -2949,8 +2926,6 @@ type QueryType {
         """
         allowedTicketTypes: [String]
 
-        """Tuning parameter for the search algorithm, mainly useful for testing."""
-        heuristicStepsPerMainStep: Int
         """
         Which vehicle rental networks can be used. By default, all networks are allowed.
         """
@@ -3035,16 +3010,45 @@ type QueryType {
         Which vehicle rental networks can be used. By default, all networks are allowed.
         """
         allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedVehicleRentalNetworks instead")
+
         """
         The maximum time (in seconds) of pre-transit travel when using
         drive-to-transit (park and ride or kiss and ride). Default value: 1800.
         """
+
         maxPreTransitTime: Int @deprecated(reason: "Use walkReluctance or future reluctance parameters for other modes")
         """
         How expensive it is to drive a car when car&parking, increase this value to
         make car driving legs shorter. Default value: 1.
         """
+
         carParkCarLegWeight: Float @deprecated(reason: "Use `carReluctance` instead.")
+
+        """Tuning parameter for the search algorithm, mainly useful for testing."""
+        heuristicStepsPerMainStep: Int @deprecated(reason: "Removed. Doesn't do anything.")
+
+        """
+        How easily bad itineraries are filtered from results. Value 0 (default)
+        disables filtering. Itineraries are filtered if they are worse than another
+        one in some respect (e.g. more walking) by more than the percentage of
+        filtering level, which is calculated by dividing 100% by the value of this
+        argument (e.g. `itineraryFiltering = 0.5` → 200% worse itineraries are filtered).
+        """
+        itineraryFiltering: Float @deprecated(reason: "Removed. Doesn't do anything.")
+
+        """An ordered list of intermediate locations to be visited."""
+        intermediatePlaces: [InputCoordinates] @deprecated(reason: "Not implemented in OTP2.")
+
+        """
+        ID of the trip on which the itinerary starts. This argument can be used to
+        plan itineraries when the user is already onboard a vehicle. When using this
+        argument, arguments `time` and `from` should be set based on a vehicle
+        position message received from the vehicle running the specified trip.
+        **Note:** this argument only takes into account the route and estimated
+        travel time of the trip (and therefore arguments `time` and `from` must be
+        used correctly to get meaningful itineraries).
+        """
+        startTransitTripId: String @deprecated(reason: "Not implemented in OTP2")
     ): Plan @async
 }
 
