@@ -533,8 +533,6 @@ public class VertexLinker {
     }
   }
 
-  private record StreetEdgePair(StreetEdge e0, StreetEdge e1) {}
-
   /**
    * Link a new vertex permanently with area geometry
    */
@@ -612,7 +610,6 @@ public class VertexLinker {
       new Coordinate[] { from.getCoordinate(), to.getCoordinate() }
     );
 
-    List<NamedArea> intersects = new ArrayList<>();
     NamedArea hit = null;
     for (NamedArea area : areas) {
       Geometry polygon = area.getPolygon();
