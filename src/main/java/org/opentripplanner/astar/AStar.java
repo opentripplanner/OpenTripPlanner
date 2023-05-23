@@ -142,6 +142,9 @@ public class AStar<
       // Iterate over traversal results. When an edge leads nowhere (as indicated by
       // returning null), the iteration is over.
       var states = edge.traverse(u);
+      if (states == null) {
+        throw new IllegalStateException("%s returned null when traversing".formatted(edge));
+      }
       for (var v : states) {
         // Could be: for (State v : traverseEdge...)
 
