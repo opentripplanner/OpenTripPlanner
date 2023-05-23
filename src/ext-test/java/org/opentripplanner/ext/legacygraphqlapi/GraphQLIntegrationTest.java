@@ -16,6 +16,8 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_50;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
+import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
@@ -66,6 +68,7 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -113,11 +116,7 @@ class GraphQLIntegrationTest {
       )
       .toList();
 
-    var busRoute = routes
-      .stream()
-      .filter(r -> r.getMode().equals(TransitMode.BUS))
-      .findFirst()
-      .get();
+    var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
 
     routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
 
@@ -167,7 +166,12 @@ class GraphQLIntegrationTest {
       .build();
     railLeg.addAlert(alert);
 
-    var transitService = new DefaultTransitService(transitModel);
+    var transitService = new DefaultTransitService(transitModel) {
+      @Override
+      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+        return List.of(BUS, FERRY);
+      }
+    };
     context =
       new LegacyGraphQLRequestContext(
         new TestRoutingService(List.of(i1)),

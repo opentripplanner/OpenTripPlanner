@@ -14,6 +14,20 @@ public class StringUtils {
     return text != null && !text.isBlank();
   }
 
+  /** true if the given text is {@code null} or only have white-space characters. */
+  public static boolean hasNoValue(String text) {
+    return text == null || text.isBlank();
+  }
+
+  /**
+   * true if the given text is {@code null}, empty, only white-space or the string {@code "null"}.
+   * This is convenient when parsing untrusted external client requests, and we do not care to
+   * differentiate.
+   * */
+  public static boolean hasNoValueOrNullAsString(String text) {
+    return hasNoValue(text) || "null".equals(text);
+  }
+
   /**
    * Verify String value is NOT {@code null}, empty or only whitespace.
    *
