@@ -17,25 +17,25 @@ public class TransferConstraintTest {
   private final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.durationInSeconds("1h");
   private final int D3m = DurationUtils.durationInSeconds("3m");
 
-  private final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
-  private final TransferConstraint RECOMMENDED = TransferConstraint.create().recommended().build();
-  private final TransferConstraint STAY_SEATED = TransferConstraint.create().staySeated().build();
-  private final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
-  private final TransferConstraint NOT_ALLOWED = TransferConstraint.create().notAllowed().build();
+  private final TransferConstraint NO_CONSTRAINS = TransferConstraint.of().build();
+  private final TransferConstraint RECOMMENDED = TransferConstraint.of().recommended().build();
+  private final TransferConstraint STAY_SEATED = TransferConstraint.of().staySeated().build();
+  private final TransferConstraint GUARANTIED = TransferConstraint.of().guaranteed().build();
+  private final TransferConstraint NOT_ALLOWED = TransferConstraint.of().notAllowed().build();
   private final TransferConstraint MAX_WAIT_TIME = TransferConstraint
-    .create()
+    .of()
     .guaranteed()
     .maxWaitTime(MAX_WAIT_TIME_ONE_HOUR)
     .build();
   private final TransferConstraint EVERYTHING = TransferConstraint
-    .create()
+    .of()
     .staySeated()
     .guaranteed()
     .preferred()
     .maxWaitTime(MAX_WAIT_TIME_ONE_HOUR)
     .build();
   private final TransferConstraint MIN_TX_TIME = TransferConstraint
-    .create()
+    .of()
     .minTransferTime(D3m)
     .build();
 

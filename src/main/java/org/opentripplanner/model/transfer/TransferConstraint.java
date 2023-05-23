@@ -24,7 +24,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
   /**
    * A regular transfer is a transfer with no constraints.
    */
-  public static final TransferConstraint REGULAR_TRANSFER = create().build();
+  public static final TransferConstraint REGULAR_TRANSFER = of().build();
 
   /**
    * STAY_SEATED is not a priority, but we assign a cost to it to be able to compare it with other
@@ -112,7 +112,7 @@ public class TransferConstraint implements Serializable, RaptorTransferConstrain
     return c == null ? DEFAULT_COST : c.cost();
   }
 
-  public static Builder create() {
+  public static Builder of() {
     return new Builder();
   }
 

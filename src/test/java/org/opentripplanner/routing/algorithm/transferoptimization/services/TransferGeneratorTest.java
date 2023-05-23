@@ -529,7 +529,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     var tripA = l1.getTripSchedule(0);
     var tripB = l2.getTripSchedule(0);
     var constraint = TransferConstraint
-      .create()
+      .of()
       .minTransferTime((int) minTransferTime.getSeconds())
       .build();
     data.withConstrainedTransfer(tripA, STOP_B, tripB, STOP_B, constraint);
