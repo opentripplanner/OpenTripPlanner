@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 public class HSLFareServiceImpl extends DefaultFareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
+  // this is not Float.MAX_VALUE to avoid overflow which would then make debugging harder
   public static final Money MAX_PRICE = Money.euros(999999f);
 
   @Override
