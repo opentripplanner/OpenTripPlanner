@@ -38,7 +38,7 @@ public class Money implements Comparable<Money> {
   }
 
   /**
-   * Creates a US dollar money object, mostly used in tests.
+   * Creates a US dollar money object.
    * @param amount Amount in fractional dollars, so 1.5 for 1.50 USD
    */
   public static Money usDollars(float amount) {
