@@ -10,8 +10,12 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
@@ -569,6 +573,30 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
+  public List<TransitMode> getModesOfStopLocationsGroup(StopLocationsGroup station) {
+    return sortByOccurrenceAndReduce(
+      station.getChildStops().stream().flatMap(this::getPatternModesOfStop)
+    )
+      .toList();
+  }
+
+  @Override
+  public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+    return sortByOccurrenceAndReduce(getPatternModesOfStop(stop)).toList();
+  }
+
+  /**
+   * For each pattern visiting this {@link StopLocation} return its {@link TransitMode}
+   */
+  private Stream<TransitMode> getPatternModesOfStop(StopLocation stop) {
+    if (stop.getGtfsVehicleType() != null) {
+      return Stream.of(stop.getGtfsVehicleType());
+    } else {
+      return getPatternsForStop(stop).stream().map(TripPattern::getMode);
+    }
+  }
+
+  @Override
   public TransferService getTransferService() {
     return transitModel.getTransferService();
   }
@@ -576,5 +604,20 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public boolean transitFeedCovers(Instant dateTime) {
     return transitModel.transitFeedCovers(dateTime);
+  }
+
+  /**
+   * Take a stream of T, count the occurrences of each value and return it in order of frequency
+   * from high to low.
+   * <p>
+   * Example: [a,b,b,c,c,c] will return [c,b,a]
+   */
+  private static <T> Stream<T> sortByOccurrenceAndReduce(Stream<T> input) {
+    return input
+      .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+      .entrySet()
+      .stream()
+      .sorted(Map.Entry.<T, Long>comparingByValue().reversed())
+      .map(Map.Entry::getKey);
   }
 }

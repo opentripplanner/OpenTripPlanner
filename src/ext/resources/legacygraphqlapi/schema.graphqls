@@ -2898,7 +2898,7 @@ type QueryType {
         allowKeepingRentedBicycleAtDestination: Boolean
 
         """
-        The cost of arriving at the destination with the rented bicycle, to discourage doing so.
+        The cost of arriving at the destination with the rented vehicle, to discourage doing so.
         Default value: 0.
         """
         keepingRentedBicycleAtDestinationCost: Int
