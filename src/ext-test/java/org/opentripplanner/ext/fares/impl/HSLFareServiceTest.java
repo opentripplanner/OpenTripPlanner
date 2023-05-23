@@ -1,11 +1,13 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -349,6 +351,43 @@ public class HSLFareServiceTest implements PlanTestConstants {
       Arguments.of("Ride with agency 2", hslFareService, d2, List.of(fareAttributeD2.getId()))
     );
 
+    // Itineraries within zone A
+    Itinerary A1_A2_F = newItinerary(A1, T11_06)
+      .bus(1, T11_06, T11_12, A2)
+      .bus(1, T11_06, T11_12, F)
+      .build();
+
+    args.add(
+      Arguments.of(
+        "Bus ride within zone A, then another one outside of HSL's area",
+        hslFareService,
+        A1_A2_F,
+        List.of(fareAttributeAB.getId())
+      )
+    );
+
     return args;
+  }
+
+  @Test
+  void unknownFare() {
+    FareAttribute fareAttributeAB = FareAttribute
+      .of(new FeedScopedId(FEED_ID, "AB"))
+      .setCurrencyType("EUR")
+      .setPrice(2.80f)
+      .setTransferDuration(60 * 5)
+      .build();
+
+    FareRuleSet ruleSetAB = new FareRuleSet(fareAttributeAB);
+
+    var service = new HSLFareServiceImpl();
+    service.addFareRules(FareType.regular, List.of(ruleSetAB));
+
+    // outside HSL's fare zones, should return null
+    Itinerary outsideHsl = newItinerary(PlanTestConstants.D, T11_06)
+      .bus(1, T11_20, T11_30, PlanTestConstants.E)
+      .build();
+    var result = service.calculateFares(outsideHsl);
+    assertNull(result);
   }
 }

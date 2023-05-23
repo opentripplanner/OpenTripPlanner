@@ -40,7 +40,7 @@ public class HSLFareServiceImpl extends DefaultFareService {
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
-    Set<String> zones = new HashSet<String>();
+    Set<String> zones = new HashSet<>();
     ZonedDateTime startTime = legs.get(0).getStartTime();
     ZonedDateTime lastRideStartTime = startTime;
 
@@ -175,10 +175,9 @@ public class HSLFareServiceImpl extends DefaultFareService {
       bestAttribute = specialFareAttribute;
     }
     LOG.debug("HSL {} best for {}", bestAttribute, legs);
-    final FareAndId value = new FareAndId(
-      bestFare,
-      bestAttribute == null ? null : bestAttribute.getId()
-    );
-    return Optional.of(value);
+    final Money finalBestFare = bestFare;
+    return Optional
+      .ofNullable(bestAttribute)
+      .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
   }
 }
