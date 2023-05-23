@@ -74,7 +74,9 @@
         "ch.qos.logback:logback-classic",
         // maven plugins
         "org.codehaus.mojo:build-helper-maven-plugin",
-        "org.apache.maven.plugins:maven-gpg-plugin"
+        "org.apache.maven.plugins:maven-gpg-plugin",
+        "org.apache.maven.plugins:maven-source-plugin",
+        "io.github.git-commit-id:git-commit-id-maven-plugin"
       ],
       "matchPackagePrefixes": [
         "org.junit.jupiter:",
