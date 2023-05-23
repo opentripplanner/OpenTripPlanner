@@ -28,6 +28,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Route
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -228,16 +229,7 @@ public class TransitRouter {
     List<DefaultAccessEgress> results = new ArrayList<>(
       accessEgressMapper.mapNearbyStops(nearbyStops, isEgress)
     );
-    if (streetRequest.mode() == StreetMode.CAR_HAILING) {
-      results =
-        RideHailingAccessShifter.shiftAccesses(
-          isAccess,
-          results,
-          serverContext.rideHailingServices(),
-          request,
-          Instant.now()
-        );
-    }
+    results = timeshiftRideHailing(streetRequest, isAccess, results);
 
     // Special handling of flex accesses
     if (OTPFeature.FlexRouting.isOn() && streetRequest.mode() == StreetMode.FLEXIBLE) {
@@ -254,6 +246,34 @@ public class TransitRouter {
       results.addAll(accessEgressMapper.mapFlexAccessEgresses(flexAccessList, isEgress));
     }
 
+    return results;
+  }
+
+  /**
+   * Given a list of {@code results} shift the access ones which contain driving
+   * so that they only start at the time when the ride hailing vehicle can actually be there
+   * to pick up passengers.
+   * <p>
+   * If there are accesses/egresses with only walking then they remain unchanged.
+   * <p>
+   * This method is a good candidate to be moved to the access/egress filter chain when that has
+   * been added.
+   */
+  private List<DefaultAccessEgress> timeshiftRideHailing(
+    StreetRequest streetRequest,
+    boolean isAccess,
+    List<DefaultAccessEgress> results
+  ) {
+    if (streetRequest.mode() == StreetMode.CAR_HAILING) {
+      results =
+        RideHailingAccessShifter.shiftAccesses(
+          isAccess,
+          results,
+          serverContext.rideHailingServices(),
+          request,
+          Instant.now()
+        );
+    }
     return results;
   }
 

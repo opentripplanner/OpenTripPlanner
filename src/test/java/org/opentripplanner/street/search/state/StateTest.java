@@ -96,12 +96,12 @@ class StateTest {
   @Test
   void containsDriving() {
     var state = TestStateBuilder.ofDriving().streetEdge().streetEdge().streetEdge().build();
-    assertTrue(state.containsDriving());
+    assertTrue(state.containsModeCar());
   }
 
   @Test
   void walking() {
     var state = TestStateBuilder.ofWalking().streetEdge().streetEdge().streetEdge().build();
-    assertFalse(state.containsDriving());
+    assertFalse(state.containsModeCar());
   }
 }

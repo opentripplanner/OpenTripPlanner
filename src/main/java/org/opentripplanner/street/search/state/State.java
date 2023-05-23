@@ -424,10 +424,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   /**
    * Whether the street path contains any driving.
    */
-  public boolean containsDriving() {
+  public boolean containsModeCar() {
     var state = this;
     while (state != null) {
-      if (state.getNonTransitMode().isDriving()) {
+      if (state.getNonTransitMode().isInCar()) {
         return true;
       } else {
         state = state.getBackState();

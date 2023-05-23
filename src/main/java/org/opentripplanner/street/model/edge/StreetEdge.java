@@ -1184,7 +1184,7 @@ public class StreetEdge
         turnDuration = 0;
       }
 
-      if (!traverseMode.isDriving()) {
+      if (!traverseMode.isInCar()) {
         s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
       }
 
@@ -1192,7 +1192,7 @@ public class StreetEdge
       weight += preferences.street().turnReluctance() * turnDuration;
     }
 
-    if (!traverseMode.isDriving()) {
+    if (!traverseMode.isInCar()) {
       s1.incrementWalkDistance(getDistanceWithElevation());
     }
 
