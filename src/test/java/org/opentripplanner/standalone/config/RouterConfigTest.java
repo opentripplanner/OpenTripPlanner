@@ -1,12 +1,10 @@
 package org.opentripplanner.standalone.config;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeForTest;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
 
-import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -28,30 +26,25 @@ class RouterConfigTest {
 
     // Test for unused parameters
     var buf = new StringBuilder();
-    a.logAllUnusedParameters(m -> buf.append("\n").append(m));
+    a.logAllWarnings(m -> buf.append("\n").append(m));
     if (!buf.isEmpty()) {
       fail(buf.toString());
     }
   }
 
   @Test
-  void parseStreetRoutingTimeout() {
-    var DEFAULT_TIMEOUT = RouterConfig.DEFAULT.streetRoutingTimeout();
-    NodeAdapter c;
-
-    // Fall back to default 5 seconds
-    c = createNodeAdaptor("{}");
-    assertEquals(DEFAULT_TIMEOUT, RouterConfig.parseStreetRoutingTimeout(c));
-
-    // New format: 33 seconds
-    c = createNodeAdaptor("{streetRoutingTimeout: '33s'}");
-    assertEquals(Duration.ofSeconds(33), RouterConfig.parseStreetRoutingTimeout(c));
-  }
-
-  @Test
-  void parseStreetRoutingTimeoutWithIllegalFormat() {
-    final var c = createNodeAdaptor("{streetRoutingTimeout: 'Hi'}");
-    assertThrows(OtpAppException.class, () -> RouterConfig.parseStreetRoutingTimeout(c));
+  void testSemanticValidation() {
+    // apiProcessingTimeout must be greater then streetRoutingTimeout
+    var root = createNodeAdaptor(
+      """
+      {
+        server: { apiProcessingTimeout : "1s" },
+        routingDefaults: { streetRoutingTimeout: "17s" }
+      }
+      """
+    );
+    //
+    assertThrows(OtpAppException.class, () -> new RouterConfig(root, false));
   }
 
   private static NodeAdapter createNodeAdaptor(String jsonText) {

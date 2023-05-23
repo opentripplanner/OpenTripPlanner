@@ -9,7 +9,7 @@
     "islandWithStopsMaxSize": 5
   },
   "dataImportReport": true,
-  "maxTransferDurationSeconds": 3600,
+  "maxTransferDuration": "1h",
   "maxStopToShapeSnapDistance": 500,
   "osmDefaults": {
     "osmTagMapping": "norway",

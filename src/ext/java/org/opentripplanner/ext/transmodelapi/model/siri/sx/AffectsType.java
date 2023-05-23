@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.model.siri.sx;
 
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.stopConditionEnum;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.STOP_CONDITION_ENUM;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
@@ -56,7 +56,7 @@ public class AffectsType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("stopConditions")
-          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopConditionEnum))))
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(STOP_CONDITION_ENUM))))
           .build()
       )
       .build();
@@ -156,7 +156,7 @@ public class AffectsType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("stopConditions")
-          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopConditionEnum))))
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(STOP_CONDITION_ENUM))))
           .build()
       )
       .build();
@@ -226,7 +226,7 @@ public class AffectsType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("stopConditions")
-          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopConditionEnum))))
+          .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(STOP_CONDITION_ENUM))))
           .build()
       )
       .build();

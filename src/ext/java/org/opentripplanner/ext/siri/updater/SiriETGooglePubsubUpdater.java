@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
+import com.google.api.gax.rpc.NotFoundException;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Subscriber;
@@ -33,9 +34,9 @@ import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.UpdateResult;
-import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +48,9 @@ import uk.org.siri.www.siri.SiriType;
  * This class starts a Google PubSub subscription
  * <p>
  * NOTE: - Path to Google credentials (.json-file) MUST exist in environment-variable
- * "GOOGLE_APPLICATION_CREDENTIALS" as described here: https://cloud.google.com/docs/authentication/getting-started
- * - ServiceAccount need access to create subscription ("editor")
+ * "GOOGLE_APPLICATION_CREDENTIALS" as described here:
+ * https://cloud.google.com/docs/authentication/getting-started - ServiceAccount need access to
+ * create subscription ("editor")
  * <p>
  * <p>
  * <p>
@@ -71,6 +73,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private static final AtomicLong MESSAGE_COUNTER = new AtomicLong(0);
   private static final AtomicLong UPDATE_COUNTER = new AtomicLong(0);
   private static final AtomicLong SIZE_COUNTER = new AtomicLong(0);
+  private static final String SUBSCRIPTION_PREFIX = "siri-et-";
   /**
    * The URL used to fetch all initial updates
    */
@@ -85,14 +88,14 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private final java.time.Duration reconnectPeriod;
 
   /**
-   * For larger deployments it sometimes takes more than the default 30 seconds to fetch
-   * data, if so this parameter can be increased.
+   * For larger deployments it sometimes takes more than the default 30 seconds to fetch data, if so
+   * this parameter can be increased.
    */
   private final java.time.Duration initialGetDataTimeout;
 
-  private final SubscriptionAdminClient subscriptionAdminClient;
   private final ProjectSubscriptionName subscriptionName;
   private final ProjectTopicName topic;
+  private Subscriber subscriber;
   private final PushConfig pushConfig;
   private final String configRef;
   private final SiriTimetableSnapshotSource snapshotSource;
@@ -103,7 +106,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
    */
   private WriteToGraphCallback saveResultOnGraph;
 
-  private transient Instant startTime;
+  private final Instant startTime = Instant.now();
   private boolean primed;
 
   private final Consumer<UpdateResult> recordMetrics;
@@ -126,11 +129,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     this.snapshotSource = timetableSnapshot;
 
     // set subscriber
-    String subscriptionId = System.getenv("HOSTNAME");
-    if (subscriptionId == null || subscriptionId.isEmpty()) {
-      subscriptionId = "otp-" + UUID.randomUUID();
-    }
-
+    String subscriptionId = buildSubscriptionId();
     String subscriptionProjectName = config.subscriptionProjectName();
     String topicProjectName = config.topicProjectName();
 
@@ -143,28 +142,9 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     this.entityResolver = new EntityResolver(transitService, feedId);
     this.fuzzyTripMatcher =
       config.fuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
-
-    try {
-      if (
-        System.getenv("GOOGLE_APPLICATION_CREDENTIALS") != null &&
-        !System.getenv("GOOGLE_APPLICATION_CREDENTIALS").isEmpty()
-      ) {
-        // Google libraries expects path to credentials json-file is stored in environment variable "GOOGLE_APPLICATION_CREDENTIALS"
-        // Ref.: https://cloud.google.com/docs/authentication/getting-started
-
-        subscriptionAdminClient = SubscriptionAdminClient.create();
-
-        addShutdownHook();
-      } else {
-        throw new RuntimeException(
-          "Google Pubsub updater is configured, but environment variable 'GOOGLE_APPLICATION_CREDENTIALS' is not defined. " +
-          "See https://cloud.google.com/docs/authentication/getting-started"
-        );
-      }
-    } catch (IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
     recordMetrics = TripUpdateMetrics.streaming(config);
+
+    addShutdownHook();
   }
 
   @Override
@@ -173,45 +153,18 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   }
 
   @Override
-  public void run() throws IOException {
-    if (subscriptionAdminClient == null) {
-      throw new RuntimeException(
-        "Unable to initialize Google Pubsub-updater: System.getenv('GOOGLE_APPLICATION_CREDENTIALS') = " +
-        System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-      );
-    }
-
+  public void run() {
     LOG.info("Creating subscription {}", subscriptionName);
-
-    Subscription subscription = subscriptionAdminClient.createSubscription(
-      Subscription
-        .newBuilder()
-        .setTopic(topic.toString())
-        .setName(subscriptionName.toString())
-        .setPushConfig(pushConfig)
-        .setMessageRetentionDuration(
-          // How long will an unprocessed message be kept - minimum 10 minutes
-          com.google.protobuf.Duration.newBuilder().setSeconds(600).build()
-        )
-        .setExpirationPolicy(
-          ExpirationPolicy
-            .newBuilder()
-            // How long will the subscription exist when no longer in use - minimum 1 day
-            .setTtl(com.google.protobuf.Duration.newBuilder().setSeconds(86400).build())
-            .build()
-        )
-        .build()
-    );
-
+    Subscription subscription = createSubscription();
     LOG.info("Created subscription {}", subscriptionName);
-
-    startTime = Instant.now();
 
     final EstimatedTimetableMessageReceiver receiver = new EstimatedTimetableMessageReceiver();
 
     int sleepPeriod = 1000;
     int attemptCounter = 1;
-    while (!isPrimed()) { // Retrying until data is initialized successfully
+    boolean otpIsShuttingDown = false;
+
+    while (!isPrimed() && !otpIsShuttingDown) { // Retrying until data is initialized successfully
       try {
         initializeData(dataInitializationUrl, receiver);
       } catch (Exception e) {
@@ -227,13 +180,18 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         try {
           Thread.sleep(sleepPeriod);
         } catch (InterruptedException interruptedException) {
-          //Ignore
+          Thread.currentThread().interrupt();
+          otpIsShuttingDown = true;
+          LOG.info(
+            "OTP is shutting down, cancelling initialization of SIRI ET Google PubSub Updater."
+          );
         }
       }
     }
 
-    Subscriber subscriber = null;
-    while (true) {
+    subscriber = null;
+
+    while (!otpIsShuttingDown) {
       try {
         subscriber = Subscriber.newBuilder(subscription.getName(), receiver).build();
         subscriber.startAsync().awaitRunning();
@@ -247,22 +205,22 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       try {
         Thread.sleep(reconnectPeriod.toMillis());
       } catch (InterruptedException e) {
-        e.printStackTrace();
+        Thread.currentThread().interrupt();
+        otpIsShuttingDown = true;
+        LOG.info(
+          "OTP is shutting down, cancelling attempt to reconnect SIRI ET Google PubSub Updater."
+        );
       }
     }
   }
 
   @Override
   public void teardown() {
-    if (subscriptionAdminClient != null) {
-      LOG.info("Deleting subscription {}", subscriptionName);
-      subscriptionAdminClient.deleteSubscription(subscriptionName);
-      LOG.info(
-        "Subscription deleted {} - time since startup: {}",
-        subscriptionName,
-        DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
-      );
+    if (subscriber != null) {
+      LOG.info("Stopping SIRI-ET PubSub subscriber  {}", subscriptionName);
+      subscriber.stopAsync();
     }
+    deleteSubscription();
   }
 
   @Override
@@ -284,6 +242,71 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       // Handling cornercase when instance is being shut down before it has been initialized
       LOG.info("Instance is already shutting down - cleaning up immediately.", e);
       teardown();
+    }
+  }
+
+  /**
+   * Build a unique name for the subscription.
+   * This ensures that if the subscription is not properly deleted during shutdown,
+   * a restarted instance will get a fresh subscription.
+   */
+  private static String buildSubscriptionId() {
+    String hostname = System.getenv("HOSTNAME");
+    if (hostname == null || hostname.isEmpty()) {
+      return SUBSCRIPTION_PREFIX + "otp-" + UUID.randomUUID();
+    } else {
+      return SUBSCRIPTION_PREFIX + hostname + '-' + Instant.now().toEpochMilli();
+    }
+  }
+
+  private Subscription createSubscription() {
+    try (SubscriptionAdminClient subscriptionAdminClient = SubscriptionAdminClient.create()) {
+      return subscriptionAdminClient.createSubscription(
+        Subscription
+          .newBuilder()
+          .setTopic(topic.toString())
+          .setName(subscriptionName.toString())
+          .setPushConfig(pushConfig)
+          .setMessageRetentionDuration(
+            // How long will an unprocessed message be kept - minimum 10 minutes
+            com.google.protobuf.Duration.newBuilder().setSeconds(600).build()
+          )
+          .setExpirationPolicy(
+            ExpirationPolicy
+              .newBuilder()
+              // How long will the subscription exist when no longer in use - minimum 1 day
+              .setTtl(com.google.protobuf.Duration.newBuilder().setSeconds(86400).build())
+              .build()
+          )
+          .build()
+      );
+    } catch (IOException e) {
+      // Google libraries expects credentials json-file either as
+      //   Path is stored in environment variable "GOOGLE_APPLICATION_CREDENTIALS"
+      //   (https://cloud.google.com/docs/authentication/getting-started)
+      // or
+      //   Credentials are provided through "workload identity"
+      //   (https://cloud.google.com/kubernetes-engine/docs/concepts/workload-identity)
+      throw new RuntimeException(
+        "Unable to initialize Google Pubsub-updater: System.getenv('GOOGLE_APPLICATION_CREDENTIALS') = " +
+        System.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+      );
+    }
+  }
+
+  private void deleteSubscription() {
+    try (SubscriptionAdminClient subscriptionAdminClient = SubscriptionAdminClient.create()) {
+      LOG.info("Deleting subscription {}", subscriptionName);
+      subscriptionAdminClient.deleteSubscription(subscriptionName);
+      LOG.info(
+        "Subscription deleted {} - time since startup: {}",
+        subscriptionName,
+        DurationUtils.durationToStr(Duration.between(startTime, Instant.now()))
+      );
+    } catch (IOException e) {
+      LOG.error("Could not delete subscription {}", subscriptionName);
+    } catch (NotFoundException nfe) {
+      LOG.info("Subscription {} not found, ignoring deletion request", subscriptionName);
     }
   }
 
@@ -369,7 +392,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
               .get(0)
               .getEstimatedVehicleJourneies()
               .size();
-        } catch (Throwable t) {
+        } catch (Exception e) {
           //ignore
         }
         long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
@@ -390,7 +413,6 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
         var f = saveResultOnGraph.execute((graph, transitModel) -> {
           var results = snapshotSource.applyEstimatedTimetable(
-            transitModel,
             fuzzyTripMatcher,
             entityResolver,
             feedId,
@@ -404,7 +426,10 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         if (!isPrimed()) {
           try {
             f.get();
-          } catch (InterruptedException | ExecutionException e) {
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+          } catch (ExecutionException e) {
             throw new RuntimeException(e);
           }
         }

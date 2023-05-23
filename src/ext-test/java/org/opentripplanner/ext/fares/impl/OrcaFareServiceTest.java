@@ -15,6 +15,7 @@ import static org.opentripplanner.routing.core.FareType.regular;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,10 +31,11 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.model.fare.FareProductUse;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.ItineraryFares;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -42,6 +44,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 public class OrcaFareServiceTest {
 
+  public static final Currency USD = Currency.getInstance("USD");
   private static TestOrcaFareService orcaFareService;
   public static final float DEFAULT_TEST_RIDE_PRICE = 3.49f;
   private static final int DEFAULT_RIDE_PRICE_IN_CENTS = (int) (DEFAULT_TEST_RIDE_PRICE * 100);
@@ -60,8 +63,8 @@ public class OrcaFareServiceTest {
    */
   private static void calculateFare(List<Leg> legs, FareType fareType, float expectedFareInCents) {
     ItineraryFares fare = new ItineraryFares();
-    orcaFareService.populateFare(fare, null, fareType, legs, null);
-    Assertions.assertEquals(expectedFareInCents, fare.getFare(fareType).cents());
+    orcaFareService.populateFare(fare, USD, fareType, legs, null);
+    Assertions.assertEquals(expectedFareInCents, fare.getFare(fareType).amount());
   }
 
   private static void assertLegFareEquals(
@@ -74,8 +77,9 @@ public class OrcaFareServiceTest {
 
     var rideCost = legFareProducts
       .stream()
+      .map(FareProductUse::product)
       .filter(fp ->
-        fp.container().name().equals("electronic") &&
+        fp.medium().name().equals("electronic") &&
         fp.category().name().equals("regular") &&
         fp.name().equals("rideCost")
       )
@@ -83,12 +87,13 @@ public class OrcaFareServiceTest {
     if (rideCost.isEmpty()) {
       Assertions.fail("Missing leg fare product.");
     }
-    Assertions.assertEquals(fare, rideCost.get().amount().cents());
+    Assertions.assertEquals(fare, rideCost.get().price().amount());
 
     var transfer = legFareProducts
       .stream()
+      .map(FareProductUse::product)
       .filter(fp ->
-        fp.container().name().equals("electronic") &&
+        fp.medium().name().equals("electronic") &&
         fp.category().name().equals("regular") &&
         fp.name().equals("transfer")
       )
@@ -146,7 +151,7 @@ public class OrcaFareServiceTest {
   public void calculateFareByLeg() {
     List<Leg> rides = List.of(getLeg(KITSAP_TRANSIT_AGENCY_ID, 0), getLeg(COMM_TRANS_AGENCY_ID, 2));
     ItineraryFares fares = new ItineraryFares();
-    orcaFareService.populateFare(fares, null, FareType.electronicRegular, rides, null);
+    orcaFareService.populateFare(fares, USD, FareType.electronicRegular, rides, null);
 
     assertLegFareEquals(349, rides.get(0), fares, false);
     assertLegFareEquals(0, rides.get(1), fares, true);
@@ -468,7 +473,7 @@ public class OrcaFareServiceTest {
     );
 
     var fare = new ItineraryFares();
-    orcaFareService.populateFare(fare, null, type, legs, null);
+    orcaFareService.populateFare(fare, USD, type, legs, null);
     assertNotNull(fare.getFare(type));
   }
 
@@ -490,7 +495,7 @@ public class OrcaFareServiceTest {
     );
 
     var fare = new ItineraryFares();
-    orcaFareService.populateFare(fare, null, type, legs, null);
+    orcaFareService.populateFare(fare, USD, type, legs, null);
     assertNotNull(fare.getFare(type));
   }
 

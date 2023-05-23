@@ -12,9 +12,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.routing.core.ItineraryFares;
+import org.opentripplanner.transit.model.basic.Money;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 
 public class AtlantaFareService extends DefaultFareService {
@@ -25,6 +28,7 @@ public class AtlantaFareService extends DefaultFareService {
   public static final String MARTA_AGENCY_ID = "5";
   public static final String GCT_AGENCY_ID = "4";
   public static final Set<String> COBB_FREE_RIDE_SHORT_NAMES = Set.of("blue", "green");
+  private static final String FEED_ID = "atlanta";
 
   private enum TransferType {
     END_TRANSFER, // Ends this transfer entirely.
@@ -159,7 +163,7 @@ public class AtlantaFareService extends DefaultFareService {
     public float getTotal() {
       int total = 0;
       for (ItineraryFares f : fares) {
-        total += f.getFare(fareType).cents();
+        total += f.getFare(fareType).amount();
       }
       return (float) total / 100;
     }
@@ -384,7 +388,17 @@ public class AtlantaFareService extends DefaultFareService {
       cost += transfer.getTotal();
     }
 
-    fare.addFare(fareType, getMoney(currency, cost));
+    final Money money = getMoney(currency, cost);
+    fare.addFare(fareType, money);
+    var fareProduct = new FareProduct(
+      new FeedScopedId(FEED_ID, fareType.name()),
+      fareType.name(),
+      money,
+      null,
+      null,
+      null
+    );
+    fare.addItineraryProducts(List.of(fareProduct));
 
     return true;
   }

@@ -1,13 +1,12 @@
 package org.opentripplanner.street.model.edge;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -18,7 +17,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
-class VehicleParkingEdgeTest extends GraphRoutingTest {
+class VehicleParkingEdgeTest {
 
   Graph graph;
   VehicleParkingEdge vehicleParkingEdge;
@@ -29,18 +28,18 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
   public void availableCarPlacesTest() {
     initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true);
 
-    State s1 = traverse();
+    var s1 = traverse();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
   public void notAvailableCarPlacesTest() {
     initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, false);
 
-    State s1 = traverse();
+    var s1 = traverse();
 
-    assertNull(s1);
+    assertTrue(State.isEmpty(s1));
   }
 
   @Test
@@ -53,18 +52,18 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
       true
     );
 
-    State s1 = traverse();
+    var s1 = traverse();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
   public void realtimeAvailableCarPlacesFallbackTest() {
     initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true, null, true);
 
-    State s1 = traverse();
+    var s1 = traverse();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
@@ -77,27 +76,27 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
       true
     );
 
-    State s1 = traverse();
+    var s1 = traverse();
 
-    assertNull(s1);
+    assertTrue(State.isEmpty(s1));
   }
 
   @Test
   public void availableBicyclePlacesTest() {
     initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false);
 
-    State s1 = traverse();
+    var s1 = traverse();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
   public void notAvailableBicyclePlacesTest() {
     initEdgeAndRequest(StreetMode.BIKE_TO_PARK, false, false);
 
-    State s1 = traverse();
+    var s1 = traverse();
 
-    assertNull(s1);
+    assertTrue(State.isEmpty(s1));
   }
 
   @Test
@@ -110,18 +109,18 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
       true
     );
 
-    State s1 = traverse();
+    var s1 = traverse();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
   public void realtimeAvailableBicyclePlacesFallbackTest() {
     initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false, null, true);
 
-    State s1 = traverse();
+    var s1 = traverse();
 
-    assertNotNull(s1);
+    assertFalse(State.isEmpty(s1));
   }
 
   @Test
@@ -134,9 +133,9 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
       true
     );
 
-    State s1 = traverse();
+    var s1 = traverse();
 
-    assertNull(s1);
+    assertTrue(State.isEmpty(s1));
   }
 
   private void initEdgeAndRequest(
@@ -190,7 +189,7 @@ class VehicleParkingEdgeTest extends GraphRoutingTest {
         .coordinate(new WgsCoordinate(0, 0));
   }
 
-  private State traverse() {
+  private State[] traverse() {
     return vehicleParkingEdge.traverse(new State(vertex, request));
   }
 }

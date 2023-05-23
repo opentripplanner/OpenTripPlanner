@@ -36,6 +36,10 @@ public interface RaptorTestConstants {
   int T00_40 = hm2time(0, 40);
   int T01_00 = hm2time(1, 0);
 
+  int TX_0 = 0;
+  int TX_1 = 1;
+  int TX_2 = 2;
+
   // Stop indexes - Note! There is no stop defined for index 0(zero)! You must
   // account for that in the test if you uses a stop index.
   int STOP_A = 1;
@@ -46,6 +50,7 @@ public interface RaptorTestConstants {
   int STOP_F = 6;
   int STOP_G = 7;
   int STOP_H = 8;
+  int STOP_I = 9;
 
   // Stop position in pattern
   int STOP_POS_0 = 0;

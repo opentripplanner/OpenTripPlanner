@@ -8,9 +8,10 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
-import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.UpdateResult;
-import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.ResultLogger;
+import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,16 +20,7 @@ import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 
 /**
- * Update OTP stop time tables from some (realtime) source
- * <p>
- * Usage example ('rt' name is an example) in file 'Graph.properties':
- *
- * <pre>
- * rt.type = stop-time-updater
- * rt.frequencySec = 60
- * rt.url = http://host.tld/path
- * rt.feedId = TA
- * </pre>
+ * Update OTP stop timetables from some a Siri-ET HTTP sources.
  */
 public class SiriETUpdater extends PollingGraphUpdater {
 
@@ -65,7 +57,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
   ) {
     super(config);
     // Create update streamer from preferences
-    this.feedId = config.getFeedId();
+    this.feedId = config.feedId();
 
     this.updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters());
 
@@ -75,7 +67,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     TransitService transitService = new DefaultTransitService(transitModel);
     this.entityResolver = new EntityResolver(transitService, feedId);
     this.fuzzyTripMatcher =
-      config.isFuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
+      config.fuzzyTripMatching() ? SiriFuzzyTripMatcher.of(transitService) : null;
 
     LOG.info(
       "Creating stop time updater (SIRI ET) running every {} seconds : {}",
@@ -110,13 +102,13 @@ public class SiriETUpdater extends PollingGraphUpdater {
         if (etds != null) {
           saveResultOnGraph.execute((graph, transitModel) -> {
             var result = snapshotSource.applyEstimatedTimetable(
-              transitModel,
               fuzzyTripMatcher,
               entityResolver,
               feedId,
               fullDataset,
               etds
             );
+            ResultLogger.logUpdateResult(feedId, "siri-et", result);
             recordMetrics.accept(result);
             if (markPrimed) primed = true;
           });

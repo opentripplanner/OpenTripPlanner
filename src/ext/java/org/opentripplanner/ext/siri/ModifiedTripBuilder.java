@@ -2,7 +2,7 @@ package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.model.PickDrop.NONE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.ext.siri.mapper.PickDropMapper;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.UpdateError;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -20,6 +20,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.updater.spi.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.UpdateError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
@@ -96,7 +98,7 @@ public class ModifiedTripBuilder {
 
     StopPattern stopPattern = createStopPattern(pattern, calls, entityResolver);
 
-    if (cancellation || stopPattern.isAllStopsCancelled()) {
+    if (cancellation || stopPattern.isAllStopsNonRoutable()) {
       LOG.debug("Trip is cancelled");
       newTimes.cancelTrip();
       return Result.success(new TripUpdate(pattern.getStopPattern(), newTimes, serviceDate));
@@ -112,15 +114,16 @@ public class ModifiedTripBuilder {
       newTimes.setRealTimeState(RealTimeState.MODIFIED);
     }
 
-    var result = newTimes.validateNonIncreasingTimes();
-    if (result.isFailure()) {
-      var updateError = result.failureValue();
+    var error = newTimes.validateNonIncreasingTimes();
+    if (error.isPresent()) {
+      var updateError = error.get();
+      final FeedScopedId id = newTimes.getTrip().getId();
       LOG.info(
         "TripTimes are non-increasing after applying SIRI delay propagation - Trip {}. Stop index {}",
-        updateError.tripId(),
+        id,
         updateError.stopIndex()
       );
-      return Result.failure(updateError);
+      return TripTimesValidationMapper.toResult(id, updateError);
     }
 
     if (newTimes.getNumStops() != pattern.numberOfStops()) {

@@ -18,6 +18,12 @@ class NoopDataImportIssueStore implements DataImportIssueStore {
   public void add(String type, String message, Object... arguments) {}
 
   @Override
+  public void startProcessingSource(String source) {}
+
+  @Override
+  public void stopProcessingSource() {}
+
+  @Override
   public List<DataImportIssue> listIssues() {
     return List.of();
   }

@@ -38,13 +38,13 @@ The information is downloaded in a single HTTP request and polled regularly.
 
 | Config Parameter          |       Type      | Summary                                                                      |  Req./Opt. | Default Value | Since |
 |---------------------------|:---------------:|------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "REAL_TIME_ALERTS" |      `enum`     | The type of the updater.                                                     | *Required* |               |  1.5  |
+| type = "real-time-alerts" |      `enum`     | The type of the updater.                                                     | *Required* |               |  1.5  |
 | earlyStartSec             |    `integer`    | How long before the posted start of an event it should be displayed to users | *Optional* | `0`           |  1.5  |
 | feedId                    |     `string`    | The id of the feed to apply the alerts to.                                   | *Optional* |               |  1.5  |
 | frequencySec              |    `integer`    | How often the URL should be fetched.                                         | *Optional* | `60`          |  1.5  |
 | fuzzyTripMatching         |    `boolean`    | Whether to match trips fuzzily.                                              | *Optional* | `false`       |  1.5  |
 | url                       |     `string`    | URL to fetch the GTFS-RT feed from.                                          | *Required* |               |  1.5  |
-| [headers](#u_0_headers)   | `map of string` | Extra headers to add to the HTTP request fetching the data.                  | *Optional* |               |  2.3  |
+| [headers](#u_0_headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.   | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
@@ -54,7 +54,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[0] 
 
-Extra headers to add to the HTTP request fetching the data.
+HTTP headers to add to the request. Any header key, value can be inserted.
 
 
 
@@ -89,15 +89,15 @@ The information is downloaded in a single HTTP request and polled regularly.
 <!-- stop-time-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                                      |       Type      | Summary                                                     |  Req./Opt. | Default Value        | Since |
-|-----------------------------------------------------------------------|:---------------:|-------------------------------------------------------------|:----------:|----------------------|:-----:|
-| type = "STOP_TIME_UPDATER"                                            |      `enum`     | The type of the updater.                                    | *Required* |                      |  1.5  |
-| [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                | *Optional* | `"required-no-data"` |  2.2  |
-| feedId                                                                |     `string`    | Which feed the updates apply to.                            | *Optional* |                      |  1.5  |
-| frequencySec                                                          |    `integer`    | How often the data should be downloaded in seconds.         | *Optional* | `60`                 |  1.5  |
-| fuzzyTripMatching                                                     |    `boolean`    | If the trips should be matched fuzzily.                     | *Optional* | `false`              |  1.5  |
-| url                                                                   |     `string`    | The URL of the GTFS-RT resource.                            | *Required* |                      |  1.5  |
-| [headers](#u__5__headers)                                             | `map of string` | Extra headers to add to the HTTP request fetching the data. | *Optional* |                      |  2.3  |
+| Config Parameter                                                      |       Type      | Summary                                                                    |  Req./Opt. | Default Value        | Since |
+|-----------------------------------------------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|----------------------|:-----:|
+| type = "stop-time-updater"                                            |      `enum`     | The type of the updater.                                                   | *Required* |                      |  1.5  |
+| [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                               | *Optional* | `"required-no-data"` |  2.2  |
+| feedId                                                                |     `string`    | Which feed the updates apply to.                                           | *Optional* |                      |  1.5  |
+| frequencySec                                                          |    `integer`    | How often the data should be downloaded in seconds.                        | *Optional* | `60`                 |  1.5  |
+| fuzzyTripMatching                                                     |    `boolean`    | If the trips should be matched fuzzily.                                    | *Optional* | `false`              |  1.5  |
+| [url](#u__5__url)                                                     |     `string`    | The URL of the GTFS-RT resource.                                           | *Required* |                      |  1.5  |
+| [headers](#u__5__headers)                                             | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |                      |  2.3  |
 
 
 ##### Parameter details
@@ -124,12 +124,21 @@ How backwards propagation should be handled.
   The updated times are exposed through APIs.
 
 
+<h4 id="u__5__url">url</h4>
+
+**Since version:** `1.5` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[5] 
+
+The URL of the GTFS-RT resource.
+
+`file:` URLs are also supported if you want to read a file from the local disk.
+
 <h4 id="u__5__headers">headers</h4>
 
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[5] 
 
-Extra headers to add to the HTTP request fetching the data.
+HTTP headers to add to the request. Any header key, value can be inserted.
 
 
 
@@ -170,7 +179,7 @@ file.
 
 | Config Parameter                                                      |    Type   | Summary                  |  Req./Opt. | Default Value        | Since |
 |-----------------------------------------------------------------------|:---------:|--------------------------|:----------:|----------------------|:-----:|
-| type = "WEBSOCKET_GTFS_RT_UPDATER"                                    |   `enum`  | The type of the updater. | *Required* |                      |  1.5  |
+| type = "websocket-gtfs-rt-updater"                                    |   `enum`  | The type of the updater. | *Required* |                      |  1.5  |
 | [backwardsDelayPropagationType](#u__7__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |  1.5  |
 | feedId                                                                |  `string` | TODO                     | *Optional* |                      |  1.5  |
 | reconnectPeriodSec                                                    | `integer` | TODO                     | *Optional* | `60`                 |  1.5  |
@@ -214,13 +223,13 @@ The information is downloaded in a single HTTP request and polled regularly.
 <!-- vehicle-positions BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter           |       Type      | Summary                                                                   |  Req./Opt. | Default Value | Since |
-|----------------------------|:---------------:|---------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_POSITIONS" |      `enum`     | The type of the updater.                                                  | *Required* |               |  1.5  |
-| feedId                     |     `string`    | Feed ID to which the update should be applied.                            | *Required* |               |  2.2  |
-| frequencySec               |    `integer`    | How often the positions should be updated.                                | *Optional* | `60`          |  2.2  |
-| url                        |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from. | *Required* |               |  2.2  |
-| [headers](#u__6__headers)  | `map of string` | Extra headers to add to the HTTP request fetching the data.               | *Optional* |               |  2.3  |
+| Config Parameter           |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
+|----------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "vehicle-positions" |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| feedId                     |     `string`    | Feed ID to which the update should be applied.                             | *Required* |               |  2.2  |
+| frequencySec               |    `integer`    | How often the positions should be updated.                                 | *Optional* | `60`          |  2.2  |
+| url                        |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from.  | *Required* |               |  2.2  |
+| [headers](#u__6__headers)  | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
@@ -230,7 +239,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 **Since version:** `2.3` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /updaters/[6] 
 
-Extra headers to add to the HTTP request fetching the data.
+HTTP headers to add to the request. Any header key, value can be inserted.
 
 
 
@@ -270,12 +279,13 @@ partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.
 
 | Config Parameter                                                                      |       Type      | Summary                                                                         |  Req./Opt. | Default Value | Since |
 |---------------------------------------------------------------------------------------|:---------------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "VEHICLE_RENTAL"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |  1.5  |
-| [allowKeepingRentedBicycleAtDestination](#u_1_allowKeepingRentedBicycleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |  2.1  |
+| type = "vehicle-rental"                                                               |      `enum`     | The type of the updater.                                                        | *Required* |               |  1.5  |
+| [allowKeepingRentedVehicleAtDestination](#u_1_allowKeepingRentedVehicleAtDestination) |    `boolean`    | If a vehicle should be allowed to be kept at the end of a station-based rental. | *Optional* | `false`       |  2.1  |
 | frequencySec                                                                          |    `integer`    | How often the data should be updated in seconds.                                | *Optional* | `60`          |  1.5  |
 | [geofencingZones](#u_1_geofencingZones)                                               |    `boolean`    | Compute rental restrictions based on GBFS 2.2 geofencing zones.                 | *Optional* | `false`       |  2.3  |
 | language                                                                              |     `string`    | TODO                                                                            | *Optional* |               |  2.1  |
 | [network](#u_1_network)                                                               |     `string`    | The name of the network to override the one derived from the source data.       | *Optional* |               |  1.5  |
+| overloadingAllowed                                                                    |    `boolean`    | Allow leaving vehicles at a station even though there are no free slots.        | *Optional* | `false`       |  2.2  |
 | [sourceType](#u_1_sourceType)                                                         |      `enum`     | What source of vehicle rental updater to use.                                   | *Required* |               |  1.5  |
 | url                                                                                   |     `string`    | The URL to download the data from.                                              | *Required* |               |  1.5  |
 | [headers](#u_1_headers)                                                               | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |  1.5  |
@@ -283,21 +293,21 @@ partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.
 
 ##### Parameter details
 
-<h4 id="u_1_allowKeepingRentedBicycleAtDestination">allowKeepingRentedBicycleAtDestination</h4>
+<h4 id="u_1_allowKeepingRentedVehicleAtDestination">allowKeepingRentedVehicleAtDestination</h4>
 
 **Since version:** `2.1` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
 **Path:** /updaters/[1] 
 
 If a vehicle should be allowed to be kept at the end of a station-based rental.
 
-In some cases it may be useful to not drop off the rented bicycle before arriving at the destination.
-This is useful if bicycles may only be rented for round trips, or the destination is an intermediate place.
+In some cases it may be useful to not drop off the rented vehicle before arriving at the destination.
+This is useful if vehicles may only be rented for round trips, or the destination is an intermediate place.
 
 For this to be possible three things need to be configured:
 
- - In the updater configuration `allowKeepingRentedBicycleAtDestination` should be set to `true`.
- - `allowKeepingRentedBicycleAtDestination` should also be set for each request, either using routing defaults, or per-request.
- - If keeping the bicycle at the destination should be discouraged, then `keepingRentedBicycleAtDestinationCost` (default: 0) may also be set in the routing defaults.
+ - In the updater configuration `allowKeepingRentedVehicleAtDestination` should be set to `true`.
+ - `allowKeepingRentedVehicleAtDestination` should also be set for each request, either using routing defaults, or per-request.
+ - If keeping the vehicle at the destination should be discouraged, then `keepingRentedVehicleAtDestinationCost` (default: 0) may also be set in the routing defaults.
 
 
 <h4 id="u_1_geofencingZones">geofencingZones</h4>
@@ -326,7 +336,7 @@ GBFS feeds must include a system_id which will be used as the default `network`.
 
 **Since version:** `1.5` ∙ **Type:** `enum` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[1]   
-**Enum values:** `gbfs` | `smoove` | `vilkku`
+**Enum values:** `gbfs` | `smoove`
 
 What source of vehicle rental updater to use.
 
@@ -351,7 +361,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "sourceType" : "gbfs",
       "language" : "en",
       "frequencySec" : 60,
-      "allowKeepingRentedBicycleAtDestination" : false,
+      "allowKeepingRentedVehicleAtDestination" : false,
       "geofencingZones" : false,
       "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
       "headers" : {
@@ -367,23 +377,8 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 ## Other updaters in sandboxes
 
-### Vehicle parking
-
-Vehicle parking options and configuration is documented in
-its [sandbox documentation](sandbox/VehicleParking.md).
-
-<!-- INSERT: vehicle-parking -->
-
-
-### SIRI SX updater for Azure Service Bus
-
-This is a Sandbox updater, see [sandbox documentation](sandbox/SiriAzureUpdater.md).
-
-<!-- INSERT: siri-azure-sx-updater -->
-
-
-### Vehicle Rental Service Directory configuration
-
-To configure and url for
-the [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md).
+- [Vehicle parking](sandbox/VehicleParking.md)
+- [Siri over HTTP](sandbox/SiriUpdater.md)
+- [Siri over Azure Message Bus](sandbox/SiriAzureUpdater.md)
+- [VehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)
 

@@ -171,16 +171,6 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return new Coordinate(getX(), getY());
   }
 
-  /** Get the bearing, in degrees, between this vertex and another coordinate. */
-  public double azimuthTo(Coordinate other) {
-    return DirectionUtils.getAzimuth(getCoordinate(), other);
-  }
-
-  /** Get the bearing, in degrees, between this vertex and another. */
-  public double azimuthTo(Vertex other) {
-    return azimuthTo(other.getCoordinate());
-  }
-
   public List<StreetEdge> getIncomingStreetEdges() {
     List<StreetEdge> result = new ArrayList<>();
     for (Edge out : this.getIncoming()) {
@@ -201,6 +191,23 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
       result.add((StreetEdge) out);
     }
     return result;
+  }
+
+  /**
+   * Returns true if vertex is connected to another one by an edge
+   */
+  public boolean isConnected(Vertex v) {
+    for (Edge e : outgoing) {
+      if (e.getToVertex() == v) {
+        return true;
+      }
+    }
+    for (Edge e : incoming) {
+      if (e.getFromVertex() == v) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean rentalTraversalBanned(State currentState) {

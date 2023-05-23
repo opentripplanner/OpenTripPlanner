@@ -10,14 +10,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
+import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
@@ -34,6 +35,7 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSame
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.street.search.TraverseMode;
@@ -46,11 +48,12 @@ import org.opentripplanner.transit.model.site.Station;
 public class ItineraryListFilterChainBuilder {
 
   private static final int NOT_SET = -1;
+  public static final String MAX_NUMBER_OF_ITINERARIES_TAG = "number-of-itineraries-filter";
 
   private final SortOrder sortOrder;
   private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
 
-  private boolean debug = false;
+  private ItineraryFilterDebugProfile debug = ItineraryFilterDebugProfile.OFF;
   private int maxNumberOfItineraries = NOT_SET;
   private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
   private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
@@ -69,6 +72,9 @@ public class ItineraryListFilterChainBuilder {
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
+
+  @Sandbox
+  private ItineraryListFilter rideHailingFilter;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -197,14 +203,14 @@ public class ItineraryListFilterChainBuilder {
    * This will NOT delete itineraries, but tag them as deleted using the {@link
    * Itinerary#getSystemNotices()}.
    */
-  public ItineraryListFilterChainBuilder withDebugEnabled(boolean value) {
+  public ItineraryListFilterChainBuilder withDebugEnabled(ItineraryFilterDebugProfile value) {
     this.debug = value;
     return this;
   }
 
   /**
-   * Max departure time. This is a absolute filter on the itinerary departure time from the origin.
-   * The filter is ignored if the value is {@code null}.
+   * Max departure time(end of search-window). This is an absolute filter on the itinerary
+   * departure time from the origin. The filter is ignored if the value is {@code null}.
    */
   public ItineraryListFilterChainBuilder withLatestDepartureTimeLimit(
     Instant latestDepartureTimeLimit
@@ -272,6 +278,11 @@ public class ItineraryListFilterChainBuilder {
     boolean remove
   ) {
     this.removeItinerariesWithSameRoutesAndStops = remove;
+    return this;
+  }
+
+  public ItineraryListFilterChainBuilder withRideHailingFilter(ItineraryListFilter filter) {
+    this.rideHailingFilter = filter;
     return this;
   }
 
@@ -346,7 +357,7 @@ public class ItineraryListFilterChainBuilder {
 
       if (latestDepartureTimeLimit != null) {
         filters.add(
-          new DeletionFlaggingFilter(new LatestDepartureTimeFilter(latestDepartureTimeLimit))
+          new DeletionFlaggingFilter(new OutsideSearchWindowFilter(latestDepartureTimeLimit))
         );
       }
 
@@ -373,7 +384,7 @@ public class ItineraryListFilterChainBuilder {
       filters.add(
         new DeletionFlaggingFilter(
           new MaxLimitFilter(
-            "number-of-itineraries-filter",
+            MAX_NUMBER_OF_ITINERARIES_TAG,
             maxNumberOfItineraries,
             maxNumberOfItinerariesCrop,
             maxLimitReachedSubscriber
@@ -385,7 +396,13 @@ public class ItineraryListFilterChainBuilder {
     // Do the final itineraries sort
     filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
 
-    return new ItineraryListFilterChain(filters, debug);
+    if (rideHailingFilter != null) {
+      filters.add(rideHailingFilter);
+    }
+
+    var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
+
+    return new ItineraryListFilterChain(filters, debugHandler);
   }
 
   public ItineraryListFilterChainBuilder withTransitAlerts(

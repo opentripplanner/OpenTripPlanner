@@ -6,6 +6,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
+import static org.opentripplanner.standalone.config.routerequest.VehicleRentalConfig.setVehicleRental;
 import static org.opentripplanner.standalone.config.routerequest.WheelchairConfig.mapWheelchairPreferences;
 
 import java.time.Duration;
@@ -21,24 +22,19 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
-import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RouteRequestConfig {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RouteRequestConfig.class);
   private static final String WHEELCHAIR_ACCESSIBILITY = "wheelchairAccessibility";
 
-  public static RouteRequest mapDefaultRouteRequest(NodeAdapter root, String parameterName) {
+  public static RouteRequest mapDefaultRouteRequest(String parameterName, NodeAdapter root) {
     var c = root
       .of(parameterName)
       .since(V2_0)
@@ -49,29 +45,20 @@ public class RouteRequestConfig {
   }
 
   public static RouteRequest mapRouteRequest(NodeAdapter c) {
-    RouteRequest dft = new RouteRequest();
+    return mapRouteRequest(c, new RouteRequest());
+  }
 
+  public static RouteRequest mapRouteRequest(NodeAdapter c, RouteRequest dft) {
     if (c.isEmpty()) {
       return dft;
     }
 
-    LOG.debug("Loading default routing parameters from JSON.");
-    RouteRequest request = new RouteRequest();
-    VehicleRentalRequest vehicleRental = request.journey().rental();
+    RouteRequest request = dft.clone();
     VehicleParkingRequest vehicleParking = request.journey().parking();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
 
-    vehicleRental.setAllowedNetworks(
-      c
-        .of("allowedVehicleRentalNetworks")
-        .since(V2_1)
-        .summary(
-          "The vehicle rental networks which may be used. If empty all networks may be used."
-        )
-        .asStringSet(vehicleRental.allowedNetworks())
-    );
     request.setArriveBy(
       c
         .of("arriveBy")
@@ -79,29 +66,6 @@ public class RouteRequestConfig {
         .summary("Whether the trip should depart or arrive at the specified date and time.")
         .asBoolean(dft.arriveBy())
     );
-
-    vehicleRental.setBannedNetworks(
-      c
-        .of("bannedVehicleRentalNetworks")
-        .since(V2_1)
-        .summary(
-          "he vehicle rental networks which may not be used. If empty, no networks are banned."
-        )
-        .asStringSet(vehicleRental.bannedNetworks())
-    );
-
-    request
-      .journey()
-      .rental()
-      .setAllowArrivingInRentedVehicleAtDestination(
-        c
-          .of("allowKeepingRentedBicycleAtDestination")
-          .since(V2_2)
-          .summary(
-            "If a vehicle should be allowed to be kept at the end of a station-based rental."
-          )
-          .asBoolean(request.journey().rental().allowArrivingInRentedVehicleAtDestination())
-      );
 
     request.setLocale(c.of("locale").since(V2_0).summary("TODO").asLocale(dft.locale()));
 
@@ -242,21 +206,25 @@ travel time `x` (in seconds).
       );
 
     // Map preferences
-    request.withPreferences(preferences -> mapPreferences(c, preferences));
+    request.withPreferences(preferences -> mapPreferences(c, request, preferences));
 
     return request;
   }
 
-  private static void mapPreferences(NodeAdapter c, RoutingPreferences.Builder preferences) {
+  private static void mapPreferences(
+    NodeAdapter c,
+    RouteRequest request,
+    RoutingPreferences.Builder preferences
+  ) {
     preferences.withTransit(it -> mapTransitPreferences(c, it));
     preferences.withBike(it -> mapBikePreferences(c, it));
-    preferences.withRental(it -> mapRentalPreferences(c, it));
     preferences.withStreet(it -> mapStreetPreferences(c, it));
     preferences.withCar(it -> mapCarPreferences(c, it));
     preferences.withSystem(it -> mapSystemPreferences(c, it));
+    preferences.withRental(it -> setVehicleRental(c, request, it));
     preferences.withTransfer(it -> mapTransferPreferences(c, it));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
-    preferences.withWheelchair(mapWheelchairPreferences(c, WHEELCHAIR_ACCESSIBILITY));
+    preferences.withWheelchair(it -> mapWheelchairPreferences(c, it, WHEELCHAIR_ACCESSIBILITY));
     preferences.withItineraryFilter(it -> mapItineraryFilterParams("itineraryFilters", c, it));
   }
 
@@ -496,60 +464,6 @@ ferries, where the check-in process needs to be done in good time before ride.
       );
   }
 
-  private static void mapRentalPreferences(
-    NodeAdapter c,
-    VehicleRentalPreferences.Builder builder
-  ) {
-    var dft = builder.original();
-    builder
-      .withDropoffCost(
-        c
-          .of("bikeRentalDropoffCost")
-          .since(V2_0)
-          .summary("Cost to drop-off a rented bike.")
-          .asInt(dft.dropoffCost())
-      )
-      .withDropoffTime(
-        c
-          .of("bikeRentalDropoffTime")
-          .since(V2_0)
-          .summary("Time to drop-off a rented bike.")
-          .asInt(dft.dropoffTime())
-      )
-      .withPickupCost(
-        c
-          .of("bikeRentalPickupCost")
-          .since(V2_0)
-          .summary("Cost to rent a bike.")
-          .asInt(dft.pickupCost())
-      )
-      .withPickupTime(
-        c
-          .of("bikeRentalPickupTime")
-          .since(V2_0)
-          .summary("Time to rent a bike.")
-          .asInt(dft.pickupTime())
-      )
-      .withUseAvailabilityInformation(
-        c
-          .of("useBikeRentalAvailabilityInformation")
-          .since(V2_0)
-          .summary(
-            "Whether or not bike rental availability information will be used to plan bike rental trips."
-          )
-          .asBoolean(dft.useAvailabilityInformation())
-      )
-      .withArrivingInRentalVehicleAtDestinationCost(
-        c
-          .of("keepingRentedBicycleAtDestinationCost")
-          .since(V2_2)
-          .summary(
-            "The cost of arriving at the destination with the rented bicycle, to discourage doing so."
-          )
-          .asDouble(dft.arrivingInRentalVehicleAtDestinationCost())
-      );
-  }
-
   private static void mapStreetPreferences(NodeAdapter c, StreetPreferences.Builder builder) {
     var dft = builder.original();
     builder
@@ -659,6 +573,25 @@ do not exist."
           .since(V2_2)
           .summary("The model that computes the costs of turns.")
           .asEnum(dft.intersectionTraversalModel())
+      )
+      .withRoutingTimeout(
+        c
+          .of("streetRoutingTimeout")
+          .since(V2_2)
+          .summary(
+            "The maximum time a street routing request is allowed to take before returning the " +
+            "results."
+          )
+          .description(
+            """
+The street search(AStar) aborts after this duration and any paths found are returned to the client.
+The street part of the routing may take a long time if searching very long distances. You can set
+the street routing timeout to avoid tying up server resources on pointless searches and ensure that
+your users receive a timely response. You can also limit the max duration. There are is also a
+'apiProcessingTimeout'. Make sure the street timeout is less than the 'apiProcessingTimeout'.
+            """
+          )
+          .asDuration(dft.routingTimeout())
       );
   }
 

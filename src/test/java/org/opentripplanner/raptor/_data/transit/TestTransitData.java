@@ -1,5 +1,9 @@
 package org.opentripplanner.raptor._data.transit;
 
+import static org.opentripplanner.raptor._data.transit.TestRoute.route;
+import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
+import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
@@ -17,10 +21,10 @@ import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
-import org.opentripplanner.raptor.spi.CostCalculator;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorPathConstrainedTransferSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
@@ -96,7 +100,7 @@ public class TestTransitData
   }
 
   @Override
-  public CostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
+  public RaptorCostCalculator<TestTripSchedule> multiCriteriaCostCalculator() {
     return CostCalculatorFactory.createCostCalculator(
       costParamsBuilder.build(),
       stopBoardAlightCost()
@@ -217,6 +221,19 @@ public class TestTransitData
       routeIndexesByStopIndex.get(stopIndex).add(routeIndex);
     }
     return this;
+  }
+
+  /**
+   * Same as:
+   * <pre>
+   * withRoute(
+   *   route(pattern(routeName, stopIndexes))
+   *     .withTimetable(schedule().times(times))
+   * )
+   * </pre>
+   */
+  public TestTransitData withTransit(String routeName, String times, int... stopIndexes) {
+    return withRoute(route(pattern(routeName, stopIndexes)).withTimetable(schedule().times(times)));
   }
 
   public TestTransitData withRoutes(TestRoute... routes) {

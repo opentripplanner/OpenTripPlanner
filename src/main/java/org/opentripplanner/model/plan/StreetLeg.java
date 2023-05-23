@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -35,7 +36,6 @@ public class StreetLeg implements Leg {
   private final Boolean walkingBike;
   private final Boolean rentedVehicle;
   private final String vehicleRentalNetwork;
-
   private final Float accessibilityScore;
 
   public StreetLeg(StreetLegBuilder builder) {
@@ -171,6 +171,16 @@ public class StreetLeg implements Leg {
       .withStartTime(startTime.plus(duration))
       .withEndTime(endTime.plus(duration))
       .build();
+  }
+
+  @Override
+  public void setFareProducts(List<FareProductUse> products) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public List<FareProductUse> fareProducts() {
+    return List.of();
   }
 
   public StreetLeg withAccessibilityScore(float accessibilityScore) {

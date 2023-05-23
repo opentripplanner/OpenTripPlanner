@@ -1,10 +1,11 @@
 package org.opentripplanner.standalone.api;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Duration;
+import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.inspector.raster.TileRendererManager;
@@ -23,7 +24,6 @@ import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.service.TransitService;
-import org.slf4j.Logger;
 
 /**
  * The purpose of this class is to allow APIs (HTTP Resources) to access the OTP Server Context.
@@ -90,15 +90,9 @@ public interface OtpServerRequestContext {
 
   RaptorTuningParameters raptorTuningParameters();
 
-  Duration streetRoutingTimeout();
+  List<RideHailingService> rideHailingServices();
 
   MeterRegistry meterRegistry();
-
-  /**
-   * Separate logger for incoming requests. This should be handled with a Logback logger rather than
-   * something simple like a PrintStream because requests come in multi-threaded.
-   */
-  Logger requestLogger();
 
   /** Inspector/debug services */
   TileRendererManager tileRendererManager();

@@ -114,9 +114,14 @@ public class TimeUtils {
     return timeToStrCompact((int) duration.toSeconds());
   }
 
-  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
+  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59. */
   public static String timeToStrCompact(int time, int notSetValue) {
-    return time == notSetValue ? "" : RelativeTime.ofSeconds(time).toCompactStr();
+    return timeToStrCompact(time, notSetValue, "");
+  }
+
+  /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */
+  public static String timeToStrCompact(int time, int notSetValue, String notSetText) {
+    return time == notSetValue ? notSetText : RelativeTime.ofSeconds(time).toCompactStr();
   }
 
   /** Format string on format [H]H:MM[:SS]. Examples: 0:00, 8:31:11, 9:31 and 23:59:59.  */

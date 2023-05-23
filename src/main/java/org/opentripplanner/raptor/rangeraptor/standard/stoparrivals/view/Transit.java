@@ -1,9 +1,13 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
+import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
+
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.TransitPathView;
 import org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 final class Transit<T extends RaptorTripSchedule>
   extends StopArrivalViewAdapter<T>
@@ -19,6 +23,16 @@ final class Transit<T extends RaptorTripSchedule>
   }
 
   @Override
+  public int c1() {
+    return RaptorCostCalculator.ZERO_COST;
+  }
+
+  @Override
+  public int c2() {
+    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
+  }
+
+  @Override
   public int arrivalTime() {
     return arrival.onBoardArrivalTime();
   }
@@ -29,8 +43,8 @@ final class Transit<T extends RaptorTripSchedule>
   }
 
   @Override
-  public boolean arrivedByTransit() {
-    return true;
+  public PathLegType arrivedBy() {
+    return TRANSIT;
   }
 
   @Override
@@ -50,5 +64,10 @@ final class Transit<T extends RaptorTripSchedule>
 
   public int boardTime() {
     return arrival.boardTime();
+  }
+
+  @Override
+  public boolean arrivedOnBoard() {
+    return true;
   }
 }

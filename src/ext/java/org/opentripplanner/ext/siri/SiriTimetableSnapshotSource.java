@@ -1,15 +1,15 @@
 package org.opentripplanner.ext.siri;
 
 import static java.lang.Boolean.TRUE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NOT_MONITORED;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_TRIP_ID;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.UNKNOWN;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_MONITORED;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_TRIP_ID;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN;
 
+import java.time.Duration;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -17,8 +17,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
-import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -29,7 +27,9 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
-import org.opentripplanner.updater.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -64,7 +64,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * messages.
    */
   private final SiriTripPatternCache tripPatternCache;
-  private final ZoneId timeZone;
+  private final TransitModel transitModel;
 
   private final TransitService transitService;
   private final TransitLayerUpdater transitLayerUpdater;
@@ -74,7 +74,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
    */
-  private final int maxSnapshotFrequency;
+  private final Duration maxSnapshotFrequency;
 
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
@@ -92,10 +92,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     TimetableSnapshotSourceParameters parameters,
     TransitModel transitModel
   ) {
-    this.timeZone = transitModel.getTimeZone();
+    this.transitModel = transitModel;
     this.transitService = new DefaultTransitService(transitModel);
     this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
-    this.maxSnapshotFrequency = parameters.maxSnapshotFrequencyMs();
+    this.maxSnapshotFrequency = parameters.maxSnapshotFrequency();
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.tripPatternCache =
       new SiriTripPatternCache(tripPatternIdGenerator, transitService::getPatternForTrip);
@@ -135,13 +135,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
    *
-   * @param transitModel transitModel to update (needed for adding/changing stop patterns)
    * @param fullDataset  true iff the list with updates represent all updates that are active right
    *                     now, i.e. all previous updates should be disregarded
    * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
    */
   public UpdateResult applyEstimatedTimetable(
-    TransitModel transitModel,
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,
     EntityResolver entityResolver,
     String feedId,
@@ -222,12 +220,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
       /* commit */
       return addTripToGraphAndBuffer(result.successValue(), journey, entityResolver);
-    } catch (Throwable t) {
+    } catch (Exception e) {
       LOG.warn(
         "{} EstimatedJourney {} failed.",
         shouldAddNewTrip ? "Adding" : "Updating",
         DebugString.of(journey),
-        t
+        e
       );
       return Result.failure(UpdateError.noTripId(UNKNOWN));
     }
@@ -251,7 +249,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   private TimetableSnapshot getTimetableSnapshot(final boolean force) {
     final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
+    if (force || now - lastSnapshotTime > maxSnapshotFrequency.toMillis()) {
       if (force || buffer.isDirty()) {
         LOG.debug("Committing {}", buffer);
         snapshot = buffer.commit(transitLayerUpdater, force);
@@ -339,7 +337,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       pattern,
       estimatedVehicleJourney,
       serviceDate,
-      timeZone,
+      transitModel.getTimeZone(),
       entityResolver
     )
       .build();
@@ -449,7 +447,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   }
 
   private boolean purgeExpiredData() {
-    final LocalDate today = LocalDate.now(timeZone);
+    final LocalDate today = LocalDate.now(transitModel.getTimeZone());
     final LocalDate previously = today.minusDays(2); // Just to be safe...
 
     if (lastPurgeDate != null && lastPurgeDate.compareTo(previously) > 0) {

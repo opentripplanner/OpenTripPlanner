@@ -6,6 +6,8 @@ import static org.opentripplanner.model.plan.PlanTestConstants.A;
 import static org.opentripplanner.model.plan.PlanTestConstants.B;
 import static org.opentripplanner.model.plan.PlanTestConstants.C;
 import static org.opentripplanner.model.plan.PlanTestConstants.D;
+import static org.opentripplanner.model.plan.PlanTestConstants.D10m;
+import static org.opentripplanner.model.plan.PlanTestConstants.E;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_01;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_15;
@@ -14,6 +16,8 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_50;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
+import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
@@ -33,10 +37,16 @@ import org.junit.jupiter.api.parallel.Execution;
 import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.model.fare.FareMedium;
+import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -44,6 +54,8 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.core.FareComponent;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -52,9 +64,11 @@ import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalSe
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -90,28 +104,53 @@ class GraphQLIntegrationTest {
     var transitModel = new TransitModel(stopModel.build(), new Deduplicator());
     transitModel.initTimeZone(ZoneIds.BERLIN);
     transitModel.index();
-    Arrays
+    var routes = Arrays
       .stream(TransitMode.values())
       .sorted(Comparator.comparing(Enum::name))
-      .forEach(m ->
-        transitModel
-          .getTransitModelIndex()
-          .addRoutes(
-            TransitModelForTest
-              .route(m.name())
-              .withMode(m)
-              .withLongName(new NonLocalizedString("Long name for %s".formatted(m)))
-              .build()
-          )
-      );
+      .map(m ->
+        TransitModelForTest
+          .route(m.name())
+          .withMode(m)
+          .withLongName(new NonLocalizedString("Long name for %s".formatted(m)))
+          .build()
+      )
+      .toList();
+
+    var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
+
+    routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
 
     Itinerary i1 = newItinerary(A, T11_00)
       .walk(20, B)
-      .bus(122, T11_01, T11_15, C)
+      .bus(busRoute, 122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
+      .carHail(D10m, E)
       .build();
+    var busLeg = i1.getTransitLeg(1);
+    ScheduledTransitLeg railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
 
-    var railLeg = i1.getTransitLeg(2);
+    var fares = new ItineraryFares();
+    fares.addFare(FareType.regular, Money.euros(310));
+    fares.addFareComponent(
+      FareType.regular,
+      List.of(new FareComponent(id("AB"), Money.euros(310), List.of(busLeg)))
+    );
+
+    var dayPass = fareProduct("day-pass");
+    fares.addItineraryProducts(List.of(dayPass));
+
+    var singleTicket = fareProduct("single-ticket");
+    fares.addFareProduct(railLeg, singleTicket);
+    fares.addFareProduct(busLeg, singleTicket);
+    i1.setFare(fares);
+
+    i1.setFare(fares);
+    FaresToItineraryMapper.addFaresToLegs(fares, i1);
+
+    i1.setAccessibilityScore(0.5f);
+
+    railLeg.withAccessibilityScore(.3f);
+
     var alert = TransitAlert
       .of(id("an-alert"))
       .withHeaderText(new NonLocalizedString("A header"))
@@ -127,7 +166,12 @@ class GraphQLIntegrationTest {
       .build();
     railLeg.addAlert(alert);
 
-    var transitService = new DefaultTransitService(transitModel);
+    var transitService = new DefaultTransitService(transitModel) {
+      @Override
+      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+        return List.of(BUS, FERRY);
+      }
+    };
     context =
       new LegacyGraphQLRequestContext(
         new TestRoutingService(List.of(i1)),
@@ -139,6 +183,18 @@ class GraphQLIntegrationTest {
         GraphFinder.getInstance(graph, transitService::findRegularStop),
         new RouteRequest()
       );
+  }
+
+  @Nonnull
+  private static FareProduct fareProduct(String name) {
+    return new FareProduct(
+      id(name),
+      name,
+      Money.euros(1000),
+      null,
+      new RiderCategory(id("senior-citizens"), "Senior citizens", null),
+      new FareMedium(id("oyster"), "TfL Oyster Card")
+    );
   }
 
   @FilePatternSource(pattern = "src/ext-test/resources/legacygraphqlapi/queries/*.graphql")

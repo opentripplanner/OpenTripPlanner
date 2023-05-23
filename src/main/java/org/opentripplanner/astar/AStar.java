@@ -4,8 +4,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.opentripplanner.astar.model.BinHeap;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.astar.model.ShortestPathTree;
@@ -60,7 +62,7 @@ public class AStar<
     Set<Vertex> toVertices,
     SearchTerminationStrategy<State> terminationStrategy,
     DominanceFunction<State> dominanceFunction,
-    Duration timeout,
+    @Nonnull Duration timeout,
     Collection<State> initialStates
   ) {
     this.heuristic = heuristic;
@@ -70,7 +72,7 @@ public class AStar<
     this.toVertices = toVertices;
     this.arriveBy = arriveBy;
     this.terminationStrategy = terminationStrategy;
-    this.timeout = timeout;
+    this.timeout = Objects.requireNonNull(timeout);
 
     this.spt = new ShortestPathTree<>(dominanceFunction);
 
@@ -138,8 +140,9 @@ public class AStar<
       }
 
       // Iterate over traversal results. When an edge leads nowhere (as indicated by
-      // returning NULL), the iteration is over.
-      for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
+      // returning null), the iteration is over.
+      var states = edge.traverse(u);
+      for (var v : states) {
         // Could be: for (State v : traverseEdge...)
 
         if (traverseVisitor != null) {

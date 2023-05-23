@@ -52,15 +52,15 @@ public class StateData implements Cloneable {
 
   /** Private constructor, use static methods to get a set of initial states. */
   protected StateData(StreetMode requestMode) {
-    if (requestMode.includesDriving()) {
-      currentMode = TraverseMode.CAR;
-    } else if (requestMode.includesWalking()) {
-      currentMode = TraverseMode.WALK;
-    } else if (requestMode.includesBiking()) {
-      currentMode = TraverseMode.BICYCLE;
-    } else {
-      currentMode = null;
-    }
+    currentMode =
+      switch (requestMode) {
+        // when renting or using a flex vehicle, you start on foot until you have found the vehicle
+        case NOT_SET, WALK, BIKE_RENTAL, SCOOTER_RENTAL, CAR_RENTAL, FLEXIBLE -> TraverseMode.WALK;
+        // when cycling all the way or to a stop, you start on your own bike
+        case BIKE, BIKE_TO_PARK -> TraverseMode.BICYCLE;
+        // when driving (not car rental) you start in your own car or your driver's car
+        case CAR, CAR_TO_PARK, CAR_PICKUP, CAR_HAILING -> TraverseMode.CAR;
+      };
   }
 
   /**
@@ -200,6 +200,7 @@ public class StateData implements Cloneable {
         CAR,
         CAR_TO_PARK,
         CAR_PICKUP,
+        CAR_HAILING,
         FLEXIBLE -> throw new IllegalStateException(
         "Cannot convert street mode %s to a form factor".formatted(streetMode)
       );

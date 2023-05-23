@@ -67,7 +67,7 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
     int departureTime,
     int fromStopIndex,
     int toStopIndex,
-    int flexTime
+    int flexTripDurationSeconds
   );
 
   /**
@@ -87,7 +87,7 @@ public abstract class FlexTrip<T extends FlexTrip<T, B>, B extends FlexTripBuild
     int arrivalTime,
     int fromStopIndex,
     int toStopIndex,
-    int flexTime
+    int tripDurationSeconds
   );
 
   /**

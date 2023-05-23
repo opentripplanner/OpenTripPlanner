@@ -14,6 +14,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -216,7 +218,9 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
     Executors
       .newSingleThreadExecutor()
       .submit(() -> {
-        while (true) {
+        boolean otpIsShuttingDown = false;
+
+        while (!otpIsShuttingDown) {
           try {
             if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
               LOG.info("OTP UPDATERS INITIALIZED - OTP is ready for routing!");
@@ -224,6 +228,10 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
             }
             //noinspection BusyWait
             Thread.sleep(1000);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            otpIsShuttingDown = true;
+            LOG.info("OTP is shutting down, cancelling wait for updaters readiness.");
           } catch (Exception e) {
             LOG.error(e.getMessage(), e);
           }

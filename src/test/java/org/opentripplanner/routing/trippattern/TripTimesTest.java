@@ -3,8 +3,8 @@ package org.opentripplanner.routing.trippattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class TripTimesTest {
       stopTime.setStop(stop);
       stopTime.setArrivalTime(i * 60);
       stopTime.setDepartureTime(i * 60);
-      stopTime.setStopSequence(i);
+      stopTime.setStopSequence(i * 10);
       stopTimes.add(stopTime);
     }
 
@@ -89,26 +89,29 @@ public class TripTimesTest {
   }
 
   @Test
-  public void testNonIncreasingUpdate() {
+  public void testNegativeDwellTime() {
     TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
 
     updatedTripTimesA.updateArrivalTime(1, 60);
     updatedTripTimesA.updateDepartureTime(1, 59);
 
     var error = updatedTripTimesA.validateNonIncreasingTimes();
-    assertTrue(error.isFailure());
-    assertEquals(1, error.failureValue().stopIndex());
-    assertEquals(NEGATIVE_DWELL_TIME, error.failureValue().errorType());
+    assertTrue(error.isPresent());
+    assertEquals(1, error.get().stopIndex());
+    assertEquals(NEGATIVE_DWELL_TIME, error.get().code());
+  }
 
+  @Test
+  public void testNegativeHopTime() {
     TripTimes updatedTripTimesB = new TripTimes(originalTripTimes);
 
     updatedTripTimesB.updateDepartureTime(6, 421);
     updatedTripTimesB.updateArrivalTime(7, 420);
 
-    error = updatedTripTimesB.validateNonIncreasingTimes();
-    assertTrue(error.isFailure());
-    assertEquals(7, error.failureValue().stopIndex());
-    assertEquals(NEGATIVE_HOP_TIME, error.failureValue().errorType());
+    var error = updatedTripTimesB.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(7, error.get().stopIndex());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
   }
 
   @Test
@@ -118,7 +121,7 @@ public class TripTimesTest {
     updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
     updatedTripTimesA.updateDepartureTime(0, 50);
 
-    assertTrue(updatedTripTimesA.validateNonIncreasingTimes().isSuccess());
+    assertTrue(updatedTripTimesA.validateNonIncreasingTimes().isEmpty());
   }
 
   @Test
@@ -145,6 +148,25 @@ public class TripTimesTest {
     assertFalse(updatedTripTimesA.isNoDataStop(0));
     assertTrue(updatedTripTimesA.isNoDataStop(1));
     assertFalse(updatedTripTimesA.isNoDataStop(2));
+  }
+
+  @Test
+  void gtfsSequence() {
+    var stopIndex = originalTripTimes.gtfsSequenceOfStopIndex(2);
+    assertEquals(20, stopIndex);
+  }
+
+  @Test
+  void stopIndexOfGtfsSequence() {
+    var stopIndex = originalTripTimes.stopIndexOfGtfsSequence(40);
+    assertTrue(stopIndex.isPresent());
+    assertEquals(4, stopIndex.getAsInt());
+  }
+
+  @Test
+  void unknownGtfsSequence() {
+    var stopIndex = originalTripTimes.stopIndexOfGtfsSequence(4);
+    assertTrue(stopIndex.isEmpty());
   }
 
   @Test
@@ -186,8 +208,8 @@ public class TripTimesTest {
     updatedTripTimesA.updateDepartureTime(1, 98);
 
     var validationResult = updatedTripTimesA.validateNonIncreasingTimes();
-    assertTrue(validationResult.isFailure());
-    assertEquals(2, validationResult.failureValue().stopIndex());
-    assertEquals(NEGATIVE_DWELL_TIME, validationResult.failureValue().errorType());
+    assertTrue(validationResult.isPresent());
+    assertEquals(2, validationResult.get().stopIndex());
+    assertEquals(NEGATIVE_DWELL_TIME, validationResult.get().code());
   }
 }

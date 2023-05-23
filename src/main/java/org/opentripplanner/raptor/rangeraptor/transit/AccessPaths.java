@@ -7,7 +7,6 @@ import gnu.trove.map.TIntObjectMap;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Predicate;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 
@@ -62,8 +61,8 @@ public class AccessPaths {
       paths = removeNoneOptimalPathsForStandardRaptor(paths);
     }
     return new AccessPaths(
-      groupByRound(paths, Predicate.not(RaptorAccessEgress::hasRides)),
-      groupByRound(paths, RaptorAccessEgress::hasRides)
+      groupByRound(paths, RaptorAccessEgress::stopReachedByWalking),
+      groupByRound(paths, RaptorAccessEgress::stopReachedOnBoard)
     );
   }
 

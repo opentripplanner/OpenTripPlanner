@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.config;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
@@ -53,13 +52,13 @@ public class OtpConfigLoaderTest {
   public void loadRouterConfig() throws IOException {
     // Given:
     File file = new File(tempDir, ROUTER_CONFIG_FILENAME);
-    Files.writeString(file.toPath(), "{requestLogFile : \"aFile.txt\"}", UTF_8);
+    Files.writeString(file.toPath(), "{ server: { apiProcessingTimeout: \"13s\" } }", UTF_8);
 
     // when:
     RouterConfig params = new OtpConfigLoader(tempDir).loadRouterConfig();
 
     // then:
-    assertEquals("aFile.txt", params.requestLogFile());
+    assertEquals(13, params.server().apiProcessingTimeout().toSeconds());
   }
 
   @Test
@@ -68,7 +67,7 @@ public class OtpConfigLoaderTest {
     RouterConfig res = new OtpConfigLoader(tempDir).loadRouterConfig();
 
     // then: expect missing node
-    assertNull(res.requestLogFile(), "Expect deafult value(null)");
+    assertTrue(res.isDefault(), "Expect default value");
   }
 
   /**

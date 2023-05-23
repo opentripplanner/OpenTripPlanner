@@ -16,10 +16,11 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
-import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLUtils;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter;
@@ -100,9 +101,13 @@ public class RouteRequestMapper {
         );
         rental.withUseAvailabilityInformation(request.isTripPlannedForNow());
       });
+      // TODO Add support for all debug filter variants
       callWith.argument(
         "debugItineraryFilter",
-        (Boolean v) -> preferences.withItineraryFilter(it -> it.withDebug(v))
+        (Boolean v) ->
+          preferences.withItineraryFilter(it ->
+            it.withDebug(ItineraryFilterDebugProfile.ofDebugEnabled(v))
+          )
       );
       preferences.withTransit(tr -> {
         callWith.argument("boardSlack", tr::withDefaultBoardSlackSec);
@@ -171,23 +176,17 @@ public class RouteRequestMapper {
     if (hasArgument(environment, "banned") || hasArgument(environment, "transportModes")) {
       var filterRequestBuilder = TransitFilterRequest.of();
 
-      if (hasArgument(environment, "banned.routes")) {
-        callWith.argument(
-          "banned.routes",
-          s ->
-            filterRequestBuilder.addNot(SelectRequest.of().withRoutesFromString((String) s).build())
-        );
-      }
+      callWith.argument(
+        "banned.routes",
+        s ->
+          filterRequestBuilder.addNot(SelectRequest.of().withRoutesFromString((String) s).build())
+      );
 
-      if (hasArgument(environment, "banned.agencies")) {
-        callWith.argument(
-          "banned.agencies",
-          s ->
-            filterRequestBuilder.addNot(
-              SelectRequest.of().withAgenciesFromString((String) s).build()
-            )
-        );
-      }
+      callWith.argument(
+        "banned.agencies",
+        s ->
+          filterRequestBuilder.addNot(SelectRequest.of().withAgenciesFromString((String) s).build())
+      );
 
       callWith.argument("banned.trips", request.journey().transit()::setBannedTripsFromString);
 
@@ -263,7 +262,7 @@ public class RouteRequestMapper {
 
     callWith.argument(
       "locale",
-      (String v) -> request.setLocale(LegacyGraphQLUtils.getLocale(environment, v))
+      (String v) -> request.setLocale(GraphQLUtils.getLocale(environment, v))
     );
     return request;
   }

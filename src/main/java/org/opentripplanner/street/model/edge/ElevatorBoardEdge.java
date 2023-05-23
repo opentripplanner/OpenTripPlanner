@@ -39,10 +39,10 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
   }
 
   @Override
-  public State traverse(State s0) {
+  public State[] traverse(State s0) {
     StateEditor s1 = createEditorForDrivingOrWalking(s0, this);
     if (s1 == null) {
-      return null;
+      return State.empty();
     }
 
     var streetPreferences = s0.getPreferences().street();
@@ -50,7 +50,7 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
     s1.incrementWeight(streetPreferences.elevator().boardCost());
     s1.incrementTimeInSeconds(streetPreferences.elevator().boardTime());
 
-    return s1.makeState();
+    return s1.makeStateArray();
   }
 
   @Override

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.timetable;
 
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -10,13 +10,13 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.UpdateError;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +110,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    */
   private RealTimeState realTimeState = RealTimeState.SCHEDULED;
 
-  public Accessibility wheelchairAccessibility;
+  private Accessibility wheelchairAccessibility;
 
   /**
    * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing. The
@@ -237,7 +237,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * trip down the line.
    */
   public int sortIndex() {
-    return getArrivalTime(0);
+    return getDepartureTime(0);
   }
 
   /** @return the time in seconds after midnight that the vehicle arrives at the stop. */
@@ -382,7 +382,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    *
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
-  public Result<?, UpdateError> validateNonIncreasingTimes() {
+  public Optional<ValidationError> validateNonIncreasingTimes() {
     final int nStops = scheduledArrivalTimes.length;
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
@@ -390,14 +390,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       final int dep = getDepartureTime(s);
 
       if (dep < arr) {
-        return Result.failure(new UpdateError(getTrip().getId(), NEGATIVE_DWELL_TIME, s));
+        return Optional.of(new ValidationError(NEGATIVE_DWELL_TIME, s));
       }
       if (prevDep > arr) {
-        return Result.failure(new UpdateError(getTrip().getId(), NEGATIVE_HOP_TIME, s));
+        return Optional.of(new ValidationError(NEGATIVE_HOP_TIME, s));
       }
       prevDep = dep;
     }
-    return Result.success();
+    return Optional.empty();
   }
 
   /** Cancel this entire trip */
@@ -471,9 +471,27 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     timeShift += duration.toSeconds();
   }
 
-  /** Just to create uniform getter-syntax across the whole public interface of TripTimes. */
-  public int getOriginalGtfsStopSequence(final int stop) {
+  /**
+   * Returns the GTFS sequence number of the given 0-based stop index.
+   */
+  public int gtfsSequenceOfStopIndex(final int stop) {
     return originalGtfsStopSequence[stop];
+  }
+
+  /**
+   * Returns the 0-based stop index of the given GTFS sequence number.
+   */
+  public OptionalInt stopIndexOfGtfsSequence(int stopSequence) {
+    if (originalGtfsStopSequence == null) {
+      return OptionalInt.empty();
+    }
+    for (int i = 0; i < originalGtfsStopSequence.length; i++) {
+      var sequence = originalGtfsStopSequence[i];
+      if (sequence == stopSequence) {
+        return OptionalInt.of(i);
+      }
+    }
+    return OptionalInt.empty();
   }
 
   /** @return whether or not stopIndex is considered a timepoint in this TripTimes. */

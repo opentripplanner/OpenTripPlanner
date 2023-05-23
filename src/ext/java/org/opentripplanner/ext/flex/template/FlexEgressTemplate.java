@@ -3,6 +3,7 @@ package org.opentripplanner.ext.flex.template;
 import com.google.common.collect.Lists;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -48,14 +49,30 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
     return edge.getToVertex();
   }
 
-  protected int[] getFlexTimes(FlexTripEdge flexEdge, State state) {
+  protected FlexPathDurations calculateFlexPathDurations(FlexTripEdge flexEdge, State state) {
     int postFlexTime = (int) accessEgress.state.getElapsedTimeSeconds();
     int edgeTimeInSeconds = flexEdge.getTimeInSeconds();
     int preFlexTime = (int) state.getElapsedTimeSeconds() - postFlexTime - edgeTimeInSeconds;
-    return new int[] { preFlexTime, edgeTimeInSeconds, postFlexTime };
+    return new FlexPathDurations(
+      preFlexTime,
+      edgeTimeInSeconds,
+      postFlexTime,
+      secondsFromStartOfTime
+    );
   }
 
   protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop) {
+    var flexPath = calculator.calculateFlexPath(
+      flexFromVertex,
+      accessEgress.state.getVertex(),
+      fromStopIndex,
+      toStopIndex
+    );
+
+    if (flexPath == null) {
+      return null;
+    }
+
     return new FlexTripEdge(
       flexFromVertex,
       accessEgress.state.getVertex(),
@@ -63,7 +80,7 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
       accessEgress.stop,
       trip,
       this,
-      calculator
+      flexPath
     );
   }
 

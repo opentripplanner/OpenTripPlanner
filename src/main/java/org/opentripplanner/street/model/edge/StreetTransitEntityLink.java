@@ -45,7 +45,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return false;
   }
 
-  public State traverse(State s0) {
+  @Override
+  public State[] traverse(State s0) {
     // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
     // avoids spurious leg transitions. As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815,
     // it is possible that two stops can have the same GPS coordinate thus creating a possibility for a
@@ -55,7 +56,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       s0.backEdge instanceof StreetTransitEntityLink &&
       ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex == this.transitEntityVertex
     ) {
-      return null;
+      return State.empty();
     }
 
     RoutingPreferences pref = s0.getPreferences();
@@ -71,7 +72,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
         accessibility.stop().onlyConsiderAccessible() &&
         wheelchairAccessibility != Accessibility.POSSIBLE
       ) {
-        return null;
+        return State.empty();
       } else if (wheelchairAccessibility == Accessibility.NO_INFORMATION) {
         s1.incrementWeight(accessibility.stop().unknownCost());
       } else if (wheelchairAccessibility == Accessibility.NOT_POSSIBLE) {
@@ -83,7 +84,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       case BICYCLE:
         // Forbid taking your own bike in the station if bike P+R activated.
         if (s0.getRequest().mode().includesParking() && !s0.isVehicleParked()) {
-          return null;
+          return State.empty();
         }
         // Forbid taking a (station) rental vehicle in the station. This allows taking along
         // floating rental vehicles.
@@ -94,21 +95,21 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
             s0.getRequest().rental().allowArrivingInRentedVehicleAtDestination()
           )
         ) {
-          return null;
+          return State.empty();
         }
         // Allow taking an owned bike in the station
         break;
       case CAR:
         // Forbid taking your own car in the station if bike P+R activated.
         if (s0.getRequest().mode().includesParking() && !s0.isVehicleParked()) {
-          return null;
+          return State.empty();
         }
         // For Kiss & Ride allow dropping of the passenger before entering the station
         if (s0.getCarPickupState() != null) {
           if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(s0.getRequest().arriveBy())) {
             dropOffAfterDriving(s0, s1);
           } else {
-            return null;
+            return State.empty();
           }
         }
         // If Kiss & Ride (Taxi) mode is not enabled allow car traversal so that the Stop
@@ -117,7 +118,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       case WALK:
         break;
       default:
-        return null;
+        return State.empty();
     }
 
     if (
@@ -135,7 +136,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     int streetToStopTime = getStreetToStopTime();
     s1.incrementTimeInSeconds(streetToStopTime);
     s1.incrementWeight(STEL_TRAVERSE_COST + streetToStopTime);
-    return s1.makeState();
+    return s1.makeStateArray();
   }
 
   public I18NString getName() {

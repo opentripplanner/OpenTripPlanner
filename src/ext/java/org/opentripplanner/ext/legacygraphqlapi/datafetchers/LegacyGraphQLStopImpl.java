@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -21,6 +20,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -138,8 +138,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment ->
       getValue(
         environment,
-        stop -> LegacyGraphQLUtils.getTranslation(stop.getDescription(), environment),
-        station -> LegacyGraphQLUtils.getTranslation(station.getDescription(), environment)
+        stop -> GraphQLUtils.getTranslation(stop.getDescription(), environment),
+        station -> GraphQLUtils.getTranslation(station.getDescription(), environment)
       );
   }
 
@@ -148,8 +148,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment ->
       getValue(
         environment,
-        stop -> LegacyGraphQLUtils.getTranslation(stop.getUrl(), environment),
-        station -> LegacyGraphQLUtils.getTranslation(station.getUrl(), environment)
+        stop -> GraphQLUtils.getTranslation(stop.getUrl(), environment),
+        station -> GraphQLUtils.getTranslation(station.getUrl(), environment)
       );
   }
 
@@ -205,8 +205,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment ->
       getValue(
         environment,
-        stop -> LegacyGraphQLUtils.getTranslation(stop.getName(), environment),
-        station -> LegacyGraphQLUtils.getTranslation(station.getName(), environment)
+        stop -> GraphQLUtils.getTranslation(stop.getName(), environment),
+        station -> GraphQLUtils.getTranslation(station.getName(), environment)
       );
   }
 
@@ -423,42 +423,26 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> vehicleMode() {
-    return environment ->
-      getValue(
+    return environment -> {
+      TransitService transitService = getTransitService(environment);
+      return getValue(
         environment,
-        stop -> {
-          if (stop.getGtfsVehicleType() != null) {
-            return stop.getGtfsVehicleType().name();
-          }
-          return getTransitService(environment)
-            .getPatternsForStop(stop)
+        stop ->
+          transitService
+            .getModesOfStopLocation(stop)
             .stream()
-            .map(TripPattern::getMode)
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-            .entrySet()
-            .stream()
-            .max(Map.Entry.comparingByValue())
-            .map(Map.Entry::getKey)
+            .findFirst()
             .map(Enum::toString)
-            .orElse(null);
-        },
-        station -> {
-          TransitService transitService = getTransitService(environment);
-          return station
-            .getChildStops()
+            .orElse(null),
+        station ->
+          transitService
+            .getModesOfStopLocationsGroup(station)
             .stream()
-            .flatMap(stop ->
-              transitService.getPatternsForStop(stop).stream().map(TripPattern::getMode)
-            )
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-            .entrySet()
-            .stream()
-            .max(Map.Entry.comparingByValue())
-            .map(Map.Entry::getKey)
+            .findFirst()
             .map(Enum::toString)
-            .orElse(null);
-        }
+            .orElse(null)
       );
+    };
   }
 
   // TODO
@@ -563,7 +547,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       );
   }
 
-  private <T> T getValue(
+  private static <T> T getValue(
     DataFetchingEnvironment environment,
     Function<StopLocation, T> stopTFunction,
     Function<Station, T> stationTFunction

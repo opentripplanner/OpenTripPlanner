@@ -915,6 +915,7 @@ public class LegacyGraphQLTypes {
     DIRECT,
     DROPOFF,
     EGRESS,
+    HAIL,
     HAVE,
     KEEP,
     PARK,

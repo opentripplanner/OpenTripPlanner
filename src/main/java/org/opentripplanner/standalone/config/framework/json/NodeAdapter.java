@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.application.OtpAppException;
 
@@ -51,6 +52,12 @@ public class NodeAdapter {
    * parameter and can be used for generating documentation and such.
    */
   private final Map<String, NodeInfo> parameters = new HashMap<>();
+
+  /**
+   * All warnings are collected during the file parsing and printed as one block at the
+   * end.
+   */
+  private final List<String> warnings = new ArrayList<>();
 
   private boolean usedAsRaw = false;
 
@@ -155,13 +162,14 @@ public class NodeAdapter {
   }
 
   /**
-   * Log unused parameters for the entire configuration file/node tree. Only call this method for the
-   * root adapter, once for each config file read.
+   * Log unused parameters and other warnings for the entire configuration file/node tree. Only
+   * call this method for the root adapter, once for each config file read.
    */
-  public void logAllUnusedParameters(Consumer<String> logger) {
+  public void logAllWarnings(Consumer<String> logger) {
     for (String p : unusedParams()) {
       logger.accept("Unexpected config parameter: '" + p + "' in '" + source + "'");
     }
+    allWarnings().forEach(logger);
   }
 
   /**
@@ -262,6 +270,16 @@ public class NodeAdapter {
   }
 
   /**
+   * Add a warning to the list of warnings logged after parsing a config file is
+   * complete.
+   */
+  public void addWarning(String message, String paramName) {
+    message += " Parameter: " + fullPath(paramName) + ".";
+    message += " Source: " + source + ".";
+    warnings.add(message);
+  }
+
+  /**
    * Return a {@link OtpAppException}. The full path and source is injected into the message if
    * replacing the placeholders {@code "{path}"}, if they exist.
    */
@@ -281,6 +299,14 @@ public class NodeAdapter {
   }
 
   /* private methods */
+
+  private Stream<String> allWarnings() {
+    Stream<String> childrenWarnings = childrenByName
+      .values()
+      .stream()
+      .flatMap(NodeAdapter::allWarnings);
+    return Stream.concat(childrenWarnings, warnings.stream());
+  }
 
   private void addParameterInfo(NodeInfo info) {
     if (parameters.containsKey(info.name())) {

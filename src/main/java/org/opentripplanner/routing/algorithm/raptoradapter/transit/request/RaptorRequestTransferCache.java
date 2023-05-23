@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RaptorTransferIndex;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -17,8 +18,12 @@ import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RaptorRequestTransferCache {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RaptorRequestTransferCache.class);
 
   private final LoadingCache<CacheKey, RaptorTransferIndex> transferCache;
 
@@ -48,6 +53,7 @@ public class RaptorRequestTransferCache {
       @Override
       @Nonnull
       public RaptorTransferIndex load(@Nonnull CacheKey cacheKey) {
+        LOG.info("Adding request to cache: {}", cacheKey.options);
         return RaptorTransferIndex.create(cacheKey.transfersByStopIndex, cacheKey.request);
       }
     };
@@ -112,6 +118,19 @@ public class RaptorRequestTransferCache {
       this.street = preferences.street();
       this.wheelchairPreferences =
         this.wheelchair ? preferences.wheelchair() : WheelchairPreferences.DEFAULT;
+    }
+
+    @Override
+    public String toString() {
+      return ToStringBuilder
+        .of(StreetRelevantOptions.class)
+        .addEnum("transferMode", transferMode)
+        .addBoolIfTrue("wheelchair", wheelchair)
+        .addObj("walk", walk, WalkPreferences.DEFAULT)
+        .addObj("bike", bike, BikePreferences.DEFAULT)
+        .addObj("street", street, StreetPreferences.DEFAULT)
+        .addObj("wheelchairPreferences", wheelchairPreferences, WheelchairPreferences.DEFAULT)
+        .toString();
     }
 
     @Override

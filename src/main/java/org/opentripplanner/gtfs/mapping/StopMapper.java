@@ -40,7 +40,9 @@ class StopMapper {
         "Expected type " +
         org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP +
         ", but got " +
-        gtfsStop.getLocationType()
+        gtfsStop.getLocationType() +
+        " from stop " +
+        gtfsStop
       );
     }
 

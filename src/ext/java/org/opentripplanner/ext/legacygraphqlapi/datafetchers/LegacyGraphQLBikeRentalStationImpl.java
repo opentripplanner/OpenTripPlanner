@@ -26,7 +26,7 @@ public class LegacyGraphQLBikeRentalStationImpl
 
   @Override
   public DataFetcher<Boolean> allowOverloading() {
-    return environment -> getSource(environment).isAllowOverloading();
+    return environment -> getSource(environment).overloadingAllowed();
   }
 
   @Override

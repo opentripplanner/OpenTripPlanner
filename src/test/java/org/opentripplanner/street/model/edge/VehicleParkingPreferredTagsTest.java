@@ -107,6 +107,6 @@ class VehicleParkingPreferredTagsTest {
     var state = new State(fromV, request);
 
     assertEquals(0, state.weight);
-    return edge.traverse(state);
+    return edge.traverse(state)[0];
   }
 }

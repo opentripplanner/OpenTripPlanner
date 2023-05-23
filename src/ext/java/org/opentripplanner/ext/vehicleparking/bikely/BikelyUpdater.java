@@ -13,7 +13,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.transit.model.basic.LocalizedMoney;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.updater.GenericJsonDataSource;
+import org.opentripplanner.updater.spi.GenericJsonDataSource;
 
 /**
  * Vehicle parking updater class for the Norwegian bike box provider Bikely:

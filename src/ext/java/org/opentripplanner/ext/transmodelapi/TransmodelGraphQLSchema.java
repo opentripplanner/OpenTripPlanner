@@ -4,9 +4,9 @@ import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 import static org.opentripplanner.ext.transmodelapi.mapping.SeverityMapper.getTransmodelSeverity;
 import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.FILTER_PLACE_TYPE_ENUM;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MULTI_MODAL_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.filterPlaceTypeEnum;
 import static org.opentripplanner.model.projectinfo.OtpProjectInfo.projectInfo;
 
 import graphql.Scalars;
@@ -705,7 +705,9 @@ public class TransmodelGraphQLSchema {
           .newFieldDefinition()
           .name("quaysByRadius")
           .description(
-            "Get all quays within the specified walking radius from a location. The returned type has two fields quay and distance"
+            "Get all quays within the specified walking radius from a location. There are no maximum " +
+            "limits for the input parameters, but the query will timeout and return if the parameters " +
+            "are too high."
           )
           .withDirective(gqlUtil.timingData)
           .type(
@@ -845,7 +847,7 @@ public class TransmodelGraphQLSchema {
               .name("filterByPlaceTypes")
               .description("Only include places of given types if set. Default accepts all types")
               .defaultValue(Arrays.asList(TransmodelPlaceType.values()))
-              .type(new GraphQLList(filterPlaceTypeEnum))
+              .type(new GraphQLList(FILTER_PLACE_TYPE_ENUM))
               .build()
           )
           .argument(

@@ -350,5 +350,15 @@ otp.config.modes = {
     "FLEX_ACCESS,FLEX_EGRESS,TRANSIT" : _tr('Transit with flex access and egress'),
     //TRANSLATORS: Travel by: mode of transport (Used in selection in Travel Options widgets)
     "FLEX_DIRECT"              : _tr('Direct flex search'),
-    "CARPOOL,WALK"             : _tr("Carpool")
+    "CARPOOL,WALK"             : _tr("Carpool"),
+    "CAR_HAIL,TRANSIT,WALK"    : _tr("Car hailing and transit")
+};
+
+let limitTo = _tr("Limit to ");
+
+otp.config.debugItinerarys = {
+    "OFF"      : _tr('Off'),
+    "LIST_ALL" : _tr('Show all'),
+    "LIMIT_TO_NUM_OF_ITINERARIES" : limitTo + '<code>numItineraries</code>',
+    "LIMIT_TO_SEARCH_WINDOW" : limitTo + '<code>searchWindow</code>'
 };

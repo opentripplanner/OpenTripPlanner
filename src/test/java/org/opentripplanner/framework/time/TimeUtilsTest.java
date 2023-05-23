@@ -44,6 +44,7 @@ public class TimeUtilsTest {
     assertEquals("0:58:59", TimeUtils.timeToStrCompact(T00_58_59));
     assertEquals("13:33:57", TimeUtils.timeToStrCompact(T13_33_57, NOT_SET));
     assertEquals("", TimeUtils.timeToStrCompact(NOT_SET, NOT_SET));
+    assertEquals("NOT-SET", TimeUtils.timeToStrCompact(NOT_SET, NOT_SET, "NOT-SET"));
     assertEquals("9:36:07", TimeUtils.timeToStrCompact(CAL));
     assertEquals("10:26:03-1d", TimeUtils.timeToStrCompact(-T13_33_57));
   }

@@ -6,19 +6,20 @@ import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 
-final class DebugHandlerPatternRideAdapter extends AbstractDebugHandlerAdapter<PatternRideView<?>> {
+final class DebugHandlerPatternRideAdapter
+  extends AbstractDebugHandlerAdapter<PatternRideView<?, ?>> {
 
   DebugHandlerPatternRideAdapter(DebugRequest debug, WorkerLifeCycle lifeCycle) {
     super(debug, debug.patternRideDebugListener(), lifeCycle);
   }
 
   @Override
-  protected int stop(PatternRideView<?> ride) {
+  protected int stop(PatternRideView<?, ?> ride) {
     return ride.boardStopIndex();
   }
 
   @Override
-  protected Iterable<Integer> stopsVisited(PatternRideView<?> ride) {
+  protected Iterable<Integer> stopsVisited(PatternRideView<?, ?> ride) {
     return listStopsForDebugging(ride.prevArrival());
   }
 
@@ -29,12 +30,10 @@ final class DebugHandlerPatternRideAdapter extends AbstractDebugHandlerAdapter<P
   private Iterable<Integer> listStopsForDebugging(ArrivalView<?> it) {
     LinkedList<Integer> stops = new LinkedList<>();
 
-    while (!it.arrivedByAccess()) {
+    while (it != null) {
       stops.addFirst(it.stop());
       it = it.previous();
     }
-    stops.addFirst(it.stop());
-
     return stops;
   }
 }

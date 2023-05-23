@@ -6,6 +6,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -75,9 +76,7 @@ public class ConstructApplication {
 
     // We create the optional GraphVisualizer here, because it would be significant more complex to
     // use Dagger DI to do it - passing in a parameter to enable it or not.
-    var graphVisualizer = cli.visualize
-      ? new GraphVisualizer(graph, config.routerConfig().streetRoutingTimeout())
-      : null;
+    var graphVisualizer = cli.visualize ? new GraphVisualizer(graph) : null;
 
     this.factory =
       DaggerConstructApplicationFactory
@@ -100,7 +99,11 @@ public class ConstructApplication {
    * this method is called.
    */
   public GrizzlyServer createGrizzlyServer() {
-    return new GrizzlyServer(cli, createApplication());
+    return new GrizzlyServer(
+      cli,
+      createApplication(),
+      routerConfig().server().apiProcessingTimeout()
+    );
   }
 
   /**
@@ -153,6 +156,8 @@ public class ConstructApplication {
 
     initEllipsoidToGeoidDifference();
 
+    initializeTransferCache(routerConfig().transitTuningConfig(), transitModel());
+
     if (OTPFeature.SandboxAPITransmodelApi.isOn()) {
       TransmodelAPI.setUp(
         routerConfig().transmodelApi(),
@@ -198,6 +203,31 @@ public class ConstructApplication {
         transitModel.getTransitModelIndex().getServiceCodesRunningForDate()
       )
     );
+  }
+
+  public static void initializeTransferCache(
+    TransitTuningParameters transitTuningConfig,
+    TransitModel transitModel
+  ) {
+    var transferCacheRequests = transitTuningConfig.transferCacheRequests();
+    if (!transferCacheRequests.isEmpty()) {
+      var progress = ProgressTracker.track(
+        "Creating initial raptor transfer cache",
+        1,
+        transferCacheRequests.size()
+      );
+
+      LOG.info(progress.startMessage());
+
+      transferCacheRequests.forEach(request -> {
+        transitModel.getTransitLayer().getRaptorTransfersForRequest(request);
+
+        //noinspection Convert2MethodRef
+        progress.step(s -> LOG.info(s));
+      });
+
+      LOG.info(progress.completeMessage());
+    }
   }
 
   public TransitModel transitModel() {

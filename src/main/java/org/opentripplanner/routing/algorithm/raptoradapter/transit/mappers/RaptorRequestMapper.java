@@ -99,12 +99,13 @@ public class RaptorRequestMapper {
     if (preferences.transfer().maxAdditionalTransfers() != null) {
       searchParams.numberOfAdditionalTransfers(preferences.transfer().maxAdditionalTransfers());
     }
-
-    preferences
-      .transit()
-      .raptor()
-      .relaxGeneralizedCostAtDestination()
-      .ifPresent(searchParams::relaxCostAtDestination);
+    builder.withMultiCriteria(mcBuilder -> {
+      preferences
+        .transit()
+        .raptor()
+        .relaxGeneralizedCostAtDestination()
+        .ifPresent(mcBuilder::withRelaxCostAtDestination);
+    });
 
     for (Optimization optimization : preferences.transit().raptor().optimizations()) {
       if (optimization.is(PARALLEL)) {

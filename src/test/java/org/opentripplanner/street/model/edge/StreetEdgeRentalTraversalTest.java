@@ -1,8 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
 import static org.opentripplanner.routing.api.request.StreetMode.SCOOTER_RENTAL;
@@ -23,6 +22,7 @@ import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
 import org.opentripplanner.test.support.VariableSource;
 
@@ -67,9 +67,9 @@ public class StreetEdgeRentalTraversalTest {
     var state = editor.makeState();
 
     assertEquals(state.getNonTransitMode(), formFactor.traverseMode);
-    var afterTraversal = e0.traverse(state);
-
-    assertNotNull(afterTraversal);
+    var states = e0.traverse(state);
+    assertEquals(1, states.length);
+    var afterTraversal = states[0];
 
     assertEquals(formFactor.traverseMode, afterTraversal.getNonTransitMode());
   }
@@ -97,6 +97,6 @@ public class StreetEdgeRentalTraversalTest {
     assertEquals(state.getNonTransitMode(), formFactor.traverseMode);
     var afterTraversal = e0.traverse(state);
 
-    assertNull(afterTraversal);
+    assertTrue(State.isEmpty(afterTraversal));
   }
 }

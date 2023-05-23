@@ -1,5 +1,4 @@
 {
-  "streetRoutingTimeout": "7s",
   "routingDefaults": {
     "maxJourneyDuration": "6h",
     "boardSlack": "0s",
@@ -9,10 +8,11 @@
     "walkReluctance": 1.75,
     "stairsReluctance": 1.65,
     "numItineraries": 3,
-    "geoidElevation": true
+    "geoidElevation": true,
+    "streetRoutingTimeout": "7s"
   },
   "transit": {
-    "maxNumberOfTransfers" : 4
+    "maxNumberOfTransfers": 4
   },
   "updaters": [
     {
@@ -55,6 +55,14 @@
       "network": "SPIN",
       "sourceType": "gbfs",
       "url": "https://gbfs.spin.pm/api/gbfs/v2/portland"
+    }
+  ],
+  "rideHailingServices": [
+    {
+      "type": "uber-car-hailing",
+      "clientId": "${UBER_CLIENT_ID}",
+      "clientSecret": "${UBER_CLIENT_SECRET}",
+      "wheelchairAccessibleRideType": "970ed376-bd33-4ad1-81c5-d2928a347a06"
     }
   ]
 }

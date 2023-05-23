@@ -10,8 +10,10 @@ import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.legreference.LegReference;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -456,6 +458,19 @@ public interface Leg {
 
     return Stream.of(intermediate, start, end).flatMap(s -> s).collect(Collectors.toSet());
   }
+
+  /**
+   * Set {@link FareProductUse} for this leg. Their use-id can identify them across several
+   * legs.
+   */
+  @Sandbox
+  void setFareProducts(List<FareProductUse> products);
+
+  /**
+   * Get the {@link FareProductUse} for this leg.
+   */
+  @Sandbox
+  List<FareProductUse> fareProducts();
 
   private static Stream<FareZone> getFareZones(Place place) {
     if (place.stop == null) {

@@ -24,6 +24,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
@@ -65,13 +66,20 @@ class StopAndStationMapper {
     FeedScopedIdFactory idFactory,
     ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
     TariffZoneMapper tariffZoneMapper,
+    StopModelBuilder stopModelBuilder,
     ZoneId defaultTimeZone,
     DataImportIssueStore issueStore,
     boolean noTransfersOnIsolatedStops
   ) {
     this.stationMapper =
-      new StationMapper(issueStore, idFactory, defaultTimeZone, noTransfersOnIsolatedStops);
-    this.quayMapper = new QuayMapper(idFactory, issueStore);
+      new StationMapper(
+        issueStore,
+        idFactory,
+        defaultTimeZone,
+        noTransfersOnIsolatedStops,
+        stopModelBuilder.stationById()
+      );
+    this.quayMapper = new QuayMapper(idFactory, issueStore, stopModelBuilder.regularStopsById());
     this.tariffZoneMapper = tariffZoneMapper;
     this.quayIndex = quayIndex;
     this.issueStore = issueStore;
@@ -92,7 +100,7 @@ class StopAndStationMapper {
     var transitMode = stopPlaceTypeMapper.map(selectedStopPlace);
 
     // Loop through all versions of the StopPlace in order to collect all quays, even if they
-    // were deleted in never versions of the StopPlace
+    // were deleted in newer versions of the StopPlace
     for (StopPlace stopPlace : stopPlaceAllVersions) {
       for (Quay quay : listOfQuays(stopPlace)) {
         addStopToParentIfNotPresent(quay, station, fareZones, transitMode, selectedStopPlace);

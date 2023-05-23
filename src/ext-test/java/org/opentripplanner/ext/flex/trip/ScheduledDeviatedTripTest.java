@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.test.support.PolylineAssert.assertThatPolylinesAreEqual;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
@@ -24,6 +23,7 @@ import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.ext.flex.FlexTest;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.StopTime;
@@ -148,7 +148,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var itineraries = filter.filter(router.createFlexOnlyItineraries().stream().toList());
 
     var itinerary = itineraries.iterator().next();
-    assertFalse(itinerary.getFares().getTypes().isEmpty());
+    assertFalse(itinerary.getFares().getFareTypes().isEmpty());
 
     assertEquals(Money.usDollars(250), itinerary.getFares().getFare(FareType.regular));
 
@@ -238,23 +238,20 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     GenericLocation to,
     OtpServerRequestContext serverContext
   ) {
+    var zoneId = ZoneIds.NEW_YORK;
     RouteRequest request = new RouteRequest();
     request.journey().transit().setFilters(List.of(AllowAllTransitFilter.of()));
-    Instant dateTime = LocalDateTime
-      .of(2021, Month.DECEMBER, 16, 12, 0)
-      .atZone(ZoneIds.NEW_YORK)
-      .toInstant();
-    request.setDateTime(dateTime);
+    var dateTime = LocalDateTime.of(2021, Month.DECEMBER, 16, 12, 0).atZone(zoneId);
+    request.setDateTime(dateTime.toInstant());
     request.setFrom(from);
     request.setTo(to);
 
-    var time = dateTime.atZone(ZoneIds.NEW_YORK);
-    var additionalSearchDays = AdditionalSearchDays.defaults(time);
-
+    var transitStartOfTime = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
+    var additionalSearchDays = AdditionalSearchDays.defaults(dateTime);
     var result = TransitRouter.route(
       request,
       serverContext,
-      time,
+      transitStartOfTime,
       additionalSearchDays,
       new DebugTimingAggregator()
     );

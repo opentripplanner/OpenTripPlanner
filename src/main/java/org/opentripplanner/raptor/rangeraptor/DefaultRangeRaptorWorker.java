@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor.rangeraptor;
 
 import java.util.Collection;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
@@ -134,6 +135,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
       // the arrival time given departure at minute t + 1.
       final IntIterator it = calculator.rangeRaptorMinutes();
       while (it.hasNext()) {
+        OTPRequestTimeoutException.checkForTimeout();
         // Run the raptor search for this particular iteration departure time
         iterationDepartureTime = it.next();
         lifeCycle.setupIteration(iterationDepartureTime);
@@ -200,7 +202,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
         int alightSlack = slackProvider.alightSlack(pattern.slackIndex());
         int boardSlack = slackProvider.boardSlack(pattern.slackIndex());
 
-        transitWorker.prepareForTransitWith(route.timetable());
+        transitWorker.prepareForTransitWith(route);
 
         IntIterator stop = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
 
@@ -211,7 +213,11 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
           // attempt to alight if we're on board, this is done above the board search
           // so that we don't alight on first stop boarded
           if (calculator.alightingPossibleAt(pattern, stopPos)) {
-            transitWorker.alight(stopIndex, stopPos, alightSlack);
+            if (enableTransferConstraints && txSearch.transferExistSourceStop(stopPos)) {
+              transitWorker.alightConstrainedTransferExist(stopIndex, stopPos, alightSlack);
+            } else {
+              transitWorker.alightOnlyRegularTransferExist(stopIndex, stopPos, alightSlack);
+            }
           }
 
           if (calculator.boardingPossibleAt(pattern, stopPos)) {
@@ -219,7 +225,7 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
             // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
             if (state.isStopReachedInPreviousRound(stopIndex)) {
               // has constrained transfers
-              if (enableTransferConstraints && txSearch.transferExist(stopPos)) {
+              if (enableTransferConstraints && txSearch.transferExistTargetStop(stopPos)) {
                 transitWorker.boardWithConstrainedTransfer(
                   stopIndex,
                   stopPos,

@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.collection.ListUtils;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.TransitLeg;
@@ -106,5 +107,13 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
     fareZones.addAll(second.getFareZones());
 
     return fareZones;
+  }
+
+  @Override
+  public void setFareProducts(List<FareProductUse> products) {}
+
+  @Override
+  public List<FareProductUse> fareProducts() {
+    return List.of();
   }
 }

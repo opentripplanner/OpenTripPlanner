@@ -29,7 +29,7 @@ public class BuildConfigTest {
 
     // Test for unused parameters
     var buf = new StringBuilder();
-    a.logAllUnusedParameters(m -> buf.append("\n").append(m));
+    a.logAllWarnings(m -> buf.append("\n").append(m));
     if (!buf.isEmpty()) {
       fail(buf.toString());
     }

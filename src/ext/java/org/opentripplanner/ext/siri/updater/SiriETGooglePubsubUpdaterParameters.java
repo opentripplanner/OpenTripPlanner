@@ -64,17 +64,7 @@ public record SiriETGooglePubsubUpdaterParameters(
   }
 
   @Override
-  public String getUrl() {
+  public String url() {
     return dataInitializationUrl;
-  }
-
-  @Override
-  public String configRef() {
-    return configRef;
-  }
-
-  @Override
-  public String getFeedId() {
-    return feedId;
   }
 }

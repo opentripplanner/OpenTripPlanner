@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.File;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,7 +13,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
@@ -156,16 +155,14 @@ public class UnconnectedAreasTest {
     Assertions.assertNotNull(fileUrl);
     File file = new File(fileUrl.getFile());
 
-    OpenStreetMapProvider provider = new OpenStreetMapProvider(file, false);
-    OpenStreetMapModule loader = new OpenStreetMapModule(
-      List.of(provider),
-      Set.of(),
-      graph,
-      issueStore,
-      true
-    );
-    loader.staticParkAndRide = true;
-    loader.staticBikeParkAndRide = true;
+    OsmProvider provider = new OsmProvider(file, false);
+    OsmModule loader = OsmModule
+      .of(provider, graph)
+      .withIssueStore(issueStore)
+      .withAreaVisibility(true)
+      .withStaticParkAndRide(true)
+      .withStaticBikeParkAndRide(true)
+      .build();
 
     loader.buildGraph();
 

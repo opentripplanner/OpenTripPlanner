@@ -23,7 +23,14 @@ jobs:
       - uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 0
-          
+
+      # nodejs is needed because the dynamic download of it via the prettier maven plugin often
+      # times out
+      # Example: https://github.com/opentripplanner/OpenTripPlanner/actions/runs/4490450225/jobs/7897533439
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
       # Java setup step completes very fast, no need to run in a preconfigured docker container
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -38,7 +45,7 @@ jobs:
         # NAT drops them
         # https://github.com/actions/runner-images/issues/1499
         run: |
-          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck
+          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node
           mvn --batch-mode package -Dmaven.test.skip -P prettierSkip
 
       - name: Send coverage data to codecov.io
@@ -79,7 +86,7 @@ jobs:
       LOCAL_BRANCH: local-pages
       REMOTE_BRANCH: main
       TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
-      MASTER_BRANCH_VERSION: 2.3.0
+      MASTER_BRANCH_VERSION: 2.4.0
 
     steps:
 
@@ -97,21 +104,26 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r docs/requirements.txt
         
-      - name: Build documentation
+
+      - name: Build main documentation
         if: github.event_name == 'pull_request'
         run: mkdocs build
-        
-      - name: Deploy docs to Github pages
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Build GTFS GraphQL API documentation
+        run: |
+          npm install -g @magidoc/cli@3.6.4
+          magidoc generate
+
+      - name: Deploy compiled HTML to Github pages
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
         run: |
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
           
-          # mkdocs/mike generates a new sitemap.xml.gz for every commit even if the docs have not changed
-          # this configures the date of the change to be the date when the docs haven been changed last
-          # https://github.com/jimporter/mike/issues/103#issuecomment-1453878471
-          export SOURCE_DATE_EPOCH=`git log -1 --format=%ct docs`
-
           # mike, the versioning plugin for mkdocs, expects there to be a local branch to push to so
           # we are cloning one here and commit to it
           # mike has support for specifing the origin but then it tries to rebase the _local_ gh-pages
@@ -129,6 +141,14 @@ jobs:
           else
             mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
           fi
+          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
+          
+          # commit and push the GraphQL documentation
+          git checkout $LOCAL_BRANCH
+          mkdir -p api
+          rsync -r --delete target/magidoc/api/ api/dev-2.x/
+          git add api
+          git commit -am "Add Magidoc GraphQL documentation"
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
 
   graphql-code-generation:
@@ -159,10 +179,6 @@ jobs:
     needs:
       - build-windows
       - build-linux
-    env:
-      CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
-      CONTAINER_REGISTRY_USER: otpbot
-      CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
     steps:
       - uses: actions/checkout@v3.1.0
         with:
@@ -174,6 +190,10 @@ jobs:
           distribution: temurin
           cache: maven
       - name: Build container image with Jib, push to Dockerhub
+        env:
+          CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
+          CONTAINER_REGISTRY_USER: otpbot
+          CONTAINER_REGISTRY_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
         run: |
           # we give the container two tags
           #   - "latest"

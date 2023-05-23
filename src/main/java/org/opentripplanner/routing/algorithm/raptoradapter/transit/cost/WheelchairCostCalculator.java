@@ -3,17 +3,18 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
-import org.opentripplanner.raptor.spi.CostCalculator;
+import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
-public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements CostCalculator<T> {
+public class WheelchairCostCalculator<T extends DefaultTripSchedule>
+  implements RaptorCostCalculator<T> {
 
-  private final CostCalculator<T> delegate;
+  private final RaptorCostCalculator<T> delegate;
   private final int[] wheelchairBoardingCost;
 
   public WheelchairCostCalculator(
-    @Nonnull CostCalculator<T> delegate,
+    @Nonnull RaptorCostCalculator<T> delegate,
     @Nonnull AccessibilityPreferences wheelchairAccessibility
   ) {
     this.delegate = delegate;
@@ -83,7 +84,7 @@ public class WheelchairCostCalculator<T extends DefaultTripSchedule> implements 
     for (var it : Accessibility.values()) {
       costIndex[it.ordinal()] =
         switch (it) {
-          case POSSIBLE -> CostCalculator.ZERO_COST;
+          case POSSIBLE -> RaptorCostCalculator.ZERO_COST;
           case NO_INFORMATION -> RaptorCostConverter.toRaptorCost(requirements.unknownCost());
           case NOT_POSSIBLE -> RaptorCostConverter.toRaptorCost(requirements.inaccessibleCost());
         };

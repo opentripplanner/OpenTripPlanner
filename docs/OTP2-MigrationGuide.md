@@ -59,7 +59,7 @@ of this type:
 - `boardTimes` to `routingDefaults.boardSlackForMode`. Since v2.0
 - `htmlAnnotations` to `dataImportReport`. Since v2.0
 - `maxHtmlAnnotationsPerFile` to `maxDataImportIssuesPerFile`. Since v2.0
-- `maxTransferDistance` to `maxTransferDurationSeconds`. Since v2.1
+- `maxTransferDistance` to `maxTransferDuration`. Since v2.1
 
 #### These parameters are no longer supported
 
@@ -69,7 +69,7 @@ of this type:
 - `stationTransfers`. Since v2.0
 - `stopClusterMode`. Since v2.0
 - `useTransfersTxt`. Since v2.1
-
+- `extraEdgesStopPlatformLink`. Since v2.0
 
 Since v2.2, `osmWayPropertySet` was renamed `osmTagMapping` and is part of the individual osm 
 source. The driving direction and intersection cost model were decoupled for the tag mapping and can
@@ -181,7 +181,7 @@ permanently from OTP2, but may require some development to support valid importa
 - `preferredAgencies`, `unpreferredAgencies`, `bannedAgencies` and `whiteListedAgencies` use
   feed-scoped ids. If you are using the ids directly from the Index API, no changes are needed.
   Since 2.0
-- `maxTransferDistance`, replaced by `maxTransferDurationSeconds` Since 2.1
+- `maxTransferDistance`, replaced by `maxTransferDuration` Since 2.1
 - `bannedTrips` no longer allows specifying stop indices, but only allows banning complete trips.
   Since 2.2
 

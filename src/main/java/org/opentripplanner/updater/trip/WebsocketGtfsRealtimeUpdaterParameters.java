@@ -22,11 +22,11 @@ public class WebsocketGtfsRealtimeUpdaterParameters implements UrlUpdaterParamet
     this.backwardsDelayPropagationType = backwardsDelayPropagationType;
   }
 
-  public String getUrl() {
+  public String url() {
     return url;
   }
 
-  public String getFeedId() {
+  public String feedId() {
     return feedId;
   }
 

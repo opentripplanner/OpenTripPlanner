@@ -3,6 +3,7 @@ package org.opentripplanner;
 import static org.opentripplanner.standalone.configure.ConstructApplication.creatTransitLayerForRaptor;
 
 import io.micrometer.core.instrument.Metrics;
+import java.util.List;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
@@ -32,7 +33,6 @@ public class TestServerContext {
     DefaultServerRequestContext context = DefaultServerRequestContext.create(
       routerConfig.transitTuningConfig(),
       routerConfig.routingRequestDefaults(),
-      routerConfig.streetRoutingTimeout(),
       new RaptorConfig<>(routerConfig.transitTuningConfig()),
       graph,
       new DefaultTransitService(transitModel),
@@ -42,8 +42,8 @@ public class TestServerContext {
       createVehiclePositionService(),
       createVehicleRentalService(),
       routerConfig.flexConfig(),
-      null,
-      routerConfig.requestLogFile()
+      List.of(),
+      null
     );
     creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());
     return context;

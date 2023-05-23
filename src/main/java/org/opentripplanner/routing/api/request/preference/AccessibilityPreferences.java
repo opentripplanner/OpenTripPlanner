@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.Units;
 
@@ -28,6 +29,8 @@ public final class AccessibilityPreferences {
   private final int unknownCost;
   private final int inaccessibleCost;
 
+  private static final AccessibilityPreferences DEFAULT_UNSET = ofCost(NOT_SET, NOT_SET);
+
   private AccessibilityPreferences(
     boolean onlyConsiderAccessible,
     int unknownCost,
@@ -50,6 +53,18 @@ public final class AccessibilityPreferences {
    */
   public static AccessibilityPreferences ofCost(int unknownCost, int inaccessibleCost) {
     return new AccessibilityPreferences(false, unknownCost, inaccessibleCost);
+  }
+
+  public static Builder of() {
+    return DEFAULT_UNSET.copyOf();
+  }
+
+  public Builder copyOf() {
+    return new Builder(this, this);
+  }
+
+  public Builder copyOfWithDefaultCosts(AccessibilityPreferences defaultCosts) {
+    return new Builder(this, defaultCosts);
   }
 
   /**
@@ -92,14 +107,81 @@ public final class AccessibilityPreferences {
 
   @Override
   public String toString() {
+    return toString(DEFAULT_UNSET);
+  }
+
+  public String toString(AccessibilityPreferences defaultCosts) {
     if (onlyConsiderAccessible) {
       return "OnlyConsiderAccessible";
     }
 
     return ToStringBuilder
       .of(AccessibilityPreferences.class)
-      .addCost("unknownCost", unknownCost, NOT_SET)
-      .addCost("inaccessibleCost", inaccessibleCost, NOT_SET)
+      .addCost("unknownCost", unknownCost, defaultCosts.unknownCost)
+      .addCost("inaccessibleCost", inaccessibleCost, defaultCosts.inaccessibleCost)
       .toString();
+  }
+
+  public static class Builder {
+
+    private final AccessibilityPreferences original;
+    private boolean onlyConsiderAccessible;
+    private int unknownCost;
+    private int inaccessibleCost;
+
+    private Builder(AccessibilityPreferences original, AccessibilityPreferences defaultCosts) {
+      this.original = original;
+
+      if (original.onlyConsiderAccessible) {
+        this.onlyConsiderAccessible = true;
+        this.unknownCost = defaultCosts.unknownCost;
+        this.inaccessibleCost = defaultCosts.inaccessibleCost;
+      } else {
+        this.onlyConsiderAccessible = false;
+        this.unknownCost = original.unknownCost;
+        this.inaccessibleCost = original.inaccessibleCost;
+      }
+    }
+
+    public boolean onlyConsiderAccessible() {
+      return onlyConsiderAccessible;
+    }
+
+    public Builder withAccessibleOnly() {
+      this.onlyConsiderAccessible = true;
+      return this;
+    }
+
+    public int unknownCost() {
+      return unknownCost;
+    }
+
+    public Builder withUnknownCost(int unknownCost) {
+      this.onlyConsiderAccessible = false;
+      this.unknownCost = unknownCost;
+      return this;
+    }
+
+    public int inaccessibleCost() {
+      return inaccessibleCost;
+    }
+
+    public Builder withInaccessibleCost(int inaccessibleCost) {
+      this.onlyConsiderAccessible = false;
+      this.inaccessibleCost = inaccessibleCost;
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
+      return this;
+    }
+
+    public AccessibilityPreferences build() {
+      var value = onlyConsiderAccessible
+        ? ofOnlyAccessible()
+        : ofCost(unknownCost, inaccessibleCost);
+      return original.equals(value) ? original : value;
+    }
   }
 }

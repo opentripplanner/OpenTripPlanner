@@ -6,10 +6,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
+import org.opentripplanner.datastore.file.DirectoryDataSource;
 import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -19,13 +19,13 @@ import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
-import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
-import org.opentripplanner.openstreetmap.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -77,10 +77,8 @@ public class ConstantsForTests {
   private static final String NETEX_NORDIC_DIR = "src/test/resources/netex/nordic";
 
   private static final String NETEX_NORDIC_FILENAME = "netex_minimal.zip";
-  private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip";
-
-  private static final String NETEX_EPIP_FILENAME = "netex_epip_minimal.zip";
-
+  private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip/";
+  private static final String NETEX_EPIP_DATA_DIR = NETEX_EPIP_DIR + "netex_epip_minimal/";
   /* Stuttgart area, Germany */
   public static final String DEUFRINGEN_OSM =
     "src/test/resources/germany/deufringen-minimal.osm.pbf";
@@ -135,9 +133,10 @@ public class ConstantsForTests {
 
   public static NetexBundle createMinimalNetexEpipBundle() {
     var buildConfig = createNetexEpipBuilderParameters();
-    var netexZipFile = new File(NETEX_EPIP_DIR, NETEX_EPIP_FILENAME);
 
-    var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
+    var netexZipFile = new File(NETEX_EPIP_DATA_DIR);
+
+    var dataSource = new DirectoryDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
     return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
   }
@@ -153,17 +152,12 @@ public class ConstantsForTests {
       // Add street data from OSM
       {
         File osmFile = new File(PORTLAND_CENTRAL_OSM);
-        OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, false);
-        OpenStreetMapModule osmModule = new OpenStreetMapModule(
-          List.of(osmProvider),
-          Set.of(),
-          // Need to use a mutable set here, since it is used
-          graph,
-          DataImportIssueStore.NOOP,
-          false
-        );
-        osmModule.staticBikeParkAndRide = true;
-        osmModule.staticParkAndRide = true;
+        OsmProvider osmProvider = new OsmProvider(osmFile, false);
+        OsmModule osmModule = OsmModule
+          .of(osmProvider, graph)
+          .withStaticParkAndRide(true)
+          .withStaticBikeParkAndRide(true)
+          .build();
         osmModule.buildGraph();
       }
       // Add transit data from GTFS
@@ -203,14 +197,8 @@ public class ConstantsForTests {
       var transitModel = new TransitModel(stopModel, deduplicator);
       // Add street data from OSM
       File osmFile = new File(osmPath);
-      OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, true);
-      OpenStreetMapModule osmModule = new OpenStreetMapModule(
-        List.of(osmProvider),
-        Set.of(),
-        graph,
-        DataImportIssueStore.NOOP,
-        false
-      );
+      OsmProvider osmProvider = new OsmProvider(osmFile, true);
+      OsmModule osmModule = OsmModule.of(osmProvider, graph).build();
       osmModule.buildGraph();
       return new TestOtpModel(graph, transitModel);
     } catch (Exception e) {
@@ -261,14 +249,8 @@ public class ConstantsForTests {
       {
         File osmFile = new File(OSLO_EAST_OSM);
 
-        OpenStreetMapProvider osmProvider = new OpenStreetMapProvider(osmFile, false);
-        OpenStreetMapModule osmModule = new OpenStreetMapModule(
-          List.of(osmProvider),
-          Set.of(),
-          graph,
-          DataImportIssueStore.NOOP,
-          false
-        );
+        OsmProvider osmProvider = new OsmProvider(osmFile, false);
+        OsmModule osmModule = OsmModule.of(osmProvider, graph).build();
         osmModule.buildGraph();
       }
       // Add transit data from Netex

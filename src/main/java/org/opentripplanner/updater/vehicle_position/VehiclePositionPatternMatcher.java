@@ -1,8 +1,8 @@
 package org.opentripplanner.updater.vehicle_position;
 
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
-import static org.opentripplanner.model.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -27,8 +27,6 @@ import java.util.stream.Stream;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.UpdateError;
-import org.opentripplanner.model.UpdateSuccess;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopStatus;
@@ -38,8 +36,10 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
-import org.opentripplanner.updater.ResultLogger;
-import org.opentripplanner.updater.UpdateResult;
+import org.opentripplanner.updater.spi.ResultLogger;
+import org.opentripplanner.updater.spi.UpdateError;
+import org.opentripplanner.updater.spi.UpdateResult;
+import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,12 +134,7 @@ public class VehiclePositionPatternMatcher {
       .toList();
     // needs to be put into a new list so the types are correct
     var updateResult = UpdateResult.ofResults(new ArrayList<>(results));
-    ResultLogger.logUpdateResult(
-      feedId,
-      "vehicle-positions",
-      vehiclePositions.size(),
-      updateResult
-    );
+    ResultLogger.logUpdateResult(feedId, "gtfs-rt-vehicle-positions", updateResult);
 
     return updateResult;
   }
@@ -193,7 +188,7 @@ public class VehiclePositionPatternMatcher {
   private static RealtimeVehiclePosition mapVehiclePosition(
     VehiclePosition vehiclePosition,
     List<StopLocation> stopsOnVehicleTrip,
-    Trip trip
+    TripTimes tripTimes
   ) {
     var newPosition = RealtimeVehiclePosition.builder();
 
@@ -213,7 +208,7 @@ public class VehiclePositionPatternMatcher {
 
     if (vehiclePosition.hasVehicle()) {
       var vehicle = vehiclePosition.getVehicle();
-      var id = new FeedScopedId(trip.getId().getFeedId(), vehicle.getId());
+      var id = new FeedScopedId(tripTimes.getTrip().getId().getFeedId(), vehicle.getId());
       newPosition
         .setVehicleId(id)
         .setLabel(Optional.ofNullable(vehicle.getLabel()).orElse(vehicle.getLicensePlate()));
@@ -239,19 +234,32 @@ public class VehiclePositionPatternMatcher {
         LOG.warn(
           "Stop ID {} is not in trip {}. Not setting stopRelationship.",
           vehiclePosition.getStopId(),
-          trip.getId()
+          tripTimes.getTrip().getId()
         );
       }
     }
     // but if stop_id isn't there we try current_stop_sequence
     else if (vehiclePosition.hasCurrentStopSequence()) {
-      var stop = stopsOnVehicleTrip.get(vehiclePosition.getCurrentStopSequence());
-      newPosition.setStop(stop);
+      tripTimes
+        .stopIndexOfGtfsSequence(vehiclePosition.getCurrentStopSequence())
+        .ifPresent(stopIndex -> {
+          if (validStopIndex(stopIndex, stopsOnVehicleTrip)) {
+            var stop = stopsOnVehicleTrip.get(stopIndex);
+            newPosition.setStop(stop);
+          }
+        });
     }
 
-    newPosition.setTrip(trip);
+    newPosition.setTrip(tripTimes.getTrip());
 
     return newPosition.build();
+  }
+
+  /**
+   * Checks that the stop index can actually be found in the pattern.
+   */
+  private static boolean validStopIndex(int stopIndex, List<StopLocation> stopsOnVehicleTrip) {
+    return stopIndex < stopsOnVehicleTrip.size() - 1;
   }
 
   private record TemporalDistance(LocalDate date, long distance) {}
@@ -286,7 +294,7 @@ public class VehiclePositionPatternMatcher {
 
     var tripId = vehiclePosition.getTrip().getTripId();
 
-    if (!StringUtils.hasValue(tripId)) {
+    if (StringUtils.hasNoValue(tripId)) {
       return Result.failure(UpdateError.noTripId(UpdateError.UpdateErrorType.NO_TRIP_ID));
     }
 
@@ -314,7 +322,11 @@ public class VehiclePositionPatternMatcher {
     }
 
     // Add position to pattern
-    var newPosition = mapVehiclePosition(vehiclePosition, pattern.getStops(), trip);
+    var newPosition = mapVehiclePosition(
+      vehiclePosition,
+      pattern.getStops(),
+      pattern.getScheduledTimetable().getTripTimes(trip)
+    );
 
     return Result.success(new PatternAndVehiclePosition(pattern, newPosition));
   }

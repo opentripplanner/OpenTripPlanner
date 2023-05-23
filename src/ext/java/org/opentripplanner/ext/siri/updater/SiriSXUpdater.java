@@ -3,8 +3,6 @@ package org.opentripplanner.ext.siri.updater;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
@@ -13,9 +11,10 @@ import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.WriteToGraphCallback;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
+import org.opentripplanner.updater.spi.HttpHeaders;
+import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
@@ -25,11 +24,11 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
   private static final long RETRY_INTERVAL_MILLIS = 5000;
-  private static final Map<String, String> requestHeaders = new HashMap<>();
   private final String url;
   private final String originalRequestorRef;
   private final TransitAlertService transitAlertService;
   private final SiriAlertsUpdateHandler updateHandler;
+  private final HttpHeaders requestHeaders;
   private WriteToGraphCallback saveResultOnGraph;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
   private String requestorRef;
@@ -39,8 +38,8 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   public SiriSXUpdater(SiriSXUpdaterParameters config, TransitModel transitModel) {
     super(config);
     // TODO: add options to choose different patch services
-    this.url = config.getUrl();
-    this.requestorRef = config.getRequestorRef();
+    this.url = config.url();
+    this.requestorRef = config.requestorRef();
 
     if (requestorRef == null || requestorRef.isEmpty()) {
       requestorRef = "otp-" + UUID.randomUUID().toString();
@@ -49,22 +48,22 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     //Keeping original requestorRef use as base for updated requestorRef to be used in retries
     this.originalRequestorRef = requestorRef;
 
-    int timeoutSec = config.getTimeoutSec();
+    int timeoutSec = config.timeoutSec();
     if (timeoutSec > 0) {
       this.timeout = 1000 * timeoutSec;
     }
 
     blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-    requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
+    requestHeaders = config.requestHeaders();
 
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
     this.updateHandler =
       new SiriAlertsUpdateHandler(
-        config.getFeedId(),
+        config.feedId(),
         transitModel,
         transitAlertService,
         SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel)),
-        config.getEarlyStartSec()
+        config.earlyStartSec()
       );
     LOG.info(
       "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",
@@ -87,7 +86,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   }
 
   @Override
-  protected void runPolling() {
+  protected void runPolling() throws InterruptedException {
     try {
       boolean moreData = false;
       do {
@@ -113,11 +112,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
       LOG.info("Caught timeout - retry no. {} after {} millis", retryCount, sleepTime);
 
-      try {
-        Thread.sleep(sleepTime);
-      } catch (InterruptedException ex) {
-        //Ignore
-      }
+      Thread.sleep(sleepTime);
 
       // Creating new requestorRef so all data is refreshed
       requestorRef = originalRequestorRef + "-retry-" + retryCount;
@@ -135,7 +130,12 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
       creating = System.currentTimeMillis() - t1;
       t1 = System.currentTimeMillis();
 
-      InputStream is = SiriHttpUtils.postData(url, sxServiceRequest, timeout, requestHeaders);
+      InputStream is = SiriHttpUtils.postData(
+        url,
+        sxServiceRequest,
+        timeout,
+        requestHeaders.asMap()
+      );
 
       fetching = System.currentTimeMillis() - t1;
       t1 = System.currentTimeMillis();

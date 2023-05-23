@@ -210,4 +210,12 @@ public class TransitModelForTest {
     }
     return builder.build();
   }
+
+  /**
+   * Create {@link TripPatternBuilder} fully set up with the given mode.
+   */
+  public static TripPatternBuilder pattern(TransitMode mode) {
+    return tripPattern(mode.name(), route(mode.name()).withMode(mode).build())
+      .withStopPattern(stopPattern(3));
+  }
 }

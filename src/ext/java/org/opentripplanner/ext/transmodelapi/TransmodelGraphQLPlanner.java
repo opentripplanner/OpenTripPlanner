@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.transmodelapi;
 
+import graphql.GraphQLError;
 import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.Map;
 import org.opentripplanner.ext.transmodelapi.mapping.TripRequestMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.ViaRequestMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
+import org.opentripplanner.ext.transmodelapi.support.OTPProcessingTimeoutGraphQLException;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
@@ -15,6 +18,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +42,25 @@ public class TransmodelGraphQLPlanner {
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
       response.previousPageCursor = res.getPreviousPageCursor();
       response.nextPageCursor = res.getNextPageCursor();
+    } catch (OTPRequestTimeoutException e) {
+      response.plan = TripPlanMapper.mapTripPlan(request, List.of());
+      response.messages.add(new RoutingError(RoutingErrorCode.PROCESSING_TIMEOUT, null));
+      Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
+      return DataFetcherResult
+        .<PlanResponse>newResult()
+        .data(response)
+        .errors(
+          response.messages
+            .stream()
+            .map(routingError ->
+              (GraphQLError) new OTPProcessingTimeoutGraphQLException(routingError.code.name())
+            )
+            .toList()
+        )
+        .localContext(Map.of("locale", locale))
+        .build();
     } catch (Exception e) {
-      LOG.error("System error: " + e.getMessage(), e);
+      LOG.error("System error: {}", e.getMessage(), e);
       response.plan = TripPlanMapper.mapTripPlan(request, List.of());
       response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
     }
@@ -58,6 +79,8 @@ public class TransmodelGraphQLPlanner {
     try {
       request = ViaRequestMapper.createRouteViaRequest(environment);
       response = ctx.getRoutingService().route(request);
+    } catch (RoutingValidationException e) {
+      response = new ViaRoutingResponse(Map.of(), List.of(), e.getRoutingErrors());
     } catch (Exception e) {
       LOG.error("System error: " + e.getMessage(), e);
       response =

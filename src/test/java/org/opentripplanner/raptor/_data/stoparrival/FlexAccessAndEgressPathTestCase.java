@@ -296,12 +296,12 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       prevArrival = new Access(accessPath.stop(), arrivalTime, accessPath);
       int timeShift = TX1_START - prevArrival.arrivalTime();
 
-      prevArrival = new Walk(1, TX1_END - timeShift, TX1_TRANSFER, prevArrival);
+      prevArrival = new Transfer(1, TX1_END - timeShift, TX1_TRANSFER, prevArrival);
 
       int waitCost = costL1ForwardIncWait(prevArrival.arrivalTime());
       prevArrival = new Bus(2, STOP_C, L1_STOP_ARR_TIME, waitCost, TRIP_B, prevArrival);
 
-      prevArrival = new Walk(2, TX2_END, TX2_TRANSFER, prevArrival);
+      prevArrival = new Transfer(2, TX2_END, TX2_TRANSFER, prevArrival);
     }
 
     // Egress
@@ -336,11 +336,11 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       arrivalTime = egressPath.earliestDepartureTime(arrivalTime);
       prevArrival = new Access(egressPath.stop(), arrivalTime, egressPath);
       arrivalTime = prevArrival.arrivalTime() - TX2_DURATION;
-      prevArrival = new Walk(1, arrivalTime, TX2_TRANSFER_REV, prevArrival);
+      prevArrival = new Transfer(1, arrivalTime, TX2_TRANSFER_REV, prevArrival);
       cost = costL1ReverseIncWait(prevArrival.arrivalTime());
       prevArrival = new Bus(2, STOP_B, L1_STOP_ARR_TIME_REV, cost, TRIP_B, prevArrival);
       arrivalTime = prevArrival.arrivalTime() - TX1_DURATION;
-      prevArrival = new Walk(2, arrivalTime, TX1_TRANSFER_REV, prevArrival);
+      prevArrival = new Transfer(2, arrivalTime, TX1_TRANSFER_REV, prevArrival);
     }
 
     // Access

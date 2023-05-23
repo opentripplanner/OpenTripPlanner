@@ -11,11 +11,11 @@ import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
-import org.opentripplanner.routing.core.ItineraryFares;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -174,6 +174,14 @@ public class Itinerary {
 
   public boolean isFlaggedForDeletion() {
     return !getSystemNotices().isEmpty();
+  }
+
+  /**
+   * Utility method to check if one of the attached system notices matches the
+   * given {@code tag}.
+   */
+  public boolean hasSystemNoticeTag(String tag) {
+    return systemNotices.stream().map(n -> n.tag).anyMatch(tag::equals);
   }
 
   public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
@@ -538,7 +546,7 @@ public class Itinerary {
   }
 
   /**
-   * The cost of this trip
+   * The fare products of this itinerary.
    */
   public ItineraryFares getFares() {
     return fare;

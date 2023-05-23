@@ -187,9 +187,9 @@ type DestinationDisplay {
 
 "List of visits to quays as part of vehicle journeys. Updated with real time information where available"
 type EstimatedCall {
-  "Actual time of arrival at quay. Updated from real time information if available. NOT IMPLEMENTED"
+  "Actual time of arrival at quay. Updated from real time information if available."
   actualArrivalTime: DateTime
-  "Actual time of departure from quay. Updated with real time information if available. NOT IMPLEMENTED"
+  "Actual time of departure from quay. Updated with real time information if available."
   actualDepartureTime: DateTime
   "Scheduled time of arrival at quay. Not affected by read time updated"
   aimedArrivalTime: DateTime!
@@ -534,7 +534,7 @@ type Quay implements PlaceInterface {
   estimatedCalls(
     "Filters results by either departures, arrivals or both. For departures forBoarding has to be true and the departure time has to be within the specified time range. For arrivals, forAlight has to be true and the arrival time has to be within the specified time range. If both are asked for, either the conditions for arrivals or the conditions for departures will have to be true for an EstimatedCall to show."
     arrivalDeparture: ArrivalDeparture = departures,
-    "Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED"
+    "Indicates that realtime-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
     "Limit the total number of departures returned."
     numberOfDepartures: Int = 5,
@@ -679,7 +679,7 @@ type QueryType {
     minimumLatitude: Float!,
     minimumLongitude: Float!
   ): [Quay]! @timingData
-  "Get all quays within the specified walking radius from a location. The returned type has two fields quay and distance"
+  "Get all quays within the specified walking radius from a location. There are no maximum limits for the input parameters, but the query will timeout and return if the parameters are too high."
   quaysByRadius(
     "fetching only nodes after this node (exclusive)"
     after: String,
@@ -777,8 +777,10 @@ type QueryType {
     itineraryFilters: ItineraryFilters,
     "The preferable language to use for text targeted the end user. Note! The data quality is limited, only stop and quay names are translates, and not in all places of the API."
     locale: Locale = no,
-    "Maximum duration for access/egress for street searches per respective mode."
-    maxAccessEgressDurationForMode: [StreetModeDurationInput!],
+    "Maximum duration for access/egress for street searches per respective mode. Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search. "
+    maxAccessEgressDurationForMode: [StreetModeDurationInput!] = [],
+    "Maximum duration for direct street searchers per respective mode. Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search."
+    maxDirectDurationForMode: [StreetModeDurationInput!] = [],
     "Maximum number of additional transfers compared to the best number of transfers allowed. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
     maximumAdditionalTransfers: Int = 5,
     "Maximum number of transfers. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
@@ -946,7 +948,7 @@ type RoutingParameters {
   "Max car speed along streets, in meters per second"
   carSpeed: Float
   compactLegsByReversedSearch: Boolean @deprecated
-  debugItineraryFilter: Boolean
+  debugItineraryFilter: Boolean @deprecated
   "Option to disable the default filtering of GTFS-RT alerts by time."
   disableAlertFiltering: Boolean @deprecated
   "If true, the remaining weight heuristic is disabled."
@@ -1071,7 +1073,7 @@ type StopPlace implements PlaceInterface {
   "List of visits to this stop place as part of vehicle journeys."
   estimatedCalls(
     arrivalDeparture: ArrivalDeparture = departures,
-    "Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED"
+    "Indicates that realtime-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
     "Limit the total number of departures returned."
     numberOfDepartures: Int = 5,
@@ -1121,7 +1123,17 @@ type StopToStopGeometry {
   toQuay: Quay
 }
 
-"A system notice is used to tag elements with system information for debugging or other system related purpose. One use-case is to run a routing search with 'itineraryFilters.debug: true'. This will then tag itineraries instead of removing them from the result. This make it possible to inspect the itinerary-filter-chain. A SystemNotice only have english text, because the primary user are technical staff, like testers and developers."
+"""
+A system notice is used to tag elements with system information for debugging or other
+system related purpose. One use-case is to run a routing search with
+`itineraryFilters.debug=listAll`. This will then tag itineraries instead of removing
+them from the result. This make it possible to inspect the itinerary-filter-chain. A
+SystemNotice only have english text, because the primary user are technical staff, like
+testers and developers.
+
+**NOTE!** _A SystemNotice is for debugging the system, avoid putting logic on it in the
+client. The tags and usage may change without notice._
+"""
 type SystemNotice {
   tag: String
   text: String
@@ -1401,6 +1413,7 @@ enum FilterPlaceType {
 enum InputField {
   dateTime
   from
+  intermediatePlace
   to
 }
 
@@ -1420,6 +1433,29 @@ enum InterchangeWeighting {
   preferredInterchange
   "Second highest priority interchange."
   recommendedInterchange
+}
+
+"""
+Enable this to attach a system notice to itineraries instead of removing them. This is very
+convenient when tuning the itinerary-filter-chain.
+"""
+enum ItineraryFilterDebugProfile {
+  """
+  Only return the requested number of itineraries, counting both actual and deleted ones.
+  The top `numItineraries` using the request sort order is returned. This does not work
+  with paging, itineraries after the limit, but inside the search-window are skipped when
+  moving to the next page.
+  """
+  limitToNumOfItineraries
+  """
+  Return all itineraries, including deleted ones, inside the actual search-window used
+  (the requested search-window may differ).
+  """
+  limitToSearchWindow
+  "List all itineraries, including all deleted itineraries."
+  listAll
+  "By default, the debug itinerary filters is turned off."
+  off
 }
 
 enum Locale {
@@ -1527,6 +1563,8 @@ enum RoutingErrorCode {
   outsideBounds
   "The date specified is outside the range of data currently loaded into the system"
   outsideServicePeriod
+  "The routing request timed out."
+  processingTimeout
   "An unknown error happened during the search. The details have been logged to the server logs"
   systemError
   "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
@@ -1819,6 +1857,12 @@ input InputWhiteListed {
 
 "Parameters for the OTP Itinerary Filter Chain. These parameters SHOULD be configured on the server side and should not be used by the client. They are made available here to be able to experiment and tune the server."
 input ItineraryFilters {
+  """
+  Use this parameter to debug the itinerary-filter-chain. The default is `off`
+  (itineraries are filtered and not returned). For all other values the unwanted
+  itineraries are returned with a system notice, and not deleted.
+  """
+  debug: ItineraryFilterDebugProfile = off
   groupSimilarityKeepNumOfItineraries: Float = 0.68 @deprecated
   "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."
   groupSimilarityKeepOne: Float = 0.85

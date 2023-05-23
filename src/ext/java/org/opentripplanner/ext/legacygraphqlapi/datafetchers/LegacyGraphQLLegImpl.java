@@ -10,8 +10,12 @@ import org.opentripplanner.api.mapping.LocalDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.legacygraphqlapi.mapping.NumberMapper;
+import org.opentripplanner.ext.ridehailing.model.RideEstimate;
+import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
@@ -75,6 +79,11 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<Long> endTime() {
     return environment -> getSource(environment).getEndTime().toInstant().toEpochMilli();
+  }
+
+  @Override
+  public DataFetcher<Iterable<FareProductUse>> fareProducts() {
+    return environment -> getSource(environment).fareProducts();
   }
 
   @Override
@@ -178,6 +187,18 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
+  public DataFetcher<RideEstimate> rideHailingEstimate() {
+    return environment -> {
+      Leg leg = getSource(environment);
+      if (leg instanceof RideHailingLeg rhl) {
+        return rhl.rideEstimate();
+      } else {
+        return null;
+      }
+    };
+  }
+
+  @Override
   public DataFetcher<Route> route() {
     return environment -> getSource(environment).getRoute();
   }
@@ -277,5 +298,10 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
         return res;
       } else return null;
     };
+  }
+
+  @Override
+  public DataFetcher<Double> accessibilityScore() {
+    return environment -> NumberMapper.toDouble(getSource(environment).accessibilityScore());
   }
 }

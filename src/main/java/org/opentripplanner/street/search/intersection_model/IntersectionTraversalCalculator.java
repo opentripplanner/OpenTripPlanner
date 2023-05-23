@@ -12,12 +12,12 @@ import org.opentripplanner.street.search.TraverseMode;
  *
  * @author avi
  */
+
 public interface IntersectionTraversalCalculator {
   IntersectionTraversalCalculator DEFAULT = create(
     IntersectionTraversalModel.SIMPLE,
     DrivingDirection.RIGHT
   );
-
   /**
    * Compute the duration of turning onto "to" from "from".
    *
@@ -37,8 +37,8 @@ public interface IntersectionTraversalCalculator {
     DrivingDirection drivingDirection
   ) {
     return switch (intersectionTraversalModel) {
-      case NORWAY -> new NorwayIntersectionTraversalCalculator(drivingDirection);
       case SIMPLE -> new SimpleIntersectionTraversalCalculator(drivingDirection);
+      case CONSTANT -> new ConstantIntersectionTraversalCalculator();
     };
   }
 }

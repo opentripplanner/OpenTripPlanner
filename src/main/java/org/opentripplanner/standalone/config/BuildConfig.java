@@ -5,7 +5,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -26,7 +25,7 @@ import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParamete
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersList;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParametersList;
-import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.netex.config.NetexFeedParameters;
@@ -142,7 +141,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   /**
    * A custom OSM namer to use.
    */
-  public final CustomNamer customNamer;
+  public final EdgeNamer edgeNamer;
 
   public final boolean osmCacheDataInMem;
 
@@ -151,8 +150,7 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final boolean banDiscouragedWalking;
   public final boolean banDiscouragedBiking;
-  public final double maxTransferDurationSeconds;
-  public final Boolean extraEdgesStopPlatformLink;
+  public final Duration maxTransferDuration;
   public final NetexFeedParameters netexDefaults;
   public final GtfsFeedParameters gtfsDefaults;
 
@@ -259,15 +257,6 @@ public class BuildConfig implements OtpDataStoreConfig {
           "configured over the wire."
         )
         .asBoolean(true);
-    extraEdgesStopPlatformLink =
-      root
-        .of("extraEdgesStopPlatformLink")
-        .since(V2_0)
-        .summary(
-          "Add extra edges when linking a stop to a platform, to prevent detours along the " +
-          "platform edge."
-        )
-        .asBoolean(false);
     includeEllipsoidToGeoidDifference =
       root
         .of("includeEllipsoidToGeoidDifference")
@@ -311,14 +300,14 @@ all of the elevation values in the street edges.
             """
         )
         .asInt(1000);
-    maxTransferDurationSeconds =
+    maxTransferDuration =
       root
-        .of("maxTransferDurationSeconds")
+        .of("maxTransferDuration")
         .since(V2_1)
         .summary(
           "Transfers up to this duration with the default walk speed value will be pre-calculated and included in the Graph."
         )
-        .asDouble((double) Duration.ofMinutes(30).toSeconds());
+        .asDuration(Duration.ofMinutes(30));
     maxStopToShapeSnapDistance =
       root
         .of("maxStopToShapeSnapDistance")
@@ -505,7 +494,7 @@ recommended.
         .summary(
           "Visibility calculations for an area will not be done if there are more nodes than this limit."
         )
-        .asInt(500);
+        .asInt(150);
     maxElevationPropagationMeters =
       root
         .of("maxElevationPropagationMeters")
@@ -643,13 +632,13 @@ Netex data is also often supplied in a ZIP file.
 
     // List of complex parameters
     fareServiceFactory = FaresConfiguration.fromConfig(root, "fares");
-    customNamer = CustomNamer.CustomNamerFactory.fromConfig(root, "osmNaming");
+    edgeNamer = EdgeNamer.EdgeNamerFactory.fromConfig(root, "osmNaming");
     dataOverlay = DataOverlayConfigMapper.map(root, "dataOverlay");
 
     transferRequests = TransferRequestConfig.map(root, "transferRequests");
 
     if (logUnusedParams && LOG.isWarnEnabled()) {
-      root.logAllUnusedParameters(LOG::warn);
+      root.logAllWarnings(LOG::warn);
     }
   }
 

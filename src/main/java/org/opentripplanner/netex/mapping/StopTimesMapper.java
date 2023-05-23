@@ -20,6 +20,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.support.JourneyPatternHelper;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -418,8 +419,7 @@ class StopTimesMapper {
       lineRef = lineRefStruct.getValue().getRef();
     } else if (serviceJourney.getJourneyPatternRef() != null) {
       // Connect to Line referenced through JourneyPattern->Route
-      String routeRef = journeyPattern.getRouteRef().getRef();
-      lineRef = routeByid.lookup(routeRef).getLineRef().getValue().getRef();
+      lineRef = JourneyPatternHelper.getLineFromRoute(routeByid, journeyPattern);
     }
     return flexibleLinesById.lookup(lineRef);
   }

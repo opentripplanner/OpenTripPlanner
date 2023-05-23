@@ -30,9 +30,9 @@ import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.UpdaterConstructionException;
-import org.opentripplanner.updater.WriteToGraphCallback;
+import org.opentripplanner.updater.spi.PollingGraphUpdater;
+import org.opentripplanner.updater.spi.UpdaterConstructionException;
+import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDatasource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +77,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       // Do any setup if needed
       source.setup();
     } catch (UpdaterConstructionException e) {
-      LOG.warn("Unable to setup updater: {}", parameters.configRef(), e);
+      LOG.warn("Unable to setup updater: {}", this, e);
     }
 
     if (pollingPeriodSeconds() <= 0) {
