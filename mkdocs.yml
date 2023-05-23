@@ -57,23 +57,24 @@ nav:
     - Getting OTP: 'Getting-OTP.md'
     - Container Image: 'Container-Image.md'
     - System Requirements and Suggestions: 'System-Requirements.md'
-    - Configuration:
-        - Introduction: 'Configuration.md'
-        - Build: 'BuildConfiguration.md'
-        - "Boarding Locations": 'BoardingLocations.md'
-        - "Street Graph Pruning": 'IslandPruning.md'
-        - Router: 'RouterConfiguration.md'
-        - Accessibility: 'Accessibility.md'
-        - "Route Request": 'RouteRequest.md'
-        - "Realtime Updaters" : 'UpdaterConfig.md'
-        - "Routing Modes" : "RoutingModes.md"
-        - "Logging" : "Logging.md"
+
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
     - Comparing OTP2 to OTP1: 'Version-Comparison.md'
-    - OTP2 Migration Guide: 'OTP2-MigrationGuide.md'  
+    - OTP2 Migration Guide: 'OTP2-MigrationGuide.md'
+- Configuration:
+    - Introduction: 'Configuration.md'
+    - Build: 'BuildConfiguration.md'
+    - "Boarding Locations": 'BoardingLocations.md'
+    - "Street Graph Pruning": 'IslandPruning.md'
+    - Router: 'RouterConfiguration.md'
+    - Accessibility: 'Accessibility.md'
+    - "Route Request": 'RouteRequest.md'
+    - "Realtime Updaters": 'UpdaterConfig.md'
+    - "Routing Modes": "RoutingModes.md"
+    - "Logging": "Logging.md"
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
     - Interfaces and Data Sources: 'Interfaces-Data-Sources.md'
