@@ -8,7 +8,7 @@ import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
- * Represent an elevation profile as a list of {@code x,y} coordinates. The {@code x} is the
+ * Represents an elevation profile as a list of {@code x,y} coordinates. The {@code x} is the
  * horizontal position/distance from the first position. The {@code y} is the vertical position
  * at {@code x}.
  * <p>

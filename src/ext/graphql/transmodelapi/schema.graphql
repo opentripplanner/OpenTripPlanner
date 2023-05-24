@@ -185,6 +185,14 @@ type DestinationDisplay {
   via: [String]
 }
 
+"Part of a trip pattern. Either a ride on a public transport vehicle or access or path link to/from/between places"
+type ElevationProfileStep {
+  "The distance from the start of the step, in meters."
+  distance: Float
+  "The elevation at this distance, in meters."
+  elevation: Float
+}
+
 "List of visits to quays as part of vehicle journeys. Updated with real time information where available"
 type EstimatedCall {
   "Actual time of arrival at quay. Updated from real time information if available."
@@ -295,6 +303,7 @@ type Leg {
   distance: Float!
   "The leg's duration in seconds"
   duration: Long!
+  elevation: [ElevationProfileStep]!
   "The expected, realtime adjusted date and time this leg ends."
   expectedEndTime: DateTime!
   "The expected, realtime adjusted date and time this leg starts."
@@ -432,6 +441,8 @@ type PathGuidance {
   bogusName: Boolean
   "The distance in meters that this step takes."
   distance: Float
+  "The longitude of the step."
+  elevation: [ElevationProfileStep]!
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
   "The absolute direction of this step."

@@ -12,6 +12,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Objects;
@@ -23,6 +24,7 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -50,6 +52,7 @@ public class LegType {
     GraphQLOutputType ptSituationElementType,
     GraphQLObjectType placeType,
     GraphQLObjectType pathGuidanceType,
+    GraphQLType elevationStepType,
     GqlUtil gqlUtil
   ) {
     return GraphQLObjectType
@@ -439,6 +442,18 @@ public class LegType {
             leg(env).getVehicleRentalNetwork() == null
               ? List.of()
               : List.of(leg(env).getVehicleRentalNetwork())
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("elevation")
+          .type(new GraphQLNonNull(new GraphQLList(elevationStepType)))
+          .dataFetcher(env ->
+            Objects
+              .requireNonNullElse(leg(env).getElevationProfile(), ElevationProfile.empty())
+              .steps()
           )
           .build()
       )
