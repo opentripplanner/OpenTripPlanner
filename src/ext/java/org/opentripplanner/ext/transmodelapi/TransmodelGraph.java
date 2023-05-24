@@ -52,10 +52,11 @@ class TransmodelGraph {
         );
     }
 
+    var executionStrategy = new AbortOnTimeoutExecutionStrategy();
     GraphQL graphQL = GraphQL
       .newGraphQL(indexSchema)
       .instrumentation(instrumentation)
-      .queryExecutionStrategy(new AbortOnTimeoutExecutionStrategy())
+      .queryExecutionStrategy(executionStrategy)
       .build();
 
     if (variables == null) {
@@ -84,6 +85,8 @@ class TransmodelGraph {
       return OtpExecutionResult.of(result);
     } catch (OTPRequestTimeoutException te) {
       return OtpExecutionResult.ofTimeout();
+    } finally {
+      executionStrategy.tearDown();
     }
   }
 

@@ -4,8 +4,10 @@ import graphql.execution.AsyncExecutionStrategy;
 import graphql.execution.ExecutionContext;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
+import org.opentripplanner.framework.logging.ProgressTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * To abort fetching data when a timeout occurs we have to rethrow the time-out-exception.
@@ -14,7 +16,13 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
  */
 public class AbortOnTimeoutExecutionStrategy extends AsyncExecutionStrategy {
 
-  private final AtomicInteger counter = new AtomicInteger(0);
+  private static final Logger LOG = LoggerFactory.getLogger(AbortOnTimeoutExecutionStrategy.class);
+  public static final int LOG_STEPS = 25_000;
+  private final ProgressTracker timeoutProgressTracker = ProgressTracker.track(
+    "TIMEOUT! Abort GraphQL query",
+    LOG_STEPS,
+    -1
+  );
 
   @Override
   protected <T> CompletableFuture<T> handleFetchingException(
@@ -23,12 +31,19 @@ public class AbortOnTimeoutExecutionStrategy extends AsyncExecutionStrategy {
     Throwable e
   ) {
     if (e instanceof OTPRequestTimeoutException te) {
-      if (counter.incrementAndGet() % 10_000 == 0) {
-        // TODO: Replace this with proper progress tracking
-        System.out.println(counter.get());
-      }
+      logTimeoutProgress();
       throw te;
     }
     return super.handleFetchingException(executionContext, environment, e);
+  }
+
+  @SuppressWarnings("Convert2MethodRef")
+  private void logTimeoutProgress() {
+    timeoutProgressTracker.startOrStep(m -> LOG.info(m));
+  }
+
+  @SuppressWarnings("Convert2MethodRef")
+  public void tearDown() {
+    timeoutProgressTracker.completeIfHasSteps(m -> LOG.info(m));
   }
 }

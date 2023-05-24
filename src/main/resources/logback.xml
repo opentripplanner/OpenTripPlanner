@@ -79,8 +79,6 @@
   <logger name="com.conveyal" level="info"/>
   <logger name="notprivacysafe.graphql" level="off" />
 
-
-
   <!-- Avoid printing info messages about calendars when building graph -->
   <logger name="org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl" level="warn" />
   <!-- Avoid printing ugly warning message when unable to create websocket connection -->
