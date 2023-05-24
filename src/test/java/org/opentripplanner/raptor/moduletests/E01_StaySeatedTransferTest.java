@@ -26,9 +26,9 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  * FEATURE UNDER TEST
  * <p>
  * Raptor should return a path if it exists when a transfer is only possible because it is
- * guaranteed/stay-seated. A guaranteed transfer should be able even if there is zero time to do the
- * transfer. In these cases the transfer-slack should be ignored and the connection should be
- * possible.
+ * guaranteed/stay-seated. A stay-seated transfer should be possible even if there is zero time to
+ * do the transfer. In these cases the transfer-slack should be ignored and the connection should
+ * be possible.
  */
 public class E01_StaySeatedTransferTest implements RaptorTestConstants {
 
@@ -75,7 +75,7 @@ public class E01_StaySeatedTransferTest implements RaptorTestConstants {
       .latestArrivalTime(T00_30)
       .timetable(true);
 
-    // Make sure the slack have values which prevent the normal from happening transfer.
+    // Make sure the slack have values which prevent a normal transfer.
     // The test scenario have zero seconds to transfer, so any slack will do.
     data.withSlackProvider(new DefaultSlackProvider(D30s, D20s, D10s));
 
