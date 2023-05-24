@@ -380,21 +380,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     LOG.debug("Applied realtime data for trip {} on {}", trip, serviceDate);
 
-
-    /*
-      This causes the DatedServiceJourney-ID supplied in planned data to be replaced with the id
-      from realtime-data.
-     */
-    // Add TripOnServiceDate to buffer if a dated service journey id is supplied in the SIRI message
-    //    TripOnServiceDateBuilder tripOnServiceDateBuilder = entityResolver.createTripOnServiceDateBuilder(
-    //      estimatedVehicleJourney
-    //    );
-    //    if (tripOnServiceDateBuilder != null) {
-    //      buffer.addLastAddedTripOnServiceDate(
-    //        tripOnServiceDateBuilder.withTrip(trip).withServiceDate(serviceDate).build()
-    //      );
-    //    }
-
     return result;
   }
 
