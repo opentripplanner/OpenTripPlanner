@@ -1,16 +1,18 @@
 package org.opentripplanner.raptor.api.request;
 
-import java.util.HashSet;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 
-public class RaptorTransitViaRequest implements C2Request {
+public class RaptorTransitPassThroughRequest implements C2Request {
 
-  HashSet<Integer> viaPoints = null;
+  private final PassThroughPoints passThroughPoints;
 
-  // TODO: 2023-05-19 we haven't decided yet how this should look
-  //  Probably not a HashSet<Integer>
-  public HashSet<Integer> viaPoints() {
-    return viaPoints;
+  public RaptorTransitPassThroughRequest(final PassThroughPoints passThroughPoints) {
+    this.passThroughPoints = passThroughPoints;
+  }
+
+  // TODO: Should this method be part of the interface?
+  public PassThroughPoints passThroughPoints() {
+    return passThroughPoints;
   }
 
   /**
@@ -18,6 +20,7 @@ public class RaptorTransitViaRequest implements C2Request {
    * It is critical that the implementation is "static" so it can be inlined, since it
    * is run in the innermost loop of Raptor.
    */
+  @Override
   public DominanceFunction dominanceFunction() {
     return (left, right) -> left > right;
   }
