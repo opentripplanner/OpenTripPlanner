@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 class FareSearch {
 
   // Cell [i,j] holds the best (lowest) cost for a trip from rides[i] to rides[j]
-  Money[][] resultTable;
+  float[][] resultTable;
 
   // Cell [i,j] holds the index of the ride to pass through for the best cost
   // This is used for reconstructing which rides are grouped together
@@ -48,7 +48,7 @@ class FareSearch {
   int[] endOfComponent;
 
   FareSearch(int size) {
-    resultTable = new Money[size][size];
+    resultTable = new float[size][size];
     next = new int[size][size];
     fareIds = new FeedScopedId[size][size];
     endOfComponent = new int[size];
@@ -142,7 +142,7 @@ public class DefaultFareService implements FareService {
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
-    FareSearch r = performSearch(currency, fareType, legs, fareRules);
+    FareSearch r = performSearch(fareType, legs, fareRules);
 
     List<FareComponent> components = new ArrayList<>();
     int count = 0;
@@ -159,20 +159,22 @@ public class DefaultFareService implements FareService {
       }
 
       int via = r.next[start][r.endOfComponent[start]];
-      Money cost = r.resultTable[start][via];
+      float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
 
       var componentLegs = new ArrayList<Leg>();
       for (int i = start; i <= via; ++i) {
         componentLegs.add(legs.get(i));
       }
-      var component = new FareComponent(fareId, cost, componentLegs);
-      components.add(component);
+      components.add(
+        new FareComponent(fareId, Money.ofFractionalAmount(currency, cost), componentLegs)
+      );
       ++count;
       start = via + 1;
     }
 
-    fare.addFare(fareType, r.resultTable[0][legs.size() - 1]);
+    var amount = r.resultTable[0][legs.size() - 1];
+    fare.addFare(fareType, Money.ofFractionalAmount(currency, amount));
     fare.addFareComponent(fareType, components);
     return count > 0;
   }
@@ -253,15 +255,10 @@ public class DefaultFareService implements FareService {
       }
     }
     LOG.debug("{} best for {}", bestAttribute, legs);
-    if (bestFare == null) {
-      return Optional.empty();
-    } else {
-      final FareAndId value = new FareAndId(
-        bestFare,
-        bestAttribute == null ? null : bestAttribute.getId()
-      );
-      return Optional.of(value);
-    }
+    Money finalBestFare = bestFare;
+    return Optional
+      .ofNullable(bestAttribute)
+      .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
   }
 
   protected Money getFarePrice(FareAttribute fare, FareType type) {
@@ -322,36 +319,40 @@ public class DefaultFareService implements FareService {
   }
 
   private FareSearch performSearch(
-    Currency currency,
     FareType fareType,
-    List<Leg> legs,
+    List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
-    FareSearch r = new FareSearch(legs.size());
-    final FareAndId UNKNOWN = new FareAndId(
-      Money.ofFractionalAmount(currency, 999f),
-      new FeedScopedId("max", "max")
-    );
+    FareSearch r = new FareSearch(rides.size());
 
     // Dynamic algorithm to calculate fare cost.
     // This is a modified Floyd-Warshall algorithm, a key thing to remember is that
-    // legs are already edges, so when comparing "via" routes, i -> k is connected
+    // rides are already edges, so when comparing "via" routes, i -> k is connected
     // to k+1 -> j.
-    for (int i = 0; i < legs.size(); i++) {
+    for (int i = 0; i < rides.size(); i++) {
       // each diagonal
-      for (int j = 0; j < legs.size() - i; j++) {
-        FareAndId best = getBestFareAndId(fareType, legs.subList(j, j + i + 1), fareRules)
-          .orElse(UNKNOWN);
-        Money cost = best.fare();
-        if (!cost.equals(UNKNOWN.fare())) {
+      for (int j = 0; j < rides.size() - i; j++) {
+        Optional<FareAndId> best = getBestFareAndId(
+          fareType,
+          rides.subList(j, j + i + 1),
+          fareRules
+        );
+        float cost = best
+          .map(b -> b.fare().fractionalAmount().floatValue())
+          .orElse(Float.POSITIVE_INFINITY);
+        if (cost < 0) {
+          LOG.error("negative cost for a ride sequence");
+          cost = Float.POSITIVE_INFINITY;
+        }
+        if (cost < Float.POSITIVE_INFINITY) {
           r.endOfComponent[j] = j + i;
           r.next[j][j + i] = j + i;
         }
         r.resultTable[j][j + i] = cost;
-        r.fareIds[j][j + i] = best.fareId();
+        r.fareIds[j][j + i] = best.map(FareAndId::fareId).orElse(null);
         for (int k = 0; k < i; k++) {
-          Money via = r.resultTable[j][j + k].plus(r.resultTable[j + k + 1][j + i]);
-          if (r.resultTable[j][j + i].greaterThan(via)) {
+          float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
+          if (r.resultTable[j][j + i] > via) {
             r.resultTable[j][j + i] = via;
             r.endOfComponent[j] = j + i;
             r.next[j][j + i] = r.next[j][j + k];

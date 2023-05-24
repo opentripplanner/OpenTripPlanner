@@ -463,7 +463,7 @@ public class OrcaFareService extends DefaultFareService {
             fare,
             fareType,
             Money.ZERO_USD,
-            legFare.isNonZero() ? orcaFareDiscount : Money.ZERO_USD
+            legFare.isPositive() ? orcaFareDiscount : Money.ZERO_USD
           );
         }
       } else if (usesOrca(fareType) && !inFreeTransferWindow) {
@@ -534,7 +534,7 @@ public class OrcaFareService extends DefaultFareService {
     var fareProduct = new FareProduct(id, "rideCost", totalFare, duration, riderCategory, medium);
     itineraryFares.addFareProduct(leg, fareProduct);
     // If a transfer was used, then also add a transfer fare product.
-    if (transferDiscount.isNonZero()) {
+    if (transferDiscount.isPositive()) {
       var transferFareProduct = new FareProduct(
         id,
         "transfer",

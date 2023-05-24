@@ -73,7 +73,7 @@ public class Money implements Comparable<Money> {
   /**
    * Does this instance contain a non-zero amount.
    */
-  public boolean isNonZero() {
+  public boolean isPositive() {
     return amount > 0f;
   }
 

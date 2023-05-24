@@ -8,6 +8,7 @@ import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_TO_CIT
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_A_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_B_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.INSIDE_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.impl.FareModelForTest.SUBURB_STOP;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
@@ -69,5 +70,32 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var price = fare.getFare(FareType.regular);
 
     assertEquals(Money.usDollars(20), price);
+  }
+
+  @Test
+  void unknownLeg() {
+    var service = new DefaultFareService();
+    service.addFareRules(FareType.regular, List.of(AIRPORT_TO_CITY_CENTER_SET));
+
+    var itin = newItinerary(Place.forStop(AIRPORT_STOP), T11_00)
+      .bus(1, T11_00, T11_12, Place.forStop(CITY_CENTER_A_STOP))
+      .bus(3, T11_20, T11_33, Place.forStop(SUBURB_STOP))
+      .build();
+
+    var fare = service.calculateFares(itin);
+    assertNotNull(fare);
+
+    var price = fare.getFare(FareType.regular);
+    assertEquals(Money.usDollars(-0.01f), price);
+
+    var components = fare.getComponents(FareType.regular);
+    assertEquals(1, components.size());
+
+    var component = components.get(0);
+    assertEquals(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), component.fareId());
+    assertEquals(Money.usDollars(10), component.price());
+
+    var firstBusLeg = itin.firstTransitLeg().get();
+    assertEquals(List.of(firstBusLeg), component.legs());
   }
 }
