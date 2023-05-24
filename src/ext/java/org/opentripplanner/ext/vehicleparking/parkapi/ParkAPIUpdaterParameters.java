@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.parkapi;
 
+import java.time.Duration;
 import java.time.ZoneId;
 import java.util.List;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -14,7 +15,7 @@ public record ParkAPIUpdaterParameters(
   String configRef,
   String url,
   String feedId,
-  int frequencySec,
+  Duration frequency,
   HttpHeaders httpHeaders,
   List<String> tags,
   VehicleParkingSourceType sourceType,

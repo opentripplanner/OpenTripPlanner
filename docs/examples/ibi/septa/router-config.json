@@ -4,12 +4,12 @@
       "type": "vehicle-positions",
       "url": "https://www3.septa.org/gtfsrt/septarail-pa-us/Vehicle/rtVehiclePosition.pb",
       "feedId": "septa-rail",
-      "frequencySec": 60
+      "frequency": "1m"
     },
     {
       "type": "vehicle-rental",
       "sourceType": "gbfs",
-      "frequencySec": 60,
+      "frequency": "1m",
       "url": "https://gbfs.bcycle.com/bcycle_indego/gbfs.json"
     }
   ]

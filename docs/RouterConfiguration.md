@@ -598,7 +598,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
   "updaters" : [
     {
       "type" : "real-time-alerts",
-      "frequencySec" : 30,
+      "frequency" : "30s",
       "url" : "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
       "feedId" : "TriMet",
       "headers" : {
@@ -610,7 +610,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "network" : "socialbicycles_coast",
       "sourceType" : "gbfs",
       "language" : "en",
-      "frequencySec" : 60,
+      "frequency" : "1m",
       "allowKeepingRentedVehicleAtDestination" : false,
       "geofencingZones" : false,
       "url" : "http://coast.socialbicycles.com/opendata/gbfs.json",
@@ -635,7 +635,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "sourceType" : "park-api",
       "feedId" : "parkapi",
       "timeZone" : "Europe/Berlin",
-      "frequencySec" : 600,
+      "frequency" : "10m",
       "url" : "https://foo.bar",
       "headers" : {
         "Cache-Control" : "max-age=604800"
@@ -656,7 +656,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
     },
     {
       "type" : "stop-time-updater",
-      "frequencySec" : 60,
+      "frequency" : "1m",
       "backwardsDelayPropagationType" : "REQUIRED_NO_DATA",
       "url" : "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
       "feedId" : "TriMet",
@@ -668,7 +668,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "type" : "vehicle-positions",
       "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
       "feedId" : "1",
-      "frequencySec" : 60,
+      "frequency" : "1m",
       "headers" : {
         "Header-Name" : "Header-Value"
       }

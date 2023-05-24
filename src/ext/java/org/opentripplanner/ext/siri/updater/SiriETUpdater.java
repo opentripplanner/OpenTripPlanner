@@ -71,7 +71,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
     LOG.info(
       "Creating stop time updater (SIRI ET) running every {} seconds : {}",
-      pollingPeriodSeconds(),
+      pollingPeriod(),
       updateSource
     );
     recordMetrics = TripUpdateMetrics.streaming(config);

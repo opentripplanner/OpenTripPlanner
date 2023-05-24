@@ -61,7 +61,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
 
     LOG.info(
       "Creating vehicle-parking updater running every {} seconds : {}",
-      pollingPeriodSeconds(),
+      pollingPeriod(),
       source
     );
   }
