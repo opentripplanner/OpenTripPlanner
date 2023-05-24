@@ -145,8 +145,8 @@ public class UberService extends CachingRideHailingService {
         return new RideEstimate(
           RideHailingProvider.UBER,
           Duration.ofSeconds(price.duration()),
-          new Money(currency, price.low_estimate() * 100),
-          new Money(currency, price.high_estimate() * 100),
+          Money.ofFractionalAmount(currency, price.low_estimate()),
+          Money.ofFractionalAmount(currency, price.high_estimate()),
           price.product_id(),
           price.display_name(),
           productIsWheelchairAccessible(price.product_id())

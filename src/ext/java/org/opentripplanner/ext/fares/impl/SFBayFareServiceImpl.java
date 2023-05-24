@@ -12,6 +12,7 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +24,10 @@ public class SFBayFareServiceImpl extends DefaultFareService {
 
   public static final int SFMTA_TRANSFER_DURATION = 60 * 90;
   public static final int BART_TRANSFER_DURATION = 60 * 60;
-  public static final float SFMTA_BASE_FARE = 2.00f;
-  public static final float CABLE_CAR_FARE = 5.00f;
-  public static final float AIRBART_FARE = 3.00f;
-  public static final float SFMTA_BART_TRANSFER_FARE = 1.75f;
+  public static final Money SFMTA_BASE_FARE = Money.usDollars(2);
+  public static final Money CABLE_CAR_FARE = Money.usDollars(5);
+  public static final Money AIRBART_FARE = Money.usDollars(3);
+  public static final Money SFMTA_BART_TRANSFER_FARE = Money.usDollars(1.75f);
   public static final Set<String> SFMTA_BART_TRANSFER_STOPS = new HashSet<>(
     Arrays.asList("EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY")
   );
@@ -36,8 +37,7 @@ public class SFBayFareServiceImpl extends DefaultFareService {
     addFareRules(FareType.regular, regularFareRules);
   }
 
-  @Override
-  protected float getLowestCost(
+  protected Money getLowestCost(
     FareType fareType,
     List<Leg> rides,
     Collection<FareRuleSet> fareRules
@@ -46,7 +46,7 @@ public class SFBayFareServiceImpl extends DefaultFareService {
     Long sfmtaTransferIssued = null;
     Long alightedBart = null;
     String alightedBartStop = null;
-    float cost = 0f;
+    Money cost = Money.ZERO_USD;
     String agencyId = null;
     for (var ride : rides) {
       agencyId = ride.getRoute().getId().getFeedId();
@@ -60,14 +60,14 @@ public class SFBayFareServiceImpl extends DefaultFareService {
       } else { // non-BART agency
         if (bartBlock != null) {
           // finalize outstanding bart block, if any
-          cost += calculateCost(fareType, bartBlock, fareRules);
+          cost = cost.plus(calculateCost(fareType, bartBlock, fareRules).orElse(Money.ZERO_USD));
           bartBlock = null;
         }
         if (agencyId.equals("SFMTA")) {
           TransitMode mode = (ride instanceof TransitLeg transitLeg) ? transitLeg.getMode() : null;
           if (mode == TransitMode.CABLE_CAR) {
             // no transfers issued or accepted
-            cost += CABLE_CAR_FARE;
+            cost = cost.plus(CABLE_CAR_FARE);
           } else if (
             sfmtaTransferIssued == null ||
             sfmtaTransferIssued + SFMTA_TRANSFER_DURATION < ride.getEndTime().toEpochSecond()
@@ -82,23 +82,23 @@ public class SFBayFareServiceImpl extends DefaultFareService {
               if (alightedBartStop.equals(SFMTA_BART_FREE_TRANSFER_STOP)) {
                 // no cost to ride Muni
               } else {
-                cost += SFMTA_BART_TRANSFER_FARE;
+                cost = cost.plus(SFMTA_BART_TRANSFER_FARE);
               }
             } else {
               // no transfer, basic fare
-              cost += SFMTA_BASE_FARE;
+              cost = cost.plus(SFMTA_BASE_FARE);
             }
           } else {
             // SFMTA-SFMTA non-cable-car transfer within time limit, no cost
           }
         } else if (agencyId.equals("AirBART")) {
-          cost += AIRBART_FARE;
+          cost = cost.plus(AIRBART_FARE);
         }
       }
     }
     if (bartBlock != null) {
       // finalize outstanding bart block, if any
-      cost += calculateCost(fareType, bartBlock, fareRules);
+      cost = cost.plus(calculateCost(fareType, bartBlock, fareRules).orElse(Money.ZERO_USD));
     }
     return cost;
   }
@@ -111,11 +111,8 @@ public class SFBayFareServiceImpl extends DefaultFareService {
     List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
-    float lowestCost = getLowestCost(fareType, rides, fareRules);
-    if (lowestCost != Float.POSITIVE_INFINITY) {
-      fare.addFare(fareType, getMoney(currency, lowestCost));
-      return true;
-    }
-    return false;
+    Money lowestCost = getLowestCost(fareType, rides, fareRules);
+    fare.addFare(fareType, lowestCost);
+    return true;
   }
 }

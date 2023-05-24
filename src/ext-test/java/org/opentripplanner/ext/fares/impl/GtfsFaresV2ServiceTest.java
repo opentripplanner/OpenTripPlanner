@@ -12,12 +12,13 @@ import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.ext.fares.model.Distance;
+import org.opentripplanner.ext.fares.model.FareDistance;
+import org.opentripplanner.ext.fares.model.FareDistance.LinearDistance;
+import org.opentripplanner.ext.fares.model.FareLegRule;
+import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.fare.Distance;
-import org.opentripplanner.model.fare.FareDistance;
-import org.opentripplanner.model.fare.FareLegRule;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareTransferRule;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -39,7 +40,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FareProduct single = new FareProduct(
     new FeedScopedId(FEED_ID, "single"),
     "Single one-way ticket",
-    Money.euros(100),
+    Money.euros(1),
     null,
     null,
     null
@@ -47,7 +48,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FareProduct singleToOuter = new FareProduct(
     new FeedScopedId(FEED_ID, "single_to_outer"),
     "Single one-way ticket to outer zone",
-    Money.euros(100),
+    Money.euros(1),
     null,
     null,
     null
@@ -56,7 +57,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FareProduct singleFromOuter = new FareProduct(
     new FeedScopedId(FEED_ID, "single_from_outer"),
     "Single one-way ticket from outer zone to anywhere",
-    Money.euros(100),
+    Money.euros(1),
     null,
     null,
     null
@@ -65,7 +66,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FareProduct dayPass = new FareProduct(
     new FeedScopedId(FEED_ID, "day_pass"),
     "Day Pass",
-    Money.euros(500),
+    Money.euros(5),
     Duration.ofDays(1),
     null,
     null
@@ -73,7 +74,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FareProduct innerToOuterZoneSingle = new FareProduct(
     new FeedScopedId(FEED_ID, "zone_ab_single"),
     "Day Pass",
-    Money.euros(500),
+    Money.euros(5),
     null,
     null,
     null
@@ -81,7 +82,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FareProduct monthlyPass = new FareProduct(
     new FeedScopedId("another", "monthly_pass"),
     "Monthly Pass",
-    Money.euros(3000),
+    Money.euros(30),
     Duration.ofDays(30),
     null,
     null
@@ -90,7 +91,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FareProduct expressPass = new FareProduct(
     new FeedScopedId(FEED_ID, "express_pass"),
     "Express Pass",
-    Money.euros(5000),
+    Money.euros(50),
     Duration.ofDays(1),
     null,
     null
@@ -99,7 +100,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   FareProduct localPass = new FareProduct(
     new FeedScopedId(FEED_ID, "local_pass"),
     "Local Pass",
-    Money.euros(2000),
+    Money.euros(20),
     Duration.ofDays(1),
     null,
     null
@@ -230,7 +231,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     FareProduct freeTransferFromInnerToOuter = new FareProduct(
       new FeedScopedId(FEED_ID, "free-transfer-from-inner-to-outer"),
       "Single ticket with free transfer from the inner to the outer zone",
-      Money.euros(500),
+      Money.euros(50),
       null,
       null,
       null
@@ -239,7 +240,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     FareProduct freeTransferSingle = new FareProduct(
       new FeedScopedId(FEED_ID, "free-transfer-from-anywhere-to-outer"),
       "Single ticket with free transfer any zone",
-      Money.euros(1000),
+      Money.euros(10),
       null,
       null,
       null
@@ -289,7 +290,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     FareProduct threeStopProduct = new FareProduct(
       new FeedScopedId(FEED_ID, "three-stop-product"),
       "three-stop-product",
-      Money.euros(100),
+      Money.euros(1),
       Duration.ofHours(1),
       null,
       null
@@ -298,7 +299,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     FareProduct fiveStopProduct = new FareProduct(
       new FeedScopedId(FEED_ID, "five-stop-product"),
       "five-stop-product",
-      Money.euros(100),
+      Money.euros(1),
       Duration.ofHours(1),
       null,
       null
@@ -306,7 +307,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     FareProduct twelveStopProduct = new FareProduct(
       new FeedScopedId(FEED_ID, "twelve-stop-product"),
       "twelve-stop-product",
-      Money.euros(100),
+      Money.euros(1),
       Duration.ofHours(1),
       null,
       null
@@ -315,7 +316,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     FareProduct tenKmProduct = new FareProduct(
       new FeedScopedId(FEED_ID, "ten-km-product"),
       "ten-km-product",
-      Money.euros(100),
+      Money.euros(1),
       Duration.ofHours(1),
       null,
       null
@@ -323,7 +324,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     FareProduct threeKmProduct = new FareProduct(
       new FeedScopedId(FEED_ID, "three-km-product"),
       "three-km-product",
-      Money.euros(100),
+      Money.euros(1),
       Duration.ofHours(1),
       null,
       null
@@ -331,7 +332,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     FareProduct twoKmProduct = new FareProduct(
       new FeedScopedId(FEED_ID, "two-km-product"),
       "two-km-product",
-      Money.euros(100),
+      Money.euros(1),
       Duration.ofHours(1),
       null,
       null
@@ -349,7 +350,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         null,
         null,
         null,
-        new FareDistance.LinearDistance(Distance.ofMeters(7000), Distance.ofMeters(10_000)),
+        new LinearDistance(Distance.ofKilometers(7), Distance.ofKilometers(10)),
         tenKmProduct
       ),
       new FareLegRule(
@@ -357,7 +358,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         null,
         null,
         null,
-        new FareDistance.LinearDistance(Distance.ofMeters(3000), Distance.ofMeters(6000)),
+        new LinearDistance(Distance.ofKilometers(3), Distance.ofKilometers(6)),
         threeKmProduct
       ),
       new FareLegRule(
@@ -365,7 +366,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
         null,
         null,
         null,
-        new FareDistance.LinearDistance(Distance.ofMeters(0), Distance.ofMeters(2000)),
+        new LinearDistance(Distance.ofMeters(0), Distance.ofMeters(2000)),
         twoKmProduct
       )
     );

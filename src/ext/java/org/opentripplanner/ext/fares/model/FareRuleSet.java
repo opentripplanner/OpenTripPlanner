@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.fares.model;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -74,7 +75,10 @@ public class FareRuleSet implements Serializable {
     String endZone,
     Set<String> zonesVisited,
     Set<FeedScopedId> routesVisited,
-    Set<FeedScopedId> tripsVisited
+    Set<FeedScopedId> tripsVisited,
+    int transfersUsed,
+    Duration tripTime,
+    Duration journeyTime
   ) {
     //check for matching origin/destination, if this ruleset has any origin/destination restrictions
     if (originDestinations.size() > 0) {
@@ -109,6 +113,23 @@ public class FareRuleSet implements Serializable {
       if (!trips.containsAll(tripsVisited)) {
         return false;
       }
+    }
+    if (fareAttribute.isTransfersSet() && fareAttribute.getTransfers() < transfersUsed) {
+      return false;
+    }
+    // assume transfers are evaluated at boarding time,
+    // as trimet does
+    if (
+      fareAttribute.isTransferDurationSet() &&
+      tripTime.getSeconds() > fareAttribute.getTransferDuration()
+    ) {
+      return false;
+    }
+    if (
+      fareAttribute.isJourneyDurationSet() &&
+      journeyTime.getSeconds() > fareAttribute.getJourneyDuration()
+    ) {
+      return false;
     }
 
     return true;

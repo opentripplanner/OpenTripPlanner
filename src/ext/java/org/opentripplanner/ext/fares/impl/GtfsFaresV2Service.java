@@ -14,11 +14,11 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
-import org.opentripplanner.model.fare.FareDistance;
-import org.opentripplanner.model.fare.FareLegRule;
+import org.opentripplanner.ext.fares.model.FareDistance;
+import org.opentripplanner.ext.fares.model.FareLegRule;
+import org.opentripplanner.ext.fares.model.FareTransferRule;
+import org.opentripplanner.ext.fares.model.LegProducts;
 import org.opentripplanner.model.fare.FareProduct;
-import org.opentripplanner.model.fare.FareTransferRule;
-import org.opentripplanner.model.fare.LegProducts;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -139,7 +139,7 @@ public final class GtfsFaresV2Service implements Serializable {
 
     return (
       feedIdsInItinerary.size() == 1 &&
-      pwt.transferRules().stream().anyMatch(r -> r.fareProduct().price().amount() == 0)
+      pwt.transferRules().stream().anyMatch(r -> r.fareProduct().price().isZero())
     );
   }
 

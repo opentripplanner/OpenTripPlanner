@@ -40,8 +40,8 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     .bus(route, 1, T11_05, T11_12, Place.forStop(CITY_CENTER_A_STOP))
     .staySeatedBus(route, 2, T11_12, T11_16, Place.forStop(CITY_CENTER_B_STOP))
     .build();
-  static Money tenDollars = Money.usDollars(1000);
-  static Money twentyDollars = Money.usDollars(2000);
+  static Money tenDollars = Money.usDollars(10);
+  static Money twentyDollars = Money.usDollars(20);
 
   static Stream<Arguments> testCases = Stream.of(
     Arguments.of(ALWAYS, interlinedWithSameRoute, tenDollars, "same routes"),
@@ -61,7 +61,7 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
       List.of(AIRPORT_TO_CITY_CENTER_SET, INSIDE_CITY_CENTER_SET)
     );
 
-    var fare = service.getCost(itinerary);
+    var fare = service.calculateFares(itinerary);
     assertNotNull(fare);
 
     var price = fare.getFare(FareType.regular);

@@ -17,7 +17,7 @@ class FareMapperTest implements PlanTestConstants {
   @Test
   public void emptyDetails() {
     var fare = new ItineraryFares();
-    fare.addFare(FareType.regular, Money.usDollars(500));
+    fare.addFare(FareType.regular, Money.usDollars(5));
 
     Itinerary itinerary = newItinerary(A, 30).bus(1, 30, 60, B).bus(2, 90, 120, C).build();
 

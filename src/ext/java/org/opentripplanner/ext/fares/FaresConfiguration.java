@@ -6,7 +6,6 @@ import org.opentripplanner.ext.fares.impl.CombineInterlinedLegsFactory;
 import org.opentripplanner.ext.fares.impl.DefaultFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.HSLFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareServiceFactory;
-import org.opentripplanner.ext.fares.impl.MultipleFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.NoopFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.OrcaFareFactory;
 import org.opentripplanner.ext.fares.impl.SFBayFareServiceFactory;
@@ -45,14 +44,6 @@ public class FaresConfiguration {
    *       type : "foobar",
    *       param1 : 42
    * } }
-   * --------------------------
-   * { fares : {
-   *       combinationStrategy : "additive",
-   *       fares : [
-   *           "seattle",
-   *           { type : "foobar", ... }
-   *       ]
-   * } }
    * </pre>
    */
   public static FareServiceFactory fromConfig(JsonNode config) {
@@ -63,18 +54,6 @@ public class FaresConfiguration {
     } else if (config.isTextual()) {
       /* Simplest form: { fares : "seattle" } */
       type = config.asText();
-    } else if (config.has("combinationStrategy")) {
-      /* Composite */
-      String combinationStrategy = config.path("combinationStrategy").asText();
-      switch (combinationStrategy) {
-        case "additive":
-          break;
-        default:
-          throw new IllegalArgumentException(
-            "Unknown fare combinationStrategy: " + combinationStrategy
-          );
-      }
-      type = "composite:" + combinationStrategy;
     } else if (config.has("type")) {
       /* Fare with a type: { fares : { type : "foobar", param1 : 42 } } */
       type = config.path("type").asText(null);
@@ -93,7 +72,6 @@ public class FaresConfiguration {
     return switch (type) {
       case "default" -> new DefaultFareServiceFactory();
       case "off" -> new NoopFareServiceFactory();
-      case "composite:additive" -> new MultipleFareServiceFactory.AddingMultipleFareServiceFactory();
       case "vehicle-rental-time-based" -> new TimeBasedVehicleRentalFareServiceFactory();
       case "san-francisco" -> new SFBayFareServiceFactory();
       case "highest-fare-in-free-transfer-window",

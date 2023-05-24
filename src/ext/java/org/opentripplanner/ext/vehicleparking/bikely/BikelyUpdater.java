@@ -72,8 +72,8 @@ public class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
   }
 
   private static LocalizedString toNote(JsonNode price) {
-    var startPriceAmount = price.get("startPriceAmount").asDouble();
-    var mainPriceAmount = price.get("mainPriceAmount").asDouble();
+    var startPriceAmount = price.get("startPriceAmount").floatValue();
+    var mainPriceAmount = price.get("mainPriceAmount").floatValue();
 
     var startPriceDurationHours = price.get("startPriceDurationHours").asInt();
     var mainPriceDurationHours = price.get("mainPriceDurationHours").asInt();
@@ -84,8 +84,8 @@ public class BikelyUpdater extends GenericJsonDataSource<VehicleParking> {
       return new LocalizedString(
         "price.startMain",
         NonLocalizedString.ofNumber(startPriceDurationHours),
-        new LocalizedMoney(new Money(NOK, (int) (startPriceAmount * 100))),
-        new LocalizedMoney(new Money(NOK, (int) (mainPriceAmount * 100))),
+        new LocalizedMoney(Money.ofFractionalAmount(NOK, startPriceAmount)),
+        new LocalizedMoney(Money.ofFractionalAmount(NOK, mainPriceAmount)),
         NonLocalizedString.ofNumber(mainPriceDurationHours)
       );
     }

@@ -30,7 +30,7 @@ class TimeBasedVehicleRentalFareService implements FareService, Serializable {
   }
 
   @Override
-  public ItineraryFares getCost(Itinerary itinerary) {
+  public ItineraryFares calculateFares(Itinerary itinerary) {
     var totalCost = itinerary
       .getLegs()
       .stream()
@@ -39,7 +39,7 @@ class TimeBasedVehicleRentalFareService implements FareService, Serializable {
       .sum();
 
     ItineraryFares fare = ItineraryFares.empty();
-    fare.addFare(FareType.regular, new Money(currency, totalCost));
+    fare.addFare(FareType.regular, Money.ofFractionalAmount(currency, totalCost));
     return fare;
   }
 
