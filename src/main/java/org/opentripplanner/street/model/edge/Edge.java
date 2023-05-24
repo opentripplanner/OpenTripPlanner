@@ -17,11 +17,40 @@ import org.opentripplanner.street.search.state.State;
  */
 public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializable {
 
-  protected Vertex fromv;
+  protected enum ConnectToGraph {
+    CONNECT,
+    TEMPORARY_EDGE_NOT_CONNECTED_TO_GRAPH,
+  }
 
-  protected Vertex tov;
+  protected final Vertex fromv;
 
+  protected final Vertex tov;
+
+  /**
+   * Recommended constructor for creating an edge.
+   * The edge is automatically added to the graph by updating the outgoing edge list of the
+   * origin ("from") vertex and the incoming edge list of the destination ("to") vertex.
+   * @param v1 origin vertex
+   * @param v2 destination vertex
+   */
   protected Edge(Vertex v1, Vertex v2) {
+    this(v1, v2, ConnectToGraph.CONNECT);
+  }
+
+  /**
+   * Constructor for creating an edge optionally disconnected from the graph.
+   * This constructor should be used only for the special case of a
+   * {@link org.opentripplanner.ext.flex.edgetype.FlexTripEdge}
+   * that is intended to remain disconnected from the graph.
+   * Use {@link Edge#Edge(Vertex, Vertex)} for the general use case.
+   * The edge is optionally added to the graph by updating the outgoing edge list of the
+   * origin ("from") vertex and the incoming edge list of the destination ("to") vertex.
+   * @param v1 origin vertex
+   * @param v2 destination vertex
+   * @param connectToGraph if the edge should be connected to the graph
+   */
+  protected Edge(Vertex v1, Vertex v2, ConnectToGraph connectToGraph) {
+    Objects.requireNonNull(connectToGraph);
     if (v1 == null || v2 == null) {
       String err = String.format(
         "%s constructed with null vertex : %s %s",
@@ -33,8 +62,10 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     }
     this.fromv = v1;
     this.tov = v2;
-    fromv.addOutgoing(this);
-    tov.addIncoming(this);
+    if (connectToGraph == ConnectToGraph.CONNECT) {
+      fromv.addOutgoing(this);
+      tov.addIncoming(this);
+    }
   }
 
   public final Vertex getFromVertex() {
@@ -130,19 +161,11 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   }
 
   public void remove() {
-    if (this.fromv != null) {
-      for (Edge edge : this.fromv.getIncoming()) {
-        edge.removeTurnRestrictionsTo(this);
-      }
-
-      this.fromv.removeOutgoing(this);
-      this.fromv = null;
+    for (Edge edge : this.fromv.getIncoming()) {
+      edge.removeTurnRestrictionsTo(this);
     }
-
-    if (this.tov != null) {
-      this.tov.removeIncoming(this);
-      this.tov = null;
-    }
+    this.fromv.removeOutgoing(this);
+    this.tov.removeIncoming(this);
   }
 
   public void removeTurnRestrictionsTo(Edge origin) {}
