@@ -216,7 +216,8 @@ public class RaptorArchitectureTest {
         RR_TRANSIT,
         RR_CONTEXT,
         RR_STD_CONFIGURE,
-        RR_MC_CONFIGURE
+        RR_MC_CONFIGURE,
+        FRAMEWORK_UTILS
       )
       .verify();
   }

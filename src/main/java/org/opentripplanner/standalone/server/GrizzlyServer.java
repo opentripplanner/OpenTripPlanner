@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.server;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.ws.rs.core.Application;
 import java.io.File;
 import java.io.IOException;
@@ -76,6 +77,8 @@ public class GrizzlyServer {
     int nHandlerThreads = getMaxThreads();
     ThreadPoolConfig threadPoolConfig = ThreadPoolConfig
       .defaultConfig()
+      .setPoolName("grizzly")
+      .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("grizzly-%d").build())
       .setCorePoolSize(nHandlerThreads)
       .setMaxPoolSize(nHandlerThreads)
       .setQueueLimit(-1);
@@ -147,7 +150,7 @@ public class GrizzlyServer {
 
     // Add shutdown hook to gracefully shut down Grizzly.
     // Signal handling (sun.misc.Signal) is potentially not available on all JVMs.
-    Thread shutdownThread = new Thread(httpServer::shutdown);
+    Thread shutdownThread = new Thread(httpServer::shutdown, "grizzly-shutdown");
     Runtime.getRuntime().addShutdownHook(shutdownThread);
 
     /* RELINQUISH CONTROL TO THE SERVER THREAD */

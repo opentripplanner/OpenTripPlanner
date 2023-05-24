@@ -40,7 +40,10 @@ public class OtpStartupInfo {
     Runtime
       .getRuntime()
       .addShutdownHook(
-        new Thread(() -> LOG.info("OTP SHUTTING DOWN ({})", projectInfo().getVersionString()))
+        new Thread(
+          () -> LOG.info("OTP SHUTTING DOWN ({})", projectInfo().getVersionString()),
+          "server-shutdown-info"
+        )
       );
     LOG.info(NEW_LINE + "{}", info());
   }

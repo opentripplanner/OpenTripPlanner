@@ -72,7 +72,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
     this.graph = graph;
     this.transitModel = transitModel;
     // Thread factory used to create new threads, giving them more human-readable names.
-    var threadFactory = new ThreadFactoryBuilder().setNameFormat("GraphUpdater-%d").build();
+    var threadFactory = new ThreadFactoryBuilder().setNameFormat("updater-%d").build();
     this.scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
     this.updaterPool = Executors.newCachedThreadPool(threadFactory);
 
@@ -216,7 +216,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
    */
   private void reportReadinessForUpdaters() {
     Executors
-      .newSingleThreadExecutor()
+      .newSingleThreadExecutor(new ThreadFactoryBuilder().setNameFormat("updater-ready").build())
       .submit(() -> {
         boolean otpIsShuttingDown = false;
 
