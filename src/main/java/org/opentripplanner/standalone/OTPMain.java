@@ -48,6 +48,7 @@ public class OTPMain {
    */
   public static void main(String[] args) {
     try {
+      Thread.currentThread().setName("main");
       CommandLineParameters params = parseAndValidateCmdLine(args);
       OtpStartupInfo.logInfo();
       startOTPServer(params);
@@ -218,14 +219,17 @@ public class OTPMain {
     TransitModel transitModel,
     RaptorConfig<?> raptorConfig
   ) {
-    var hook = new Thread(() -> {
-      LOG.info("OTP shutdown started...");
-      UpdaterConfigurator.shutdownGraph(transitModel);
-      raptorConfig.shutdown();
-      WeakCollectionCleaner.DEFAULT.exit();
-      DeferredAuthorityFactory.exit();
-      LOG.info("OTP shutdown: resources released...");
-    });
+    var hook = new Thread(
+      () -> {
+        LOG.info("OTP shutdown started...");
+        UpdaterConfigurator.shutdownGraph(transitModel);
+        raptorConfig.shutdown();
+        WeakCollectionCleaner.DEFAULT.exit();
+        DeferredAuthorityFactory.exit();
+        LOG.info("OTP shutdown: resources released...");
+      },
+      "server-shutdown"
+    );
     Runtime.getRuntime().addShutdownHook(hook);
   }
 

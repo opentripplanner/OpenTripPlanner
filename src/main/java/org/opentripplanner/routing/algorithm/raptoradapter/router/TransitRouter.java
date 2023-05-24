@@ -178,6 +178,8 @@ public class TransitRouter {
 
     if (OTPFeature.ParallelRouting.isOn()) {
       try {
+        // TODO: This is not using {@link OtpRequestThreadFactory} witch mean we do not get
+        //       log-trace-parameters-propagation and graceful timeout handling here.
         CompletableFuture
           .allOf(
             CompletableFuture.runAsync(accessCalculator),

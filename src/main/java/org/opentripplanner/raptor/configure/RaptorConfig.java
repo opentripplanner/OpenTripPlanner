@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.configure;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
@@ -125,6 +126,8 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
 
   @Nullable
   private ExecutorService createNewThreadPool(int size) {
-    return size > 0 ? Executors.newFixedThreadPool(size) : null;
+    return size > 0
+      ? Executors.newFixedThreadPool(size, OtpRequestThreadFactory.of("raptor-%d"))
+      : null;
   }
 }
