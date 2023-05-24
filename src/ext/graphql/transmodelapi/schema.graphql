@@ -251,9 +251,9 @@ type Interchange {
   ToServiceJourney: ServiceJourney @deprecated
   fromServiceJourney: ServiceJourney
   guaranteed: Boolean
-  "Maximum time after scheduled departure time the connecting transport is guarantied to wait for the delayed trip. [NOT RESPECTED DURING ROUTING, JUST PASSED THROUGH]"
+  "Maximum time after scheduled departure time the connecting transport is guaranteed to wait for the delayed trip. [NOT RESPECTED DURING ROUTING, JUST PASSED THROUGH]"
   maximumWaitTime: Int
-  "The transfer priority is used to decide where a transfer should happen, at the highest prioritized location. If the guarantied flag is set it take precedence priority. A guarantied ALLOWED transfer is preferred over a PREFERRED none-guarantied transfer."
+  "The transfer priority is used to decide where a transfer should happen, at the highest prioritized location. If the guaranteed flag is set it take precedence priority. A guaranteed ALLOWED transfer is preferred over a PREFERRED none-guaranteed transfer."
   priority: InterchangePriority
   staySeated: Boolean
   toServiceJourney: ServiceJourney

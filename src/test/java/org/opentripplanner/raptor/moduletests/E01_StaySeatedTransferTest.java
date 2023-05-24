@@ -26,7 +26,7 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  * FEATURE UNDER TEST
  * <p>
  * Raptor should return a path if it exists when a transfer is only possible because it is
- * guaranteed/stay-seated. A guarantied transfer should be able even if there is zero time to do the
+ * guaranteed/stay-seated. A guaranteed transfer should be able even if there is zero time to do the
  * transfer. In these cases the transfer-slack should be ignored and the connection should be
  * possible.
  */
