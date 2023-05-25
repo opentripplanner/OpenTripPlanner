@@ -24,6 +24,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Do not enforce API processing timeout for parallel routing [#5114](https://github.com/opentripplanner/OpenTripPlanner/pull/5114)
 - Rename bikeRental options to vehicleRental [#5089](https://github.com/opentripplanner/OpenTripPlanner/pull/5089)
 - Fare sandbox cleanup, remove MultipleFareService [#5100](https://github.com/opentripplanner/OpenTripPlanner/pull/5100)
+- Add validation of NeTEX timetabled passing times [#5081](https://github.com/opentripplanner/OpenTripPlanner/pull/5081)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
