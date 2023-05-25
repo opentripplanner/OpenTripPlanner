@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Contains the logic for extracting elevators out of OSM data
+ * Contains the logic for extracting escalators out of OSM data
  */
 class EscalatorProcessor {
 

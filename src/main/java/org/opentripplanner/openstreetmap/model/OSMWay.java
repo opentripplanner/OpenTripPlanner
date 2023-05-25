@@ -2,7 +2,6 @@ package org.opentripplanner.openstreetmap.model;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
-import java.util.List;
 
 public class OSMWay extends OSMWithTags {
 
