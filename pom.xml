@@ -391,6 +391,7 @@
                               for deployment in the way source and docs are. -->
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>shaded</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
                             <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
                               We have eliminated most Jersey auto-scanning, but there is still some need for include
                               filters to force-include classes that are dynamically loaded by name/auto-scanned. -->
