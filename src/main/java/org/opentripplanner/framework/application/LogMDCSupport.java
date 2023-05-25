@@ -29,11 +29,26 @@ public class LogMDCSupport {
   }
 
   /**
-   * Put key/value into the thread local MDC context map
+   * Put key/value into the thread local MDC context map. If the value is {@code null}/empty, then
+   * the key is removed(if it exists).
    */
   public static void putLocal(String key, String value) {
     if (enabled && StringUtils.hasValue(key)) {
-      MDC.put(key, value);
+      if (StringUtils.hasValue(value)) {
+        MDC.put(key, value);
+      } else {
+        MDC.remove(key);
+      }
+    }
+  }
+
+  /**
+   * Remove a log key from the thread local log context map. If the key is {@code null}/empty or
+   * does not exist in the log context, then nothing happens and the method returns.
+   */
+  public static void removeLocal(String key) {
+    if (enabled && StringUtils.hasValue(key)) {
+      MDC.remove(key);
     }
   }
 

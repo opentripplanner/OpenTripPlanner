@@ -66,10 +66,10 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
       if (value == null && it.generateIdIfMissing()) {
         value = generateUniqueId();
       }
-      if (StringUtils.hasValue(value)) {
-        if (it.hasLogKey()) {
-          LogMDCSupport.putLocal(it.logKey(), value);
-        }
+      if (it.hasLogKey()) {
+        // Put value, even if it is empty. This will clear any value set in the thread from
+        // before. This happens if the previous request did not clean up after it-self.
+        LogMDCSupport.putLocal(it.logKey(), value);
       }
     }
   }
@@ -87,6 +87,9 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
       if (it.hasHttpResponseHeader()) {
         var value = resolveValue(it, requestContext);
         setHttpResponseHeaderValue(responseContext, it.httpResponseHeader(), value);
+      }
+      if (it.hasLogKey()) {
+        LogMDCSupport.removeLocal(it.logKey());
       }
     }
   }
