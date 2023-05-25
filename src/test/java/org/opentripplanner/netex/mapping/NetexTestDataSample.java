@@ -46,7 +46,7 @@ import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
 import org.rutebanken.netex.model.Via_VersionedChildStructure;
 import org.rutebanken.netex.model.Vias_RelStructure;
 
-class NetexTestDataSample {
+public class NetexTestDataSample {
 
   public static final String SERVICE_JOURNEY_ID = "RUT:ServiceJourney:1";
   public static final List<String> DATED_SERVICE_JOURNEY_ID = List.of(
@@ -72,7 +72,7 @@ class NetexTestDataSample {
 
   private final EntityById<org.opentripplanner.transit.model.network.Route> otpRouteByid = new EntityById<>();
 
-  NetexTestDataSample() {
+  public NetexTestDataSample() {
     final int[] stopTimes = { 0, 4, 10, 15 };
     final int NUM_OF_STOPS = stopTimes.length;
 
@@ -203,7 +203,7 @@ class NetexTestDataSample {
     return quayIdByStopPointRef;
   }
 
-  JourneyPattern getJourneyPattern() {
+  public JourneyPattern getJourneyPattern() {
     return journeyPattern;
   }
 
@@ -211,7 +211,7 @@ class NetexTestDataSample {
     return timetabledPassingTimes;
   }
 
-  HierarchicalMapById<ServiceJourney> getServiceJourneyById() {
+  public HierarchicalMapById<ServiceJourney> getServiceJourneyById() {
     return serviceJourneyById;
   }
 

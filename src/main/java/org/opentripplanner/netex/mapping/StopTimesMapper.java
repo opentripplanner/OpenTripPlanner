@@ -47,6 +47,8 @@ import org.rutebanken.netex.model.Vias_RelStructure;
  * StopTime has a reference to the correct stop. DestinationDisplay is mapped to HeadSign. There is
  * logic to take care of the the fact that DestinationsDisplay is also valid for each subsequent
  * TimeTabledPassingTime, while HeadSign has to be explicitly defined for each StopTime.
+ * This class does not take Daylight Saving Time transitions into account, this is an error and
+ * should be fixed. See https://github.com/opentripplanner/OpenTripPlanner/issues/5109
  */
 class StopTimesMapper {
 
