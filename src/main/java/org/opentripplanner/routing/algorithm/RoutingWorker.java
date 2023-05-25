@@ -140,7 +140,6 @@ public class RoutingWorker {
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
-
     routingErrors.addAll(filterChain.getRoutingErrors());
 
     if (LOG.isDebugEnabled()) {
