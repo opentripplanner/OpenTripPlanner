@@ -1,14 +1,11 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
 import graphql.schema.DataFetchingEnvironment;
-import java.time.Duration;
-import java.util.List;
-import java.util.Map;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
+import org.opentripplanner.ext.transmodelapi.model.framework.StreetModeDurationInputType;
 import org.opentripplanner.ext.transmodelapi.model.plan.ItineraryFiltersInputType;
+import org.opentripplanner.ext.transmodelapi.model.plan.TripQuery;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
-import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -39,7 +36,6 @@ class PreferencesMapper {
     preferences.withRental(rental -> mapRentalPreferences(rental, environment, callWith));
   }
 
-  @SuppressWarnings("unchecked")
   private static void mapWalkPreferences(
     WalkPreferences.Builder walk,
     DataFetchingEnvironment environment,
@@ -49,45 +45,28 @@ class PreferencesMapper {
     callWith.argument("walkSpeed", walk::withSpeed);
   }
 
-  @SuppressWarnings("unchecked")
   private static void mapStreetPreferences(
     StreetPreferences.Builder street,
     DataFetchingEnvironment environment,
     StreetPreferences defaultPreferences
   ) {
-    if (GqlUtil.hasArgument(environment, "maxAccessEgressDurationForMode")) {
-      for (var entry : (List<Map<String, ?>>) environment.getArgument(
-        "maxAccessEgressDurationForMode"
-      )) {
-        var streetMode = (StreetMode) entry.get("streetMode");
-        var duration = (Duration) entry.get("duration");
+    street.withMaxAccessEgressDuration(builder ->
+      StreetModeDurationInputType.mapDurationForStreetModeAndAssertValueIsGreaterThenDefault(
+        builder,
+        environment,
+        TripQuery.MAX_ACCESS_EGRESS_DURATION_FOR_MODE,
+        defaultPreferences.maxAccessEgressDuration()
+      )
+    );
 
-        var defaultDuration = defaultPreferences.maxAccessEgressDuration().valueOf(streetMode);
-
-        if (defaultDuration.compareTo(duration) < 0) {
-          throw new IllegalArgumentException(
-            "Invalid max access/egress duration for mode " + streetMode
-          );
-        }
-
-        street.withMaxAccessEgressDuration(streetMode, duration);
-      }
-    }
-
-    if (GqlUtil.hasArgument(environment, "maxDirectDurationForMode")) {
-      for (var entry : (List<Map<String, ?>>) environment.getArgument("maxDirectDurationForMode")) {
-        var streetMode = (StreetMode) entry.get("streetMode");
-        var duration = (Duration) entry.get("duration");
-
-        var defaultDuration = defaultPreferences.maxDirectDuration().defaultValue();
-
-        if (defaultDuration.compareTo(duration) < 0) {
-          throw new IllegalArgumentException("Invalid max direct duration for mode " + streetMode);
-        }
-
-        street.withMaxDirectDuration(streetMode, duration);
-      }
-    }
+    street.withMaxDirectDuration(builder ->
+      StreetModeDurationInputType.mapDurationForStreetModeAndAssertValueIsGreaterThenDefault(
+        builder,
+        environment,
+        TripQuery.MAX_DIRECT_DURATION_FOR_MODE,
+        defaultPreferences.maxDirectDuration()
+      )
+    );
   }
 
   private static void mapBikePreferences(

@@ -105,10 +105,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
     assertNotNull(maxAccessEgressDuration);
 
     for (var entry : DURATIONS) {
-      var streetMode = (StreetMode) entry.get("streetMode");
-      var duration = (Duration) entry.get("duration");
-
-      assertEquals(maxAccessEgressDuration.valueOf(streetMode), duration);
+      var mode = (StreetMode) entry.get("streetMode");
+      var expected = (Duration) entry.get("duration");
+      assertEquals(expected, maxAccessEgressDuration.valueOf(mode), mode.name());
     }
   }
 
@@ -175,10 +174,6 @@ public class TripRequestMapperTest implements PlanTestConstants {
     );
   }
 
-
-  /**
-   * FIX - THIS TEST FAILS
-   */
   @Test
   public void testMaxDirectDurationForFlexWithTooLongDuration() {
     Map<String, Object> arguments = Map.of(

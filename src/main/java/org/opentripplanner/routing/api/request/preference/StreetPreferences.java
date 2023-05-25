@@ -202,11 +202,6 @@ public final class StreetPreferences implements Serializable {
       return this;
     }
 
-    @Deprecated
-    public Builder withMaxAccessEgressDuration(StreetMode mode, Duration duration) {
-      return withMaxAccessEgressDuration(b -> b.with(mode, duration));
-    }
-
     /** Utility method to simplify config parsing */
     public Builder withMaxAccessEgressDuration(
       Duration defaultValue,
@@ -218,11 +213,6 @@ public final class StreetPreferences implements Serializable {
     public Builder withMaxDirectDuration(Consumer<DurationForEnum.Builder<StreetMode>> body) {
       this.maxDirectDuration = this.maxDirectDuration.copyOf().apply(body).build();
       return this;
-    }
-
-    @Deprecated
-    public Builder withMaxDirectDuration(StreetMode mode, Duration duration) {
-      return withMaxDirectDuration(b -> b.with(mode, duration));
     }
 
     /** Utility method to simplify config parsing */
