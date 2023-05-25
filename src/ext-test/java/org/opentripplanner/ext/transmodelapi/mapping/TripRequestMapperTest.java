@@ -21,8 +21,8 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graphfinder.StopFinderTraverseVisitor;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
@@ -35,6 +35,7 @@ import org.opentripplanner.transit.service.TransitModel;
 public class TripRequestMapperTest implements PlanTestConstants {
 
   static final TransmodelRequestContext context;
+  private static final Duration MAX_FLEXIBLE = Duration.ofMinutes(20);
 
   static {
     var graph = new Graph();
@@ -42,11 +43,23 @@ public class TripRequestMapperTest implements PlanTestConstants {
     transitModel.initTimeZone(ZoneIds.STOCKHOLM);
     final var transitService = new DefaultTransitService(transitModel);
 
+    var defaultRequest = new RouteRequest();
+
+    // Change defaults for FLEXIBLE to a lower value than the default 45m. This should restrict the
+    // input to be less than 20m, not 45m.
+    defaultRequest.withPreferences(pb ->
+      pb.withStreet(sp ->
+        sp
+          .withMaxAccessEgressDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
+          .withMaxDirectDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
+      )
+    );
+
     context =
       new TransmodelRequestContext(
         DefaultServerRequestContext.create(
           RouterConfig.DEFAULT.transitTuningConfig(),
-          new RouteRequest(),
+          defaultRequest,
           RaptorConfig.defaultConfigForTest(),
           graph,
           transitService,
@@ -74,7 +87,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
     Map.of("streetMode", StreetMode.CAR_TO_PARK, "duration", Duration.ofMinutes(36)),
     Map.of("streetMode", StreetMode.CAR_PICKUP, "duration", Duration.ofMinutes(30)),
     Map.of("streetMode", StreetMode.CAR_RENTAL, "duration", Duration.ofMinutes(38)),
-    Map.of("streetMode", StreetMode.FLEXIBLE, "duration", Duration.ofMinutes(39))
+    // Same as max value for FLEXIBLE
+    Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE)
   );
 
   @Test
@@ -121,8 +135,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   @Test
   public void testMaxAccessEgressDurationValidation() {
+    var defaultValue = StreetPreferences.DEFAULT.maxAccessEgressDuration().valueOf(StreetMode.WALK);
     var duration = List.of(
-      Map.of("streetMode", StreetMode.WALK, "duration", Duration.ofDays(9999))
+      Map.of("streetMode", StreetMode.WALK, "duration", defaultValue.plusSeconds(1))
     );
 
     Map<String, Object> arguments = Map.of("maxAccessEgressDurationForMode", duration);
@@ -134,13 +149,42 @@ public class TripRequestMapperTest implements PlanTestConstants {
   }
 
   @Test
+  public void testMaxAccessEgressDurationForFlexWithTooLongDuration() {
+    Map<String, Object> arguments = Map.of(
+      "maxAccessEgressDurationForMode",
+      List.of(Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE.plusSeconds(1)))
+    );
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> TripRequestMapper.createRequest(executionContext(arguments))
+    );
+  }
+
+  @Test
   public void testMaxDirectDurationValidation() {
+    var defaultValue = StreetPreferences.DEFAULT.maxDirectDuration().valueOf(StreetMode.WALK);
     var duration = List.of(
-      Map.of("streetMode", StreetMode.WALK, "duration", Duration.ofDays(9999))
+      Map.of("streetMode", StreetMode.WALK, "duration", defaultValue.plusSeconds(1))
     );
 
     Map<String, Object> arguments = Map.of("maxDirectDurationForMode", duration);
 
+    assertThrows(
+      IllegalArgumentException.class,
+      () -> TripRequestMapper.createRequest(executionContext(arguments))
+    );
+  }
+
+
+  /**
+   * FIX - THIS TEST FAILS
+   */
+  @Test
+  public void testMaxDirectDurationForFlexWithTooLongDuration() {
+    Map<String, Object> arguments = Map.of(
+      "maxDirectDurationForMode",
+      List.of(Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE.plusSeconds(1)))
+    );
     assertThrows(
       IllegalArgumentException.class,
       () -> TripRequestMapper.createRequest(executionContext(arguments))
