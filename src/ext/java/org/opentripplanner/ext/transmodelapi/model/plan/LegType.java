@@ -453,7 +453,7 @@ public class LegType {
           .dataFetcher(env ->
             Objects
               .requireNonNullElse(leg(env).getElevationProfile(), ElevationProfile.empty())
-              .steps()
+              .stepsWithoutUnknowns()
           )
           .build()
       )

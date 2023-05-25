@@ -185,7 +185,7 @@ type DestinationDisplay {
   via: [String]
 }
 
-"Part of a trip pattern. Either a ride on a public transport vehicle or access or path link to/from/between places"
+"Individual step of an elevation profile."
 type ElevationProfileStep {
   "The distance from the start of the step, in meters."
   distance: Float
@@ -441,7 +441,7 @@ type PathGuidance {
   bogusName: Boolean
   "The distance in meters that this step takes."
   distance: Float
-  "The longitude of the step."
+  "The step's elevation profile."
   elevation: [ElevationProfileStep]!
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String

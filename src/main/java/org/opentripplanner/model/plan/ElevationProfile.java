@@ -98,6 +98,13 @@ public class ElevationProfile {
     return steps;
   }
 
+  /**
+   * @return The list of elevation steps but skips those elements where the y value is unknown.
+   */
+  public List<Step> stepsWithoutUnknowns() {
+    return steps.stream().filter(step -> !step.isYUnknown()).toList();
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder.of(ElevationProfile.class).addCol("steps", steps).toString();

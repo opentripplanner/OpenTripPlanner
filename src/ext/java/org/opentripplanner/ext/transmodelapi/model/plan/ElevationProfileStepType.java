@@ -17,7 +17,7 @@ public class ElevationProfileStepType {
       .newObject()
       .name(NAME)
       .description(
-        "Part of a trip pattern. Either a ride on a public transport vehicle or access or path link to/from/between places"
+        "Individual step of an elevation profile."
       )
       .field(
         GraphQLFieldDefinition
@@ -25,7 +25,7 @@ public class ElevationProfileStepType {
           .name("distance")
           .description("The distance from the start of the step, in meters.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> (float) step(env).x())
+          .dataFetcher(env -> step(env).x())
           .build()
       )
       .field(
@@ -34,7 +34,7 @@ public class ElevationProfileStepType {
           .name("elevation")
           .description("The elevation at this distance, in meters.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> (float) step(env).y())
+          .dataFetcher(env -> step(env).y())
           .build()
       )
       .build();
