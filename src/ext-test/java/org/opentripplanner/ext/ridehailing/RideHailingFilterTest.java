@@ -6,16 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.ridehailing.TestRideHailingService.DEFAULT_ARRIVAL_TIMES;
 import static org.opentripplanner.ext.ridehailing.model.RideHailingProvider.UBER;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
-import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
@@ -29,30 +24,13 @@ class RideHailingFilterTest implements PlanTestConstants {
     Money.usDollars(15),
     Money.usDollars(30),
     "foo",
-    "UberX",
-    false
+    "UberX"
   );
   RideHailingService mockService = new TestRideHailingService(
     DEFAULT_ARRIVAL_TIMES,
     List.of(RIDE_ESTIMATE)
   );
-  RideHailingService failingService = new RideHailingService() {
-    @Override
-    public RideHailingProvider provider() {
-      return UBER;
-    }
-
-    @Override
-    public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) {
-      throw new RuntimeException();
-    }
-
-    @Override
-    public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end)
-      throws ExecutionException {
-      throw new ExecutionException(new IOException());
-    }
-  };
+  RideHailingService failingService = new FailingRideHailingService();
 
   Itinerary i = TestItineraryBuilder
     .newItinerary(A)
@@ -61,7 +39,7 @@ class RideHailingFilterTest implements PlanTestConstants {
 
   @Test
   void noServices() {
-    var filter = new RideHailingFilter(List.of());
+    var filter = new RideHailingFilter(List.of(), false);
 
     var filtered = filter.filter(List.of(i));
 
@@ -70,7 +48,7 @@ class RideHailingFilterTest implements PlanTestConstants {
 
   @Test
   void addRideHailingInformation() {
-    var filter = new RideHailingFilter(List.of(mockService));
+    var filter = new RideHailingFilter(List.of(mockService), false);
 
     var filtered = filter.filter(List.of(i));
 
@@ -85,7 +63,7 @@ class RideHailingFilterTest implements PlanTestConstants {
 
   @Test
   void failingService() {
-    var filter = new RideHailingFilter(List.of(failingService));
+    var filter = new RideHailingFilter(List.of(failingService), false);
 
     var filtered = filter.filter(List.of(i));
 

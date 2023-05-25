@@ -17,6 +17,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.ext.ridehailing.CachingRideHailingService;
 import org.opentripplanner.ext.ridehailing.RideHailingServiceParameters;
 import org.opentripplanner.ext.ridehailing.model.ArrivalTime;
+import org.opentripplanner.ext.ridehailing.model.Ride;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideEstimateRequest;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
@@ -43,6 +44,12 @@ public class UberService extends CachingRideHailingService {
   private final OAuthService oauthService;
   private final String timeEstimateUri;
   private final String priceEstimateUri;
+  private final List<String> bannedTypes;
+  /**
+   * Only a single product ID can be classified as wheelchair-accessible, but it would not
+   * be hard to change it, should the need arise.
+   */
+  private final String wheelchairAccessibleProductId;
 
   public UberService(RideHailingServiceParameters config) {
     this(
@@ -53,14 +60,24 @@ public class UberService extends CachingRideHailingService {
         UriBuilder.fromUri("https://login.uber.com/oauth/v2/token").build()
       ),
       DEFAULT_PRICE_ESTIMATE_URI,
-      DEFAULT_TIME_ESTIMATE_URI
+      DEFAULT_TIME_ESTIMATE_URI,
+      config.bannedProductIds(),
+      config.wheelchairProductId()
     );
   }
 
-  UberService(OAuthService oauthService, String priceEstimateUri, String timeEstimateUri) {
+  UberService(
+    OAuthService oauthService,
+    String priceEstimateUri,
+    String timeEstimateUri,
+    List<String> bannedTypes,
+    String wheelchairAccessibleProductId
+  ) {
     this.oauthService = oauthService;
     this.priceEstimateUri = priceEstimateUri;
     this.timeEstimateUri = timeEstimateUri;
+    this.bannedTypes = bannedTypes;
+    this.wheelchairAccessibleProductId = wheelchairAccessibleProductId;
   }
 
   @Override
@@ -69,7 +86,8 @@ public class UberService extends CachingRideHailingService {
   }
 
   @Override
-  public List<ArrivalTime> queryArrivalTimes(WgsCoordinate coord) throws IOException {
+  public List<ArrivalTime> queryArrivalTimes(WgsCoordinate coord, boolean wheelchairAccessible)
+    throws IOException {
     var uri = UriBuilder.fromUri(timeEstimateUri).build();
 
     var finalUri = uri;
@@ -97,10 +115,10 @@ public class UberService extends CachingRideHailingService {
           RideHailingProvider.UBER,
           time.product_id(),
           time.localized_display_name(),
-          Duration.ofSeconds(time.estimate()),
-          productIsWheelchairAccessible(time.product_id())
+          Duration.ofSeconds(time.estimate())
         )
       )
+      .filter(a -> filterRides(a, wheelchairAccessible))
       .toList();
 
     if (arrivalTimes.isEmpty()) {
@@ -148,11 +166,19 @@ public class UberService extends CachingRideHailingService {
           Money.ofFractionalAmount(currency, price.low_estimate()),
           Money.ofFractionalAmount(currency, price.high_estimate()),
           price.product_id(),
-          price.display_name(),
-          productIsWheelchairAccessible(price.product_id())
+          price.display_name()
         );
       })
+      .filter(re -> filterRides(re, request.wheelchairAccessible()))
       .toList();
+  }
+
+  private boolean filterRides(Ride a, boolean wheelchairAccessible) {
+    if (wheelchairAccessible) {
+      return a.rideType().equals(wheelchairAccessibleProductId);
+    } else {
+      return !bannedTypes.contains(a.rideType());
+    }
   }
 
   @Nonnull
