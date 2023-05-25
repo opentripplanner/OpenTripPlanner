@@ -16,9 +16,7 @@ public class ElevationProfileStepType {
     return GraphQLObjectType
       .newObject()
       .name(NAME)
-      .description(
-        "Individual step of an elevation profile."
-      )
+      .description("Individual step of an elevation profile.")
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()

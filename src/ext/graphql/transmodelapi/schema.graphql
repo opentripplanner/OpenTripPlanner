@@ -303,7 +303,8 @@ type Leg {
   distance: Float!
   "The leg's duration in seconds"
   duration: Long!
-  elevation: [ElevationProfileStep]!
+  "The leg's elevation profile."
+  elevationProfile: [ElevationProfileStep]!
   "The expected, realtime adjusted date and time this leg ends."
   expectedEndTime: DateTime!
   "The expected, realtime adjusted date and time this leg starts."
@@ -442,7 +443,7 @@ type PathGuidance {
   "The distance in meters that this step takes."
   distance: Float
   "The step's elevation profile."
-  elevation: [ElevationProfileStep]!
+  elevationProfile: [ElevationProfileStep]!
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
   "The absolute direction of this step."

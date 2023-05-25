@@ -122,7 +122,7 @@ public class PathGuidanceType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
-          .name("elevation")
+          .name("elevationProfile")
           .description("The step's elevation profile.")
           .type(new GraphQLNonNull(new GraphQLList(elevationStepType)))
           .dataFetcher(environment ->
