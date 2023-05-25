@@ -2970,6 +2970,7 @@ type QueryType {
         `waitReluctance` on the first boarding). Default value: 0.4
         """
         waitAtBeginningFactor: Float @deprecated(reason: "Removed in OTP 2, the timetable-view replaces this functionality.")
+
         """
         This argument has no use for itinerary planning and will be removed later.
         When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.
@@ -3017,6 +3018,7 @@ type QueryType {
         """
 
         maxPreTransitTime: Int @deprecated(reason: "Use walkReluctance or future reluctance parameters for other modes")
+
         """
         How expensive it is to drive a car when car&parking, increase this value to
         make car driving legs shorter. Default value: 1.
