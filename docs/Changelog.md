@@ -26,6 +26,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fare sandbox cleanup, remove MultipleFareService [#5100](https://github.com/opentripplanner/OpenTripPlanner/pull/5100)
 - Add validation of NeTEX timetabled passing times [#5081](https://github.com/opentripplanner/OpenTripPlanner/pull/5081)
 - Return WALKING_BETTER_THAN_TRANSIT only on a fully walking leg [#5091](https://github.com/opentripplanner/OpenTripPlanner/pull/5091)
+- Handle CoercingParseValueException [#5133](https://github.com/opentripplanner/OpenTripPlanner/pull/5133)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
