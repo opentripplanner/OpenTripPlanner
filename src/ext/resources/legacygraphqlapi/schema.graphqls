@@ -3016,14 +3016,12 @@ type QueryType {
         The maximum time (in seconds) of pre-transit travel when using
         drive-to-transit (park and ride or kiss and ride). Default value: 1800.
         """
-
         maxPreTransitTime: Int @deprecated(reason: "Use walkReluctance or future reluctance parameters for other modes")
 
         """
         How expensive it is to drive a car when car&parking, increase this value to
         make car driving legs shorter. Default value: 1.
         """
-
         carParkCarLegWeight: Float @deprecated(reason: "Use `carReluctance` instead.")
 
         """Tuning parameter for the search algorithm, mainly useful for testing."""
