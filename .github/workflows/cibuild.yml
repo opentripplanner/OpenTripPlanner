@@ -141,15 +141,28 @@ jobs:
           else
             mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
           fi
-          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
           
-          # commit and push the GraphQL documentation
+          # commit and push the GraphQL documentation if the schema file is newer than the 
+          # compiled output. it's necessary to have this check because the diffs of the magidoc tool
+          # this are quite large and unnecessarily increase the size of the docs repo even when the 
+          # schema hasn't changed.
+          # example commit: https://github.com/opentripplanner/docs/commit/45e6ddf8e4a4
+          
+          SCHEMA_FILE_MODIFIED=`stat -c "%Y" src/ext/resources/legacygraphqlapi/schema.graphqls` 
           git checkout $LOCAL_BRANCH
-          mkdir -p api
-          rsync -r --delete target/magidoc/api/ api/dev-2.x/
-          git add api
-          git commit -am "Add Magidoc GraphQL documentation"
+          DOCS_MODIFIED=`stat -c "%Y" api/dev-2.x/graphql-gtfs/introduction.html` 
+          if [ ${SCHEMA_FILE_MODIFIED} -gt ${DOCS_MODIFIED} ]; then
+            echo "schema.graphqls has been modified, committing updated documentation"
+            mkdir -p api
+            rsync -r --delete target/magidoc/api/ api/dev-2.x/
+            git add api
+            git commit -am "Add Magidoc GraphQL documentation"
+          else
+            echo "schema.graphqls has not been modified, not committing documentation"
+          fi
+          
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
+  
 
   graphql-code-generation:
     if: github.repository_owner == 'opentripplanner'
