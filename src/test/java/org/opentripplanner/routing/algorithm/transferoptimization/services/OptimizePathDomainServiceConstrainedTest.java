@@ -23,7 +23,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
  * <pre>
  * POSSIBLE TRANSFERS
  * Transfers        B-C 1m     C-D 2m       D-E 3m     E-F 4m      F-G 5m
- * Constraint       ALLOWED  RECOMMENDED  PREFERRED  GUARANTIED  STAY_SEATED
+ * Constraint       ALLOWED  RECOMMENDED  PREFERRED  GUARANTEED  STAY_SEATED
  * Trip 1  A 10:02  B 10:10    C 10:15     D 10:20     E 10:25     F 10:30
  * Trip 2           C 10:13    D 10:18     E 10:24     G 10:30     G 10:36   H 10:40
  * </pre>

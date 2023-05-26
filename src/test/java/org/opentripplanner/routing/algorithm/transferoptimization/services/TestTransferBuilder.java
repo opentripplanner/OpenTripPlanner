@@ -20,7 +20,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
   private final int fromStopIndex;
   private final T toTrip;
   private final int toStopIndex;
-  private final TransferConstraint.Builder constraint = TransferConstraint.create();
+  private final TransferConstraint.Builder constraint = TransferConstraint.of();
 
   private TestTransferBuilder(T fromTrip, int fromStopIndex, T toTrip, int toStopIndex) {
     this.fromTrip = fromTrip;

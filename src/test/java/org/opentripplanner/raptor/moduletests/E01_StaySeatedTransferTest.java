@@ -10,6 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.api.PathUtils;
@@ -25,11 +26,11 @@ import org.opentripplanner.raptor.spi.DefaultSlackProvider;
  * FEATURE UNDER TEST
  * <p>
  * Raptor should return a path if it exists when a transfer is only possible because it is
- * guaranteed/stay-seated. A guarantied transfer should be able even if there is zero time to do the
- * transfer. In these cases the transfer-slack should be ignored and the connection should be
- * possible.
+ * guaranteed/stay-seated. A stay-seated transfer should be possible even if there is zero time to
+ * do the transfer. In these cases the transfer-slack should be ignored and the connection should
+ * be possible.
  */
-public class E01_GuaranteedTransferTest implements RaptorTestConstants {
+public class E01_StaySeatedTransferTest implements RaptorTestConstants {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -38,8 +39,12 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
   );
 
   /**
-   * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
-   * <p>
+   * Schedule
+   * <pre>
+   * Stop:   1       2       3
+   *   R1: 00:02 - 00:05
+   *   R2:         00:05 - 00:10
+   *</pre>
    * Access(stop 1) and egress(stop 3) is 30s.
    */
   @BeforeEach
@@ -51,7 +56,13 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
     var tripB = r2.timetable().getTripSchedule(0);
 
     data.withRoutes(r1, r2);
-    data.withGuaranteedTransfer(tripA, STOP_B, tripB, STOP_B);
+    data.withConstrainedTransfer(
+      tripA,
+      STOP_B,
+      tripB,
+      STOP_B,
+      TransferConstraint.of().staySeated().build()
+    );
     data.mcCostParamsBuilder().transferCost(100);
 
     // NOTE! No search-window is set.
@@ -64,7 +75,7 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
       .latestArrivalTime(T00_30)
       .timetable(true);
 
-    // Make sure the slack have values which prevent the normal from happening transfer.
+    // Make sure the slack have values which prevent a normal transfer.
     // The test scenario have zero seconds to transfer, so any slack will do.
     data.withSlackProvider(new DefaultSlackProvider(D30s, D20s, D10s));
 
@@ -72,9 +83,10 @@ public class E01_GuaranteedTransferTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
+    // Note! The number of transfers is zero with stay-seated/interlining
     var path =
       "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R2 0:05 0:10 ~ C ~ Walk 30s " +
-      "[0:01:10 0:10:40 9m30s 1tx $1230]";
+      "[0:01:10 0:10:40 9m30s 0tx $1230]";
     return RaptorModuleTestCase
       .of()
       .addMinDuration("9m30s", TX_1, T00_00, T00_30)

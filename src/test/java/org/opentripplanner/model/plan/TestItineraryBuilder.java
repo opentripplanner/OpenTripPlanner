@@ -363,7 +363,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       to,
       null,
       null,
-      new ConstrainedTransfer(null, null, null, TransferConstraint.create().staySeated().build())
+      new ConstrainedTransfer(null, null, null, TransferConstraint.of().staySeated().build())
     );
   }
 

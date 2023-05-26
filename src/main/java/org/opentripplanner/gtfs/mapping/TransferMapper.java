@@ -194,7 +194,7 @@ class TransferMapper {
   }
 
   private TransferConstraint mapConstraint(Transfer rhs) {
-    var builder = TransferConstraint.create();
+    var builder = TransferConstraint.of();
 
     builder.guaranteed(rhs.getTransferType() == GUARANTEED);
 

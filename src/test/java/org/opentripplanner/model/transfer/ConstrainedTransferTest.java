@@ -17,11 +17,8 @@ import org.junit.jupiter.api.Test;
 
 public class ConstrainedTransferTest {
 
-  private static final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
-  private static final TransferConstraint GUARANTIED = TransferConstraint
-    .create()
-    .guaranteed()
-    .build();
+  private static final TransferConstraint NO_CONSTRAINS = TransferConstraint.of().build();
+  private static final TransferConstraint GUARANTEED = TransferConstraint.of().guaranteed().build();
 
   private final ConstrainedTransfer TX_STATION_TO_STATION = noConstTx(STATION_POINT, STATION_POINT);
   private final ConstrainedTransfer TX_STATION_TO_B = noConstTx(STATION_POINT, STOP_POINT_B);
@@ -55,11 +52,11 @@ public class ConstrainedTransferTest {
 
   private final ConstrainedTransfer TX_NO_CONSTRAINS = noConstTx(STOP_POINT_A, STOP_POINT_B);
 
-  private final ConstrainedTransfer TX_GUARANTIED = new ConstrainedTransfer(
+  private final ConstrainedTransfer TX_GUARANTEED = new ConstrainedTransfer(
     null,
     TRIP_POINT_11_1,
     TRIP_POINT_21_3,
-    GUARANTIED
+    GUARANTEED
   );
 
   @Test
@@ -104,7 +101,7 @@ public class ConstrainedTransferTest {
   @Test
   public void noConstraints() {
     assertTrue(TX_NO_CONSTRAINS.noConstraints());
-    assertFalse(TX_GUARANTIED.noConstraints());
+    assertFalse(TX_GUARANTEED.noConstraints());
   }
 
   @Test

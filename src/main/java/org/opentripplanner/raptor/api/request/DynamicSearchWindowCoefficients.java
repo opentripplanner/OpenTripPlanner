@@ -64,7 +64,7 @@ public interface DynamicSearchWindowCoefficients {
    * may take a long time. Use this parameter to tune the desired maximum search time.
    * <p>
    * This is the parameter that affect the response time most, the downside is that a search is only
-   * guarantied to be pareto-optimal within a search-window.
+   * guaranteed to be pareto-optimal within a search-window.
    * <p>
    * The default is 3 hours. The unit is minutes.
    */
