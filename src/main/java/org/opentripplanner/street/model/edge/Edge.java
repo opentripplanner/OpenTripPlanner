@@ -10,12 +10,16 @@ import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances; all
  * standard OTP edges are subclasses of this.
  */
 public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializable {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Edge.class);
 
   protected enum ConnectToGraph {
     CONNECT,
@@ -89,6 +93,31 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    */
   public boolean isReverseOf(Edge e) {
     return (this.getFromVertex() == e.getToVertex() && this.getToVertex() == e.getFromVertex());
+  }
+
+  /**
+   * While in destructive splitting mode (during graph construction rather than handling routing
+   * requests), we remove edges that have been split and may then re-split the resulting segments
+   * recursively, so parts of them are also removed. Newly created edge fragments are added to the
+   * spatial index; the edges that were split are removed (disconnected) from the graph but were
+   * previously not removed from the spatial index, so for all subsequent splitting operations we
+   * had to check whether any edge coming out of the spatial index had been "soft deleted".
+   * <p>
+   * I believe this was compensating for the fact that STRTrees are optimized at construction and
+   * read-only. That restriction no longer applies since we've been using our own hash grid spatial
+   * index instead of the STRTree. So rather than filtering out soft deleted edges, this is now an
+   * assertion that the system behaves as intended, and will log an error if the spatial index is
+   * returning edges that have been disconnected from the graph.
+   */
+  public boolean isReachableFromGraph() {
+    boolean edgeReachableFromGraph = tov.getIncoming().contains(this);
+    if (!edgeReachableFromGraph) {
+      LOG.warn(
+        "Edge {} returned from spatial index is no longer reachable from graph. That is not expected.",
+        this
+      );
+    }
+    return edgeReachableFromGraph;
   }
 
   @Override
@@ -180,12 +209,6 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   }
 
   private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
-    if (fromv == null) {
-      System.out.printf("fromv null %s \n", this);
-    }
-    if (tov == null) {
-      System.out.printf("tov null %s \n", this);
-    }
     out.defaultWriteObject();
   }
 }
