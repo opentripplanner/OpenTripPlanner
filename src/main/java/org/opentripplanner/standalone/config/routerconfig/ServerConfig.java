@@ -51,7 +51,7 @@ The timeout is not enforced when the parallel routing OTP feature is in use.
         )
         .description(
           """
-OTP support tracing user requests across log events and "outside" services. OTP can insert
+OTP supports tracing user requests across log events and "outside" services. OTP can insert
 http-request-header parameters into all associated log events and into the http response. If the
 value is not present in the request, a unique value can be generated. The OTP generated value is
 a 6 characters long base 36[0-9a-z] character string.
@@ -61,7 +61,7 @@ a 6 characters long base 36[0-9a-z] character string.
 A common use-case in a service oriented environment is to use a _correlation-id_ to identify all log
 messages across multiple (micro-)services from the same user. This is done by setting the
 "X-Correlation-ID" http header in the http facade/gateway. Use the "traceParameters" to configure
-OTP to pick up the correlation id, insert it inti the logs and return it. See the example below
+OTP to pick up the correlation id, insert it into the logs and return it. See the example below
 on how-to configure the "server.traceParameters" instance.
 """
         )
@@ -83,7 +83,7 @@ on how-to configure the "server.traceParameters" instance.
               .summary("The log event key used.")
               .description(
                 """
-OTP store the key/value pair in the log MDC(Mapped Diagnostic Context). To use it you normally
+OTP stores the key/value pair in the log MDC(Mapped Diagnostic Context). To use it you normally
 include the key in the log pattern like this: `%X{LOG-KEY}`. See your log framework for details.
 Only log4j and logback support this.
 """

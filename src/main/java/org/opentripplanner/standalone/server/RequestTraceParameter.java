@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.server;
 import org.opentripplanner.framework.lang.StringUtils;
 
 /**
- * OTP support tracing user requests across log events and "outside" services. It does so by
+ * OTP supports tracing user requests across log events and "outside" services. It does so by
  * allowing http-request-header parameters to be included in log events and in the http response.
  * OTP can also generate a unique value to insert in the logs and in the response, if the value is
  * missing in the request.

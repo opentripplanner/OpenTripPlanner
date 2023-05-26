@@ -15,7 +15,7 @@ import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.lang.StringUtils;
 
 /**
- * This filter manage OTP request trace parameters. A trace parameter can be read from the
+ * This filter manages OTP request trace parameters. A trace parameter can be read from the
  * HTTP headers and written to the HTTP response. If the header is missing or the value is
  * empty a trace parameter value can be generated. The value is made available in the logs
  * as well if they have an associated logKey.
