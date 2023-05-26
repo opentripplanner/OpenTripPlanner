@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Pattern;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.lang.StringUtils;
 
@@ -37,6 +38,14 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
   private static final Random ID_GEN = new Random(new SecureRandom().nextLong());
 
   /**
+   * Allow HTTP header values to be inserted into the logs if it matches this pattern.
+   * If this is to strict a PATTERN should be added to the configuration parameters.
+   * The pattern specified accepts all characters except control characters and vertical
+   * space. The length must be between 1 and 512 characters.
+   */
+  private static final Pattern HTTP_HEADER_VALUE_CHECK = Pattern.compile("[^\\p{Cntrl}\\v]{1,512}");
+
+  /**
    * This can not be final since it is injected at startup time.
    */
   private static List<RequestTraceParameter> traceParameters;
@@ -60,7 +69,7 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
       if (it.hasLogKey()) {
         String value = null;
         if (it.hasHttpRequestHeader()) {
-          value = requestContext.getHeaderString(it.httpRequestHeader());
+          value = retrieveHTTPHeaderValue(requestContext, it.httpRequestHeader());
         }
         if (value == null && it.generateIdIfMissing()) {
           value = generateUniqueId();
@@ -83,7 +92,7 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
   ) throws IOException {
     for (var it : traceParameters) {
       if (it.hasHttpResponseHeader()) {
-        var value = resolveValue(it, requestContext);
+        var value = resolveValueForResponse(it, requestContext);
         setHttpResponseHeaderValue(responseContext, it.httpResponseHeader(), value);
       }
       if (it.hasLogKey()) {
@@ -100,11 +109,14 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
    *   <li>generate a new unique value.</li>
    * </ol>
    */
-  private String resolveValue(RequestTraceParameter p, ContainerRequestContext requestContext) {
+  private String resolveValueForResponse(
+    RequestTraceParameter p,
+    ContainerRequestContext requestContext
+  ) {
     String value = null;
 
     if (p.hasHttpRequestHeader()) {
-      value = requestContext.getHeaderString(p.httpRequestHeader());
+      value = retrieveHTTPHeaderValue(requestContext, p.httpRequestHeader());
     }
     if (value == null && p.hasLogKey()) {
       value = LogMDCSupport.getLocalValue(p.logKey());
@@ -128,5 +140,16 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
   private static String generateUniqueId() {
     long v = ID_GEN.nextLong(MIN_ID, MAX_ID);
     return Long.toString(v, Character.MAX_RADIX);
+  }
+
+  private static String retrieveHTTPHeaderValue(
+    ContainerRequestContext requestContext,
+    String httpHeader
+  ) {
+    String value = requestContext.getHeaderString(httpHeader);
+    if (StringUtils.hasNoValue(value)) {
+      return null;
+    }
+    return HTTP_HEADER_VALUE_CHECK.matcher(value).matches() ? value : null;
   }
 }
