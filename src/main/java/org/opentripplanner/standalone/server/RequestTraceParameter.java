@@ -11,9 +11,9 @@ import org.opentripplanner.framework.lang.StringUtils;
  * <b>Correlation-ID example</b>
  * <p>
  * A common use-case in a service oriented environment is to use a correlation id to identify
- * all logg messages across multiple services the serve the same user initiated request. This
+ * all log messages across multiple services the serve the same user initiated request. This
  * can be done by setting the "X-Correlation-ID" http header in the http facade/gateway. Then
- * all services must add this to all logg messages for this request and also set the header in
+ * all services must add this to all log messages for this request and also set the header in
  * the response. To configure OTP to do this, add a parameter like this:
  * <pre>
  * {

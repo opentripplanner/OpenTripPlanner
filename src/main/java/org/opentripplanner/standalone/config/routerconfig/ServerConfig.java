@@ -53,7 +53,7 @@ The timeout is not enforced when the parallel routing OTP feature is in use.
           """
 OTP support tracing user requests across log events and "outside" services. OTP can insert
 http-request-header parameters into all associated log events and into the http response. If the
-value is not present in the request, a unique value can be generated. The otp generated value is
+value is not present in the request, a unique value can be generated. The OTP generated value is
 a 6 characters long base 36[0-9a-z] character string.
 <p>
 <b>Use-case Correlation-ID</b>

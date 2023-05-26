@@ -51,22 +51,20 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
   }
 
   /**
-   * The all trance-parameters and read in from http-request header; Generate value if
-   * not present in request or header key does not exist. At last insert key/value into
-   * log context.
+   * Loop through all trance-parameters and insert key/value into the log context. The value is
+   * read from the http-request header or generated.
    */
-
   @Override
   public void filter(ContainerRequestContext requestContext) throws IOException {
     for (var it : traceParameters) {
-      String value = null;
-      if (it.hasHttpRequestHeader()) {
-        value = requestContext.getHeaderString(it.httpRequestHeader());
-      }
-      if (value == null && it.generateIdIfMissing()) {
-        value = generateUniqueId();
-      }
       if (it.hasLogKey()) {
+        String value = null;
+        if (it.hasHttpRequestHeader()) {
+          value = requestContext.getHeaderString(it.httpRequestHeader());
+        }
+        if (value == null && it.generateIdIfMissing()) {
+          value = generateUniqueId();
+        }
         // Put value, even if it is empty. This will clear any value set in the thread from
         // before. This happens if the previous request did not clean up after it-self.
         LogMDCSupport.putLocal(it.logKey(), value);
