@@ -175,7 +175,7 @@ public class TimeUtils {
    * to a given client request. Wait a bit, then make another request, and you will enter the
    * busy-wait again.
    * <p>
-   * This method do a "busy" wait - it is not affected by a thread interrupt like
+   * This method does a "busy" wait - it is not affected by a thread interrupt like
    * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic witch uses the interrupt
    * flag.
    * <p>

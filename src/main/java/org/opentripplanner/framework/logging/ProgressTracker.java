@@ -157,7 +157,7 @@ public class ProgressTracker {
   }
 
   /**
-   * This method call {@code progressNotification} with the {@link #startMessage()} if it is the
+   * This method calls {@code progressNotification} with the {@link #startMessage()} if it is the
    * first step, if not it calls the {@link #steps(int, Consumer)}.
    * <p>
    * This method is used if you would like to avoid logging the start message - in case
