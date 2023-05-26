@@ -43,7 +43,7 @@ public class RequestTraceFilter implements ContainerRequestFilter, ContainerResp
    * The pattern specified accepts all characters except control characters and vertical
    * space. The length must be between 1 and 512 characters.
    */
-  private static final Pattern HTTP_HEADER_VALUE_CHECK = Pattern.compile("[^\\p{Cntrl}\\v]{1,512}");
+  static final Pattern HTTP_HEADER_VALUE_CHECK = Pattern.compile("[^\\p{Cntrl}\\v]{1,512}");
 
   /**
    * This can not be final since it is injected at startup time.
