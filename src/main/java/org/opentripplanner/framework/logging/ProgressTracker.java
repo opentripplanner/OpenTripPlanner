@@ -156,6 +156,26 @@ public class ProgressTracker {
     return actionName + " progress tracking started.";
   }
 
+  /**
+   * This method calls {@code progressNotification} with the {@link #startMessage()} if it is the
+   * first step, if not it calls the {@link #steps(int, Consumer)}.
+   * <p>
+   * This method is used if you would like to avoid logging the start message - in case
+   * the progress completes before reaching the first {@link #startOrStep(Consumer)}
+   * statement.
+   */
+  public void startOrStep(Consumer<String> progressNotification) {
+    long counter = stepCounter.incrementAndGet();
+    if (counter == 1) {
+      progressNotification.accept(startMessage());
+      return;
+    }
+    if (counter % minBlockSize != 0) {
+      return;
+    }
+    notifyIfQuietPeriodIsOver(counter, progressNotification);
+  }
+
   public void step(Consumer<String> progressNotification) {
     long counter = stepCounter.incrementAndGet();
     if (counter % minBlockSize != 0) {
@@ -191,6 +211,16 @@ public class ProgressTracker {
     }
 
     notifyIfQuietPeriodIsOver(counter, progressNotification);
+  }
+
+  /**
+   * Log complete message if at least one step is performed. This is usually used in combination
+   * with {@link #startOrStep(Consumer)}.
+   */
+  public void completeIfHasSteps(Consumer<String> progressNotification) {
+    if (stepCounter.get() > 0) {
+      progressNotification.accept(completeMessage());
+    }
   }
 
   public String completeMessage() {
