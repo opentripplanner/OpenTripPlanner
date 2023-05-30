@@ -96,6 +96,9 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
+          # fetch a large-ish number of commits so that we can check when the GraphQL schema file
+          # was modified last
+          fetch-depth: 1000
 
       - uses: actions/checkout@v3.3.0
         # for a simple PR where we don't push, we don't need any credentials
