@@ -28,6 +28,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Return WALKING_BETTER_THAN_TRANSIT only on a fully walking leg [#5091](https://github.com/opentripplanner/OpenTripPlanner/pull/5091)
 - Handle CoercingParseValueException [#5133](https://github.com/opentripplanner/OpenTripPlanner/pull/5133)
 - Remove broken Jersey tracing configuration [#5142](https://github.com/opentripplanner/OpenTripPlanner/pull/5142)
+- Graceful timeout error handling [#5130](https://github.com/opentripplanner/OpenTripPlanner/pull/5130)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
