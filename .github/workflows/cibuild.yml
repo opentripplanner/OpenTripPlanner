@@ -148,9 +148,9 @@ jobs:
           # schema hasn't changed.
           # example commit: https://github.com/opentripplanner/docs/commit/45e6ddf8e4a4
           
-          SCHEMA_FILE_MODIFIED=`stat -c "%Y" src/ext/resources/legacygraphqlapi/schema.graphqls` 
+          SCHEMA_FILE_MODIFIED=`git log -n 1 --pretty=format:%at src/ext/resources/legacygraphqlapi/schema.graphqls` 
           git checkout $LOCAL_BRANCH
-          DOCS_MODIFIED=`stat -c "%Y" api/dev-2.x/graphql-gtfs/introduction.html` 
+          DOCS_MODIFIED=`git log -n 1 --pretty=format:%at api/dev-2.x/graphql-gtfs/introduction.html` 
           if [ ${SCHEMA_FILE_MODIFIED} -gt ${DOCS_MODIFIED} ]; then
             echo "schema.graphqls has been modified, committing updated documentation"
             mkdir -p api
