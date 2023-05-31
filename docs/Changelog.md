@@ -29,6 +29,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Handle CoercingParseValueException [#5133](https://github.com/opentripplanner/OpenTripPlanner/pull/5133)
 - Remove broken Jersey tracing configuration [#5142](https://github.com/opentripplanner/OpenTripPlanner/pull/5142)
 - Graceful timeout error handling [#5130](https://github.com/opentripplanner/OpenTripPlanner/pull/5130)
+- Log http request headers - like  [#5131](https://github.com/opentripplanner/OpenTripPlanner/pull/5131)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
