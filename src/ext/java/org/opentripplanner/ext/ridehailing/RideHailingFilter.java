@@ -21,9 +21,14 @@ public class RideHailingFilter implements ItineraryListFilter {
 
   public static final String NO_RIDE_HAILING_AVAILABLE = "no-ride-hailing-available";
   private final List<RideHailingService> rideHailingServices;
+  private final boolean wheelchairAccessible;
 
-  public RideHailingFilter(List<RideHailingService> rideHailingServices) {
+  public RideHailingFilter(
+    List<RideHailingService> rideHailingServices,
+    boolean wheelchairAccessible
+  ) {
     this.rideHailingServices = rideHailingServices;
+    this.wheelchairAccessible = wheelchairAccessible;
   }
 
   @Override
@@ -60,8 +65,12 @@ public class RideHailingFilter implements ItineraryListFilter {
 
   private Leg decorateLegWithRideEstimate(Itinerary i, Leg leg, RideHailingService service) {
     try {
-      if (leg instanceof StreetLeg sl && sl.getMode().isDriving()) {
-        var estimates = service.rideEstimates(leg.getFrom().coordinate, leg.getTo().coordinate);
+      if (leg instanceof StreetLeg sl && sl.getMode().isInCar()) {
+        var estimates = service.rideEstimates(
+          leg.getFrom().coordinate,
+          leg.getTo().coordinate,
+          wheelchairAccessible
+        );
         if (estimates.isEmpty()) {
           flagForDeletion(i);
           return leg;

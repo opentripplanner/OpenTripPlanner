@@ -267,7 +267,7 @@ public class RouteRequest implements Cloneable, Serializable {
    * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
    * latest arrival time (LAT - EAT).
    * <p>
-   * All optimal travels that depart within the search window is guarantied to be found.
+   * All optimal travels that depart within the search window is guaranteed to be found.
    * <p>
    * This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
    * Transit search as well; Hence this is named search-window and not raptor-search-window. Do not

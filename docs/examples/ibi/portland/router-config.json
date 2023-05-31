@@ -62,7 +62,7 @@
       "type": "uber-car-hailing",
       "clientId": "${UBER_CLIENT_ID}",
       "clientSecret": "${UBER_CLIENT_SECRET}",
-      "wheelchairAccessibleRideType": "970ed376-bd33-4ad1-81c5-d2928a347a06"
+      "wheelchairAccessibleProductId": "8ddc7ce4-67d1-4ac4-8b56-205bd6a6314e"
     }
   ]
 }

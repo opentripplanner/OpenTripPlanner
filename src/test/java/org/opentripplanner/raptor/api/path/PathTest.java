@@ -176,7 +176,7 @@ public class PathTest implements RaptorTestConstants {
       .times(time("09:10"), time("09:20"))
       .build();
 
-    var tx = TransferConstraint.create().staySeated().build();
+    var tx = TransferConstraint.of().staySeated().build();
     TransitPathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(
       trip2,
       trip2.departure(0),

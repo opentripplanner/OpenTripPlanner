@@ -318,7 +318,10 @@
       "type": "uber-car-hailing",
       "clientId": "secret-id",
       "clientSecret": "very-secret",
-      "wheelchairAccessibleRideType": "car"
+      "wheelchairAccessibleProductId": "545de0c4-659f-49c6-be65-0d5e448dffd5",
+      "bannedProductIds": [
+        "1196d0dd-423b-4a81-a1d8-615367d3a365", "f58761e5-8dd5-4940-a472-872f1236c596"
+      ]
     }
   ]
 }

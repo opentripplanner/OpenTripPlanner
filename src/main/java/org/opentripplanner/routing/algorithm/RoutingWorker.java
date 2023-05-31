@@ -100,6 +100,8 @@ public class RoutingWorker {
     var routingErrors = Collections.synchronizedSet(new HashSet<RoutingError>());
 
     if (OTPFeature.ParallelRouting.isOn()) {
+      // TODO: This is not using {@link OtpRequestThreadFactory} witch mean we do not get
+      //       log-trace-parameters-propagation and graceful timeout handling here.
       try {
         CompletableFuture
           .allOf(
@@ -138,7 +140,6 @@ public class RoutingWorker {
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
-
     routingErrors.addAll(filterChain.getRoutingErrors());
 
     if (LOG.isDebugEnabled()) {

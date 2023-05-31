@@ -31,7 +31,7 @@ public class SimpleIntersectionTraversalCalculator
       return 0;
     }
 
-    if (mode.isDriving()) {
+    if (mode.isInCar()) {
       return computeDrivingTraversalDuration(v, from, to);
     } else if (mode.isCyclingIsh()) {
       return computeCyclingTraversalDuration(v, from, to, toSpeed);

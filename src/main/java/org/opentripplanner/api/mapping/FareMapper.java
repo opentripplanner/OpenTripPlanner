@@ -130,7 +130,7 @@ public class FareMapper {
   private ApiMoney toApiMoney(Money m) {
     var c = m.currency();
     return new ApiMoney(
-      m.amount(),
+      m.minorUnitAmount(),
       new ApiCurrency(
         c.getCurrencyCode(),
         c.getDefaultFractionDigits(),

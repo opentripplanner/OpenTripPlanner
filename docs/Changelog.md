@@ -12,7 +12,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Configure HTTP WebServer Transaction timeouts [#5047](https://github.com/opentripplanner/OpenTripPlanner/pull/5047)
 - Add Fares v2 to GraphQL API [#4917](https://github.com/opentripplanner/OpenTripPlanner/pull/4917)
 - Improve Graph updaters shutdown [#5092](https://github.com/opentripplanner/OpenTripPlanner/pull/5092)
-- Add deduplicated  to geocoding sandbox API [#5084](https://github.com/opentripplanner/OpenTripPlanner/pull/5084)
+- Add deduplicated "stop clusters" to geocoding sandbox API [#5084](https://github.com/opentripplanner/OpenTripPlanner/pull/5084)
 - Fix flex timeshift [#5063](https://github.com/opentripplanner/OpenTripPlanner/pull/5063)
 - Merge norway traversal calculator into default [#5106](https://github.com/opentripplanner/OpenTripPlanner/pull/5106)
 - Use correct GTFS sequence number in vehicle position matcher [#5090](https://github.com/opentripplanner/OpenTripPlanner/pull/5090)
@@ -23,6 +23,12 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add modes to geocoding  [#5115](https://github.com/opentripplanner/OpenTripPlanner/pull/5115)
 - Do not enforce API processing timeout for parallel routing [#5114](https://github.com/opentripplanner/OpenTripPlanner/pull/5114)
 - Rename bikeRental options to vehicleRental [#5089](https://github.com/opentripplanner/OpenTripPlanner/pull/5089)
+- Fare sandbox cleanup, remove MultipleFareService [#5100](https://github.com/opentripplanner/OpenTripPlanner/pull/5100)
+- Add validation of NeTEX timetabled passing times [#5081](https://github.com/opentripplanner/OpenTripPlanner/pull/5081)
+- Return WALKING_BETTER_THAN_TRANSIT only on a fully walking leg [#5091](https://github.com/opentripplanner/OpenTripPlanner/pull/5091)
+- Handle CoercingParseValueException [#5133](https://github.com/opentripplanner/OpenTripPlanner/pull/5133)
+- Remove broken Jersey tracing configuration [#5142](https://github.com/opentripplanner/OpenTripPlanner/pull/5142)
+- Graceful timeout error handling [#5130](https://github.com/opentripplanner/OpenTripPlanner/pull/5130)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

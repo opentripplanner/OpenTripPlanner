@@ -15,7 +15,7 @@ public record FaresFilter(FareService fareService) implements ItineraryListFilte
     return itineraries
       .stream()
       .peek(i -> {
-        var fare = fareService.getCost(i);
+        var fare = fareService.calculateFares(i);
         if (Objects.nonNull(fare)) {
           i.setFare(fare);
           FaresToItineraryMapper.addFaresToLegs(fare, i);

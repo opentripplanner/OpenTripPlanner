@@ -61,6 +61,6 @@ class ItineraryFaresTest {
 
   @Nonnull
   private static FareProduct fareProduct(String id) {
-    return new FareProduct(id(id), id, Money.euros(1000), null, null, null);
+    return new FareProduct(id(id), id, Money.euros(10), null, null, null);
   }
 }

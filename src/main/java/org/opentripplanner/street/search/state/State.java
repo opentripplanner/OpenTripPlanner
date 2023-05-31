@@ -144,10 +144,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   /**
-   * Convenience method to check if the state array is null or empty.
+   * Convenience method to check if the state array is empty.
    */
   public static boolean isEmpty(State[] s) {
-    return s == null || s.length == 0;
+    return s.length == 0;
   }
 
   /**
@@ -419,6 +419,21 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public boolean isInsideNoRentalDropOffArea() {
     return stateData.insideNoRentalDropOffArea;
+  }
+
+  /**
+   * Whether the street path contains any driving.
+   */
+  public boolean containsModeCar() {
+    var state = this;
+    while (state != null) {
+      if (state.getNonTransitMode().isInCar()) {
+        return true;
+      } else {
+        state = state.getBackState();
+      }
+    }
+    return false;
   }
 
   protected State clone() {

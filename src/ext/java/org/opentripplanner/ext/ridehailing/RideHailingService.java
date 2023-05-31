@@ -19,8 +19,12 @@ public interface RideHailingService {
   /**
    * Get the next arrivals for a specific location.
    */
-  List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) throws ExecutionException;
-
-  List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end)
+  List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate, boolean wheelchairAccessible)
     throws ExecutionException;
+
+  List<RideEstimate> rideEstimates(
+    WgsCoordinate start,
+    WgsCoordinate end,
+    boolean wheelchairAccessible
+  ) throws ExecutionException;
 }

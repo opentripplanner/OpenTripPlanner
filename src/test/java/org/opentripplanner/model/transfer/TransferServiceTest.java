@@ -102,7 +102,7 @@ public class TransferServiceTest {
   }
 
   ConstrainedTransfer transfer(TransferPoint from, TransferPoint to) {
-    var c = TransferConstraint.create().build();
+    var c = TransferConstraint.of().build();
     return new ConstrainedTransfer(null, from, to, c);
   }
 }

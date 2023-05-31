@@ -10,7 +10,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
@@ -55,16 +57,7 @@ class FareSearch {
 }
 
 /** Holds fare and corresponding fareId */
-class FareAndId {
-
-  float fare;
-  FeedScopedId fareId;
-
-  FareAndId(float fare, FeedScopedId fareId) {
-    this.fare = fare;
-    this.fareId = fareId;
-  }
-}
+record FareAndId(Money fare, FeedScopedId fareId) {}
 
 /**
  * This fare service module handles the cases that GTFS handles within a single feed. It cannot
@@ -95,7 +88,7 @@ public class DefaultFareService implements FareService {
   }
 
   @Override
-  public ItineraryFares getCost(Itinerary itinerary) {
+  public ItineraryFares calculateFares(Itinerary itinerary) {
     var fareLegs = itinerary
       .getLegs()
       .stream()
@@ -124,24 +117,6 @@ public class DefaultFareService implements FareService {
       }
     }
     return hasFare ? fare : null;
-  }
-
-  protected static Money getMoney(Currency currency, float cost) {
-    int fractionDigits = 2;
-    if (currency != null) {
-      fractionDigits = currency.getDefaultFractionDigits();
-    }
-    int cents = (int) Math.round(cost * Math.pow(10, fractionDigits));
-    return new Money(currency, cents);
-  }
-
-  protected float getLowestCost(
-    FareType fareType,
-    List<Leg> rides,
-    Collection<FareRuleSet> fareRules
-  ) {
-    FareSearch r = performSearch(fareType, rides, fareRules);
-    return r.resultTable[0][rides.size() - 1];
   }
 
   /**
@@ -191,26 +166,28 @@ public class DefaultFareService implements FareService {
       for (int i = start; i <= via; ++i) {
         componentLegs.add(legs.get(i));
       }
-      var component = new FareComponent(fareId, getMoney(currency, cost), componentLegs);
-      components.add(component);
+      components.add(
+        new FareComponent(fareId, Money.ofFractionalAmount(currency, cost), componentLegs)
+      );
       ++count;
       start = via + 1;
     }
 
-    fare.addFare(fareType, getMoney(currency, r.resultTable[0][legs.size() - 1]));
+    var amount = r.resultTable[0][legs.size() - 1];
+    fare.addFare(fareType, Money.ofFractionalAmount(currency, amount));
     fare.addFareComponent(fareType, components);
     return count > 0;
   }
 
-  protected float calculateCost(
+  protected Optional<Money> calculateCost(
     FareType fareType,
     List<Leg> rides,
     Collection<FareRuleSet> fareRules
   ) {
-    return getBestFareAndId(fareType, rides, fareRules).fare;
+    return getBestFareAndId(fareType, rides, fareRules).map(FareAndId::fare);
   }
 
-  protected FareAndId getBestFareAndId(
+  protected Optional<FareAndId> getBestFareAndId(
     FareType fareType,
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
@@ -231,7 +208,7 @@ public class DefaultFareService implements FareService {
     for (var leg : legs) {
       if (!leg.getTrip().getId().getFeedId().equals(feedId)) {
         LOG.debug("skipped multi-feed ride sequence {}", legs);
-        return new FareAndId(Float.POSITIVE_INFINITY, null);
+        return Optional.empty();
       }
       lastRideStartTime = leg.getStartTime();
       lastRideEndTime = leg.getEndTime();
@@ -244,8 +221,10 @@ public class DefaultFareService implements FareService {
       transfersUsed += 1;
     }
 
+    @Nullable
     FareAttribute bestAttribute = null;
-    float bestFare = Float.POSITIVE_INFINITY;
+    @Nullable
+    Money bestFare = null;
     Duration tripTime = Duration.between(startTime, lastRideStartTime);
     Duration journeyTime = Duration.between(startTime, lastRideEndTime);
 
@@ -256,56 +235,46 @@ public class DefaultFareService implements FareService {
       // check only if the fare is not mapped to an agency
       if (!attribute.getId().getFeedId().equals(feedId)) continue;
 
-      if (ruleSet.matches(startZone, endZone, zones, routes, trips)) {
-        // TODO Maybe move the code below in FareRuleSet::matches() ?
-        if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
-          continue;
-        }
-        // assume transfers are evaluated at boarding time,
-        // as trimet does
-        if (
-          attribute.isTransferDurationSet() &&
-          tripTime.getSeconds() > attribute.getTransferDuration()
-        ) {
-          continue;
-        }
-        if (
-          attribute.isJourneyDurationSet() &&
-          journeyTime.getSeconds() > attribute.getJourneyDuration()
-        ) {
-          continue;
-        }
-        float newFare = getFarePrice(attribute, fareType);
-        if (newFare < bestFare) {
+      if (
+        ruleSet.matches(
+          startZone,
+          endZone,
+          zones,
+          routes,
+          trips,
+          transfersUsed,
+          tripTime,
+          journeyTime
+        )
+      ) {
+        Money newFare = getFarePrice(attribute, fareType);
+        if (bestFare == null || newFare.lessThan(bestFare)) {
           bestAttribute = attribute;
           bestFare = newFare;
         }
       }
     }
     LOG.debug("{} best for {}", bestAttribute, legs);
-    if (bestFare == Float.POSITIVE_INFINITY) {
-      LOG.debug("No fare for a ride sequence: {}", legs);
-    }
-    return new FareAndId(bestFare, bestAttribute == null ? null : bestAttribute.getId());
+    Money finalBestFare = bestFare;
+    return Optional
+      .ofNullable(bestAttribute)
+      .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
   }
 
-  protected float getFarePrice(FareAttribute fare, FareType type) {
-    switch (type) {
+  protected Money getFarePrice(FareAttribute fare, FareType type) {
+    var currency = Currency.getInstance(fare.getCurrencyType());
+    return switch (type) {
       case senior:
         if (fare.getSeniorPrice() >= 0) {
-          return fare.getSeniorPrice();
+          yield Money.ofFractionalAmount(currency, fare.getSeniorPrice());
         }
-        break;
       case youth:
         if (fare.getYouthPrice() >= 0) {
-          return fare.getYouthPrice();
+          yield Money.ofFractionalAmount(currency, fare.getYouthPrice());
         }
-        break;
-      case regular:
       default:
-        break;
-    }
-    return fare.getPrice();
+        yield Money.ofFractionalAmount(currency, fare.getPrice());
+    };
   }
 
   /**
@@ -363,8 +332,14 @@ public class DefaultFareService implements FareService {
     for (int i = 0; i < rides.size(); i++) {
       // each diagonal
       for (int j = 0; j < rides.size() - i; j++) {
-        FareAndId best = getBestFareAndId(fareType, rides.subList(j, j + i + 1), fareRules);
-        float cost = best.fare;
+        Optional<FareAndId> best = getBestFareAndId(
+          fareType,
+          rides.subList(j, j + i + 1),
+          fareRules
+        );
+        float cost = best
+          .map(b -> b.fare().fractionalAmount().floatValue())
+          .orElse(Float.POSITIVE_INFINITY);
         if (cost < 0) {
           LOG.error("negative cost for a ride sequence");
           cost = Float.POSITIVE_INFINITY;
@@ -374,7 +349,7 @@ public class DefaultFareService implements FareService {
           r.next[j][j + i] = j + i;
         }
         r.resultTable[j][j + i] = cost;
-        r.fareIds[j][j + i] = best.fareId;
+        r.fareIds[j][j + i] = best.map(FareAndId::fareId).orElse(null);
         for (int k = 0; k < i; k++) {
           float via = r.resultTable[j][j + k] + r.resultTable[j + k + 1][j + i];
           if (r.resultTable[j][j + i] > via) {

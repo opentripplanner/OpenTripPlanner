@@ -386,6 +386,7 @@ public class StreetEdge
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     final StateEditor editor;
 
@@ -396,7 +397,7 @@ public class StreetEdge
       arriveByRental &&
       (tov.rentalTraversalBanned(s0) || hasStartedSearchInNoDropOffZoneAndIsExitingIt(s0))
     ) {
-      return null;
+      return State.empty();
     }
     // if the traversal is banned for the current state because of a GBFS geofencing zone
     // we drop the vehicle and continue walking
@@ -1184,7 +1185,7 @@ public class StreetEdge
         turnDuration = 0;
       }
 
-      if (!traverseMode.isDriving()) {
+      if (!traverseMode.isInCar()) {
         s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
       }
 
@@ -1192,7 +1193,7 @@ public class StreetEdge
       weight += preferences.street().turnReluctance() * turnDuration;
     }
 
-    if (!traverseMode.isDriving()) {
+    if (!traverseMode.isInCar()) {
       s1.incrementWalkDistance(getDistanceWithElevation());
     }
 

@@ -13,7 +13,7 @@
   <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
       <!-- print out file and line number in parenthesis, which Eclipse and IDEA will link -->
-      <pattern>%d{HH:mm:ss.SSS} %level \(%F:%L\) %msg%n</pattern>
+      <pattern>%d{HH:mm:ss.SSS} %level [%thread] \(%F:%L\) %msg%n</pattern>
     </encoder>
   </appender>
 

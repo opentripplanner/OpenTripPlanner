@@ -44,6 +44,7 @@ public interface OtpArchitectureModules {
     FRAMEWORK.subPackage("logging"),
     FRAMEWORK.subPackage("text"),
     FRAMEWORK.subPackage("time"),
-    FRAMEWORK.subPackage("tostring")
+    FRAMEWORK.subPackage("tostring"),
+    FRAMEWORK.subPackage("concurrent")
   );
 }

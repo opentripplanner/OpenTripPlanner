@@ -37,7 +37,7 @@ public class NoopFareServiceFactory implements FareServiceFactory {
   private static class NoopFareService implements FareService {
 
     @Override
-    public ItineraryFares getCost(Itinerary path) {
+    public ItineraryFares calculateFares(Itinerary path) {
       return null;
     }
   }

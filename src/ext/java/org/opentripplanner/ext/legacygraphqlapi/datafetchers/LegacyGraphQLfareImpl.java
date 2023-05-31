@@ -11,7 +11,7 @@ public class LegacyGraphQLfareImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<Integer> cents() {
-    return environment -> ((Money) getSource(environment).get("fare")).amount();
+    return environment -> ((Money) getSource(environment).get("fare")).minorUnitAmount();
   }
 
   @Override

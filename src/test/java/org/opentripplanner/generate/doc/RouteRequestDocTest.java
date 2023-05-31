@@ -7,6 +7,7 @@ import static org.opentripplanner.framework.io.FileUtils.writeFile;
 import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_3;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
+import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceJsonExample;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersDetails;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceParametersTable;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
@@ -17,6 +18,7 @@ import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
+import org.opentripplanner.generate.doc.framework.TemplateUtil;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -33,16 +35,15 @@ public class RouteRequestDocTest {
     .build();
 
   /**
-   * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
+   * NOTE! This test updates the {@code docs/RouteRequest.md} document based on the latest
    * version of the code. The following is auto generated:
    * <ul>
    *   <li>The configuration type table</li>
-   *   <li>The list of OTP features</li>
    * </ul>
    */
   @Test
-  public void updateBuildConfigurationDoc() {
-    NodeAdapter node = readBuildConfig();
+  public void updateRouteRequestConfigurationDoc() {
+    NodeAdapter node = readRoutingDefaults();
 
     // Read and close inout file (same as output file)
     String doc = readFile(TEMPLATE);
@@ -51,12 +52,18 @@ public class RouteRequestDocTest {
     doc = replaceParametersTable(doc, getParameterSummaryTable(node));
     doc = replaceParametersDetails(doc, getParameterDetailsList(node));
 
+    var example = TemplateUtil
+      .jsonExampleBuilder(node.rawNode())
+      .wrapInObject("routingDefaults")
+      .build();
+    doc = replaceJsonExample(doc, example, ROUTER_CONFIG_FILENAME);
+
     writeFile(OUT_FILE, doc);
 
     assertFileEquals(original, OUT_FILE);
   }
 
-  private NodeAdapter readBuildConfig() {
+  private NodeAdapter readRoutingDefaults() {
     var json = jsonNodeFromResource(ROUTER_CONFIG_PATH);
     var conf = new RouterConfig(json, ROUTER_CONFIG_PATH, false);
     return conf.asNodeAdapter().child("routingDefaults");

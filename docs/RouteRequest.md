@@ -279,7 +279,7 @@ This is the time/duration in seconds from the earliest-departure-time(EDT) to th
 latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
 latest arrival time (LAT - EAT).
 
-All optimal travels that depart within the search window is guarantied to be found.
+All optimal travels that depart within the search window is guaranteed to be found.
 
 This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
 Transit search as well; Hence this is named search-window and not raptor-search-window.
@@ -815,3 +815,110 @@ include stairs as a last result.
 
 
 <!-- PARAMETERS-DETAILS END -->
+
+## Config Example
+
+<!-- JSON-EXAMPLE BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+```JSON
+// router-config.json
+{
+  "routingDefaults" : {
+    "walkSpeed" : 1.3,
+    "bikeSpeed" : 5,
+    "carSpeed" : 40,
+    "numItineraries" : 12,
+    "transferPenalty" : 0,
+    "walkReluctance" : 4.0,
+    "bikeReluctance" : 5.0,
+    "bikeWalkingReluctance" : 10.0,
+    "bikeStairsReluctance" : 150.0,
+    "carReluctance" : 10.0,
+    "stairsReluctance" : 1.65,
+    "turnReluctance" : 1.0,
+    "elevatorBoardTime" : 90,
+    "elevatorBoardCost" : 90,
+    "elevatorHopTime" : 20,
+    "elevatorHopCost" : 20,
+    "vehicleRental" : {
+      "pickupCost" : 120,
+      "dropOffTime" : 30,
+      "dropOffCost" : 30
+    },
+    "bikeParkTime" : 60,
+    "bikeParkCost" : 120,
+    "carDropoffTime" : 120,
+    "waitReluctance" : 1.0,
+    "walkBoardCost" : 600,
+    "bikeBoardCost" : 600,
+    "otherThanPreferredRoutesPenalty" : 300,
+    "transferSlack" : 120,
+    "boardSlackForMode" : {
+      "AIRPLANE" : "35m"
+    },
+    "alightSlackForMode" : {
+      "AIRPLANE" : "15m"
+    },
+    "transitReluctanceForMode" : {
+      "RAIL" : 0.85
+    },
+    "maxAccessEgressDurationForMode" : {
+      "BIKE_RENTAL" : "20m"
+    },
+    "itineraryFilters" : {
+      "transitGeneralizedCostLimit" : {
+        "costLimitFunction" : "900 + 1.5 x",
+        "intervalRelaxFactor" : 0.4
+      },
+      "bikeRentalDistanceRatio" : 0.3,
+      "accessibilityScore" : true,
+      "minBikeParkingDistance" : 300
+    },
+    "carDecelerationSpeed" : 2.9,
+    "carAccelerationSpeed" : 2.9,
+    "ignoreRealtimeUpdates" : false,
+    "geoidElevation" : false,
+    "maxJourneyDuration" : "36h",
+    "unpreferred" : {
+      "agencies" : [
+        "HSL:123"
+      ],
+      "routes" : [
+        "HSL:456"
+      ]
+    },
+    "unpreferredCost" : "600 + 2.0 x",
+    "streetRoutingTimeout" : "5s",
+    "transferOptimization" : {
+      "optimizeTransferWaitTime" : true,
+      "minSafeWaitTimeFactor" : 5.0,
+      "backTravelWaitTimeFactor" : 1.0,
+      "extraStopBoardAlightCostsFactor" : 8.0
+    },
+    "wheelchairAccessibility" : {
+      "trip" : {
+        "onlyConsiderAccessible" : false,
+        "unknownCost" : 600,
+        "inaccessibleCost" : 3600
+      },
+      "stop" : {
+        "onlyConsiderAccessible" : false,
+        "unknownCost" : 600,
+        "inaccessibleCost" : 3600
+      },
+      "elevator" : {
+        "onlyConsiderAccessible" : false,
+        "unknownCost" : 20,
+        "inaccessibleCost" : 3600
+      },
+      "inaccessibleStreetReluctance" : 25,
+      "maxSlope" : 0.083,
+      "slopeExceededReluctance" : 1,
+      "stairsReluctance" : 100
+    }
+  }
+}
+```
+
+<!-- JSON-EXAMPLE END -->

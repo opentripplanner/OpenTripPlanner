@@ -398,6 +398,7 @@
                               for deployment in the way source and docs are. -->
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>shaded</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
                             <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
                               We have eliminated most Jersey auto-scanning, but there is still some need for include
                               filters to force-include classes that are dynamically loaded by name/auto-scanned. -->
@@ -780,7 +781,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>31.1-jre</version>
+            <version>32.0.0-jre</version>
         </dependency>
         <!-- Jersey annotation-driven REST web services (JAX-RS implementation) -->
         <dependency>
@@ -915,7 +916,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>20.2</version>
+            <version>20.3</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
