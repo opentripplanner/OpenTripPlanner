@@ -21,7 +21,7 @@ public class VehicleRentalUpdaterConfig {
       c
         .of("frequency")
         .since(V1_5)
-        .summary("How often the data should be updated in seconds.")
+        .summary("How often the data should be updated.")
         .asDuration(Duration.ofMinutes(1)),
       VehicleRentalSourceFactory.create(sourceType, c)
     );

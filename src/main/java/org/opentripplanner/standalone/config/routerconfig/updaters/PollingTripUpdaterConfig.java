@@ -28,7 +28,7 @@ public class PollingTripUpdaterConfig {
       c
         .of("frequency")
         .since(V1_5)
-        .summary("How often the data should be downloaded in seconds.")
+        .summary("How often the data should be downloaded.")
         .asDuration(Duration.ofMinutes(1)),
       c
         .of("fuzzyTripMatching")
