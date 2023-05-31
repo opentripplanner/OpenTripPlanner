@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model._data;
 import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 
 import java.util.List;
+import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -189,6 +190,19 @@ public class TransitModelForTest {
     stopTime.setArrivalTime(time);
     stopTime.setDepartureTime(time);
     return stopTime;
+  }
+
+  /**
+   * Generates a list of stop times of length {@code count} where each stop is 5 minutes after
+   * the previous one.
+   * <p>
+   * The first stop has stop sequence 10, the following one has 20 and so on.
+   */
+  public static List<StopTime> stopTimesEvery5Minutes(int count, Trip trip, int startTime) {
+    return IntStream
+      .range(0, count)
+      .mapToObj(seq -> stopTime(trip, (seq + 1) * 10, startTime + (seq * 60 * 5)))
+      .toList();
   }
 
   public static StopPattern stopPattern(int numberOfStops) {

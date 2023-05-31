@@ -67,8 +67,10 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -84,6 +86,8 @@ class GraphQLIntegrationTest {
   static final Instant ALERT_END_TIME = ALERT_START_TIME.plus(1, ChronoUnit.DAYS);
 
   private static final LegacyGraphQLRequestContext context;
+
+  private static final Deduplicator DEDUPLICATOR = new Deduplicator();
 
   static {
     graph
@@ -101,7 +105,16 @@ class GraphQLIntegrationTest {
 
     var stopModel = StopModel.of();
     PlanTestConstants.listStops().forEach(sl -> stopModel.withRegularStop((RegularStop) sl));
-    var transitModel = new TransitModel(stopModel.build(), new Deduplicator());
+    var transitModel = new TransitModel(stopModel.build(), DEDUPLICATOR);
+
+    final TripPattern pattern = TransitModelForTest.pattern(BUS).build();
+    var trip = TransitModelForTest.trip("123").build();
+    var stopTimes = TransitModelForTest.stopTimesEvery5Minutes(3, trip, T11_00);
+    var tripTimes = new TripTimes(trip, stopTimes, DEDUPLICATOR);
+    pattern.add(tripTimes);
+
+    transitModel.addTripPattern(id("pattern-1"), pattern);
+
     transitModel.initTimeZone(ZoneIds.BERLIN);
     transitModel.index();
     var routes = Arrays
