@@ -112,6 +112,10 @@ public class TripTimeOnDate {
     return tripTimes.getScheduledArrivalTime(stopIndex);
   }
 
+  public int getGtfsSequence() {
+    return tripTimes.gtfsSequenceOfStopIndex(stopIndex);
+  }
+
   public int getScheduledDeparture() {
     return tripTimes.getScheduledDepartureTime(stopIndex);
   }

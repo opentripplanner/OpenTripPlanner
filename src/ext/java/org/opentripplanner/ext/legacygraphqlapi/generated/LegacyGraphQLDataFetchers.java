@@ -194,6 +194,10 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> web();
   }
 
+  /**
+   * Booking information for a stop time which has special requirements to use, like calling ahead or
+   * using an app.
+   */
   public interface LegacyGraphQLBookingInfo {
     public DataFetcher<org.opentripplanner.transit.model.organization.ContactInfo> contactInfo();
 
@@ -212,6 +216,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> pickupMessage();
   }
 
+  /** Temporal restriction for a booking */
   public interface LegacyGraphQLBookingTime {
     public DataFetcher<Integer> daysPrior();
 
@@ -256,6 +261,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> stops();
   }
 
+  /** Contact information for booking an on-demand or flexible service. */
   public interface LegacyGraphQLContactInfo {
     public DataFetcher<String> additionalDetails();
 
@@ -907,6 +913,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Integer> scheduledArrival();
 
     public DataFetcher<Integer> scheduledDeparture();
+
+    public DataFetcher<Integer> sequence();
 
     public DataFetcher<Long> serviceDay();
 

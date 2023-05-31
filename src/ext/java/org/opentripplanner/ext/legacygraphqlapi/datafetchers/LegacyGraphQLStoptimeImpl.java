@@ -85,6 +85,11 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   }
 
   @Override
+  public DataFetcher<Integer> sequence() {
+    return environment -> getSource(environment).getGtfsSequence();
+  }
+
+  @Override
   public DataFetcher<Long> serviceDay() {
     return environment -> getSource(environment).getServiceDayMidnight();
   }

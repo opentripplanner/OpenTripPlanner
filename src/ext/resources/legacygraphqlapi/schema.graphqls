@@ -3592,6 +3592,12 @@ type Stoptime {
     stop: Stop
 
     """
+    The of the stop in the trip. This is not required to start from 0 or be consecutive - any
+    increasing integer sequence along the stop sequence is valid.
+    """
+    sequence: Int
+
+    """
     Scheduled arrival time. Format: seconds since midnight of the departure date
     """
     scheduledArrival: Int
