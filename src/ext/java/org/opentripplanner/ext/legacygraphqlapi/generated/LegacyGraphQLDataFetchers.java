@@ -555,6 +555,8 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Object> stop();
 
+    public DataFetcher<Integer> stopSequence();
+
     public DataFetcher<VehicleParking> vehicleParking();
 
     public DataFetcher<VehicleRentalStation> vehicleRentalStation();

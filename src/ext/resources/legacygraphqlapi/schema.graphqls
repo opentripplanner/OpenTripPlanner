@@ -2084,8 +2084,11 @@ type Place {
     """The stop related to the place."""
     stop: Stop
 
-    """The bike rental station related to the place"""
-    bikeRentalStation: BikeRentalStation @deprecated(reason: "Use vehicleRentalStation and rentalVehicle instead")
+    """
+    The sequence of the stop in the trip. This is not required to start from 0 or be consecutive - any
+    increasing integer sequence along the stop sequence is valid.
+    """
+    stopSequence: Int
 
     """The vehicle rental station related to the place"""
     vehicleRentalStation: VehicleRentalStation
@@ -2093,14 +2096,17 @@ type Place {
     """The rental vehicle related to the place"""
     rentalVehicle: RentalVehicle
 
+    """The vehicle parking related to the place"""
+    vehicleParking: VehicleParking
+
+    """The bike rental station related to the place"""
+    bikeRentalStation: BikeRentalStation @deprecated(reason: "Use vehicleRentalStation and rentalVehicle instead")
+
     """The bike parking related to the place"""
     bikePark: BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """The car parking related to the place"""
     carPark: CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
-
-    """The vehicle parking related to the place"""
-    vehicleParking: VehicleParking
 }
 
 type placeAtDistance implements Node {
@@ -3592,7 +3598,7 @@ type Stoptime {
     stop: Stop
 
     """
-    The of the stop in the trip. This is not required to start from 0 or be consecutive - any
+    The sequence of the stop in the trip. This is not required to start from 0 or be consecutive - any
     increasing integer sequence along the stop sequence is valid.
     """
     sequence: Int

@@ -112,6 +112,9 @@ public class TripTimeOnDate {
     return tripTimes.getScheduledArrivalTime(stopIndex);
   }
 
+  /**
+   * @return The GTFS stop sequence of the stop time.
+   */
   public int getGtfsSequence() {
     return tripTimes.gtfsSequenceOfStopIndex(stopIndex);
   }

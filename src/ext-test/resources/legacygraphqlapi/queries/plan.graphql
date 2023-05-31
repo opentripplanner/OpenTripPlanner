@@ -28,6 +28,7 @@
                     lon
                     departureTime
                     arrivalTime
+                    stopSequence
                 }
                 to {
                     name
@@ -35,6 +36,7 @@
                     lon
                     departureTime
                     arrivalTime
+                    stopSequence
                 }
                 startTime
                 endTime

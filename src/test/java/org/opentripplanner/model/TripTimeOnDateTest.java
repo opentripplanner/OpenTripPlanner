@@ -17,13 +17,17 @@ class TripTimeOnDateTest {
   static final int SEQUENCE = 99;
 
   @Test
-  void gtfsSequence(){
+  void gtfsSequence() {
     var pattern = TransitModelForTest.pattern(TransitMode.BUS).build();
     var trip = TransitModelForTest.trip("123").build();
     var sixOclock = (int) Duration.ofHours(18).toSeconds();
     var fivePast6 = sixOclock + 300;
     var tenPast6 = fivePast6 + 300;
-    var stopTimes = List.of(stopTime(trip, 0, sixOclock), stopTime(trip, 5, fivePast6), stopTime(trip, SEQUENCE, tenPast6));
+    var stopTimes = List.of(
+      stopTime(trip, 0, sixOclock),
+      stopTime(trip, 5, fivePast6),
+      stopTime(trip, SEQUENCE, tenPast6)
+    );
 
     var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
@@ -36,6 +40,4 @@ class TripTimeOnDateTest {
 
     assertEquals(LocalTime.of(18, 10), departure);
   }
-
-
 }
