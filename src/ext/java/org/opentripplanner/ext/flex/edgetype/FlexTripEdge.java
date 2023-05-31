@@ -47,7 +47,7 @@ public class FlexTripEdge extends Edge {
   }
 
   @Override
-  public State traverse(State s0) {
+  public State[] traverse(State s0) {
     StateEditor editor = s0.edit(this);
     editor.setBackMode(TraverseMode.FLEX);
     // TODO: decide good value
@@ -56,7 +56,7 @@ public class FlexTripEdge extends Edge {
     editor.incrementTimeInSeconds(timeInSeconds);
     editor.incrementWeight(timeInSeconds);
     editor.resetEnteredNoThroughTrafficArea();
-    return editor.makeState();
+    return editor.makeStateArray();
   }
 
   @Override

@@ -183,7 +183,7 @@ public class StreetIndex {
     // Differentiate between driving and non-driving, as driving is not available from transit stops
     TraverseMode nonTransitMode = getTraverseModeForLinker(streetMode, endVertex);
 
-    if (nonTransitMode.isDriving()) {
+    if (nonTransitMode.isInCar()) {
       // Fetch coordinate from stop, if not given in request
       if (location.stopId != null && location.getCoordinate() == null) {
         var coordinate = stopModel.getCoordinateById(location.stopId);

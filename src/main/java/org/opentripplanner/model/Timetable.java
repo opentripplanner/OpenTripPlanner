@@ -220,7 +220,7 @@ public class Timetable implements Serializable {
       boolean match = false;
       if (update != null) {
         if (update.hasStopSequence()) {
-          match = update.getStopSequence() == newTimes.getOriginalGtfsStopSequence(i);
+          match = update.getStopSequence() == newTimes.gtfsSequenceOfStopIndex(i);
         } else if (update.hasStopId()) {
           match = pattern.getStop(i).getId().getId().equals(update.getStopId());
         }

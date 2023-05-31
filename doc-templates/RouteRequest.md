@@ -16,3 +16,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 ## Parameter Details
 
 <!-- INSERT: PARAMETERS-DETAILS -->
+
+## Config Example
+
+<!-- INSERT: JSON-EXAMPLE -->

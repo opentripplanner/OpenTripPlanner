@@ -1,7 +1,10 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.opentripplanner.transit.model.basic.Money.USD;
+
 import java.util.Map;
 import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.transit.model.basic.Money;
 
 /**
  * Class used to store all the fares for Sounder commuter rail.
@@ -11,7 +14,7 @@ import org.opentripplanner.routing.core.FareType;
  */
 class OrcaFaresData {
 
-  public static Map<String, Map<FareType, Float>> sounderFares = Map.ofEntries(
+  public static Map<String, Map<FareType, Money>> sounderFares = Map.ofEntries(
     entry("everett-mukilteo", 3.25f, 3.25f),
     entry("everett-edmonds", 4.0f, 4.0f),
     entry("everett-kingstreet", 5.0f, 5.0f),
@@ -55,7 +58,7 @@ class OrcaFaresData {
     entry("kent-kingstreet", 4.0f, 4.0f),
     entry("tukwila-kingstreet", 3.75f, 3.75f)
   );
-  public static Map<String, Map<FareType, Float>> linkFares = Map.ofEntries(
+  public static Map<String, Map<FareType, Money>> linkFares = Map.ofEntries(
     entry("northgate-roosevelt", 2.25f, 2.25f),
     entry("northgate-udistrict", 2.5f, 2.5f),
     entry("northgate-univofwashington", 2.5f, 2.5f),
@@ -232,7 +235,7 @@ class OrcaFaresData {
   );
 
   // Spaces have been removed from the route name because of inconsistencies in the WSF GTFS route dataset.
-  public static Map<String, Map<FareType, Float>> washingtonStateFerriesFares = Map.ofEntries(
+  public static Map<String, Map<FareType, Money>> washingtonStateFerriesFares = Map.ofEntries(
     sEntry("Seattle-BainbridgeIsland", 9.25f, 4.60f),
     sEntry("Seattle-Bremerton", 9.25f, 4.60f),
     sEntry("Mukilteo-Clinton", 5.65f, 2.80f),
@@ -249,22 +252,35 @@ class OrcaFaresData {
     sEntry("Southworth-VashonIsland", 6.10f, 3.05f)
   );
 
-  private static Map.Entry<String, Map<FareType, Float>> entry(
+  private static Map.Entry<String, Map<FareType, Money>> entry(
     String name,
     float regularFare,
     float electronicRegularFare
   ) {
     return Map.entry(
       name,
-      Map.of(FareType.regular, regularFare, FareType.electronicRegular, electronicRegularFare)
+      Map.of(
+        FareType.regular,
+        Money.usDollars(regularFare),
+        FareType.electronicRegular,
+        Money.usDollars(electronicRegularFare)
+      )
     );
   }
 
-  private static Map.Entry<String, Map<FareType, Float>> sEntry(
+  private static Map.Entry<String, Map<FareType, Money>> sEntry(
     String name,
     float regularFare,
     float seniorFare
   ) {
-    return Map.entry(name, Map.of(FareType.regular, regularFare, FareType.senior, seniorFare));
+    return Map.entry(
+      name,
+      Map.of(
+        FareType.regular,
+        Money.usDollars(regularFare),
+        FareType.senior,
+        Money.usDollars(seniorFare)
+      )
+    );
   }
 }

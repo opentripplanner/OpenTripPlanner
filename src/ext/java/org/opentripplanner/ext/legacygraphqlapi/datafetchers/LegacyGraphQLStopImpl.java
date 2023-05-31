@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -424,42 +423,26 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> vehicleMode() {
-    return environment ->
-      getValue(
+    return environment -> {
+      TransitService transitService = getTransitService(environment);
+      return getValue(
         environment,
-        stop -> {
-          if (stop.getGtfsVehicleType() != null) {
-            return stop.getGtfsVehicleType().name();
-          }
-          return getTransitService(environment)
-            .getPatternsForStop(stop)
+        stop ->
+          transitService
+            .getModesOfStopLocation(stop)
             .stream()
-            .map(TripPattern::getMode)
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-            .entrySet()
-            .stream()
-            .max(Map.Entry.comparingByValue())
-            .map(Map.Entry::getKey)
+            .findFirst()
             .map(Enum::toString)
-            .orElse(null);
-        },
-        station -> {
-          TransitService transitService = getTransitService(environment);
-          return station
-            .getChildStops()
+            .orElse(null),
+        station ->
+          transitService
+            .getModesOfStopLocationsGroup(station)
             .stream()
-            .flatMap(stop ->
-              transitService.getPatternsForStop(stop).stream().map(TripPattern::getMode)
-            )
-            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-            .entrySet()
-            .stream()
-            .max(Map.Entry.comparingByValue())
-            .map(Map.Entry::getKey)
+            .findFirst()
             .map(Enum::toString)
-            .orElse(null);
-        }
+            .orElse(null)
       );
+    };
   }
 
   // TODO
@@ -564,7 +547,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
       );
   }
 
-  private <T> T getValue(
+  private static <T> T getValue(
     DataFetchingEnvironment environment,
     Function<StopLocation, T> stopTFunction,
     Function<Station, T> stationTFunction

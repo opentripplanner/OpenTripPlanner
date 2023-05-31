@@ -81,7 +81,9 @@ public class RouteRequestToFilterChainMapper {
       .withDebugEnabled(params.debug());
 
     if (!context.rideHailingServices().isEmpty()) {
-      builder.withRideHailingFilter(new RideHailingFilter(context.rideHailingServices()));
+      builder.withRideHailingFilter(
+        new RideHailingFilter(context.rideHailingServices(), request.wheelchair())
+      );
     }
 
     return builder.build();

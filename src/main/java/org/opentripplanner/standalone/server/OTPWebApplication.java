@@ -101,16 +101,12 @@ public class OTPWebApplication extends Application {
   }
 
   /**
-   * Enabling tracing allows us to see how web resource names were matched from the client, in
-   * headers. Disable auto-discovery of features because it's extremely obnoxious to debug and
+   * Disable auto-discovery of features because it's extremely obnoxious to debug and
    * interacts in confusing ways with manually registered features.
    */
   @Override
   public Map<String, Object> getProperties() {
-    Map<String, Object> props = new HashMap<>();
-    props.put(ServerProperties.TRACING, Boolean.TRUE);
-    props.put(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, Boolean.TRUE);
-    return props;
+    return Map.of(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, Boolean.TRUE);
   }
 
   /**

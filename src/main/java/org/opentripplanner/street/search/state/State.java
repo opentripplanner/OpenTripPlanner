@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -22,6 +23,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 
 public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
+  private static final State[] EMPTY_STATES = {};
   private final StreetSearchRequest request;
 
   /* Data which is likely to change at most traversals */
@@ -102,6 +104,50 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       }
     }
     return states;
+  }
+
+  /**
+   * Takes a nullable state and returns an array of states, possibly empty.
+   */
+  public static State[] ofNullable(@Nullable State u) {
+    if (u == null) {
+      return EMPTY_STATES;
+    } else {
+      return new State[] { u };
+    }
+  }
+
+  /**
+   * Takes two nullable states and returns an array of states (possibly empty) which is guaranteed
+   * to contain no nulls.
+   * <p>
+   * This method is optimized for a low number of allocations and therefore doesn't use any streams
+   * or collections to filter out the nulls.
+   */
+  public static State[] ofNullable(@Nullable State s1, @Nullable State s2) {
+    if (s1 == null && s2 == null) {
+      return EMPTY_STATES;
+    } else if (s1 == null) {
+      return new State[] { s2 };
+    } else if (s2 == null) {
+      return new State[] { s1 };
+    } else {
+      return new State[] { s1, s2 };
+    }
+  }
+
+  /**
+   * Convenience method to return an empty array of states.
+   */
+  public static State[] empty() {
+    return EMPTY_STATES;
+  }
+
+  /**
+   * Convenience method to check if the state array is empty.
+   */
+  public static boolean isEmpty(State[] s) {
+    return s.length == 0;
   }
 
   /**
@@ -245,39 +291,6 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     this.backEdge = requireNotInitialized(this.backEdge, initialBackEdge);
   }
 
-  /**
-   * Optional next result that allows {@link Edge} to return multiple results.
-   *
-   * @return the next additional result from an edge traversal, or null if no more results
-   */
-  public State getNextResult() {
-    return next;
-  }
-
-  /**
-   * Extend an exiting result chain by appending this result to the existing chain. The usage model
-   * looks like this:
-   *
-   * <code>
-   * TraverseResult result = null;
-   * <p>
-   * for( ... ) { TraverseResult individualResult = ...; result = individualResult.addToExistingResultChain(result);
-   * }
-   * <p>
-   * return result;
-   * </code>
-   *
-   * @param existingResultChain the tail of an existing result chain, or null if the chain has not
-   *                            been started
-   */
-  public State addToExistingResultChain(State existingResultChain) {
-    if (this.getNextResult() != null) {
-      throw new IllegalStateException("this result already has a next result set");
-    }
-    next = existingResultChain;
-    return this;
-  }
-
   public StreetSearchRequest getRequest() {
     return request;
   }
@@ -406,6 +419,21 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public boolean isInsideNoRentalDropOffArea() {
     return stateData.insideNoRentalDropOffArea;
+  }
+
+  /**
+   * Whether the street path contains any driving.
+   */
+  public boolean containsModeCar() {
+    var state = this;
+    while (state != null) {
+      if (state.getNonTransitMode().isInCar()) {
+        return true;
+      } else {
+        state = state.getBackState();
+      }
+    }
+    return false;
   }
 
   protected State clone() {

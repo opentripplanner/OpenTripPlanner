@@ -1,14 +1,14 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.router;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import org.opentripplanner.ext.ridehailing.RideHailingAccessShifter;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.framework.concurrent.InterruptibleExecutor;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.Route
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -179,14 +180,17 @@ public class TransitRouter {
     };
 
     if (OTPFeature.ParallelRouting.isOn()) {
-      List<Callable<Object>> tasks = List.of(
-        Executors.callable(accessCalculator),
-        Executors.callable(egressCalculator)
-      );
       try {
-        InterruptibleExecutor.execute(tasks);
-      } catch (ExecutionException e) {
-        RoutingValidationException.unwrapAndRethrowExecutionException(e);
+        // TODO: This is not using {@link OtpRequestThreadFactory} witch mean we do not get
+        //       log-trace-parameters-propagation and graceful timeout handling here.
+        CompletableFuture
+          .allOf(
+            CompletableFuture.runAsync(accessCalculator),
+            CompletableFuture.runAsync(egressCalculator)
+          )
+          .join();
+      } catch (CompletionException e) {
+        RoutingValidationException.unwrapAndRethrowCompletionException(e);
       }
     } else {
       accessCalculator.run();
@@ -222,7 +226,11 @@ public class TransitRouter {
       accessRequest.preferences().street().maxAccessEgressDuration().valueOf(streetRequest.mode())
     );
 
-    var results = new ArrayList<>(accessEgressMapper.mapNearbyStops(nearbyStops, isEgress));
+    var isAccess = !isEgress;
+    List<DefaultAccessEgress> results = new ArrayList<>(
+      accessEgressMapper.mapNearbyStops(nearbyStops, isEgress)
+    );
+    results = timeshiftRideHailing(streetRequest, isAccess, results);
 
     // Special handling of flex accesses
     if (OTPFeature.FlexRouting.isOn() && streetRequest.mode() == StreetMode.FLEXIBLE) {
@@ -239,6 +247,34 @@ public class TransitRouter {
       results.addAll(accessEgressMapper.mapFlexAccessEgresses(flexAccessList, isEgress));
     }
 
+    return results;
+  }
+
+  /**
+   * Given a list of {@code results} shift the access ones which contain driving
+   * so that they only start at the time when the ride hailing vehicle can actually be there
+   * to pick up passengers.
+   * <p>
+   * If there are accesses/egresses with only walking then they remain unchanged.
+   * <p>
+   * This method is a good candidate to be moved to the access/egress filter chain when that has
+   * been added.
+   */
+  private List<DefaultAccessEgress> timeshiftRideHailing(
+    StreetRequest streetRequest,
+    boolean isAccess,
+    List<DefaultAccessEgress> results
+  ) {
+    if (streetRequest.mode() == StreetMode.CAR_HAILING) {
+      results =
+        RideHailingAccessShifter.shiftAccesses(
+          isAccess,
+          results,
+          serverContext.rideHailingServices(),
+          request,
+          Instant.now()
+        );
+    }
     return results;
   }
 

@@ -49,7 +49,7 @@ public class StreetNotesService implements Serializable {
   public static final StreetNoteMatcher DRIVING_MATCHER = new StreetNoteMatcher() {
     @Override
     public boolean matches(State state) {
-      return state.getBackMode().isDriving();
+      return state.getBackMode().isInCar();
     }
   };
 

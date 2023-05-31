@@ -71,7 +71,7 @@ public record FareProduct(
       .append(startTime.toEpochSecond())
       .append(id)
       .append(price.currency().getCurrencyCode())
-      .append(price.amount());
+      .append(price.minorUnitAmount());
 
     if (validity != null) {
       buf.append(validity.toSeconds());

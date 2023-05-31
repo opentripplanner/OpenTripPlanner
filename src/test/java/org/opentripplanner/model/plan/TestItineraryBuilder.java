@@ -363,7 +363,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       to,
       null,
       null,
-      new ConstrainedTransfer(null, null, null, TransferConstraint.create().staySeated().build())
+      new ConstrainedTransfer(null, null, null, TransferConstraint.of().staySeated().build())
     );
   }
 
@@ -376,11 +376,10 @@ public class TestItineraryBuilder implements PlanTestConstants {
       new RideEstimate(
         RideHailingProvider.UBER,
         Duration.ofSeconds(duration),
-        Money.euros(1000),
-        Money.euros(2000),
+        Money.euros(10),
+        Money.euros(20),
         "VW",
-        "UberX",
-        true
+        "UberX"
       )
     );
     // the removal is necessary because the call to streetLeg() also adds a leg to the list

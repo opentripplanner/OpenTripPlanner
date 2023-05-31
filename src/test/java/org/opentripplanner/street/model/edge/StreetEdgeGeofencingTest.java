@@ -2,7 +2,7 @@ package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
@@ -50,7 +50,7 @@ class StreetEdgeGeofencingTest {
     @Test
     public void finishInEdgeWithoutRestrictions() {
       var edge = streetEdge(V1, V2);
-      State result = traverseFromV1(edge);
+      var result = traverseFromV1(edge)[0];
       assertTrue(result.isFinal());
     }
 
@@ -60,10 +60,12 @@ class StreetEdgeGeofencingTest {
       var ext = new BusinessAreaBorder(network);
       V2.addRentalRestriction(ext);
 
-      State result = traverseFromV1(edge1);
-      assertEquals(HAVE_RENTED, result.getVehicleRentalState());
-      assertEquals(TraverseMode.WALK, result.getBackMode());
-      assertNull(result.getNextResult());
+      var results = traverseFromV1(edge1);
+
+      var onFoot = results[0];
+      assertEquals(HAVE_RENTED, onFoot.getVehicleRentalState());
+      assertEquals(TraverseMode.WALK, onFoot.getBackMode());
+      assertEquals(1, results.length);
     }
 
     @Test
@@ -74,7 +76,7 @@ class StreetEdgeGeofencingTest {
           new GeofencingZone(new FeedScopedId(network, "a-park"), null, true, true)
         )
       );
-      State result = traverseFromV1(edge);
+      State result = traverseFromV1(edge)[0];
       assertEquals(WALK, result.getBackMode());
       assertEquals(HAVE_RENTED, result.getVehicleRentalState());
     }
@@ -94,19 +96,20 @@ class StreetEdgeGeofencingTest {
         )
       );
 
-      var continueOnFoot = edge1.traverse(editor.makeState());
+      var results = edge1.traverse(editor.makeState());
 
+      var continueOnFoot = results[0];
       assertEquals(HAVE_RENTED, continueOnFoot.getVehicleRentalState());
       assertEquals(WALK, continueOnFoot.getBackMode());
 
-      var continueRenting = continueOnFoot.getNextResult();
+      var continueRenting = results[1];
       assertEquals(RENTING_FLOATING, continueRenting.getVehicleRentalState());
       assertEquals(SCOOTER, continueRenting.getBackMode());
       assertTrue(continueRenting.isInsideNoRentalDropOffArea());
 
-      var insideZone = restrictedEdge.traverse(continueRenting);
+      var insideZone = restrictedEdge.traverse(continueRenting)[0];
 
-      var leftNoDropOff = edge2.traverse(insideZone);
+      var leftNoDropOff = edge2.traverse(insideZone)[0];
       assertFalse(leftNoDropOff.isInsideNoRentalDropOffArea());
       assertEquals(RENTING_FLOATING, continueRenting.getVehicleRentalState());
     }
@@ -116,7 +119,7 @@ class StreetEdgeGeofencingTest {
       var edge = streetEdge(V1, V2);
       V2.addRentalRestriction(NO_DROP_OFF);
       edge.addRentalRestriction(NO_DROP_OFF);
-      State result = traverseFromV1(edge);
+      State result = traverseFromV1(edge)[0];
       assertFalse(result.isFinal());
     }
   }
@@ -140,7 +143,8 @@ class StreetEdgeGeofencingTest {
 
       var result = restrictedEdge.traverse(editor.makeState());
 
-      assertNull(result);
+      assertTrue(State.isEmpty(result));
+      assertNotNull(result);
     }
 
     @Test
@@ -148,7 +152,7 @@ class StreetEdgeGeofencingTest {
       var edge = streetEdge(V1, V2);
       edge.addRentalRestriction(NO_DROP_OFF);
       var state = initialState(V2, network, true);
-      var state2 = edge.traverse(state);
+      var state2 = edge.traverse(state)[0];
       assertFalse(state2.isFinal());
     }
 
@@ -158,7 +162,9 @@ class StreetEdgeGeofencingTest {
       V2.addRentalRestriction(NO_TRAVERSAL);
       var intialState = initialState(V2, network, true);
       var result = edge.traverse(intialState);
-      assertNull(result);
+
+      assertTrue(State.isEmpty(result));
+      assertNotNull(result);
     }
 
     @Test
@@ -180,16 +186,17 @@ class StreetEdgeGeofencingTest {
 
       var edge = streetEdge(V1, V2);
       V2.addRentalRestriction(NO_TRAVERSAL);
-      var result = edge.traverse(haveRentedState);
+      var states = edge.traverse(haveRentedState);
 
       // we want to pick up a vehicle
-      final State rentalState = result.getNextResult();
+      final State rentalState = states[1];
       assertEquals(RENTING_FLOATING, rentalState.getVehicleRentalState());
       assertEquals(BICYCLE, rentalState.getNonTransitMode());
 
       // but also keep on walking in case we don't find an edge where to leave the vehicle
-      assertEquals(HAVE_RENTED, result.getVehicleRentalState());
-      assertEquals(WALK, result.getNonTransitMode());
+      var walkingState = states[0];
+      assertEquals(HAVE_RENTED, walkingState.getVehicleRentalState());
+      assertEquals(WALK, walkingState.getNonTransitMode());
     }
   }
 
@@ -234,11 +241,11 @@ class StreetEdgeGeofencingTest {
 
     var state = traverseFromV1(edge);
 
-    assertEquals(RENTING_FLOATING, state.getVehicleRentalState());
-    assertNull(state.getNextResult());
+    assertEquals(RENTING_FLOATING, state[0].getVehicleRentalState());
+    assertEquals(1, state.length);
   }
 
-  private State traverseFromV1(StreetEdge edge) {
+  private State[] traverseFromV1(StreetEdge edge) {
     var state = initialState(V1, network, false);
     return edge.traverse(state);
   }

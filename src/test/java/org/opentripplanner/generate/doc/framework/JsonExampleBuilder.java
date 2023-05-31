@@ -13,7 +13,7 @@ public class JsonExampleBuilder {
   private static final ObjectMapper MAPPER = new ObjectMapper();
   private JsonNode node;
 
-  public JsonExampleBuilder(JsonNode node) {
+  JsonExampleBuilder(JsonNode node) {
     Objects.requireNonNull(node);
     this.node = node;
   }

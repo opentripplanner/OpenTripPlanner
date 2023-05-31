@@ -13,7 +13,7 @@ public class TestRideHailingService implements RideHailingService {
 
   public static final Duration DEFAULT_ARRIVAL_DURATION = Duration.ofMinutes(10);
   public static final List<ArrivalTime> DEFAULT_ARRIVAL_TIMES = List.of(
-    new ArrivalTime(UBER, "123", "a ride", DEFAULT_ARRIVAL_DURATION, false)
+    new ArrivalTime(UBER, "123", "a ride", DEFAULT_ARRIVAL_DURATION)
   );
   private final List<ArrivalTime> arrivalTimes;
   private final List<RideEstimate> rideEstimates;
@@ -29,12 +29,16 @@ public class TestRideHailingService implements RideHailingService {
   }
 
   @Override
-  public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate) {
+  public List<ArrivalTime> arrivalTimes(WgsCoordinate coordinate, boolean wheelchair) {
     return arrivalTimes;
   }
 
   @Override
-  public List<RideEstimate> rideEstimates(WgsCoordinate start, WgsCoordinate end) {
+  public List<RideEstimate> rideEstimates(
+    WgsCoordinate start,
+    WgsCoordinate end,
+    boolean wheelchair
+  ) {
     return rideEstimates;
   }
 }

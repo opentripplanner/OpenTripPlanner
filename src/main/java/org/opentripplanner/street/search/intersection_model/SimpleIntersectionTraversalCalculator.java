@@ -31,7 +31,7 @@ public class SimpleIntersectionTraversalCalculator
       return 0;
     }
 
-    if (mode.isDriving()) {
+    if (mode.isInCar()) {
       return computeDrivingTraversalDuration(v, from, to);
     } else if (mode.isCyclingIsh()) {
       return computeCyclingTraversalDuration(v, from, to, toSpeed);
@@ -85,10 +85,11 @@ public class SimpleIntersectionTraversalCalculator
   }
 
   /**
-   * Expected time it takes to continue straight without a stop light.
+   * Expected time it takes to continue straight without a stop light. This used to be higher, but
+   * it caused unrealistically slow car travel.
    */
   public double getExpectedStraightNoLightTimeSec() {
-    return 5.0;
+    return 0.0;
   }
 
   /**

@@ -8,8 +8,8 @@ import java.time.Duration;
  */
 public record ArrivalTime(
   RideHailingProvider provider,
-  String productId,
+  String rideType,
   String displayName,
-  Duration duration,
-  boolean wheelchairAccessible
-) {}
+  Duration duration
+)
+  implements Ride {}

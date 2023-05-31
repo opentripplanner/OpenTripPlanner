@@ -20,7 +20,7 @@ public final class ItineraryFilterPreferences {
 
   private final boolean accessibilityScore;
   private final double bikeRentalDistanceRatio;
-  private final boolean debug;
+  private final ItineraryFilterDebugProfile debug;
   private final boolean filterItinerariesWithSameFirstOrLastTrip;
   private final double groupedOtherThanSameLegsMaxCostMultiplier;
   private final double groupSimilarityKeepOne;
@@ -34,7 +34,7 @@ public final class ItineraryFilterPreferences {
   private ItineraryFilterPreferences() {
     this.accessibilityScore = false;
     this.bikeRentalDistanceRatio = 0.0;
-    this.debug = false;
+    this.debug = ItineraryFilterDebugProfile.OFF;
     this.filterItinerariesWithSameFirstOrLastTrip = false;
     this.groupedOtherThanSameLegsMaxCostMultiplier = 2.0;
     this.groupSimilarityKeepOne = 0.85;
@@ -81,7 +81,7 @@ public final class ItineraryFilterPreferences {
     return bikeRentalDistanceRatio;
   }
 
-  public boolean debug() {
+  public ItineraryFilterDebugProfile debug() {
     return debug;
   }
 
@@ -127,7 +127,7 @@ public final class ItineraryFilterPreferences {
       .of(ItineraryFilterPreferences.class)
       .addBoolIfTrue("accessibilityScore", accessibilityScore)
       .addNum("bikeRentalDistanceRatio", bikeRentalDistanceRatio, DEFAULT.bikeRentalDistanceRatio)
-      .addBoolIfTrue("debug", debug)
+      .addEnum("debug", debug, ItineraryFilterDebugProfile.OFF)
       .addBoolIfTrue(
         "filterItinerariesWithSameFirstOrLastTrip",
         filterItinerariesWithSameFirstOrLastTrip
@@ -214,7 +214,7 @@ public final class ItineraryFilterPreferences {
     private final ItineraryFilterPreferences original;
     private boolean accessibilityScore;
     private double bikeRentalDistanceRatio;
-    private boolean debug;
+    private ItineraryFilterDebugProfile debug;
     private boolean filterItinerariesWithSameFirstOrLastTrip;
     private double groupedOtherThanSameLegsMaxCostMultiplier;
     private double groupSimilarityKeepOne;
@@ -239,7 +239,7 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
-    public Builder withDebug(boolean debug) {
+    public Builder withDebug(ItineraryFilterDebugProfile debug) {
       this.debug = debug;
       return this;
     }

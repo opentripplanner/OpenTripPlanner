@@ -43,15 +43,15 @@ public class TestTransitData
   implements RaptorTransitDataProvider<TestTripSchedule>, RaptorTestConstants {
 
   public static final TransferConstraint TX_GUARANTEED = TransferConstraint
-    .create()
+    .of()
     .guaranteed()
     .build();
   public static final TransferConstraint TX_NOT_ALLOWED = TransferConstraint
-    .create()
+    .of()
     .notAllowed()
     .build();
   public static final TransferConstraint TX_LONG_MIN_TIME = TransferConstraint
-    .create()
+    .of()
     .minTransferTime(3600)
     .build();
 

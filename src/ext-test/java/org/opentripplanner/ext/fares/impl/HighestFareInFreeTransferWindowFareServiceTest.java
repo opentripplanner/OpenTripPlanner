@@ -42,8 +42,8 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     Itinerary i,
     float expectedFare
   ) {
-    var fares = fareService.getCost(i);
-    final Money expected = Money.usDollars(Math.round(expectedFare * 100));
+    var fares = fareService.calculateFares(i);
+    final Money expected = Money.usDollars(expectedFare);
     assertEquals(expected, fares.getFare(FareType.regular));
 
     for (var type : fares.getFareTypes()) {

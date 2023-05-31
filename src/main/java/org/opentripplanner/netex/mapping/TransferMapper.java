@@ -94,7 +94,7 @@ public class TransferMapper {
   }
 
   private TransferConstraint mapConstraint(ServiceJourneyInterchange it) {
-    var cBuilder = TransferConstraint.create();
+    var cBuilder = TransferConstraint.of();
 
     if (it.isStaySeated() != null) {
       cBuilder.staySeated(it.isStaySeated());

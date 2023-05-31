@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.ZoneId;
 import java.util.Comparator;
-import java.util.Currency;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
@@ -18,6 +17,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
@@ -27,8 +27,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class FaresIntegrationTest {
-
-  private final Currency USD = Currency.getInstance("USD");
 
   @Test
   public void testBasic() {
@@ -48,7 +46,7 @@ public class FaresIntegrationTest {
     var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
     ItineraryFares fare = getFare(from, to, start, serverContext);
-    assertEquals(fare.getFare(FareType.regular), new Money(USD, 425));
+    assertEquals(fare.getFare(FareType.regular), Money.usDollars(4.25f));
   }
 
   @Test
@@ -79,7 +77,7 @@ public class FaresIntegrationTest {
 
     ItineraryFares fare = getFare(from, to, startTime, serverContext);
 
-    assertEquals(new Money(USD, 200), fare.getFare(FareType.regular));
+    assertEquals(Money.usDollars(2), fare.getFare(FareType.regular));
 
     // long trip
 
@@ -116,7 +114,7 @@ public class FaresIntegrationTest {
 
     var serverContext = TestServerContext.createServerContext(graph, transitModel);
 
-    Money tenUSD = new Money(USD, 1000);
+    Money tenUSD = Money.usDollars(10);
 
     var dateTime = LocalDateTime
       .of(2009, 8, 7, 0, 0, 0)
@@ -177,7 +175,7 @@ public class FaresIntegrationTest {
 
     fareComponents = fare.getComponents(FareType.regular);
     assertEquals(fareComponents.size(), 1);
-    assertEquals(fareComponents.get(0).price(), tenUSD);
+    assertEquals(tenUSD, fareComponents.get(0).price());
     assertEquals(fareComponents.get(0).fareId(), new FeedScopedId(feedId, "EG"));
     assertEquals(fareComponents.get(0).routes().get(0), new FeedScopedId(feedId, "5"));
     assertEquals(fareComponents.get(0).routes().get(1), new FeedScopedId(feedId, "6"));
@@ -242,7 +240,9 @@ public class FaresIntegrationTest {
     request.setDateTime(time);
     request.setFrom(from);
     request.setTo(to);
-    request.withPreferences(p -> p.withItineraryFilter(it -> it.withDebug(true)));
+    request.withPreferences(p ->
+      p.withItineraryFilter(it -> it.withDebug(ItineraryFilterDebugProfile.LIST_ALL))
+    );
 
     var result = serverContext.routingService().route(request);
 

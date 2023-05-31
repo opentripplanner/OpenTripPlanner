@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
+import static org.opentripplanner.ext.transmodelapi.model.framework.StreetModeDurationInputType.mapDurationForStreetModeGraphQLValue;
+
 import graphql.Scalars;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
@@ -13,6 +15,7 @@ import org.opentripplanner.ext.transmodelapi.model.DefaultRouteRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
+import org.opentripplanner.ext.transmodelapi.model.framework.StreetModeDurationInputType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -467,7 +470,7 @@ public class TripQuery {
             "instead of removing them. This is very convenient when tuning the filters."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(preferences.itineraryFilter().debug())
+          .defaultValue(preferences.itineraryFilter().debug().debugEnabled())
           .build()
       )
       .argument(
@@ -510,9 +513,27 @@ public class TripQuery {
           .newArgument()
           .name("maxAccessEgressDurationForMode")
           .description(
-            "Maximum duration for access/egress for street searches per respective mode."
+            "Maximum duration for access/egress for street searches per respective mode. " +
+            "Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search. "
           )
           .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
+          .defaultValueLiteral(
+            mapDurationForStreetModeGraphQLValue(preferences.street().maxAccessEgressDuration())
+          )
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("maxDirectDurationForMode")
+          .description(
+            "Maximum duration for direct street searchers per respective mode. " +
+            "Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search."
+          )
+          .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
+          .defaultValueLiteral(
+            mapDurationForStreetModeGraphQLValue(preferences.street().maxDirectDuration())
+          )
           .build()
       )
       .dataFetcher(environment -> new TransmodelGraphQLPlanner().plan(environment))

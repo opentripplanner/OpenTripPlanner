@@ -16,6 +16,8 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_50;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
+import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
@@ -66,6 +68,7 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -113,11 +116,7 @@ class GraphQLIntegrationTest {
       )
       .toList();
 
-    var busRoute = routes
-      .stream()
-      .filter(r -> r.getMode().equals(TransitMode.BUS))
-      .findFirst()
-      .get();
+    var busRoute = routes.stream().filter(r -> r.getMode().equals(BUS)).findFirst().get();
 
     routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
 
@@ -131,10 +130,10 @@ class GraphQLIntegrationTest {
     ScheduledTransitLeg railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
-    fares.addFare(FareType.regular, Money.euros(310));
+    fares.addFare(FareType.regular, Money.euros(3.1f));
     fares.addFareComponent(
       FareType.regular,
-      List.of(new FareComponent(id("AB"), Money.euros(310), List.of(busLeg)))
+      List.of(new FareComponent(id("AB"), Money.euros(3.1f), List.of(busLeg)))
     );
 
     var dayPass = fareProduct("day-pass");
@@ -167,7 +166,12 @@ class GraphQLIntegrationTest {
       .build();
     railLeg.addAlert(alert);
 
-    var transitService = new DefaultTransitService(transitModel);
+    var transitService = new DefaultTransitService(transitModel) {
+      @Override
+      public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
+        return List.of(BUS, FERRY);
+      }
+    };
     context =
       new LegacyGraphQLRequestContext(
         new TestRoutingService(List.of(i1)),
@@ -186,7 +190,7 @@ class GraphQLIntegrationTest {
     return new FareProduct(
       id(name),
       name,
-      Money.euros(1000),
+      Money.euros(10),
       null,
       new RiderCategory(id("senior-citizens"), "Senior citizens", null),
       new FareMedium(id("oyster"), "TfL Oyster Card")

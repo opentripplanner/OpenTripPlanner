@@ -53,7 +53,7 @@ public class InterlineProcessor {
       .stream()
       .filter(this::staySeatedAllowed)
       .map(p -> {
-        var constraint = TransferConstraint.create();
+        var constraint = TransferConstraint.of();
         constraint.staySeated();
         constraint.priority(TransferPriority.ALLOWED);
 

@@ -6,7 +6,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.ext.smoovebikerental.SmooveBikeRentalDataSourceParameters;
-import org.opentripplanner.ext.vilkkubikerental.VilkkuBikeRentalDataSourceParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.HttpHeadersConfig;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -52,12 +51,6 @@ public class VehicleRentalSourceFactory {
         overloadingAllowed(),
         headers()
       );
-      case VILKKU -> new VilkkuBikeRentalDataSourceParameters(
-        url(),
-        network(),
-        overloadingAllowed(),
-        headers()
-      );
     };
   }
 
@@ -87,19 +80,19 @@ public class VehicleRentalSourceFactory {
 
   private boolean allowKeepingRentedVehicleAtDestination() {
     return c
-      .of("allowKeepingRentedBicycleAtDestination")
+      .of("allowKeepingRentedVehicleAtDestination")
       .since(V2_1)
       .summary("If a vehicle should be allowed to be kept at the end of a station-based rental.")
       .description(
         """
-          In some cases it may be useful to not drop off the rented bicycle before arriving at the destination.
-          This is useful if bicycles may only be rented for round trips, or the destination is an intermediate place.
+          In some cases it may be useful to not drop off the rented vehicle before arriving at the destination.
+          This is useful if vehicles may only be rented for round trips, or the destination is an intermediate place.
                   
           For this to be possible three things need to be configured:
                          
-           - In the updater configuration `allowKeepingRentedBicycleAtDestination` should be set to `true`.
-           - `allowKeepingRentedBicycleAtDestination` should also be set for each request, either using routing defaults, or per-request.
-           - If keeping the bicycle at the destination should be discouraged, then `keepingRentedBicycleAtDestinationCost` (default: 0) may also be set in the routing defaults.
+           - In the updater configuration `allowKeepingRentedVehicleAtDestination` should be set to `true`.
+           - `allowKeepingRentedVehicleAtDestination` should also be set for each request, either using routing defaults, or per-request.
+           - If keeping the vehicle at the destination should be discouraged, then `keepingRentedVehicleAtDestinationCost` (default: 0) may also be set in the routing defaults.
           """
       )
       .asBoolean(false);

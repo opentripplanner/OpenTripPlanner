@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.ext.transmodelapi.support.GraphQLToWebResponseMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitModel;
@@ -119,7 +120,7 @@ public class TransmodelAPI {
     } else {
       variables = new HashMap<>();
     }
-    return index.getGraphQLResponse(
+    var result = index.executeGraphQL(
       query,
       serverContext,
       variables,
@@ -127,6 +128,7 @@ public class TransmodelAPI {
       maxResolves,
       getTagsFromHeaders(headers)
     );
+    return GraphQLToWebResponseMapper.map(result);
   }
 
   @POST
@@ -137,7 +139,7 @@ public class TransmodelAPI {
     @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
     @Context HttpHeaders headers
   ) {
-    return index.getGraphQLResponse(
+    var result = index.executeGraphQL(
       query,
       serverContext,
       null,
@@ -145,11 +147,13 @@ public class TransmodelAPI {
       maxResolves,
       getTagsFromHeaders(headers)
     );
+    return GraphQLToWebResponseMapper.map(result);
   }
 
   @POST
   @Path("/graphql/batch")
   @Consumes(MediaType.APPLICATION_JSON)
+  @Deprecated
   public Response getGraphQLBatch(
     List<HashMap<String, Object>> queries,
     @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout,
@@ -176,14 +180,16 @@ public class TransmodelAPI {
       String operationName = (String) query.getOrDefault("operationName", null);
 
       futures.add(() ->
-        index.getGraphQLExecutionResult(
-          (String) query.get("query"),
-          serverContext,
-          variables,
-          operationName,
-          maxResolves,
-          getTagsFromHeaders(headers)
-        )
+        index
+          .executeGraphQL(
+            (String) query.get("query"),
+            serverContext,
+            variables,
+            operationName,
+            maxResolves,
+            getTagsFromHeaders(headers)
+          )
+          .result()
       );
     }
 

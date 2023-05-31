@@ -15,7 +15,7 @@ public enum TraverseMode {
     return STREET_MODES.contains(this);
   }
 
-  public boolean isDriving() {
+  public boolean isInCar() {
     return this == CAR;
   }
 

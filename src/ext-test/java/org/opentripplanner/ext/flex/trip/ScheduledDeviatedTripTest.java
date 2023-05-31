@@ -150,7 +150,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var itinerary = itineraries.iterator().next();
     assertFalse(itinerary.getFares().getFareTypes().isEmpty());
 
-    assertEquals(Money.usDollars(250), itinerary.getFares().getFare(FareType.regular));
+    assertEquals(Money.usDollars(2.5f), itinerary.getFares().getFare(FareType.regular));
 
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }

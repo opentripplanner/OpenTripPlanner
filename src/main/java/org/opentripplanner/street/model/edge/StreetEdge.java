@@ -386,7 +386,8 @@ public class StreetEdge
   }
 
   @Override
-  public State traverse(State s0) {
+  @Nonnull
+  public State[] traverse(State s0) {
     final StateEditor editor;
 
     final boolean arriveByRental =
@@ -396,7 +397,7 @@ public class StreetEdge
       arriveByRental &&
       (tov.rentalTraversalBanned(s0) || hasStartedSearchInNoDropOffZoneAndIsExitingIt(s0))
     ) {
-      return null;
+      return State.empty();
     }
     // if the traversal is banned for the current state because of a GBFS geofencing zone
     // we drop the vehicle and continue walking
@@ -434,7 +435,7 @@ public class StreetEdge
       } else if (canTraverse(TraverseMode.WALK)) {
         editor = doTraverse(s0, TraverseMode.WALK, true);
       } else {
-        return null;
+        return State.empty();
       }
     } else if (canTraverse(s0.getNonTransitMode())) {
       editor = doTraverse(s0, s0.getNonTransitMode(), false);
@@ -456,8 +457,7 @@ public class StreetEdge
         );
         afterTraversal.leaveNoRentalDropOffArea();
         var forkState = afterTraversal.makeState();
-        forkState.addToExistingResultChain(state);
-        return forkState;
+        return State.ofNullable(forkState, state);
       }
     }
 
@@ -469,8 +469,7 @@ public class StreetEdge
     if (state != null && arriveByRental && leavesZoneWithRentalRestrictionsWhenHavingRented(s0)) {
       StateEditor walking = doTraverse(s0, TraverseMode.WALK, false);
       var forkState = walking.makeState();
-      forkState.addToExistingResultChain(state);
-      return forkState;
+      return State.ofNullable(forkState, state);
     }
 
     if (canPickupAndDrive(s0) && canTraverse(TraverseMode.CAR)) {
@@ -478,11 +477,8 @@ public class StreetEdge
       if (inCar != null) {
         driveAfterPickup(s0, inCar);
         State forkState = inCar.makeState();
-        if (forkState != null) {
-          // Return both the original WALK state, along with the new IN_CAR state
-          forkState.addToExistingResultChain(state);
-          return forkState;
-        }
+        // Return both the original WALK state, along with the new IN_CAR state
+        return State.ofNullable(forkState, state);
       }
     }
 
@@ -495,11 +491,11 @@ public class StreetEdge
       if (dropOff != null) {
         dropOffAfterDriving(s0, dropOff);
         // Only the walk state is returned, since traversing by car was not possible
-        return dropOff.makeState();
+        return dropOff.makeStateArray();
       }
     }
 
-    return state;
+    return State.ofNullable(state);
   }
 
   /**
@@ -1189,7 +1185,7 @@ public class StreetEdge
         turnDuration = 0;
       }
 
-      if (!traverseMode.isDriving()) {
+      if (!traverseMode.isInCar()) {
         s1.incrementWalkDistance(turnDuration / 100); // just a tie-breaker
       }
 
@@ -1197,7 +1193,7 @@ public class StreetEdge
       weight += preferences.street().turnReluctance() * turnDuration;
     }
 
-    if (!traverseMode.isDriving()) {
+    if (!traverseMode.isInCar()) {
       s1.incrementWalkDistance(getDistanceWithElevation());
     }
 

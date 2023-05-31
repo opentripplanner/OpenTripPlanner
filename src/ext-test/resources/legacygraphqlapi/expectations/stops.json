@@ -5,49 +5,57 @@
         "gtfsId" : "F:A",
         "lat" : 5.0,
         "lon" : 8.0,
-        "name" : "A"
+        "name" : "A",
+        "vehicleMode" : "BUS"
       },
       {
         "gtfsId" : "F:B",
         "lat" : 6.0,
         "lon" : 8.5,
-        "name" : "B"
+        "name" : "B",
+        "vehicleMode" : "BUS"
       },
       {
         "gtfsId" : "F:C",
         "lat" : 7.0,
         "lon" : 9.0,
-        "name" : "C"
+        "name" : "C",
+        "vehicleMode" : "BUS"
       },
       {
         "gtfsId" : "F:D",
         "lat" : 8.0,
         "lon" : 9.5,
-        "name" : "D"
+        "name" : "D",
+        "vehicleMode" : "BUS"
       },
       {
         "gtfsId" : "F:E",
         "lat" : 9.0,
         "lon" : 10.0,
-        "name" : "E"
+        "name" : "E",
+        "vehicleMode" : "BUS"
       },
       {
         "gtfsId" : "F:F",
         "lat" : 9.0,
         "lon" : 10.5,
-        "name" : "F"
+        "name" : "F",
+        "vehicleMode" : "BUS"
       },
       {
         "gtfsId" : "F:G",
         "lat" : 9.5,
         "lon" : 11.0,
-        "name" : "G"
+        "name" : "G",
+        "vehicleMode" : "BUS"
       },
       {
         "gtfsId" : "F:H",
         "lat" : 10.0,
         "lon" : 11.5,
-        "name" : "H"
+        "name" : "H",
+        "vehicleMode" : "BUS"
       }
     ]
   }
