@@ -1426,7 +1426,8 @@ type Itinerary {
 type Currency {
     "ISO-4217 currency code, for example `USD` or `EUR`."
     code: String!
-    """Fractional digits of this currency. A value of 2 would express that in this currency
+    """
+    Fractional digits of this currency. A value of 2 would express that in this currency
     100 minor units make up one major unit.
 
     Expressed more concretely: 100 Euro-cents make up one Euro.
@@ -1443,7 +1444,10 @@ type Money {
     "The currency of this money amount."
     currency: Currency!
     """
-    Money as a fractional amount, so 3.10 USD is represented as `3.1`.
+    Money in the major currency unit, so 3.10 USD is represented as `3.1`.
+
+    If you want to get the minor currency unit (310 cents), multiply with
+    (10 to the power of `currency.digits`).
     """
     amount: Float!
 }
