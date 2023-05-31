@@ -2,10 +2,20 @@ package org.opentripplanner.street.search.state;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.List;
+import javax.annotation.Nonnull;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
+import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
+import org.opentripplanner.street.model.edge.ElevatorHopEdge;
+import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
+import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
  * Builds up a state chain for use in tests.
@@ -56,6 +66,50 @@ public class TestStateBuilder {
     }
     currentState = states[0];
     return this;
+  }
+
+  /**
+   * Traverse an elevator (onboard, hop and offboard edges).
+   */
+  public TestStateBuilder elevator() {
+    count++;
+
+    var onboard1 = elevatorOnBoard(count, "1");
+    var onboard2 = elevatorOnBoard(count, "2");
+    var offboard1 = elevatorOffBoard(count, "1");
+    var offboard2 = elevatorOffBoard(count, "2");
+
+    var from = (StreetVertex) currentState.vertex;
+    var link = StreetModelForTest.streetEdge(from, offboard1);
+
+    var boardEdge = new ElevatorBoardEdge(offboard1, onboard1);
+
+    var hopEdge = new ElevatorHopEdge(
+      onboard1,
+      onboard2,
+      StreetTraversalPermission.PEDESTRIAN,
+      Accessibility.POSSIBLE
+    );
+
+    var alightEdge = new ElevatorAlightEdge(onboard2, offboard2, new NonLocalizedString("1"));
+
+    currentState =
+      EdgeTraverser
+        .traverseEdges(currentState, List.of(link, boardEdge, hopEdge, alightEdge))
+        .orElseThrow();
+    return this;
+  }
+
+  @Nonnull
+  private static ElevatorOffboardVertex elevatorOffBoard(int count, String suffix) {
+    final String label = "elevator_off_board_" + suffix;
+    return new ElevatorOffboardVertex(null, label, count, count, new NonLocalizedString(label));
+  }
+
+  @Nonnull
+  private static ElevatorOnboardVertex elevatorOnBoard(int count, String suffix) {
+    final String label = "elevator_on_board_" + suffix;
+    return new ElevatorOnboardVertex(null, label, count, count, new NonLocalizedString(label));
   }
 
   public State build() {

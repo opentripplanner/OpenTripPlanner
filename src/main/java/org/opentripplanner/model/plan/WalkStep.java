@@ -8,6 +8,7 @@ import java.util.Set;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
 
@@ -227,10 +228,12 @@ public class WalkStep {
 
   @Override
   public String toString() {
-    String direction = absoluteDirection.toString();
-    if (relativeDirection != null) {
-      direction = relativeDirection.toString();
-    }
-    return "WalkStep(" + direction + " on " + streetName + " for " + distance + ")";
+    return ToStringBuilder
+      .of(this.getClass())
+      .addEnum("absoluteDirection", absoluteDirection)
+      .addEnum("relativeDirection", relativeDirection)
+      .addStr("streetName", streetName.toString())
+      .addNum("distance", distance)
+      .toString();
   }
 }
