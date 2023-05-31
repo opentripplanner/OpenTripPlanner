@@ -17,8 +17,8 @@
 
   <appender name="plain" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <!-- print out file and line number in parenthesis, which Eclipse and IDEA will link -->
-      <pattern>%d{HH:mm:ss.SSS} %level [%thread] \(%F:%L\) %msg%n</pattern>
+      <!-- print out file and line number in parentheses, which Eclipse and IDEA will link -->
+      <pattern>%d{HH:mm:ss.SSS} %level [%thread] %X{correlationId} \(%F:%L\) %msg%n</pattern>
     </encoder>
   </appender>
 
