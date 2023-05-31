@@ -60,7 +60,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     this.vehicleParkingService = vehicleParkingService;
 
     LOG.info(
-      "Creating vehicle-parking updater running every {} seconds : {}",
+      "Creating vehicle-parking updater running every {}: {}",
       pollingPeriod(),
       source
     );

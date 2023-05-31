@@ -53,7 +53,7 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
       );
 
     LOG.info(
-      "Creating vehicle position updater running every {} seconds : {}",
+      "Creating vehicle position updater running every {}: {}",
       pollingPeriod(),
       vehiclePositionSource
     );
