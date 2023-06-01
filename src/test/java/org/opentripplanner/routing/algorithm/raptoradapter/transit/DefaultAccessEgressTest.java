@@ -21,4 +21,15 @@ class DefaultAccessEgressTest {
     var access = new DefaultAccessEgress(0, state);
     assertFalse(access.getLastState().containsModeCar());
   }
+
+  @Test
+  void containsModeWalkOnly() {
+    var stateWalk = TestStateBuilder.ofWalking().build();
+    var subject = new DefaultAccessEgress(0, stateWalk);
+    assertTrue(subject.isWalkOnly());
+
+    var carRentalState = TestStateBuilder.ofCarRental().streetEdge().pickUpCar().build();
+    subject = new DefaultAccessEgress(0, carRentalState);
+    assertFalse(subject.isWalkOnly());
+  }
 }
