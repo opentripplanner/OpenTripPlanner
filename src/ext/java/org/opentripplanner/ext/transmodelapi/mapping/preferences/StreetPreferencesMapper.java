@@ -12,6 +12,15 @@ public class StreetPreferencesMapper {
     DataFetchingEnvironment environment,
     StreetPreferences defaultPreferences
   ) {
+    street.withMinAccessEgressDuration(builder ->
+      StreetModeDurationInputType.mapDurationForStreetMode(
+        builder,
+        environment,
+        TripQuery.MIN_ACCESS_EGRESS_DURATION_FOR_MODE,
+        defaultPreferences.maxAccessEgressDuration()
+      )
+    );
+
     street.withMaxAccessEgressDuration(builder ->
       StreetModeDurationInputType.mapDurationForStreetModeAndAssertValueIsGreaterThenDefault(
         builder,

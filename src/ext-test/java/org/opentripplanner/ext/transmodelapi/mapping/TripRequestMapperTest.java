@@ -2,8 +2,14 @@ package org.opentripplanner.ext.transmodelapi.mapping;
 
 import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.ext.transmodelapi.model.framework.StreetModeDurationInputType.FIELD_DURATION;
+import static org.opentripplanner.ext.transmodelapi.model.framework.StreetModeDurationInputType.FIELD_STREET_MODE;
+import static org.opentripplanner.ext.transmodelapi.model.plan.TripQuery.MAX_ACCESS_EGRESS_DURATION_FOR_MODE;
+import static org.opentripplanner.ext.transmodelapi.model.plan.TripQuery.MAX_DIRECT_DURATION_FOR_MODE;
+import static org.opentripplanner.ext.transmodelapi.model.plan.TripQuery.MIN_ACCESS_EGRESS_DURATION_FOR_MODE;
+import static org.opentripplanner.routing.api.request.StreetMode.CAR;
+import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
+import static org.opentripplanner.routing.api.request.StreetMode.WALK;
 
 import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
@@ -20,8 +26,6 @@ import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -35,7 +39,11 @@ import org.opentripplanner.transit.service.TransitModel;
 public class TripRequestMapperTest implements PlanTestConstants {
 
   static final TransmodelRequestContext context;
+  private static final Duration MIN_DEFAULT = Duration.ofMinutes(1);
+  private static final Duration MAX_DEFAULT = Duration.ofMinutes(45);
+  private static final Duration MIN_FLEXIBLE = Duration.ofMinutes(5);
   private static final Duration MAX_FLEXIBLE = Duration.ofMinutes(20);
+  private static final Duration D10m = Duration.ofMinutes(10);
 
   static {
     var graph = new Graph();
@@ -50,8 +58,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
     defaultRequest.withPreferences(pb ->
       pb.withStreet(sp ->
         sp
-          .withMaxAccessEgressDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
-          .withMaxDirectDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
+          .withMinAccessEgressDuration(b -> b.withDefault(MIN_DEFAULT).with(FLEXIBLE, MIN_FLEXIBLE))
+          .withMaxAccessEgressDuration(b -> b.withDefault(MAX_DEFAULT).with(FLEXIBLE, MAX_FLEXIBLE))
+          .withMaxDirectDuration(b -> b.withDefault(MAX_DEFAULT).with(FLEXIBLE, MAX_FLEXIBLE))
       )
     );
 
@@ -77,113 +86,47 @@ public class TripRequestMapperTest implements PlanTestConstants {
       );
   }
 
-  private static final List<Map<String, Object>> DURATIONS = List.of(
-    Map.of("streetMode", StreetMode.WALK, "duration", Duration.ofMinutes(30)),
-    Map.of("streetMode", StreetMode.BIKE, "duration", Duration.ofMinutes(31)),
-    Map.of("streetMode", StreetMode.BIKE_TO_PARK, "duration", Duration.ofMinutes(32)),
-    Map.of("streetMode", StreetMode.BIKE_RENTAL, "duration", Duration.ofMinutes(33)),
-    Map.of("streetMode", StreetMode.SCOOTER_RENTAL, "duration", Duration.ofMinutes(34)),
-    Map.of("streetMode", StreetMode.CAR, "duration", Duration.ofMinutes(35)),
-    Map.of("streetMode", StreetMode.CAR_TO_PARK, "duration", Duration.ofMinutes(36)),
-    Map.of("streetMode", StreetMode.CAR_PICKUP, "duration", Duration.ofMinutes(30)),
-    Map.of("streetMode", StreetMode.CAR_RENTAL, "duration", Duration.ofMinutes(38)),
-    // Same as max value for FLEXIBLE
-    Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE)
-  );
+  @Test
+  public void testMinAccessEgressDurationForMode() {
+    // We only need one element since we are testing the "wiring", not the business rules
+    Map<String, Object> arguments = Map.of(
+      MIN_ACCESS_EGRESS_DURATION_FOR_MODE,
+      List.<Map<String, Object>>of(Map.of(FIELD_STREET_MODE, CAR, FIELD_DURATION, D10m))
+    );
+    var routeRequest = TripRequestMapper.createRequest(executionContext(arguments));
+    var durationForMode = routeRequest.preferences().street().minAccessEgressDuration();
+
+    assertEquals(D10m, durationForMode.valueOf(CAR));
+    assertEquals(MIN_DEFAULT, durationForMode.valueOf(WALK));
+    assertEquals(MIN_FLEXIBLE, durationForMode.valueOf(FLEXIBLE));
+  }
 
   @Test
   public void testMaxAccessEgressDurationForMode() {
-    Map<String, Object> arguments = Map.of("maxAccessEgressDurationForMode", DURATIONS);
-
+    Map<String, Object> arguments = Map.of(
+      MAX_ACCESS_EGRESS_DURATION_FOR_MODE,
+      List.<Map<String, Object>>of(Map.of(FIELD_STREET_MODE, CAR, FIELD_DURATION, D10m))
+    );
     var routeRequest = TripRequestMapper.createRequest(executionContext(arguments));
-    assertNotNull(routeRequest);
-    var preferences = routeRequest.preferences();
-    assertNotNull(preferences);
-    var streetPreferences = preferences.street();
-    assertNotNull(streetPreferences);
-    var maxAccessEgressDuration = streetPreferences.maxAccessEgressDuration();
-    assertNotNull(maxAccessEgressDuration);
+    var durationForMode = routeRequest.preferences().street().maxAccessEgressDuration();
 
-    for (var entry : DURATIONS) {
-      var mode = (StreetMode) entry.get("streetMode");
-      var expected = (Duration) entry.get("duration");
-      assertEquals(expected, maxAccessEgressDuration.valueOf(mode), mode.name());
-    }
+    assertEquals(D10m, durationForMode.valueOf(CAR));
+    assertEquals(MAX_DEFAULT, durationForMode.valueOf(WALK));
+    assertEquals(MAX_FLEXIBLE, durationForMode.valueOf(FLEXIBLE));
   }
 
   @Test
   public void testMaxDirectDurationForMode() {
-    Map<String, Object> arguments = Map.of("maxDirectDurationForMode", DURATIONS);
-
+    Map<String, Object> arguments = Map.of(
+      MAX_DIRECT_DURATION_FOR_MODE,
+      List.<Map<String, Object>>of(Map.of(FIELD_STREET_MODE, CAR, FIELD_DURATION, D10m))
+    );
     var routeRequest = TripRequestMapper.createRequest(executionContext(arguments));
-    assertNotNull(routeRequest);
-    var preferences = routeRequest.preferences();
-    assertNotNull(preferences);
-    var streetPreferences = preferences.street();
-    assertNotNull(streetPreferences);
-    var maxDirectDuration = streetPreferences.maxDirectDuration();
-    assertNotNull(maxDirectDuration);
+    var durationForMode = routeRequest.preferences().street().maxDirectDuration();
 
-    for (var entry : DURATIONS) {
-      var streetMode = (StreetMode) entry.get("streetMode");
-      var duration = (Duration) entry.get("duration");
-
-      assertEquals(maxDirectDuration.valueOf(streetMode), duration);
-    }
-  }
-
-  @Test
-  public void testMaxAccessEgressDurationValidation() {
-    var defaultValue = StreetPreferences.DEFAULT.maxAccessEgressDuration().valueOf(StreetMode.WALK);
-    var duration = List.of(
-      Map.of("streetMode", StreetMode.WALK, "duration", defaultValue.plusSeconds(1))
-    );
-
-    Map<String, Object> arguments = Map.of("maxAccessEgressDurationForMode", duration);
-
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> TripRequestMapper.createRequest(executionContext(arguments))
-    );
-  }
-
-  @Test
-  public void testMaxAccessEgressDurationForFlexWithTooLongDuration() {
-    Map<String, Object> arguments = Map.of(
-      "maxAccessEgressDurationForMode",
-      List.of(Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE.plusSeconds(1)))
-    );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> TripRequestMapper.createRequest(executionContext(arguments))
-    );
-  }
-
-  @Test
-  public void testMaxDirectDurationValidation() {
-    var defaultValue = StreetPreferences.DEFAULT.maxDirectDuration().valueOf(StreetMode.WALK);
-    var duration = List.of(
-      Map.of("streetMode", StreetMode.WALK, "duration", defaultValue.plusSeconds(1))
-    );
-
-    Map<String, Object> arguments = Map.of("maxDirectDurationForMode", duration);
-
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> TripRequestMapper.createRequest(executionContext(arguments))
-    );
-  }
-
-  @Test
-  public void testMaxDirectDurationForFlexWithTooLongDuration() {
-    Map<String, Object> arguments = Map.of(
-      "maxDirectDurationForMode",
-      List.of(Map.of("streetMode", StreetMode.FLEXIBLE, "duration", MAX_FLEXIBLE.plusSeconds(1)))
-    );
-    assertThrows(
-      IllegalArgumentException.class,
-      () -> TripRequestMapper.createRequest(executionContext(arguments))
-    );
+    assertEquals(D10m, durationForMode.valueOf(CAR));
+    assertEquals(MAX_DEFAULT, durationForMode.valueOf(WALK));
+    assertEquals(MAX_FLEXIBLE, durationForMode.valueOf(FLEXIBLE));
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {

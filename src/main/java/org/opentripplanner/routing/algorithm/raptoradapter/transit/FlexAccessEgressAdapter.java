@@ -58,6 +58,12 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
   }
 
   @Override
+  public boolean isWalkOnly() {
+    return false;
+  }
+
+
+  @Override
   public String toString() {
     return asString(true);
   }

@@ -513,6 +513,20 @@ ferries, where the check-in process needs to be done in good time before ride.
               .asInt(dftElevator.hopTime())
           );
       })
+      .withMinAccessEgressDuration(
+        // The default value should be ZERO, so it is not configurable
+        c
+          .of("minAccessEgressDurationForMode")
+          .since(V2_1)
+          .summary("Minimum limit for access/egress by street mode.")
+          .description(
+            """
+            Use this to prevent short access/egress legs with for example FLEX. Be careful,
+            do not set a minAccessEgressDuration for WALKING, this will lead to empty results.
+            """
+          )
+          .asEnumMap(StreetMode.class, Duration.class)
+      )
       .withMaxAccessEgressDuration(
         c
           .of("maxAccessEgressDuration")

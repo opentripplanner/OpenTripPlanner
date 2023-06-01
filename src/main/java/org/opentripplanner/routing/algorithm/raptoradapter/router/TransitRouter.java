@@ -18,6 +18,7 @@ import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressFilter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
@@ -193,7 +194,12 @@ public class TransitRouter {
 
     verifyAccessEgress(asyncAccessList, asyncEgressList);
 
-    return new AccessEgresses(asyncAccessList, asyncEgressList);
+    // Filter access/egress
+    var accessEgressFilter = new AccessEgressFilter(request);
+    var accessList = accessEgressFilter.filterAccess(asyncAccessList);
+    var egressList = accessEgressFilter.filterEgress(asyncEgressList);
+
+    return new AccessEgresses(accessList, egressList);
   }
 
   private Collection<DefaultAccessEgress> fetchAccess() {

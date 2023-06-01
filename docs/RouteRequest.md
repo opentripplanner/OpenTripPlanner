@@ -92,6 +92,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                  |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                             | *Optional* | `0.4`                    |  2.2  |
 | [maxAccessEgressDurationForMode](#rd_maxAccessEgressDurationForMode)                                 | `enum map of duration` | Limit access/egress per street mode.                                                                                                           | *Optional* |                          |  2.1  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                 | `enum map of duration` | Limit direct route duration per street mode.                                                                                                   | *Optional* |                          |  2.2  |
+| [minAccessEgressDurationForMode](#rd_minAccessEgressDurationForMode)                                 | `enum map of duration` | Minimum limit for access/egress by street mode.                                                                                                | *Optional* |                          |  2.1  |
 | [preferredVehicleParkingTags](#rd_preferredVehicleParkingTags)                                       |       `string[]`       | Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.                       | *Optional* |                          |  2.3  |
 | [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                         |       `string[]`       | Tags without which a vehicle parking will not be used. If empty, no tags are required.                                                         | *Optional* |                          |  2.1  |
 | [transferOptimization](#rd_transferOptimization)                                                     |        `object`        | Optimize where a transfer between to trip happens.                                                                                             | *Optional* |                          |  2.1  |
@@ -626,6 +627,18 @@ Limit direct route duration per street mode.
 
 Override the settings in `maxDirectStreetDuration` for specific street modes. This is
 done because some street modes searches are much more resource intensive than others.
+
+
+<h3 id="rd_minAccessEgressDurationForMode">minAccessEgressDurationForMode</h3>
+
+**Since version:** `2.1` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults   
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+
+Minimum limit for access/egress by street mode.
+
+Use this to prevent short access/egress legs with for example FLEX. Be careful,
+do not set a minAccessEgressDuration for WALKING, this will lead to empty results.
 
 
 <h3 id="rd_preferredVehicleParkingTags">preferredVehicleParkingTags</h3>

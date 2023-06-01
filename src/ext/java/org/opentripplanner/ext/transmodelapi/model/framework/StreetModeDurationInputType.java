@@ -24,8 +24,9 @@ import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 
 public class StreetModeDurationInputType {
 
-  private static final String FIELD_STREET_MODE = "streetMode";
-  private static final String FIELD_DURATION = "duration";
+  // Unfortunately public to allow unit-testing
+  public static final String FIELD_STREET_MODE = "streetMode";
+  public static final String FIELD_DURATION = "duration";
 
   public static GraphQLInputObjectType create(GqlUtil gqlUtil) {
     return GraphQLInputObjectType
@@ -85,21 +86,52 @@ public class StreetModeDurationInputType {
       .build();
   }
 
+  public static void mapDurationForStreetMode(
+    DurationForEnum.Builder<StreetMode> builder,
+    DataFetchingEnvironment environment,
+    String fieldName,
+    DurationForEnum<StreetMode> defaultValue
+  ) {
+    mapDurationForStreetMode(builder, environment, fieldName, defaultValue, false);
+  }
+
   public static void mapDurationForStreetModeAndAssertValueIsGreaterThenDefault(
     DurationForEnum.Builder<StreetMode> builder,
     DataFetchingEnvironment environment,
     String fieldName,
     DurationForEnum<StreetMode> defaultValue
   ) {
-    if (GqlUtil.hasArgument(environment, fieldName)) {
-      for (var entry : environment.<List<Map<String, ?>>>getArgument(fieldName)) {
-        StreetMode streetMode = (StreetMode) entry.get(FIELD_STREET_MODE);
-        var value = (Duration) entry.get(FIELD_DURATION);
-        var defaultValue1 = defaultValue.valueOf(streetMode);
+    mapDurationForStreetMode(builder, environment, fieldName, defaultValue, true);
+  }
 
-        assertDurationIsGreaterThanDefault(streetMode, value, defaultValue1);
-        builder.with(streetMode, value);
+  private static void mapDurationForStreetMode(
+    DurationForEnum.Builder<StreetMode> builder,
+    DataFetchingEnvironment environment,
+    String fieldName,
+    DurationForEnum<StreetMode> defaultValues,
+    boolean assertValueIsGreaterThenDefault
+  ) {
+    if (GqlUtil.hasArgument(environment, fieldName)) {
+      List<Map<String, ?>> modes = environment.getArgument(fieldName);
+      mapDurationForStreetMode(builder, defaultValues, modes, assertValueIsGreaterThenDefault);
+    }
+  }
+
+  static void mapDurationForStreetMode(
+    DurationForEnum.Builder<StreetMode> builder,
+    DurationForEnum<StreetMode> defaultValues,
+    List<Map<String, ?>> modes,
+    boolean assertValueIsGreaterThenDefault
+  ) {
+    for (var entry : modes) {
+      StreetMode streetMode = (StreetMode) entry.get(FIELD_STREET_MODE);
+      var value = (Duration) entry.get(FIELD_DURATION);
+      var defaultValue = defaultValues.valueOf(streetMode);
+
+      if (assertValueIsGreaterThenDefault) {
+        assertDurationIsGreaterThanDefault(streetMode, value, defaultValue);
       }
+      builder.with(streetMode, value);
     }
   }
 
@@ -108,9 +140,9 @@ public class StreetModeDurationInputType {
     Duration value,
     Duration defaultValue
   ) {
-    if (defaultValue.minus(value).isNegative()) {
+    if (value.toSeconds() > defaultValue.toSeconds()) {
       throw new IllegalArgumentException(
-        "Invalid duration for mode %s. The value %s is not greater than the default %s.".formatted(
+        "Invalid duration for mode %s. The value %s is greater than the default %s.".formatted(
             key,
             DurationUtils.durationToStr(value),
             DurationUtils.durationToStr(defaultValue)

@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 public class TripQuery {
 
+  public static final String MIN_ACCESS_EGRESS_DURATION_FOR_MODE = "minAccessEgressDurationForMode";
   public static final String MAX_ACCESS_EGRESS_DURATION_FOR_MODE = "maxAccessEgressDurationForMode";
   public static final String MAX_DIRECT_DURATION_FOR_MODE = "maxDirectDurationForMode";
 
@@ -508,6 +509,20 @@ public class TripQuery {
             "FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
           )
           .type(ItineraryFiltersInputType.create(gqlUtil, preferences.itineraryFilter()))
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name(MIN_ACCESS_EGRESS_DURATION_FOR_MODE)
+          .description(
+            "The minimum duration for access/egress for street searches per respective mode. " +
+            "Avoid setting a min duration for mode foot, this may lead to an empty result."
+          )
+          .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
+          .defaultValueLiteral(
+            mapDurationForStreetModeGraphQLValue(preferences.street().minAccessEgressDuration())
+          )
           .build()
       )
       .argument(

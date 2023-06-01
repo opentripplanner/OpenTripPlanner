@@ -112,12 +112,21 @@ class StateTest {
   void walkingOnly() {
     // Walk only
     assertTrue(ofWalking().streetEdge().build().containsModeWalkOnly(), "One edge");
-    assertTrue(ofWalking().streetEdge().streetEdge().build().containsModeWalkOnly(), "Several edges");
+    assertTrue(
+      ofWalking().streetEdge().streetEdge().build().containsModeWalkOnly(),
+      "Several edges"
+    );
 
     // Car only
     assertFalse(ofDriving().streetEdge().build().containsModeWalkOnly(), "One edge");
-    assertFalse(ofDriving().streetEdge().streetEdge().build().containsModeWalkOnly(), "Several edges");
+    assertFalse(
+      ofDriving().streetEdge().streetEdge().build().containsModeWalkOnly(),
+      "Several edges"
+    );
 
-    assertFalse(ofCarRental().streetEdge().pickUpCar().build().containsModeWalkOnly(), "Walk + CAR");
+    assertFalse(
+      ofCarRental().streetEdge().pickUpCar().build().containsModeWalkOnly(),
+      "Walk + CAR"
+    );
   }
 }

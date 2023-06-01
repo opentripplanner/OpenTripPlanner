@@ -785,6 +785,8 @@ type QueryType {
     maximumAdditionalTransfers: Int = 5,
     "Maximum number of transfers. Note! The best way to reduce the number of transfers is to set the `transferPenalty` parameter."
     maximumTransfers: Int = 12,
+    "The minimum duration for access/egress for street searches per respective mode. Avoid setting a min duration for mode foot, this may lead to an empty result."
+    minAccessEgressDurationForMode: [StreetModeDurationInput!] = [],
     "The set of access/egress/direct/transit modes to be used for this search. Note that this only works at the Line level. If individual ServiceJourneys have modes that differ from the Line mode, this will NOT be accounted for."
     modes: Modes,
     "The maximum number of trip patterns to return. Note! This reduce the number of trip patterns AFTER the OTP travel search is done in a post-filtering process. There is little/no performance gain in reducing the number of trip patterns returned. See also the trip meta-data on how to implement paging."
