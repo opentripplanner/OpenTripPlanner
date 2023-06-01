@@ -260,7 +260,7 @@ public class OsmModule implements GraphBuilderModule {
         issueStore
       );
       if (
-        !OsmFilter.isWayRoutable(way) || permissions.allowsNothing() || way.hasTag("conveying")
+        !OsmFilter.isWayRoutable(way) || permissions.allowsNothing() || way.isEscalator()
       ) continue;
 
       // handle duplicate nodes in OSM ways

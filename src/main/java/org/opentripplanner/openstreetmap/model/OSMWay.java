@@ -2,6 +2,7 @@ package org.opentripplanner.openstreetmap.model;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
+import java.util.Set;
 
 public class OSMWay extends OSMWithTags {
 
@@ -127,8 +128,19 @@ public class OSMWay extends OSMWithTags {
   }
 
   public boolean isEscalator() {
-    return "steps".equals(getTag("highway")) && "yes".equals(getTag("conveying"));
+    return "steps".equals(this.getTag("highway")) &&
+      this.getTag("conveying") != null &&
+      Set.of("yes", "forward", "backward", "reversible").contains(this.getTag("conveying"));
   }
+
+  public boolean isForwardEscalator() {
+    return isEscalator() && "forward".equals(this.getTag("conveying"));
+  }
+
+  public boolean isBackwardEscalator() {
+    return isEscalator() && "backward".equals(this.getTag("conveying"));
+  }
+
 
   @Override
   public String getOpenStreetMapLink() {

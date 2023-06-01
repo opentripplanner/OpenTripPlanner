@@ -36,7 +36,7 @@ class EscalatorProcessor {
   private static final Logger LOG = LoggerFactory.getLogger(ElevatorProcessor.class);
 
   public void buildEscalatorEdges() {
-    var escalators = osmdb.getWays().stream().filter(this::isEscalatorWay).iterator();
+    var escalators = osmdb.getWays().stream().filter(OSMWay::isEscalator).iterator();
     ArrayList<EscalatorEdge> edges = new ArrayList<>();
     while (escalators.hasNext()) {
       OSMWay escalatorWay = escalators.next();
@@ -44,28 +44,40 @@ class EscalatorProcessor {
       List<Long> nodes = Arrays
         .stream(escalatorWay.getNodeRefs().toArray())
         .filter(nodeRef ->
-          intersectionNodes.containsKey(nodeRef) && intersectionNodes.get(nodeRef) != null //&& nodeRef > 0
+          intersectionNodes.containsKey(nodeRef) && intersectionNodes.get(nodeRef) != null
         )
         .boxed()
         .toList();
 
       for (int i = 0; i < nodes.size() - 1; i++) {
+        if(escalatorWay.isForwardEscalator()) {
         edges.add(
           new EscalatorEdge(
             intersectionNodes.get(nodes.get(i)),
             intersectionNodes.get(nodes.get(i + 1))
           )
-        );
+        );}
+        else if(escalatorWay.isBackwardEscalator()) {
+          edges.add(new EscalatorEdge(
+            intersectionNodes.get(nodes.get(i + 1)),
+            intersectionNodes.get(nodes.get(i))
+          )
+          );
+        }else {
+          edges.add(
+            new EscalatorEdge(
+              intersectionNodes.get(nodes.get(i)),
+              intersectionNodes.get(nodes.get(i + 1))
+            )
+          );
+          edges.add(new EscalatorEdge(
+              intersectionNodes.get(nodes.get(i + 1)),
+              intersectionNodes.get(nodes.get(i))
+            )
+          );
+        }
       }
     }
-    System.out.println("Number of escalators: " + edges.size());
   }
 
-  private boolean isEscalatorWay(OSMWay osmWay) {
-    return (
-      "steps".equals(osmWay.getTag("highway")) &&
-      osmWay.getTag("conveying") != null &&
-      Set.of("yes", "forward", "backward", "reversible").contains(osmWay.getTag("conveying"))
-    );
-  }
 }
