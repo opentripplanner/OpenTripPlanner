@@ -29,14 +29,13 @@ public class FrameworkArchitectureTest {
   private static final Package LANG = FRAMEWORK.subPackage("lang");
   private static final Package LOGGING = FRAMEWORK.subPackage("logging");
   private static final Package RESOURCES = FRAMEWORK.subPackage("resources");
-  private static final Package STATISTICS = FRAMEWORK.subPackage("statistics");
   private static final Package TEXT = FRAMEWORK.subPackage("text");
   private static final Package TIME = FRAMEWORK.subPackage("time");
   private static final Package TO_STRING = FRAMEWORK.subPackage("tostring");
 
   @Test
   void enforceApplicationPackageDependencies() {
-    APPLICATION.verify();
+    APPLICATION.dependsOn(LANG).verify();
   }
 
   @Test

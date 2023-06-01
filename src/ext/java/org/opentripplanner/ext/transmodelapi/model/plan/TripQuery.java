@@ -15,12 +15,14 @@ import org.opentripplanner.ext.transmodelapi.model.DefaultRouteRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
-import org.opentripplanner.ext.transmodelapi.model.framework.StreetModeDurationInputType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 public class TripQuery {
+
+  public static final String MAX_ACCESS_EGRESS_DURATION_FOR_MODE = "maxAccessEgressDurationForMode";
+  public static final String MAX_DIRECT_DURATION_FOR_MODE = "maxDirectDurationForMode";
 
   public static GraphQLFieldDefinition create(
     DefaultRouteRequestType routing,
@@ -511,7 +513,7 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
-          .name("maxAccessEgressDurationForMode")
+          .name(MAX_ACCESS_EGRESS_DURATION_FOR_MODE)
           .description(
             "Maximum duration for access/egress for street searches per respective mode. " +
             "Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search. "
@@ -525,7 +527,7 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
-          .name("maxDirectDurationForMode")
+          .name(MAX_DIRECT_DURATION_FOR_MODE)
           .description(
             "Maximum duration for direct street searchers per respective mode. " +
             "Cannot be higher than default value. This is a performance optimisation parameter, avoid using it to limit the search."

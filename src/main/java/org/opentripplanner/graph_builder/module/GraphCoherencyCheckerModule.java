@@ -40,16 +40,8 @@ public class GraphCoherencyCheckerModule implements GraphBuilderModule {
           issueStore.add("InvalidEdge", "outgoing edge of %s: from vertex %s does not match", v, e);
           coherent = false;
         }
-        if (e.getToVertex() == null) {
-          issueStore.add("InvalidEdge", "outgoing edge has no to vertex %s", e);
-          coherent = false;
-        }
       }
       for (Edge e : v.getIncoming()) {
-        if (e.getFromVertex() == null) {
-          issueStore.add("InvalidEdge", "incoming edge has no from vertex %s", e);
-          coherent = false;
-        }
         if (e.getToVertex() != v) {
           issueStore.add("InvalidEdge", "incoming edge of %s: to vertex %s does not match", v, e);
           coherent = false;

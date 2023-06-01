@@ -5,9 +5,11 @@ package org.opentripplanner.framework.application;
  */
 public class OTPRequestTimeoutException extends RuntimeException {
 
+  public static final String MESSAGE = "TIMEOUT! The request is too resource intensive.";
+
   @Override
   public String getMessage() {
-    return "TIMEOUT! The request is too resource intensive.";
+    return MESSAGE;
   }
 
   /**

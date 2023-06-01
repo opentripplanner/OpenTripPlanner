@@ -96,6 +96,9 @@ jobs:
         if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
+          # fetch a large-ish number of commits so that we can check when the GraphQL schema file
+          # was modified last
+          fetch-depth: 1000
 
       - uses: actions/checkout@v3.3.0
         # for a simple PR where we don't push, we don't need any credentials
@@ -148,10 +151,12 @@ jobs:
           # schema hasn't changed.
           # example commit: https://github.com/opentripplanner/docs/commit/45e6ddf8e4a4
           
-          SCHEMA_FILE_MODIFIED=`stat -c "%Y" src/ext/resources/legacygraphqlapi/schema.graphqls` 
+          SCHEMA_FILE_MODIFIED=`git log -n 1 --pretty=format:%at src/ext/resources/legacygraphqlapi/schema.graphqls` 
+          echo "schema modified at ${SCHEMA_FILE_MODIFIED}"
           git checkout $LOCAL_BRANCH
-          DOCS_MODIFIED=`stat -c "%Y" api/dev-2.x/graphql-gtfs/introduction.html` 
-          if [ ${SCHEMA_FILE_MODIFIED} -gt ${DOCS_MODIFIED} ]; then
+          DOCS_MODIFIED=`git log -n 1 --pretty=format:%at api/dev-2.x/graphql-gtfs/introduction.html` 
+          echo "docs modified at ${DOCS_MODIFIED}"
+          if [ "${SCHEMA_FILE_MODIFIED}" -gt "${DOCS_MODIFIED}" ]; then
             echo "schema.graphqls has been modified, committing updated documentation"
             mkdir -p api
             rsync -r --delete target/magidoc/api/ api/dev-2.x/
