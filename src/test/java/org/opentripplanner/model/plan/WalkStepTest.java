@@ -1,7 +1,11 @@
 package org.opentripplanner.model.plan;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.plan.AbsoluteDirection.EAST;
+import static org.opentripplanner.model.plan.AbsoluteDirection.NORTH;
+import static org.opentripplanner.model.plan.AbsoluteDirection.SOUTHWEST;
 
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -24,21 +28,21 @@ public class WalkStepTest {
 
     step.setDirections(angle1, angle2, false);
     assertEquals(RelativeDirection.RIGHT, step.getRelativeDirection());
-    assertEquals(AbsoluteDirection.EAST, step.getAbsoluteDirection());
+    assertEquals(Optional.of(EAST), step.getAbsoluteDirection());
 
     angle1 = degreesToRadians(0);
     angle2 = degreesToRadians(5);
 
     step.setDirections(angle1, angle2, false);
     assertEquals(RelativeDirection.CONTINUE, step.getRelativeDirection());
-    assertEquals(AbsoluteDirection.NORTH, step.getAbsoluteDirection());
+    assertEquals(Optional.of(NORTH), step.getAbsoluteDirection());
 
     angle1 = degreesToRadians(0);
     angle2 = degreesToRadians(240);
 
     step.setDirections(angle1, angle2, false);
     assertEquals(RelativeDirection.HARD_LEFT, step.getRelativeDirection());
-    assertEquals(AbsoluteDirection.SOUTHWEST, step.getAbsoluteDirection());
+    assertEquals(Optional.of(SOUTHWEST), step.getAbsoluteDirection());
   }
 
   private double degreesToRadians(double deg) {

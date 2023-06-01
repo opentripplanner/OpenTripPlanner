@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -149,13 +150,12 @@ public class WalkStep {
 
   /**
    * The absolute direction of this step.
+   * <p>
+   * There are steps, like riding on an elevator, that don't have an absolute direction and therefore
+   * the value is optional.
    */
-  public AbsoluteDirection getAbsoluteDirection() {
-    return absoluteDirection;
-  }
-
-  public void setAbsoluteDirection(AbsoluteDirection absoluteDirection) {
-    this.absoluteDirection = absoluteDirection;
+  public Optional<AbsoluteDirection> getAbsoluteDirection() {
+    return Optional.ofNullable(absoluteDirection);
   }
 
   /**
