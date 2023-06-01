@@ -29,6 +29,20 @@ class DurationForEnumTest {
   @Test
   void testToString() {
     assertEquals("DurationForStreetMode{default:7s, WALK:3s}", subject.toString());
+
+    // Assert modes are in order of the enum ordinal
+    assertEquals(
+      "DurationForStreetMode{default:7s, BIKE:3s, SCOOTER_RENTAL:1s, CAR:4s, FLEXIBLE:2s}",
+      DurationForEnum
+        .of(StreetMode.class)
+        .withDefault(DEFAULT)
+        .withValues(Map.of(StreetMode.SCOOTER_RENTAL, Duration.ofSeconds(1)))
+        .withValues(Map.of(StreetMode.CAR, Duration.ofSeconds(4)))
+        .withValues(Map.of(StreetMode.FLEXIBLE, Duration.ofSeconds(2)))
+        .withValues(Map.of(StreetMode.BIKE, Duration.ofSeconds(3)))
+        .build()
+        .toString()
+    );
   }
 
   @Test
