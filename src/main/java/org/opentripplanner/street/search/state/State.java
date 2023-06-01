@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
@@ -434,6 +435,17 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       }
     }
     return false;
+  }
+
+  /**
+   * Check all edges is traversed on foot {@code mode=WALK}.
+   * <p>
+   * DO NOT USE THIS IN ROUTING IT WILL NOT PERFORM WELL!
+   */
+  public boolean containsModeWalkOnly() {
+    return Stream
+      .iterate(this, it -> it.backEdge != null, it -> it.backState)
+      .allMatch(it -> it.stateData.currentMode.isWalking());
   }
 
   protected State clone() {

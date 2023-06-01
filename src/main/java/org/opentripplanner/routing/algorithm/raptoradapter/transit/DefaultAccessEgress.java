@@ -60,4 +60,8 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
   public String toString() {
     return asString(true) + (lastState != null ? " (" + lastState + ")" : "");
   }
+
+  public boolean isWalkOnly() {
+    return lastState.containsModeWalkOnly();
+  }
 }
