@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -1086,6 +1087,24 @@ public class OsmDatabase {
     }
   }
 
+  private int getLevel(OSMWithTags o) {
+    if (o.hasTag("level")) {
+      try {
+        return Integer.parseInt(o.getTag("level"));
+      } catch (NumberFormatException ex) {
+        return 0;
+      }
+    } else if (o.hasTag("layer")) {
+      try {
+        return Integer.parseInt(o.getTag("layer"));
+      } catch (NumberFormatException ex) {
+        return 0;
+      }
+    }
+    // default
+    return 0;
+  }
+
   /**
    * Process an OSM public transport stop area relation.
    * <p>
@@ -1100,6 +1119,7 @@ public class OsmDatabase {
   private void processPublicTransportStopArea(OSMRelation relation) {
     OSMWithTags platformArea = null;
     Set<OSMNode> platformsNodes = new HashSet<>();
+    int level = 0;
     for (OSMRelationMember member : relation.getMembers()) {
       if (
         "way".equals(member.getType()) &&
@@ -1108,6 +1128,10 @@ public class OsmDatabase {
       ) {
         if (platformArea == null) {
           platformArea = areaWaysById.get(member.getRef());
+          // take level from first area
+          if (level == 0) {
+            level = getLevel(platformArea);
+          }
         } else {
           issueStore.add(new TooManyAreasInRelation(relation));
         }
@@ -1118,6 +1142,9 @@ public class OsmDatabase {
       ) {
         if (platformArea == null) {
           platformArea = relationsById.get(member.getRef());
+          if (level == 0) {
+            level = getLevel(platformArea);
+          }
         } else {
           issueStore.add(new TooManyAreasInRelation(relation));
         }
@@ -1125,8 +1152,13 @@ public class OsmDatabase {
         platformsNodes.add(nodesById.get(member.getRef()));
       }
     }
-    if (platformArea != null && !platformsNodes.isEmpty()) {
-      stopsInAreas.put(platformArea, platformsNodes);
+    final int filterLevel = level;
+    Set<OSMNode> sameLevelNodes = platformsNodes
+      .stream()
+      .filter(node -> getLevel(node) == filterLevel)
+      .collect(Collectors.toSet());
+    if (platformArea != null && !sameLevelNodes.isEmpty()) {
+      stopsInAreas.put(platformArea, sameLevelNodes);
     } else {
       issueStore.add(new PublicTransportRelationSkipped(relation));
     }
