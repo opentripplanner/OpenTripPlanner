@@ -32,6 +32,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Log http request headers - like  [#5131](https://github.com/opentripplanner/OpenTripPlanner/pull/5131)
 - Fix vertex removal race condition [#5141](https://github.com/opentripplanner/OpenTripPlanner/pull/5141)
 - Comment out replacing DSJ-ID from planned data with ID from realtime-data [#5140](https://github.com/opentripplanner/OpenTripPlanner/pull/5140)
+- Remove San Francisco and vehicle rental fare calculators [#5145](https://github.com/opentripplanner/OpenTripPlanner/pull/5145)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
