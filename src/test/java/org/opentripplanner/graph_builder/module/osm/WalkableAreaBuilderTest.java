@@ -102,6 +102,21 @@ public class WalkableAreaBuilderTest {
     assertFalse(areas.get(0).getAreas().isEmpty());
   }
 
+  // test that entrance node in a stop area relation does not link across different levels and layers
+  @Test
+  @OsmFile("keilaniemi_entrance_above_the_platform.osm.pbf")
+  @Visibility(true)
+  public void test_entrance_stoparea_linking() {
+    var entranceAreaConnections = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().equals("osm:node:4107557023"))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(0, entranceAreaConnections.size());
+  }
+
   // -- Infrastructure --
 
   @Retention(RUNTIME)
