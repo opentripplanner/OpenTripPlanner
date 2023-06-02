@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - otp2_prepare_raptor_c2
 
 jobs:
   perf-test:
