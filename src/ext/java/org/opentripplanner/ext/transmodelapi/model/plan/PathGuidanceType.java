@@ -126,7 +126,9 @@ public class PathGuidanceType {
           .description("The step's elevation profile.")
           .type(new GraphQLNonNull(new GraphQLList(elevationStepType)))
           .dataFetcher(environment ->
-            ((WalkStep) environment.getSource()).getElevationProfile().stepsWithoutUnknowns()
+            ElevationProfileStepType.mapElevationProfile(
+              ((WalkStep) environment.getSource()).getElevationProfile()
+            )
           )
           .build()
       )

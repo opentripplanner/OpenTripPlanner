@@ -187,9 +187,13 @@ type DestinationDisplay {
 
 "Individual step of an elevation profile."
 type ElevationProfileStep {
-  "The distance from the start of the step, in meters."
+  "The horizontal distance from the start of the step, in meters."
   distance: Float
-  "The elevation at this distance, in meters."
+  """
+  The elevation at this distance, in meters.
+  
+  If the value can also be less than zero if the location is below sea level.
+  """
   elevation: Float
 }
 

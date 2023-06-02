@@ -5,6 +5,8 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLTypeReference;
+import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.model.plan.ElevationProfile;
 
 public class ElevationProfileStepType {
@@ -21,7 +23,7 @@ public class ElevationProfileStepType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("distance")
-          .description("The distance from the start of the step, in meters.")
+          .description("The horizontal distance from the start of the step, in meters.")
           .type(Scalars.GraphQLFloat)
           .dataFetcher(env -> step(env).x())
           .build()
@@ -30,7 +32,11 @@ public class ElevationProfileStepType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("elevation")
-          .description("The elevation at this distance, in meters.")
+          .description("""
+          The elevation at this distance, in meters.
+          
+          If the value can also be less than zero if the location is below sea level.
+          """.stripIndent())
           .type(Scalars.GraphQLFloat)
           .dataFetcher(env -> step(env).y())
           .build()
@@ -40,5 +46,9 @@ public class ElevationProfileStepType {
 
   private static ElevationProfile.Step step(DataFetchingEnvironment environment) {
     return environment.getSource();
+  }
+
+  protected static List<ElevationProfile.Step> mapElevationProfile(ElevationProfile profile) {
+    return Objects.requireNonNullElse(profile, ElevationProfile.empty()).stepsWithoutUnknowns();
   }
 }

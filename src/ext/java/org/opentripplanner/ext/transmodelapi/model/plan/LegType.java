@@ -24,7 +24,6 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
-import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -452,9 +451,7 @@ public class LegType {
           .name("elevationProfile")
           .type(new GraphQLNonNull(new GraphQLList(elevationStepType)))
           .dataFetcher(env ->
-            Objects
-              .requireNonNullElse(leg(env).getElevationProfile(), ElevationProfile.empty())
-              .stepsWithoutUnknowns()
+            ElevationProfileStepType.mapElevationProfile(leg(env).getElevationProfile())
           )
           .build()
       )
