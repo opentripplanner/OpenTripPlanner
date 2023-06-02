@@ -1,12 +1,14 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.function.BiFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
+import org.opentripplanner.raptor.api.request.RaptorTransitViaRequest;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
@@ -81,26 +83,14 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     PatternRideFactory<T, R> factory,
     ParetoComparator<R> patternRideComparator
   ) {
-
-    // TODO: 2023-05-19 via pass through: this temporary solution for adding "via" stops
-    //  we should use context.multiCriteria().transitViaRequest()
-    //  and we should not inject stop indexes like that
-    var STOP_NAME = "Helsingborg C";
-
-    for (int i = 0; i < 16734; i++) {
-      if (STOP_NAME.equals(context.stopNameResolver().apply(i).split("\\(")[0])) {
-//        System.out.println("adding index: " + i);
-        MultiCriteriaRoutingStrategy.indexes.add(i);
-      }
-    }
-
     return new MultiCriteriaRoutingStrategy<>(
       state,
       context.createTimeBasedBoardingSupport(),
       factory,
       context.costCalculator(),
       context.slackProvider(),
-      createPatternRideParetoSet(patternRideComparator)
+      createPatternRideParetoSet(patternRideComparator),
+      context.multiCriteria().transitViaRequest().map(RaptorTransitViaRequest::viaPoints).orElse(new HashSet<>())
     );
   }
 

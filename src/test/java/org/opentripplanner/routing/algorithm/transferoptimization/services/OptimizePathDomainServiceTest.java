@@ -79,8 +79,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     var subject = subject(transfers, null);
 
+    // TODO: 2023-06-02 via pass through: fix this test
     // When
-    var result = subject.findBestTransitPath(original);
+    var result = subject.findBestTransitPath(original, List.of());
 
     // Then expect a set containing the original path
     assertEquals(
@@ -124,8 +125,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     var subject = subject(transfers, TRANS_WAIT_TIME_CALC);
 
+    // TODO: 2023-06-02 via pass through: fix this test
     // When
-    var result = subject.findBestTransitPath(original);
+    var result = subject.findBestTransitPath(original, List.of());
 
     // Insert wait-time cost summary info
     var expected = original
@@ -189,8 +191,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     // transfer between Trip 2 and 3 is at stop F.
     var subject = subject(transfers, null);
 
+    // TODO: 2023-06-02 via pass through: fix this test
     // Find the path with the lowest cost
-    var result = subject.findBestTransitPath(original);
+    var result = subject.findBestTransitPath(original, List.of());
 
     assertEquals(
       "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ BUS T3 10:37 10:49 ~ G " +
@@ -204,8 +207,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     // transfer between Trip 2 and 3 is at stop F (same as case 1).
     subject = subject(transfers, TRANS_WAIT_TIME_CALC);
 
+    // TODO: 2023-06-02 via pass through: fix this test
     // Find the path with the lowest cost
-    result = subject.findBestTransitPath(original);
+    result = subject.findBestTransitPath(original, List.of());
 
     assertEquals(
       "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C " +
@@ -256,8 +260,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     var subject = subject(transfers, null);
 
+    // TODO: 2023-06-02 via pass through: fix this test
     // Find the path with the lowest cost
-    var result = subject.findBestTransitPath(original);
+    var result = subject.findBestTransitPath(original, List.of());
 
     assertEquals(1, result.size(), result.toString());
 

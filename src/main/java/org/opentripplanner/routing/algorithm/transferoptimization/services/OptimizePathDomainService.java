@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -11,11 +12,13 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.path.PathBuilderLeg;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedTransferCostAndC2FilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
@@ -100,7 +103,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     this.stopNameTranslator = stopNameTranslator;
   }
 
-  public Set<OptimizedPath<T>> findBestTransitPath(RaptorPath<T> originalPath) {
+  public Set<OptimizedPath<T>> findBestTransitPath(RaptorPath<T> originalPath, List<Set<Integer>> viaIndexes) {
     List<TransitPathLeg<T>> transitLegs = originalPath.transitLegs().collect(Collectors.toList());
 
     // Find all possible transfers between each pair of transit legs, and sort on arrival time
@@ -109,7 +112,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     );
 
     // Combine transit legs and transfers
-    var tails = findBestTransferOption(originalPath, transitLegs, possibleTransfers);
+    var tails = findBestTransferOption(originalPath, transitLegs, possibleTransfers, viaIndexes);
 
     return tails.stream().map(OptimizedPathTail::build).collect(Collectors.toSet());
   }
@@ -121,8 +124,15 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   private Set<OptimizedPathTail<T>> findBestTransferOption(
     RaptorPath<T> originalPath,
     List<TransitPathLeg<T>> originalTransitLegs,
-    List<List<TripToTripTransfer<T>>> possibleTransfers
+    List<List<TripToTripTransfer<T>>> possibleTransfers,
+    List<Set<Integer>> viaIndexes
   ) {
+
+    var c2FilterChain = new OptimizedTransferCostAndC2FilterChain<>(
+      minCostFilterChain,
+      tail -> this.calculateC2(tail, possibleTransfers, viaIndexes)
+    );
+
     final int iterationDepartureTime = originalPath.rangeRaptorIterationDepartureTime();
     // Create a set of tails with the last transit leg in it (one element)
     Set<OptimizedPathTail<T>> tails = Set.of(
@@ -158,7 +168,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
       // create a tailSelector for the tails produced in the last round and use it to filter them
       // based on the transfer-arrival-time and given filter
-      var tailSelector = new TransitPathLegSelector<>(minCostFilterChain, tails);
+      var tailSelector = new TransitPathLegSelector<>(c2FilterChain, tails);
 
       // Reset the result set to an empty set
       tails = new HashSet<>();
@@ -183,13 +193,111 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
     // Filter tails one final time
     tails =
-      new TransitPathLegSelector<>(minCostFilterChain, tails)
+      new TransitPathLegSelector<>(c2FilterChain, tails)
         .next(originalPath.accessLeg().toTime());
 
     // Insert the access leg and the following transfer
     insertAccess(originalPath, tails);
 
-    return tails;
+    Set<OptimizedPathTail<T>> result = new HashSet<>();
+
+    // Here we are filtering out all tails which are missing via points
+    for (var tail : tails) {
+      var c2 = calculateC2(tail, possibleTransfers, viaIndexes);
+
+      if (c2 == 0) {
+        result.add(tail);
+      }
+    }
+
+    return result;
+  }
+
+  public int calculateC2(OptimizedPathTail<T> tail,
+                         List<List<TripToTripTransfer<T>>> possibleTransfers,
+                         List<Set<Integer>> via) {
+
+    var legs = new ArrayList<>(tail.legsAsStream().toList());
+
+    var transits = legs.stream().filter(PathBuilderLeg::isTransit).toList();
+
+    int c2;
+    if (transits.size() == 1) {
+      // That's the first journey we are checking. There can't be any via stops yet.
+      // This should be via.size
+      c2 = via.size();
+    } else {
+      // Check c2 value on board position from previous transit leg.
+      var previousTransit = transits.get(1);
+      c2 = previousTransit.c2PerStopPosition()[previousTransit.fromStopPos()];
+    }
+
+    var transitLeg = transits.get(0);
+    // This should be the earliest possible board stop position for a leg
+    //  We can verify that with transfers.
+    // Or if previous leg is access then we know what position it is
+    int fromStopPosition;
+    if (possibleTransfers.size() + 1 == transits.size()) {
+      fromStopPosition = transitLeg.fromStopPos();
+    } else {
+      fromStopPosition = possibleTransfers.get(possibleTransfers.size() - transits.size()).stream()
+        .map(t -> t.to().stopPosition())
+        .reduce((first, second) -> first < second ? first: second)
+        .get();
+    }
+
+    for (int pos = transitLeg.toStopPos(); pos >= fromStopPosition; pos--) {
+      // We already visited all via stops
+      if (c2 == 0) {
+        transitLeg.c2PerStopPosition()[pos] = c2;
+        continue;
+      }
+      var indexes = via.get(c2 - 1);
+
+      var pattern = transitLeg.trip().pattern();
+      if (indexes.contains(pattern.stopIndex(pos))) {
+        c2--;
+      }
+
+      transitLeg.c2PerStopPosition()[pos] = c2;
+    }
+
+    // TODO: 2023-06-02 via pass through: this is debug output to check whether everything works fine
+//    var path = new ArrayList<String>();
+//
+//    new ArrayList<>(tail.legsAsStream().toList()).forEach(leg -> {
+//      if (leg.isEgress()) {
+//        path.add("Egress");
+//      } else if (leg.isAccess()) {
+//        path.add("Access");
+//      } else if (leg.isTransfer()) {
+//        path.add("Transfer");
+//      } else {
+//        path.add("Transit");
+//      }
+//    });
+//
+//    if (path.get(0).equals("Access")) {
+//      System.out.println("=======================================");
+//      System.out.println(String.join(" - ", path));
+//
+//      for (int pos = fromStopPosition; pos <= transitLeg.toStopPos(); pos++) {
+//        var pattern = transitLeg.trip().pattern();
+//        System.out.println(stopNameTranslator.apply(pattern.stopIndex(pos)) + " - " + transitLeg.getC2PerStopPosition()[pos]);
+//      }
+//
+//      System.out.println("-");
+//      for (int i = 1; i < transits.size(); i++) {
+//        var transit = transits.get(i);
+//        for (int pos = transit.fromStopPos(); pos <= transit.toStopPos(); pos++) {
+//          var pattern = transit.trip().pattern();
+//          System.out.println(stopNameTranslator.apply(pattern.stopIndex(pos)) + " - " + transit.getC2PerStopPosition()[pos]);
+//        }
+//        System.out.println("-");
+//      }
+//    }
+
+    return transitLeg.c2PerStopPosition()[fromStopPosition];
   }
 
   /**

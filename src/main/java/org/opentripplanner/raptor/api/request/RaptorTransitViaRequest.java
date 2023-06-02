@@ -5,7 +5,7 @@ import org.opentripplanner.raptor.api.model.DominanceFunction;
 
 public class RaptorTransitViaRequest implements C2Request {
 
-  HashSet<Integer> viaPoints = null;
+  HashSet<Integer> viaPoints = new HashSet<>();
 
   // TODO: 2023-05-19 we haven't decided yet how this should look
   //  Probably not a HashSet<Integer>

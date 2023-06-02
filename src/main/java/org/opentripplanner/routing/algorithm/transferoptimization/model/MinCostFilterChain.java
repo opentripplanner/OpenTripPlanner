@@ -17,7 +17,7 @@ import java.util.function.ToIntFunction;
  *
  * @param <T> The element type of the cost-functions and the filtered list
  */
-public class MinCostFilterChain<T> {
+public class MinCostFilterChain<T> implements OptimizeTransferFilterChain<T> {
 
   private final List<ToIntFunction<T>> costFunctions;
 
@@ -25,6 +25,7 @@ public class MinCostFilterChain<T> {
     this.costFunctions = costFunctions;
   }
 
+  @Override
   public Set<T> filter(Set<T> elements) {
     for (ToIntFunction<T> costFunction : costFunctions) {
       elements = filter(elements, costFunction);

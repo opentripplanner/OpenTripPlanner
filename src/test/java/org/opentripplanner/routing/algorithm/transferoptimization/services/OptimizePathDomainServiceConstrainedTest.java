@@ -151,8 +151,9 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
 
     var subject = OptimizePathDomainServiceTest.subject(transfers, null);
 
+    // TODO: 2023-06-02 via pass through: fix this test
     // Find the path with the lowest cost
-    var result = subject.findBestTransitPath(original);
+    var result = subject.findBestTransitPath(original, List.of());
 
     assertEquals(expItinerary, PathUtils.pathsToString(result));
 

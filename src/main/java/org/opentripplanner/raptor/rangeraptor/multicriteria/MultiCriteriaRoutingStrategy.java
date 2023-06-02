@@ -4,6 +4,7 @@ import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
@@ -36,6 +37,7 @@ public final class MultiCriteriaRoutingStrategy<
   private final ParetoSet<R> patternRides;
   private final RaptorCostCalculator<T> generalizedCostCalculator;
   private final SlackProvider slackProvider;
+  public Set<Integer> indexes = new HashSet<>();
 
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
@@ -43,7 +45,8 @@ public final class MultiCriteriaRoutingStrategy<
     PatternRideFactory<T, R> patternRideFactory,
     RaptorCostCalculator<T> generalizedCostCalculator,
     SlackProvider slackProvider,
-    ParetoSet<R> patternRides
+    ParetoSet<R> patternRides,
+    Set<Integer> indexes
   ) {
     this.state = state;
     this.boardingSupport = boardingSupport;
@@ -51,6 +54,7 @@ public final class MultiCriteriaRoutingStrategy<
     this.generalizedCostCalculator = generalizedCostCalculator;
     this.slackProvider = slackProvider;
     this.patternRides = patternRides;
+    this.indexes = indexes;
   }
 
   @Override
@@ -64,9 +68,6 @@ public final class MultiCriteriaRoutingStrategy<
     patternRideFactory.prepareForTransitWith(route.pattern());
     this.patternRides.clear();
   }
-
-  // Helsingborg C
-  public static HashSet<Integer> indexes = new HashSet<>();
 
   @Override
   public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {

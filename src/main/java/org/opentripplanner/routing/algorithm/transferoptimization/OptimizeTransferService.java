@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import org.opentripplanner.framework.logging.ThrottleLogger;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -25,6 +26,11 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
   private final OptimizePathDomainService<T> optimizePathDomainService;
   private final MinSafeTransferTimeCalculator<T> minSafeTransferTimeCalculator;
   private final TransferWaitTimeCostCalculator transferWaitTimeCostCalculator;
+  private List<Set<Integer>> indexes = new ArrayList<>();
+
+  public List<Set<Integer>> getIndexes() {
+    return indexes;
+  }
 
   public OptimizeTransferService(
     OptimizePathDomainService<T> optimizePathDomainService,
@@ -82,7 +88,7 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
       return List.of(new OptimizedPath<>(path));
     }
     try {
-      return optimizePathDomainService.findBestTransitPath(path);
+      return optimizePathDomainService.findBestTransitPath(path, indexes);
     } catch (RuntimeException e) {
       OPTIMIZATION_FAILED_LOG.error(
         "Unable to optimize transfers in path. Details: {}, path: {}",

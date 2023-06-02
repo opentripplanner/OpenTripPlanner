@@ -43,6 +43,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private PathBuilderLeg<T> prev = null;
   private PathBuilderLeg<T> next = null;
+  private final int[] c2PerStopPosition;
 
   /**
    * Copy-constructor - do a deep copy with the exception of immutable types. Always start with the
@@ -54,6 +55,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     this.fromTime = other.fromTime;
     this.toTime = other.toTime;
     this.leg = other.leg;
+    this.c2PerStopPosition = other.c2PerStopPosition.clone();
 
     // Mutable fields
     if (other.next != null) {
@@ -69,6 +71,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       var transit = (MyTransitLeg<T>) leg;
       this.fromTime = transit.fromTime();
       this.toTime = transit.toTime();
+      c2PerStopPosition = new int[transit.trip.pattern().numberOfStopsInPattern()];
+    } else {
+      c2PerStopPosition = new int[0];
     }
   }
 
@@ -102,6 +107,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   public int durationInSec() {
     return toTime - fromTime;
+  }
+
+  public int[] c2PerStopPosition() {
+    return c2PerStopPosition;
   }
 
   @Nullable

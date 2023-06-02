@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.configure;
 
+import java.util.List;
+import java.util.Set;
 import java.util.function.IntFunction;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -57,9 +59,10 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     TransferService transferService,
     RaptorTransitDataProvider<T> transitDataProvider,
     int[] stopBoardAlightCosts,
-    TransferOptimizationParameters config
+    TransferOptimizationParameters config,
+    List<Set<Integer>> indexes
   ) {
-    return new TransferOptimizationServiceConfigurator<T>(
+    var service = new TransferOptimizationServiceConfigurator<T>(
       stopLookup,
       stopNameResolver,
       transferService,
@@ -68,6 +71,10 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       config
     )
       .createOptimizeTransferService();
+
+    service.getIndexes().addAll(indexes);
+
+    return service;
   }
 
   private OptimizeTransferService<T> createOptimizeTransferService() {

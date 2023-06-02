@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -13,6 +14,7 @@ import org.opentripplanner.framework.concurrent.InterruptibleExecutor;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.api.request.RaptorTransitViaRequest;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
@@ -25,6 +27,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Rapto
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.request.RouteRequestTransitDataProviderFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.configure.TransferOptimizationServiceConfigurator;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
@@ -121,6 +124,44 @@ public class TransitRouter {
       serverContext.meterRegistry()
     );
 
+    var STOP_NAME = "Helsingborg C";
+
+    for (int i = 0; i < serverContext.transitService().getTransitLayer().getStopCount(); i++) {
+
+      var stopName = serverContext
+        .transitService()
+        .getTransitLayer()
+        .getStopByIndex(i)
+        .getName()
+        .toString()
+        .split("\\(")[0];
+
+      if (STOP_NAME.equals(stopName)) {
+//        System.out.println("adding index: " + i);
+        raptorRequest.multiCriteria().transitViaRequest().get().viaPoints().add(i);
+      }
+    }
+
+    var firstVia = raptorRequest.multiCriteria().transitViaRequest().map(RaptorTransitViaRequest::viaPoints).orElse(new HashSet<>());
+    var secondVia = new HashSet<Integer>();
+
+    STOP_NAME = "Helsingör Färjeläge";
+    for (int i = 0; i < serverContext.transitService().getTransitLayer().getStopCount(); i++) {
+
+      var stopName = serverContext
+        .transitService()
+        .getTransitLayer()
+        .getStopByIndex(i)
+        .getName()
+        .toString()
+        .split("\\(")[0];
+
+      if (STOP_NAME.equals(stopName)) {
+        secondVia.add(i);
+      }
+    }
+
+
     // Route transit
     var raptorService = new RaptorService<>(serverContext.raptorConfig());
     var transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
@@ -140,7 +181,8 @@ public class TransitRouter {
             serverContext.transitService().getTransferService(),
             requestTransitDataProvider,
             transitLayer.getStopBoardAlightCosts(),
-            request.preferences().transfer().optimization()
+            request.preferences().transfer().optimization(),
+            List.of(firstVia, secondVia)
           )
           .optimize(transitResponse.paths());
     }
