@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -70,6 +71,24 @@ public class CalendarServiceData implements Serializable {
     for (FeedScopedId serviceId : other.serviceDatesByServiceId.keySet()) {
       putServiceDatesForServiceId(serviceId, other.serviceDatesByServiceId.get(serviceId));
     }
+  }
+
+  public Optional<LocalDate> getFirstDate() {
+    return serviceDatesByServiceId
+      .values()
+      .stream()
+      .filter(list -> !list.isEmpty())
+      .map(list -> list.get(0))
+      .min(LocalDate::compareTo);
+  }
+
+  public Optional<LocalDate> getLastDate() {
+    return serviceDatesByServiceId
+      .values()
+      .stream()
+      .filter(list -> !list.isEmpty())
+      .map(list -> list.get(list.size() - 1))
+      .max(LocalDate::compareTo);
   }
 
   /* private methods */
