@@ -192,7 +192,7 @@ type ElevationProfileStep {
   """
   The elevation at this distance, in meters.
   
-  If the value can also be less than zero if the location is below sea level.
+  The value can also be less than zero if the location is below sea level.
   """
   elevation: Float
 }
@@ -307,7 +307,14 @@ type Leg {
   distance: Float!
   "The leg's duration in seconds"
   duration: Long!
-  "The leg's elevation profile."
+  """
+  The leg's elevation profile.
+  
+  **Notes**
+   - All elevation values, including the first one, are relative to the sea level.
+   - Negative values are possible for places below sea level.
+   - The data includes both the start end end coordinate of the leg.
+  """
   elevationProfile: [ElevationProfileStep]!
   "The expected, realtime adjusted date and time this leg ends."
   expectedEndTime: DateTime!
@@ -446,7 +453,14 @@ type PathGuidance {
   bogusName: Boolean
   "The distance in meters that this step takes."
   distance: Float
-  "The step's elevation profile."
+  """
+  The step's elevation profile.
+  
+  **Notes**
+   - All elevation values, including the first one, are relative to the sea level.
+   - Negative values are possible for places below sea level.
+   - The data includes both the start end end coordinate of the step.
+  """
   elevationProfile: [ElevationProfileStep]!
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String

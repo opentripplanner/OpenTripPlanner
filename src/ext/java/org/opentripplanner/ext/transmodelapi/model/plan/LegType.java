@@ -447,7 +447,7 @@ public class LegType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
-          .description("The leg's elevation profile.")
+          .description(ElevationProfileStepType.makeDescription("leg"))
           .name("elevationProfile")
           .type(new GraphQLNonNull(new GraphQLList(elevationStepType)))
           .dataFetcher(env ->

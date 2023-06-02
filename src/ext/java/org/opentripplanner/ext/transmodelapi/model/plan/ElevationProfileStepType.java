@@ -14,6 +14,21 @@ public class ElevationProfileStepType {
   private static final String NAME = "ElevationProfileStep";
   public static final GraphQLTypeReference REF = new GraphQLTypeReference(NAME);
 
+  static String makeDescription(String name) {
+    return """
+       The %s's elevation profile.
+                 
+       **Notes**
+        - All elevation values, including the first one, are relative to the sea level.
+        - Negative values are possible for places below sea level.
+        - The data includes both the start end end coordinate of the %s.
+       """.formatted(
+        name,
+        name
+      )
+      .stripIndent();
+  }
+
   public static GraphQLObjectType create() {
     return GraphQLObjectType
       .newObject()
@@ -32,11 +47,13 @@ public class ElevationProfileStepType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("elevation")
-          .description("""
+          .description(
+            """
           The elevation at this distance, in meters.
           
-          If the value can also be less than zero if the location is below sea level.
-          """.stripIndent())
+          The value can also be less than zero if the location is below sea level.
+          """.stripIndent()
+          )
           .type(Scalars.GraphQLFloat)
           .dataFetcher(env -> step(env).y())
           .build()
