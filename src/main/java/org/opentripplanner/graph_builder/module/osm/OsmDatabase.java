@@ -1117,50 +1117,36 @@ public class OsmDatabase {
    * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
    */
   private void processPublicTransportStopArea(OSMRelation relation) {
-    OSMWithTags platformArea = null;
-    Set<OSMNode> platformsNodes = new HashSet<>();
-    int level = 0;
+    Set<OSMWithTags> platformAreas = new HashSet<>();
+    Set<OSMNode> platformNodes = new HashSet<>();
     for (OSMRelationMember member : relation.getMembers()) {
       if (
         "way".equals(member.getType()) &&
         "platform".equals(member.getRole()) &&
         areaWayIds.contains(member.getRef())
       ) {
-        if (platformArea == null) {
-          platformArea = areaWaysById.get(member.getRef());
-          // take level from first area
-          if (level == 0) {
-            level = getLevel(platformArea);
-          }
-        } else {
-          issueStore.add(new TooManyAreasInRelation(relation));
-        }
+        platformAreas.add(areaWaysById.get(member.getRef()));
       } else if (
         "relation".equals(member.getType()) &&
         "platform".equals(member.getRole()) &&
         relationsById.containsKey(member.getRef())
       ) {
-        if (platformArea == null) {
-          platformArea = relationsById.get(member.getRef());
-          if (level == 0) {
-            level = getLevel(platformArea);
-          }
-        } else {
-          issueStore.add(new TooManyAreasInRelation(relation));
-        }
+        platformAreas.add(relationsById.get(member.getRef()));
       } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
-        platformsNodes.add(nodesById.get(member.getRef()));
+        platformNodes.add(nodesById.get(member.getRef()));
       }
     }
-    final int filterLevel = level;
-    Set<OSMNode> sameLevelNodes = platformsNodes
-      .stream()
-      .filter(node -> getLevel(node) == filterLevel)
-      .collect(Collectors.toSet());
-    if (platformArea != null && !sameLevelNodes.isEmpty()) {
-      stopsInAreas.put(platformArea, sameLevelNodes);
-    } else {
-      issueStore.add(new PublicTransportRelationSkipped(relation));
+    for (OSMWithTags area : platformAreas) {
+      final int filterLevel = getLevel(area);
+      Set<OSMNode> sameLevelNodes = platformNodes
+        .stream()
+        .filter(node -> getLevel(node) == filterLevel)
+        .collect(Collectors.toSet());
+      if (!sameLevelNodes.isEmpty()) {
+        stopsInAreas.put(area, sameLevelNodes);
+      } else {
+        issueStore.add(new PublicTransportRelationSkipped(relation));
+      }
     }
   }
 
