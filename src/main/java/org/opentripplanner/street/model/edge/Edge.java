@@ -197,6 +197,7 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     this.tov.removeIncoming(this);
   }
 
+
   public void removeTurnRestrictionsTo(Edge origin) {}
 
   /* SERIALIZATION */

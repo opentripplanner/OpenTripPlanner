@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.street.model.RepeatingTimePeriod;
 import org.opentripplanner.street.model.TurnRestrictionType;
+import org.opentripplanner.street.model.edge.OsmEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseModeSet;
 
@@ -19,8 +20,8 @@ class TurnRestrictionTag {
   TurnRestrictionType type;
   Direction direction;
   RepeatingTimePeriod time;
-  public List<StreetEdge> possibleFrom = new ArrayList<>();
-  public List<StreetEdge> possibleTo = new ArrayList<>();
+  public List<OsmEdge> possibleFrom = new ArrayList<>();
+  public List<OsmEdge> possibleTo = new ArrayList<>();
   public TraverseModeSet modes;
 
   TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction, long relationOSMID) {

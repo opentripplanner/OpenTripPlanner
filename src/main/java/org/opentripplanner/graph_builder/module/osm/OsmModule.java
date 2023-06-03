@@ -28,6 +28,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.edge.OsmEdge;
+import org.opentripplanner.street.model.edge.StairsEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -105,7 +107,7 @@ public class OsmModule implements GraphBuilderModule {
     return elevationData;
   }
 
-  private record StreetEdgePair(StreetEdge main, StreetEdge back) {}
+  private record StreetEdgePair(OsmEdge main, OsmEdge back) {}
 
   private void build() {
     var parkingProcessor = new ParkingProcessor(
@@ -378,8 +380,8 @@ public class OsmModule implements GraphBuilderModule {
           geometry
         );
 
-        StreetEdge street = streets.main;
-        StreetEdge backStreet = streets.back;
+        var street = streets.main;
+        var backStreet = streets.back;
         normalizer.applyWayProperties(street, backStreet, wayData, way);
 
         applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
@@ -408,8 +410,8 @@ public class OsmModule implements GraphBuilderModule {
     OSMWay way,
     long startNode,
     long endNode,
-    StreetEdge street,
-    StreetEdge backStreet
+    OsmEdge street,
+    OsmEdge backStreet
   ) {
     /* Check if there are turn restrictions starting on this segment */
     Collection<TurnRestrictionTag> restrictionTags = osmdb.getFromWayTurnRestrictions(way.getId());
@@ -455,7 +457,7 @@ public class OsmModule implements GraphBuilderModule {
     }
 
     LineString backGeometry = geometry.reverse();
-    StreetEdge street = null, backStreet = null;
+    OsmEdge street = null, backStreet = null;
     double length = getGeometryLengthMeters(geometry);
 
     var permissionPair = OsmFilter.getPermissions(permissions, way);
@@ -492,16 +494,12 @@ public class OsmModule implements GraphBuilderModule {
       backStreet.shareData(street);
     }
 
-    /* mark edges that are on roundabouts */
-    if (way.isRoundabout()) {
-      if (street != null) street.setRoundabout(true);
-      if (backStreet != null) backStreet.setRoundabout(true);
-    }
+
 
     return new StreetEdgePair(street, backStreet);
   }
 
-  private StreetEdge getEdgeForStreet(
+  private OsmEdge getEdgeForStreet(
     IntersectionVertex startEndpoint,
     IntersectionVertex endEndpoint,
     OSMWay way,
@@ -513,42 +511,50 @@ public class OsmModule implements GraphBuilderModule {
   ) {
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
+
     I18NString name = params.edgeNamer().getNameForWay(way, label);
-    float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
-
-    StreetEdge street = new StreetEdge(
-      startEndpoint,
-      endEndpoint,
-      geometry,
-      name,
-      length,
-      permissions,
-      back
-    );
-    street.setCarSpeed(carSpeed);
-    street.setLink(OsmFilter.isLink(way));
-
-    if (!way.hasTag("name") && !way.hasTag("ref")) {
-      street.setHasBogusName(true);
-    }
-
     boolean steps = way.isSteps();
-    street.setStairs(steps);
+    if(way.isSteps()) {
+      return new StairsEdge(startEndpoint, endEndpoint, geometry, name, length);
+    }else {
+      float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
-    /* TODO: This should probably generalized somehow? */
-    if ((way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair")))) {
-      street.setWheelchairAccessible(false);
+      StreetEdge street = new StreetEdge(
+        startEndpoint,
+        endEndpoint,
+        geometry,
+        name,
+        length,
+        permissions,
+        back
+      );
+      street.setCarSpeed(carSpeed);
+      street.setLink(OsmFilter.isLink(way));
+
+      if (!way.hasTag("name") && !way.hasTag("ref")) {
+        street.setHasBogusName(true);
+      }
+
+      /* mark edges that are on roundabouts */
+      if (way.isRoundabout()) {
+        street.setRoundabout(true);
+      }
+
+      /* TODO: This should probably generalized somehow? */
+      if ((way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair")))) {
+        street.setWheelchairAccessible(false);
+      }
+
+      street.setSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way));
+
+      // < 0.04: account for
+      if (carSpeed < 0.04) {
+        issueStore.add(new StreetCarSpeedZero(way));
+      }
+
+      params.edgeNamer().recordEdge(way, street);
+
+      return street;
     }
-
-    street.setSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way));
-
-    // < 0.04: account for
-    if (carSpeed < 0.04) {
-      issueStore.add(new StreetCarSpeedZero(way));
-    }
-
-    params.edgeNamer().recordEdge(way, street);
-
-    return street;
   }
 }

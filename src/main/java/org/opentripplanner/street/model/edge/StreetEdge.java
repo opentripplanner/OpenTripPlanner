@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @author novalis
  */
 public class StreetEdge
-  extends Edge
+  extends OsmEdge
   implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
@@ -58,7 +58,6 @@ public class StreetEdge
   private static final int ROUNDABOUT_FLAG_INDEX = 1;
   private static final int HASBOGUSNAME_FLAG_INDEX = 2;
   private static final int MOTOR_VEHICLE_NOTHRUTRAFFIC = 3;
-  private static final int STAIRS_FLAG_INDEX = 4;
   private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
   private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
   private static final int BICYCLE_NOTHRUTRAFFIC = 7;
@@ -288,15 +287,12 @@ public class StreetEdge
       return Double.NaN;
     }
 
-    final double speed =
-      switch (traverseMode) {
-        case WALK -> walkingBike ? preferences.bike().walkingSpeed() : preferences.walk().speed();
-        case BICYCLE, SCOOTER -> preferences.bike().speed();
-        case CAR -> getCarSpeed();
-        case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
-      };
-
-    return isStairs() ? (speed / preferences.walk().stairsTimeFactor()) : speed;
+    return switch (traverseMode) {
+      case WALK -> walkingBike ? preferences.bike().walkingSpeed() : preferences.walk().speed();
+      case BICYCLE, SCOOTER -> preferences.bike().speed();
+      case CAR -> getCarSpeed();
+      case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
+    };
   }
 
   /**
@@ -626,11 +622,16 @@ public class StreetEdge
     return true;
   }
 
-  public void shareData(StreetEdge reversedEdge) {
-    if (Arrays.equals(compactGeometry, reversedEdge.compactGeometry)) {
-      compactGeometry = reversedEdge.compactGeometry;
+  @Override
+  public void shareData(Edge reversedEdge) {
+    if(reversedEdge instanceof StreetEdge otherStreetEdge) {
+
+    if (Arrays.equals(compactGeometry, otherStreetEdge.compactGeometry)) {
+      compactGeometry = otherStreetEdge.compactGeometry;
     } else {
       LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
+    }
+
     }
   }
 
@@ -695,11 +696,7 @@ public class StreetEdge
    * This street is a staircase
    */
   public boolean isStairs() {
-    return BitSetUtils.get(flags, STAIRS_FLAG_INDEX);
-  }
-
-  public void setStairs(boolean stairs) {
-    flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
+    return false;
   }
 
   /**
@@ -1053,8 +1050,8 @@ public class StreetEdge
   }
 
   private static void applyRestrictionsToNewEdge(
-    StreetEdge fromEdge,
-    StreetEdge toEdge,
+    OsmEdge fromEdge,
+    OsmEdge toEdge,
     TurnRestriction restriction
   ) {
     TurnRestriction splitTurnRestriction = new TurnRestriction(
@@ -1291,10 +1288,6 @@ public class StreetEdge
       if (walkingBike) {
         // take slopes into account when walking bikes
         time = weight = (getEffectiveBikeDistance() / speed);
-        if (isStairs()) {
-          // we do allow walking the bike across a stairs but there is a very high default penalty
-          weight *= preferences.bike().stairsReluctance();
-        }
       } else {
         // take slopes into account when walking
         time = getEffectiveWalkDistance() / speed;

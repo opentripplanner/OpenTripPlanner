@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -113,8 +114,8 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("wheelchairStairsCases")
   public void wheelchairStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
-    edge.setStairs(true);
+
+    var stairsEdge = new StairsEdge(V1, V2, null, new NonLocalizedString("stairs"), length);
 
     var req = StreetSearchRequest.of();
     req.withWheelchair(true);
@@ -135,10 +136,10 @@ class StreetEdgeWheelchairCostTest {
 
     req.withPreferences(pref -> pref.withWalk(w -> w.withReluctance(1.0)));
 
-    var result = traverse(edge, req.build());
+    var result = traverse(stairsEdge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
-    edge.setStairs(false);
+    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
     var notStairsResult = traverse(edge, req.build());
     assertEquals(7, (long) notStairsResult.weight);
   }
@@ -209,7 +210,7 @@ class StreetEdgeWheelchairCostTest {
     assertEquals(8, result.getElapsedTimeSeconds());
   }
 
-  private State traverse(StreetEdge edge, StreetSearchRequest req) {
+  private State traverse(OsmEdge edge, StreetSearchRequest req) {
     var state = new State(V1, req);
 
     assertEquals(0, state.weight);

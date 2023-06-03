@@ -8,6 +8,7 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.V2;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -94,8 +95,7 @@ class StreetEdgeCostTest {
   @VariableSource("stairsCases")
   public void stairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
-    edge.setStairs(true);
+    var edge = new StairsEdge(V1, V2, null, new NonLocalizedString("stairs"), length);
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withStairsReluctance(stairsReluctance)));
@@ -105,8 +105,8 @@ class StreetEdgeCostTest {
 
     assertEquals(23, result.getElapsedTimeSeconds());
 
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req.build());
+    var streetEdge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    var notStairsResult = traverse(streetEdge, req.build());
     assertEquals(15, (long) notStairsResult.weight);
   }
 
@@ -120,16 +120,8 @@ class StreetEdgeCostTest {
   @VariableSource("bikeStairsCases")
   public void bikeStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(
-      V1,
-      V2,
-      null,
-      "stairs",
-      length,
-      StreetTraversalPermission.PEDESTRIAN,
-      false
-    );
-    edge.setStairs(true);
+
+    var edge = new StairsEdge(V1, V2, null, new NonLocalizedString("stairs"), length);
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withBike(b -> b.withStairsReluctance(stairsReluctance)));
@@ -138,9 +130,17 @@ class StreetEdgeCostTest {
     assertEquals(expectedCost, (long) result.weight);
 
     assertEquals(23, result.getElapsedTimeSeconds());
+    var streetEdge = new StreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.PEDESTRIAN,
+      false
+    );
 
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req.build());
+    var notStairsResult = traverse(streetEdge, req.build());
     assertEquals(37, (long) notStairsResult.weight);
   }
 
@@ -178,7 +178,7 @@ class StreetEdgeCostTest {
     assertEquals(15, (long) defaultSafetyResult.weight);
   }
 
-  private State traverse(StreetEdge edge, StreetSearchRequest request) {
+  private State traverse(OsmEdge edge, StreetSearchRequest request) {
     var state = new State(V1, request);
 
     assertEquals(0, state.weight);
