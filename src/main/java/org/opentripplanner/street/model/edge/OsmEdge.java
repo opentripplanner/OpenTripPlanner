@@ -4,6 +4,7 @@ import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 public abstract class OsmEdge extends Edge {
+
   protected OsmEdge(Vertex v1, Vertex v2) {
     super(v1, v2);
   }

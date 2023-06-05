@@ -2,16 +2,24 @@ package org.opentripplanner.street.model.edge;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.state.State;
 
 public class StairsEdge extends OsmEdge {
+
   private final I18NString name;
   private final LineString geometry;
   private final double distance;
 
-  public StairsEdge(StreetVertex from, StreetVertex to, LineString geometry, I18NString name, double distance) {
+  public StairsEdge(
+    StreetVertex from,
+    StreetVertex to,
+    LineString geometry,
+    I18NString name,
+    double distance
+  ) {
     super(from, to);
     this.name = name;
     this.geometry = geometry;
@@ -20,31 +28,30 @@ public class StairsEdge extends OsmEdge {
 
   @Override
   public State[] traverse(State s0) {
-
-    // ban cars on stairs
-    if(s0.getNonTransitMode().isInCar()) {
+    // no cars on stairs
+    if (s0.getNonTransitMode().isInCar()) {
       return State.empty();
     }
 
     var prefs = s0.getPreferences();
-    double speed = switch (s0.getNonTransitMode()){
-      case WALK -> prefs.walk().speed();
-      case BICYCLE, SCOOTER ->  prefs.bike().walkingSpeed();
-      case CAR, FLEX -> 1;
-    };
+    double speed =
+      switch (s0.getNonTransitMode()) {
+        case WALK -> prefs.walk().speed();
+        case BICYCLE, SCOOTER -> prefs.bike().walkingSpeed();
+        case CAR, FLEX -> 0;
+      };
+    // slow down by stairsTimeFactor
+    speed = speed / prefs.walk().stairsTimeFactor();
 
-    var time = distance / speed;
-    var weight =
-      distance *
-        prefs.walk().safetyFactor() +
-        distance *
-          (1 - prefs.walk().safetyFactor());
+    double time = distance / speed;
+    double weight =
+      distance * prefs.walk().safetyFactor() + distance * (1 - prefs.walk().safetyFactor());
     weight /= speed;
 
-    if(s0.getNonTransitMode().isCyclingIsh()) {
-      weight *= prefs.bike().stairsReluctance();
-    } else if(s0.getNonTransitMode().isWalking()) {
-      weight *= prefs.walk().stairsReluctance();
+    weight *= reluctance(s0, prefs);
+
+    if (s0.getNonTransitMode().isCyclingIsh()) {
+      weight = weight * prefs.bike().stairsReluctance();
     }
 
     var editor = s0.edit(this);
@@ -52,6 +59,19 @@ public class StairsEdge extends OsmEdge {
     editor.incrementTimeInSeconds((int) time);
 
     return editor.makeStateArray();
+  }
+
+  private static double reluctance(State s0, RoutingPreferences prefs) {
+    if (s0.getRequest().wheelchair()) {
+      return StreetEdgeReluctanceCalculator.computeWheelchairReluctance(prefs, 0, true, true);
+    } else {
+      return StreetEdgeReluctanceCalculator.computeReluctance(
+        prefs,
+        s0.getNonTransitMode(),
+        false,
+        true
+      );
+    }
   }
 
   @Override
@@ -70,29 +90,19 @@ public class StairsEdge extends OsmEdge {
   }
 
   @Override
-  public void setBicycleSafetyFactor(float bicycleSafety) {
-
-  }
+  public void setBicycleSafetyFactor(float bicycleSafety) {}
 
   @Override
-  public void setWalkSafetyFactor(float walkSafety) {
-
-  }
+  public void setWalkSafetyFactor(float walkSafety) {}
 
   @Override
-  public void setMotorVehicleNoThruTraffic(boolean motorVehicleNoThrough) {
-
-  }
+  public void setMotorVehicleNoThruTraffic(boolean motorVehicleNoThrough) {}
 
   @Override
-  public void setBicycleNoThruTraffic(boolean bicycleNoThrough) {
-
-  }
+  public void setBicycleNoThruTraffic(boolean bicycleNoThrough) {}
 
   @Override
-  public void setWalkNoThruTraffic(boolean walkNoThrough) {
-
-  }
+  public void setWalkNoThruTraffic(boolean walkNoThrough) {}
 
   @Override
   public int getOutAngle() {
@@ -105,7 +115,5 @@ public class StairsEdge extends OsmEdge {
   }
 
   @Override
-  public void addTurnRestriction(TurnRestriction restriction) {
-
-  }
+  public void addTurnRestriction(TurnRestriction restriction) {}
 }

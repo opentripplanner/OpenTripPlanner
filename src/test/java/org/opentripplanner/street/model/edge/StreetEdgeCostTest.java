@@ -103,22 +103,30 @@ class StreetEdgeCostTest {
     var result = traverse(edge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
-    assertEquals(23, result.getElapsedTimeSeconds());
+    assertEquals(22, result.getElapsedTimeSeconds());
 
-    var streetEdge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    var streetEdge = new StreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
     var notStairsResult = traverse(streetEdge, req.build());
     assertEquals(15, (long) notStairsResult.weight);
   }
 
   static Stream<Arguments> bikeStairsCases = Stream.of(
     Arguments.of(1, 45),
-    Arguments.of(1.5, 67),
+    Arguments.of(1.5, 68),
     Arguments.of(3, 135)
   );
 
   @ParameterizedTest(name = "bike stairs reluctance of {0} should lead to traversal costs of {1}")
   @VariableSource("bikeStairsCases")
-  public void bikeStairsReluctance(double stairsReluctance, long expectedCost) {
+  public void bikeStairsReluctance(double stairsReluctance, double expectedCost) {
     double length = 10;
 
     var edge = new StairsEdge(V1, V2, null, new NonLocalizedString("stairs"), length);
@@ -127,9 +135,9 @@ class StreetEdgeCostTest {
     req.withPreferences(p -> p.withBike(b -> b.withStairsReluctance(stairsReluctance)));
     req.withMode(StreetMode.BIKE);
     var result = traverse(edge, req.build());
-    assertEquals(expectedCost, (long) result.weight);
+    assertEquals(expectedCost, result.weight, 0.5);
 
-    assertEquals(23, result.getElapsedTimeSeconds());
+    assertEquals(22, result.getElapsedTimeSeconds());
     var streetEdge = new StreetEdge(
       V1,
       V2,

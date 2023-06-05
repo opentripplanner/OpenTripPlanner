@@ -494,8 +494,6 @@ public class OsmModule implements GraphBuilderModule {
       backStreet.shareData(street);
     }
 
-
-
     return new StreetEdgePair(street, backStreet);
   }
 
@@ -514,9 +512,9 @@ public class OsmModule implements GraphBuilderModule {
 
     I18NString name = params.edgeNamer().getNameForWay(way, label);
     boolean steps = way.isSteps();
-    if(way.isSteps()) {
+    if (way.isSteps()) {
       return new StairsEdge(startEndpoint, endEndpoint, geometry, name, length);
-    }else {
+    } else {
       float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
       StreetEdge street = new StreetEdge(

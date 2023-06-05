@@ -624,14 +624,12 @@ public class StreetEdge
 
   @Override
   public void shareData(Edge reversedEdge) {
-    if(reversedEdge instanceof StreetEdge otherStreetEdge) {
-
-    if (Arrays.equals(compactGeometry, otherStreetEdge.compactGeometry)) {
-      compactGeometry = otherStreetEdge.compactGeometry;
-    } else {
-      LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
-    }
-
+    if (reversedEdge instanceof StreetEdge otherStreetEdge) {
+      if (Arrays.equals(compactGeometry, otherStreetEdge.compactGeometry)) {
+        compactGeometry = otherStreetEdge.compactGeometry;
+      } else {
+        LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
+      }
     }
   }
 
