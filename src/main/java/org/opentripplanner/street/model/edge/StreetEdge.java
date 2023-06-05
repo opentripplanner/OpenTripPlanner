@@ -58,11 +58,11 @@ public class StreetEdge
   private static final int ROUNDABOUT_FLAG_INDEX = 1;
   private static final int HASBOGUSNAME_FLAG_INDEX = 2;
   private static final int MOTOR_VEHICLE_NOTHRUTRAFFIC = 3;
-  private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
-  private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
-  private static final int BICYCLE_NOTHRUTRAFFIC = 7;
-  private static final int WALK_NOTHRUTRAFFIC = 8;
-  private static final int CLASS_LINK = 9;
+  private static final int SLOPEOVERRIDE_FLAG_INDEX = 4;
+  private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 5;
+  private static final int BICYCLE_NOTHRUTRAFFIC = 6;
+  private static final int WALK_NOTHRUTRAFFIC = 7;
+  private static final int CLASS_LINK = 8;
   private StreetEdgeCostExtension costExtension;
   /** back, roundabout, stairs, ... */
   private short flags;
@@ -651,7 +651,7 @@ public class StreetEdge
     return BitSetUtils.get(flags, BACK_FLAG_INDEX);
   }
 
-  public void setBack(boolean back) {
+  private void setBack(boolean back) {
     flags = BitSetUtils.set(flags, BACK_FLAG_INDEX, back);
   }
 
