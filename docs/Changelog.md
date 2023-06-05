@@ -33,6 +33,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix vertex removal race condition [#5141](https://github.com/opentripplanner/OpenTripPlanner/pull/5141)
 - Comment out replacing DSJ-ID from planned data with ID from realtime-data [#5140](https://github.com/opentripplanner/OpenTripPlanner/pull/5140)
 - Remove San Francisco and vehicle rental fare calculators [#5145](https://github.com/opentripplanner/OpenTripPlanner/pull/5145)
+- Make update frequency a Duration [#5152](https://github.com/opentripplanner/OpenTripPlanner/pull/5152)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
