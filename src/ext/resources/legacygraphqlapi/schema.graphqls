@@ -2086,7 +2086,15 @@ type Place {
 
     """
     The sequence of the stop in the trip. This is not required to start from 0 or be consecutive - any
-    increasing integer sequence along the stop sequence is valid.
+    increasing integer sequence along the stops is valid.
+
+    The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
+    between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
+    However, it should be noted that realtime updates can change the values, so don't store it for
+    longer amounts of time.
+
+    Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
+    even generated.
     """
     stopSequence: Int
 
@@ -3602,7 +3610,7 @@ type Stoptime {
     increasing integer sequence along the stops is valid.
 
     The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
-    between the it and the itinerary. It is safe cross-reference when done quickly, i.e. within seconds.
+    between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
     However, it should be noted that realtime updates can change the values, so don't store it for
     longer amounts of time.
 
