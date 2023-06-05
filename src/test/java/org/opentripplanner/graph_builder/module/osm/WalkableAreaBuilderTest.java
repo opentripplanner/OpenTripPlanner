@@ -103,18 +103,42 @@ public class WalkableAreaBuilderTest {
   }
 
   // test that entrance node in a stop area relation does not link across different levels and layers
+  // test also that entrance linking of stop area with multiple platforms works properly
   @Test
-  @OsmFile("keilaniemi_entrance_above_the_platform.osm.pbf")
+  @OsmFile("stopareas.pbf")
   @Visibility(true)
   public void test_entrance_stoparea_linking() {
-    var entranceAreaConnections = graph
+
+    // first platform has level 0, entrance below it has level -1 -> no links
+    var entranceAtWrongLevel = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals("osm:node:4107557023"))
+      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143769"))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
-    assertEquals(0, entranceAreaConnections.size());
+    assertEquals(0, entranceAtWrongLevel.size());
+
+    // second platform and its entrance both default to level zero, entrance gets connected
+    var entranceAtSameLevel = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-142970"))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(1, entranceAtSameLevel.size());
+
+    // test that third platform and its entrance get connected
+    // and there are not too many connections (to remote platforms)
+    var connectionEdges = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143743"))
+      .toList();
+    // entrance is connected top 2 opposite corners of a single platform
+    // with two bidirectional edge pairs
+    assertEquals(4, connectionEdges.size());
   }
 
   // -- Infrastructure --
