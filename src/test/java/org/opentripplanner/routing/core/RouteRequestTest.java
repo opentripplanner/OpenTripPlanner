@@ -2,12 +2,19 @@ package org.opentripplanner.routing.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.List;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.error.RoutingValidationException;
 
-public class RouteRequestTest {
+class RouteRequestTest {
 
   @Test
   public void testRequest() {
@@ -60,6 +67,67 @@ public class RouteRequestTest {
     );
     assertEquals(50, request.numItineraries());
     assertEquals(50, clone.numItineraries());
+  }
+
+  @Test
+  void testValidateEmptyRequest() {
+    RouteRequest request = new RouteRequest();
+    try {
+      request.validate();
+      Assertions.fail();
+    } catch (RoutingValidationException e) {
+      Assertions.assertEquals(2, e.getRoutingErrors().size());
+    }
+  }
+
+  @Test
+  void testValidateMissingFrom() {
+    RouteRequest request = new RouteRequest();
+    request.setTo(randomLocation());
+    try {
+      request.validate();
+      fail();
+    } catch (RoutingValidationException e) {
+      List<RoutingError> routingErrors = e.getRoutingErrors();
+      Assertions.assertEquals(1, routingErrors.size());
+      Assertions.assertTrue(
+        routingErrors
+          .stream()
+          .anyMatch(routingError ->
+            routingError.code == RoutingErrorCode.LOCATION_NOT_FOUND &&
+            routingError.inputField == InputField.FROM_PLACE
+          )
+      );
+    }
+  }
+
+  @Test
+  void testValidateMissingTo() {
+    RouteRequest request = new RouteRequest();
+    request.setFrom(randomLocation());
+    try {
+      request.validate();
+    } catch (RoutingValidationException e) {
+      List<RoutingError> routingErrors = e.getRoutingErrors();
+
+      Assertions.assertEquals(1, routingErrors.size());
+      Assertions.assertTrue(
+        routingErrors
+          .stream()
+          .anyMatch(routingError ->
+            routingError.code == RoutingErrorCode.LOCATION_NOT_FOUND &&
+            routingError.inputField == InputField.TO_PLACE
+          )
+      );
+    }
+  }
+
+  @Test
+  void testValidateFromAndTo() {
+    RouteRequest request = new RouteRequest();
+    request.setFrom(randomLocation());
+    request.setTo(randomLocation());
+    request.validate();
   }
 
   private GenericLocation randomLocation() {
