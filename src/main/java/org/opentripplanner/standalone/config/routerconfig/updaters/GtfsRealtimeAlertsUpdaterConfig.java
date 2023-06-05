@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.routerconfig.updaters;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1_5;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
+import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
 
@@ -27,7 +28,11 @@ public class GtfsRealtimeAlertsUpdaterConfig {
         .since(V1_5)
         .summary("Whether to match trips fuzzily.")
         .asBoolean(false),
-      c.of("frequencySec").since(V1_5).summary("How often the URL should be fetched.").asInt(60),
+      c
+        .of("frequency")
+        .since(V1_5)
+        .summary("How often the URL should be fetched.")
+        .asDuration(Duration.ofMinutes(1)),
       HttpHeadersConfig.headers(c, V2_3)
     );
   }

@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.routerconfig.updaters;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
+import java.time.Duration;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Set;
@@ -51,7 +52,11 @@ public class VehicleParkingUpdaterConfig {
         updaterRef,
         c.of("url").since(V2_2).summary("URL of the resource.").asString(null),
         feedId,
-        c.of("frequencySec").since(V2_2).summary("How often to update the source.").asInt(60),
+        c
+          .of("frequency")
+          .since(V2_2)
+          .summary("How often to update the source.")
+          .asDuration(Duration.ofMinutes(1)),
         HttpHeadersConfig.headers(c, V2_2),
         new ArrayList<>(
           c.of("tags").since(V2_2).summary("Tags to add to the parking lots.").asStringSet(Set.of())
@@ -63,7 +68,11 @@ public class VehicleParkingUpdaterConfig {
         updaterRef,
         c.of("url").since(V2_3).summary("URL of the locations endpoint.").asString(null),
         feedId,
-        c.of("frequencySec").since(V2_3).summary("How often to update the source.").asInt(60),
+        c
+          .of("frequency")
+          .since(V2_3)
+          .summary("How often to update the source.")
+          .asDuration(Duration.ofMinutes(1)),
         HttpHeadersConfig.headers(c, V2_3)
       );
     };

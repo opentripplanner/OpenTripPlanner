@@ -80,12 +80,12 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       LOG.warn("Unable to setup updater: {}", this, e);
     }
 
-    if (pollingPeriodSeconds() <= 0) {
+    if (pollingPeriod().toSeconds() <= 0) {
       LOG.info("Creating vehicle-rental updater running once only (non-polling): {}", source);
     } else {
       LOG.info(
         "Creating vehicle-rental updater running every {} seconds: {}",
-        pollingPeriodSeconds(),
+        pollingPeriod(),
         source
       );
     }

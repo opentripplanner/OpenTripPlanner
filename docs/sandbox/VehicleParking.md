@@ -107,7 +107,7 @@ Used for converting abstract opening hours into concrete points in time.
 |---------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "vehicle-parking"        |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
 | [feedId](#u__3__feedId)         |     `string`    | The name of the data source.                                               | *Optional* |               |  2.2  |
-| frequencySec                    |    `integer`    | How often to update the source.                                            | *Optional* | `60`          |  2.2  |
+| frequency                       |    `duration`   | How often to update the source.                                            | *Optional* | `"PT1M"`      |  2.2  |
 | [sourceType](#u__3__sourceType) |      `enum`     | The source of the vehicle updates.                                         | *Required* |               |  2.2  |
 | [timeZone](#u__3__timeZone)     |   `time-zone`   | The time zone of the feed.                                                 | *Optional* |               |  2.2  |
 | url                             |     `string`    | URL of the resource.                                                       | *Optional* |               |  2.2  |
@@ -170,7 +170,7 @@ Tags to add to the parking lots.
       "sourceType" : "park-api",
       "feedId" : "parkapi",
       "timeZone" : "Europe/Berlin",
-      "frequencySec" : 600,
+      "frequency" : "10m",
       "url" : "https://foo.bar",
       "headers" : {
         "Cache-Control" : "max-age=604800"
@@ -194,7 +194,7 @@ Tags to add to the parking lots.
 |---------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "vehicle-parking"        |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
 | [feedId](#u__4__feedId)         |     `string`    | The name of the data source.                                               | *Optional* |               |  2.2  |
-| frequencySec                    |    `integer`    | How often to update the source.                                            | *Optional* | `60`          |  2.3  |
+| frequency                       |    `duration`   | How often to update the source.                                            | *Optional* | `"PT1M"`      |  2.3  |
 | [sourceType](#u__4__sourceType) |      `enum`     | The source of the vehicle updates.                                         | *Required* |               |  2.2  |
 | url                             |     `string`    | URL of the locations endpoint.                                             | *Optional* |               |  2.3  |
 | [headers](#u__4__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |

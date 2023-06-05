@@ -8,8 +8,6 @@ import org.opentripplanner.ext.fares.impl.HSLFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.HighestFareInFreeTransferWindowFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.NoopFareServiceFactory;
 import org.opentripplanner.ext.fares.impl.OrcaFareFactory;
-import org.opentripplanner.ext.fares.impl.SFBayFareServiceFactory;
-import org.opentripplanner.ext.fares.impl.TimeBasedVehicleRentalFareServiceFactory;
 import org.opentripplanner.routing.fares.FareServiceFactory;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
@@ -72,8 +70,6 @@ public class FaresConfiguration {
     return switch (type) {
       case "default" -> new DefaultFareServiceFactory();
       case "off" -> new NoopFareServiceFactory();
-      case "vehicle-rental-time-based" -> new TimeBasedVehicleRentalFareServiceFactory();
-      case "san-francisco" -> new SFBayFareServiceFactory();
       case "highest-fare-in-free-transfer-window",
         "highestFareInFreeTransferWindow" -> new HighestFareInFreeTransferWindowFareServiceFactory();
       case "hsl" -> new HSLFareServiceFactory();
