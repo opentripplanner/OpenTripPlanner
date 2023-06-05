@@ -20,7 +20,7 @@ public class SiriSXUpdaterConfig {
         .since(V2_0)
         .summary("How often the updates should be retrieved.")
         .asDuration(Duration.ofMinutes(1)),
-      c.of("earlyStartSec").since(V2_0).summary("TODO").asInt(-1),
+      c.of("earlyStartSec").since(V2_0).summary("TODO").asInt(0),
       c.of("timeoutSec").since(V2_0).summary("The HTTP timeout to download the updates.").asInt(15),
       c
         .of("blockReadinessUntilInitialized")
