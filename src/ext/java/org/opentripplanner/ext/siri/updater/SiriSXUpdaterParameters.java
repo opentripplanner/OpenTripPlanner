@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
+import java.time.Duration;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
@@ -8,7 +9,7 @@ public record SiriSXUpdaterParameters(
   String feedId,
   String url,
   String requestorRef,
-  int frequencySec,
+  Duration frequency,
   int earlyStartSec,
   int timeoutSec,
   boolean blockReadinessUntilInitialized,

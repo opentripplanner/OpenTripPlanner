@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import com.google.common.util.concurrent.Futures;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Future;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,8 +54,8 @@ class VehicleParkingUpdaterTest {
       }
 
       @Override
-      public int frequencySec() {
-        return -1;
+      public Duration frequency() {
+        return Duration.ZERO;
       }
 
       @Override

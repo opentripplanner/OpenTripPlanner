@@ -1,12 +1,12 @@
 package org.opentripplanner.updater.trip;
 
-import java.util.Map;
+import java.time.Duration;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public record PollingTripUpdaterParameters(
   String configRef,
-  int frequencySec,
+  Duration frequency,
   boolean fuzzyTripMatching,
   BackwardsDelayPropagationType backwardsDelayPropagationType,
 
