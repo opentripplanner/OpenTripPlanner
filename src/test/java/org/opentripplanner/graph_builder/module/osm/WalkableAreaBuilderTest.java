@@ -108,7 +108,6 @@ public class WalkableAreaBuilderTest {
   @OsmFile("stopareas.pbf")
   @Visibility(true)
   public void test_entrance_stoparea_linking() {
-
     // first platform has level 0, entrance below it has level -1 -> no links
     var entranceAtWrongLevel = graph
       .getEdgesOfType(AreaEdge.class)
