@@ -9,6 +9,7 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
+import org.opentripplanner.street.model.edge.StairsEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -51,13 +52,8 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
     String label;
 
     if (e instanceof StreetEdge pse) {
-      if (pse.isStairs()) {
-        color = STAIRS_COLOR_EDGE;
-        label = "stairs";
-      } else {
-        color = getColor(pse.getPermission());
-        label = getLabel(pse.getPermission());
-      }
+      color = getColor(pse.getPermission());
+      label = getLabel(pse.getPermission());
       if (pse.isMotorVehicleNoThruTraffic()) {
         label += " car NTT";
       }
@@ -79,6 +75,9 @@ public class TraversalPermissionsEdgeRenderer implements EdgeVertexRenderer {
       if (ehe.getPermission().allows(StreetTraversalPermission.CAR)) {
         label += " car";
       }
+    } else if (e instanceof StairsEdge) {
+      color = STAIRS_COLOR_EDGE;
+      label = "stairs";
     } else {
       color = LINK_COLOR_EDGE;
       label = "link";

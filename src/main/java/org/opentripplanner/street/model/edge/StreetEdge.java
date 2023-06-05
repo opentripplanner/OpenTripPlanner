@@ -691,13 +691,6 @@ public class StreetEdge
   }
 
   /**
-   * This street is a staircase
-   */
-  public boolean isStairs() {
-    return false;
-  }
-
-  /**
    * The edge is part of an osm way, which is of type link
    */
   public boolean isLink() {
@@ -1217,7 +1210,7 @@ public class StreetEdge
         preferences,
         traverseMode,
         walkingBike,
-        isStairs()
+        false
       );
     return new TraversalCosts(time, weight);
   }
@@ -1257,7 +1250,7 @@ public class StreetEdge
       pref,
       TraverseMode.BICYCLE,
       false,
-      isStairs()
+      false
     );
     weight *= reluctance;
     return new TraversalCosts(time, weight);
@@ -1280,7 +1273,7 @@ public class StreetEdge
           preferences,
           getMaxSlope(),
           isWheelchairAccessible(),
-          isStairs()
+          false
         );
     } else {
       if (walkingBike) {
@@ -1301,7 +1294,7 @@ public class StreetEdge
           preferences,
           traverseMode,
           walkingBike,
-          isStairs()
+          false
         );
     }
 
