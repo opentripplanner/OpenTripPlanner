@@ -28,7 +28,6 @@ import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
-import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -236,12 +235,7 @@ public class StreetEdge
    */
   public boolean canTraverse(TraverseMode mode) {
     StreetTraversalPermission permission = getPermission();
-    if (fromv instanceof BarrierVertex bv) {
-      permission = permission.intersection(bv.getBarrierPermissions());
-    }
-    if (tov instanceof BarrierVertex bv) {
-      permission = permission.intersection(bv.getBarrierPermissions());
-    }
+    permission = BarrierCalculator.reducePermissions(permission, fromv, tov);
 
     return permission.allows(mode);
   }

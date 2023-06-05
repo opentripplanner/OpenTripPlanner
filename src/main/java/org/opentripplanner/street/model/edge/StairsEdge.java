@@ -6,11 +6,16 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.state.State;
 
 public class StairsEdge extends OsmEdge {
+
+  // stairs are only allowed for walking and cycling/scootering
+  private static final StreetTraversalPermission DEFAULT_PERMISSIONS =
+    StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
   private final I18NString name;
   private final LineString geometry;
@@ -36,8 +41,7 @@ public class StairsEdge extends OsmEdge {
 
   @Override
   public State[] traverse(State s0) {
-    // no cars on stairs
-    if (s0.getNonTransitMode().isInCar()) {
+    if (blockedByBarriers() || s0.getNonTransitMode().isInCar()) {
       return State.empty();
     }
 
@@ -70,6 +74,11 @@ public class StairsEdge extends OsmEdge {
     editor.incrementTimeInSeconds((int) time);
 
     return editor.makeStateArray();
+  }
+
+  private boolean blockedByBarriers() {
+    var permission = BarrierCalculator.reducePermissions(DEFAULT_PERMISSIONS, fromv, tov);
+    return permission.allowsNothing();
   }
 
   private static double reluctance(State s0, RoutingPreferences prefs) {
