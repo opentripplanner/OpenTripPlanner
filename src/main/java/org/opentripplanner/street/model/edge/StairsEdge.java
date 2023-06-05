@@ -30,26 +30,21 @@ public class StairsEdge extends OsmEdge {
     double speed = switch (s0.getNonTransitMode()){
       case WALK -> prefs.walk().speed();
       case BICYCLE, SCOOTER ->  prefs.bike().walkingSpeed();
-      case CAR, FLEX -> 0;
+      case CAR, FLEX -> 1;
     };
 
-    var time = getDistanceMeters() / speed;
-    weight =
-      getEffectiveWalkSafetyDistance() *
-        preferences.walk().safetyFactor() +
-        getEffectiveWalkDistance() *
-          (1 - preferences.walk().safetyFactor());
+    var time = distance / speed;
+    var weight =
+      distance *
+        prefs.walk().safetyFactor() +
+        distance *
+          (1 - prefs.walk().safetyFactor());
     weight /= speed;
-
-  weight *=
-    StreetEdgeReluctanceCalculator.computeReluctance(
-  preferences,
-  traverseMode)
-    var time = getDistanceMeters() / speed;
-    var weight = time * prefs.walk().stairsReluctance();
 
     if(s0.getNonTransitMode().isCyclingIsh()) {
       weight *= prefs.bike().stairsReluctance();
+    } else if(s0.getNonTransitMode().isWalking()) {
+      weight *= prefs.walk().stairsReluctance();
     }
 
     var editor = s0.edit(this);
