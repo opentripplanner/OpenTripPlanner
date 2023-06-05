@@ -18,6 +18,7 @@ import org.opentripplanner.netex.issues.DayTypeScheduleIsEmpty;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
+import org.rutebanken.netex.model.OperatingDayRefStructure;
 import org.rutebanken.netex.model.OperatingPeriod;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 import org.rutebanken.netex.model.PropertyOfDay;
@@ -158,8 +159,8 @@ public class DayTypeAssignmentMapper {
     if (period instanceof OperatingPeriod operatingPeriod) {
       Set<DayOfWeek> daysOfWeek = daysOfWeekForDayType(dayType);
       // Plus 1 to make the end date exclusive - simplify the loop test
-      LocalDateTime endDate = operatingPeriod.getToDate().plusDays(1);
-      LocalDateTime date = operatingPeriod.getFromDate();
+      LocalDateTime endDate = getOperatingPeriodEndDate(operatingPeriod).plusDays(1);
+      LocalDateTime date = getOperatingPeriodStartDate(operatingPeriod);
 
       addDates(isAvailable, daysOfWeek, endDate, date);
     } else if (period instanceof UicOperatingPeriod uicOperatingPeriod) {
@@ -168,6 +169,34 @@ public class DayTypeAssignmentMapper {
 
       addDates(uicOperatingPeriod.getValidDayBits(), isAvailable, endDate, date);
     }
+  }
+
+  private LocalDateTime getOperatingPeriodStartDate(OperatingPeriod operatingPeriod) {
+    if (operatingPeriod.getFromDate() != null) {
+      return operatingPeriod.getFromDate();
+    }
+    if (operatingPeriod.getFromOperatingDayRef() != null) {
+      return lookupOperatingDay(operatingPeriod.getFromOperatingDayRef());
+    }
+    throw new IllegalArgumentException(
+      "Missing start date for operating period " + operatingPeriod.getId()
+    );
+  }
+
+  private LocalDateTime getOperatingPeriodEndDate(OperatingPeriod operatingPeriod) {
+    if (operatingPeriod.getToDate() != null) {
+      return operatingPeriod.getToDate();
+    }
+    if (operatingPeriod.getToOperatingDayRef() != null) {
+      return lookupOperatingDay(operatingPeriod.getToOperatingDayRef());
+    }
+    throw new IllegalArgumentException(
+      "Missing end date for operating period " + operatingPeriod.getId()
+    );
+  }
+
+  private LocalDateTime lookupOperatingDay(OperatingDayRefStructure operatingDayRef) {
+    return operatingDays.lookup(operatingDayRef.getRef()).getCalendarDate();
   }
 
   private void addDates(
