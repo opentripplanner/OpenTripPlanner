@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -115,7 +116,13 @@ class StreetEdgeWheelchairCostTest {
   public void wheelchairStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
 
-    var stairsEdge = new StairsEdge(V1, V2, null, new NonLocalizedString("stairs"), length);
+    var stairsEdge = new StairsEdge(
+      V1,
+      V2,
+      GeometryUtils.makeLineString(V1.getCoordinate(), V2.getCoordinate()),
+      new NonLocalizedString("stairs"),
+      length
+    );
 
     var req = StreetSearchRequest.of();
     req.withWheelchair(true);

@@ -8,6 +8,7 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.V2;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -95,7 +96,13 @@ class StreetEdgeCostTest {
   @VariableSource("stairsCases")
   public void stairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StairsEdge(V1, V2, null, new NonLocalizedString("stairs"), length);
+    var edge = new StairsEdge(
+      V1,
+      V2,
+      GeometryUtils.makeLineString(V1.getCoordinate(), V2.getCoordinate()),
+      new NonLocalizedString("stairs"),
+      length
+    );
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withStairsReluctance(stairsReluctance)));
@@ -129,7 +136,13 @@ class StreetEdgeCostTest {
   public void bikeStairsReluctance(double stairsReluctance, double expectedCost) {
     double length = 10;
 
-    var edge = new StairsEdge(V1, V2, null, new NonLocalizedString("stairs"), length);
+    var edge = new StairsEdge(
+      V1,
+      V2,
+      GeometryUtils.makeLineString(V1.getCoordinate(), V2.getCoordinate()),
+      new NonLocalizedString("stairs"),
+      length
+    );
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withBike(b -> b.withStairsReluctance(stairsReluctance)));

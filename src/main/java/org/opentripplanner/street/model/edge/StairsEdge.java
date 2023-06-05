@@ -17,6 +17,7 @@ public class StairsEdge extends OsmEdge {
   private final double distance;
   private final byte outAngle;
   private final byte inAngle;
+  private float walkSafetyFactor = 1f;
 
   public StairsEdge(
     StreetVertex from,
@@ -52,7 +53,10 @@ public class StairsEdge extends OsmEdge {
 
     double time = distance / speed;
     double weight =
-      distance * prefs.walk().safetyFactor() + distance * (1 - prefs.walk().safetyFactor());
+      getEffectiveWalkSafetyDistance() *
+      prefs.walk().safetyFactor() +
+      getEffectiveWalkSafetyDistance() *
+      (1 - prefs.walk().safetyFactor());
     weight /= speed;
 
     weight *= reluctance(s0, prefs);
@@ -100,7 +104,13 @@ public class StairsEdge extends OsmEdge {
   public void setBicycleSafetyFactor(float bicycleSafety) {}
 
   @Override
-  public void setWalkSafetyFactor(float walkSafety) {}
+  public void setWalkSafetyFactor(float walkSafety) {
+    this.walkSafetyFactor = walkSafety;
+  }
+
+  public double getEffectiveWalkSafetyDistance() {
+    return walkSafetyFactor * getDistanceMeters();
+  }
 
   @Override
   public void setMotorVehicleNoThruTraffic(boolean motorVehicleNoThrough) {}
