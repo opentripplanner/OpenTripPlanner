@@ -5,7 +5,9 @@ import java.util.Objects;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 
 public class RoutingValidationException extends RuntimeException {
 
@@ -40,5 +42,33 @@ public class RoutingValidationException extends RuntimeException {
   @Override
   public String getMessage() {
     return routingErrors.stream().map(Objects::toString).collect(Collectors.joining("\n"));
+  }
+
+  public boolean isFromLocationNotFound() {
+    return (
+      routingErrors != null &&
+      routingErrors
+        .stream()
+        .anyMatch(routingError ->
+          routingError.code == RoutingErrorCode.LOCATION_NOT_FOUND &&
+          routingError.inputField == InputField.FROM_PLACE
+        )
+    );
+  }
+
+  public boolean isToLocationNotFound() {
+    return (
+      routingErrors != null &&
+      routingErrors
+        .stream()
+        .anyMatch(routingError ->
+          routingError.code == RoutingErrorCode.LOCATION_NOT_FOUND &&
+          routingError.inputField == InputField.TO_PLACE
+        )
+    );
+  }
+
+  public boolean isFromToLocationNotFound() {
+    return isFromLocationNotFound() && isToLocationNotFound();
   }
 }
