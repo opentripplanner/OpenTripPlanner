@@ -11,6 +11,9 @@ import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.state.State;
 
+/**
+ * Represents a flight of stairs that are derived from OSM data.
+ */
 public class StairsEdge extends OsmEdge {
 
   // stairs are only allowed for walking and cycling/scootering
@@ -50,7 +53,7 @@ public class StairsEdge extends OsmEdge {
       switch (s0.getNonTransitMode()) {
         case WALK -> prefs.walk().speed();
         case BICYCLE, SCOOTER -> prefs.bike().walkingSpeed();
-        case CAR, FLEX -> 0;
+        case CAR, FLEX -> throw new IllegalStateException();
       };
     // slow down by stairsTimeFactor
     speed = speed / prefs.walk().stairsTimeFactor();
@@ -65,10 +68,6 @@ public class StairsEdge extends OsmEdge {
 
     weight *= reluctance(s0, prefs);
 
-    if (s0.getNonTransitMode().isCyclingIsh()) {
-      weight = weight * prefs.bike().stairsReluctance();
-    }
-
     var editor = s0.edit(this);
     editor.incrementWeight(weight);
     editor.incrementTimeInSeconds((int) time);
@@ -76,9 +75,60 @@ public class StairsEdge extends OsmEdge {
     return editor.makeStateArray();
   }
 
-  private boolean blockedByBarriers() {
-    var permission = BarrierCalculator.reducePermissions(DEFAULT_PERMISSIONS, fromv, tov);
-    return permission.allowsNothing();
+  @Override
+  public I18NString getName() {
+    return this.name;
+  }
+
+  @Override
+  public LineString getGeometry() {
+    return geometry;
+  }
+
+  @Override
+  public double getDistanceMeters() {
+    return distance;
+  }
+
+  @Override
+  public void setBicycleSafetyFactor(float bicycleSafety) {
+    // we ignore the bicycle safety factor, stairs are inherently unsafe and therefore have a separate
+    // reluctance
+  }
+
+  @Override
+  public void setWalkSafetyFactor(float walkSafety) {
+    this.walkSafetyFactor = walkSafety;
+  }
+
+  @Override
+  public void setMotorVehicleNoThruTraffic(boolean motorVehicleNoThrough) {
+    // we are ignoring no-through on stairs
+  }
+
+  @Override
+  public void setBicycleNoThruTraffic(boolean bicycleNoThrough) {
+    // we are ignoring no-through on stairs
+  }
+
+  @Override
+  public void setWalkNoThruTraffic(boolean walkNoThrough) {
+    // we are ignoring no-through on stairs
+  }
+
+  @Override
+  public int getOutAngle() {
+    return outAngle;
+  }
+
+  @Override
+  public int getInAngle() {
+    return inAngle;
+  }
+
+  @Override
+  public void addTurnRestriction(TurnRestriction restriction) {
+    // we are ignoring turn restrictions on stairs
   }
 
   private static double reluctance(State s0, RoutingPreferences prefs) {
@@ -94,52 +144,12 @@ public class StairsEdge extends OsmEdge {
     }
   }
 
-  @Override
-  public double getDistanceMeters() {
-    return distance;
+  private boolean blockedByBarriers() {
+    var permission = BarrierCalculator.reducePermissions(DEFAULT_PERMISSIONS, fromv, tov);
+    return permission.allowsNothing();
   }
 
-  @Override
-  public LineString getGeometry() {
-    return geometry;
-  }
-
-  @Override
-  public I18NString getName() {
-    return this.name;
-  }
-
-  @Override
-  public void setBicycleSafetyFactor(float bicycleSafety) {}
-
-  @Override
-  public void setWalkSafetyFactor(float walkSafety) {
-    this.walkSafetyFactor = walkSafety;
-  }
-
-  public double getEffectiveWalkSafetyDistance() {
+  private double getEffectiveWalkSafetyDistance() {
     return walkSafetyFactor * getDistanceMeters();
   }
-
-  @Override
-  public void setMotorVehicleNoThruTraffic(boolean motorVehicleNoThrough) {}
-
-  @Override
-  public void setBicycleNoThruTraffic(boolean bicycleNoThrough) {}
-
-  @Override
-  public void setWalkNoThruTraffic(boolean walkNoThrough) {}
-
-  @Override
-  public int getOutAngle() {
-    return outAngle;
-  }
-
-  @Override
-  public int getInAngle() {
-    return inAngle;
-  }
-
-  @Override
-  public void addTurnRestriction(TurnRestriction restriction) {}
 }

@@ -710,15 +710,10 @@ public class StreetEdge
     flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
   }
 
-  /**
-   * Return the azimuth of the first segment in this edge in integer degrees clockwise from South.
-   * TODO change everything to clockwise from North
-   */
   public int getInAngle() {
     return (int) Math.round(this.inAngle * 180 / 128.0);
   }
 
-  /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
   public int getOutAngle() {
     return (int) Math.round(this.outAngle * 180 / 128.0);
   }

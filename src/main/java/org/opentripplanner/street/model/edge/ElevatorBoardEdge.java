@@ -72,9 +72,4 @@ public class ElevatorBoardEdge extends Edge implements BikeWalkableEdge, Elevato
   public LineString getGeometry() {
     return geometry;
   }
-
-  @Override
-  public double getDistanceMeters() {
-    return 0;
-  }
 }
