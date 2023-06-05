@@ -11,6 +11,7 @@ import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.framework.geometry.AngleUtils;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -172,10 +173,8 @@ public class StreetEdge
         // FIXME Use only North as a reference, not a mix of North and South!
         // Range restriction happens automatically due to Java signed overflow behavior.
         // 180 degrees exists as a negative rather than a positive due to the integer range.
-        double angleRadians = DirectionUtils.getLastAngle(geometry);
-        outAngle = (byte) Math.round(angleRadians * 128 / Math.PI + 128);
-        angleRadians = DirectionUtils.getFirstAngle(geometry);
-        inAngle = (byte) Math.round(angleRadians * 128 / Math.PI + 128);
+        outAngle = AngleUtils.calculateAngle(DirectionUtils.getLastAngle(geometry));
+        inAngle = AngleUtils.calculateAngle(DirectionUtils.getFirstAngle(geometry));
       } catch (IllegalArgumentException iae) {
         LOG.error(
           "exception while determining street edge angles. setting to zero. there is probably something wrong with this street segment's geometry."

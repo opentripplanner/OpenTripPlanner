@@ -1,6 +1,9 @@
 package org.opentripplanner.street.model.edge;
 
+import static org.opentripplanner.framework.geometry.AngleUtils.calculateAngle;
+
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.TurnRestriction;
@@ -12,6 +15,8 @@ public class StairsEdge extends OsmEdge {
   private final I18NString name;
   private final LineString geometry;
   private final double distance;
+  private final byte outAngle;
+  private final byte inAngle;
 
   public StairsEdge(
     StreetVertex from,
@@ -24,6 +29,8 @@ public class StairsEdge extends OsmEdge {
     this.name = name;
     this.geometry = geometry;
     this.distance = distance;
+    this.outAngle = calculateAngle(DirectionUtils.getLastAngle(geometry));
+    this.inAngle = calculateAngle(DirectionUtils.getFirstAngle(geometry));
   }
 
   @Override
@@ -106,12 +113,12 @@ public class StairsEdge extends OsmEdge {
 
   @Override
   public int getOutAngle() {
-    return 0;
+    return outAngle;
   }
 
   @Override
   public int getInAngle() {
-    return 0;
+    return inAngle;
   }
 
   @Override
