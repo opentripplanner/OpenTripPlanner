@@ -511,7 +511,6 @@ public class OsmModule implements GraphBuilderModule {
     label = label.intern();
 
     I18NString name = params.edgeNamer().getNameForWay(way, label);
-    boolean steps = way.isSteps();
     if (way.isSteps()) {
       return new StairsEdge(startEndpoint, endEndpoint, geometry, name, length);
     } else {
@@ -539,7 +538,7 @@ public class OsmModule implements GraphBuilderModule {
       }
 
       /* TODO: This should probably generalized somehow? */
-      if ((way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair")))) {
+      if (way.isTagFalse("wheelchair")) {
         street.setWheelchairAccessible(false);
       }
 
