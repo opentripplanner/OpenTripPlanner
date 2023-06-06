@@ -34,9 +34,9 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 | feedId                         |     `string`    | The ID of the feed to apply the updates to.                                                            | *Required* |               |  2.0  |
 | frequency                      |    `duration`   | How often the updates should be retrieved.                                                             | *Optional* | `"PT1M"`      |  2.0  |
 | fuzzyTripMatching              |    `boolean`    | If the fuzzy trip matcher should be used to match trips.                                               | *Optional* | `false`       |  2.0  |
-| previewIntervalMinutes         |    `integer`    | TODO                                                                                                   | *Optional* | `-1`          |  2.0  |
+| previewInterval                |    `duration`   | TODO                                                                                                   | *Optional* |               |  2.0  |
 | requestorRef                   |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
-| timeoutSec                     |    `integer`    | The HTTP timeout to download the updates.                                                              | *Optional* | `15`          |  2.0  |
+| timeout                        |    `duration`   | The HTTP timeout to download the updates.                                                              | *Optional* | `"PT15S"`     |  2.0  |
 | url                            |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
 | [headers](#u__8__headers)      | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
 
@@ -62,7 +62,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "type" : "siri-et-updater",
       "url" : "https://example.com/some/path",
       "feedId" : "feed_id",
-      "timeoutSec" : 30,
+      "timeout" : "30s",
       "headers" : {
         "Authorization" : "Some-Token"
       }
@@ -123,7 +123,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "type" : "siri-sx-updater",
       "url" : "https://example.com/some/path",
       "feedId" : "feed_id",
-      "timeoutSec" : 30,
+      "timeout" : "30s",
       "headers" : {
         "Key" : "Value"
       }
