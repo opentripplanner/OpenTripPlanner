@@ -1,7 +1,7 @@
 package org.opentripplanner.raptor.api.model;
 
-import static org.opentripplanner.raptor.api.RaptorConstants.SECONDS_IN_A_DAY;
-import static org.opentripplanner.raptor.api.RaptorConstants.TIME_NOT_SET;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.SECONDS_IN_A_DAY;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -32,7 +32,7 @@ public interface RaptorAccessEgress {
    * calculated for each invocation.
    * <p>
    * If this is {@link #isFree()}, then this method must return
-   * {@link org.opentripplanner.raptor.api.RaptorConstants#ZERO_COST}.
+   * {@link RaptorConstants#ZERO_COST}.
    */
   int generalizedCost();
 
@@ -56,7 +56,7 @@ public interface RaptorAccessEgress {
    * when the access path can't start immediately, but have to wait for a vehicle arriving. Also DRT
    * systems or bike shares can have operation time limitations.
    * <p>
-   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible after the requested departure time.
    */
   default int earliestDepartureTime(int requestedDepartureTime) {
@@ -67,7 +67,7 @@ public interface RaptorAccessEgress {
    * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares
    * where they can have operation time limitations.
    * <p>
-   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible before the requested arrival time.
    */
   default int latestArrivalTime(int requestedArrivalTime) {

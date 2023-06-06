@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api;
+package org.opentripplanner.raptor.api.model;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 

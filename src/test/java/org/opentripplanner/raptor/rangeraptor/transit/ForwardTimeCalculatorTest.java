@@ -3,7 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.raptor.api.RaptorConstants.TIME_UNREACHED_FORWARD;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_UNREACHED_FORWARD;
 
 import org.junit.jupiter.api.Test;
 

@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
