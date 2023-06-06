@@ -28,7 +28,7 @@ public class DefaultRoutingService implements RoutingService {
 
   @Override
   public RoutingResponse route(RouteRequest request) {
-    request.validate();
+    request.validateOriginAndDestination();
     RoutingWorker worker = new RoutingWorker(serverContext, request, timeZone);
     return worker.route();
   }

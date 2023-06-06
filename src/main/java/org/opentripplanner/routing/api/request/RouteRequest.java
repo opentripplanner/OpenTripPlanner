@@ -206,12 +206,15 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   /**
-   * Validate that the routing request contains both an origin and a destination.
-   * Origin and destination can be specified either by a reference to a stop place or
-   * by geographical coordinates.
+   * Validate that the routing request contains both an origin and a destination. Origin and
+   * destination can be specified either by a reference to a stop place or by geographical
+   * coordinates. Origin and destination are required in a one-to-one search, but not in a
+   * many-to-one or one-to-many.
+   * TODO - Refactor and make separate requests for one-to-one and the other searches.
+   *
    * @throws RoutingValidationException if either origin or destination is missing.
    */
-  public void validate() {
+  public void validateOriginAndDestination() {
     List<RoutingError> routingErrors = new ArrayList<>(2);
 
     if (from == null || !from.isSpecified()) {
