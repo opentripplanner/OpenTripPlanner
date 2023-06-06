@@ -1087,24 +1087,6 @@ public class OsmDatabase {
     }
   }
 
-  private int getLevel(OSMWithTags o) {
-    if (o.hasTag("level")) {
-      try {
-        return Integer.parseInt(o.getTag("level"));
-      } catch (NumberFormatException ex) {
-        return 0;
-      }
-    } else if (o.hasTag("layer")) {
-      try {
-        return Integer.parseInt(o.getTag("layer"));
-      } catch (NumberFormatException ex) {
-        return 0;
-      }
-    }
-    // default
-    return 0;
-  }
-
   /**
    * Process an OSM public transport stop area relation.
    * <p>
@@ -1137,10 +1119,10 @@ public class OsmDatabase {
       }
     }
     for (OSMWithTags area : platformAreas) {
-      final int filterLevel = getLevel(area);
+      final int filterLevel = area.getLevel();
       Set<OSMNode> sameLevelNodes = platformNodes
         .stream()
-        .filter(node -> getLevel(node) == filterLevel)
+        .filter(node -> node.getLevel() == filterLevel)
         .collect(Collectors.toSet());
       if (!sameLevelNodes.isEmpty()) {
         stopsInAreas.put(area, sameLevelNodes);

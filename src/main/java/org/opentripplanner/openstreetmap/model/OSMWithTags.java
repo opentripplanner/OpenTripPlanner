@@ -465,6 +465,14 @@ public class OSMWithTags {
     return "no".equals(tagValue) || "license".equals(tagValue);
   }
 
+  /**
+   * Returns building floor level or layer tag value, defaults to zero
+   */
+
+  public int getLevel() {
+    return getTagAsInt("level", e -> {}).orElse(getTagAsInt("layer", e -> {}).orElse(0));
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder.of(this.getClass()).addObj("tags", tags).toString();
