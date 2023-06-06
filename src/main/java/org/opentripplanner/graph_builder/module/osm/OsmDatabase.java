@@ -1101,6 +1101,7 @@ public class OsmDatabase {
   private void processPublicTransportStopArea(OSMRelation relation) {
     Set<OSMWithTags> platformAreas = new HashSet<>();
     Set<OSMNode> platformNodes = new HashSet<>();
+    boolean skipped = false;
     for (OSMRelationMember member : relation.getMembers()) {
       if (
         "way".equals(member.getType()) &&
@@ -1127,8 +1128,11 @@ public class OsmDatabase {
       if (!sameLevelNodes.isEmpty()) {
         stopsInAreas.put(area, sameLevelNodes);
       } else {
-        issueStore.add(new PublicTransportRelationSkipped(relation));
+        skipped = true;
       }
+    }
+    if (skipped) {
+      issueStore.add(new PublicTransportRelationSkipped(relation));
     }
   }
 
