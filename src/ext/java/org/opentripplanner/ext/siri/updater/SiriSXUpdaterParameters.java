@@ -10,7 +10,7 @@ public record SiriSXUpdaterParameters(
   String url,
   String requestorRef,
   Duration frequency,
-  int earlyStartSec,
+  Duration earlyStart,
   int timeoutSec,
   boolean blockReadinessUntilInitialized,
   HttpHeaders requestHeaders

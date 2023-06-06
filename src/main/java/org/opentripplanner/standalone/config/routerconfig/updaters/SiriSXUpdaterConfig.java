@@ -20,7 +20,17 @@ public class SiriSXUpdaterConfig {
         .since(V2_0)
         .summary("How often the updates should be retrieved.")
         .asDuration(Duration.ofMinutes(1)),
-      c.of("earlyStartSec").since(V2_0).summary("TODO").asInt(0),
+      c
+        .of("earlyStart")
+        .since(V2_0)
+        .summary("This value is subtracted from the actual validity defined in the message.")
+        .description(
+          """
+          Normally the planed departure time is used, so setting this to 10s will cause the
+          SX-message to be included in trip-results 10 seconds before the the planed departure
+          time."""
+        )
+        .asDuration(Duration.ZERO),
       c.of("timeoutSec").since(V2_0).summary("The HTTP timeout to download the updates.").asInt(15),
       c
         .of("blockReadinessUntilInitialized")

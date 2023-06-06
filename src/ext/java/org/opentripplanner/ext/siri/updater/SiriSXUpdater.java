@@ -63,7 +63,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         transitModel,
         transitAlertService,
         SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel)),
-        config.earlyStartSec()
+        config.earlyStart()
       );
     LOG.info(
       "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",
