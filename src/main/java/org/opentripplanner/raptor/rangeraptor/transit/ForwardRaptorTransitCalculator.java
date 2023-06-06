@@ -26,8 +26,8 @@ public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
 
   public ForwardRaptorTransitCalculator(SearchParams s, RaptorTuningParameters t) {
     this(
-      s.earliestDepartureTime(),
-      s.searchWindowInSeconds(),
+      s.routerEarliestDepartureTime(),
+      s.routerSearchWindowInSeconds(),
       s.latestArrivalTime(),
       t.iterationDepartureStepInSeconds()
     );
