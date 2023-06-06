@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
-import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.raptor.api.RaptorConstants;
@@ -46,15 +45,6 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
     // TODO OTP2: THIS SHOULD BE IMPLEMENTED SO WE CAN FILTER FLEX ACCESS AND EGRESS
     //            IN ROUTING, IT IS SET TO TRUE NOW TO ASSUME ALL FLEX HAS OPENING HOURS
     return true;
-  }
-
-  @Nullable
-  @Override
-  public String openingHoursToString() {
-    //  TODO - Return "[earliest-board/alight-time latest-board-time]" or
-    //       - "[exact-board/alight-time]" for the given access/egress stop.
-    //       - For egress used board-time for access used alight-time.
-    return "TODO";
   }
 
   @Override

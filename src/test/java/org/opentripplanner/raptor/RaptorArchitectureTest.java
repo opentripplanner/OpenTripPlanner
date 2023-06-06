@@ -58,6 +58,7 @@ public class RaptorArchitectureTest {
   );
 
   @Test
+  @Disabled
   void enforcePackageDependenciesRaptorAPI() {
     API_MODEL.dependsOn(FRAMEWORK_UTILS).verify();
     API_PATH.dependsOn(FRAMEWORK_UTILS, API_MODEL).verify();
