@@ -33,7 +33,6 @@ import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
-import org.opentripplanner.graph_builder.issues.PublicTransportRelationSkipped;
 import org.opentripplanner.graph_builder.issues.TooManyAreasInRelation;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
