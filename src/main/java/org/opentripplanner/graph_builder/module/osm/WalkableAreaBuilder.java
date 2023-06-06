@@ -229,19 +229,17 @@ public class WalkableAreaBuilder {
         // they may provide the only entrance to a platform
         // which otherwise would be pruned as unconnected island
         Collection<OSMNode> entrances = osmdb.getStopsInArea(area.parent);
-        if (entrances != null) {
-          for (OSMNode node : entrances) {
-            var vertex = vertexBuilder.getVertexForOsmNode(node, areaEntity);
-            platformLinkingVertices.add(vertex);
-            visibilityNodes.add(node);
-            startingNodes.add(node);
-            edgeList.visibilityVertices.add(vertex);
-          }
+        for (OSMNode node : entrances) {
+          var vertex = vertexBuilder.getVertexForOsmNode(node, areaEntity);
+          platformLinkingVertices.add(vertex);
+          visibilityNodes.add(node);
+          startingNodes.add(node);
+          edgeList.visibilityVertices.add(vertex);
         }
 
         for (Ring outerRing : area.outermostRings) {
           // variable to indicate if some additional entrance points have been added to area
-          boolean linkPointsAdded = entrances != null;
+          boolean linkPointsAdded = !entrances.isEmpty();
           // Add unconnected entries to area if platformEntriesLinking parameter is true
           if (platformEntriesLinking && "platform".equals(area.parent.getTag("public_transport"))) {
             List<OsmVertex> endpointsWithin = platformLinkingEndpoints

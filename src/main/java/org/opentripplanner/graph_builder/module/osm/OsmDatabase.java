@@ -118,7 +118,7 @@ public class OsmDatabase {
    * Map of all transit stop nodes that lie within an area and which are connected to the area by
    * a relation. Keyed by the area's OSM way.
    */
-  private final Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<>();
+  private final Multimap<OSMWithTags, OSMNode> stopsInAreas = ArrayListMultimap.create();
 
   /*
    * ID of the next virtual node we create during building phase. Negative to prevent conflicts
@@ -1121,18 +1121,10 @@ public class OsmDatabase {
     }
     for (OSMWithTags area : platformAreas) {
       final int filterLevel = area.getLevel();
-      Set<OSMNode> sameLevelNodes = platformNodes
+      platformNodes
         .stream()
         .filter(node -> node.getLevel() == filterLevel)
-        .collect(Collectors.toSet());
-      if (!sameLevelNodes.isEmpty()) {
-        stopsInAreas.put(area, sameLevelNodes);
-      } else {
-        skipped = true;
-      }
-    }
-    if (skipped) {
-      issueStore.add(new PublicTransportRelationSkipped(relation));
+        .forEach(node -> stopsInAreas.put(area, node));
     }
   }
 
