@@ -112,7 +112,7 @@ public class WalkableAreaBuilderTest {
     var entranceAtWrongLevel = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143769"))
+      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143850"))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -122,7 +122,7 @@ public class WalkableAreaBuilderTest {
     var entranceAtSameLevel = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-142970"))
+      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143832"))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -130,10 +130,11 @@ public class WalkableAreaBuilderTest {
 
     // test that third platform and its entrance get connected
     // and there are not too many connections (to remote platforms)
+    // third platform also tests layer tag
     var connectionEdges = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143743"))
+      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143845"))
       .toList();
     // entrance is connected top 2 opposite corners of a single platform
     // with two bidirectional edge pairs
