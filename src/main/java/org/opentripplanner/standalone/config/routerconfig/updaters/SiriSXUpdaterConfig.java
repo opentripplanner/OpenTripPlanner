@@ -31,7 +31,11 @@ public class SiriSXUpdaterConfig {
           time."""
         )
         .asDuration(Duration.ZERO),
-      c.of("timeoutSec").since(V2_0).summary("The HTTP timeout to download the updates.").asInt(15),
+      c
+        .of("timeout")
+        .since(V2_0)
+        .summary("The HTTP timeout to download the updates.")
+        .asDuration(Duration.ofSeconds(15)),
       c
         .of("blockReadinessUntilInitialized")
         .since(V2_0)

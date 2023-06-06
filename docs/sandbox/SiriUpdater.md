@@ -78,20 +78,31 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 <!-- siri-sx-updater BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter               |       Type      | Summary                                                                                                |  Req./Opt. | Default Value | Since |
-|--------------------------------|:---------------:|--------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "siri-sx-updater"       |      `enum`     | The type of the updater.                                                                               | *Required* |               |  1.5  |
-| blockReadinessUntilInitialized |    `boolean`    | Whether catching up with the updates should block the readiness check from returning a 'ready' result. | *Optional* | `false`       |  2.0  |
-| earlyStartSec                  |    `integer`    | TODO                                                                                                   | *Optional* | `-1`          |  2.0  |
-| feedId                         |     `string`    | The ID of the feed to apply the updates to.                                                            | *Required* |               |  2.0  |
-| frequency                      |    `duration`   | How often the updates should be retrieved.                                                             | *Optional* | `"PT1M"`      |  2.0  |
-| requestorRef                   |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
-| timeoutSec                     |    `integer`    | The HTTP timeout to download the updates.                                                              | *Optional* | `15`          |  2.0  |
-| url                            |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
-| [headers](#u__9__headers)      | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
+| Config Parameter                |       Type      | Summary                                                                                                |  Req./Opt. | Default Value | Since |
+|---------------------------------|:---------------:|--------------------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "siri-sx-updater"        |      `enum`     | The type of the updater.                                                                               | *Required* |               |  1.5  |
+| blockReadinessUntilInitialized  |    `boolean`    | Whether catching up with the updates should block the readiness check from returning a 'ready' result. | *Optional* | `false`       |  2.0  |
+| [earlyStart](#u__9__earlyStart) |    `duration`   | This value is subtracted from the actual validity defined in the message.                              | *Optional* | `"PT0S"`      |  2.0  |
+| feedId                          |     `string`    | The ID of the feed to apply the updates to.                                                            | *Required* |               |  2.0  |
+| frequency                       |    `duration`   | How often the updates should be retrieved.                                                             | *Optional* | `"PT1M"`      |  2.0  |
+| requestorRef                    |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
+| timeout                         |    `duration`   | The HTTP timeout to download the updates.                                                              | *Optional* | `"PT15S"`     |  2.0  |
+| url                             |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
+| [headers](#u__9__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
+
+<h4 id="u__9__earlyStart">earlyStart</h4>
+
+**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
+**Path:** /updaters/[9] 
+
+This value is subtracted from the actual validity defined in the message.
+
+Normally the planed departure time is used, so setting this to 10s will cause the
+SX-message to be included in trip-results 10 seconds before the the planed departure
+time.
 
 <h4 id="u__9__headers">headers</h4>
 
