@@ -68,6 +68,7 @@ nav:
     - Introduction: 'Configuration.md'
     - Build: 'BuildConfiguration.md'
     - "Boarding Locations": 'BoardingLocations.md'
+    - "Stop Area Relations": 'StopAreas.md'
     - "Street Graph Pruning": 'IslandPruning.md'
     - Router: 'RouterConfiguration.md'
     - Accessibility: 'Accessibility.md'
