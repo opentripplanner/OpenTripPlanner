@@ -71,14 +71,14 @@ class WalkPreferencesTest {
     // By changing the speed back and forth we force the builder to create a new instance
     var other = subject.copyOf().withSpeed(10.0).build();
     var copy = other.copyOf().withSpeed(SPEED).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
+    assertEqualsAndHashCode(subject, other, copy);
   }
 
   @Test
   void testToSting() {
     assertEquals("WalkPreferences{}", WalkPreferences.DEFAULT.toString());
     assertEquals(
-      "WalkPreferences{speed: 1.71, reluctance: 2.5, boardCost: 301, stairsReluctance: 3.0, stairsTimeFactor: 1.31, safetyFactor: 0.51}",
+      "WalkPreferences{speed: 1.71, reluctance: 2.5, boardCost: $301, stairsReluctance: 3.0, stairsTimeFactor: 1.31, safetyFactor: 0.51}",
       subject.toString()
     );
   }

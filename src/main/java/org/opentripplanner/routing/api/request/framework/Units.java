@@ -25,15 +25,6 @@ public class Units {
   private Units() {}
 
   /**
-   * A generalized-cost. Zero(0) or positive integer.
-   * <p>
-   * Unit: Human cost of riding transit for 1 second.
-   */
-  public static int cost(int valueInSeconds) {
-    return IntUtils.requireNotNegative(valueInSeconds);
-  }
-
-  /**
    * Reluctance of factor from zero(0) to positive infinitive.
    * Number of decimals used are: 2 for values less than 2.0, 1 for values less than 10.0, and
    * zero for values above 10.0.

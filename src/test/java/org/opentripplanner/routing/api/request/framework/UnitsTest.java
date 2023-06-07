@@ -9,13 +9,6 @@ import org.junit.jupiter.api.Test;
 class UnitsTest {
 
   @Test
-  void cost() {
-    assertEquals(0, Units.cost(0));
-    assertEquals(10_000, Units.cost(10_000));
-    assertThrows(IllegalArgumentException.class, () -> Units.cost(-1));
-  }
-
-  @Test
   void reluctance() {
     assertEquals(0.0, Units.reluctance(0.0));
     assertEquals(1.12, Units.reluctance(1.1234));

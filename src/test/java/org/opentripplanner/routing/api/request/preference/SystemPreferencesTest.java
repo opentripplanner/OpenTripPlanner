@@ -67,7 +67,7 @@ class SystemPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withMaxJourneyDuration(Duration.ofHours(2)).build();
     var copy = other.copyOf().withMaxJourneyDuration(MAX_JOURNEY_DURATION).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
+    assertEqualsAndHashCode(subject, other, copy);
   }
 
   @Test

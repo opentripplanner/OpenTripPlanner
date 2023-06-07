@@ -81,6 +81,6 @@ class TransferOptimizationPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withMinSafeWaitTimeFactor(0.0).build();
     var copy = other.copyOf().withMinSafeWaitTimeFactor(MIN_SAFE_WAIT_TIME_FACTOR).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
+    assertEqualsAndHashCode(subject, other, copy);
   }
 }
