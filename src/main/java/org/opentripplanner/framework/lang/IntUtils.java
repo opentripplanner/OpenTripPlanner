@@ -60,4 +60,24 @@ public final class IntUtils {
 
     return Math.sqrt(sum / v.size());
   }
+
+  public static int requireNotNegative(int value) {
+    if (value < 0) {
+      throw new IllegalArgumentException("Negative value not expected: " + value);
+    }
+    return value;
+  }
+
+  public static int requireInRange(int value, int minInclusive, int maxInclusive) {
+    return requireInRange(value, minInclusive, maxInclusive, "value");
+  }
+
+  public static int requireInRange(int value, int minInclusive, int maxInclusive, String field) {
+    if (value < minInclusive || value > maxInclusive) {
+      throw new IllegalArgumentException(
+        "The %s is not in range[%d, %d]: %d".formatted(field, minInclusive, maxInclusive, value)
+      );
+    }
+    return value;
+  }
 }

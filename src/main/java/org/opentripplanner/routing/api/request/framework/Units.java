@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.framework;
 import static java.lang.Math.abs;
 
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.lang.IntUtils;
 
 /**
  * This utility can be used to perform sanity checks on common number types. It will also normalize
@@ -26,13 +27,10 @@ public class Units {
   /**
    * A generalized-cost. Zero(0) or positive integer.
    * <p>
-   * Unit: Human cost of riding transit for 1 second ($)
+   * Unit: Human cost of riding transit for 1 second.
    */
-  public static int cost(int value) {
-    if (value < 0) {
-      throw new IllegalArgumentException("Negative generalized-cost not expected: " + value);
-    }
-    return value;
+  public static int cost(int valueInSeconds) {
+    return IntUtils.requireNotNegative(valueInSeconds);
   }
 
   /**
@@ -58,12 +56,7 @@ public class Units {
    * Unit: scalar
    */
   public static double normalizedFactor(double value, double minValue, double maxValue) {
-    if (value < minValue) {
-      throw new IllegalArgumentException("Min limit(" + minValue + ") exceeded: " + value);
-    }
-    if (value > maxValue) {
-      throw new IllegalArgumentException("Max limit(" + maxValue + ") exceeded: " + value);
-    }
+    DoubleUtils.requireInRange(value, minValue, maxValue);
     if (abs(value) < 2.0) {
       return DoubleUtils.roundTo2Decimals(value);
     }
@@ -85,6 +78,7 @@ public class Units {
    * Amount of time/slack/duration in seconds - A constant amount of time.
    */
   public static int duration(int seconds) {
+    IntUtils.requireNotNegative(seconds);
     if (seconds < 0) {
       throw new IllegalArgumentException("Negative slack/time/duration not expected: " + seconds);
     }
