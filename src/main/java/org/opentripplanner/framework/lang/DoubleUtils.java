@@ -2,6 +2,7 @@ package org.opentripplanner.framework.lang;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Locale;
 import javax.annotation.Nullable;
 
 public class DoubleUtils {
@@ -72,10 +73,21 @@ public class DoubleUtils {
     return Double.compare(a, b) == 0;
   }
 
-  public static double assertInRange(double value, double min, double max, String field) {
+  public static double requireInRange(double value, double min, double max) {
+    return requireInRange(value, min, max, "value");
+  }
+
+  public static double requireInRange(double value, double min, double max, String field) {
     if (value < min || value > max) {
       throw new IllegalArgumentException(
-        "The %s is not in range[%.1f, %.1f]: %.1f".formatted(field, min, max, value)
+        String.format(
+          Locale.ROOT,
+          "The %s is not in range[%.1f, %.1f]: %.1f",
+          field,
+          min,
+          max,
+          value
+        )
       );
     }
     return value;

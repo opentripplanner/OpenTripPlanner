@@ -4,47 +4,52 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.framework.lang.DoubleUtils.assertInRange;
+import static org.opentripplanner.framework.lang.DoubleUtils.requireInRange;
+import static org.opentripplanner.framework.lang.DoubleUtils.roundTo1Decimal;
+import static org.opentripplanner.framework.lang.DoubleUtils.roundTo2Decimals;
+import static org.opentripplanner.framework.lang.DoubleUtils.roundTo3Decimals;
+import static org.opentripplanner.framework.lang.DoubleUtils.roundTo4Decimals;
+import static org.opentripplanner.framework.lang.DoubleUtils.roundToZeroDecimals;
 
 import org.junit.jupiter.api.Test;
 
 class DoubleUtilsTest {
 
   @Test
-  void roundToZeroDecimals() {
-    assertEquals(3, DoubleUtils.roundToZeroDecimals(3.4999999999));
-    assertEquals(4, DoubleUtils.roundToZeroDecimals(3.50));
-    assertEquals(5, DoubleUtils.roundToZeroDecimals(4.5));
+  void testRoundToZeroDecimals() {
+    assertEquals(3, roundToZeroDecimals(3.4999999999));
+    assertEquals(4, roundToZeroDecimals(3.50));
+    assertEquals(5, roundToZeroDecimals(4.5));
   }
 
   @Test
-  void roundTo1Decimal() {
-    assertEquals(0.3, DoubleUtils.roundTo1Decimal(0.34999999999));
-    assertEquals(0.4, DoubleUtils.roundTo1Decimal(0.35));
-    assertEquals(0.5, DoubleUtils.roundTo1Decimal(0.45));
+  void testRoundTo1Decimal() {
+    assertEquals(0.3, roundTo1Decimal(0.34999999999));
+    assertEquals(0.4, roundTo1Decimal(0.35));
+    assertEquals(0.5, roundTo1Decimal(0.45));
   }
 
   @Test
-  void roundTo2Decimals() {
-    assertEquals(0.12, DoubleUtils.roundTo2Decimals(0.124999999999));
-    assertEquals(0.13, DoubleUtils.roundTo2Decimals(0.125));
-    assertEquals(0.12, DoubleUtils.roundTo2Decimals(Double.valueOf(0.124999999999)));
-    assertEquals(0.13, DoubleUtils.roundTo2Decimals(Double.valueOf(0.125)));
-    assertNull(DoubleUtils.roundTo2Decimals(null));
+  void testRoundTo2Decimals() {
+    assertEquals(0.12, roundTo2Decimals(0.124999999999));
+    assertEquals(0.13, roundTo2Decimals(0.125));
+    assertEquals(0.12, roundTo2Decimals(Double.valueOf(0.124999999999)));
+    assertEquals(0.13, roundTo2Decimals(Double.valueOf(0.125)));
+    assertNull(roundTo2Decimals(null));
   }
 
   @Test
-  void roundTo3Decimals() {
-    assertEquals(0.712, DoubleUtils.roundTo3Decimals(0.7124999999999));
-    assertEquals(0.713, DoubleUtils.roundTo3Decimals(0.7125));
+  void testRoundTo3Decimals() {
+    assertEquals(0.712, roundTo3Decimals(0.7124999999999));
+    assertEquals(0.713, roundTo3Decimals(0.7125));
   }
 
   @Test
-  void roundTo4Decimals() {
-    assertEquals(0.7125, DoubleUtils.roundTo4Decimals(0.7124999999999));
-    assertEquals(0.7125, DoubleUtils.roundTo4Decimals(0.7125));
-    assertEquals(0.7126, DoubleUtils.roundTo4Decimals(0.71255));
-    assertEquals(0.7125, DoubleUtils.roundTo4Decimals(0.71254));
+  void testRoundTo4Decimals() {
+    assertEquals(0.7125, roundTo4Decimals(0.7124999999999));
+    assertEquals(0.7125, roundTo4Decimals(0.7125));
+    assertEquals(0.7126, roundTo4Decimals(0.71255));
+    assertEquals(0.7125, roundTo4Decimals(0.71254));
   }
 
   @Test
@@ -58,19 +63,20 @@ class DoubleUtilsTest {
 
   @Test
   void specialCases() {
-    assertEquals(DoubleUtils.roundTo1Decimal(Double.NaN), Double.NaN);
-    assertEquals(DoubleUtils.roundTo2Decimals(Double.NEGATIVE_INFINITY), Double.NEGATIVE_INFINITY);
-    assertEquals(DoubleUtils.roundTo3Decimals(Double.POSITIVE_INFINITY), Double.POSITIVE_INFINITY);
+    assertEquals(roundTo1Decimal(Double.NaN), Double.NaN);
+    assertEquals(roundTo2Decimals(Double.NEGATIVE_INFINITY), Double.NEGATIVE_INFINITY);
+    assertEquals(roundTo3Decimals(Double.POSITIVE_INFINITY), Double.POSITIVE_INFINITY);
   }
 
   @Test
   void testAssertInRange() {
-    assertInRange(7.0, 0d, 10d, "test");
-    assertInRange(0.0, 0d, 10d, "test");
-    assertInRange(10.0, 0d, 10d, "test");
+    requireInRange(7.0, 0d, 10d);
+    requireInRange(0.0, 0d, 10d);
+    requireInRange(10.0, 0d, 10d);
 
-    assertThrows(IllegalArgumentException.class, () -> assertInRange(10.1, 0d, 10d, "test"), "");
-    assertThrows(IllegalArgumentException.class, () -> assertInRange(-0.1, 0d, 10d, "test"), "");
+    assertThrows(IllegalArgumentException.class, () -> requireInRange(10.1, 0d, 10d));
+    var ex = assertThrows(IllegalArgumentException.class, () -> requireInRange(-0.1, 0d, 10d, "t"));
+    assertEquals("The t is not in range[0.0, 10.0]: -0.1", ex.getMessage());
   }
 
   @Test
