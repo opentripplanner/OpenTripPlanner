@@ -16,16 +16,10 @@ public class ElevationProfileStepType {
 
   static String makeDescription(String name) {
     return """
-       The %s's elevation profile.
-                 
-       **Notes**
-        - All elevation values, including the first one, are relative to the sea level.
-        - Negative values are possible for places below sea level.
-        - The data includes both the start end end coordinate of the %s.
-       """.formatted(
-        name,
-        name
-      )
+       The %s's elevation profile. All elevation values, including the first one, are in meters 
+       above sea level. The elevation is negative for places below sea level. The profile 
+       includes both the start and end coordinate.
+       """.formatted(name)
       .stripIndent();
   }
 
@@ -49,9 +43,8 @@ public class ElevationProfileStepType {
           .name("elevation")
           .description(
             """
-          The elevation at this distance, in meters.
-          
-          The value can also be less than zero if the location is below sea level.
+          The elevation at this distance, in meters above sea level. It is negative if the
+          location is below sea level.
           """.stripIndent()
           )
           .type(Scalars.GraphQLFloat)
