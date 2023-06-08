@@ -29,6 +29,15 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Handle CoercingParseValueException [#5133](https://github.com/opentripplanner/OpenTripPlanner/pull/5133)
 - Remove broken Jersey tracing configuration [#5142](https://github.com/opentripplanner/OpenTripPlanner/pull/5142)
 - Graceful timeout error handling [#5130](https://github.com/opentripplanner/OpenTripPlanner/pull/5130)
+- Log http request headers - like  [#5131](https://github.com/opentripplanner/OpenTripPlanner/pull/5131)
+- Fix vertex removal race condition [#5141](https://github.com/opentripplanner/OpenTripPlanner/pull/5141)
+- Comment out replacing DSJ-ID from planned data with ID from realtime-data [#5140](https://github.com/opentripplanner/OpenTripPlanner/pull/5140)
+- Remove San Francisco and vehicle rental fare calculators [#5145](https://github.com/opentripplanner/OpenTripPlanner/pull/5145)
+- Make update frequency a Duration [#5152](https://github.com/opentripplanner/OpenTripPlanner/pull/5152)
+- Remove batch query from Transmodel API [#5147](https://github.com/opentripplanner/OpenTripPlanner/pull/5147)
+- Fix nullable absolute direction in GTFS GraphQL API [#5159](https://github.com/opentripplanner/OpenTripPlanner/pull/5159)
+- Fix error in flex validation [#5161](https://github.com/opentripplanner/OpenTripPlanner/pull/5161)
+- Check service dates instead of service ids for block id transfers [#5162](https://github.com/opentripplanner/OpenTripPlanner/pull/5162)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

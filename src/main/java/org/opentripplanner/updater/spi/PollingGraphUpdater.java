@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.spi;
 
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
  *
  * <pre>
  * polling.type = polling-updater
- * polling.frequencySec = 60
+ * polling.frequency = 60
  * </pre>
  *
  * @see GraphUpdater
@@ -20,7 +21,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
   private static final Logger LOG = LoggerFactory.getLogger(PollingGraphUpdater.class);
   private final String configRef;
   /** How long to wait after polling to poll again. */
-  private Integer pollingPeriodSeconds;
+  private final Duration pollingPeriod;
 
   // TODO OTP2 eliminate this field for reasons in "primed" javadoc; also "initialized" is not a clear term.
   protected boolean blockReadinessUntilInitialized;
@@ -35,12 +36,12 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
 
   /** Shared configuration code for all polling graph updaters. */
   public PollingGraphUpdater(PollingGraphUpdaterParameters config) {
-    this.pollingPeriodSeconds = config.frequencySec();
+    this.pollingPeriod = config.frequency();
     this.configRef = config.configRef();
   }
 
-  public Integer pollingPeriodSeconds() {
-    return pollingPeriodSeconds;
+  public Duration pollingPeriod() {
+    return pollingPeriod;
   }
 
   @Override
@@ -51,7 +52,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         try {
           // Run concrete polling graph updater's implementation method.
           runPolling();
-          if (pollingPeriodSeconds <= 0) {
+          if (pollingPeriod.toSeconds() <= 0) {
             // Non-positive polling period values mean to run the updater only once.
             LOG.info(
               "As requested in configuration, updater {} has run only once and will now stop.",
@@ -67,7 +68,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         } finally {
           primed = true;
         }
-        Thread.sleep(pollingPeriodSeconds * 1000);
+        Thread.sleep(pollingPeriod.toMillis());
       }
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
@@ -95,7 +96,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
 
   /**
    * Mirrors GraphUpdater.run method. Only difference is that runPolling will be run multiple times
-   * with pauses in between. The length of the pause is defined in the preference frequencySec.
+   * with pauses in between. The length of the pause is defined in the preference frequency.
    */
   protected abstract void runPolling() throws Exception;
 }

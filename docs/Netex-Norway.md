@@ -101,14 +101,14 @@ loaded at server startup.
     "updaters": [
         {
             "type": "siri-sx-updater",
-            "frequencySec": 60,
+            "frequency": "1m",
             "url": "https://api.example.com/siri",
             "feedId": "siri-sx",
             "blockReadinessUntilInitialized": true
         },
         {
             "type": "siri-et-updater",
-            "frequencySec": 20,
+            "frequency": "20s",
             "previewIntervalMinutes": 180,
             "url": "https://api.example.com/siri",
             "feedId": "siri-et",
@@ -116,7 +116,7 @@ loaded at server startup.
         },
         {
             "type": "siri-vm-updater",
-            "frequencySec": 60,
+            "frequency": "1m",
             "url": "https://api.example.com/siri",
             "feedId": "siri-vm",
             "blockReadinessUntilInitialized": true

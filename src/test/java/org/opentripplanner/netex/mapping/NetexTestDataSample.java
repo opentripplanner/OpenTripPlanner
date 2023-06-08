@@ -215,6 +215,10 @@ public class NetexTestDataSample {
     return serviceJourneyById;
   }
 
+  public ServiceJourney getServiceJourney() {
+    return serviceJourneyById.lookup(SERVICE_JOURNEY_ID);
+  }
+
   HierarchicalMapById<Route> getRouteById() {
     return routesById;
   }

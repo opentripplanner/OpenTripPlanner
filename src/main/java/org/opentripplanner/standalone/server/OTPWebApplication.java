@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.binder.jersey.server.DefaultJerseyTagsProvi
 import io.micrometer.core.instrument.binder.jersey.server.MetricsApplicationEventListener;
 import io.micrometer.prometheus.PrometheusConfig;
 import io.micrometer.prometheus.PrometheusMeterRegistry;
+import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.Application;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,6 +38,8 @@ public class OTPWebApplication extends Application {
   /* This object groups together all the modules for a single running OTP server. */
   private final Supplier<OtpServerRequestContext> contextProvider;
 
+  private final List<Class<? extends ContainerResponseFilter>> customFilters;
+
   static {
     // Remove existing handlers attached to the j.u.l root logger
     SLF4JBridgeHandler.removeHandlersForRootLogger();
@@ -45,8 +48,12 @@ public class OTPWebApplication extends Application {
     SLF4JBridgeHandler.install();
   }
 
-  public OTPWebApplication(Supplier<OtpServerRequestContext> contextProvider) {
+  public OTPWebApplication(
+    OTPWebApplicationParameters parameters,
+    Supplier<OtpServerRequestContext> contextProvider
+  ) {
     this.contextProvider = contextProvider;
+    this.customFilters = createCustomFilters(parameters.traceParameters());
   }
 
   /**
@@ -62,10 +69,21 @@ public class OTPWebApplication extends Application {
     // Add API Endpoints defined in the api package
     Set<Class<?>> classes = new HashSet<>(APIEndpoints.listAPIEndpoints());
 
-    /* Features and Filters: extend Jersey, manipulate requests and responses. */
-    classes.addAll(Set.of(CorsFilter.class, EtagRequestFilter.class, VaryRequestFilter.class));
+    classes.addAll(resolveFilterClasses());
 
     return classes;
+  }
+
+  /**
+   * Features and Filters: extend Jersey, manipulate requests and responses.
+   */
+  private Set<Class<? extends ContainerResponseFilter>> resolveFilterClasses() {
+    var set = new HashSet<Class<? extends ContainerResponseFilter>>();
+    set.addAll(customFilters);
+    set.add(CorsFilter.class);
+    set.add(EtagRequestFilter.class);
+    set.add(VaryRequestFilter.class);
+    return set;
   }
 
   /**
@@ -155,5 +173,16 @@ public class OTPWebApplication extends Application {
         bind(prometheusRegistry).to(PrometheusMeterRegistry.class);
       }
     };
+  }
+
+  private List<Class<? extends ContainerResponseFilter>> createCustomFilters(
+    List<RequestTraceParameter> traceParameters
+  ) {
+    if (traceParameters.isEmpty()) {
+      return List.of();
+    }
+    RequestTraceFilter.init(traceParameters);
+
+    return List.of(RequestTraceFilter.class);
   }
 }

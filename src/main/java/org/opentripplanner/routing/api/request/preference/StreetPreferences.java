@@ -53,8 +53,8 @@ public final class StreetPreferences implements Serializable {
     this.drivingDirection = requireNonNull(builder.drivingDirection);
     this.elevator = requireNonNull(builder.elevator);
     this.intersectionTraversalModel = requireNonNull(builder.intersectionTraversalModel);
-    this.maxDirectDuration = requireNonNull(builder.maxDirectDuration.build());
-    this.maxAccessEgressDuration = requireNonNull(builder.maxAccessEgressDuration.build());
+    this.maxDirectDuration = requireNonNull(builder.maxDirectDuration);
+    this.maxAccessEgressDuration = requireNonNull(builder.maxAccessEgressDuration);
     this.routingTimeout = requireNonNull(builder.routingTimeout);
   }
 
@@ -158,8 +158,8 @@ public final class StreetPreferences implements Serializable {
     private DrivingDirection drivingDirection;
     private ElevatorPreferences elevator;
     private IntersectionTraversalModel intersectionTraversalModel;
-    private DurationForEnum.Builder<StreetMode> maxAccessEgressDuration;
-    private DurationForEnum.Builder<StreetMode> maxDirectDuration;
+    private DurationForEnum<StreetMode> maxAccessEgressDuration;
+    private DurationForEnum<StreetMode> maxDirectDuration;
     private Duration routingTimeout;
 
     public Builder(StreetPreferences original) {
@@ -168,8 +168,8 @@ public final class StreetPreferences implements Serializable {
       this.drivingDirection = original.drivingDirection;
       this.elevator = original.elevator;
       this.intersectionTraversalModel = original.intersectionTraversalModel;
-      this.maxAccessEgressDuration = original.maxAccessEgressDuration.copyOf();
-      this.maxDirectDuration = original.maxDirectDuration.copyOf();
+      this.maxAccessEgressDuration = original.maxAccessEgressDuration;
+      this.maxDirectDuration = original.maxDirectDuration;
       this.routingTimeout = original.routingTimeout;
     }
 
@@ -197,30 +197,27 @@ public final class StreetPreferences implements Serializable {
       return this;
     }
 
-    public Builder withMaxAccessEgressDuration(StreetMode mode, Duration duration) {
-      this.maxAccessEgressDuration.with(mode, duration);
+    public Builder withMaxAccessEgressDuration(Consumer<DurationForEnum.Builder<StreetMode>> body) {
+      this.maxAccessEgressDuration = this.maxAccessEgressDuration.copyOf().apply(body).build();
       return this;
     }
 
+    /** Utility method to simplify config parsing */
     public Builder withMaxAccessEgressDuration(
       Duration defaultValue,
       Map<StreetMode, Duration> values
     ) {
-      this.maxAccessEgressDuration.withDefault(defaultValue).withValues(values).build();
+      return withMaxAccessEgressDuration(b -> b.withDefault(defaultValue).withValues(values));
+    }
+
+    public Builder withMaxDirectDuration(Consumer<DurationForEnum.Builder<StreetMode>> body) {
+      this.maxDirectDuration = this.maxDirectDuration.copyOf().apply(body).build();
       return this;
     }
 
-    public Builder withMaxDirectDuration(StreetMode mode, Duration duration) {
-      this.maxDirectDuration.with(mode, duration);
-      return this;
-    }
-
-    public Builder withMaxDirectDuration(
-      Duration defaultValue,
-      Map<StreetMode, Duration> valuePerMode
-    ) {
-      this.maxDirectDuration.withDefault(defaultValue).withValues(valuePerMode).build();
-      return this;
+    /** Utility method to simplify config parsing */
+    public Builder withMaxDirectDuration(Duration defaultValue, Map<StreetMode, Duration> values) {
+      return withMaxDirectDuration(b -> b.withDefault(defaultValue).withValues(values));
     }
 
     public Builder withRoutingTimeout(Duration routingTimeout) {

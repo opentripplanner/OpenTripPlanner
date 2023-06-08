@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.street_note;
 
+import java.time.Duration;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 
 public class WFSNotePollingGraphUpdaterParameters implements PollingGraphUpdaterParameters {
@@ -10,18 +11,18 @@ public class WFSNotePollingGraphUpdaterParameters implements PollingGraphUpdater
 
   private final String featureType;
 
-  private final int frequencySec;
+  private final Duration frequency;
 
   public WFSNotePollingGraphUpdaterParameters(
     String configRef,
     String url,
     String featureType,
-    int frequencySec
+    Duration frequency
   ) {
     this.configRef = configRef;
     this.url = url;
     this.featureType = featureType;
-    this.frequencySec = frequencySec;
+    this.frequency = frequency;
   }
 
   public String getUrl() {
@@ -29,8 +30,8 @@ public class WFSNotePollingGraphUpdaterParameters implements PollingGraphUpdater
   }
 
   @Override
-  public int frequencySec() {
-    return frequencySec;
+  public Duration frequency() {
+    return frequency;
   }
 
   public String configRef() {

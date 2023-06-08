@@ -15,16 +15,21 @@ public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGr
   @Override
   public DataFetcher<LegacyGraphQLAbsoluteDirection> absoluteDirection() {
     return environment ->
-      switch (getSource(environment).getAbsoluteDirection()) {
-        case NORTH -> LegacyGraphQLAbsoluteDirection.NORTH;
-        case NORTHEAST -> LegacyGraphQLAbsoluteDirection.NORTHEAST;
-        case EAST -> LegacyGraphQLAbsoluteDirection.EAST;
-        case SOUTHEAST -> LegacyGraphQLAbsoluteDirection.SOUTHEAST;
-        case SOUTH -> LegacyGraphQLAbsoluteDirection.SOUTH;
-        case SOUTHWEST -> LegacyGraphQLAbsoluteDirection.SOUTHWEST;
-        case WEST -> LegacyGraphQLAbsoluteDirection.WEST;
-        case NORTHWEST -> LegacyGraphQLAbsoluteDirection.NORTHWEST;
-      };
+      getSource(environment)
+        .getAbsoluteDirection()
+        .map(dir ->
+          switch (dir) {
+            case NORTH -> LegacyGraphQLAbsoluteDirection.NORTH;
+            case NORTHEAST -> LegacyGraphQLAbsoluteDirection.NORTHEAST;
+            case EAST -> LegacyGraphQLAbsoluteDirection.EAST;
+            case SOUTHEAST -> LegacyGraphQLAbsoluteDirection.SOUTHEAST;
+            case SOUTH -> LegacyGraphQLAbsoluteDirection.SOUTH;
+            case SOUTHWEST -> LegacyGraphQLAbsoluteDirection.SOUTHWEST;
+            case WEST -> LegacyGraphQLAbsoluteDirection.WEST;
+            case NORTHWEST -> LegacyGraphQLAbsoluteDirection.NORTHWEST;
+          }
+        )
+        .orElse(null);
   }
 
   @Override
