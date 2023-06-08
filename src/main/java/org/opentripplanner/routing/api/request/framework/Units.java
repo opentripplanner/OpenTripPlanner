@@ -2,6 +2,7 @@ package org.opentripplanner.routing.api.request.framework;
 
 import static java.lang.Math.abs;
 
+import java.util.Locale;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.lang.IntUtils;
 
@@ -55,6 +56,19 @@ public class Units {
       return DoubleUtils.roundTo1Decimal(value);
     }
     return DoubleUtils.roundToZeroDecimals(value);
+  }
+
+  /**
+   * Convert a factor to string using the normalized number of digits.
+   */
+  public static String factorToString(double value) {
+    if (abs(value) < 2.0) {
+      return String.format(Locale.ROOT, "%.2f", value);
+    }
+    if (abs(value) < 10.0) {
+      return String.format(Locale.ROOT, "%.1f", value);
+    }
+    return String.format(Locale.ROOT, "%.0f", value);
   }
 
   /**
