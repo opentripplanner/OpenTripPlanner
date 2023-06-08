@@ -6,6 +6,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
@@ -23,6 +24,10 @@ public class StreetModelForTest {
 
   public static IntersectionVertex intersectionVertex(String label, double lat, double lon) {
     return new IntersectionVertex(null, label, lat, lon, label);
+  }
+
+  public static BarrierVertex barrierVertex(double lat, double lon) {
+    return new BarrierVertex(null, "barrier_lat:%s_lon:%s".formatted(lat, lon), lat, lon, 111555);
   }
 
   public static StreetEdge streetEdge(StreetVertex vA, StreetVertex vB) {
