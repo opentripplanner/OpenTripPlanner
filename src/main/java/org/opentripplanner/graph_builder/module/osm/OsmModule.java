@@ -498,8 +498,8 @@ public class OsmModule implements GraphBuilderModule {
   }
 
   private OsmEdge getEdgeForStreet(
-    IntersectionVertex startEndpoint,
-    IntersectionVertex endEndpoint,
+    IntersectionVertex from,
+    IntersectionVertex to,
     OSMWay way,
     int index,
     double length,
@@ -512,19 +512,11 @@ public class OsmModule implements GraphBuilderModule {
 
     I18NString name = params.edgeNamer().getNameForWay(way, label);
     if (way.isSteps()) {
-      return new StairsEdge(startEndpoint, endEndpoint, geometry, name, length);
+      return new StairsEdge(from, to, geometry, name, length);
     } else {
       float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
-      StreetEdge street = new StreetEdge(
-        startEndpoint,
-        endEndpoint,
-        geometry,
-        name,
-        length,
-        permissions,
-        back
-      );
+      StreetEdge street = new StreetEdge(from, to, geometry, name, length, permissions, back);
       street.setCarSpeed(carSpeed);
       street.setLink(OsmFilter.isLink(way));
 

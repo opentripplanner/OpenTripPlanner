@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.linking;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -33,8 +32,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.service.StopModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely
@@ -380,7 +377,7 @@ public class VertexLinker {
       }
       if (split) {
         // split the edge, get the split vertex
-        start = (IntersectionVertex) split(edge, ll, scope, direction, tempEdges);
+        start = split(edge, ll, scope, direction, tempEdges);
       }
     }
 

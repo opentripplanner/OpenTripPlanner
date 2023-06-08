@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.edge;
 import static org.opentripplanner.framework.geometry.AngleUtils.calculateAngle;
 
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.geometry.CompactLineStringUtils;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -21,7 +22,7 @@ public class StairsEdge extends OsmEdge {
     StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
   private final I18NString name;
-  private final LineString geometry;
+  private final byte[] compactGeometry;
   private final double distance;
   private final byte outAngle;
   private final byte inAngle;
@@ -36,7 +37,15 @@ public class StairsEdge extends OsmEdge {
   ) {
     super(from, to);
     this.name = name;
-    this.geometry = geometry;
+    this.compactGeometry =
+      CompactLineStringUtils.compactLineString(
+        from.getX(),
+        from.getY(),
+        to.getX(),
+        to.getY(),
+        geometry,
+        false
+      );
     this.distance = distance;
     this.outAngle = calculateAngle(DirectionUtils.getLastAngle(geometry));
     this.inAngle = calculateAngle(DirectionUtils.getFirstAngle(geometry));
@@ -82,7 +91,14 @@ public class StairsEdge extends OsmEdge {
 
   @Override
   public LineString getGeometry() {
-    return geometry;
+    return CompactLineStringUtils.uncompactLineString(
+      fromv.getX(),
+      fromv.getY(),
+      tov.getX(),
+      tov.getY(),
+      compactGeometry,
+      false
+    );
   }
 
   @Override
