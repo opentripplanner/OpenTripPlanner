@@ -34,7 +34,7 @@ public class GbfsStationStatusMapper {
     GBFSStation status = statusLookup.get(station.getStationId());
 
     station.vehiclesAvailable =
-      status.getNumBikesAvailable() != null ? status.getNumBikesAvailable().intValue() : 0;
+      status.getNumBikesAvailable() != null ? status.getNumBikesAvailable() : 0;
 
     station.vehicleTypesAvailable =
       status.getVehicleTypesAvailable() != null
@@ -42,21 +42,14 @@ public class GbfsStationStatusMapper {
           .getVehicleTypesAvailable()
           .stream()
           .filter(e -> containsVehicleType(e, status))
-          .collect(
-            Collectors.toMap(
-              e -> vehicleTypes.get(e.getVehicleTypeId()),
-              e -> e.getCount().intValue()
-            )
-          )
+          .collect(Collectors.toMap(e -> vehicleTypes.get(e.getVehicleTypeId()), e -> e.getCount()))
         : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.vehiclesAvailable);
 
     station.vehiclesDisabled =
-      status.getNumBikesDisabled() != null ? status.getNumBikesDisabled().intValue() : 0;
+      status.getNumBikesDisabled() != null ? status.getNumBikesDisabled() : 0;
 
     station.spacesAvailable =
-      status.getNumDocksAvailable() != null
-        ? status.getNumDocksAvailable().intValue()
-        : Integer.MAX_VALUE;
+      status.getNumDocksAvailable() != null ? status.getNumDocksAvailable() : Integer.MAX_VALUE;
 
     station.vehicleSpacesAvailable =
       status.getVehicleDocksAvailable() != null
@@ -67,13 +60,13 @@ public class GbfsStationStatusMapper {
             available
               .getVehicleTypeIds()
               .stream()
-              .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount().intValue()))
+              .map(t -> new VehicleTypeCount(vehicleTypes.get(t), available.getCount()))
           )
           .collect(Collectors.toMap(VehicleTypeCount::type, VehicleTypeCount::count))
         : Map.of(RentalVehicleType.getDefaultType(station.getNetwork()), station.spacesAvailable);
 
     station.spacesDisabled =
-      status.getNumDocksDisabled() != null ? status.getNumDocksDisabled().intValue() : 0;
+      status.getNumDocksDisabled() != null ? status.getNumDocksDisabled() : 0;
 
     station.isInstalled = status.getIsInstalled() != null ? status.getIsInstalled() : true;
     station.isRenting = status.getIsRenting() != null ? status.getIsRenting() : true;
