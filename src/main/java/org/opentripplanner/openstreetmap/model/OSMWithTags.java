@@ -116,6 +116,16 @@ public class OSMWithTags {
   }
 
   /**
+   * Checks if an entity is wheelchair-accessible. If there is no information provided is provided
+   * in the data, the result is {@code true}.
+   * <p>
+   * {@link OSMWithTags#getWheelchairAccessibility()}
+   */
+  public boolean isWheelchairAccessible() {
+    return !getWheelchairAccessibility().equals(Accessibility.NOT_POSSIBLE);
+  }
+
+  /**
    * Determines if a tag contains a true value. 'yes', 'true', and '1' are considered true.
    */
   public boolean isTagTrue(String tag) {

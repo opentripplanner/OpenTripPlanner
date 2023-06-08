@@ -532,15 +532,8 @@ public class OsmModule implements GraphBuilderModule {
         street.setHasBogusName(true);
       }
 
-      /* mark edges that are on roundabouts */
-      if (way.isRoundabout()) {
-        street.setRoundabout(true);
-      }
-
-      /* TODO: This should probably generalized somehow? */
-      if (way.isTagFalse("wheelchair")) {
-        street.setWheelchairAccessible(false);
-      }
+      street.setRoundabout(way.isRoundabout());
+      street.setWheelchairAccessible(way.isWheelchairAccessible());
 
       street.setSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way));
 
