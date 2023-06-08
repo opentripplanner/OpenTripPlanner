@@ -31,8 +31,7 @@ public interface RaptorAccessEgress {
    * This method is called many times, so care needs to be taken that the value is stored, not
    * calculated for each invocation.
    * <p>
-   * If this is {@link #isFree()}, then this method must return
-   * {@link RaptorConstants#ZERO_COST}.
+   * If this is {@link #isFree()}, then this method must return 0(zero).
    */
   int generalizedCost();
 
