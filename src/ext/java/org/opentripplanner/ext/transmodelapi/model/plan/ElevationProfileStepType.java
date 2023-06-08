@@ -19,7 +19,9 @@ public class ElevationProfileStepType {
        The %s's elevation profile. All elevation values, including the first one, are in meters 
        above sea level. The elevation is negative for places below sea level. The profile 
        includes both the start and end coordinate.
-       """.formatted(name)
+       """.formatted(
+        name
+      )
       .stripIndent();
   }
 
