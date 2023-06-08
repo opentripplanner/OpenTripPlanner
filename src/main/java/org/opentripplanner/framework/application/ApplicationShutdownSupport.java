@@ -23,7 +23,7 @@ public final class ApplicationShutdownSupport {
       LOG.info("Adding shutdown hook {}", shutdownHookName);
       Runtime.getRuntime().addShutdownHook(shutdownHook);
       return true;
-    } catch (IllegalStateException e) {
+    } catch (IllegalStateException ignore) {
       LOG.info(
         "OTP is already shutting down, the shutdown hook {} will not be added",
         shutdownHookName
