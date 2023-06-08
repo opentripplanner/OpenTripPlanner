@@ -17,25 +17,25 @@ public class TransferConstraintTest {
   private final int MAX_WAIT_TIME_ONE_HOUR = DurationUtils.durationInSeconds("1h");
   private final int D3m = DurationUtils.durationInSeconds("3m");
 
-  private final TransferConstraint NO_CONSTRAINS = TransferConstraint.create().build();
-  private final TransferConstraint RECOMMENDED = TransferConstraint.create().recommended().build();
-  private final TransferConstraint STAY_SEATED = TransferConstraint.create().staySeated().build();
-  private final TransferConstraint GUARANTIED = TransferConstraint.create().guaranteed().build();
-  private final TransferConstraint NOT_ALLOWED = TransferConstraint.create().notAllowed().build();
+  private final TransferConstraint NO_CONSTRAINS = TransferConstraint.of().build();
+  private final TransferConstraint RECOMMENDED = TransferConstraint.of().recommended().build();
+  private final TransferConstraint STAY_SEATED = TransferConstraint.of().staySeated().build();
+  private final TransferConstraint GUARANTEED = TransferConstraint.of().guaranteed().build();
+  private final TransferConstraint NOT_ALLOWED = TransferConstraint.of().notAllowed().build();
   private final TransferConstraint MAX_WAIT_TIME = TransferConstraint
-    .create()
+    .of()
     .guaranteed()
     .maxWaitTime(MAX_WAIT_TIME_ONE_HOUR)
     .build();
   private final TransferConstraint EVERYTHING = TransferConstraint
-    .create()
+    .of()
     .staySeated()
     .guaranteed()
     .preferred()
     .maxWaitTime(MAX_WAIT_TIME_ONE_HOUR)
     .build();
   private final TransferConstraint MIN_TX_TIME = TransferConstraint
-    .create()
+    .of()
     .minTransferTime(D3m)
     .build();
 
@@ -53,13 +53,13 @@ public class TransferConstraintTest {
 
   @Test
   public void isGuaranteed() {
-    assertTrue(GUARANTIED.isGuaranteed());
+    assertTrue(GUARANTEED.isGuaranteed());
     assertFalse(NO_CONSTRAINS.isGuaranteed());
   }
 
   @Test
   public void isFacilitated() {
-    assertTrue(GUARANTIED.isFacilitated());
+    assertTrue(GUARANTEED.isFacilitated());
     assertTrue(STAY_SEATED.isFacilitated());
     assertFalse(NO_CONSTRAINS.isFacilitated());
     assertFalse(NOT_ALLOWED.isFacilitated());
@@ -68,7 +68,7 @@ public class TransferConstraintTest {
 
   @Test
   public void useInRaptorRouting() {
-    assertTrue(GUARANTIED.includeInRaptorRouting());
+    assertTrue(GUARANTEED.includeInRaptorRouting());
     assertTrue(STAY_SEATED.includeInRaptorRouting());
     assertFalse(NO_CONSTRAINS.includeInRaptorRouting());
     assertTrue(NOT_ALLOWED.includeInRaptorRouting());
@@ -78,7 +78,7 @@ public class TransferConstraintTest {
   @Test
   public void isNotAllowed() {
     assertTrue(NOT_ALLOWED.isNotAllowed());
-    assertFalse(GUARANTIED.isNotAllowed());
+    assertFalse(GUARANTEED.isNotAllowed());
     assertFalse(NO_CONSTRAINS.isNotAllowed());
     assertFalse(MIN_TX_TIME.isNotAllowed());
   }
@@ -99,7 +99,7 @@ public class TransferConstraintTest {
     assertEquals(33_00, NO_CONSTRAINS.cost());
     assertEquals(33_00, MIN_TX_TIME.cost());
     assertEquals(32_00, RECOMMENDED.cost());
-    assertEquals(23_00, GUARANTIED.cost());
+    assertEquals(23_00, GUARANTEED.cost());
     assertEquals(13_00, STAY_SEATED.cost());
     assertEquals(11_00, EVERYTHING.cost());
   }
@@ -108,7 +108,7 @@ public class TransferConstraintTest {
   public void noConstraints() {
     assertTrue(NO_CONSTRAINS.isRegularTransfer());
     assertFalse(STAY_SEATED.isRegularTransfer());
-    assertFalse(GUARANTIED.isRegularTransfer());
+    assertFalse(GUARANTEED.isRegularTransfer());
     assertFalse(RECOMMENDED.isRegularTransfer());
     assertFalse(MAX_WAIT_TIME.isRegularTransfer());
     assertFalse(EVERYTHING.isRegularTransfer());
@@ -127,7 +127,7 @@ public class TransferConstraintTest {
   public void staticPriorityCost() {
     assertEquals(NO_CONSTRAINS.cost(), TransferConstraint.cost(null));
     assertEquals(NO_CONSTRAINS.cost(), TransferConstraint.cost(NO_CONSTRAINS));
-    assertEquals(GUARANTIED.cost(), TransferConstraint.cost(GUARANTIED));
+    assertEquals(GUARANTEED.cost(), TransferConstraint.cost(GUARANTEED));
   }
 
   @Test
@@ -147,7 +147,7 @@ public class TransferConstraintTest {
 
     assertEquals(txMinus, NO_CONSTRAINS.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
     assertEquals(txMinus, RECOMMENDED.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
-    assertEquals(t0, GUARANTIED.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
+    assertEquals(t0, GUARANTEED.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
     assertEquals(t0, STAY_SEATED.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
     assertEquals(t0, EVERYTHING.calculateTransferTargetTime(t0, dt, txMinusOp, FORWARD));
 
@@ -178,7 +178,7 @@ public class TransferConstraintTest {
 
     assertEquals(txMinus, NO_CONSTRAINS.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
     assertEquals(txMinus, RECOMMENDED.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
-    assertEquals(t0, GUARANTIED.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
+    assertEquals(t0, GUARANTEED.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
     assertEquals(t0, STAY_SEATED.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
     assertEquals(t0, EVERYTHING.calculateTransferTargetTime(t0, dt, txMinusOp, REVERSE));
 

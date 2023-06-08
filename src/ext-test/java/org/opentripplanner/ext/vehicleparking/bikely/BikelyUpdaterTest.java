@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -19,7 +20,13 @@ public class BikelyUpdaterTest {
   @Test
   void parseBikeBoxes() {
     var url = "file:src/ext-test/resources/vehicleparking/bikely/bikely.json";
-    var parameters = new BikelyUpdaterParameters("", url, "bikely", 30, HttpHeaders.empty());
+    var parameters = new BikelyUpdaterParameters(
+      "",
+      url,
+      "bikely",
+      Duration.ofSeconds(30),
+      HttpHeaders.empty()
+    );
     var updater = new BikelyUpdater(parameters);
 
     assertTrue(updater.update());

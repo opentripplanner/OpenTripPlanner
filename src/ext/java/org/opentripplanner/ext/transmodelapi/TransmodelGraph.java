@@ -14,15 +14,15 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
+import org.opentripplanner.ext.transmodelapi.support.AbortOnTimeoutExecutionStrategy;
+import org.opentripplanner.ext.transmodelapi.support.OtpExecutionResult;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class TransmodelGraph {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraph.class);
   private static final int MAX_ERROR_TO_RETURN = 25;
   private final GraphQLSchema indexSchema;
 
@@ -34,7 +34,7 @@ class TransmodelGraph {
     this.indexSchema = schema;
   }
 
-  ExecutionResult executeGraphQL(
+  OtpExecutionResult executeGraphQL(
     String query,
     OtpServerRequestContext serverContext,
     Map<String, Object> variables,
@@ -43,6 +43,7 @@ class TransmodelGraph {
     Iterable<Tag> tracingTags
   ) {
     Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
+
     if (OTPFeature.ActuatorAPI.isOn()) {
       instrumentation =
         new ChainedInstrumentation(
@@ -51,7 +52,12 @@ class TransmodelGraph {
         );
     }
 
-    GraphQL graphQL = GraphQL.newGraphQL(indexSchema).instrumentation(instrumentation).build();
+    var executionStrategy = new AbortOnTimeoutExecutionStrategy();
+    GraphQL graphQL = GraphQL
+      .newGraphQL(indexSchema)
+      .instrumentation(instrumentation)
+      .queryExecutionStrategy(executionStrategy)
+      .build();
 
     if (variables == null) {
       variables = new HashMap<>();
@@ -72,9 +78,16 @@ class TransmodelGraph {
       .variables(variables)
       .build();
 
-    var result = graphQL.execute(executionInput);
-    result = limitMaxNumberOfErrors(result);
-    return result;
+    // EXECUTE GRAPHQL QUERY
+    try {
+      var result = graphQL.execute(executionInput);
+      result = limitMaxNumberOfErrors(result);
+      return OtpExecutionResult.of(result);
+    } catch (OTPRequestTimeoutException te) {
+      return OtpExecutionResult.ofTimeout();
+    } finally {
+      executionStrategy.tearDown();
+    }
   }
 
   /**

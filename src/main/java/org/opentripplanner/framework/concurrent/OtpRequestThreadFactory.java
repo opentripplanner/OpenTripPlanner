@@ -3,6 +3,7 @@ package org.opentripplanner.framework.concurrent;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.concurrent.ThreadFactory;
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.application.LogMDCSupport;
 
 /**
  * This thread pool factory should be used to create all threads handling "user" requests in OTP.
@@ -34,6 +35,9 @@ public class OtpRequestThreadFactory implements ThreadFactory {
 
   @Override
   public Thread newThread(@Nonnull Runnable r) {
+    if (LogMDCSupport.isRequestTracingInLoggingEnabled()) {
+      return delegate.newThread(new LogMDCRunnableDecorator(r));
+    }
     return delegate.newThread(r);
   }
 }

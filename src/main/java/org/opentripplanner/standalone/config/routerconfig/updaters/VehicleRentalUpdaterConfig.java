@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.routerconfig.updaters;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1_5;
 
+import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerconfig.updaters.sources.VehicleRentalSourceFactory;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalSourceType;
@@ -18,10 +19,10 @@ public class VehicleRentalUpdaterConfig {
     return new VehicleRentalUpdaterParameters(
       configRef + "." + sourceType,
       c
-        .of("frequencySec")
+        .of("frequency")
         .since(V1_5)
-        .summary("How often the data should be updated in seconds.")
-        .asInt(60),
+        .summary("How often the data should be updated.")
+        .asDuration(Duration.ofMinutes(1)),
       VehicleRentalSourceFactory.create(sourceType, c)
     );
   }

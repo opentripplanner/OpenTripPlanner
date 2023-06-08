@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.bikely;
 
+import java.time.Duration;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -12,7 +13,7 @@ public record BikelyUpdaterParameters(
   String configRef,
   String url,
   String feedId,
-  int frequencySec,
+  Duration frequency,
   HttpHeaders httpHeaders
 )
   implements VehicleParkingUpdaterParameters {

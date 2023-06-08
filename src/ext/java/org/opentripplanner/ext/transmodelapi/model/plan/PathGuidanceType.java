@@ -54,7 +54,9 @@ public class PathGuidanceType {
           .name("heading")
           .description("The absolute direction of this step.")
           .type(EnumTypes.ABSOLUTE_DIRECTION)
-          .dataFetcher(environment -> ((WalkStep) environment.getSource()).getAbsoluteDirection())
+          .dataFetcher(environment ->
+            ((WalkStep) environment.getSource()).getAbsoluteDirection().orElse(null)
+          )
           .build()
       )
       .field(

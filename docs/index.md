@@ -36,15 +36,13 @@ the selector in the upper left of the published documentation.
 **Snapshot**
 
 - [dev-2.x](http://docs.opentripplanner.org/en/dev-2.x) - OTP 2 active development
-- [dev-1.x](http://docs.opentripplanner.org/en/dev-1.x) - OTP 1 active development
-
 
 # Audience
 
 The end users of OTP are the millions of people who rely on it to help plan their daily travel,
 often without even knowing they are using OTP. As an infrastructure component, installation and
 configuration of OTP tends to be somewhat technical and essentially invisible to those end users.
-This documentation is indended for people who wish to perform such deployments of OTP without
+This documentation is intended for people who wish to perform such deployments of OTP without
 necessarily diving into the internal details of the software.
 
 For members of the OTP community interested in software development, additional documentation

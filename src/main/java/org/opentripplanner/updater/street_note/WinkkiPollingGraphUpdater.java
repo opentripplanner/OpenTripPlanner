@@ -15,7 +15,7 @@ import org.opentripplanner.street.model.note.StreetNote;
  *
  * <pre>
  *     winkki.type = winkki-polling-updater
- *     winkki.frequencySec = 21600
+ *     winkki.frequency = 21600
  *     winkki.url = http://geoserver.hel.fi/geoserver/hkr/ows?Service=wfs&amp;Version=1.1.0&amp;Request=GetCapabilities
  *     winkki.featureType = hkr:winkki_works
  * </pre>

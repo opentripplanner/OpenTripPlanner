@@ -10,7 +10,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -89,13 +88,5 @@ public class GtfsRealtimeTripUpdateSource {
    */
   public boolean getFullDatasetValueOfLastUpdates() {
     return fullDataset;
-  }
-
-  interface Parameters {
-    String getFeedId();
-
-    String getUrl();
-
-    Map<String, String> headers();
   }
 }
