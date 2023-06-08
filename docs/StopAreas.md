@@ -11,11 +11,13 @@ walk routing.
 For example, an elevator or stairs can connect a normal street to a railway platform above it. There is
 no need to add an explicit edge, which connects the entrance point with the actual geometry of the platform.
 
+An  example: [Huopalahti railway station in Helsinki](https://www.openstreetmap.org/relation/6815620)
+
 #### Instructions:
 
 - Add platforms, which need special linking, as members of a `stop_area` tagged relation
 - Set role=platform to these platform members
-- Platforms must be also proper areas, tagged as `area=yes`. Also [boarding locations](BoardingLocations.md) are accepted.
+- Platforms must be also proper areas, tagged as routable highways and `area=yes`. Also a single tag `public_transport=platform` will do.
 - Model required entrance points inside platform geometry and make them relation members, too. No special tagging or role is required.
 - Connect entrance points to the street network
 - Platform and its entrance point must have the same `level` tag value. Also matching by default value zero is accepted.
