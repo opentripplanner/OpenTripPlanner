@@ -341,7 +341,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     )
       .build();
     if (updateResult.isFailure()) {
-      LOG.info("Failed to update TripTimes for trip {}", trip);
       return updateResult.toFailureResult();
     }
 
