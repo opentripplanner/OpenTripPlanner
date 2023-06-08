@@ -60,13 +60,7 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
     );
 
     // Get vehicle types
-    Map<String, RentalVehicleType> vehicleTypes = null;
-    GBFSVehicleTypes rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
-    if (rawVehicleTypes != null) {
-      GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId);
-      List<GBFSVehicleType> gbfsVehicleTypes = rawVehicleTypes.getData().getVehicleTypes();
-      vehicleTypes = mapVehicleTypes(vehicleTypeMapper, gbfsVehicleTypes);
-    }
+    final Map<String, RentalVehicleType> vehicleTypes = getVehicleTypes(system);
 
     List<VehicleRentalPlace> stations = new LinkedList<>();
 
@@ -131,6 +125,16 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
       this.geofencingZones = mapper.mapGeofencingZone(zones);
     }
     return stations;
+  }
+
+  private Map<String, RentalVehicleType> getVehicleTypes(VehicleRentalSystem system) {
+    GBFSVehicleTypes rawVehicleTypes = loader.getFeed(GBFSVehicleTypes.class);
+    if (rawVehicleTypes != null) {
+      GbfsVehicleTypeMapper vehicleTypeMapper = new GbfsVehicleTypeMapper(system.systemId);
+      List<GBFSVehicleType> gbfsVehicleTypes = rawVehicleTypes.getData().getVehicleTypes();
+      return mapVehicleTypes(vehicleTypeMapper, gbfsVehicleTypes);
+    }
+    return Map.of();
   }
 
   @Override

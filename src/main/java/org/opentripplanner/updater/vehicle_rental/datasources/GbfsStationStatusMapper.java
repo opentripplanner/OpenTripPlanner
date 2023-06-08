@@ -2,12 +2,18 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.entur.gbfs.v2_3.station_status.GBFSStation;
+import org.entur.gbfs.v2_3.station_status.GBFSVehicleTypesAvailable;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GbfsStationStatusMapper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsStationStatusMapper.class);
 
   private final Map<String, GBFSStation> statusLookup;
   private final Map<String, RentalVehicleType> vehicleTypes;
@@ -16,8 +22,8 @@ public class GbfsStationStatusMapper {
     Map<String, GBFSStation> statusLookup,
     Map<String, RentalVehicleType> vehicleTypes
   ) {
-    this.statusLookup = statusLookup;
-    this.vehicleTypes = vehicleTypes;
+    this.statusLookup = Objects.requireNonNull(statusLookup);
+    this.vehicleTypes = Objects.requireNonNull(vehicleTypes);
   }
 
   void fillStationStatus(VehicleRentalStation station) {
@@ -35,6 +41,7 @@ public class GbfsStationStatusMapper {
         ? status
           .getVehicleTypesAvailable()
           .stream()
+          .filter(e -> containsVehicleType(e, status))
           .collect(
             Collectors.toMap(
               e -> vehicleTypes.get(e.getVehicleTypeId()),
@@ -76,6 +83,21 @@ public class GbfsStationStatusMapper {
       status.getLastReported() != null
         ? Instant.ofEpochSecond(status.getLastReported().longValue())
         : null;
+  }
+
+  private boolean containsVehicleType(
+    GBFSVehicleTypesAvailable vehicleTypesAvailable,
+    GBFSStation station
+  ) {
+    boolean containsKey = vehicleTypes.containsKey(vehicleTypesAvailable.getVehicleTypeId());
+    if (!containsKey) {
+      LOG.warn(
+        "Unexpected vehicle type ID {} in status for GBFS station {}",
+        vehicleTypesAvailable.getVehicleTypeId(),
+        station.getStationId()
+      );
+    }
+    return containsKey;
   }
 
   private record VehicleTypeCount(RentalVehicleType type, int count) {}
