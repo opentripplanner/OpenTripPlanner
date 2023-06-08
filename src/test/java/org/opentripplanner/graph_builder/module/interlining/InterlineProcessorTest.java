@@ -4,12 +4,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.stopTime;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.StaySeatedNotAllowed;
+import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.transfer.DefaultTransferService;
+import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -20,27 +27,95 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 class InterlineProcessorTest implements PlanTestConstants {
 
   List<TripPattern> patterns = List.of(
-    tripPattern("trip-1", "block-1"),
-    tripPattern("trip-2", "block-1"),
-    tripPattern("trip-2", "block-3")
+    tripPattern("trip-1", "block-1", "service-1"),
+    tripPattern("trip-2", "block-1", "service-1"),
+    tripPattern("trip-3", "block-1", "service-2"),
+    tripPattern("trip-4", "block-1", "service-3"),
+    tripPattern("trip-5", "block-2", "service-4")
   );
 
-  @Test
-  void run() {
+  static Stream<Arguments> interlineTestCases = Stream.of(
+    Arguments.of(
+      List.of(
+        new FeedScopedId("1", "service-1"),
+        new FeedScopedId("1", "service-2"),
+        new FeedScopedId("1", "service-3"),
+        new FeedScopedId("1", "service-4")
+      ),
+      List.of(
+        List.of(LocalDate.of(2023, Month.JANUARY, 1), LocalDate.of(2023, Month.JANUARY, 5)),
+        List.of(LocalDate.of(2023, Month.JANUARY, 1)),
+        List.of(LocalDate.of(2023, Month.JANUARY, 1)),
+        List.of(LocalDate.of(2023, Month.JANUARY, 1))
+      ),
+      "[ConstrainedTransfer{from: TripTP{F:trip-2, stopPos 2}, to: TripTP{F:trip-3, stopPos 0}, " +
+      "constraint: {staySeated}}, ConstrainedTransfer{from: TripTP{F:trip-1, stopPos 2}, " +
+      "to: TripTP{F:trip-2, stopPos 0}, constraint: {staySeated}}, " +
+      "ConstrainedTransfer{from: TripTP{F:trip-3, stopPos 2}, to: TripTP{F:trip-4, stopPos 0}, constraint: {staySeated}}]"
+    ),
+    Arguments.of(
+      List.of(
+        new FeedScopedId("1", "service-1"),
+        new FeedScopedId("1", "service-2"),
+        new FeedScopedId("1", "service-3"),
+        new FeedScopedId("1", "service-4")
+      ),
+      List.of(
+        List.of(LocalDate.of(2023, Month.JANUARY, 1), LocalDate.of(2023, Month.JANUARY, 5)),
+        List.of(LocalDate.of(2023, Month.JANUARY, 1)),
+        List.of(LocalDate.of(2023, Month.JANUARY, 5)),
+        List.of(LocalDate.of(2023, Month.JANUARY, 1))
+      ),
+      "[ConstrainedTransfer{from: TripTP{F:trip-2, stopPos 2}, to: TripTP{F:trip-3, stopPos 0}, " +
+      "constraint: {staySeated}}, ConstrainedTransfer{from: TripTP{F:trip-1, stopPos 2}, " +
+      "to: TripTP{F:trip-2, stopPos 0}, constraint: {staySeated}}, " +
+      "ConstrainedTransfer{from: TripTP{F:trip-2, stopPos 2}, to: TripTP{F:trip-4, stopPos 0}, constraint: {staySeated}}]"
+    ),
+    // No common days between services
+    Arguments.of(
+      List.of(
+        new FeedScopedId("1", "service-1"),
+        new FeedScopedId("1", "service-2"),
+        new FeedScopedId("1", "service-3"),
+        new FeedScopedId("1", "service-4")
+      ),
+      List.of(
+        List.of(LocalDate.of(2023, Month.JANUARY, 1), LocalDate.of(2023, Month.JANUARY, 5)),
+        List.of(LocalDate.of(2023, Month.JANUARY, 2)),
+        List.of(LocalDate.of(2023, Month.JANUARY, 3)),
+        List.of(LocalDate.of(2023, Month.JANUARY, 1))
+      ),
+      "[ConstrainedTransfer{from: TripTP{F:trip-1, stopPos 2}, to: TripTP{F:trip-2, stopPos 0}, constraint: {staySeated}}]"
+    )
+  );
+
+  @ParameterizedTest(name = "{0} services with {1} dates should generate transfers: {2}")
+  @VariableSource("interlineTestCases")
+  void testInterline(
+    List<FeedScopedId> serviceIds,
+    List<List<LocalDate>> serviceDates,
+    String transfers
+  ) {
     var transferService = new DefaultTransferService();
+    var calendarServiceData = new CalendarServiceData();
+    for (int i = 0; i < serviceIds.size(); i++) {
+      calendarServiceData.putServiceDatesForServiceId(serviceIds.get(i), serviceDates.get(i));
+    }
     var processor = new InterlineProcessor(
       transferService,
       List.of(),
       100,
-      DataImportIssueStore.NOOP
+      DataImportIssueStore.NOOP,
+      calendarServiceData
     );
 
     var createdTransfers = processor.run(patterns);
-    assertEquals(1, createdTransfers.size());
 
     assertEquals(transferService.listAll(), createdTransfers);
 
     createdTransfers.forEach(t -> assertTrue(t.getTransferConstraint().isStaySeated()));
+
+    assertEquals(transfers, createdTransfers.toString());
   }
 
   @Test
@@ -52,11 +127,18 @@ class InterlineProcessorTest implements PlanTestConstants {
 
     var notAllowed = new StaySeatedNotAllowed(fromTrip, toTrip);
 
+    var calendarService = new CalendarServiceData();
+    calendarService.putServiceDatesForServiceId(
+      new FeedScopedId("1", "service-1"),
+      List.of(LocalDate.of(2023, Month.JANUARY, 1))
+    );
+
     var processor = new InterlineProcessor(
       transferService,
       List.of(notAllowed),
       100,
-      DataImportIssueStore.NOOP
+      DataImportIssueStore.NOOP,
+      calendarService
     );
 
     var createdTransfers = processor.run(patterns);
@@ -65,11 +147,11 @@ class InterlineProcessorTest implements PlanTestConstants {
     assertEquals(transferService.listAll(), createdTransfers);
   }
 
-  private static TripPattern tripPattern(String tripId, String blockId) {
+  private static TripPattern tripPattern(String tripId, String blockId, String serviceId) {
     var trip = TransitModelForTest
       .trip(tripId)
       .withGtfsBlockId(blockId)
-      .withServiceId(new FeedScopedId("1", "1"))
+      .withServiceId(new FeedScopedId("1", serviceId))
       .build();
 
     var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
