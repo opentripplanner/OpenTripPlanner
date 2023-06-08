@@ -53,10 +53,9 @@ public class InterlineProcessor {
     this.staySeatedNotAllowed = staySeatedNotAllowed;
     this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     this.issueStore = issueStore;
-    this.transitServiceStart = calendarServiceData.getFirstDate().get();
+    this.transitServiceStart = calendarServiceData.getFirstDate();
     this.daysInTransitService =
-      (int) ChronoUnit.DAYS.between(transitServiceStart, calendarServiceData.getLastDate().get()) +
-      1;
+      (int) ChronoUnit.DAYS.between(transitServiceStart, calendarServiceData.getLastDate()) + 1;
     this.calendarServiceData = calendarServiceData;
   }
 
