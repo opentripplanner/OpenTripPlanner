@@ -199,8 +199,8 @@ public class InterlineProcessor {
       );
       return true;
     }
-    TripPattern fromPattern = patternForTripTimes.get(fromTripTimes);
-    TripPattern toPattern = patternForTripTimes.get(toTripTimes);
+    var fromPattern = patternForTripTimes.get(fromTripTimes);
+    var toPattern = patternForTripTimes.get(toTripTimes);
     var fromStop = fromPattern.lastStop();
     var toStop = toPattern.firstStop();
     double teleportationDistance = SphericalDistanceLibrary.fastDistance(
