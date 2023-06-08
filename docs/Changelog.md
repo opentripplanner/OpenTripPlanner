@@ -37,6 +37,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove batch query from Transmodel API [#5147](https://github.com/opentripplanner/OpenTripPlanner/pull/5147)
 - Fix nullable absolute direction in GTFS GraphQL API [#5159](https://github.com/opentripplanner/OpenTripPlanner/pull/5159)
 - Fix error in flex validation [#5161](https://github.com/opentripplanner/OpenTripPlanner/pull/5161)
+- Check service dates instead of service ids for block id transfers [#5162](https://github.com/opentripplanner/OpenTripPlanner/pull/5162)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
