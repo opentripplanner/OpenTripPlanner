@@ -1,10 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
-import static org.opentripplanner.framework.geometry.AngleUtils.calculateAngle;
-
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
-import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -24,8 +21,6 @@ public class StairsEdge extends OsmEdge {
   private final I18NString name;
   private final byte[] compactGeometry;
   private final double distance;
-  private final byte outAngle;
-  private final byte inAngle;
   private float walkSafetyFactor = 1f;
 
   public StairsEdge(
@@ -35,7 +30,7 @@ public class StairsEdge extends OsmEdge {
     I18NString name,
     double distance
   ) {
-    super(from, to);
+    super(from, to, geometry);
     this.name = name;
     this.compactGeometry =
       CompactLineStringUtils.compactLineString(
@@ -47,8 +42,6 @@ public class StairsEdge extends OsmEdge {
         false
       );
     this.distance = distance;
-    this.outAngle = calculateAngle(DirectionUtils.getLastAngle(geometry));
-    this.inAngle = calculateAngle(DirectionUtils.getFirstAngle(geometry));
   }
 
   @Override
@@ -130,16 +123,6 @@ public class StairsEdge extends OsmEdge {
   @Override
   public void setWalkNoThruTraffic(boolean walkNoThrough) {
     // we are ignoring no-through on stairs
-  }
-
-  @Override
-  public int getOutAngle() {
-    return outAngle;
-  }
-
-  @Override
-  public int getInAngle() {
-    return inAngle;
   }
 
   @Override

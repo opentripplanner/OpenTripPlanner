@@ -100,15 +100,6 @@ public class StreetEdge
    */
   private float carSpeed;
 
-  /**
-   * The angle at the start of the edge geometry. Internal representation is -180 to +179 integer
-   * degrees mapped to -128 to +127 (brads)
-   */
-  private byte inAngle;
-
-  /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
-  private byte outAngle;
-
   private StreetElevationExtension elevationExtension;
 
   /**
@@ -138,7 +129,7 @@ public class StreetEdge
     StreetTraversalPermission permission,
     boolean back
   ) {
-    super(v1, v2);
+    super(v1, v2, geometry);
     this.setBack(back);
     this.setGeometry(geometry);
     this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS
@@ -156,32 +147,6 @@ public class StreetEdge
     this.setPermission(permission);
     this.setCarSpeed(DEFAULT_CAR_SPEED);
     this.setWheelchairAccessible(true); // accessible by default
-    if (geometry != null) {
-      try {
-        for (Coordinate c : geometry.getCoordinates()) {
-          if (Double.isNaN(c.x)) {
-            System.out.println("X DOOM");
-          }
-          if (Double.isNaN(c.y)) {
-            System.out.println("Y DOOM");
-          }
-        }
-        // Conversion from radians to internal representation as a single signed byte.
-        // We also reorient the angles since OTP seems to use South as a reference
-        // while the azimuth functions use North.
-        // FIXME Use only North as a reference, not a mix of North and South!
-        // Range restriction happens automatically due to Java signed overflow behavior.
-        // 180 degrees exists as a negative rather than a positive due to the integer range.
-        outAngle = AngleUtils.calculateAngle(DirectionUtils.getLastAngle(geometry));
-        inAngle = AngleUtils.calculateAngle(DirectionUtils.getFirstAngle(geometry));
-      } catch (IllegalArgumentException iae) {
-        LOG.error(
-          "exception while determining street edge angles. setting to zero. there is probably something wrong with this street segment's geometry."
-        );
-        inAngle = 0;
-        outAngle = 0;
-      }
-    }
   }
 
   //For testing only
@@ -708,14 +673,6 @@ public class StreetEdge
 
   public void setSlopeOverride(boolean slopeOverride) {
     flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
-  }
-
-  public int getInAngle() {
-    return (int) Math.round(this.inAngle * 180 / 128.0);
-  }
-
-  public int getOutAngle() {
-    return (int) Math.round(this.outAngle * 180 / 128.0);
   }
 
   public void setCostExtension(StreetEdgeCostExtension costExtension) {
