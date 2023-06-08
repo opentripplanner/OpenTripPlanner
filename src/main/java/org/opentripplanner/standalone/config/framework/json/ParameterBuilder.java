@@ -274,6 +274,39 @@ public class ParameterBuilder {
   }
 
   /**
+   * Add a map of a custom type with an enum as the key. You must provide a mapper for the
+   * custom type.
+   *
+   * @param <E>  The enum type
+   * @param <T>  The map value type.
+   * @return a map of T by enum values as keys, or an empty map if not set.
+   */
+  public <T, E extends Enum<E>> Map<E, T> asEnumMap(
+    Class<E> enumType,
+    Function<NodeAdapter, T> typeMapper
+  ) {
+    info.withOptional().withEnumMap(enumType, OBJECT);
+
+    var mapNode = buildObject();
+
+    if (mapNode.isEmpty()) {
+      return Map.of();
+    }
+    EnumMap<E, T> result = new EnumMap<>(enumType);
+
+    Iterator<String> it = mapNode.listExistingChildNodes();
+    while (it.hasNext()) {
+      String name = it.next();
+      Optional<E> key = parseOptionalEnum(name, enumType);
+      if (key.isPresent()) {
+        var child = mapNode.pathUndocumentedChild(name, info.since());
+        result.put(key.get(), typeMapper.apply(child));
+      }
+    }
+    return result;
+  }
+
+  /**
    * Get a map of enum values listed in the config like the {@link #asEnumMap(Class, Class)}, but
    * verify that all enum keys are listed. This can be used for settings where there is no
    * appropriate default value. Note! This method return {@code null}, not an empty map, if the
