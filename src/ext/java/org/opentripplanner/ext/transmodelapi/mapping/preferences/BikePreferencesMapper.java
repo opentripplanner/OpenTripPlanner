@@ -17,9 +17,9 @@ public class BikePreferencesMapper {
 
     if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
       bike.withOptimizeTriangle(triangle -> {
-        callWith.argument("triangle.timeFactor", triangle::withTime);
-        callWith.argument("triangle.slopeFactor", triangle::withSlope);
-        callWith.argument("triangle.safetyFactor", triangle::withSafety);
+        callWith.argument("triangleFactors.time", triangle::withTime);
+        callWith.argument("triangleFactors.slope", triangle::withSlope);
+        callWith.argument("triangleFactors.safety", triangle::withSafety);
       });
     }
   }
