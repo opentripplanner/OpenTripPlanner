@@ -69,11 +69,7 @@ public class Units {
    * Amount of time/slack/duration in seconds - A constant amount of time.
    */
   public static int duration(int seconds) {
-    IntUtils.requireNotNegative(seconds);
-    if (seconds < 0) {
-      throw new IllegalArgumentException("Negative slack/time/duration not expected: " + seconds);
-    }
-    return seconds;
+    return IntUtils.requireNotNegative(seconds);
   }
 
   /**
@@ -137,10 +133,7 @@ public class Units {
    * Unit: scalar
    */
   public static double ratio(double value) {
-    if (value < 0.0 || value > 1.0) {
-      throw new IllegalArgumentException("Ratio between 0.0 and 1.0 expected. Value: " + value);
-    }
-    return DoubleUtils.roundTo3Decimals(value);
+    return DoubleUtils.requireInRange(DoubleUtils.roundTo3Decimals(value), 0.0, 1.0);
   }
 
   /**
@@ -149,12 +142,6 @@ public class Units {
    * Unit: scalar
    */
   public static int count(int value, int maxValue) {
-    if (value < 0) {
-      throw new IllegalArgumentException("Negative count not expected: " + value);
-    }
-    if (value > maxValue) {
-      throw new IllegalArgumentException("Max limit(" + maxValue + ") exceeded: " + value);
-    }
-    return value;
+    return IntUtils.requireInRange(value, 0, maxValue);
   }
 }

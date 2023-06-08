@@ -1,8 +1,9 @@
 package org.opentripplanner.framework.lang;
 
+import static org.opentripplanner.framework.lang.OtpNumberFormat.formatTwoDecimals;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Locale;
 import javax.annotation.Nullable;
 
 public class DoubleUtils {
@@ -80,14 +81,12 @@ public class DoubleUtils {
   public static double requireInRange(double value, double min, double max, String field) {
     if (value < min || value > max) {
       throw new IllegalArgumentException(
-        String.format(
-          Locale.ROOT,
-          "The %s is not in range[%.1f, %.1f]: %.1f",
-          field,
-          min,
-          max,
-          value
-        )
+        "The %s is not in range[%s, %s]: %s".formatted(
+            field,
+            formatTwoDecimals(min),
+            formatTwoDecimals(max),
+            formatTwoDecimals(value)
+          )
       );
     }
     return value;
