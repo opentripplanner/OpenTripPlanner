@@ -147,7 +147,7 @@ public class InterlineProcessor {
       for (int i = 0; i < blockTripTimes.size(); i++) {
         var fromTripTimes = blockTripTimes.get(i);
         var fromServiceId = fromTripTimes.getTrip().getServiceId();
-        BitSet uncoveredDays = getDaysForService(fromServiceId, true);
+        BitSet uncoveredDays = getAndCopyDaysForService(fromServiceId);
         for (int j = i + 1; j < blockTripTimes.size(); j++) {
           var toTripTimes = blockTripTimes.get(j);
           var toServiceId = toTripTimes.getTrip().getServiceId();
@@ -157,10 +157,7 @@ public class InterlineProcessor {
           ) {
             break;
           }
-          BitSet daysForToTripTimes = getDaysForService(
-            toTripTimes.getTrip().getServiceId(),
-            false
-          );
+          BitSet daysForToTripTimes = getDaysForService(toTripTimes.getTrip().getServiceId());
           if (
             uncoveredDays.intersects(daysForToTripTimes) &&
             createInterline(fromTripTimes, toTripTimes, blockId, patternForTripTimes, interlines)
@@ -235,12 +232,14 @@ public class InterlineProcessor {
   }
 
   /**
-   * @param mutable This should be set as true if the {@link BitSet} will be modified as otherwise
-   *                we don't have to create a copy of a cached entity.
+   * This method should only be used when the returned {@link BitSet} is not altered as the returned
+   * value is cached for future use. If the BitSet needs to be modified, use
+   * {@link #getAndCopyDaysForService(FeedScopedId)}
+   *
    * @return {@link BitSet} which index starts at the first overall date of the services and the
    * last index is the last date.
    */
-  private BitSet getDaysForService(FeedScopedId serviceId, boolean mutable) {
+  private BitSet getDaysForService(FeedScopedId serviceId) {
     BitSet daysForService = this.daysOfServices.get(serviceId);
     if (daysForService == null) {
       daysForService = new BitSet(daysInTransitService);
@@ -253,7 +252,18 @@ public class InterlineProcessor {
       }
       daysOfServices.put(serviceId, daysForService);
     }
-    return mutable ? (BitSet) daysForService.clone() : daysForService;
+    return daysForService;
+  }
+
+  /**
+   * This {@link BitSet} returned from this method can be modified. If there is no need to modify
+   * it, {@link #getDaysForService(FeedScopedId)} can be used instead.
+   *
+   * @return {@link BitSet} which index starts at the first overall date of the services and the
+   * last index is the last date.
+   */
+  private BitSet getAndCopyDaysForService(FeedScopedId serviceId) {
+    return (BitSet) getDaysForService(serviceId).clone();
   }
 
   private record TripPatternPair(TripPattern from, TripPattern to) {}
