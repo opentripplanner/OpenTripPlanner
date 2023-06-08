@@ -36,6 +36,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Make update frequency a Duration [#5152](https://github.com/opentripplanner/OpenTripPlanner/pull/5152)
 - Remove batch query from Transmodel API [#5147](https://github.com/opentripplanner/OpenTripPlanner/pull/5147)
 - Fix nullable absolute direction in GTFS GraphQL API [#5159](https://github.com/opentripplanner/OpenTripPlanner/pull/5159)
+- Fix error in flex validation [#5161](https://github.com/opentripplanner/OpenTripPlanner/pull/5161)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
