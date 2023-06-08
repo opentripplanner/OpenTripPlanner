@@ -180,7 +180,8 @@ public class GtfsModule implements GraphBuilderModule {
             transitModel.getTransferService(),
             builder.getStaySeatedNotAllowed(),
             gtfsBundle.maxInterlineDistance(),
-            issueStore
+            issueStore,
+            calendarServiceData
           )
             .run(otpTransitService.getTripPatterns());
         }
