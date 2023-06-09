@@ -543,7 +543,7 @@ ferries, where the check-in process needs to be done in good time before ride.
             extra cost, while 1.0 will add the same amount to both time and cost.
             """
           )
-          .asEnumMap(StreetMode.class, TimeCostPenaltyMapper::map)
+          .asEnumMap(StreetMode.class, TimeAmdCostPenaltyMapper::map)
       )
       .withMaxAccessEgressDuration(
         c

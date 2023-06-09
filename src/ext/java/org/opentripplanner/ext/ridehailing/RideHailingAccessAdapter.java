@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.ridehailing;
 
 import java.time.Duration;
-import javax.annotation.Nullable;
+import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 
 /**
@@ -17,14 +17,19 @@ public final class RideHailingAccessAdapter extends DefaultAccessEgress {
     this.arrival = arrival;
   }
 
+  public RideHailingAccessAdapter(RideHailingAccessAdapter other, TimeAndCost penalty) {
+    super(other, penalty);
+    this.arrival = other.arrival;
+  }
+
   @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
-    return (int) (super.earliestDepartureTime(requestedDepartureTime) + arrival.toSeconds());
+    return super.earliestDepartureTime(requestedDepartureTime) + (int) arrival.toSeconds();
   }
 
   @Override
   public int latestArrivalTime(int requestedArrivalTime) {
-    return (int) (super.latestArrivalTime(requestedArrivalTime) + arrival.toSeconds());
+    return super.latestArrivalTime(requestedArrivalTime) + (int) arrival.toSeconds();
   }
 
   @Override
@@ -38,10 +43,14 @@ public final class RideHailingAccessAdapter extends DefaultAccessEgress {
     return true;
   }
 
-  @Nullable
   @Override
   public String openingHoursToString() {
     return "Arrival in " + arrival.toString();
+  }
+
+  @Override
+  public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
+    return new RideHailingAccessAdapter(this, penalty);
   }
 
   @Override

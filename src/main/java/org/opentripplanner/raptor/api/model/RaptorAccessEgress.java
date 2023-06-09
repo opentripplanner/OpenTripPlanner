@@ -59,9 +59,7 @@ public interface RaptorAccessEgress {
    * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible after the requested departure time.
    */
-  default int earliestDepartureTime(int requestedDepartureTime) {
-    return requestedDepartureTime;
-  }
+  int earliestDepartureTime(int requestedDepartureTime);
 
   /**
    * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares
@@ -70,9 +68,7 @@ public interface RaptorAccessEgress {
    * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible before the requested arrival time.
    */
-  default int latestArrivalTime(int requestedArrivalTime) {
-    return requestedArrivalTime;
-  }
+  int latestArrivalTime(int requestedArrivalTime);
 
   /**
    * This method should return {@code true} if, and only if the instance have restricted

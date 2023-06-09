@@ -48,10 +48,7 @@ class StreetPreferencesTest {
 
   @Test
   void accessEgressPenalty() {
-    assertEquals(
-      TimeAndCostPenalty.ZERO,
-      subject.accessEgressPenalty().valueOf(StreetMode.WALK)
-    );
+    assertEquals(TimeAndCostPenalty.ZERO, subject.accessEgressPenalty().valueOf(StreetMode.WALK));
     assertEquals(CAR_PENALTY, subject.accessEgressPenalty().valueOf(StreetMode.CAR_TO_PARK));
   }
 
