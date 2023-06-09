@@ -9,6 +9,8 @@ import org.rutebanken.netex.model.TimetabledPassingTime;
  * comparison. Passing times are exposed as seconds since midnight, taking into account the day
  * offset.
  * <p>
+ * This class does not take Daylight Saving Time transitions into account, this is an error and
+ * should be fixed. See https://github.com/opentripplanner/OpenTripPlanner/issues/5109
  */
 abstract sealed class AbstractStopTimeAdaptor
   implements StopTimeAdaptor
@@ -32,25 +34,15 @@ abstract sealed class AbstractStopTimeAdaptor
     // picture - so keep it together until more cases are added.
     if (this instanceof RegularStopTimeAdaptor) {
       if (next instanceof RegularStopTimeAdaptor) {
-        // regular followed by regular stop
-        return (
-          normalizedDepartureTimeOrElseArrivalTime() <=
-          next.normalizedArrivalTimeOrElseDepartureTime()
-        );
+        return isRegularStopFollowedByRegularStopValid(next);
       } else {
-        // Regular followed by area stop
-        return normalizedDepartureTimeOrElseArrivalTime() <= next.normalizedEarliestDepartureTime();
+        return isRegularStopFollowedByAreaStopValid(next);
       }
     } else {
       if (next instanceof RegularStopTimeAdaptor) {
-        // area followed by regular stop
-        return normalizedLatestArrivalTime() <= next.normalizedArrivalTimeOrElseDepartureTime();
+        return isAreaStopFollowedByRegularStopValid(next);
       } else {
-        // Area followed by area stop
-        return (
-          (normalizedEarliestDepartureTime() < next.normalizedEarliestDepartureTime()) &&
-          (normalizedLatestArrivalTime() < next.normalizedLatestArrivalTime())
-        );
+        return isAreaStopFollowedByAreaStopValid(next);
       }
     }
   }
@@ -85,5 +77,31 @@ abstract sealed class AbstractStopTimeAdaptor
 
   protected BigInteger earliestDepartureDayOffset() {
     return timetabledPassingTime.getEarliestDepartureDayOffset();
+  }
+
+  private boolean isRegularStopFollowedByRegularStopValid(StopTimeAdaptor next) {
+    return (
+      normalizedDepartureTimeOrElseArrivalTime() <= next.normalizedArrivalTimeOrElseDepartureTime()
+    );
+  }
+
+  private boolean isAreaStopFollowedByAreaStopValid(StopTimeAdaptor next) {
+    int earliestDepartureTime = normalizedEarliestDepartureTime();
+    int nextEarliestDepartureTime = next.normalizedEarliestDepartureTime();
+    int latestArrivalTime = normalizedLatestArrivalTime();
+    int nextLatestArrivalTime = next.normalizedLatestArrivalTime();
+
+    return (
+      earliestDepartureTime <= nextEarliestDepartureTime &&
+      latestArrivalTime <= nextLatestArrivalTime
+    );
+  }
+
+  private boolean isRegularStopFollowedByAreaStopValid(StopTimeAdaptor next) {
+    return normalizedDepartureTimeOrElseArrivalTime() <= next.normalizedEarliestDepartureTime();
+  }
+
+  private boolean isAreaStopFollowedByRegularStopValid(StopTimeAdaptor next) {
+    return normalizedLatestArrivalTime() <= next.normalizedArrivalTimeOrElseDepartureTime();
   }
 }

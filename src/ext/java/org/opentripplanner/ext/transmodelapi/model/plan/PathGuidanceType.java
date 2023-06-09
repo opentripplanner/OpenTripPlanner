@@ -3,7 +3,6 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.plan.WalkStep;
@@ -53,7 +52,9 @@ public class PathGuidanceType {
           .name("heading")
           .description("The absolute direction of this step.")
           .type(EnumTypes.ABSOLUTE_DIRECTION)
-          .dataFetcher(environment -> ((WalkStep) environment.getSource()).getAbsoluteDirection())
+          .dataFetcher(environment ->
+            ((WalkStep) environment.getSource()).getAbsoluteDirection().orElse(null)
+          )
           .build()
       )
       .field(

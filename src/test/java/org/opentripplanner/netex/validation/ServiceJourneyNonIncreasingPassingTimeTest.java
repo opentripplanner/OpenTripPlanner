@@ -19,7 +19,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithRegularStop() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
@@ -38,7 +38,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithRegularStopMissingTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     // remove arrival time and departure time
@@ -61,7 +61,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithRegularStopInconsistentTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     // set arrival time after departure time
@@ -83,7 +83,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithAreaStop() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     HierarchicalMapById<ServiceJourney> serviceJourneyById = sample.getServiceJourneyById();
@@ -115,7 +115,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithAreaStopMissingTimeWindow() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     HierarchicalMapById<ServiceJourney> serviceJourneyById = sample.getServiceJourneyById();
@@ -147,7 +147,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithAreaStopInconsistentTimeWindow() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     HierarchicalMapById<ServiceJourney> serviceJourneyById = sample.getServiceJourneyById();
@@ -186,7 +186,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithRegularStopFollowedByRegularStopNonIncreasingTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     // remove arrival time and departure time and add flex window on second stop
@@ -206,10 +206,32 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
     );
   }
 
+  /**
+   * This test makes sure all passing times are complete and consistent, before it checks for
+   * increasing times.
+   */
+  @Test
+  void testValidateWithRegularStopFollowedByRegularStopWithMissingTime() {
+    var sample = new NetexTestDataSample();
+    var serviceJourney = sample.getServiceJourney();
+    var journeyPattern = sample.getJourneyPattern();
+
+    // Set arrivalTime AFTER departure time (not valid)
+    getSecondPassingTime(serviceJourney).withDepartureTime(null).withArrivalTime(null);
+
+    var entityIndex = new NetexEntityIndex();
+    entityIndex.journeyPatternsById.add(journeyPattern);
+
+    var subject = new ServiceJourneyNonIncreasingPassingTime();
+    subject.setup(entityIndex.readOnlyView());
+
+    assertEquals(HMapValidationRule.Status.DISCARD, subject.validate(serviceJourney));
+  }
+
   @Test
   void testValidateServiceJourneyWithRegularStopFollowedByStopArea() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     // remove arrival time and departure time and add flex window on second stop
@@ -240,7 +262,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithRegularStopFollowedByStopAreaNonIncreasingTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     // remove arrival time and departure time and add flex window with decreasing time on second stop
@@ -271,7 +293,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByRegularStop() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     // remove arrival time and departure time and add flex window on first stop
@@ -302,7 +324,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByStopArea() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     // remove arrival time and departure time and add flex window on first stop
@@ -343,7 +365,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByStopAreaNonIncreasingTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     // remove arrival time and departure time and add flex window on first stop and second stop
@@ -385,7 +407,7 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
   @Test
   void testValidateServiceJourneyWithStopAreaFollowedByRegularStopNonIncreasingTime() {
     NetexTestDataSample sample = new NetexTestDataSample();
-    ServiceJourney serviceJourney = getServiceJourney(sample);
+    ServiceJourney serviceJourney = sample.getServiceJourney();
     JourneyPattern journeyPattern = sample.getJourneyPattern();
 
     // remove arrival time and departure time and add flex window on first stop
@@ -417,12 +439,6 @@ class ServiceJourneyNonIncreasingPassingTimeTest {
       HMapValidationRule.Status.DISCARD,
       serviceJourneyNonIncreasingPassingTime.validate(serviceJourney)
     );
-  }
-
-  private ServiceJourney getServiceJourney(NetexTestDataSample sample) {
-    HierarchicalMapById<ServiceJourney> serviceJourneyById = sample.getServiceJourneyById();
-
-    return serviceJourneyById.localValues().stream().findFirst().orElseThrow();
   }
 
   private TimetabledPassingTime getPassingTime(ServiceJourney serviceJourney, int order) {

@@ -34,6 +34,12 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Comment out replacing DSJ-ID from planned data with ID from realtime-data [#5140](https://github.com/opentripplanner/OpenTripPlanner/pull/5140)
 - Remove San Francisco and vehicle rental fare calculators [#5145](https://github.com/opentripplanner/OpenTripPlanner/pull/5145)
 - Make update frequency a Duration [#5152](https://github.com/opentripplanner/OpenTripPlanner/pull/5152)
+- Remove batch query from Transmodel API [#5147](https://github.com/opentripplanner/OpenTripPlanner/pull/5147)
+- Fix nullable absolute direction in GTFS GraphQL API [#5159](https://github.com/opentripplanner/OpenTripPlanner/pull/5159)
+- Fix error in flex validation [#5161](https://github.com/opentripplanner/OpenTripPlanner/pull/5161)
+- Check service dates instead of service ids for block id transfers [#5162](https://github.com/opentripplanner/OpenTripPlanner/pull/5162)
+- Improve updater log messages [#5168](https://github.com/opentripplanner/OpenTripPlanner/pull/5168)
+- Add support for mapping NeTEx operating day in operating period [#5167](https://github.com/opentripplanner/OpenTripPlanner/pull/5167)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
