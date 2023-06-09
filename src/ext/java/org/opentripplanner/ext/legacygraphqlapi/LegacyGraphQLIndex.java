@@ -85,6 +85,7 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLplaceA
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLserviceTimeRangeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstepImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstopAtDistanceImpl;
+import org.opentripplanner.ext.legacygraphqlapi.model.StopPosition;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.slf4j.Logger;
@@ -120,7 +121,7 @@ class LegacyGraphQLIndex {
         )
         .type(
           "StopPosition",
-          type -> type.typeResolver(new LegacyGraphQLStopPositionTypeResolver())
+          type -> type.typeResolver(new StopPosition() {})
         )
         .type(typeWiring.build(LegacyGraphQLAgencyImpl.class))
         .type(typeWiring.build(LegacyGraphQLAlertImpl.class))

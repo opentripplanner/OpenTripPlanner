@@ -4,7 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVertexType;
-import org.opentripplanner.ext.legacygraphqlapi.model.PositionAtStop;
+import org.opentripplanner.ext.legacygraphqlapi.model.StopPosition;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
@@ -91,7 +91,7 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
     return environment -> {
       var seq = getSource(environment).gtfsStopSequence;
       if (seq != null) {
-        return new PositionAtStop(seq);
+        return new StopPosition.PositionAtStop(seq);
       } else {
         return null;
       }
