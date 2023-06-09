@@ -162,7 +162,7 @@ public class GbfsFeedLoader {
     private boolean fetchData() {
       T newData = GbfsFeedLoader.fetchFeed(url, httpHeaders, implementingClass);
       if (newData == null) {
-        LOG.error("Invalid data for {}", url);
+        LOG.warn("Could not fetch GBFS data for {}. Retrying.", url);
         nextUpdate = getCurrentTimeSeconds();
         return false;
       }
