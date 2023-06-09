@@ -105,7 +105,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
         legs.add(transitLeg);
       }
-      // Map transfer leg
+      // Map transfer leg but not when there is a stay seated transfer as the transfer leg would be
+      // a walk/bicycle leg between two stops (more details in
+      // https://github.com/opentripplanner/OpenTripPlanner/issues/5086).
       else if (pathLeg.isTransferLeg() && !staySeatedInTransferFrom(transitLeg)) {
         legs.addAll(
           mapTransferLeg(
