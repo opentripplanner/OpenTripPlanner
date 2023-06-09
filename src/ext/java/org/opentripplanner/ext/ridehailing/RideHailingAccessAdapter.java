@@ -46,6 +46,6 @@ public final class RideHailingAccessAdapter extends DefaultAccessEgress {
 
   @Override
   public String toString() {
-    return asString(true);
+    return asString(true, false, null);
   }
 }

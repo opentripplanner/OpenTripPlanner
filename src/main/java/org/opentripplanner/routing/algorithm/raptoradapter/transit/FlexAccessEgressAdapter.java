@@ -47,11 +47,6 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
     return true;
   }
 
-  @Override
-  public String toString() {
-    return asString(true);
-  }
-
   private static int mapToRaptorTime(int flexTime) {
     return flexTime == StopTime.MISSING_VALUE ? RaptorConstants.TIME_NOT_SET : flexTime;
   }

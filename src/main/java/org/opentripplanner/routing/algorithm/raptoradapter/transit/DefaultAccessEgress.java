@@ -26,11 +26,6 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
-  public boolean hasOpeningHours() {
-    return false;
-  }
-
-  @Override
   public int durationInSeconds() {
     return durationInSeconds;
   }
@@ -45,16 +40,21 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     return generalizedCost;
   }
 
+  @Override
+  public boolean hasOpeningHours() {
+    return false;
+  }
+
   public State getLastState() {
     return lastState;
   }
 
-  @Override
-  public String toString() {
-    return asString(true) + (lastState != null ? " (" + lastState + ")" : "");
-  }
-
   public boolean isWalkOnly() {
     return lastState.containsOnlyWalkMode();
+  }
+
+  @Override
+  public String toString() {
+    return asString(true, true, null);
   }
 }
