@@ -2053,6 +2053,17 @@ type BookingInfo {
     dropOffMessage: String
 }
 
+type PositionBetweenStops {
+    previousPosition: Int
+    nextPosition: Int
+}
+
+type PositionAtStop {
+    position: Int
+}
+
+union StopPosition = PositionAtStop | PositionBetweenStops
+
 type Place {
     """
     For transit stops, the name of the stop. For points of interest, the name of the POI.
@@ -2096,7 +2107,7 @@ type Place {
     Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
     even generated.
     """
-    stopSequence: Int
+    stopPosition: StopPosition
 
     """The vehicle rental station related to the place"""
     vehicleRentalStation: VehicleRentalStation
@@ -3617,7 +3628,7 @@ type Stoptime {
     Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
     even generated.
     """
-    sequence: Int
+    stopPosition: StopPosition
 
     """
     Scheduled arrival time. Format: seconds since midnight of the departure date

@@ -11,7 +11,12 @@
                 }
                 scheduledArrival
                 scheduledDeparture
-                sequence
+                stopPosition {
+                    __typename
+                    ... on PositionAtStop {
+                        position
+                    }
+                }
                 realtimeState
                 pickupType
                 dropoffType

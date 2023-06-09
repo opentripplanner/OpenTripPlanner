@@ -15,16 +15,14 @@
                 "lat" : 5.0,
                 "lon" : 8.0,
                 "departureTime" : 1580641200000,
-                "arrivalTime" : 1580641200000,
-                "stopSequence" : null
+                "arrivalTime" : 1580641200000
               },
               "to" : {
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
                 "departureTime" : 1580641220000,
-                "arrivalTime" : 1580641220000,
-                "stopSequence" : null
+                "arrivalTime" : 1580641220000
               },
               "startTime" : 1580641200000,
               "endTime" : 1580641220000,
@@ -41,16 +39,14 @@
                 "lat" : 6.0,
                 "lon" : 8.5,
                 "departureTime" : 1580641260000,
-                "arrivalTime" : 1580641260000,
-                "stopSequence" : 0
+                "arrivalTime" : 1580641260000
               },
               "to" : {
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
                 "departureTime" : 1580642100000,
-                "arrivalTime" : 1580642100000,
-                "stopSequence" : 0
+                "arrivalTime" : 1580642100000
               },
               "startTime" : 1580641260000,
               "endTime" : 1580642100000,
@@ -128,16 +124,14 @@
                 "lat" : 7.0,
                 "lon" : 9.0,
                 "departureTime" : 1580643000000,
-                "arrivalTime" : 1580643000000,
-                "stopSequence" : 0
+                "arrivalTime" : 1580643000000
               },
               "to" : {
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
                 "departureTime" : 1580644200000,
-                "arrivalTime" : 1580644200000,
-                "stopSequence" : 0
+                "arrivalTime" : 1580644200000
               },
               "startTime" : 1580643000000,
               "endTime" : 1580644200000,
@@ -219,16 +213,14 @@
                 "lat" : 8.0,
                 "lon" : 9.5,
                 "departureTime" : 1580644200000,
-                "arrivalTime" : 1580644200000,
-                "stopSequence" : null
+                "arrivalTime" : 1580644200000
               },
               "to" : {
                 "name" : "E",
                 "lat" : 9.0,
                 "lon" : 10.0,
                 "departureTime" : 1580644800000,
-                "arrivalTime" : 1580644800000,
-                "stopSequence" : null
+                "arrivalTime" : 1580644800000
               },
               "startTime" : 1580644200000,
               "endTime" : 1580644800000,

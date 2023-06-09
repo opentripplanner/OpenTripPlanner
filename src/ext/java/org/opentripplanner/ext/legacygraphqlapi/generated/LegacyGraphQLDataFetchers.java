@@ -555,7 +555,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Object> stop();
 
-    public DataFetcher<Integer> stopSequence();
+    public DataFetcher<Object> stopPosition();
 
     public DataFetcher<VehicleParking> vehicleParking();
 
@@ -605,6 +605,16 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Long> searchWindowUsed();
 
     public DataFetcher<StopArrival> to();
+  }
+
+  public interface LegacyGraphQLPositionAtStop {
+    public DataFetcher<Integer> position();
+  }
+
+  public interface LegacyGraphQLPositionBetweenStops {
+    public DataFetcher<Integer> nextPosition();
+
+    public DataFetcher<Integer> previousPosition();
   }
 
   public interface LegacyGraphQLQueryType {
@@ -885,6 +895,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Trip> trip();
   }
 
+  public interface LegacyGraphQLStopPosition extends TypeResolver {}
+
   /** Upcoming or current stop and how close the vehicle is to it. */
   public interface LegacyGraphQLStopRelationship {
     public DataFetcher<Object> status();
@@ -916,11 +928,11 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Integer> scheduledDeparture();
 
-    public DataFetcher<Integer> sequence();
-
     public DataFetcher<Long> serviceDay();
 
     public DataFetcher<Object> stop();
+
+    public DataFetcher<Object> stopPosition();
 
     public DataFetcher<Boolean> timepoint();
 

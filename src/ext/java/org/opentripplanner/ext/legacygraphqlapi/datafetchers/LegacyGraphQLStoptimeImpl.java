@@ -3,6 +3,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.legacygraphqlapi.model.PositionAtStop;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -85,8 +86,8 @@ public class LegacyGraphQLStoptimeImpl implements LegacyGraphQLDataFetchers.Lega
   }
 
   @Override
-  public DataFetcher<Integer> sequence() {
-    return environment -> getSource(environment).getGtfsSequence();
+  public DataFetcher<Object> stopPosition() {
+    return environment -> new PositionAtStop(getSource(environment).getGtfsSequence());
   }
 
   @Override
