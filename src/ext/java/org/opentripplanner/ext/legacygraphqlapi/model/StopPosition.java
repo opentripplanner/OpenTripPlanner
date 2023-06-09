@@ -4,13 +4,11 @@ import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 
-public interface StopPosition extends LegacyGraphQLDataFetchers.LegacyGraphQLStopPosition  {
-  record PositionAtStop(int position)
-    implements StopPosition {
-  }
-  record PositionBetweenStops(int previousPosition, int nextPosition)
-    implements StopPosition {
-  }
+public interface StopPosition extends LegacyGraphQLDataFetchers.LegacyGraphQLStopPosition {
+  record PositionAtStop(int position) implements StopPosition {}
+
+  record PositionBetweenStops(int previousPosition, int nextPosition) implements StopPosition {}
+
   @Override
   default GraphQLObjectType getType(TypeResolutionEnvironment env) {
     var schema = env.getSchema();
@@ -24,4 +22,3 @@ public interface StopPosition extends LegacyGraphQLDataFetchers.LegacyGraphQLSto
     return null;
   }
 }
-

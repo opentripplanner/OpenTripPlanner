@@ -65,7 +65,6 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStopGe
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStopImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStopOnRouteImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStopOnTripImpl;
-import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStopPositionTypeResolver;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStopRelationshipImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStoptimeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLStoptimesInPatternImpl;
@@ -119,10 +118,7 @@ class LegacyGraphQLIndex {
           "PlaceInterface",
           type -> type.typeResolver(new LegacyGraphQLPlaceInterfaceTypeResolver())
         )
-        .type(
-          "StopPosition",
-          type -> type.typeResolver(new StopPosition() {})
-        )
+        .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
         .type(typeWiring.build(LegacyGraphQLAgencyImpl.class))
         .type(typeWiring.build(LegacyGraphQLAlertImpl.class))
         .type(typeWiring.build(LegacyGraphQLBikeParkImpl.class))
