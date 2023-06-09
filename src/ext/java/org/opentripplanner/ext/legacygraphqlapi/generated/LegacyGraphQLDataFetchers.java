@@ -608,10 +608,12 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<StopArrival> to();
   }
 
+  /** Stop position at a specific stop. */
   public interface LegacyGraphQLPositionAtStop {
     public DataFetcher<Integer> position();
   }
 
+  /** The board/alight position in between two stops of the pattern of a trip with continuous pickup/drop off. */
   public interface LegacyGraphQLPositionBetweenStops {
     public DataFetcher<Integer> nextPosition();
 

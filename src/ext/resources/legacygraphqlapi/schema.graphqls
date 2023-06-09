@@ -2053,12 +2053,17 @@ type BookingInfo {
     dropOffMessage: String
 }
 
+"The board/alight position in between two stops of the pattern of a trip with continuous pickup/drop off."
 type PositionBetweenStops {
+    "Position of the previous stop in the pattern. Positions must not start from 0 or be consecutive."
     previousPosition: Int
+    "Position of the next stop in the pattern. Positions must not start from 0 or be consecutive."
     nextPosition: Int
 }
 
+"Stop position at a specific stop."
 type PositionAtStop {
+    "Position of the stop in the pattern. Positions must not start from 0 or be consecutive."
     position: Int
 }
 
@@ -2096,7 +2101,7 @@ type Place {
     stop: Stop
 
     """
-    The sequence of the stop in the trip. This is not required to start from 0 or be consecutive - any
+    The position the stop in the pattern. This is not required to start from 0 or be consecutive - any
     increasing integer sequence along the stops is valid.
 
     The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
@@ -3617,7 +3622,7 @@ type Stoptime {
     stop: Stop
 
     """
-    The sequence of the stop in the trip. This is not required to start from 0 or be consecutive - any
+    The sequence of the stop in the pattern. This is not required to start from 0 or be consecutive - any
     increasing integer sequence along the stops is valid.
 
     The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
