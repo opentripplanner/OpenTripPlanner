@@ -1,6 +1,5 @@
 package org.opentripplanner.framework.model;
 
-import java.io.Serial;
 import java.io.Serializable;
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
@@ -13,9 +12,6 @@ import org.opentripplanner.framework.lang.OtpNumberFormat;
  * This is an immutable, thread-safe value-object.
  */
 public final class Cost implements Serializable, Comparable<Cost> {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   public static final Cost ZERO = Cost.costOfSeconds(0);
 
