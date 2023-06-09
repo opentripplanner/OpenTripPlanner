@@ -43,6 +43,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Relax validity check on flex trip with null duration [#5169](https://github.com/opentripplanner/OpenTripPlanner/pull/5169)
 - Log unexpected vehicle type in GBFS update [#5175](https://github.com/opentripplanner/OpenTripPlanner/pull/5175)
 - Validate to/from in routing request [#5164](https://github.com/opentripplanner/OpenTripPlanner/pull/5164)
+- Changing default value for earlyStartSec [#5165](https://github.com/opentripplanner/OpenTripPlanner/pull/5165)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
