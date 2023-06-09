@@ -2,9 +2,12 @@ package org.opentripplanner.ext.siri.updater;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.UUID;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,8 +26,11 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private final String requestorRef;
 
-  private final int timeout;
-  private final int previewIntervalMillis;
+  private final int timeoutMillis;
+
+  @Nullable
+  private final Duration previewInterval;
+
   private final HttpHeaders requestHeaders;
 
   /**
@@ -35,18 +41,20 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
   public SiriETHttpTripUpdateSource(Parameters parameters) {
-    this.feedId = parameters.getFeedId();
-    this.url = parameters.getUrl();
+    this.feedId = parameters.feedId();
+    this.url = parameters.url();
     this.requestHeaders = parameters.httpRequestHeaders();
 
     this.requestorRef =
-      parameters.getRequestorRef() == null || parameters.getRequestorRef().isEmpty()
+      parameters.requestorRef() == null || parameters.requestorRef().isEmpty()
         ? "otp-" + UUID.randomUUID()
-        : parameters.getRequestorRef();
-    this.timeout = parameters.getTimeoutSec() > 0 ? 1000 * parameters.getTimeoutSec() : -1;
+        : parameters.requestorRef();
 
-    int min = parameters.getPreviewIntervalMinutes();
-    this.previewIntervalMillis = min > 0 ? 1000 * 60 * min : -1;
+    // TODO: This is not consistent, in SiriSXUpdater the default timeout is 0, here it is -1, but
+    //       the same framework is used. Also, this is unnecessary; Refactor and ensure the timeout
+    //       is non-null and initialized with a good default value.
+    this.timeoutMillis = DurationUtils.toIntMilliseconds(parameters.timeout(), -1);
+    this.previewInterval = parameters.previewInterval();
   }
 
   @Override
@@ -58,7 +66,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
     try {
       String etServiceRequest = SiriHelper.createETServiceRequestAsXml(
         requestorRef,
-        previewIntervalMillis
+        previewInterval
       );
       creating = System.currentTimeMillis() - t1;
       t1 = System.currentTimeMillis();
@@ -66,7 +74,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
       InputStream is = SiriHttpUtils.postData(
         url,
         etServiceRequest,
-        timeout,
+        timeoutMillis,
         requestHeaders.asMap()
       );
       if (is != null) {
@@ -122,15 +130,16 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   }
 
   public interface Parameters {
-    String getUrl();
+    String url();
 
-    String getRequestorRef();
+    String requestorRef();
 
-    String getFeedId();
+    String feedId();
 
-    int getTimeoutSec();
+    Duration timeout();
 
-    int getPreviewIntervalMinutes();
+    @Nullable
+    Duration previewInterval();
 
     HttpHeaders httpRequestHeaders();
   }

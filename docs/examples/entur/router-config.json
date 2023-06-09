@@ -107,7 +107,7 @@
     {
       "type": "siri-et-updater",
       "frequency": "20s",
-      "previewIntervalMinutes": 180,
+      "previewInterval": "3h",
       "url": "https://example.com",
       "feedId": "EN",
       "blockReadinessUntilInitialized": true
