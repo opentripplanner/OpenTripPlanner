@@ -100,8 +100,8 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 This value is subtracted from the actual validity defined in the message.
 
-Normally the planed departure time is used, so setting this to 10s will cause the
-SX-message to be included in trip-results 10 seconds before the the planed departure
+Normally the planned departure time is used, so setting this to 10s will cause the
+SX-message to be included in trip-results 10 seconds before the the planned departure
 time.
 
 <h4 id="u__9__headers">headers</h4>
