@@ -41,6 +41,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Improve updater log messages [#5168](https://github.com/opentripplanner/OpenTripPlanner/pull/5168)
 - Add support for mapping NeTEx operating day in operating period [#5167](https://github.com/opentripplanner/OpenTripPlanner/pull/5167)
 - Relax validity check on flex trip with null duration [#5169](https://github.com/opentripplanner/OpenTripPlanner/pull/5169)
+- Log unexpected vehicle type in GBFS update [#5175](https://github.com/opentripplanner/OpenTripPlanner/pull/5175)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
