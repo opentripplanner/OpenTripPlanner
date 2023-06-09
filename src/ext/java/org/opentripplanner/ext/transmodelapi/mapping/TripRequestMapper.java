@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
+import org.opentripplanner.ext.transmodelapi.model.framework.ViaPointInputType;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -39,6 +40,12 @@ public class TripRequestMapper {
     callWith.argument(
       "to",
       (Map<String, Object> v) -> request.setTo(GenericLocationMapper.toGenericLocation(v))
+    );
+    callWith.argument(
+      "via",
+      (List<List<String>> via) -> via.stream().forEach(
+        v -> request.setVia(ViaPointInputType.toGenericLocation(v))
+    )
     );
 
     callWith.argument(

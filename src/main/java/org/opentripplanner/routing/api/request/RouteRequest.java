@@ -18,6 +18,7 @@ import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.routing.api.request.request.ViaPoint;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -52,6 +53,8 @@ public class RouteRequest implements Cloneable, Serializable {
   private GenericLocation from;
 
   private GenericLocation to;
+
+  private List<ViaPoint> viaPoints;
 
   private Instant dateTime = Instant.now();
 

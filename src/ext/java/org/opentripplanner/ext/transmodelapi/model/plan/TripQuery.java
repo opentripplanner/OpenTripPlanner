@@ -15,6 +15,7 @@ import org.opentripplanner.ext.transmodelapi.model.DefaultRouteRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
+import org.opentripplanner.ext.transmodelapi.model.framework.ViaPointInputType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -145,6 +146,14 @@ public class TripQuery {
           .name("to")
           .description("The destination location")
           .type(new GraphQLNonNull(LocationInputType.INPUT_TYPE))
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name("via")
+          .description("The via points as stops. Max 2/3.")
+          .type(new GraphQLList(new GraphQLNonNull(ViaPointInputType.INPUT_TYPE)))
           .build()
       )
       .argument(
