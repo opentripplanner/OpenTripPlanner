@@ -4,12 +4,10 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -25,7 +23,6 @@ import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * Builds up a state chain for use in tests.
@@ -88,27 +85,7 @@ public class TestStateBuilder {
   public TestStateBuilder pickUpCar() {
     count++;
 
-    var station = new VehicleRentalStation();
-    var stationName = "FooStation";
-    var networkName = "bar";
-    var vehicleType = new RentalVehicleType(
-      new FeedScopedId(networkName, "car"),
-      "car",
-      RentalFormFactor.CAR,
-      RentalVehicleType.PropulsionType.ELECTRIC,
-      100000d
-    );
-    station.id = new FeedScopedId(networkName, stationName);
-    station.name = new NonLocalizedString(stationName);
-    station.latitude = count;
-    station.longitude = count;
-    station.vehiclesAvailable = 10;
-    station.spacesAvailable = 10;
-    station.vehicleTypesAvailable = Map.of(vehicleType, 10);
-    station.vehicleSpacesAvailable = Map.of(vehicleType, 10);
-    station.isRenting = true;
-    station.isReturning = true;
-    station.realTimeData = true;
+    var station = TestVehicleRentalStationBuilder.of().withVehicleTypeCar().build();
 
     VehicleRentalPlaceVertex vertex = new VehicleRentalPlaceVertex(null, station);
     var link = new StreetVehicleRentalLink((StreetVertex) currentState.vertex, vertex);
