@@ -2101,7 +2101,7 @@ type Place {
     stop: Stop
 
     """
-    The position the stop in the pattern. This is not required to start from 0 or be consecutive - any
+    The position of the stop in the pattern. This is not required to start from 0 or be consecutive - any
     increasing integer sequence along the stops is valid.
 
     The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
