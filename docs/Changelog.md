@@ -39,6 +39,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix error in flex validation [#5161](https://github.com/opentripplanner/OpenTripPlanner/pull/5161)
 - Check service dates instead of service ids for block id transfers [#5162](https://github.com/opentripplanner/OpenTripPlanner/pull/5162)
 - Improve updater log messages [#5168](https://github.com/opentripplanner/OpenTripPlanner/pull/5168)
+- Add support for mapping NeTEx operating day in operating period [#5167](https://github.com/opentripplanner/OpenTripPlanner/pull/5167)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
