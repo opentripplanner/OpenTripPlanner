@@ -45,30 +45,26 @@ public class RoutingValidationException extends RuntimeException {
   }
 
   public boolean isFromLocationNotFound() {
-    return (
-      routingErrors != null &&
-      routingErrors
-        .stream()
-        .anyMatch(routingError ->
-          routingError.code == RoutingErrorCode.LOCATION_NOT_FOUND &&
-          routingError.inputField == InputField.FROM_PLACE
-        )
-    );
+    return isLocationNotFound(InputField.FROM_PLACE);
   }
 
   public boolean isToLocationNotFound() {
-    return (
-      routingErrors != null &&
-      routingErrors
-        .stream()
-        .anyMatch(routingError ->
-          routingError.code == RoutingErrorCode.LOCATION_NOT_FOUND &&
-          routingError.inputField == InputField.TO_PLACE
-        )
-    );
+    return isLocationNotFound(InputField.TO_PLACE);
   }
 
   public boolean isFromToLocationNotFound() {
     return isFromLocationNotFound() && isToLocationNotFound();
+  }
+
+  private boolean isLocationNotFound(InputField location) {
+    return (
+      routingErrors != null &&
+      routingErrors
+        .stream()
+        .anyMatch(routingError ->
+          routingError.code == RoutingErrorCode.LOCATION_NOT_FOUND &&
+          routingError.inputField == location
+        )
+    );
   }
 }
