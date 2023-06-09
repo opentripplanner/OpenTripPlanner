@@ -177,9 +177,8 @@ class RouteRequestMapperTest implements PlanTestConstants {
     );
   }
 
-  static Stream<Arguments> noTriangleCases = Arrays
-    .stream(BicycleOptimizeType.values())
-    .filter(t -> t != BicycleOptimizeType.TRIANGLE)
+  static Stream<Arguments> noTriangleCases = BicycleOptimizeType
+    .nonTriangleValues()
     .map(Arguments::of);
 
   @ParameterizedTest

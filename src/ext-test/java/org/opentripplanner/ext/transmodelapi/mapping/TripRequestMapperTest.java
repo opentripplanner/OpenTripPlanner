@@ -218,9 +218,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
     assertEquals(TimeSlopeSafetyTriangle.DEFAULT, req2.preferences().bike().optimizeTriangle());
   }
 
-  static Stream<Arguments> noTriangleCases = Arrays
-    .stream(BicycleOptimizeType.values())
-    .filter(t -> t != BicycleOptimizeType.TRIANGLE)
+  static Stream<Arguments> noTriangleCases = BicycleOptimizeType
+    .nonTriangleValues()
     .map(Arguments::of);
 
   @ParameterizedTest
