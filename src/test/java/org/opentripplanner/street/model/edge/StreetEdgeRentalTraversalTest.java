@@ -66,12 +66,12 @@ public class StreetEdgeRentalTraversalTest {
     editor.beginFloatingVehicleRenting(formFactor, "network", false);
     var state = editor.makeState();
 
-    assertEquals(state.getNonTransitMode(), formFactor.traverseMode);
+    assertEquals(state.currentMode(), formFactor.traverseMode);
     var states = e0.traverse(state);
     assertEquals(1, states.length);
     var afterTraversal = states[0];
 
-    assertEquals(formFactor.traverseMode, afterTraversal.getNonTransitMode());
+    assertEquals(formFactor.traverseMode, afterTraversal.currentMode());
   }
 
   static Stream<Arguments> noTraversal = Stream
@@ -94,7 +94,7 @@ public class StreetEdgeRentalTraversalTest {
     editor.beginFloatingVehicleRenting(formFactor, "network", false);
     var state = editor.makeState();
 
-    assertEquals(state.getNonTransitMode(), formFactor.traverseMode);
+    assertEquals(state.currentMode(), formFactor.traverseMode);
     var afterTraversal = e0.traverse(state);
 
     assertTrue(State.isEmpty(afterTraversal));

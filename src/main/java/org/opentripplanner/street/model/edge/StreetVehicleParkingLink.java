@@ -43,7 +43,7 @@ public class StreetVehicleParkingLink extends Edge {
     }
 
     var entrance = vehicleParkingEntranceVertex.getParkingEntrance();
-    if (s0.getNonTransitMode() == TraverseMode.CAR) {
+    if (s0.currentMode() == TraverseMode.CAR) {
       if (!entrance.isCarAccessible()) {
         return State.empty();
       }

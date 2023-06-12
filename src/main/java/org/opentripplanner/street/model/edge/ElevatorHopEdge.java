@@ -99,7 +99,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
       }
     }
 
-    TraverseMode mode = s0.getNonTransitMode();
+    TraverseMode mode = s0.currentMode();
 
     if (mode == TraverseMode.WALK && !permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
       return State.empty();

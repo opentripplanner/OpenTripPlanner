@@ -405,7 +405,7 @@ public class StatesToWalkStepsMapper {
 
   private static boolean multipleTurnOptionsInPreviousState(State state) {
     boolean foundAlternatePaths = false;
-    TraverseMode requestedMode = state.getNonTransitMode();
+    TraverseMode requestedMode = state.currentMode();
     for (Edge out : state.getBackState().getVertex().getOutgoing()) {
       if (out == state.backEdge) {
         continue;

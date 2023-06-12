@@ -300,13 +300,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   /**
-   * This method is on State rather than RouteRequest because we care whether the user is in
-   * possession of a rented bike.
-   *
-   * @return BICYCLE if routing with an owned bicycle, or if at this state the user is holding on to
-   * a rented bicycle.
+   * @return The current mode of this state. When doing a rental request, this can for example
+   * indicate if the state is currently using a vehicle or not.
    */
-  public TraverseMode getNonTransitMode() {
+  public TraverseMode currentMode() {
     return stateData.currentMode;
   }
 
@@ -390,7 +387,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         }
       }
       if (orig.isVehicleParked() != orig.getBackState().isVehicleParked()) {
-        editor.setVehicleParked(true, orig.getBackState().getNonTransitMode());
+        editor.setVehicleParked(true, orig.getBackState().currentMode());
       }
 
       ret = editor.makeState();
@@ -427,7 +424,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   public boolean containsModeCar() {
     var state = this;
     while (state != null) {
-      if (state.getNonTransitMode().isInCar()) {
+      if (state.currentMode().isInCar()) {
         return true;
       } else {
         state = state.getBackState();

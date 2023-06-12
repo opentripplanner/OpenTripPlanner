@@ -83,7 +83,7 @@ public class VehicleParkingEdge extends Edge {
   }
 
   protected State[] traverseUnPark(State s0) {
-    if (s0.getNonTransitMode() != TraverseMode.WALK || !s0.isVehicleParked()) {
+    if (s0.currentMode() != TraverseMode.WALK || !s0.isVehicleParked()) {
       return State.empty();
     }
 
@@ -147,7 +147,7 @@ public class VehicleParkingEdge extends Edge {
   private State[] traversePark(State s0, int parkingCost, int parkingTime) {
     if (
       !vehicleParking.hasSpacesAvailable(
-        s0.getNonTransitMode(),
+        s0.currentMode(),
         s0.getRequest().wheelchair(),
         s0.getRequest().parking().useAvailabilityInformation()
       )

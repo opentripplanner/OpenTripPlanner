@@ -30,7 +30,7 @@ public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
   @Override
   public State[] traverse(State s0) {
     double d = getDistanceMeters();
-    TraverseMode mode = s0.getNonTransitMode();
+    TraverseMode mode = s0.currentMode();
     int t = (int) (d / s0.getPreferences().getSpeed(mode, false));
     StateEditor s1 = s0.edit(this);
     s1.incrementTimeInSeconds(t);

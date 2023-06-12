@@ -191,12 +191,12 @@ class StreetEdgeGeofencingTest {
       // we want to pick up a vehicle
       final State rentalState = states[1];
       assertEquals(RENTING_FLOATING, rentalState.getVehicleRentalState());
-      assertEquals(BICYCLE, rentalState.getNonTransitMode());
+      assertEquals(BICYCLE, rentalState.currentMode());
 
       // but also keep on walking in case we don't find an edge where to leave the vehicle
       var walkingState = states[0];
       assertEquals(HAVE_RENTED, walkingState.getVehicleRentalState());
-      assertEquals(WALK, walkingState.getNonTransitMode());
+      assertEquals(WALK, walkingState.currentMode());
     }
   }
 

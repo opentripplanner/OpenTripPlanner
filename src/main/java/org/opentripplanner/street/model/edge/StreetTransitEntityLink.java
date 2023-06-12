@@ -80,7 +80,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       }
     }
 
-    switch (s0.getNonTransitMode()) {
+    switch (s0.currentMode()) {
       case BICYCLE:
         // Forbid taking your own bike in the station if bike P+R activated.
         if (s0.getRequest().mode().includesParking() && !s0.isVehicleParked()) {

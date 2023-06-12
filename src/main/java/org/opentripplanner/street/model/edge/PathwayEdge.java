@@ -112,7 +112,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
           StreetEdgeReluctanceCalculator.computeReluctance(
             preferences,
             TraverseMode.WALK,
-            s0.getNonTransitMode() == TraverseMode.BICYCLE,
+            s0.currentMode() == TraverseMode.BICYCLE,
             isStairs()
           );
       }

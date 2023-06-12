@@ -429,7 +429,7 @@ public class StreetEdge
       }
     }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
-    else if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
+    else if (s0.currentMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
         editor = doTraverse(s0, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
@@ -437,8 +437,8 @@ public class StreetEdge
       } else {
         return State.empty();
       }
-    } else if (canTraverse(s0.getNonTransitMode())) {
-      editor = doTraverse(s0, s0.getNonTransitMode(), false);
+    } else if (canTraverse(s0.currentMode())) {
+      editor = doTraverse(s0, s0.currentMode(), false);
     } else {
       editor = null;
     }
