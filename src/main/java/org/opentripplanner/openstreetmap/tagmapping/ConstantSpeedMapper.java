@@ -30,17 +30,9 @@ class ConstantSpeedMapper implements OsmTagMapper {
 
   @Override
   public void populateProperties(WayPropertySet props) {
-    // Remove informal and private roads
-    props.setProperties("highway=*;informal=yes", withModes(NONE));
-    props.setProperties("highway=service;access=private", withModes(NONE));
-    props.setProperties("highway=trail", withModes(NONE));
-    props.setProperties("highway=service;tunnel=yes;access=destination", withModes(NONE));
-    props.setProperties("highway=service;access=destination", withModes(ALL));
-
     props.setCarSpeed("highway=*", speed);
-
     // Read the rest from the default set
-    new DefaultMapper().populateProperties(props);
+    new FinlandMapper().populateProperties(props);
   }
 
   @Override
