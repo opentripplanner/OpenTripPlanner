@@ -128,7 +128,7 @@ class StreetEdgeGeofencingTest {
   class Backwards {
 
     @Test
-    public void backwardsRejectWhenEnteringNoTraversalZone() {
+    public void backwardsRejectWhenEnteringNoDropOffZone() {
       var restrictedEdge = streetEdge(V1, V2);
       V2.addRentalRestriction(NO_DROP_OFF);
 
@@ -141,10 +141,14 @@ class StreetEdgeGeofencingTest {
       var editor = new StateEditor(restrictedEdge.getToVertex(), req);
       editor.dropFloatingVehicle(RentalFormFactor.SCOOTER, network, true);
 
-      var result = restrictedEdge.traverse(editor.makeState());
+      var s0 = editor.makeState();
+      assertEquals(Set.of(network), s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
 
-      assertTrue(State.isEmpty(result));
+      var result = restrictedEdge.traverse(s0);
+
+      assertFalse(State.isEmpty(result));
       assertNotNull(result);
+      assertEquals(2, result.length);
     }
 
     @Test

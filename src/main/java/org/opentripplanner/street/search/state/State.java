@@ -5,7 +5,9 @@ import static org.opentripplanner.framework.lang.ObjectUtils.requireNotInitializ
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
@@ -148,6 +150,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
    */
   public static boolean isEmpty(State[] s) {
     return s.length == 0;
+  }
+
+  public static State[] ofStream(Stream<State> states) {
+    return states.filter(Objects::nonNull).toArray(State[]::new);
   }
 
   /**

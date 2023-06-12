@@ -2,11 +2,13 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -392,12 +394,28 @@ public class StreetEdge
 
     final boolean arriveByRental =
       s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy();
-
-    if (
-      arriveByRental &&
-      (tov.rentalTraversalBanned(s0) || hasStartedSearchInNoDropOffZoneAndIsExitingIt(s0))
-    ) {
+    if (arriveByRental && tov.rentalTraversalBanned(s0)) {
       return State.empty();
+    } else if (arriveByRental && hasStartedSearchInNoDropOffZoneAndIsExitingIt(s0)) {
+      var networks = new ArrayList<>(tov.rentalRestrictions().noDropOffNetworks());
+      networks.add(null);
+
+      Stream<State> states = networks
+        .stream()
+        .map(network -> {
+          var edit = doTraverse(s0, TraverseMode.WALK, false);
+          if (edit != null) {
+            edit.dropFloatingVehicle(
+              s0.vehicleRentalFormFactor(),
+              network,
+              s0.getRequest().arriveBy()
+            );
+            edit.resetStartedInNoDropOffZone();
+            return edit.makeState();
+          }
+          return null;
+        });
+      return State.ofStream(states);
     }
     // if the traversal is banned for the current state because of a GBFS geofencing zone
     // we drop the vehicle and continue walking
