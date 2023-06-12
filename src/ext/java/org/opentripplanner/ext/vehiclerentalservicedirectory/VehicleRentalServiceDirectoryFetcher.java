@@ -3,6 +3,7 @@ package org.opentripplanner.ext.vehiclerentalservicedirectory;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
@@ -26,7 +27,7 @@ public class VehicleRentalServiceDirectoryFetcher {
     VehicleRentalServiceDirectoryFetcher.class
   );
 
-  private static final int DEFAULT_FREQUENCY_SEC = 15;
+  private static final Duration DEFAULT_FREQUENCY = Duration.ofSeconds(15);
 
   public static List<GraphUpdater> createUpdatersFromEndpoint(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
@@ -65,7 +66,7 @@ public class VehicleRentalServiceDirectoryFetcher {
 
         VehicleRentalParameters vehicleRentalParameters = new VehicleRentalParameters(
           "vehicle-rental-service-directory:" + network,
-          DEFAULT_FREQUENCY_SEC,
+          DEFAULT_FREQUENCY,
           new GbfsVehicleRentalDataSourceParameters(
             updaterUrl.asText(),
             parameters.getLanguage(),

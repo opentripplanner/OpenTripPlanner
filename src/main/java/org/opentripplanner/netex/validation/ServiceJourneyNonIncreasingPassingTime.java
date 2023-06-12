@@ -2,6 +2,7 @@ package org.opentripplanner.netex.validation;
 
 import java.util.List;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
+import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.netex.support.ServiceJourneyInfo;
 import org.opentripplanner.netex.support.stoptime.StopTimeAdaptor;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -36,66 +37,63 @@ class ServiceJourneyNonIncreasingPassingTime
   public Status validate(ServiceJourney sj) {
     ServiceJourneyInfo serviceJourneyInfo = new ServiceJourneyInfo(sj, index);
     List<StopTimeAdaptor> orderedPassingTimes = serviceJourneyInfo.orderedTimetabledPassingTimeInfos();
-    int lastIndex = orderedPassingTimes.size() - 1;
 
-    for (int i = 0; true; i++) {
-      var current = orderedPassingTimes.get(i);
+    var previousPassingTime = orderedPassingTimes.get(0);
+    if (!previousPassingTime.isComplete()) {
+      return discard(previousPassingTime, ErrorType.INCOMPLETE);
+    }
+    if (!previousPassingTime.isConsistent()) {
+      return discard(previousPassingTime, ErrorType.INCONSISTENT);
+    }
 
-      if (!current.isComplete()) {
-        invalidTimetabledPassingTimeInfo = current;
-        errorType = ErrorType.INCOMPLETE;
-        return Status.DISCARD;
+    for (int i = 1; i < orderedPassingTimes.size(); i++) {
+      var currentPassingTime = orderedPassingTimes.get(i);
+
+      if (!currentPassingTime.isComplete()) {
+        return discard(currentPassingTime, ErrorType.INCOMPLETE);
+      }
+      if (!currentPassingTime.isConsistent()) {
+        return discard(currentPassingTime, ErrorType.INCONSISTENT);
       }
 
-      if (!current.isConsistent()) {
-        invalidTimetabledPassingTimeInfo = current;
-        errorType = ErrorType.INCONSISTENT;
-        return Status.DISCARD;
+      if (!previousPassingTime.isStopTimesIncreasing(currentPassingTime)) {
+        return discard(currentPassingTime, ErrorType.NON_INCREASING);
       }
 
-      // Break out of the loop if last element processed
-      if (i == lastIndex) {
-        break;
-      }
-
-      // Validate increasing times for i (current) and i+1 (next)
-      if (!current.isStopTimesIncreasing(orderedPassingTimes.get(i + 1))) {
-        invalidTimetabledPassingTimeInfo = current;
-        errorType = ErrorType.NON_INCREASING;
-        return Status.DISCARD;
-      }
+      previousPassingTime = currentPassingTime;
     }
     return Status.OK;
   }
 
   @Override
   public DataImportIssue logMessage(String key, ServiceJourney sj) {
-    return new DataImportIssue() {
-      @Override
-      public String getMessage() {
-        return (
-          String.format(
-            "ServiceJourney has %s. ServiceJourney will be skipped. ServiceJourney = %s, TimetabledPassingTime = %s",
-            errorType.message,
-            sj.getId(),
-            invalidTimetabledPassingTimeInfo.timetabledPassingTimeId()
-          )
-        );
-      }
+    return Issue.issue(
+      errorType.type,
+      "%s ServiceJourney will be skipped. ServiceJourney = %s, TimetabledPassingTime = %s",
+      errorType.message,
+      sj.getId(),
+      invalidTimetabledPassingTimeInfo.timetabledPassingTimeId()
+    );
+  }
 
-      @Override
-      public String getType() {
-        return errorType.type;
-      }
-    };
+  private Status discard(StopTimeAdaptor stopTime, ErrorType errorType) {
+    this.invalidTimetabledPassingTimeInfo = stopTime;
+    this.errorType = errorType;
+    return Status.DISCARD;
   }
 
   private enum ErrorType {
-    INCOMPLETE("TimetabledPassingTimeIncompleteTime", "incomplete TimetabledPassingTime"),
-    INCONSISTENT("TimetabledPassingTimeInconsistentTime", "inconsistent TimetabledPassingTime"),
+    INCOMPLETE(
+      "TimetabledPassingTimeIncompleteTime",
+      "ServiceJourney has incomplete TimetabledPassingTime."
+    ),
+    INCONSISTENT(
+      "TimetabledPassingTimeInconsistentTime",
+      "ServiceJourney has inconsistent TimetabledPassingTime."
+    ),
     NON_INCREASING(
       "TimetabledPassingTimeNonIncreasingTime",
-      "non-increasing TimetabledPassingTime"
+      "ServiceJourney has non-increasing TimetabledPassingTime."
     );
 
     private final String type;

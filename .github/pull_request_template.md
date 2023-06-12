@@ -35,7 +35,7 @@ proceed.
 Add [GitHub keywords](https://help.github.com/articles/closing-issues-using-keywords/) to this PR's
 description, for example:
 
-`closes #45`
+Closes #45
 
 ### Unit tests
 

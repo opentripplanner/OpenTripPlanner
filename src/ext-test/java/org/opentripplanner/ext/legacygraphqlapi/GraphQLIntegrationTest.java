@@ -39,6 +39,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -46,7 +47,9 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -120,12 +123,19 @@ class GraphQLIntegrationTest {
 
     routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
 
+    var step1 = walkStep("street");
+    step1.setRelativeDirection(RelativeDirection.DEPART);
+    step1.setAbsoluteDirection(20);
+    var step2 = walkStep("elevator");
+    step2.setRelativeDirection(RelativeDirection.ELEVATOR);
+
     Itinerary i1 = newItinerary(A, T11_00)
-      .walk(20, B)
+      .walk(20, B, List.of(step1, step2))
       .bus(busRoute, 122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
       .carHail(D10m, E)
       .build();
+
     var busLeg = i1.getTransitLeg(1);
     ScheduledTransitLeg railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
 
@@ -185,18 +195,6 @@ class GraphQLIntegrationTest {
       );
   }
 
-  @Nonnull
-  private static FareProduct fareProduct(String name) {
-    return new FareProduct(
-      id(name),
-      name,
-      Money.euros(10),
-      null,
-      new RiderCategory(id("senior-citizens"), "Senior citizens", null),
-      new FareMedium(id("oyster"), "TfL Oyster Card")
-    );
-  }
-
   @FilePatternSource(pattern = "src/ext-test/resources/legacygraphqlapi/queries/*.graphql")
   @ParameterizedTest(name = "Check GraphQL query in {0}")
   void graphQL(Path path) throws IOException {
@@ -228,6 +226,30 @@ class GraphQLIntegrationTest {
 
     var expectedJson = Files.readString(expectationFile);
     assertEqualJson(expectedJson, actualJson);
+  }
+
+  @Nonnull
+  private static WalkStep walkStep(String name) {
+    return new WalkStep(
+      new NonLocalizedString(name),
+      WgsCoordinate.GREENWICH,
+      false,
+      10,
+      false,
+      false
+    );
+  }
+
+  @Nonnull
+  private static FareProduct fareProduct(String name) {
+    return new FareProduct(
+      id(name),
+      name,
+      Money.euros(10),
+      null,
+      new RiderCategory(id("senior-citizens"), "Senior citizens", null),
+      new FareMedium(id("oyster"), "TfL Oyster Card")
+    );
   }
 
   /**

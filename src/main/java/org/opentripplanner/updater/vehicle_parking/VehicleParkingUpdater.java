@@ -59,11 +59,7 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
     // Adding a vehicle parking station service needs a graph writer runnable
     this.vehicleParkingService = vehicleParkingService;
 
-    LOG.info(
-      "Creating vehicle-parking updater running every {} seconds : {}",
-      pollingPeriodSeconds(),
-      source
-    );
+    LOG.info("Creating vehicle-parking updater running every {}: {}", pollingPeriod(), source);
   }
 
   @Override

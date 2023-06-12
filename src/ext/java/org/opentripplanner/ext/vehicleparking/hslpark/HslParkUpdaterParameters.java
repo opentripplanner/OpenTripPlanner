@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.vehicleparking.hslpark;
 
+import java.time.Duration;
 import java.time.ZoneId;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingSourceType;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
@@ -21,7 +22,7 @@ public record HslParkUpdaterParameters(
 )
   implements VehicleParkingUpdaterParameters {
   @Override
-  public int frequencySec() {
-    return utilizationsFrequencySec;
+  public Duration frequency() {
+    return Duration.ofSeconds(utilizationsFrequencySec);
   }
 }

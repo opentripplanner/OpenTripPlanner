@@ -65,7 +65,7 @@ public class PollingTripUpdater extends PollingGraphUpdater {
 
     LOG.info(
       "Creating stop time updater running every {} seconds : {}",
-      pollingPeriodSeconds(),
+      pollingPeriod(),
       updateSource
     );
   }

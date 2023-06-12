@@ -26,7 +26,7 @@ An example updater configuration:
     "sourceType": "smoove",
     "network": "smoove-network-1",
     "url": "https://helsinki-fi.smoove.pro/api-public/stations",
-    "frequencySec": 10,
+    "frequency": 10,
     "overloadingAllowed": true
 }
 ```

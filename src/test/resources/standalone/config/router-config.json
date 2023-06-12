@@ -1,7 +1,15 @@
 {
   "configVersion": "v2.3.0-EN000121",
   "server": {
-    "apiProcessingTimeout" : "7s"
+    "apiProcessingTimeout": "7s",
+    "traceParameters": [
+      {
+        "httpRequestHeader": "X-Correlation-ID",
+        "httpResponseHeader": "X-Correlation-ID",
+        "logKey": "correlationId",
+        "generateIdIfMissing": true
+      }
+    ]
   },
   "routingDefaults": {
     "walkSpeed": 1.3,
@@ -195,7 +203,7 @@
     // GTFS-RT service alerts (frequent polling)
     {
       "type": "real-time-alerts",
-      "frequencySec": 30,
+      "frequency": "30s",
       "url": "http://developer.trimet.org/ws/V1/FeedSpecAlerts/appID/0123456789ABCDEF",
       "feedId": "TriMet",
       "headers": {
@@ -208,7 +216,7 @@
       "network": "socialbicycles_coast",
       "sourceType": "gbfs",
       "language": "en",
-      "frequencySec": 60,
+      "frequency": "1m",
       "allowKeepingRentedVehicleAtDestination": false,
       "geofencingZones": false,
       "url": "http://coast.socialbicycles.com/opendata/gbfs.json",
@@ -235,7 +243,7 @@
       "sourceType": "park-api",
       "feedId": "parkapi",
       "timeZone": "Europe/Berlin",
-      "frequencySec": 600,
+      "frequency": "10m",
       "url": "https://foo.bar",
       "headers": {
         "Cache-Control": "max-age=604800"
@@ -256,7 +264,7 @@
     },
     {
       "type": "stop-time-updater",
-      "frequencySec": 60,
+      "frequency": "1m",
       "backwardsDelayPropagationType": "REQUIRED_NO_DATA",
       "url": "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",
       "feedId": "TriMet",
@@ -269,7 +277,7 @@
       "type": "vehicle-positions",
       "url": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
       "feedId": "1",
-      "frequencySec": 60,
+      "frequency": "1m",
       "headers": {
         "Header-Name": "Header-Value"
       }

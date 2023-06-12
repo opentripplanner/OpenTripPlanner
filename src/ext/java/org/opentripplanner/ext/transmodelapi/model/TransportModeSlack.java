@@ -160,13 +160,6 @@ public class TransportModeSlack {
     );
   }
 
-  private static String defaultsToString(Map<TransitMode, Integer> byMode) {
-    List<String> groups = new ArrayList<>();
-    byMode.forEach((m, v) -> groups.add(serializeTransportMode(m) + " : " + v));
-    Collections.sort(groups);
-    return "Defaults: " + groups;
-  }
-
   private static String defaultsToString(DurationForEnum<TransitMode> byMode) {
     List<String> groups = new ArrayList<>();
     Arrays

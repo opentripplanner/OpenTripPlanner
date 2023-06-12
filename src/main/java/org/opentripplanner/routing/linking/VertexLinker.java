@@ -12,7 +12,6 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Polygon;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.operation.distance.DistanceOp;
@@ -55,7 +54,6 @@ import org.slf4j.LoggerFactory;
  */
 public class VertexLinker {
 
-  private static final Logger LOG = LoggerFactory.getLogger(VertexLinker.class);
   /**
    * if there are two ways and the distances to them differ by less than this value, we link to both
    * of them
@@ -127,30 +125,6 @@ public class VertexLinker {
   // TODO Temporary code until we refactor WalkableAreaBuilder (#3152)
   public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
-  }
-
-  /**
-   * While in destructive splitting mode (during graph construction rather than handling routing
-   * requests), we remove edges that have been split and may then re-split the resulting segments
-   * recursively, so parts of them are also removed. Newly created edge fragments are added to the
-   * spatial index; the edges that were split are removed (disconnected) from the graph but were
-   * previously not removed from the spatial index, so for all subsequent splitting operations we
-   * had to check whether any edge coming out of the spatial index had been "soft deleted".
-   * <p>
-   * I believe this was compensating for the fact that STRTrees are optimized at construction and
-   * read-only. That restriction no longer applies since we've been using our own hash grid spatial
-   * index instead of the STRTree. So rather than filtering out soft deleted edges, this is now an
-   * assertion that the system behaves as intended, and will log an error if the spatial index is
-   * returning edges that have been disconnected from the graph.
-   */
-  private static boolean edgeReachableFromGraph(Edge edge) {
-    boolean edgeReachableFromGraph = edge.getToVertex().getIncoming().contains(edge);
-    if (!edgeReachableFromGraph) {
-      LOG.error(
-        "Edge returned from spatial index is no longer reachable from graph. That is not expected."
-      );
-    }
-    return edgeReachableFromGraph;
   }
 
   /** projected distance from stop to edge, in latitude degrees */
@@ -270,10 +244,10 @@ public class VertexLinker {
       .query(env, scope)
       .filter(StreetEdge.class::isInstance)
       .map(StreetEdge.class::cast)
-      .filter(e -> e.canTraverse(traverseModes) && edgeReachableFromGraph(e))
+      .filter(e -> e.canTraverse(traverseModes) && e.isReachableFromGraph())
       .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
       .filter(ead -> ead.distanceDegreesLat < radiusDeg)
-      .collect(Collectors.toList());
+      .toList();
 
     if (candidateEdges.isEmpty()) {
       return Set.of();

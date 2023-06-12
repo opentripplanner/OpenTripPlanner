@@ -112,6 +112,17 @@ public final class NetexTestDataSupport {
       .withToDate(createLocalDateTime(toDate));
   }
 
+  public static OperatingPeriod createOperatingPeriodWithOperatingDays(
+    String id,
+    String fromOperatingDayId,
+    String toOperatingDayId
+  ) {
+    return new OperatingPeriod()
+      .withId(id)
+      .withFromOperatingDayRef(operatingDayRef(fromOperatingDayId))
+      .withToOperatingDayRef(operatingDayRef(toOperatingDayId));
+  }
+
   public static UicOperatingPeriod createUicOperatingPeriod(
     String id,
     LocalDate fromDate,
@@ -151,5 +162,9 @@ public final class NetexTestDataSupport {
 
   public static JourneyRefStructure journeyRef(String sjId) {
     return new JourneyRefStructure().withRef(sjId);
+  }
+
+  public static OperatingDayRefStructure operatingDayRef(String id) {
+    return new OperatingDayRefStructure().withRef(id);
   }
 }

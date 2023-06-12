@@ -30,15 +30,11 @@ public class FlexTripEdge extends Edge {
     FlexAccessEgressTemplate flexTemplate,
     FlexPath flexPath
   ) {
-    // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
-    // The first parameter in Vertex constructor is graph. If it is null, the vertex isn't added to it.
-    super(new Vertex(null, null, 0.0, 0.0) {}, new Vertex(null, null, 0.0, 0.0) {});
+    super(v1, v2, ConnectToGraph.TEMPORARY_EDGE_NOT_CONNECTED_TO_GRAPH);
     this.s1 = s1;
     this.s2 = s2;
     this.trip = trip;
     this.flexTemplate = flexTemplate;
-    this.fromv = v1;
-    this.tov = v2;
     this.flexPath = Objects.requireNonNull(flexPath);
   }
 
