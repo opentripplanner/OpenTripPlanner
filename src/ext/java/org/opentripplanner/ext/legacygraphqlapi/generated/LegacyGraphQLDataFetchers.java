@@ -935,7 +935,7 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Object> stop();
 
-    public DataFetcher<StopPosition> stopPosition();
+    public DataFetcher<Integer> stopPosition();
 
     public DataFetcher<Boolean> timepoint();
 

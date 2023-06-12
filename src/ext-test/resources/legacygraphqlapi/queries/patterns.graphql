@@ -11,12 +11,7 @@
                 }
                 scheduledArrival
                 scheduledDeparture
-                stopPosition {
-                    __typename
-                    ... on PositionAtStop {
-                        position
-                    }
-                }
+                stopPosition
                 realtimeState
                 pickupType
                 dropoffType

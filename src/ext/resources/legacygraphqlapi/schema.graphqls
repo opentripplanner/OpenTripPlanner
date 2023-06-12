@@ -2055,15 +2055,15 @@ type BookingInfo {
 
 "The board/alight position in between two stops of the pattern of a trip with continuous pickup/drop off."
 type PositionBetweenStops {
-    "Position of the previous stop in the pattern. Positions must not start from 0 or be consecutive."
+    "Position of the previous stop in the pattern. Positions are not required to start from 0 or be consecutive."
     previousPosition: Int
-    "Position of the next stop in the pattern. Positions must not start from 0 or be consecutive."
+    "Position of the next stop in the pattern. Positions are not required to start from 0 or be consecutive."
     nextPosition: Int
 }
 
 "Stop position at a specific stop."
 type PositionAtStop {
-    "Position of the stop in the pattern. Positions must not start from 0 or be consecutive."
+    "Position of the stop in the pattern. Positions are not required to start from 0 or be consecutive."
     position: Int
 }
 
@@ -2111,6 +2111,8 @@ type Place {
 
     Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
     even generated.
+
+    The position can be either at a certain stop or in between two for trips where this is possible.
     """
     stopPosition: StopPosition
 
@@ -3633,7 +3635,7 @@ type Stoptime {
     Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
     even generated.
     """
-    stopPosition: StopPosition
+    stopPosition: Int
 
     """
     Scheduled arrival time. Format: seconds since midnight of the departure date

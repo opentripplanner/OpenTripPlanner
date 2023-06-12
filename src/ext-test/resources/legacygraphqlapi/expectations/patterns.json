@@ -15,10 +15,7 @@
                 },
                 "scheduledArrival" : 39600,
                 "scheduledDeparture" : 39600,
-                "stopPosition" : {
-                  "__typename" : "PositionAtStop",
-                  "position" : 10
-                },
+                "stopPosition" : 10,
                 "realtimeState" : "SCHEDULED",
                 "pickupType" : "SCHEDULED",
                 "dropoffType" : "SCHEDULED"
@@ -30,10 +27,7 @@
                 },
                 "scheduledArrival" : 39900,
                 "scheduledDeparture" : 39900,
-                "stopPosition" : {
-                  "__typename" : "PositionAtStop",
-                  "position" : 20
-                },
+                "stopPosition" : 20,
                 "realtimeState" : "SCHEDULED",
                 "pickupType" : "SCHEDULED",
                 "dropoffType" : "SCHEDULED"
@@ -45,10 +39,7 @@
                 },
                 "scheduledArrival" : 40200,
                 "scheduledDeparture" : 40200,
-                "stopPosition" : {
-                  "__typename" : "PositionAtStop",
-                  "position" : 30
-                },
+                "stopPosition" : 30,
                 "realtimeState" : "SCHEDULED",
                 "pickupType" : "SCHEDULED",
                 "dropoffType" : "SCHEDULED"
