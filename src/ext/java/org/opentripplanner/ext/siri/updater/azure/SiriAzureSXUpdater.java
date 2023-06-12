@@ -48,7 +48,13 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
     this.toDateTime = config.getToDateTime();
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
     this.updateHandler =
-      new SiriAlertsUpdateHandler(feedId, transitModel, transitAlertService, fuzzyTripMatcher(), 0);
+      new SiriAlertsUpdateHandler(
+        feedId,
+        transitModel,
+        transitAlertService,
+        fuzzyTripMatcher(),
+        Duration.ZERO
+      );
   }
 
   @Override

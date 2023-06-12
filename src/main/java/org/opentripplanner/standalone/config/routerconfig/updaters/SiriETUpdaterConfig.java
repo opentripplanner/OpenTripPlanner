@@ -27,8 +27,12 @@ public class SiriETUpdaterConfig {
         .summary("How often the updates should be retrieved.")
         .asDuration(Duration.ofMinutes(1)),
       c.of("requestorRef").since(V2_0).summary("The requester reference.").asString(null),
-      c.of("timeoutSec").since(V2_0).summary("The HTTP timeout to download the updates.").asInt(15),
-      c.of("previewIntervalMinutes").since(V2_0).summary("TODO").asInt(-1),
+      c
+        .of("timeout")
+        .since(V2_0)
+        .summary("The HTTP timeout to download the updates.")
+        .asDuration(Duration.ofSeconds(15)),
+      c.of("previewInterval").since(V2_0).summary("TODO").asDuration(null),
       c
         .of("fuzzyTripMatching")
         .since(V2_0)

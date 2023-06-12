@@ -725,7 +725,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "type" : "siri-et-updater",
       "url" : "https://example.com/some/path",
       "feedId" : "feed_id",
-      "timeoutSec" : 30,
+      "timeout" : "30s",
       "headers" : {
         "Authorization" : "Some-Token"
       }
@@ -734,7 +734,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "type" : "siri-sx-updater",
       "url" : "https://example.com/some/path",
       "feedId" : "feed_id",
-      "timeoutSec" : 30,
+      "timeout" : "30s",
       "headers" : {
         "Key" : "Value"
       }

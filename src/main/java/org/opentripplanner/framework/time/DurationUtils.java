@@ -161,6 +161,13 @@ public class DurationUtils {
     }
   }
 
+  /**
+   * Convert duration to an int with unit milliseconds.
+   */
+  public static int toIntMilliseconds(Duration timeout, int defaultValue) {
+    return timeout == null ? defaultValue : (int) timeout.toMillis();
+  }
+
   private static String msToSecondsStr(String formatSeconds, double timeMs) {
     return String.format(ROOT, formatSeconds, timeMs / 1000.0) + " seconds";
   }
