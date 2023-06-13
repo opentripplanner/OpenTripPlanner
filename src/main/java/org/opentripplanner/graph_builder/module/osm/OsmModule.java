@@ -163,13 +163,6 @@ public class OsmModule implements GraphBuilderModule {
     var elevatorProcessor = new ElevatorProcessor(issueStore, osmdb, vertexGenerator);
     elevatorProcessor.buildElevatorEdges(graph);
 
-    var escalatorProcessor = new EscalatorProcessor(
-      issueStore,
-      osmdb,
-      vertexGenerator.intersectionNodes()
-    );
-    escalatorProcessor.buildEscalatorEdges();
-
     TurnRestrictionUnifier.unifyTurnRestrictions(osmdb, issueStore);
 
     params.edgeNamer().postprocess();
@@ -248,6 +241,7 @@ public class OsmModule implements GraphBuilderModule {
     long wayCount = osmdb.getWays().size();
     ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
     LOG.info(progress.startMessage());
+      var escalatorProcessor =  new EscalatorProcessor(issueStore, osmdb, vertexGenerator.intersectionNodes());
 
     WAY:for (OSMWay way : osmdb.getWays()) {
       WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
@@ -260,8 +254,13 @@ public class OsmModule implements GraphBuilderModule {
         issueStore
       );
       if (
-        !OsmFilter.isWayRoutable(way) || permissions.allowsNothing() || way.isEscalator()
+        !OsmFilter.isWayRoutable(way) || permissions.allowsNothing()
       ) continue;
+
+      if(way.isEscalator()) {
+        escalatorProcessor.buildEscalatorEdge(way);
+        continue;
+      }
 
       // handle duplicate nodes in OSM ways
       // this is a workaround for crappy OSM data quality
