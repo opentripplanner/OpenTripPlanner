@@ -328,12 +328,16 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private ZonedDateTime createZonedDateTime(int timeInSeconds) {
     return transitSearchTimeZero.plusSeconds(timeInSeconds);
   }
-
-  private boolean staySeatedInTransferFrom(Leg transitLeg) {
+  /**
+   * Include transfer leg in itinerary if the path is a "physical" path-leg between two stops, like walk or 
+   * bicycle. Do NOT include it if it represent a stay-seated transfer. See more details in
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/5086.
+   */
+  private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
     return (
-      transitLeg != null &&
-      transitLeg.getTransferToNextLeg() != null &&
-      transitLeg.getTransferToNextLeg().getTransferConstraint().isStaySeated()
+      transitLegBeforeTransfer != null &&
+      transitLegBeforeTransfer.getTransferToNextLeg() != null &&
+      transitLegBeforeTransfer.getTransferToNextLeg().getTransferConstraint().isStaySeated()
     );
   }
 }
