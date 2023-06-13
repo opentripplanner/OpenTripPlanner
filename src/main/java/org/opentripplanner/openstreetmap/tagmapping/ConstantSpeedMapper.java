@@ -14,16 +14,16 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 /**
  * OSM way properties for optimizing distance (not traveling time) in routing.
  */
-class ConstantSpeedMapper implements OsmTagMapper {
+class ConstantSpeedFinlandMapper implements OsmTagMapper {
 
   private float speed;
 
-  public ConstantSpeedMapper() {
+  public ConstantSpeedFinlandMapper() {
     super();
     this.speed = 22.22f; // 80 kmph by default
   }
 
-  public ConstantSpeedMapper(float speed) {
+  public ConstantSpeedFinlandMapper(float speed) {
     super();
     this.speed = speed;
   }
