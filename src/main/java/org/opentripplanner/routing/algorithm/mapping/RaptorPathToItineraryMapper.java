@@ -105,16 +105,16 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         transitLeg = mapTransitLeg(transitLeg, pathLeg.asTransitLeg());
         legs.add(transitLeg);
       }
-      // Map transfer leg but not when there is a stay seated transfer as the transfer leg would be
-      // a walk/bicycle leg between two stops (more details in
-      // https://github.com/opentripplanner/OpenTripPlanner/issues/5086).
-      else if (pathLeg.isTransferLeg() && !staySeatedInTransferFrom(transitLeg)) {
-        legs.addAll(
-          mapTransferLeg(
-            pathLeg.asTransferLeg(),
-            transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
-          )
-        );
+      // Map transfer leg
+      else if (pathLeg.isTransferLeg()) {
+        if (includeTransferInItinerary(transitLeg)) {
+          legs.addAll(
+            mapTransferLeg(
+              pathLeg.asTransferLeg(),
+              transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
+            )
+          );
+        }
       }
 
       pathLeg = pathLeg.nextLeg();
@@ -328,16 +328,16 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
   private ZonedDateTime createZonedDateTime(int timeInSeconds) {
     return transitSearchTimeZero.plusSeconds(timeInSeconds);
   }
+
   /**
-   * Include transfer leg in itinerary if the path is a "physical" path-leg between two stops, like walk or 
-   * bicycle. Do NOT include it if it represent a stay-seated transfer. See more details in
+   * Include transfer leg in itinerary if the path is a "physical" path-leg between two stops, like
+   * walk or bicycle. Do NOT include it if it represents a stay-seated transfer. See more details in
    * https://github.com/opentripplanner/OpenTripPlanner/issues/5086.
    */
   private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
     return (
-      transitLegBeforeTransfer != null &&
-      transitLegBeforeTransfer.getTransferToNextLeg() != null &&
-      transitLegBeforeTransfer.getTransferToNextLeg().getTransferConstraint().isStaySeated()
+      transitLegBeforeTransfer.getTransferToNextLeg() == null ||
+      !transitLegBeforeTransfer.getTransferToNextLeg().getTransferConstraint().isStaySeated()
     );
   }
 }
