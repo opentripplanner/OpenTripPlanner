@@ -8,8 +8,14 @@ This is only worth it when the execution is long running, i.e. more than ~50 mil
 """
 directive @async on FIELD_DEFINITION
 
+directive @oneOf on FIELD_DEFINITION
+
 schema {
     query: QueryType
+}
+
+input AccessibilityPreferences {
+    enabled: Boolean
 }
 
 """A public transport agency"""
@@ -271,6 +277,10 @@ enum AlertSeverityLevelType {
     affected, for example: All train services are cancelled due to technical problems.
     """
     SEVERE
+}
+
+input AlightPreferences {
+    slack: Int
 }
 
 type OpeningHours {
@@ -758,6 +768,21 @@ enum BikesAllowed {
     NOT_ALLOWED
 }
 
+input BikePreferences {
+    reluctance: Float
+    bikeWalking: WalkPreferences
+    speed: Float
+    switchTime: Int
+    switchCost: Int
+    optimize: OptimizationCriteria
+    boardCost: Int
+}
+
+input BoardPreferences {
+    waitReluctance: Float
+    slack: Int
+}
+
 """Car park represents a location where cars can be parked."""
 type CarPark implements Node & PlaceInterface {
     """
@@ -802,6 +827,10 @@ type CarPark implements Node & PlaceInterface {
     openingHours: OpeningHours
 }
 
+input CarPreferences {
+    reluctance: Float
+}
+
 """Cluster is a list of stops grouped by name and proximity"""
 type Cluster implements Node {
     """
@@ -829,12 +858,36 @@ type Cluster implements Node {
     stops: [Stop!]
 }
 
+input Cost @oneOf {
+    static: Float
+    function: CostFunction
+}
+
+scalar CostFunction
+
 type Coordinates {
     """Latitude (WGS 84)"""
     lat: Float
 
     """Longitude (WGS 84)"""
     lon: Float
+}
+
+input SearchWindowOptions @oneOf {
+    departure: SearchWindow
+    arrival: SearchWindow
+}
+
+input SearchWindow {
+    dateTime: DateTime
+    timeZone: TimeZone
+    before: SearchWindowRestriction
+    after: SearchWindowRestriction
+}
+
+input SearchWindowRestriction {
+    maxOffset: Duration
+    numberOfItineraries: Int
 }
 
 type debugOutput {
@@ -1010,6 +1063,11 @@ type StopGeometries {
     Proper stops are represented as single point "lines".
     """
     googleEncoded: [Geometry]
+}
+
+input Coordinate {
+    lat: Float!
+    lon: Float!
 }
 
 input InputBanned {
@@ -1193,6 +1251,43 @@ input ParkingFilter {
     further by the `not` filter.
     """
     select: [ParkingFilterOperation!]
+}
+
+input PlanDebugSettings {
+    debugItineraryFilter: Boolean
+}
+
+input PlanLocation @oneOf {
+    coordinate: Coordinate
+    """TODO should place string be a scalar?"""
+    place: String
+}
+
+input PlanLocations {
+    origin: PlanLocation
+    destination: PlanLocation
+}
+
+input PlanPreferences {
+    street: PlanStreetPreferences
+    transit: TransitPreferences
+    accessibility: AccessibilityPreferences
+}
+
+input PlanStreetModes {
+    direct: StreetMode
+    access: StreetMode
+    egress: StreetMode
+    transfer: StreetMode
+}
+
+input PlanStreetPreferences {
+    modes: PlanStreetModes
+    bike: BikePreferences
+    scooter: ScooterPreferences
+    car: CarPreferences
+    walk: WalkPreferences
+    rental: RentalPreferences
 }
 
 """
@@ -1447,6 +1542,11 @@ type Money {
     """
     amount: Float!
 }
+
+""""
+An ISO-8601-formatted datetime, i.e. `2023-06-13T14:30` for 2:30pm on June 13th 2023.
+"""
+scalar DateTime
 
 """"
 An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
@@ -1836,6 +1936,26 @@ type PageInfo {
     endCursor: String
 }
 
+enum StreetMode {
+    """BICYCLE"""
+    BICYCLE
+
+    """CAR"""
+    CAR
+
+    """"Private car trips shared with others."""
+    CARPOOL
+
+    """Enables flexible transit for access and egress legs"""
+    FLEX
+
+    """SCOOTER"""
+    SCOOTER
+
+    """WALK"""
+    WALK
+}
+
 """Realtime vehicle position"""
 type VehiclePosition {
     """Feed-scoped ID that uniquely identifies the vehicle in the format FeedId:VehicleId"""
@@ -2049,6 +2169,18 @@ type BookingInfo {
     dropOffMessage: String
 }
 
+input OptimizationCriteria @oneOf {
+    type: OptimizationType
+    triangle: InputTriangle
+}
+
+enum OptimizationType {
+    QUICK
+    SAFE
+    FLAT
+    GREENWAYS
+}
+
 type Place {
     """
     For transit stops, the name of the stop. For points of interest, the name of the POI.
@@ -2201,6 +2333,41 @@ type Plan {
 
     """Information about the timings for the plan generation"""
     debugOutput: debugOutput!
+}
+
+type PlanConnection {
+    searchDateTime: PlanDateTime
+
+    locations: PlanPlaces
+
+    routingErrors: [RoutingError!]!
+
+    debugInformation: PlanDebugInformation!
+
+    edges: [PlanEdge]
+
+    pageInfo: PageInfo!
+}
+
+type PlanDateTime {
+    date: DateTime
+    timeZone: TimeZone
+}
+
+type PlanDebugInformation {
+    totalTime: Int
+    pathCalculationTime: Int
+    searchWindowUsed: Long
+}
+
+type PlanEdge {
+    node: Itinerary
+    cursor: String!
+}
+
+type PlanPlaces {
+    from: Place!
+    to: Place!
 }
 
 """
@@ -3050,6 +3217,23 @@ type QueryType {
         """
         startTransitTripId: String @deprecated(reason: "Not implemented in OTP2")
     ): Plan @async
+
+    planConnection(
+        searchWindow: SearchWindowOptions
+        locations: PlanLocations
+        preferences: PlanPreferences
+        debugSettings: PlanDebugSettings
+        locale: String
+        before: String
+        after: String
+        first: Int
+        last: Int
+    ): PlanConnection @async
+}
+
+input RealtimePreferences {
+    omitCanceled: Boolean
+    ignoreRealtimeUpdates: Boolean
 }
 
 enum RealtimeState {
@@ -3076,6 +3260,13 @@ enum RealtimeState {
     compared to the trip pattern of the scheduled trip.
     """
     MODIFIED
+}
+
+input RentalPreferences {
+    allowKeepingVehicleAtDestination: Boolean
+    keepingVehicleAtDestinationCost: Int
+    allowedNetworks: [String!]
+    bannedNetworks: [String!]
 }
 
 """
@@ -3246,6 +3437,14 @@ enum AbsoluteDirection {
   SOUTHWEST
   WEST
   NORTHWEST
+}
+
+input ScooterPreferences {
+    reluctance: Float
+    scooterWalking: WalkPreferences
+    speed: Float
+    optimize: OptimizationCriteria
+    boardCost: Int
 }
 
 type step {
@@ -3694,6 +3893,30 @@ type TicketType implements Node {
     zones: [String!]
 }
 
+scalar TimeZone
+
+input TransferPreferences {
+    penalty: Int
+    minimumTime: Duration
+}
+
+input TransitModePreferences {
+    mode: TransitMode!
+    reluctance: Cost
+}
+
+input TransitPreferences {
+    """TODO should we reuse this or make a new design"""
+    unpreferred: InputUnpreferred
+    """TODO should we reuse this or make a new design"""
+    banned: InputBanned
+    board: BoardPreferences
+    alight: AlightPreferences
+    transfer: TransferPreferences
+    realtime: RealtimePreferences
+    modes: [TransitModePreference!]
+}
+
 """Text with language"""
 type TranslatedString {
     text: String
@@ -3875,6 +4098,13 @@ enum VertexType {
 
     """PARKANDRIDE"""
     PARKANDRIDE
+}
+
+input WalkPreferences {
+    speed: Float
+    reluctance: Float
+    safetyFactor: Float
+    boardCost: Int
 }
 
 enum WheelchairBoarding {
