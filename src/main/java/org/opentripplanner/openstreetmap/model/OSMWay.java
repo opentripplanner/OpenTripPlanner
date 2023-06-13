@@ -128,9 +128,11 @@ public class OSMWay extends OSMWithTags {
   }
 
   public boolean isEscalator() {
-    return "steps".equals(this.getTag("highway")) &&
+    return (
+      "steps".equals(this.getTag("highway")) &&
       this.getTag("conveying") != null &&
-      Set.of("yes", "forward", "backward", "reversible").contains(this.getTag("conveying"));
+      Set.of("yes", "forward", "backward", "reversible").contains(this.getTag("conveying"))
+    );
   }
 
   public boolean isForwardEscalator() {
@@ -140,7 +142,6 @@ public class OSMWay extends OSMWithTags {
   public boolean isBackwardEscalator() {
     return isEscalator() && "backward".equals(this.getTag("conveying"));
   }
-
 
   @Override
   public String getOpenStreetMapLink() {

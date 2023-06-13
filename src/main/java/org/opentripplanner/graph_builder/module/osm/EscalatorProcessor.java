@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
@@ -35,6 +34,47 @@ class EscalatorProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ElevatorProcessor.class);
 
+  public void buildEscalatorEdge(OSMWay escalatorWay) {
+    ArrayList<EscalatorEdge> edges = new ArrayList<>();
+    List<Long> nodes = Arrays
+      .stream(escalatorWay.getNodeRefs().toArray())
+      .filter(nodeRef ->
+        intersectionNodes.containsKey(nodeRef) && intersectionNodes.get(nodeRef) != null
+      )
+      .boxed()
+      .toList();
+
+    for (int i = 0; i < nodes.size() - 1; i++) {
+      if(escalatorWay.isForwardEscalator()) {
+      edges.add(
+        new EscalatorEdge(
+          intersectionNodes.get(nodes.get(i)),
+          intersectionNodes.get(nodes.get(i + 1))
+        )
+      );
+          }
+            else if(escalatorWay.isBackwardEscalator()) {
+              edges.add(new EscalatorEdge(
+                  intersectionNodes.get(nodes.get(i + 1)),
+                  intersectionNodes.get(nodes.get(i))
+                )
+              );
+            }else {
+              edges.add(
+                new EscalatorEdge(
+                  intersectionNodes.get(nodes.get(i)),
+                  intersectionNodes.get(nodes.get(i + 1))
+                )
+              );
+              edges.add(new EscalatorEdge(
+                  intersectionNodes.get(nodes.get(i + 1)),
+                  intersectionNodes.get(nodes.get(i))
+                )
+              );
+            }
+    }
+  }
+
   public void buildEscalatorEdges() {
     var escalators = osmdb.getWays().stream().filter(OSMWay::isEscalator).iterator();
     ArrayList<EscalatorEdge> edges = new ArrayList<>();
@@ -50,27 +90,29 @@ class EscalatorProcessor {
         .toList();
 
       for (int i = 0; i < nodes.size() - 1; i++) {
-        if(escalatorWay.isForwardEscalator()) {
-        edges.add(
-          new EscalatorEdge(
-            intersectionNodes.get(nodes.get(i)),
-            intersectionNodes.get(nodes.get(i + 1))
-          )
-        );}
-        else if(escalatorWay.isBackwardEscalator()) {
-          edges.add(new EscalatorEdge(
-            intersectionNodes.get(nodes.get(i + 1)),
-            intersectionNodes.get(nodes.get(i))
-          )
-          );
-        }else {
+        if (escalatorWay.isForwardEscalator()) {
           edges.add(
             new EscalatorEdge(
               intersectionNodes.get(nodes.get(i)),
               intersectionNodes.get(nodes.get(i + 1))
             )
           );
-          edges.add(new EscalatorEdge(
+        } else if (escalatorWay.isBackwardEscalator()) {
+          edges.add(
+            new EscalatorEdge(
+              intersectionNodes.get(nodes.get(i + 1)),
+              intersectionNodes.get(nodes.get(i))
+            )
+          );
+        } else {
+          edges.add(
+            new EscalatorEdge(
+              intersectionNodes.get(nodes.get(i)),
+              intersectionNodes.get(nodes.get(i + 1))
+            )
+          );
+          edges.add(
+            new EscalatorEdge(
               intersectionNodes.get(nodes.get(i + 1)),
               intersectionNodes.get(nodes.get(i))
             )
@@ -79,5 +121,4 @@ class EscalatorProcessor {
       }
     }
   }
-
 }
