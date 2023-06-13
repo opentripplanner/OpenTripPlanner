@@ -37,7 +37,7 @@ public final class WalkPreferences implements Serializable {
     this.stairsReluctance = 2.0;
     this.stairsTimeFactor = 3.0;
     this.safetyFactor = 1.0;
-    this.escalatorReluctance = 2.0;
+    this.escalatorReluctance = 1.5;
   }
 
   private WalkPreferences(Builder builder) {
