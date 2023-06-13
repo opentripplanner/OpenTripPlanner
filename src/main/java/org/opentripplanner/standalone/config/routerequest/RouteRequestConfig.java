@@ -779,6 +779,11 @@ high values.
           )
           .asDouble(dft.safetyFactor())
       )
-      .withEscalatorReluctance(c.of("escalatorReluctance").asDouble(dft.escalatorReluctance()));
+      .withEscalatorReluctance(
+        c.of("escalatorReluctance")
+          .summary(
+            "A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time"
+          )
+          .asDouble(dft.escalatorReluctance()));
   }
 }
