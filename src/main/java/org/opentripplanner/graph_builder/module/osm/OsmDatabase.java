@@ -1115,15 +1115,22 @@ public class OsmDatabase {
         relationsById.containsKey(member.getRef())
       ) {
         platformAreas.add(relationsById.get(member.getRef()));
-      } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
+      } else if (
+        "node".equals(member.getType()) &&
+        nodesById.containsKey(member.getRef()) &&
+        nodesById.get(member.getRef()).isEntrance()
+      ) {
         platformNodes.add(nodesById.get(member.getRef()));
       }
     }
     for (OSMWithTags area : platformAreas) {
-      final int filterLevel = area.getLevel();
+      // single platform area presumably contains only one level in most cases
+      // a node inside it may specify several levels if it is an elevator
+      // make sure each node has access to the current platform level
+      final Set<String> filterLevels = area.getLevels();
       platformNodes
         .stream()
-        .filter(node -> node.getLevel() == filterLevel)
+        .filter(node -> node.getLevels().containsAll(filterLevels))
         .forEach(node -> stopsInAreas.put(area, node));
     }
   }
