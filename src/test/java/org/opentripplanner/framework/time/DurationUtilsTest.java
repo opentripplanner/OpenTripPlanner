@@ -1,6 +1,8 @@
 package org.opentripplanner.framework.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegative;
 import static org.opentripplanner.framework.time.DurationUtils.toIntMilliseconds;
 
 import java.time.Duration;
@@ -85,6 +87,12 @@ public class DurationUtilsTest {
     assertEquals(List.of(Duration.ZERO), DurationUtils.durations("0s"));
     assertEquals(List.of(D9s, D2h, D5m), DurationUtils.durations("9s 2h 5m"));
     assertEquals(List.of(D9s, D2h, D5m), DurationUtils.durations("9s;2h,5m"));
+  }
+
+  @Test
+  public void testRequireNonNegative() {
+    assertThrows(NullPointerException.class, () -> requireNonNegative(null));
+    assertThrows(IllegalArgumentException.class, () -> requireNonNegative(Duration.ofSeconds(-1)));
   }
 
   @Test

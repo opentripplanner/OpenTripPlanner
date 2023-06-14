@@ -3,6 +3,7 @@ package org.opentripplanner.routing.api.request.framework;
 import static java.lang.Math.abs;
 
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.lang.IntUtils;
 
 /**
  * This utility can be used to perform sanity checks on common number types. It will also normalize
@@ -22,18 +23,6 @@ public class Units {
 
   /** This is a utility class, it is never instantiated; Hence, private constructor. */
   private Units() {}
-
-  /**
-   * A generalized-cost. Zero(0) or positive integer.
-   * <p>
-   * Unit: Human cost of riding transit for 1 second ($)
-   */
-  public static int cost(int value) {
-    if (value < 0) {
-      throw new IllegalArgumentException("Negative generalized-cost not expected: " + value);
-    }
-    return value;
-  }
 
   /**
    * Reluctance of factor from zero(0) to positive infinitive.
@@ -58,12 +47,7 @@ public class Units {
    * Unit: scalar
    */
   public static double normalizedFactor(double value, double minValue, double maxValue) {
-    if (value < minValue) {
-      throw new IllegalArgumentException("Min limit(" + minValue + ") exceeded: " + value);
-    }
-    if (value > maxValue) {
-      throw new IllegalArgumentException("Max limit(" + maxValue + ") exceeded: " + value);
-    }
+    DoubleUtils.requireInRange(value, minValue, maxValue);
     if (abs(value) < 2.0) {
       return DoubleUtils.roundTo2Decimals(value);
     }
@@ -85,10 +69,7 @@ public class Units {
    * Amount of time/slack/duration in seconds - A constant amount of time.
    */
   public static int duration(int seconds) {
-    if (seconds < 0) {
-      throw new IllegalArgumentException("Negative slack/time/duration not expected: " + seconds);
-    }
-    return seconds;
+    return IntUtils.requireNotNegative(seconds);
   }
 
   /**
@@ -152,10 +133,7 @@ public class Units {
    * Unit: scalar
    */
   public static double ratio(double value) {
-    if (value < 0.0 || value > 1.0) {
-      throw new IllegalArgumentException("Ratio between 0.0 and 1.0 expected. Value: " + value);
-    }
-    return DoubleUtils.roundTo3Decimals(value);
+    return DoubleUtils.requireInRange(DoubleUtils.roundTo3Decimals(value), 0.0, 1.0);
   }
 
   /**
@@ -164,12 +142,6 @@ public class Units {
    * Unit: scalar
    */
   public static int count(int value, int maxValue) {
-    if (value < 0) {
-      throw new IllegalArgumentException("Negative count not expected: " + value);
-    }
-    if (value > maxValue) {
-      throw new IllegalArgumentException("Max limit(" + maxValue + ") exceeded: " + value);
-    }
-    return value;
+    return IntUtils.requireInRange(value, 0, maxValue);
   }
 }

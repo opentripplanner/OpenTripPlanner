@@ -1,12 +1,12 @@
 package org.opentripplanner.raptor.rangeraptor.standard.besttimes;
 
-import static org.opentripplanner.raptor.api.RaptorConstants.TIME_NOT_SET;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;

@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.raptor.api.debug.DebugEvent;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.request.DebugRequest;
 import org.opentripplanner.raptor.rangeraptor.internalapi.DebugHandler;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -71,7 +72,7 @@ abstract class AbstractDebugHandlerAdapter<T> implements DebugHandler<T> {
   }
 
   /**
-   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#NOT_FOUND} not supported.
+   * Returns {@link RaptorConstants#NOT_FOUND} not supported.
    */
   protected abstract int stop(T arrival);
 

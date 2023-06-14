@@ -73,7 +73,7 @@ class TransferPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withCost(23).build();
     var copy = other.copyOf().withCost(COST).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
+    assertEqualsAndHashCode(subject, other, copy);
   }
 
   @Test
@@ -81,13 +81,13 @@ class TransferPreferencesTest {
     assertEquals("TransferPreferences{}", TransferPreferences.DEFAULT.toString());
     assertEquals(
       "TransferPreferences{" +
-      "cost: 200, " +
+      "cost: $200, " +
       "slack: 150, " +
       "waitReluctance: 0.95, " +
       "maxTransfers: 17, " +
       "maxAdditionalTransfers: 7, " +
       "optimization: TransferOptimizationPreferences{backTravelWaitTimeFactor: 2.5}, " +
-      "nonpreferredCost: 30,000" +
+      "nonpreferredCost: $30000" +
       "}",
       subject.toString()
     );

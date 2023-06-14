@@ -1,4 +1,6 @@
-package org.opentripplanner.raptor.api;
+package org.opentripplanner.raptor.api.model;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 /**
  * Raptor relies on {@code int} operation to be fast, so in many cases we use a "magic number" to
@@ -63,4 +65,11 @@ public class RaptorConstants {
 
   /** Alias for {@link #UNREACHED_HIGH} */
   public static final int N_TRANSFERS_UNREACHED = UNREACHED_HIGH;
+
+  /**
+   * There is 86400 seconds in a "normal" day(24 * 60 * 60). This is used for testing, logging
+   * and debugging, but do not base any important logic on this. A day with changes in
+   * daylight-saving-time does not have this amount of seconds.
+   */
+  public static final int SECONDS_IN_A_DAY = (int) DAYS.getDuration().toSeconds();
 }

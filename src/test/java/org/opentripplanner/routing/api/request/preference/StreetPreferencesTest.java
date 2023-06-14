@@ -79,7 +79,7 @@ class StreetPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withTurnReluctance(34.0).build();
     var copy = other.copyOf().withTurnReluctance(TURN_RELUCTANCE).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
+    assertEqualsAndHashCode(subject, other, copy);
   }
 
   @Test

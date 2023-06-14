@@ -23,7 +23,6 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMultimap;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
-import org.rutebanken.netex.model.OperatingDay_VersionStructure;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 
 class DayTypeAssignmentMapperTest {

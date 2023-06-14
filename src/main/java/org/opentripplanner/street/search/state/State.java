@@ -436,6 +436,21 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return false;
   }
 
+  /**
+   * Check all edges is traversed on foot {@code mode=WALK}.
+   * <p>
+   * DO NOT USE THIS IN ROUTING IT WILL NOT PERFORM WELL!
+   */
+  public boolean containsOnlyWalkMode() {
+    // The for-loop has the best performance
+    for (var s = this; s != null; s = s.backState) {
+      if (!s.stateData.currentMode.isWalking()) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   protected State clone() {
     State ret;
     try {

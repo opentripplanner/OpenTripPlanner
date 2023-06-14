@@ -49,7 +49,7 @@ class ElevatorPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withBoardTime(123).build();
     var same = other.copyOf().withBoardTime(BOARD_TIME).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, same);
+    assertEqualsAndHashCode(subject, other, same);
   }
 
   @Test

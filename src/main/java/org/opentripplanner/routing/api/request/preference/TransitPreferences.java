@@ -8,11 +8,11 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
-import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
@@ -27,7 +27,7 @@ public final class TransitPreferences implements Serializable {
   private final DurationForEnum<TransitMode> boardSlack;
   private final DurationForEnum<TransitMode> alightSlack;
   private final Map<TransitMode, Double> reluctanceForMode;
-  private final int otherThanPreferredRoutesPenalty;
+  private final Cost otherThanPreferredRoutesPenalty;
   private final DoubleAlgorithmFunction unpreferredCost;
   private final boolean ignoreRealtimeUpdates;
   private final boolean includePlannedCancellations;
@@ -37,7 +37,7 @@ public final class TransitPreferences implements Serializable {
   private TransitPreferences() {
     this.boardSlack = this.alightSlack = DurationForEnum.of(TransitMode.class).build();
     this.reluctanceForMode = Map.of();
-    this.otherThanPreferredRoutesPenalty = 300;
+    this.otherThanPreferredRoutesPenalty = Cost.costOfMinutes(5);
     this.unpreferredCost = createLinearFunction(0.0, DEFAULT_ROUTE_RELUCTANCE);
     this.ignoreRealtimeUpdates = false;
     this.includePlannedCancellations = false;
@@ -49,7 +49,7 @@ public final class TransitPreferences implements Serializable {
     this.boardSlack = requireNonNull(builder.boardSlack);
     this.alightSlack = requireNonNull(builder.alightSlack);
     this.reluctanceForMode = Map.copyOf(requireNonNull(builder.reluctanceForMode));
-    this.otherThanPreferredRoutesPenalty = Units.cost(builder.otherThanPreferredRoutesPenalty);
+    this.otherThanPreferredRoutesPenalty = builder.otherThanPreferredRoutesPenalty;
     this.unpreferredCost = requireNonNull(builder.unpreferredCost);
     this.ignoreRealtimeUpdates = builder.ignoreRealtimeUpdates;
     this.includePlannedCancellations = builder.includePlannedCancellations;
@@ -120,7 +120,7 @@ public final class TransitPreferences implements Serializable {
    */
   @Deprecated
   public int otherThanPreferredRoutesPenalty() {
-    return otherThanPreferredRoutesPenalty;
+    return otherThanPreferredRoutesPenalty.toSeconds();
   }
 
   public DoubleAlgorithmFunction unpreferredCost() {
@@ -195,7 +195,7 @@ public final class TransitPreferences implements Serializable {
       .addObj("boardSlack", boardSlack, DEFAULT.boardSlack)
       .addObj("alightSlack", alightSlack, DEFAULT.alightSlack)
       .addObj("reluctanceForMode", reluctanceForMode, DEFAULT.reluctanceForMode)
-      .addNum(
+      .addObj(
         "otherThanPreferredRoutesPenalty",
         otherThanPreferredRoutesPenalty,
         DEFAULT.otherThanPreferredRoutesPenalty
@@ -225,7 +225,7 @@ public final class TransitPreferences implements Serializable {
     private DurationForEnum<TransitMode> boardSlack;
     private DurationForEnum<TransitMode> alightSlack;
     private Map<TransitMode, Double> reluctanceForMode;
-    private int otherThanPreferredRoutesPenalty;
+    private Cost otherThanPreferredRoutesPenalty;
     private DoubleAlgorithmFunction unpreferredCost;
     private boolean ignoreRealtimeUpdates;
     private boolean includePlannedCancellations;
@@ -274,7 +274,7 @@ public final class TransitPreferences implements Serializable {
 
     @Deprecated
     public Builder setOtherThanPreferredRoutesPenalty(int otherThanPreferredRoutesPenalty) {
-      this.otherThanPreferredRoutesPenalty = otherThanPreferredRoutesPenalty;
+      this.otherThanPreferredRoutesPenalty = Cost.costOfSeconds(otherThanPreferredRoutesPenalty);
       return this;
     }
 

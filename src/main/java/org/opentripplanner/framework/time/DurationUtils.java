@@ -8,6 +8,7 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -159,6 +160,14 @@ public class DurationUtils {
     } else {
       return msToSecondsStr("%.0f", timeMs);
     }
+  }
+
+  public static Duration requireNonNegative(Duration value) {
+    Objects.requireNonNull(value);
+    if (value.isNegative()) {
+      throw new IllegalArgumentException("Duration can no be negative: " + value);
+    }
+    return value;
   }
 
   /**

@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.Units;
 
@@ -23,7 +24,7 @@ public final class WalkPreferences implements Serializable {
 
   private final double speed;
   private final double reluctance;
-  private final int boardCost;
+  private final Cost boardCost;
   private final double stairsReluctance;
   private final double stairsTimeFactor;
   private final double safetyFactor;
@@ -31,7 +32,7 @@ public final class WalkPreferences implements Serializable {
   private WalkPreferences() {
     this.speed = 1.33;
     this.reluctance = 2.0;
-    this.boardCost = 60 * 10;
+    this.boardCost = Cost.costOfMinutes(10);
     this.stairsReluctance = 2.0;
     this.stairsTimeFactor = 3.0;
     this.safetyFactor = 1.0;
@@ -40,7 +41,7 @@ public final class WalkPreferences implements Serializable {
   private WalkPreferences(Builder builder) {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
-    this.boardCost = Units.cost(builder.boardCost);
+    this.boardCost = builder.boardCost;
     this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
     this.stairsTimeFactor = Units.reluctance(builder.stairsTimeFactor);
     this.safetyFactor = Units.reluctance(builder.safetyFactor);
@@ -83,7 +84,7 @@ public final class WalkPreferences implements Serializable {
    * {@link TransferPreferences#cost()}.
    */
   public int boardCost() {
-    return boardCost;
+    return boardCost.toSeconds();
   }
 
   /** Used instead of walk reluctance for stairs */
@@ -136,7 +137,7 @@ public final class WalkPreferences implements Serializable {
       .of(WalkPreferences.class)
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
-      .addNum("boardCost", boardCost, DEFAULT.boardCost)
+      .addObj("boardCost", boardCost, DEFAULT.boardCost)
       .addNum("stairsReluctance", stairsReluctance, DEFAULT.stairsReluctance)
       .addNum("stairsTimeFactor", stairsTimeFactor, DEFAULT.stairsTimeFactor)
       .addNum("safetyFactor", safetyFactor, DEFAULT.safetyFactor)
@@ -148,7 +149,7 @@ public final class WalkPreferences implements Serializable {
     private final WalkPreferences original;
     private double speed;
     private double reluctance;
-    private int boardCost;
+    private Cost boardCost;
     private double stairsReluctance;
     private double stairsTimeFactor;
     private double safetyFactor;
@@ -185,12 +186,12 @@ public final class WalkPreferences implements Serializable {
       return this;
     }
 
-    public int boardCost() {
+    public Cost boardCost() {
       return boardCost;
     }
 
     public Builder withBoardCost(int boardCost) {
-      this.boardCost = boardCost;
+      this.boardCost = Cost.costOfSeconds(boardCost);
       return this;
     }
 
