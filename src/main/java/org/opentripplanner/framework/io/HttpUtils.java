@@ -50,11 +50,18 @@ public class HttpUtils {
   ) throws IOException {
     HttpResponse response = getResponse(new HttpGet(uri), timeout, requestHeaderValues);
     if (response.getStatusLine().getStatusCode() != 200) {
-      return null;
+      throw new IOException(
+        "Service unavailable: " +
+        uri +
+        ". HTTP status code: " +
+        response.getStatusLine().getStatusCode() +
+        " - " +
+        response.getStatusLine().getReasonPhrase()
+      );
     }
     HttpEntity entity = response.getEntity();
     if (entity == null) {
-      return null;
+      throw new IOException("HTTP response message entity is empty for url: " + uri);
     }
     return entity.getContent();
   }

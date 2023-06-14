@@ -102,10 +102,6 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.asMap());
       final long t2 = System.currentTimeMillis();
 
-      if (data == null) {
-        throw new IOException("Historical endpoint returned no data from url" + url);
-      }
-
       var reader = new InputStreamReader(data);
       var string = CharStreams.toString(reader);
 
