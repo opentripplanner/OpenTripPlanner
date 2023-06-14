@@ -11,6 +11,7 @@ import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.PathComparator;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -132,6 +133,7 @@ public class GraphPathFinder {
     Set<Vertex> from,
     Set<Vertex> to
   ) {
+    OTPRequestTimeoutException.checkForTimeout();
     Instant reqTime = request.dateTime().truncatedTo(ChronoUnit.SECONDS);
 
     List<GraphPath<State, Edge, Vertex>> paths = getPaths(request, from, to);
