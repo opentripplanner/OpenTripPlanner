@@ -323,11 +323,6 @@ public class EnumTypes {
       "The date specified is outside the range of data currently loaded into the system"
     )
     .value(
-      "processingTimeout",
-      RoutingErrorCode.PROCESSING_TIMEOUT,
-      "The routing request timed out."
-    )
-    .value(
       "systemError",
       RoutingErrorCode.SYSTEM_ERROR,
       "An unknown error happened during the search. The details have been logged to the server logs"

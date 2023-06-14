@@ -37,10 +37,5 @@ public enum RoutingErrorCode {
    */
   NO_STOPS_IN_RANGE,
 
-  /**
-   * The routing request timed out.
-   */
-  PROCESSING_TIMEOUT,
-
   SYSTEM_ERROR,
 }
