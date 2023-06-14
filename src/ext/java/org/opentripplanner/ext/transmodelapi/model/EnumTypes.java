@@ -324,11 +324,6 @@ public class EnumTypes {
       "The date specified is outside the range of data currently loaded into the system"
     )
     .value(
-      "systemError",
-      RoutingErrorCode.SYSTEM_ERROR,
-      "An unknown error happened during the search. The details have been logged to the server logs"
-    )
-    .value(
       "walkingBetterThanTransit",
       RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT,
       "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"

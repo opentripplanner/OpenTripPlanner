@@ -45,9 +45,6 @@ public class PlannerErrorMapper {
       case WALKING_BETTER_THAN_TRANSIT:
         api = new PlannerError(Message.TOO_CLOSE);
         break;
-      case SYSTEM_ERROR:
-        api = new PlannerError(Message.SYSTEM_ERROR);
-        break;
       default:
         throw new IllegalArgumentException();
     }

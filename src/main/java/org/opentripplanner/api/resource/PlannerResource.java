@@ -92,8 +92,6 @@ public class PlannerResource extends RoutingResource {
       response.elevationMetadata.geoidElevation = request.preferences().system().geoidElevation();
 
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
-    } catch (OTPRequestTimeoutException e) {
-      response.setError(new PlannerError(Message.PROCESSING_TIMEOUT));
     } catch (RoutingValidationException e) {
       if (e.isFromToLocationNotFound()) {
         response.setError(new PlannerError(Message.GEOCODE_FROM_TO_NOT_FOUND));
@@ -104,6 +102,8 @@ public class PlannerResource extends RoutingResource {
       } else {
         response.setError(new PlannerError(Message.SYSTEM_ERROR));
       }
+    } catch (OTPRequestTimeoutException e) {
+      response.setError(new PlannerError(Message.PROCESSING_TIMEOUT));
     } catch (Exception e) {
       LOG.error("System error", e);
       response.setError(new PlannerError(Message.SYSTEM_ERROR));
