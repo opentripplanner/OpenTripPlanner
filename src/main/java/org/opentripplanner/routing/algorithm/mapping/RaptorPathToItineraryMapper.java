@@ -107,12 +107,14 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       }
       // Map transfer leg
       else if (pathLeg.isTransferLeg()) {
-        legs.addAll(
-          mapTransferLeg(
-            pathLeg.asTransferLeg(),
-            transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
-          )
-        );
+        if (includeTransferInItinerary(transitLeg)) {
+          legs.addAll(
+            mapTransferLeg(
+              pathLeg.asTransferLeg(),
+              transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
+            )
+          );
+        }
       }
 
       pathLeg = pathLeg.nextLeg();
@@ -325,5 +327,17 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private ZonedDateTime createZonedDateTime(int timeInSeconds) {
     return transitSearchTimeZero.plusSeconds(timeInSeconds);
+  }
+
+  /**
+   * Include transfer leg in itinerary if the path is a "physical" path-leg between two stops, like
+   * walk or bicycle. Do NOT include it if it represents a stay-seated transfer. See more details in
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/5086.
+   */
+  private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
+    return (
+      transitLegBeforeTransfer.getTransferToNextLeg() == null ||
+      !transitLegBeforeTransfer.getTransferToNextLeg().getTransferConstraint().isStaySeated()
+    );
   }
 }
