@@ -13,14 +13,15 @@ import org.opentripplanner.test.support.VariableSource;
 
 class GtfsFeedIdTest {
 
-  private static final String NUMBERS_ONLY_REGEX = "^\\d$";
+  private static final String NUMBERS_ONLY_REGEX = "^\\d+$";
 
   static Stream<Arguments> emptyCases = Stream.of(null, "", "     ", "\n", "  ").map(Arguments::of);
 
   @ParameterizedTest
   @VariableSource("emptyCases")
   void autogenerateNumber(String id) {
-    assertTrue(feedId(id).matches(NUMBERS_ONLY_REGEX));
+    String feedId = feedId(id);
+    assertTrue(feedId.matches(NUMBERS_ONLY_REGEX), "'%s' is not an integer.".formatted(feedId));
   }
 
   @Test
