@@ -45,6 +45,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Validate to/from in routing request [#5164](https://github.com/opentripplanner/OpenTripPlanner/pull/5164)
 - Changing default value for earlyStartSec [#5165](https://github.com/opentripplanner/OpenTripPlanner/pull/5165)
 - Add GTFS stop sequence to GTFS GraphQL API [#5153](https://github.com/opentripplanner/OpenTripPlanner/pull/5153)
+- Remove walk leg in a stay seated transfer [#5135](https://github.com/opentripplanner/OpenTripPlanner/pull/5135)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
