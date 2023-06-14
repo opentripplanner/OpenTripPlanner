@@ -13,7 +13,7 @@ public enum OsmTagMapperSource {
   ATLANTA,
   HOUSTON,
   PORTLAND,
-  CONSTANTSPEEDFINLAND;
+  CONSTANT_SPEED_FINLAND;
 
   public OsmTagMapper getInstance() {
     return switch (this) {
@@ -25,7 +25,7 @@ public enum OsmTagMapperSource {
       case ATLANTA -> new AtlantaMapper();
       case HOUSTON -> new HoustonMapper();
       case PORTLAND -> new PortlandMapper();
-      case CONSTANTSPEEDFINLAND -> new ConstantSpeedFinlandMapper();
+      case CONSTANT_SPEED_FINLAND -> new ConstantSpeedFinlandMapper();
     };
   }
 }
