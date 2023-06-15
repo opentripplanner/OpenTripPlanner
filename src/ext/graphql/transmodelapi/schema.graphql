@@ -585,7 +585,9 @@ type Quay implements PlaceInterface {
   longitude: Float
   name(
     "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned."
-    lang: String
+    lang: String,
+    "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned."
+    language: String
   ): String!
   "Public code used to identify this quay within the stop place. For instance a platform code."
   publicCode: String
@@ -1114,8 +1116,10 @@ type StopPlace implements PlaceInterface {
   latitude: Float
   longitude: Float
   name(
-    "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned."
-    lang: String
+    "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exist, the default name is returned."
+    lang: String,
+    "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exist, the default name is returned."
+    language: String
   ): String!
   "Returns parent stop for this stop"
   parent: StopPlace
