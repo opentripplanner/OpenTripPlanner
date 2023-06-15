@@ -96,11 +96,7 @@ public class TestStateBuilder {
 
     State[] traverse = edge.traverse(currentState);
     currentState =
-      Arrays
-        .stream(traverse)
-        .filter(it -> it.getNonTransitMode() == TraverseMode.CAR)
-        .findFirst()
-        .get();
+      Arrays.stream(traverse).filter(it -> it.currentMode() == TraverseMode.CAR).findFirst().get();
 
     return this;
   }

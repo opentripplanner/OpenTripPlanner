@@ -65,7 +65,17 @@ public class VehicleRentalEdge extends Edge {
           pickedUp = false;
         }
         case RENTING_FLOATING -> {
-          if (!station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)) {
+          // a very special case: an arriveBy search has started in a no-drop-off zone.
+          // in such a case we mark this case in the state that speculatively picks up a vehicle
+          // when leaving the no-drop-off zone (has no network) and check it here so that we cannot
+          // begin the rental.
+          // reminder: in an arriveBy search we traverse backwards so beginFloatingVehicle means
+          // dropping it. i know 🤯.
+          if (s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.contains(network)) {
+            return State.empty();
+          } else if (
+            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
+          ) {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {

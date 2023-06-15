@@ -2,7 +2,6 @@ package org.opentripplanner.street.model.edge;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -396,25 +395,27 @@ public class StreetEdge
       s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy();
     if (arriveByRental && tov.rentalTraversalBanned(s0)) {
       return State.empty();
-    } else if (arriveByRental && hasStartedSearchInNoDropOffZoneAndIsExitingIt(s0)) {
-      var networks = new ArrayList<>(tov.rentalRestrictions().noDropOffNetworks());
-      networks.add(null);
+    } else if (arriveByRental && hasStartedWalkingInNoDropOffZoneAndIsExitingIt(s0)) {
+      var networks = Stream.concat(
+        fromv.rentalRestrictions().noDropOffNetworks().stream(),
+        Stream.of((String) null)
+      );
 
-      Stream<State> states = networks
-        .stream()
-        .map(network -> {
-          var edit = doTraverse(s0, TraverseMode.WALK, false);
-          if (edit != null) {
-            edit.dropFloatingVehicle(
-              s0.vehicleRentalFormFactor(),
-              network,
-              s0.getRequest().arriveBy()
-            );
+      var states = networks.map(network -> {
+        var edit = doTraverse(s0, TraverseMode.WALK, false);
+        if (edit != null) {
+          edit.dropFloatingVehicle(
+            s0.vehicleRentalFormFactor(),
+            network,
+            s0.getRequest().arriveBy()
+          );
+          if (network != null) {
             edit.resetStartedInNoDropOffZone();
-            return edit.makeState();
           }
-          return null;
-        });
+          return edit.makeState();
+        }
+        return null;
+      });
       return State.ofStream(states);
     }
     // if the traversal is banned for the current state because of a GBFS geofencing zone
@@ -443,7 +444,6 @@ public class StreetEdge
           s0.getVehicleRentalNetwork(),
           s0.getRequest().arriveBy()
         );
-        editor.resetStartedInNoDropOffZone();
       }
     }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
@@ -534,12 +534,12 @@ public class StreetEdge
    * If the reverse search has started in a no-drop off rental zone and you are exiting
    * it .
    */
-  private boolean hasStartedSearchInNoDropOffZoneAndIsExitingIt(State s0) {
+  private boolean hasStartedWalkingInNoDropOffZoneAndIsExitingIt(State s0) {
     return (
-      s0.isRentingVehicle() &&
-      !fromv.rentalDropOffBanned(s0) &&
-      tov.rentalDropOffBanned(s0) &&
-      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty()
+      s0.currentMode() == TraverseMode.WALK &&
+      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty() &&
+      !fromv.rentalRestrictions().noDropOffNetworks().isEmpty() &&
+      tov.rentalRestrictions().noDropOffNetworks().isEmpty()
     );
   }
 

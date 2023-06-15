@@ -80,7 +80,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     this.vertex = vertex;
     this.backState = null;
     this.stateData = stateData;
-    if (!vertex.rentalRestrictions().noDropOffNetworks().isEmpty()) {
+    if (request.arriveBy() && !vertex.rentalRestrictions().noDropOffNetworks().isEmpty()) {
       this.stateData.noRentalDropOffZonesAtStartOfReverseSearch =
         vertex.rentalRestrictions().noDropOffNetworks();
     }
@@ -152,6 +152,9 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     return s.length == 0;
   }
 
+  /**
+   * Takes a stream of states and converts it to an array while removing nulls.
+   */
   public static State[] ofStream(Stream<State> states) {
     return states.filter(Objects::nonNull).toArray(State[]::new);
   }
