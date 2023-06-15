@@ -12,7 +12,7 @@ public class GraphQLToWebResponseMapper {
   public static Response map(OtpExecutionResult result) {
     if (result.timeout()) {
       return Response
-        .status(OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY.statusCode())
+        .status(OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY)
         .entity(GraphQLResponseSerializer.serialize(result.result()))
         .build();
     }
