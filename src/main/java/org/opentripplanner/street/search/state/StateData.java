@@ -127,7 +127,9 @@ public class StateData implements Cloneable {
       };
 
     if (baseStates.size() != 1) {
-      throw new IllegalStateException("Unable to create only a single state for %s".formatted(request));
+      throw new IllegalStateException(
+        "Unable to create only a single state for %s".formatted(request)
+      );
     }
     return baseStates.get(0);
   }

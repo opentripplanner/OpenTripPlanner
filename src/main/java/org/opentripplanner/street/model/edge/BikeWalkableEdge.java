@@ -49,12 +49,7 @@ public interface BikeWalkableEdge {
       return s0.edit(edge);
     }
 
-    return createEditor(
-      s0,
-      edge,
-      TraverseMode.WALK,
-      s0.currentMode() == TraverseMode.BICYCLE
-    );
+    return createEditor(s0, edge, TraverseMode.WALK, s0.currentMode() == TraverseMode.BICYCLE);
   }
 
   default StateEditor createEditorForWalking(State s0, Edge edge) {
@@ -62,12 +57,7 @@ public interface BikeWalkableEdge {
       return null;
     }
 
-    return createEditor(
-      s0,
-      edge,
-      TraverseMode.WALK,
-      s0.currentMode() == TraverseMode.BICYCLE
-    );
+    return createEditor(s0, edge, TraverseMode.WALK, s0.currentMode() == TraverseMode.BICYCLE);
   }
 
   default StateEditor createEditor(State s0, Edge edge, TraverseMode mode, boolean bicycleWalking) {
