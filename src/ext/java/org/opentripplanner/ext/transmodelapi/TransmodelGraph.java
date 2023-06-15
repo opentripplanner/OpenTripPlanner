@@ -10,20 +10,25 @@ import graphql.execution.instrumentation.Instrumentation;
 import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
+import jakarta.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.ext.transmodelapi.support.AbortOnTimeoutExecutionStrategy;
-import org.opentripplanner.ext.transmodelapi.support.OtpExecutionResult;
+import org.opentripplanner.ext.transmodelapi.support.ExecutionResultMapper;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 class TransmodelGraph {
+
+  private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraph.class);
 
   private static final int MAX_ERROR_TO_RETURN = 25;
   private final GraphQLSchema indexSchema;
@@ -36,7 +41,7 @@ class TransmodelGraph {
     this.indexSchema = schema;
   }
 
-  OtpExecutionResult executeGraphQL(
+  Response executeGraphQL(
     String query,
     OtpServerRequestContext serverContext,
     Map<String, Object> variables,
@@ -59,9 +64,13 @@ class TransmodelGraph {
 
       var result = graphQL.execute(executionInput);
       result = limitMaxNumberOfErrors(result);
-      return OtpExecutionResult.of(result);
+
+      return ExecutionResultMapper.okResponse(result);
     } catch (OTPRequestTimeoutException te) {
-      return OtpExecutionResult.ofTimeout();
+      return ExecutionResultMapper.timeoutResponse();
+    } catch (Exception systemError) {
+      LOG.error(systemError.getMessage(), systemError);
+      return ExecutionResultMapper.systemErrorResponse(systemError.getMessage());
     }
   }
 

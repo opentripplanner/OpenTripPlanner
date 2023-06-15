@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.ext.transmodelapi.support.GraphQLToWebResponseMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitModel;
@@ -114,7 +113,7 @@ public class TransmodelAPI {
     } else {
       variables = new HashMap<>();
     }
-    var result = index.executeGraphQL(
+    return index.executeGraphQL(
       query,
       serverContext,
       variables,
@@ -122,7 +121,6 @@ public class TransmodelAPI {
       maxResolves,
       getTagsFromHeaders(headers)
     );
-    return GraphQLToWebResponseMapper.map(result);
   }
 
   @POST
@@ -133,7 +131,7 @@ public class TransmodelAPI {
     @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
     @Context HttpHeaders headers
   ) {
-    var result = index.executeGraphQL(
+    return index.executeGraphQL(
       query,
       serverContext,
       null,
@@ -141,7 +139,6 @@ public class TransmodelAPI {
       maxResolves,
       getTagsFromHeaders(headers)
     );
-    return GraphQLToWebResponseMapper.map(result);
   }
 
   private static Iterable<Tag> getTagsFromHeaders(HttpHeaders headers) {
