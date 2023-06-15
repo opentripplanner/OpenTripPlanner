@@ -3,21 +3,21 @@ package org.opentripplanner.raptor._data.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.SECONDS_IN_A_DAY;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 
 /**
  * Simple implementation for {@link RaptorAccessEgress} for use in unit-tests.
  */
 public class TestAccessEgress implements RaptorAccessEgress {
 
-  public static final int SECONDS_IN_DAY = 24 * 3600;
   public static final int DEFAULT_NUMBER_OF_RIDES = 0;
   public static final boolean STOP_REACHED_ON_BOARD = true;
   public static final boolean STOP_REACHED_ON_FOOT = false;
@@ -194,15 +194,15 @@ public class TestAccessEgress implements RaptorAccessEgress {
       return RaptorConstants.TIME_NOT_SET;
     }
 
-    int days = Math.floorDiv(requestedDepartureTime, SECONDS_IN_DAY);
-    int specificOpening = days * SECONDS_IN_DAY + opening;
-    int specificClosing = days * SECONDS_IN_DAY + closing;
+    int days = Math.floorDiv(requestedDepartureTime, SECONDS_IN_A_DAY);
+    int specificOpening = days * SECONDS_IN_A_DAY + opening;
+    int specificClosing = days * SECONDS_IN_A_DAY + closing;
 
     if (requestedDepartureTime < specificOpening) {
       return specificOpening;
     } else if (requestedDepartureTime > specificClosing) {
       // return the opening time for the next day
-      return specificOpening + SECONDS_IN_DAY;
+      return specificOpening + SECONDS_IN_A_DAY;
     }
     return requestedDepartureTime;
   }
@@ -218,14 +218,14 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
     // opening & closing is relative to the departure
     int requestedDepartureTime = requestedArrivalTime - durationInSeconds();
-    int days = Math.floorDiv(requestedDepartureTime, SECONDS_IN_DAY);
-    int specificOpening = days * SECONDS_IN_DAY + opening;
-    int specificClosing = days * SECONDS_IN_DAY + closing;
+    int days = Math.floorDiv(requestedDepartureTime, SECONDS_IN_A_DAY);
+    int specificOpening = days * SECONDS_IN_A_DAY + opening;
+    int specificClosing = days * SECONDS_IN_A_DAY + closing;
     int closeAtArrival = specificClosing + durationInSeconds();
 
     if (requestedDepartureTime < specificOpening) {
       // return the closing for the previous day, offset with durationInSeconds()
-      return closeAtArrival - SECONDS_IN_DAY;
+      return closeAtArrival - SECONDS_IN_A_DAY;
     } else if (requestedArrivalTime > closeAtArrival) {
       return closeAtArrival;
     }
@@ -250,23 +250,6 @@ public class TestAccessEgress implements RaptorAccessEgress {
   @Override
   public boolean isFree() {
     return this.free;
-  }
-
-  @Override
-  public String openingHoursToString() {
-    if (!hasOpeningHours()) {
-      return null;
-    }
-    if (closed) {
-      return "closed";
-    }
-    return (
-      "Open(" +
-      TimeUtils.timeToStrCompact(opening) +
-      " " +
-      TimeUtils.timeToStrCompact(closing) +
-      ")"
-    );
   }
 
   @Override

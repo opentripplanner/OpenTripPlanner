@@ -120,7 +120,7 @@ class RaptorPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withTimeLimit(null).build();
     var copy = other.copyOf().withTimeLimit(TIME_LIMIT).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
+    assertEqualsAndHashCode(subject, other, copy);
   }
 
   @Test

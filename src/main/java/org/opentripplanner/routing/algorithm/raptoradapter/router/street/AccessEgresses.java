@@ -1,14 +1,14 @@
-package org.opentripplanner.routing.algorithm.raptoradapter.router;
+package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
 
-class AccessEgresses {
+public class AccessEgresses {
 
   private final Collection<DefaultAccessEgress> accesses;
   private final Collection<DefaultAccessEgress> egresses;
 
-  AccessEgresses(
+  public AccessEgresses(
     Collection<DefaultAccessEgress> accesses,
     Collection<DefaultAccessEgress> egresses
   ) {
@@ -16,11 +16,11 @@ class AccessEgresses {
     this.egresses = egresses;
   }
 
-  Collection<DefaultAccessEgress> getAccesses() {
+  public Collection<DefaultAccessEgress> getAccesses() {
     return accesses;
   }
 
-  Collection<DefaultAccessEgress> getEgresses() {
+  public Collection<DefaultAccessEgress> getEgresses() {
     return egresses;
   }
 }

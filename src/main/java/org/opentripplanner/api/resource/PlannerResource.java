@@ -18,6 +18,7 @@ import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +94,16 @@ public class PlannerResource extends RoutingResource {
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
     } catch (OTPRequestTimeoutException e) {
       response.setError(new PlannerError(Message.PROCESSING_TIMEOUT));
+    } catch (RoutingValidationException e) {
+      if (e.isFromToLocationNotFound()) {
+        response.setError(new PlannerError(Message.GEOCODE_FROM_TO_NOT_FOUND));
+      } else if (e.isFromLocationNotFound()) {
+        response.setError(new PlannerError(Message.GEOCODE_FROM_NOT_FOUND));
+      } else if (e.isToLocationNotFound()) {
+        response.setError(new PlannerError(Message.GEOCODE_TO_NOT_FOUND));
+      } else {
+        response.setError(new PlannerError(Message.SYSTEM_ERROR));
+      }
     } catch (Exception e) {
       LOG.error("System error", e);
       response.setError(new PlannerError(Message.SYSTEM_ERROR));

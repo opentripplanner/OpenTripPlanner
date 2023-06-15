@@ -59,6 +59,9 @@ public class TransmodelGraphQLPlanner {
         )
         .localContext(Map.of("locale", locale))
         .build();
+    } catch (RoutingValidationException e) {
+      response.plan = TripPlanMapper.mapTripPlan(request, List.of());
+      response.messages.addAll(e.getRoutingErrors());
     } catch (Exception e) {
       LOG.error("System error: {}", e.getMessage(), e);
       response.plan = TripPlanMapper.mapTripPlan(request, List.of());

@@ -40,6 +40,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Check service dates instead of service ids for block id transfers [#5162](https://github.com/opentripplanner/OpenTripPlanner/pull/5162)
 - Improve updater log messages [#5168](https://github.com/opentripplanner/OpenTripPlanner/pull/5168)
 - Add support for mapping NeTEx operating day in operating period [#5167](https://github.com/opentripplanner/OpenTripPlanner/pull/5167)
+- Relax validity check on flex trip with null duration [#5169](https://github.com/opentripplanner/OpenTripPlanner/pull/5169)
+- Log unexpected vehicle type in GBFS update [#5175](https://github.com/opentripplanner/OpenTripPlanner/pull/5175)
+- Validate to/from in routing request [#5164](https://github.com/opentripplanner/OpenTripPlanner/pull/5164)
+- Changing default value for earlyStartSec [#5165](https://github.com/opentripplanner/OpenTripPlanner/pull/5165)
+- Add GTFS stop sequence to GTFS GraphQL API [#5153](https://github.com/opentripplanner/OpenTripPlanner/pull/5153)
+- Remove walk leg in a stay seated transfer [#5135](https://github.com/opentripplanner/OpenTripPlanner/pull/5135)
+- Validate distinct from/to temporary vertices [#5181](https://github.com/opentripplanner/OpenTripPlanner/pull/5181)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

@@ -30,7 +30,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   private final int numberOfTransfers;
   private final int generalizedCost;
   private final AccessPathLeg<T> accessLeg;
-  private final EgressPathLeg<T> egressPathLeg;
+  private final EgressPathLeg<T> egressLeg;
 
   /** @see #dummyPath(int, int, int, int, int) */
   private Path(
@@ -46,7 +46,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this.numberOfTransfers = numberOfTransfers;
     this.generalizedCost = generalizedCost;
     this.accessLeg = null;
-    this.egressPathLeg = null;
+    this.egressLeg = null;
   }
 
   public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost) {
@@ -54,9 +54,9 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this.startTime = accessLeg.fromTime();
     this.generalizedCost = generalizedCost;
     this.accessLeg = accessLeg;
-    this.egressPathLeg = findEgressLeg(accessLeg);
-    this.numberOfTransfers = countNumberOfTransfers(accessLeg, egressPathLeg);
-    this.endTime = egressPathLeg.toTime();
+    this.egressLeg = findEgressLeg(accessLeg);
+    this.numberOfTransfers = countNumberOfTransfers(accessLeg, egressLeg);
+    this.endTime = egressLeg.toTime();
   }
 
   public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg) {
@@ -124,7 +124,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
 
   @Override
   public final EgressPathLeg<T> egressLeg() {
-    return egressPathLeg;
+    return egressLeg;
   }
 
   @Override

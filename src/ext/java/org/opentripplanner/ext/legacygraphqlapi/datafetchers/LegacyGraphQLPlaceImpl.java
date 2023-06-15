@@ -2,9 +2,10 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.util.Locale;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVertexType;
+import org.opentripplanner.ext.legacygraphqlapi.model.StopPosition;
+import org.opentripplanner.ext.legacygraphqlapi.model.StopPosition.PositionAtStop;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
@@ -87,6 +88,18 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   @Override
+  public DataFetcher<StopPosition> stopPosition() {
+    return environment -> {
+      var seq = getSource(environment).gtfsStopSequence;
+      if (seq != null) {
+        return new PositionAtStop(seq);
+      } else {
+        return null;
+      }
+    };
+  }
+
+  @Override
   public DataFetcher<VehicleParking> vehicleParking() {
     return this::getVehicleParking;
   }
@@ -111,18 +124,12 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
   public DataFetcher<String> vertexType() {
     return environment -> {
       var place = getSource(environment).place;
-      switch (place.vertexType) {
-        case NORMAL:
-          return LegacyGraphQLVertexType.NORMAL.name();
-        case TRANSIT:
-          return LegacyGraphQLVertexType.TRANSIT.name();
-        case VEHICLERENTAL:
-          return LegacyGraphQLVertexType.BIKESHARE.name();
-        case VEHICLEPARKING:
-          return LegacyGraphQLVertexType.BIKEPARK.name();
-        default:
-          throw new IllegalStateException("Unhandled vertexType: " + place.vertexType.name());
-      }
+      return switch (place.vertexType) {
+        case NORMAL -> LegacyGraphQLVertexType.NORMAL.name();
+        case TRANSIT -> LegacyGraphQLVertexType.TRANSIT.name();
+        case VEHICLERENTAL -> LegacyGraphQLVertexType.BIKESHARE.name();
+        case VEHICLEPARKING -> LegacyGraphQLVertexType.BIKEPARK.name();
+      };
     };
   }
 

@@ -210,14 +210,14 @@ public class NodeAdapter {
     return json.toPrettyString();
   }
 
-  /* private methods */
-
   NodeAdapter path(String paramName, JsonNode node) {
     if (childrenByName.containsKey(paramName)) {
       return childrenByName.get(paramName);
     }
     return new NodeAdapter(node, this, paramName);
   }
+
+  /* private methods */
 
   /**
    * This method list all unused parameters(full path), also nested ones. It uses recursion to get

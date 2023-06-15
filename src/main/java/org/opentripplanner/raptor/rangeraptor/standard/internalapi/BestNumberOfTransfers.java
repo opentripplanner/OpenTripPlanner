@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard.internalapi;
 
-import org.opentripplanner.raptor.api.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SingleCriteriaStopArrivals;
 
 /**
