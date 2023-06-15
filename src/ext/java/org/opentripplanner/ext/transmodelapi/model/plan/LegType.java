@@ -12,6 +12,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +51,7 @@ public class LegType {
     GraphQLOutputType ptSituationElementType,
     GraphQLObjectType placeType,
     GraphQLObjectType pathGuidanceType,
+    GraphQLType elevationStepType,
     GqlUtil gqlUtil
   ) {
     return GraphQLObjectType
@@ -439,6 +441,17 @@ public class LegType {
             leg(env).getVehicleRentalNetwork() == null
               ? List.of()
               : List.of(leg(env).getVehicleRentalNetwork())
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .description(ElevationProfileStepType.makeDescription("leg"))
+          .name("elevationProfile")
+          .type(new GraphQLNonNull(new GraphQLList(elevationStepType)))
+          .dataFetcher(env ->
+            ElevationProfileStepType.mapElevationProfile(leg(env).getElevationProfile())
           )
           .build()
       )

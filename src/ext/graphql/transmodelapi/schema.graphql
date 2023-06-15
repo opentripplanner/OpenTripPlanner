@@ -185,6 +185,17 @@ type DestinationDisplay {
   via: [String]
 }
 
+"Individual step of an elevation profile."
+type ElevationProfileStep {
+  "The horizontal distance from the start of the step, in meters."
+  distance: Float
+  """
+  The elevation at this distance, in meters above sea level. It is negative if the
+  location is below sea level.
+  """
+  elevation: Float
+}
+
 "List of visits to quays as part of vehicle journeys. Updated with real time information where available"
 type EstimatedCall {
   "Actual time of arrival at quay. Updated from real time information if available."
@@ -295,6 +306,12 @@ type Leg {
   distance: Float!
   "The leg's duration in seconds"
   duration: Long!
+  """
+  The leg's elevation profile. All elevation values, including the first one, are in meters
+  above sea level. The elevation is negative for places below sea level. The profile
+  includes both the start and end coordinate.
+  """
+  elevationProfile: [ElevationProfileStep]!
   "The expected, realtime adjusted date and time this leg ends."
   expectedEndTime: DateTime!
   "The expected, realtime adjusted date and time this leg starts."
@@ -432,6 +449,12 @@ type PathGuidance {
   bogusName: Boolean
   "The distance in meters that this step takes."
   distance: Float
+  """
+  The step's elevation profile. All elevation values, including the first one, are in meters
+  above sea level. The elevation is negative for places below sea level. The profile
+  includes both the start and end coordinate.
+  """
+  elevationProfile: [ElevationProfileStep]!
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
   "The absolute direction of this step."
