@@ -4,6 +4,7 @@ import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
+import graphql.execution.ExecutionStrategy;
 import graphql.execution.instrumentation.ChainedInstrumentation;
 import graphql.execution.instrumentation.Instrumentation;
 import graphql.schema.GraphQLSchema;
@@ -19,6 +20,7 @@ import org.opentripplanner.ext.transmodelapi.support.OtpExecutionResult;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
+import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 class TransmodelGraph {
@@ -42,41 +44,19 @@ class TransmodelGraph {
     int maxResolves,
     Iterable<Tag> tracingTags
   ) {
-    Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
-
-    if (OTPFeature.ActuatorAPI.isOn()) {
-      instrumentation =
-        new ChainedInstrumentation(
-          new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, tracingTags),
-          instrumentation
-        );
-    }
+    variables = ObjectUtils.ifNotNull(variables, new HashMap<>());
 
     var executionStrategy = new AbortOnTimeoutExecutionStrategy();
-    GraphQL graphQL = GraphQL
-      .newGraphQL(indexSchema)
-      .instrumentation(instrumentation)
-      .queryExecutionStrategy(executionStrategy)
-      .build();
-
-    if (variables == null) {
-      variables = new HashMap<>();
-    }
-
-    TransmodelRequestContext transmodelRequestContext = new TransmodelRequestContext(
+    var instrumentation = createInstrumentation(maxResolves, tracingTags);
+    var transmodelRequestContext = createRequestContext(serverContext);
+    var executionInput = createExecutionInput(
+      query,
       serverContext,
-      serverContext.routingService(),
-      serverContext.transitService()
+      variables,
+      operationName,
+      transmodelRequestContext
     );
-
-    ExecutionInput executionInput = ExecutionInput
-      .newExecutionInput()
-      .query(query)
-      .operationName(operationName)
-      .context(transmodelRequestContext)
-      .root(serverContext)
-      .variables(variables)
-      .build();
+    var graphQL = createGraphQL(instrumentation, executionStrategy);
 
     // EXECUTE GRAPHQL QUERY
     try {
@@ -90,10 +70,61 @@ class TransmodelGraph {
     }
   }
 
+  private static Instrumentation createInstrumentation(int maxResolves, Iterable<Tag> tracingTags) {
+    Instrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
+
+    if (OTPFeature.ActuatorAPI.isOn()) {
+      instrumentation =
+        new ChainedInstrumentation(
+          new MicrometerGraphQLInstrumentation(Metrics.globalRegistry, tracingTags),
+          instrumentation
+        );
+    }
+    return instrumentation;
+  }
+
+  private static TransmodelRequestContext createRequestContext(
+    OtpServerRequestContext serverContext
+  ) {
+    return new TransmodelRequestContext(
+      serverContext,
+      serverContext.routingService(),
+      serverContext.transitService()
+    );
+  }
+
+  private static ExecutionInput createExecutionInput(
+    String query,
+    OtpServerRequestContext serverContext,
+    Map<String, Object> variables,
+    String operationName,
+    TransmodelRequestContext transmodelRequestContext
+  ) {
+    return ExecutionInput
+      .newExecutionInput()
+      .query(query)
+      .operationName(operationName)
+      .context(transmodelRequestContext)
+      .root(serverContext)
+      .variables(variables)
+      .build();
+  }
+
+  private GraphQL createGraphQL(
+    Instrumentation instrumentation,
+    ExecutionStrategy executionStrategy
+  ) {
+    return GraphQL
+      .newGraphQL(indexSchema)
+      .instrumentation(instrumentation)
+      .queryExecutionStrategy(executionStrategy)
+      .build();
+  }
+
   /**
    * Reduce the number of errors returned down to limit
    */
-  private ExecutionResult limitMaxNumberOfErrors(ExecutionResult result) {
+  private static ExecutionResult limitMaxNumberOfErrors(ExecutionResult result) {
     var errors = result.getErrors();
     if (errors.size() > MAX_ERROR_TO_RETURN) {
       final var errorsShortList = errors.stream().limit(MAX_ERROR_TO_RETURN).toList();
