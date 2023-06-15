@@ -26,8 +26,8 @@ public final class WgsCoordinate implements Serializable {
 
   public WgsCoordinate(double latitude, double longitude) {
     // Verify coordinates are in range
-    DoubleUtils.assertInRange(latitude, LAT_MIN, LAT_MAX, "latitude");
-    DoubleUtils.assertInRange(longitude, LON_MIN, LON_MAX, "longitude");
+    DoubleUtils.requireInRange(latitude, LAT_MIN, LAT_MAX, "latitude");
+    DoubleUtils.requireInRange(longitude, LON_MIN, LON_MAX, "longitude");
 
     // Normalize coordinates to precision around ~ 1 centimeters (7 decimals)
     this.latitude = DoubleUtils.roundTo7Decimals(latitude);

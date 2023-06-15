@@ -2,9 +2,9 @@ package org.opentripplanner.raptor.rangeraptor;
 
 import java.util.Collection;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerResult;

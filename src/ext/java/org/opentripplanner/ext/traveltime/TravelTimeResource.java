@@ -188,7 +188,7 @@ public class TravelTimeResource {
       routingRequest.arriveBy(),
       traveltimeRequest.maxAccessDuration
     );
-    return new AccessEgressMapper().mapNearbyStops(accessStops, routingRequest.arriveBy());
+    return AccessEgressMapper.mapNearbyStops(accessStops, routingRequest.arriveBy());
   }
 
   private ShortestPathTree<State, Edge, Vertex> getShortestPathTree(

@@ -2,8 +2,8 @@ package org.opentripplanner.routing.api.request.preference;
 
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
  * Preferences for how to treat trips or stops with accessibility restrictions, like wheelchair
@@ -17,8 +17,13 @@ public final class AccessibilityPreferences {
    * Set the unknown cost to a very high number, so in case it is used accidentally it
    * will not cause any harm.
    */
-  private static final int NOT_SET = 9_999_999;
+  private static final Cost NOT_SET = Cost.costOfSeconds(9_999_999);
 
+  private static final AccessibilityPreferences DEFAULT_UNSET = new AccessibilityPreferences(
+    false,
+    NOT_SET,
+    NOT_SET
+  );
   private static final AccessibilityPreferences ONLY_CONSIDER_ACCESSIBLE = new AccessibilityPreferences(
     true,
     NOT_SET,
@@ -26,19 +31,17 @@ public final class AccessibilityPreferences {
   );
 
   private final boolean onlyConsiderAccessible;
-  private final int unknownCost;
-  private final int inaccessibleCost;
-
-  private static final AccessibilityPreferences DEFAULT_UNSET = ofCost(NOT_SET, NOT_SET);
+  private final Cost unknownCost;
+  private final Cost inaccessibleCost;
 
   private AccessibilityPreferences(
     boolean onlyConsiderAccessible,
-    int unknownCost,
-    int inaccessibleCost
+    Cost unknownCost,
+    Cost inaccessibleCost
   ) {
     this.onlyConsiderAccessible = onlyConsiderAccessible;
-    this.unknownCost = Units.cost(unknownCost);
-    this.inaccessibleCost = Units.cost(inaccessibleCost);
+    this.unknownCost = unknownCost;
+    this.inaccessibleCost = inaccessibleCost;
   }
 
   /**
@@ -52,7 +55,11 @@ public final class AccessibilityPreferences {
    * Create a feature which considers trips/stops that don't have an accessibility of POSSIBLE.
    */
   public static AccessibilityPreferences ofCost(int unknownCost, int inaccessibleCost) {
-    return new AccessibilityPreferences(false, unknownCost, inaccessibleCost);
+    return new AccessibilityPreferences(
+      false,
+      Cost.costOfSeconds(unknownCost),
+      Cost.costOfSeconds(inaccessibleCost)
+    );
   }
 
   public static Builder of() {
@@ -78,14 +85,14 @@ public final class AccessibilityPreferences {
    * The extra cost to add when using a trip/stop which has an accessibility of UNKNOWN.
    */
   public int unknownCost() {
-    return unknownCost;
+    return unknownCost.toSeconds();
   }
 
   /**
    * The extra cost to add when using a trip/stop which has an accessibility of NOT_POSSIBLE.
    */
   public int inaccessibleCost() {
-    return inaccessibleCost;
+    return inaccessibleCost.toSeconds();
   }
 
   @Override
@@ -95,8 +102,8 @@ public final class AccessibilityPreferences {
     AccessibilityPreferences that = (AccessibilityPreferences) o;
     return (
       onlyConsiderAccessible == that.onlyConsiderAccessible &&
-      unknownCost == that.unknownCost &&
-      inaccessibleCost == that.inaccessibleCost
+      Objects.equals(unknownCost, that.unknownCost) &&
+      Objects.equals(inaccessibleCost, that.inaccessibleCost)
     );
   }
 
@@ -117,8 +124,8 @@ public final class AccessibilityPreferences {
 
     return ToStringBuilder
       .of(AccessibilityPreferences.class)
-      .addCost("unknownCost", unknownCost, defaultCosts.unknownCost)
-      .addCost("inaccessibleCost", inaccessibleCost, defaultCosts.inaccessibleCost)
+      .addObj("unknownCost", unknownCost, defaultCosts.unknownCost)
+      .addObj("inaccessibleCost", inaccessibleCost, defaultCosts.inaccessibleCost)
       .toString();
   }
 
@@ -126,8 +133,8 @@ public final class AccessibilityPreferences {
 
     private final AccessibilityPreferences original;
     private boolean onlyConsiderAccessible;
-    private int unknownCost;
-    private int inaccessibleCost;
+    private Cost unknownCost;
+    private Cost inaccessibleCost;
 
     private Builder(AccessibilityPreferences original, AccessibilityPreferences defaultCosts) {
       this.original = original;
@@ -153,22 +160,22 @@ public final class AccessibilityPreferences {
     }
 
     public int unknownCost() {
-      return unknownCost;
+      return unknownCost.toSeconds();
     }
 
     public Builder withUnknownCost(int unknownCost) {
       this.onlyConsiderAccessible = false;
-      this.unknownCost = unknownCost;
+      this.unknownCost = Cost.costOfSeconds(unknownCost);
       return this;
     }
 
     public int inaccessibleCost() {
-      return inaccessibleCost;
+      return inaccessibleCost.toSeconds();
     }
 
     public Builder withInaccessibleCost(int inaccessibleCost) {
       this.onlyConsiderAccessible = false;
-      this.inaccessibleCost = inaccessibleCost;
+      this.inaccessibleCost = Cost.costOfSeconds(inaccessibleCost);
       return this;
     }
 
@@ -180,7 +187,7 @@ public final class AccessibilityPreferences {
     public AccessibilityPreferences build() {
       var value = onlyConsiderAccessible
         ? ofOnlyAccessible()
-        : ofCost(unknownCost, inaccessibleCost);
+        : ofCost(unknownCost.toSeconds(), inaccessibleCost.toSeconds());
       return original.equals(value) ? original : value;
     }
   }

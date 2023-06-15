@@ -106,3 +106,4 @@ config:
     FareProduct: org.opentripplanner.model.fare.FareProduct#FareProduct
     FareMedium: org.opentripplanner.model.fare.FareMedium#FareMedium
     RiderCategory: org.opentripplanner.model.fare.RiderCategory#RiderCategory
+    StopPosition: org.opentripplanner.ext.legacygraphqlapi.model.StopPosition#StopPosition

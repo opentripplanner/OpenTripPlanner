@@ -1,7 +1,11 @@
 package org.opentripplanner.raptor.api.model;
 
+import static org.opentripplanner.raptor.api.model.RaptorConstants.SECONDS_IN_A_DAY;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
+
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 
 /**
  * Encapsulate information about an access or egress path. We do not distinguish between
@@ -27,8 +31,7 @@ public interface RaptorAccessEgress {
    * This method is called many times, so care needs to be taken that the value is stored, not
    * calculated for each invocation.
    * <p>
-   * If this is {@link #isFree()}, then this method must return
-   * {@link org.opentripplanner.raptor.api.RaptorConstants#ZERO_COST}.
+   * If this is {@link #isFree()}, then this method must return 0(zero).
    */
   int generalizedCost();
 
@@ -52,7 +55,7 @@ public interface RaptorAccessEgress {
    * when the access path can't start immediately, but have to wait for a vehicle arriving. Also DRT
    * systems or bike shares can have operation time limitations.
    * <p>
-   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible after the requested departure time.
    */
   default int earliestDepartureTime(int requestedDepartureTime) {
@@ -60,10 +63,10 @@ public interface RaptorAccessEgress {
   }
 
   /**
-   * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares where
-   * they can have operation time limitations.
+   * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares
+   * where they can have operation time limitations.
    * <p>
-   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible before the requested arrival time.
    */
   default int latestArrivalTime(int requestedArrivalTime) {
@@ -77,13 +80,29 @@ public interface RaptorAccessEgress {
   boolean hasOpeningHours();
 
   /**
-   * Return the opening hours in a short human-readable way. Do not parse this, this should
-   * only be used for things like debugging and logging.
+   * Return the opening hours in a short human-readable way for the departure at the origin. Do
+   * not parse this, this should only be used for things like testing, debugging and logging.
    * <p>
    * This method return {@code null} if there is no opening hours, see {@link #hasOpeningHours()}.
    */
   @Nullable
-  String openingHoursToString();
+  default String openingHoursToString() {
+    if (!hasOpeningHours()) {
+      return null;
+    }
+    // The earliest-departure-time(after 00:00) and latest-arrival-time(before edt+1d). This
+    // assumes the access/egress is a continuous period without gaps withing 24 hours from the
+    // opening. We ignore the access/egress duration. This is ok for test, debugging and logging.
+    int edt = earliestDepartureTime(0);
+    int lat = latestArrivalTime(edt + SECONDS_IN_A_DAY);
+
+    if (edt == TIME_NOT_SET || lat == TIME_NOT_SET) {
+      return "closed";
+    }
+    // Opening hours are specified for the departure, not arrival
+    int ldt = lat - durationInSeconds();
+    return "Open(" + TimeUtils.timeToStrCompact(edt) + " " + TimeUtils.timeToStrCompact(ldt) + ")";
+  }
 
   /*
        ACCESS/TRANSFER/EGRESS PATH CONTAINING MULTIPLE LEGS

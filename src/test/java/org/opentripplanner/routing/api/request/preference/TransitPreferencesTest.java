@@ -105,7 +105,7 @@ class TransitPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().setIgnoreRealtimeUpdates(!IGNORE_REALTIME_UPDATES).build();
     var copy = other.copyOf().setIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
+    assertEqualsAndHashCode(subject, other, copy);
   }
 
   @Test
@@ -115,7 +115,7 @@ class TransitPreferencesTest {
       "boardSlack: DurationForTransitMode{default:45s, AIRPLANE:35m}, " +
       "alightSlack: DurationForTransitMode{default:15s, AIRPLANE:25m}, " +
       "reluctanceForMode: {AIRPLANE=2.1}, " +
-      "otherThanPreferredRoutesPenalty: 350, " +
+      "otherThanPreferredRoutesPenalty: $350, " +
       "unpreferredCost: f(x) = 300 + 1.15 x, " +
       "ignoreRealtimeUpdates, " +
       "includePlannedCancellations, " +

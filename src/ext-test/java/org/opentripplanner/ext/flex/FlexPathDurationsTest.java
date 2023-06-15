@@ -29,7 +29,7 @@ class FlexPathDurationsTest {
     );
     assertThrows(
       IllegalArgumentException.class,
-      () -> new FlexPathDurations(ACCESS_DURATION_SEC, 0, EGRESS_DURATION_SEC, OFFSET)
+      () -> new FlexPathDurations(ACCESS_DURATION_SEC, -1, EGRESS_DURATION_SEC, OFFSET)
     );
     assertThrows(
       IllegalArgumentException.class,

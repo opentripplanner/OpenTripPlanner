@@ -19,7 +19,7 @@ public class SiriHttpUtils extends HttpUtils {
   public static InputStream postData(
     String url,
     String xmlData,
-    int timeout,
+    int timeoutMillis,
     Map<String, String> requestHeaderValues
   ) throws IOException {
     HttpPost httppost = new HttpPost(url);
@@ -32,7 +32,7 @@ public class SiriHttpUtils extends HttpUtils {
       }
     }
 
-    HttpClient httpclient = getClient(timeout, timeout);
+    HttpClient httpclient = getClient(timeoutMillis, timeoutMillis);
 
     HttpResponse response = httpclient.execute(httppost);
     if (response.getStatusLine().getStatusCode() != 200) {
@@ -46,11 +46,11 @@ public class SiriHttpUtils extends HttpUtils {
     return entity.getContent();
   }
 
-  private static HttpClient getClient(int socketTimeout, int connectionTimeout) {
+  private static HttpClient getClient(int socketTimeoutMillis, int connectionTimeoutMillis) {
     return HttpClientBuilder
       .create()
-      .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(socketTimeout).build())
-      .setConnectionTimeToLive(connectionTimeout, TimeUnit.MILLISECONDS)
+      .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(socketTimeoutMillis).build())
+      .setConnectionTimeToLive(connectionTimeoutMillis, TimeUnit.MILLISECONDS)
       .build();
   }
 }
