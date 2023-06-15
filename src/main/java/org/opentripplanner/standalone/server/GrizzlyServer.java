@@ -16,6 +16,7 @@ import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.jersey.server.ContainerFactory;
+import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.slf4j.Logger;
@@ -151,7 +152,7 @@ public class GrizzlyServer {
     // Add shutdown hook to gracefully shut down Grizzly.
     // Signal handling (sun.misc.Signal) is potentially not available on all JVMs.
     Thread shutdownThread = new Thread(httpServer::shutdown, "grizzly-shutdown");
-    Runtime.getRuntime().addShutdownHook(shutdownThread);
+    ApplicationShutdownSupport.addShutdownHook(shutdownThread, shutdownThread.getName());
 
     /* RELINQUISH CONTROL TO THE SERVER THREAD */
     try {

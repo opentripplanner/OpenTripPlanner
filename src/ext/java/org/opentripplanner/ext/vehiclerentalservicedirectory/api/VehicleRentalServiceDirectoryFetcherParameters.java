@@ -5,39 +5,14 @@ import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class VehicleRentalServiceDirectoryFetcherParameters {
 
-  /**
-   * Endpoint for the VehicleRentalServiceDirectory
-   * <p>
-   * This is required.
-   */
   private final URI url;
 
-  /**
-   * Json tag name for updater sources
-   * <p>
-   * Optonal, default values is "systems".
-   */
   private final String sourcesName;
 
-  /**
-   * Json tag name for endpoint urls for each source
-   * <p>
-   * Optonal, default values is "url".
-   */
   private final String sourceUrlName;
 
-  /**
-   * Json tag name for the network name for each source
-   * <p>
-   * Optonal, default values is "id".
-   */
   private final String sourceNetworkName;
 
-  /**
-   * Json tag name for http headers
-   * <p>
-   * Optional, default value is null
-   */
   private final HttpHeaders headers;
 
   private final String language;
@@ -58,22 +33,47 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     this.headers = headers;
   }
 
+  /**
+   * Endpoint for the VehicleRentalServiceDirectory
+   * <p>
+   * This is required.
+   */
   public URI getUrl() {
     return url;
   }
 
+  /**
+   * Json tag name for updater sources
+   * <p>
+   * Optional, default values is "systems".
+   */
   public String getSourcesName() {
     return sourcesName;
   }
 
+  /**
+   * Json tag name for endpoint urls for each source
+   * <p>
+   * Optional, default values is "url".
+   */
   public String getSourceUrlName() {
     return sourceUrlName;
   }
 
+  /**
+   * Json tag name for the network name for each source
+   * <p>
+   * Optional, default values is "id".
+   */
   public String getSourceNetworkName() {
     return sourceNetworkName;
   }
 
+  /**
+   * Json tag name for http headers
+   * <p>
+   * Optional, default value is null
+   */
   public HttpHeaders getHeaders() {
     return headers;
   }

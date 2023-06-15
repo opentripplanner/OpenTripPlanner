@@ -28,6 +28,7 @@ import org.entur.protobuf.mapper.SiriMapper;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.text.FileSizeToTextConverter;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -235,12 +236,14 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   private void addShutdownHook() {
     // TODO: This should probably be on a higher level?
-    try {
-      Runtime.getRuntime().addShutdownHook(new Thread(this::teardown));
-      LOG.info("Shutdown-hook to clean up Google Pubsub subscription has been added.");
-    } catch (IllegalStateException e) {
-      // Handling cornercase when instance is being shut down before it has been initialized
-      LOG.info("Instance is already shutting down - cleaning up immediately.", e);
+    Thread shutdownHook = new Thread(this::teardown, "siri-et-google-pubsub-shutdown");
+    boolean added = ApplicationShutdownSupport.addShutdownHook(
+      shutdownHook,
+      shutdownHook.getName()
+    );
+    if (!added) {
+      // Handling corner case when instance is being shut down before it has been initialized
+      LOG.info("Instance is already shutting down - cleaning up immediately.");
       teardown();
     }
   }

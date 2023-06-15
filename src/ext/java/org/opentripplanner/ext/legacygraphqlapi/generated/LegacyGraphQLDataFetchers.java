@@ -20,6 +20,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.Leg
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLTransitMode;
 import org.opentripplanner.ext.legacygraphqlapi.model.RideHailingProvider;
+import org.opentripplanner.ext.legacygraphqlapi.model.StopPosition;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
@@ -194,6 +195,10 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> web();
   }
 
+  /**
+   * Booking information for a stop time which has special requirements to use, like calling ahead or
+   * using an app.
+   */
   public interface LegacyGraphQLBookingInfo {
     public DataFetcher<org.opentripplanner.transit.model.organization.ContactInfo> contactInfo();
 
@@ -212,6 +217,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> pickupMessage();
   }
 
+  /** Temporal restriction for a booking */
   public interface LegacyGraphQLBookingTime {
     public DataFetcher<Integer> daysPrior();
 
@@ -256,6 +262,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> stops();
   }
 
+  /** Contact information for booking an on-demand or flexible service. */
   public interface LegacyGraphQLContactInfo {
     public DataFetcher<String> additionalDetails();
 
@@ -549,6 +556,8 @@ public class LegacyGraphQLDataFetchers {
 
     public DataFetcher<Object> stop();
 
+    public DataFetcher<StopPosition> stopPosition();
+
     public DataFetcher<VehicleParking> vehicleParking();
 
     public DataFetcher<VehicleRentalStation> vehicleRentalStation();
@@ -597,6 +606,18 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Long> searchWindowUsed();
 
     public DataFetcher<StopArrival> to();
+  }
+
+  /** Stop position at a specific stop. */
+  public interface LegacyGraphQLPositionAtStop {
+    public DataFetcher<Integer> position();
+  }
+
+  /** The board/alight position in between two stops of the pattern of a trip with continuous pickup/drop off. */
+  public interface LegacyGraphQLPositionBetweenStops {
+    public DataFetcher<Integer> nextPosition();
+
+    public DataFetcher<Integer> previousPosition();
   }
 
   public interface LegacyGraphQLQueryType {
@@ -877,6 +898,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Trip> trip();
   }
 
+  public interface LegacyGraphQLStopPosition extends TypeResolver {}
+
   /** Upcoming or current stop and how close the vehicle is to it. */
   public interface LegacyGraphQLStopRelationship {
     public DataFetcher<Object> status();
@@ -911,6 +934,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Long> serviceDay();
 
     public DataFetcher<Object> stop();
+
+    public DataFetcher<Integer> stopPosition();
 
     public DataFetcher<Boolean> timepoint();
 

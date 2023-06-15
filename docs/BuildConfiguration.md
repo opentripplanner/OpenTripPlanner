@@ -965,7 +965,7 @@ the local filesystem.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /osm/[0]   
-**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constantspeed`
+**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
 
 The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.
 
@@ -973,7 +973,7 @@ The named set of mapping rules applied when parsing OSM tags. Overrides the valu
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /osmDefaults   
-**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constantspeed`
+**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
 
 The named set of mapping rules applied when parsing OSM tags.
 
