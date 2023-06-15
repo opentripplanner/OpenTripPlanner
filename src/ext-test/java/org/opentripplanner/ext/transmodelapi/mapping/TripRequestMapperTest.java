@@ -220,6 +220,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   static Stream<Arguments> noTriangleCases = BicycleOptimizeType
     .nonTriangleValues()
+    .stream()
     .map(Arguments::of);
 
   @ParameterizedTest

@@ -11,7 +11,6 @@ import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -179,6 +178,7 @@ class RouteRequestMapperTest implements PlanTestConstants {
 
   static Stream<Arguments> noTriangleCases = BicycleOptimizeType
     .nonTriangleValues()
+    .stream()
     .map(Arguments::of);
 
   @ParameterizedTest
