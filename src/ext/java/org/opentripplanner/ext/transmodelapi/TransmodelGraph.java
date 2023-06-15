@@ -44,29 +44,24 @@ class TransmodelGraph {
     int maxResolves,
     Iterable<Tag> tracingTags
   ) {
-    variables = ObjectUtils.ifNotNull(variables, new HashMap<>());
+    try (var executionStrategy = new AbortOnTimeoutExecutionStrategy()) {
+      variables = ObjectUtils.ifNotNull(variables, new HashMap<>());
+      var instrumentation = createInstrumentation(maxResolves, tracingTags);
+      var transmodelRequestContext = createRequestContext(serverContext);
+      var executionInput = createExecutionInput(
+        query,
+        serverContext,
+        variables,
+        operationName,
+        transmodelRequestContext
+      );
+      var graphQL = createGraphQL(instrumentation, executionStrategy);
 
-    var executionStrategy = new AbortOnTimeoutExecutionStrategy();
-    var instrumentation = createInstrumentation(maxResolves, tracingTags);
-    var transmodelRequestContext = createRequestContext(serverContext);
-    var executionInput = createExecutionInput(
-      query,
-      serverContext,
-      variables,
-      operationName,
-      transmodelRequestContext
-    );
-    var graphQL = createGraphQL(instrumentation, executionStrategy);
-
-    // EXECUTE GRAPHQL QUERY
-    try {
       var result = graphQL.execute(executionInput);
       result = limitMaxNumberOfErrors(result);
       return OtpExecutionResult.of(result);
     } catch (OTPRequestTimeoutException te) {
       return OtpExecutionResult.ofTimeout();
-    } finally {
-      executionStrategy.tearDown();
     }
   }
 
