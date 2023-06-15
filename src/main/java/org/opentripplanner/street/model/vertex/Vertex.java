@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
-import org.opentripplanner.framework.geometry.DirectionUtils;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
@@ -208,6 +208,16 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
       }
     }
     return false;
+  }
+
+  /**
+   * Compare two vertices and return {@code true} if they are close together - have the same
+   * location.
+   * @see org.opentripplanner.framework.geometry.WgsCoordinate#sameLocation(WgsCoordinate)
+   **/
+  public boolean sameLocation(Vertex other) {
+    return new WgsCoordinate(getLat(), getLon())
+      .sameLocation(new WgsCoordinate(other.getLat(), other.getLon()));
   }
 
   public boolean rentalTraversalBanned(State currentState) {
