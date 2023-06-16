@@ -17,6 +17,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
+import org.rutebanken.netex.model.KeyListStructure;
 import org.rutebanken.netex.model.KeyValueStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +79,7 @@ class FlexStopsMapper {
         continue;
       }
 
-      if (UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE.equals(getFlexibleAreaType(flexibleArea))) {
+      if (shouldAddStopsFromArea(flexibleArea, flexibleStopPlace)) {
         stops.addAll(findStopsInFlexArea(flexibleArea));
       } else {
         AreaStop areaStop = mapFlexArea(flexibleArea, flexibleStopPlace.getName().getValue());
@@ -166,16 +167,32 @@ class FlexStopsMapper {
     }
   }
 
-  private static String getFlexibleAreaType(FlexibleArea flexibleArea) {
-    String flexibleAreaType = null;
-    if (flexibleArea.getKeyList() != null) {
-      for (KeyValueStructure k : flexibleArea.getKeyList().getKeyValue()) {
+  private boolean shouldAddStopsFromArea(
+    FlexibleArea flexibleArea,
+    FlexibleStopPlace parentStop
+  ) {
+    var flexibleAreaType = getFlexibleStopAreaType(flexibleArea.getKeyList());
+    var parentStopType = getFlexibleStopAreaType(parentStop.getKeyList());
+
+    if (UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE.equals(flexibleAreaType)) {
+      return true;
+    } else {
+      return (
+        UNRESTRICTED_PUBLIC_TRANSPORT_AREAS_VALUE.equals(parentStopType) && flexibleAreaType == null
+      );
+    }
+  }
+
+  private static String getFlexibleStopAreaType(KeyListStructure keyListStructure) {
+    String flexibleStopAreaType = null;
+    if (keyListStructure != null) {
+      for (KeyValueStructure k : keyListStructure.getKeyValue()) {
         if (k.getKey().equals(FLEXIBLE_STOP_AREA_TYPE_KEY)) {
-          flexibleAreaType = k.getValue();
+          flexibleStopAreaType = k.getValue();
           break;
         }
       }
     }
-    return flexibleAreaType;
+    return flexibleStopAreaType;
   }
 }
