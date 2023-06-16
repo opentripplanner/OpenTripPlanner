@@ -45,7 +45,6 @@ public class EmissionsModule implements GraphBuilderModule {
       LOG.info("Fetching data from {}", url);
       try {
         var data = HttpUtils.getData(url);
-        System.out.println("YEE");
         if (data == null) {
           throw new IOException("Did not find any emissions data from url " + url);
         }
