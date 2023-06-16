@@ -64,6 +64,7 @@ Sections follow that describe particular settings in more depth.
 |    maxInterlineDistance                                                  |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.                                                  | *Optional* | `200`                             |  2.3  |
 |    removeRepeatedStops                                                   |  `boolean`  | Should consecutive identical stops be merged into one stop time entry.                                                                                         | *Optional* | `true`                            |  2.3  |
 |    [stationTransferPreference](#gd_stationTransferPreference)            |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                                                                 | *Optional* | `"allowed"`                       |  2.3  |
+| [hslEmissions](#hslEmissions)                                            |  `object[]` | Configure properties for emissions file.                                                                                                                       | *Optional* |                                   |  2.2  |
 | islandPruning                                                            |   `object`  | Settings for fixing street graph connectivity errors                                                                                                           | *Optional* |                                   |  2.3  |
 |    [adaptivePruningDistance](#islandPruning_adaptivePruningDistance)     |  `integer`  | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250`                             |  2.3  |
 |    [adaptivePruningFactor](#islandPruning_adaptivePruningFactor)         |   `double`  | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.3  |
@@ -765,6 +766,19 @@ Should there be some preference or aversion for transfers at stops that are part
 
 This parameter sets the generic level of preference. What is the actual cost can be changed
 with the `stopTransferCost` parameter in the router configuration.
+
+
+<h3 id="hslEmissions">hslEmissions</h3>
+
+**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Configure properties for emissions file.
+
+The emissions section of build-config.json allows you to override the default behavior of scanning
+for OpenStreetMap files in the base directory. You can specify data located outside the
+local filesystem (including cloud storage services) or at various different locations around
+the local filesystem.
 
 
 <h3 id="islandPruning_adaptivePruningDistance">adaptivePruningDistance</h3>

@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.emissions.EmissionsModule;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
@@ -106,6 +107,18 @@ public class GraphBuilderModules {
       config.getTransitServicePeriod(),
       config.fareServiceFactory
     );
+  }
+
+  @Provides
+  @Singleton
+  static EmissionsModule provideEmissionsModule(
+    GraphBuilderDataSources dataSources,
+    BuildConfig config,
+    Graph graph,
+    TransitModel transitModel,
+    DataImportIssueStore issueStore
+  ) {
+    return new EmissionsModule(transitModel, graph, issueStore, config);
   }
 
   @Provides

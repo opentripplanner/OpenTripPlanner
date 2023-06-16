@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
+import org.opentripplanner.emissions.EmissionsConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
@@ -166,6 +167,7 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final Set<String> boardingLocationTags;
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
+  public final EmissionsConfig emissions;
   public final TransitFeeds transitFeeds;
   public boolean staticParkAndRide;
   public boolean staticBikeParkAndRide;
@@ -625,6 +627,8 @@ Netex data is also often supplied in a ZIP file.
     osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
+    emissions = new EmissionsConfig("digitransitEmissions", root);
+
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
     transitFeeds =

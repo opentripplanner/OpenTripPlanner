@@ -29,6 +29,8 @@ public enum OTPFeature {
   ),
   DebugClient(true, false, "Enable the debug web client located at the root of the web server."),
   FloatingBike(true, false, "Enable floating bike routing."),
+
+  co2Emissions(false, true, "Enable emissions"),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will
