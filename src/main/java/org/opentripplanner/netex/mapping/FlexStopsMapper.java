@@ -167,10 +167,7 @@ class FlexStopsMapper {
     }
   }
 
-  private boolean shouldAddStopsFromArea(
-    FlexibleArea flexibleArea,
-    FlexibleStopPlace parentStop
-  ) {
+  private boolean shouldAddStopsFromArea(FlexibleArea flexibleArea, FlexibleStopPlace parentStop) {
     var flexibleAreaType = getFlexibleStopAreaType(flexibleArea.getKeyList());
     var parentStopType = getFlexibleStopAreaType(parentStop.getKeyList());
 
