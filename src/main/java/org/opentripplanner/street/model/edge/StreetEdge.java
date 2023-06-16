@@ -397,8 +397,8 @@ public class StreetEdge
       return State.empty();
     } else if (arriveByRental && hasStartedWalkingInNoDropOffZoneAndIsExitingIt(s0)) {
       var networks = Stream.concat(
-        fromv.rentalRestrictions().noDropOffNetworks().stream(),
-        Stream.of((String) null)
+        Stream.of((String) null),
+        tov.rentalRestrictions().noDropOffNetworks().stream()
       );
 
       var states = networks.map(network -> {
@@ -538,8 +538,8 @@ public class StreetEdge
     return (
       s0.currentMode() == TraverseMode.WALK &&
       !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty() &&
-      !fromv.rentalRestrictions().noDropOffNetworks().isEmpty() &&
-      tov.rentalRestrictions().noDropOffNetworks().isEmpty()
+      fromv.rentalRestrictions().noDropOffNetworks().isEmpty() &&
+      !tov.rentalRestrictions().noDropOffNetworks().isEmpty()
     );
   }
 
