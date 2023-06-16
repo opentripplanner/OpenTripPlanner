@@ -141,10 +141,6 @@ class FlexStopsMapper {
           area.getId()
         )
       );
-      LOG.warn(
-        "FlexibleArea {} with type UnrestrictedPublicTransportAreas does not contain any regular stop.",
-        area.getId()
-      );
       return List.of();
     }
 
