@@ -102,7 +102,7 @@ public class GtfsFeedId {
       // Colon is used as a separator in OTP so that's why we strip it out - it will confuse the
       // parsers in the API (but those could be updated if someone is keen to use colons as the feed
       // id).
-      return id.replaceAll(":", "");
+      return id.replace(":", "");
     }
   }
 }

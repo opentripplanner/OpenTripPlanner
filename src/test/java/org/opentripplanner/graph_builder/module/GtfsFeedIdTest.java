@@ -26,12 +26,12 @@ class GtfsFeedIdTest {
 
   @Test
   void removeColon() {
-    assertEquals(feedId("feed:id:"), "feedid");
+    assertEquals("feedid", feedId("feed:id:"));
   }
 
   @Test
   void keepUnderscore() {
-    assertEquals(feedId("feed_id_"), "feed_id_");
+    assertEquals("feed_id_", feedId("feed_id_"));
   }
 
   @Nonnull

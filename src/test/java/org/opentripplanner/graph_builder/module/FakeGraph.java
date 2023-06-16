@@ -3,7 +3,6 @@ package org.opentripplanner.graph_builder.module;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
