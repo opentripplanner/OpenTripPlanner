@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -22,13 +23,13 @@ public final class BikePreferences implements Serializable {
 
   private final double speed;
   private final double reluctance;
-  private final int boardCost;
+  private final Cost boardCost;
   private final double walkingSpeed;
   private final double walkingReluctance;
   private final int switchTime;
-  private final int switchCost;
+  private final Cost switchCost;
   private final int parkTime;
-  private final int parkCost;
+  private final Cost parkCost;
   private final double stairsReluctance;
   private final BicycleOptimizeType optimizeType;
   private final TimeSlopeSafetyTriangle optimizeTriangle;
@@ -36,14 +37,14 @@ public final class BikePreferences implements Serializable {
   private BikePreferences() {
     this.speed = 5;
     this.reluctance = 2.0;
-    this.boardCost = 60 * 10;
+    this.boardCost = Cost.costOfMinutes(10);
     this.walkingSpeed = 1.33;
     this.walkingReluctance = 5.0;
     this.switchTime = 0;
-    this.switchCost = 0;
+    this.switchCost = Cost.ZERO;
     this.parkTime = 60;
     /** Cost of parking a bike. */
-    this.parkCost = 120;
+    this.parkCost = Cost.costOfSeconds(120);
     this.optimizeType = BicycleOptimizeType.SAFE;
     this.optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
     // very high reluctance to carry the bike up/down a flight of stairs
@@ -53,13 +54,13 @@ public final class BikePreferences implements Serializable {
   private BikePreferences(Builder builder) {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
-    this.boardCost = Units.cost(builder.boardCost);
+    this.boardCost = builder.boardCost;
     this.walkingSpeed = Units.speed(builder.walkingSpeed);
     this.walkingReluctance = Units.reluctance(builder.walkingReluctance);
     this.switchTime = Units.duration(builder.switchTime);
-    this.switchCost = Units.cost(builder.switchCost);
+    this.switchCost = builder.switchCost;
     this.parkTime = Units.duration(builder.parkTime);
-    this.parkCost = Units.cost(builder.parkCost);
+    this.parkCost = builder.parkCost;
     this.optimizeType = Objects.requireNonNull(builder.optimizeType);
     this.optimizeTriangle = Objects.requireNonNull(builder.optimizeTriangle);
     this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
@@ -90,7 +91,7 @@ public final class BikePreferences implements Serializable {
    * the {@link TransferPreferences#cost()}.
    */
   public int boardCost() {
-    return boardCost;
+    return boardCost.toSeconds();
   }
 
   /**
@@ -120,7 +121,7 @@ public final class BikePreferences implements Serializable {
 
   /** Cost of getting on and off your own bike */
   public int switchCost() {
-    return switchCost;
+    return switchCost.toSeconds();
   }
 
   /** Time to park a bike */
@@ -130,7 +131,7 @@ public final class BikePreferences implements Serializable {
 
   /** Cost of parking a bike. */
   public int parkCost() {
-    return parkCost;
+    return parkCost.toSeconds();
   }
 
   /**
@@ -156,13 +157,13 @@ public final class BikePreferences implements Serializable {
     return (
       doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
-      boardCost == that.boardCost &&
+      boardCost.equals(that.boardCost) &&
       doubleEquals(that.walkingSpeed, walkingSpeed) &&
       doubleEquals(that.walkingReluctance, walkingReluctance) &&
       switchTime == that.switchTime &&
-      switchCost == that.switchCost &&
+      switchCost.equals(that.switchCost) &&
       parkTime == that.parkTime &&
-      parkCost == that.parkCost &&
+      parkCost.equals(that.parkCost) &&
       optimizeType == that.optimizeType &&
       optimizeTriangle.equals(that.optimizeTriangle) &&
       doubleEquals(stairsReluctance, that.stairsReluctance)
@@ -193,13 +194,13 @@ public final class BikePreferences implements Serializable {
       .of(BikePreferences.class)
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
-      .addNum("boardCost", boardCost, DEFAULT.boardCost)
+      .addObj("boardCost", boardCost, DEFAULT.boardCost)
       .addNum("walkingSpeed", walkingSpeed, DEFAULT.walkingSpeed)
       .addNum("walkingReluctance", walkingReluctance, DEFAULT.walkingReluctance)
       .addDurationSec("switchTime", switchTime, DEFAULT.switchTime)
-      .addNum("switchCost", switchCost, DEFAULT.switchCost)
+      .addObj("switchCost", switchCost, DEFAULT.switchCost)
       .addDurationSec("parkTime", parkTime, DEFAULT.parkTime)
-      .addNum("parkCost", parkCost, DEFAULT.parkCost)
+      .addObj("parkCost", parkCost, DEFAULT.parkCost)
       .addEnum("optimizeType", optimizeType, DEFAULT.optimizeType)
       .addObj("optimizeTriangle", optimizeTriangle, DEFAULT.optimizeTriangle)
       .toString();
@@ -211,13 +212,13 @@ public final class BikePreferences implements Serializable {
     private final BikePreferences original;
     private double speed;
     private double reluctance;
-    private int boardCost;
+    private Cost boardCost;
     private double walkingSpeed;
     private double walkingReluctance;
     private int switchTime;
-    private int switchCost;
+    private Cost switchCost;
     private int parkTime;
-    private int parkCost;
+    private Cost parkCost;
     private BicycleOptimizeType optimizeType;
     private TimeSlopeSafetyTriangle optimizeTriangle;
 
@@ -261,12 +262,12 @@ public final class BikePreferences implements Serializable {
       return this;
     }
 
-    public int boardCost() {
+    public Cost boardCost() {
       return boardCost;
     }
 
     public Builder withBoardCost(int boardCost) {
-      this.boardCost = boardCost;
+      this.boardCost = Cost.costOfSeconds(boardCost);
       return this;
     }
 
@@ -297,12 +298,12 @@ public final class BikePreferences implements Serializable {
       return this;
     }
 
-    public int switchCost() {
+    public Cost switchCost() {
       return switchCost;
     }
 
     public Builder withSwitchCost(int switchCost) {
-      this.switchCost = switchCost;
+      this.switchCost = Cost.costOfSeconds(switchCost);
       return this;
     }
 
@@ -315,12 +316,12 @@ public final class BikePreferences implements Serializable {
       return this;
     }
 
-    public int parkCost() {
+    public Cost parkCost() {
       return parkCost;
     }
 
     public Builder withParkCost(int parkCost) {
-      this.parkCost = parkCost;
+      this.parkCost = Cost.costOfSeconds(parkCost);
       return this;
     }
 

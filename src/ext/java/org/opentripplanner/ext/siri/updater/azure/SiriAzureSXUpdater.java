@@ -48,7 +48,13 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
     this.toDateTime = config.getToDateTime();
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
     this.updateHandler =
-      new SiriAlertsUpdateHandler(feedId, transitModel, transitAlertService, fuzzyTripMatcher(), 0);
+      new SiriAlertsUpdateHandler(
+        feedId,
+        transitModel,
+        transitAlertService,
+        fuzzyTripMatcher(),
+        Duration.ZERO
+      );
   }
 
   @Override
@@ -95,10 +101,6 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
 
       final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.asMap());
       final long t2 = System.currentTimeMillis();
-
-      if (data == null) {
-        throw new IOException("Historical endpoint returned no data from url" + url);
-      }
 
       var reader = new InputStreamReader(data);
       var string = CharStreams.toString(reader);

@@ -94,7 +94,7 @@ Only log4j and logback support this.
               .since(V2_4)
               .summary(
                 "If `true` a unique value is generated if no http request header is provided, or " +
-                "the value is missing, then "
+                "the value is missing."
               )
               .asBoolean(false)
           )

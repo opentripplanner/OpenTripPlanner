@@ -1426,7 +1426,8 @@ type Itinerary {
 type Currency {
     "ISO-4217 currency code, for example `USD` or `EUR`."
     code: String!
-    """Fractional digits of this currency. A value of 2 would express that in this currency
+    """
+    Fractional digits of this currency. A value of 2 would express that in this currency
     100 minor units make up one major unit.
 
     Expressed more concretely: 100 Euro-cents make up one Euro.
@@ -1443,7 +1444,10 @@ type Money {
     "The currency of this money amount."
     currency: Currency!
     """
-    Money as a fractional amount, so 3.10 USD is represented as `3.1`.
+    Money in the major currency unit, so 3.10 USD is represented as `3.1`.
+
+    If you want to get the minor currency unit (310 cents), multiply with
+    (10 to the power of `currency.digits`).
     """
     amount: Float!
 }
@@ -2049,6 +2053,22 @@ type BookingInfo {
     dropOffMessage: String
 }
 
+"The board/alight position in between two stops of the pattern of a trip with continuous pickup/drop off."
+type PositionBetweenStops {
+    "Position of the previous stop in the pattern. Positions are not required to start from 0 or be consecutive."
+    previousPosition: Int
+    "Position of the next stop in the pattern. Positions are not required to start from 0 or be consecutive."
+    nextPosition: Int
+}
+
+"Stop position at a specific stop."
+type PositionAtStop {
+    "Position of the stop in the pattern. Positions are not required to start from 0 or be consecutive."
+    position: Int
+}
+
+union StopPosition = PositionAtStop | PositionBetweenStops
+
 type Place {
     """
     For transit stops, the name of the stop. For points of interest, the name of the POI.
@@ -2080,8 +2100,21 @@ type Place {
     """The stop related to the place."""
     stop: Stop
 
-    """The bike rental station related to the place"""
-    bikeRentalStation: BikeRentalStation @deprecated(reason: "Use vehicleRentalStation and rentalVehicle instead")
+    """
+    The position of the stop in the pattern. This is not required to start from 0 or be consecutive - any
+    increasing integer sequence along the stops is valid.
+
+    The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
+    between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
+    However, it should be noted that realtime updates can change the values, so don't store it for
+    longer amounts of time.
+
+    Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
+    even generated.
+
+    The position can be either at a certain stop or in between two for trips where this is possible.
+    """
+    stopPosition: StopPosition
 
     """The vehicle rental station related to the place"""
     vehicleRentalStation: VehicleRentalStation
@@ -2089,14 +2122,17 @@ type Place {
     """The rental vehicle related to the place"""
     rentalVehicle: RentalVehicle
 
+    """The vehicle parking related to the place"""
+    vehicleParking: VehicleParking
+
+    """The bike rental station related to the place"""
+    bikeRentalStation: BikeRentalStation @deprecated(reason: "Use vehicleRentalStation and rentalVehicle instead")
+
     """The bike parking related to the place"""
     bikePark: BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """The car parking related to the place"""
     carPark: CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
-
-    """The vehicle parking related to the place"""
-    vehicleParking: VehicleParking
 }
 
 type placeAtDistance implements Node {
@@ -3586,6 +3622,20 @@ Stoptime represents the time when a specific trip arrives to or departs from a s
 type Stoptime {
     """The stop where this arrival/departure happens"""
     stop: Stop
+
+    """
+    The sequence of the stop in the pattern. This is not required to start from 0 or be consecutive - any
+    increasing integer sequence along the stops is valid.
+
+    The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
+    between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
+    However, it should be noted that realtime updates can change the values, so don't store it for
+    longer amounts of time.
+
+    Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
+    even generated.
+    """
+    stopPosition: Int
 
     """
     Scheduled arrival time. Format: seconds since midnight of the departure date

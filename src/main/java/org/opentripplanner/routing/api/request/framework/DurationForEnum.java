@@ -2,6 +2,7 @@ package org.opentripplanner.routing.api.request.framework;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
@@ -73,7 +74,13 @@ public class DurationForEnum<E extends Enum<E>> implements Serializable {
       .addText("default:")
       .addDuration(defaultValue);
 
-    for (Map.Entry<E, Duration> e : valueForEnum.entrySet()) {
+    var sortedEntryList = valueForEnum
+      .entrySet()
+      .stream()
+      .sorted(Comparator.comparingInt(e -> e.getKey().ordinal()))
+      .toList();
+
+    for (Map.Entry<E, Duration> e : sortedEntryList) {
       if (!defaultValue.equals(e.getValue())) {
         builder.addText(", ").addText(e.getKey().name()).addText(":").addDuration(e.getValue());
       }

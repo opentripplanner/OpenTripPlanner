@@ -6,6 +6,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
+import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -230,7 +231,7 @@ public class OTPMain {
       },
       "server-shutdown"
     );
-    Runtime.getRuntime().addShutdownHook(hook);
+    ApplicationShutdownSupport.addShutdownHook(hook, hook.getName());
   }
 
   private static void setOtpConfigVersionsOnServerInfo(ConstructApplication app) {
