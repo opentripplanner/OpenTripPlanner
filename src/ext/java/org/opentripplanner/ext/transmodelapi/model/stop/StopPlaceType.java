@@ -106,7 +106,9 @@ public class StopPlaceType {
           )
           .dataFetcher(environment -> {
             String lang = environment.getArgument("lang");
-            Locale locale = GraphQLUtils.getLocale(environment, lang);
+            Locale locale = lang != null
+              ? GraphQLUtils.getLocale(environment, lang)
+              : GraphQLUtils.getLocale(environment);
             return (((MonoOrMultiModalStation) environment.getSource()).getName().toString(locale));
           })
           .build()
