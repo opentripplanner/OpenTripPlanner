@@ -84,13 +84,12 @@ public class QuayType {
               .type(Scalars.GraphQLString)
               .build()
           )
-          .dataFetcher(environment -> {
-            String lang = environment.getArgument("lang");
-            Locale locale = lang != null
-              ? GraphQLUtils.getLocale(environment, lang)
-              : GraphQLUtils.getLocale(environment);
-            return (((StopLocation) environment.getSource()).getName().toString(locale));
-          })
+          .dataFetcher(environment ->
+            (
+              ((StopLocation) environment.getSource()).getName()
+                .toString(GqlUtil.getLocale(environment))
+            )
+          )
           .build()
       )
       .field(

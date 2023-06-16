@@ -104,13 +104,12 @@ public class StopPlaceType {
               .type(Scalars.GraphQLString)
               .build()
           )
-          .dataFetcher(environment -> {
-            String lang = environment.getArgument("lang");
-            Locale locale = lang != null
-              ? GraphQLUtils.getLocale(environment, lang)
-              : GraphQLUtils.getLocale(environment);
-            return (((MonoOrMultiModalStation) environment.getSource()).getName().toString(locale));
-          })
+          .dataFetcher(environment ->
+            (
+              ((MonoOrMultiModalStation) environment.getSource()).getName()
+                .toString(GqlUtil.getLocale(environment))
+            )
+          )
           .build()
       )
       .field(
