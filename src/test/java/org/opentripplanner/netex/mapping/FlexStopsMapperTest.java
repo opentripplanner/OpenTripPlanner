@@ -166,6 +166,40 @@ class FlexStopsMapperTest {
   }
 
   @Test
+  void testMapGroupStopVariantWithKeyValueOnArea() {
+    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
+
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
+
+    var area = (FlexibleArea) flexibleStopPlace
+      .getAreas()
+      .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
+      .get(0);
+    area.withKeyList(
+      new KeyListStructure()
+        .withKeyValue(
+          new KeyValueStructure()
+            .withKey("FlexibleStopAreaType")
+            .withValue("UnrestrictedPublicTransportAreas")
+        )
+    );
+
+    FlexStopsMapper subject = new FlexStopsMapper(
+      ID_FACTORY,
+      List.of(stop1, stop2),
+      DataImportIssueStore.NOOP
+    );
+
+    GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
+
+    assertNotNull(groupStop);
+
+    // Only one of the stops should be inside the polygon
+    assertEquals(1, groupStop.getLocations().size());
+  }
+
+  @Test
   void testMapFlexibleStopPlaceMissingStops() {
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
     flexibleStopPlace.setKeyList(
