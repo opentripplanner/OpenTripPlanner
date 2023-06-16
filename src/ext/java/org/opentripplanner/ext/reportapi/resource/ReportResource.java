@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.reportapi.resource;
 
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -61,9 +62,15 @@ public class ReportResource {
   @Path("/bicycle-safety.csv")
   @Produces("text/csv")
   public Response getBicycleSafetyAsCsv(
-    @DefaultValue("default") @QueryParam("osmWayPropertySet") String osmWayPropertySet
+    @DefaultValue("DEFAULT") @QueryParam("osmWayPropertySet") String osmWayPropertySet
   ) {
-    var source = OsmTagMapperSource.valueOf(osmWayPropertySet);
+    OsmTagMapperSource source;
+    try {
+      source = OsmTagMapperSource.valueOf(osmWayPropertySet.toUpperCase());
+    } catch (IllegalArgumentException ignore) {
+      throw new BadRequestException("Unknown osmWayPropertySet: " + osmWayPropertySet);
+    }
+
     return Response
       .ok(BicycleSafetyReport.makeCsv(source))
       .header(
