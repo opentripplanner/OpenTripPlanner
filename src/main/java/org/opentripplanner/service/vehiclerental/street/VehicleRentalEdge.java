@@ -2,7 +2,7 @@ package org.opentripplanner.service.vehiclerental.street;
 
 import java.util.Collections;
 import java.util.Set;
-import org.locationtech.jts.geom.LineString;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -26,6 +26,7 @@ public class VehicleRentalEdge extends Edge {
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     if (!s0.getRequest().mode().includesRenting()) {
       return State.empty();
@@ -70,7 +71,7 @@ public class VehicleRentalEdge extends Edge {
           // when leaving the no-drop-off zone (has no network) and check it here so that we cannot
           // begin the rental.
           // reminder: in an arriveBy search we traverse backwards so beginFloatingVehicle means
-          // dropping it. i know 🤯.
+          // traversing from renting to walking.
           if (s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.contains(network)) {
             return State.empty();
           } else if (
@@ -167,21 +168,6 @@ public class VehicleRentalEdge extends Edge {
   @Override
   public I18NString getName() {
     return getToVertex().getName();
-  }
-
-  @Override
-  public boolean hasBogusName() {
-    return false;
-  }
-
-  @Override
-  public LineString getGeometry() {
-    return null;
-  }
-
-  @Override
-  public double getDistanceMeters() {
-    return 0;
   }
 
   /**
