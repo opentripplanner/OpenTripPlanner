@@ -54,10 +54,10 @@ nav:
     - Visual Identity: 'Visual-Identity.md'
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
+    - Interfaces and Data Sources: 'Interfaces-Data-Sources.md'
     - Getting OTP: 'Getting-OTP.md'
     - Container Image: 'Container-Image.md'
     - System Requirements and Suggestions: 'System-Requirements.md'
-
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
@@ -77,7 +77,6 @@ nav:
     - "Logging": "Logging.md"
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
-    - Interfaces and Data Sources: 'Interfaces-Data-Sources.md'
     - Localization: 'Localization.md'
     - Bibliography: 'Bibliography.md'
     - Codestyle: 'Codestyle.md'
@@ -88,7 +87,7 @@ nav:
     - Actuator API: 'sandbox/ActuatorAPI.md'
     - Direct Transfer Analyzer: 'sandbox/transferanalyzer.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
-    - HSL Legacy GraphQL API: 'sandbox/LegacyGraphQLApi.md'
+    - GTFS GraphQL API: 'sandbox/GtfsGraphQlApi.md'
     - Transmodel(NeTEx) GraphQL API: 'sandbox/TransmodelApi.md'
     - SIRI Updaters: 'sandbox/SiriUpdater.md'
     - SIRI Updater (Azure): 'sandbox/SiriAzureUpdater.md'

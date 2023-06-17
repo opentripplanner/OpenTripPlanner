@@ -1,32 +1,32 @@
-# HSL Legacy GraphQL API
+# GTFS GraphQL API
 
 ## Contact Info
 
 - Digitransit team, HSL, Helsinki, Finland
 - Kyyti, Helsinki, Finland
+- IBI, USA
 
 ### Configuration
 
-To enable this you need to add the feature `SandboxAPILegacyGraphQLApi`.
+The API is enabled by default. 
+
+If you want to disable it, do it in `otp-config.json`:
 
 ```json
 // otp-config.json
 {
   "otpFeatures" : {
-    "SandboxAPILegacyGraphQLApi": true
+    "GtfsGraphQlApi": false
   }
 }
 ```
 
 ## Documentation
 
-This is a copy of HSL's GraphQL API used by the Digitransit project. The API is used to run OTP2
+This is the GraphQL API used by the Digitransit project. The API is used to run OTP2
 together with the [digitransit-ui](https://github.com/HSLdevcom/digitransit-ui).
 
-The GraphQL endpoints are available at:
-
-- single query: `http://localhost:8080/otp/routers/default/index/graphql`
-- batch query: `http://localhost:8080/otp/routers/default/index/graphql/batch`
+The GraphQL endpoint is available at: `http://localhost:8080/otp/routers/default/index/graphql`
 
 A complete example that fetches the list of all stops from OTP is:
 
@@ -39,7 +39,7 @@ curl --request POST \
 ```
 ## Schema documentation
 
-Available at [https://docs.opentripplanner.org/](https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/)
+Available at [https://docs.opentripplanner.org/api/](https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/)
 
 ## Built-in API client
 
@@ -50,7 +50,7 @@ A browser based GraphQL API client is available at [http://localhost:8080/graphi
 ### OTP2 Official GraphQL API (Not available)
 
 We **plan** to make a new offical OTP2 API, replacing the REST API. The plan is to base the new API
-on this API and the [Legacy GraphQL Api](LegacyGraphQLApi.md). The new API will most likely have 2
+on this API and the [GTFS GraphQL API](GtfsGraphQlApi.md). The new API will most likely have 2
 "translations": A GTFS version and a Transmodel version, we will try to keep the semantics the same.
 
 ## Changelog
