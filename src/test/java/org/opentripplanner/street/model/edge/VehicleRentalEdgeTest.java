@@ -33,7 +33,7 @@ class VehicleRentalEdgeTest {
   VehicleRentalPlaceVertex vertex;
 
   @Test
-  public void testRentingWithAvailableVehicles() {
+  void testRentingWithAvailableVehicles() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3);
 
     var s1 = rent();
@@ -42,7 +42,7 @@ class VehicleRentalEdgeTest {
   }
 
   @Test
-  public void testRentingWithNoAvailableVehicles() {
+  void testRentingWithNoAvailableVehicles() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 0, 3);
 
     var s1 = rent();
@@ -51,7 +51,7 @@ class VehicleRentalEdgeTest {
   }
 
   @Test
-  public void testRentingWithNoAvailableVehiclesAndNoRealtimeUsage() {
+  void testRentingWithNoAvailableVehiclesAndNoRealtimeUsage() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 0, 3, false, true, false);
 
     var s1 = rent();
@@ -60,7 +60,7 @@ class VehicleRentalEdgeTest {
   }
 
   @Test
-  public void testReturningWithAvailableSpaces() {
+  void testReturningWithAvailableSpaces() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3);
 
     var s1 = rentAndDropOff();
@@ -69,7 +69,7 @@ class VehicleRentalEdgeTest {
   }
 
   @Test
-  public void testReturningWithNoAvailableSpaces() {
+  void testReturningWithNoAvailableSpaces() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0);
 
     var s1 = rentAndDropOff();
@@ -78,7 +78,7 @@ class VehicleRentalEdgeTest {
   }
 
   @Test
-  public void testReturningWithNoAvailableSpacesAndOverloading() {
+  void testReturningWithNoAvailableSpacesAndOverloading() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, true, true, true);
 
     var s1 = rentAndDropOff();
@@ -87,7 +87,7 @@ class VehicleRentalEdgeTest {
   }
 
   @Test
-  public void testReturningWithNoAvailableSpacesAndNoRealtimeUsage() {
+  void testReturningWithNoAvailableSpacesAndNoRealtimeUsage() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, false, true, false);
 
     var s1 = rentAndDropOff();
@@ -96,7 +96,7 @@ class VehicleRentalEdgeTest {
   }
 
   @Test
-  public void testRentingFromClosedStation() {
+  void testRentingFromClosedStation() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 0, true, false, true);
 
     var s1 = rent();
@@ -105,7 +105,7 @@ class VehicleRentalEdgeTest {
   }
 
   @Test
-  public void testReturningToClosedStation() {
+  void testReturningToClosedStation() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, true, true, true);
 
     var s1 = rent();
@@ -120,7 +120,7 @@ class VehicleRentalEdgeTest {
   }
 
   @Test
-  public void testReturningAndReturningToClosedStationWithNoRealtimeUsage() {
+  void testReturningAndReturningToClosedStationWithNoRealtimeUsage() {
     initEdgeAndRequest(StreetMode.BIKE_RENTAL, 3, 3, false, true, false);
 
     var s1 = rentAndDropOff();
