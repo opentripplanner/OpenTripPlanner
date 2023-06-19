@@ -245,7 +245,6 @@ public class SimpleIntersectionTraversalCalculatorTest {
     // A vertex for each. No light.
     IntersectionVertex u = vertex("from_v", a, false, false);
     SplitterVertex v = new SplitterVertex(
-      graph,
       "intersection",
       b.getX(),
       b.getY(),
@@ -434,7 +433,6 @@ public class SimpleIntersectionTraversalCalculatorTest {
     boolean hasCrossingLight
   ) {
     IntersectionVertex v = new IntersectionVertex(
-      graph,
       label,
       coord.y,
       coord.x,

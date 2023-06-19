@@ -140,13 +140,13 @@ public class TestStateBuilder {
   @Nonnull
   private static ElevatorOffboardVertex elevatorOffBoard(int count, String suffix) {
     final String label = "elevator_off_board_" + suffix;
-    return new ElevatorOffboardVertex(null, label, count, count, new NonLocalizedString(label));
+    return new ElevatorOffboardVertex(label, count, count, new NonLocalizedString(label));
   }
 
   @Nonnull
   private static ElevatorOnboardVertex elevatorOnBoard(int count, String suffix) {
     final String label = "elevator_on_board_" + suffix;
-    return new ElevatorOnboardVertex(null, label, count, count, new NonLocalizedString(label));
+    return new ElevatorOnboardVertex(label, count, count, new NonLocalizedString(label));
   }
 
   public State build() {

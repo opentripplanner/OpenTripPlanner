@@ -21,7 +21,6 @@ public class TransitPathwayNodeVertex extends StationElementVertex {
    */
   public TransitPathwayNodeVertex(Graph graph, PathwayNode node) {
     super(
-      graph,
       node.getId().toString(),
       node.getCoordinate().longitude(),
       node.getCoordinate().latitude(),

@@ -21,8 +21,8 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 class ElevatorHopEdgeTest {
 
   Graph graph = new Graph();
-  Vertex from = new SimpleVertex(graph, "from", 0, 0);
-  Vertex to = new SimpleVertex(graph, "to", 0, 0);
+  Vertex from = new SimpleVertex("from", 0, 0);
+  Vertex to = new SimpleVertex("to", 0, 0);
 
   static Stream<Arguments> noTraverse = Stream
     .of(Accessibility.NO_INFORMATION, Accessibility.NOT_POSSIBLE)

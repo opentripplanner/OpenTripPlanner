@@ -139,7 +139,7 @@ public class StreetMatcherTest {
    ****/
 
   private SimpleVertex vertex(String label, double lat, double lon) {
-    return new SimpleVertex(graph, label, lat, lon);
+    return new SimpleVertex(label, lat, lon);
   }
 
   private void edges(String... vLabels) {

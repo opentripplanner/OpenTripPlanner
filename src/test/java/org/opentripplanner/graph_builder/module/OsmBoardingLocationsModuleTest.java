@@ -74,12 +74,10 @@ class OsmBoardingLocationsModuleTest {
 
     var provider = new OsmProvider(file, false);
     var floatingBusVertex = new TransitStopVertexBuilder()
-      .withGraph(graph)
       .withStop(floatingBusStop)
       .withModes(Set.of(TransitMode.BUS))
       .build();
     var floatingBoardingLocation = new OsmBoardingLocationVertex(
-      graph,
       "floating-bus-stop",
       floatingBusVertex.getX(),
       floatingBusVertex.getY(),
@@ -95,12 +93,10 @@ class OsmBoardingLocationsModuleTest {
     osmModule.buildGraph();
 
     var platformVertex = new TransitStopVertexBuilder()
-      .withGraph(graph)
       .withStop(platform)
       .withModes(Set.of(TransitMode.RAIL))
       .build();
     var busVertex = new TransitStopVertexBuilder()
-      .withGraph(graph)
       .withStop(busStop)
       .withModes(Set.of(TransitMode.BUS))
       .build();

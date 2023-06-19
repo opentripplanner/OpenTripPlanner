@@ -96,7 +96,6 @@ class ParkingProcessor {
       vehicleParkingToAdd.add(vehicleParking);
 
       VehicleParkingEntranceVertex parkVertex = new VehicleParkingEntranceVertex(
-        graph,
         vehicleParking.getEntrances().get(0)
       );
       new VehicleParkingEdge(parkVertex);

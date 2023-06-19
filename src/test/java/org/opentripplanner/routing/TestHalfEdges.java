@@ -78,10 +78,10 @@ public class TestHalfEdges {
     graph = new Graph(deduplicator);
     transitModel = new TransitModel(new StopModel(), deduplicator);
     // a 0.1 degree x 0.1 degree square
-    tl = new IntersectionVertex(graph, "tl", -74.01, 40.01);
-    tr = new IntersectionVertex(graph, "tr", -74.0, 40.01);
-    bl = new IntersectionVertex(graph, "bl", -74.01, 40.0);
-    br = new IntersectionVertex(graph, "br", -74.00, 40.0);
+    tl = new IntersectionVertex("tl", -74.01, 40.01);
+    tr = new IntersectionVertex("tr", -74.0, 40.01);
+    bl = new IntersectionVertex("bl", -74.01, 40.0);
+    br = new IntersectionVertex("br", -74.00, 40.0);
 
     top =
       new StreetEdge(
@@ -170,8 +170,8 @@ public class TestHalfEdges {
 
     transitModel.mergeStopModels(StopModel.of().withRegularStop(s1).withRegularStop(s2).build());
 
-    station1 = new TransitStopVertexBuilder().withGraph(graph).withStop(s1).build();
-    station2 = new TransitStopVertexBuilder().withGraph(graph).withStop(s2).build();
+    station1 = new TransitStopVertexBuilder().withStop(s1).build();
+    station2 = new TransitStopVertexBuilder().withStop(s2).build();
     station1.addMode(TransitMode.RAIL);
     station2.addMode(TransitMode.RAIL);
 

@@ -13,20 +13,21 @@ public class VehicleParkingHelper {
 
   public static void linkVehicleParkingToGraph(Graph graph, VehicleParking vehicleParking) {
     var vehicleParkingVertices = VehicleParkingHelper.createVehicleParkingVertices(
-      graph,
       vehicleParking
     );
+
+    vehicleParkingVertices.forEach(graph::addVertex);
     VehicleParkingHelper.linkVehicleParkingEntrances(vehicleParkingVertices);
+
   }
 
   public static List<VehicleParkingEntranceVertex> createVehicleParkingVertices(
-    Graph graph,
     VehicleParking vehicleParking
   ) {
     return vehicleParking
       .getEntrances()
       .stream()
-      .map(entrance -> new VehicleParkingEntranceVertex(graph, entrance))
+      .map(VehicleParkingEntranceVertex::new)
       .collect(Collectors.toList());
   }
 

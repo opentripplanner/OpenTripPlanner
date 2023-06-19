@@ -35,8 +35,8 @@ public class TransitStopVertex extends StationElementVertex {
    * @param modes Set of modes for all Routes using this stop. If {@code null} an empty set is
    *              used.
    */
-  TransitStopVertex(Graph graph, RegularStop stop, Set<TransitMode> modes) {
-    super(graph, stop.getId().toString(), stop.getLon(), stop.getLat(), stop.getName());
+  TransitStopVertex(RegularStop stop, Set<TransitMode> modes) {
+    super(stop.getId().toString(), stop.getLon(), stop.getLat(), stop.getName());
     this.stop = stop;
     this.modes = modes != null ? modes : new HashSet<>();
     this.wheelchairAccessibility = stop.getWheelchairAccessibility();

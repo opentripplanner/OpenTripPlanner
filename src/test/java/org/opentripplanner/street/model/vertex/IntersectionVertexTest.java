@@ -63,13 +63,13 @@ public class IntersectionVertexTest {
 
   @Test
   public void testInferredFreeFlowing() {
-    IntersectionVertex iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0);
+    IntersectionVertex iv = new IntersectionVertex("vertex", 1.0, 2.0);
     assertFalse(iv.hasDrivingTrafficLight());
     assertFalse(iv.inferredFreeFlowing());
     assertEquals(0, iv.getDegreeIn());
     assertEquals(0, iv.getDegreeOut());
 
-    iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0, true, false);
+    iv = new IntersectionVertex("vertex", 1.0, 2.0, true, false);
     assertTrue(iv.hasDrivingTrafficLight());
     assertTrue(iv.hasCyclingTrafficLight());
     assertFalse(iv.hasWalkingTrafficLight());
@@ -85,13 +85,13 @@ public class IntersectionVertexTest {
     assertEquals(1, iv.getDegreeOut());
     assertFalse(iv.inferredFreeFlowing());
 
-    iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0);
+    iv = new IntersectionVertex("vertex", 1.0, 2.0);
     iv.addIncoming(fromEdge);
     iv.addOutgoing(straightAheadEdge);
     assertFalse(iv.hasDrivingTrafficLight());
     assertTrue(iv.inferredFreeFlowing());
 
-    iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0, false, true);
+    iv = new IntersectionVertex("vertex", 1.0, 2.0, false, true);
     iv.addIncoming(fromEdge);
     iv.addOutgoing(straightAheadEdge);
     assertTrue(iv.hasWalkingTrafficLight());
@@ -104,7 +104,7 @@ public class IntersectionVertexTest {
    ****/
 
   private StreetVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(graph, label, lat, lon);
+    return new IntersectionVertex(label, lat, lon);
   }
 
   /**

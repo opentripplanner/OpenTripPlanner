@@ -22,8 +22,8 @@ public class VehicleParkingTestGraphData {
     transitModel = new TransitModel(stopModel, deduplicator);
     graph.hasStreets = true;
 
-    A = new IntersectionVertex(graph, "A", 0, 0);
-    B = new IntersectionVertex(graph, "B", 0.01, 0);
+    A = new IntersectionVertex("A", 0, 0);
+    B = new IntersectionVertex("B", 0.01, 0);
 
     VehicleParkingTestUtil.createStreet(A, B, StreetTraversalPermission.PEDESTRIAN);
   }

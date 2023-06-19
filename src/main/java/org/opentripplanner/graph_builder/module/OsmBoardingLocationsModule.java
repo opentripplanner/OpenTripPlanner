@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -22,6 +23,7 @@ import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.service.TransitModel;
@@ -50,6 +52,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   private final Graph graph;
 
   private final TransitModel transitModel;
+  private final VertexFactory vertexFactory;
 
   private VertexLinker linker;
 
@@ -57,6 +60,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   public OsmBoardingLocationsModule(Graph graph, TransitModel transitModel) {
     this.graph = graph;
     this.transitModel = transitModel;
+    this.vertexFactory = new VertexFactory(graph);
   }
 
   @Override
@@ -165,13 +169,11 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           .orElse(new LocalizedString("name.platform"));
         var label = "platform-centroid/%s".formatted(ts.getStop().getId().toString());
         var centroid = edgeList.getGeometry().getCentroid();
-        var boardingLocation = new OsmBoardingLocationVertex(
-          graph,
+        var boardingLocation = vertexFactory.osmBoardingLocation(
+          new Coordinate(centroid.getX(), centroid.getY()),
           label,
-          centroid.getX(),
-          centroid.getY(),
-          name,
-          edgeList.references
+          edgeList.references,
+          name
         );
         linker.addPermanentAreaVertex(boardingLocation, edgeList);
         linkBoardingLocationToStop(ts, stopCode, boardingLocation);

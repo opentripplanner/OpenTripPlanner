@@ -82,7 +82,7 @@ public class FakeGraph {
       for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
         String id = Integer.toString(count++);
         RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
-        new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
+        new TransitStopVertexBuilder().withStop(stop).build();
       }
     }
   }
@@ -94,7 +94,7 @@ public class FakeGraph {
     for (double lat = 40; lat < 40.01; lat += 0.005) {
       String id = "EXTRA_" + count++;
       RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
-      new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
+      new TransitStopVertexBuilder().withStop(stop).build();
     }
 
     // add some duplicate stops, identical to the regular stop grid
@@ -102,7 +102,7 @@ public class FakeGraph {
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       String id = "DUPE_" + count++;
       RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
-      new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
+      new TransitStopVertexBuilder().withStop(stop).build();
     }
 
     // add some almost duplicate stops
@@ -110,7 +110,7 @@ public class FakeGraph {
     for (double lat = 39.9059; lat < 40.0281; lat += 0.005) {
       String id = "ALMOST_" + count++;
       RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
-      new TransitStopVertexBuilder().withGraph(g).withStop(stop).build();
+      new TransitStopVertexBuilder().withStop(stop).build();
     }
   }
 

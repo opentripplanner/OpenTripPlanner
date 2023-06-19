@@ -156,7 +156,7 @@ class VehicleParkingEdgeTest {
     graph = new Graph();
 
     var vehicleParking = createVehicleParking(bicyclePlaces, carPlaces, availability);
-    this.vertex = new VehicleParkingEntranceVertex(graph, vehicleParking.getEntrances().get(0));
+    this.vertex = new VehicleParkingEntranceVertex(vehicleParking.getEntrances().get(0));
 
     vehicleParkingEdge = new VehicleParkingEdge(vertex);
 

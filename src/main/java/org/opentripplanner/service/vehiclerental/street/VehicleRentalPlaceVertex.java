@@ -15,7 +15,6 @@ public class VehicleRentalPlaceVertex extends Vertex {
 
   public VehicleRentalPlaceVertex(Graph g, VehicleRentalPlace station) {
     super(
-      g,
       "vehicle rental station " + station.getId(),
       station.getLongitude(),
       station.getLatitude(),

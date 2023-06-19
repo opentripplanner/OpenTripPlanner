@@ -45,7 +45,7 @@ public class VehicleParkingLinkingTest {
         builder.entranceId(id("1")).coordinate(new WgsCoordinate(A.getCoordinate())).vertex(A)
       )
       .build();
-    var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
+    var parkingVertex = new VehicleParkingEntranceVertex(parking.getEntrances().get(0));
 
     StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
@@ -68,7 +68,7 @@ public class VehicleParkingLinkingTest {
           .walkAccessible(true)
       )
       .build();
-    var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
+    var parkingVertex = new VehicleParkingEntranceVertex(parking.getEntrances().get(0));
 
     StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
@@ -82,8 +82,12 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void carParkingEntranceToAllTraversableStreetLinkingTest() {
-    var C = new IntersectionVertex(graph, "C", 0.0001, 0.0001);
-    var D = new IntersectionVertex(graph, "D", 0.01, 0.01);
+    var C = new IntersectionVertex("C", 0.0001, 0.0001);
+    var D = new IntersectionVertex("D", 0.01, 0.01);
+
+    graph.addVertex(C);
+    graph.addVertex(D);
+
     VehicleParkingTestUtil.createStreet(C, D, StreetTraversalPermission.CAR);
 
     VehicleParkingTestUtil.createStreet(A, C, StreetTraversalPermission.NONE);
@@ -98,7 +102,7 @@ public class VehicleParkingLinkingTest {
           .walkAccessible(true)
       )
       .build();
-    var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
+    var parkingVertex = new VehicleParkingEntranceVertex(parking.getEntrances().get(0));
 
     StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 

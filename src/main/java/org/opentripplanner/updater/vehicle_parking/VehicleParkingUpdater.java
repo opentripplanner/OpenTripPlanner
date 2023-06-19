@@ -140,7 +140,6 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
       /* Add new parks, after removing, so that there are no duplicate vertices for removed and re-added parks.*/
       for (final VehicleParking updatedVehicleParking : toLink) {
         var vehicleParkingVertices = VehicleParkingHelper.createVehicleParkingVertices(
-          graph,
           updatedVehicleParking
         );
         var disposableEdgeCollectionsForVertex = linkVehicleParkingVertexToStreets(

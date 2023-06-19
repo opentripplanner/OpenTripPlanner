@@ -219,7 +219,7 @@ public class TemporaryVertexDisposeTest {
   private static class V extends Vertex {
 
     private V(String label) {
-      super(null, label, ANY_LOC, ANY_LOC);
+      super(label, ANY_LOC, ANY_LOC);
     }
 
     @Override

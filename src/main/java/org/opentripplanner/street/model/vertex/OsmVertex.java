@@ -15,13 +15,12 @@ public class OsmVertex extends IntersectionVertex {
   /** The OSM node ID from whence this came */
   public final long nodeId;
 
-  public OsmVertex(Graph g, String label, double x, double y, long nodeId) {
-    super(g, label, x, y);
+  public OsmVertex(String label, double x, double y, long nodeId) {
+    super(label, x, y);
     this.nodeId = nodeId;
   }
 
   public OsmVertex(
-    Graph g,
     String label,
     double x,
     double y,
@@ -30,7 +29,7 @@ public class OsmVertex extends IntersectionVertex {
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(g, label, x, y, name, hasHighwayTrafficLight, hasCrossingTrafficLight);
+    super(label, x, y, name, hasHighwayTrafficLight, hasCrossingTrafficLight);
     this.nodeId = nodeId;
   }
 }

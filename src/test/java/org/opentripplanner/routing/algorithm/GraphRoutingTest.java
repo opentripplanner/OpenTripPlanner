@@ -32,7 +32,6 @@ import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
-import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -43,6 +42,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -73,12 +73,14 @@ public abstract class GraphRoutingTest {
 
     private final Graph graph;
     private final TransitModel transitModel;
+    private final VertexFactory vertexFactory;
 
     protected Builder() {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
       graph = new Graph(deduplicator);
       transitModel = new TransitModel(stopModel, deduplicator);
+      vertexFactory = new VertexFactory(graph);
     }
 
     public abstract void build();
@@ -101,7 +103,7 @@ public abstract class GraphRoutingTest {
 
     // -- Street network
     public IntersectionVertex intersection(String label, double latitude, double longitude) {
-      return new IntersectionVertex(graph, label, longitude, latitude);
+      return vertexFactory.intersection(label, latitude, longitude);
     }
 
     public StreetEdge street(
@@ -159,20 +161,8 @@ public abstract class GraphRoutingTest {
         var boardLabel = String.format("%s-onboard", level);
         var alightLabel = String.format("%s-offboard", level);
 
-        var onboard = new ElevatorOnboardVertex(
-          graph,
-          boardLabel,
-          v.getX(),
-          v.getY(),
-          new NonLocalizedString(boardLabel)
-        );
-        var offboard = new ElevatorOffboardVertex(
-          graph,
-          alightLabel,
-          v.getX(),
-          v.getY(),
-          new NonLocalizedString(alightLabel)
-        );
+        var onboard = vertexFactory.elevatorOnboard(v, boardLabel, boardLabel);
+        var offboard = vertexFactory.elevatorOffboard(v, alightLabel, alightLabel);
 
         new FreeEdge(v, offboard);
         new FreeEdge(offboard, v);
@@ -238,7 +228,6 @@ public abstract class GraphRoutingTest {
       boolean noTransfers
     ) {
       return new TransitStopVertexBuilder()
-        .withGraph(graph)
         .withStop(stopEntity(id, latitude, longitude, noTransfers))
         .build();
     }
@@ -399,7 +388,7 @@ public abstract class GraphRoutingTest {
         .tags(List.of(tags))
         .build();
 
-      var vertices = VehicleParkingHelper.createVehicleParkingVertices(graph, vehicleParking);
+      var vertices = VehicleParkingHelper.createVehicleParkingVertices(vehicleParking);
       VehicleParkingHelper.linkVehicleParkingEntrances(vertices);
       vertices.forEach(v -> biLink(v.getParkingEntrance().getVertex(), v));
       return vehicleParking;

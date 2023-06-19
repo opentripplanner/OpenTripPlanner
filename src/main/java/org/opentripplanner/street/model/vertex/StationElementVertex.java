@@ -7,8 +7,8 @@ import org.opentripplanner.transit.model.site.StationElement;
 
 public abstract class StationElementVertex extends Vertex {
 
-  protected StationElementVertex(Graph g, String label, double x, double y, I18NString name) {
-    super(g, label, x, y, name);
+  protected StationElementVertex(String label, double x, double y, I18NString name) {
+    super(label, x, y, name);
   }
 
   /** Get the corresponding StationElement */

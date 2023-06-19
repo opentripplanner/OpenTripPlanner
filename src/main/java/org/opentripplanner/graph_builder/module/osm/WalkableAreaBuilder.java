@@ -44,6 +44,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
@@ -88,6 +89,7 @@ public class WalkableAreaBuilder {
   private final Set<String> boardingLocationRefTags;
   private final EdgeNamer namer;
   private final SafetyValueNormalizer normalizer;
+  private final VertexFactory vertexFactory;
 
   public WalkableAreaBuilder(
     Graph graph,
@@ -119,6 +121,7 @@ public class WalkableAreaBuilder {
           .filter(this::isPlatformLinkingEndpoint)
           .collect(Collectors.toList())
         : List.of();
+    this.vertexFactory = new VertexFactory(graph);
   }
 
   /**
@@ -631,13 +634,7 @@ public class WalkableAreaBuilder {
 
           IntersectionVertex newEndpoint = areaBoundaryVertexForCoordinate.get(edgeCoordinate);
           if (newEndpoint == null) {
-            newEndpoint =
-              new IntersectionVertex(
-                graph,
-                "area splitter at " + edgeCoordinate,
-                edgeCoordinate.x,
-                edgeCoordinate.y
-              );
+            newEndpoint = vertexFactory.intersection(edgeCoordinate);
             areaBoundaryVertexForCoordinate.put(edgeCoordinate, newEndpoint);
           }
           edges.addAll(createSegments(startEndpoint, newEndpoint, List.of(area), edgeList));

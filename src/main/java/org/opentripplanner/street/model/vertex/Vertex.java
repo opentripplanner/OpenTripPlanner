@@ -13,7 +13,6 @@ import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -44,19 +43,15 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
 
   /* CONSTRUCTORS */
 
-  protected Vertex(Graph g, String label, double x, double y) {
+  protected Vertex(String label, double x, double y) {
     this.label = label;
     this.x = x;
     this.y = y;
-    // null graph means temporary vertex
-    if (g != null) {
-      g.addVertex(this);
-    }
     this.name = new NonLocalizedString("(no name provided)");
   }
 
-  protected Vertex(Graph g, String label, double x, double y, I18NString name) {
-    this(g, label, x, y);
+  protected Vertex(String label, double x, double y, I18NString name) {
+    this(label, x, y);
     this.name = name;
   }
 

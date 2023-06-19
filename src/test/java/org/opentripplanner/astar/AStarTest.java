@@ -287,7 +287,9 @@ public class AStarTest {
    ****/
 
   private SimpleConcreteVertex vertex(String label, double lat, double lon) {
-    return new SimpleConcreteVertex(graph, label, lat, lon);
+    var v = new SimpleConcreteVertex(graph, label, lat, lon);
+    graph.addVertex(v);
+    return v;
   }
 
   private void edges(String... vLabels) {

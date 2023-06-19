@@ -28,6 +28,7 @@ import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -55,6 +56,7 @@ public class AddTransitModelEntitiesToGraph {
   private final Map<StationElement<?, ?>, StationElementVertex> stationElementNodes = new HashMap<>();
 
   private final int subwayAccessTime;
+  private final VertexFactory vertexFactory;
 
   /**
    * @param subwayAccessTime a positive integer for the extra time to access a subway platform, if
@@ -62,10 +64,12 @@ public class AddTransitModelEntitiesToGraph {
    */
   private AddTransitModelEntitiesToGraph(
     OtpTransitService otpTransitService,
-    int subwayAccessTime
+    int subwayAccessTime,
+    Graph graph
   ) {
     this.otpTransitService = otpTransitService;
     this.subwayAccessTime = Math.max(subwayAccessTime, 0);
+    this.vertexFactory = new VertexFactory(graph);
   }
 
   public static void addToGraph(
@@ -74,7 +78,7 @@ public class AddTransitModelEntitiesToGraph {
     Graph graph,
     TransitModel transitModel
   ) {
-    new AddTransitModelEntitiesToGraph(otpTransitService, subwayAccessTime)
+    new AddTransitModelEntitiesToGraph(otpTransitService, subwayAccessTime, graph)
       .applyToGraph(graph, transitModel);
   }
 
@@ -84,7 +88,7 @@ public class AddTransitModelEntitiesToGraph {
     addStopsToGraphAndGenerateStopVertexes(graph, transitModel);
     addEntrancesToGraph(graph);
     addPathwayNodesToGraph(graph);
-    addBoardingAreasToGraph(graph);
+    addBoardingAreasToGraph();
 
     // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
     createPathwayEdgesAndAddThemToGraph(graph);
@@ -120,7 +124,6 @@ public class AddTransitModelEntitiesToGraph {
       Set<TransitMode> modes = stopModeMap.get(stop);
       TransitStopVertex stopVertex = new TransitStopVertexBuilder()
         .withStop(stop)
-        .withGraph(graph)
         .withModes(modes)
         .build();
 
@@ -147,10 +150,9 @@ public class AddTransitModelEntitiesToGraph {
     }
   }
 
-  private void addBoardingAreasToGraph(Graph graph) {
+  private void addBoardingAreasToGraph() {
     for (BoardingArea boardingArea : otpTransitService.getAllBoardingAreas()) {
-      TransitBoardingAreaVertex boardingAreaVertex = new TransitBoardingAreaVertex(
-        graph,
+      TransitBoardingAreaVertex boardingAreaVertex = vertexFactory.transitBoardingArea(
         boardingArea
       );
       stationElementNodes.put(boardingArea, boardingAreaVertex);
@@ -258,37 +260,29 @@ public class AddTransitModelEntitiesToGraph {
       levels = Math.abs(fromLevel.index() - toLevel.index());
     }
 
-    ElevatorOffboardVertex fromOffboardVertex = new ElevatorOffboardVertex(
-      graph,
-      fromVertex.getLabel() + "_" + pathway.getId() + "_offboard",
-      fromVertex.getX(),
-      fromVertex.getY(),
-      fromLevel.name()
+    ElevatorOffboardVertex fromOffboardVertex = vertexFactory.elevatorOffboard(
+      fromVertex,
+      fromVertex.getLabel() + "_" + pathway.getId(),
+      fromLevel.name().toString()
     );
-    ElevatorOffboardVertex toOffboardVertex = new ElevatorOffboardVertex(
-      graph,
+    ElevatorOffboardVertex toOffboardVertex = vertexFactory.elevatorOffboard(
+      toVertex,
       toVertex.getLabel() + "_" + pathway.getId() + "_offboard",
-      toVertex.getX(),
-      toVertex.getY(),
-      toLevel.name()
+      toLevel.name().toString()
     );
 
     PathwayEdge.lowCost(fromVertex, fromOffboardVertex, fromVertex.getName(), PathwayMode.ELEVATOR);
     PathwayEdge.lowCost(toOffboardVertex, toVertex, toVertex.getName(), PathwayMode.ELEVATOR);
 
-    ElevatorOnboardVertex fromOnboardVertex = new ElevatorOnboardVertex(
-      graph,
-      fromVertex.getLabel() + "_" + pathway.getId() + "_onboard",
-      fromVertex.getX(),
-      fromVertex.getY(),
-      fromLevel.name()
+    ElevatorOnboardVertex fromOnboardVertex = vertexFactory.elevatorOnboard(
+      fromVertex,
+      fromVertex.getLabel() + "_" + pathway.getId(),
+      fromLevel.name().toString()
     );
-    ElevatorOnboardVertex toOnboardVertex = new ElevatorOnboardVertex(
-      graph,
-      toVertex.getLabel() + "_" + pathway.getId() + "_onboard",
-      toVertex.getX(),
-      toVertex.getY(),
-      toLevel.name()
+    ElevatorOnboardVertex toOnboardVertex = vertexFactory.elevatorOnboard(
+      toVertex,
+      toVertex.getLabel() + "_" + pathway.getId(),
+      toLevel.name().toString()
     );
 
     new ElevatorBoardEdge(fromOffboardVertex, fromOnboardVertex);

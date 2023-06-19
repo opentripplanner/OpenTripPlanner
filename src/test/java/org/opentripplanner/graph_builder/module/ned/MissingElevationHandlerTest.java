@@ -186,7 +186,7 @@ class MissingElevationHandlerTest {
   }
 
   private IntersectionVertex vertex(String A) {
-    return new IntersectionVertex(graph, A, 0, 0);
+    return new IntersectionVertex(A, 0, 0);
   }
 
   private StreetEdge edge(IntersectionVertex from, IntersectionVertex to, double length) {

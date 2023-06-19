@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -55,9 +53,7 @@ public class LinkStopToPlatformTest {
 
     for (int i = 0; i < platform.length; i++) {
       Coordinate c = platform[i];
-      vertices.add(
-        new IntersectionVertex(graph, String.valueOf(i), c.x, c.y, "Platform vertex " + i)
-      );
+      vertices.add(new IntersectionVertex(String.valueOf(i), c.x, c.y, "Platform vertex " + i));
       closedGeom[i] = c;
     }
     closedGeom[platform.length] = closedGeom[0];
@@ -104,7 +100,7 @@ public class LinkStopToPlatformTest {
     graph.index(transitModel.getStopModel());
 
     for (RegularStop s : transitStops) {
-      new TransitStopVertexBuilder().withGraph(graph).withStop(s).build();
+      new TransitStopVertexBuilder().withStop(s).build();
     }
 
     return graph;
