@@ -109,7 +109,7 @@ Be aware that OTP uses the config embedded in the loaded graph if no new config 
 Configuration for router server.
 
 These parameters are used to configure the router server. Many parameters are specific to a
-domain, these are set tin the routing request.
+domain, these are set in the routing request.
 
 
 <h3 id="server_apiProcessingTimeout">apiProcessingTimeout</h3>

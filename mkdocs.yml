@@ -54,7 +54,7 @@ nav:
     - Visual Identity: 'Visual-Identity.md'
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
-    - Interfaces and Data Sources: 'Interfaces-Data-Sources.md'
+    - APIs and Data Sources: 'Apis-Data-Sources.md'
     - Getting OTP: 'Getting-OTP.md'
     - Container Image: 'Container-Image.md'
     - System Requirements and Suggestions: 'System-Requirements.md'

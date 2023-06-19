@@ -15,11 +15,11 @@ and uses the same schema, so eventual support for the full the EU profile is a p
 GTFS and Netex data are converted into OTP's own internal model which is a superset of both. It is
 therefore possible to mix Netex and GTFS data, and potentially even data from other sources.
 
-## Interfaces APIs
+## APIs
 
 Several different services are built upon this routing library, and expose APIs:
 
-## GraphQL
+### GraphQL
 
 The [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) is used by the Digitransit and otp-react-redux 
 projects in production for many years.
@@ -30,11 +30,11 @@ Entur in production(Sep, 2020).
 The [Actuator API](sandbox/ActuatorAPI.md) provides endpoints for checking the health status of the
 OTP instance. It can be useful when running OTP in a container.
 
-## Legacy APIs (to be removed)
+### Legacy APIs (to be removed)
 
 The OTP REST API used to power many apps and frontends. For years it was the only way to access
 OTP programmatically.
 
-Over the years it has been replaced by the GraphQL APIs and is scheduled to be disabled by default
-and eventually removed completely. It's therefor not recommended to use it.
+Over time it has been replaced by the GraphQL APIs and is scheduled to be disabled by default
+and eventually removed completely. It's therefore not recommended to use it.
 
