@@ -422,7 +422,6 @@ public class OSMWithTags {
   /**
    * @return True if this entity provides an entrance to a platform or similar entity
    */
-
   public boolean isEntrance() {
     return (
       (
