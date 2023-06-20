@@ -72,7 +72,9 @@ class TripTimesTest {
 
   @Test
   void shouldHandleDifferingTripAndStopHeadSignScenario() {
-    Trip trip = TransitModelForTest.trip("TRIP").build();
+    Trip trip = TransitModelForTest.trip("TRIP")
+      .withHeadsign(DIRECTION)
+      .build();
     StopTime stopWithHeadsign = new StopTime();
     stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
     Collection<StopTime> stopTimes = List.of(stopWithHeadsign, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
