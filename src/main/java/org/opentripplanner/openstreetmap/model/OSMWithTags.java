@@ -494,7 +494,7 @@ public class OSMWithTags {
     var levels = getMultiTagValues(levelTags);
     if (levels.isEmpty()) {
       // default
-      levels.add("0");
+      return Set.of("0");
     }
     return levels;
   }
