@@ -47,6 +47,7 @@ class ParkingProcessor {
   private final OSMOpeningHoursParser osmOpeningHoursParser;
   private final BiFunction<OSMNode, OSMWithTags, IntersectionVertex> getVertexForOsmNode;
   private final VertexFactory vertexFactory;
+  private final VehicleParkingHelper vehicleParkingHelper;
 
   public ParkingProcessor(
     Graph graph,
@@ -59,6 +60,7 @@ class ParkingProcessor {
     this.osmOpeningHoursParser =
       new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), issueStore);
     this.vertexFactory = new VertexFactory(graph);
+    this.vehicleParkingHelper = new VehicleParkingHelper(graph);
   }
 
   public List<VehicleParking> buildParkAndRideNodes(
@@ -274,7 +276,7 @@ class ParkingProcessor {
       entrances
     );
 
-    VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
+    vehicleParkingHelper.linkVehicleParkingToGraph(vehicleParking);
 
     return vehicleParking;
   }

@@ -9,10 +9,13 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.site.BoardingArea;
+import org.opentripplanner.transit.model.site.Entrance;
+import org.opentripplanner.transit.model.site.PathwayNode;
 
 public class VertexFactory {
 
@@ -70,8 +73,9 @@ public class VertexFactory {
     );
   }
 
+  @Nonnull
   public IntersectionVertex intersection(String label, double longitude, double latitude) {
-    return addToGraph(new IntersectionVertex(label, latitude, longitude));
+    return addToGraph(new IntersectionVertex(label, longitude, latitude));
   }
 
   @Nonnull
@@ -132,12 +136,26 @@ public class VertexFactory {
 
   @Nonnull
   public VehicleParkingEntranceVertex vehicleParkingEntrance(VehicleParking vehicleParking) {
-    return addToGraph(new VehicleParkingEntranceVertex(vehicleParking.getEntrances().get(0)));
+    return vehicleParkingEntrance(vehicleParking.getEntrances().get(0));
+  }
+
+  public VehicleParkingEntranceVertex vehicleParkingEntrance(VehicleParkingEntrance entrance) {
+    return addToGraph(new VehicleParkingEntranceVertex(entrance));
   }
 
   @Nonnull
   public VehicleRentalPlaceVertex vehicleRentalPlace(VehicleRentalPlace station) {
     return addToGraph(new VehicleRentalPlaceVertex(station));
+  }
+
+  @Nonnull
+  public TransitPathwayNodeVertex transitPathwayNode(PathwayNode node) {
+    return addToGraph(new TransitPathwayNodeVertex(node));
+  }
+
+  @Nonnull
+  public TransitEntranceVertex transitEntrance(Entrance entrance) {
+    return addToGraph(new TransitEntranceVertex(entrance));
   }
 
   private <T extends Vertex> T addToGraph(T vertex) {

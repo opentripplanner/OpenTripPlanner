@@ -85,9 +85,9 @@ public class AddTransitModelEntitiesToGraph {
   private void applyToGraph(Graph graph, TransitModel transitModel) {
     transitModel.mergeStopModels(otpTransitService.stopModel());
 
-    addStopsToGraphAndGenerateStopVertexes(graph, transitModel);
-    addEntrancesToGraph(graph);
-    addPathwayNodesToGraph(graph);
+    addStopsToGraphAndGenerateStopVertexes(transitModel);
+    addEntrancesToGraph();
+    addPathwayNodesToGraph();
     addBoardingAreasToGraph();
 
     // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
@@ -105,7 +105,7 @@ public class AddTransitModelEntitiesToGraph {
     }
   }
 
-  private void addStopsToGraphAndGenerateStopVertexes(Graph graph, TransitModel transitModel) {
+  private void addStopsToGraphAndGenerateStopVertexes(TransitModel transitModel) {
     // Compute the set of modes for each stop based on all the TripPatterns it is part of
     Map<StopLocation, Set<TransitMode>> stopModeMap = new HashMap<>();
 
@@ -135,16 +135,16 @@ public class AddTransitModelEntitiesToGraph {
     }
   }
 
-  private void addEntrancesToGraph(Graph graph) {
+  private void addEntrancesToGraph() {
     for (Entrance entrance : otpTransitService.getAllEntrances()) {
-      TransitEntranceVertex entranceVertex = new TransitEntranceVertex(graph, entrance);
+      TransitEntranceVertex entranceVertex = vertexFactory.transitEntrance(entrance);
       stationElementNodes.put(entrance, entranceVertex);
     }
   }
 
-  private void addPathwayNodesToGraph(Graph graph) {
+  private void addPathwayNodesToGraph() {
     for (PathwayNode node : otpTransitService.getAllPathwayNodes()) {
-      TransitPathwayNodeVertex nodeVertex = new TransitPathwayNodeVertex(graph, node);
+      TransitPathwayNodeVertex nodeVertex = vertexFactory.transitPathwayNode(node);
       stationElementNodes.put(node, nodeVertex);
     }
   }

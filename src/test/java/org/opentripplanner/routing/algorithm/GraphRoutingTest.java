@@ -74,6 +74,7 @@ public abstract class GraphRoutingTest {
     private final Graph graph;
     private final TransitModel transitModel;
     private final VertexFactory vertexFactory;
+    private final VehicleParkingHelper vehicleParkingHelper;
 
     protected Builder() {
       var deduplicator = new Deduplicator();
@@ -81,6 +82,7 @@ public abstract class GraphRoutingTest {
       graph = new Graph(deduplicator);
       transitModel = new TransitModel(stopModel, deduplicator);
       vertexFactory = new VertexFactory(graph);
+      vehicleParkingHelper = new VehicleParkingHelper(graph);
     }
 
     public abstract void build();
@@ -103,7 +105,7 @@ public abstract class GraphRoutingTest {
 
     // -- Street network
     public IntersectionVertex intersection(String label, double latitude, double longitude) {
-      return vertexFactory.intersection(label, latitude, longitude);
+      return vertexFactory.intersection(label, longitude, latitude);
     }
 
     public StreetEdge street(
@@ -233,7 +235,7 @@ public abstract class GraphRoutingTest {
     }
 
     public TransitEntranceVertex entrance(String id, double latitude, double longitude) {
-      return new TransitEntranceVertex(graph, entranceEntity(id, latitude, longitude));
+      return new TransitEntranceVertex(entranceEntity(id, latitude, longitude));
     }
 
     public StreetTransitEntranceLink link(StreetVertex from, TransitEntranceVertex to) {
@@ -387,7 +389,7 @@ public abstract class GraphRoutingTest {
         .tags(List.of(tags))
         .build();
 
-      var vertices = VehicleParkingHelper.createVehicleParkingVertices(vehicleParking);
+      var vertices = vehicleParkingHelper.createVehicleParkingVertices(vehicleParking);
       VehicleParkingHelper.linkVehicleParkingEntrances(vertices);
       vertices.forEach(v -> biLink(v.getParkingEntrance().getVertex(), v));
       return vehicleParking;

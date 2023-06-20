@@ -15,7 +15,7 @@ public class TransitEntranceVertex extends StationElementVertex {
   /**
    * @param entrance The transit model entrance reference.
    */
-  public TransitEntranceVertex(Graph graph, Entrance entrance) {
+  public TransitEntranceVertex(Entrance entrance) {
     super(
       entrance.getId().toString(),
       entrance.getCoordinate().longitude(),

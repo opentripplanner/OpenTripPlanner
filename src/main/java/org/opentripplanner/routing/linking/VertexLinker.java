@@ -71,7 +71,7 @@ public class VertexLinker {
   private final VertexFactory vertexFactory;
 
   // TODO Temporary code until we refactor WalkableAreaBuilder  (#3152)
-  private Boolean addExtraEdgesToAreas = true;
+  private boolean addExtraEdgesToAreas = true;
 
   /**
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
@@ -380,7 +380,7 @@ public class VertexLinker {
       }
       if (split) {
         // split the edge, get the split vertex
-        start = (IntersectionVertex) split(edge, ll, scope, direction, tempEdges);
+        start = split(edge, ll, scope, direction, tempEdges);
       }
     }
 

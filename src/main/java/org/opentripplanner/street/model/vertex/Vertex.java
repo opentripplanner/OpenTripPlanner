@@ -259,8 +259,8 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
    */
   private Edge[] removeEdge(Edge[] existing, Edge e) {
     int nfound = 0;
-    for (int i = 0; i < existing.length; i++) {
-      if (existing[i] == e) nfound++;
+    for (Edge edge : existing) {
+      if (edge == e) nfound++;
     }
     if (nfound == 0) {
       LOG.debug(
