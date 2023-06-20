@@ -8,6 +8,9 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.transit.model.site.BoardingArea;
 
@@ -19,6 +22,7 @@ public class VertexFactory {
     this.graph = graph;
   }
 
+  @Nonnull
   public TransitBoardingAreaVertex transitBoardingArea(BoardingArea boardingArea) {
     return addToGraph(new TransitBoardingAreaVertex(boardingArea));
   }
@@ -97,7 +101,7 @@ public class VertexFactory {
 
   @Nonnull
   public ExitVertex exit(long nid, Coordinate coordinate, String label) {
-    return new ExitVertex(label, coordinate.x, coordinate.y, nid);
+    return addToGraph(new ExitVertex(label, coordinate.x, coordinate.y, nid));
   }
 
   @Nonnull
@@ -121,8 +125,19 @@ public class VertexFactory {
     );
   }
 
+  @Nonnull
   public TransitStopVertex transitStop(TransitStopVertexBuilder transitStopVertexBuilder) {
     return addToGraph(transitStopVertexBuilder.build());
+  }
+
+  @Nonnull
+  public VehicleParkingEntranceVertex vehicleParkingEntrance(VehicleParking vehicleParking) {
+    return addToGraph(new VehicleParkingEntranceVertex(vehicleParking.getEntrances().get(0)));
+  }
+
+  @Nonnull
+  public VehicleRentalPlaceVertex vehicleRentalPlace(VehicleRentalPlace station) {
+    return addToGraph(new VehicleRentalPlaceVertex(station));
   }
 
   private <T extends Vertex> T addToGraph(T vertex) {

@@ -20,7 +20,7 @@ public abstract class StreetVertex extends Vertex {
   /** All locations for flex transit, which this vertex is part of */
   public Set<AreaStop> areaStops;
 
-  public StreetVertex(String label, double x, double y, I18NString streetName) {
+  StreetVertex(String label, double x, double y, I18NString streetName) {
     super(label, x, y, streetName);
   }
 

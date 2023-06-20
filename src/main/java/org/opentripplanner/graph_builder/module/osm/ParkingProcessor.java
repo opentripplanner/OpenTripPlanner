@@ -32,6 +32,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -45,6 +46,7 @@ class ParkingProcessor {
   private final DataImportIssueStore issueStore;
   private final OSMOpeningHoursParser osmOpeningHoursParser;
   private final BiFunction<OSMNode, OSMWithTags, IntersectionVertex> getVertexForOsmNode;
+  private final VertexFactory vertexFactory;
 
   public ParkingProcessor(
     Graph graph,
@@ -56,6 +58,7 @@ class ParkingProcessor {
     this.getVertexForOsmNode = getVertexForOsmNode;
     this.osmOpeningHoursParser =
       new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), issueStore);
+    this.vertexFactory = new VertexFactory(graph);
   }
 
   public List<VehicleParking> buildParkAndRideNodes(
@@ -95,8 +98,8 @@ class ParkingProcessor {
 
       vehicleParkingToAdd.add(vehicleParking);
 
-      VehicleParkingEntranceVertex parkVertex = new VehicleParkingEntranceVertex(
-        vehicleParking.getEntrances().get(0)
+      VehicleParkingEntranceVertex parkVertex = vertexFactory.vehicleParkingEntrance(
+        vehicleParking
       );
       new VehicleParkingEdge(parkVertex);
     }

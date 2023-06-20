@@ -338,7 +338,7 @@ public class ConstantsForTests {
         station.realTimeData = false;
         station.isArrivingInRentalVehicleAtDestinationAllowed = true;
 
-        VehicleRentalPlaceVertex stationVertex = new VehicleRentalPlaceVertex(graph, station);
+        VehicleRentalPlaceVertex stationVertex = new VehicleRentalPlaceVertex(station);
         new VehicleRentalEdge(stationVertex, vehicleType.formFactor);
 
         linker.linkVertexPermanently(

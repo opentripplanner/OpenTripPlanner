@@ -87,7 +87,7 @@ public class TestStateBuilder {
 
     var station = TestVehicleRentalStationBuilder.of().withVehicleTypeCar().build();
 
-    VehicleRentalPlaceVertex vertex = new VehicleRentalPlaceVertex(null, station);
+    VehicleRentalPlaceVertex vertex = new VehicleRentalPlaceVertex(station);
     var link = new StreetVehicleRentalLink((StreetVertex) currentState.vertex, vertex);
 
     currentState = link.traverse(currentState)[0];

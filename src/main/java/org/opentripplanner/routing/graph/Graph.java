@@ -133,14 +133,7 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph,
-   * when they are constructed or deserialized.
-   * <p>
-   * TODO OTP2 - This strategy is error prune, problematic when testing and causes a cyclic
-   *           - dependency Graph -> Vertex -> Graph. A better approach is to lett the bigger
-   *           - whole (Graph) create and attach its smaller parts (Vertex). A way is to create
-   *           - a VertexCollection class, let the graph hold an instance of this collection,
-   *           - and create factory methods for each type of Vertex in the VertexCollection.
+   * Add the given vertex to the graph.
    */
   public void addVertex(Vertex v) {
     Vertex old = vertices.put(v.getLabel(), v);

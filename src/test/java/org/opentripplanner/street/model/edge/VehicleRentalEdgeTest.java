@@ -140,7 +140,7 @@ class VehicleRentalEdgeTest {
       .withStationOn(stationOn)
       .build();
 
-    this.vertex = new VehicleRentalPlaceVertex(graph, station);
+    this.vertex = new VehicleRentalPlaceVertex(station);
 
     vehicleRentalEdge = new VehicleRentalEdge(vertex, RentalFormFactor.BICYCLE);
 

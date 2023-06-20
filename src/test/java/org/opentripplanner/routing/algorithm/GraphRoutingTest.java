@@ -227,9 +227,9 @@ public abstract class GraphRoutingTest {
       double longitude,
       boolean noTransfers
     ) {
-      return new TransitStopVertexBuilder()
-        .withStop(stopEntity(id, latitude, longitude, noTransfers))
-        .build();
+      return vertexFactory.transitStop(
+        new TransitStopVertexBuilder().withStop(stopEntity(id, latitude, longitude, noTransfers))
+      );
     }
 
     public TransitEntranceVertex entrance(String id, double latitude, double longitude) {
@@ -328,7 +328,6 @@ public abstract class GraphRoutingTest {
       String network
     ) {
       var vertex = new VehicleRentalPlaceVertex(
-        graph,
         vehicleRentalStationEntity(id, latitude, longitude, network)
       );
       new VehicleRentalEdge(vertex, RentalVehicleType.getDefaultType(network).formFactor);

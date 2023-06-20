@@ -53,7 +53,9 @@ public class LinkStopToPlatformTest {
 
     for (int i = 0; i < platform.length; i++) {
       Coordinate c = platform[i];
-      vertices.add(new IntersectionVertex(String.valueOf(i), c.x, c.y, "Platform vertex " + i));
+      var vertex = new IntersectionVertex(String.valueOf(i), c.x, c.y, "Platform vertex " + i);
+      graph.addVertex(vertex);
+      vertices.add(vertex);
       closedGeom[i] = c;
     }
     closedGeom[platform.length] = closedGeom[0];
@@ -100,7 +102,8 @@ public class LinkStopToPlatformTest {
     graph.index(transitModel.getStopModel());
 
     for (RegularStop s : transitStops) {
-      new TransitStopVertexBuilder().withStop(s).build();
+      var v = new TransitStopVertexBuilder().withStop(s).build();
+      graph.addVertex(v);
     }
 
     return graph;
