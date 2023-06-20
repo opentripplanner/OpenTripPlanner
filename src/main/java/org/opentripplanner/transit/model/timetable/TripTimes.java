@@ -192,10 +192,12 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * a pointer to its enclosing timetable or pattern.
    */
   public I18NString getHeadsign(final int stop) {
+    I18NString tripHeadsign = getTrip().getHeadsign();
     if (headsigns == null) {
-      return getTrip().getHeadsign();
+      return tripHeadsign;
     } else {
-      return headsigns[stop];
+      I18NString stopHeadsign = headsigns[stop];
+      return stopHeadsign != null ? stopHeadsign : tripHeadsign;
     }
   }
 
