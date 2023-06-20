@@ -49,6 +49,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Validate distinct from/to temporary vertices [#5181](https://github.com/opentripplanner/OpenTripPlanner/pull/5181)
 - Add support for taxi mode [#5183](https://github.com/opentripplanner/OpenTripPlanner/pull/5183)
 - Fix bike triangle in Transmodel API [#5179](https://github.com/opentripplanner/OpenTripPlanner/pull/5179)
+- Bug fixes in stop area relation processing [#5166](https://github.com/opentripplanner/OpenTripPlanner/pull/5166)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
