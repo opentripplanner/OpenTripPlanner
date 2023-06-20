@@ -488,7 +488,6 @@ public class OSMWithTags {
    * Returns level tag (i.e. building floor) or layer tag values, defaults to "0"
    * Some entities can have a semicolon separated list of levels (e.g. elevators)
    */
-
   public Set<String> getLevels() {
     var levels = getMultiTagValues(levelTags);
     if (levels.isEmpty()) {
