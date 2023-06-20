@@ -7,26 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.Route;
-import org.opentripplanner.transit.model.organization.Agency;
 
 class TripTimesTest {
 
   private static final NonLocalizedString DIRECTION = new NonLocalizedString("DIRECTION");
-  private static final Agency AGENCY = Agency
-    .of(new FeedScopedId("TEST", "AGENCY"))
-    .withName("Test Agency")
-    .withTimezone("Europe/Berlin")
-    .build();
-  private static final Route ROUTE = Route
-    .of(new FeedScopedId("TEST", "ROUTE"))
-    .withAgency(AGENCY)
-    .withMode(TransitMode.RAIL)
-    .withShortName("Route")
-    .build();
   private static final StopTime EMPTY_STOPPOINT = new StopTime();
   private static final NonLocalizedString STOP_TEST_DIRECTION = new NonLocalizedString(
     "STOP TEST DIRECTION"
@@ -34,7 +20,7 @@ class TripTimesTest {
 
   @Test
   void shouldHandleBothNullScenario() {
-    Trip trip = Trip.of(new FeedScopedId("TEST", "TRIP")).withRoute(ROUTE).build();
+    Trip trip = TransitModelForTest.trip("TRIP").build();
     Collection<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
 
     TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
@@ -45,9 +31,7 @@ class TripTimesTest {
 
   @Test
   void shouldHandleTripOnlyHeadSignScenario() {
-    Trip trip = Trip
-      .of(new FeedScopedId("TEST", "TRIP"))
-      .withRoute(ROUTE)
+    Trip trip = TransitModelForTest.trip("TRIP")
       .withHeadsign(DIRECTION)
       .build();
     Collection<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
@@ -60,7 +44,7 @@ class TripTimesTest {
 
   @Test
   void shouldHandleStopsOnlyHeadSignScenario() {
-    Trip trip = Trip.of(new FeedScopedId("TEST", "TRIP")).withRoute(ROUTE).build();
+    Trip trip = TransitModelForTest.trip("TRIP").build();
     StopTime stopWithHeadsign = new StopTime();
     stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
     Collection<StopTime> stopTimes = List.of(stopWithHeadsign, stopWithHeadsign, stopWithHeadsign);
@@ -73,9 +57,7 @@ class TripTimesTest {
 
   @Test
   void shouldHandleStopsEqualToTripHeadSignScenario() {
-    Trip trip = Trip
-      .of(new FeedScopedId("TEST", "TRIP"))
-      .withRoute(ROUTE)
+    Trip trip = TransitModelForTest.trip("TRIP")
       .withHeadsign(DIRECTION)
       .build();
     StopTime stopWithHeadsign = new StopTime();
@@ -90,11 +72,7 @@ class TripTimesTest {
 
   @Test
   void shouldHandleDifferingTripAndStopHeadSignScenario() {
-    Trip trip = Trip
-      .of(new FeedScopedId("TEST", "TRIP"))
-      .withRoute(ROUTE)
-      .withHeadsign(DIRECTION)
-      .build();
+    Trip trip = TransitModelForTest.trip("TRIP").build();
     StopTime stopWithHeadsign = new StopTime();
     stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
     Collection<StopTime> stopTimes = List.of(stopWithHeadsign, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
