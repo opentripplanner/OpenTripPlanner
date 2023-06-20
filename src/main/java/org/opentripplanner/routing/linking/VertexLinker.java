@@ -61,6 +61,7 @@ public class VertexLinker {
   private static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
   private static final int INITIAL_SEARCH_RADIUS_METERS = 100;
   private static final int MAX_SEARCH_RADIUS_METERS = 1000;
+  private static final int MAX_AREA_LINKS = 100; // exit complex area maximally via this many exit points
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
   /**
    * Spatial index of StreetEdges in the graph.
@@ -540,7 +541,18 @@ public class VertexLinker {
 
     int added = 0;
 
+    // if area is too complex, consider only part of visibility nodes
+    float skip_ratio = (float) MAX_AREA_LINKS / (float) visibilityVertices.size();
+    int i = 0;
+    float sum_i = 0;
+
     for (IntersectionVertex v : visibilityVertices) {
+      sum_i += skip_ratio;
+      if (Math.floor(sum_i) < i + 1) {
+        continue;
+      }
+      i = (int) Math.floor(sum_i);
+
       LineString newGeometry = GEOMETRY_FACTORY.createLineString(
         new Coordinate[] { nearestPoints[0], v.getCoordinate() }
       );
