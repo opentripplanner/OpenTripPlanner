@@ -34,7 +34,7 @@ public class OSMWithTags {
 
   private OsmProvider osmProvider;
 
-  static Set<String> levelTags = new HashSet<String>(Arrays.asList("level", "layer"));
+  static final Set<String> levelTags = Set.of("level", "layer");
 
   public static boolean isFalse(String tagValue) {
     return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
