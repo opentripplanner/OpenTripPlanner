@@ -128,17 +128,39 @@ public class WalkableAreaBuilderTest {
       .toList();
     assertEquals(1, entranceAtSameLevel.size());
 
+    // second platform also contains a stop position which is not considered as an entrance
+    // therefore it should not get linked
+    var stopPositionConnection = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143863"))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(0, stopPositionConnection.size());
+
     // test that third platform and its entrance get connected
     // and there are not too many connections (to remote platforms)
-    // third platform also tests layer tag
+    // third platform also tests the 'layer' tag
     var connectionEdges = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
       .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143845"))
       .toList();
     // entrance is connected top 2 opposite corners of a single platform
-    // with two bidirectional edge pairs
-    assertEquals(4, connectionEdges.size());
+    // with two bidirectional edge pairs, and with the other entrance point
+    assertEquals(6, connectionEdges.size());
+
+    // test that semicolon separated list of elevator levals works in level matching
+    // e.g. 'level'='0;1'
+    var elevatorConnection = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143861"))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(1, elevatorConnection.size());
   }
 
   // -- Infrastructure --
