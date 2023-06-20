@@ -2,6 +2,7 @@ package org.opentripplanner.openstreetmap.model;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
@@ -32,6 +33,8 @@ public class OSMWithTags {
   protected I18NString creativeName;
 
   private OsmProvider osmProvider;
+
+  static final Set<String> levelTags = Set.of("level", "layer");
 
   public static boolean isFalse(String tagValue) {
     return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
@@ -417,6 +420,22 @@ public class OSMWithTags {
   }
 
   /**
+   * @return True if this entity provides an entrance to a platform or similar entity
+   */
+  public boolean isEntrance() {
+    return (
+      (
+        isTag("railway", "subway_entrance") ||
+        isTag("highway", "elevator") ||
+        isTag("entrance", "yes") ||
+        isTag("entrance", "main")
+      ) &&
+      !isTag("access", "private") &&
+      !isTag("access", "no")
+    );
+  }
+
+  /**
    * @return True if this node / area is a bike parking.
    */
   public boolean isBikeParking() {
@@ -463,6 +482,19 @@ public class OSMWithTags {
   private boolean isTagDeniedAccess(String tagName) {
     String tagValue = getTag(tagName);
     return "no".equals(tagValue) || "license".equals(tagValue);
+  }
+
+  /**
+   * Returns level tag (i.e. building floor) or layer tag values, defaults to "0"
+   * Some entities can have a semicolon separated list of levels (e.g. elevators)
+   */
+  public Set<String> getLevels() {
+    var levels = getMultiTagValues(levelTags);
+    if (levels.isEmpty()) {
+      // default
+      return Set.of("0");
+    }
+    return levels;
   }
 
   @Override
