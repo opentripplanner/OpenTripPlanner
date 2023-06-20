@@ -121,6 +121,10 @@ public class VertexFactory {
     );
   }
 
+  public TransitStopVertex transitStop(TransitStopVertexBuilder transitStopVertexBuilder) {
+    return addToGraph(transitStopVertexBuilder.build());
+  }
+
   private <T extends Vertex> T addToGraph(T vertex) {
     graph.addVertex(vertex);
     return vertex;

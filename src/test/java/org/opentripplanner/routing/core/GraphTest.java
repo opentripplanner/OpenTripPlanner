@@ -38,6 +38,7 @@ public class GraphTest {
   public void testGetVertex() {
     var g = new Graph();
     Vertex a = new IntersectionVertex("A", 5, 5);
+    g.addVertex(a);
     Vertex b = g.getVertex("A");
     assertEquals(a, b);
   }
@@ -55,6 +56,10 @@ public class GraphTest {
     Graph g = new Graph();
     Vertex a = new IntersectionVertex("A", 5, 5);
     Vertex b = new IntersectionVertex("B", 6, 6);
+
+    g.addVertex(a);
+    g.addVertex(b);
+
     FreeEdge ee = new FreeEdge(a, b);
 
     List<Edge> edges = new ArrayList<>(g.getEdges());
@@ -68,6 +73,10 @@ public class GraphTest {
     Vertex a = new IntersectionVertex("A", 5, 5);
     Vertex b = new IntersectionVertex("B", 6, 6);
     Vertex c = new IntersectionVertex("C", 3, 2);
+
+    g.addVertex(a);
+    g.addVertex(b);
+    g.addVertex(c);
 
     Set<Edge> expectedEdges = new HashSet<>(4);
     expectedEdges.add(new FreeEdge(a, b));
@@ -103,6 +112,10 @@ public class GraphTest {
     StreetVertex a = new IntersectionVertex("A", 5, 5);
     StreetVertex b = new IntersectionVertex("B", 6, 6);
     StreetVertex c = new IntersectionVertex("C", 3, 2);
+
+    g.addVertex(a);
+    g.addVertex(b);
+    g.addVertex(c);
 
     Set<Edge> allStreetEdges = new HashSet<>(4);
     allStreetEdges.add(edge(a, b, 1.0));

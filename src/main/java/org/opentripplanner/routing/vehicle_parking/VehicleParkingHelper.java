@@ -12,13 +12,10 @@ public class VehicleParkingHelper {
   private VehicleParkingHelper() {}
 
   public static void linkVehicleParkingToGraph(Graph graph, VehicleParking vehicleParking) {
-    var vehicleParkingVertices = VehicleParkingHelper.createVehicleParkingVertices(
-      vehicleParking
-    );
+    var vehicleParkingVertices = VehicleParkingHelper.createVehicleParkingVertices(vehicleParking);
 
     vehicleParkingVertices.forEach(graph::addVertex);
     VehicleParkingHelper.linkVehicleParkingEntrances(vehicleParkingVertices);
-
   }
 
   public static List<VehicleParkingEntranceVertex> createVehicleParkingVertices(
