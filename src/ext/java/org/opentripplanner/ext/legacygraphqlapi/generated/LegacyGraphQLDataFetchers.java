@@ -292,6 +292,10 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Integer> digits();
   }
 
+  /**
+   * The standard case of a fare product: it only has a single price to be paid by the passenger
+   * and no discounts are applied.
+   */
   public interface LegacyGraphQLDefaultFareProduct {
     public DataFetcher<String> id();
 
@@ -321,20 +325,6 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Object> stop();
 
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
-  }
-
-  public interface LegacyGraphQLDiscountedFareProduct {
-    public DataFetcher<Money> discountedPrice();
-
-    public DataFetcher<Money> fullPrice();
-
-    public DataFetcher<String> id();
-
-    public DataFetcher<FareMedium> medium();
-
-    public DataFetcher<String> name();
-
-    public DataFetcher<RiderCategory> riderCategory();
   }
 
   /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
