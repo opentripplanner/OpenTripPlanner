@@ -25,7 +25,7 @@ The [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) is used by the Digitransit and
 projects in production for many years.
 
 The [Transmodel GraphQL API](sandbox/TransmodelApi.md) is the Transmodel API (version 3) used at
-Entur in production(Sep, 2020).
+Entur in production (Sep, 2020).
 
 The [Actuator API](sandbox/ActuatorAPI.md) provides endpoints for checking the health status of the
 OTP instance. It can be useful when running OTP in a container.
