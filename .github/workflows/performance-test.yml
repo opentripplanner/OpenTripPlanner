@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - vertex-graph-cleanup
 
 jobs:
   perf-test:
@@ -47,17 +48,17 @@ jobs:
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
             iterations: 1
             jfr-delay: "50s"
-            profile: extended
+            profile: core
 
           - location: switzerland
             iterations: 1
             jfr-delay: "50s"
-            profile: extended
+            profile: core
 
           - location: washington-state
             iterations: 1
             jfr-delay: "20s"
-            profile: extended
+            profile: core
 
     steps:
       - uses: actions/checkout@v3.1.0
