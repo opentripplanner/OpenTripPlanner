@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.linking;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -580,6 +581,26 @@ public class VertexLinker {
     }
   }
 
+  static final Set<TraverseMode> noThruModes = Set.of(
+    TraverseMode.WALK,
+    TraverseMode.BICYCLE,
+    TraverseMode.CAR
+  );
+
+  private Set<TraverseMode> getNoThruModes(Collection<Edge> edges) {
+    var modes = new HashSet<>(noThruModes);
+    for (Edge e : edges) {
+      if (e instanceof StreetEdge se) {
+        for (TraverseMode tm : noThruModes) {
+          if (!se.isNoThruTraffic(tm)) {
+            modes.remove(tm);
+          }
+        }
+      }
+    }
+    return modes;
+  }
+
   private void createSegments(
     IntersectionVertex from,
     IntersectionVertex to,
@@ -609,6 +630,11 @@ public class VertexLinker {
       // If more than one area intersects, we pick one by random for the name & properties
       double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
 
+      // apply consistent NoThru restrictions
+      // if all joining edges are nothru, then the new edge should be as well
+      var incomingNoThruModes = getNoThruModes(to.getIncoming());
+      var outgoingNoThruModes = getNoThruModes(to.getIncoming());
+
       AreaEdge ae = new AreaEdge(
         from,
         to,
@@ -619,6 +645,10 @@ public class VertexLinker {
         false,
         ael
       );
+      for (TraverseMode tm : outgoingNoThruModes) {
+        ae.setNoThruTraffic(tm);
+      }
+
       if (scope != Scope.PERMANENT) {
         tempEdges.addEdge(ae);
       }
@@ -634,6 +664,10 @@ public class VertexLinker {
           true,
           ael
         );
+      for (TraverseMode tm : incomingNoThruModes) {
+        ae.setNoThruTraffic(tm);
+      }
+
       if (scope != Scope.PERMANENT) {
         tempEdges.addEdge(ae);
       }
