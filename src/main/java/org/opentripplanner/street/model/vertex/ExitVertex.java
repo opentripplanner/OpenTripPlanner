@@ -1,7 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.routing.graph.Graph;
-
 public class ExitVertex extends OsmVertex {
 
   private String exitName;

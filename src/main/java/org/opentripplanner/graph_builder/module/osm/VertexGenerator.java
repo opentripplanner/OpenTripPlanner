@@ -34,13 +34,11 @@ class VertexGenerator {
 
   private final HashMap<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
   private final OsmDatabase osmdb;
-  private final Graph graph;
   private final Set<String> boardingAreaRefTags;
   private final VertexFactory vertexFactory;
 
   public VertexGenerator(OsmDatabase osmdb, Graph graph, Set<String> boardingAreaRefTags) {
     this.osmdb = osmdb;
-    this.graph = graph;
     this.vertexFactory = new VertexFactory(graph);
     this.boardingAreaRefTags = boardingAreaRefTags;
   }
