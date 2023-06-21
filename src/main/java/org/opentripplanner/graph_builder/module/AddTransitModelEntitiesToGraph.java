@@ -79,10 +79,10 @@ public class AddTransitModelEntitiesToGraph {
     TransitModel transitModel
   ) {
     new AddTransitModelEntitiesToGraph(otpTransitService, subwayAccessTime, graph)
-      .applyToGraph(graph, transitModel);
+      .applyToGraph(transitModel);
   }
 
-  private void applyToGraph(Graph graph, TransitModel transitModel) {
+  private void applyToGraph(TransitModel transitModel) {
     transitModel.mergeStopModels(otpTransitService.stopModel());
 
     addStopsToGraphAndGenerateStopVertexes(transitModel);
@@ -91,7 +91,7 @@ public class AddTransitModelEntitiesToGraph {
     addBoardingAreasToGraph();
 
     // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
-    createPathwayEdgesAndAddThemToGraph(graph);
+    createPathwayEdgesAndAddThemToGraph();
     addFeedInfoToGraph(transitModel);
     addAgenciesToGraph(transitModel);
     addServicesToTransitModel(transitModel);
@@ -180,7 +180,7 @@ public class AddTransitModelEntitiesToGraph {
     }
   }
 
-  private void createPathwayEdgesAndAddThemToGraph(Graph graph) {
+  private void createPathwayEdgesAndAddThemToGraph() {
     for (Pathway pathway : otpTransitService.getAllPathways()) {
       StationElementVertex fromVertex = stationElementNodes.get(pathway.getFromStop());
       StationElementVertex toVertex = stationElementNodes.get(pathway.getToStop());
@@ -188,7 +188,7 @@ public class AddTransitModelEntitiesToGraph {
       if (fromVertex != null && toVertex != null) {
         // Elevator
         if (pathway.getPathwayMode() == PathwayMode.ELEVATOR) {
-          createElevatorEdgesAndAddThemToGraph(graph, pathway, fromVertex, toVertex);
+          createElevatorEdgesAndAddThemToGraph(pathway, fromVertex, toVertex);
         } else {
           // the GTFS spec allows you to define a pathway which has neither traversal time, distance
           // nor steps. This would lead to traversal costs of 0, so we compute the distance from the
@@ -242,7 +242,6 @@ public class AddTransitModelEntitiesToGraph {
    * of having only one set of vertices per level and edges between them.
    */
   private void createElevatorEdgesAndAddThemToGraph(
-    Graph graph,
     Pathway pathway,
     StationElementVertex fromVertex,
     StationElementVertex toVertex
