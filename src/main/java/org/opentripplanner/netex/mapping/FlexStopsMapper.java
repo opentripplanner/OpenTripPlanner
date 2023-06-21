@@ -74,10 +74,12 @@ class FlexStopsMapper {
         continue;
       }
 
+      Geometry flexibleAreaGeometry = mapGeometry(flexibleArea);
+
       if (shouldAddStopsFromArea(flexibleArea, flexibleStopPlace)) {
-        stops.addAll(findStopsInFlexArea(flexibleArea));
+        stops.addAll(findStopsInFlexArea(flexibleArea, flexibleAreaGeometry));
       } else {
-        AreaStop areaStop = mapFlexArea(flexibleArea, flexibleStopPlace.getName().getValue());
+        AreaStop areaStop = mapFlexArea(flexibleArea, flexibleAreaGeometry, flexibleStopPlace.getName().getValue());
         if (areaStop != null) {
           stops.add(areaStop);
         }
@@ -100,8 +102,7 @@ class FlexStopsMapper {
   /**
    * Allows pickup / drop off along any eligible street inside the area
    */
-  AreaStop mapFlexArea(FlexibleArea area, String backupName) {
-    Geometry geometry = mapGeometry(area);
+  AreaStop mapFlexArea(FlexibleArea area, Geometry geometry, String backupName) {
     if (geometry == null) {
       return null;
     }
@@ -117,8 +118,7 @@ class FlexStopsMapper {
   /**
    * Allows pickup / drop off at any regular Stop inside the area
    */
-  List<RegularStop> findStopsInFlexArea(FlexibleArea area) {
-    Geometry geometry = mapGeometry(area);
+  List<RegularStop> findStopsInFlexArea(FlexibleArea area, Geometry geometry) {
     if (geometry == null) {
       return List.of();
     }
