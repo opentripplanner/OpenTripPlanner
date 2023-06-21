@@ -40,45 +40,29 @@
                 endTime
                 mode
                 generalizedCost
-                alerts {
+                fareProducts {
                     id
-                    alertHeaderText
-                    alertDescriptionText
-                    alertEffect
-                    alertCause
-                    alertSeverityLevel
-                    alertUrl
-                    effectiveStartDate
-                    effectiveEndDate
-                    entities {
-                        ... on Stop {
-                            name
-                            gtfsId
-                            lat
-                            lon
-                        }
-                    }
-                }
-                rideHailingEstimate {
-                    provider {
+                    product {
                         id
-                    }
-                    productName
-                    minPrice {
-                        currency {
-                            code
-                            digits
+                        name
+                        ... on DefaultFareProduct {
+                            price {
+                                currency {
+                                    digits
+                                    code
+                                }
+                                amount
+                            }
                         }
-                        amount
-                    }
-                    maxPrice {
-                        currency {
-                            code
-                            digits
+                        riderCategory {
+                            id
+                            name
                         }
-                        amount
+                        medium {
+                            id
+                            name
+                        }
                     }
-                    arrival
                 }
                 accessibilityScore
             }

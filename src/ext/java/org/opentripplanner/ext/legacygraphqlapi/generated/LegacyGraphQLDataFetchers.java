@@ -292,6 +292,18 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Integer> digits();
   }
 
+  public interface LegacyGraphQLDefaultFareProduct {
+    public DataFetcher<String> id();
+
+    public DataFetcher<FareMedium> medium();
+
+    public DataFetcher<String> name();
+
+    public DataFetcher<Money> price();
+
+    public DataFetcher<RiderCategory> riderCategory();
+  }
+
   /**
    * Departure row is a location, which lists departures of a certain pattern from a
    * stop. Departure rows are identified with the pattern, so querying departure rows
@@ -311,6 +323,20 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<TripTimeOnDate>> stoptimes();
   }
 
+  public interface LegacyGraphQLDiscountedFareProduct {
+    public DataFetcher<Money> discountedPrice();
+
+    public DataFetcher<Money> fullPrice();
+
+    public DataFetcher<String> id();
+
+    public DataFetcher<FareMedium> medium();
+
+    public DataFetcher<String> name();
+
+    public DataFetcher<RiderCategory> riderCategory();
+  }
+
   /** A 'medium' that a fare product applies to, for example cash, 'Oyster Card' or 'DB Navigator App'. */
   public interface LegacyGraphQLFareMedium {
     public DataFetcher<String> id();
@@ -319,16 +345,22 @@ public class LegacyGraphQLDataFetchers {
   }
 
   /** A fare product (a ticket) to be bought by a passenger */
-  public interface LegacyGraphQLFareProduct {
-    public DataFetcher<String> id();
+  public interface LegacyGraphQLFareProduct extends TypeResolver {
+    public default DataFetcher<String> id() {
+      return null;
+    }
 
-    public DataFetcher<FareMedium> medium();
+    public default DataFetcher<FareMedium> medium() {
+      return null;
+    }
 
-    public DataFetcher<String> name();
+    public default DataFetcher<String> name() {
+      return null;
+    }
 
-    public DataFetcher<Money> price();
-
-    public DataFetcher<RiderCategory> riderCategory();
+    public default DataFetcher<RiderCategory> riderCategory() {
+      return null;
+    }
   }
 
   /** A container for both a fare product (a ticket) and its relationship to the itinerary. */

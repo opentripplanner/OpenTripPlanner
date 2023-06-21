@@ -1325,7 +1325,31 @@ type FareProductUse {
 }
 
 "A fare product (a ticket) to be bought by a passenger"
-type FareProduct {
+interface FareProduct {
+    "Identifier for the fare product."
+    id: String!
+
+    """
+    Human readable name of the product, for example example "Day pass" or "Single ticket".
+    """
+    name: String!
+
+    "The category of riders this product applies to, for example students or pensioners."
+    riderCategory: RiderCategory
+
+    """
+    The 'medium' that this product applies to, for example "Oyster Card" or "Berlin Ticket App".
+
+    This communicates to riders that a specific way of buying or keeping this product is required.
+    """
+    medium: FareMedium
+}
+
+"""
+The standard case of a fare product: it only has a single price to be paid by the passenger
+and no discounts are applied.
+"""
+type DefaultFareProduct implements FareProduct {
     "Identifier for the fare product."
     id: String!
 

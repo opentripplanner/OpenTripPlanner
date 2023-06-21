@@ -29,7 +29,6 @@
               "generalizedCost" : 40,
               "alerts" : [ ],
               "rideHailingEstimate" : null,
-              "fareProducts" : [ ],
               "accessibilityScore" : null
             },
             {
@@ -53,68 +52,6 @@
               "generalizedCost" : 992,
               "alerts" : [ ],
               "rideHailingEstimate" : null,
-              "fareProducts" : [
-                {
-                  "id" : "5d8f889c-42cb-3bcc-89d5-480b995c78c8",
-                  "product" : {
-                    "id" : "F:day-pass",
-                    "name" : "day-pass",
-                    "price" : {
-                      "currency" : {
-                        "digits" : 2,
-                        "code" : "EUR"
-                      },
-                      "amount" : 10.0
-                    },
-                    "riderCategory" : {
-                      "id" : "F:senior-citizens",
-                      "name" : "Senior citizens"
-                    },
-                    "medium" : {
-                      "id" : "F:oyster",
-                      "name" : "TfL Oyster Card"
-                    }
-                  }
-                },
-                {
-                  "id" : "6bd27c98-c0ee-3f62-b606-bbacf2e1f41b",
-                  "product" : {
-                    "id" : "F:AB",
-                    "name" : "regular",
-                    "price" : {
-                      "currency" : {
-                        "digits" : 2,
-                        "code" : "EUR"
-                      },
-                      "amount" : 3.1
-                    },
-                    "riderCategory" : null,
-                    "medium" : null
-                  }
-                },
-                {
-                  "id" : "09bb5f2b-6af9-3355-8b5d-5e93a27ce280",
-                  "product" : {
-                    "id" : "F:single-ticket",
-                    "name" : "single-ticket",
-                    "price" : {
-                      "currency" : {
-                        "digits" : 2,
-                        "code" : "EUR"
-                      },
-                      "amount" : 10.0
-                    },
-                    "riderCategory" : {
-                      "id" : "F:senior-citizens",
-                      "name" : "Senior citizens"
-                    },
-                    "medium" : {
-                      "id" : "F:oyster",
-                      "name" : "TfL Oyster Card"
-                    }
-                  }
-                }
-              ],
               "accessibilityScore" : null
             },
             {
@@ -158,52 +95,6 @@
                 }
               ],
               "rideHailingEstimate" : null,
-              "fareProducts" : [
-                {
-                  "id" : "5d8f889c-42cb-3bcc-89d5-480b995c78c8",
-                  "product" : {
-                    "id" : "F:day-pass",
-                    "name" : "day-pass",
-                    "price" : {
-                      "currency" : {
-                        "digits" : 2,
-                        "code" : "EUR"
-                      },
-                      "amount" : 10.0
-                    },
-                    "riderCategory" : {
-                      "id" : "F:senior-citizens",
-                      "name" : "Senior citizens"
-                    },
-                    "medium" : {
-                      "id" : "F:oyster",
-                      "name" : "TfL Oyster Card"
-                    }
-                  }
-                },
-                {
-                  "id" : "46190ddd-93b0-3136-adb7-a18394f8b0ef",
-                  "product" : {
-                    "id" : "F:single-ticket",
-                    "name" : "single-ticket",
-                    "price" : {
-                      "currency" : {
-                        "digits" : 2,
-                        "code" : "EUR"
-                      },
-                      "amount" : 10.0
-                    },
-                    "riderCategory" : {
-                      "id" : "F:senior-citizens",
-                      "name" : "Senior citizens"
-                    },
-                    "medium" : {
-                      "id" : "F:oyster",
-                      "name" : "TfL Oyster Card"
-                    }
-                  }
-                }
-              ],
               "accessibilityScore" : null
             },
             {
@@ -247,7 +138,6 @@
                 },
                 "arrival" : "PT10M"
               },
-              "fareProducts" : [ ],
               "accessibilityScore" : null
             }
           ],
