@@ -79,7 +79,11 @@ class FlexStopsMapper {
       if (shouldAddStopsFromArea(flexibleArea, flexibleStopPlace)) {
         stops.addAll(findStopsInFlexArea(flexibleArea, flexibleAreaGeometry));
       } else {
-        AreaStop areaStop = mapFlexArea(flexibleArea, flexibleAreaGeometry, flexibleStopPlace.getName().getValue());
+        AreaStop areaStop = mapFlexArea(
+          flexibleArea,
+          flexibleAreaGeometry,
+          flexibleStopPlace.getName().getValue()
+        );
         if (areaStop != null) {
           stops.add(areaStop);
         }

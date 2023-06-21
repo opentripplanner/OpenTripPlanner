@@ -226,18 +226,18 @@ class FlexStopsMapperTest {
     var invalidPolygon = List.of(1.0);
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(invalidPolygon);
     flexibleStopPlace.setKeyList(
-            new KeyListStructure()
-                    .withKeyValue(
-                            new KeyValueStructure()
-                                    .withKey("FlexibleStopAreaType")
-                                    .withValue("UnrestrictedPublicTransportAreas")
-                    )
+      new KeyListStructure()
+        .withKeyValue(
+          new KeyValueStructure()
+            .withKey("FlexibleStopAreaType")
+            .withValue("UnrestrictedPublicTransportAreas")
+        )
     );
 
     FlexStopsMapper subject = new FlexStopsMapper(
-            ID_FACTORY,
-            List.of(stop1, stop2),
-            DataImportIssueStore.NOOP
+      ID_FACTORY,
+      List.of(stop1, stop2),
+      DataImportIssueStore.NOOP
     );
 
     GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
