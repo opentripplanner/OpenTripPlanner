@@ -3,10 +3,6 @@
     "plan" : {
       "itineraries" : [
         {
-          "startTime" : 1580641200000,
-          "endTime" : 1580644800000,
-          "generalizedCost" : 4072,
-          "accessibilityScore" : 0.5,
           "legs" : [
             {
               "mode" : "WALK",
@@ -27,8 +23,7 @@
               "startTime" : 1580641200000,
               "endTime" : 1580641220000,
               "generalizedCost" : 40,
-              "fareProducts" : [ ],
-              "accessibilityScore" : null
+              "fareProducts" : [ ]
             },
             {
               "mode" : "BUS",
@@ -55,6 +50,7 @@
                   "product" : {
                     "id" : "F:day-pass",
                     "name" : "day-pass",
+                    "__typename" : "DefaultFareProduct",
                     "price" : {
                       "currency" : {
                         "digits" : 2,
@@ -77,6 +73,7 @@
                   "product" : {
                     "id" : "F:AB",
                     "name" : "regular",
+                    "__typename" : "DefaultFareProduct",
                     "price" : {
                       "currency" : {
                         "digits" : 2,
@@ -93,6 +90,7 @@
                   "product" : {
                     "id" : "F:single-ticket",
                     "name" : "single-ticket",
+                    "__typename" : "DefaultFareProduct",
                     "price" : {
                       "currency" : {
                         "digits" : 2,
@@ -110,8 +108,7 @@
                     }
                   }
                 }
-              ],
-              "accessibilityScore" : null
+              ]
             },
             {
               "mode" : "RAIL",
@@ -138,6 +135,7 @@
                   "product" : {
                     "id" : "F:day-pass",
                     "name" : "day-pass",
+                    "__typename" : "DefaultFareProduct",
                     "price" : {
                       "currency" : {
                         "digits" : 2,
@@ -160,6 +158,7 @@
                   "product" : {
                     "id" : "F:single-ticket",
                     "name" : "single-ticket",
+                    "__typename" : "DefaultFareProduct",
                     "price" : {
                       "currency" : {
                         "digits" : 2,
@@ -177,8 +176,7 @@
                     }
                   }
                 }
-              ],
-              "accessibilityScore" : null
+              ]
             },
             {
               "mode" : "CAR",
@@ -199,8 +197,7 @@
               "startTime" : 1580644200000,
               "endTime" : 1580644800000,
               "generalizedCost" : 1000,
-              "fareProducts" : [ ],
-              "accessibilityScore" : null
+              "fareProducts" : [ ]
             }
           ],
           "fares" : [

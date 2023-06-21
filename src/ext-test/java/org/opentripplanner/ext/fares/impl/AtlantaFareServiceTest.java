@@ -19,7 +19,6 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -218,7 +217,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       .toList();
 
     assertEquals(1, fareProducts.size());
-    var fp = (FareProduct) fareProducts.get(0);
+    var fp = fareProducts.get(0);
     assertEquals(expectedFare, fp.price());
   }
 

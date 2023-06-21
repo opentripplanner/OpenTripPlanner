@@ -1,25 +1,12 @@
 {
     plan(
-        fromPlace: "from",
-        toPlace: "to",
+        from: { lat: 52.3092, lon: 13.0291 }
+        to: { lat: 52.5147, lon: 13.3927 }
         date: "2023-02-15",
         time: "11:37",
-        parking: {
-            unpreferredCost: 555,
-            preferred: [{ not: [{tags: ["a", "b", "c"]}] }],
-            filters: [{ select: [{tags:["e"]}] }]
-        },
-        transportModes: [
-            {
-                mode: CAR,
-                qualifier: HAIL
-            }
-        ]) {
+        transportModes: [{ mode: TRANSIT }]
+    ) {
         itineraries {
-            startTime
-            endTime
-            generalizedCost
-            accessibilityScore
             legs {
                 mode
                 from {
@@ -45,6 +32,7 @@
                     product {
                         id
                         name
+                        __typename
                         ... on DefaultFareProduct {
                             price {
                                 currency {
@@ -64,7 +52,6 @@
                         }
                     }
                 }
-                accessibilityScore
             }
             fares {
                 type

@@ -140,25 +140,6 @@
               },
               "accessibilityScore" : null
             }
-          ],
-          "fares" : [
-            {
-              "type" : "regular",
-              "cents" : 310,
-              "currency" : "EUR",
-              "components" : [
-                {
-                  "currency" : "EUR",
-                  "cents" : 310,
-                  "fareId" : "F:AB",
-                  "routes" : [
-                    {
-                      "gtfsId" : "F:BUS"
-                    }
-                  ]
-                }
-              ]
-            }
           ]
         }
       ]
