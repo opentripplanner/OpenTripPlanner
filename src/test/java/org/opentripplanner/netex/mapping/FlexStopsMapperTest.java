@@ -218,6 +218,33 @@ class FlexStopsMapperTest {
     assertNull(groupStop);
   }
 
+  @Test
+  void testMapFlexibleStopPlaceWithInvalidGeometryOnUnrestrictedPublicTransportAreas() {
+    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
+
+    var invalidPolygon = List.of(1.0);
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(invalidPolygon);
+    flexibleStopPlace.setKeyList(
+            new KeyListStructure()
+                    .withKeyValue(
+                            new KeyValueStructure()
+                                    .withKey("FlexibleStopAreaType")
+                                    .withValue("UnrestrictedPublicTransportAreas")
+                    )
+    );
+
+    FlexStopsMapper subject = new FlexStopsMapper(
+            ID_FACTORY,
+            List.of(stop1, stop2),
+            DataImportIssueStore.NOOP
+    );
+
+    GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
+
+    assertNull(groupStop);
+  }
+
   private FlexibleStopPlace getFlexibleStopPlace(Collection<Double> areaPosList) {
     return new FlexibleStopPlace()
       .withId(FLEXIBLE_STOP_PLACE_ID)
