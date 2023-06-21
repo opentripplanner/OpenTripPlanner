@@ -71,11 +71,6 @@ class FlexStopsMapper {
             area
           )
         );
-        LOG.warn(
-          "FlexibleStopPlace {} contains an unsupported area {}. Hail and ride areas are not currently supported.",
-          flexibleStopPlace.getId(),
-          area
-        );
         continue;
       }
 
@@ -158,7 +153,6 @@ class FlexStopsMapper {
           area.getId()
         )
       );
-      LOG.warn("FlexibleArea {}  has an invalid geometry", area.getId(), e);
       return null;
     }
   }
