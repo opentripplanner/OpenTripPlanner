@@ -143,17 +143,17 @@ on writing it.
 In short:
 
 ```
-$ pip install mkdocs
+$ pip install -r docs/requirements.txt
 $ mkdocs serve
 ```
 
-The OTP REST API documentation is available online in the format of:
+The OTP GTFS GraphQL API documentation is available online at 
 
-http://dev.opentripplanner.org/apidoc/x.x.x/index.html
+https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/
 
-For example, for v2.3.0:
+You can also use the interactive GraphQL API client that is built into every instance at
 
-http://dev.opentripplanner.org/apidoc/2.3.0/index.html
+http://localhost:8080/graphiql
 
 ### Debug layers
 
