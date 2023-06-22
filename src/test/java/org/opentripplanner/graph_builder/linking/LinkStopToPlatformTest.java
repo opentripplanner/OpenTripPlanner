@@ -171,6 +171,7 @@ public class LinkStopToPlatformTest {
   /**
    * Link stop which is very close to a platform vertex.
    * Linking snaps directly to the vertex.
+   * Connections to other vertices are not created.
    */
   @Test
   public void testLinkStopNearPlatformVertex() {
@@ -190,8 +191,7 @@ public class LinkStopToPlatformTest {
     linkStops(graph);
 
     // stop links to a existing vertex with 2 edges
-    // selected vertex connects to opposite corner with 2 new edges
-    assertEquals(12, graph.getEdges().size());
+    assertEquals(10, graph.getEdges().size());
   }
 
   /**
