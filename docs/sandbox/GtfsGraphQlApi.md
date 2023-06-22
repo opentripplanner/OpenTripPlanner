@@ -6,23 +6,6 @@
 - Kyyti, Helsinki, Finland
 - IBI, USA
 
-### Configuration
-
-The API is enabled by default. 
-
-If you want to disable it, do it in `otp-config.json`:
-
-```json
-// otp-config.json
-{
-  "otpFeatures" : {
-    "GtfsGraphQlApi": false
-  }
-}
-```
-
-## Documentation
-
 This is the GraphQL API used by the Digitransit project. The API is used to run OTP2
 together with the [digitransit-ui](https://github.com/HSLdevcom/digitransit-ui).
 
@@ -46,6 +29,21 @@ Available at [https://docs.opentripplanner.org/api/](https://docs.opentripplanne
 A browser based GraphQL API client is available at [http://localhost:8080/graphiql](http://localhost:8080/graphiql)
 
 ![GraphiQL](../images/graphiql.png)
+
+### Configuration
+
+The API is enabled by default.
+
+If you want to disable it, do it in `otp-config.json`:
+
+```json
+// otp-config.json
+{
+  "otpFeatures" : {
+    "GtfsGraphQlApi": false
+  }
+}
+```
 
 ### OTP2 Official GraphQL API (Not available)
 
