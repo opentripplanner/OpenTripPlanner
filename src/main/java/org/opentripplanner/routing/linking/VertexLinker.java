@@ -340,7 +340,7 @@ public class VertexLinker {
     double length = SphericalDistanceLibrary.length(orig);
 
     IntersectionVertex start = null;
-    Boolean snapped = true;
+    boolean snapped = true;
 
     // if we're very close to one end of the line or the other, or endwise, don't bother to split,
     // cut to the chase and link directly
