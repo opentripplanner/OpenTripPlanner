@@ -54,7 +54,6 @@ import org.slf4j.LoggerFactory;
  * replacement of the stop linker, #1305.
  */
 public class VertexLinker {
-
   /**
    * if there are two ways and the distances to them differ by less than this value, we link to both
    * of them
@@ -62,7 +61,7 @@ public class VertexLinker {
   private static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
   private static final int INITIAL_SEARCH_RADIUS_METERS = 100;
   private static final int MAX_SEARCH_RADIUS_METERS = 1000;
-  private static final int MAX_AREA_LINKS = 100; // exit complex area maximally via this many exit points
+  private static final int MAX_AREA_LINKS = 300; // exit complex area maximally via this many exit points
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
   /**
    * Spatial index of StreetEdges in the graph.
@@ -340,6 +339,7 @@ public class VertexLinker {
     double length = SphericalDistanceLibrary.length(orig);
 
     IntersectionVertex start = null;
+    Boolean snapped = true;
 
     // if we're very close to one end of the line or the other, or endwise, don't bother to split,
     // cut to the chase and link directly
@@ -363,6 +363,7 @@ public class VertexLinker {
     ) {
       start = (IntersectionVertex) edge.getToVertex();
     } else {
+      snapped = false;
       boolean split = true;
       // if vertex is inside an area, no need to snap to nearest edge and split it
       if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
@@ -386,7 +387,7 @@ public class VertexLinker {
       }
     }
 
-    if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
+    if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge && !snapped) {
       addAreaVertex(start, aEdge.getArea(), scope, tempEdges);
     }
     // TODO Consider moving this code
