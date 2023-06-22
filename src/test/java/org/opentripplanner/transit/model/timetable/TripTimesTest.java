@@ -31,9 +31,7 @@ class TripTimesTest {
 
   @Test
   void shouldHandleTripOnlyHeadSignScenario() {
-    Trip trip = TransitModelForTest.trip("TRIP")
-      .withHeadsign(DIRECTION)
-      .build();
+    Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
     Collection<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
 
     TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
@@ -57,9 +55,7 @@ class TripTimesTest {
 
   @Test
   void shouldHandleStopsEqualToTripHeadSignScenario() {
-    Trip trip = TransitModelForTest.trip("TRIP")
-      .withHeadsign(DIRECTION)
-      .build();
+    Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
     StopTime stopWithHeadsign = new StopTime();
     stopWithHeadsign.setStopHeadsign(DIRECTION);
     Collection<StopTime> stopTimes = List.of(stopWithHeadsign, stopWithHeadsign, stopWithHeadsign);
@@ -72,9 +68,7 @@ class TripTimesTest {
 
   @Test
   void shouldHandleDifferingTripAndStopHeadSignScenario() {
-    Trip trip = TransitModelForTest.trip("TRIP")
-      .withHeadsign(DIRECTION)
-      .build();
+    Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
     StopTime stopWithHeadsign = new StopTime();
     stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
     Collection<StopTime> stopTimes = List.of(stopWithHeadsign, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
