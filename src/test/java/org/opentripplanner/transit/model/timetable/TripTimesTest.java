@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.model.timetable;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 import java.util.Collection;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -26,7 +28,7 @@ class TripTimesTest {
     TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
     I18NString headsignFirstStop = tripTimes.getHeadsign(0);
-    Assertions.assertNull(headsignFirstStop);
+    assertNull(headsignFirstStop);
   }
 
   @Test
@@ -37,7 +39,7 @@ class TripTimesTest {
     TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
     I18NString headsignFirstStop = tripTimes.getHeadsign(0);
-    Assertions.assertEquals(DIRECTION, headsignFirstStop);
+    assertEquals(DIRECTION, headsignFirstStop);
   }
 
   @Test
@@ -50,7 +52,7 @@ class TripTimesTest {
     TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
     I18NString headsignFirstStop = tripTimes.getHeadsign(0);
-    Assertions.assertEquals(STOP_TEST_DIRECTION, headsignFirstStop);
+    assertEquals(STOP_TEST_DIRECTION, headsignFirstStop);
   }
 
   @Test
@@ -63,7 +65,7 @@ class TripTimesTest {
     TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
     I18NString headsignFirstStop = tripTimes.getHeadsign(0);
-    Assertions.assertEquals(DIRECTION, headsignFirstStop);
+    assertEquals(DIRECTION, headsignFirstStop);
   }
 
   @Test
@@ -76,9 +78,9 @@ class TripTimesTest {
     TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
     I18NString headsignFirstStop = tripTimes.getHeadsign(0);
-    Assertions.assertEquals(STOP_TEST_DIRECTION, headsignFirstStop);
+    assertEquals(STOP_TEST_DIRECTION, headsignFirstStop);
 
     I18NString headsignSecondStop = tripTimes.getHeadsign(1);
-    Assertions.assertEquals(DIRECTION, headsignSecondStop);
+    assertEquals(DIRECTION, headsignSecondStop);
   }
 }
