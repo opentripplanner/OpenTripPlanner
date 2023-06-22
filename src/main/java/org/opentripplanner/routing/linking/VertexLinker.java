@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
  * replacement of the stop linker, #1305.
  */
 public class VertexLinker {
+
   /**
    * if there are two ways and the distances to them differ by less than this value, we link to both
    * of them
