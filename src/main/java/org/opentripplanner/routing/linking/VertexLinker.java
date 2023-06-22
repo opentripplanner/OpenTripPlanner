@@ -388,8 +388,10 @@ public class VertexLinker {
       }
     }
 
-    if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge && !snapped) {
-      addAreaVertex(start, aEdge.getArea(), scope, tempEdges);
+    if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
+      if (!snapped || !aEdge.getArea().visibilityVertices.contains(start)) {
+        addAreaVertex(start, aEdge.getArea(), scope, tempEdges);
+      }
     }
     // TODO Consider moving this code
     if (OTPFeature.FlexRouting.isOn()) {
