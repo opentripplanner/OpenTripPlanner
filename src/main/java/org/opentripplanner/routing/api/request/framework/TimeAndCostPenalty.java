@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Objects;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
+import org.opentripplanner.framework.model.Units;
 
 /**
  * The time and cost penalty is used to calculate an extra penalty on time and cost.

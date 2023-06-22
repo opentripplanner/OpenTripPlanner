@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.framework;
+package org.opentripplanner.framework.model;
 
 import static java.lang.Math.abs;
 

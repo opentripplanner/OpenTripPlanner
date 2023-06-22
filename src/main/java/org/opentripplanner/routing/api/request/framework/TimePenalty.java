@@ -6,6 +6,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.lang.StringUtils;
+import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.time.DurationUtils;
 
 /** See {@link #DOC}. */
