@@ -374,7 +374,8 @@ public class OsmModule implements GraphBuilderModule {
           }
         }
         if (way.isEscalator()) {
-          escalatorProcessor.buildEscalatorEdge(way);
+          var length = getGeometryLengthMeters(geometry);
+          escalatorProcessor.buildEscalatorEdge(way, length);
         } else {
           StreetEdgePair streets = getEdgesForStreet(
             startEndpoint,

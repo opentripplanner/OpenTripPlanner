@@ -34,7 +34,7 @@ class EscalatorProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ElevatorProcessor.class);
 
-  public void buildEscalatorEdge(OSMWay escalatorWay) {
+  public void buildEscalatorEdge(OSMWay escalatorWay, double length) {
     ArrayList<EscalatorEdge> edges = new ArrayList<>();
     List<Long> nodes = Arrays
       .stream(escalatorWay.getNodeRefs().toArray())
@@ -49,76 +49,34 @@ class EscalatorProcessor {
       edges.add(
         new EscalatorEdge(
           intersectionNodes.get(nodes.get(i)),
-          intersectionNodes.get(nodes.get(i + 1))
+          intersectionNodes.get(nodes.get(i + 1)),
+          length
         )
       );
           }
             else if(escalatorWay.isBackwardEscalator()) {
               edges.add(new EscalatorEdge(
                   intersectionNodes.get(nodes.get(i + 1)),
-                  intersectionNodes.get(nodes.get(i))
+                  intersectionNodes.get(nodes.get(i)),
+                  length
                 )
               );
             }else {
               edges.add(
                 new EscalatorEdge(
                   intersectionNodes.get(nodes.get(i)),
-                  intersectionNodes.get(nodes.get(i + 1))
+                  intersectionNodes.get(nodes.get(i + 1)),
+                  length
                 )
               );
               edges.add(new EscalatorEdge(
                   intersectionNodes.get(nodes.get(i + 1)),
-                  intersectionNodes.get(nodes.get(i))
+                  intersectionNodes.get(nodes.get(i)),
+                  length
                 )
               );
             }
     }
   }
 
-  public void buildEscalatorEdges() {
-    var escalators = osmdb.getWays().stream().filter(OSMWay::isEscalator).iterator();
-    ArrayList<EscalatorEdge> edges = new ArrayList<>();
-    while (escalators.hasNext()) {
-      OSMWay escalatorWay = escalators.next();
-
-      List<Long> nodes = Arrays
-        .stream(escalatorWay.getNodeRefs().toArray())
-        .filter(nodeRef ->
-          intersectionNodes.containsKey(nodeRef) && intersectionNodes.get(nodeRef) != null
-        )
-        .boxed()
-        .toList();
-
-      for (int i = 0; i < nodes.size() - 1; i++) {
-        if (escalatorWay.isForwardEscalator()) {
-          edges.add(
-            new EscalatorEdge(
-              intersectionNodes.get(nodes.get(i)),
-              intersectionNodes.get(nodes.get(i + 1))
-            )
-          );
-        } else if (escalatorWay.isBackwardEscalator()) {
-          edges.add(
-            new EscalatorEdge(
-              intersectionNodes.get(nodes.get(i + 1)),
-              intersectionNodes.get(nodes.get(i))
-            )
-          );
-        } else {
-          edges.add(
-            new EscalatorEdge(
-              intersectionNodes.get(nodes.get(i)),
-              intersectionNodes.get(nodes.get(i + 1))
-            )
-          );
-          edges.add(
-            new EscalatorEdge(
-              intersectionNodes.get(nodes.get(i + 1)),
-              intersectionNodes.get(nodes.get(i))
-            )
-          );
-        }
-      }
-    }
-  }
 }
