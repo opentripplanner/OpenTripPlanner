@@ -28,7 +28,6 @@ public class GtfsContextBuilder {
   private final GtfsFeedId feedId;
 
   private final OtpTransitServiceBuilder transitBuilder;
-  private final boolean repairStopTimesAndGenerateTripPatterns = true;
   private CalendarService calendarService = null;
   private DataImportIssueStore issueStore = null;
   private Deduplicator deduplicator;
@@ -60,10 +59,6 @@ public class GtfsContextBuilder {
       .withDataImportIssueStore(DataImportIssueStore.NOOP);
   }
 
-  public GtfsFeedId getFeedId() {
-    return feedId;
-  }
-
   public OtpTransitServiceBuilder getTransitBuilder() {
     return transitBuilder;
   }
@@ -84,7 +79,7 @@ public class GtfsContextBuilder {
     return this;
   }
 
-  public GtfsContextBuilder withDeduplicator(Deduplicator deduplicator) {
+  private GtfsContextBuilder withDeduplicator(Deduplicator deduplicator) {
     this.deduplicator = deduplicator;
     return this;
   }
@@ -92,15 +87,12 @@ public class GtfsContextBuilder {
   /**
    * This method will:
    * <ol>
-   *     <li>repair stop-times (if enabled)</li>
    *     <li>generate TripPatterns (if enabled)</li>
    *     <li>create a new context</li>
    * </ol>
    */
   public GtfsContext build() {
-    if (repairStopTimesAndGenerateTripPatterns) {
-      repairStopTimesAndGenerateTripPatterns();
-    }
+    repairStopTimesAndGenerateTripPatterns();
     return new GtfsContextImpl(feedId, transitBuilder);
   }
 

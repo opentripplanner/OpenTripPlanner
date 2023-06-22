@@ -11,10 +11,14 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -22,6 +26,8 @@ import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
+import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -29,6 +35,7 @@ import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRe
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
+import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -184,6 +191,52 @@ public class TripRequestMapperTest implements PlanTestConstants {
       IllegalArgumentException.class,
       () -> TripRequestMapper.createRequest(executionContext(arguments))
     );
+  }
+
+  @Test
+  public void testBikeTriangleFactors() {
+    Map<String, Object> arguments = Map.of(
+      "bicycleOptimisationMethod",
+      BicycleOptimizeType.TRIANGLE,
+      "triangleFactors",
+      Map.of("safety", 0.1, "slope", 0.1, "time", 0.8)
+    );
+
+    var req1 = TripRequestMapper.createRequest(executionContext(arguments));
+
+    assertEquals(BicycleOptimizeType.TRIANGLE, req1.preferences().bike().optimizeType());
+    assertEquals(
+      new TimeSlopeSafetyTriangle(0.8, 0.1, 0.1),
+      req1.preferences().bike().optimizeTriangle()
+    );
+  }
+
+  @Test
+  void testDefaultTriangleFactors() {
+    var req2 = TripRequestMapper.createRequest(executionContext(Map.of()));
+    assertEquals(BicycleOptimizeType.SAFE, req2.preferences().bike().optimizeType());
+    assertEquals(TimeSlopeSafetyTriangle.DEFAULT, req2.preferences().bike().optimizeTriangle());
+  }
+
+  static Stream<Arguments> noTriangleCases = BicycleOptimizeType
+    .nonTriangleValues()
+    .stream()
+    .map(Arguments::of);
+
+  @ParameterizedTest
+  @VariableSource("noTriangleCases")
+  public void testBikeTriangleFactorsHasNoEffect(BicycleOptimizeType bot) {
+    Map<String, Object> arguments = Map.of(
+      "bicycleOptimisationMethod",
+      bot,
+      "triangleFactors",
+      Map.of("safety", 0.1, "slope", 0.1, "time", 0.8)
+    );
+
+    var req1 = TripRequestMapper.createRequest(executionContext(arguments));
+
+    assertEquals(bot, req1.preferences().bike().optimizeType());
+    assertEquals(TimeSlopeSafetyTriangle.DEFAULT, req1.preferences().bike().optimizeTriangle());
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {

@@ -87,17 +87,29 @@ public class StopPlaceType {
             GraphQLArgument
               .newArgument()
               .name("lang")
+              .deprecate("Use 'language' instead")
               .description(
-                "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned."
+                "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exist, the default name is returned."
               )
               .type(Scalars.GraphQLString)
               .build()
           )
-          .dataFetcher(environment -> {
-            String lang = environment.getArgument("lang");
-            Locale locale = lang != null ? new Locale(lang) : null;
-            return (((MonoOrMultiModalStation) environment.getSource()).getName().toString(locale));
-          })
+          .argument(
+            GraphQLArgument
+              .newArgument()
+              .name("language")
+              .description(
+                "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exist, the default name is returned."
+              )
+              .type(Scalars.GraphQLString)
+              .build()
+          )
+          .dataFetcher(environment ->
+            (
+              ((MonoOrMultiModalStation) environment.getSource()).getName()
+                .toString(GqlUtil.getLocale(environment))
+            )
+          )
           .build()
       )
       .field(
