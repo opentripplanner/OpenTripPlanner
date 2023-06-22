@@ -50,6 +50,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add support for taxi mode [#5183](https://github.com/opentripplanner/OpenTripPlanner/pull/5183)
 - Fix bike triangle in Transmodel API [#5179](https://github.com/opentripplanner/OpenTripPlanner/pull/5179)
 - Bug fixes in stop area relation processing [#5166](https://github.com/opentripplanner/OpenTripPlanner/pull/5166)
+- Enable GTFS GraphQL API by default, remove the word  from its documentation [#5202](https://github.com/opentripplanner/OpenTripPlanner/pull/5202)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
