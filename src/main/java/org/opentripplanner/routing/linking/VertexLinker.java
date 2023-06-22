@@ -62,7 +62,8 @@ public class VertexLinker {
   private static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
   private static final int INITIAL_SEARCH_RADIUS_METERS = 100;
   private static final int MAX_SEARCH_RADIUS_METERS = 1000;
-  private static final int MAX_AREA_LINKS = 300; // exit complex area maximally via this many exit points
+  // exit a complex area maximally via this many exit points
+  private static final int MAX_AREA_LINKS = 300;
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
   /**
    * Spatial index of StreetEdges in the graph.
