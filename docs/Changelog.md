@@ -52,6 +52,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Bug fixes in stop area relation processing [#5166](https://github.com/opentripplanner/OpenTripPlanner/pull/5166)
 - Enable GTFS GraphQL API by default, remove the word  from its documentation [#5202](https://github.com/opentripplanner/OpenTripPlanner/pull/5202)
 - Allow underscores in GTFS feed IDs [#5191](https://github.com/opentripplanner/OpenTripPlanner/pull/5191)
+- Area vertex linking improvements [#5209](https://github.com/opentripplanner/OpenTripPlanner/pull/5209)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
