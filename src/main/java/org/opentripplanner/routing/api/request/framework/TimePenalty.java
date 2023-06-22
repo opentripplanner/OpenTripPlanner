@@ -1,10 +1,7 @@
 package org.opentripplanner.routing.api.request.framework;
 
 import java.time.Duration;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -33,15 +30,6 @@ public class TimePenalty {
     The `coefficient` must be in range `[0.0, 10.0]`.
     """;
 
-  private static final String SEP = "\\s*";
-  private static final String NUM = "([\\d.,]+)";
-  private static final String DUR = "(?:PT)?((?:[\\d]+[hms]?)+)";
-  private static final String PLUS = Pattern.quote("+");
-  private static final String TIME_VARIABLE = "[XxTt]";
-  private static final Pattern PATTERN = Pattern.compile(
-    String.join(SEP, DUR, PLUS, NUM, TIME_VARIABLE)
-  );
-
   public static final TimePenalty ZERO = new TimePenalty(Duration.ZERO, 0.0);
 
   private final Duration constant;
@@ -63,13 +51,7 @@ public class TimePenalty {
     if (StringUtils.hasNoValue(text)) {
       return ZERO;
     }
-    Matcher m = PATTERN.matcher(text);
-
-    if (m.matches()) {
-      return TimePenalty.of(DurationUtils.duration(m.group(1)), Double.parseDouble(m.group(2)));
-    }
-    // No function matched
-    throw new IllegalArgumentException("Unable to parse time-penalty: '" + text + "'");
+    return LinearFunctionOfTimeParser.parse(text, TimePenalty::new).orElse(ZERO);
   }
 
   public boolean isZero() {
@@ -91,19 +73,10 @@ public class TimePenalty {
 
   @Override
   public String toString() {
-    return String.format(
-      Locale.ROOT,
-      "%s + %s t",
-      DurationUtils.durationToStr(constant),
-      Units.factorToString(coefficient)
-    );
+    return LinearFunctionOfTimeParser.serialize(constant, coefficient);
   }
 
   public Duration calculate(int timeInSeconds) {
-    return calculateNewTimeInSeconds(timeInSeconds);
-  }
-
-  private Duration calculateNewTimeInSeconds(int timeInSeconds) {
     return Duration.ofSeconds(constant.toSeconds() + Math.round(coefficient * timeInSeconds));
   }
 }
