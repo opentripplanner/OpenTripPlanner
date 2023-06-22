@@ -1720,7 +1720,7 @@ enum Mode {
     GONDOLA
 
     """Only used internally. No use for API users."""
-    LEG_SWITCH
+    LEG_SWITCH @deprecated
 
     """RAIL"""
     RAIL
@@ -2634,6 +2634,8 @@ type QueryType {
     Get a single vehicle rental station based on its ID, i.e. value of field `stationId`
     """
     vehicleRentalStation(id: String!): VehicleRentalStation
+
+    ## Deprecated fields
 
     """Get all bike parks"""
     bikeParks: [BikePark] @deprecated(reason: "bikeParks is deprecated. Use vehicleParkings instead.")
