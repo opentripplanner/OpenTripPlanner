@@ -26,11 +26,10 @@ at http://localhost:8080/graphiql
 
 ## Activation
 
-As of April '23 this API needs to be explicitly activated. Read the 
-[documentation](https://docs.opentripplanner.org/en/dev-2.x/sandbox/LegacyGraphQLApi/) about how to
-do it.
+This API used to be off by default but since June '23 that has changed.
 
-This API will become activated by default in the future.
+To learn how to deactivate it, read the
+[documentation](https://docs.opentripplanner.org/en/dev-2.x/sandbox/GtfsGraphQlApi/).
 `,
       }],
       appTitle: 'OTP GTFS GraphQL API',

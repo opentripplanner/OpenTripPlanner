@@ -13,6 +13,10 @@ strict: true
 plugins:
     - "no-sitemap"
     - search
+    # remove this after OTP 2.4.0 has been released
+    - redirects:
+        redirect_maps:
+          'sandbox/LegacyGraphQLApi.md': 'sandbox/GtfsGraphQlApi.md'
 
 theme:
     name: material
@@ -54,10 +58,10 @@ nav:
     - Visual Identity: 'Visual-Identity.md'
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
+    - APIs and Data Sources: 'Apis-Data-Sources.md'
     - Getting OTP: 'Getting-OTP.md'
     - Container Image: 'Container-Image.md'
     - System Requirements and Suggestions: 'System-Requirements.md'
-
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
@@ -68,6 +72,7 @@ nav:
     - Introduction: 'Configuration.md'
     - Build: 'BuildConfiguration.md'
     - "Boarding Locations": 'BoardingLocations.md'
+    - "Stop Area Relations": 'StopAreas.md'
     - "Street Graph Pruning": 'IslandPruning.md'
     - Router: 'RouterConfiguration.md'
     - Accessibility: 'Accessibility.md'
@@ -77,7 +82,6 @@ nav:
     - "Logging": "Logging.md"
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
-    - Interfaces and Data Sources: 'Interfaces-Data-Sources.md'
     - Localization: 'Localization.md'
     - Bibliography: 'Bibliography.md'
     - Codestyle: 'Codestyle.md'
@@ -88,7 +92,7 @@ nav:
     - Actuator API: 'sandbox/ActuatorAPI.md'
     - Direct Transfer Analyzer: 'sandbox/transferanalyzer.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
-    - HSL Legacy GraphQL API: 'sandbox/LegacyGraphQLApi.md'
+    - GTFS GraphQL API: 'sandbox/GtfsGraphQlApi.md'
     - Transmodel(NeTEx) GraphQL API: 'sandbox/TransmodelApi.md'
     - SIRI Updaters: 'sandbox/SiriUpdater.md'
     - SIRI Updater (Azure): 'sandbox/SiriAzureUpdater.md'
