@@ -8,10 +8,13 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
 /**
  * Configure a GTFS feed.
  * Example: {@code [ {type="gtfs", source: "file:///path/to/otp/norway-gtfs.zip"} ] }
+ *
+ * @param source See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}.
+ * @param feedId See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}.
  */
 public record GtfsFeedParameters(
   URI source,
-  String feedId,
+  @Nullable String feedId,
   boolean removeRepeatedStops,
   StopTransferPriority stationTransferPreference,
   boolean discardMinTransferTimes,
@@ -42,18 +45,6 @@ public record GtfsFeedParameters(
       builder.blockBasedInterlining(),
       builder.maxInterlineDistance()
     );
-  }
-
-  /** See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}. */
-  @Override
-  public URI source() {
-    return source;
-  }
-
-  /** See {@link org.opentripplanner.standalone.config.buildconfig.TransitFeedConfig}. */
-  @Nullable
-  public String feedId() {
-    return feedId;
   }
 
   public GtfsFeedParametersBuilder copyOf() {

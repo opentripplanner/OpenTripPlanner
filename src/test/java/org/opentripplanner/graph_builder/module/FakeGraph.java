@@ -3,7 +3,6 @@ package org.opentripplanner.graph_builder.module;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
@@ -53,20 +52,6 @@ public class FakeGraph {
   }
 
   /**
-   * Add many transit lines to a lot of stops. This is only used by InitialStopsTest.
-   */
-  public static void addTransitMultipleLines(Graph g, TransitModel transitModel)
-    throws URISyntaxException {
-    GtfsModule gtfs = new GtfsModule(
-      Arrays.asList(new GtfsBundle(getFileForResource("addTransitMultipleLines.gtfs.zip"))),
-      transitModel,
-      g,
-      ServiceDateInterval.unbounded()
-    );
-    gtfs.buildGraph();
-  }
-
-  /**
    * This introduces a 1MB test resource but is only used by TestIntermediatePlaces.
    */
   public static void addPerpendicularRoutes(Graph graph, TransitModel transitModel)
@@ -76,7 +61,7 @@ public class FakeGraph {
   }
 
   /** Add a regular grid of stops to the graph */
-  public static void addRegularStopGrid(Graph g, TransitModel transitModel) {
+  public static void addRegularStopGrid(Graph g) {
     int count = 0;
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
@@ -88,7 +73,7 @@ public class FakeGraph {
   }
 
   /** add some extra stops to the graph */
-  public static void addExtraStops(Graph g, TransitModel transitModel) {
+  public static void addExtraStops(Graph g) {
     int count = 0;
     double lon = -83;
     for (double lat = 40; lat < 40.01; lat += 0.005) {
