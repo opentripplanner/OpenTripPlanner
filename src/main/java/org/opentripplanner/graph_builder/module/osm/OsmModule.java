@@ -241,7 +241,11 @@ public class OsmModule implements GraphBuilderModule {
     long wayCount = osmdb.getWays().size();
     ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
     LOG.info(progress.startMessage());
-      var escalatorProcessor =  new EscalatorProcessor(issueStore, osmdb, vertexGenerator.intersectionNodes());
+    var escalatorProcessor = new EscalatorProcessor(
+      issueStore,
+      osmdb,
+      vertexGenerator.intersectionNodes()
+    );
 
     WAY:for (OSMWay way : osmdb.getWays()) {
       WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
@@ -253,9 +257,7 @@ public class OsmModule implements GraphBuilderModule {
         params.banDiscouragedBiking(),
         issueStore
       );
-      if (
-        !OsmFilter.isWayRoutable(way) || permissions.allowsNothing()
-      ) continue;
+      if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) continue;
 
       // handle duplicate nodes in OSM ways
       // this is a workaround for crappy OSM data quality
@@ -286,7 +288,6 @@ public class OsmModule implements GraphBuilderModule {
         lastLat = node.lat;
         lastLevel = level;
       }
-
 
       IntersectionVertex startEndpoint = null;
       IntersectionVertex endEndpoint = null;
@@ -331,11 +332,11 @@ public class OsmModule implements GraphBuilderModule {
 
         if (
           vertexGenerator.intersectionNodes().containsKey(endNode) ||
-            i == nodes.size() - 2 ||
-            nodes.subList(0, i).contains(nodes.get(i)) ||
-            osmEndNode.hasTag("ele") ||
-            osmEndNode.isBoardingLocation() ||
-            osmEndNode.isBarrier()
+          i == nodes.size() - 2 ||
+          nodes.subList(0, i).contains(nodes.get(i)) ||
+          osmEndNode.hasTag("ele") ||
+          osmEndNode.isBoardingLocation() ||
+          osmEndNode.isBarrier()
         ) {
           segmentCoordinates.add(osmEndNode.getCoordinate());
 

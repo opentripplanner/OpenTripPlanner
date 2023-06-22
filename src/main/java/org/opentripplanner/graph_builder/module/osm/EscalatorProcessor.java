@@ -45,38 +45,38 @@ class EscalatorProcessor {
       .toList();
 
     for (int i = 0; i < nodes.size() - 1; i++) {
-      if(escalatorWay.isForwardEscalator()) {
-      edges.add(
-        new EscalatorEdge(
-          intersectionNodes.get(nodes.get(i)),
-          intersectionNodes.get(nodes.get(i + 1)),
-          length
-        )
-      );
-          }
-            else if(escalatorWay.isBackwardEscalator()) {
-              edges.add(new EscalatorEdge(
-                  intersectionNodes.get(nodes.get(i + 1)),
-                  intersectionNodes.get(nodes.get(i)),
-                  length
-                )
-              );
-            }else {
-              edges.add(
-                new EscalatorEdge(
-                  intersectionNodes.get(nodes.get(i)),
-                  intersectionNodes.get(nodes.get(i + 1)),
-                  length
-                )
-              );
-              edges.add(new EscalatorEdge(
-                  intersectionNodes.get(nodes.get(i + 1)),
-                  intersectionNodes.get(nodes.get(i)),
-                  length
-                )
-              );
-            }
+      if (escalatorWay.isForwardEscalator()) {
+        edges.add(
+          new EscalatorEdge(
+            intersectionNodes.get(nodes.get(i)),
+            intersectionNodes.get(nodes.get(i + 1)),
+            length
+          )
+        );
+      } else if (escalatorWay.isBackwardEscalator()) {
+        edges.add(
+          new EscalatorEdge(
+            intersectionNodes.get(nodes.get(i + 1)),
+            intersectionNodes.get(nodes.get(i)),
+            length
+          )
+        );
+      } else {
+        edges.add(
+          new EscalatorEdge(
+            intersectionNodes.get(nodes.get(i)),
+            intersectionNodes.get(nodes.get(i + 1)),
+            length
+          )
+        );
+        edges.add(
+          new EscalatorEdge(
+            intersectionNodes.get(nodes.get(i + 1)),
+            intersectionNodes.get(nodes.get(i)),
+            length
+          )
+        );
+      }
     }
   }
-
 }

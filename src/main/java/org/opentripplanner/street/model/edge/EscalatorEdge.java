@@ -11,6 +11,7 @@ public class EscalatorEdge extends Edge {
   private double length;
 
   private double speed = 0.45;
+
   public EscalatorEdge(Vertex v1, Vertex v2, double length) {
     super(v1, v2);
     this.length = length;
