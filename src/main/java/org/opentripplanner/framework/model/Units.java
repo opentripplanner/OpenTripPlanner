@@ -17,7 +17,11 @@ import org.opentripplanner.framework.lang.IntUtils;
  *   <li>acceleration - Unit: meters per second squared (m/s^2)</li>
  *   <li>ratio - Unit: meters per second squared (m/s^2)</li>
  * </ul>
+ *
+ * @deprecated Convert primitive types to type-safe value objects. The need for this class should
+ *             then go away.
  */
+@Deprecated
 public class Units {
 
   private static final double ONE_MACH = 340.0;
