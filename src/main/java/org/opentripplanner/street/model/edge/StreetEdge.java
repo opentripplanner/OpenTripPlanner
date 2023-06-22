@@ -276,6 +276,20 @@ public class StreetEdge
     };
   }
 
+  public void setNoThruTraffic(TraverseMode traverseMode) {
+    switch (traverseMode) {
+      case WALK:
+        setWalkNoThruTraffic(true);
+        break;
+      case BICYCLE, SCOOTER:
+        setBicycleNoThruTraffic(true);
+        break;
+      case CAR, FLEX:
+        setMotorVehicleNoThruTraffic(true);
+        break;
+    }
+  }
+
   /**
    * Calculate the speed appropriately given the RouteRequest and traverseMode.
    */

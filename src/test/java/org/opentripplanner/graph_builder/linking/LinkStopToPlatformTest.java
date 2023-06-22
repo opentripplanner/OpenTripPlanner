@@ -82,15 +82,21 @@ public class LinkStopToPlatformTest {
 
     for (int i = 0; i < platform.length; i++) {
       int next_i = (i + 1) % platform.length;
-      edges.add(createAreaEdge(vertices.get(i), vertices.get(next_i), areaEdgeList, "edge " + i));
-      edges.add(
-        createAreaEdge(
-          vertices.get(next_i),
-          vertices.get(i),
-          areaEdgeList,
-          "edge " + String.valueOf(i + platform.length)
-        )
+
+      var edge1 = createAreaEdge(vertices.get(i), vertices.get(next_i), areaEdgeList, "edge " + i);
+      var edge2 = createAreaEdge(
+        vertices.get(next_i),
+        vertices.get(i),
+        areaEdgeList,
+        "edge " + String.valueOf(i + platform.length)
       );
+      edges.add(edge1);
+      edges.add(edge2);
+      // make one corner surrounded by walk nothru edges
+      if (i < 2) {
+        edge1.setWalkNoThruTraffic(true);
+        edge2.setWalkNoThruTraffic(true);
+      }
     }
 
     RegularStop[] transitStops = new RegularStop[stops.length];
@@ -166,11 +172,23 @@ public class LinkStopToPlatformTest {
     // stop links to a new street vertex with 2 edges
     // new vertex connects to all 4 visibility points with 4*2 new edges
     assertEquals(18, graph.getEdges().size());
+
+    // transit stop is connected in one rectangle corner only to walk no thru trafic edges
+    // verify that new area edge connection is also walk no thru
+    // otherwise connection cannot be used to exit the area
+    var noThruEdges = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.isWalkNoThruTraffic())
+      .toList();
+    // original platform has 4 nothru edges, now 2 more got added
+    assertEquals(6, noThruEdges.size());
   }
 
   /**
    * Link stop which is very close to a platform vertex.
    * Linking snaps directly to the vertex.
+   * Connections to other vertices are not created.
    */
   @Test
   public void testLinkStopNearPlatformVertex() {
@@ -190,8 +208,7 @@ public class LinkStopToPlatformTest {
     linkStops(graph);
 
     // stop links to a existing vertex with 2 edges
-    // selected vertex connects to opposite corner with 2 new edges
-    assertEquals(12, graph.getEdges().size());
+    assertEquals(10, graph.getEdges().size());
   }
 
   /**
