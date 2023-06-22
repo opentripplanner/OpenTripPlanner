@@ -257,11 +257,6 @@ public class OsmModule implements GraphBuilderModule {
         !OsmFilter.isWayRoutable(way) || permissions.allowsNothing()
       ) continue;
 
-      if(way.isEscalator()) {
-        escalatorProcessor.buildEscalatorEdge(way);
-        continue;
-      }
-
       // handle duplicate nodes in OSM ways
       // this is a workaround for crappy OSM data quality
       ArrayList<Long> nodes = new ArrayList<>(way.getNodeRefs().size());
@@ -291,6 +286,7 @@ public class OsmModule implements GraphBuilderModule {
         lastLat = node.lat;
         lastLevel = level;
       }
+
 
       IntersectionVertex startEndpoint = null;
       IntersectionVertex endEndpoint = null;
@@ -335,11 +331,11 @@ public class OsmModule implements GraphBuilderModule {
 
         if (
           vertexGenerator.intersectionNodes().containsKey(endNode) ||
-          i == nodes.size() - 2 ||
-          nodes.subList(0, i).contains(nodes.get(i)) ||
-          osmEndNode.hasTag("ele") ||
-          osmEndNode.isBoardingLocation() ||
-          osmEndNode.isBarrier()
+            i == nodes.size() - 2 ||
+            nodes.subList(0, i).contains(nodes.get(i)) ||
+            osmEndNode.hasTag("ele") ||
+            osmEndNode.isBoardingLocation() ||
+            osmEndNode.isBarrier()
         ) {
           segmentCoordinates.add(osmEndNode.getCoordinate());
 
@@ -377,22 +373,26 @@ public class OsmModule implements GraphBuilderModule {
             elevationData.put(endEndpoint, elevation);
           }
         }
-        StreetEdgePair streets = getEdgesForStreet(
-          startEndpoint,
-          endEndpoint,
-          way,
-          i,
-          permissions,
-          geometry
-        );
+        if (way.isEscalator()) {
+          escalatorProcessor.buildEscalatorEdge(way);
+        } else {
+          StreetEdgePair streets = getEdgesForStreet(
+            startEndpoint,
+            endEndpoint,
+            way,
+            i,
+            permissions,
+            geometry
+          );
 
-        StreetEdge street = streets.main;
-        StreetEdge backStreet = streets.back;
-        normalizer.applyWayProperties(street, backStreet, wayData, way);
+          StreetEdge street = streets.main;
+          StreetEdge backStreet = streets.back;
+          normalizer.applyWayProperties(street, backStreet, wayData, way);
 
-        applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
-        startNode = endNode;
-        osmStartNode = osmdb.getNode(startNode);
+          applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
+          startNode = endNode;
+          osmStartNode = osmdb.getNode(startNode);
+        }
       }
 
       //Keep lambda! A method-ref would log incorrect class and line number
