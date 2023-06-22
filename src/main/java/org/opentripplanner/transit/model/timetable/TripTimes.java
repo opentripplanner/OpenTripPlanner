@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.timetable;
 import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
+import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -191,6 +192,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * StopPatterns unique human readable route variant names, but a TripTimes currently does not have
    * a pointer to its enclosing timetable or pattern.
    */
+  @Nullable
   public I18NString getHeadsign(final int stop) {
     I18NString tripHeadsign = getTrip().getHeadsign();
     if (headsigns == null) {
