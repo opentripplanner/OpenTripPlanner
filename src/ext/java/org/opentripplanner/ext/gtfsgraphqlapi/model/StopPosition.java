@@ -2,9 +2,9 @@ package org.opentripplanner.ext.gtfsgraphqlapi.model;
 
 import graphql.TypeResolutionEnvironment;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 
-public interface StopPosition extends LegacyGraphQLDataFetchers.LegacyGraphQLStopPosition {
+public interface StopPosition extends GraphQLDataFetchers.GraphQLStopPosition {
   record PositionAtStop(int position) implements StopPosition {}
 
   record PositionBetweenStops(int previousPosition, int nextPosition) implements StopPosition {}

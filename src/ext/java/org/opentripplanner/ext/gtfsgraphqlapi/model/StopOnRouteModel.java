@@ -6,7 +6,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 /**
  * Class that contains a {@link StopLocation} on a {@link Route}.
  */
-public class LegacyGraphQLStopOnRouteModel {
+public class StopOnRouteModel {
 
   /**
    * Stop that should be on the route but technically it's possible that it isn't or that it's
@@ -20,7 +20,7 @@ public class LegacyGraphQLStopOnRouteModel {
    */
   private final Route route;
 
-  public LegacyGraphQLStopOnRouteModel(StopLocation stop, Route route) {
+  public StopOnRouteModel(StopLocation stop, Route route) {
     this.stop = stop;
     this.route = route;
   }

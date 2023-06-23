@@ -5,14 +5,14 @@ import static org.opentripplanner.ext.gtfsgraphqlapi.GraphQLUtils.toGraphQL;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
 import org.opentripplanner.routing.api.response.RoutingError;
 
-public class RoutingErrorImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLRoutingError {
+public class RoutingErrorImpl implements GraphQLDataFetchers.GraphQLRoutingError {
 
   @Override
-  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLRoutingErrorCode> code() {
+  public DataFetcher<GraphQLTypes.GraphQLRoutingErrorCode> code() {
     return environment -> toGraphQL(getSource(environment).code);
   }
 
@@ -23,7 +23,7 @@ public class RoutingErrorImpl implements LegacyGraphQLDataFetchers.LegacyGraphQL
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLInputField> inputField() {
+  public DataFetcher<GraphQLTypes.GraphQLInputField> inputField() {
     return environment -> toGraphQL(getSource(environment).inputField);
   }
 

@@ -2,14 +2,14 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-public class StoptimeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStoptime {
+public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
   public DataFetcher<Integer> arrivalDelay() {

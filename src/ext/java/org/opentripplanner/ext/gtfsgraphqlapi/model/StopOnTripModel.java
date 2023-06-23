@@ -6,7 +6,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 /**
  * Class that contains a {@link StopLocation} on a {@link Trip}.
  */
-public class LegacyGraphQLStopOnTripModel {
+public class StopOnTripModel {
 
   /**
    * Stop that should be on the trip but technically it's possible that it isn't or that it's null.
@@ -19,7 +19,7 @@ public class LegacyGraphQLStopOnTripModel {
    */
   private final Trip trip;
 
-  public LegacyGraphQLStopOnTripModel(StopLocation stop, Trip trip) {
+  public StopOnTripModel(StopLocation stop, Trip trip) {
     this.stop = stop;
     this.trip = trip;
   }

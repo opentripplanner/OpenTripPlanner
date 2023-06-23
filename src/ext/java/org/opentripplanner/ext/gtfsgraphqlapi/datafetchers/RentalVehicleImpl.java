@@ -3,12 +3,12 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 
-public class RentalVehicleImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLRentalVehicle {
+public class RentalVehicleImpl implements GraphQLDataFetchers.GraphQLRentalVehicle {
 
   @Override
   public DataFetcher<Boolean> allowPickupNow() {

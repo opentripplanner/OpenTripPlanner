@@ -15,8 +15,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -32,14 +32,14 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 
-public class PatternImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPattern {
+public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
 
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
       TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
-      var args = new LegacyGraphQLTypes.LegacyGraphQLPatternAlertsArgs(environment.getArguments());
-      List<LegacyGraphQLTypes.LegacyGraphQLPatternAlertType> types = args.getLegacyGraphQLTypes();
+      var args = new GraphQLTypes.GraphQLPatternAlertsArgs(environment.getArguments());
+      List<GraphQLTypes.GraphQLPatternAlertType> types = args.getGraphQLTypes();
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
@@ -205,10 +205,10 @@ public class PatternImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPatte
   @Override
   public DataFetcher<Iterable<Trip>> tripsForDate() {
     return environment -> {
-      String serviceDate = new LegacyGraphQLTypes.LegacyGraphQLPatternTripsForDateArgs(
+      String serviceDate = new GraphQLTypes.GraphQLPatternTripsForDateArgs(
         environment.getArguments()
       )
-        .getLegacyGraphQLServiceDate();
+        .getGraphQLServiceDate();
 
       try {
         TIntSet services = getTransitService(environment)

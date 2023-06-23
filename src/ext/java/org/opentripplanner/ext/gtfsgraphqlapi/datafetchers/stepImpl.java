@@ -2,31 +2,31 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAbsoluteDirection;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRelativeDirection;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLAbsoluteDirection;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.ext.gtfsgraphqlapi.mapping.StreetNoteMapper;
 import org.opentripplanner.model.plan.ElevationProfile.Step;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
-public class stepImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStep {
+public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
-  public DataFetcher<LegacyGraphQLAbsoluteDirection> absoluteDirection() {
+  public DataFetcher<GraphQLAbsoluteDirection> absoluteDirection() {
     return environment ->
       getSource(environment)
         .getAbsoluteDirection()
         .map(dir ->
           switch (dir) {
-            case NORTH -> LegacyGraphQLAbsoluteDirection.NORTH;
-            case NORTHEAST -> LegacyGraphQLAbsoluteDirection.NORTHEAST;
-            case EAST -> LegacyGraphQLAbsoluteDirection.EAST;
-            case SOUTHEAST -> LegacyGraphQLAbsoluteDirection.SOUTHEAST;
-            case SOUTH -> LegacyGraphQLAbsoluteDirection.SOUTH;
-            case SOUTHWEST -> LegacyGraphQLAbsoluteDirection.SOUTHWEST;
-            case WEST -> LegacyGraphQLAbsoluteDirection.WEST;
-            case NORTHWEST -> LegacyGraphQLAbsoluteDirection.NORTHWEST;
+            case NORTH -> GraphQLAbsoluteDirection.NORTH;
+            case NORTHEAST -> GraphQLAbsoluteDirection.NORTHEAST;
+            case EAST -> GraphQLAbsoluteDirection.EAST;
+            case SOUTHEAST -> GraphQLAbsoluteDirection.SOUTHEAST;
+            case SOUTH -> GraphQLAbsoluteDirection.SOUTH;
+            case SOUTHWEST -> GraphQLAbsoluteDirection.SOUTHWEST;
+            case WEST -> GraphQLAbsoluteDirection.WEST;
+            case NORTHWEST -> GraphQLAbsoluteDirection.NORTHWEST;
           }
         )
         .orElse(null);
@@ -78,22 +78,22 @@ public class stepImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStep {
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLRelativeDirection> relativeDirection() {
+  public DataFetcher<GraphQLRelativeDirection> relativeDirection() {
     return environment ->
       switch (getSource(environment).getRelativeDirection()) {
-        case DEPART -> LegacyGraphQLRelativeDirection.DEPART;
-        case HARD_LEFT -> LegacyGraphQLRelativeDirection.HARD_LEFT;
-        case LEFT -> LegacyGraphQLRelativeDirection.LEFT;
-        case SLIGHTLY_LEFT -> LegacyGraphQLRelativeDirection.SLIGHTLY_LEFT;
-        case CONTINUE -> LegacyGraphQLRelativeDirection.CONTINUE;
-        case SLIGHTLY_RIGHT -> LegacyGraphQLRelativeDirection.SLIGHTLY_RIGHT;
-        case RIGHT -> LegacyGraphQLRelativeDirection.RIGHT;
-        case HARD_RIGHT -> LegacyGraphQLRelativeDirection.HARD_RIGHT;
-        case CIRCLE_CLOCKWISE -> LegacyGraphQLRelativeDirection.CIRCLE_CLOCKWISE;
-        case CIRCLE_COUNTERCLOCKWISE -> LegacyGraphQLRelativeDirection.CIRCLE_COUNTERCLOCKWISE;
-        case ELEVATOR -> LegacyGraphQLRelativeDirection.ELEVATOR;
-        case UTURN_LEFT -> LegacyGraphQLRelativeDirection.UTURN_LEFT;
-        case UTURN_RIGHT -> LegacyGraphQLRelativeDirection.UTURN_RIGHT;
+        case DEPART -> GraphQLRelativeDirection.DEPART;
+        case HARD_LEFT -> GraphQLRelativeDirection.HARD_LEFT;
+        case LEFT -> GraphQLRelativeDirection.LEFT;
+        case SLIGHTLY_LEFT -> GraphQLRelativeDirection.SLIGHTLY_LEFT;
+        case CONTINUE -> GraphQLRelativeDirection.CONTINUE;
+        case SLIGHTLY_RIGHT -> GraphQLRelativeDirection.SLIGHTLY_RIGHT;
+        case RIGHT -> GraphQLRelativeDirection.RIGHT;
+        case HARD_RIGHT -> GraphQLRelativeDirection.HARD_RIGHT;
+        case CIRCLE_CLOCKWISE -> GraphQLRelativeDirection.CIRCLE_CLOCKWISE;
+        case CIRCLE_COUNTERCLOCKWISE -> GraphQLRelativeDirection.CIRCLE_COUNTERCLOCKWISE;
+        case ELEVATOR -> GraphQLRelativeDirection.ELEVATOR;
+        case UTURN_LEFT -> GraphQLRelativeDirection.UTURN_LEFT;
+        case UTURN_RIGHT -> GraphQLRelativeDirection.UTURN_RIGHT;
       };
   }
 

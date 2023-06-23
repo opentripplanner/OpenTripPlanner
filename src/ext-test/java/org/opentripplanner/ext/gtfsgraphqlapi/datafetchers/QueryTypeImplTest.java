@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
@@ -52,7 +52,7 @@ public class QueryTypeImplTest {
   public void testFilterAlertsWithNoFilterArgs() {
     Map<String, Object> args = Map.of();
 
-    var queryTypeAlertsArgs = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(args);
+    var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
     var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(2, filteredAlerts.size());
@@ -64,13 +64,13 @@ public class QueryTypeImplTest {
       Map.entry(
         "severityLevel",
         List.of(
-          LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType.SEVERE,
-          LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType.WARNING
+          GraphQLTypes.GraphQLAlertSeverityLevelType.SEVERE,
+          GraphQLTypes.GraphQLAlertSeverityLevelType.WARNING
         )
       )
     );
 
-    var queryTypeAlertsArgs = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(args);
+    var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
     var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
@@ -83,13 +83,13 @@ public class QueryTypeImplTest {
       Map.entry(
         "cause",
         List.of(
-          LegacyGraphQLTypes.LegacyGraphQLAlertCauseType.UNKNOWN_CAUSE,
-          LegacyGraphQLTypes.LegacyGraphQLAlertCauseType.STRIKE
+          GraphQLTypes.GraphQLAlertCauseType.UNKNOWN_CAUSE,
+          GraphQLTypes.GraphQLAlertCauseType.STRIKE
         )
       )
     );
 
-    var queryTypeAlertsArgs = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(args);
+    var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
     var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
@@ -102,13 +102,13 @@ public class QueryTypeImplTest {
       Map.entry(
         "effect",
         List.of(
-          LegacyGraphQLTypes.LegacyGraphQLAlertEffectType.REDUCED_SERVICE,
-          LegacyGraphQLTypes.LegacyGraphQLAlertEffectType.ACCESSIBILITY_ISSUE
+          GraphQLTypes.GraphQLAlertEffectType.REDUCED_SERVICE,
+          GraphQLTypes.GraphQLAlertEffectType.ACCESSIBILITY_ISSUE
         )
       )
     );
 
-    var queryTypeAlertsArgs = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(args);
+    var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
     var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
@@ -121,27 +121,27 @@ public class QueryTypeImplTest {
       Map.entry(
         "severityLevel",
         List.of(
-          LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType.SEVERE,
-          LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType.INFO
+          GraphQLTypes.GraphQLAlertSeverityLevelType.SEVERE,
+          GraphQLTypes.GraphQLAlertSeverityLevelType.INFO
         )
       ),
       Map.entry(
         "cause",
         List.of(
-          LegacyGraphQLTypes.LegacyGraphQLAlertCauseType.UNKNOWN_CAUSE,
-          LegacyGraphQLTypes.LegacyGraphQLAlertCauseType.STRIKE
+          GraphQLTypes.GraphQLAlertCauseType.UNKNOWN_CAUSE,
+          GraphQLTypes.GraphQLAlertCauseType.STRIKE
         )
       ),
       Map.entry(
         "effect",
         List.of(
-          LegacyGraphQLTypes.LegacyGraphQLAlertEffectType.REDUCED_SERVICE,
-          LegacyGraphQLTypes.LegacyGraphQLAlertEffectType.DETOUR
+          GraphQLTypes.GraphQLAlertEffectType.REDUCED_SERVICE,
+          GraphQLTypes.GraphQLAlertEffectType.DETOUR
         )
       )
     );
 
-    var queryTypeAlertsArgs = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(args);
+    var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
     var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
@@ -154,7 +154,7 @@ public class QueryTypeImplTest {
   public void testFilterAlertsRoute() {
     Map<String, Object> args = Map.ofEntries(Map.entry("route", List.of("test:foo", "test:bar")));
 
-    var queryTypeAlertsArgs = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(args);
+    var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
     var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());
@@ -165,7 +165,7 @@ public class QueryTypeImplTest {
   public void testFilterAlertsStop() {
     Map<String, Object> args = Map.ofEntries(Map.entry("stop", List.of("test:foo", "test:bar")));
 
-    var queryTypeAlertsArgs = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeAlertsArgs(args);
+    var queryTypeAlertsArgs = new GraphQLTypes.GraphQLQueryTypeAlertsArgs(args);
 
     var filteredAlerts = QueryTypeImpl.filterAlerts(alerts, queryTypeAlertsArgs);
     assertEquals(1, filteredAlerts.size());

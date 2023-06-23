@@ -2,12 +2,12 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 
-public class BookingInfoImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLBookingInfo {
+public class BookingInfoImpl implements GraphQLDataFetchers.GraphQLBookingInfo {
 
   @Override
   public DataFetcher<ContactInfo> contactInfo() {

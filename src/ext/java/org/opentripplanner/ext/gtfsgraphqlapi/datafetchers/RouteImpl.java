@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLUtils;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLTransitMode;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
-public class RouteImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLRoute {
+public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   @Override
   public DataFetcher<Agency> agency() {
@@ -34,8 +34,8 @@ public class RouteImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLRoute {
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
       TransitAlertService alertService = getAlertService(environment);
-      var args = new LegacyGraphQLTypes.LegacyGraphQLRouteAlertsArgs(environment.getArguments());
-      List<LegacyGraphQLTypes.LegacyGraphQLRouteAlertType> types = args.getLegacyGraphQLTypes();
+      var args = new GraphQLTypes.GraphQLRouteAlertsArgs(environment.getArguments());
+      List<GraphQLTypes.GraphQLRouteAlertType> types = args.getGraphQLTypes();
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
@@ -171,7 +171,7 @@ public class RouteImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLRoute {
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLTransitMode> mode() {
+  public DataFetcher<GraphQLTransitMode> mode() {
     return environment -> GraphQLUtils.toGraphQL(getSource(environment).getMode());
   }
 

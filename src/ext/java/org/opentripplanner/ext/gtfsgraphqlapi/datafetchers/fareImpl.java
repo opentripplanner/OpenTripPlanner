@@ -3,11 +3,11 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Map;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.transit.model.basic.Money;
 
-public class fareImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLFare {
+public class fareImpl implements GraphQLDataFetchers.GraphQLFare {
 
   @Override
   public DataFetcher<Integer> cents() {

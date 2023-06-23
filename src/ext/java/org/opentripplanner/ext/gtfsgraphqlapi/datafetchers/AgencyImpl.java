@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -17,14 +17,14 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.service.TransitService;
 
-public class AgencyImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAgency {
+public class AgencyImpl implements GraphQLDataFetchers.GraphQLAgency {
 
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
       TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
-      var args = new LegacyGraphQLTypes.LegacyGraphQLAgencyAlertsArgs(environment.getArguments());
-      List<LegacyGraphQLTypes.LegacyGraphQLAgencyAlertType> types = args.getLegacyGraphQLTypes();
+      var args = new GraphQLTypes.GraphQLAgencyAlertsArgs(environment.getArguments());
+      List<GraphQLTypes.GraphQLAgencyAlertType> types = args.getGraphQLTypes();
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {

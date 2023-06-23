@@ -5,7 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
@@ -13,7 +13,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 
-public class PlanImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPlan {
+public class PlanImpl implements GraphQLDataFetchers.GraphQLPlan {
 
   @Override
   public DataFetcher<Long> date() {

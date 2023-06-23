@@ -4,12 +4,12 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.service.TransitService;
 
-public class fareComponentImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLFareComponent {
+public class fareComponentImpl implements GraphQLDataFetchers.GraphQLFareComponent {
 
   @Override
   public DataFetcher<Integer> cents() {

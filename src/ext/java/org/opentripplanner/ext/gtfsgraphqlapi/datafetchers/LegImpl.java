@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.mapping.LocalDateMapper;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
 import org.opentripplanner.ext.gtfsgraphqlapi.mapping.NumberMapper;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
@@ -29,7 +29,7 @@ import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-public class LegImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLLeg {
+public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
   @Override
   public DataFetcher<Agency> agency() {
@@ -255,19 +255,19 @@ public class LegImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLLeg {
   public DataFetcher<Iterable<Leg>> nextLegs() {
     return environment -> {
       if (environment.getSource() instanceof ScheduledTransitLeg originalLeg) {
-        var args = new LegacyGraphQLTypes.LegacyGraphQLLegNextLegsArgs(environment.getArguments());
+        var args = new GraphQLTypes.GraphQLLegNextLegsArgs(environment.getArguments());
 
-        int numberOfLegs = args.getLegacyGraphQLNumberOfLegs();
+        int numberOfLegs = args.getGraphQLNumberOfLegs();
 
-        var originModesWithParentStation = args.getLegacyGraphQLOriginModesWithParentStation();
-        var destinationModesWithParentStation = args.getLegacyGraphQLDestinationModesWithParentStation();
+        var originModesWithParentStation = args.getGraphQLOriginModesWithParentStation();
+        var destinationModesWithParentStation = args.getGraphQLDestinationModesWithParentStation();
 
         boolean limitToExactOriginStop =
           originModesWithParentStation == null ||
           !(
             originModesWithParentStation
               .stream()
-              .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString)
+              .map(GraphQLTypes.GraphQLTransitMode::toString)
               .toList()
               .contains(originalLeg.getMode().name())
           );
@@ -277,7 +277,7 @@ public class LegImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLLeg {
           !(
             destinationModesWithParentStation
               .stream()
-              .map(LegacyGraphQLTypes.LegacyGraphQLTransitMode::toString)
+              .map(GraphQLTypes.GraphQLTransitMode::toString)
               .toList()
               .contains(originalLeg.getMode().name())
           );

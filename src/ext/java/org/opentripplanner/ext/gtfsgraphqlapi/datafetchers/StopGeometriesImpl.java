@@ -4,9 +4,9 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.ArrayList;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLStopGeometries;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers.GraphQLStopGeometries;
 
-public class StopGeometriesImpl implements LegacyGraphQLStopGeometries {
+public class StopGeometriesImpl implements GraphQLStopGeometries {
 
   @Override
   public DataFetcher<Geometry> geoJson() {

@@ -3,10 +3,10 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Currency;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.transit.model.basic.Money;
 
-public class MoneyImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLMoney {
+public class MoneyImpl implements GraphQLDataFetchers.GraphQLMoney {
 
   @Override
   public DataFetcher<Double> amount() {

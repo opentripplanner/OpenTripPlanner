@@ -3,10 +3,10 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
-public class stopAtDistanceImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStopAtDistance {
+public class stopAtDistanceImpl implements GraphQLDataFetchers.GraphQLStopAtDistance {
 
   @Override
   public DataFetcher<Integer> distance() {

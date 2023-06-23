@@ -2,13 +2,13 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
 
-public class FareProductImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLFareProduct {
+public class FareProductImpl implements GraphQLDataFetchers.GraphQLFareProduct {
 
   @Override
   public DataFetcher<String> id() {

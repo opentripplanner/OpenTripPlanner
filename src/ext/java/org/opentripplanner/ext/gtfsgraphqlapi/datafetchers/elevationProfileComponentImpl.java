@@ -2,11 +2,11 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.model.plan.ElevationProfile;
 
 public class elevationProfileComponentImpl
-  implements LegacyGraphQLDataFetchers.LegacyGraphQLElevationProfileComponent {
+  implements GraphQLDataFetchers.GraphQLElevationProfileComponent {
 
   @Override
   public DataFetcher<Double> distance() {

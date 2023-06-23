@@ -16,10 +16,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLUtils;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLStopAlertType;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLStopAlertType;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLWheelchairBoarding;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -38,23 +38,23 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
-public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
+public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
 
   @Override
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
       TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
-      var args = new LegacyGraphQLTypes.LegacyGraphQLStopAlertsArgs(environment.getArguments());
-      List<LegacyGraphQLTypes.LegacyGraphQLStopAlertType> types = args.getLegacyGraphQLTypes();
+      var args = new GraphQLTypes.GraphQLStopAlertsArgs(environment.getArguments());
+      List<GraphQLTypes.GraphQLStopAlertType> types = args.getGraphQLTypes();
       FeedScopedId id = getValue(environment, StopLocation::getId, AbstractTransitEntity::getId);
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
-        if (types.contains(LegacyGraphQLStopAlertType.STOP)) {
+        if (types.contains(GraphQLStopAlertType.STOP)) {
           alerts.addAll(alertService.getStopAlerts(id));
         }
         if (
-          types.contains(LegacyGraphQLStopAlertType.STOP_ON_ROUTES) ||
-          types.contains(LegacyGraphQLStopAlertType.STOP_ON_TRIPS)
+          types.contains(GraphQLStopAlertType.STOP_ON_ROUTES) ||
+          types.contains(GraphQLStopAlertType.STOP_ON_TRIPS)
         ) {
           alerts.addAll(
             alertService
@@ -66,12 +66,12 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
                   .stream()
                   .anyMatch(entity ->
                     (
-                      types.contains(LegacyGraphQLStopAlertType.STOP_ON_ROUTES) &&
+                      types.contains(GraphQLStopAlertType.STOP_ON_ROUTES) &&
                       entity instanceof StopAndRoute stopAndRoute &&
                       stopAndRoute.stopId().equals(id)
                     ) ||
                     (
-                      types.contains(LegacyGraphQLStopAlertType.STOP_ON_TRIPS) &&
+                      types.contains(GraphQLStopAlertType.STOP_ON_TRIPS) &&
                       entity instanceof EntitySelector.StopAndTrip stopAndTrip &&
                       stopAndTrip.stopId().equals(id)
                     )
@@ -81,12 +81,12 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
           );
         }
         if (
-          types.contains(LegacyGraphQLStopAlertType.PATTERNS) ||
-          types.contains(LegacyGraphQLStopAlertType.TRIPS)
+          types.contains(GraphQLStopAlertType.PATTERNS) ||
+          types.contains(GraphQLStopAlertType.TRIPS)
         ) {
           getPatterns(environment)
             .forEach(pattern -> {
-              if (types.contains(LegacyGraphQLStopAlertType.PATTERNS)) {
+              if (types.contains(GraphQLStopAlertType.PATTERNS)) {
                 alerts.addAll(
                   alertService.getDirectionAndRouteAlerts(
                     pattern.getDirection(),
@@ -94,7 +94,7 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
                   )
                 );
               }
-              if (types.contains(LegacyGraphQLStopAlertType.TRIPS)) {
+              if (types.contains(GraphQLStopAlertType.TRIPS)) {
                 pattern
                   .scheduledTripsAsStream()
                   .forEach(trip -> alerts.addAll(alertService.getTripAlerts(trip.getId(), null)));
@@ -102,15 +102,15 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
             });
         }
         if (
-          types.contains(LegacyGraphQLStopAlertType.ROUTES) ||
-          types.contains(LegacyGraphQLStopAlertType.AGENCIES_OF_ROUTES)
+          types.contains(GraphQLStopAlertType.ROUTES) ||
+          types.contains(GraphQLStopAlertType.AGENCIES_OF_ROUTES)
         ) {
           getRoutes(environment)
             .forEach(route -> {
-              if (types.contains(LegacyGraphQLStopAlertType.ROUTES)) {
+              if (types.contains(GraphQLStopAlertType.ROUTES)) {
                 alerts.addAll(alertService.getRouteAlerts(route.getId()));
               }
-              if (types.contains(LegacyGraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
+              if (types.contains(GraphQLStopAlertType.AGENCIES_OF_ROUTES)) {
                 alerts.addAll(alertService.getAgencyAlerts(route.getAgency().getId()));
               }
             });
@@ -255,11 +255,11 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
         environment,
         stop -> {
           TransitService transitService = getTransitService(environment);
-          LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args = new LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs(
+          GraphQLTypes.GraphQLStopStopTimesForPatternArgs args = new GraphQLTypes.GraphQLStopStopTimesForPatternArgs(
             environment.getArguments()
           );
           TripPattern pattern = transitService.getTripPatternForId(
-            FeedScopedId.parseId(args.getLegacyGraphQLId())
+            FeedScopedId.parseId(args.getGraphQLId())
           );
 
           if (pattern == null) {
@@ -278,13 +278,11 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
           return transitService.stopTimesForPatternAtStop(
             stop,
             pattern,
-            GraphQLUtils.getTimeOrNow(args.getLegacyGraphQLStartTime()),
-            Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
-            args.getLegacyGraphQLNumberOfDepartures(),
-            args.getLegacyGraphQLOmitNonPickups()
-              ? ArrivalDeparture.DEPARTURES
-              : ArrivalDeparture.BOTH,
-            !args.getLegacyGraphQLOmitCanceled()
+            GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
+            Duration.ofSeconds(args.getGraphQLTimeRange()),
+            args.getGraphQLNumberOfDepartures(),
+            args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
+            !args.getGraphQLOmitCanceled()
           );
         },
         station -> null
@@ -305,20 +303,16 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
   public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForPatterns() {
     return environment -> {
       TransitService transitService = getTransitService(environment);
-      var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForPatternsArgs(
-        environment.getArguments()
-      );
+      var args = new GraphQLTypes.GraphQLStopStoptimesForPatternsArgs(environment.getArguments());
 
       Function<StopLocation, List<StopTimesInPattern>> stopTFunction = stop ->
         transitService.stopTimesForStop(
           stop,
-          GraphQLUtils.getTimeOrNow(args.getLegacyGraphQLStartTime()),
-          Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
-          args.getLegacyGraphQLNumberOfDepartures(),
-          args.getLegacyGraphQLOmitNonPickups()
-            ? ArrivalDeparture.DEPARTURES
-            : ArrivalDeparture.BOTH,
-          !args.getLegacyGraphQLOmitCanceled()
+          GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
+          Duration.ofSeconds(args.getGraphQLTimeRange()),
+          args.getGraphQLNumberOfDepartures(),
+          args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
+          !args.getGraphQLOmitCanceled()
         );
 
       return getValue(
@@ -339,12 +333,12 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
   public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForServiceDate() {
     return environment -> {
       TransitService transitService = getTransitService(environment);
-      var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForServiceDateArgs(
+      var args = new GraphQLTypes.GraphQLStopStoptimesForServiceDateArgs(
         environment.getArguments()
       );
       LocalDate date;
       try {
-        date = ServiceDateUtils.parseString(args.getLegacyGraphQLDate());
+        date = ServiceDateUtils.parseString(args.getGraphQLDate());
       } catch (ParseException e) {
         return null;
       }
@@ -353,10 +347,8 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
         transitService.getStopTimesForStop(
           stop,
           date,
-          args.getLegacyGraphQLOmitNonPickups()
-            ? ArrivalDeparture.DEPARTURES
-            : ArrivalDeparture.BOTH,
-          !args.getLegacyGraphQLOmitCanceled()
+          args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
+          !args.getGraphQLOmitCanceled()
         );
 
       return getValue(
@@ -377,21 +369,17 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
   public DataFetcher<Iterable<TripTimeOnDate>> stoptimesWithoutPatterns() {
     return environment -> {
       TransitService transitService = getTransitService(environment);
-      var args = new LegacyGraphQLTypes.LegacyGraphQLStopStoptimesForPatternsArgs(
-        environment.getArguments()
-      );
+      var args = new GraphQLTypes.GraphQLStopStoptimesForPatternsArgs(environment.getArguments());
 
       Function<StopLocation, Stream<StopTimesInPattern>> stopTFunction = stop ->
         transitService
           .stopTimesForStop(
             stop,
-            GraphQLUtils.getTimeOrNow(args.getLegacyGraphQLStartTime()),
-            Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
-            args.getLegacyGraphQLNumberOfDepartures(),
-            args.getLegacyGraphQLOmitNonPickups()
-              ? ArrivalDeparture.DEPARTURES
-              : ArrivalDeparture.BOTH,
-            !args.getLegacyGraphQLOmitCanceled()
+            GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
+            Duration.ofSeconds(args.getGraphQLTimeRange()),
+            args.getGraphQLNumberOfDepartures(),
+            args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
+            !args.getGraphQLOmitCanceled()
           )
           .stream();
 
@@ -404,7 +392,7 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
       return stream
         .flatMap(stoptimesWithPattern -> stoptimesWithPattern.times.stream())
         .sorted(Comparator.comparing(t -> t.getServiceDayMidnight() + t.getRealtimeDeparture()))
-        .limit(args.getLegacyGraphQLNumberOfDepartures())
+        .limit(args.getGraphQLNumberOfDepartures())
         .collect(Collectors.toList());
     };
   }
@@ -425,10 +413,10 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
       getValue(
         environment,
         stop -> {
-          Integer maxDistance = new LegacyGraphQLTypes.LegacyGraphQLStopTransfersArgs(
+          Integer maxDistance = new GraphQLTypes.GraphQLStopTransfersArgs(
             environment.getArguments()
           )
-            .getLegacyGraphQLMaxDistance();
+            .getGraphQLMaxDistance();
 
           return getTransitService(environment)
             .getTransfersByStop(stop)
@@ -475,7 +463,7 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairBoarding() {
+  public DataFetcher<GraphQLWheelchairBoarding> wheelchairBoarding() {
     return environment -> {
       var boarding = getValue(
         environment,
@@ -519,9 +507,9 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
     TripPattern originalPattern,
     StopLocation stop,
     TransitService transitService,
-    LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args
+    GraphQLTypes.GraphQLStopStopTimesForPatternArgs args
   ) {
-    Instant startTime = GraphQLUtils.getTimeOrNow(args.getLegacyGraphQLStartTime());
+    Instant startTime = GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime());
     LocalDate date = startTime.atZone(transitService.getTimeZone()).toLocalDate();
 
     return Stream
@@ -535,11 +523,9 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
             stop,
             tripPattern,
             startTime,
-            Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
-            args.getLegacyGraphQLNumberOfDepartures(),
-            args.getLegacyGraphQLOmitNonPickups()
-              ? ArrivalDeparture.DEPARTURES
-              : ArrivalDeparture.BOTH,
+            Duration.ofSeconds(args.getGraphQLTimeRange()),
+            args.getGraphQLNumberOfDepartures(),
+            args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH,
             false
           )
           .stream()
@@ -549,7 +535,7 @@ public class StopImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStop {
           tts.getServiceDayMidnight() + tts.getRealtimeDeparture()
         )
       )
-      .limit(args.getLegacyGraphQLNumberOfDepartures())
+      .limit(args.getGraphQLNumberOfDepartures())
       .toList();
   }
 

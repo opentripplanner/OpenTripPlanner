@@ -3,9 +3,9 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 
-public class debugOutputImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLDebugOutput {
+public class debugOutputImpl implements GraphQLDataFetchers.GraphQLDebugOutput {
 
   private static final long nanosToMillis = 1000000;
 

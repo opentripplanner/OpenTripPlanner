@@ -3,11 +3,10 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.transit.service.TransitService;
 
-public class serviceTimeRangeImpl
-  implements LegacyGraphQLDataFetchers.LegacyGraphQLServiceTimeRange {
+public class serviceTimeRangeImpl implements GraphQLDataFetchers.GraphQLServiceTimeRange {
 
   @Override
   public DataFetcher<Long> end() {

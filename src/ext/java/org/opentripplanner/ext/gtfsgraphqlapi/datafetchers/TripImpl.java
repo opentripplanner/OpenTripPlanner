@@ -18,9 +18,9 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.support.SemanticHash;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLUtils;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLWheelchairBoarding;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLWheelchairBoarding;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -37,7 +37,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 
-public class TripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
+public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
 
   @Override
   public DataFetcher<Iterable<String>> activeDates() {
@@ -54,8 +54,8 @@ public class TripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
   public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> {
       TransitAlertService alertService = getTransitService(environment).getTransitAlertService();
-      var args = new LegacyGraphQLTypes.LegacyGraphQLTripAlertsArgs(environment.getArguments());
-      List<LegacyGraphQLTypes.LegacyGraphQLTripAlertType> types = args.getLegacyGraphQLTypes();
+      var args = new GraphQLTypes.GraphQLTripAlertsArgs(environment.getArguments());
+      List<GraphQLTypes.GraphQLTripAlertType> types = args.getGraphQLTypes();
       if (types != null) {
         Collection<TransitAlert> alerts = new ArrayList<>();
         types.forEach(type -> {
@@ -141,11 +141,9 @@ public class TripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
         LocalDate serviceDate = null;
         Instant midnight = null;
 
-        var args = new LegacyGraphQLTypes.LegacyGraphQLTripArrivalStoptimeArgs(
-          environment.getArguments()
-        );
-        if (args.getLegacyGraphQLServiceDate() != null) {
-          serviceDate = ServiceDateUtils.parseString(args.getLegacyGraphQLServiceDate());
+        var args = new GraphQLTypes.GraphQLTripArrivalStoptimeArgs(environment.getArguments());
+        if (args.getGraphQLServiceDate() != null) {
+          serviceDate = ServiceDateUtils.parseString(args.getGraphQLServiceDate());
           midnight =
             ServiceDateUtils
               .asStartOfService(serviceDate, transitService.getTimeZone())
@@ -196,11 +194,9 @@ public class TripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
         LocalDate serviceDate = null;
         Instant midnight = null;
 
-        var args = new LegacyGraphQLTypes.LegacyGraphQLTripDepartureStoptimeArgs(
-          environment.getArguments()
-        );
-        if (args.getLegacyGraphQLServiceDate() != null) {
-          serviceDate = ServiceDateUtils.parseString(args.getLegacyGraphQLServiceDate());
+        var args = new GraphQLTypes.GraphQLTripDepartureStoptimeArgs(environment.getArguments());
+        if (args.getGraphQLServiceDate() != null) {
+          serviceDate = ServiceDateUtils.parseString(args.getGraphQLServiceDate());
           midnight =
             ServiceDateUtils
               .asStartOfService(serviceDate, transitService.getTimeZone())
@@ -324,13 +320,11 @@ public class TripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
       try {
         TransitService transitService = getTransitService(environment);
         Trip trip = getSource(environment);
-        var args = new LegacyGraphQLTypes.LegacyGraphQLTripStoptimesForDateArgs(
-          environment.getArguments()
-        );
+        var args = new GraphQLTypes.GraphQLTripStoptimesForDateArgs(environment.getArguments());
 
         ZoneId timeZone = transitService.getTimeZone();
-        LocalDate serviceDate = args.getLegacyGraphQLServiceDate() != null
-          ? ServiceDateUtils.parseString(args.getLegacyGraphQLServiceDate())
+        LocalDate serviceDate = args.getGraphQLServiceDate() != null
+          ? ServiceDateUtils.parseString(args.getGraphQLServiceDate())
           : LocalDate.now(timeZone);
 
         TripPattern tripPattern = transitService.getPatternForTrip(trip, serviceDate);
@@ -374,7 +368,7 @@ public class TripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLWheelchairBoarding> wheelchairAccessible() {
+  public DataFetcher<GraphQLWheelchairBoarding> wheelchairAccessible() {
     return environment -> GraphQLUtils.toGraphQL(getSource(environment).getWheelchairBoarding());
   }
 

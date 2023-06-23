@@ -6,15 +6,15 @@ import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLUtils;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.service.TransitService;
 
-public class DepartureRowImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLDepartureRow {
+public class DepartureRowImpl implements GraphQLDataFetchers.GraphQLDepartureRow {
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
@@ -44,19 +44,17 @@ public class DepartureRowImpl implements LegacyGraphQLDataFetchers.LegacyGraphQL
   @Override
   public DataFetcher<Iterable<TripTimeOnDate>> stoptimes() {
     return environment -> {
-      LegacyGraphQLTypes.LegacyGraphQLDepartureRowStoptimesArgs args = new LegacyGraphQLTypes.LegacyGraphQLDepartureRowStoptimesArgs(
+      GraphQLTypes.GraphQLDepartureRowStoptimesArgs args = new GraphQLTypes.GraphQLDepartureRowStoptimesArgs(
         environment.getArguments()
       );
 
       return getSource(environment)
         .getStoptimes(
           getTransitService(environment),
-          GraphQLUtils.getTimeOrNow(args.getLegacyGraphQLStartTime()),
-          Duration.ofSeconds(args.getLegacyGraphQLTimeRange()),
-          args.getLegacyGraphQLNumberOfDepartures(),
-          args.getLegacyGraphQLOmitNonPickups()
-            ? ArrivalDeparture.DEPARTURES
-            : ArrivalDeparture.BOTH
+          GraphQLUtils.getTimeOrNow(args.getGraphQLStartTime()),
+          Duration.ofSeconds(args.getGraphQLTimeRange()),
+          args.getGraphQLNumberOfDepartures(),
+          args.getGraphQLOmitNonPickups() ? ArrivalDeparture.DEPARTURES : ArrivalDeparture.BOTH
         );
     };
   }

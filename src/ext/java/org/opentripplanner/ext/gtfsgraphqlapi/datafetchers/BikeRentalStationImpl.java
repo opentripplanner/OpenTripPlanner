@@ -4,12 +4,11 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 
-public class BikeRentalStationImpl
-  implements LegacyGraphQLDataFetchers.LegacyGraphQLBikeRentalStation {
+public class BikeRentalStationImpl implements GraphQLDataFetchers.GraphQLBikeRentalStation {
 
   final String STATE_ON = "Station on";
   final String STATE_OFF = "Station off";

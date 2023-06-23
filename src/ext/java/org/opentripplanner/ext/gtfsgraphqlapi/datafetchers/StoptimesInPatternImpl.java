@@ -2,13 +2,12 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.network.TripPattern;
 
-public class StoptimesInPatternImpl
-  implements LegacyGraphQLDataFetchers.LegacyGraphQLStoptimesInPattern {
+public class StoptimesInPatternImpl implements GraphQLDataFetchers.GraphQLStoptimesInPattern {
 
   @Override
   public DataFetcher<TripPattern> pattern() {

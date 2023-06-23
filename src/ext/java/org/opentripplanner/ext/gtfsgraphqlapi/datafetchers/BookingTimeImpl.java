@@ -3,10 +3,10 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.format.DateTimeFormatter;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.model.BookingTime;
 
-public class BookingTimeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLBookingTime {
+public class BookingTimeImpl implements GraphQLDataFetchers.GraphQLBookingTime {
 
   @Override
   public DataFetcher<Integer> daysPrior() {

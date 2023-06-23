@@ -2,8 +2,8 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVertexType;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLVertexType;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.StopPosition;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.StopPosition.PositionAtStop;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -15,7 +15,7 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 
-public class PlaceImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPlace {
+public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
   @Override
   public DataFetcher<Long> arrivalTime() {
@@ -125,10 +125,10 @@ public class PlaceImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPlace {
     return environment -> {
       var place = getSource(environment).place;
       return switch (place.vertexType) {
-        case NORMAL -> LegacyGraphQLVertexType.NORMAL.name();
-        case TRANSIT -> LegacyGraphQLVertexType.TRANSIT.name();
-        case VEHICLERENTAL -> LegacyGraphQLVertexType.BIKESHARE.name();
-        case VEHICLEPARKING -> LegacyGraphQLVertexType.BIKEPARK.name();
+        case NORMAL -> GraphQLVertexType.NORMAL.name();
+        case TRANSIT -> GraphQLVertexType.TRANSIT.name();
+        case VEHICLERENTAL -> GraphQLVertexType.BIKESHARE.name();
+        case VEHICLEPARKING -> GraphQLVertexType.BIKEPARK.name();
       };
     };
   }

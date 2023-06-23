@@ -5,9 +5,9 @@ import graphql.schema.DataFetcher;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 
-public class TicketTypeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTicketType {
+public class TicketTypeImpl implements GraphQLDataFetchers.GraphQLTicketType {
 
   @Override
   public DataFetcher<String> currency() {

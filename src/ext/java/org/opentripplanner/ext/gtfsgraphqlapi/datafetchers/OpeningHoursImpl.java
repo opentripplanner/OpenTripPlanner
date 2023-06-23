@@ -2,11 +2,11 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.model.calendar.openinghours.OsmOpeningHoursSupport;
 
-public class OpeningHoursImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLOpeningHours {
+public class OpeningHoursImpl implements GraphQLDataFetchers.GraphQLOpeningHours {
 
   @Override
   public DataFetcher<Iterable<Object>> dates() {

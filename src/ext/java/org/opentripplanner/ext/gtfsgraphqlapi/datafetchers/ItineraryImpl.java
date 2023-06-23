@@ -5,14 +5,14 @@ import graphql.schema.DataFetchingEnvironment;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.ext.gtfsgraphqlapi.mapping.NumberMapper;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 
-public class ItineraryImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLItinerary {
+public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
 
   @Override
   public DataFetcher<Boolean> arrivedAtDestinationWithRentedBicycle() {

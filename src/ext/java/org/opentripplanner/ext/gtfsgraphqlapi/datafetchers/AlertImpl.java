@@ -1,8 +1,7 @@
 package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
-import static org.opentripplanner.ext.gtfsgraphqlapi.mapping.LegacyGraphQLCauseMapper.getLegacyGraphQLCause;
-import static org.opentripplanner.ext.gtfsgraphqlapi.mapping.LegacyGraphQLEffectMapper.getLegacyGraphQLEffect;
-import static org.opentripplanner.ext.gtfsgraphqlapi.mapping.LegacyGraphQLSeverityMapper.getLegacyGraphQLSeverity;
+import static org.opentripplanner.ext.gtfsgraphqlapi.mapping.AlertEffectMapper.getGraphQLEffect;
+import static org.opentripplanner.ext.gtfsgraphqlapi.mapping.SeverityMapper.getGraphQLSeverity;
 
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
@@ -15,14 +14,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType;
-import org.opentripplanner.ext.gtfsgraphqlapi.model.LegacyGraphQLRouteTypeModel;
-import org.opentripplanner.ext.gtfsgraphqlapi.model.LegacyGraphQLStopOnRouteModel;
-import org.opentripplanner.ext.gtfsgraphqlapi.model.LegacyGraphQLStopOnTripModel;
-import org.opentripplanner.ext.gtfsgraphqlapi.model.LegacyGraphQLUnknownModel;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLAlertEffectType;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLAlertSeverityLevelType;
+import org.opentripplanner.ext.gtfsgraphqlapi.mapping.AlertCauseMapper;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.RouteTypeModel;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.StopOnRouteModel;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.StopOnTripModel;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.UnknownModel;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.TranslatedString;
@@ -38,7 +38,7 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
-public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
+public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
 
   @Override
   public DataFetcher<Agency> agency() {
@@ -56,8 +56,8 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLAlertCauseType> alertCause() {
-    return environment -> getLegacyGraphQLCause(getSource(environment).cause());
+  public DataFetcher<GraphQLTypes.GraphQLAlertCauseType> alertCause() {
+    return environment -> AlertCauseMapper.getGraphQLCause(getSource(environment).cause());
   }
 
   @Override
@@ -75,8 +75,8 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLAlertEffectType> alertEffect() {
-    return environment -> getLegacyGraphQLEffect(getSource(environment).effect());
+  public DataFetcher<GraphQLAlertEffectType> alertEffect() {
+    return environment -> getGraphQLEffect(getSource(environment).effect());
   }
 
   @Override
@@ -109,8 +109,8 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLAlertSeverityLevelType> alertSeverityLevel() {
-    return environment -> getLegacyGraphQLSeverity(getSource(environment).severity());
+  public DataFetcher<GraphQLAlertSeverityLevelType> alertSeverityLevel() {
+    return environment -> getGraphQLSeverity(getSource(environment).severity());
   }
 
   @Override
@@ -185,7 +185,7 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
             Route route = getTransitService(environment).getRouteForId(routeId);
             return List.of(
               stop != null && route != null
-                ? new LegacyGraphQLStopOnRouteModel(stop, route)
+                ? new StopOnRouteModel(stop, route)
                 : getUnknownForAlertEntityPair(
                   stop,
                   route,
@@ -203,7 +203,7 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
             Trip trip = getTransitService(environment).getTripForId(tripId);
             return List.of(
               stop != null && trip != null
-                ? new LegacyGraphQLStopOnTripModel(stop, trip)
+                ? new StopOnTripModel(stop, trip)
                 : getUnknownForAlertEntityPair(
                   stop,
                   trip,
@@ -220,7 +220,7 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
             Agency agency = getTransitService(environment).getAgencyForId(agencyId);
             return List.of(
               agency != null
-                ? new LegacyGraphQLRouteTypeModel(agency, routeType, agency.getId().getFeedId())
+                ? new RouteTypeModel(agency, routeType, agency.getId().getFeedId())
                 : getUnknownForAlertEntityPair(
                   agency,
                   routeType,
@@ -234,7 +234,7 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
           if (entitySelector instanceof EntitySelector.RouteType) {
             int routeType = ((EntitySelector.RouteType) entitySelector).routeType();
             String feedId = ((EntitySelector.RouteType) entitySelector).feedId();
-            return List.of(new LegacyGraphQLRouteTypeModel(null, routeType, feedId));
+            return List.of(new RouteTypeModel(null, routeType, feedId));
           }
           if (entitySelector instanceof EntitySelector.DirectionAndRoute) {
             Direction direction = ((DirectionAndRoute) entitySelector).direction();
@@ -258,9 +258,10 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
               );
           }
           if (entitySelector instanceof EntitySelector.Unknown) {
-            return List.of(
-              new LegacyGraphQLUnknownModel(((EntitySelector.Unknown) entitySelector).description())
+            final List<Object> objects = List.of(
+              new UnknownModel(((EntitySelector.Unknown) entitySelector).description())
             );
+            return objects;
           }
           return List.of();
         })
@@ -333,7 +334,7 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
     if (entity != null) {
       return entity;
     }
-    return new LegacyGraphQLUnknownModel(
+    return new UnknownModel(
       String.format(
         "Alert's entity selector was %s with id %s but the %s doesn't exist.",
         type,
@@ -352,7 +353,7 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
     String typeB
   ) {
     if (entityA == null && entityB == null) {
-      return new LegacyGraphQLUnknownModel(
+      return new UnknownModel(
         String.format(
           "Alert's entity selector was %s with id %s and %s with id %s but the %s and %s don't exist.",
           typeA,
@@ -365,7 +366,7 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
       );
     }
     if (entityA == null) {
-      return new LegacyGraphQLUnknownModel(
+      return new UnknownModel(
         String.format(
           "Alert's entity selector was %s with id %s and %s with id %s but the %s doesn't exist.",
           typeA,
@@ -376,7 +377,7 @@ public class AlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
         )
       );
     }
-    return new LegacyGraphQLUnknownModel(
+    return new UnknownModel(
       String.format(
         "Alert's entity selector was %s with id %s and %s with id %s but the %s doesn't exist.",
         typeA,

@@ -4,13 +4,13 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.model.LegacyGraphQLRouteTypeModel;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.RouteTypeModel;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.service.TransitService;
 
-public class RouteTypeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLRouteType {
+public class RouteTypeImpl implements GraphQLDataFetchers.GraphQLRouteType {
 
   @Override
   public DataFetcher<Agency> agency() {
@@ -42,7 +42,7 @@ public class RouteTypeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLRou
     return environment.<GraphQLRequestContext>getContext().transitService();
   }
 
-  private LegacyGraphQLRouteTypeModel getSource(DataFetchingEnvironment environment) {
+  private RouteTypeModel getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

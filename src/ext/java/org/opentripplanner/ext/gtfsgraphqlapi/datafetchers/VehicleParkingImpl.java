@@ -3,14 +3,14 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 
-public class VehicleParkingImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLVehicleParking {
+public class VehicleParkingImpl implements GraphQLDataFetchers.GraphQLVehicleParking {
 
   @Override
   public DataFetcher<Boolean> anyCarPlaces() {

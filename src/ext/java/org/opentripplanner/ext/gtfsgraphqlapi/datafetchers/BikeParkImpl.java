@@ -3,12 +3,12 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.calendar.openinghours.OHCalendar;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
-public class BikeParkImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLBikePark {
+public class BikeParkImpl implements GraphQLDataFetchers.GraphQLBikePark {
 
   @Override
   public DataFetcher<String> bikeParkId() {

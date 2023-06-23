@@ -9,10 +9,10 @@ import graphql.schema.FieldCoordinates;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.TypeResolver;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 
-public class placeAtDistanceImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPlaceAtDistance {
+public class placeAtDistanceImpl implements GraphQLDataFetchers.GraphQLPlaceAtDistance {
 
   @Override
   public DataFetcher<Integer> distance() {

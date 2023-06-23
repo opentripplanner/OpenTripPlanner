@@ -3,10 +3,9 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.Map;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 
-public class TranslatedStringImpl
-  implements LegacyGraphQLDataFetchers.LegacyGraphQLTranslatedString {
+public class TranslatedStringImpl implements GraphQLDataFetchers.GraphQLTranslatedString {
 
   @Override
   public DataFetcher<String> language() {

@@ -2,12 +2,12 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLVehiclePosition;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers.GraphQLVehiclePosition;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-public class VehiclePositionImpl implements LegacyGraphQLVehiclePosition {
+public class VehiclePositionImpl implements GraphQLVehiclePosition {
 
   @Override
   public DataFetcher<Double> heading() {

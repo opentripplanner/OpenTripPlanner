@@ -2,40 +2,40 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers.LegacyGraphQLRentalVehicleType;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLFormFactor;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPropulsionType;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers.GraphQLRentalVehicleType;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLFormFactor;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLPropulsionType;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 
-public class RentalVehicleTypeImpl implements LegacyGraphQLRentalVehicleType {
+public class RentalVehicleTypeImpl implements GraphQLRentalVehicleType {
 
   @Override
-  public DataFetcher<LegacyGraphQLFormFactor> formFactor() {
+  public DataFetcher<GraphQLFormFactor> formFactor() {
     return environment ->
       switch (getSource(environment).formFactor) {
-        case CARGO_BICYCLE -> LegacyGraphQLFormFactor.CARGO_BICYCLE;
-        case CAR -> LegacyGraphQLFormFactor.CAR;
-        case BICYCLE -> LegacyGraphQLFormFactor.BICYCLE;
-        case MOPED -> LegacyGraphQLFormFactor.MOPED;
-        case SCOOTER -> LegacyGraphQLFormFactor.SCOOTER;
-        case SCOOTER_STANDING -> LegacyGraphQLFormFactor.SCOOTER_STANDING;
-        case SCOOTER_SEATED -> LegacyGraphQLFormFactor.SCOOTER_SEATED;
-        case OTHER -> LegacyGraphQLFormFactor.OTHER;
+        case CARGO_BICYCLE -> GraphQLFormFactor.CARGO_BICYCLE;
+        case CAR -> GraphQLFormFactor.CAR;
+        case BICYCLE -> GraphQLFormFactor.BICYCLE;
+        case MOPED -> GraphQLFormFactor.MOPED;
+        case SCOOTER -> GraphQLFormFactor.SCOOTER;
+        case SCOOTER_STANDING -> GraphQLFormFactor.SCOOTER_STANDING;
+        case SCOOTER_SEATED -> GraphQLFormFactor.SCOOTER_SEATED;
+        case OTHER -> GraphQLFormFactor.OTHER;
       };
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLPropulsionType> propulsionType() {
+  public DataFetcher<GraphQLPropulsionType> propulsionType() {
     return environment ->
       switch (getSource(environment).propulsionType) {
-        case HUMAN -> LegacyGraphQLPropulsionType.HUMAN;
-        case ELECTRIC_ASSIST -> LegacyGraphQLPropulsionType.ELECTRIC_ASSIST;
-        case ELECTRIC -> LegacyGraphQLPropulsionType.ELECTRIC;
-        case COMBUSTION -> LegacyGraphQLPropulsionType.COMBUSTION;
-        case COMBUSTION_DIESEL -> LegacyGraphQLPropulsionType.COMBUSTION_DIESEL;
-        case HYBRID -> LegacyGraphQLPropulsionType.HYBRID;
-        case PLUG_IN_HYBRID -> LegacyGraphQLPropulsionType.PLUG_IN_HYBRID;
-        case HYDROGEN_FUEL_CELL -> LegacyGraphQLPropulsionType.HYDROGEN_FUEL_CELL;
+        case HUMAN -> GraphQLPropulsionType.HUMAN;
+        case ELECTRIC_ASSIST -> GraphQLPropulsionType.ELECTRIC_ASSIST;
+        case ELECTRIC -> GraphQLPropulsionType.ELECTRIC;
+        case COMBUSTION -> GraphQLPropulsionType.COMBUSTION;
+        case COMBUSTION_DIESEL -> GraphQLPropulsionType.COMBUSTION_DIESEL;
+        case HYBRID -> GraphQLPropulsionType.HYBRID;
+        case PLUG_IN_HYBRID -> GraphQLPropulsionType.PLUG_IN_HYBRID;
+        case HYDROGEN_FUEL_CELL -> GraphQLPropulsionType.HYDROGEN_FUEL_CELL;
       };
   }
 

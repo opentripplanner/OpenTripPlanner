@@ -3,13 +3,12 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.time.Duration;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.RideHailingProvider;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.transit.model.basic.Money;
 
-public class RideHailingEstimateImpl
-  implements LegacyGraphQLDataFetchers.LegacyGraphQLRideHailingEstimate {
+public class RideHailingEstimateImpl implements GraphQLDataFetchers.GraphQLRideHailingEstimate {
 
   @Override
   public DataFetcher<Duration> arrival() {

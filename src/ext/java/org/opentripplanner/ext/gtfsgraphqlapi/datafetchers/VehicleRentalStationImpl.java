@@ -3,12 +3,11 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 
-public class VehicleRentalStationImpl
-  implements LegacyGraphQLDataFetchers.LegacyGraphQLVehicleRentalStation {
+public class VehicleRentalStationImpl implements GraphQLDataFetchers.GraphQLVehicleRentalStation {
 
   @Override
   public DataFetcher<Boolean> allowDropoff() {

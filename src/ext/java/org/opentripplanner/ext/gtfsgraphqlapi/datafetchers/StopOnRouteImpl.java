@@ -2,11 +2,11 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.gtfsgraphqlapi.model.LegacyGraphQLStopOnRouteModel;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.StopOnRouteModel;
 import org.opentripplanner.transit.model.network.Route;
 
-public class StopOnRouteImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStopOnRoute {
+public class StopOnRouteImpl implements GraphQLDataFetchers.GraphQLStopOnRoute {
 
   @Override
   public DataFetcher<Route> route() {
@@ -18,7 +18,7 @@ public class StopOnRouteImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLS
     return environment -> getSource(environment).getStop();
   }
 
-  private LegacyGraphQLStopOnRouteModel getSource(DataFetchingEnvironment environment) {
+  private StopOnRouteModel getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }
