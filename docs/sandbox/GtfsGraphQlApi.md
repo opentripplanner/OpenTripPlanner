@@ -1,15 +1,29 @@
 # GTFS GraphQL API
 
+The GTFS GraphQL API was created for the Digitransit project and is used heavily by
+[digitransit-ui](https://github.com/HSLdevcom/digitransit-ui).
+
+As of 2023 [otp-rr](https://github.com/opentripplanner/otp-react-redux) is in the process of 
+migrating to this API.
+
 ## Contact Info
 
 - Digitransit team, HSL, Helsinki, Finland
 - Kyyti, Helsinki, Finland
 - IBI, USA
 
-This is the GraphQL API used by the Digitransit project. The API is used to run OTP2
-together with the [digitransit-ui](https://github.com/HSLdevcom/digitransit-ui).
+## URLs 
+ - GraphQL endpoint: `http://localhost:8080/otp/routers/default/index/graphql`
+ - HTML schema documentation: [https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/](https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/)
+ - Built-in visual GraphQL client: [http://localhost:8080/graphiql](http://localhost:8080/graphiql)
 
-The GraphQL endpoint is available at: `http://localhost:8080/otp/routers/default/index/graphql`
+## Built-in API client
+
+A browser based GraphQL API client is available at [http://localhost:8080/graphiql](http://localhost:8080/graphiql)
+
+![GraphiQL](../images/graphiql.png)
+
+**`curl` example**
 
 A complete example that fetches the list of all stops from OTP is:
 
@@ -20,17 +34,7 @@ curl --request POST \
   --header 'OTPTimeout: 180000' \
   --data '{"query":"query stops {\n  stops {\n    gtfsId\n    name\n  }\n}\n","operationName":"stops"}'
 ```
-## Schema documentation
-
-Available at [https://docs.opentripplanner.org/api/](https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/)
-
-## Built-in API client
-
-A browser based GraphQL API client is available at [http://localhost:8080/graphiql](http://localhost:8080/graphiql)
-
-![GraphiQL](../images/graphiql.png)
-
-### Configuration
+## Configuration
 
 The API is enabled by default.
 
@@ -45,10 +49,10 @@ If you want to disable it, do it in `otp-config.json`:
 }
 ```
 
-### OTP2 Official GraphQL API (Not available)
+## OTP2 Official GraphQL API (Not available)
 
 We **plan** to make a new offical OTP2 API, replacing the REST API. The plan is to base the new API
-on this API and the [GTFS GraphQL API](GtfsGraphQlApi.md). The new API will most likely have two
+on this API and the [Transmodel GraphQL API](TransmodelApi.md). The new API will most likely have two
 "translations": A GTFS version and a Transmodel version, we will try to keep the semantics the same.
 
 ## Changelog
