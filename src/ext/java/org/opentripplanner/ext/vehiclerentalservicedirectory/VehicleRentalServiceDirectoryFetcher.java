@@ -2,12 +2,13 @@ package org.opentripplanner.ext.vehiclerentalservicedirectory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.updater.spi.GraphUpdater;
@@ -38,10 +39,12 @@ public class VehicleRentalServiceDirectoryFetcher {
 
     List<GraphUpdater> updaters = new ArrayList<>();
 
-    try {
-      InputStream is = HttpUtils.getData(parameters.getUrl());
-      JsonNode node = (new ObjectMapper()).readTree(is);
-
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+      JsonNode node = otpHttpClient.getAndMapAsJsonNode(
+        parameters.getUrl(),
+        Map.of(),
+        new ObjectMapper()
+      );
       JsonNode sources = node.get(parameters.getSourcesName());
 
       if (sources == null) {
@@ -90,7 +93,7 @@ public class VehicleRentalServiceDirectoryFetcher {
         );
         updaters.add(updater);
       }
-    } catch (java.io.IOException e) {
+    } catch (OtpHttpClientException e) {
       LOG.warn("Error fetching list of vehicle rental endpoints from {}", parameters.getUrl(), e);
     }
 
