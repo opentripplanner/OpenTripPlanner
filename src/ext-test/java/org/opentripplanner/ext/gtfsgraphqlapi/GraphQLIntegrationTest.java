@@ -208,7 +208,7 @@ class GraphQLIntegrationTest {
       );
   }
 
-  @FilePatternSource(pattern = "src/ext-test/resources/legacygraphqlapi/queries/*.graphql")
+  @FilePatternSource(pattern = "src/ext-test/resources/gtfsgraphqlapi/queries/*.graphql")
   @ParameterizedTest(name = "Check GraphQL query in {0}")
   void graphQL(Path path) throws IOException {
     var query = Files.readString(path);

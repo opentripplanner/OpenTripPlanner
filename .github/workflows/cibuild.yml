@@ -151,7 +151,7 @@ jobs:
           # schema hasn't changed.
           # example commit: https://github.com/opentripplanner/docs/commit/45e6ddf8e4a4
           
-          SCHEMA_FILE_MODIFIED=`git log -n 1 --pretty=format:%at src/ext/resources/legacygraphqlapi/schema.graphqls` 
+          SCHEMA_FILE_MODIFIED=`git log -n 1 --pretty=format:%at src/ext/resources/gtfsgraphqlapi/schema.graphqls` 
           echo "schema modified at ${SCHEMA_FILE_MODIFIED}"
           git checkout $LOCAL_BRANCH
           DOCS_MODIFIED=`git log -n 1 --pretty=format:%at api/dev-2.x/graphql-gtfs/introduction.html` 
@@ -178,7 +178,7 @@ jobs:
         with:
           node-version: 16
       - name: Run code generator
-        working-directory: src/ext/java/org/opentripplanner/ext/legacygraphqlapi/generated
+        working-directory: src/ext/java/org/opentripplanner/ext/gtfsgraphqlapi/generated
         run: |
           yarn install
           yarn generate

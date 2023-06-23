@@ -102,7 +102,7 @@ class GtfsGraphQLIndex {
 
   protected static GraphQLSchema buildSchema() {
     try {
-      URL url = Resources.getResource("legacygraphqlapi/schema.graphqls");
+      URL url = Resources.getResource("gtfsgraphqlapi/schema.graphqls");
       String sdl = Resources.toString(url, StandardCharsets.UTF_8);
       TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(sdl);
       IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
