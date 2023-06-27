@@ -3,6 +3,7 @@ package org.opentripplanner.updater.vehicle_position;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Sets;
@@ -24,6 +25,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -188,7 +190,7 @@ public class VehiclePositionPatternMatcher {
   private static RealtimeVehiclePosition mapVehiclePosition(
     VehiclePosition vehiclePosition,
     List<StopLocation> stopsOnVehicleTrip,
-    TripTimes tripTimes
+    @Nonnull TripTimes tripTimes
   ) {
     var newPosition = RealtimeVehiclePosition.builder();
 
@@ -321,12 +323,14 @@ public class VehiclePositionPatternMatcher {
       return UpdateError.result(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
+    var tripTimes = pattern.getScheduledTimetable().getTripTimes(trip);
+    if (tripTimes == null) {
+      LOG.debug("No trip {} found in {}", trip, pattern);
+      return UpdateError.result(scopedTripId, TRIP_NOT_FOUND_IN_PATTERN);
+    }
+
     // Add position to pattern
-    var newPosition = mapVehiclePosition(
-      vehiclePosition,
-      pattern.getStops(),
-      pattern.getScheduledTimetable().getTripTimes(trip)
-    );
+    var newPosition = mapVehiclePosition(vehiclePosition, pattern.getStops(), tripTimes);
 
     return Result.success(new PatternAndVehiclePosition(pattern, newPosition));
   }
