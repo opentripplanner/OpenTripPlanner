@@ -1407,12 +1407,6 @@ type Itinerary {
     legs: [Leg]!
 
     """
-    Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
-    will be removed in the future.
-    """
-    fares: [fare] @deprecated(reason: "Use the leg's `fareProducts`.")
-
-    """
     How much elevation is gained, in total, over the course of the itinerary, in meters.
     """
     elevationGained: Float
@@ -1444,6 +1438,16 @@ type Itinerary {
     More information is available in the [feature documentation](https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/).
     """
     accessibilityScore: Float
+
+    #
+    # deprecated fields
+    #
+
+    """
+    Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
+    will be removed in the future.
+    """
+    fares: [fare] @deprecated(reason: "Use the leg's `fareProducts`.")
 }
 
 "A currency"
