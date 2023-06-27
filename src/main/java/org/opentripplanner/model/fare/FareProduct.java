@@ -47,10 +47,10 @@ public record FareProduct(
     var builder = ToStringBuilder
       .of(FareProduct.class)
       .addStr("id", id.toString())
-      .addObj("amount", price);
-    builder.addDuration("duration", validity);
-    builder.addObj("category", category);
-    builder.addObj("medium", medium);
+      .addObj("amount", price)
+      .addDuration("duration", validity)
+      .addObj("category", category)
+      .addObj("medium", medium);
 
     return builder.toString();
   }

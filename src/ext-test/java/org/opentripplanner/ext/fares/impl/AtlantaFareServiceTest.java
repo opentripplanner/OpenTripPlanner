@@ -10,7 +10,6 @@ import static org.opentripplanner.transit.model.basic.Money.USD;
 import static org.opentripplanner.transit.model.basic.Money.usDollars;
 
 import java.util.Collection;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
