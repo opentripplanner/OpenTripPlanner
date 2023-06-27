@@ -16,9 +16,6 @@ import org.slf4j.LoggerFactory;
  */
 class EscalatorProcessor {
 
-  private final DataImportIssueStore issueStore;
-
-  private final OsmDatabase osmdb;
 
   private final Map<Long, IntersectionVertex> intersectionNodes;
 
@@ -32,7 +29,6 @@ class EscalatorProcessor {
     this.intersectionNodes = intersectionNodes;
   }
 
-  private static final Logger LOG = LoggerFactory.getLogger(ElevatorProcessor.class);
 
   public void buildEscalatorEdge(OSMWay escalatorWay, double length) {
     ArrayList<EscalatorEdge> edges = new ArrayList<>();
