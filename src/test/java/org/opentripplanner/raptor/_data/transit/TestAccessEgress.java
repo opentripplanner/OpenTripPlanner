@@ -254,7 +254,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
   @Override
   public String toString() {
-    return asString(true);
+    return asString(true, true, null);
   }
 
   /**

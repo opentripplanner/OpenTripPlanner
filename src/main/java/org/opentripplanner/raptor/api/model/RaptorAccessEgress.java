@@ -4,6 +4,7 @@ import static org.opentripplanner.raptor.api.model.RaptorConstants.SECONDS_IN_A_
 import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 
@@ -58,9 +59,7 @@ public interface RaptorAccessEgress {
    * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible after the requested departure time.
    */
-  default int earliestDepartureTime(int requestedDepartureTime) {
-    return requestedDepartureTime;
-  }
+  int earliestDepartureTime(int requestedDepartureTime);
 
   /**
    * Returns the latest possible arrival time for the path. Used in DRT systems or bike shares
@@ -69,9 +68,7 @@ public interface RaptorAccessEgress {
    * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible before the requested arrival time.
    */
-  default int latestArrivalTime(int requestedArrivalTime) {
-    return requestedArrivalTime;
-  }
+  int latestArrivalTime(int requestedArrivalTime);
 
   /**
    * This method should return {@code true} if, and only if the instance have restricted
@@ -187,7 +184,7 @@ public interface RaptorAccessEgress {
   }
 
   /** Call this from toString */
-  default String asString(boolean includeStop) {
+  default String asString(boolean includeStop, boolean includeCost, @Nullable String summary) {
     StringBuilder buf = new StringBuilder();
     if (isFree()) {
       buf.append("Free");
@@ -201,11 +198,17 @@ public interface RaptorAccessEgress {
       buf.append("Walk");
     }
     buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
+    if (includeCost && generalizedCost() > 0) {
+      buf.append(' ').append(OtpNumberFormat.formatCostCenti(generalizedCost()));
+    }
     if (hasRides()) {
       buf.append(' ').append(numberOfRides()).append('x');
     }
     if (hasOpeningHours()) {
       buf.append(' ').append(openingHoursToString());
+    }
+    if (summary != null) {
+      buf.append(' ').append(summary);
     }
     if (includeStop) {
       buf.append(" ~ ").append(stop());
