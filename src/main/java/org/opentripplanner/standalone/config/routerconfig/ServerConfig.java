@@ -22,7 +22,7 @@ public class ServerConfig implements OTPWebApplicationParameters {
       .description(
         """
 These parameters are used to configure the router server. Many parameters are specific to a 
-domain, these are set tin the routing request.
+domain, these are set in the routing request.
 """
       )
       .asObject();

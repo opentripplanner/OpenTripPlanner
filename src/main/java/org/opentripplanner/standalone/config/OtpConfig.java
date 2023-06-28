@@ -3,7 +3,6 @@ package org.opentripplanner.standalone.config;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpFileNames;
@@ -51,8 +50,8 @@ public class OtpConfig {
    */
   public final String configVersion;
 
-  public OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
-    this.root = new NodeAdapter(otpConfig, source);
+  public OtpConfig(NodeAdapter nodeAdapter, boolean logUnusedParams) {
+    this.root = nodeAdapter;
 
     this.configVersion =
       root

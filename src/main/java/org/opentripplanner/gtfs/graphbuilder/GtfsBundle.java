@@ -28,13 +28,13 @@ public class GtfsBundle {
   private double maxStopToShapeSnapDistance = 150;
   private final boolean removeRepeatedStops;
 
-  private StopTransferPriority stationTransferPreference;
+  private final StopTransferPriority stationTransferPreference;
 
-  private boolean discardMinTransferTimes;
+  private final boolean discardMinTransferTimes;
 
-  private boolean blockBasedInterlining;
+  private final boolean blockBasedInterlining;
 
-  private int maxInterlineDistance;
+  private final int maxInterlineDistance;
 
   /** Used by unit tests */
   public GtfsBundle(File gtfsFile) {

@@ -29,6 +29,7 @@ public enum OTPFeature {
   ),
   DebugClient(true, false, "Enable the debug web client located at the root of the web server."),
   FloatingBike(true, false, "Enable floating bike routing."),
+  GtfsGraphQlApi(true, true, "Enable GTFS GraphQL API."),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will
@@ -87,7 +88,6 @@ public enum OTPFeature {
     "Enable a default RouteRequest to be passed in as JSON on the REST API - FOR DEBUGGING ONLY!"
   ),
   SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
-  SandboxAPILegacyGraphQLApi(false, true, "Enable (GTFS) GraphQL API."),
   SandboxAPIMapboxVectorTilesApi(false, true, "Enable Mapbox vector tiles API."),
   SandboxAPIParkAndRideApi(false, true, "Enable park-and-ride endpoint."),
   SandboxAPITransmodelApi(false, true, "Enable Entur Transmodel(NeTEx) GraphQL API."),
