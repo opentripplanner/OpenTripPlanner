@@ -5,7 +5,7 @@ import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 
-public class TimeAmdCostPenaltyMapper {
+public class TimeAndCostPenaltyMapper {
 
   public static TimeAndCostPenalty map(NodeAdapter c) {
     return TimeAndCostPenalty.of(

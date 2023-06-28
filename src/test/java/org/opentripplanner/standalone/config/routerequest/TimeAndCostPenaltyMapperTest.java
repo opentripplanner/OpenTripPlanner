@@ -6,7 +6,7 @@ import static org.opentripplanner.standalone.config.framework.json.JsonSupport.n
 
 import org.junit.jupiter.api.Test;
 
-class TimeAmdCostPenaltyMapperTest {
+class TimeAndCostPenaltyMapperTest {
 
   @Test
   void mapNormal() {
@@ -17,7 +17,7 @@ class TimeAmdCostPenaltyMapperTest {
     );
     assertEquals(
       "(timePenalty: 2m + 3.0 t, costFactor: 3.4)",
-      TimeAmdCostPenaltyMapper.map(node).toString()
+      TimeAndCostPenaltyMapper.map(node).toString()
     );
   }
 
@@ -26,7 +26,7 @@ class TimeAmdCostPenaltyMapperTest {
     var node = newNodeAdapterForTest("""
       { "costFactor": 3.4 }
       """);
-    var ex = assertThrows(IllegalArgumentException.class, () -> TimeAmdCostPenaltyMapper.map(node));
+    var ex = assertThrows(IllegalArgumentException.class, () -> TimeAndCostPenaltyMapper.map(node));
     assertEquals(
       "When time-penalty is zero, the costFactor have no effect and should be zero as well.",
       ex.getMessage()
