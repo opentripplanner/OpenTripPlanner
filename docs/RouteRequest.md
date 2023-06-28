@@ -50,6 +50,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [intersectionTraversalModel](#rd_intersectionTraversalModel)                                         |         `enum`         | The model that computes the costs of turns.                                                                                                    | *Optional* | `"simple"`               |  2.2  |
 | locale                                                                                               |        `locale`        | TODO                                                                                                                                           | *Optional* | `"en_US"`                |  2.0  |
 | [maxAccessEgressDuration](#rd_maxAccessEgressDuration)                                               |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                            | *Optional* | `"PT45M"`                |  2.1  |
+| [maxAccessEgressStopCount](#rd_maxAccessEgressStopCount)                                             |        `integer`       | Maximal number of stops collected in access/egress routing                                                                                     | *Optional* | `0`                      |  2.2  |
 | [maxDirectStreetDuration](#rd_maxDirectStreetDuration)                                               |       `duration`       | This is the maximum duration for a direct street search for each mode.                                                                         | *Optional* | `"PT4H"`                 |  2.1  |
 | [maxJourneyDuration](#rd_maxJourneyDuration)                                                         |       `duration`       | The expected maximum time a journey can last across all possible journeys for the current deployment.                                          | *Optional* | `"PT24H"`                |  2.1  |
 | [modes](RoutingModes.md)                                                                             |        `string`        | The set of access/egress/direct/transit modes to be used for the route search.                                                                 | *Optional* | `"TRANSIT,WALK"`         |  2.0  |
@@ -200,6 +201,16 @@ guaranteed to be optimal. Use itinerary-filters to limit what is presented to th
 duration can be set per mode(`maxAccessEgressDurationForMode`), because some street modes searches
 are much more resource intensive than others. A default value is applied if the mode specific value
 do not exist.
+
+
+<h3 id="rd_maxAccessEgressStopCount">maxAccessEgressStopCount</h3>
+
+**Since version:** `2.2` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`   
+**Path:** /routingDefaults 
+
+Maximal number of stops collected in access/egress routing
+
+Safety limit to prevent access to and egress from too many stops.
 
 
 <h3 id="rd_maxDirectStreetDuration">maxDirectStreetDuration</h3>
