@@ -186,7 +186,8 @@ public class TravelTimeResource {
       getAccessRequest(routingRequest),
       null,
       routingRequest.arriveBy(),
-      traveltimeRequest.maxAccessDuration
+      traveltimeRequest.maxAccessDuration,
+      0
     );
     return AccessEgressMapper.mapNearbyStops(accessStops, routingRequest.arriveBy());
   }

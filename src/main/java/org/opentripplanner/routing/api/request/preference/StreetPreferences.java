@@ -36,6 +36,7 @@ public final class StreetPreferences implements Serializable {
   private final DurationForEnum<StreetMode> maxAccessEgressDuration;
   private final DurationForEnum<StreetMode> maxDirectDuration;
   private final Duration routingTimeout;
+  private final int maxAccessEgressStopCount;
 
   private StreetPreferences() {
     this.turnReluctance = 1.0;
@@ -46,6 +47,7 @@ public final class StreetPreferences implements Serializable {
       DurationForEnum.of(StreetMode.class).withDefault(ofMinutes(45)).build();
     this.maxDirectDuration = DurationForEnum.of(StreetMode.class).withDefault(ofHours(4)).build();
     this.routingTimeout = Duration.ofSeconds(5);
+    this.maxAccessEgressStopCount = 0;
   }
 
   private StreetPreferences(Builder builder) {
@@ -56,6 +58,7 @@ public final class StreetPreferences implements Serializable {
     this.maxDirectDuration = requireNonNull(builder.maxDirectDuration);
     this.maxAccessEgressDuration = requireNonNull(builder.maxAccessEgressDuration);
     this.routingTimeout = requireNonNull(builder.routingTimeout);
+    this.maxAccessEgressStopCount = builder.maxAccessEgressStopCount;
   }
 
   public static Builder of() {
@@ -94,6 +97,10 @@ public final class StreetPreferences implements Serializable {
     return maxDirectDuration;
   }
 
+  public int maxAccessEgressStopCount() {
+    return maxAccessEgressStopCount;
+  }
+
   /**
    * The preferred way to limit the search is to limit the distance for each street mode(WALK, BIKE,
    * CAR). So the default timeout for a street search is set quite high. This is used to abort the
@@ -116,7 +123,8 @@ public final class StreetPreferences implements Serializable {
       routingTimeout.equals(that.routingTimeout) &&
       intersectionTraversalModel == that.intersectionTraversalModel &&
       maxAccessEgressDuration.equals(that.maxAccessEgressDuration) &&
-      maxDirectDuration.equals(that.maxDirectDuration)
+      maxDirectDuration.equals(that.maxDirectDuration) &&
+      maxAccessEgressStopCount == that.maxAccessEgressStopCount
     );
   }
 
@@ -129,6 +137,7 @@ public final class StreetPreferences implements Serializable {
       routingTimeout,
       intersectionTraversalModel,
       maxAccessEgressDuration,
+      maxAccessEgressStopCount,
       maxDirectDuration
     );
   }
@@ -147,6 +156,11 @@ public final class StreetPreferences implements Serializable {
         DEFAULT.intersectionTraversalModel
       )
       .addObj("maxAccessEgressDuration", maxAccessEgressDuration, DEFAULT.maxAccessEgressDuration)
+      .addObj(
+        "maxAccessEgressStopCount",
+        maxAccessEgressStopCount,
+        DEFAULT.maxAccessEgressStopCount
+      )
       .addObj("maxDirectDuration", maxDirectDuration, DEFAULT.maxDirectDuration)
       .toString();
   }
@@ -159,6 +173,7 @@ public final class StreetPreferences implements Serializable {
     private ElevatorPreferences elevator;
     private IntersectionTraversalModel intersectionTraversalModel;
     private DurationForEnum<StreetMode> maxAccessEgressDuration;
+    private int maxAccessEgressStopCount;
     private DurationForEnum<StreetMode> maxDirectDuration;
     private Duration routingTimeout;
 
@@ -169,6 +184,7 @@ public final class StreetPreferences implements Serializable {
       this.elevator = original.elevator;
       this.intersectionTraversalModel = original.intersectionTraversalModel;
       this.maxAccessEgressDuration = original.maxAccessEgressDuration;
+      this.maxAccessEgressStopCount = original.maxAccessEgressStopCount;
       this.maxDirectDuration = original.maxDirectDuration;
       this.routingTimeout = original.routingTimeout;
     }
@@ -199,6 +215,11 @@ public final class StreetPreferences implements Serializable {
 
     public Builder withMaxAccessEgressDuration(Consumer<DurationForEnum.Builder<StreetMode>> body) {
       this.maxAccessEgressDuration = this.maxAccessEgressDuration.copyOf().apply(body).build();
+      return this;
+    }
+
+    public Builder withMaxAccessEgressStopCount(int maxCount) {
+      this.maxAccessEgressStopCount = maxCount;
       return this;
     }
 

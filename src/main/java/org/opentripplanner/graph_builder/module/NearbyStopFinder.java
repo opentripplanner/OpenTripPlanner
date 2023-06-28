@@ -15,6 +15,7 @@ import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.MaxCountSkipEdgeStrategy;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.vehicletostopheuristics.BikeToStopSkipEdgeStrategy;
@@ -62,6 +63,7 @@ public class NearbyStopFinder {
   private final TransitService transitService;
 
   private final Duration durationLimit;
+  private final int maxStopCount;
   private final DataOverlayContext dataOverlayContext;
 
   private DirectGraphFinder directGraphFinder;
@@ -75,6 +77,7 @@ public class NearbyStopFinder {
   public NearbyStopFinder(
     TransitService transitService,
     Duration durationLimit,
+    int maxStopCount,
     DataOverlayContext dataOverlayContext,
     boolean useStreets
   ) {
@@ -82,6 +85,7 @@ public class NearbyStopFinder {
     this.dataOverlayContext = dataOverlayContext;
     this.useStreets = useStreets;
     this.durationLimit = durationLimit;
+    this.maxStopCount = maxStopCount;
 
     if (!useStreets) {
       // We need to accommodate straight line distance (in meters) but when streets are present we
@@ -307,6 +311,10 @@ public class NearbyStopFinder {
       var strategy = new BikeToStopSkipEdgeStrategy(transitService::getTripsForStop);
       return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else {
+      if (maxStopCount > 0) {
+        var strategy = new MaxCountSkipEdgeStrategy(maxStopCount);
+        return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
+      }
       return durationSkipEdgeStrategy;
     }
   }

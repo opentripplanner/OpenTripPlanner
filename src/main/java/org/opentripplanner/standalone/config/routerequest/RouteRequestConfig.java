@@ -540,6 +540,18 @@ do not exist.
           )
           .asEnumMap(StreetMode.class, Duration.class)
       )
+      .withMaxAccessEgressStopCount(
+        c
+          .of("maxAccessEgressStopCount")
+          .since(V2_2)
+          .summary("Maximal number of stops collected in access/egress routing")
+          .description(
+            """
+            Safety limit to prevent access to and egress from too many stops.
+            """
+          )
+          .asInt(dft.maxAccessEgressStopCount())
+      )
       .withMaxDirectDuration(
         c
           .of("maxDirectStreetDuration")

@@ -226,6 +226,8 @@ public class TransitRouter {
       .street()
       .maxAccessEgressDuration()
       .valueOf(streetRequest.mode());
+    int stopCountLimit = accessRequest.preferences().street().maxAccessEgressStopCount();
+
     var nearbyStops = AccessEgressRouter.streetSearch(
       accessRequest,
       temporaryVerticesContainer,
@@ -233,7 +235,8 @@ public class TransitRouter {
       streetRequest,
       serverContext.dataOverlayContext(accessRequest),
       type.isEgress(),
-      durationLimit
+      durationLimit,
+      stopCountLimit
     );
 
     List<DefaultAccessEgress> results = new ArrayList<>(
