@@ -8,8 +8,8 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
 
-public class LegacyGraphQLFareProductImpl
-  implements LegacyGraphQLDataFetchers.LegacyGraphQLFareProduct {
+public class LegacyGraphQLDefaultFareProductImpl
+  implements LegacyGraphQLDataFetchers.LegacyGraphQLDefaultFareProduct {
 
   @Override
   public DataFetcher<String> id() {

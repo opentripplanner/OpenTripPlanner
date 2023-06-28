@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.service;
 
 import java.time.ZoneId;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.via.ViaRoutingWorker;
 import org.opentripplanner.routing.api.RoutingService;
@@ -28,6 +29,7 @@ public class DefaultRoutingService implements RoutingService {
 
   @Override
   public RoutingResponse route(RouteRequest request) {
+    OTPRequestTimeoutException.checkForTimeout();
     request.validateOriginAndDestination();
     RoutingWorker worker = new RoutingWorker(serverContext, request, timeZone);
     return worker.route();
@@ -35,6 +37,7 @@ public class DefaultRoutingService implements RoutingService {
 
   @Override
   public ViaRoutingResponse route(RouteViaRequest request) {
+    OTPRequestTimeoutException.checkForTimeout();
     var viaRoutingWorker = new ViaRoutingWorker(
       request,
       req ->

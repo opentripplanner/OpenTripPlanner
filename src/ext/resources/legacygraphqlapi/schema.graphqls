@@ -1325,7 +1325,31 @@ type FareProductUse {
 }
 
 "A fare product (a ticket) to be bought by a passenger"
-type FareProduct {
+interface FareProduct {
+    "Identifier for the fare product."
+    id: String!
+
+    """
+    Human readable name of the product, for example example "Day pass" or "Single ticket".
+    """
+    name: String!
+
+    "The category of riders this product applies to, for example students or pensioners."
+    riderCategory: RiderCategory
+
+    """
+    The 'medium' that this product applies to, for example "Oyster Card" or "Berlin Ticket App".
+
+    This communicates to riders that a specific way of buying or keeping this product is required.
+    """
+    medium: FareMedium
+}
+
+"""
+The standard case of a fare product: it only has a single price to be paid by the passenger
+and no discounts are applied.
+"""
+type DefaultFareProduct implements FareProduct {
     "Identifier for the fare product."
     id: String!
 
@@ -1383,12 +1407,6 @@ type Itinerary {
     legs: [Leg]!
 
     """
-    Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
-    will be removed in the future.
-    """
-    fares: [fare] @deprecated(reason: "Use the leg's `fareProducts`.")
-
-    """
     How much elevation is gained, in total, over the course of the itinerary, in meters.
     """
     elevationGained: Float
@@ -1420,6 +1438,16 @@ type Itinerary {
     More information is available in the [feature documentation](https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/).
     """
     accessibilityScore: Float
+
+    #
+    # deprecated fields
+    #
+
+    """
+    Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
+    will be removed in the future.
+    """
+    fares: [fare] @deprecated(reason: "Use the leg's `fareProducts`.")
 }
 
 "A currency"
@@ -1720,7 +1748,7 @@ enum Mode {
     GONDOLA
 
     """Only used internally. No use for API users."""
-    LEG_SWITCH
+    LEG_SWITCH @deprecated
 
     """RAIL"""
     RAIL
@@ -2634,6 +2662,8 @@ type QueryType {
     Get a single vehicle rental station based on its ID, i.e. value of field `stationId`
     """
     vehicleRentalStation(id: String!): VehicleRentalStation
+
+    ## Deprecated fields
 
     """Get all bike parks"""
     bikeParks: [BikePark] @deprecated(reason: "bikeParks is deprecated. Use vehicleParkings instead.")

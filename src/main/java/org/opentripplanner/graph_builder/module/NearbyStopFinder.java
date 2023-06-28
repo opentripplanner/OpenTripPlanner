@@ -20,6 +20,7 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.vehicletostopheuristics.BikeToStopSkipEdgeStrategy;
 import org.opentripplanner.ext.vehicletostopheuristics.VehicleToStopSkipEdgeStrategy;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
@@ -188,6 +189,8 @@ public class NearbyStopFinder {
     RouteRequest request,
     StreetRequest streetRequest
   ) {
+    OTPRequestTimeoutException.checkForTimeout();
+
     List<NearbyStop> stopsFound = createDirectlyConnectedStops(
       originVertices,
       reverseDirection,

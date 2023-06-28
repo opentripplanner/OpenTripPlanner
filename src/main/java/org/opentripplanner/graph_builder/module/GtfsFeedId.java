@@ -82,7 +82,7 @@ public class GtfsFeedId {
      */
     public GtfsFeedId build() {
       id = cleanId(id);
-      if (id == null || id.trim().length() == 0) {
+      if (id == null) {
         id = String.valueOf(FEED_ID_COUNTER);
       }
       FEED_ID_COUNTER++;
@@ -95,13 +95,14 @@ public class GtfsFeedId {
      * @param id The feed id
      * @return The cleaned id.
      */
-    protected String cleanId(String id) {
+    private String cleanId(String id) {
       if (id == null || id.trim().length() == 0) {
-        return id;
+        return null;
       }
-      // 1. Underscore is used as an separator by OBA.
-      // 2. Colon is used as an separator in OTP.
-      return id.replaceAll("_", "").replaceAll(":", "");
+      // Colon is used as a separator in OTP so that's why we strip it out - it will confuse the
+      // parsers in the API (but those could be updated if someone is keen to use colons as the feed
+      // id).
+      return id.replace(":", "");
     }
   }
 }

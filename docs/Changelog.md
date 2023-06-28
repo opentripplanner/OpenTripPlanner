@@ -29,7 +29,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Handle CoercingParseValueException [#5133](https://github.com/opentripplanner/OpenTripPlanner/pull/5133)
 - Remove broken Jersey tracing configuration [#5142](https://github.com/opentripplanner/OpenTripPlanner/pull/5142)
 - Graceful timeout error handling [#5130](https://github.com/opentripplanner/OpenTripPlanner/pull/5130)
-- Log http request headers - like  [#5131](https://github.com/opentripplanner/OpenTripPlanner/pull/5131)
+- Log http request headers - like correlationId [#5131](https://github.com/opentripplanner/OpenTripPlanner/pull/5131)
 - Fix vertex removal race condition [#5141](https://github.com/opentripplanner/OpenTripPlanner/pull/5141)
 - Comment out replacing DSJ-ID from planned data with ID from realtime-data [#5140](https://github.com/opentripplanner/OpenTripPlanner/pull/5140)
 - Remove San Francisco and vehicle rental fare calculators [#5145](https://github.com/opentripplanner/OpenTripPlanner/pull/5145)
@@ -49,6 +49,12 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Validate distinct from/to temporary vertices [#5181](https://github.com/opentripplanner/OpenTripPlanner/pull/5181)
 - Add support for taxi mode [#5183](https://github.com/opentripplanner/OpenTripPlanner/pull/5183)
 - Fix bike triangle in Transmodel API [#5179](https://github.com/opentripplanner/OpenTripPlanner/pull/5179)
+- Bug fixes in stop area relation processing [#5166](https://github.com/opentripplanner/OpenTripPlanner/pull/5166)
+- Enable GTFS GraphQL API by default, remove the word "legacy" from its documentation [#5202](https://github.com/opentripplanner/OpenTripPlanner/pull/5202)
+- Allow underscores in GTFS feed IDs [#5191](https://github.com/opentripplanner/OpenTripPlanner/pull/5191)
+- Area vertex linking improvements [#5209](https://github.com/opentripplanner/OpenTripPlanner/pull/5209)
+- Allow multiple FlexibleAreas in a FlexibleStopPlace [#4922](https://github.com/opentripplanner/OpenTripPlanner/pull/4922)
+- Preemptively make a GraphQL FareProduct an interface [#5207](https://github.com/opentripplanner/OpenTripPlanner/pull/5207)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

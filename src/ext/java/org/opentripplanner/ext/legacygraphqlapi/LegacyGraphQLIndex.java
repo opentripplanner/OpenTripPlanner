@@ -40,8 +40,9 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCarPar
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLContactInfoImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCoordinatesImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCurrencyImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLDefaultFareProductImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLDepartureRowImpl;
-import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFareProductImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFareProductTypeResolver;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFareProductUseImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFeedImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLGeometryImpl;
@@ -172,7 +173,8 @@ class LegacyGraphQLIndex {
         .type(typeWiring.build(LegacyGraphQLMoneyImpl.class))
         .type(typeWiring.build(LegacyGraphQLCurrencyImpl.class))
         .type(typeWiring.build(LegacyGraphQLFareProductUseImpl.class))
-        .type(typeWiring.build(LegacyGraphQLFareProductImpl.class))
+        .type("FareProduct", type -> type.typeResolver(new LegacyGraphQLFareProductTypeResolver()))
+        .type(typeWiring.build(LegacyGraphQLDefaultFareProductImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
