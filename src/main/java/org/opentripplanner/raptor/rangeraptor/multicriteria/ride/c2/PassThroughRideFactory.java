@@ -4,7 +4,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
 
-public class ViaRideFactory<T extends RaptorTripSchedule>
+public class PassThroughRideFactory<T extends RaptorTripSchedule>
   implements PatternRideFactory<T, PatternRideC2<T>> {
 
   @Override

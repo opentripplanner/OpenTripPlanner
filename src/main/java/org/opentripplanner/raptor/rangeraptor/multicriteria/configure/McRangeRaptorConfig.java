@@ -25,9 +25,9 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.heuristic.Heuristics
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.PassThroughRideFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.PatternRideC2;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.TransitPriorityGroupRideFactory;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.ViaRideFactory;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
@@ -83,7 +83,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     ParetoComparator<R> patternRideComparator
   ) {
     // TODO Verify that this works.
-    final PassThroughPoints passthroughPoints = context
+    final PassThroughPoints passThroughPoints = context
       .multiCriteria()
       .transitPassThroughRequest()
       .map(RaptorTransitPassThroughRequest::passThroughPoints)
@@ -96,7 +96,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
       context.costCalculator(),
       context.slackProvider(),
       createPatternRideParetoSet(patternRideComparator),
-      passthroughPoints
+      passThroughPoints
     );
   }
 
@@ -173,7 +173,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private PatternRideFactory<T, PatternRideC2<T>> createPatternRideC2Factory() {
     if (mcRequest().transitPassThroughRequest().isPresent()) {
-      return new ViaRideFactory<>();
+      return new PassThroughRideFactory<>();
     } else if (mcRequest().transitPriorityCalculator().isPresent()) {
       return new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator());
     } else {

@@ -68,15 +68,18 @@ public final class MultiCriteriaRoutingStrategy<
 
   @Override
   public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
-    // TODO: 2023-05-11 pass through via: add extra c2 to the ride
-
-    for (R ride : patternRides) {
-      // TODO passthroughIndex should not be hardcoded to '0' but rather set the current passthrough point we're looking for.
-      if (ride.c2() == 0 && passThroughPoints.isPassThroughPoint(0, stopIndex)) {
-        ride = patternRideFactory.createPatternRide(ride, 1);
+    if (passThroughPoints.size() != 0) {
+      for (R ride : patternRides) {
+        int c2 = ride.c2();
+        if (c2 < passThroughPoints.size() && passThroughPoints.isPassThroughPoint(c2, stopIndex)) {
+          ride = patternRideFactory.createPatternRide(ride, c2 + 1);
+        }
+        state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
       }
-
-      state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
+    } else {
+      for (R ride : patternRides) {
+        state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
+      }
     }
   }
 
