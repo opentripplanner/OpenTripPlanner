@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>109</otp.serialization.version.id>
+        <otp.serialization.version.id>110</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>29.1</geotools.version>
         <google.dagger.version>2.46.1</google.dagger.version>
