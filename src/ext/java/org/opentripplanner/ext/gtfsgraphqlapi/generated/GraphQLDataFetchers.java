@@ -293,6 +293,22 @@ public class GraphQLDataFetchers {
   }
 
   /**
+   * The standard case of a fare product: it only has a single price to be paid by the passenger
+   * and no discounts are applied.
+   */
+  public interface GraphQLDefaultFareProduct {
+    public DataFetcher<String> id();
+
+    public DataFetcher<FareMedium> medium();
+
+    public DataFetcher<String> name();
+
+    public DataFetcher<Money> price();
+
+    public DataFetcher<RiderCategory> riderCategory();
+  }
+
+  /**
    * Departure row is a location, which lists departures of a certain pattern from a
    * stop. Departure rows are identified with the pattern, so querying departure rows
    * will return only departures from one stop per pattern
@@ -319,16 +335,22 @@ public class GraphQLDataFetchers {
   }
 
   /** A fare product (a ticket) to be bought by a passenger */
-  public interface GraphQLFareProduct {
-    public DataFetcher<String> id();
+  public interface GraphQLFareProduct extends TypeResolver {
+    public default DataFetcher<String> id() {
+      return null;
+    }
 
-    public DataFetcher<FareMedium> medium();
+    public default DataFetcher<FareMedium> medium() {
+      return null;
+    }
 
-    public DataFetcher<String> name();
+    public default DataFetcher<String> name() {
+      return null;
+    }
 
-    public DataFetcher<Money> price();
-
-    public DataFetcher<RiderCategory> riderCategory();
+    public default DataFetcher<RiderCategory> riderCategory() {
+      return null;
+    }
   }
 
   /** A container for both a fare product (a ticket) and its relationship to the itinerary. */

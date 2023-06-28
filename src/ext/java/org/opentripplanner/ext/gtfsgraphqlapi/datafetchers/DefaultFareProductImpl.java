@@ -8,7 +8,7 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.transit.model.basic.Money;
 
-public class FareProductImpl implements GraphQLDataFetchers.GraphQLFareProduct {
+public class DefaultFareProductImpl implements GraphQLDataFetchers.GraphQLDefaultFareProduct {
 
   @Override
   public DataFetcher<String> id() {

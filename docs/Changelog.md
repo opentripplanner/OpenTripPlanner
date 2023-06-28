@@ -54,6 +54,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Allow underscores in GTFS feed IDs [#5191](https://github.com/opentripplanner/OpenTripPlanner/pull/5191)
 - Area vertex linking improvements [#5209](https://github.com/opentripplanner/OpenTripPlanner/pull/5209)
 - Allow multiple FlexibleAreas in a FlexibleStopPlace [#4922](https://github.com/opentripplanner/OpenTripPlanner/pull/4922)
+- Preemptively make a GraphQL FareProduct an interface [#5207](https://github.com/opentripplanner/OpenTripPlanner/pull/5207)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
