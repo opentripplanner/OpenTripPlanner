@@ -55,6 +55,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Area vertex linking improvements [#5209](https://github.com/opentripplanner/OpenTripPlanner/pull/5209)
 - Allow multiple FlexibleAreas in a FlexibleStopPlace [#4922](https://github.com/opentripplanner/OpenTripPlanner/pull/4922)
 - Preemptively make a GraphQL FareProduct an interface [#5207](https://github.com/opentripplanner/OpenTripPlanner/pull/5207)
+- Access and egress penalty on time and cost [#5180](https://github.com/opentripplanner/OpenTripPlanner/pull/5180)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
