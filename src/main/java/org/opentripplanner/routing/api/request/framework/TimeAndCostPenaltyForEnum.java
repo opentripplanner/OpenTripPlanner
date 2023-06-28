@@ -117,7 +117,7 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
     }
 
     /**
-     * Build a copy of the current values. This will create a defencive copy of the builder values.
+     * Build a copy of the current values. This will create a defensive copy of the builder values.
      * Hence, the builder can be used to generate new values if desired.
      * */
     Map<E, TimeAndCostPenalty> valuesCopy() {

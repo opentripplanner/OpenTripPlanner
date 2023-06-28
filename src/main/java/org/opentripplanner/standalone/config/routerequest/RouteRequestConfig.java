@@ -524,7 +524,7 @@ ferries, where the check-in process needs to be done in good time before ride.
           .description(
             """
             Use this to add a time and cost penalty to an access/egress legs for a given street
-            mode. This will favour other street-modes and transit. This have a performance penalty,
+            mode. This will favour other street-modes and transit. This has a performance penalty,
             since the search-window is increased with the same amount as the maximum penalty for
             the access legs used. In other cases where the access(CAR) is faster than transit the
             performance will be better.
@@ -539,7 +539,7 @@ ferries, where the check-in process needs to be done in good time before ride.
             **Cost factor**
             
             The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
-            time-penalty is multiplied with the cost-factor. A cost-factor of zero, give no
+            time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
             extra cost, while 1.0 will add the same amount to both time and cost.
             """
           )
