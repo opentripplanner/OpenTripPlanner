@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -186,11 +187,15 @@ public class VehiclePositionPatternMatcher {
   /**
    * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be used by
    * the API.
+   *
+   * @param stopIndexOfGtfsSequence A function that takes a GTFS stop_sequence and returns the index
+   *                                of the stop in the trip.
    */
-  private static RealtimeVehiclePosition mapVehiclePosition(
+  private RealtimeVehiclePosition mapVehiclePosition(
     VehiclePosition vehiclePosition,
     List<StopLocation> stopsOnVehicleTrip,
-    @Nonnull TripTimes tripTimes
+    @Nonnull Trip trip,
+    @Nonnull Function<Integer, OptionalInt> stopIndexOfGtfsSequence
   ) {
     var newPosition = RealtimeVehiclePosition.builder();
 
@@ -210,7 +215,7 @@ public class VehiclePositionPatternMatcher {
 
     if (vehiclePosition.hasVehicle()) {
       var vehicle = vehiclePosition.getVehicle();
-      var id = new FeedScopedId(tripTimes.getTrip().getId().getFeedId(), vehicle.getId());
+      var id = new FeedScopedId(feedId, vehicle.getId());
       newPosition
         .setVehicleId(id)
         .setLabel(Optional.ofNullable(vehicle.getLabel()).orElse(vehicle.getLicensePlate()));
@@ -236,14 +241,14 @@ public class VehiclePositionPatternMatcher {
         LOG.warn(
           "Stop ID {} is not in trip {}. Not setting stopRelationship.",
           vehiclePosition.getStopId(),
-          tripTimes.getTrip().getId()
+          trip.getId()
         );
       }
     }
     // but if stop_id isn't there we try current_stop_sequence
     else if (vehiclePosition.hasCurrentStopSequence()) {
-      tripTimes
-        .stopIndexOfGtfsSequence(vehiclePosition.getCurrentStopSequence())
+      stopIndexOfGtfsSequence
+        .apply(vehiclePosition.getCurrentStopSequence())
         .ifPresent(stopIndex -> {
           if (validStopIndex(stopIndex, stopsOnVehicleTrip)) {
             var stop = stopsOnVehicleTrip.get(stopIndex);
@@ -252,7 +257,7 @@ public class VehiclePositionPatternMatcher {
         });
     }
 
-    newPosition.setTrip(tripTimes.getTrip());
+    newPosition.setTrip(trip);
 
     return newPosition.build();
   }
@@ -323,14 +328,21 @@ public class VehiclePositionPatternMatcher {
       return UpdateError.result(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
-    var tripTimes = pattern.getScheduledTimetable().getTripTimes(trip);
-    if (tripTimes == null) {
-      LOG.debug("No trip {} found in {}", trip, pattern);
+    // the trip times are only used or mapping the GTFS-RT stop_sequence back to a stop.
+    // because new trips without trip times are created for realtime-updated ones, we explicitly
+    // look at the static trips for the stop_sequence->stop mapping
+    var staticTripTimes = getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
+    if (staticTripTimes == null) {
       return UpdateError.result(scopedTripId, TRIP_NOT_FOUND_IN_PATTERN);
     }
 
     // Add position to pattern
-    var newPosition = mapVehiclePosition(vehiclePosition, pattern.getStops(), tripTimes);
+    var newPosition = mapVehiclePosition(
+      vehiclePosition,
+      pattern.getStops(),
+      trip,
+      staticTripTimes::stopIndexOfGtfsSequence
+    );
 
     return Result.success(new PatternAndVehiclePosition(pattern, newPosition));
   }
