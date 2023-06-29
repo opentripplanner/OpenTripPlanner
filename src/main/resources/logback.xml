@@ -52,6 +52,8 @@
   <logger name="DATA_IMPORT_ISSUES" level="info" />
 
   <logger name="org.opentripplanner" level="info"/>
+
+  <logger name="org.opentripplanner.framework.application" level="info"/>
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info"/>
 
 

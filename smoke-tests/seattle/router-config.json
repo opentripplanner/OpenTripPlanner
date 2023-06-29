@@ -2,19 +2,19 @@
   "updaters": [
     {
       "type": "stop-time-updater",
-      "frequencySec": 30,
+      "frequency": "30s",
       "url": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/tripupdates.pb",
       "feedId": "kcm"
     },
     {
       "type": "real-time-alerts",
-      "frequencySec": 30,
+      "frequency": "30s",
       "url": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/alerts.pb",
       "feedId": "kcm"
     },
     {
       "type": "vehicle-positions",
-      "frequencySec": 30,
+      "frequency": "30s",
       "url": "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
       "feedId": "kcm"
     }

@@ -84,7 +84,6 @@ public class ItineraryFares {
    * <p>
    * @deprecated It only exists for backwards-compatibility.
    * Use {@link ItineraryFares#addFareProduct(Leg, FareProduct)},
-   * {@link ItineraryFares#addLegProducts(Collection)} or
    * {@link ItineraryFares#addItineraryProducts(Collection)} instead.
    */
   @Deprecated
@@ -99,7 +98,6 @@ public class ItineraryFares {
    * @deprecated Only exitst for backwards compatibility.
    * Use @{link {@link ItineraryFares#addItineraryProducts(Collection)}},
    * {@link ItineraryFares#addFareProduct(Leg, FareProduct)} or
-   * {@link ItineraryFares#addLegProducts(Collection)} instead.
    */
   @Deprecated
   public void addFareComponent(FareType fareType, List<FareComponent> components) {
