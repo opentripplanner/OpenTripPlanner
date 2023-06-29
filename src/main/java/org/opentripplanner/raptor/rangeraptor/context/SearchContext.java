@@ -28,6 +28,7 @@ import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.ForwardRaptorTransitCalculator;
+import org.opentripplanner.raptor.rangeraptor.transit.PassThroughForwardRaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.ReverseRaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
@@ -254,10 +255,29 @@ public class SearchContext<T extends RaptorTripSchedule> {
     RaptorRequest<T> r,
     RaptorTuningParameters t
   ) {
+    var forward = r.searchDirection().isForward();
     SearchParams s = r.searchParams();
-    return r.searchDirection().isForward()
-      ? new ForwardRaptorTransitCalculator<>(s, t)
-      : new ReverseRaptorTransitCalculator<>(s, t);
+
+    if (r.multiCriteria().transitPassthroughRequest().isPresent()) {
+      var requiredC2 = r
+        .multiCriteria()
+        .transitPassthroughRequest()
+        .get()
+        .passthroughPoints()
+        .size();
+      if (forward) {
+        return new PassThroughForwardRaptorTransitCalculator<>(s, t, requiredC2);
+      } else {
+        // TODO: 2023-06-29 via pass through: we should have pass-through calculator for reverse as well
+        return new ReverseRaptorTransitCalculator<>(s, t);
+      }
+    } else {
+      if (forward) {
+        return new ForwardRaptorTransitCalculator<>(s, t);
+      } else {
+        return new ReverseRaptorTransitCalculator<>(s, t);
+      }
+    }
   }
 
   private static DebugRequest debugRequest(RaptorRequest<?> request) {

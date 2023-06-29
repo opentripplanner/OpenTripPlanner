@@ -86,9 +86,9 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
       return;
     }
 
-    // TODO: 2023-05-17 via pass through: somewhere here we should filter out all paths without via
-    if (transitCalculator.exceedsTimeLimit(destArrival.arrivalTime()) || destArrival.c2() == 0) {
-      debugRejectByTimeLimitOptimization(destArrival);
+    var errors = transitCalculator.validate(destArrival);
+    if (!errors.isEmpty()) {
+      debugReject(destArrival, String.join(" ", errors));
     } else {
       RaptorPath<T> path = pathMapper.mapToPath(destArrival);
 

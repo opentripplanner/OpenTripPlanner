@@ -3,11 +3,13 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.opentripplanner.framework.time.TimeUtils.hm2time;
 import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
+import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
@@ -61,6 +63,11 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule>
       ? new ForwardRaptorTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60)
       : new ReverseRaptorTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60);
   }
+
+  /**
+   * Generate a list of validation errors. If list is empty then validation was successful.
+   */
+  Collection<String> validate(ArrivalView<T> destArrival);
 
   /**
    * Stop the search when the time exceeds the latest-acceptable-arrival-time. In a reverse search
