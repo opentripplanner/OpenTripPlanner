@@ -4,7 +4,6 @@ import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.PassThroughPoints;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
@@ -23,18 +22,15 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class MultiCriteriaRoutingStrategy<
-  T extends RaptorTripSchedule, R extends PatternRide<T>
->
+public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extends PatternRide<T>>
   implements RoutingStrategy<T> {
 
-  private final McRangeRaptorWorkerState<T> state;
-  private final TimeBasedBoardingSupport<T> boardingSupport;
-  private final PatternRideFactory<T, R> patternRideFactory;
-  private final ParetoSet<R> patternRides;
-  private final RaptorCostCalculator<T> generalizedCostCalculator;
-  private final SlackProvider slackProvider;
-  private final PassThroughPoints passThroughPoints;
+  protected final McRangeRaptorWorkerState<T> state;
+  protected final TimeBasedBoardingSupport<T> boardingSupport;
+  protected final PatternRideFactory<T, R> patternRideFactory;
+  protected final ParetoSet<R> patternRides;
+  protected final RaptorCostCalculator<T> generalizedCostCalculator;
+  protected final SlackProvider slackProvider;
 
   public MultiCriteriaRoutingStrategy(
     McRangeRaptorWorkerState<T> state,
@@ -42,8 +38,7 @@ public final class MultiCriteriaRoutingStrategy<
     PatternRideFactory<T, R> patternRideFactory,
     RaptorCostCalculator<T> generalizedCostCalculator,
     SlackProvider slackProvider,
-    ParetoSet<R> patternRides,
-    PassThroughPoints passThroughPoints
+    ParetoSet<R> patternRides
   ) {
     this.state = state;
     this.boardingSupport = boardingSupport;
@@ -51,7 +46,6 @@ public final class MultiCriteriaRoutingStrategy<
     this.generalizedCostCalculator = generalizedCostCalculator;
     this.slackProvider = slackProvider;
     this.patternRides = patternRides;
-    this.passThroughPoints = passThroughPoints;
   }
 
   @Override
@@ -68,18 +62,8 @@ public final class MultiCriteriaRoutingStrategy<
 
   @Override
   public void alightOnlyRegularTransferExist(int stopIndex, int stopPos, int alightSlack) {
-    if (passThroughPoints.size() != 0) {
-      for (R ride : patternRides) {
-        int c2 = ride.c2();
-        if (c2 < passThroughPoints.size() && passThroughPoints.isPassThroughPoint(c2, stopIndex)) {
-          ride = patternRideFactory.createPatternRide(ride, c2 + 1);
-        }
-        state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
-      }
-    } else {
-      for (R ride : patternRides) {
-        state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
-      }
+    for (R ride : patternRides) {
+      state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
     }
   }
 
