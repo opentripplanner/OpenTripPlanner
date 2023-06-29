@@ -1,13 +1,12 @@
 package org.opentripplanner.astar.strategy;
 
-import java.util.HashSet;
+import java.util.function.Function;
 import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.astar.spi.AStarState;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
-import org.opentripplanner.street.model.vertex.TransitStopVertex;
 
 /**
- * Skips edges when the specified number of stops have been visited
+ * Skips edges when the specified number of desired vertices have been visited
  */
 public class MaxCountSkipEdgeStrategy<
   State extends AStarState<State, Edge, ?>, Edge extends AStarEdge<State, Edge, ?>
@@ -15,17 +14,21 @@ public class MaxCountSkipEdgeStrategy<
   implements SkipEdgeStrategy<State, Edge> {
 
   private final int maxCount;
-  private final HashSet<TransitStopVertex> stopsCounted = new HashSet<>();
+  private final Function<Object, Boolean> acceptVertex;
 
-  public MaxCountSkipEdgeStrategy(int count) {
+  private int visited;
+
+  public MaxCountSkipEdgeStrategy(int count, Function<Object, Boolean> acceptVertex) {
     this.maxCount = count;
+    this.acceptVertex = acceptVertex;
+    this.visited = 0;
   }
 
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
-    if (current.getVertex() instanceof TransitStopVertex stopVertex) {
-      stopsCounted.add(stopVertex);
+    if (this.acceptVertex.apply(current.getVertex())) {
+      visited++;
     }
-    return stopsCounted.size() > maxCount;
+    return visited > maxCount;
   }
 }

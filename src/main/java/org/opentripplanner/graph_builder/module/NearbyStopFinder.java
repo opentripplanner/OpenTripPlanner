@@ -68,6 +68,10 @@ public class NearbyStopFinder {
 
   private DirectGraphFinder directGraphFinder;
 
+  public static Boolean isTransitVertex(Object vertex) {
+    return vertex instanceof TransitStopVertex;
+  }
+
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
    *
@@ -312,7 +316,10 @@ public class NearbyStopFinder {
       return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else {
       if (maxStopCount > 0) {
-        var strategy = new MaxCountSkipEdgeStrategy(maxStopCount);
+        var strategy = new MaxCountSkipEdgeStrategy(
+          maxStopCount,
+          NearbyStopFinder::isTransitVertex
+        );
         return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
       }
       return durationSkipEdgeStrategy;
