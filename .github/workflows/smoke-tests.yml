@@ -42,7 +42,7 @@ jobs:
 
       - name: Build jar file, compile tests
         run: |
-          mvn --batch-mode clean package -Dmaven.test.skip -P prettierSkip
+          mvn --no-transfer-progress clean package -Dmaven.test.skip -P prettierSkip
           mvn org.apache.maven.plugins:maven-compiler-plugin:testCompile
 
       - name: Cache OSM files
@@ -67,7 +67,7 @@ jobs:
 
           # run the actual smoke tests
           # we run surefire:test in order to not recompile the tests for each city
-          mvn surefire:test -Djunit.tags.included="${{ matrix.locations.name }}" -Djunit.tags.excluded="" -P prettierSkip
+          mvn --no-transfer-progress surefire:test -Djunit.tags.included="${{ matrix.locations.name }}" -Djunit.tags.excluded="" -P prettierSkip
 
           # shutting down the OTP instance running in the background (via make)
           killall make
