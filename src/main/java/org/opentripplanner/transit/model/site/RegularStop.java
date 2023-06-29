@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.SubMode;
@@ -108,7 +108,7 @@ public final class RegularStop
 
   @Override
   @Nonnull
-  public Geometry getGeometry() {
+  public Point getGeometry() {
     return GeometryUtils.getGeometryFactory().createPoint(getCoordinate().asJtsCoordinate());
   }
 

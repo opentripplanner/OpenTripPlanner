@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.ext.flex.FlexRouter;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -23,6 +24,7 @@ public class DirectFlexRouter {
     if (!StreetMode.FLEXIBLE.equals(request.journey().direct().mode())) {
       return Collections.emptyList();
     }
+    OTPRequestTimeoutException.checkForTimeout();
     try (
       var temporaryVertices = new TemporaryVerticesContainer(
         serverContext.graph(),

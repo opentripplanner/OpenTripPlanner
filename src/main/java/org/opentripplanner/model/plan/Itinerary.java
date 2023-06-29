@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFares;
@@ -38,6 +40,8 @@ public class Itinerary {
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
   private int generalizedCost = UNKNOWN;
+  private TimeAndCost accessPenalty = null;
+  private TimeAndCost egressPenalty = null;
   private int waitTimeOptimizedCost = UNKNOWN;
   private int transferPriorityCost = UNKNOWN;
   private boolean tooSloped = false;
@@ -448,6 +452,24 @@ public class Itinerary {
 
   public void setGeneralizedCost(int generalizedCost) {
     this.generalizedCost = generalizedCost;
+  }
+
+  @Nullable
+  public TimeAndCost getAccessPenalty() {
+    return accessPenalty;
+  }
+
+  public void setAccessPenalty(TimeAndCost accessPenalty) {
+    this.accessPenalty = accessPenalty;
+  }
+
+  @Nullable
+  public TimeAndCost getEgressPenalty() {
+    return egressPenalty;
+  }
+
+  public void setEgressPenalty(TimeAndCost egressPenalty) {
+    this.egressPenalty = egressPenalty;
   }
 
   /**

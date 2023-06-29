@@ -27,9 +27,6 @@ import org.opentripplanner.updater.spi.UpdateSuccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// this is only currently in edgetype because that's where Trippattern is.
-// move these classes elsewhere.
-
 /**
  * Part of concurrency control for stoptime updates.
  * <p>
@@ -40,8 +37,6 @@ import org.slf4j.LoggerFactory;
  * <p>
  * At this point, only one writing thread at a time is supported.
  * <p>
- *  TODO OTP2 - Move this to package: org.opentripplanner.model
- *            - after ass Entur NeTEx PRs are merged.
  */
 public class TimetableSnapshot {
 
