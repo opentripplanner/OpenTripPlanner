@@ -51,4 +51,9 @@ public class SeattleSmokeTest {
 
     assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS"), modes);
   }
+
+  @Test
+  public void vehiclePositions() {
+    SmokeTest.assertThereArePatternsWithVehiclePositions();
+  }
 }
