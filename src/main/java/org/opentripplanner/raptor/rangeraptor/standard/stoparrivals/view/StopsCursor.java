@@ -2,8 +2,8 @@ package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.view;
 
 import java.util.function.ToIntFunction;
 import javax.annotation.Nonnull;
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;

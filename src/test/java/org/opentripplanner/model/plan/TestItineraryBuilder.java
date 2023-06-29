@@ -103,12 +103,22 @@ public class TestItineraryBuilder implements PlanTestConstants {
    *
    * @param duration number of seconds to walk
    */
-  public TestItineraryBuilder walk(int duration, Place to) {
+  public TestItineraryBuilder walk(int duration, Place to, List<WalkStep> steps) {
     if (lastEndTime == NOT_SET) {
       throw new IllegalStateException("Start time unknown!");
     }
     int legCost = cost(WALK_RELUCTANCE_FACTOR, duration);
-    streetLeg(WALK, lastEndTime, lastEndTime + duration, to, legCost);
+    streetLeg(WALK, lastEndTime, lastEndTime + duration, to, legCost, steps);
+    return this;
+  }
+
+  /**
+   * Add a walking leg to the itinerary
+   *
+   * @param duration number of seconds to walk
+   */
+  public TestItineraryBuilder walk(int duration, Place to) {
+    walk(duration, to, List.of());
     return this;
   }
 
@@ -117,13 +127,13 @@ public class TestItineraryBuilder implements PlanTestConstants {
    */
   public TestItineraryBuilder bicycle(int startTime, int endTime, Place to) {
     int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
-    streetLeg(BICYCLE, startTime, endTime, to, legCost);
+    streetLeg(BICYCLE, startTime, endTime, to, legCost, List.of());
     return this;
   }
 
   public TestItineraryBuilder drive(int startTime, int endTime, Place to) {
     int legCost = cost(CAR_RELUCTANCE_FACTOR, endTime - startTime);
-    streetLeg(CAR, startTime, endTime, to, legCost);
+    streetLeg(CAR, startTime, endTime, to, legCost, List.of());
     return this;
   }
 
@@ -132,7 +142,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
    */
   public TestItineraryBuilder rentedBicycle(int startTime, int endTime, Place to) {
     int legCost = cost(BICYCLE_RELUCTANCE_FACTOR, endTime - startTime);
-    streetLeg(BICYCLE, startTime, endTime, to, legCost);
+    streetLeg(BICYCLE, startTime, endTime, to, legCost, List.of());
     var leg = ((StreetLeg) this.legs.get(0));
     var updatedLeg = StreetLegBuilder.of(leg).withRentedVehicle(true).build();
     this.legs.add(0, updatedLeg);
@@ -363,12 +373,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
       to,
       null,
       null,
-      new ConstrainedTransfer(null, null, null, TransferConstraint.create().staySeated().build())
+      new ConstrainedTransfer(null, null, null, TransferConstraint.of().staySeated().build())
     );
   }
 
   public TestItineraryBuilder carHail(int duration, Place to) {
-    var streetLeg = streetLeg(CAR, lastEndTime, lastEndTime + duration, to, 1000);
+    var streetLeg = streetLeg(CAR, lastEndTime, lastEndTime + duration, to, 1000, List.of());
 
     var rhl = new RideHailingLeg(
       streetLeg,
@@ -376,11 +386,10 @@ public class TestItineraryBuilder implements PlanTestConstants {
       new RideEstimate(
         RideHailingProvider.UBER,
         Duration.ofSeconds(duration),
-        Money.euros(1000),
-        Money.euros(2000),
+        Money.euros(10),
+        Money.euros(20),
         "VW",
-        "UberX",
-        true
+        "UberX"
       )
     );
     // the removal is necessary because the call to streetLeg() also adds a leg to the list
@@ -508,7 +517,8 @@ public class TestItineraryBuilder implements PlanTestConstants {
     int startTime,
     int endTime,
     Place to,
-    int legCost
+    int legCost,
+    List<WalkStep> walkSteps
   ) {
     StreetLeg leg = StreetLeg
       .create()
@@ -519,7 +529,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       .withTo(stop(to))
       .withDistanceMeters(speed(mode) * (endTime - startTime))
       .withGeneralizedCost(legCost)
-      .withWalkSteps(List.of())
+      .withWalkSteps(walkSteps)
       .build();
 
     legs.add(leg);

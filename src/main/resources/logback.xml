@@ -17,8 +17,8 @@
 
   <appender name="plain" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <!-- print out file and line number in parenthesis, which Eclipse and IDEA will link -->
-      <pattern>%d{HH:mm:ss.SSS} %level \(%F:%L\) %msg%n</pattern>
+      <!-- print out file and line number in parentheses, which Eclipse and IDEA will link -->
+      <pattern>%d{HH:mm:ss.SSS} %level [%thread] %X{correlationId} \(%F:%L\) %msg%n</pattern>
     </encoder>
   </appender>
 
@@ -52,6 +52,8 @@
   <logger name="DATA_IMPORT_ISSUES" level="info" />
 
   <logger name="org.opentripplanner" level="info"/>
+
+  <logger name="org.opentripplanner.framework.application" level="info"/>
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info"/>
 
 
@@ -77,6 +79,7 @@
   <logger name="com.amazonaws" level="info"/>
   <logger name="org.apache.http" level="info" />
   <logger name="com.conveyal" level="info"/>
+  <logger name="notprivacysafe.graphql" level="off" />
 
   <!-- Avoid printing info messages about calendars when building graph -->
   <logger name="org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl" level="warn" />

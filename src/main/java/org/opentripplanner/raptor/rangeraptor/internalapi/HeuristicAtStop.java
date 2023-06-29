@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
-import org.opentripplanner.raptor.api.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 
 /**
  * Heuristic data for a given stop.

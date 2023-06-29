@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
-import org.opentripplanner.framework.geometry.DirectionUtils;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
@@ -210,6 +210,16 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return false;
   }
 
+  /**
+   * Compare two vertices and return {@code true} if they are close together - have the same
+   * location.
+   * @see org.opentripplanner.framework.geometry.WgsCoordinate#sameLocation(WgsCoordinate)
+   **/
+  public boolean sameLocation(Vertex other) {
+    return new WgsCoordinate(getLat(), getLon())
+      .sameLocation(new WgsCoordinate(other.getLat(), other.getLon()));
+  }
+
   public boolean rentalTraversalBanned(State currentState) {
     return rentalRestrictions.traversalBanned(currentState);
   }
@@ -249,20 +259,28 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /**
-   * A static helper method to avoid repeated code for outgoing and incoming lists. Synchronization
+   * A helper method to avoid repeated code for outgoing and incoming lists. Synchronization
    * must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
    */
-  private static Edge[] removeEdge(Edge[] existing, Edge e) {
+  private Edge[] removeEdge(Edge[] existing, Edge e) {
     int nfound = 0;
-    for (int i = 0, j = 0; i < existing.length; i++) {
+    for (int i = 0; i < existing.length; i++) {
       if (existing[i] == e) nfound++;
     }
     if (nfound == 0) {
-      LOG.error("Requested removal of an edge which isn't connected to this vertex.");
+      LOG.debug(
+        "The edge {} has already been removed from this vertex {}, skipping removal",
+        e,
+        this
+      );
       return existing;
     }
     if (nfound > 1) {
-      LOG.error("There are multiple copies of the edge to be removed.)");
+      LOG.warn(
+        "There are multiple copies of the edge {} to be removed from this vertex {}",
+        e,
+        this
+      );
     }
     Edge[] copy = new Edge[existing.length - nfound];
     for (int i = 0, j = 0; i < existing.length; i++) {

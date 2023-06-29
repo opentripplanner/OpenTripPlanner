@@ -1,0 +1,23 @@
+{
+    plan(
+        fromPlace: "from",
+        toPlace: "to",
+        date: "2023-02-15",
+        time: "11:37",
+        transportModes: [
+            {
+                mode: WALK
+            }
+        ]) {
+        itineraries {
+            legs {
+                steps {
+                    streetName
+                    area
+                    relativeDirection
+                    absoluteDirection
+                }
+            }
+        }
+    }
+}

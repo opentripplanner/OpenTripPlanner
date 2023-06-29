@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.server;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.ws.rs.core.Application;
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.jersey.server.ContainerFactory;
+import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.slf4j.Logger;
@@ -76,6 +78,8 @@ public class GrizzlyServer {
     int nHandlerThreads = getMaxThreads();
     ThreadPoolConfig threadPoolConfig = ThreadPoolConfig
       .defaultConfig()
+      .setPoolName("grizzly")
+      .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("grizzly-%d").build())
       .setCorePoolSize(nHandlerThreads)
       .setMaxPoolSize(nHandlerThreads)
       .setQueueLimit(-1);
@@ -147,8 +151,8 @@ public class GrizzlyServer {
 
     // Add shutdown hook to gracefully shut down Grizzly.
     // Signal handling (sun.misc.Signal) is potentially not available on all JVMs.
-    Thread shutdownThread = new Thread(httpServer::shutdown);
-    Runtime.getRuntime().addShutdownHook(shutdownThread);
+    Thread shutdownThread = new Thread(httpServer::shutdown, "grizzly-shutdown");
+    ApplicationShutdownSupport.addShutdownHook(shutdownThread, shutdownThread.getName());
 
     /* RELINQUISH CONTROL TO THE SERVER THREAD */
     try {

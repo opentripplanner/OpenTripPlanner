@@ -5,6 +5,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -92,8 +93,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     var optimizedPath = path instanceof OptimizedPath ? (OptimizedPath<TripSchedule>) path : null;
 
+    var accessPathLeg = Objects.requireNonNull(path.accessLeg());
     // Map access leg
-    List<Leg> legs = new ArrayList<>(mapAccessLeg(path.accessLeg()));
+    List<Leg> legs = new ArrayList<>(mapAccessLeg(accessPathLeg));
 
     PathLeg<T> pathLeg = path.accessLeg().nextLeg();
 
@@ -107,12 +109,14 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       }
       // Map transfer leg
       else if (pathLeg.isTransferLeg()) {
-        legs.addAll(
-          mapTransferLeg(
-            pathLeg.asTransferLeg(),
-            transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
-          )
-        );
+        if (includeTransferInItinerary(transitLeg)) {
+          legs.addAll(
+            mapTransferLeg(
+              pathLeg.asTransferLeg(),
+              transferMode == StreetMode.BIKE ? TraverseMode.BICYCLE : TraverseMode.WALK
+            )
+          );
+        }
       }
 
       pathLeg = pathLeg.nextLeg();
@@ -138,6 +142,14 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       itinerary.setTransferPriorityCost(toOtpDomainCost(optimizedPath.transferPriorityCost()));
     }
 
+    if (accessPathLeg.access() instanceof DefaultAccessEgress ae) {
+      itinerary.setAccessPenalty(ae.penalty());
+    }
+
+    if (egressPathLeg.egress() instanceof DefaultAccessEgress ae) {
+      itinerary.setAccessPenalty(ae.penalty());
+    }
+
     return itinerary;
   }
 
@@ -156,9 +168,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return List.of();
     }
 
-    return subItinerary
-      .withTimeShiftToStartAt(createZonedDateTime(accessPathLeg.fromTime()))
-      .getLegs();
+    int fromTime = accessPathLeg.fromTime();
+
+    if (accessPath.hasPenalty()) {
+      fromTime = accessPath.timeShiftDepartureTimeToActualTime(fromTime);
+    }
+
+    return subItinerary.withTimeShiftToStartAt(createZonedDateTime(fromTime)).getLegs();
   }
 
   private Leg mapTransitLeg(Leg prevTransitLeg, TransitPathLeg<T> pathLeg) {
@@ -249,6 +265,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return null;
     }
 
+    // No need to remove penalty here, since we use the fromTime only
     return subItinerary.withTimeShiftToStartAt(createZonedDateTime(egressPathLeg.fromTime()));
   }
 
@@ -325,5 +342,17 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
   private ZonedDateTime createZonedDateTime(int timeInSeconds) {
     return transitSearchTimeZero.plusSeconds(timeInSeconds);
+  }
+
+  /**
+   * Include transfer leg in itinerary if the path is a "physical" path-leg between two stops, like
+   * walk or bicycle. Do NOT include it if it represents a stay-seated transfer. See more details in
+   * https://github.com/opentripplanner/OpenTripPlanner/issues/5086.
+   */
+  private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
+    return (
+      transitLegBeforeTransfer.getTransferToNextLeg() == null ||
+      !transitLegBeforeTransfer.getTransferToNextLeg().getTransferConstraint().isStaySeated()
+    );
   }
 }

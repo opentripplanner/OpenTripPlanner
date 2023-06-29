@@ -4,6 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
+import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
@@ -25,10 +26,10 @@ public class PollingTripUpdaterConfig {
     return new PollingTripUpdaterParameters(
       configRef,
       c
-        .of("frequencySec")
+        .of("frequency")
         .since(V1_5)
-        .summary("How often the data should be downloaded in seconds.")
-        .asInt(60),
+        .summary("How often the data should be downloaded.")
+        .asDuration(Duration.ofMinutes(1)),
       c
         .of("fuzzyTripMatching")
         .since(V1_5)

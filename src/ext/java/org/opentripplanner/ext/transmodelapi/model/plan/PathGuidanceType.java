@@ -2,15 +2,16 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.plan.WalkStep;
 
 public class PathGuidanceType {
 
-  public static GraphQLObjectType create() {
+  public static GraphQLObjectType create(GraphQLObjectType elevationStepType) {
     return GraphQLObjectType
       .newObject()
       .name("PathGuidance")
@@ -53,7 +54,9 @@ public class PathGuidanceType {
           .name("heading")
           .description("The absolute direction of this step.")
           .type(EnumTypes.ABSOLUTE_DIRECTION)
-          .dataFetcher(environment -> ((WalkStep) environment.getSource()).getAbsoluteDirection())
+          .dataFetcher(environment ->
+            ((WalkStep) environment.getSource()).getAbsoluteDirection().orElse(null)
+          )
           .build()
       )
       .field(
@@ -115,6 +118,19 @@ public class PathGuidanceType {
           .type(Scalars.GraphQLFloat)
           .dataFetcher(environment ->
             ((WalkStep) environment.getSource()).getStartLocation().longitude()
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("elevationProfile")
+          .description(ElevationProfileStepType.makeDescription("step"))
+          .type(new GraphQLNonNull(new GraphQLList(elevationStepType)))
+          .dataFetcher(environment ->
+            ElevationProfileStepType.mapElevationProfile(
+              ((WalkStep) environment.getSource()).getElevationProfile()
+            )
           )
           .build()
       )

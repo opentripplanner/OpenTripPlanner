@@ -36,7 +36,7 @@ public class LegacyGraphQLUtils {
       case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW -> LegacyGraphQLRoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW;
       case OUTSIDE_BOUNDS -> LegacyGraphQLRoutingErrorCode.OUTSIDE_BOUNDS;
       case OUTSIDE_SERVICE_PERIOD -> LegacyGraphQLRoutingErrorCode.OUTSIDE_SERVICE_PERIOD;
-      case SYSTEM_ERROR, PROCESSING_TIMEOUT -> LegacyGraphQLRoutingErrorCode.SYSTEM_ERROR;
+      case SYSTEM_ERROR -> LegacyGraphQLRoutingErrorCode.SYSTEM_ERROR;
       case WALKING_BETTER_THAN_TRANSIT -> LegacyGraphQLRoutingErrorCode.WALKING_BETTER_THAN_TRANSIT;
     };
   }

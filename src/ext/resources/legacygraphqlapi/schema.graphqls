@@ -1325,7 +1325,31 @@ type FareProductUse {
 }
 
 "A fare product (a ticket) to be bought by a passenger"
-type FareProduct {
+interface FareProduct {
+    "Identifier for the fare product."
+    id: String!
+
+    """
+    Human readable name of the product, for example example "Day pass" or "Single ticket".
+    """
+    name: String!
+
+    "The category of riders this product applies to, for example students or pensioners."
+    riderCategory: RiderCategory
+
+    """
+    The 'medium' that this product applies to, for example "Oyster Card" or "Berlin Ticket App".
+
+    This communicates to riders that a specific way of buying or keeping this product is required.
+    """
+    medium: FareMedium
+}
+
+"""
+The standard case of a fare product: it only has a single price to be paid by the passenger
+and no discounts are applied.
+"""
+type DefaultFareProduct implements FareProduct {
     "Identifier for the fare product."
     id: String!
 
@@ -1383,12 +1407,6 @@ type Itinerary {
     legs: [Leg]!
 
     """
-    Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
-    will be removed in the future.
-    """
-    fares: [fare] @deprecated(reason: "Use the leg's `fareProducts`.")
-
-    """
     How much elevation is gained, in total, over the course of the itinerary, in meters.
     """
     elevationGained: Float
@@ -1420,13 +1438,24 @@ type Itinerary {
     More information is available in the [feature documentation](https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/).
     """
     accessibilityScore: Float
+
+    #
+    # deprecated fields
+    #
+
+    """
+    Information about the fares for this itinerary. This is primarily a GTFS Fares V1 interface
+    will be removed in the future.
+    """
+    fares: [fare] @deprecated(reason: "Use the leg's `fareProducts`.")
 }
 
 "A currency"
 type Currency {
     "ISO-4217 currency code, for example `USD` or `EUR`."
     code: String!
-    """Fractional digits of this currency. A value of 2 would express that in this currency
+    """
+    Fractional digits of this currency. A value of 2 would express that in this currency
     100 minor units make up one major unit.
 
     Expressed more concretely: 100 Euro-cents make up one Euro.
@@ -1443,7 +1472,10 @@ type Money {
     "The currency of this money amount."
     currency: Currency!
     """
-    Money as a fractional amount, so 3.10 USD is represented as `3.1`.
+    Money in the major currency unit, so 3.10 USD is represented as `3.1`.
+
+    If you want to get the minor currency unit (310 cents), multiply with
+    (10 to the power of `currency.digits`).
     """
     amount: Float!
 }
@@ -1589,8 +1621,16 @@ type Leg {
     """
     interlineWithPreviousLeg: Boolean
 
+    """
+    Special booking information for the drop off stop of this leg if, for example, it needs
+    to be booked in advance. This could be due to a flexible or on-demand service.
+    """
     dropOffBookingInfo: BookingInfo
 
+    """
+    Special booking information for the pick up stop of this leg if, for example, it needs
+    to be booked in advance. This could be due to a flexible or on-demand service.
+    """
     pickupBookingInfo: BookingInfo
 
     """Applicable alerts for this leg."""
@@ -1708,7 +1748,7 @@ enum Mode {
     GONDOLA
 
     """Only used internally. No use for API users."""
-    LEG_SWITCH
+    LEG_SWITCH @deprecated
 
     """RAIL"""
     RAIL
@@ -1992,31 +2032,70 @@ enum PickupDropoffType {
     COORDINATE_WITH_DRIVER
 }
 
+"Contact information for booking an on-demand or flexible service."
 type ContactInfo {
+    "Name of the person to contact"
     contactPerson: String
+    "Phone number to contact"
     phoneNumber: String
+    "Email to contact"
     eMail: String
+    "Fax number to contact"
     faxNumber: String
+    "URL containing general information about the service"
     infoUrl: String
+    "URL to the booking systems of the service"
     bookingUrl: String
+    "Additional notes about the contacting the service provider"
     additionalDetails: String
 }
 
+"Temporal restriction for a booking"
 type BookingTime {
+    "Time of the booking"
     time: String
+    "How many days before the booking"
     daysPrior: Int
 }
 
+"""
+Booking information for a stop time which has special requirements to use, like calling ahead or
+using an app.
+"""
 type BookingInfo {
+    "Contact information for reaching the service provider"
     contactInfo: ContactInfo
+    "When is the earliest time the service can be booked."
     earliestBookingTime: BookingTime
+    "When is the latest time the service can be booked"
     latestBookingTime: BookingTime
+    "Minimum number of seconds before travel to make the request"
     minimumBookingNoticeSeconds: Long
+    "Maximum number of seconds before travel to make the request"
     maximumBookingNoticeSeconds: Long
+    "A general message for those booking the service"
     message: String
+    "A message specific to the pick up"
     pickupMessage: String
+    "A message specific to the drop off"
     dropOffMessage: String
 }
+
+"The board/alight position in between two stops of the pattern of a trip with continuous pickup/drop off."
+type PositionBetweenStops {
+    "Position of the previous stop in the pattern. Positions are not required to start from 0 or be consecutive."
+    previousPosition: Int
+    "Position of the next stop in the pattern. Positions are not required to start from 0 or be consecutive."
+    nextPosition: Int
+}
+
+"Stop position at a specific stop."
+type PositionAtStop {
+    "Position of the stop in the pattern. Positions are not required to start from 0 or be consecutive."
+    position: Int
+}
+
+union StopPosition = PositionAtStop | PositionBetweenStops
 
 type Place {
     """
@@ -2049,8 +2128,21 @@ type Place {
     """The stop related to the place."""
     stop: Stop
 
-    """The bike rental station related to the place"""
-    bikeRentalStation: BikeRentalStation @deprecated(reason: "Use vehicleRentalStation and rentalVehicle instead")
+    """
+    The position of the stop in the pattern. This is not required to start from 0 or be consecutive - any
+    increasing integer sequence along the stops is valid.
+
+    The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
+    between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
+    However, it should be noted that realtime updates can change the values, so don't store it for
+    longer amounts of time.
+
+    Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
+    even generated.
+
+    The position can be either at a certain stop or in between two for trips where this is possible.
+    """
+    stopPosition: StopPosition
 
     """The vehicle rental station related to the place"""
     vehicleRentalStation: VehicleRentalStation
@@ -2058,14 +2150,17 @@ type Place {
     """The rental vehicle related to the place"""
     rentalVehicle: RentalVehicle
 
+    """The vehicle parking related to the place"""
+    vehicleParking: VehicleParking
+
+    """The bike rental station related to the place"""
+    bikeRentalStation: BikeRentalStation @deprecated(reason: "Use vehicleRentalStation and rentalVehicle instead")
+
     """The bike parking related to the place"""
     bikePark: BikePark @deprecated(reason: "bikePark is deprecated. Use vehicleParking instead.")
 
     """The car parking related to the place"""
     carPark: CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
-
-    """The vehicle parking related to the place"""
-    vehicleParking: VehicleParking
 }
 
 type placeAtDistance implements Node {
@@ -2568,6 +2663,8 @@ type QueryType {
     """
     vehicleRentalStation(id: String!): VehicleRentalStation
 
+    ## Deprecated fields
+
     """Get all bike parks"""
     bikeParks: [BikePark] @deprecated(reason: "bikeParks is deprecated. Use vehicleParkings instead.")
 
@@ -2693,44 +2790,6 @@ type QueryType {
         pageCursor: String
 
         """
-        The maximum distance (in meters) the user is willing to walk per walking
-        section. If the only transport mode allowed is `WALK`, then the value of
-        this argument is ignored.
-        Default: 2000m
-        Maximum value: 15000m
-        **Note:** If this argument has a relatively small value and only some
-        transport modes are allowed (e.g. `WALK` and `RAIL`), it is possible to get
-        an itinerary which has (useless) back and forth public transport legs to
-        avoid walking too long distances.
-
-        DEPRECATED - Use walkReluctance instead
-        """
-        maxWalkDistance: Float @deprecated(reason: "Does nothing. Use walkReluctance instead.")
-
-        """
-        The maximum time (in seconds) of pre-transit travel when using
-        drive-to-transit (park and ride or kiss and ride). Default value: 1800.
-
-        DEPRECATED - Use walkReluctance or future reluctance parameters for other modes
-        """
-        maxPreTransitTime: Int
-
-        """
-        How expensive it is to drive a car when car&parking, increase this value to
-        make car driving legs shorter. Default value: 1.
-        """
-        carParkCarLegWeight: Float
-
-        """
-        How easily bad itineraries are filtered from results. Value 0 (default)
-        disables filtering. Itineraries are filtered if they are worse than another
-        one in some respect (e.g. more walking) by more than the percentage of
-        filtering level, which is calculated by dividing 100% by the value of this
-        argument (e.g. `itineraryFiltering = 0.5` → 200% worse itineraries are filtered).
-        """
-        itineraryFiltering: Float
-
-        """
         A multiplier for how bad biking is, compared to being in transit for equal
         lengths of time. Default value: 2.0
         """
@@ -2760,13 +2819,6 @@ type QueryType {
         walkReluctance: Float
 
         """
-        How much more reluctant is the user to walk on streets with car traffic allowed. Default value: 1.0
-
-        Deprecated, use walkSafetyFactor instead.
-        """
-        walkOnStreetReluctance: Float @deprecated(reason: "Use walkSafetyFactor instead")
-
-        """
         How much worse is waiting for a transit vehicle than being on a transit
         vehicle, as a multiplier. The default value treats wait and on-vehicle time
         as the same. It may be tempting to set this higher than walkReluctance (as
@@ -2778,14 +2830,6 @@ type QueryType {
         neighboring stop patterns, this problem could disappear. Default value: 1.0.
         """
         waitReluctance: Float
-
-        """
-        How much less bad is waiting at the beginning of the trip (replaces
-        `waitReluctance` on the first boarding). Default value: 0.4
-
-        Deprecated, not used, the timetable-view replaces this functionality.
-        """
-        waitAtBeginningFactor: Float @deprecated(reason: "Removed in OTP 2")
 
         """
         Max walk speed along streets, in meters per second. Default value: 1.33
@@ -2818,9 +2862,6 @@ type QueryType {
         to the destination at the specified time (true). Default value: false.
         """
         arriveBy: Boolean
-
-        """An ordered list of intermediate locations to be visited."""
-        intermediatePlaces: [InputCoordinates]
 
         """
         List of routes and agencies which are given higher preference when planning the itinerary
@@ -2868,12 +2909,6 @@ type QueryType {
         transferPenalty: Int
 
         """
-        This argument has no use for itinerary planning and will be removed later.
-        ~~When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.~~
-        """
-        batch: Boolean @deprecated(reason: "Removed in OTP 2")
-
-        """
         List of transportation modes that the user is willing to use. Default: `["WALK","TRANSIT"]`
         """
         transportModes: [TransportMode]
@@ -2887,9 +2922,6 @@ type QueryType {
         Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, but does NOT delete them when this is enabled.
         """
         debugItineraryFilter: Boolean
-
-        """Is bike rental allowed? Default value: false"""
-        allowBikeRental: Boolean @deprecated(reason: "Rental is specified by modes")
 
         """
         Whether arriving at the destination with a rented (station) bicycle is allowed without
@@ -2937,33 +2969,6 @@ type QueryType {
         startTransitStopId: String
 
         """
-        ID of the trip on which the itinerary starts. This argument can be used to
-        plan itineraries when the user is already onboard a vehicle. When using this
-        argument, arguments `time` and `from` should be set based on a vehicle
-        position message received from the vehicle running the specified trip.
-        **Note:** this argument only takes into account the route and estimated
-        travel time of the trip (and therefore arguments `time` and `from` must be
-        used correctly to get meaningful itineraries).
-        """
-        startTransitTripId: String
-
-        """
-        No effect on itinerary planning, adjust argument `time` instead to get later departures.
-        ~~The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.~~
-        """
-        claimInitialWait: Long @deprecated(reason: "Removed in OTP 2")
-
-        """
-        **Consider this argument experimental** – setting this argument to true
-        causes timeouts and unoptimal routes in many cases.
-        When true, reverse optimize (find alternative transportation mode, which
-        still arrives to the destination in time) this search on the fly after
-        processing each transit leg, rather than reverse-optimizing the entire path
-        when it's done. Default value: false.
-        """
-        reverseOptimizeOnTheFly: Boolean @deprecated(reason: "Removed in OTP 2")
-
-        """
         When false, return itineraries using canceled trips. Default value: true.
         """
         omitCanceled: Boolean = true
@@ -2972,13 +2977,6 @@ type QueryType {
         When true, realtime updates are ignored during this search. Default value: false
         """
         ignoreRealtimeUpdates: Boolean
-
-        """
-        Only useful for testing and troubleshooting.
-        ~~If true, the remaining weight heuristic is disabled. Currently only
-        implemented for the long distance path service. Default value: false.~~
-        """
-        disableRemainingWeightHeuristic: Boolean @deprecated(reason: "Removed in OTP 2.2")
 
         """
         Two-letter language code (ISO 639-1) used for returned text.
@@ -2993,22 +2991,6 @@ type QueryType {
         See `ticketTypes` query for list of possible ticket types.
         """
         allowedTicketTypes: [String]
-
-        """Tuning parameter for the search algorithm, mainly useful for testing."""
-        heuristicStepsPerMainStep: Int
-
-        """
-        Whether legs should be compacted by performing a reversed search.
-        **Experimental argument, will be removed!**
-        """
-        compactLegsByReversedSearch: Boolean @deprecated(reason: "Removed in OTP 2")
-
-        """
-        Which vehicle rental networks can be used. By default, all networks are allowed.
-
-        Deprecated: Use `allowedVehicleRentalNetworks` instead.
-        """
-        allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedVehicleRentalNetworks instead")
 
         """
         Which vehicle rental networks can be used. By default, all networks are allowed.
@@ -3028,6 +3010,111 @@ type QueryType {
 
         "Preferences for vehicle parking"
         parking: VehicleParkingInput
+
+        ## Deprecated fields, none of these have any effect on the routing anymore
+
+        """
+        The maximum distance (in meters) the user is willing to walk per walking
+        section. If the only transport mode allowed is `WALK`, then the value of
+        this argument is ignored.
+        Default: 2000m
+        Maximum value: 15000m
+        **Note:** If this argument has a relatively small value and only some
+        transport modes are allowed (e.g. `WALK` and `RAIL`), it is possible to get
+        an itinerary which has (useless) back and forth public transport legs to
+        avoid walking too long distances.
+        """
+        maxWalkDistance: Float @deprecated(reason: "Does nothing. Use walkReluctance instead.")
+
+        """
+        How much more reluctant is the user to walk on streets with car traffic allowed. Default value: 1.0
+        """
+        walkOnStreetReluctance: Float @deprecated(reason: "Use `walkSafetyFactor` instead")
+
+        """
+        How much less bad is waiting at the beginning of the trip (replaces
+        `waitReluctance` on the first boarding). Default value: 0.4
+        """
+        waitAtBeginningFactor: Float @deprecated(reason: "Removed in OTP 2, the timetable-view replaces this functionality.")
+
+        """
+        This argument has no use for itinerary planning and will be removed later.
+        When true, do not use goal direction or stop at the target, build a full SPT. Default value: false.
+        """
+        batch: Boolean @deprecated(reason: "Removed in OTP 2")
+
+        """Is bike rental allowed? Default value: false"""
+        allowBikeRental: Boolean @deprecated(reason: "Rental is specified by modes")
+
+        """
+        No effect on itinerary planning, adjust argument `time` instead to get later departures.
+        ~~The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.~~
+        """
+        claimInitialWait: Long @deprecated(reason: "Removed in OTP 2")
+
+        """
+        **Consider this argument experimental** – setting this argument to true
+        causes timeouts and unoptimal routes in many cases.
+        When true, reverse optimize (find alternative transportation mode, which
+        still arrives to the destination in time) this search on the fly after
+        processing each transit leg, rather than reverse-optimizing the entire path
+        when it's done. Default value: false.
+        """
+        reverseOptimizeOnTheFly: Boolean @deprecated(reason: "Removed in OTP 2")
+
+        """
+        If true, the remaining weight heuristic is disabled. Currently only
+        implemented for the long distance path service.
+        """
+        disableRemainingWeightHeuristic: Boolean @deprecated(reason: "Removed in OTP 2.2")
+
+        """
+        Whether legs should be compacted by performing a reversed search.
+        """
+        compactLegsByReversedSearch: Boolean @deprecated(reason: "Removed in OTP 2")
+
+        """
+        Which vehicle rental networks can be used. By default, all networks are allowed.
+        """
+        allowedBikeRentalNetworks: [String] @deprecated(reason: "Use allowedVehicleRentalNetworks instead")
+
+        """
+        The maximum time (in seconds) of pre-transit travel when using
+        drive-to-transit (park and ride or kiss and ride). Default value: 1800.
+        """
+        maxPreTransitTime: Int @deprecated(reason: "Use walkReluctance or future reluctance parameters for other modes")
+
+        """
+        How expensive it is to drive a car when car&parking, increase this value to
+        make car driving legs shorter. Default value: 1.
+        """
+        carParkCarLegWeight: Float @deprecated(reason: "Use `carReluctance` instead.")
+
+        """Tuning parameter for the search algorithm, mainly useful for testing."""
+        heuristicStepsPerMainStep: Int @deprecated(reason: "Removed. Doesn't do anything.")
+
+        """
+        How easily bad itineraries are filtered from results. Value 0 (default)
+        disables filtering. Itineraries are filtered if they are worse than another
+        one in some respect (e.g. more walking) by more than the percentage of
+        filtering level, which is calculated by dividing 100% by the value of this
+        argument (e.g. `itineraryFiltering = 0.5` → 200% worse itineraries are filtered).
+        """
+        itineraryFiltering: Float @deprecated(reason: "Removed. Doesn't do anything.")
+
+        """An ordered list of intermediate locations to be visited."""
+        intermediatePlaces: [InputCoordinates] @deprecated(reason: "Not implemented in OTP2.")
+
+        """
+        ID of the trip on which the itinerary starts. This argument can be used to
+        plan itineraries when the user is already onboard a vehicle. When using this
+        argument, arguments `time` and `from` should be set based on a vehicle
+        position message received from the vehicle running the specified trip.
+        **Note:** this argument only takes into account the route and estimated
+        travel time of the trip (and therefore arguments `time` and `from` must be
+        used correctly to get meaningful itineraries).
+        """
+        startTransitTripId: String @deprecated(reason: "Not implemented in OTP2")
     ): Plan @async
 }
 
@@ -3565,6 +3652,20 @@ Stoptime represents the time when a specific trip arrives to or departs from a s
 type Stoptime {
     """The stop where this arrival/departure happens"""
     stop: Stop
+
+    """
+    The sequence of the stop in the pattern. This is not required to start from 0 or be consecutive - any
+    increasing integer sequence along the stops is valid.
+
+    The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
+    between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
+    However, it should be noted that realtime updates can change the values, so don't store it for
+    longer amounts of time.
+
+    Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
+    even generated.
+    """
+    stopPosition: Int
 
     """
     Scheduled arrival time. Format: seconds since midnight of the departure date

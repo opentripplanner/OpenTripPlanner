@@ -33,6 +33,11 @@ public class FareModelForTest {
     .addFareZones(CITY_CENTER_ZONE)
     .withName(new NonLocalizedString("City center: stop B"))
     .build();
+  static RegularStop SUBURB_STOP = RegularStop
+    .of(id("suburb"))
+    .withCoordinate(new WgsCoordinate(1, 4))
+    .withName(new NonLocalizedString("Suburb"))
+    .build();
 
   static FareAttribute TEN_DOLLARS = FareAttribute
     .of(id("airport-to-city-center"))

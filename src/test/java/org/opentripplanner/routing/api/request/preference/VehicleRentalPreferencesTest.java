@@ -65,7 +65,7 @@ class VehicleRentalPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withPickupTime(450).build();
     var copy = other.copyOf().withPickupTime(PICKUP_TIME).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
+    assertEqualsAndHashCode(subject, other, copy);
   }
 
   @Test

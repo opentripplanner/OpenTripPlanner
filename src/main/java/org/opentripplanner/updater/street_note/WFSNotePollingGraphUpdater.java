@@ -73,7 +73,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
   private Map<StreetNoteAndMatcher, StreetNoteAndMatcher> uniqueMatchers;
 
   /**
-   * The property 'frequencySec' is already read and used by the abstract base class.
+   * The property 'frequency' is already read and used by the abstract base class.
    */
   public WFSNotePollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config, Graph graph) {
     super(config);
@@ -94,8 +94,8 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
       graph.streetNotesService.addNotesSource(notesSource);
 
       LOG.info(
-        "Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
-        pollingPeriodSeconds(),
+        "Configured WFS polling updater: frequency={}, url={} and featureType={}",
+        pollingPeriod(),
         url.toString(),
         featureType
       );

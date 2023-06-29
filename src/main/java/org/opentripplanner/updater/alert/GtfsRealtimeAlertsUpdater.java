@@ -53,7 +53,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
 
     LOG.info(
       "Creating real-time alert updater running every {} seconds : {}",
-      pollingPeriodSeconds(),
+      pollingPeriod(),
       url
     );
   }
@@ -76,9 +76,6 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
   protected void runPolling() {
     try {
       InputStream data = HttpUtils.getData(URI.create(url), this.headers.asMap());
-      if (data == null) {
-        throw new RuntimeException("Failed to get data from url " + url);
-      }
 
       final FeedMessage feed = FeedMessage.PARSER.parseFrom(data);
 

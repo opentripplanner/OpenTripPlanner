@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
@@ -17,18 +18,18 @@ public final class VehicleRentalPreferences implements Serializable {
 
   public static final VehicleRentalPreferences DEFAULT = new VehicleRentalPreferences();
   private final int pickupTime;
-  private final int pickupCost;
+  private final Cost pickupCost;
   private final int dropoffTime;
-  private final int dropoffCost;
+  private final Cost dropoffCost;
 
   private final boolean useAvailabilityInformation;
   private final double arrivingInRentalVehicleAtDestinationCost;
 
   private VehicleRentalPreferences() {
     this.pickupTime = 60;
-    this.pickupCost = 120;
+    this.pickupCost = Cost.costOfMinutes(2);
     this.dropoffTime = 30;
-    this.dropoffCost = 30;
+    this.dropoffCost = Cost.costOfSeconds(30);
     this.useAvailabilityInformation = false;
     this.arrivingInRentalVehicleAtDestinationCost = 0;
   }
@@ -61,7 +62,7 @@ public final class VehicleRentalPreferences implements Serializable {
    * and trouble.
    */
   public int pickupCost() {
-    return pickupCost;
+    return pickupCost.toSeconds();
   }
 
   /** Time to drop-off a rented vehicle */
@@ -71,7 +72,7 @@ public final class VehicleRentalPreferences implements Serializable {
 
   /** Cost of dropping-off a rented vehicle */
   public int dropoffCost() {
-    return dropoffCost;
+    return dropoffCost.toSeconds();
   }
 
   /**
@@ -129,9 +130,9 @@ public final class VehicleRentalPreferences implements Serializable {
     return ToStringBuilder
       .of(VehicleRentalPreferences.class)
       .addDurationSec("pickupTime", pickupTime, DEFAULT.pickupTime)
-      .addCost("pickupCost", pickupCost, DEFAULT.pickupCost)
+      .addObj("pickupCost", pickupCost, DEFAULT.pickupCost)
       .addDurationSec("dropoffTime", dropoffTime, DEFAULT.dropoffTime)
-      .addCost("dropoffCost", dropoffCost, DEFAULT.dropoffCost)
+      .addObj("dropoffCost", dropoffCost, DEFAULT.dropoffCost)
       .addBoolIfTrue("useAvailabilityInformation", useAvailabilityInformation)
       .addNum(
         "arrivingInRentalVehicleAtDestinationCost",
@@ -145,18 +146,18 @@ public final class VehicleRentalPreferences implements Serializable {
 
     private final VehicleRentalPreferences original;
     private int pickupTime;
-    private int pickupCost;
+    private Cost pickupCost;
     private int dropoffTime;
-    private int dropoffCost;
+    private Cost dropoffCost;
     private boolean useAvailabilityInformation;
     private double arrivingInRentalVehicleAtDestinationCost;
 
     private Builder(VehicleRentalPreferences original) {
       this.original = original;
       this.pickupTime = Units.duration(original.pickupTime);
-      this.pickupCost = Units.cost(original.pickupCost);
+      this.pickupCost = original.pickupCost;
       this.dropoffTime = Units.duration(original.dropoffTime);
-      this.dropoffCost = Units.cost(original.dropoffCost);
+      this.dropoffCost = original.dropoffCost;
       this.useAvailabilityInformation = original.useAvailabilityInformation;
       this.arrivingInRentalVehicleAtDestinationCost =
         original.arrivingInRentalVehicleAtDestinationCost;
@@ -172,7 +173,7 @@ public final class VehicleRentalPreferences implements Serializable {
     }
 
     public Builder withPickupCost(int pickupCost) {
-      this.pickupCost = pickupCost;
+      this.pickupCost = Cost.costOfSeconds(pickupCost);
       return this;
     }
 
@@ -182,7 +183,7 @@ public final class VehicleRentalPreferences implements Serializable {
     }
 
     public Builder withDropoffCost(int dropoffCost) {
-      this.dropoffCost = dropoffCost;
+      this.dropoffCost = Cost.costOfSeconds(dropoffCost);
       return this;
     }
 

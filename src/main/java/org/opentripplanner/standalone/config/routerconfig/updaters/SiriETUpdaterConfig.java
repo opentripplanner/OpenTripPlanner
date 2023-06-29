@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.config.routerconfig.updaters;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
+import java.time.Duration;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -21,13 +22,17 @@ public class SiriETUpdaterConfig {
         .asBoolean(false),
       c.of("url").since(V2_0).summary("The URL to send the HTTP requests to.").asString(),
       c
-        .of("frequencySec")
+        .of("frequency")
         .since(V2_0)
         .summary("How often the updates should be retrieved.")
-        .asInt(60),
+        .asDuration(Duration.ofMinutes(1)),
       c.of("requestorRef").since(V2_0).summary("The requester reference.").asString(null),
-      c.of("timeoutSec").since(V2_0).summary("The HTTP timeout to download the updates.").asInt(15),
-      c.of("previewIntervalMinutes").since(V2_0).summary("TODO").asInt(-1),
+      c
+        .of("timeout")
+        .since(V2_0)
+        .summary("The HTTP timeout to download the updates.")
+        .asDuration(Duration.ofSeconds(15)),
+      c.of("previewInterval").since(V2_0).summary("TODO").asDuration(null),
       c
         .of("fuzzyTripMatching")
         .since(V2_0)

@@ -44,7 +44,6 @@ The classes and their maintainers are as follows:
 | AtlantaFareService                         | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
 | CombinedInterlinedLegsFareService          | IBI Group ([David Emory](mailto:david.emory@ibigroup.com)) |
 | HSLFareServiceImpl                         | HSL ([Viljami Nurminen](mailto:viljami.nurminen@cgi.com))  |
-| SFBayFareServiceImpl                       | unmaintained                                               |
 | OrcaFareService                            | IBI Group ([Daniel Heppner](mailto:daniel.heppner@ibigroup.com))|
 
 
@@ -77,30 +76,6 @@ Or this alternative form that could allow additional configuration
 }
 ```
 
-```JSON
-// build-config.json
-{
-  "fares": {
-    // Combine two fares by simply adding them
-    "combinationStrategy": "additive",
-    // First fare to combine
-    "fare0": "new-york",
-    // Second fare to combine
-    "fare1": {
-      "type": "vehicle-rental-time-based",
-      "currency": "USD",
-      "prices": {
-          // For trip shorter than 30', $4 fare
-          "30":   4.00,
-          // For trip shorter than 1h, $6 fare
-          "1:00": 6.00
-      }
-    }
-    // We could also add fareFoo, fareBar...
-  }
-}
-```
-
 Turning the fare service _off_, this will ignore any fare data in the provided GTFS data.
 
 ```JSON
@@ -112,11 +87,6 @@ Turning the fare service _off_, this will ignore any fare data in the provided G
 
 The current list of custom fare type is:
 
-- `vehicle-rental-time-based` - accepting the following parameters:
-    - `currency` - the ISO 4217 currency code to use, such as `"EUR"` or `"USD"`,
-    - `prices` - a list of {time, price}. The resulting cost is the smallest cost where the elapsed
-      time of vehicle rental is lower than the defined time.
-- `san-francisco` (no parameters)
 - `highest-fare-in-free-transfer-window` Will apply the highest observed transit fare (across all
   operators) within a free transfer window, adding to the cost if a trip is boarded outside the free
   transfer window. It accepts the following parameters:
@@ -134,10 +104,6 @@ The current list of custom fare type is:
 - `orca` (no parameters)
 - `off` (no parameters)
 
-The current list of `combinationStrategy` is:
-
-- `additive` - simply adds all sub-fares.
- 
 ## Removed fare calculators
 
 The following calculators used to be part of the OTP codebase but since their maintainership
@@ -148,6 +114,10 @@ they were [removed](https://github.com/opentripplanner/OpenTripPlanner/pull/4273
 - DutchFareServiceImpl
 
 The NYC fare calculator was removed in [#4694](https://github.com/opentripplanner/OpenTripPlanner/pull/4694).
+
+The `MultipleFareService` was removed in [#5100](https://github.com/opentripplanner/OpenTripPlanner/pull/5100).
+
+The `SFBayFareServiceImpl` and `TimeBasedVehicleRentalFareService` were removed in [#5145](https://github.com/opentripplanner/OpenTripPlanner/pull/5145).
 
 If you were using these calculators, you're welcome to re-add them to the code base and become their
 maintainer.

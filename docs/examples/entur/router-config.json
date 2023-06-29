@@ -90,7 +90,7 @@
     // SIRI SX service alerts
     {
       "type": "siri-sx-updater",
-      "frequencySec": 60,
+      "frequency": "1m",
       "url": "https://example.com",
       "feedId": "EN",
       "blockReadinessUntilInitialized": true
@@ -106,8 +106,8 @@
     // SIRI ET updater
     {
       "type": "siri-et-updater",
-      "frequencySec": 20,
-      "previewIntervalMinutes": 180,
+      "frequency": "20s",
+      "previewInterval": "3h",
       "url": "https://example.com",
       "feedId": "EN",
       "blockReadinessUntilInitialized": true

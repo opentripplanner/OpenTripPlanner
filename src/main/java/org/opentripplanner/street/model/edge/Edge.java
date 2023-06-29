@@ -10,6 +10,8 @@ import org.opentripplanner.astar.spi.AStarEdge;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances; all
@@ -17,11 +19,42 @@ import org.opentripplanner.street.search.state.State;
  */
 public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializable {
 
-  protected Vertex fromv;
+  private static final Logger LOG = LoggerFactory.getLogger(Edge.class);
 
-  protected Vertex tov;
+  protected enum ConnectToGraph {
+    CONNECT,
+    TEMPORARY_EDGE_NOT_CONNECTED_TO_GRAPH,
+  }
 
+  protected final Vertex fromv;
+
+  protected final Vertex tov;
+
+  /**
+   * Recommended constructor for creating an edge.
+   * The edge is automatically added to the graph by updating the outgoing edge list of the
+   * origin ("from") vertex and the incoming edge list of the destination ("to") vertex.
+   * @param v1 origin vertex
+   * @param v2 destination vertex
+   */
   protected Edge(Vertex v1, Vertex v2) {
+    this(v1, v2, ConnectToGraph.CONNECT);
+  }
+
+  /**
+   * Constructor for creating an edge optionally disconnected from the graph.
+   * This constructor should be used only for the special case of a
+   * {@link org.opentripplanner.ext.flex.edgetype.FlexTripEdge}
+   * that is intended to remain disconnected from the graph.
+   * Use {@link Edge#Edge(Vertex, Vertex)} for the general use case.
+   * The edge is optionally added to the graph by updating the outgoing edge list of the
+   * origin ("from") vertex and the incoming edge list of the destination ("to") vertex.
+   * @param v1 origin vertex
+   * @param v2 destination vertex
+   * @param connectToGraph if the edge should be connected to the graph
+   */
+  protected Edge(Vertex v1, Vertex v2, ConnectToGraph connectToGraph) {
+    Objects.requireNonNull(connectToGraph);
     if (v1 == null || v2 == null) {
       String err = String.format(
         "%s constructed with null vertex : %s %s",
@@ -33,8 +66,10 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     }
     this.fromv = v1;
     this.tov = v2;
-    fromv.addOutgoing(this);
-    tov.addIncoming(this);
+    if (connectToGraph == ConnectToGraph.CONNECT) {
+      fromv.addOutgoing(this);
+      tov.addIncoming(this);
+    }
   }
 
   public final Vertex getFromVertex() {
@@ -58,6 +93,31 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
    */
   public boolean isReverseOf(Edge e) {
     return (this.getFromVertex() == e.getToVertex() && this.getToVertex() == e.getFromVertex());
+  }
+
+  /**
+   * While in destructive splitting mode (during graph construction rather than handling routing
+   * requests), we remove edges that have been split and may then re-split the resulting segments
+   * recursively, so parts of them are also removed. Newly created edge fragments are added to the
+   * spatial index; the edges that were split are removed (disconnected) from the graph but were
+   * previously not removed from the spatial index, so for all subsequent splitting operations we
+   * had to check whether any edge coming out of the spatial index had been "soft deleted".
+   * <p>
+   * I believe this was compensating for the fact that STRTrees are optimized at construction and
+   * read-only. That restriction no longer applies since we've been using our own hash grid spatial
+   * index instead of the STRTree. So rather than filtering out soft deleted edges, this is now an
+   * assertion that the system behaves as intended, and will log an error if the spatial index is
+   * returning edges that have been disconnected from the graph.
+   */
+  public boolean isReachableFromGraph() {
+    boolean edgeReachableFromGraph = tov.getIncoming().contains(this);
+    if (!edgeReachableFromGraph) {
+      LOG.warn(
+        "Edge {} returned from spatial index is no longer reachable from graph. That is not expected.",
+        this
+      );
+    }
+    return edgeReachableFromGraph;
   }
 
   @Override
@@ -130,19 +190,11 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   }
 
   public void remove() {
-    if (this.fromv != null) {
-      for (Edge edge : this.fromv.getIncoming()) {
-        edge.removeTurnRestrictionsTo(this);
-      }
-
-      this.fromv.removeOutgoing(this);
-      this.fromv = null;
+    for (Edge edge : this.fromv.getIncoming()) {
+      edge.removeTurnRestrictionsTo(this);
     }
-
-    if (this.tov != null) {
-      this.tov.removeIncoming(this);
-      this.tov = null;
-    }
+    this.fromv.removeOutgoing(this);
+    this.tov.removeIncoming(this);
   }
 
   public void removeTurnRestrictionsTo(Edge origin) {}
@@ -157,12 +209,6 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
   }
 
   private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
-    if (fromv == null) {
-      System.out.printf("fromv null %s \n", this);
-    }
-    if (tov == null) {
-      System.out.printf("tov null %s \n", this);
-    }
     out.defaultWriteObject();
   }
 }

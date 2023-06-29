@@ -1,6 +1,8 @@
 package org.opentripplanner.street.search.state;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE;
 import static org.opentripplanner.routing.api.request.StreetMode.BIKE_RENTAL;
@@ -15,6 +17,9 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.intersec
 import static org.opentripplanner.street.search.TraverseMode.BICYCLE;
 import static org.opentripplanner.street.search.TraverseMode.CAR;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
+import static org.opentripplanner.street.search.state.TestStateBuilder.ofCarRental;
+import static org.opentripplanner.street.search.state.TestStateBuilder.ofDriving;
+import static org.opentripplanner.street.search.state.TestStateBuilder.ofWalking;
 import static org.opentripplanner.street.search.state.VehicleRentalState.BEFORE_RENTING;
 import static org.opentripplanner.street.search.state.VehicleRentalState.HAVE_RENTED;
 import static org.opentripplanner.street.search.state.VehicleRentalState.RENTING_FLOATING;
@@ -23,6 +28,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -88,5 +94,39 @@ class StateTest {
 
   private static StreetSearchRequest req(StreetMode streetMode, boolean arriveBy) {
     return StreetSearchRequest.of().withMode(streetMode).withArriveBy(arriveBy).build();
+  }
+
+  @Test
+  void containsDriving() {
+    var state = ofDriving().streetEdge().streetEdge().streetEdge().build();
+    assertTrue(state.containsModeCar());
+  }
+
+  @Test
+  void walking() {
+    var state = ofWalking().streetEdge().streetEdge().streetEdge().build();
+    assertFalse(state.containsModeCar());
+  }
+
+  @Test
+  void walkingOnly() {
+    // Walk only
+    assertTrue(ofWalking().streetEdge().build().containsOnlyWalkMode(), "One edge");
+    assertTrue(
+      ofWalking().streetEdge().streetEdge().build().containsOnlyWalkMode(),
+      "Several edges"
+    );
+
+    // Car only
+    assertFalse(ofDriving().streetEdge().build().containsOnlyWalkMode(), "One edge");
+    assertFalse(
+      ofDriving().streetEdge().streetEdge().build().containsOnlyWalkMode(),
+      "Several edges"
+    );
+
+    assertFalse(
+      ofCarRental().streetEdge().pickUpCar().build().containsOnlyWalkMode(),
+      "Walk + CAR"
+    );
   }
 }

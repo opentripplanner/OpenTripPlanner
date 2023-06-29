@@ -225,19 +225,21 @@ public class WalkableAreaBuilder {
           continue;
         }
 
-        // Add stops from public transit relations into the area
-        Collection<OSMNode> nodes = osmdb.getStopsInArea(area.parent);
-        if (nodes != null) {
-          for (OSMNode node : nodes) {
-            var vertex = vertexBuilder.getVertexForOsmNode(node, areaEntity);
-            platformLinkingVertices.add(vertex);
-            visibilityNodes.add(node);
-            startingNodes.add(node);
-            edgeList.visibilityVertices.add(vertex);
-          }
+        // Add stops/entrances from public transit relations into the area
+        // they may provide the only entrance to a platform
+        // which otherwise would be pruned as unconnected island
+        Collection<OSMNode> entrances = osmdb.getStopsInArea(area.parent);
+        for (OSMNode node : entrances) {
+          var vertex = vertexBuilder.getVertexForOsmNode(node, areaEntity);
+          platformLinkingVertices.add(vertex);
+          visibilityNodes.add(node);
+          startingNodes.add(node);
+          edgeList.visibilityVertices.add(vertex);
         }
 
         for (Ring outerRing : area.outermostRings) {
+          // variable to indicate if some additional entrance points have been added to area
+          boolean linkPointsAdded = !entrances.isEmpty();
           // Add unconnected entries to area if platformEntriesLinking parameter is true
           if (platformEntriesLinking && "platform".equals(area.parent.getTag("public_transport"))) {
             List<OsmVertex> endpointsWithin = platformLinkingEndpoints
@@ -252,6 +254,7 @@ public class WalkableAreaBuilder {
               visibilityNodes.add(node);
               startingNodes.add(node);
               edgeList.visibilityVertices.add(v);
+              linkPointsAdded = true;
             }
           }
 
@@ -266,9 +269,15 @@ public class WalkableAreaBuilder {
             );
             edges.addAll(newEdges);
             ringEdges.addAll(newEdges);
+
             // A node can only be a visibility node only if it is an entrance to the
             // area or a convex point, i.e. the angle is over 180 degrees.
-            if (outerRing.isNodeConvex(i)) {
+            // Also, if additional linking points have been defined, add some points from outer
+            // edge to ensure that platform geometry gets connected
+            if (
+              outerRing.isNodeConvex(i) ||
+              (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2))
+            ) {
               visibilityNodes.add(node);
               edgeList.visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }

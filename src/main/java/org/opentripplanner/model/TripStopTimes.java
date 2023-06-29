@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 /**
  * A multimap from Trip to a sorted list of StopTimes.
  * <p>
- * The list of stop times  for a given trip is guarantied to be sorted.
+ * The list of stop times  for a given trip is guaranteed to be sorted.
  */
 public class TripStopTimes {
 

@@ -39,6 +39,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -46,7 +47,9 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -67,8 +70,10 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -84,6 +89,8 @@ class GraphQLIntegrationTest {
   static final Instant ALERT_END_TIME = ALERT_START_TIME.plus(1, ChronoUnit.DAYS);
 
   private static final LegacyGraphQLRequestContext context;
+
+  private static final Deduplicator DEDUPLICATOR = new Deduplicator();
 
   static {
     graph
@@ -101,7 +108,16 @@ class GraphQLIntegrationTest {
 
     var stopModel = StopModel.of();
     PlanTestConstants.listStops().forEach(sl -> stopModel.withRegularStop((RegularStop) sl));
-    var transitModel = new TransitModel(stopModel.build(), new Deduplicator());
+    var transitModel = new TransitModel(stopModel.build(), DEDUPLICATOR);
+
+    final TripPattern pattern = TransitModelForTest.pattern(BUS).build();
+    var trip = TransitModelForTest.trip("123").build();
+    var stopTimes = TransitModelForTest.stopTimesEvery5Minutes(3, trip, T11_00);
+    var tripTimes = new TripTimes(trip, stopTimes, DEDUPLICATOR);
+    pattern.add(tripTimes);
+
+    transitModel.addTripPattern(id("pattern-1"), pattern);
+
     transitModel.initTimeZone(ZoneIds.BERLIN);
     transitModel.index();
     var routes = Arrays
@@ -120,20 +136,27 @@ class GraphQLIntegrationTest {
 
     routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
 
+    var step1 = walkStep("street");
+    step1.setRelativeDirection(RelativeDirection.DEPART);
+    step1.setAbsoluteDirection(20);
+    var step2 = walkStep("elevator");
+    step2.setRelativeDirection(RelativeDirection.ELEVATOR);
+
     Itinerary i1 = newItinerary(A, T11_00)
-      .walk(20, B)
+      .walk(20, B, List.of(step1, step2))
       .bus(busRoute, 122, T11_01, T11_15, C)
       .rail(439, T11_30, T11_50, D)
       .carHail(D10m, E)
       .build();
+
     var busLeg = i1.getTransitLeg(1);
     ScheduledTransitLeg railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
-    fares.addFare(FareType.regular, Money.euros(310));
+    fares.addFare(FareType.regular, Money.euros(3.1f));
     fares.addFareComponent(
       FareType.regular,
-      List.of(new FareComponent(id("AB"), Money.euros(310), List.of(busLeg)))
+      List.of(new FareComponent(id("AB"), Money.euros(3.1f), List.of(busLeg)))
     );
 
     var dayPass = fareProduct("day-pass");
@@ -185,18 +208,6 @@ class GraphQLIntegrationTest {
       );
   }
 
-  @Nonnull
-  private static FareProduct fareProduct(String name) {
-    return new FareProduct(
-      id(name),
-      name,
-      Money.euros(1000),
-      null,
-      new RiderCategory(id("senior-citizens"), "Senior citizens", null),
-      new FareMedium(id("oyster"), "TfL Oyster Card")
-    );
-  }
-
   @FilePatternSource(pattern = "src/ext-test/resources/legacygraphqlapi/queries/*.graphql")
   @ParameterizedTest(name = "Check GraphQL query in {0}")
   void graphQL(Path path) throws IOException {
@@ -228,6 +239,30 @@ class GraphQLIntegrationTest {
 
     var expectedJson = Files.readString(expectationFile);
     assertEqualJson(expectedJson, actualJson);
+  }
+
+  @Nonnull
+  private static WalkStep walkStep(String name) {
+    return new WalkStep(
+      new NonLocalizedString(name),
+      WgsCoordinate.GREENWICH,
+      false,
+      10,
+      false,
+      false
+    );
+  }
+
+  @Nonnull
+  private static FareProduct fareProduct(String name) {
+    return new FareProduct(
+      id(name),
+      name,
+      Money.euros(10),
+      null,
+      new RiderCategory(id("senior-citizens"), "Senior citizens", null),
+      new FareMedium(id("oyster"), "TfL Oyster Card")
+    );
   }
 
   /**

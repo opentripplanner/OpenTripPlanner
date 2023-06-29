@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
+import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
@@ -144,10 +145,14 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
       subscriptionName
     );
 
-    try {
-      Runtime.getRuntime().addShutdownHook(new Thread(this::teardown));
-    } catch (IllegalStateException e) {
-      LOG.error(e.getLocalizedMessage(), e);
+    Thread shutdownHook = new Thread(this::teardown, "azur-siri-updater-shutdown");
+    boolean added = ApplicationShutdownSupport.addShutdownHook(
+      shutdownHook,
+      shutdownHook.getName()
+    );
+    if (!added) {
+      // Handling corner case when instance is being shut down before it has been initialized
+      LOG.info("Instance is already shutting down - cleaning up immediately.");
       teardown();
     }
   }

@@ -10,8 +10,8 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 
 public class ForwardTransitCalculatorTest implements RaptorTestConstants {
 

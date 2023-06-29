@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.List;
+import java.util.Optional;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFares;
@@ -54,20 +55,21 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
     List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
-    float cost = 0;
-    float currentTransferWindowCost = 0;
+    var zero = Money.ofFractionalAmount(currency, 0);
+    Money cost = zero;
+    Money currentTransferWindowCost = zero;
     // The initial value of -1 indicates that the free transfer window end time has not yet been set
     long freeTransferWindowEndTimeEpochSeconds = -1;
     for (var leg : legs) {
-      float rideCost = calculateCost(fareType, List.of(leg), fareRules);
+      Optional<Money> rideCost = calculateCost(fareType, List.of(leg), fareRules);
 
       if (leg.getStartTime().toEpochSecond() > freeTransferWindowEndTimeEpochSeconds) {
         // free transfer window has expired or has not yet been initialized. Reset some items and add to the
         // overall cost. This is fine to do if the free transfer window hasn't been initialized since the
         // overall cost will be 0.
-        cost += currentTransferWindowCost;
+        cost = cost.plus(currentTransferWindowCost);
         // reset current window cost
-        currentTransferWindowCost = 0;
+        currentTransferWindowCost = zero;
         // reset transfer window end time to trigger recalculation in next block
         freeTransferWindowEndTimeEpochSeconds = -1;
       }
@@ -80,23 +82,21 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
           leg.getStartTime().plus(freeTransferWindow).toEpochSecond();
       }
 
-      currentTransferWindowCost = Float.max(currentTransferWindowCost, rideCost);
+      currentTransferWindowCost = Money.max(currentTransferWindowCost, rideCost.orElse(zero));
     }
-    cost += currentTransferWindowCost;
-    if (cost < Float.POSITIVE_INFINITY) {
-      final Money money = getMoney(currency, cost);
-      fare.addFare(fareType, money);
-      var fp = new FareProduct(
-        new FeedScopedId("fares", fareType.name()),
-        fareType.name(),
-        money,
-        null,
-        null,
-        null
-      );
-      fare.addItineraryProducts(List.of(fp));
-    }
-    return cost > 0 && cost < Float.POSITIVE_INFINITY;
+    cost = cost.plus(currentTransferWindowCost);
+    fare.addFare(fareType, cost);
+    var fp = new FareProduct(
+      new FeedScopedId("fares", fareType.name()),
+      fareType.name(),
+      cost,
+      null,
+      null,
+      null
+    );
+    fare.addItineraryProducts(List.of(fp));
+    fare.addFare(fareType, cost);
+    return cost.greaterThan(zero);
   }
 
   @Override

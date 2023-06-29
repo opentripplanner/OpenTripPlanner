@@ -9,6 +9,7 @@ import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssign
 import static org.opentripplanner.netex.NetexTestDataSupport.createDayTypeAssignmentWithPeriod;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingDay;
 import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingPeriod;
+import static org.opentripplanner.netex.NetexTestDataSupport.createOperatingPeriodWithOperatingDays;
 import static org.opentripplanner.netex.NetexTestDataSupport.createUicOperatingPeriod;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.EVERYDAY;
 import static org.rutebanken.netex.model.DayOfWeekEnumeration.WEEKDAYS;
@@ -24,7 +25,7 @@ import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingPeriod_VersionStructure;
 
-public class DayTypeAssignmentMapperTest {
+class DayTypeAssignmentMapperTest {
 
   private static final LocalDate D2020_10_21 = LocalDate.of(2020, 10, 21);
   private static final LocalDate D2020_11_01 = LocalDate.of(2020, 11, 1);
@@ -51,9 +52,11 @@ public class DayTypeAssignmentMapperTest {
 
   private static final HierarchicalMapById<OperatingDay> EMPTY_OPERATING_DAYS = new HierarchicalMapById<>();
   private static final HierarchicalMapById<OperatingPeriod_VersionStructure> EMPTY_PERIODS = new HierarchicalMapById<>();
+  public static final String OPERATING_DAY_1 = "OD-1";
+  public static final String OPERATING_DAY_2 = "OD-2";
 
   @Test
-  public void mapDayTypesToLocalDatesForAGivenDate() {
+  void mapDayTypesToLocalDatesForAGivenDate() {
     // GIVEN
     var dayTypes = new HierarchicalMapById<DayType>();
     var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
@@ -83,7 +86,7 @@ public class DayTypeAssignmentMapperTest {
   }
 
   @Test
-  public void mapDayTypesToLocalDatesForSetOfDaysExceptSomeDays() {
+  void mapDayTypesToLocalDatesForSetOfDaysExceptSomeDays() {
     // GIVEN
     var dayTypes = new HierarchicalMapById<DayType>();
     var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
@@ -114,7 +117,7 @@ public class DayTypeAssignmentMapperTest {
   }
 
   @Test
-  public void mapDayTypesToLocalDatesWithOperatingDay() {
+  void mapDayTypesToLocalDatesWithOperatingDay() {
     // GIVEN
     var dayTypes = new HierarchicalMapById<DayType>();
     var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
@@ -140,7 +143,7 @@ public class DayTypeAssignmentMapperTest {
 
   // TODO add test for uicOperatingPeriods
   @Test
-  public void mapDayTypesToLocalDatesWithPeriods() {
+  void mapDayTypesToLocalDatesWithPeriods() {
     // GIVEN
     var dayTypes = new HierarchicalMapById<DayType>();
     var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
@@ -177,7 +180,35 @@ public class DayTypeAssignmentMapperTest {
   }
 
   @Test
-  public void mapDayTypesToLocalDatesWithPeriodExceptAGivenDate() {
+  void mapDayTypesToLocalDatesWithOperatingDays() {
+    // GIVEN
+    var dayTypes = new HierarchicalMapById<DayType>();
+    var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
+    var periods = new HierarchicalMapById<OperatingPeriod_VersionStructure>();
+    var operatingDays = new HierarchicalMapById<OperatingDay>();
+
+    operatingDays.add(createOperatingDay(OPERATING_DAY_1, D2020_11_01));
+    operatingDays.add(createOperatingDay(OPERATING_DAY_2, D2020_11_03));
+    periods.add(createOperatingPeriodWithOperatingDays(OP_1, OPERATING_DAY_1, OPERATING_DAY_2));
+    dayTypes.add(createDayType(DAY_TYPE_1, EVERYDAY));
+
+    assignments.add(DAY_TYPE_1, createDayTypeAssignmentWithPeriod(DAY_TYPE_1, OP_1, AVAILABLE));
+
+    // WHEN - create calendar
+    Map<String, Set<LocalDate>> result = DayTypeAssignmentMapper.mapDayTypes(
+      dayTypes,
+      assignments,
+      operatingDays,
+      periods,
+      null
+    );
+
+    // THEN - verify
+    assertEquals("[2020-11-01, 2020-11-02, 2020-11-03]", toStr(result, DAY_TYPE_1));
+  }
+
+  @Test
+  void mapDayTypesToLocalDatesWithPeriodExceptAGivenDate() {
     // GIVEN
     var dayTypes = new HierarchicalMapById<DayType>();
     var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();
@@ -214,7 +245,7 @@ public class DayTypeAssignmentMapperTest {
   }
 
   @Test
-  public void mapDayTypesToLocalDatesWithUicPeriods() {
+  void mapDayTypesToLocalDatesWithUicPeriods() {
     // GIVEN
     var dayTypes = new HierarchicalMapById<DayType>();
     var assignments = new HierarchicalMultimap<String, DayTypeAssignment>();

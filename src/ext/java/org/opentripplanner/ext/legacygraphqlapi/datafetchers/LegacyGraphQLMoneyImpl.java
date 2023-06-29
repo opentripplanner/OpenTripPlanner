@@ -10,7 +10,7 @@ public class LegacyGraphQLMoneyImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<Double> amount() {
-    return env -> getSource(env).fractionalAmount();
+    return env -> getSource(env).fractionalAmount().doubleValue();
   }
 
   @Override

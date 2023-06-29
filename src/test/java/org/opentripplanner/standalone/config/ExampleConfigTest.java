@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.opentripplanner.framework.application.OtpFileNames.BUILD_CONFIG_FILENAME;
+import static org.opentripplanner.framework.application.OtpFileNames.OTP_CONFIG_FILENAME;
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 
 import java.io.IOException;
@@ -43,10 +44,12 @@ public class ExampleConfigTest {
     testConfig(filename, SpeedTestConfig::new);
   }
 
-  @FilePatternSource(pattern = "test/performance/**/otp-config.json")
+  @FilePatternSource(
+    pattern = { "test/performance/**/otp-config.json", "docs/examples/**/" + OTP_CONFIG_FILENAME }
+  )
   @ParameterizedTest(name = "Check validity of {0}")
   void otpConfig(Path filename) {
-    testConfig(filename, json -> new OtpConfig(json.rawNode(), json.toJson(), true));
+    testConfig(filename, nodeAdapter -> new OtpConfig(nodeAdapter, true));
   }
 
   @FilePatternSource(pattern = { "src/test/resources/standalone/config/invalid-config.json" })

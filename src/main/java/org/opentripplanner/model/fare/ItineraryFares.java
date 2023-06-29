@@ -60,14 +60,6 @@ public class ItineraryFares {
   @Deprecated
   private final Map<FareType, Money> fares = new HashMap<>();
 
-  public ItineraryFares(ItineraryFares aFare) {
-    if (aFare != null) {
-      itineraryProducts.addAll(aFare.itineraryProducts);
-    }
-  }
-
-  public ItineraryFares() {}
-
   public static ItineraryFares empty() {
     return new ItineraryFares();
   }
@@ -92,7 +84,6 @@ public class ItineraryFares {
    * <p>
    * @deprecated It only exists for backwards-compatibility.
    * Use {@link ItineraryFares#addFareProduct(Leg, FareProduct)},
-   * {@link ItineraryFares#addLegProducts(Collection)} or
    * {@link ItineraryFares#addItineraryProducts(Collection)} instead.
    */
   @Deprecated
@@ -107,7 +98,6 @@ public class ItineraryFares {
    * @deprecated Only exitst for backwards compatibility.
    * Use @{link {@link ItineraryFares#addItineraryProducts(Collection)}},
    * {@link ItineraryFares#addFareProduct(Leg, FareProduct)} or
-   * {@link ItineraryFares#addLegProducts(Collection)} instead.
    */
   @Deprecated
   public void addFareComponent(FareType fareType, List<FareComponent> components) {
@@ -195,22 +185,6 @@ public class ItineraryFares {
       .addObj("itineraryProducts", itineraryProducts)
       .addObj("legProducts", legProducts)
       .toString();
-  }
-
-  /**
-   * Add a complex set of fare products for a specific leg;
-   */
-  public void addLegProducts(Collection<LegProducts> legProducts) {
-    legProducts.forEach(lp -> {
-      var time = lp.leg().getStartTime();
-      var products = lp
-        .products()
-        .stream()
-        .map(LegProducts.ProductWithTransfer::product)
-        .map(fp -> new FareProductUse(fp.uniqueInstanceId(time), fp))
-        .toList();
-      this.legProducts.putAll(lp.leg(), products);
-    });
   }
 
   /**

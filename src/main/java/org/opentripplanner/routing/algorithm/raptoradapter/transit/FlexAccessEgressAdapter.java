@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
-import javax.annotation.Nullable;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.raptor.api.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 
 /**
  * This class is used to adapt the FlexAccessEgress into a time-dependent multi-leg DefaultAccessEgress.
@@ -20,14 +20,25 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
     this.flexAccessEgress = flexAccessEgress;
   }
 
+  private FlexAccessEgressAdapter(FlexAccessEgressAdapter other, TimeAndCost penalty) {
+    super(other, penalty);
+    this.flexAccessEgress = other.flexAccessEgress;
+  }
+
   @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
-    return mapToRaptorTime(flexAccessEgress.earliestDepartureTime(requestedDepartureTime));
+    return calculateEarliestDepartureTimeWithOpeningHours(
+      requestedDepartureTime,
+      v -> mapToRaptorTime(flexAccessEgress.earliestDepartureTime(v))
+    );
   }
 
   @Override
   public int latestArrivalTime(int requestedArrivalTime) {
-    return mapToRaptorTime(flexAccessEgress.latestArrivalTime(requestedArrivalTime));
+    return calculateLatestArrivalTimeWithOpeningHours(
+      requestedArrivalTime,
+      v -> mapToRaptorTime(flexAccessEgress.latestArrivalTime(v))
+    );
   }
 
   @Override
@@ -48,18 +59,14 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
     return true;
   }
 
-  @Nullable
   @Override
-  public String openingHoursToString() {
-    //  TODO - Return "[earliest-board/alight-time latest-board-time]" or
-    //       - "[exact-board/alight-time]" for the given access/egress stop.
-    //       - For egress used board-time for access used alight-time.
-    return "TODO";
+  public boolean isWalkOnly() {
+    return false;
   }
 
   @Override
-  public String toString() {
-    return asString(true);
+  public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
+    return new FlexAccessEgressAdapter(this, penalty);
   }
 
   private static int mapToRaptorTime(int flexTime) {

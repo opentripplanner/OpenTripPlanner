@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
@@ -17,6 +18,8 @@ import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class ParkAPIUpdaterTest {
 
+  private static final Duration FREQUENCY = Duration.ofSeconds(30);
+
   @Test
   void parseCars() {
     var url = "file:src/ext-test/resources/vehicleparking/parkapi/parkapi-reutlingen.json";
@@ -25,7 +28,7 @@ public class ParkAPIUpdaterTest {
       "",
       url,
       "park-api",
-      30,
+      FREQUENCY,
       HttpHeaders.empty(),
       List.of(),
       null,
@@ -69,7 +72,7 @@ public class ParkAPIUpdaterTest {
       "",
       url,
       "park-api",
-      30,
+      FREQUENCY,
       HttpHeaders.empty(),
       List.of(),
       null,
@@ -101,7 +104,7 @@ public class ParkAPIUpdaterTest {
       "",
       url,
       "park-api",
-      30,
+      FREQUENCY,
       HttpHeaders.empty(),
       List.of(),
       null,

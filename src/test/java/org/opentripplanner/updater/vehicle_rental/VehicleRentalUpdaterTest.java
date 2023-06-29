@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.util.concurrent.Futures;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.Future;
 import javax.annotation.Nonnull;
@@ -24,7 +25,7 @@ class VehicleRentalUpdaterTest {
   void failingDatasourceCountsAsPrimed() {
     var source = new FailingDatasource();
     var updater = new VehicleRentalUpdater(
-      new VehicleRentalUpdaterParameters("A", 1, new FakeParams()),
+      new VehicleRentalUpdaterParameters("A", Duration.ofMinutes(1), new FakeParams()),
       source,
       null,
       new DefaultVehicleRentalService()

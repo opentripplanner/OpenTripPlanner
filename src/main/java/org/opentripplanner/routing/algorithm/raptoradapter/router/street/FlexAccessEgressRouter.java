@@ -5,6 +5,7 @@ import java.util.List;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexRouter;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -28,6 +29,8 @@ public class FlexAccessEgressRouter {
     DataOverlayContext dataOverlayContext,
     boolean isEgress
   ) {
+    OTPRequestTimeoutException.checkForTimeout();
+
     TransitService transitService = serverContext.transitService();
 
     Collection<NearbyStop> accessStops = !isEgress

@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
 import com.google.common.io.Resources;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -41,8 +40,9 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCarPar
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLContactInfoImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCoordinatesImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLCurrencyImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLDefaultFareProductImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLDepartureRowImpl;
-import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFareProductImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFareProductTypeResolver;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFareProductUseImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLFeedImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLGeometryImpl;
@@ -85,7 +85,9 @@ import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLplaceA
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLserviceTimeRangeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstepImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLstopAtDistanceImpl;
+import org.opentripplanner.ext.legacygraphqlapi.model.StopPosition;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +98,7 @@ class LegacyGraphQLIndex {
   private static final GraphQLSchema indexSchema = buildSchema();
 
   static final ExecutorService threadPool = Executors.newCachedThreadPool(
-    new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-%d").build()
+    OtpRequestThreadFactory.of("gtfs-api-%d")
   );
 
   protected static GraphQLSchema buildSchema() {
@@ -117,6 +119,7 @@ class LegacyGraphQLIndex {
           "PlaceInterface",
           type -> type.typeResolver(new LegacyGraphQLPlaceInterfaceTypeResolver())
         )
+        .type("StopPosition", type -> type.typeResolver(new StopPosition() {}))
         .type(typeWiring.build(LegacyGraphQLAgencyImpl.class))
         .type(typeWiring.build(LegacyGraphQLAlertImpl.class))
         .type(typeWiring.build(LegacyGraphQLBikeParkImpl.class))
@@ -170,7 +173,8 @@ class LegacyGraphQLIndex {
         .type(typeWiring.build(LegacyGraphQLMoneyImpl.class))
         .type(typeWiring.build(LegacyGraphQLCurrencyImpl.class))
         .type(typeWiring.build(LegacyGraphQLFareProductUseImpl.class))
-        .type(typeWiring.build(LegacyGraphQLFareProductImpl.class))
+        .type("FareProduct", type -> type.typeResolver(new LegacyGraphQLFareProductTypeResolver()))
+        .type(typeWiring.build(LegacyGraphQLDefaultFareProductImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

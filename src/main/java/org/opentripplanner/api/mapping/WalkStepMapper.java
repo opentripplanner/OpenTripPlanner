@@ -1,6 +1,5 @@
 package org.opentripplanner.api.mapping;
 
-import static org.opentripplanner.api.mapping.AbsoluteDirectionMapper.mapAbsoluteDirection;
 import static org.opentripplanner.api.mapping.ElevationMapper.mapElevation;
 import static org.opentripplanner.api.mapping.RelativeDirectionMapper.mapRelativeDirection;
 
@@ -37,7 +36,8 @@ public class WalkStepMapper {
     api.distance = domain.getDistance();
     api.relativeDirection = mapRelativeDirection(domain.getRelativeDirection());
     api.streetName = domain.getStreetName().toString(locale);
-    api.absoluteDirection = mapAbsoluteDirection(domain.getAbsoluteDirection());
+    api.absoluteDirection =
+      domain.getAbsoluteDirection().map(AbsoluteDirectionMapper::mapAbsoluteDirection).orElse(null);
     api.exit = domain.getExit();
     api.stayOn = domain.getStayOn();
     api.area = domain.getArea();

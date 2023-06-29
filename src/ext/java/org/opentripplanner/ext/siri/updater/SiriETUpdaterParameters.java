@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
+import java.time.Duration;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.trip.UrlUpdaterParameters;
@@ -9,45 +10,16 @@ public record SiriETUpdaterParameters(
   String feedId,
   boolean blockReadinessUntilInitialized,
   String url,
-  int frequencySec,
+  Duration frequency,
   String requestorRef,
-  int timeoutSec,
-  int previewIntervalMinutes,
+  Duration timeout,
+  Duration previewInterval,
   boolean fuzzyTripMatching,
-  HttpHeaders headers
+  HttpHeaders httpRequestHeaders
 )
-  implements PollingGraphUpdaterParameters, UrlUpdaterParameters {
+  implements
+    PollingGraphUpdaterParameters, UrlUpdaterParameters, SiriETHttpTripUpdateSource.Parameters {
   public SiriETHttpTripUpdateSource.Parameters sourceParameters() {
-    return new SiriETHttpTripUpdateSource.Parameters() {
-      @Override
-      public String getUrl() {
-        return url;
-      }
-
-      @Override
-      public String getRequestorRef() {
-        return requestorRef;
-      }
-
-      @Override
-      public String getFeedId() {
-        return feedId;
-      }
-
-      @Override
-      public int getTimeoutSec() {
-        return timeoutSec;
-      }
-
-      @Override
-      public int getPreviewIntervalMinutes() {
-        return previewIntervalMinutes;
-      }
-
-      @Override
-      public HttpHeaders httpRequestHeaders() {
-        return headers;
-      }
-    };
+    return this;
   }
 }

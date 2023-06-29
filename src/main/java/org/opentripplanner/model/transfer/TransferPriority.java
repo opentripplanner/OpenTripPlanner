@@ -18,9 +18,9 @@ package org.opentripplanner.model.transfer;
  *     /li>
  * </ol>
  * <p>
- * Note that for {@code transfer_type=1} the guarantied flag is also set causing it to take
- * precedence over the priority. A guarantied ALLOWED transfer is preferred over a PREFERRED
- * none-guarantied transfer.
+ * Note that for {@code transfer_type=1} the guaranteed flag is also set causing it to take
+ * precedence over the priority. A guaranteed ALLOWED transfer is preferred over a PREFERRED
+ * none-guaranteed transfer.
  * <p>
  * Note that {@code transfer_type=2} is not a constraint, just a regular path transfer.
  */

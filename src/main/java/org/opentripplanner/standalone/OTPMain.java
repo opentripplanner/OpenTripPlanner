@@ -6,6 +6,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
+import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
@@ -48,6 +49,7 @@ public class OTPMain {
    */
   public static void main(String[] args) {
     try {
+      Thread.currentThread().setName("main");
       CommandLineParameters params = parseAndValidateCmdLine(args);
       OtpStartupInfo.logInfo();
       startOTPServer(params);
@@ -218,15 +220,18 @@ public class OTPMain {
     TransitModel transitModel,
     RaptorConfig<?> raptorConfig
   ) {
-    var hook = new Thread(() -> {
-      LOG.info("OTP shutdown started...");
-      UpdaterConfigurator.shutdownGraph(transitModel);
-      raptorConfig.shutdown();
-      WeakCollectionCleaner.DEFAULT.exit();
-      DeferredAuthorityFactory.exit();
-      LOG.info("OTP shutdown: resources released...");
-    });
-    Runtime.getRuntime().addShutdownHook(hook);
+    var hook = new Thread(
+      () -> {
+        LOG.info("OTP shutdown started...");
+        UpdaterConfigurator.shutdownGraph(transitModel);
+        raptorConfig.shutdown();
+        WeakCollectionCleaner.DEFAULT.exit();
+        DeferredAuthorityFactory.exit();
+        LOG.info("OTP shutdown: resources released...");
+      },
+      "server-shutdown"
+    );
+    ApplicationShutdownSupport.addShutdownHook(hook, hook.getName());
   }
 
   private static void setOtpConfigVersionsOnServerInfo(ConstructApplication app) {

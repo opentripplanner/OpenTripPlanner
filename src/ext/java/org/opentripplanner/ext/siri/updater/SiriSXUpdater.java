@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -32,7 +33,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   private WriteToGraphCallback saveResultOnGraph;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
   private String requestorRef;
-  private int timeout;
+  private int timeoutMillis = 0;
   private int retryCount = 0;
 
   public SiriSXUpdater(SiriSXUpdaterParameters config, TransitModel transitModel) {
@@ -47,15 +48,9 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
     //Keeping original requestorRef use as base for updated requestorRef to be used in retries
     this.originalRequestorRef = requestorRef;
-
-    int timeoutSec = config.timeoutSec();
-    if (timeoutSec > 0) {
-      this.timeout = 1000 * timeoutSec;
-    }
-
-    blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-    requestHeaders = config.requestHeaders();
-
+    this.timeoutMillis = DurationUtils.toIntMilliseconds(config.timeout(), 0);
+    this.blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
+    this.requestHeaders = config.requestHeaders();
     this.transitAlertService = new TransitAlertServiceImpl(transitModel);
     this.updateHandler =
       new SiriAlertsUpdateHandler(
@@ -63,11 +58,11 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         transitModel,
         transitAlertService,
         SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel)),
-        config.earlyStartSec()
+        config.earlyStart()
       );
     LOG.info(
       "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",
-      pollingPeriodSeconds(),
+      pollingPeriod(),
       url
     );
   }
@@ -133,7 +128,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
       InputStream is = SiriHttpUtils.postData(
         url,
         sxServiceRequest,
-        timeout,
+        timeoutMillis,
         requestHeaders.asMap()
       );
 

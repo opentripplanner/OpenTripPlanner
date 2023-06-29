@@ -73,6 +73,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [walkReluctance](#rd_walkReluctance)                                                                 |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`                    |  2.0  |
 | [walkSafetyFactor](#rd_walkSafetyFactor)                                                             |        `double`        | Factor for how much the walk safety is considered in routing.                                                                                  | *Optional* | `1.0`                    |  2.2  |
 | walkSpeed                                                                                            |        `double`        | The user's walking speed in meters/second.                                                                                                     | *Optional* | `1.33`                   |  2.0  |
+| [accessEgressPenalty](#rd_accessEgressPenalty)                                                       |  `enum map of object`  | Penalty for access/egress by street mode.                                                                                                      | *Optional* |                          |  2.4  |
 | [alightSlackForMode](#rd_alightSlackForMode)                                                         | `enum map of duration` | How much extra time should be given when alighting a vehicle for each given mode.                                                              | *Optional* |                          |  2.0  |
 | [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                             |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned.                                                              | *Optional* |                          |  2.1  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                           | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                               | *Optional* |                          |  2.0  |
@@ -280,7 +281,7 @@ This is the time/duration in seconds from the earliest-departure-time(EDT) to th
 latest-departure-time(LDT). In case of a reverse search it will be the time from earliest to
 latest arrival time (LAT - EAT).
 
-All optimal travels that depart within the search window is guarantied to be found.
+All optimal travels that depart within the search window is guaranteed to be found.
 
 This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
 Transit search as well; Hence this is named search-window and not raptor-search-window.
@@ -388,6 +389,48 @@ high values.
 Factor for how much the walk safety is considered in routing.
 
 Value should be between 0 and 1. If the value is set to be 0, safety is ignored.
+
+<h3 id="rd_accessEgressPenalty">accessEgressPenalty</h3>
+
+**Since version:** `2.4` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults   
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+
+Penalty for access/egress by street mode.
+
+Use this to add a time and cost penalty to an access/egress legs for a given street
+mode. This will favour other street-modes and transit. This has a performance penalty,
+since the search-window is increased with the same amount as the maximum penalty for
+the access legs used. In other cases where the access(CAR) is faster than transit the
+performance will be better.
+
+Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
+
+**Time penalty**
+The time penalty is a linear function applied to the actual-time/duration of the leg. The time
+penalty consist of a `constant` and a `coefficient`. The penalty is not added to the actual
+time, like a slack. Instead, the penalty is *invisible* in the returned itinerary, but it is
+applied during routing.
+
+The penalty is a function of time(duration):
+```
+f(t) = a + b * t
+```
+where `a` is the constant time part, `b` is the time-coefficient. `f(t)` is the function to
+calculate the penalty-time. The penalty-time is added to the actual-time during routing. If
+`a=0s` and `b=0.0`, then the penalty is `0`(zero).
+
+Examples: `0s + 2.5t`, `10m + 0t` and `1h5m59s + 9.9t`
+
+The `constant` must be 0 or a positive duration.
+The `coefficient` must be in range `[0.0, 10.0]`.
+
+**Cost factor**
+
+The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
+time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
+extra cost, while 1.0 will add the same amount to both time and cost.
+
 
 <h3 id="rd_alightSlackForMode">alightSlackForMode</h3>
 
@@ -816,3 +859,110 @@ include stairs as a last result.
 
 
 <!-- PARAMETERS-DETAILS END -->
+
+## Config Example
+
+<!-- JSON-EXAMPLE BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+```JSON
+// router-config.json
+{
+  "routingDefaults" : {
+    "walkSpeed" : 1.3,
+    "bikeSpeed" : 5,
+    "carSpeed" : 40,
+    "numItineraries" : 12,
+    "transferPenalty" : 0,
+    "walkReluctance" : 4.0,
+    "bikeReluctance" : 5.0,
+    "bikeWalkingReluctance" : 10.0,
+    "bikeStairsReluctance" : 150.0,
+    "carReluctance" : 10.0,
+    "stairsReluctance" : 1.65,
+    "turnReluctance" : 1.0,
+    "elevatorBoardTime" : 90,
+    "elevatorBoardCost" : 90,
+    "elevatorHopTime" : 20,
+    "elevatorHopCost" : 20,
+    "vehicleRental" : {
+      "pickupCost" : 120,
+      "dropOffTime" : 30,
+      "dropOffCost" : 30
+    },
+    "bikeParkTime" : 60,
+    "bikeParkCost" : 120,
+    "carDropoffTime" : 120,
+    "waitReluctance" : 1.0,
+    "walkBoardCost" : 600,
+    "bikeBoardCost" : 600,
+    "otherThanPreferredRoutesPenalty" : 300,
+    "transferSlack" : 120,
+    "boardSlackForMode" : {
+      "AIRPLANE" : "35m"
+    },
+    "alightSlackForMode" : {
+      "AIRPLANE" : "15m"
+    },
+    "transitReluctanceForMode" : {
+      "RAIL" : 0.85
+    },
+    "maxAccessEgressDurationForMode" : {
+      "BIKE_RENTAL" : "20m"
+    },
+    "itineraryFilters" : {
+      "transitGeneralizedCostLimit" : {
+        "costLimitFunction" : "900 + 1.5 x",
+        "intervalRelaxFactor" : 0.4
+      },
+      "bikeRentalDistanceRatio" : 0.3,
+      "accessibilityScore" : true,
+      "minBikeParkingDistance" : 300
+    },
+    "carDecelerationSpeed" : 2.9,
+    "carAccelerationSpeed" : 2.9,
+    "ignoreRealtimeUpdates" : false,
+    "geoidElevation" : false,
+    "maxJourneyDuration" : "36h",
+    "unpreferred" : {
+      "agencies" : [
+        "HSL:123"
+      ],
+      "routes" : [
+        "HSL:456"
+      ]
+    },
+    "unpreferredCost" : "600 + 2.0 x",
+    "streetRoutingTimeout" : "5s",
+    "transferOptimization" : {
+      "optimizeTransferWaitTime" : true,
+      "minSafeWaitTimeFactor" : 5.0,
+      "backTravelWaitTimeFactor" : 1.0,
+      "extraStopBoardAlightCostsFactor" : 8.0
+    },
+    "wheelchairAccessibility" : {
+      "trip" : {
+        "onlyConsiderAccessible" : false,
+        "unknownCost" : 600,
+        "inaccessibleCost" : 3600
+      },
+      "stop" : {
+        "onlyConsiderAccessible" : false,
+        "unknownCost" : 600,
+        "inaccessibleCost" : 3600
+      },
+      "elevator" : {
+        "onlyConsiderAccessible" : false,
+        "unknownCost" : 20,
+        "inaccessibleCost" : 3600
+      },
+      "inaccessibleStreetReluctance" : 25,
+      "maxSlope" : 0.083,
+      "slopeExceededReluctance" : 1,
+      "stairsReluctance" : 100
+    }
+  }
+}
+```
+
+<!-- JSON-EXAMPLE END -->

@@ -152,19 +152,16 @@ public class StreetIndex {
   }
 
   /**
-   * Return the edges whose geometry intersect with the specified envelope. Warning: edges w/o
-   * geometry will not be indexed.
+   * Return the edges whose geometry intersect with the specified envelope. Warning: edges disconnected from the graph
+   * will not be indexed.
    */
   public Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
     return edgeSpatialIndex
       .query(envelope, Scope.PERMANENT)
-      .filter(e -> {
-        if (e.getToVertex() == null || e.getFromVertex() == null) {
-          return false;
-        }
-        Envelope eenv = edgeGeometryOrStraightLine(e).getEnvelopeInternal();
-        return envelope.intersects(eenv);
-      })
+      .filter(e ->
+        e.isReachableFromGraph() &&
+        envelope.intersects(edgeGeometryOrStraightLine(e).getEnvelopeInternal())
+      )
       .toList();
   }
 
@@ -183,7 +180,7 @@ public class StreetIndex {
     // Differentiate between driving and non-driving, as driving is not available from transit stops
     TraverseMode nonTransitMode = getTraverseModeForLinker(streetMode, endVertex);
 
-    if (nonTransitMode.isDriving()) {
+    if (nonTransitMode.isInCar()) {
       // Fetch coordinate from stop, if not given in request
       if (location.stopId != null && location.getCoordinate() == null) {
         var coordinate = stopModel.getCoordinateById(location.stopId);

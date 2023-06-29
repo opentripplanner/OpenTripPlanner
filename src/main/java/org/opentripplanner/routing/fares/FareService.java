@@ -12,5 +12,5 @@ public interface FareService extends Serializable {
   /**
    * @param itinerary the OTP2 Itinerary for which we want to compute a fare
    */
-  ItineraryFares getCost(Itinerary itinerary);
+  ItineraryFares calculateFares(Itinerary itinerary);
 }
