@@ -1,7 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
 import javax.annotation.Nonnull;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.site.BoardingArea;
 import org.opentripplanner.transit.model.site.StationElement;

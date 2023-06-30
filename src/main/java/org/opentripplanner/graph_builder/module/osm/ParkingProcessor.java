@@ -42,7 +42,6 @@ class ParkingProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ParkingProcessor.class);
   private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
-  private final Graph graph;
   private final DataImportIssueStore issueStore;
   private final OSMOpeningHoursParser osmOpeningHoursParser;
   private final BiFunction<OSMNode, OSMWithTags, IntersectionVertex> getVertexForOsmNode;
@@ -54,7 +53,6 @@ class ParkingProcessor {
     DataImportIssueStore issueStore,
     BiFunction<OSMNode, OSMWithTags, IntersectionVertex> getVertexForOsmNode
   ) {
-    this.graph = graph;
     this.issueStore = issueStore;
     this.getVertexForOsmNode = getVertexForOsmNode;
     this.osmOpeningHoursParser =

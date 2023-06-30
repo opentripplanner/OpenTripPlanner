@@ -10,7 +10,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -26,13 +25,10 @@ import org.opentripplanner.street.search.TraverseMode;
  */
 public class SimpleIntersectionTraversalCalculatorTest {
 
-  private Graph graph;
-
   public SimpleIntersectionTraversalCalculator calculator;
 
   @BeforeEach
   public void before() {
-    graph = new Graph();
     calculator = new SimpleIntersectionTraversalCalculator(DrivingDirection.RIGHT);
   }
 

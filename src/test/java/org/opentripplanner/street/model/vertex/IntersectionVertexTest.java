@@ -9,21 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
 public class IntersectionVertexTest {
-
-  private Graph graph;
 
   private StreetEdge fromEdge;
   private StreetEdge straightAheadEdge;
 
   @BeforeEach
   public void before() {
-    graph = new Graph();
-
     // Graph for a fictional grid city with turn restrictions
     StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
     StreetVertex maple2 = vertex("maple_2nd", 1.0, 2.0);
