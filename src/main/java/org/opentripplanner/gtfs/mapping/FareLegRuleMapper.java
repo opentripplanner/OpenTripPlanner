@@ -51,7 +51,11 @@ public final class FareLegRuleMapper {
   }
 
   private FareDistance createFareDistance(org.onebusaway.gtfs.model.FareLegRule fareLegRule) {
-    return switch (fareLegRule.getDistanceType()) {
+    final Integer distanceType = fareLegRule.getDistanceType();
+    if (distanceType == null) {
+      return null;
+    }
+    return switch (distanceType) {
       case 0 -> new FareDistance.Stops(
         fareLegRule.getMinDistance().intValue(),
         fareLegRule.getMaxDistance().intValue()
