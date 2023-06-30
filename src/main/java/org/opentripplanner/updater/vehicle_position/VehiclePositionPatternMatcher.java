@@ -328,7 +328,7 @@ public class VehiclePositionPatternMatcher {
       return UpdateError.result(scopedTripId, NO_SERVICE_ON_DATE);
     }
 
-    // the trip times are only used or mapping the GTFS-RT stop_sequence back to a stop.
+    // the trip times are only used for mapping the GTFS-RT stop_sequence back to a stop.
     // because new trips without trip times are created for realtime-updated ones, we explicitly
     // look at the static trips for the stop_sequence->stop mapping
     var staticTripTimes = getStaticPattern.apply(trip).getScheduledTimetable().getTripTimes(trip);
