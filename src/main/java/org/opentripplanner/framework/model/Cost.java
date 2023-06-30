@@ -13,6 +13,8 @@ import org.opentripplanner.framework.lang.OtpNumberFormat;
  */
 public final class Cost implements Serializable, Comparable<Cost> {
 
+  private static final int CENTI_FACTOR = 100;
+
   public static final Cost ZERO = Cost.costOfSeconds(0);
 
   private final int value;
@@ -78,5 +80,9 @@ public final class Cost implements Serializable, Comparable<Cost> {
   @Override
   public int compareTo(Cost o) {
     return value - o.value;
+  }
+
+  public int toCentiSeconds() {
+    return value * CENTI_FACTOR;
   }
 }

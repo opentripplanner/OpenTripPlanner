@@ -53,7 +53,7 @@ public class PathStringBuilder {
     if (leg.isFree()) {
       return this;
     }
-    return legSep().text(leg.asString(false));
+    return legSep().text(leg.asString(false, false, null));
   }
 
   public PathStringBuilder transit(String description, int fromTime, int toTime) {

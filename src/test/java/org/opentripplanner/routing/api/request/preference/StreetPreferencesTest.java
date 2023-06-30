@@ -7,19 +7,22 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import java.time.Duration;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.street.search.intersection_model.DrivingDirection;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
 
 class StreetPreferencesTest {
 
   private static final double TURN_RELUCTANCE = 2.0;
+  private static final Duration MAX_ACCESS_EGRESS = Duration.ofMinutes(5);
+  private static final Duration MAX_DIRECT = Duration.ofMinutes(10);
+  private static final Duration ROUTING_TIMEOUT = Duration.ofSeconds(3);
   private static final DrivingDirection DRIVING_DIRECTION = DrivingDirection.LEFT;
   private static final int ELEVATOR_BOARD_TIME = (int) Duration.ofMinutes(2).toSeconds();
   private static final IntersectionTraversalModel INTERSECTION_TRAVERSAL_MODEL =
     IntersectionTraversalModel.CONSTANT;
-  private static final Duration MAX_ACCESS_EGRESS = Duration.ofMinutes(5);
-  private static final Duration MAX_DIRECT = Duration.ofMinutes(10);
-  public static final Duration ROUTING_TIMEOUT = Duration.ofSeconds(3);
+  private static final TimeAndCostPenalty CAR_PENALTY = TimeAndCostPenalty.of("2m + 1.5t", 3.5);
 
   private final StreetPreferences subject = StreetPreferences
     .of()
@@ -27,6 +30,7 @@ class StreetPreferencesTest {
     .withTurnReluctance(TURN_RELUCTANCE)
     .withElevator(it -> it.withBoardTime(ELEVATOR_BOARD_TIME))
     .withIntersectionTraversalModel(INTERSECTION_TRAVERSAL_MODEL)
+    .withAccessEgressPenalty(Map.of(StreetMode.CAR_TO_PARK, CAR_PENALTY))
     .withMaxAccessEgressDuration(MAX_ACCESS_EGRESS, Map.of())
     .withMaxDirectDuration(MAX_DIRECT, Map.of())
     .withRoutingTimeout(ROUTING_TIMEOUT)
@@ -40,6 +44,12 @@ class StreetPreferencesTest {
   @Test
   void intersectionTraversalModel() {
     assertEquals(INTERSECTION_TRAVERSAL_MODEL, subject.intersectionTraversalModel());
+  }
+
+  @Test
+  void accessEgressPenalty() {
+    assertEquals(TimeAndCostPenalty.ZERO, subject.accessEgressPenalty().valueOf(StreetMode.WALK));
+    assertEquals(CAR_PENALTY, subject.accessEgressPenalty().valueOf(StreetMode.CAR_TO_PARK));
   }
 
   @Test
@@ -92,6 +102,9 @@ class StreetPreferencesTest {
       "routingTimeout: 3s, " +
       "elevator: ElevatorPreferences{boardTime: 2m}, " +
       "intersectionTraversalModel: CONSTANT, " +
+      "accessEgressPenalty: TimeAndCostPenaltyForEnum{CAR_TO_PARK: " +
+      CAR_PENALTY +
+      "}, " +
       "maxAccessEgressDuration: DurationForStreetMode{default:5m}, " +
       "maxDirectDuration: DurationForStreetMode{default:10m}" +
       "}",
