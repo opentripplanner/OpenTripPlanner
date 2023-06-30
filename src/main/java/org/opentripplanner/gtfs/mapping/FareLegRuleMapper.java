@@ -28,14 +28,14 @@ public final class FareLegRuleMapper {
         FareDistance fareDistance = createFareDistance(r);
 
         if (productForRule != null) {
-          return new FareLegRule(
-            r.getLegGroupId(),
-            r.getNetworkId(),
-            r.getFromAreaId(),
-            r.getToAreaId(),
-            fareDistance,
-            productForRule
-          );
+          return FareLegRule
+            .of(productForRule)
+            .withLegGroupId(r.getLegGroupId())
+            .withNetworkId(r.getNetworkId())
+            .withFromAreaId(r.getFromAreaId())
+            .withToAreaId(r.getToAreaId())
+            .withFareDistance(fareDistance)
+            .build();
         } else {
           issueStore.add(
             "UnknownFareProductId",
