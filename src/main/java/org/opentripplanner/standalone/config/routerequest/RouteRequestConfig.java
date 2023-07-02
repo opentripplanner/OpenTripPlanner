@@ -4,6 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
 import static org.opentripplanner.standalone.config.routerequest.VehicleRentalConfig.setVehicleRental;
@@ -16,6 +17,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -513,6 +515,36 @@ ferries, where the check-in process needs to be done in good time before ride.
               .asInt(dftElevator.hopTime())
           );
       })
+      .withAccessEgressPenalty(
+        // The default value is NO-PENALTY and is not configurable
+        c
+          .of("accessEgressPenalty")
+          .since(V2_4)
+          .summary("Penalty for access/egress by street mode.")
+          .description(
+            """
+            Use this to add a time and cost penalty to an access/egress legs for a given street
+            mode. This will favour other street-modes and transit. This has a performance penalty,
+            since the search-window is increased with the same amount as the maximum penalty for
+            the access legs used. In other cases where the access(CAR) is faster than transit the
+            performance will be better.
+            
+            Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
+            
+            **Time penalty**
+            """ +
+            TimePenalty.DOC +
+            """  
+            
+            **Cost factor**
+            
+            The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
+            time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
+            extra cost, while 1.0 will add the same amount to both time and cost.
+            """
+          )
+          .asEnumMap(StreetMode.class, TimeAndCostPenaltyMapper::map)
+      )
       .withMaxAccessEgressDuration(
         c
           .of("maxAccessEgressDuration")

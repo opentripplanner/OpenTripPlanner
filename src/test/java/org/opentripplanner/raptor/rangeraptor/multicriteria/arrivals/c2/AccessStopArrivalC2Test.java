@@ -1,12 +1,10 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
-import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
@@ -81,7 +79,7 @@ class AccessStopArrivalC2Test {
   @Test
   public void testToString() {
     assertEquals(
-      "Access { stop: 100, arrival: [8:10 $1200], path: Walk 10m ~ 100 }",
+      "Access { stop: 100, arrival: [8:10 $1200], path: Walk 10m $1200 ~ 100 }",
       subject.toString()
     );
   }

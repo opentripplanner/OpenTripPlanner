@@ -18,6 +18,7 @@ import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.response.RaptorResponse;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
@@ -126,6 +127,7 @@ public class TransitRouter {
       serverContext.raptorConfig().isMultiThreaded(),
       accessEgresses.getAccesses(),
       accessEgresses.getEgresses(),
+      accessEgresses.calculateMaxAccessTimePenalty(),
       serverContext.meterRegistry()
     );
 
@@ -194,7 +196,12 @@ public class TransitRouter {
 
     verifyAccessEgress(asyncAccessList, asyncEgressList);
 
-    return new AccessEgresses(asyncAccessList, asyncEgressList);
+    // Decorate access/egress with a penalty to make it less favourable than transit
+    var penaltyDecorator = new AccessEgressPenaltyDecorator(request);
+    var accessList = penaltyDecorator.decorateAccess(asyncAccessList);
+    var egressList = penaltyDecorator.decorateEgress(asyncEgressList);
+
+    return new AccessEgresses(accessList, egressList);
   }
 
   private Collection<DefaultAccessEgress> fetchAccess() {

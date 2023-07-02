@@ -1,7 +1,9 @@
 package org.opentripplanner.updater.vehicle_position;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.stopTime;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -13,6 +15,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,6 +60,35 @@ public class VehiclePositionsMatcherTest {
       )
       .build();
     testVehiclePositions(posWithoutServiceDate);
+  }
+
+  @Test
+  public void tripNotFoundInPattern() {
+    var service = new DefaultVehiclePositionService();
+
+    final String secondTripId = "trip2";
+
+    var trip1 = TransitModelForTest.trip(tripId).build();
+    var trip2 = TransitModelForTest.trip(secondTripId).build();
+
+    var stopTimes = TransitModelForTest.stopTimesEvery5Minutes(3, trip1, T11_00);
+    var pattern = tripPattern(trip1, stopTimes);
+
+    // Map positions to trips in feed
+    VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
+      TransitModelForTest.FEED_ID,
+      ignored -> trip2,
+      ignored -> pattern,
+      (id, time) -> pattern,
+      service,
+      zoneId
+    );
+
+    var positions = List.of(vehiclePosition(secondTripId));
+    var result = matcher.applyVehiclePositionUpdates(positions);
+
+    assertEquals(1, result.failed());
+    assertEquals(Set.of(TRIP_NOT_FOUND_IN_PATTERN), result.failures().keySet());
   }
 
   @Test

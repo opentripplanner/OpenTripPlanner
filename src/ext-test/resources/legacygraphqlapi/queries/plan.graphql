@@ -1,7 +1,7 @@
 {
     plan(
-        fromPlace: "from",
-        toPlace: "to",
+        from: { lat: 52.3092, lon: 13.0291 }
+        to: { lat: 52.5147, lon: 13.3927 }
         date: "2023-02-15",
         time: "11:37",
         parking: {
@@ -80,42 +80,7 @@
                     }
                     arrival
                 }
-                fareProducts {
-                    id
-                    product {
-                        id
-                        name
-                        price {
-                            currency {
-                                digits
-                                code
-                            }
-                            amount
-                        }
-                        riderCategory {
-                            id
-                            name
-                        }
-                        medium {
-                            id
-                            name
-                        }
-                    }
-                }
                 accessibilityScore
-            }
-            fares {
-                type
-                cents
-                currency
-                components {
-                    currency
-                    cents
-                    fareId
-                    routes {
-                       gtfsId
-                    }
-                }
             }
         }
     }

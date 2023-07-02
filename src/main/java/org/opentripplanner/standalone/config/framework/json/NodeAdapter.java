@@ -217,6 +217,13 @@ public class NodeAdapter {
     return new NodeAdapter(node, this, paramName);
   }
 
+  /**
+   * Create an undocumented child, version is required.
+   */
+  NodeAdapter pathUndocumentedChild(String paramName, OtpVersion since) {
+    return of(paramName).since(since).summary("NA").asObject();
+  }
+
   /* private methods */
 
   /**
