@@ -70,8 +70,10 @@ class StreetEdgeGeofencingTest {
 
     edge.removeRentalExtension(a);
 
-    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(forwardState("b")));
-    assertTrue(edge.fromv.rentalRestrictions().traversalBanned(forwardState("c")));
+    var restrictions = edge.fromv.rentalRestrictions();
+    assertTrue(restrictions.traversalBanned(forwardState("b")));
+    assertTrue(restrictions.traversalBanned(forwardState("c")));
+    assertFalse(restrictions.traversalBanned(forwardState("a")));
 
     edge.removeRentalExtension(b);
 

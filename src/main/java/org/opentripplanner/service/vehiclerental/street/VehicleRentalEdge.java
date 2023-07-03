@@ -72,9 +72,8 @@ public class VehicleRentalEdge extends Edge {
           // begin the rental.
           // reminder: in an arriveBy search we traverse backwards so beginFloatingVehicle means
           // traversing from renting to walking.
-          if (s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.contains(network)) {
-            return State.empty();
-          } else if (
+          if (
+            s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.contains(network) ||
             !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
           ) {
             return State.empty();

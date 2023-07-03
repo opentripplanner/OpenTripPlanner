@@ -1,5 +1,7 @@
 package org.opentripplanner.street.search.state;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import java.util.Arrays;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,7 +20,8 @@ class StateDataTest {
   @VariableSource("cases")
   void baseCases(boolean arriveBy, StreetMode streetMode) {
     var req = StreetSearchRequest.of().withArriveBy(arriveBy).withMode(streetMode).build();
-    // no assertion as this will throw an exception if there is more than one state
-    StateData.getBaseCaseStateData(req);
+    var data = StateData.getBaseCaseStateData(req);
+    // no better assertion as this will throw an exception if there is more than one state
+    assertNotNull(data);
   }
 }
