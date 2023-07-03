@@ -61,7 +61,7 @@ public class FakeGraph {
   }
 
   /** Add a regular grid of stops to the graph */
-  public static void addRegularStopGrid(Graph g) {
+  public static void addRegularStopGrid() {
     int count = 0;
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
@@ -73,7 +73,7 @@ public class FakeGraph {
   }
 
   /** add some extra stops to the graph */
-  public static void addExtraStops(Graph g) {
+  public static void addExtraStops() {
     int count = 0;
     double lon = -83;
     for (double lat = 40; lat < 40.01; lat += 0.005) {

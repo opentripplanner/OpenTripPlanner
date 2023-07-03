@@ -84,7 +84,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       if (alreadyLinked) continue;
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
-        if (!connectVertexToStop(ts, streetIndex, graph)) {
+        if (!connectVertexToStop(ts, streetIndex)) {
           LOG.debug("Could not connect {} at {}", ts.getStop().getCode(), ts.getCoordinate());
         } else {
           successes++;
@@ -99,7 +99,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     //no inputs
   }
 
-  private boolean connectVertexToStop(TransitStopVertex ts, StreetIndex index, Graph graph) {
+  private boolean connectVertexToStop(TransitStopVertex ts, StreetIndex index) {
     var stopCode = ts.getStop().getCode();
     var stopId = ts.getStop().getId().getId();
     Envelope envelope = new Envelope(ts.getCoordinate());
