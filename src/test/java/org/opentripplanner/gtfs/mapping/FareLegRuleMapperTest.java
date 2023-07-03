@@ -56,7 +56,6 @@ class FareLegRuleMapperTest {
             obaRule.setFareProduct(fp);
             obaRule.setDistanceType(tc.distanceType);
             obaRule.setMinDistance(tc.minDistance);
-            obaRule.setMinDistance(tc.minDistance);
             obaRule.setMaxDistance(tc.maxDistance);
 
             var mappedRules = List.copyOf(mapper.map(List.of(obaRule)));
