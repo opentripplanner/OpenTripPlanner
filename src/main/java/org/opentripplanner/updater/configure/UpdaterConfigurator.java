@@ -10,6 +10,7 @@ import org.opentripplanner.ext.siri.updater.azure.SiriAzureETUpdater;
 import org.opentripplanner.ext.siri.updater.azure.SiriAzureSXUpdater;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.VehicleRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
@@ -140,11 +141,18 @@ public class UpdaterConfigurator {
 
     List<GraphUpdater> updaters = new ArrayList<>();
 
-    for (var configItem : updatersParameters.getVehicleRentalParameters()) {
-      var source = VehicleRentalDataSourceFactory.create(configItem.sourceParameters());
-      updaters.add(
-        new VehicleRentalUpdater(configItem, source, graph.getLinker(), vehicleRentalRepository)
-      );
+    if (!updatersParameters.getVehicleRentalParameters().isEmpty()) {
+      int maxHttpConnections = updatersParameters.getVehicleRentalParameters().size();
+      OtpHttpClient otpHttpClient = new OtpHttpClient(maxHttpConnections);
+      for (var configItem : updatersParameters.getVehicleRentalParameters()) {
+        var source = VehicleRentalDataSourceFactory.create(
+          configItem.sourceParameters(),
+          otpHttpClient
+        );
+        updaters.add(
+          new VehicleRentalUpdater(configItem, source, graph.getLinker(), vehicleRentalRepository)
+        );
+      }
     }
     for (var configItem : updatersParameters.getGtfsRealtimeAlertsUpdaterParameters()) {
       updaters.add(new GtfsRealtimeAlertsUpdater(configItem, transitModel));
