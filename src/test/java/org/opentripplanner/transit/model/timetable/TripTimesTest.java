@@ -1,24 +1,26 @@
-package org.opentripplanner.routing.trippattern;
+package org.opentripplanner.transit.model.timetable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.timetable.RealTimeState;
-import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 
-public class TripTimesTest {
+class TripTimesTest {
 
   private static final String TRIP_ID = "testTripId";
 
@@ -31,7 +33,7 @@ public class TripTimesTest {
   private static final FeedScopedId STOP_G = TransitModelForTest.id("G"); // 6
   private static final FeedScopedId STOP_H = TransitModelForTest.id("H"); // 7
 
-  private static final FeedScopedId[] stops = {
+  private static final List<FeedScopedId> stops = List.of(
     STOP_A,
     STOP_B,
     STOP_C,
@@ -39,20 +41,18 @@ public class TripTimesTest {
     STOP_E,
     STOP_F,
     STOP_G,
-    STOP_H,
-  };
+    STOP_H
+  );
 
-  private static final TripTimes originalTripTimes;
-
-  static {
+  static TripTimes createInitialTripTimes() {
     Trip trip = TransitModelForTest.trip(TRIP_ID).build();
 
     List<StopTime> stopTimes = new LinkedList<>();
 
-    for (int i = 0; i < stops.length; ++i) {
+    for (int i = 0; i < stops.size(); ++i) {
       StopTime stopTime = new StopTime();
 
-      RegularStop stop = TransitModelForTest.stopForTest(stops[i].getId(), 0.0, 0.0);
+      RegularStop stop = TransitModelForTest.stopForTest(stops.get(i).getId(), 0.0, 0.0);
       stopTime.setStop(stop);
       stopTime.setArrivalTime(i * 60);
       stopTime.setDepartureTime(i * 60);
@@ -60,12 +60,94 @@ public class TripTimesTest {
       stopTimes.add(stopTime);
     }
 
-    originalTripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    return new TripTimes(trip, stopTimes, new Deduplicator());
+  }
+
+  @Nested
+  class HeadsignTest {
+
+    private static final NonLocalizedString STOP_TEST_DIRECTION = new NonLocalizedString(
+      "STOP TEST DIRECTION"
+    );
+    private static final NonLocalizedString DIRECTION = new NonLocalizedString("DIRECTION");
+    private static final StopTime EMPTY_STOPPOINT = new StopTime();
+
+    @Test
+    void shouldHandleBothNullScenario() {
+      Trip trip = TransitModelForTest.trip("TRIP").build();
+      Collection<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
+
+      TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+
+      I18NString headsignFirstStop = tripTimes.getHeadsign(0);
+      assertNull(headsignFirstStop);
+    }
+
+    @Test
+    void shouldHandleTripOnlyHeadSignScenario() {
+      Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
+      Collection<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
+
+      TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+
+      I18NString headsignFirstStop = tripTimes.getHeadsign(0);
+      assertEquals(DIRECTION, headsignFirstStop);
+    }
+
+    @Test
+    void shouldHandleStopsOnlyHeadSignScenario() {
+      Trip trip = TransitModelForTest.trip("TRIP").build();
+      StopTime stopWithHeadsign = new StopTime();
+      stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
+      Collection<StopTime> stopTimes = List.of(
+        stopWithHeadsign,
+        stopWithHeadsign,
+        stopWithHeadsign
+      );
+
+      TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+
+      I18NString headsignFirstStop = tripTimes.getHeadsign(0);
+      assertEquals(STOP_TEST_DIRECTION, headsignFirstStop);
+    }
+
+    @Test
+    void shouldHandleStopsEqualToTripHeadSignScenario() {
+      Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
+      StopTime stopWithHeadsign = new StopTime();
+      stopWithHeadsign.setStopHeadsign(DIRECTION);
+      Collection<StopTime> stopTimes = List.of(
+        stopWithHeadsign,
+        stopWithHeadsign,
+        stopWithHeadsign
+      );
+
+      TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+
+      I18NString headsignFirstStop = tripTimes.getHeadsign(0);
+      assertEquals(DIRECTION, headsignFirstStop);
+    }
+
+    @Test
+    void shouldHandleDifferingTripAndStopHeadSignScenario() {
+      Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
+      StopTime stopWithHeadsign = new StopTime();
+      stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
+      Collection<StopTime> stopTimes = List.of(stopWithHeadsign, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
+
+      TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+
+      I18NString headsignFirstStop = tripTimes.getHeadsign(0);
+      assertEquals(STOP_TEST_DIRECTION, headsignFirstStop);
+
+      I18NString headsignSecondStop = tripTimes.getHeadsign(1);
+      assertEquals(DIRECTION, headsignSecondStop);
+    }
   }
 
   @Test
   public void testStopUpdate() {
-    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
 
     updatedTripTimesA.updateArrivalTime(3, 190);
     updatedTripTimesA.updateDepartureTime(3, 190);
@@ -80,7 +162,7 @@ public class TripTimesTest {
 
   @Test
   public void testPassedUpdate() {
-    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
 
     updatedTripTimesA.updateDepartureTime(0, 30);
 
@@ -90,7 +172,7 @@ public class TripTimesTest {
 
   @Test
   public void testNegativeDwellTime() {
-    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
 
     updatedTripTimesA.updateArrivalTime(1, 60);
     updatedTripTimesA.updateDepartureTime(1, 59);
@@ -103,7 +185,7 @@ public class TripTimesTest {
 
   @Test
   public void testNegativeHopTime() {
-    TripTimes updatedTripTimesB = new TripTimes(originalTripTimes);
+    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
 
     updatedTripTimesB.updateDepartureTime(6, 421);
     updatedTripTimesB.updateArrivalTime(7, 420);
@@ -116,7 +198,7 @@ public class TripTimesTest {
 
   @Test
   public void testNonIncreasingUpdateCrossingMidnight() {
-    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
 
     updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
     updatedTripTimesA.updateDepartureTime(0, 50);
@@ -126,7 +208,7 @@ public class TripTimesTest {
 
   @Test
   public void testDelay() {
-    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
     updatedTripTimesA.updateDepartureDelay(0, 10);
     updatedTripTimesA.updateArrivalDelay(6, 13);
 
@@ -136,14 +218,14 @@ public class TripTimesTest {
 
   @Test
   public void testCancel() {
-    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
     updatedTripTimesA.cancelTrip();
     assertEquals(RealTimeState.CANCELED, updatedTripTimesA.getRealTimeState());
   }
 
   @Test
   public void testNoData() {
-    TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
+    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
     updatedTripTimesA.setNoData(1);
     assertFalse(updatedTripTimesA.isNoDataStop(0));
     assertTrue(updatedTripTimesA.isNoDataStop(1));
@@ -152,20 +234,20 @@ public class TripTimesTest {
 
   @Test
   void gtfsSequence() {
-    var stopIndex = originalTripTimes.gtfsSequenceOfStopIndex(2);
+    var stopIndex = createInitialTripTimes().gtfsSequenceOfStopIndex(2);
     assertEquals(20, stopIndex);
   }
 
   @Test
   void stopIndexOfGtfsSequence() {
-    var stopIndex = originalTripTimes.stopIndexOfGtfsSequence(40);
+    var stopIndex = createInitialTripTimes().stopIndexOfGtfsSequence(40);
     assertTrue(stopIndex.isPresent());
     assertEquals(4, stopIndex.getAsInt());
   }
 
   @Test
   void unknownGtfsSequence() {
-    var stopIndex = originalTripTimes.stopIndexOfGtfsSequence(4);
+    var stopIndex = createInitialTripTimes().stopIndexOfGtfsSequence(4);
     assertTrue(stopIndex.isEmpty());
   }
 
@@ -179,9 +261,9 @@ public class TripTimesTest {
     StopTime stopTime1 = new StopTime();
     StopTime stopTime2 = new StopTime();
 
-    RegularStop stop0 = TransitModelForTest.stopForTest(stops[0].getId(), 0.0, 0.0);
-    RegularStop stop1 = TransitModelForTest.stopForTest(stops[1].getId(), 0.0, 0.0);
-    RegularStop stop2 = TransitModelForTest.stopForTest(stops[2].getId(), 0.0, 0.0);
+    RegularStop stop0 = TransitModelForTest.stopForTest(stops.get(0).getId(), 0.0, 0.0);
+    RegularStop stop1 = TransitModelForTest.stopForTest(stops.get(1).getId(), 0.0, 0.0);
+    RegularStop stop2 = TransitModelForTest.stopForTest(stops.get(2).getId(), 0.0, 0.0);
 
     stopTime0.setStop(stop0);
     stopTime0.setDepartureTime(0);

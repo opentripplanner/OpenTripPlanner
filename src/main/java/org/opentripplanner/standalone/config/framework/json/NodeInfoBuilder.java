@@ -46,6 +46,13 @@ class NodeInfoBuilder {
     return this;
   }
 
+  /**
+   * Allow parent to set the `since` property of children without version.
+   */
+  OtpVersion since() {
+    return since;
+  }
+
   public NodeInfoBuilder withSummary(String summary) {
     this.summary = summary;
     return this;
