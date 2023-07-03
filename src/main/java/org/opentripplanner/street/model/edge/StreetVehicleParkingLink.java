@@ -18,14 +18,28 @@ public class StreetVehicleParkingLink extends Edge {
 
   private final VehicleParkingEntranceVertex vehicleParkingEntranceVertex;
 
-  public StreetVehicleParkingLink(StreetVertex fromv, VehicleParkingEntranceVertex tov) {
+  private StreetVehicleParkingLink(StreetVertex fromv, VehicleParkingEntranceVertex tov) {
     super(fromv, tov);
     vehicleParkingEntranceVertex = tov;
   }
 
-  public StreetVehicleParkingLink(VehicleParkingEntranceVertex fromv, StreetVertex tov) {
+  private StreetVehicleParkingLink(VehicleParkingEntranceVertex fromv, StreetVertex tov) {
     super(fromv, tov);
     vehicleParkingEntranceVertex = fromv;
+  }
+
+  public static StreetVehicleParkingLink createStreetVehicleParkingLink(
+    StreetVertex fromv,
+    VehicleParkingEntranceVertex tov
+  ) {
+    return connectToGraph(new StreetVehicleParkingLink(fromv, tov));
+  }
+
+  public static StreetVehicleParkingLink createStreetVehicleParkingLink(
+    VehicleParkingEntranceVertex fromv,
+    StreetVertex tov
+  ) {
+    return connectToGraph(new StreetVehicleParkingLink(fromv, tov));
   }
 
   @Override

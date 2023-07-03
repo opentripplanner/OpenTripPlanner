@@ -39,24 +39,24 @@ public class VehicleParkingHelper {
     for (int i = 0; i < vehicleParkingVertices.size(); i++) {
       var currentVertex = vehicleParkingVertices.get(i);
       if (isUsableForParking(currentVertex, currentVertex)) {
-        new VehicleParkingEdge(currentVertex);
+        VehicleParkingEdge.createVehicleParkingEdge(currentVertex);
       }
       for (int j = i + 1; j < vehicleParkingVertices.size(); j++) {
         var nextVertex = vehicleParkingVertices.get(j);
         if (isUsableForParking(currentVertex, nextVertex)) {
-          new VehicleParkingEdge(currentVertex, nextVertex);
-          new VehicleParkingEdge(nextVertex, currentVertex);
+          VehicleParkingEdge.createVehicleParkingEdge(currentVertex, nextVertex);
+          VehicleParkingEdge.createVehicleParkingEdge(nextVertex, currentVertex);
         }
       }
     }
   }
 
   public static void linkToGraph(VehicleParkingEntranceVertex vehicleParkingEntrance) {
-    new StreetVehicleParkingLink(
+    StreetVehicleParkingLink.createStreetVehicleParkingLink(
       vehicleParkingEntrance,
       vehicleParkingEntrance.getParkingEntrance().getVertex()
     );
-    new StreetVehicleParkingLink(
+    StreetVehicleParkingLink.createStreetVehicleParkingLink(
       vehicleParkingEntrance.getParkingEntrance().getVertex(),
       vehicleParkingEntrance
     );

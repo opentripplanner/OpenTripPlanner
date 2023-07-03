@@ -13,18 +13,26 @@ import org.opentripplanner.street.search.state.StateEditor;
 
 public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
 
-  public TemporaryConcreteEdge(TemporaryVertex v1, Vertex v2) {
+  private TemporaryConcreteEdge(TemporaryVertex v1, Vertex v2) {
     super((Vertex) v1, v2);
     if (v1.isEndVertex()) {
       throw new IllegalStateException("A temporary edge is directed away from an end vertex");
     }
   }
 
-  public TemporaryConcreteEdge(Vertex v1, TemporaryVertex v2) {
+  private TemporaryConcreteEdge(Vertex v1, TemporaryVertex v2) {
     super(v1, (Vertex) v2);
     if (!v2.isEndVertex()) {
       throw new IllegalStateException("A temporary edge is directed towards a start vertex");
     }
+  }
+
+  public static TemporaryConcreteEdge createTemporaryConcreteEdge(TemporaryVertex v1, Vertex v2) {
+    return connectToGraph(new TemporaryConcreteEdge(v1, v2));
+  }
+
+  public static TemporaryConcreteEdge createTemporaryConcreteEdge(Vertex v1, TemporaryVertex v2) {
+    return connectToGraph(new TemporaryConcreteEdge(v1, v2));
   }
 
   @Override

@@ -516,7 +516,7 @@ public class OsmModule implements GraphBuilderModule {
     I18NString name = params.edgeNamer().getNameForWay(way, label);
     float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
-    StreetEdge street = new StreetEdge(
+    StreetEdge street = StreetEdge.createStreetEdge(
       startEndpoint,
       endEndpoint,
       geometry,

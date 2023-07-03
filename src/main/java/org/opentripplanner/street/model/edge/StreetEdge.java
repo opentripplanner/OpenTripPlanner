@@ -130,7 +130,7 @@ public class StreetEdge
    */
   private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
-  public StreetEdge(
+  StreetEdge(
     StreetVertex v1,
     StreetVertex v2,
     LineString geometry,
@@ -188,7 +188,7 @@ public class StreetEdge
   }
 
   //For testing only
-  public StreetEdge(
+  private StreetEdge(
     StreetVertex v1,
     StreetVertex v2,
     LineString geometry,
@@ -200,7 +200,7 @@ public class StreetEdge
     this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
   }
 
-  public StreetEdge(
+  StreetEdge(
     StreetVertex v1,
     StreetVertex v2,
     LineString geometry,
@@ -209,6 +209,41 @@ public class StreetEdge
     boolean back
   ) {
     this(v1, v2, geometry, name, SphericalDistanceLibrary.length(geometry), permission, back);
+  }
+
+  public static StreetEdge createStreetEdge(
+    StreetVertex v1,
+    StreetVertex v2,
+    LineString geometry,
+    I18NString name,
+    double length,
+    StreetTraversalPermission permission,
+    boolean back
+  ) {
+    return connectToGraph(new StreetEdge(v1, v2, geometry, name, length, permission, back));
+  }
+
+  public static StreetEdge createStreetEdge(
+    StreetVertex v1,
+    StreetVertex v2,
+    LineString geometry,
+    String name,
+    double length,
+    StreetTraversalPermission permission,
+    boolean back
+  ) {
+    return connectToGraph(new StreetEdge(v1, v2, geometry, name, length, permission, back));
+  }
+
+  public static StreetEdge createStreetEdge(
+    StreetVertex v1,
+    StreetVertex v2,
+    LineString geometry,
+    I18NString name,
+    StreetTraversalPermission permission,
+    boolean back
+  ) {
+    return connectToGraph(new StreetEdge(v1, v2, geometry, name, permission, back));
   }
 
   /**
@@ -774,7 +809,7 @@ public class StreetEdge
   public SplitStreetEdge splitDestructively(SplitterVertex v) {
     SplitLineString geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
-    StreetEdge e1 = new StreetEdge(
+    StreetEdge e1 = createStreetEdge(
       (StreetVertex) fromv,
       v,
       geoms.beginning(),
@@ -782,7 +817,7 @@ public class StreetEdge
       permission,
       this.isBack()
     );
-    StreetEdge e2 = new StreetEdge(
+    StreetEdge e2 = createStreetEdge(
       v,
       (StreetVertex) tov,
       geoms.ending(),
@@ -858,7 +893,7 @@ public class StreetEdge
 
     if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
       e1 =
-        new TemporaryPartialStreetEdge(
+        TemporaryPartialStreetEdge.createTemporaryPartialStreetEdge(
           this,
           (StreetVertex) fromv,
           v,
@@ -871,7 +906,7 @@ public class StreetEdge
     }
     if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
       e2 =
-        new TemporaryPartialStreetEdge(
+        TemporaryPartialStreetEdge.createTemporaryPartialStreetEdge(
           this,
           v,
           (StreetVertex) tov,
@@ -917,7 +952,14 @@ public class StreetEdge
       double lengthRatio = partial.getLength() / parent.getLength();
       double length = getDistanceMeters() * lengthRatio;
 
-      var tempEdge = new TemporaryPartialStreetEdge(this, from, to, partial, getName(), length);
+      var tempEdge = TemporaryPartialStreetEdge.createTemporaryPartialStreetEdge(
+        this,
+        from,
+        to,
+        partial,
+        getName(),
+        length
+      );
       copyPropertiesToSplitEdge(tempEdge, start, start + length);
       return Optional.of(tempEdge);
     } else {

@@ -138,7 +138,7 @@ class VehicleRentalEdgeTest {
 
     this.vertex = new VehicleRentalPlaceVertex(station);
 
-    vehicleRentalEdge = new VehicleRentalEdge(vertex, RentalFormFactor.BICYCLE);
+    vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, RentalFormFactor.BICYCLE);
 
     var rentalRequest = new VehicleRentalRequest();
     this.request =

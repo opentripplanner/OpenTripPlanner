@@ -305,7 +305,7 @@ public class StreetEdgeTest {
 
     double length = 650.0;
 
-    StreetEdge testStreet = new StreetEdge(
+    StreetEdge testStreet = StreetEdge.createStreetEdge(
       v1,
       v2,
       geometry,

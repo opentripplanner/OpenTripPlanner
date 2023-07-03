@@ -21,7 +21,7 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
    * is negative, a new length is calculated from the geometry. The elevation data is calculated
    * using the 'parentEdge' and given 'length'.
    */
-  public TemporaryPartialStreetEdge(
+  private TemporaryPartialStreetEdge(
     StreetEdge parentEdge,
     StreetVertex v1,
     StreetVertex v2,
@@ -41,7 +41,7 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
    * calculated using the provided geometry. The elevation data is calculated using the 'parentEdge'
    * and the calculated 'length'.
    */
-  TemporaryPartialStreetEdge(
+  private TemporaryPartialStreetEdge(
     StreetEdge parentEdge,
     StreetVertex v1,
     StreetVertex v2,
@@ -52,6 +52,19 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
     super(v1, v2, geometry, name, parentEdge.getPermission(), back);
     this.parentEdge = parentEdge;
     this.geometry = super.getGeometry();
+  }
+
+  public static TemporaryPartialStreetEdge createTemporaryPartialStreetEdge(
+    StreetEdge parentEdge,
+    StreetVertex v1,
+    StreetVertex v2,
+    LineString geometry,
+    I18NString name,
+    double length
+  ) {
+    return connectToGraph(
+      new TemporaryPartialStreetEdge(parentEdge, v1, v2, geometry, name, length)
+    );
   }
 
   /**
@@ -130,5 +143,16 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
   @Override
   public int getOutAngle() {
     return parentEdge.getInAngle();
+  }
+
+  static TemporaryPartialStreetEdge createTemporaryPartialStreetEdge(
+    StreetEdge parentEdge,
+    StreetVertex v1,
+    StreetVertex v2,
+    LineString geometry,
+    I18NString name,
+    boolean back
+  ) {
+    return connectToGraph(new TemporaryPartialStreetEdge(parentEdge, v1, v2, geometry, name, back));
   }
 }

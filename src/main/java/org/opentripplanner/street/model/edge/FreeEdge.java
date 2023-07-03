@@ -14,8 +14,12 @@ import org.opentripplanner.street.search.state.StateEditor;
  */
 public class FreeEdge extends Edge {
 
-  public FreeEdge(Vertex from, Vertex to) {
+  protected FreeEdge(Vertex from, Vertex to) {
     super(from, to);
+  }
+
+  public static FreeEdge createFreeEdge(Vertex from, Vertex to) {
+    return connectToGraph(new FreeEdge(from, to));
   }
 
   public String toString() {

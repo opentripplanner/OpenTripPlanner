@@ -261,8 +261,14 @@ public class LinkStopToPlatformTest {
         LinkingDirection.BOTH_WAYS,
         (vertex, streetVertex) ->
           List.of(
-            new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
-            new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
+            StreetTransitStopLink.createStreetTransitStopLink(
+              (TransitStopVertex) vertex,
+              streetVertex
+            ),
+            StreetTransitStopLink.createStreetTransitStopLink(
+              streetVertex,
+              (TransitStopVertex) vertex
+            )
           )
       );
     }
@@ -278,7 +284,7 @@ public class LinkStopToPlatformTest {
       new Coordinate[] { v1.getCoordinate(), v2.getCoordinate() }
     );
     I18NString name = new LocalizedString(nameString);
-    return new AreaEdge(
+    return AreaEdge.createAreaEdge(
       v1,
       v2,
       line,

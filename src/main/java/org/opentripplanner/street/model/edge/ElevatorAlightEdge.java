@@ -32,7 +32,7 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
   /**
    * @param level It's a float for future expansion.
    */
-  public ElevatorAlightEdge(
+  private ElevatorAlightEdge(
     ElevatorOnboardVertex from,
     ElevatorOffboardVertex to,
     I18NString level
@@ -45,6 +45,14 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
     coords[0] = new Coordinate(from.getX(), from.getY());
     coords[1] = new Coordinate(to.getX(), to.getY());
     the_geom = GeometryUtils.getGeometryFactory().createLineString(coords);
+  }
+
+  public static ElevatorAlightEdge createElevatorAlightEdge(
+    ElevatorOnboardVertex from,
+    ElevatorOffboardVertex to,
+    I18NString level
+  ) {
+    return connectToGraph(new ElevatorAlightEdge(from, to, level));
   }
 
   public String toString() {

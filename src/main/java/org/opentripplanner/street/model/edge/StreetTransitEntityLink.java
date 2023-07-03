@@ -25,13 +25,21 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   private final Accessibility wheelchairAccessibility;
 
-  public StreetTransitEntityLink(StreetVertex fromv, T tov, Accessibility wheelchairAccessibility) {
+  protected StreetTransitEntityLink(
+    StreetVertex fromv,
+    T tov,
+    Accessibility wheelchairAccessibility
+  ) {
     super(fromv, tov);
     this.transitEntityVertex = tov;
     this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
-  public StreetTransitEntityLink(T fromv, StreetVertex tov, Accessibility wheelchairAccessibility) {
+  protected StreetTransitEntityLink(
+    T fromv,
+    StreetVertex tov,
+    Accessibility wheelchairAccessibility
+  ) {
     super(fromv, tov);
     this.transitEntityVertex = fromv;
     this.wheelchairAccessibility = wheelchairAccessibility;
