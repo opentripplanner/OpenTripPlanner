@@ -66,9 +66,6 @@
       "matchPackageNames": [
         "mkdocs-material"
       ],
-      "matchPackagePrefixes": [
-        "org.apache.lucene:"
-      ],
       "extends": [
         "schedule:quarterly"
       ],
