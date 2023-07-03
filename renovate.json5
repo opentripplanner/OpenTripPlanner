@@ -54,6 +54,15 @@
     },
     {
       "description": "in order to keep review burden low, don't update these quite so frequently",
+      "matchPackagePrefixes": [
+        "org.apache.lucene:"
+      ],
+      "extends": [
+        "schedule:quarterly"
+      ]
+    },
+    {
+      "description": "automerge mkdocs-material every quarter",
       "matchPackageNames": [
         "mkdocs-material"
       ],
@@ -62,7 +71,8 @@
       ],
       "extends": [
         "schedule:quarterly"
-      ]
+      ],
+      "automerge": true
     },
     {
       "description": "automatically merge test and logging dependencies",
