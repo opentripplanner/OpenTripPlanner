@@ -32,6 +32,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -41,21 +42,23 @@ class ParkingProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ParkingProcessor.class);
   private static final String VEHICLE_PARKING_OSM_FEED_ID = "OSM";
-  private final Graph graph;
   private final DataImportIssueStore issueStore;
   private final OSMOpeningHoursParser osmOpeningHoursParser;
   private final BiFunction<OSMNode, OSMWithTags, IntersectionVertex> getVertexForOsmNode;
+  private final VertexFactory vertexFactory;
+  private final VehicleParkingHelper vehicleParkingHelper;
 
   public ParkingProcessor(
     Graph graph,
     DataImportIssueStore issueStore,
     BiFunction<OSMNode, OSMWithTags, IntersectionVertex> getVertexForOsmNode
   ) {
-    this.graph = graph;
     this.issueStore = issueStore;
     this.getVertexForOsmNode = getVertexForOsmNode;
     this.osmOpeningHoursParser =
       new OSMOpeningHoursParser(graph.getOpeningHoursCalendarService(), issueStore);
+    this.vertexFactory = new VertexFactory(graph);
+    this.vehicleParkingHelper = new VehicleParkingHelper(graph);
   }
 
   public List<VehicleParking> buildParkAndRideNodes(
@@ -95,9 +98,8 @@ class ParkingProcessor {
 
       vehicleParkingToAdd.add(vehicleParking);
 
-      VehicleParkingEntranceVertex parkVertex = new VehicleParkingEntranceVertex(
-        graph,
-        vehicleParking.getEntrances().get(0)
+      VehicleParkingEntranceVertex parkVertex = vertexFactory.vehicleParkingEntrance(
+        vehicleParking
       );
       new VehicleParkingEdge(parkVertex);
     }
@@ -272,7 +274,7 @@ class ParkingProcessor {
       entrances
     );
 
-    VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
+    vehicleParkingHelper.linkVehicleParkingToGraph(vehicleParking);
 
     return vehicleParking;
   }

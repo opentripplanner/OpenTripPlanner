@@ -1,32 +1,35 @@
 package org.opentripplanner.routing.vehicle_parking;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 
 public class VehicleParkingHelper {
 
-  private VehicleParkingHelper() {}
+  private final VertexFactory vertexFactory;
 
-  public static void linkVehicleParkingToGraph(Graph graph, VehicleParking vehicleParking) {
-    var vehicleParkingVertices = VehicleParkingHelper.createVehicleParkingVertices(
-      graph,
-      vehicleParking
-    );
+  public VehicleParkingHelper(Graph graph) {
+    Objects.requireNonNull(graph);
+    this.vertexFactory = new VertexFactory(graph);
+  }
+
+  public void linkVehicleParkingToGraph(VehicleParking vehicleParking) {
+    var vehicleParkingVertices = createVehicleParkingVertices(vehicleParking);
     VehicleParkingHelper.linkVehicleParkingEntrances(vehicleParkingVertices);
   }
 
-  public static List<VehicleParkingEntranceVertex> createVehicleParkingVertices(
-    Graph graph,
+  public List<VehicleParkingEntranceVertex> createVehicleParkingVertices(
     VehicleParking vehicleParking
   ) {
     return vehicleParking
       .getEntrances()
       .stream()
-      .map(entrance -> new VehicleParkingEntranceVertex(graph, entrance))
+      .map(vertexFactory::vehicleParkingEntrance)
       .collect(Collectors.toList());
   }
 

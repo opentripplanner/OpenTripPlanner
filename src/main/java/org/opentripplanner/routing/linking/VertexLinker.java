@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.linking;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -31,11 +30,10 @@ import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporarySplitterVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.service.StopModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely
@@ -73,9 +71,10 @@ public class VertexLinker {
   private final Graph graph;
 
   private final StopModel stopModel;
+  private final VertexFactory vertexFactory;
 
   // TODO Temporary code until we refactor WalkableAreaBuilder  (#3152)
-  private Boolean addExtraEdgesToAreas = true;
+  private boolean addExtraEdgesToAreas = true;
 
   /**
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
@@ -84,6 +83,7 @@ public class VertexLinker {
   public VertexLinker(Graph graph, StopModel stopModel, EdgeSpatialIndex edgeSpatialIndex) {
     this.edgeSpatialIndex = edgeSpatialIndex;
     this.graph = graph;
+    this.vertexFactory = new VertexFactory(graph);
     this.stopModel = stopModel;
   }
 
@@ -385,7 +385,7 @@ public class VertexLinker {
       }
       if (split) {
         // split the edge, get the split vertex
-        start = (IntersectionVertex) split(edge, ll, scope, direction, tempEdges);
+        start = split(edge, ll, scope, direction, tempEdges);
       }
     }
 
@@ -476,7 +476,7 @@ public class VertexLinker {
       tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
     } else {
-      v = new SplitterVertex(graph, uniqueSplitLabel, x, y, originalEdge.getName());
+      v = vertexFactory.splitter(originalEdge, x, y, uniqueSplitLabel);
     }
     v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
     v.addRentalRestriction(originalEdge.getToVertex().rentalRestrictions());

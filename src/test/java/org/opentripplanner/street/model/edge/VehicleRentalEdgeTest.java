@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -17,7 +16,6 @@ import org.opentripplanner.street.search.state.State;
 
 class VehicleRentalEdgeTest {
 
-  Graph graph;
   VehicleRentalEdge vehicleRentalEdge;
   StreetSearchRequest request;
   VehicleRentalPlaceVertex vertex;
@@ -130,8 +128,6 @@ class VehicleRentalEdgeTest {
     boolean stationOn,
     boolean useRealtime
   ) {
-    graph = new Graph();
-
     var station = TestVehicleRentalStationBuilder
       .of()
       .withVehicles(vehicles)
@@ -140,7 +136,7 @@ class VehicleRentalEdgeTest {
       .withStationOn(stationOn)
       .build();
 
-    this.vertex = new VehicleRentalPlaceVertex(graph, station);
+    this.vertex = new VehicleRentalPlaceVertex(station);
 
     vehicleRentalEdge = new VehicleRentalEdge(vertex, RentalFormFactor.BICYCLE);
 

@@ -58,7 +58,7 @@ class StreetVehicleParkingLinkTest {
       .carAccessible(true)
       .build();
 
-    var entranceVertex = new VehicleParkingEntranceVertex(null, entrance);
+    var entranceVertex = new VehicleParkingEntranceVertex(entrance);
     var parkingReq = new VehicleParkingRequest();
 
     Set<VehicleParkingFilter> notFilter = Set.of(new VehicleParkingFilter.TagsFilter(not));

@@ -82,7 +82,7 @@ class VehicleParkingPreferredTagsTest {
       .coordinate(COORDINATE)
       .build();
 
-    var fromV = new VehicleParkingEntranceVertex(null, entrance);
+    var fromV = new VehicleParkingEntranceVertex(entrance);
     var edge = new VehicleParkingEdge(fromV);
 
     var parkingReq = new VehicleParkingRequest();

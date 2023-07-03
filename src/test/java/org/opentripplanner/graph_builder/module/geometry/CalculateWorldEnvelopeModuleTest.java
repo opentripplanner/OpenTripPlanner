@@ -40,7 +40,7 @@ class CalculateWorldEnvelopeModuleTest {
   static class V extends Vertex {
 
     protected V(double x, double y) {
-      super(null, "V-" + x + "-" + y, x, y);
+      super("V-" + x + "-" + y, x, y);
     }
   }
 }
