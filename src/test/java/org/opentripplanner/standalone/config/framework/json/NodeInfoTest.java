@@ -42,6 +42,11 @@ class NodeInfoTest {
   }
 
   @Test
+  void since() {
+    assertEquals(OtpVersion.V2_2, subject.since());
+  }
+
+  @Test
   void testToString() {
     assertEquals("Name : string = \"Default-Value\" Since 2.2", subject.toString());
   }

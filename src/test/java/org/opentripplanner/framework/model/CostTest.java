@@ -23,6 +23,11 @@ class CostTest {
   }
 
   @Test
+  void testToCentiSeconds() {
+    assertEquals(100 * VALUE_SECONDS, subject.toCentiSeconds());
+  }
+
+  @Test
   void plus() {
     assertEquals("$13", subject.plus(Cost.costOfSeconds(3)).toString());
   }

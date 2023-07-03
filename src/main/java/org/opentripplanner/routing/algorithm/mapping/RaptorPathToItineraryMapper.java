@@ -5,6 +5,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.astar.model.GraphPath;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -92,8 +93,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
 
     var optimizedPath = path instanceof OptimizedPath ? (OptimizedPath<TripSchedule>) path : null;
 
+    var accessPathLeg = Objects.requireNonNull(path.accessLeg());
     // Map access leg
-    List<Leg> legs = new ArrayList<>(mapAccessLeg(path.accessLeg()));
+    List<Leg> legs = new ArrayList<>(mapAccessLeg(accessPathLeg));
 
     PathLeg<T> pathLeg = path.accessLeg().nextLeg();
 
@@ -140,6 +142,14 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       itinerary.setTransferPriorityCost(toOtpDomainCost(optimizedPath.transferPriorityCost()));
     }
 
+    if (accessPathLeg.access() instanceof DefaultAccessEgress ae) {
+      itinerary.setAccessPenalty(ae.penalty());
+    }
+
+    if (egressPathLeg.egress() instanceof DefaultAccessEgress ae) {
+      itinerary.setAccessPenalty(ae.penalty());
+    }
+
     return itinerary;
   }
 
@@ -158,9 +168,13 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return List.of();
     }
 
-    return subItinerary
-      .withTimeShiftToStartAt(createZonedDateTime(accessPathLeg.fromTime()))
-      .getLegs();
+    int fromTime = accessPathLeg.fromTime();
+
+    if (accessPath.hasPenalty()) {
+      fromTime = accessPath.timeShiftDepartureTimeToActualTime(fromTime);
+    }
+
+    return subItinerary.withTimeShiftToStartAt(createZonedDateTime(fromTime)).getLegs();
   }
 
   private Leg mapTransitLeg(Leg prevTransitLeg, TransitPathLeg<T> pathLeg) {
@@ -251,6 +265,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
       return null;
     }
 
+    // No need to remove penalty here, since we use the fromTime only
     return subItinerary.withTimeShiftToStartAt(createZonedDateTime(egressPathLeg.fromTime()));
   }
 
