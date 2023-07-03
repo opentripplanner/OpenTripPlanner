@@ -25,11 +25,10 @@ public class EdgeTest {
 
   @Test
   public void testEdgeRemoval() {
-    Graph graph = new Graph();
-    StreetVertex va = new IntersectionVertex(graph, "A", 10.0, 10.0);
-    StreetVertex vb = new IntersectionVertex(graph, "B", 10.1, 10.1);
-    StreetVertex vc = new IntersectionVertex(graph, "C", 10.2, 10.2);
-    StreetVertex vd = new IntersectionVertex(graph, "D", 10.3, 10.3);
+    StreetVertex va = new IntersectionVertex("A", 10.0, 10.0);
+    StreetVertex vb = new IntersectionVertex("B", 10.1, 10.1);
+    StreetVertex vc = new IntersectionVertex("C", 10.2, 10.2);
+    StreetVertex vd = new IntersectionVertex("D", 10.3, 10.3);
     Edge eab = new StreetEdge(va, vb, null, "AB", 10, StreetTraversalPermission.ALL, false);
     Edge ebc = new StreetEdge(vb, vc, null, "BC", 10, StreetTraversalPermission.ALL, false);
     Edge ecd = new StreetEdge(vc, vd, null, "CD", 10, StreetTraversalPermission.ALL, false);

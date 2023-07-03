@@ -87,7 +87,7 @@ public class TestStateBuilder {
 
     var station = TestVehicleRentalStationBuilder.of().withVehicleTypeCar().build();
 
-    VehicleRentalPlaceVertex vertex = new VehicleRentalPlaceVertex(null, station);
+    VehicleRentalPlaceVertex vertex = new VehicleRentalPlaceVertex(station);
     var link = new StreetVehicleRentalLink((StreetVertex) currentState.vertex, vertex);
 
     currentState = link.traverse(currentState)[0];
@@ -140,13 +140,13 @@ public class TestStateBuilder {
   @Nonnull
   private static ElevatorOffboardVertex elevatorOffBoard(int count, String suffix) {
     final String label = "elevator_off_board_" + suffix;
-    return new ElevatorOffboardVertex(null, label, count, count, new NonLocalizedString(label));
+    return new ElevatorOffboardVertex(label, count, count, new NonLocalizedString(label));
   }
 
   @Nonnull
   private static ElevatorOnboardVertex elevatorOnBoard(int count, String suffix) {
     final String label = "elevator_on_board_" + suffix;
-    return new ElevatorOnboardVertex(null, label, count, count, new NonLocalizedString(label));
+    return new ElevatorOnboardVertex(label, count, count, new NonLocalizedString(label));
   }
 
   public State build() {
