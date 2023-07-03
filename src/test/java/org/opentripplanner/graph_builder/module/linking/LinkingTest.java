@@ -11,7 +11,6 @@ import static org.opentripplanner.graph_builder.module.FakeGraph.link;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -111,18 +110,21 @@ public class LinkingTest {
     TestOtpModel model = buildGraphNoTransit();
     Graph g1 = model.graph();
     TransitModel transitModel1 = model.transitModel();
-    addRegularStopGrid();
+    addRegularStopGrid(g1);
     link(g1, transitModel1);
 
     TestOtpModel model2 = buildGraphNoTransit();
     Graph g2 = model2.graph();
     TransitModel transitModel2 = model2.transitModel();
-    addExtraStops();
-    addRegularStopGrid();
+    addExtraStops(g2);
+    addRegularStopGrid(g2);
     link(g2, transitModel2);
 
+    var transitStopVertices = g1.getVerticesOfType(TransitStopVertex.class);
+    assertEquals(1350, transitStopVertices.size());
+
     // compare the linkages
-    for (TransitStopVertex ts : g1.getVerticesOfType(TransitStopVertex.class)) {
+    for (TransitStopVertex ts : transitStopVertices) {
       List<StreetTransitStopLink> stls1 = outgoingStls(ts);
       assertTrue(stls1.size() >= 1);
 
@@ -147,6 +149,6 @@ public class LinkingTest {
       .filter(StreetTransitStopLink.class::isInstance)
       .map(StreetTransitStopLink.class::cast)
       .sorted(Comparator.comparing(e -> e.getGeometry().getLength()))
-      .collect(Collectors.toList());
+      .toList();
   }
 }
