@@ -158,7 +158,7 @@ class VehicleRentalEdgeTest {
 
     @Test
     void startedInNoDropOffZone() {
-      var rentalVertex = new VehicleRentalPlaceVertex(graph, RENTAL_PLACE);
+      var rentalVertex = new VehicleRentalPlaceVertex(RENTAL_PLACE);
       var rentalEdge = new VehicleRentalEdge(rentalVertex, RentalFormFactor.SCOOTER);
 
       rentalVertex.addRentalRestriction(noDropOffZone());
@@ -172,7 +172,7 @@ class VehicleRentalEdgeTest {
 
     @Test
     void startedOutsideNoDropOffZone() {
-      var rentalVertex = new VehicleRentalPlaceVertex(graph, RENTAL_PLACE);
+      var rentalVertex = new VehicleRentalPlaceVertex(RENTAL_PLACE);
       var rentalEdge = new VehicleRentalEdge(rentalVertex, RentalFormFactor.SCOOTER);
       var state = new State(rentalVertex, SEARCH_REQUEST);
 
