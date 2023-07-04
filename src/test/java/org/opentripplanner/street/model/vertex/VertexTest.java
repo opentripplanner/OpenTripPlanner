@@ -14,15 +14,15 @@ class VertexTest {
 
   @Test
   void testSameLocation() {
-    Vertex v1 = new SimpleVertex(null, "", LAT, LON);
-    Vertex v2 = new SimpleVertex(null, "", LAT + EPSILON_10_E_MINUS_8, LON);
+    Vertex v1 = new SimpleVertex("", LAT, LON);
+    Vertex v2 = new SimpleVertex("", LAT + EPSILON_10_E_MINUS_8, LON);
     assertTrue(v1.sameLocation(v2));
   }
 
   @Test
   void testDifferentLocation() {
-    Vertex v1 = new SimpleVertex(null, "", LAT, LON);
-    Vertex v2 = new SimpleVertex(null, "", LAT + EPSILON_10_E_MINUS_7, LON);
+    Vertex v1 = new SimpleVertex("", LAT, LON);
+    Vertex v2 = new SimpleVertex("", LAT + EPSILON_10_E_MINUS_7, LON);
     assertFalse(v1.sameLocation(v2));
   }
 }

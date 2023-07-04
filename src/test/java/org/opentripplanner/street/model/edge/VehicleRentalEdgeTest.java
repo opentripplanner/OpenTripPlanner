@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
@@ -27,7 +26,6 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class VehicleRentalEdgeTest {
 
-  Graph graph;
   VehicleRentalEdge vehicleRentalEdge;
   StreetSearchRequest request;
   VehicleRentalPlaceVertex vertex;
@@ -203,8 +201,6 @@ class VehicleRentalEdgeTest {
     boolean stationOn,
     boolean useRealtime
   ) {
-    graph = new Graph();
-
     var station = TestVehicleRentalStationBuilder
       .of()
       .withVehicles(vehicles)
@@ -213,7 +209,7 @@ class VehicleRentalEdgeTest {
       .withStationOn(stationOn)
       .build();
 
-    this.vertex = new VehicleRentalPlaceVertex(graph, station);
+    this.vertex = new VehicleRentalPlaceVertex(station);
 
     vehicleRentalEdge = new VehicleRentalEdge(vertex, RentalFormFactor.BICYCLE);
 

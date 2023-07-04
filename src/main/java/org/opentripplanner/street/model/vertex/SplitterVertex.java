@@ -1,7 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.graph.Graph;
 
 /**
  * A vertex representing a place along a street between two intersections that is not derived from
@@ -10,8 +9,8 @@ import org.opentripplanner.routing.graph.Graph;
  */
 public class SplitterVertex extends IntersectionVertex {
 
-  public SplitterVertex(Graph g, String label, double x, double y, I18NString name) {
-    super(g, label, x, y, name, false, false);
+  public SplitterVertex(String label, double x, double y, I18NString name) {
+    super(label, x, y, name, false, false);
   }
 
   @Override

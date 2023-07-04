@@ -14,7 +14,6 @@ import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -83,7 +82,7 @@ public class PlaceTest {
       .withName(stopName)
       .build();
 
-    var vertex = new SimpleVertex(new Graph(), "corner", 1, 1) {
+    var vertex = new SimpleVertex("corner", 1, 1) {
       @Override
       public I18NString getIntersectionName() {
         return new NonLocalizedString("an intersection name");

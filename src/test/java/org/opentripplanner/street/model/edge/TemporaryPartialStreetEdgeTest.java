@@ -258,7 +258,7 @@ public class TemporaryPartialStreetEdgeTest {
   }
 
   private IntersectionVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(graph, label, lat, lon);
+    return new IntersectionVertex(label, lat, lon);
   }
 
   /**

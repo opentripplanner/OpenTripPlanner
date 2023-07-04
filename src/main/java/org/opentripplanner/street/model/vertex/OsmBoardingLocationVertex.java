@@ -5,7 +5,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.graph.Graph;
 
 /**
  * A vertex for an OSM node that represents a transit stop and has a tag to cross-reference this to
@@ -22,14 +21,13 @@ public class OsmBoardingLocationVertex extends IntersectionVertex {
   public final Set<String> references;
 
   public OsmBoardingLocationVertex(
-    Graph g,
     String label,
     double x,
     double y,
     @Nullable I18NString name,
     Collection<String> references
   ) {
-    super(g, label, x, y, name, false, false);
+    super(label, x, y, name, false, false);
     this.references = Set.copyOf(references);
   }
 

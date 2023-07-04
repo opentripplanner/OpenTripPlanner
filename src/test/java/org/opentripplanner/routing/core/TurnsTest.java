@@ -20,8 +20,8 @@ public class TurnsTest {
       new Coordinate[] { new Coordinate(-0.10, 0), new Coordinate(0, 0) }
     );
 
-    IntersectionVertex v1 = new IntersectionVertex(null, "v1", -0.10, 0);
-    IntersectionVertex v2 = new IntersectionVertex(null, "v2", 0, 0);
+    IntersectionVertex v1 = new IntersectionVertex("v1", -0.10, 0, "v1");
+    IntersectionVertex v2 = new IntersectionVertex("v2", 0, 0, "v2");
 
     StreetEdge leftEdge = new StreetEdge(
       v1,
