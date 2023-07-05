@@ -68,11 +68,6 @@ public class NearbyStopFinder {
 
   private DirectGraphFinder directGraphFinder;
 
-  // callback for skipEdgeStrategy which counts visited stops
-  public static boolean isTransitVertex(Object vertex) {
-    return vertex instanceof TransitStopVertex;
-  }
-
   /**
    * Construct a NearbyStopFinder for the given graph and search radius.
    *
@@ -317,7 +312,7 @@ public class NearbyStopFinder {
       return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else {
       if (maxStopCount > 0) {
-        var strategy = new MaxCountSkipEdgeStrategy(
+        var strategy = new MaxCountSkipEdgeStrategy<>(
           maxStopCount,
           NearbyStopFinder::isTransitVertex
         );
@@ -368,5 +363,12 @@ public class NearbyStopFinder {
       .anyMatch(e ->
         e instanceof StreetEdge && ((StreetEdge) e).getPermission().allows(TraverseMode.CAR)
       );
+  }
+
+  /**
+   * Checks if the {@code state} as at a transit vertex.
+   */
+  public static boolean isTransitVertex(State state) {
+    return state.getVertex() instanceof TransitStopVertex;
   }
 }
