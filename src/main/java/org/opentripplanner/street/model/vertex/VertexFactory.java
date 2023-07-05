@@ -146,6 +146,10 @@ public class VertexFactory {
     return addToGraph(new TransitEntranceVertex(entrance));
   }
 
+  public OsmVertex levelledOsm(OSMNode node, String level) {
+    return addToGraph(new LevelledOsmVertex(node, level));
+  }
+
   private <T extends Vertex> T addToGraph(T vertex) {
     graph.addVertex(vertex);
     return vertex;

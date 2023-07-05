@@ -20,6 +20,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 
 /**
  * Tracks the generation of vertices and returns an existing instance if a vertex is encountered
@@ -176,9 +177,7 @@ class VertexGenerator {
       multiLevelNodes.put(nodeId, vertices);
     }
     if (!vertices.containsKey(level)) {
-      Coordinate coordinate = node.getCoordinate();
-      String label = String.format(levelnodeLabelFormat, node.getId(), level.shortName);
-      OsmVertex vertex = vertexFactory.osm(coordinate, node, false, false);
+      OsmVertex vertex = vertexFactory.levelledOsm(node, level.shortName);
       vertices.put(level, vertex);
 
       return vertex;

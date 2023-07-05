@@ -9,6 +9,10 @@ public sealed interface VertexLabel {
     return new StringLabel(label);
   }
 
+  static VertexLabel osm(long nodeId, String level) {
+    return new LevelledOsmNodeLabel(nodeId, level);
+  }
+
   record StringLabel(String value) implements VertexLabel {
     @Override
     public String toString() {
@@ -22,6 +26,17 @@ public sealed interface VertexLabel {
     @Override
     public String toString() {
       return TEMPLATE.formatted(nodeId);
+    }
+  }
+
+  record LevelledOsmNodeLabel(long nodeId, String level) implements VertexLabel{
+
+
+    private static final String TEMPLATE = "osm:node:%s/%s";
+
+    @Override
+    public String toString() {
+      return TEMPLATE.formatted(nodeId, level);
     }
   }
 }

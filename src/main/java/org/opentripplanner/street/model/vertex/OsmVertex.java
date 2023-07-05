@@ -6,9 +6,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 /**
  * A vertex coming from OpenStreetMap.
  * <p>
- * This class marks something that comes from the street network itself. It is used for linking
- * origins in Analyst to ensure that they are linked to the same locations regardless of changes in
- * the transit network between (or eventually within) graphs.
+ * This class marks something that comes from the street network itself.
  */
 public class OsmVertex extends IntersectionVertex {
 
