@@ -260,11 +260,11 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOffboardVertex fromOffboardVertex = vertexFactory.elevatorOffboard(
       fromVertex,
-      fromLevel.name().toString()
+      fromVertex.getLabel(), fromLevel.name().toString()
     );
     ElevatorOffboardVertex toOffboardVertex = vertexFactory.elevatorOffboard(
       toVertex,
-      toLevel.name().toString()
+      toVertex.getLabel(), toLevel.name().toString()
     );
 
     PathwayEdge.lowCost(fromVertex, fromOffboardVertex, fromVertex.getName(), PathwayMode.ELEVATOR);
@@ -272,10 +272,12 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOnboardVertex fromOnboardVertex = vertexFactory.elevatorOnboard(
       fromVertex,
+      fromVertex.getLabel(),
       fromLevel.name().toString()
     );
     ElevatorOnboardVertex toOnboardVertex = vertexFactory.elevatorOnboard(
       toVertex,
+      toVertex.getLabel(),
       toLevel.name().toString()
     );
 

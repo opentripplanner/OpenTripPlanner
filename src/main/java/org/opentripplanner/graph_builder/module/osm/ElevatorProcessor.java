@@ -27,6 +27,7 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +87,7 @@ class ElevatorProcessor {
         OsmVertex sourceVertex = vertices.get(level);
         String levelName = level.longName;
 
-        createElevatorVertices(graph, onboardVertices, sourceVertex, levelName);
+        createElevatorVertices(graph, onboardVertices, sourceVertex, sourceVertex.getLabel(), levelName);
       }
       int travelTime = parseDuration(node).orElse(-1);
 
@@ -122,7 +123,13 @@ class ElevatorProcessor {
         var sourceVertex = vertexGenerator.intersectionNodes().get(node);
         String sourceVertexLabel = sourceVertex.getLabel().toString();
         String levelName = elevatorWay.getId() + " / " + i;
-        createElevatorVertices(graph, onboardVertices, sourceVertex, levelName);
+        createElevatorVertices(
+          graph,
+          onboardVertices,
+          sourceVertex,
+          VertexLabel.string(elevatorWay.getId() + "_" + sourceVertexLabel),
+          levelName
+        );
       }
 
       int travelTime = parseDuration(elevatorWay).orElse(-1);
@@ -144,18 +151,20 @@ class ElevatorProcessor {
     Graph graph,
     ArrayList<Vertex> onboardVertices,
     IntersectionVertex sourceVertex,
+    VertexLabel label,
     String levelName
   ) {
     var factory = new VertexFactory(graph);
     ElevatorOffboardVertex offboardVertex = factory.elevatorOffboard(
       sourceVertex,
+      label,
       levelName
     );
 
     new FreeEdge(sourceVertex, offboardVertex);
     new FreeEdge(offboardVertex, sourceVertex);
 
-    ElevatorOnboardVertex onboardVertex = factory.elevatorOnboard(sourceVertex, levelName);
+    ElevatorOnboardVertex onboardVertex = factory.elevatorOnboard(sourceVertex, label, levelName);
 
     new ElevatorBoardEdge(offboardVertex, onboardVertex);
     new ElevatorAlightEdge(onboardVertex, offboardVertex, new NonLocalizedString(levelName));
