@@ -66,6 +66,7 @@ public class RouteRequestToFilterChainMapper {
         request.preferences().wheelchair().maxSlope()
       )
       .withFares(context.graph().getFareService())
+      .withEmissions(context.graph().getEmissionsService())
       .withMinBikeParkingDistance(minBikeParkingDistance(request))
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
         params.removeItinerariesWithSameRoutesAndStops()

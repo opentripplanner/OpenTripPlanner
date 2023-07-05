@@ -1,6 +1,10 @@
 package org.opentripplanner.ext.emissions;
 
-public class DigitransitEmissions {
+import java.io.Serializable;
+import org.opentripplanner.framework.lang.Sandbox;
+
+@Sandbox
+public class DigitransitEmissions implements Serializable {
 
   private String db;
   private String agency_id;

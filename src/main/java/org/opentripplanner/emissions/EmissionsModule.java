@@ -60,6 +60,7 @@ public class EmissionsModule implements GraphBuilderModule {
           );
           emissionsService = new DigitransitEmissionsService(digitransitEmissions);
           transitModel.setEmissionsService(emissionsService);
+          graph.setEmissionsService(new DigitransitEmissionsService(digitransitEmissions));
         }
       } catch (Exception e) {
         LOG.error("ERROR " + e);

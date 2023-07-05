@@ -1,5 +1,13 @@
 package org.opentripplanner.ext.emissions;
 
-public interface EmissionsService {
-  void getEmissionForRoute();
+import java.io.Serializable;
+import java.util.HashMap;
+import org.opentripplanner.framework.lang.Sandbox;
+import org.opentripplanner.model.plan.Itinerary;
+
+@Sandbox
+public interface EmissionsService extends Serializable {
+  HashMap<String, DigitransitEmissionsAgency> getEmissionByAgency();
+
+  float getEmissionsForRoute(Itinerary itinerary);
 }

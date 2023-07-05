@@ -68,7 +68,6 @@ public class GraphBuilder implements Runnable {
     boolean hasGtfs = dataSources.has(GTFS);
     boolean hasNetex = dataSources.has(NETEX);
     boolean hasTransitData = hasGtfs || hasNetex;
-    boolean hasEmissions = true; // TODO
 
     transitModel.initTimeZone(config.transitModelTimeZone);
 
@@ -93,9 +92,7 @@ public class GraphBuilder implements Runnable {
     if (hasGtfs) {
       graphBuilder.addModule(factory.gtfsModule());
     }
-    if (hasEmissions) {
-      graphBuilder.addModule(factory.emissionsModule());
-    }
+
     if (hasNetex) {
       graphBuilder.addModule(factory.netexModule());
     }
@@ -157,6 +154,10 @@ public class GraphBuilder implements Runnable {
 
     if (OTPFeature.DataOverlay.isOn()) {
       graphBuilder.addModuleOptional(factory.dataOverlayFactory());
+    }
+
+    if (OTPFeature.co2Emissions.isOn()) {
+      graphBuilder.addModule(factory.emissionsModule());
     }
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());

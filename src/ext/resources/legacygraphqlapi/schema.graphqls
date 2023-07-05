@@ -1374,6 +1374,9 @@ type Itinerary {
     """How far the user has to walk, in meters."""
     walkDistance: Float
 
+    """CO2 emissions of the trip on this itinerary, in grams per person."""
+    emissions: Float
+    
     """
     A list of Legs. Each Leg is either a walking (cycling, car) portion of the
     itinerary, or a transit leg on a particular vehicle. So a itinerary where the

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
+import org.opentripplanner.ext.emissions.EmissionsFilter;
+import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
@@ -72,6 +74,9 @@ public class ItineraryListFilterChainBuilder {
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
+
+  @Sandbox
+  private EmissionsService emissionsService;
 
   @Sandbox
   private ItineraryListFilter rideHailingFilter;
@@ -269,6 +274,11 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withEmissions(EmissionsService emissionsService) {
+    this.emissionsService = emissionsService;
+    return this;
+  }
+
   public ItineraryListFilterChainBuilder withMinBikeParkingDistance(double distance) {
     this.minBikeParkingDistance = distance;
     return this;
@@ -313,6 +323,10 @@ public class ItineraryListFilterChainBuilder {
 
     if (faresService != null) {
       filters.add(new FaresFilter(faresService));
+    }
+
+    if (emissionsService != null) {
+      filters.add(new EmissionsFilter(emissionsService));
     }
 
     if (transitAlertService != null) {

@@ -47,6 +47,8 @@ public class Itinerary {
   /* Sandbox experimental properties */
   private Float accessibilityScore;
 
+  private float emissions;
+
   /* other properties */
 
   private final List<SystemNotice> systemNotices = new ArrayList<>();
@@ -245,6 +247,7 @@ public class Itinerary {
       .addNum("elevationGained", elevationGained, 0.0)
       .addCol("legs", legs)
       .addObj("fare", fare)
+      .addObj("emissions", emissions)
       .toString();
   }
 
@@ -562,5 +565,16 @@ public class Itinerary {
       .filter(ScheduledTransitLeg.class::isInstance)
       .map(ScheduledTransitLeg.class::cast)
       .toList();
+  }
+
+  /**
+   * The co2 emissions of this itinerary.
+   */
+  public void setEmissions(float emissions) {
+    this.emissions = emissions;
+  }
+
+  public float getEmissions() {
+    return this.emissions;
   }
 }
