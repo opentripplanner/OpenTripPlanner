@@ -553,7 +553,7 @@ ferries, where the check-in process needs to be done in good time before ride.
       .withMaxAccessEgressDuration(
         accessEgress
           .of("maxDuration")
-          .since(V2_4)
+          .since(V2_1)
           .summary("This is the maximum duration for access/egress for street searches.")
           .description(
             """
@@ -567,7 +567,7 @@ do not exist.
           .asDuration(dft.maxAccessEgressDuration().defaultValue()),
         accessEgress
           .of("maxDurationForMode")
-          .since(V2_4)
+          .since(V2_1)
           .summary("Limit access/egress per street mode.")
           .description(
             """

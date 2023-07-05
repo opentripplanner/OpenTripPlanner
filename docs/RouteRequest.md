@@ -72,9 +72,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [walkSafetyFactor](#rd_walkSafetyFactor)                                                             |        `double`        | Factor for how much the walk safety is considered in routing.                                                                                  | *Optional* | `1.0`                    |  2.2  |
 | walkSpeed                                                                                            |        `double`        | The user's walking speed in meters/second.                                                                                                     | *Optional* | `1.33`                   |  2.0  |
 | accessEgress                                                                                         |        `object`        | Parameters for access and egress routing.                                                                                                      | *Optional* |                          |  2.4  |
-|    [maxDuration](#rd_accessEgress_maxDuration)                                                       |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                            | *Optional* | `"PT45M"`                |  2.4  |
+|    [maxDuration](#rd_accessEgress_maxDuration)                                                       |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                            | *Optional* | `"PT45M"`                |  2.1  |
 |    [maxStopCount](#rd_accessEgress_maxStopCount)                                                     |        `integer`       | Maximal number of stops collected in access/egress routing                                                                                     | *Optional* | `0`                      |  2.4  |
-|    [maxDurationForMode](#rd_accessEgress_maxDurationForMode)                                         | `enum map of duration` | Limit access/egress per street mode.                                                                                                           | *Optional* |                          |  2.4  |
+|    [maxDurationForMode](#rd_accessEgress_maxDurationForMode)                                         | `enum map of duration` | Limit access/egress per street mode.                                                                                                           | *Optional* |                          |  2.1  |
 |    [penalty](#rd_accessEgress_penalty)                                                               |  `enum map of object`  | Penalty for access/egress by street mode.                                                                                                      | *Optional* |                          |  2.4  |
 | [alightSlackForMode](#rd_alightSlackForMode)                                                         | `enum map of duration` | How much extra time should be given when alighting a vehicle for each given mode.                                                              | *Optional* |                          |  2.0  |
 | [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                             |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned.                                                              | *Optional* |                          |  2.1  |
@@ -379,7 +379,7 @@ Value should be between 0 and 1. If the value is set to be 0, safety is ignored.
 
 <h3 id="rd_accessEgress_maxDuration">maxDuration</h3>
 
-**Since version:** `2.4` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT45M"`   
+**Since version:** `2.1` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT45M"`   
 **Path:** /routingDefaults/accessEgress 
 
 This is the maximum duration for access/egress for street searches.
@@ -403,7 +403,7 @@ Safety limit to prevent access to and egress from too many stops.
 
 <h3 id="rd_accessEgress_maxDurationForMode">maxDurationForMode</h3>
 
-**Since version:** `2.4` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.1` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults/accessEgress   
 **Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
 
