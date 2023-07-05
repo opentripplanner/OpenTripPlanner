@@ -69,7 +69,7 @@ public class NearbyStopFinder {
   private DirectGraphFinder directGraphFinder;
 
   // callback for skipEdgeStrategy which counts visited stops
-  public static Boolean isTransitVertex(Object vertex) {
+  public static boolean isTransitVertex(Vertex vertex) {
     return vertex instanceof TransitStopVertex;
   }
 
