@@ -4,8 +4,8 @@ public class ExitVertex extends OsmVertex {
 
   private String exitName;
 
-  public ExitVertex(String label, double x, double y, long nodeId) {
-    super(label, x, y, nodeId);
+  public ExitVertex(double x, double y, long nodeId) {
+    super(x, y, nodeId);
   }
 
   public String getExitName() {

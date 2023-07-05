@@ -28,8 +28,8 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Money;
@@ -220,14 +220,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
       FlexConfig.DEFAULT
     );
 
-    var fromv = new SimpleConcreteVertex(
-      null,
+    var fromv = StreetModelForTest.intersectionVertex(
       "v1",
       lastPlace.coordinate.latitude(),
       lastPlace.coordinate.longitude()
     );
-    var tov = new SimpleConcreteVertex(
-      null,
+    var tov = StreetModelForTest.intersectionVertex(
       "v2",
       to.coordinate.latitude(),
       to.coordinate.longitude()

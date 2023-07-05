@@ -67,12 +67,11 @@ class VertexGenerator {
     iv = intersectionNodes.get(nid);
     if (iv == null) {
       Coordinate coordinate = node.getCoordinate();
-      String label = String.format(nodeLabelFormat, node.getId());
       String highway = node.getTag("highway");
       if ("motorway_junction".equals(highway)) {
         String ref = node.getTag("ref");
         if (ref != null) {
-          ExitVertex ev = vertexFactory.exit(nid, coordinate, label);
+          ExitVertex ev = vertexFactory.exit(nid, coordinate);
           ev.setExitName(ref);
           iv = ev;
         }
@@ -80,6 +79,7 @@ class VertexGenerator {
 
       /* If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. */
       if (node.isBoardingLocation()) {
+        String label = String.format(nodeLabelFormat, node.getId());
         var refs = node.getMultiTagValues(boardingAreaRefTags);
         if (!refs.isEmpty()) {
           String name = node.getTag("name");
@@ -94,7 +94,7 @@ class VertexGenerator {
       }
 
       if (node.isBarrier()) {
-        BarrierVertex bv = vertexFactory.barrier(nid, coordinate, label);
+        BarrierVertex bv = vertexFactory.barrier(nid, coordinate);
         bv.setBarrierPermissions(
           OsmFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions)
         );
@@ -104,7 +104,6 @@ class VertexGenerator {
       if (iv == null) {
         iv =
           vertexFactory.osm(
-            label,
             coordinate,
             node,
             node.hasHighwayTrafficLight(),
@@ -179,7 +178,7 @@ class VertexGenerator {
     if (!vertices.containsKey(level)) {
       Coordinate coordinate = node.getCoordinate();
       String label = String.format(levelnodeLabelFormat, node.getId(), level.shortName);
-      OsmVertex vertex = vertexFactory.osm(label, coordinate, node, false, false);
+      OsmVertex vertex = vertexFactory.osm(coordinate, node, false, false);
       vertices.put(level, vertex);
 
       return vertex;

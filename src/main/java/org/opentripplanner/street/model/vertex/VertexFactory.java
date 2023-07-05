@@ -5,7 +5,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -39,51 +38,34 @@ public class VertexFactory {
   }
 
   @Nonnull
-  public ElevatorOnboardVertex elevatorOnboard(
-    Vertex sourceVertex,
-    String sourceVertexLabel,
-    String levelName
-  ) {
-    return addToGraph(
-      new ElevatorOnboardVertex(
-        sourceVertexLabel + "_onboard",
-        sourceVertex.getX(),
-        sourceVertex.getY(),
-        new NonLocalizedString(levelName)
-      )
-    );
+  public ElevatorOnboardVertex elevatorOnboard(Vertex sourceVertex, String levelName) {
+    return addToGraph(new ElevatorOnboardVertex(sourceVertex, levelName));
   }
 
   @Nonnull
-  public ElevatorOffboardVertex elevatorOffboard(
-    Vertex sourceVertex,
-    String sourceVertexLabel,
-    String levelName
-  ) {
-    return addToGraph(
-      new ElevatorOffboardVertex(
-        sourceVertexLabel + "_offboard",
-        sourceVertex.getX(),
-        sourceVertex.getY(),
-        new NonLocalizedString(levelName)
-      )
-    );
+  public ElevatorOffboardVertex elevatorOffboard(Vertex sourceVertex, String levelName) {
+    return addToGraph(new ElevatorOffboardVertex(sourceVertex, levelName));
   }
 
   @Nonnull
   public IntersectionVertex intersection(Coordinate edgeCoordinate) {
     return addToGraph(
-      new IntersectionVertex(
+      new LabelledIntersectionVertex(
         "area splitter at " + edgeCoordinate,
         edgeCoordinate.x,
-        edgeCoordinate.y
+        edgeCoordinate.y,
+        null,
+        false,
+        false
       )
     );
   }
 
   @Nonnull
   public IntersectionVertex intersection(String label, double longitude, double latitude) {
-    return addToGraph(new IntersectionVertex(label, longitude, latitude));
+    return addToGraph(
+      new LabelledIntersectionVertex(label, longitude, latitude, null, false, false)
+    );
   }
 
   @Nonnull
@@ -107,18 +89,17 @@ public class VertexFactory {
   }
 
   @Nonnull
-  public BarrierVertex barrier(long nid, Coordinate coordinate, String label) {
-    return addToGraph(new BarrierVertex(label, coordinate.x, coordinate.y, nid));
+  public BarrierVertex barrier(long nid, Coordinate coordinate) {
+    return addToGraph(new BarrierVertex(coordinate.x, coordinate.y, nid));
   }
 
   @Nonnull
-  public ExitVertex exit(long nid, Coordinate coordinate, String label) {
-    return addToGraph(new ExitVertex(label, coordinate.x, coordinate.y, nid));
+  public ExitVertex exit(long nid, Coordinate coordinate) {
+    return addToGraph(new ExitVertex(coordinate.x, coordinate.y, nid));
   }
 
   @Nonnull
   public OsmVertex osm(
-    String label,
     Coordinate coordinate,
     OSMNode node,
     boolean highwayTrafficLight,
@@ -126,11 +107,10 @@ public class VertexFactory {
   ) {
     return addToGraph(
       new OsmVertex(
-        label,
         coordinate.x,
         coordinate.y,
         node.getId(),
-        new NonLocalizedString(label),
+        null,
         highwayTrafficLight,
         crossingTrafficLight
       )

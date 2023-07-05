@@ -3,6 +3,7 @@ package org.opentripplanner.astar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model.vertex.VertexLabel.string;
 
 import java.util.HashSet;
 import java.util.List;
@@ -18,11 +19,12 @@ import org.opentripplanner.routing.algorithm.MultiTargetTerminationStrategy;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteEdge;
-import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.TemporaryConcreteEdge;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
@@ -90,8 +92,8 @@ public class AStarTest {
     var request = new RouteRequest();
 
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
-    Vertex from = graph.getVertex("56th_24th");
-    Vertex to = graph.getVertex("leary_20th");
+    Vertex from = graph.getVertex(string("56th_24th"));
+    Vertex to = graph.getVertex(string("leary_20th"));
     ShortestPathTree tree = StreetSearchBuilder
       .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
@@ -106,13 +108,13 @@ public class AStarTest {
 
     assertEquals(7, states.size());
 
-    assertEquals("56th_24th", states.get(0).getVertex().getLabel());
-    assertEquals("market_24th", states.get(1).getVertex().getLabel());
-    assertEquals("market_ballard", states.get(2).getVertex().getLabel());
-    assertEquals("market_22nd", states.get(3).getVertex().getLabel());
-    assertEquals("market_leary", states.get(4).getVertex().getLabel());
-    assertEquals("leary_vernon", states.get(5).getVertex().getLabel());
-    assertEquals("leary_20th", states.get(6).getVertex().getLabel());
+    assertEquals("56th_24th", states.get(0).getVertex().getLabel().toString());
+    assertEquals("market_24th", states.get(1).getVertex().getLabel().toString());
+    assertEquals("market_ballard", states.get(2).getVertex().getLabel().toString());
+    assertEquals("market_22nd", states.get(3).getVertex().getLabel().toString());
+    assertEquals("market_leary", states.get(4).getVertex().getLabel().toString());
+    assertEquals("leary_vernon", states.get(5).getVertex().getLabel().toString());
+    assertEquals("leary_20th", states.get(6).getVertex().getLabel().toString());
   }
 
   @Test
@@ -121,8 +123,8 @@ public class AStarTest {
 
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
     request.setArriveBy(true);
-    Vertex from = graph.getVertex("56th_24th");
-    Vertex to = graph.getVertex("leary_20th");
+    Vertex from = graph.getVertex(string("56th_24th"));
+    Vertex to = graph.getVertex(string("leary_20th"));
     ShortestPathTree tree = StreetSearchBuilder
       .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
@@ -137,23 +139,23 @@ public class AStarTest {
 
     assertTrue(states.size() == 6 || states.size() == 7);
 
-    assertEquals("56th_24th", states.get(0).getVertex().getLabel());
+    assertEquals("56th_24th", states.get(0).getVertex().getLabel().toString());
 
     int n;
     // we could go either way around the block formed by 56th, 22nd, market, and 24th.
     if (states.size() == 7) {
-      assertEquals("market_24th", states.get(1).getVertex().getLabel());
-      assertEquals("market_ballard", states.get(2).getVertex().getLabel());
+      assertEquals("market_24th", states.get(1).getVertex().getLabel().toString());
+      assertEquals("market_ballard", states.get(2).getVertex().getLabel().toString());
       n = 0;
     } else {
-      assertEquals("56th_22nd", states.get(1).getVertex().getLabel());
+      assertEquals("56th_22nd", states.get(1).getVertex().getLabel().toString());
       n = -1;
     }
 
-    assertEquals("market_22nd", states.get(n + 3).getVertex().getLabel());
-    assertEquals("market_leary", states.get(n + 4).getVertex().getLabel());
-    assertEquals("leary_vernon", states.get(n + 5).getVertex().getLabel());
-    assertEquals("leary_20th", states.get(n + 6).getVertex().getLabel());
+    assertEquals("market_22nd", states.get(n + 3).getVertex().getLabel().toString());
+    assertEquals("market_leary", states.get(n + 4).getVertex().getLabel().toString());
+    assertEquals("leary_vernon", states.get(n + 5).getVertex().getLabel().toString());
+    assertEquals("leary_20th", states.get(n + 6).getVertex().getLabel().toString());
   }
 
   @Test
@@ -168,7 +170,7 @@ public class AStarTest {
       new NonLocalizedString("near_shilshole_22nd"),
       false
     );
-    new TemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
+    new TemporaryConcreteEdge(from, graph.getVertex(VertexLabel.string("shilshole_22nd")));
 
     TemporaryStreetLocation to = new TemporaryStreetLocation(
       "near_56th_20th",
@@ -176,7 +178,7 @@ public class AStarTest {
       new NonLocalizedString("near_56th_20th"),
       true
     );
-    new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
+    new TemporaryConcreteEdge(graph.getVertex(string("56th_20th")), to);
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
       .of()
@@ -192,15 +194,15 @@ public class AStarTest {
 
     assertEquals(9, states.size());
 
-    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabel());
-    assertEquals("shilshole_22nd", states.get(1).getVertex().getLabel());
-    assertEquals("ballard_22nd", states.get(2).getVertex().getLabel());
-    assertEquals("market_22nd", states.get(3).getVertex().getLabel());
-    assertEquals("market_leary", states.get(4).getVertex().getLabel());
-    assertEquals("market_russell", states.get(5).getVertex().getLabel());
-    assertEquals("market_20th", states.get(6).getVertex().getLabel());
-    assertEquals("56th_20th", states.get(7).getVertex().getLabel());
-    assertEquals("near_56th_20th", states.get(8).getVertex().getLabel());
+    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabel().toString());
+    assertEquals("shilshole_22nd", states.get(1).getVertex().getLabel().toString());
+    assertEquals("ballard_22nd", states.get(2).getVertex().getLabel().toString());
+    assertEquals("market_22nd", states.get(3).getVertex().getLabel().toString());
+    assertEquals("market_leary", states.get(4).getVertex().getLabel().toString());
+    assertEquals("market_russell", states.get(5).getVertex().getLabel().toString());
+    assertEquals("market_20th", states.get(6).getVertex().getLabel().toString());
+    assertEquals("56th_20th", states.get(7).getVertex().getLabel().toString());
+    assertEquals("near_56th_20th", states.get(8).getVertex().getLabel().toString());
   }
 
   @Test
@@ -216,7 +218,7 @@ public class AStarTest {
       new NonLocalizedString("near_shilshole_22nd"),
       false
     );
-    new TemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
+    new TemporaryConcreteEdge(from, graph.getVertex(string("shilshole_22nd")));
 
     TemporaryStreetLocation to = new TemporaryStreetLocation(
       "near_56th_20th",
@@ -224,7 +226,7 @@ public class AStarTest {
       new NonLocalizedString("near_56th_20th"),
       true
     );
-    new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
+    new TemporaryConcreteEdge(graph.getVertex(string("56th_20th")), to);
 
     ShortestPathTree tree = StreetSearchBuilder
       .of()
@@ -240,15 +242,15 @@ public class AStarTest {
 
     assertEquals(9, states.size());
 
-    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabel());
-    assertEquals("shilshole_22nd", states.get(1).getVertex().getLabel());
-    assertEquals("ballard_22nd", states.get(2).getVertex().getLabel());
-    assertEquals("market_22nd", states.get(3).getVertex().getLabel());
-    assertEquals("market_leary", states.get(4).getVertex().getLabel());
-    assertEquals("market_russell", states.get(5).getVertex().getLabel());
-    assertEquals("market_20th", states.get(6).getVertex().getLabel());
-    assertEquals("56th_20th", states.get(7).getVertex().getLabel());
-    assertEquals("near_56th_20th", states.get(8).getVertex().getLabel());
+    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabel().toString());
+    assertEquals("shilshole_22nd", states.get(1).getVertex().getLabel().toString());
+    assertEquals("ballard_22nd", states.get(2).getVertex().getLabel().toString());
+    assertEquals("market_22nd", states.get(3).getVertex().getLabel().toString());
+    assertEquals("market_leary", states.get(4).getVertex().getLabel().toString());
+    assertEquals("market_russell", states.get(5).getVertex().getLabel().toString());
+    assertEquals("market_20th", states.get(6).getVertex().getLabel().toString());
+    assertEquals("56th_20th", states.get(7).getVertex().getLabel().toString());
+    assertEquals("near_56th_20th", states.get(8).getVertex().getLabel().toString());
   }
 
   @Test
@@ -258,15 +260,15 @@ public class AStarTest {
     request.withPreferences(pref -> pref.withWalk(w -> w.withSpeed(1.0)));
 
     Set<Vertex> targets = new HashSet<>();
-    targets.add(graph.getVertex("shilshole_22nd"));
-    targets.add(graph.getVertex("market_russell"));
-    targets.add(graph.getVertex("56th_20th"));
-    targets.add(graph.getVertex("leary_20th"));
+    targets.add(graph.getVertex(string("shilshole_22nd")));
+    targets.add(graph.getVertex(string("market_russell")));
+    targets.add(graph.getVertex(string("56th_20th")));
+    targets.add(graph.getVertex(string("leary_20th")));
 
     SearchTerminationStrategy strategy = new MultiTargetTerminationStrategy(targets);
 
-    Vertex v1 = graph.getVertex("56th_24th");
-    Vertex v2 = graph.getVertex("leary_20th");
+    Vertex v1 = graph.getVertex(string("56th_24th"));
+    Vertex v2 = graph.getVertex(string("leary_20th"));
     ShortestPathTree tree = StreetSearchBuilder
       .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())
@@ -278,7 +280,7 @@ public class AStarTest {
 
     for (Vertex v : targets) {
       GraphPath path = tree.getPath(v);
-      assertNotNull(path, "No path found for target " + v.getLabel());
+      assertNotNull(path, "No path found for target " + v.getLabel().toString());
     }
   }
 
@@ -286,16 +288,16 @@ public class AStarTest {
    * Private Methods
    ****/
 
-  private SimpleConcreteVertex vertex(String label, double lat, double lon) {
-    var v = new SimpleConcreteVertex(graph, label, lat, lon);
+  private Vertex vertex(String label, double lat, double lon) {
+    var v = StreetModelForTest.intersectionVertex(label, lat, lon);
     graph.addVertex(v);
     return v;
   }
 
   private void edges(String... vLabels) {
     for (int i = 0; i < vLabels.length - 1; i++) {
-      Vertex vA = graph.getVertex(vLabels[i]);
-      Vertex vB = graph.getVertex(vLabels[i + 1]);
+      Vertex vA = graph.getVertex(string(vLabels[i]));
+      Vertex vB = graph.getVertex(string(vLabels[i + 1]));
 
       new SimpleConcreteEdge(vA, vB);
       new SimpleConcreteEdge(vB, vA);

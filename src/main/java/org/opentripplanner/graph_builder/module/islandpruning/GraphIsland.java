@@ -42,7 +42,7 @@ public record GraphIsland(
 
   @Override
   public String getHTMLMessage() {
-    String label = island.getRepresentativeVertex().getLabel();
+    String label = island.getRepresentativeVertex().getLabel().toString();
     if (label.startsWith("osm:")) {
       String osmNodeId = label.split(":")[2];
       return String.format(

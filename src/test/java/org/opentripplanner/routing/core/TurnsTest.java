@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 
@@ -20,8 +21,8 @@ public class TurnsTest {
       new Coordinate[] { new Coordinate(-0.10, 0), new Coordinate(0, 0) }
     );
 
-    IntersectionVertex v1 = new IntersectionVertex("v1", -0.10, 0, "v1");
-    IntersectionVertex v2 = new IntersectionVertex("v2", 0, 0, "v2");
+    IntersectionVertex v1 = StreetModelForTest.intersectionVertex("v1", -0.10, 0);
+    IntersectionVertex v2 = StreetModelForTest.intersectionVertex("v2", 0, 0);
 
     StreetEdge leftEdge = new StreetEdge(
       v1,

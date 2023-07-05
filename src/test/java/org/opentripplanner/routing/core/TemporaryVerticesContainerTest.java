@@ -20,10 +20,10 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -38,9 +38,9 @@ public class TemporaryVerticesContainerTest {
   // - a graph with 3 intersections/vertexes
   private final Graph g = new Graph(new Deduplicator());
 
-  private final StreetVertex a = new IntersectionVertex("A", 1.0, 1.0);
-  private final StreetVertex b = new IntersectionVertex("B", 0.0, 1.0);
-  private final StreetVertex c = new IntersectionVertex("C", 1.0, 0.0);
+  private final StreetVertex a = StreetModelForTest.intersectionVertex("A", 1.0, 1.0);
+  private final StreetVertex b = StreetModelForTest.intersectionVertex("B", 0.0, 1.0);
+  private final StreetVertex c = StreetModelForTest.intersectionVertex("C", 1.0, 0.0);
   private final List<Vertex> permanentVertexes = Arrays.asList(a, b, c);
   // - And travel *origin* is 0,4 degrees on the road from B to A
   private final GenericLocation from = new GenericLocation(1.0, 0.4);

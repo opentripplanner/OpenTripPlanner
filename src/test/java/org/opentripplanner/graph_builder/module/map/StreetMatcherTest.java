@@ -14,6 +14,7 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 
 public class StreetMatcherTest {
 
@@ -146,8 +147,8 @@ public class StreetMatcherTest {
 
   private void edges(String... vLabels) {
     for (int i = 0; i < vLabels.length - 1; i++) {
-      StreetVertex vA = (StreetVertex) graph.getVertex(vLabels[i]);
-      StreetVertex vB = (StreetVertex) graph.getVertex(vLabels[i + 1]);
+      StreetVertex vA = (StreetVertex) graph.getVertex(VertexLabel.string(vLabels[i]));
+      StreetVertex vB = (StreetVertex) graph.getVertex(VertexLabel.string(vLabels[i + 1]));
 
       StreetModelForTest.streetEdge(vA, vB);
       StreetModelForTest.streetEdge(vB, vA);

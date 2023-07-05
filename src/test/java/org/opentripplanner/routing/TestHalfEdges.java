@@ -42,6 +42,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -266,8 +267,8 @@ public class TestHalfEdges {
 
     // the bottom is not part of the shortest path
     for (State s : path.states) {
-      assertNotSame(s.getVertex(), graph.getVertex("bottom"));
-      assertNotSame(s.getVertex(), graph.getVertex("bottomBack"));
+      assertNotSame(s.getVertex(), graph.getVertex(VertexLabel.string("bottom")));
+      assertNotSame(s.getVertex(), graph.getVertex(VertexLabel.string("bottomBack")));
     }
 
     options.setArriveBy(true);
@@ -286,8 +287,8 @@ public class TestHalfEdges {
 
     // the bottom edge is not part of the shortest path
     for (State s : path.states) {
-      assertNotSame(s.getVertex(), graph.getVertex("bottom"));
-      assertNotSame(s.getVertex(), graph.getVertex("bottomBack"));
+      assertNotSame(s.getVertex(), graph.getVertex(VertexLabel.string("bottom")));
+      assertNotSame(s.getVertex(), graph.getVertex(VertexLabel.string("bottomBack")));
     }
 
     // Number of vertices and edges should be the same as before after a cleanup.
@@ -336,8 +337,8 @@ public class TestHalfEdges {
 
     // the left edge is not part of the shortest path (even though the bike must be walked along the right)
     for (State s : path.states) {
-      assertNotSame(s.getVertex(), graph.getVertex("left"));
-      assertNotSame(s.getVertex(), graph.getVertex("leftBack"));
+      assertNotSame(s.getVertex(), graph.getVertex(VertexLabel.string("left")));
+      assertNotSame(s.getVertex(), graph.getVertex(VertexLabel.string("leftBack")));
     }
 
     // Number of vertices and edges should be the same as before after a cleanup.
@@ -378,8 +379,8 @@ public class TestHalfEdges {
 
     // the right edge is not part of the shortest path, e
     for (State s : path.states) {
-      assertNotSame(s.getVertex(), graph.getVertex("right"));
-      assertNotSame(s.getVertex(), graph.getVertex("rightBack"));
+      assertNotSame(s.getVertex(), graph.getVertex(VertexLabel.string("right")));
+      assertNotSame(s.getVertex(), graph.getVertex(VertexLabel.string("rightBack")));
     }
 
     // Number of vertices and edges should be the same as before after a cleanup.

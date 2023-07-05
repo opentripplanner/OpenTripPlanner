@@ -260,12 +260,10 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOffboardVertex fromOffboardVertex = vertexFactory.elevatorOffboard(
       fromVertex,
-      fromVertex.getLabel() + "_" + pathway.getId(),
       fromLevel.name().toString()
     );
     ElevatorOffboardVertex toOffboardVertex = vertexFactory.elevatorOffboard(
       toVertex,
-      toVertex.getLabel() + "_" + pathway.getId() + "_offboard",
       toLevel.name().toString()
     );
 
@@ -274,12 +272,10 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOnboardVertex fromOnboardVertex = vertexFactory.elevatorOnboard(
       fromVertex,
-      fromVertex.getLabel() + "_" + pathway.getId(),
       fromLevel.name().toString()
     );
     ElevatorOnboardVertex toOnboardVertex = vertexFactory.elevatorOnboard(
       toVertex,
-      toVertex.getLabel() + "_" + pathway.getId(),
       toLevel.name().toString()
     );
 

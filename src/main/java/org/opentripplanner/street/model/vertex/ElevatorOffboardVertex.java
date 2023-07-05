@@ -1,10 +1,20 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 
 public class ElevatorOffboardVertex extends StreetVertex {
 
-  public ElevatorOffboardVertex(String label, double x, double y, I18NString name) {
-    super(label, x, y, name);
+  private final Vertex sourceVertex;
+  private final String level;
+
+  public ElevatorOffboardVertex(Vertex sourceVertex, String level) {
+    super(sourceVertex.getX(), sourceVertex.getY(), NonLocalizedString.ofNullable(level));
+    this.sourceVertex = sourceVertex;
+    this.level=level;
+  }
+
+  @Override
+  public VertexLabel getLabel() {
+    return VertexLabel.string("elevator_offboard/%s/%s".formatted(sourceVertex.getLabel(), level));
   }
 }

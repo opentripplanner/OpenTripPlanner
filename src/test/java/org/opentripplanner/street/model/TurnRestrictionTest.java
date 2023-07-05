@@ -16,9 +16,9 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -189,7 +189,7 @@ public class TurnRestrictionTest {
    ****/
 
   private StreetVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(label, lat, lon);
+    return StreetModelForTest.intersectionVertex(label, lat, lon);
   }
 
   /**
@@ -198,8 +198,8 @@ public class TurnRestrictionTest {
    * @param back true if this is a reverse edge
    */
   private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
+    var labelA = vA.getLabel();
+    var labelB = vB.getLabel();
     String name = String.format("%s_%s", labelA, labelB);
     Coordinate[] coords = new Coordinate[2];
     coords[0] = vA.getCoordinate();

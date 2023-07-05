@@ -40,6 +40,7 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeLabel;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
@@ -61,16 +62,16 @@ public class OsmModuleTest {
     osmModule.buildGraph();
 
     // Kamiennogorska at south end of segment
-    Vertex v1 = gg.getVertex("osm:node:280592578");
+    Vertex v1 = gg.getVertex(new OsmNodeLabel(280592578));
 
     // Kamiennogorska at Mariana Smoluchowskiego
-    Vertex v2 = gg.getVertex("osm:node:288969929");
+    Vertex v2 = gg.getVertex(new OsmNodeLabel(288969929));
 
     // Mariana Smoluchowskiego, north end
-    Vertex v3 = gg.getVertex("osm:node:280107802");
+    Vertex v3 = gg.getVertex(new OsmNodeLabel(280107802));
 
     // Mariana Smoluchowskiego, south end (of segment connected to v2)
-    Vertex v4 = gg.getVertex("osm:node:288970952");
+    Vertex v4 = gg.getVertex(new OsmNodeLabel(288970952));
 
     assertNotNull(v1);
     assertNotNull(v2);
@@ -122,20 +123,20 @@ public class OsmModuleTest {
     osmModule.buildGraph();
 
     // These vertices are labeled in the OSM file as having traffic lights.
-    IntersectionVertex iv1 = (IntersectionVertex) gg.getVertex("osm:node:1919595918");
-    IntersectionVertex iv2 = (IntersectionVertex) gg.getVertex("osm:node:42442273");
-    IntersectionVertex iv3 = (IntersectionVertex) gg.getVertex("osm:node:1919595927");
-    IntersectionVertex iv4 = (IntersectionVertex) gg.getVertex("osm:node:42452026");
+    IntersectionVertex iv1 = (IntersectionVertex) gg.getVertex(new OsmNodeLabel(1919595918));
+    IntersectionVertex iv2 = (IntersectionVertex) gg.getVertex(new OsmNodeLabel(42442273));
+    IntersectionVertex iv3 = (IntersectionVertex) gg.getVertex(new OsmNodeLabel(1919595927));
+    IntersectionVertex iv4 = (IntersectionVertex) gg.getVertex(new OsmNodeLabel(42452026));
     assertTrue(iv1.hasDrivingTrafficLight());
     assertTrue(iv2.hasDrivingTrafficLight());
     assertTrue(iv3.hasDrivingTrafficLight());
     assertTrue(iv4.hasDrivingTrafficLight());
 
     // These are not.
-    IntersectionVertex iv5 = (IntersectionVertex) gg.getVertex("osm:node:42435485");
-    IntersectionVertex iv6 = (IntersectionVertex) gg.getVertex("osm:node:42439335");
-    IntersectionVertex iv7 = (IntersectionVertex) gg.getVertex("osm:node:42436761");
-    IntersectionVertex iv8 = (IntersectionVertex) gg.getVertex("osm:node:42442291");
+    IntersectionVertex iv5 = (IntersectionVertex) gg.getVertex(new OsmNodeLabel(42435485));
+    IntersectionVertex iv6 = (IntersectionVertex) gg.getVertex(new OsmNodeLabel(42439335));
+    IntersectionVertex iv7 = (IntersectionVertex) gg.getVertex(new OsmNodeLabel(42436761));
+    IntersectionVertex iv8 = (IntersectionVertex) gg.getVertex(new OsmNodeLabel(42442291));
     assertFalse(iv5.hasDrivingTrafficLight());
     assertFalse(iv6.hasDrivingTrafficLight());
     assertFalse(iv7.hasDrivingTrafficLight());
@@ -296,7 +297,7 @@ public class OsmModuleTest {
     graph
       .getVerticesOfType(VehicleParkingEntranceVertex.class)
       .stream()
-      .filter(v -> v.getLabel().contains("centroid"))
+      .filter(v -> v.getLabel().toString().contains("centroid"))
       .forEach(v -> {
         assertFalse(v.getOutgoing().isEmpty());
         assertFalse(v.getIncoming().isEmpty());
@@ -349,8 +350,8 @@ public class OsmModuleTest {
 
     //This are vertices that can be connected only over edges on area (with correct permissions)
     //It tests if it is possible to route over area without visibility calculations
-    Vertex bottomV = graph.getVertex("osm:node:580290955");
-    Vertex topV = graph.getVertex("osm:node:559271124");
+    Vertex bottomV = graph.getVertex(new OsmNodeLabel(580290955));
+    Vertex topV = graph.getVertex(new OsmNodeLabel(559271124));
 
     GraphPathFinder graphPathFinder = new GraphPathFinder(null);
     List<GraphPath<State, Edge, Vertex>> pathList = graphPathFinder.graphPathFinderEntryPoint(

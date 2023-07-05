@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -27,15 +30,18 @@ import org.slf4j.LoggerFactory;
 public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serializable, Cloneable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
+  private static final I18NString NO_NAME = new NonLocalizedString("(no name provided)");
 
   /**
    * Short debugging name. This is a graph mathematical term as in https://en.wikipedia.org/wiki/Graph_labeling
    */
-  private final String label;
   private final double x;
   private final double y;
+
   /* Longer human-readable name for the client */
-  private I18NString name;
+  @Nonnull
+  private final I18NString name;
+
   private transient Edge[] incoming = new Edge[0];
 
   private transient Edge[] outgoing = new Edge[0];
@@ -43,16 +49,14 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
 
   /* CONSTRUCTORS */
 
-  protected Vertex(String label, double x, double y) {
-    this.label = label;
-    this.x = x;
-    this.y = y;
-    this.name = new NonLocalizedString("(no name provided)");
+  protected Vertex(double x, double y) {
+    this(x, y, NO_NAME);
   }
 
-  protected Vertex(String label, double x, double y, I18NString name) {
-    this(label, x, y);
-    this.name = name;
+  protected Vertex(double x, double y, @Nullable I18NString name) {
+    this.x = x;
+    this.y = y;
+    this.name = Objects.requireNonNullElse(name, NO_NAME);
   }
 
   /* PUBLIC METHODS */
@@ -158,9 +162,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /** Every vertex has a label which is globally unique. */
-  public String getLabel() {
-    return label;
-  }
+  public abstract VertexLabel getLabel();
 
   public Coordinate getCoordinate() {
     return new Coordinate(getX(), getY());

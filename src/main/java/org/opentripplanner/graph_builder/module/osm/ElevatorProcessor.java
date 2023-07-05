@@ -84,10 +84,9 @@ class ElevatorProcessor {
       for (OSMLevel level : levels) {
         // get the node to build the elevator out from
         OsmVertex sourceVertex = vertices.get(level);
-        String sourceVertexLabel = sourceVertex.getLabel();
         String levelName = level.longName;
 
-        createElevatorVertices(graph, onboardVertices, sourceVertex, sourceVertexLabel, levelName);
+        createElevatorVertices(graph, onboardVertices, sourceVertex, levelName);
       }
       int travelTime = parseDuration(node).orElse(-1);
 
@@ -121,15 +120,9 @@ class ElevatorProcessor {
       for (int i = 0; i < nodes.size(); i++) {
         Long node = nodes.get(i);
         var sourceVertex = vertexGenerator.intersectionNodes().get(node);
-        String sourceVertexLabel = sourceVertex.getLabel();
+        String sourceVertexLabel = sourceVertex.getLabel().toString();
         String levelName = elevatorWay.getId() + " / " + i;
-        createElevatorVertices(
-          graph,
-          onboardVertices,
-          sourceVertex,
-          elevatorWay.getId() + "_" + sourceVertexLabel,
-          levelName
-        );
+        createElevatorVertices(graph, onboardVertices, sourceVertex, levelName);
       }
 
       int travelTime = parseDuration(elevatorWay).orElse(-1);
@@ -151,24 +144,18 @@ class ElevatorProcessor {
     Graph graph,
     ArrayList<Vertex> onboardVertices,
     IntersectionVertex sourceVertex,
-    String sourceVertexLabel,
     String levelName
   ) {
     var factory = new VertexFactory(graph);
     ElevatorOffboardVertex offboardVertex = factory.elevatorOffboard(
       sourceVertex,
-      sourceVertexLabel,
       levelName
     );
 
     new FreeEdge(sourceVertex, offboardVertex);
     new FreeEdge(offboardVertex, sourceVertex);
 
-    ElevatorOnboardVertex onboardVertex = factory.elevatorOnboard(
-      sourceVertex,
-      sourceVertexLabel,
-      levelName
-    );
+    ElevatorOnboardVertex onboardVertex = factory.elevatorOnboard(sourceVertex, levelName);
 
     new ElevatorBoardEdge(offboardVertex, onboardVertex);
     new ElevatorAlightEdge(onboardVertex, offboardVertex, new NonLocalizedString(levelName));

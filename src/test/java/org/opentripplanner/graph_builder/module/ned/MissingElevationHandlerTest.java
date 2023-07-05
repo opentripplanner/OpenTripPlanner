@@ -13,6 +13,7 @@ import org.opentripplanner.framework.i18n.LocalizedStringFormat;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetElevationExtension;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -182,7 +183,7 @@ class MissingElevationHandlerTest {
   }
 
   private IntersectionVertex vertex(String A) {
-    return new IntersectionVertex(A, 0, 0);
+    return StreetModelForTest.intersectionVertex(A, 0, 0);
   }
 
   private StreetEdge edge(IntersectionVertex from, IntersectionVertex to, double length) {

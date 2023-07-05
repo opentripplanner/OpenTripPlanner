@@ -35,7 +35,7 @@ public class TransitStopVertex extends StationElementVertex {
    *              used.
    */
   TransitStopVertex(RegularStop stop, Set<TransitMode> modes) {
-    super(stop.getId().toString(), stop.getLon(), stop.getLat(), stop.getName());
+    super(stop.getId(), stop.getLon(), stop.getLat(), stop.getName());
     this.stop = stop;
     this.modes = modes != null ? modes : new HashSet<>();
     this.wheelchairAccessibility = stop.getWheelchairAccessibility();

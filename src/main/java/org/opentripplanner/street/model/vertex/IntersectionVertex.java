@@ -7,7 +7,7 @@ import org.opentripplanner.framework.lang.BitSetUtils;
 /**
  * Represents an ordinary location in space, typically an intersection.
  */
-public class IntersectionVertex extends StreetVertex {
+public abstract class IntersectionVertex extends StreetVertex {
 
   private static final int HIGHWAY_TRAFFIC_LIGHT_INDEX = 0;
 
@@ -19,42 +19,19 @@ public class IntersectionVertex extends StreetVertex {
    */
   private final short flags;
 
-  //For testing only
-  public IntersectionVertex(String label, double x, double y, String name) {
-    this(label, x, y, new NonLocalizedString(name), false, false);
-  }
-
   public IntersectionVertex(
-    String label,
     double x,
     double y,
     I18NString name,
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(label, x, y, name);
+    super(x, y, name);
     flags = initFlags(hasHighwayTrafficLight, hasCrossingTrafficLight);
   }
 
-  public IntersectionVertex(String label, double x, double y) {
-    this(label, x, y, new NonLocalizedString(label), false, false);
-  }
-
-  public IntersectionVertex(
-    String label,
-    double x,
-    double y,
-    boolean hasHighwayTrafficLight,
-    boolean hasCrossingTrafficLight
-  ) {
-    this(
-      label,
-      x,
-      y,
-      new NonLocalizedString(label),
-      hasHighwayTrafficLight,
-      hasCrossingTrafficLight
-    );
+  public IntersectionVertex(double x, double y) {
+    this(x, y, null, false, false);
   }
 
   /**
