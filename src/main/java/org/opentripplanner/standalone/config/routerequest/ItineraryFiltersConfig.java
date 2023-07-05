@@ -154,6 +154,25 @@ non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are d
           )
           .asLinearFunction(dft.nonTransitGeneralizedCostLimit())
       )
+      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+        c
+          .of("removeTransitWithHigherCostThanBestOnStreetOnly")
+          .since(V2_1)
+          .summary(
+            "Limit function for generalized-cost computed from non-transit itineries for transit itineraries."
+          )
+          .description(
+            """
+The max-limit is applied to itineraries with transit *legs*, and only itineraries
+without transit legs are considered when calculating the minimum cost. The smallest
+generalized-cost value is used as input to the function. The function is used to calculate a
+*max-limit*. The max-limit is then used to filter *transit* itineraries by
+*generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
+set.
+"""
+          )
+          .asLinearFunction(dft.removeTransitWithHigherCostThanBestOnStreetOnly())
+      )
       .withBikeRentalDistanceRatio(
         c
           .of("bikeRentalDistanceRatio")

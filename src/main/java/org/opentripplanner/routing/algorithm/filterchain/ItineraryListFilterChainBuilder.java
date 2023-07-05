@@ -56,7 +56,7 @@ public class ItineraryListFilterChainBuilder {
   private ItineraryFilterDebugProfile debug = ItineraryFilterDebugProfile.OFF;
   private int maxNumberOfItineraries = NOT_SET;
   private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
-  private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
+  private DoubleAlgorithmFunction removeTransitWithHigherCostThanBestOnStreetOnly;
   private boolean removeWalkAllTheWayResults;
   private boolean sameFirstOrLastTripFilter;
   private TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams;
@@ -193,7 +193,7 @@ public class ItineraryListFilterChainBuilder {
    * exist.
    */
   public ItineraryListFilterChainBuilder withRemoveTransitWithHigherCostThanBestOnStreetOnly(
-    boolean value
+    DoubleAlgorithmFunction value
   ) {
     this.removeTransitWithHigherCostThanBestOnStreetOnly = value;
     return this;
@@ -337,6 +337,17 @@ public class ItineraryListFilterChainBuilder {
       );
     }
 
+    // Filter transit itineraries by comparing against non-transit using generalized-cost
+    if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
+      filters.add(
+        new DeletionFlaggingFilter(
+          new RemoveTransitIfStreetOnlyIsBetterFilter(
+            removeTransitWithHigherCostThanBestOnStreetOnly
+          )
+        )
+      );
+    }
+
     // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
     // remove elements/ based on the given itinerary properties - not considering other
     // itineraries. This may remove itineraries in the "groupBy" filters that are considered
@@ -347,10 +358,6 @@ public class ItineraryListFilterChainBuilder {
     // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
     // what we want, since both itineraries are none optimal.
     {
-      if (removeTransitWithHigherCostThanBestOnStreetOnly) {
-        filters.add(new DeletionFlaggingFilter(new RemoveTransitIfStreetOnlyIsBetterFilter()));
-      }
-
       if (removeWalkAllTheWayResults) {
         filters.add(new DeletionFlaggingFilter(new RemoveWalkOnlyFilter()));
       }
