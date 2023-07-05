@@ -194,13 +194,15 @@ permanently from OTP2, but may require some development to support valid importa
 - `boardSlackForMode` How much time ride a vehicle takes for each given mode. Since 2.0
 - `carPickupCost` and `carPickupTime`. Add a cost/time for CarPickup changes when a pickup or drop
   off takes place. Since 2.1
-- `maxAccessEgressDurationForMode` Limit access/egress per street mode. Since 2.2
-  - This was called `maxAccessEgressDurationSecondsForMode` between 2.0 and 2.2
 - `maxDirectStreetDurationForMode` Limit direct route duration per street mode. Since 2.2
 - `parkAndRideDurationRatio` Filter for park and ride with long walk. Since 2.1
 - `requiredVehicleParkingTags` and `bannedVehicleParkingTags`. Since 2.1
 - `searchWindow` Limit the departure window or arrival window for the routing search. Since 2.0
 - `stairsTimeFactor` Add a penalty to the time it takes to walk up and down stairs. Since 2.1
+- `accessEgress` Access/egress routing parameters are collected into this group in 2.4. Previous
+  parameters were `maxAccessEgressDurationSecondsForMode`, `maxAccessEgressDurationForMode`,
+  and `maxAccessEgressDuration` in versions 2.0 - 2.3. New parameter , `maxStopCount` was introduced in
+  version 2.4.
 
 #### These parameters are no longer supported
 

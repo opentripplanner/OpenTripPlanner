@@ -485,8 +485,10 @@ HTTP headers to add to the request. Any header key, value can be inserted.
     "transitReluctanceForMode" : {
       "RAIL" : 0.85
     },
-    "maxAccessEgressDurationForMode" : {
-      "BIKE_RENTAL" : "20m"
+    "accessEgress" : {
+      "maxDurationForMode" : {
+        "BIKE_RENTAL" : "20m"
+      }
     },
     "itineraryFilters" : {
       "transitGeneralizedCostLimit" : {

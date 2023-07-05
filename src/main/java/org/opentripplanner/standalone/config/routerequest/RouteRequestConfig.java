@@ -468,6 +468,11 @@ ferries, where the check-in process needs to be done in good time before ride.
 
   private static void mapStreetPreferences(NodeAdapter c, StreetPreferences.Builder builder) {
     var dft = builder.original();
+    NodeAdapter accessEgress = c
+      .of("accessEgress")
+      .since(V2_4)
+      .summary("Parameters for access and egress routing.")
+      .asObject();
     builder
       .withTurnReluctance(
         c
@@ -517,8 +522,8 @@ ferries, where the check-in process needs to be done in good time before ride.
       })
       .withAccessEgressPenalty(
         // The default value is NO-PENALTY and is not configurable
-        c
-          .of("accessEgressPenalty")
+        accessEgress
+          .of("penalty")
           .since(V2_4)
           .summary("Penalty for access/egress by street mode.")
           .description(
@@ -546,9 +551,9 @@ ferries, where the check-in process needs to be done in good time before ride.
           .asEnumMap(StreetMode.class, TimeAndCostPenaltyMapper::map)
       )
       .withMaxAccessEgressDuration(
-        c
-          .of("maxAccessEgressDuration")
-          .since(V2_1)
+        accessEgress
+          .of("maxDuration")
+          .since(V2_4)
           .summary("This is the maximum duration for access/egress for street searches.")
           .description(
             """
@@ -560,9 +565,9 @@ do not exist.
 """
           )
           .asDuration(dft.maxAccessEgressDuration().defaultValue()),
-        c
-          .of("maxAccessEgressDurationForMode")
-          .since(V2_1)
+        accessEgress
+          .of("maxDurationForMode")
+          .since(V2_4)
           .summary("Limit access/egress per street mode.")
           .description(
             """
@@ -573,9 +578,9 @@ do not exist.
           .asEnumMap(StreetMode.class, Duration.class)
       )
       .withMaxAccessEgressStopCount(
-        c
-          .of("maxAccessEgressStopCount")
-          .since(V2_2)
+        accessEgress
+          .of("maxStopCount")
+          .since(V2_4)
           .summary("Maximal number of stops collected in access/egress routing")
           .description(
             """
