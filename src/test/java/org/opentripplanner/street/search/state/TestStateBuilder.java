@@ -17,11 +17,14 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
+import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
@@ -134,6 +137,25 @@ public class TestStateBuilder {
       EdgeTraverser
         .traverseEdges(currentState, List.of(link, boardEdge, hopEdge, alightEdge))
         .orElseThrow();
+    return this;
+  }
+
+  /**
+   * Add a state that arrives at a transit stop.
+   */
+  public TestStateBuilder stop() {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var to = new TransitStopVertexBuilder()
+      .withStop(TransitModelForTest.stopForTest("stop", count, count))
+      .build();
+
+    var edge = new StreetTransitStopLink(from, to);
+    var states = edge.traverse(currentState);
+    if (states.length != 1) {
+      throw new IllegalStateException("Only single state transitions are supported.");
+    }
+    currentState = states[0];
     return this;
   }
 

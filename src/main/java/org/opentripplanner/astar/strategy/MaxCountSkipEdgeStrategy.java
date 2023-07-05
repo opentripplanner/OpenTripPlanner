@@ -14,19 +14,19 @@ public class MaxCountSkipEdgeStrategy<
   implements SkipEdgeStrategy<State, Edge> {
 
   private final int maxCount;
-  private final Function<Object, Boolean> acceptVertex;
+  private final Function<State, Boolean> shouldIncreaseCount;
 
   private int visited;
 
-  public MaxCountSkipEdgeStrategy(int count, Function<Object, Boolean> acceptVertex) {
+  public MaxCountSkipEdgeStrategy(int count, Function<State, Boolean> shouldIncreaseCount) {
     this.maxCount = count;
-    this.acceptVertex = acceptVertex;
+    this.shouldIncreaseCount = shouldIncreaseCount;
     this.visited = 0;
   }
 
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
-    if (this.acceptVertex.apply(current.getVertex())) {
+    if (this.shouldIncreaseCount.apply(current)) {
       visited++;
     }
     return visited > maxCount;
