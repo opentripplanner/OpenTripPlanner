@@ -624,7 +624,8 @@ without transit legs are considered when calculating the minimum cost. The small
 generalized-cost value is used as input to the function. The function is used to calculate a
 *max-limit*. The max-limit is then used to filter *transit* itineraries by
 *generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
-set.
+	    set. Walking is handled with a different logic: if a transit itinerary has more walking than
+	    a plain walk itinerary, it will be removed even if the cost limit function would keep it.
 
 
 <h3 id="rd_if_transitGeneralizedCostLimit">transitGeneralizedCostLimit</h3>
@@ -930,6 +931,8 @@ include stairs as a last result.
         "costLimitFunction" : "900 + 1.5 x",
         "intervalRelaxFactor" : 0.4
       },
+      "nonTransitGeneralizedCostLimit" : "400 + 1.5x",
+      "removeTransitWithHigherCostThanBestOnStreetOnly" : "60 + 1.3x",
       "bikeRentalDistanceRatio" : 0.3,
       "accessibilityScore" : true,
       "minBikeParkingDistance" : 300
