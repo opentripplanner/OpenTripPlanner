@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - dev-2.x
-      - vertex-labels
 
 jobs:
   perf-test:
@@ -48,7 +47,7 @@ jobs:
           - location: baden-wuerttemberg # German state of Baden-Württemberg: https://en.wikipedia.org/wiki/Baden-W%C3%BCrttemberg
             iterations: 1
             jfr-delay: "50s"
-            profile: core
+            profile: extended
 
           - location: switzerland
             iterations: 1
