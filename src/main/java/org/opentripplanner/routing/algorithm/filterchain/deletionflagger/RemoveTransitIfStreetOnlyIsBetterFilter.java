@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 
 /**
@@ -31,6 +32,14 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletio
     return TAG;
   }
 
+  private double getWalkDistance(Itinerary it) {
+    return it
+      .getStreetLegs()
+      .filter(l -> l.isWalkingLeg())
+      .mapToDouble(Leg::getDistanceMeters)
+      .sum();
+  }
+
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     // Find the best walk-all-the-way option
@@ -47,10 +56,33 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletio
     final double limit = costLimitFunction.calculate(minStreetCost.getAsDouble());
 
     // Filter away itineraries that have higher cost than limit cost computed above
-    return itineraries
+    List<Itinerary> filtered = itineraries
       .stream()
       .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCost() >= limit)
       .collect(Collectors.toList());
+
+    // Filter the most common silly itinerary case: transit itinerary has more walking than plain walk itinerary
+    // This never makes sense
+    OptionalDouble walkDistance = itineraries
+      .stream()
+      .filter(Itinerary::isWalkingAllTheWay)
+      .mapToDouble(Itinerary::distanceMeters)
+      .min();
+
+    if (walkDistance.isEmpty()) {
+      return filtered;
+    }
+    final double walkLimit = walkDistance.getAsDouble();
+    List<Itinerary> filtered2 = itineraries
+      .stream()
+      .filter(it -> getWalkDistance(it) > walkLimit)
+      .collect(Collectors.toList());
+
+    // remove duplicates
+    filtered2.removeAll(filtered);
+    filtered.addAll(filtered2);
+
+    return filtered;
   }
 
   @Override
