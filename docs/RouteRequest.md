@@ -76,6 +76,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [maxStopCount](#rd_accessEgress_maxStopCount)                                                     |        `integer`       | Maximal number of stops collected in access/egress routing                                                                                     | *Optional* | `0`                      |  2.4  |
 |    [maxDurationForMode](#rd_accessEgress_maxDurationForMode)                                         | `enum map of duration` | Limit access/egress per street mode.                                                                                                           | *Optional* |                          |  2.1  |
 |    [penalty](#rd_accessEgress_penalty)                                                               |  `enum map of object`  | Penalty for access/egress by street mode.                                                                                                      | *Optional* |                          |  2.4  |
+|       FLEXIBLE                                                                                       |        `object`        | NA                                                                                                                                             | *Optional* |                          |  2.4  |
+|          costFactor                                                                                  |        `double`        | A factor multiplied with the time-penalty to get the cost-penalty.                                                                             | *Optional* | `0.0`                    |  2.4  |
+|          [timePenalty](#rd_accessEgress_penalty_FLEXIBLE_timePenalty)                                |        `string`        | Penalty added to the time of a leg.                                                                                                            | *Optional* | `"0s + 0.00 t"`          |  2.4  |
 | [alightSlackForMode](#rd_alightSlackForMode)                                                         | `enum map of duration` | How much extra time should be given when alighting a vehicle for each given mode.                                                              | *Optional* |                          |  2.0  |
 | [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                             |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned.                                                              | *Optional* |                          |  2.1  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                           | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                               | *Optional* |                          |  2.0  |
@@ -453,6 +456,32 @@ The `coefficient` must be in range `[0.0, 10.0]`.
 The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
 time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
 extra cost, while 1.0 will add the same amount to both time and cost.
+
+
+<h3 id="rd_accessEgress_penalty_FLEXIBLE_timePenalty">timePenalty</h3>
+
+**Since version:** `2.4` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"0s + 0.00 t"`   
+**Path:** /routingDefaults/accessEgress/penalty/FLEXIBLE 
+
+Penalty added to the time of a leg.
+
+The time penalty is a linear function applied to the actual-time/duration of the leg. The time
+penalty consist of a `constant` and a `coefficient`. The penalty is not added to the actual
+time, like a slack. Instead, the penalty is *invisible* in the returned itinerary, but it is
+applied during routing.
+
+The penalty is a function of time(duration):
+```
+f(t) = a + b * t
+```
+where `a` is the constant time part, `b` is the time-coefficient. `f(t)` is the function to
+calculate the penalty-time. The penalty-time is added to the actual-time during routing. If
+`a=0s` and `b=0.0`, then the penalty is `0`(zero).
+
+Examples: `0s + 2.5t`, `10m + 0t` and `1h5m59s + 9.9t`
+
+The `constant` must be 0 or a positive duration.
+The `coefficient` must be in range `[0.0, 10.0]`.
 
 
 <h3 id="rd_alightSlackForMode">alightSlackForMode</h3>
@@ -919,8 +948,16 @@ include stairs as a last result.
       "RAIL" : 0.85
     },
     "accessEgress" : {
+      "maxDuration" : "45m",
       "maxDurationForMode" : {
         "BIKE_RENTAL" : "20m"
+      },
+      "maxStopCount" : 500,
+      "penalty" : {
+        "FLEXIBLE" : {
+          "timePenalty" : "2m + 1.1t",
+          "costFactor" : 1.7
+        }
       }
     },
     "itineraryFilters" : {
