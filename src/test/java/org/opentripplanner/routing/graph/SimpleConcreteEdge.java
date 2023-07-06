@@ -35,11 +35,6 @@ public class SimpleConcreteEdge extends Edge {
   }
 
   @Override
-  public LineString getGeometry() {
-    return null;
-  }
-
-  @Override
   public double getDistanceMeters() {
     return SphericalDistanceLibrary.distance(
       getFromVertex().getCoordinate(),

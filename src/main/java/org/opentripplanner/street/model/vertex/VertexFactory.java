@@ -72,7 +72,7 @@ public class VertexFactory {
   @Nonnull
   public IntersectionVertex intersection(String label, double longitude, double latitude) {
     return addToGraph(
-      new LabelledIntersectionVertex(label, longitude, latitude, null, false, false)
+      new LabelledIntersectionVertex(label, longitude, latitude, I18NString.of(label), false, false)
     );
   }
 

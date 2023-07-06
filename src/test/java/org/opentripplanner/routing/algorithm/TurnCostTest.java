@@ -126,11 +126,11 @@ public class TurnCostTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel());
-    assertEquals("main_2nd", states.get(2).getVertex().getLabel());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabel().toString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabel().toString());
+    assertEquals("main_2nd", states.get(2).getVertex().getLabel().toString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabel().toString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabel().toString());
 
     assertEquals(0, states.get(0).getElapsedTimeSeconds());
     assertEquals(50, states.get(1).getElapsedTimeSeconds()); // maple_main1 = 50
@@ -155,11 +155,11 @@ public class TurnCostTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel());
-    assertEquals("broad_1st", states.get(2).getVertex().getLabel());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabel().toString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabel().toString());
+    assertEquals("broad_1st", states.get(2).getVertex().getLabel().toString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabel().toString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabel().toString());
   }
 
   @Test
@@ -179,11 +179,11 @@ public class TurnCostTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel());
-    assertEquals("broad_1st", states.get(2).getVertex().getLabel());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabel().toString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabel().toString());
+    assertEquals("broad_1st", states.get(2).getVertex().getLabel().toString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabel().toString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabel().toString());
 
     assertEquals(0, states.get(0).getElapsedTimeSeconds());
     assertEquals(50, states.get(1).getElapsedTimeSeconds()); // maple_main1 = 50

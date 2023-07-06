@@ -85,7 +85,7 @@ public class StreetMatcherTest {
     List<Edge> match = matcher.match(geometry);
     assertNotNull(match);
     assertEquals(1, match.size());
-    assertEquals("56th_24th", match.get(0).getToVertex().getLabel());
+    assertEquals("56th_24th", match.get(0).getToVertex().getLabel().toString());
 
     geometry = geometry(-122.385689, 47.669484, -122.387384, 47.669470, -122.387588, 47.669325);
 
@@ -123,7 +123,7 @@ public class StreetMatcherTest {
     match = matcher.match(geometry);
     assertNotNull(match);
     assertEquals(4, match.size());
-    assertEquals("ballard_20th", match.get(3).getToVertex().getLabel());
+    assertEquals("ballard_20th", match.get(3).getToVertex().getLabel().toString());
   }
 
   private LineString geometry(double... ordinates) {

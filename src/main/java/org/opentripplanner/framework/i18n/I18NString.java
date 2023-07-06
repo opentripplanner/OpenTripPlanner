@@ -36,6 +36,9 @@ public interface I18NString {
     return value;
   }
 
+  /**
+   * Create an instance from a string.
+   */
   static I18NString of(String value) {
     return new NonLocalizedString(value);
   }

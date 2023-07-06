@@ -9,7 +9,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -20,7 +19,6 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 
 class ElevatorHopEdgeTest {
 
-  Graph graph = new Graph();
   Vertex from = new SimpleVertex("from", 0, 0);
   Vertex to = new SimpleVertex("to", 0, 0);
 

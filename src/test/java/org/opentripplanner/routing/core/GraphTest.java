@@ -32,7 +32,7 @@ public class GraphTest {
   @Test
   public void testAddVertex() {
     Vertex a = StreetModelForTest.intersectionVertex("A", 5, 5);
-    assertEquals(a.getLabel(), "A");
+    assertEquals(a.getLabel(), VertexLabel.string("A"));
   }
 
   @Test
