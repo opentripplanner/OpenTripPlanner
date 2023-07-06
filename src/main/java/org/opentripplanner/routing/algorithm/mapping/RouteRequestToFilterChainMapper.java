@@ -60,7 +60,7 @@ public class RouteRequestToFilterChainMapper {
       .withBikeRentalDistanceRatio(params.bikeRentalDistanceRatio())
       .withParkAndRideDurationRatio(params.parkAndRideDurationRatio())
       .withNonTransitGeneralizedCostLimit(params.nonTransitGeneralizedCostLimit())
-      .withRemoveTransitWithHigherCostThanBestOnStreetOnlyh(
+      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
         params.removeTransitWithHigherCostThanBestOnStreetOnly()
       )
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip())

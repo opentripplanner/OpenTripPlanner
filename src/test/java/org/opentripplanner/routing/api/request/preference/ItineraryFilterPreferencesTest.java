@@ -28,6 +28,10 @@ class ItineraryFilterPreferencesTest {
     RequestFunctions.createLinearFunction(3.5, 5.0),
     3.0
   );
+  private static final DoubleAlgorithmFunction TRANSIT_BEST_STREET_COST_LIMIT = RequestFunctions.createLinearFunction(
+    60,
+    1.3
+  );
 
   private final ItineraryFilterPreferences subject = ItineraryFilterPreferences
     .of()
@@ -42,6 +46,7 @@ class ItineraryFilterPreferencesTest {
     .withNonTransitGeneralizedCostLimit(NON_TRANSIT_GENERALIZED_COST_LIMIT)
     .withParkAndRideDurationRatio(PARK_AND_RIDE_DURATION_RATIO)
     .withTransitGeneralizedCostLimit(TRANSIT_GENERALIZED_COST_LIMIT)
+    .withRemoveTransitWithHigherCostThanBestOnStreetOnly(TRANSIT_BEST_STREET_COST_LIMIT)
     .build();
 
   @Test
@@ -133,7 +138,8 @@ class ItineraryFilterPreferencesTest {
       "minBikeParkingDistance: 2,000.0, " +
       "nonTransitGeneralizedCostLimit: f(x) = 4 + 5.0 x, " +
       "parkAndRideDurationRatio: 0.44, " +
-      "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=f(x) = 4 + 5.0 x, intervalRelaxFactor=3.0]" +
+      "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=f(x) = 4 + 5.0 x, intervalRelaxFactor=3.0], " +
+      "removeTransitWithHigherCostThanBestOnStreetOnly: f(x) = 60 + 1.3 x" +
       "}",
       subject.toString()
     );
