@@ -5,19 +5,18 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 
 public class ElevatorOnboardVertex extends StreetVertex {
 
-  private final Vertex sourceVertex;
+  private static final String LABEL_TEMPLATE = "elevator_onboard/%s/%s";
   private final String level;
-  private final VertexLabel label;
+  private final String label;
 
-  public ElevatorOnboardVertex(Vertex sourceVertex, VertexLabel label, @Nullable String level) {
+  public ElevatorOnboardVertex(Vertex sourceVertex, String label, @Nullable String level) {
     super(sourceVertex.getX(), sourceVertex.getY(), NonLocalizedString.ofNullable(level));
-    this.sourceVertex = sourceVertex;
     this.level = level;
     this.label = label;
   }
 
   @Override
   public VertexLabel getLabel() {
-    return VertexLabel.string("elevator_onboard/%s/%s".formatted(label, level));
+    return VertexLabel.string(LABEL_TEMPLATE.formatted(label, level));
   }
 }

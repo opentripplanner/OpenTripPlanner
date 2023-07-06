@@ -40,7 +40,7 @@ public class VertexFactory {
   @Nonnull
   public ElevatorOnboardVertex elevatorOnboard(
     Vertex sourceVertex,
-    VertexLabel label,
+    String label,
     String levelName
   ) {
     return addToGraph(new ElevatorOnboardVertex(sourceVertex, label, levelName));
@@ -49,7 +49,7 @@ public class VertexFactory {
   @Nonnull
   public ElevatorOffboardVertex elevatorOffboard(
     Vertex sourceVertex,
-    VertexLabel label,
+    String label,
     String levelName
   ) {
     return addToGraph(new ElevatorOffboardVertex(sourceVertex, label, levelName));

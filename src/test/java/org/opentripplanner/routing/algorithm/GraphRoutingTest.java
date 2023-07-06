@@ -164,8 +164,8 @@ public abstract class GraphRoutingTest {
         var boardLabel = String.format("%s-onboard", level);
         var alightLabel = String.format("%s-offboard", level);
 
-        var onboard = vertexFactory.elevatorOnboard(v, v.getLabel(), boardLabel);
-        var offboard = vertexFactory.elevatorOffboard(v, v.getLabel(), alightLabel);
+        var onboard = vertexFactory.elevatorOnboard(v, v.getLabel().toString(), boardLabel);
+        var offboard = vertexFactory.elevatorOffboard(v, v.getLabel().toString(), alightLabel);
 
         new FreeEdge(v, offboard);
         new FreeEdge(offboard, v);

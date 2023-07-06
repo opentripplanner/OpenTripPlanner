@@ -29,7 +29,6 @@ import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.VertexFactory;
-import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -261,12 +260,12 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOffboardVertex fromOffboardVertex = vertexFactory.elevatorOffboard(
       fromVertex,
-      VertexLabel.string(fromVertex.getLabel() + pathway.getId().toString()),
+      elevatorLabel(fromVertex, pathway),
       fromLevel.name().toString()
     );
     ElevatorOffboardVertex toOffboardVertex = vertexFactory.elevatorOffboard(
       toVertex,
-      VertexLabel.string(toVertex.getLabel() + pathway.getId().toString()),
+      elevatorLabel(toVertex, pathway),
       toLevel.name().toString()
     );
 
@@ -275,12 +274,12 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOnboardVertex fromOnboardVertex = vertexFactory.elevatorOnboard(
       fromVertex,
-      VertexLabel.string(fromVertex.getLabel() + pathway.getId().toString()),
+      elevatorLabel(fromVertex, pathway),
       fromLevel.name().toString()
     );
     ElevatorOnboardVertex toOnboardVertex = vertexFactory.elevatorOnboard(
       toVertex,
-      VertexLabel.string(toVertex.getLabel() + pathway.getId().toString()),
+      elevatorLabel(toVertex, pathway),
       toLevel.name().toString()
     );
 
@@ -316,6 +315,10 @@ public class AddTransitModelEntitiesToGraph {
         pathway.getTraversalTime()
       );
     }
+  }
+
+  private static String elevatorLabel(StationElementVertex fromVertex, Pathway pathway) {
+    return "%s_%s".formatted(fromVertex.getLabel(), pathway.getId());
   }
 
   private StopLevel getStopLevel(StationElementVertex vertex) {

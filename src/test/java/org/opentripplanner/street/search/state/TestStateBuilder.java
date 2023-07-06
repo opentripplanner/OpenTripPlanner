@@ -20,7 +20,6 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -142,7 +141,7 @@ public class TestStateBuilder {
   private static ElevatorOffboardVertex elevatorOffBoard(int count, String suffix) {
     return new ElevatorOffboardVertex(
       StreetModelForTest.intersectionVertex(count, count),
-      VertexLabel.string(suffix),
+      suffix,
       suffix
     );
   }
@@ -151,7 +150,7 @@ public class TestStateBuilder {
   private static ElevatorOnboardVertex elevatorOnBoard(int count, String suffix) {
     return new ElevatorOnboardVertex(
       StreetModelForTest.intersectionVertex(count, count),
-      VertexLabel.string(suffix),
+      suffix,
       suffix
     );
   }

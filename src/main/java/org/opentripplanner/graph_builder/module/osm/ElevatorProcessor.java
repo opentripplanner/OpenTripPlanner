@@ -27,7 +27,6 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
-import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,7 +90,7 @@ class ElevatorProcessor {
           graph,
           onboardVertices,
           sourceVertex,
-          sourceVertex.getLabel(),
+          sourceVertex.getLabel().toString(),
           levelName
         );
       }
@@ -133,7 +132,7 @@ class ElevatorProcessor {
           graph,
           onboardVertices,
           sourceVertex,
-          VertexLabel.string(elevatorWay.getId() + "_" + sourceVertexLabel),
+          elevatorWay.getId() + "_" + sourceVertexLabel,
           levelName
         );
       }
@@ -157,7 +156,7 @@ class ElevatorProcessor {
     Graph graph,
     ArrayList<Vertex> onboardVertices,
     IntersectionVertex sourceVertex,
-    VertexLabel label,
+    String label,
     String levelName
   ) {
     var factory = new VertexFactory(graph);
