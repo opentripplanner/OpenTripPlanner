@@ -7,16 +7,16 @@ import org.opentripplanner.transit.model.site.StationElement;
 
 public abstract class StationElementVertex extends Vertex {
 
-  private final VertexLabel label;
+  private final FeedScopedId id;
 
   protected StationElementVertex(FeedScopedId id, double x, double y, I18NString name) {
     super(x, y, name);
-    this.label = VertexLabel.string(id.toString());
+    this.id = id;
   }
 
   @Override
   public final VertexLabel getLabel() {
-    return label;
+    return VertexLabel.feedScopedId(id);
   }
 
   /** Get the corresponding StationElement */

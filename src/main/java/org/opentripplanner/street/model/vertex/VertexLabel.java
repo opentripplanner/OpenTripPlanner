@@ -15,7 +15,9 @@ public sealed interface VertexLabel {
     return new LevelledOsmNodeLabel(nodeId, level);
   }
 
-  static void elevator(StationElementVertex fromVertex, FeedScopedId id) {}
+  static VertexLabel feedScopedId(FeedScopedId id) {
+    return new FeedScopedIdLabel(id);
+  }
 
   record StringLabel(String value) implements VertexLabel {
     @Override
@@ -39,6 +41,13 @@ public sealed interface VertexLabel {
     @Override
     public String toString() {
       return TEMPLATE.formatted(nodeId, level);
+    }
+  }
+
+  record FeedScopedIdLabel(FeedScopedId id) implements VertexLabel {
+    @Override
+    public String toString() {
+      return id.toString();
     }
   }
 }
