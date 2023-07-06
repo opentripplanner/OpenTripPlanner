@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.vertex;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 
 public class LevelledOsmVertex extends OsmVertex {
+
   private final String level;
 
   public LevelledOsmVertex(OSMNode node, String level) {

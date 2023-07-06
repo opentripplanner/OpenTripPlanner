@@ -87,7 +87,13 @@ class ElevatorProcessor {
         OsmVertex sourceVertex = vertices.get(level);
         String levelName = level.longName;
 
-        createElevatorVertices(graph, onboardVertices, sourceVertex, sourceVertex.getLabel(), levelName);
+        createElevatorVertices(
+          graph,
+          onboardVertices,
+          sourceVertex,
+          sourceVertex.getLabel(),
+          levelName
+        );
       }
       int travelTime = parseDuration(node).orElse(-1);
 

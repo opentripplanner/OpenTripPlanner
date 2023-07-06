@@ -9,7 +9,7 @@ public class ElevatorOnboardVertex extends StreetVertex {
   private final String level;
   private final VertexLabel label;
 
-  public ElevatorOnboardVertex(Vertex sourceVertex, VertexLabel label, @Nullable  String level) {
+  public ElevatorOnboardVertex(Vertex sourceVertex, VertexLabel label, @Nullable String level) {
     super(sourceVertex.getX(), sourceVertex.getY(), NonLocalizedString.ofNullable(level));
     this.sourceVertex = sourceVertex;
     this.level = level;

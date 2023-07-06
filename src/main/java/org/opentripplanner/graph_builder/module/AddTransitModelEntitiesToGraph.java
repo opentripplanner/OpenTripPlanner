@@ -29,6 +29,7 @@ import org.opentripplanner.street.model.vertex.TransitPathwayNodeVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -260,11 +261,13 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOffboardVertex fromOffboardVertex = vertexFactory.elevatorOffboard(
       fromVertex,
-      fromVertex.getLabel(), fromLevel.name().toString()
+      VertexLabel.string(fromVertex.getLabel() + pathway.getId().toString()),
+      fromLevel.name().toString()
     );
     ElevatorOffboardVertex toOffboardVertex = vertexFactory.elevatorOffboard(
       toVertex,
-      toVertex.getLabel(), toLevel.name().toString()
+      VertexLabel.string(toVertex.getLabel() + pathway.getId().toString()),
+      toLevel.name().toString()
     );
 
     PathwayEdge.lowCost(fromVertex, fromOffboardVertex, fromVertex.getName(), PathwayMode.ELEVATOR);
@@ -272,12 +275,12 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOnboardVertex fromOnboardVertex = vertexFactory.elevatorOnboard(
       fromVertex,
-      fromVertex.getLabel(),
+      VertexLabel.string(fromVertex.getLabel() + pathway.getId().toString()),
       fromLevel.name().toString()
     );
     ElevatorOnboardVertex toOnboardVertex = vertexFactory.elevatorOnboard(
       toVertex,
-      toVertex.getLabel(),
+      VertexLabel.string(toVertex.getLabel() + pathway.getId().toString()),
       toLevel.name().toString()
     );
 

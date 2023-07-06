@@ -141,7 +141,10 @@ public class Graph implements Serializable {
       if (old == v) {
         LOG.error("repeatedly added the same vertex: {}", v);
       } else {
-        LOG.error("duplicate vertex label in graph (added vertex to graph anyway): {}", v.getLabel());
+        LOG.error(
+          "duplicate vertex label in graph (added vertex to graph anyway): {}",
+          v.getLabel()
+        );
       }
     }
   }
