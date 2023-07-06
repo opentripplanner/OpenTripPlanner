@@ -20,7 +20,6 @@ import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
-import org.opentripplanner.street.model.vertex.VertexLabel;
 
 /**
  * Tracks the generation of vertices and returns an existing instance if a vertex is encountered
@@ -29,7 +28,6 @@ import org.opentripplanner.street.model.vertex.VertexLabel;
 class VertexGenerator {
 
   private static final String nodeLabelFormat = "osm:node:%d";
-  private static final String levelnodeLabelFormat = nodeLabelFormat + ":level:%s";
 
   private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
 

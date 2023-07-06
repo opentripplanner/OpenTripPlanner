@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.edge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,7 +11,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -19,8 +19,8 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 
 class ElevatorHopEdgeTest {
 
-  Vertex from = new SimpleVertex("from", 0, 0);
-  Vertex to = new SimpleVertex("to", 0, 0);
+  Vertex from = intersectionVertex(0, 0);
+  Vertex to = intersectionVertex(1, 1);
 
   static Stream<Arguments> noTraverse = Stream
     .of(Accessibility.NO_INFORMATION, Accessibility.NOT_POSSIBLE)
