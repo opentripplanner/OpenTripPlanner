@@ -11,7 +11,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.ZipStreamDataSourceDecorator;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
 
 /**
  * This data store accesses files in read-only mode over HTTPS.
@@ -73,6 +73,8 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
   }
 
   protected List<Header> getHttpHeaders(URI uri) {
-    return HttpUtils.getHeaders(uri, HTTP_HEAD_REQUEST_TIMEOUT, Map.of());
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+      return otpHttpClient.getHeaders(uri, HTTP_HEAD_REQUEST_TIMEOUT, Map.of());
+    }
   }
 }
