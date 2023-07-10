@@ -162,10 +162,26 @@ public class Graph implements Serializable {
     }
   }
 
-  /* Fetching vertices by label is convenient in tests and such, but avoid using in general. */
+  /**
+   * Fetching a vertex by its by label. This is convenient in tests and such, but avoid using in general.
+   *
+   * @see VertexLabel
+   */
   @VisibleForTesting
+  @Nullable
   public Vertex getVertex(VertexLabel label) {
     return vertices.get(label);
+  }
+
+  /**
+   * Converts the input to a string-based label and looks it up in the graph. Remember that there
+   * are other, non-string vertex labels for which this method will not work.
+   * @see VertexLabel
+   */
+  @VisibleForTesting
+  @Nullable
+  public Vertex getVertex(String label) {
+    return vertices.get(VertexLabel.string(label));
   }
 
   /**
