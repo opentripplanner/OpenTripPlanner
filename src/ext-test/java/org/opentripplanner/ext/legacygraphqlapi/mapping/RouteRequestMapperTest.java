@@ -103,6 +103,10 @@ class RouteRequestMapperTest implements PlanTestConstants {
       "[TransitFilterRequest{not: [SelectRequest{transportModes: [], routes: [trimet:555]}]}]"
     ),
     of(
+      Map.of("agencies", ""),
+      "[TransitFilterRequest{not: [SelectRequest{transportModes: []}]}]"
+    ),
+    of(
       Map.of("agencies", "trimet:666"),
       "[TransitFilterRequest{not: [SelectRequest{transportModes: [], agencies: [trimet:666]}]}]"
     ),
