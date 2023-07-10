@@ -11,7 +11,6 @@ import static org.opentripplanner.graph_builder.module.FakeGraph.link;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -44,8 +43,8 @@ public class LinkingTest {
     double x = -122.123;
     double y = 37.363;
     for (double delta = 0; delta <= 2; delta += 0.005) {
-      StreetVertex v0 = new IntersectionVertex(null, "zero", x, y);
-      StreetVertex v1 = new IntersectionVertex(null, "one", x + delta, y + delta);
+      StreetVertex v0 = new IntersectionVertex("zero", x, y);
+      StreetVertex v1 = new IntersectionVertex("one", x + delta, y + delta);
       LineString geom = gf.createLineString(
         new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
       );
@@ -62,7 +61,7 @@ public class LinkingTest {
       StreetEdge s1 = new StreetEdge(
         v1,
         v0,
-        (LineString) geom.reverse(),
+        geom.reverse(),
         "back",
         dist,
         StreetTraversalPermission.ALL,
@@ -73,14 +72,12 @@ public class LinkingTest {
       double splitVal = Math.random() * 0.95 + 0.025;
 
       SplitterVertex sv0 = new SplitterVertex(
-        null,
         "split",
         x + delta * splitVal,
         y + delta * splitVal,
         new NonLocalizedString("split")
       );
       SplitterVertex sv1 = new SplitterVertex(
-        null,
         "split",
         x + delta * splitVal,
         y + delta * splitVal,
@@ -123,8 +120,11 @@ public class LinkingTest {
     addRegularStopGrid(g2);
     link(g2, transitModel2);
 
+    var transitStopVertices = g1.getVerticesOfType(TransitStopVertex.class);
+    assertEquals(1350, transitStopVertices.size());
+
     // compare the linkages
-    for (TransitStopVertex ts : g1.getVerticesOfType(TransitStopVertex.class)) {
+    for (TransitStopVertex ts : transitStopVertices) {
       List<StreetTransitStopLink> stls1 = outgoingStls(ts);
       assertTrue(stls1.size() >= 1);
 
@@ -149,6 +149,6 @@ public class LinkingTest {
       .filter(StreetTransitStopLink.class::isInstance)
       .map(StreetTransitStopLink.class::cast)
       .sorted(Comparator.comparing(e -> e.getGeometry().getLength()))
-      .collect(Collectors.toList());
+      .toList();
   }
 }

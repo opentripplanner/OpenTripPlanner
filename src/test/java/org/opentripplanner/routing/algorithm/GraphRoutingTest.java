@@ -32,7 +32,6 @@ import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
-import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -43,6 +42,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -73,12 +73,16 @@ public abstract class GraphRoutingTest {
 
     private final Graph graph;
     private final TransitModel transitModel;
+    private final VertexFactory vertexFactory;
+    private final VehicleParkingHelper vehicleParkingHelper;
 
     protected Builder() {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
       graph = new Graph(deduplicator);
       transitModel = new TransitModel(stopModel, deduplicator);
+      vertexFactory = new VertexFactory(graph);
+      vehicleParkingHelper = new VehicleParkingHelper(graph);
     }
 
     public abstract void build();
@@ -101,7 +105,7 @@ public abstract class GraphRoutingTest {
 
     // -- Street network
     public IntersectionVertex intersection(String label, double latitude, double longitude) {
-      return new IntersectionVertex(graph, label, longitude, latitude);
+      return vertexFactory.intersection(label, longitude, latitude);
     }
 
     public StreetEdge street(
@@ -159,20 +163,8 @@ public abstract class GraphRoutingTest {
         var boardLabel = String.format("%s-onboard", level);
         var alightLabel = String.format("%s-offboard", level);
 
-        var onboard = new ElevatorOnboardVertex(
-          graph,
-          boardLabel,
-          v.getX(),
-          v.getY(),
-          new NonLocalizedString(boardLabel)
-        );
-        var offboard = new ElevatorOffboardVertex(
-          graph,
-          alightLabel,
-          v.getX(),
-          v.getY(),
-          new NonLocalizedString(alightLabel)
-        );
+        var onboard = vertexFactory.elevatorOnboard(v, boardLabel, boardLabel);
+        var offboard = vertexFactory.elevatorOffboard(v, alightLabel, alightLabel);
 
         new FreeEdge(v, offboard);
         new FreeEdge(offboard, v);
@@ -237,14 +229,13 @@ public abstract class GraphRoutingTest {
       double longitude,
       boolean noTransfers
     ) {
-      return new TransitStopVertexBuilder()
-        .withGraph(graph)
-        .withStop(stopEntity(id, latitude, longitude, noTransfers))
-        .build();
+      return vertexFactory.transitStop(
+        new TransitStopVertexBuilder().withStop(stopEntity(id, latitude, longitude, noTransfers))
+      );
     }
 
     public TransitEntranceVertex entrance(String id, double latitude, double longitude) {
-      return new TransitEntranceVertex(graph, entranceEntity(id, latitude, longitude));
+      return new TransitEntranceVertex(entranceEntity(id, latitude, longitude));
     }
 
     public StreetTransitEntranceLink link(StreetVertex from, TransitEntranceVertex to) {
@@ -339,7 +330,6 @@ public abstract class GraphRoutingTest {
       String network
     ) {
       var vertex = new VehicleRentalPlaceVertex(
-        graph,
         vehicleRentalStationEntity(id, latitude, longitude, network)
       );
       new VehicleRentalEdge(vertex, RentalVehicleType.getDefaultType(network).formFactor);
@@ -399,7 +389,7 @@ public abstract class GraphRoutingTest {
         .tags(List.of(tags))
         .build();
 
-      var vertices = VehicleParkingHelper.createVehicleParkingVertices(graph, vehicleParking);
+      var vertices = vehicleParkingHelper.createVehicleParkingVertices(vehicleParking);
       VehicleParkingHelper.linkVehicleParkingEntrances(vertices);
       vertices.forEach(v -> biLink(v.getParkingEntrance().getVertex(), v));
       return vehicleParking;

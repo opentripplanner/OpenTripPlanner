@@ -10,7 +10,9 @@ import com.azure.messaging.servicebus.administration.ServiceBusAdministrationAsy
 import com.azure.messaging.servicebus.administration.ServiceBusAdministrationClientBuilder;
 import com.azure.messaging.servicebus.administration.models.CreateSubscriptionOptions;
 import com.google.common.base.Preconditions;
-import java.io.IOException;
+import com.google.common.io.CharStreams;
+import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
@@ -21,10 +23,12 @@ import java.util.function.Consumer;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +50,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   private boolean isPrimed = false;
   private String subscriptionName;
 
-  protected String feedId;
+  protected final String feedId;
 
   /**
    * The URL used to fetch all initial updates
@@ -55,7 +59,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   /**
    * The timeout used when fetching historical data
    */
-  protected int timeout;
+  protected final int timeout;
 
   public AbstractAzureSiriUpdater(SiriAzureUpdaterParameters config, TransitModel transitModel) {
     this.configRef = config.configRef();
@@ -88,7 +92,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   }
 
   @Override
-  public void run() throws Exception {
+  public void run() {
     Objects.requireNonNull(topicName, "'topic' must be set");
     Objects.requireNonNull(serviceBusUrl, "'servicebus-url' must be set");
     Objects.requireNonNull(feedId, "'feedId' must be set");
@@ -178,6 +182,22 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
     return this.configRef;
   }
 
+  protected String fetchInitialData(URI uri) {
+    // Maybe put this in the config?
+    HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
+    String initialData;
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+      initialData =
+        otpHttpClient.getAndMap(
+          uri,
+          Duration.ofMillis(timeout),
+          rh.asMap(),
+          is -> CharStreams.toString(new InputStreamReader(is))
+        );
+    }
+    return initialData;
+  }
+
   SiriFuzzyTripMatcher fuzzyTripMatcher() {
     return fuzzyTripMatcher;
   }
@@ -221,7 +241,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
   protected abstract void initializeData(
     String url,
     Consumer<ServiceBusReceivedMessageContext> consumer
-  ) throws IOException, URISyntaxException;
+  ) throws URISyntaxException;
 
   /**
    * Make some sensible logging on error and if Service Bus is busy, sleep for some time before try again to get messages.

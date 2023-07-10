@@ -2,8 +2,6 @@ package org.opentripplanner.updater.vehicle_rental.datasources;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -13,7 +11,8 @@ import org.entur.gbfs.v2_3.gbfs.GBFS;
 import org.entur.gbfs.v2_3.gbfs.GBFSFeed;
 import org.entur.gbfs.v2_3.gbfs.GBFSFeedName;
 import org.entur.gbfs.v2_3.gbfs.GBFSFeeds;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.opentripplanner.updater.spi.UpdaterConstructionException;
 import org.slf4j.Logger;
@@ -124,14 +123,10 @@ public class GbfsFeedLoader {
 
   /* private static methods */
 
-  private static <T> T fetchFeed(URI uri, HttpHeaders httpHeaders, Class<T> clazz) {
-    try (InputStream is = HttpUtils.openInputStream(uri, httpHeaders.asMap());) {
-      if (is == null) {
-        LOG.warn("Failed to get data from url {}", uri);
-        return null;
-      }
-      return objectMapper.readValue(is, clazz);
-    } catch (IllegalArgumentException | IOException e) {
+  private <T> T fetchFeed(URI uri, HttpHeaders httpHeaders, Class<T> clazz) {
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+      return otpHttpClient.getAndMapAsJsonObject(uri, httpHeaders.asMap(), objectMapper, clazz);
+    } catch (OtpHttpClientException e) {
       LOG.warn("Error parsing vehicle rental feed from {}. Details: {}.", uri, e.getMessage(), e);
       return null;
     }
@@ -160,7 +155,7 @@ public class GbfsFeedLoader {
     }
 
     private boolean fetchData() {
-      T newData = GbfsFeedLoader.fetchFeed(url, httpHeaders, implementingClass);
+      T newData = fetchFeed(url, httpHeaders, implementingClass);
       if (newData == null) {
         LOG.warn("Could not fetch GBFS data for {}. Retrying.", url);
         nextUpdate = getCurrentTimeSeconds();

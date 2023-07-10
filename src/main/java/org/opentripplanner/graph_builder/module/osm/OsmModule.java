@@ -54,7 +54,7 @@ public class OsmModule implements GraphBuilderModule {
   private final VertexGenerator vertexGenerator;
   private final OsmDatabase osmdb;
 
-  public OsmModule(
+  OsmModule(
     Collection<OsmProvider> providers,
     Graph graph,
     DataImportIssueStore issueStore,

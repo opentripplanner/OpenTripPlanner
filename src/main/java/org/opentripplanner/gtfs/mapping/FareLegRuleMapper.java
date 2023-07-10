@@ -28,14 +28,14 @@ public final class FareLegRuleMapper {
         FareDistance fareDistance = createFareDistance(r);
 
         if (productForRule != null) {
-          return new FareLegRule(
-            r.getLegGroupId(),
-            r.getNetworkId(),
-            r.getFromAreaId(),
-            r.getToAreaId(),
-            fareDistance,
-            productForRule
-          );
+          return FareLegRule
+            .of(productForRule)
+            .withLegGroupId(r.getLegGroupId())
+            .withNetworkId(r.getNetworkId())
+            .withFromAreaId(r.getFromAreaId())
+            .withToAreaId(r.getToAreaId())
+            .withFareDistance(fareDistance)
+            .build();
         } else {
           issueStore.add(
             "UnknownFareProductId",
@@ -51,7 +51,11 @@ public final class FareLegRuleMapper {
   }
 
   private FareDistance createFareDistance(org.onebusaway.gtfs.model.FareLegRule fareLegRule) {
-    return switch (fareLegRule.getDistanceType()) {
+    final Integer distanceType = fareLegRule.getDistanceType();
+    if (distanceType == null) {
+      return null;
+    }
+    return switch (distanceType) {
       case 0 -> new FareDistance.Stops(
         fareLegRule.getMinDistance().intValue(),
         fareLegRule.getMaxDistance().intValue()

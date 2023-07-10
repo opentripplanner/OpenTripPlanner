@@ -2,11 +2,7 @@ package org.opentripplanner.ext.siri.updater.azure;
 
 import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
-import com.google.common.io.CharStreams;
 import jakarta.xml.bind.JAXBException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
@@ -19,13 +15,11 @@ import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
 import org.apache.http.client.utils.URIBuilder;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
-import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.alert.TransitAlertProvider;
-import org.opentripplanner.updater.spi.HttpHeaders;
 import org.rutebanken.siri20.util.SiriXml;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +73,7 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
 
   @Override
   protected void initializeData(String url, Consumer<ServiceBusReceivedMessageContext> consumer)
-    throws IOException, URISyntaxException {
+    throws URISyntaxException {
     if (url == null) {
       LOG.info("No history url set up for Siri Azure Sx Updater");
       return;
@@ -95,15 +89,8 @@ public class SiriAzureSXUpdater extends AbstractAzureSiriUpdater implements Tran
       LOG.info("Fetching initial Siri SX data from {}, timeout is {}ms", uri, timeout);
 
       final long t1 = System.currentTimeMillis();
-
-      // Maybe put this in the config?
-      HttpHeaders rh = HttpHeaders.of().acceptApplicationXML().build();
-
-      final InputStream data = HttpUtils.getData(uri, Duration.ofMillis(timeout), rh.asMap());
+      String string = fetchInitialData(uri);
       final long t2 = System.currentTimeMillis();
-
-      var reader = new InputStreamReader(data);
-      var string = CharStreams.toString(reader);
 
       LOG.info(
         "Fetching initial data - finished after {} ms, got {} bytes",
