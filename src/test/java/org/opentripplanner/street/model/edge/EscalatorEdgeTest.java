@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -18,8 +17,8 @@ import org.opentripplanner.test.support.VariableSource;
 class EscalatorEdgeTest {
 
   Graph graph = new Graph();
-  Vertex from = new SimpleVertex(graph, "A", 10, 10);
-  Vertex to = new SimpleVertex(graph, "B", 10.001, 10.001);
+  Vertex from = new SimpleVertex("A", 10, 10);
+  Vertex to = new SimpleVertex("B", 10.001, 10.001);
 
   static Stream<Arguments> args = Stream.of(Arguments.of(1.5, 150), Arguments.of(3.0, 300));
 
