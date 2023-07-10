@@ -67,7 +67,7 @@
         <netcdf4.version>5.5.3</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
         <logback.version>1.4.8</logback.version>
-        <lucene.version>9.5.0</lucene.version>
+        <lucene.version>9.7.0</lucene.version>
         <slf4j.version>2.0.7</slf4j.version>
         <netex-java-model.version>2.0.14</netex-java-model.version>
         <siri-java-model.version>1.21</siri-java-model.version>
@@ -604,7 +604,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.15.0</version>
+                <version>26.18.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -802,7 +802,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>32.0.1-jre</version>
+            <version>32.1.1-jre</version>
         </dependency>
         <!-- Jersey annotation-driven REST web services (JAX-RS implementation) -->
         <dependency>

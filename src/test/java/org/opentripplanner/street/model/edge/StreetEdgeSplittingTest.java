@@ -34,13 +34,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   @Test
   public void turnRestrictionFromEdgeSplit() {
-    var splitVtx = new SplitterVertex(
-      graph,
-      "Split_Vertex",
-      1.0,
-      0.0,
-      new NonLocalizedString("a name")
-    );
+    var splitVtx = new SplitterVertex("Split_Vertex", 1.0, 0.0, new NonLocalizedString("a name"));
 
     var splitResult = streetEdge1.splitDestructively(splitVtx);
     assertTrue(splitResult.head().getTurnRestrictions().isEmpty());
@@ -59,13 +53,7 @@ class StreetEdgeSplittingTest extends GraphRoutingTest {
 
   @Test
   public void turnRestrictionToEdgeSplit() {
-    var splitVtx = new SplitterVertex(
-      graph,
-      "Split_Vertex",
-      1.0,
-      1.0,
-      new NonLocalizedString("a name")
-    );
+    var splitVtx = new SplitterVertex("Split_Vertex", 1.0, 1.0, new NonLocalizedString("a name"));
 
     var splitResult = streetEdge2.splitDestructively(splitVtx);
     assertEquals(splitResult.head(), addedRestriction(streetEdge1).to);

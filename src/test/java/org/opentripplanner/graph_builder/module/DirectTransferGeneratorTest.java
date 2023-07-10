@@ -46,7 +46,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
  */
 class DirectTransferGeneratorTest extends GraphRoutingTest {
 
-  private static final Duration MAX_TRANSFER_DURATION = Duration.ofSeconds(3600);
+  private static final Duration MAX_TRANSFER_DURATION = Duration.ofHours(1);
   private TransitStopVertex S0, S11, S12, S13, S21, S22, S23;
   private StreetVertex V0, V11, V12, V13, V21, V22, V23;
 

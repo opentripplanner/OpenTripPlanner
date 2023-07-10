@@ -463,6 +463,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
+    "escalatorReluctance" : 1.5,
     "vehicleRental" : {
       "pickupCost" : 120,
       "dropOffTime" : 30,
