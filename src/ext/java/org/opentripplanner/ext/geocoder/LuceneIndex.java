@@ -140,9 +140,9 @@ public class LuceneIndex implements Serializable {
             addToIndex(
               directoryWriter,
               StreetVertex.class,
-              streetVertex.getLabel().toString(),
+              streetVertex.getLabelString(),
               streetVertex.getIntersectionName(),
-              streetVertex.getLabel().toString(),
+              streetVertex.getLabelString(),
               streetVertex.getLat(),
               streetVertex.getLon(),
               Set.of()

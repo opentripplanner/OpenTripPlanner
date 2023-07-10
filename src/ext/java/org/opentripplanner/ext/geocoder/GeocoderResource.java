@@ -132,7 +132,7 @@ public class GeocoderResource {
       .forServer(serverContext)
       .queryStreetVertices(query, autocomplete)
       .map(v ->
-        new SearchResult(v.getLat(), v.getLon(), stringifyStreetVertex(v), v.getLabel().toString())
+        new SearchResult(v.getLat(), v.getLon(), stringifyStreetVertex(v), v.getLabelString())
       )
       .collect(Collectors.toList());
   }

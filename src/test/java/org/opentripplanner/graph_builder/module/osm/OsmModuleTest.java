@@ -297,7 +297,7 @@ public class OsmModuleTest {
     graph
       .getVerticesOfType(VehicleParkingEntranceVertex.class)
       .stream()
-      .filter(v -> v.getLabel().toString().contains("centroid"))
+      .filter(v -> v.getLabelString().contains("centroid"))
       .forEach(v -> {
         assertFalse(v.getOutgoing().isEmpty());
         assertFalse(v.getIncoming().isEmpty());

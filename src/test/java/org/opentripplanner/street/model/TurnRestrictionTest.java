@@ -115,11 +115,11 @@ public class TurnRestrictionTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel().toString());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel().toString());
-    assertEquals("main_2nd", states.get(2).getVertex().getLabel().toString());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel().toString());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel().toString());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
+    assertEquals("main_2nd", states.get(2).getVertex().getLabelString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
   }
 
   @Test
@@ -145,11 +145,11 @@ public class TurnRestrictionTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel().toString());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel().toString());
-    assertEquals("main_2nd", states.get(2).getVertex().getLabel().toString());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel().toString());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel().toString());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
+    assertEquals("main_2nd", states.get(2).getVertex().getLabelString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
   }
 
   @Test
@@ -177,11 +177,11 @@ public class TurnRestrictionTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel().toString());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel().toString());
-    assertEquals("broad_1st", states.get(2).getVertex().getLabel().toString());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel().toString());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel().toString());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
+    assertEquals("broad_1st", states.get(2).getVertex().getLabelString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
   }
 
   /**

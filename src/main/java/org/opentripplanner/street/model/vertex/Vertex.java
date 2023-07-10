@@ -32,9 +32,6 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
   private static final I18NString NO_NAME = new NonLocalizedString("(no name provided)");
 
-  /**
-   * Short debugging name. This is a graph mathematical term as in https://en.wikipedia.org/wiki/Graph_labeling
-   */
   private final double x;
   private final double y;
 
@@ -161,8 +158,21 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return this.name.toString();
   }
 
-  /** Every vertex has a label which is globally unique. */
+  /**
+   *  Every vertex has a label which is globally unique.
+   * <p>
+   *  The name "label" is taken from graph theory: https://en.wikipedia.org/wiki/Graph_labeling
+   */
   public abstract VertexLabel getLabel();
+
+  /**
+   * Return the label of the vertex converted to a string.
+   *
+   * @see Vertex#getLabel()
+   */
+  public String getLabelString() {
+    return getLabel().toString();
+  }
 
   public Coordinate getCoordinate() {
     return new Coordinate(getX(), getY());

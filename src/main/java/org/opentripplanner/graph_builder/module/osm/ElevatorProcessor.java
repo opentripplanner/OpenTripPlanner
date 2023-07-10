@@ -90,7 +90,7 @@ class ElevatorProcessor {
           graph,
           onboardVertices,
           sourceVertex,
-          sourceVertex.getLabel().toString(),
+          sourceVertex.getLabelString(),
           levelName
         );
       }
@@ -126,7 +126,7 @@ class ElevatorProcessor {
       for (int i = 0; i < nodes.size(); i++) {
         Long node = nodes.get(i);
         var sourceVertex = vertexGenerator.intersectionNodes().get(node);
-        String sourceVertexLabel = sourceVertex.getLabel().toString();
+        String sourceVertexLabel = sourceVertex.getLabelString();
         String levelName = elevatorWay.getId() + " / " + i;
         createElevatorVertices(
           graph,

@@ -100,7 +100,7 @@ class DisplayVertex {
   }
 
   public String toString() {
-    String label = vertex.getLabel().toString();
+    String label = vertex.getLabelString();
     if (label.contains("osm node")) {
       label = vertex.getDefaultName();
     }
@@ -305,7 +305,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       new Comparator<>() {
         @Override
         public int compare(Vertex arg0, Vertex arg1) {
-          return arg0.getLabel().toString().compareTo(arg1.getLabel().toString());
+          return arg0.getLabelString().compareTo(arg1.getLabelString());
         }
       }
     );

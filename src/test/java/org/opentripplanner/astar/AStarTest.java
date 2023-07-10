@@ -108,13 +108,13 @@ public class AStarTest {
 
     assertEquals(7, states.size());
 
-    assertEquals("56th_24th", states.get(0).getVertex().getLabel().toString());
-    assertEquals("market_24th", states.get(1).getVertex().getLabel().toString());
-    assertEquals("market_ballard", states.get(2).getVertex().getLabel().toString());
-    assertEquals("market_22nd", states.get(3).getVertex().getLabel().toString());
-    assertEquals("market_leary", states.get(4).getVertex().getLabel().toString());
-    assertEquals("leary_vernon", states.get(5).getVertex().getLabel().toString());
-    assertEquals("leary_20th", states.get(6).getVertex().getLabel().toString());
+    assertEquals("56th_24th", states.get(0).getVertex().getLabelString());
+    assertEquals("market_24th", states.get(1).getVertex().getLabelString());
+    assertEquals("market_ballard", states.get(2).getVertex().getLabelString());
+    assertEquals("market_22nd", states.get(3).getVertex().getLabelString());
+    assertEquals("market_leary", states.get(4).getVertex().getLabelString());
+    assertEquals("leary_vernon", states.get(5).getVertex().getLabelString());
+    assertEquals("leary_20th", states.get(6).getVertex().getLabelString());
   }
 
   @Test
@@ -139,23 +139,23 @@ public class AStarTest {
 
     assertTrue(states.size() == 6 || states.size() == 7);
 
-    assertEquals("56th_24th", states.get(0).getVertex().getLabel().toString());
+    assertEquals("56th_24th", states.get(0).getVertex().getLabelString());
 
     int n;
     // we could go either way around the block formed by 56th, 22nd, market, and 24th.
     if (states.size() == 7) {
-      assertEquals("market_24th", states.get(1).getVertex().getLabel().toString());
-      assertEquals("market_ballard", states.get(2).getVertex().getLabel().toString());
+      assertEquals("market_24th", states.get(1).getVertex().getLabelString());
+      assertEquals("market_ballard", states.get(2).getVertex().getLabelString());
       n = 0;
     } else {
-      assertEquals("56th_22nd", states.get(1).getVertex().getLabel().toString());
+      assertEquals("56th_22nd", states.get(1).getVertex().getLabelString());
       n = -1;
     }
 
-    assertEquals("market_22nd", states.get(n + 3).getVertex().getLabel().toString());
-    assertEquals("market_leary", states.get(n + 4).getVertex().getLabel().toString());
-    assertEquals("leary_vernon", states.get(n + 5).getVertex().getLabel().toString());
-    assertEquals("leary_20th", states.get(n + 6).getVertex().getLabel().toString());
+    assertEquals("market_22nd", states.get(n + 3).getVertex().getLabelString());
+    assertEquals("market_leary", states.get(n + 4).getVertex().getLabelString());
+    assertEquals("leary_vernon", states.get(n + 5).getVertex().getLabelString());
+    assertEquals("leary_20th", states.get(n + 6).getVertex().getLabelString());
   }
 
   @Test
@@ -194,15 +194,15 @@ public class AStarTest {
 
     assertEquals(9, states.size());
 
-    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabel().toString());
-    assertEquals("shilshole_22nd", states.get(1).getVertex().getLabel().toString());
-    assertEquals("ballard_22nd", states.get(2).getVertex().getLabel().toString());
-    assertEquals("market_22nd", states.get(3).getVertex().getLabel().toString());
-    assertEquals("market_leary", states.get(4).getVertex().getLabel().toString());
-    assertEquals("market_russell", states.get(5).getVertex().getLabel().toString());
-    assertEquals("market_20th", states.get(6).getVertex().getLabel().toString());
-    assertEquals("56th_20th", states.get(7).getVertex().getLabel().toString());
-    assertEquals("near_56th_20th", states.get(8).getVertex().getLabel().toString());
+    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabelString());
+    assertEquals("shilshole_22nd", states.get(1).getVertex().getLabelString());
+    assertEquals("ballard_22nd", states.get(2).getVertex().getLabelString());
+    assertEquals("market_22nd", states.get(3).getVertex().getLabelString());
+    assertEquals("market_leary", states.get(4).getVertex().getLabelString());
+    assertEquals("market_russell", states.get(5).getVertex().getLabelString());
+    assertEquals("market_20th", states.get(6).getVertex().getLabelString());
+    assertEquals("56th_20th", states.get(7).getVertex().getLabelString());
+    assertEquals("near_56th_20th", states.get(8).getVertex().getLabelString());
   }
 
   @Test
@@ -242,15 +242,15 @@ public class AStarTest {
 
     assertEquals(9, states.size());
 
-    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabel().toString());
-    assertEquals("shilshole_22nd", states.get(1).getVertex().getLabel().toString());
-    assertEquals("ballard_22nd", states.get(2).getVertex().getLabel().toString());
-    assertEquals("market_22nd", states.get(3).getVertex().getLabel().toString());
-    assertEquals("market_leary", states.get(4).getVertex().getLabel().toString());
-    assertEquals("market_russell", states.get(5).getVertex().getLabel().toString());
-    assertEquals("market_20th", states.get(6).getVertex().getLabel().toString());
-    assertEquals("56th_20th", states.get(7).getVertex().getLabel().toString());
-    assertEquals("near_56th_20th", states.get(8).getVertex().getLabel().toString());
+    assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabelString());
+    assertEquals("shilshole_22nd", states.get(1).getVertex().getLabelString());
+    assertEquals("ballard_22nd", states.get(2).getVertex().getLabelString());
+    assertEquals("market_22nd", states.get(3).getVertex().getLabelString());
+    assertEquals("market_leary", states.get(4).getVertex().getLabelString());
+    assertEquals("market_russell", states.get(5).getVertex().getLabelString());
+    assertEquals("market_20th", states.get(6).getVertex().getLabelString());
+    assertEquals("56th_20th", states.get(7).getVertex().getLabelString());
+    assertEquals("near_56th_20th", states.get(8).getVertex().getLabelString());
   }
 
   @Test
@@ -280,7 +280,7 @@ public class AStarTest {
 
     for (Vertex v : targets) {
       GraphPath path = tree.getPath(v);
-      assertNotNull(path, "No path found for target " + v.getLabel().toString());
+      assertNotNull(path, "No path found for target " + v.getLabelString());
     }
   }
 

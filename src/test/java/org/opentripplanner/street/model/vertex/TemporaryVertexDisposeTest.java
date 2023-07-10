@@ -227,7 +227,7 @@ public class TemporaryVertexDisposeTest {
 
     @Override
     public String toString() {
-      return getLabel().toString();
+      return getLabelString();
     }
 
     @Override
