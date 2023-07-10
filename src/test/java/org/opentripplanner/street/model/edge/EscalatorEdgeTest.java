@@ -15,8 +15,6 @@ import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.test.support.VariableSource;
 
 class EscalatorEdgeTest {
-
-  Graph graph = new Graph();
   Vertex from = new SimpleVertex("A", 10, 10);
   Vertex to = new SimpleVertex("B", 10.001, 10.001);
 
