@@ -96,7 +96,7 @@ class ElevatorProcessor {
       createElevatorHopEdges(
         onboardVertices,
         wheelchair,
-        node.isTagTrue("bicycle"),
+        !node.isBicycleExplicitlyDenied(),
         levels.length,
         travelTime
       );
@@ -139,7 +139,7 @@ class ElevatorProcessor {
       createElevatorHopEdges(
         onboardVertices,
         wheelchair,
-        elevatorWay.isTagTrue("bicycle"),
+        !elevatorWay.isBicycleExplicitlyDenied(),
         levels,
         travelTime
       );

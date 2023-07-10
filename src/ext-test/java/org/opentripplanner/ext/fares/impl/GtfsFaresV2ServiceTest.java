@@ -126,14 +126,19 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
-      new FareLegRule(LEG_GROUP1, null, null, null, single),
-      new FareLegRule(LEG_GROUP1, null, null, OUTER_ZONE, singleToOuter),
-      new FareLegRule(LEG_GROUP1, null, OUTER_ZONE, null, singleFromOuter),
-      new FareLegRule(LEG_GROUP1, null, null, null, dayPass),
-      new FareLegRule(LEG_GROUP1, expressNetwork, null, null, expressPass),
-      new FareLegRule(LEG_GROUP1, localNetwork, null, null, localPass),
-      new FareLegRule(LEG_GROUP1, null, INNER_ZONE, OUTER_ZONE, innerToOuterZoneSingle),
-      new FareLegRule("another-leg-group", null, null, null, monthlyPass)
+      FareLegRule.of(single).withLegGroupId(LEG_GROUP1).build(),
+      FareLegRule.of(singleToOuter).withLegGroupId(LEG_GROUP1).withToAreaId(OUTER_ZONE).build(),
+      FareLegRule.of(singleFromOuter).withLegGroupId(LEG_GROUP1).withFromAreaId(OUTER_ZONE).build(),
+      FareLegRule.of(dayPass).withLegGroupId(LEG_GROUP1).build(),
+      FareLegRule.of(expressPass).withLegGroupId(LEG_GROUP1).withNetworkId(expressNetwork).build(),
+      FareLegRule.of(localPass).withLegGroupId(LEG_GROUP1).withNetworkId(localNetwork).build(),
+      FareLegRule
+        .of(innerToOuterZoneSingle)
+        .withLegGroupId(LEG_GROUP1)
+        .withFromAreaId(INNER_ZONE)
+        .withToAreaId(OUTER_ZONE)
+        .build(),
+      FareLegRule.of(monthlyPass).withLegGroupId("another-leg-group").build()
     ),
     List.of(),
     Multimaps.forMap(
@@ -248,10 +253,25 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     GtfsFaresV2Service service = new GtfsFaresV2Service(
       List.of(
-        new FareLegRule(LEG_GROUP2, null, INNER_ZONE, INNER_ZONE, freeTransferFromInnerToOuter),
-        new FareLegRule(LEG_GROUP3, null, OUTER_ZONE, OUTER_ZONE, single),
-        new FareLegRule(LEG_GROUP4, null, null, null, freeTransferSingle),
-        new FareLegRule(LEG_GROUP5, null, INNER_ZONE, OUTER_ZONE, singleToOuter)
+        FareLegRule
+          .of(freeTransferFromInnerToOuter)
+          .withLegGroupId(LEG_GROUP2)
+          .withFromAreaId(INNER_ZONE)
+          .withToAreaId(INNER_ZONE)
+          .build(),
+        FareLegRule
+          .of(single)
+          .withLegGroupId(LEG_GROUP3)
+          .withFromAreaId(OUTER_ZONE)
+          .withToAreaId(OUTER_ZONE)
+          .build(),
+        FareLegRule.of(freeTransferSingle).withLegGroupId(LEG_GROUP4).build(),
+        FareLegRule
+          .of(singleToOuter)
+          .withLegGroupId(LEG_GROUP5)
+          .withFromAreaId(INNER_ZONE)
+          .withToAreaId(OUTER_ZONE)
+          .build()
       ),
       List.of(
         new FareTransferRule(LEG_GROUP1, LEG_GROUP1, 1, null, freeTransfer),
@@ -339,36 +359,24 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     );
 
     List<FareLegRule> stopRules = List.of(
-      new FareLegRule(null, null, null, null, new FareDistance.Stops(0, 3), threeStopProduct),
-      new FareLegRule(null, null, null, null, new FareDistance.Stops(5, 10), fiveStopProduct),
-      new FareLegRule(null, null, null, null, new FareDistance.Stops(12, 20), twelveStopProduct)
+      FareLegRule.of(threeStopProduct).withFareDistance(new FareDistance.Stops(0, 3)).build(),
+      FareLegRule.of(fiveStopProduct).withFareDistance(new FareDistance.Stops(5, 10)).build(),
+      FareLegRule.of(twelveStopProduct).withFareDistance(new FareDistance.Stops(12, 20)).build()
     );
 
     List<FareLegRule> distanceRules = List.of(
-      new FareLegRule(
-        null,
-        null,
-        null,
-        null,
-        new LinearDistance(Distance.ofKilometers(7), Distance.ofKilometers(10)),
-        tenKmProduct
-      ),
-      new FareLegRule(
-        null,
-        null,
-        null,
-        null,
-        new LinearDistance(Distance.ofKilometers(3), Distance.ofKilometers(6)),
-        threeKmProduct
-      ),
-      new FareLegRule(
-        null,
-        null,
-        null,
-        null,
-        new LinearDistance(Distance.ofMeters(0), Distance.ofMeters(2000)),
-        twoKmProduct
-      )
+      FareLegRule
+        .of(tenKmProduct)
+        .withFareDistance(new LinearDistance(Distance.ofKilometers(7), Distance.ofKilometers(10)))
+        .build(),
+      FareLegRule
+        .of(threeKmProduct)
+        .withFareDistance(new LinearDistance(Distance.ofKilometers(3), Distance.ofKilometers(6)))
+        .build(),
+      FareLegRule
+        .of(twoKmProduct)
+        .withFareDistance(new LinearDistance(Distance.ofMeters(0), Distance.ofMeters(2000)))
+        .build()
     );
 
     @Test
