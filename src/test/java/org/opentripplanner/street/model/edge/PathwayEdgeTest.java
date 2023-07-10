@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -21,9 +20,8 @@ import org.opentripplanner.transit.model.site.PathwayMode;
 
 class PathwayEdgeTest {
 
-  Graph graph = new Graph();
-  Vertex from = new SimpleVertex(graph, "A", 10, 10);
-  Vertex to = new SimpleVertex(graph, "B", 10.001, 10.001);
+  Vertex from = new SimpleVertex("A", 10, 10);
+  Vertex to = new SimpleVertex("B", 10.001, 10.001);
 
   @Test
   void zeroLength() {

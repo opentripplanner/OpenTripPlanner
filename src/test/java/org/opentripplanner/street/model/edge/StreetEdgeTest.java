@@ -140,7 +140,7 @@ public class StreetEdgeTest {
    */
   @Test
   public void testTraverseModeSwitchBike() {
-    var vWithTrafficLight = new IntersectionVertex(null, "maple_1st", 2.0, 2.0, false, true);
+    var vWithTrafficLight = new IntersectionVertex("maple_1st", 2.0, 2.0, false, true);
     StreetEdge e0 = streetEdge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
     StreetEdge e1 = streetEdge(
       vWithTrafficLight,
@@ -177,7 +177,7 @@ public class StreetEdgeTest {
    */
   @Test
   public void testTraverseModeSwitchWalk() {
-    var vWithTrafficLight = new IntersectionVertex(null, "maple_1st", 2.0, 2.0, false, true);
+    var vWithTrafficLight = new IntersectionVertex("maple_1st", 2.0, 2.0, false, true);
     StreetEdge e0 = streetEdge(
       v0,
       vWithTrafficLight,
@@ -297,8 +297,8 @@ public class StreetEdgeTest {
     Coordinate c1 = new Coordinate(-122.575033, 45.456773);
     Coordinate c2 = new Coordinate(-122.576668, 45.451426);
 
-    StreetVertex v1 = new IntersectionVertex(null, "v1", c1.x, c1.y, null, false, false);
-    StreetVertex v2 = new IntersectionVertex(null, "v2", c2.x, c2.y, null, false, false);
+    StreetVertex v1 = new IntersectionVertex("v1", c1.x, c1.y, null, false, false);
+    StreetVertex v2 = new IntersectionVertex("v2", c2.x, c2.y, null, false, false);
 
     GeometryFactory factory = new GeometryFactory();
     LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });

@@ -18,11 +18,11 @@ public class StreetModelForTest {
 
   public static IntersectionVertex intersectionVertex(double lat, double lon) {
     var label = "%s_%s".formatted(lat, lon);
-    return new IntersectionVertex(null, label, lat, lon, label);
+    return new IntersectionVertex(label, lat, lon, label);
   }
 
   public static IntersectionVertex intersectionVertex(String label, double lat, double lon) {
-    return new IntersectionVertex(null, label, lat, lon, label);
+    return new IntersectionVertex(label, lat, lon, label);
   }
 
   public static StreetEdge streetEdge(StreetVertex vA, StreetVertex vB) {

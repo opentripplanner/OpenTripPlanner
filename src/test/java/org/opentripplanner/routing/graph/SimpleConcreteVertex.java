@@ -8,6 +8,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 public class SimpleConcreteVertex extends Vertex {
 
   public SimpleConcreteVertex(Graph g, String label, double lat, double lon) {
-    super(g, label, lon, lat);
+    super(label, lon, lat);
   }
 }

@@ -16,7 +16,6 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -30,8 +29,6 @@ import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuris
 
 public class TurnRestrictionTest {
 
-  private Graph graph;
-
   private Vertex topRight;
 
   private Vertex bottomLeft;
@@ -40,8 +37,6 @@ public class TurnRestrictionTest {
 
   @BeforeEach
   public void before() {
-    graph = new Graph();
-
     // Graph for a fictional grid city with turn restrictions
     StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
     StreetVertex maple2 = vertex("maple_2nd", 1.0, 2.0);
@@ -194,7 +189,7 @@ public class TurnRestrictionTest {
    ****/
 
   private StreetVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(graph, label, lat, lon);
+    return new IntersectionVertex(label, lat, lon);
   }
 
   /**

@@ -11,19 +11,15 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 class StreetTransitEntityLinkTest {
-
-  private static final Graph graph = new Graph(new Deduplicator());
 
   RegularStop inaccessibleStop = TransitModelForTest.stopForTest(
     "A:inaccessible",
@@ -74,9 +70,8 @@ class StreetTransitEntityLinkTest {
   }
 
   private State[] traverse(RegularStop stop, boolean onlyAccessible) {
-    var from = new SimpleVertex(graph, "A", 10, 10);
+    var from = new SimpleVertex("A", 10, 10);
     var to = new TransitStopVertexBuilder()
-      .withGraph(graph)
       .withStop(stop)
       .withModes(Set.of(TransitMode.RAIL))
       .build();
