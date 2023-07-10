@@ -7,9 +7,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -47,7 +45,7 @@ public class Graph implements Serializable {
   public final StreetNotesService streetNotesService = new StreetNotesService();
 
   /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
-  private final Map<VertexLabel, Vertex> vertices = new ConcurrentHashMap<>();
+  private final Set<Vertex> vertices = new HashSet<>();
 
   public final transient Deduplicator deduplicator;
 
@@ -136,16 +134,9 @@ public class Graph implements Serializable {
    * Add the given vertex to the graph.
    */
   public void addVertex(Vertex v) {
-    Vertex old = vertices.put(v.getLabel(), v);
-    if (old != null) {
-      if (old == v) {
-        LOG.error("repeatedly added the same vertex: {}", v);
-      } else {
-        LOG.error(
-          "duplicate vertex label in graph (added vertex to graph anyway): {}",
-          v.getLabel()
-        );
-      }
+    var alreadyContains = !vertices.add(v);
+    if (alreadyContains) {
+      LOG.error("duplicate vertex label in graph (added vertex to graph anyway): {}", v.getLabel());
     }
   }
 
@@ -170,7 +161,7 @@ public class Graph implements Serializable {
   @VisibleForTesting
   @Nullable
   public Vertex getVertex(VertexLabel label) {
-    return vertices.get(label);
+    return vertices.stream().filter(v -> v.getLabel().equals(label)).findAny().orElse(null);
   }
 
   /**
@@ -181,14 +172,14 @@ public class Graph implements Serializable {
   @VisibleForTesting
   @Nullable
   public Vertex getVertex(String label) {
-    return vertices.get(VertexLabel.string(label));
+    return getVertex(VertexLabel.string(label));
   }
 
   /**
    * Get all the vertices in the graph.
    */
   public Collection<Vertex> getVertices() {
-    return this.vertices.values();
+    return this.vertices;
   }
 
   public <T extends Vertex> List<T> getVerticesOfType(Class<T> cls) {
@@ -230,11 +221,11 @@ public class Graph implements Serializable {
   }
 
   public boolean containsVertex(Vertex v) {
-    return (v != null) && vertices.get(v.getLabel()) == v;
+    return (v != null) && vertices.contains(v);
   }
 
   public void remove(Vertex vertex) {
-    vertices.remove(vertex.getLabel());
+    vertices.remove(vertex);
   }
 
   public void removeIfUnconnected(Vertex v) {

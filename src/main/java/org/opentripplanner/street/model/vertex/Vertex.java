@@ -247,6 +247,16 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     rentalRestrictions = rentalRestrictions.remove(ext);
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    return obj instanceof Vertex v && v.getLabel().equals(getLabel());
+  }
+
+  @Override
+  public int hashCode() {
+    return getLabel().hashCode();
+  }
+
   /**
    * A static helper method to avoid repeated code for outgoing and incoming lists. Synchronization
    * must be handled by the caller, to avoid passing edge array pointers that may be invalidated.
