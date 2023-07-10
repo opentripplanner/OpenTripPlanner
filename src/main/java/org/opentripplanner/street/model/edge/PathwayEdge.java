@@ -90,10 +90,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
 
     if (time == 0) {
       if (distance > 0) {
-        time = (int) (distance * preferences.walk().speed());
+        time = (int) (distance / preferences.walk().speed());
       } else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
-        time = (int) (0.4 * Math.abs(steps) * preferences.walk().speed());
+        time = (int) (0.4 * Math.abs(steps) / preferences.walk().speed());
       }
     }
 

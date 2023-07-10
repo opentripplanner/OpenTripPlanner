@@ -111,7 +111,7 @@ class PathwayEdgeTest {
       null,
       new NonLocalizedString("pathway"),
       0,
-      100,
+      60,
       0,
       0,
       true,
@@ -119,8 +119,8 @@ class PathwayEdgeTest {
     );
 
     var state = assertThatEdgeIsTraversable(edge);
-    assertEquals(133, state.getElapsedTimeSeconds());
-    assertEquals(266, state.getWeight());
+    assertEquals(6, state.getElapsedTimeSeconds());
+    assertEquals(12, state.getWeight());
   }
 
   @Test
@@ -131,7 +131,7 @@ class PathwayEdgeTest {
       null,
       new NonLocalizedString("pathway"),
       0,
-      100,
+      60,
       0,
       0,
       false,
@@ -139,8 +139,8 @@ class PathwayEdgeTest {
     );
 
     var state = assertThatEdgeIsTraversable(edge, true);
-    assertEquals(133, state.getElapsedTimeSeconds());
-    assertEquals(6650.0, state.getWeight());
+    assertEquals(6, state.getElapsedTimeSeconds());
+    assertEquals(300.0, state.getWeight());
   }
 
   static Stream<Arguments> slopeCases = Stream.of(
@@ -194,18 +194,20 @@ class PathwayEdgeTest {
     var req = StreetSearchRequest.of().withWheelchair(wheelchair).withMode(StreetMode.WALK);
 
     req.withPreferences(preferences ->
-      preferences.withWheelchair(
-        WheelchairPreferences
-          .of()
-          .withTripOnlyAccessible()
-          .withStopOnlyAccessible()
-          .withElevatorOnlyAccessible()
-          .withInaccessibleStreetReluctance(25)
-          .withMaxSlope(0.08)
-          .withSlopeExceededReluctance(1)
-          .withStairsReluctance(25)
-          .build()
-      )
+      preferences
+        .withWalk(builder -> builder.withSpeed(10))
+        .withWheelchair(
+          WheelchairPreferences
+            .of()
+            .withTripOnlyAccessible()
+            .withStopOnlyAccessible()
+            .withElevatorOnlyAccessible()
+            .withInaccessibleStreetReluctance(25)
+            .withMaxSlope(0.08)
+            .withSlopeExceededReluctance(1)
+            .withStairsReluctance(25)
+            .build()
+        )
     );
 
     var afterTraversal = edge.traverse(new State(from, req.build()))[0];
