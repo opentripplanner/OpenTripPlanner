@@ -45,9 +45,7 @@ class IntrospectionTypeWiring {
     }
 
     return TypeRuntimeWiring
-      .newTypeWiring(
-        clazz.getSimpleName().replaceFirst("LegacyGraphQL", "").replaceAll("Impl$", "")
-      )
+      .newTypeWiring(clazz.getSimpleName().replaceAll("Impl$", ""))
       .dataFetchers(
         Arrays
           .stream(clazz.getDeclaredMethods())
