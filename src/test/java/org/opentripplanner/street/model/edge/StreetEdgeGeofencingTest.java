@@ -266,7 +266,8 @@ class StreetEdgeGeofencingTest {
       final State speculativeRenting = states[0];
       assertEquals(RENTING_FLOATING, speculativeRenting.getVehicleRentalState());
       assertEquals(BICYCLE, speculativeRenting.currentMode());
-      // null means that the
+      // null means that the vehicle has been rented speculatively and the rest of the backwards search
+      // needs to check if we really find a vehicle to pick up
       assertNull(speculativeRenting.getVehicleRentalNetwork());
       assertEquals(
         Set.of(NETWORK_TIER, NETWORK_BIRD),
