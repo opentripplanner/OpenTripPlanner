@@ -60,6 +60,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Empty stop_headsign will fall back to trip_headsign [#5205](https://github.com/opentripplanner/OpenTripPlanner/pull/5205)
 - Refactor HTTP client [#5213](https://github.com/opentripplanner/OpenTripPlanner/pull/5213)
 - Add escalator reluctance parameter [#5046](https://github.com/opentripplanner/OpenTripPlanner/pull/5046)
+- Handle reverse search when starting in no-drop-off zone [#5201](https://github.com/opentripplanner/OpenTripPlanner/pull/5201)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
