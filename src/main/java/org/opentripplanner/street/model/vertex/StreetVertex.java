@@ -1,9 +1,12 @@
 package org.opentripplanner.street.model.vertex;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.street.model.edge.Edge;
@@ -18,7 +21,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
 public abstract class StreetVertex extends Vertex {
 
   /** All locations for flex transit, which this vertex is part of */
-  public Set<AreaStop> areaStops;
+  private Set<AreaStop> areaStops;
 
   StreetVertex(String label, double x, double y, I18NString streetName) {
     super(label, x, y, streetName);
@@ -70,5 +73,30 @@ public abstract class StreetVertex extends Vertex {
 
   public boolean isEligibleForCarPickupDropoff() {
     return isConnectedToDriveableEdge() && isConnectedToWalkingEdge();
+  }
+
+  /**
+   * Returns the list of area stops that this vertex is inside of.
+   */
+  @Nonnull
+  public Set<AreaStop> areaStops() {
+    return Objects.requireNonNullElseGet(areaStops, Set::of);
+  }
+
+  /**
+   * Add a collection of area stops to this vertex.
+   */
+  public void addAreaStops(@Nonnull Collection<AreaStop> toBeAdded) {
+    Objects.requireNonNull(toBeAdded);
+
+    synchronized (this) {
+      if (areaStops == null) {
+        areaStops = Set.copyOf(toBeAdded);
+      } else {
+        var set = new HashSet<>(areaStops);
+        set.addAll(toBeAdded);
+        areaStops = Set.copyOf(set);
+      }
+    }
   }
 }

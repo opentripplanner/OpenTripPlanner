@@ -1,7 +1,9 @@
 package org.opentripplanner.ext.flex;
 
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import jakarta.inject.Inject;
-import java.util.HashSet;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.logging.ProgressTracker;
@@ -9,7 +11,6 @@ import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
@@ -44,36 +45,48 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
     );
 
     LOG.info(progress.startMessage());
-    // TODO: Make this into a parallel stream, first calculate vertices per location and then add them.
-    for (AreaStop areaStop : transitModel.getStopModel().listAreaStops()) {
-      for (Vertex vertx : streetIndex.getVerticesForEnvelope(
-        areaStop.getGeometry().getEnvelopeInternal()
-      )) {
-        // Check that the vertex is connected to both driveable and walkable edges
-        if (!(vertx instanceof StreetVertex streetVertex)) {
-          continue;
-        }
-        if (!((StreetVertex) vertx).isEligibleForCarPickupDropoff()) {
-          continue;
-        }
+    var results = transitModel
+      .getStopModel()
+      .listAreaStops()
+      .parallelStream()
+      .flatMap(areaStop -> {
+        var matches = streetIndex
+          .getVerticesForEnvelope(areaStop.getGeometry().getEnvelopeInternal())
+          .stream()
+          .filter(StreetVertex.class::isInstance)
+          .map(StreetVertex.class::cast)
+          .filter(StreetVertex::isEligibleForCarPickupDropoff)
+          .filter(vertx -> {
+            // The street index overselects, so need to check for exact geometry inclusion
+            Point p = GeometryUtils.getGeometryFactory().createPoint(vertx.getCoordinate());
+            return areaStop.getGeometry().intersects(p);
+          })
+          .map(vertx -> new MatchResult(vertx, areaStop));
+        // Keep lambda! A method-ref would cause incorrect class and line number to be logged
+        progress.step(m -> LOG.info(m));
+        return matches;
+      });
 
-        // The street index overselects, so need to check for exact geometry inclusion
-        Point p = GeometryUtils.getGeometryFactory().createPoint(vertx.getCoordinate());
-        if (areaStop.getGeometry().disjoint(p)) {
-          continue;
-        }
+    ImmutableMultimap<StreetVertex, AreaStop> mappedResults = results.collect(
+      ImmutableListMultimap.<MatchResult, StreetVertex, AreaStop>flatteningToImmutableListMultimap(
+        MatchResult::vertex,
+        mr -> Stream.of(mr.stop())
+      )
+    );
 
-        if (streetVertex.areaStops == null) {
-          streetVertex.areaStops = new HashSet<>();
-        }
+    mappedResults
+      .keySet()
+      .forEach(vertex -> {
+        vertex.addAreaStops(mappedResults.get(vertex));
+      });
 
-        streetVertex.areaStops.add(areaStop);
-      }
-      // Keep lambda! A method-ref would cause incorrect class and line number to be logged
-      progress.step(m -> LOG.info(m));
-    }
     LOG.info(progress.completeMessage());
   }
+
+  /**
+   * The result of an area stop being mapped to a vertex.
+   */
+  private record MatchResult(StreetVertex vertex, AreaStop stop) {}
 
   @Override
   public void checkInputs() {

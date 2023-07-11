@@ -4,7 +4,9 @@ import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATI
 
 import java.util.List;
 import java.util.stream.IntStream;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
@@ -46,6 +48,17 @@ public class TransitModelForTest {
     .withTimezone(TIME_ZONE_ID)
     .withUrl("https://www.agency.com")
     .build();
+
+  public static final Geometry FLEX_ZONE = GeometryUtils
+    .getGeometryFactory()
+    .createPolygon(
+      new Coordinate[] {
+        new Coordinate(1, 1),
+        new Coordinate(1, 2),
+        new Coordinate(2, 2),
+        new Coordinate(1, 1),
+      }
+    );
 
   public static FeedScopedId id(String id) {
     return new FeedScopedId(FEED_ID, id);
