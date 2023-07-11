@@ -1252,8 +1252,8 @@ enum RoutingErrorCode {
     The date specified is outside the range of data currently loaded into the system as it is too
     far into the future or the past.
 
-    The specific date range of your system is configurable but also depends on the input data
-    provided.
+    The specific date range of the system is configurable by an administrator and also depends on
+    the input data provided.
     """
     OUTSIDE_SERVICE_PERIOD
 
@@ -1276,8 +1276,8 @@ enum RoutingErrorCode {
     No stops are reachable from the start or end locations specified.
 
     You can try searching using a different access or egress mode, for example cycling instead of walking,
-    increase the walking/cycling/driving speed or change the system's configuration so that stops
-    further away are considered.
+    increase the walking/cycling/driving speed or have an administrator change the system's configuration
+    so that stops further away are considered.
     """
     NO_STOPS_IN_RANGE
 
