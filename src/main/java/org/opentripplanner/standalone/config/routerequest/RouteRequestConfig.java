@@ -814,6 +814,7 @@ high values.
       .withEscalatorReluctance(
         c
           .of("escalatorReluctance")
+          .since(V2_3)
           .summary(
             "A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time"
           )
