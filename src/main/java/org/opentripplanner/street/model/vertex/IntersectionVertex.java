@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.BitSetUtils;
@@ -22,7 +23,7 @@ public abstract class IntersectionVertex extends StreetVertex {
   public IntersectionVertex(
     double x,
     double y,
-    I18NString name,
+    @Nullable I18NString name,
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {

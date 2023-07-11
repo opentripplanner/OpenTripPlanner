@@ -15,7 +15,6 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
-import org.opentripplanner.street.model.vertex.ExitVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
@@ -70,9 +69,7 @@ class VertexGenerator {
       if ("motorway_junction".equals(highway)) {
         String ref = node.getTag("ref");
         if (ref != null) {
-          ExitVertex ev = vertexFactory.exit(nid, coordinate);
-          ev.setExitName(ref);
-          iv = ev;
+          iv = vertexFactory.exit(nid, coordinate, ref);
         }
       }
 

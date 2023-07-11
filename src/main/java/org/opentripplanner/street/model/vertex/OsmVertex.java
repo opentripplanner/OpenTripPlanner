@@ -1,8 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
-
 /**
  * A vertex coming from OpenStreetMap.
  * <p>
@@ -22,11 +19,10 @@ public class OsmVertex extends IntersectionVertex {
     double x,
     double y,
     long nodeId,
-    @Nullable I18NString name,
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(x, y, name, hasHighwayTrafficLight, hasCrossingTrafficLight);
+    super(x, y, null, hasHighwayTrafficLight, hasCrossingTrafficLight);
     this.nodeId = nodeId;
   }
 

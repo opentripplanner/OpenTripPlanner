@@ -102,8 +102,8 @@ public class VertexFactory {
   }
 
   @Nonnull
-  public ExitVertex exit(long nid, Coordinate coordinate) {
-    return addToGraph(new ExitVertex(coordinate.x, coordinate.y, nid));
+  public ExitVertex exit(long nid, Coordinate coordinate, String exitName) {
+    return addToGraph(new ExitVertex(coordinate.x, coordinate.y, nid, exitName));
   }
 
   @Nonnull
@@ -118,7 +118,6 @@ public class VertexFactory {
         coordinate.x,
         coordinate.y,
         node.getId(),
-        null,
         highwayTrafficLight,
         crossingTrafficLight
       )

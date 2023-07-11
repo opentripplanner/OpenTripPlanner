@@ -15,7 +15,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -30,7 +29,7 @@ import org.slf4j.LoggerFactory;
 public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serializable, Cloneable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
-  private static final I18NString NO_NAME = new NonLocalizedString("(no name provided)");
+  private static final I18NString NO_NAME = I18NString.of("(no name provided)");
 
   private final double x;
   private final double y;
