@@ -12,7 +12,6 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.i18n.LocalizedStringFormat;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetElevationExtension;
@@ -23,8 +22,6 @@ class MissingElevationHandlerTest {
 
   private static final DataImportIssueStore issueStore = DefaultDataImportIssueStore.NOOP;
 
-  private Graph graph;
-
   private StreetEdge AB, BC, CA, AB2, AD, ED, AF, FG, GB, FH, CJ, JI, AI, BJ;
 
   private Map<Vertex, Double> elevations;
@@ -33,7 +30,6 @@ class MissingElevationHandlerTest {
   void setUp() {
     IntersectionVertex A, B, C, D, E, F, G, H, I, J;
 
-    graph = new Graph();
     A = vertex("A");
     B = vertex("B");
     C = vertex("C");
@@ -186,7 +182,7 @@ class MissingElevationHandlerTest {
   }
 
   private IntersectionVertex vertex(String A) {
-    return new IntersectionVertex(graph, A, 0, 0);
+    return new IntersectionVertex(A, 0, 0);
   }
 
   private StreetEdge edge(IntersectionVertex from, IntersectionVertex to, double length) {

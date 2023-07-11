@@ -23,31 +23,30 @@ import org.opentripplanner.street.model.vertex.Vertex;
 public class GraphTest {
 
   @Test
-  public void testBasic() throws Exception {
+  public void testBasic() {
     Graph g = new Graph();
     assertNotNull(g);
   }
 
   @Test
-  public void testAddVertex() throws Exception {
-    Graph g = new Graph();
-    Vertex a = new IntersectionVertex(g, "A", 5, 5);
+  public void testAddVertex() {
+    Vertex a = new IntersectionVertex("A", 5, 5);
     assertEquals(a.getLabel(), "A");
   }
 
   @Test
-  public void testGetVertex() throws Exception {
-    Graph g = new Graph();
-    Vertex a = new IntersectionVertex(g, "A", 5, 5);
+  public void testGetVertex() {
+    var g = new Graph();
+    Vertex a = new IntersectionVertex("A", 5, 5);
+    g.addVertex(a);
     Vertex b = g.getVertex("A");
     assertEquals(a, b);
   }
 
   @Test
-  public void testAddEdge() throws Exception {
-    Graph g = new Graph();
-    Vertex a = new IntersectionVertex(g, "A", 5, 5);
-    Vertex b = new IntersectionVertex(g, "B", 6, 6);
+  public void testAddEdge() {
+    Vertex a = new IntersectionVertex("A", 5, 5);
+    Vertex b = new IntersectionVertex("B", 6, 6);
     FreeEdge ee = new FreeEdge(a, b);
     assertNotNull(ee);
   }
@@ -55,8 +54,12 @@ public class GraphTest {
   @Test
   public void testGetEdgesOneEdge() {
     Graph g = new Graph();
-    Vertex a = new IntersectionVertex(g, "A", 5, 5);
-    Vertex b = new IntersectionVertex(g, "B", 6, 6);
+    Vertex a = new IntersectionVertex("A", 5, 5);
+    Vertex b = new IntersectionVertex("B", 6, 6);
+
+    g.addVertex(a);
+    g.addVertex(b);
+
     FreeEdge ee = new FreeEdge(a, b);
 
     List<Edge> edges = new ArrayList<>(g.getEdges());
@@ -67,9 +70,13 @@ public class GraphTest {
   @Test
   public void testGetEdgesMultiple() {
     Graph g = new Graph();
-    Vertex a = new IntersectionVertex(g, "A", 5, 5);
-    Vertex b = new IntersectionVertex(g, "B", 6, 6);
-    Vertex c = new IntersectionVertex(g, "C", 3, 2);
+    Vertex a = new IntersectionVertex("A", 5, 5);
+    Vertex b = new IntersectionVertex("B", 6, 6);
+    Vertex c = new IntersectionVertex("C", 3, 2);
+
+    g.addVertex(a);
+    g.addVertex(b);
+    g.addVertex(c);
 
     Set<Edge> expectedEdges = new HashSet<>(4);
     expectedEdges.add(new FreeEdge(a, b));
@@ -85,9 +92,9 @@ public class GraphTest {
   @Test
   public void testGetStreetEdgesNone() {
     Graph g = new Graph();
-    Vertex a = new IntersectionVertex(g, "A", 5, 5);
-    Vertex b = new IntersectionVertex(g, "B", 6, 6);
-    Vertex c = new IntersectionVertex(g, "C", 3, 2);
+    Vertex a = new IntersectionVertex("A", 5, 5);
+    Vertex b = new IntersectionVertex("B", 6, 6);
+    Vertex c = new IntersectionVertex("C", 3, 2);
 
     Set<Edge> allEdges = new HashSet<>(4);
     allEdges.add(new FreeEdge(a, b));
@@ -102,9 +109,13 @@ public class GraphTest {
   @Test
   public void testGetStreetEdgesSeveral() {
     Graph g = new Graph();
-    StreetVertex a = new IntersectionVertex(g, "A", 5, 5);
-    StreetVertex b = new IntersectionVertex(g, "B", 6, 6);
-    StreetVertex c = new IntersectionVertex(g, "C", 3, 2);
+    StreetVertex a = new IntersectionVertex("A", 5, 5);
+    StreetVertex b = new IntersectionVertex("B", 6, 6);
+    StreetVertex c = new IntersectionVertex("C", 3, 2);
+
+    g.addVertex(a);
+    g.addVertex(b);
+    g.addVertex(c);
 
     Set<Edge> allStreetEdges = new HashSet<>(4);
     allStreetEdges.add(edge(a, b, 1.0));
@@ -119,10 +130,9 @@ public class GraphTest {
 
   @Test
   public void testGetEdgesAndVerticesById() {
-    Graph g = new Graph();
-    StreetVertex a = new IntersectionVertex(g, "A", 5, 5);
-    StreetVertex b = new IntersectionVertex(g, "B", 6, 6);
-    StreetVertex c = new IntersectionVertex(g, "C", 3, 2);
+    StreetVertex a = new IntersectionVertex("A", 5, 5);
+    StreetVertex b = new IntersectionVertex("B", 6, 6);
+    StreetVertex c = new IntersectionVertex("C", 3, 2);
 
     Set<Edge> allEdges = new HashSet<>(4);
     allEdges.add(edge(a, b, 1.0));

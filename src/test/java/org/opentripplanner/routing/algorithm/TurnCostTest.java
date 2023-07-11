@@ -14,7 +14,6 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
@@ -33,13 +32,9 @@ import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuris
 
 public class TurnCostTest {
 
-  private Graph graph;
-
   private Vertex topRight;
 
   private Vertex bottomLeft;
-
-  private StreetEdge maple_main1, broad1_2;
 
   private RouteRequest proto;
 
@@ -47,8 +42,6 @@ public class TurnCostTest {
 
   @BeforeEach
   public void before() {
-    graph = new Graph();
-
     // Graph for a fictional grid city with turn restrictions
     StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
     StreetVertex maple2 = vertex("maple_2nd", 1.0, 2.0);
@@ -69,11 +62,11 @@ public class TurnCostTest {
     StreetEdge main1_2 = edge(main1, main2, 100.0, false);
     StreetEdge main2_3 = edge(main2, main3, 100.0, false);
 
-    broad1_2 = edge(broad1, broad2, 100.0, false);
+    StreetEdge broad1_2 = edge(broad1, broad2, 100.0, false);
     StreetEdge broad2_3 = edge(broad2, broad3, 100.0, false);
 
     // Each cross-street connects
-    maple_main1 = edge(maple1, main1, 50.0, false);
+    StreetEdge maple_main1 = edge(maple1, main1, 50.0, false);
     StreetEdge main_broad1 = edge(main1, broad1, 100.0, false);
 
     StreetEdge maple_main2 = edge(maple2, main2, 50.0, false);
@@ -236,7 +229,7 @@ public class TurnCostTest {
    ****/
 
   private StreetVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(graph, label, lat, lon);
+    return new IntersectionVertex(label, lat, lon);
   }
 
   /**

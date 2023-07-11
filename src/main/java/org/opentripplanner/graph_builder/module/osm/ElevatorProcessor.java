@@ -26,6 +26,7 @@ import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +96,7 @@ class ElevatorProcessor {
       createElevatorHopEdges(
         onboardVertices,
         wheelchair,
-        node.isTagTrue("bicycle"),
+        !node.isBicycleExplicitlyDenied(),
         levels.length,
         travelTime
       );
@@ -138,7 +139,7 @@ class ElevatorProcessor {
       createElevatorHopEdges(
         onboardVertices,
         wheelchair,
-        elevatorWay.isTagTrue("bicycle"),
+        !elevatorWay.isBicycleExplicitlyDenied(),
         levels,
         travelTime
       );
@@ -153,23 +154,20 @@ class ElevatorProcessor {
     String sourceVertexLabel,
     String levelName
   ) {
-    ElevatorOffboardVertex offboardVertex = new ElevatorOffboardVertex(
-      graph,
-      sourceVertexLabel + "_offboard",
-      sourceVertex.getX(),
-      sourceVertex.getY(),
-      new NonLocalizedString(levelName)
+    var factory = new VertexFactory(graph);
+    ElevatorOffboardVertex offboardVertex = factory.elevatorOffboard(
+      sourceVertex,
+      sourceVertexLabel,
+      levelName
     );
 
     new FreeEdge(sourceVertex, offboardVertex);
     new FreeEdge(offboardVertex, sourceVertex);
 
-    ElevatorOnboardVertex onboardVertex = new ElevatorOnboardVertex(
-      graph,
-      sourceVertexLabel + "_onboard",
-      sourceVertex.getX(),
-      sourceVertex.getY(),
-      new NonLocalizedString(levelName)
+    ElevatorOnboardVertex onboardVertex = factory.elevatorOnboard(
+      sourceVertex,
+      sourceVertexLabel,
+      levelName
     );
 
     new ElevatorBoardEdge(offboardVertex, onboardVertex);

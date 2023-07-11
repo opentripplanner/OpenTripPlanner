@@ -78,13 +78,11 @@ public class GeometryProcessorTest {
       TransitStopVertex stop = (TransitStopVertex) (graph.getVertex(s));
 
       IntersectionVertex front = new IntersectionVertex(
-        graph,
         "near_1_" + stop.getStop().getId(),
         stop.getX() + 0.0001,
         stop.getY() + 0.0001
       );
       IntersectionVertex back = new IntersectionVertex(
-        graph,
         "near_2_" + stop.getStop().getId(),
         stop.getX() - 0.0001,
         stop.getY() - 0.0001
