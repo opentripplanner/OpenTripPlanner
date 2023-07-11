@@ -65,6 +65,7 @@ public class StreetEdge
   private static final int BICYCLE_NOTHRUTRAFFIC = 7;
   private static final int WALK_NOTHRUTRAFFIC = 8;
   private static final int CLASS_LINK = 9;
+
   private StreetEdgeCostExtension costExtension;
   /** back, roundabout, stairs, ... */
   private short flags;
@@ -1350,6 +1351,7 @@ public class StreetEdge
           (1 - preferences.walk().safetyFactor());
         weight /= speed;
       }
+
       weight *=
         StreetEdgeReluctanceCalculator.computeReluctance(
           preferences,

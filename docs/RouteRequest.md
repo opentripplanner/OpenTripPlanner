@@ -45,6 +45,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | elevatorBoardTime                                                                                    |        `integer`       | How long does it take to get on an elevator, on average.                                                                                       | *Optional* | `90`                     |  2.0  |
 | elevatorHopCost                                                                                      |        `integer`       | What is the cost of travelling one floor on an elevator?                                                                                       | *Optional* | `20`                     |  2.0  |
 | elevatorHopTime                                                                                      |        `integer`       | How long does it take to advance one floor on an elevator?                                                                                     | *Optional* | `20`                     |  2.0  |
+| escalatorReluctance                                                                                  |        `double`        | A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time                                       | *Optional* | `1.5`                    |  2.4  |
 | geoidElevation                                                                                       |        `boolean`       | If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.                                           | *Optional* | `false`                  |  2.0  |
 | ignoreRealtimeUpdates                                                                                |        `boolean`       | When true, realtime updates are ignored during this search.                                                                                    | *Optional* | `false`                  |  2.0  |
 | [intersectionTraversalModel](#rd_intersectionTraversalModel)                                         |         `enum`         | The model that computes the costs of turns.                                                                                                    | *Optional* | `"simple"`               |  2.2  |
@@ -884,6 +885,7 @@ include stairs as a last result.
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
+    "escalatorReluctance" : 1.5,
     "vehicleRental" : {
       "pickupCost" : 120,
       "dropOffTime" : 30,

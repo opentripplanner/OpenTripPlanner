@@ -46,7 +46,7 @@ public final class GtfsFaresV2Service implements Serializable {
     this.transferRules = fareTransferRules;
     this.networksWithRules = findNetworksWithRules(legRules);
     this.fromAreasWithRules = findAreasWithRules(legRules, FareLegRule::fromAreaId);
-    this.toAreasWithRules = findAreasWithRules(legRules, FareLegRule::toAreadId);
+    this.toAreasWithRules = findAreasWithRules(legRules, FareLegRule::toAreaId);
     this.stopAreas = stopAreas;
   }
 
@@ -152,7 +152,7 @@ public final class GtfsFaresV2Service implements Serializable {
       // if area id is null, the rule applies to all legs UNLESS there is another rule that
       // covers this area
       matchesArea(leg.getFrom().stop, rule.fromAreaId(), fromAreasWithRules) &&
-      matchesArea(leg.getTo().stop, rule.toAreadId(), toAreasWithRules) &&
+      matchesArea(leg.getTo().stop, rule.toAreaId(), toAreasWithRules) &&
       matchesDistance(leg, rule)
     );
   }
