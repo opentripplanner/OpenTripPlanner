@@ -176,7 +176,7 @@ class GtfsGraphQLIndex {
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
     } catch (Exception e) {
-      LOG.error("Unable to build Legacy GraphQL Schema", e);
+      LOG.error("Unable to build GTFS GraphQL Schema", e);
     }
     return null;
   }
