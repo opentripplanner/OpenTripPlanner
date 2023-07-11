@@ -31,7 +31,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   private final boolean wheelchairAccessible;
   private final FeedScopedId id;
 
-  public PathwayEdge(
+  private PathwayEdge(
     Vertex fromv,
     Vertex tov,
     FeedScopedId id,
@@ -55,10 +55,15 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   }
 
   /**
-   * {@link PathwayEdge#lowCost(Vertex, Vertex, FeedScopedId, I18NString, boolean, PathwayMode)}
+   * {@link PathwayEdge#createLowCostPathwayEdge(Vertex, Vertex, FeedScopedId, I18NString, boolean, PathwayMode)}
    */
-  public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name, PathwayMode mode) {
-    return PathwayEdge.lowCost(fromV, toV, null, name, true, mode);
+  public static PathwayEdge createLowCostPathwayEdge(
+    Vertex fromV,
+    Vertex toV,
+    I18NString name,
+    PathwayMode mode
+  ) {
+    return PathwayEdge.createLowCostPathwayEdge(fromV, toV, null, name, true, mode);
   }
 
   /**
@@ -66,7 +71,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
    * <p>
    * These are for edges which have an implied cost of almost zero just like a FreeEdge has.
    */
-  public static PathwayEdge lowCost(
+  public static PathwayEdge createLowCostPathwayEdge(
     Vertex fromV,
     Vertex toV,
     FeedScopedId id,
@@ -74,7 +79,35 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     boolean wheelchairAccessible,
     PathwayMode mode
   ) {
-    return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
+    return createPathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
+  }
+
+  public static PathwayEdge createPathwayEdge(
+    Vertex fromv,
+    Vertex tov,
+    FeedScopedId id,
+    I18NString name,
+    int traversalTime,
+    double distance,
+    int steps,
+    double slope,
+    boolean wheelchairAccessible,
+    PathwayMode mode
+  ) {
+    return connectToGraph(
+      new PathwayEdge(
+        fromv,
+        tov,
+        id,
+        name,
+        traversalTime,
+        distance,
+        steps,
+        slope,
+        wheelchairAccessible,
+        mode
+      )
+    );
   }
 
   @Override

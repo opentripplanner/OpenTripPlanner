@@ -640,7 +640,7 @@ public class VertexLinker {
       var incomingNoThruModes = getNoThruModes(to.getIncoming());
       var outgoingNoThruModes = getNoThruModes(to.getIncoming());
 
-      AreaEdge ae = new AreaEdge(
+      AreaEdge ae = AreaEdge.createAreaEdge(
         from,
         to,
         line,
@@ -659,7 +659,7 @@ public class VertexLinker {
       }
 
       ae =
-        new AreaEdge(
+        AreaEdge.createAreaEdge(
           to,
           from,
           line.reverse(),

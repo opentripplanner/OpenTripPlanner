@@ -15,8 +15,12 @@ public class SimpleConcreteEdge extends Edge {
   /**
    * Constructor without ID.
    */
-  public SimpleConcreteEdge(Vertex v1, Vertex v2) {
+  private SimpleConcreteEdge(Vertex v1, Vertex v2) {
     super(v1, v2);
+  }
+
+  public static SimpleConcreteEdge createSimpleConcreteEdge(Vertex v1, Vertex v2) {
+    return connectToGraph(new SimpleConcreteEdge(v1, v2));
   }
 
   @Override

@@ -8,18 +8,26 @@ import org.opentripplanner.street.search.state.StateEditor;
 
 public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
 
-  public TemporaryFreeEdge(TemporaryVertex from, Vertex to) {
+  private TemporaryFreeEdge(TemporaryVertex from, Vertex to) {
     super((Vertex) from, to);
     if (from.isEndVertex()) {
       throw new IllegalStateException("A temporary edge is directed away from an end vertex");
     }
   }
 
-  public TemporaryFreeEdge(Vertex from, TemporaryVertex to) {
+  private TemporaryFreeEdge(Vertex from, TemporaryVertex to) {
     super(from, (Vertex) to);
     if (!to.isEndVertex()) {
       throw new IllegalStateException("A temporary edge is directed towards a start vertex");
     }
+  }
+
+  public static TemporaryFreeEdge createTemporaryFreeEdge(TemporaryVertex from, Vertex to) {
+    return connectToGraph(new TemporaryFreeEdge(from, to));
+  }
+
+  public static TemporaryFreeEdge createTemporaryFreeEdge(Vertex from, TemporaryVertex to) {
+    return connectToGraph(new TemporaryFreeEdge(from, to));
   }
 
   @Override

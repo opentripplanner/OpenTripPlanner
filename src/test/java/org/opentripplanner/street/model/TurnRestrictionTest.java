@@ -207,7 +207,7 @@ public class TurnRestrictionTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdge(vA, vB, geom, name, length, perm, back);
+    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, back);
   }
 
   private void DisallowTurn(StreetEdge from, StreetEdge to) {

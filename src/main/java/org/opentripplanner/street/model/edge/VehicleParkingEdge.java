@@ -21,16 +21,31 @@ public class VehicleParkingEdge extends Edge {
 
   private final VehicleParking vehicleParking;
 
-  public VehicleParkingEdge(VehicleParkingEntranceVertex vehicleParkingEntranceVertex) {
+  private VehicleParkingEdge(VehicleParkingEntranceVertex vehicleParkingEntranceVertex) {
     this(vehicleParkingEntranceVertex, vehicleParkingEntranceVertex);
   }
 
-  public VehicleParkingEdge(
+  private VehicleParkingEdge(
     VehicleParkingEntranceVertex fromVehicleParkingEntranceVertex,
     VehicleParkingEntranceVertex toVehicleParkingEntranceVertex
   ) {
     super(fromVehicleParkingEntranceVertex, toVehicleParkingEntranceVertex);
     this.vehicleParking = fromVehicleParkingEntranceVertex.getVehicleParking();
+  }
+
+  public static VehicleParkingEdge createVehicleParkingEdge(
+    VehicleParkingEntranceVertex vehicleParkingEntranceVertex
+  ) {
+    return connectToGraph(new VehicleParkingEdge(vehicleParkingEntranceVertex));
+  }
+
+  public static VehicleParkingEdge createVehicleParkingEdge(
+    VehicleParkingEntranceVertex fromVehicleParkingEntranceVertex,
+    VehicleParkingEntranceVertex toVehicleParkingEntranceVertex
+  ) {
+    return connectToGraph(
+      new VehicleParkingEdge(fromVehicleParkingEntranceVertex, toVehicleParkingEntranceVertex)
+    );
   }
 
   public VehicleParking getVehicleParking() {

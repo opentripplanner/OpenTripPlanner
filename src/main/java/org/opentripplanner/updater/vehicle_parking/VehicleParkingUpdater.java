@@ -186,8 +186,14 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) ->
             List.of(
-              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
-              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
+              StreetVehicleParkingLink.createStreetVehicleParkingLink(
+                (VehicleParkingEntranceVertex) vertex,
+                streetVertex
+              ),
+              StreetVehicleParkingLink.createStreetVehicleParkingLink(
+                streetVertex,
+                (VehicleParkingEntranceVertex) vertex
+              )
             )
         );
         disposableEdgeCollections.add(disposableWalkEdges);
@@ -200,8 +206,14 @@ public class VehicleParkingUpdater extends PollingGraphUpdater {
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) ->
             List.of(
-              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
-              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
+              StreetVehicleParkingLink.createStreetVehicleParkingLink(
+                (VehicleParkingEntranceVertex) vertex,
+                streetVertex
+              ),
+              StreetVehicleParkingLink.createStreetVehicleParkingLink(
+                streetVertex,
+                (VehicleParkingEntranceVertex) vertex
+              )
             )
         );
         disposableEdgeCollections.add(disposableCarEdges);

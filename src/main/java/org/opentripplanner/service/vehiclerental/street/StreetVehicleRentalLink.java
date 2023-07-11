@@ -14,14 +14,28 @@ public class StreetVehicleRentalLink extends Edge {
 
   private final VehicleRentalPlaceVertex vehicleRentalPlaceVertex;
 
-  public StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalPlaceVertex tov) {
+  private StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalPlaceVertex tov) {
     super(fromv, tov);
     vehicleRentalPlaceVertex = tov;
   }
 
-  public StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, StreetVertex tov) {
+  private StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, StreetVertex tov) {
     super(fromv, tov);
     vehicleRentalPlaceVertex = fromv;
+  }
+
+  public static StreetVehicleRentalLink createStreetVehicleRentalLink(
+    StreetVertex fromv,
+    VehicleRentalPlaceVertex tov
+  ) {
+    return connectToGraph(new StreetVehicleRentalLink(fromv, tov));
+  }
+
+  public static StreetVehicleRentalLink createStreetVehicleRentalLink(
+    VehicleRentalPlaceVertex fromv,
+    StreetVertex tov
+  ) {
+    return connectToGraph(new StreetVehicleRentalLink(fromv, tov));
   }
 
   public String toString() {

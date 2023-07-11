@@ -18,11 +18,18 @@ import org.opentripplanner.street.search.state.StateEditor;
  */
 public class VehicleRentalEdge extends Edge {
 
-  public RentalFormFactor formFactor;
+  public final RentalFormFactor formFactor;
 
-  public VehicleRentalEdge(VehicleRentalPlaceVertex vertex, RentalFormFactor formFactor) {
+  private VehicleRentalEdge(VehicleRentalPlaceVertex vertex, RentalFormFactor formFactor) {
     super(vertex, vertex);
     this.formFactor = formFactor;
+  }
+
+  public static VehicleRentalEdge createVehicleRentalEdge(
+    VehicleRentalPlaceVertex vertex,
+    RentalFormFactor formFactor
+  ) {
+    return connectToGraph(new VehicleRentalEdge(vertex, formFactor));
   }
 
   @Override

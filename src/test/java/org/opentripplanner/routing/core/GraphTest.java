@@ -47,7 +47,8 @@ public class GraphTest {
   public void testAddEdge() {
     Vertex a = new IntersectionVertex("A", 5, 5);
     Vertex b = new IntersectionVertex("B", 6, 6);
-    FreeEdge ee = new FreeEdge(a, b);
+    FreeEdge ee = FreeEdge.createFreeEdge(a, b);
+
     assertNotNull(ee);
   }
 
@@ -60,7 +61,7 @@ public class GraphTest {
     g.addVertex(a);
     g.addVertex(b);
 
-    FreeEdge ee = new FreeEdge(a, b);
+    FreeEdge ee = FreeEdge.createFreeEdge(a, b);
 
     List<Edge> edges = new ArrayList<>(g.getEdges());
     assertEquals(1, edges.size());
@@ -79,10 +80,10 @@ public class GraphTest {
     g.addVertex(c);
 
     Set<Edge> expectedEdges = new HashSet<>(4);
-    expectedEdges.add(new FreeEdge(a, b));
-    expectedEdges.add(new FreeEdge(b, c));
-    expectedEdges.add(new FreeEdge(c, b));
-    expectedEdges.add(new FreeEdge(c, a));
+    expectedEdges.add(FreeEdge.createFreeEdge(a, b));
+    expectedEdges.add(FreeEdge.createFreeEdge(b, c));
+    expectedEdges.add(FreeEdge.createFreeEdge(c, b));
+    expectedEdges.add(FreeEdge.createFreeEdge(c, a));
 
     Set<Edge> edges = new HashSet<>(g.getEdges());
     assertEquals(4, edges.size());
@@ -97,10 +98,10 @@ public class GraphTest {
     Vertex c = new IntersectionVertex("C", 3, 2);
 
     Set<Edge> allEdges = new HashSet<>(4);
-    allEdges.add(new FreeEdge(a, b));
-    allEdges.add(new FreeEdge(b, c));
-    allEdges.add(new FreeEdge(c, b));
-    allEdges.add(new FreeEdge(c, a));
+    allEdges.add(FreeEdge.createFreeEdge(a, b));
+    allEdges.add(FreeEdge.createFreeEdge(b, c));
+    allEdges.add(FreeEdge.createFreeEdge(c, b));
+    allEdges.add(FreeEdge.createFreeEdge(c, a));
 
     Set<StreetEdge> edges = new HashSet<>(g.getStreetEdges());
     assertEquals(0, edges.size());
@@ -154,6 +155,6 @@ public class GraphTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdge(vA, vB, geom, name, length, perm, false);
+    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, false);
   }
 }
