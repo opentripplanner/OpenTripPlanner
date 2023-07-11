@@ -32,10 +32,7 @@ class IntrospectionTypeWiring {
   <T> TypeRuntimeWiring build(Class<T> clazz) throws Exception {
     T instance = clazz.getConstructor().newInstance();
 
-    String typeName = clazz
-      .getSimpleName()
-      .replaceFirst("LegacyGraphQL", "")
-      .replaceAll("Impl$", "");
+    String typeName = clazz.getSimpleName().replaceAll("Impl$", "");
 
     TypeDefinition type = typeRegistry
       .getType(typeName)

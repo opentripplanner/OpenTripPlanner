@@ -1,5 +1,5 @@
 {
-  "name": "legacy-graphql-generator",
+  "name": "gtfs-graphql-generator",
   "version": "1.0.0",
   "description": "Generates Java code from GraphQL schema",
   "engines": {
