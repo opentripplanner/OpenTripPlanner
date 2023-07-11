@@ -104,7 +104,7 @@ public class StateData implements Cloneable {
       StateData::new
     );
 
-    var baseStates =
+    var baseCaseDatas =
       switch (request.mode()) {
         case WALK, BIKE, BIKE_TO_PARK, CAR, CAR_TO_PARK, FLEXIBLE, NOT_SET -> stateDatas;
         case CAR_PICKUP, CAR_HAILING -> stateDatas
@@ -126,12 +126,12 @@ public class StateData implements Cloneable {
         }
       };
 
-    if (baseStates.size() != 1) {
+    if (baseCaseDatas.size() != 1) {
       throw new IllegalStateException(
         "Unable to create only a single state for %s".formatted(request)
       );
     }
-    return baseStates.get(0);
+    return baseCaseDatas.get(0);
   }
 
   private static List<StateData> getInitialStateDatas(
