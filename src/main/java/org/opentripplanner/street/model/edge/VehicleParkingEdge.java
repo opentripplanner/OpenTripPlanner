@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
-import org.locationtech.jts.geom.LineString;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
@@ -37,9 +37,9 @@ public class VehicleParkingEdge extends Edge {
     return vehicleParking;
   }
 
+  @Override
   public boolean equals(Object o) {
-    if (o instanceof VehicleParkingEdge) {
-      VehicleParkingEdge other = (VehicleParkingEdge) o;
+    if (o instanceof VehicleParkingEdge other) {
       return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
     }
     return false;
@@ -50,6 +50,7 @@ public class VehicleParkingEdge extends Edge {
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     if (!s0.getRequest().mode().includesParking()) {
       return State.empty();
@@ -67,23 +68,8 @@ public class VehicleParkingEdge extends Edge {
     return getToVertex().getName();
   }
 
-  @Override
-  public boolean hasBogusName() {
-    return false;
-  }
-
-  @Override
-  public LineString getGeometry() {
-    return null;
-  }
-
-  @Override
-  public double getDistanceMeters() {
-    return 0;
-  }
-
   protected State[] traverseUnPark(State s0) {
-    if (s0.getNonTransitMode() != TraverseMode.WALK || !s0.isVehicleParked()) {
+    if (s0.currentMode() != TraverseMode.WALK || !s0.isVehicleParked()) {
       return State.empty();
     }
 
@@ -147,7 +133,7 @@ public class VehicleParkingEdge extends Edge {
   private State[] traversePark(State s0, int parkingCost, int parkingTime) {
     if (
       !vehicleParking.hasSpacesAvailable(
-        s0.getNonTransitMode(),
+        s0.currentMode(),
         s0.getRequest().wheelchair(),
         s0.getRequest().parking().useAvailabilityInformation()
       )

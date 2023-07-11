@@ -69,7 +69,7 @@ public class VehicleToStopSkipEdgeStrategy implements SkipEdgeStrategy<State, Ed
 
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
-    if (current.getNonTransitMode().isWalking()) {
+    if (current.currentMode().isWalking()) {
       if (
         current.getVertex() instanceof TransitStopVertex stopVertex &&
         !stopsCounted.contains(stopVertex.getStop().getId())

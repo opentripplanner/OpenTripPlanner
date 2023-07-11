@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -81,6 +82,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     RoutingPreferences preferences = s0.getPreferences();
 
@@ -99,7 +101,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
       }
     }
 
-    TraverseMode mode = s0.getNonTransitMode();
+    TraverseMode mode = s0.currentMode();
 
     if (mode == TraverseMode.WALK && !permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
       return State.empty();

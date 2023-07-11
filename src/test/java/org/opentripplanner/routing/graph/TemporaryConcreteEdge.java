@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.graph;
 
-import org.locationtech.jts.geom.LineString;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
@@ -28,9 +28,10 @@ public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     double d = getDistanceMeters();
-    TraverseMode mode = s0.getNonTransitMode();
+    TraverseMode mode = s0.currentMode();
     int t = (int) (d / s0.getPreferences().getSpeed(mode, false));
     StateEditor s1 = s0.edit(this);
     s1.incrementTimeInSeconds(t);
@@ -40,11 +41,6 @@ public class TemporaryConcreteEdge extends Edge implements TemporaryEdge {
 
   @Override
   public I18NString getName() {
-    return null;
-  }
-
-  @Override
-  public LineString getGeometry() {
     return null;
   }
 

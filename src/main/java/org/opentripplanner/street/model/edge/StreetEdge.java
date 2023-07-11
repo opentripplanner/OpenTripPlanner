@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -407,12 +408,10 @@ public class StreetEdge
 
     final boolean arriveByRental =
       s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy();
-
-    if (
-      arriveByRental &&
-      (tov.rentalTraversalBanned(s0) || hasStartedSearchInNoDropOffZoneAndIsExitingIt(s0))
-    ) {
+    if (arriveByRental && tov.rentalTraversalBanned(s0)) {
       return State.empty();
+    } else if (arriveByRental && hasStartedWalkingInNoDropOffZoneAndIsExitingIt(s0)) {
+      return splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0);
     }
     // if the traversal is banned for the current state because of a GBFS geofencing zone
     // we drop the vehicle and continue walking
@@ -440,11 +439,10 @@ public class StreetEdge
           s0.getVehicleRentalNetwork(),
           s0.getRequest().arriveBy()
         );
-        editor.resetStartedInNoDropOffZone();
       }
     }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
-    else if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
+    else if (s0.currentMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
         editor = doTraverse(s0, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
@@ -452,8 +450,8 @@ public class StreetEdge
       } else {
         return State.empty();
       }
-    } else if (canTraverse(s0.getNonTransitMode())) {
-      editor = doTraverse(s0, s0.getNonTransitMode(), false);
+    } else if (canTraverse(s0.currentMode())) {
+      editor = doTraverse(s0, s0.currentMode(), false);
     } else {
       editor = null;
     }
@@ -514,6 +512,39 @@ public class StreetEdge
   }
 
   /**
+   * A very special case: an arriveBy rental search has started in a no-drop-off zone
+   * we don't know yet which rental network we will end up using.
+   * <p>
+   * So we speculatively assume that we can rent any by setting the network in the state data
+   * to null.
+   * <p>
+   * When we then leave the no drop off zone on foot we generate a state for each network that the
+   * zone applies to where we pick up a vehicle with a specific network.
+   */
+  @Nonnull
+  private State[] splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0) {
+    var networks = Stream.concat(
+      // null is a special rental network that speculatively assumes that you can take any vehicle
+      // you have to check in the rental edge if this has search has been started in a no-drop off zone
+      Stream.of((String) null),
+      tov.rentalRestrictions().noDropOffNetworks().stream()
+    );
+
+    var states = networks.map(network -> {
+      var edit = doTraverse(s0, TraverseMode.WALK, false);
+      if (edit != null) {
+        edit.dropFloatingVehicle(s0.vehicleRentalFormFactor(), network, s0.getRequest().arriveBy());
+        if (network != null) {
+          edit.resetStartedInNoDropOffZone();
+        }
+        return edit.makeState();
+      }
+      return null;
+    });
+    return State.ofStream(states);
+  }
+
+  /**
    * This is the state that starts a backwards search inside a restricted zone
    * (no drop off, no traversal or outside business area) and is walking towards finding a rental
    * vehicle. Once we are leaving a geofencing zone or are entering a business area we want to
@@ -531,12 +562,12 @@ public class StreetEdge
    * If the reverse search has started in a no-drop off rental zone and you are exiting
    * it .
    */
-  private boolean hasStartedSearchInNoDropOffZoneAndIsExitingIt(State s0) {
+  private boolean hasStartedWalkingInNoDropOffZoneAndIsExitingIt(State s0) {
     return (
-      s0.isRentingVehicle() &&
-      !fromv.rentalDropOffBanned(s0) &&
-      tov.rentalDropOffBanned(s0) &&
-      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty()
+      s0.currentMode() == TraverseMode.WALK &&
+      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty() &&
+      fromv.rentalRestrictions().noDropOffNetworks().isEmpty() &&
+      !tov.rentalRestrictions().noDropOffNetworks().isEmpty()
     );
   }
 
