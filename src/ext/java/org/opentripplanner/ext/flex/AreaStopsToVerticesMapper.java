@@ -21,15 +21,15 @@ import org.slf4j.LoggerFactory;
  * Iterates over all area stops in the stop model and adds them to vertices that are suitable for
  * boarding flex trips.
  */
-public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
+public class AreaStopsToVerticesMapper implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FlexLocationsToStreetEdgesMapper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AreaStopsToVerticesMapper.class);
 
   private final Graph graph;
   private final TransitModel transitModel;
 
   @Inject
-  public FlexLocationsToStreetEdgesMapper(Graph graph, TransitModel transitModel) {
+  public AreaStopsToVerticesMapper(Graph graph, TransitModel transitModel) {
     this.graph = graph;
     this.transitModel = transitModel;
   }
@@ -50,7 +50,8 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
     );
 
     LOG.info(progress.startMessage());
-    var results = transitModel.getStopModel()
+    var results = transitModel
+      .getStopModel()
       .listAreaStops()
       .parallelStream()
       .flatMap(areaStop -> {

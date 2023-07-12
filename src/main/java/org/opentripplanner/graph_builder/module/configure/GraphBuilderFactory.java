@@ -7,7 +7,7 @@ import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
-import org.opentripplanner.ext.flex.FlexLocationsToStreetEdgesMapper;
+import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -45,7 +45,7 @@ public interface GraphBuilderFactory {
   StreetLinkerModule streetLinkerModule();
   PruneIslands pruneIslands();
   List<ElevationModule> elevationModules();
-  FlexLocationsToStreetEdgesMapper flexLocationsToStreetEdgesMapper();
+  AreaStopsToVerticesMapper areaStopsToVerticesMapper();
   DirectTransferGenerator directTransferGenerator();
   DirectTransferAnalyzer directTransferAnalyzer();
   GraphCoherencyCheckerModule graphCoherencyCheckerModule();
