@@ -141,14 +141,20 @@ public class TestStateBuilder {
 
   @Nonnull
   private static ElevatorOffboardVertex elevatorOffBoard(int count, String suffix) {
-    final String label = "elevator_off_board_" + suffix;
-    return new ElevatorOffboardVertex(label, count, count, new NonLocalizedString(label));
+    return new ElevatorOffboardVertex(
+      StreetModelForTest.intersectionVertex(count, count),
+      suffix,
+      suffix
+    );
   }
 
   @Nonnull
   private static ElevatorOnboardVertex elevatorOnBoard(int count, String suffix) {
-    final String label = "elevator_on_board_" + suffix;
-    return new ElevatorOnboardVertex(label, count, count, new NonLocalizedString(label));
+    return new ElevatorOnboardVertex(
+      StreetModelForTest.intersectionVertex(count, count),
+      suffix,
+      suffix
+    );
   }
 
   public State build() {

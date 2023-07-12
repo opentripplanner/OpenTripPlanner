@@ -14,6 +14,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -89,8 +90,8 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void carParkingEntranceToAllTraversableStreetLinkingTest() {
-    var C = new IntersectionVertex("C", 0.0001, 0.0001);
-    var D = new IntersectionVertex("D", 0.01, 0.01);
+    var C = StreetModelForTest.intersectionVertex("C", 0.0001, 0.0001);
+    var D = StreetModelForTest.intersectionVertex("D", 0.01, 0.01);
 
     graph.addVertex(C);
     graph.addVertex(D);
