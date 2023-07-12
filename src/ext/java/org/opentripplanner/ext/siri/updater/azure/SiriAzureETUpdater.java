@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import javax.xml.stream.XMLStreamException;
-import org.apache.http.client.utils.URIBuilder;
+import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.TransitModel;
