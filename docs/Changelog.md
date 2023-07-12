@@ -62,6 +62,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add escalator reluctance parameter [#5046](https://github.com/opentripplanner/OpenTripPlanner/pull/5046)
 - Handle reverse search when starting in no-drop-off zone [#5201](https://github.com/opentripplanner/OpenTripPlanner/pull/5201)
 - Refactor edge constructors [#5221](https://github.com/opentripplanner/OpenTripPlanner/pull/5221)
+- Upgrade to Apache HTTP Client 5 [#5228](https://github.com/opentripplanner/OpenTripPlanner/pull/5228)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
