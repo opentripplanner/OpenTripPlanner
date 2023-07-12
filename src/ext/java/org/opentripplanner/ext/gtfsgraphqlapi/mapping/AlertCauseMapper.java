@@ -5,12 +5,12 @@ import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLAler
 import org.opentripplanner.routing.alertpatch.AlertCause;
 
 /**
- * Class for mapping {@link AlertCause} to LegacyGraphQL API cause (GTFS RT).
+ * Class for mapping {@link AlertCause} to GraphQL API cause (GTFS RT).
  */
 public class AlertCauseMapper {
 
   /**
-   * Returns LegacyGraphQL API string counter part for internal {@link AlertCause} enum. Defaults to
+   * Returns GraphQL API string counter part for internal {@link AlertCause} enum. Defaults to
    * returning UNKNOWN_CAUSE.
    */
   public static GraphQLTypes.GraphQLAlertCauseType getGraphQLCause(AlertCause cause) {

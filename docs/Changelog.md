@@ -219,7 +219,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Cost-based wheelchair accessibility routing for streets [#4163](https://github.com/opentripplanner/OpenTripPlanner/pull/4163)
 - Expose SIRI ET PredictionInaccurate in Transmodel-API [#4217](https://github.com/opentripplanner/OpenTripPlanner/pull/4217)
 - Do not apply walkable area processing to open platform geometries [#4225](https://github.com/opentripplanner/OpenTripPlanner/pull/4225)
-- Add field 'routingErrors' to LegacyGraphQLAPI [#4253](https://github.com/opentripplanner/OpenTripPlanner/pull/4253)
+- Add field 'routingErrors' to GTFS GraphQLAPI [#4253](https://github.com/opentripplanner/OpenTripPlanner/pull/4253)
 - Configure idempotent upload to Google Cloud Storage [#4269](https://github.com/opentripplanner/OpenTripPlanner/pull/4269)
 - Add support to unprefer certain routes [#4238](https://github.com/opentripplanner/OpenTripPlanner/pull/4238)
 - Fix inconsistent mapping of NeTEx quay publicCode [#4282](https://github.com/opentripplanner/OpenTripPlanner/pull/4282)
