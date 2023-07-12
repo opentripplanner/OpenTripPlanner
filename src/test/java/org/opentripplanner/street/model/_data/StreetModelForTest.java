@@ -44,6 +44,6 @@ public class StreetModelForTest {
     coords[1] = vB.getCoordinate();
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-    return new StreetEdge(vA, vB, geom, name, length, perm, false);
+    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, false);
   }
 }

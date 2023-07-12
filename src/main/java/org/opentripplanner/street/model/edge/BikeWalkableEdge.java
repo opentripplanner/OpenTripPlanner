@@ -7,7 +7,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 
 public interface BikeWalkableEdge {
   default boolean canSwitchToWalkingBike(State state) {
-    return state.getNonTransitMode() == TraverseMode.BICYCLE;
+    return state.currentMode() == TraverseMode.BICYCLE;
   }
 
   default void switchToWalkingBike(RoutingPreferences preferences, StateEditor editor) {
@@ -45,29 +45,19 @@ public interface BikeWalkableEdge {
   }
 
   default StateEditor createEditorForDrivingOrWalking(State s0, Edge edge) {
-    if (s0.getNonTransitMode() == TraverseMode.CAR) {
+    if (s0.currentMode() == TraverseMode.CAR) {
       return s0.edit(edge);
     }
 
-    return createEditor(
-      s0,
-      edge,
-      TraverseMode.WALK,
-      s0.getNonTransitMode() == TraverseMode.BICYCLE
-    );
+    return createEditor(s0, edge, TraverseMode.WALK, s0.currentMode() == TraverseMode.BICYCLE);
   }
 
   default StateEditor createEditorForWalking(State s0, Edge edge) {
-    if (s0.getNonTransitMode() == TraverseMode.CAR) {
+    if (s0.currentMode() == TraverseMode.CAR) {
       return null;
     }
 
-    return createEditor(
-      s0,
-      edge,
-      TraverseMode.WALK,
-      s0.getNonTransitMode() == TraverseMode.BICYCLE
-    );
+    return createEditor(s0, edge, TraverseMode.WALK, s0.currentMode() == TraverseMode.BICYCLE);
   }
 
   default StateEditor createEditor(State s0, Edge edge, TraverseMode mode, boolean bicycleWalking) {

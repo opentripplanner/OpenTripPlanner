@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.actuator;
 
-import static org.apache.http.HttpHeaders.ACCEPT;
+import static org.apache.hc.core5.http.HttpHeaders.ACCEPT;
 
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.prometheus.client.exporter.common.TextFormat;

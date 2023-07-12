@@ -27,7 +27,6 @@ public class BarrierVertexTest {
     assertFalse(simpleBarier.isBollard());
     simpleBarier.addTag("barrier", "bollard");
     assertTrue(simpleBarier.isBollard());
-    Graph graph = new Graph();
     String label = "simpleBarrier";
     BarrierVertex bv = new BarrierVertex(label, simpleBarier.lon, simpleBarier.lat, 0);
     bv.setBarrierPermissions(
@@ -168,6 +167,6 @@ public class BarrierVertexTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdge(vA, vB, geom, name, length, perm, back);
+    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, back);
   }
 }

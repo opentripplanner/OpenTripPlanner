@@ -101,7 +101,7 @@ class ParkingProcessor {
       VehicleParkingEntranceVertex parkVertex = vertexFactory.vehicleParkingEntrance(
         vehicleParking
       );
-      new VehicleParkingEdge(parkVertex);
+      VehicleParkingEdge.createVehicleParkingEdge(parkVertex);
     }
 
     LOG.info("Created {} {} P+R nodes.", n, isCarParkAndRide ? "car" : "bike");

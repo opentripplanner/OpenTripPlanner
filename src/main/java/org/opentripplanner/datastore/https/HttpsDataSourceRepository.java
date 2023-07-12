@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.apache.http.Header;
+import org.apache.hc.core5.http.Header;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;

@@ -88,7 +88,7 @@ class StateTest {
       .collect(Collectors.toSet());
     assertEquals(expectedRentalStates, vehicleRentalStates);
 
-    var modes = states.stream().map(State::getNonTransitMode).collect(Collectors.toSet());
+    var modes = states.stream().map(State::currentMode).collect(Collectors.toSet());
     assertEquals(expectedStartModes, modes);
   }
 

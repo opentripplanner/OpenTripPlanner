@@ -232,7 +232,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   public void removeRentalRestriction(RentalRestrictionExtension ext) {
-    rentalRestrictions.remove(ext);
+    rentalRestrictions = rentalRestrictions.remove(ext);
   }
 
   /**
