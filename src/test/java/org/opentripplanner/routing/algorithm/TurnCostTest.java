@@ -247,7 +247,7 @@ public class TurnCostTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    StreetEdge pse = new StreetEdge(vA, vB, geom, name, length, perm, back);
+    StreetEdge pse = StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, back);
     pse.setCarSpeed(1.0f);
     return pse;
   }

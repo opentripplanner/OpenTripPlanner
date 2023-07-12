@@ -83,7 +83,7 @@ class VehicleParkingPreferredTagsTest {
       .build();
 
     var fromV = new VehicleParkingEntranceVertex(entrance);
-    var edge = new VehicleParkingEdge(fromV);
+    var edge = VehicleParkingEdge.createVehicleParkingEdge(fromV);
 
     var parkingReq = new VehicleParkingRequest();
     Collection<VehicleParkingFilter> select = List.of(

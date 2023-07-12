@@ -169,6 +169,6 @@ public class BarrierVertexTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdge(vA, vB, geom, name, length, perm, back);
+    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, back);
   }
 }

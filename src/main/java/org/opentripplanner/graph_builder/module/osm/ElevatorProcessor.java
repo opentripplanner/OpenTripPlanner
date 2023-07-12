@@ -101,7 +101,7 @@ class ElevatorProcessor {
       createElevatorHopEdges(
         onboardVertices,
         wheelchair,
-        node.isTagTrue("bicycle"),
+        !node.isBicycleExplicitlyDenied(),
         levels.length,
         travelTime
       );
@@ -144,7 +144,7 @@ class ElevatorProcessor {
       createElevatorHopEdges(
         onboardVertices,
         wheelchair,
-        elevatorWay.isTagTrue("bicycle"),
+        !elevatorWay.isBicycleExplicitlyDenied(),
         levels,
         travelTime
       );
@@ -166,13 +166,17 @@ class ElevatorProcessor {
       levelName
     );
 
-    new FreeEdge(sourceVertex, offboardVertex);
-    new FreeEdge(offboardVertex, sourceVertex);
+    FreeEdge.createFreeEdge(sourceVertex, offboardVertex);
+    FreeEdge.createFreeEdge(offboardVertex, sourceVertex);
 
     ElevatorOnboardVertex onboardVertex = factory.elevatorOnboard(sourceVertex, label, levelName);
 
-    new ElevatorBoardEdge(offboardVertex, onboardVertex);
-    new ElevatorAlightEdge(onboardVertex, offboardVertex, new NonLocalizedString(levelName));
+    ElevatorBoardEdge.createElevatorBoardEdge(offboardVertex, onboardVertex);
+    ElevatorAlightEdge.createElevatorAlightEdge(
+      onboardVertex,
+      offboardVertex,
+      new NonLocalizedString(levelName)
+    );
 
     // accumulate onboard vertices to so they can be connected by hop edges later
     onboardVertices.add(onboardVertex);

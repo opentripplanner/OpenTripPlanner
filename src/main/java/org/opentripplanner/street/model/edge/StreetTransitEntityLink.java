@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -25,13 +26,21 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   private final Accessibility wheelchairAccessibility;
 
-  public StreetTransitEntityLink(StreetVertex fromv, T tov, Accessibility wheelchairAccessibility) {
+  protected StreetTransitEntityLink(
+    StreetVertex fromv,
+    T tov,
+    Accessibility wheelchairAccessibility
+  ) {
     super(fromv, tov);
     this.transitEntityVertex = tov;
     this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
-  public StreetTransitEntityLink(T fromv, StreetVertex tov, Accessibility wheelchairAccessibility) {
+  protected StreetTransitEntityLink(
+    T fromv,
+    StreetVertex tov,
+    Accessibility wheelchairAccessibility
+  ) {
     super(fromv, tov);
     this.transitEntityVertex = fromv;
     this.wheelchairAccessibility = wheelchairAccessibility;
@@ -46,6 +55,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
     // avoids spurious leg transitions. As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815,
@@ -80,7 +90,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       }
     }
 
-    switch (s0.getNonTransitMode()) {
+    switch (s0.currentMode()) {
       case BICYCLE:
         // Forbid taking your own bike in the station if bike P+R activated.
         if (s0.getRequest().mode().includesParking() && !s0.isVehicleParked()) {

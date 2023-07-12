@@ -28,7 +28,7 @@ class PathwayEdgeTest {
   void zeroLength() {
     // if elevators have a traversal time and distance of 0 we cannot interpolate the distance
     // from the vertices as they most likely have identical coordinates
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -46,7 +46,7 @@ class PathwayEdgeTest {
 
   @Test
   void zeroLengthWithSteps() {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -64,7 +64,7 @@ class PathwayEdgeTest {
 
   @Test
   void traversalTime() {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -84,7 +84,7 @@ class PathwayEdgeTest {
 
   @Test
   void traversalTimeOverridesLength() {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -106,7 +106,7 @@ class PathwayEdgeTest {
 
   @Test
   void distance() {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -126,7 +126,7 @@ class PathwayEdgeTest {
 
   @Test
   void wheelchair() {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -169,7 +169,7 @@ class PathwayEdgeTest {
   @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
   @VariableSource("slopeCases")
   public void shouldScaleCostWithMaxSlope(double slope, long expectedCost) {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,

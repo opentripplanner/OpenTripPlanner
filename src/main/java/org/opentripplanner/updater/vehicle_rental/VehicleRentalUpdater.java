@@ -157,8 +157,14 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             LinkingDirection.BOTH_WAYS,
             (vertex, streetVertex) ->
               List.of(
-                new StreetVehicleRentalLink((VehicleRentalPlaceVertex) vertex, streetVertex),
-                new StreetVehicleRentalLink(streetVertex, (VehicleRentalPlaceVertex) vertex)
+                StreetVehicleRentalLink.createStreetVehicleRentalLink(
+                  (VehicleRentalPlaceVertex) vertex,
+                  streetVertex
+                ),
+                StreetVehicleRentalLink.createStreetVehicleRentalLink(
+                  streetVertex,
+                  (VehicleRentalPlaceVertex) vertex
+                )
               )
           );
           if (vehicleRentalVertex.getOutgoing().isEmpty()) {
@@ -172,7 +178,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             )
             .collect(Collectors.toSet());
           for (RentalFormFactor formFactor : formFactors) {
-            tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex, formFactor));
+            tempEdges.addEdge(
+              VehicleRentalEdge.createVehicleRentalEdge(vehicleRentalVertex, formFactor)
+            );
           }
           verticesByStation.put(station.getId(), vehicleRentalVertex);
           tempEdgesByStation.put(station.getId(), tempEdges);

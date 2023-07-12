@@ -9,7 +9,7 @@ public class AreaEdge extends StreetEdge {
 
   private final AreaEdgeList area;
 
-  public AreaEdge(
+  private AreaEdge(
     IntersectionVertex startEndpoint,
     IntersectionVertex endEndpoint,
     LineString geometry,
@@ -24,7 +24,7 @@ public class AreaEdge extends StreetEdge {
   }
 
   // constructor without precomputed length
-  public AreaEdge(
+  private AreaEdge(
     IntersectionVertex startEndpoint,
     IntersectionVertex endEndpoint,
     LineString geometry,
@@ -35,6 +35,35 @@ public class AreaEdge extends StreetEdge {
   ) {
     super(startEndpoint, endEndpoint, geometry, name, permissions, back);
     this.area = area;
+  }
+
+  public static AreaEdge createAreaEdge(
+    IntersectionVertex startEndpoint,
+    IntersectionVertex endEndpoint,
+    LineString geometry,
+    I18NString name,
+    double length,
+    StreetTraversalPermission permissions,
+    boolean back,
+    AreaEdgeList area
+  ) {
+    return connectToGraph(
+      new AreaEdge(startEndpoint, endEndpoint, geometry, name, length, permissions, back, area)
+    );
+  }
+
+  public static AreaEdge createAreaEdge(
+    IntersectionVertex startEndpoint,
+    IntersectionVertex endEndpoint,
+    LineString geometry,
+    I18NString name,
+    StreetTraversalPermission permissions,
+    boolean back,
+    AreaEdgeList area
+  ) {
+    return connectToGraph(
+      new AreaEdge(startEndpoint, endEndpoint, geometry, name, permissions, back, area)
+    );
   }
 
   public AreaEdgeList getArea() {

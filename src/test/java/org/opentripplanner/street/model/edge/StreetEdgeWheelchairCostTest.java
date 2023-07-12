@@ -60,7 +60,7 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("slopeCases")
   public void shouldScaleCostWithMaxSlope(double slope, double reluctance, long expectedCost) {
     double length = 1000;
-    var edge = new StreetEdge(
+    var edge = StreetEdge.createStreetEdge(
       V1,
       V2,
       null,
@@ -113,7 +113,15 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("wheelchairStairsCases")
   public void wheelchairStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
     edge.setStairs(true);
 
     var req = StreetSearchRequest.of();
@@ -155,7 +163,15 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("inaccessibleStreetCases")
   public void inaccessibleStreet(float inaccessibleStreetReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
     edge.setWheelchairAccessible(false);
 
     var req = StreetSearchRequest.of();
@@ -197,7 +213,15 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("walkReluctanceCases")
   public void walkReluctance(double walkReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withReluctance(walkReluctance)));

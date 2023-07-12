@@ -49,7 +49,7 @@ public class LinkingTest {
         new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
       );
       double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
-      StreetEdge s0 = new StreetEdge(
+      StreetEdge s0 = StreetEdge.createStreetEdge(
         v0,
         v1,
         geom,
@@ -58,7 +58,7 @@ public class LinkingTest {
         StreetTraversalPermission.ALL,
         false
       );
-      StreetEdge s1 = new StreetEdge(
+      StreetEdge s1 = StreetEdge.createStreetEdge(
         v1,
         v0,
         geom.reverse(),

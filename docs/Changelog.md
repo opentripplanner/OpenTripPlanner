@@ -58,6 +58,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Access and egress penalty on time and cost [#5180](https://github.com/opentripplanner/OpenTripPlanner/pull/5180)
 - Prevent NPE in vehicle position matching [#5212](https://github.com/opentripplanner/OpenTripPlanner/pull/5212)
 - Empty stop_headsign will fall back to trip_headsign [#5205](https://github.com/opentripplanner/OpenTripPlanner/pull/5205)
+- Refactor HTTP client [#5213](https://github.com/opentripplanner/OpenTripPlanner/pull/5213)
+- Add escalator reluctance parameter [#5046](https://github.com/opentripplanner/OpenTripPlanner/pull/5046)
+- Handle reverse search when starting in no-drop-off zone [#5201](https://github.com/opentripplanner/OpenTripPlanner/pull/5201)
+- Refactor edge constructors [#5221](https://github.com/opentripplanner/OpenTripPlanner/pull/5221)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

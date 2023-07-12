@@ -88,19 +88,17 @@ public class TestStateBuilder {
     var station = TestVehicleRentalStationBuilder.of().withVehicleTypeCar().build();
 
     VehicleRentalPlaceVertex vertex = new VehicleRentalPlaceVertex(station);
-    var link = new StreetVehicleRentalLink((StreetVertex) currentState.vertex, vertex);
-
+    var link = StreetVehicleRentalLink.createStreetVehicleRentalLink(
+      (StreetVertex) currentState.vertex,
+      vertex
+    );
     currentState = link.traverse(currentState)[0];
 
-    var edge = new VehicleRentalEdge(vertex, RentalFormFactor.CAR);
+    var edge = VehicleRentalEdge.createVehicleRentalEdge(vertex, RentalFormFactor.CAR);
 
     State[] traverse = edge.traverse(currentState);
     currentState =
-      Arrays
-        .stream(traverse)
-        .filter(it -> it.getNonTransitMode() == TraverseMode.CAR)
-        .findFirst()
-        .get();
+      Arrays.stream(traverse).filter(it -> it.currentMode() == TraverseMode.CAR).findFirst().get();
 
     return this;
   }
@@ -119,16 +117,20 @@ public class TestStateBuilder {
     var from = (StreetVertex) currentState.vertex;
     var link = StreetModelForTest.streetEdge(from, offboard1);
 
-    var boardEdge = new ElevatorBoardEdge(offboard1, onboard1);
+    var boardEdge = ElevatorBoardEdge.createElevatorBoardEdge(offboard1, onboard1);
 
-    var hopEdge = new ElevatorHopEdge(
+    var hopEdge = ElevatorHopEdge.createElevatorHopEdge(
       onboard1,
       onboard2,
       StreetTraversalPermission.PEDESTRIAN,
       Accessibility.POSSIBLE
     );
 
-    var alightEdge = new ElevatorAlightEdge(onboard2, offboard2, new NonLocalizedString("1"));
+    var alightEdge = ElevatorAlightEdge.createElevatorAlightEdge(
+      onboard2,
+      offboard2,
+      new NonLocalizedString("1")
+    );
 
     currentState =
       EdgeTraverser

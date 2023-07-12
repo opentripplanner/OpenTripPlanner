@@ -80,7 +80,7 @@ public class ElevationModuleTest {
     for (int i = 1; i < coordinates.length; ++i) {
       length += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
     }
-    StreetEdge edge = new StreetEdge(
+    StreetEdge edge = StreetEdge.createStreetEdge(
       from,
       to,
       geometry,

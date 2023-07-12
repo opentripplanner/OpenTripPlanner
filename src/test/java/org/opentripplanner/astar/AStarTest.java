@@ -169,7 +169,7 @@ public class AStarTest {
       new NonLocalizedString("near_shilshole_22nd"),
       false
     );
-    new TemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
+    TemporaryConcreteEdge.createTemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
 
     TemporaryStreetLocation to = new TemporaryStreetLocation(
       "near_56th_20th",
@@ -177,7 +177,7 @@ public class AStarTest {
       new NonLocalizedString("near_56th_20th"),
       true
     );
-    new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
+    TemporaryConcreteEdge.createTemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
     ShortestPathTree<State, Edge, Vertex> tree = StreetSearchBuilder
       .of()
@@ -217,7 +217,7 @@ public class AStarTest {
       new NonLocalizedString("near_shilshole_22nd"),
       false
     );
-    new TemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
+    TemporaryConcreteEdge.createTemporaryConcreteEdge(from, graph.getVertex("shilshole_22nd"));
 
     TemporaryStreetLocation to = new TemporaryStreetLocation(
       "near_56th_20th",
@@ -225,7 +225,7 @@ public class AStarTest {
       new NonLocalizedString("near_56th_20th"),
       true
     );
-    new TemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
+    TemporaryConcreteEdge.createTemporaryConcreteEdge(graph.getVertex("56th_20th"), to);
 
     ShortestPathTree tree = StreetSearchBuilder
       .of()
@@ -298,8 +298,8 @@ public class AStarTest {
       Vertex vA = graph.getVertex(string(vLabels[i]));
       Vertex vB = graph.getVertex(string(vLabels[i + 1]));
 
-      new SimpleConcreteEdge(vA, vB);
-      new SimpleConcreteEdge(vB, vA);
+      SimpleConcreteEdge.createSimpleConcreteEdge(vA, vB);
+      SimpleConcreteEdge.createSimpleConcreteEdge(vB, vA);
     }
   }
 }

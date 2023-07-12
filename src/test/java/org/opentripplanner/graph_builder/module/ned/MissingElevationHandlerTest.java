@@ -187,7 +187,7 @@ class MissingElevationHandlerTest {
   }
 
   private StreetEdge edge(IntersectionVertex from, IntersectionVertex to, double length) {
-    return new StreetEdge(
+    return StreetEdge.createStreetEdge(
       from,
       to,
       null,

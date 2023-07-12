@@ -17,7 +17,7 @@ public class EdgeTest {
   public void testConstruct() {
     Vertex head = StreetModelForTest.intersectionVertex("head", 47.669457, -122.387577);
     Vertex tail = StreetModelForTest.intersectionVertex("tail", 47.669462, -122.384739);
-    Edge e = new SimpleConcreteEdge(head, tail);
+    Edge e = SimpleConcreteEdge.createSimpleConcreteEdge(head, tail);
 
     assertEquals(head, e.getFromVertex());
     assertEquals(tail, e.getToVertex());
@@ -29,10 +29,33 @@ public class EdgeTest {
     StreetVertex vb = intersectionVertex("B", 10.1, 10.1);
     StreetVertex vc = intersectionVertex("C", 10.2, 10.2);
     StreetVertex vd = intersectionVertex("D", 10.3, 10.3);
-    Edge eab = new StreetEdge(va, vb, null, "AB", 10, StreetTraversalPermission.ALL, false);
-    Edge ebc = new StreetEdge(vb, vc, null, "BC", 10, StreetTraversalPermission.ALL, false);
-    Edge ecd = new StreetEdge(vc, vd, null, "CD", 10, StreetTraversalPermission.ALL, false);
-
+    Edge eab = StreetEdge.createStreetEdge(
+      va,
+      vb,
+      null,
+      "AB",
+      10,
+      StreetTraversalPermission.ALL,
+      false
+    );
+    Edge ebc = StreetEdge.createStreetEdge(
+      vb,
+      vc,
+      null,
+      "BC",
+      10,
+      StreetTraversalPermission.ALL,
+      false
+    );
+    Edge ecd = StreetEdge.createStreetEdge(
+      vc,
+      vd,
+      null,
+      "CD",
+      10,
+      StreetTraversalPermission.ALL,
+      false
+    );
     // remove an edge that is not connected to this vertex
     va.removeOutgoing(ecd);
     assertEquals(va.getDegreeOut(), 1);
