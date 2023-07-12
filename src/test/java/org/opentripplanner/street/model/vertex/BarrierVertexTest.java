@@ -27,7 +27,6 @@ public class BarrierVertexTest {
     assertFalse(simpleBarier.isBollard());
     simpleBarier.addTag("barrier", "bollard");
     assertTrue(simpleBarier.isBollard());
-    Graph graph = new Graph();
     String label = "simpleBarrier";
     BarrierVertex bv = new BarrierVertex(label, simpleBarier.lon, simpleBarier.lat, 0);
     bv.setBarrierPermissions(

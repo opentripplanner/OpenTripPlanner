@@ -1,0 +1,71 @@
+{
+    plan(
+        from: { lat: 52.3092, lon: 13.0291 }
+        to: { lat: 52.5147, lon: 13.3927 }
+        date: "2023-02-15",
+        time: "11:37",
+        transportModes: [{ mode: TRANSIT }]
+    ) {
+        itineraries {
+            legs {
+                mode
+                from {
+                    name
+                    lat
+                    lon
+                    departureTime
+                    arrivalTime
+                }
+                to {
+                    name
+                    lat
+                    lon
+                    departureTime
+                    arrivalTime
+                }
+                startTime
+                endTime
+                mode
+                generalizedCost
+                fareProducts {
+                    id
+                    product {
+                        id
+                        name
+                        __typename
+                        ... on DefaultFareProduct {
+                            price {
+                                currency {
+                                    digits
+                                    code
+                                }
+                                amount
+                            }
+                        }
+                        riderCategory {
+                            id
+                            name
+                        }
+                        medium {
+                            id
+                            name
+                        }
+                    }
+                }
+            }
+            fares {
+                type
+                cents
+                currency
+                components {
+                    currency
+                    cents
+                    fareId
+                    routes {
+                        gtfsId
+                    }
+                }
+            }
+        }
+    }
+}
