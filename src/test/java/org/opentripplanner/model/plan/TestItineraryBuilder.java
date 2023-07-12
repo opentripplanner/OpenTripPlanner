@@ -236,7 +236,15 @@ public class TestItineraryBuilder implements PlanTestConstants {
     var flexPath = new DirectFlexPathCalculator()
       .calculateFlexPath(fromv, tov, template.fromStopIndex, template.toStopIndex);
 
-    var edge = new FlexTripEdge(fromv, tov, lastPlace.stop, to.stop, flexTrip, template, flexPath);
+    var edge = FlexTripEdge.createFlexTripEdge(
+      fromv,
+      tov,
+      lastPlace.stop,
+      to.stop,
+      flexTrip,
+      template,
+      flexPath
+    );
 
     FlexibleTransitLeg leg = new FlexibleTransitLeg(edge, newTime(start), newTime(end), legCost);
 

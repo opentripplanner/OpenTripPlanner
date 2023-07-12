@@ -78,7 +78,12 @@ class ElevatorHopEdgeTest {
   }
 
   private State[] traverse(Accessibility wheelchair, StreetSearchRequest req) {
-    var edge = new ElevatorHopEdge(from, to, StreetTraversalPermission.ALL, wheelchair);
+    var edge = ElevatorHopEdge.createElevatorHopEdge(
+      from,
+      to,
+      StreetTraversalPermission.ALL,
+      wheelchair
+    );
     var state = new State(from, req);
 
     return edge.traverse(state);

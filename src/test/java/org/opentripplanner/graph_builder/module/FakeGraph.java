@@ -113,8 +113,14 @@ public class FakeGraph {
         LinkingDirection.BOTH_WAYS,
         (vertex, streetVertex) ->
           List.of(
-            new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
-            new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
+            StreetTransitStopLink.createStreetTransitStopLink(
+              (TransitStopVertex) vertex,
+              streetVertex
+            ),
+            StreetTransitStopLink.createStreetTransitStopLink(
+              streetVertex,
+              (TransitStopVertex) vertex
+            )
           )
       );
     }

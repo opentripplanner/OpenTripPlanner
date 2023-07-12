@@ -9,12 +9,26 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
  */
 public class StreetTransitStopLink extends StreetTransitEntityLink<TransitStopVertex> {
 
-  public StreetTransitStopLink(StreetVertex fromv, TransitStopVertex tov) {
+  private StreetTransitStopLink(StreetVertex fromv, TransitStopVertex tov) {
     super(fromv, tov, tov.getWheelchairAccessibility());
   }
 
-  public StreetTransitStopLink(TransitStopVertex fromv, StreetVertex tov) {
+  private StreetTransitStopLink(TransitStopVertex fromv, StreetVertex tov) {
     super(fromv, tov, fromv.getWheelchairAccessibility());
+  }
+
+  public static StreetTransitStopLink createStreetTransitStopLink(
+    StreetVertex fromv,
+    TransitStopVertex tov
+  ) {
+    return connectToGraph(new StreetTransitStopLink(fromv, tov));
+  }
+
+  public static StreetTransitStopLink createStreetTransitStopLink(
+    TransitStopVertex fromv,
+    StreetVertex tov
+  ) {
+    return connectToGraph(new StreetTransitStopLink(fromv, tov));
   }
 
   protected int getStreetToStopTime() {

@@ -121,7 +121,7 @@ Maximum processing time for an API request
 
 This timeout limits the server-side processing time for a given API request. This does not include
 network latency nor waiting time in the HTTP server thread pool. The default value is
-`-1s`(no timeout). The timeout is applied to all APIs (REST, Transmodel , Legacy GraphQL).
+`-1s`(no timeout). The timeout is applied to all APIs (REST, Transmodel & GTFS GraphQL).
 The timeout is not enforced when the parallel routing OTP feature is in use.
 
 
@@ -463,6 +463,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
+    "escalatorReluctance" : 1.5,
     "vehicleRental" : {
       "pickupCost" : 120,
       "dropOffTime" : 30,

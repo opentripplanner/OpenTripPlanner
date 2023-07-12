@@ -44,7 +44,7 @@ public class VehicleParkingTestUtil {
     StreetVertex to,
     StreetTraversalPermission permissions
   ) {
-    new StreetEdge(
+    StreetEdge.createStreetEdge(
       from,
       to,
       GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon()),

@@ -88,7 +88,7 @@ public class GeometryProcessorTest {
         stop.getY() - 0.0001
       );
 
-      StreetEdge street1 = new StreetEdge(
+      StreetEdge street1 = StreetEdge.createStreetEdge(
         front,
         back,
         GeometryUtils.makeLineString(
@@ -102,7 +102,7 @@ public class GeometryProcessorTest {
         StreetTraversalPermission.ALL,
         false
       );
-      StreetEdge street2 = new StreetEdge(
+      StreetEdge street2 = StreetEdge.createStreetEdge(
         back,
         front,
         GeometryUtils.makeLineString(

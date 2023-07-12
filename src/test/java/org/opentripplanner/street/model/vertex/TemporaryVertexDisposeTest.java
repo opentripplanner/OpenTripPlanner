@@ -204,7 +204,7 @@ public class TemporaryVertexDisposeTest {
 
   // Factory method to create an edge
   private static void edge(Vertex a, Vertex b) {
-    new E(a, b);
+    E.createE(a, b);
   }
 
   /* private test helper classes */
@@ -249,6 +249,10 @@ public class TemporaryVertexDisposeTest {
     @Override
     public String toString() {
       return getFromVertex().getLabel() + "->" + getToVertex().getLabel();
+    }
+
+    private static E createE(Vertex from, Vertex to) {
+      return connectToGraph(new E(from, to));
     }
   }
 }
