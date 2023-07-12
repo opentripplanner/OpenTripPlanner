@@ -146,6 +146,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /** If this vertex is located on only one street, get that street's name */
+  @Nonnull
   public I18NString getName() {
     return this.name;
   }

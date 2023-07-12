@@ -24,7 +24,7 @@ import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
-import org.opentripplanner.street.model.vertex.VertexLabel.LevelledOsmNodeLabel;
+import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeOnLevelLabel;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class WalkableAreaBuilderTest {
@@ -167,7 +167,7 @@ public class WalkableAreaBuilderTest {
 
   private static boolean hasNodeId(AreaEdge a, long nodeId) {
     return (
-      a.getToVertex().getLabel() instanceof LevelledOsmNodeLabel label && label.nodeId() == nodeId
+      a.getToVertex().getLabel() instanceof OsmNodeOnLevelLabel label && label.nodeId() == nodeId
     );
   }
 

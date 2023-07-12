@@ -154,7 +154,7 @@ public class VertexFactory {
   }
 
   public OsmVertex levelledOsm(OSMNode node, String level) {
-    return addToGraph(new LevelledOsmVertex(node, level));
+    return addToGraph(new OsmVertexOnLevel(node, level));
   }
 
   private <T extends Vertex> T addToGraph(T vertex) {
