@@ -159,7 +159,10 @@ class VehicleRentalEdgeTest {
     @Test
     void startedInNoDropOffZone() {
       var rentalVertex = new VehicleRentalPlaceVertex(RENTAL_PLACE);
-      var rentalEdge = new VehicleRentalEdge(rentalVertex, RentalFormFactor.SCOOTER);
+      var rentalEdge = VehicleRentalEdge.createVehicleRentalEdge(
+        rentalVertex,
+        RentalFormFactor.SCOOTER
+      );
 
       rentalVertex.addRentalRestriction(noDropOffZone());
 
@@ -173,7 +176,10 @@ class VehicleRentalEdgeTest {
     @Test
     void startedOutsideNoDropOffZone() {
       var rentalVertex = new VehicleRentalPlaceVertex(RENTAL_PLACE);
-      var rentalEdge = new VehicleRentalEdge(rentalVertex, RentalFormFactor.SCOOTER);
+      var rentalEdge = VehicleRentalEdge.createVehicleRentalEdge(
+        rentalVertex,
+        RentalFormFactor.SCOOTER
+      );
       var state = new State(rentalVertex, SEARCH_REQUEST);
 
       assertEquals(Set.of(), state.stateData.noRentalDropOffZonesAtStartOfReverseSearch);
