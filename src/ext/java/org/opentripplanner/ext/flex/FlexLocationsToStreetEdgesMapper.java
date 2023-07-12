@@ -13,7 +13,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,31 +26,31 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(FlexLocationsToStreetEdgesMapper.class);
 
   private final Graph graph;
-  private final StopModel stopModel;
+  private final TransitModel transitModel;
 
   @Inject
-  public FlexLocationsToStreetEdgesMapper(Graph graph, StopModel stopModel) {
+  public FlexLocationsToStreetEdgesMapper(Graph graph, TransitModel transitModel) {
     this.graph = graph;
-    this.stopModel = stopModel;
+    this.transitModel = transitModel;
   }
 
   @Override
   @SuppressWarnings("Convert2MethodRef")
   public void buildGraph() {
-    if (!stopModel.hasAreaStops()) {
+    if (!transitModel.getStopModel().hasAreaStops()) {
       return;
     }
 
-    StreetIndex streetIndex = graph.getStreetIndexSafe(stopModel);
+    StreetIndex streetIndex = graph.getStreetIndexSafe(transitModel.getStopModel());
 
     ProgressTracker progress = ProgressTracker.track(
       "Add flex locations to street vertices",
       1,
-      stopModel.listAreaStops().size()
+      transitModel.getStopModel().listAreaStops().size()
     );
 
     LOG.info(progress.startMessage());
-    var results = stopModel
+    var results = transitModel.getStopModel()
       .listAreaStops()
       .parallelStream()
       .flatMap(areaStop -> {

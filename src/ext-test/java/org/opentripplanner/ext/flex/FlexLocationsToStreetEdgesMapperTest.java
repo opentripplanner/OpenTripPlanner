@@ -12,8 +12,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.TransitModel;
 
 class FlexLocationsToStreetEdgesMapperTest {
 
@@ -25,6 +27,8 @@ class FlexLocationsToStreetEdgesMapperTest {
     .of()
     .withAreaStop(FlexLocationsToStreetEdgesMapperTest.BERLIN_AREA_STOP)
     .build();
+
+  public static final TransitModel TRANSIT_MODEL = new TransitModel(STOP_MODEL, new Deduplicator());
 
   @Test
   void addAreaStopToVertex() {
@@ -40,7 +44,7 @@ class FlexLocationsToStreetEdgesMapperTest {
     graph.addVertex(berlinCenterA);
     assertTrue(berlinCenterA.areaStops().isEmpty());
 
-    var mapper = new FlexLocationsToStreetEdgesMapper(graph, STOP_MODEL);
+    var mapper = new FlexLocationsToStreetEdgesMapper(graph, TRANSIT_MODEL);
 
     mapper.buildGraph();
 
@@ -61,7 +65,7 @@ class FlexLocationsToStreetEdgesMapperTest {
     graph.addVertex(hamburgA);
     assertTrue(hamburgA.areaStops().isEmpty());
 
-    var mapper = new FlexLocationsToStreetEdgesMapper(graph, STOP_MODEL);
+    var mapper = new FlexLocationsToStreetEdgesMapper(graph, TRANSIT_MODEL);
 
     mapper.buildGraph();
 
@@ -82,7 +86,7 @@ class FlexLocationsToStreetEdgesMapperTest {
     graph.addVertex(berlinCenterA);
     assertTrue(berlinCenterA.areaStops().isEmpty());
 
-    var mapper = new FlexLocationsToStreetEdgesMapper(graph, STOP_MODEL);
+    var mapper = new FlexLocationsToStreetEdgesMapper(graph, TRANSIT_MODEL);
 
     mapper.buildGraph();
 
