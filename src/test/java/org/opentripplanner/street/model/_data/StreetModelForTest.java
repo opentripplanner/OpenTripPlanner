@@ -16,6 +16,10 @@ public class StreetModelForTest {
   public static StreetVertex V3 = intersectionVertex("V3", 2, 2);
   public static StreetVertex V4 = intersectionVertex("V4", 3, 3);
 
+  public static IntersectionVertex intersectionVertex(Coordinate c) {
+    return intersectionVertex(c.x, c.y);
+  }
+
   public static IntersectionVertex intersectionVertex(double lat, double lon) {
     var label = "%s_%s".formatted(lat, lon);
     return new IntersectionVertex(label, lat, lon, label);

@@ -203,7 +203,7 @@ public class FlexIntegrationTest {
     StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
     // link flex locations to streets
-    new FlexLocationsToStreetEdgesMapper(graph, transitModel).buildGraph();
+    new FlexLocationsToStreetEdgesMapper(graph, transitModel.getStopModel()).buildGraph();
 
     // generate direct transfers
     var req = new RouteRequest();
