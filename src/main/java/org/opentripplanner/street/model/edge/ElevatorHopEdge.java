@@ -19,12 +19,15 @@ import org.opentripplanner.transit.model.basic.Accessibility;
  */
 public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTraversalInformation {
 
+  private static final double DEFAULT_LEVELS = 1;
+  private static final int DEFAULT_TRAVEL_TIME = 0;
+
   private final StreetTraversalPermission permission;
 
   private final Accessibility wheelchairAccessibility;
 
-  private double levels = 1;
-  private int travelTime = 0;
+  private final double levels;
+  private final int travelTime;
 
   private ElevatorHopEdge(
     Vertex from,
@@ -34,7 +37,9 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     double levels,
     int travelTime
   ) {
-    this(from, to, permission, wheelchairAccessibility);
+    super(from, to);
+    this.permission = permission;
+    this.wheelchairAccessibility = wheelchairAccessibility;
     this.levels = levels;
     this.travelTime = travelTime;
   }
@@ -45,9 +50,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     StreetTraversalPermission permission,
     Accessibility wheelchairAccessibility
   ) {
-    super(from, to);
-    this.permission = permission;
-    this.wheelchairAccessibility = wheelchairAccessibility;
+    this(from, to, permission, wheelchairAccessibility, DEFAULT_LEVELS, DEFAULT_TRAVEL_TIME);
   }
 
   public static void bidirectional(
@@ -138,12 +141,12 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     }
 
     s1.incrementWeight(
-      this.travelTime > 0
+      this.travelTime > DEFAULT_TRAVEL_TIME
         ? this.travelTime
         : (preferences.street().elevator().hopCost() * this.levels)
     );
     s1.incrementTimeInSeconds(
-      this.travelTime > 0
+      this.travelTime > DEFAULT_TRAVEL_TIME
         ? this.travelTime
         : (int) (preferences.street().elevator().hopTime() * this.levels)
     );
@@ -162,7 +165,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   @Override
   public double getDistanceMeters() {
-    return 0;
+    return DEFAULT_TRAVEL_TIME;
   }
 
   @Override
