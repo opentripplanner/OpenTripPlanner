@@ -435,7 +435,7 @@ class ParkingProcessor {
     List<VehicleParking.VehicleParkingEntranceCreator> entrances = new ArrayList<>();
     var sortedAccessVertices = accessVertices
       .stream()
-      .sorted(Comparator.comparing(vn -> vn.vertex().getLabel()))
+      .sorted(Comparator.comparing(vn -> vn.vertex().getLabelString()))
       .toList();
 
     for (var access : sortedAccessVertices) {

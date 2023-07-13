@@ -16,7 +16,7 @@ public class TransitBoardingAreaVertex extends StationElementVertex {
    */
   public TransitBoardingAreaVertex(BoardingArea boardingArea) {
     super(
-      boardingArea.getId().toString(),
+      boardingArea.getId(),
       boardingArea.getCoordinate().longitude(),
       boardingArea.getCoordinate().latitude(),
       boardingArea.getName()

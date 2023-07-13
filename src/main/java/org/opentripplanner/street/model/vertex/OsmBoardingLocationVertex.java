@@ -16,7 +16,7 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
  * <p>
  * If the source is an area (way) then the centroid is computed and used.
  */
-public class OsmBoardingLocationVertex extends IntersectionVertex {
+public class OsmBoardingLocationVertex extends LabelledIntersectionVertex {
 
   public final Set<String> references;
 

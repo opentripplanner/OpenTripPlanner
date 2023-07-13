@@ -2,18 +2,15 @@ package org.opentripplanner.street.model.vertex;
 
 public class ExitVertex extends OsmVertex {
 
-  private String exitName;
+  private final String exitName;
 
-  public ExitVertex(String label, double x, double y, long nodeId) {
-    super(label, x, y, nodeId);
+  public ExitVertex(double x, double y, long nodeId, String exitName) {
+    super(x, y, nodeId);
+    this.exitName = exitName;
   }
 
   public String getExitName() {
     return exitName;
-  }
-
-  public void setExitName(String exitName) {
-    this.exitName = exitName;
   }
 
   public String toString() {

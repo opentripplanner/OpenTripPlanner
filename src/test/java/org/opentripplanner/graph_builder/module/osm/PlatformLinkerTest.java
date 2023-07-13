@@ -11,6 +11,7 @@ import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class PlatformLinkerTest {
@@ -21,7 +22,7 @@ public class PlatformLinkerTest {
    */
   @Test
   public void testLinkEntriesToPlatforms() {
-    String stairsEndpointLabel = "osm:node:1028861028";
+    var stairsEndpointLabel = VertexLabel.osm(1028861028);
 
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
