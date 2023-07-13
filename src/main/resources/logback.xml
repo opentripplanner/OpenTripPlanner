@@ -77,7 +77,7 @@
 
   <logger name="ch.qos.logback" level="warn"/>
   <logger name="com.amazonaws" level="info"/>
-  <logger name="org.apache.http" level="info" />
+  <logger name="org.apache.hc" level="info" />
   <logger name="com.conveyal" level="info"/>
   <logger name="notprivacysafe.graphql" level="off" />
 

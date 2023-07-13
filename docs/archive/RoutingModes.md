@@ -24,7 +24,7 @@ The complete list of modes are:
   _Prerequisite:_ Vehicle positions need to be added to OTP from dynamic data feeds.
 
   For dynamic bike positions configure an input feed.
-  See [Configuring real-time updaters](RouterConfiguration.md#Configuring real-time updaters).
+  See [Configuring real-time updaters](../RouterConfiguration.md#Configuring real-time updaters).
 
 - `BICYCLE_PARK`: Leaving the bicycle at the departure station and walking from the arrival station
   to the destination.

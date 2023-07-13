@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.islandpruning;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssue;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 
 public record PrunedStopIsland(
   Subgraph island,
@@ -34,13 +35,12 @@ public record PrunedStopIsland(
 
   @Override
   public String getHTMLMessage() {
-    String label = island.getRepresentativeVertex().getLabel();
-    if (label.startsWith("osm:")) {
-      String osmNodeId = label.split(":")[2];
+    VertexLabel label = island.getRepresentativeVertex().getLabel();
+    if (label instanceof VertexLabel.OsmNodeLabel osmLabel) {
       return String.format(
         HTMLFMT,
-        osmNodeId,
-        osmNodeId,
+        osmLabel.nodeId(),
+        osmLabel.nodeId(),
         island.streetSize(),
         island.stopSize(),
         this.stopLabels,

@@ -43,6 +43,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -95,11 +96,11 @@ public abstract class GraphRoutingTest {
       return transitModel;
     }
 
-    public <T> T v(String label) {
+    public <T extends Vertex> T v(VertexLabel label) {
       return vertex(label);
     }
 
-    public <T> T vertex(String label) {
+    public <T extends Vertex> T vertex(VertexLabel label) {
       return (T) graph.getVertex(label);
     }
 
@@ -118,7 +119,7 @@ public abstract class GraphRoutingTest {
         from,
         to,
         GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-        String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
+        String.format("%s%s street", from.getLabel(), to.getLabel()),
         length,
         permissions,
         false
@@ -163,8 +164,8 @@ public abstract class GraphRoutingTest {
         var boardLabel = String.format("%s-onboard", level);
         var alightLabel = String.format("%s-offboard", level);
 
-        var onboard = vertexFactory.elevatorOnboard(v, boardLabel, boardLabel);
-        var offboard = vertexFactory.elevatorOffboard(v, alightLabel, alightLabel);
+        var onboard = vertexFactory.elevatorOnboard(v, v.getLabelString(), boardLabel);
+        var offboard = vertexFactory.elevatorOffboard(v, v.getLabelString(), alightLabel);
 
         FreeEdge.createFreeEdge(v, offboard);
         FreeEdge.createFreeEdge(offboard, v);

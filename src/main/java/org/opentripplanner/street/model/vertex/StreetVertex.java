@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.street.model.edge.Edge;
@@ -23,8 +24,8 @@ public abstract class StreetVertex extends Vertex {
   /** All locations for flex transit, which this vertex is part of */
   private Set<AreaStop> areaStops;
 
-  StreetVertex(String label, double x, double y, I18NString streetName) {
-    super(label, x, y, streetName);
+  StreetVertex(double x, double y, @Nullable I18NString streetName) {
+    super(x, y, streetName);
   }
 
   /**

@@ -260,12 +260,12 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOffboardVertex fromOffboardVertex = vertexFactory.elevatorOffboard(
       fromVertex,
-      fromVertex.getLabel() + "_" + pathway.getId(),
+      elevatorLabel(fromVertex, pathway),
       fromLevel.name().toString()
     );
     ElevatorOffboardVertex toOffboardVertex = vertexFactory.elevatorOffboard(
       toVertex,
-      toVertex.getLabel() + "_" + pathway.getId() + "_offboard",
+      elevatorLabel(toVertex, pathway),
       toLevel.name().toString()
     );
 
@@ -284,12 +284,12 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOnboardVertex fromOnboardVertex = vertexFactory.elevatorOnboard(
       fromVertex,
-      fromVertex.getLabel() + "_" + pathway.getId(),
+      elevatorLabel(fromVertex, pathway),
       fromLevel.name().toString()
     );
     ElevatorOnboardVertex toOnboardVertex = vertexFactory.elevatorOnboard(
       toVertex,
-      toVertex.getLabel() + "_" + pathway.getId(),
+      elevatorLabel(toVertex, pathway),
       toLevel.name().toString()
     );
 
@@ -334,6 +334,10 @@ public class AddTransitModelEntitiesToGraph {
         pathway.getTraversalTime()
       );
     }
+  }
+
+  private static String elevatorLabel(StationElementVertex fromVertex, Pathway pathway) {
+    return "%s_%s".formatted(fromVertex.getLabel(), pathway.getId());
   }
 
   private StopLevel getStopLevel(StationElementVertex vertex) {

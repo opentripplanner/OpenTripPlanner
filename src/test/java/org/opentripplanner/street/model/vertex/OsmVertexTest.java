@@ -45,6 +45,6 @@ class OsmVertexTest {
 
   @Nonnull
   private static OsmVertex vertex() {
-    return new OsmVertex("test", 1, 2, 1);
+    return new OsmVertex(1, 2, 1);
   }
 }

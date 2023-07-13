@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.graph_builder.issues.IsolatedStop;
@@ -31,6 +32,7 @@ import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -504,7 +506,7 @@ public class PruneIslands implements GraphBuilderModule {
     if (traverseMode == TraverseMode.WALK) {
       // note: do not unlink stop if only CAR mode is pruned
       // maybe this needs more logic for flex routing cases
-      List<String> stopLabels = new ArrayList<>();
+      List<VertexLabel> stopLabels = new ArrayList<>();
       for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext();) {
         Vertex v = vIter.next();
         stopLabels.add(v.getLabel());
@@ -517,7 +519,13 @@ public class PruneIslands implements GraphBuilderModule {
       if (island.stopSize() > 0) {
         // issue about stops that got unlinked in pruning
         issueStore.add(
-          new PrunedStopIsland(island, nothru, restricted, removed, String.join(", ", stopLabels))
+          new PrunedStopIsland(
+            island,
+            nothru,
+            restricted,
+            removed,
+            stopLabels.stream().map(Object::toString).collect(Collectors.joining(","))
+          )
         );
       }
     }

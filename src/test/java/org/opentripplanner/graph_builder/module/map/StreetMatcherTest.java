@@ -14,6 +14,7 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 
 public class StreetMatcherTest {
 
@@ -84,7 +85,7 @@ public class StreetMatcherTest {
     List<Edge> match = matcher.match(geometry);
     assertNotNull(match);
     assertEquals(1, match.size());
-    assertEquals("56th_24th", match.get(0).getToVertex().getLabel());
+    assertEquals("56th_24th", match.get(0).getToVertex().getLabelString());
 
     geometry = geometry(-122.385689, 47.669484, -122.387384, 47.669470, -122.387588, 47.669325);
 
@@ -122,7 +123,7 @@ public class StreetMatcherTest {
     match = matcher.match(geometry);
     assertNotNull(match);
     assertEquals(4, match.size());
-    assertEquals("ballard_20th", match.get(3).getToVertex().getLabel());
+    assertEquals("ballard_20th", match.get(3).getToVertex().getLabelString());
   }
 
   private LineString geometry(double... ordinates) {
@@ -146,8 +147,8 @@ public class StreetMatcherTest {
 
   private void edges(String... vLabels) {
     for (int i = 0; i < vLabels.length - 1; i++) {
-      StreetVertex vA = (StreetVertex) graph.getVertex(vLabels[i]);
-      StreetVertex vB = (StreetVertex) graph.getVertex(vLabels[i + 1]);
+      StreetVertex vA = (StreetVertex) graph.getVertex(VertexLabel.string(vLabels[i]));
+      StreetVertex vB = (StreetVertex) graph.getVertex(VertexLabel.string(vLabels[i + 1]));
 
       StreetModelForTest.streetEdge(vA, vB);
       StreetModelForTest.streetEdge(vB, vA);

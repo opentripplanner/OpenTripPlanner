@@ -25,6 +25,7 @@ import org.opentripplanner.routing.api.request.request.filter.TransitFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.intersection_model.ConstantIntersectionTraversalCalculator;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
@@ -61,8 +62,8 @@ public class TriangleInequalityTest {
 
   @BeforeEach
   public void before() {
-    start = graph.getVertex("osm:node:1919595913");
-    end = graph.getVertex("osm:node:42448554");
+    start = graph.getVertex(VertexLabel.osm(1919595913));
+    end = graph.getVertex(VertexLabel.osm(42448554));
   }
 
   @Test

@@ -4,9 +4,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 
 public class StreetModelForTest {
@@ -22,11 +24,11 @@ public class StreetModelForTest {
 
   public static IntersectionVertex intersectionVertex(double lat, double lon) {
     var label = "%s_%s".formatted(lat, lon);
-    return new IntersectionVertex(label, lat, lon, label);
+    return new LabelledIntersectionVertex(label, lat, lon, I18NString.of(label), false, false);
   }
 
   public static IntersectionVertex intersectionVertex(String label, double lat, double lon) {
-    return new IntersectionVertex(label, lat, lon, label);
+    return new LabelledIntersectionVertex(label, lat, lon, I18NString.of(label), false, false);
   }
 
   public static StreetEdge streetEdge(StreetVertex vA, StreetVertex vB) {
@@ -40,8 +42,8 @@ public class StreetModelForTest {
     double length,
     StreetTraversalPermission perm
   ) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
+    var labelA = vA.getLabel();
+    var labelB = vB.getLabel();
     String name = String.format("%s_%s", labelA, labelB);
     Coordinate[] coords = new Coordinate[2];
     coords[0] = vA.getCoordinate();

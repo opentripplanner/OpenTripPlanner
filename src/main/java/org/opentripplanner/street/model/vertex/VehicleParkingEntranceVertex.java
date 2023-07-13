@@ -17,12 +17,16 @@ public class VehicleParkingEntranceVertex extends Vertex {
 
   public VehicleParkingEntranceVertex(VehicleParkingEntrance parkingEntrance) {
     super(
-      "Vehicle parking " + parkingEntrance.getEntranceId(),
       parkingEntrance.getCoordinate().longitude(),
       parkingEntrance.getCoordinate().latitude(),
       parkingEntrance.getName()
     );
     this.parkingEntrance = parkingEntrance;
+  }
+
+  @Override
+  public VertexLabel getLabel() {
+    return VertexLabel.string("Vehicle parking " + parkingEntrance.getEntranceId());
   }
 
   public VehicleParkingEntrance getParkingEntrance() {

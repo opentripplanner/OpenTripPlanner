@@ -23,7 +23,7 @@ public class DataStoreArchitectureTest {
   private static final Package SERVICE = DATASTORE;
 
   private static final Package FRAMEWORK_IO = FRAMEWORK.subPackage("io");
-  private static final Package APACHE_HTTP = Package.of("org.apache.http..");
+  private static final Package APACHE_HTTP = Package.of("org.apache.hc..");
 
   @Test
   void enforceApiPackageDependencies() {
