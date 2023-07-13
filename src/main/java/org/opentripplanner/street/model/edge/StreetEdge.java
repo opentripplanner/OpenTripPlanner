@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
@@ -107,10 +106,10 @@ public class StreetEdge
    * The angle at the start of the edge geometry. Internal representation is -180 to +179 integer
    * degrees mapped to -128 to +127 (brads)
    */
-  private byte inAngle;
+  private final byte inAngle;
 
   /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
-  private byte outAngle;
+  private final byte outAngle;
 
   private StreetElevationExtension elevationExtension;
 
@@ -159,34 +158,9 @@ public class StreetEdge
     this.setPermission(permission);
     this.setCarSpeed(DEFAULT_CAR_SPEED);
     this.setWheelchairAccessible(true); // accessible by default
-    if (geometry != null) {
-      try {
-        for (Coordinate c : geometry.getCoordinates()) {
-          if (Double.isNaN(c.x)) {
-            System.out.println("X DOOM");
-          }
-          if (Double.isNaN(c.y)) {
-            System.out.println("Y DOOM");
-          }
-        }
-        // Conversion from radians to internal representation as a single signed byte.
-        // We also reorient the angles since OTP seems to use South as a reference
-        // while the azimuth functions use North.
-        // FIXME Use only North as a reference, not a mix of North and South!
-        // Range restriction happens automatically due to Java signed overflow behavior.
-        // 180 degrees exists as a negative rather than a positive due to the integer range.
-        double angleRadians = DirectionUtils.getLastAngle(geometry);
-        outAngle = (byte) Math.round(angleRadians * 128 / Math.PI + 128);
-        angleRadians = DirectionUtils.getFirstAngle(geometry);
-        inAngle = (byte) Math.round(angleRadians * 128 / Math.PI + 128);
-      } catch (IllegalArgumentException iae) {
-        LOG.error(
-          "exception while determining street edge angles. setting to zero. there is probably something wrong with this street segment's geometry."
-        );
-        inAngle = 0;
-        outAngle = 0;
-      }
-    }
+    LineStringInOutAngles lineStringInOutAngles = LineStringInOutAngles.of(geometry);
+    inAngle = lineStringInOutAngles.inAngle();
+    outAngle = lineStringInOutAngles.outAngle();
   }
 
   //For testing only
@@ -1439,4 +1413,44 @@ public class StreetEdge
 
   /** Tuple to return time and weight from calculation */
   private record TraversalCosts(double time, double weight) {}
+
+  /**
+   * The angles of the first (in) segment and last (out) segment of a LineString, encoded on one
+   * byte.
+   */
+  private record LineStringInOutAngles(byte inAngle, byte outAngle) {
+    private static final LineStringInOutAngles DEFAULT = new LineStringInOutAngles(
+      (byte) 0,
+      (byte) 0
+    );
+
+    public static LineStringInOutAngles of(LineString geometry) {
+      if (geometry == null) {
+        return LineStringInOutAngles.DEFAULT;
+      }
+
+      try {
+        byte in = convertRadianToByte(DirectionUtils.getFirstAngle(geometry));
+        byte out = convertRadianToByte(DirectionUtils.getLastAngle(geometry));
+        return new LineStringInOutAngles(in, out);
+      } catch (Exception e) {
+        LOG.info(
+          "Exception while determining LineString angles. setting to zero. There is probably something wrong with this segment's geometry."
+        );
+        return LineStringInOutAngles.DEFAULT;
+      }
+    }
+
+    /**
+     * Conversion from radians to internal representation as a single signed byte.
+     * We also reorient the angles since OTP seems to use South as a reference
+     * while the azimuth functions use North.
+     * FIXME Use only North as a reference, not a mix of North and South!
+     * Range restriction happens automatically due to Java signed overflow behavior.
+     * 180 degrees exists as a negative rather than a positive due to the integer range.
+     */
+    private static byte convertRadianToByte(double angleRadians) {
+      return (byte) Math.round(angleRadians * 128 / Math.PI + 128);
+    }
+  }
 }
