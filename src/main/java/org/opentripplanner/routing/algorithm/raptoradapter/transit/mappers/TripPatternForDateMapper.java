@@ -53,6 +53,18 @@ public class TripPatternForDateMapper {
   public TripPatternForDate map(Timetable timetable, LocalDate serviceDate) {
     TIntSet serviceCodesRunning = serviceCodesRunningForDate.get(serviceDate);
 
+    // ServiceCodesRunning is potentially null if the date is not present in the original GTFS.
+    // At that point we can simply return null, as there are no trips running on that date.
+    if (serviceCodesRunning == null) {
+      LOG.debug(
+        "Tried to update TripPattern {}, but no service codes are running for date {}",
+        timetable.getPattern().getId(),
+        serviceDate
+      );
+
+      return null;
+    }
+
     List<TripTimes> times = new ArrayList<>();
 
     // The TripTimes are not sorted by departure time in the source timetable because
@@ -71,6 +83,7 @@ public class TripPatternForDateMapper {
       if (!serviceCodesRunning.contains(tripTimes.getServiceCode())) {
         continue;
       }
+
       if (tripTimes.isDeleted()) {
         continue;
       }
