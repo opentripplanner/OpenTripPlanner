@@ -19,6 +19,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -199,7 +200,15 @@ public class TurnRestrictionTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, back);
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(vA)
+      .withToVertex(vB)
+      .withGeometry(geom)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(perm)
+      .withBack(back)
+      .buildAndConnect();
   }
 
   private void DisallowTurn(StreetEdge from, StreetEdge to) {

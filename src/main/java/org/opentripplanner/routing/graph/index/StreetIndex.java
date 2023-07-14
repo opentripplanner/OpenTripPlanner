@@ -29,6 +29,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -276,35 +277,33 @@ public class StreetIndex {
     double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
 
     if (endVertex) {
-      TemporaryPartialStreetEdge temporaryPartialStreetEdge = TemporaryPartialStreetEdge.createTemporaryPartialStreetEdge(
-        street,
-        fromv,
-        base,
-        geometries.beginning(),
-        name,
-        lengthIn
-      );
-
-      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
-      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
-      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
-      temporaryPartialStreetEdge.setLink(street.isLink());
-      tempEdges.addEdge(temporaryPartialStreetEdge);
+      TemporaryPartialStreetEdge tpse = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(street)
+        .withFromVertex(fromv)
+        .withToVertex(base)
+        .withGeometry(geometries.beginning())
+        .withName(name)
+        .withMeterLength(lengthIn)
+        .withMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic())
+        .withBicycleNoThruTraffic(street.isBicycleNoThruTraffic())
+        .withWalkNoThruTraffic(street.isWalkNoThruTraffic())
+        .withLink(street.isLink())
+        .buildAndConnect();
+      tempEdges.addEdge(tpse);
     } else {
-      TemporaryPartialStreetEdge temporaryPartialStreetEdge = TemporaryPartialStreetEdge.createTemporaryPartialStreetEdge(
-        street,
-        base,
-        tov,
-        geometries.ending(),
-        name,
-        lengthOut
-      );
-
-      temporaryPartialStreetEdge.setLink(street.isLink());
-      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
-      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
-      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
-      tempEdges.addEdge(temporaryPartialStreetEdge);
+      TemporaryPartialStreetEdge tpse = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(street)
+        .withFromVertex(base)
+        .withToVertex(tov)
+        .withGeometry(geometries.ending())
+        .withName(name)
+        .withMeterLength(lengthOut)
+        .withLink(street.isLink())
+        .withMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic())
+        .withBicycleNoThruTraffic(street.isBicycleNoThruTraffic())
+        .withWalkNoThruTraffic(street.isWalkNoThruTraffic())
+        .buildAndConnect();
+      tempEdges.addEdge(tpse);
     }
   }
 

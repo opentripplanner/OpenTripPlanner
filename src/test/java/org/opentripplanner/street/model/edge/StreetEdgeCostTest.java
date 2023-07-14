@@ -27,15 +27,15 @@ class StreetEdgeCostTest {
   @VariableSource("walkReluctanceCases")
   public void walkReluctance(double walkReluctance, long expectedCost) {
     double length = 100;
-    var edge = StreetEdge.createStreetEdge(
-      V1,
-      V2,
-      null,
-      "edge",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withGeometry(null)
+      .withName("edge")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withReluctance(walkReluctance)));
@@ -57,15 +57,15 @@ class StreetEdgeCostTest {
   @VariableSource("bikeReluctanceCases")
   public void bikeReluctance(double bikeReluctance, long expectedCost) {
     double length = 100;
-    var edge = StreetEdge.createStreetEdge(
-      V1,
-      V2,
-      null,
-      "edge",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withGeometry(null)
+      .withName("edge")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withBike(b -> b.withReluctance(bikeReluctance)));
@@ -88,15 +88,15 @@ class StreetEdgeCostTest {
   @VariableSource("carReluctanceCases")
   public void carReluctance(double carReluctance, long expectedCost) {
     double length = 100;
-    var edge = StreetEdge.createStreetEdge(
-      V1,
-      V2,
-      null,
-      "edge",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withGeometry(null)
+      .withName("edge")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withCar(c -> c.withReluctance(carReluctance)));
@@ -118,27 +118,27 @@ class StreetEdgeCostTest {
   @VariableSource("stairsCases")
   public void stairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = StreetEdge.createStreetEdge(
-      V1,
-      V2,
-      null,
-      "stairs",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
-    edge.setStairs(true);
+    var stairsEdge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withGeometry(null)
+      .withName("stairs")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .withStairs(true)
+      .buildAndConnect();
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withStairsReluctance(stairsReluctance)));
     req.withMode(StreetMode.WALK);
-    var result = traverse(edge, req.build());
+    var result = traverse(stairsEdge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
     assertEquals(23, result.getElapsedTimeSeconds());
 
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req.build());
+    StreetEdge noStairsEdge = stairsEdge.toBuilder().withStairs(false).buildAndConnect();
+    var notStairsResult = traverse(noStairsEdge, req.build());
     assertEquals(15, (long) notStairsResult.weight);
   }
 
@@ -152,27 +152,27 @@ class StreetEdgeCostTest {
   @VariableSource("bikeStairsCases")
   public void bikeStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = StreetEdge.createStreetEdge(
-      V1,
-      V2,
-      null,
-      "stairs",
-      length,
-      StreetTraversalPermission.PEDESTRIAN,
-      false
-    );
-    edge.setStairs(true);
+    var stairsEdge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withGeometry(null)
+      .withName("stairs")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.PEDESTRIAN)
+      .withBack(false)
+      .withStairs(true)
+      .buildAndConnect();
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withBike(b -> b.withStairsReluctance(stairsReluctance)));
     req.withMode(StreetMode.BIKE);
-    var result = traverse(edge, req.build());
+    var result = traverse(stairsEdge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
     assertEquals(23, result.getElapsedTimeSeconds());
 
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req.build());
+    StreetEdge noStairsEdge = stairsEdge.toBuilder().withStairs(false).buildAndConnect();
+    var notStairsResult = traverse(noStairsEdge, req.build());
     assertEquals(37, (long) notStairsResult.weight);
   }
 
@@ -186,27 +186,27 @@ class StreetEdgeCostTest {
   @VariableSource("walkSafetyCases")
   public void walkSafetyFactor(double walkSafetyFactor, long expectedCost) {
     double length = 10;
-    var edge = StreetEdge.createStreetEdge(
-      V1,
-      V2,
-      null,
-      "test edge",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
-    edge.setWalkSafetyFactor(2);
+    var safeEdge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withGeometry(null)
+      .withName("test edge")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .withWalkSafetyFactor(2)
+      .buildAndConnect();
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withSafetyFactor(walkSafetyFactor)));
     req.withMode(StreetMode.WALK);
-    var result = traverse(edge, req.build());
+    var result = traverse(safeEdge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
     assertEquals(8, result.getElapsedTimeSeconds());
 
-    edge.setWalkSafetyFactor(1);
-    var defaultSafetyResult = traverse(edge, req.build());
+    StreetEdge lessSafeEdge = safeEdge.toBuilder().withWalkSafetyFactor(1).buildAndConnect();
+    var defaultSafetyResult = traverse(lessSafeEdge, req.build());
     assertEquals(15, (long) defaultSafetyResult.weight);
   }
 

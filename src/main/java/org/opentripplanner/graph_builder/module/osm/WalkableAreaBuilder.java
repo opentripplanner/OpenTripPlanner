@@ -37,6 +37,7 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
@@ -527,27 +528,26 @@ public class WalkableAreaBuilder {
         endEndpoint.getLabel();
       I18NString name = namer.getNameForWay(areaEntity, label);
 
-      AreaEdge street = AreaEdge.createAreaEdge(
-        startEndpoint,
-        endEndpoint,
-        line,
-        name,
-        length,
-        areaPermissions,
-        false,
-        edgeList
-      );
-      street.setCarSpeed(carSpeed);
+      AreaEdgeBuilder streetEdgeBuilder = new AreaEdgeBuilder()
+        .withFromVertex(startEndpoint)
+        .withToVertex(endEndpoint)
+        .withGeometry(line)
+        .withName(name)
+        .withMeterLength(length)
+        .withPermission(areaPermissions)
+        .withBack(false)
+        .withArea(edgeList)
+        .withCarSpeed(carSpeed);
 
       if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
-        street.setHasBogusName(true);
+        streetEdgeBuilder.withBogusName(true);
       }
 
       if (areaEntity.isTagFalse("wheelchair")) {
-        street.setWheelchairAccessible(false);
+        streetEdgeBuilder.withWheelchairAccessible(false);
       }
 
-      street.setLink(OsmFilter.isLink(areaEntity));
+      streetEdgeBuilder.withLink(OsmFilter.isLink(areaEntity));
 
       label =
         "way (area) " +
@@ -558,27 +558,26 @@ public class WalkableAreaBuilder {
         startEndpoint.getLabel();
       name = namer.getNameForWay(areaEntity, label);
 
-      AreaEdge backStreet = AreaEdge.createAreaEdge(
-        endEndpoint,
-        startEndpoint,
-        line.reverse(),
-        name,
-        length,
-        areaPermissions,
-        true,
-        edgeList
-      );
-      backStreet.setCarSpeed(carSpeed);
+      AreaEdgeBuilder backStreetEdgeBuilder = new AreaEdgeBuilder()
+        .withFromVertex(endEndpoint)
+        .withToVertex(startEndpoint)
+        .withGeometry(line.reverse())
+        .withName(name)
+        .withMeterLength(length)
+        .withPermission(areaPermissions)
+        .withBack(true)
+        .withArea(edgeList)
+        .withCarSpeed(carSpeed);
 
       if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
-        backStreet.setHasBogusName(true);
+        backStreetEdgeBuilder.withBogusName(true);
       }
 
       if (areaEntity.isTagFalse("wheelchair")) {
-        backStreet.setWheelchairAccessible(false);
+        backStreetEdgeBuilder.withWheelchairAccessible(false);
       }
 
-      backStreet.setLink(OsmFilter.isLink(areaEntity));
+      backStreetEdgeBuilder.withLink(OsmFilter.isLink(areaEntity));
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
         WayProperties wayData = areaEntity
@@ -588,6 +587,8 @@ public class WalkableAreaBuilder {
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
+      AreaEdge street = streetEdgeBuilder.buildAndConnect();
+      AreaEdge backStreet = backStreetEdgeBuilder.buildAndConnect();
       normalizer.applyWayProperties(
         street,
         backStreet,

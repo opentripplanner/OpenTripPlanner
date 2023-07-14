@@ -248,14 +248,14 @@ public class TemporaryPartialStreetEdgeTest {
     String name,
     double length
   ) {
-    return TemporaryPartialStreetEdge.createTemporaryPartialStreetEdge(
-      parentEdge,
-      v1,
-      v2,
-      geometry,
-      new NonLocalizedString(name),
-      length
-    );
+    return new TemporaryPartialStreetEdgeBuilder()
+      .withParentEdge(parentEdge)
+      .withFromVertex(v1)
+      .withToVertex(v2)
+      .withGeometry(geometry)
+      .withName(new NonLocalizedString(name))
+      .withMeterLength(length)
+      .buildAndConnect();
   }
 
   private IntersectionVertex vertex(String label, double lat, double lon) {
@@ -279,6 +279,14 @@ public class TemporaryPartialStreetEdgeTest {
     coords[1] = vB.getCoordinate();
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, false);
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(vA)
+      .withToVertex(vB)
+      .withGeometry(geom)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(perm)
+      .withBack(false)
+      .buildAndConnect();
   }
 }

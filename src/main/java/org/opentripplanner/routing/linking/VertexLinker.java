@@ -21,6 +21,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.EdgeSpatialIndex;
 import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
@@ -639,42 +640,38 @@ public class VertexLinker {
       // if all joining edges are nothru, then the new edge should be as well
       var incomingNoThruModes = getNoThruModes(to.getIncoming());
       var outgoingNoThruModes = getNoThruModes(to.getIncoming());
-
-      AreaEdge ae = AreaEdge.createAreaEdge(
-        from,
-        to,
-        line,
-        hit.getName(),
-        length,
-        hit.getPermission(),
-        false,
-        ael
-      );
+      AreaEdgeBuilder areaEdgeBuilder = new AreaEdgeBuilder()
+        .withFromVertex(from)
+        .withToVertex(to)
+        .withGeometry(line)
+        .withName(hit.getName())
+        .withMeterLength(length)
+        .withPermission(hit.getPermission())
+        .withBack(false)
+        .withArea(ael);
       for (TraverseMode tm : outgoingNoThruModes) {
-        ae.setNoThruTraffic(tm);
+        areaEdgeBuilder.withNoThruTrafficTraverseMode(tm);
       }
-
+      AreaEdge areaEdge = areaEdgeBuilder.buildAndConnect();
       if (scope != Scope.PERMANENT) {
-        tempEdges.addEdge(ae);
+        tempEdges.addEdge(areaEdge);
       }
 
-      ae =
-        AreaEdge.createAreaEdge(
-          to,
-          from,
-          line.reverse(),
-          hit.getName(),
-          length,
-          hit.getPermission(),
-          true,
-          ael
-        );
+      AreaEdgeBuilder reverseAreaEdgeBuilder = new AreaEdgeBuilder()
+        .withFromVertex(to)
+        .withToVertex(from)
+        .withGeometry(line.reverse())
+        .withName(hit.getName())
+        .withMeterLength(length)
+        .withPermission(hit.getPermission())
+        .withBack(true)
+        .withArea(ael);
       for (TraverseMode tm : incomingNoThruModes) {
-        ae.setNoThruTraffic(tm);
+        reverseAreaEdgeBuilder.withNoThruTrafficTraverseMode(tm);
       }
-
+      AreaEdge reverseAreaEdge = reverseAreaEdgeBuilder.buildAndConnect();
       if (scope != Scope.PERMANENT) {
-        tempEdges.addEdge(ae);
+        tempEdges.addEdge(reverseAreaEdge);
       }
     }
   }

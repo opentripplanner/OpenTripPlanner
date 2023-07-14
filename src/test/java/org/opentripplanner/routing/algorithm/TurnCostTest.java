@@ -20,6 +20,7 @@ import org.opentripplanner.street.model.TurnRestrictionType;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -247,9 +248,16 @@ public class TurnCostTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    StreetEdge pse = StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, back);
-    pse.setCarSpeed(1.0f);
-    return pse;
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(vA)
+      .withToVertex(vB)
+      .withGeometry(geom)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(perm)
+      .withBack(back)
+      .withCarSpeed(1.0f)
+      .buildAndConnect();
   }
 
   private void DisallowTurn(StreetEdge from, StreetEdge to) {

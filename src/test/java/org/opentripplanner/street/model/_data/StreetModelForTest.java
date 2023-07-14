@@ -7,6 +7,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -32,7 +33,7 @@ public class StreetModelForTest {
     return streetEdge(vA, vB, meters, StreetTraversalPermission.ALL);
   }
 
-  public static StreetEdge streetEdge(
+  public static StreetEdgeBuilder<?> streetEdgeBuilder(
     StreetVertex vA,
     StreetVertex vB,
     double length,
@@ -46,6 +47,22 @@ public class StreetModelForTest {
     coords[1] = vB.getCoordinate();
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, false);
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(vA)
+      .withToVertex(vB)
+      .withGeometry(geom)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(perm)
+      .withBack(false);
+  }
+
+  public static StreetEdge streetEdge(
+    StreetVertex vA,
+    StreetVertex vB,
+    double length,
+    StreetTraversalPermission perm
+  ) {
+    return streetEdgeBuilder(vA, vB, length, perm).buildAndConnect();
   }
 }

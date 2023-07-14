@@ -9,12 +9,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedStringFormat;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetElevationExtension;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -187,15 +189,15 @@ class MissingElevationHandlerTest {
   }
 
   private StreetEdge edge(IntersectionVertex from, IntersectionVertex to, double length) {
-    return StreetEdge.createStreetEdge(
-      from,
-      to,
-      null,
-      new LocalizedStringFormat("%s%s", from.getName(), to.getName()),
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(from)
+      .withToVertex(to)
+      .withGeometry(null)
+      .withName(new LocalizedStringFormat("%s%s", from.getName(), to.getName()))
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
   }
 
   private void assignElevation(StreetEdge edge, Map<Vertex, Double> elevations) {

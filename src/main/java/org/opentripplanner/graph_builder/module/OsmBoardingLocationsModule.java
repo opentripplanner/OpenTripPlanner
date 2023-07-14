@@ -19,6 +19,7 @@ import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -185,15 +186,15 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
     var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
-    return StreetEdge.createStreetEdge(
-      from,
-      to,
-      line,
-      new LocalizedString("name.platform"),
-      SphericalDistanceLibrary.length(line),
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      false
-    );
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(from)
+      .withToVertex(to)
+      .withGeometry(line)
+      .withName(new LocalizedString("name.platform"))
+      .withMeterLength(SphericalDistanceLibrary.length(line))
+      .withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE)
+      .withBack(false)
+      .buildAndConnect();
   }
 
   private void linkBoardingLocationToStop(
