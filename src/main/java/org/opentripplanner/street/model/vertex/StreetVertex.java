@@ -21,8 +21,9 @@ import org.opentripplanner.transit.model.site.AreaStop;
  */
 public abstract class StreetVertex extends Vertex {
 
+  private static final Set<AreaStop> EMPTY_SET = Set.of();
   /** All locations for flex transit, which this vertex is part of */
-  private Set<AreaStop> areaStops;
+  private Set<AreaStop> areaStops = EMPTY_SET;
 
   StreetVertex(double x, double y, @Nullable I18NString streetName) {
     super(x, y, streetName);
@@ -81,7 +82,7 @@ public abstract class StreetVertex extends Vertex {
    */
   @Nonnull
   public Set<AreaStop> areaStops() {
-    return Objects.requireNonNullElseGet(areaStops, Set::of);
+    return areaStops;
   }
 
   /**
@@ -91,7 +92,7 @@ public abstract class StreetVertex extends Vertex {
     Objects.requireNonNull(toBeAdded);
 
     synchronized (this) {
-      if (areaStops == null) {
+      if (areaStops == EMPTY_SET) {
         areaStops = Set.copyOf(toBeAdded);
       } else {
         var set = new HashSet<>(areaStops);
