@@ -90,9 +90,4 @@ public class ElevatorAlightEdge extends Edge implements BikeWalkableEdge, Elevat
   public LineString getGeometry() {
     return the_geom;
   }
-
-  @Override
-  public double getDistanceMeters() {
-    return 0;
-  }
 }

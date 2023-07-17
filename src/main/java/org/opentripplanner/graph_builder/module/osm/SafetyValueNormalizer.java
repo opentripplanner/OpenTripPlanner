@@ -12,6 +12,7 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
+import org.opentripplanner.street.model.edge.OsmEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -74,8 +75,8 @@ class SafetyValueNormalizer {
   }
 
   void applyWayProperties(
-    StreetEdge street,
-    StreetEdge backStreet,
+    OsmEdge street,
+    OsmEdge backStreet,
     WayProperties wayData,
     OSMWithTags way
   ) {

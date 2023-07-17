@@ -9,11 +9,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
-import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.SplitLineString;
@@ -28,7 +26,6 @@ import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
-import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -46,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * @author novalis
  */
 public class StreetEdge
-  extends Edge
+  extends OsmEdge
   implements BikeWalkableEdge, Cloneable, CarPickupableEdge, WheelchairTraversalInformation {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
@@ -59,13 +56,11 @@ public class StreetEdge
   private static final int ROUNDABOUT_FLAG_INDEX = 1;
   private static final int HASBOGUSNAME_FLAG_INDEX = 2;
   private static final int MOTOR_VEHICLE_NOTHRUTRAFFIC = 3;
-  private static final int STAIRS_FLAG_INDEX = 4;
-  private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
-  private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
-  private static final int BICYCLE_NOTHRUTRAFFIC = 7;
-  private static final int WALK_NOTHRUTRAFFIC = 8;
-  private static final int CLASS_LINK = 9;
-
+  private static final int SLOPEOVERRIDE_FLAG_INDEX = 4;
+  private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 5;
+  private static final int BICYCLE_NOTHRUTRAFFIC = 6;
+  private static final int WALK_NOTHRUTRAFFIC = 7;
+  private static final int CLASS_LINK = 8;
   private StreetEdgeCostExtension costExtension;
   /** back, roundabout, stairs, ... */
   private short flags;
@@ -103,15 +98,6 @@ public class StreetEdge
    */
   private float carSpeed;
 
-  /**
-   * The angle at the start of the edge geometry. Internal representation is -180 to +179 integer
-   * degrees mapped to -128 to +127 (brads)
-   */
-  private byte inAngle;
-
-  /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
-  private byte outAngle;
-
   private StreetElevationExtension elevationExtension;
 
   /**
@@ -141,7 +127,7 @@ public class StreetEdge
     StreetTraversalPermission permission,
     boolean back
   ) {
-    super(v1, v2);
+    super(v1, v2, geometry);
     this.setBack(back);
     this.setGeometry(geometry);
     this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS
@@ -159,34 +145,6 @@ public class StreetEdge
     this.setPermission(permission);
     this.setCarSpeed(DEFAULT_CAR_SPEED);
     this.setWheelchairAccessible(true); // accessible by default
-    if (geometry != null) {
-      try {
-        for (Coordinate c : geometry.getCoordinates()) {
-          if (Double.isNaN(c.x)) {
-            System.out.println("X DOOM");
-          }
-          if (Double.isNaN(c.y)) {
-            System.out.println("Y DOOM");
-          }
-        }
-        // Conversion from radians to internal representation as a single signed byte.
-        // We also reorient the angles since OTP seems to use South as a reference
-        // while the azimuth functions use North.
-        // FIXME Use only North as a reference, not a mix of North and South!
-        // Range restriction happens automatically due to Java signed overflow behavior.
-        // 180 degrees exists as a negative rather than a positive due to the integer range.
-        double angleRadians = DirectionUtils.getLastAngle(geometry);
-        outAngle = (byte) Math.round(angleRadians * 128 / Math.PI + 128);
-        angleRadians = DirectionUtils.getFirstAngle(geometry);
-        inAngle = (byte) Math.round(angleRadians * 128 / Math.PI + 128);
-      } catch (IllegalArgumentException iae) {
-        LOG.error(
-          "exception while determining street edge angles. setting to zero. there is probably something wrong with this street segment's geometry."
-        );
-        inAngle = 0;
-        outAngle = 0;
-      }
-    }
   }
 
   //For testing only
@@ -275,12 +233,7 @@ public class StreetEdge
    */
   public boolean canTraverse(TraverseMode mode) {
     StreetTraversalPermission permission = getPermission();
-    if (fromv instanceof BarrierVertex) {
-      permission = permission.intersection(((BarrierVertex) fromv).getBarrierPermissions());
-    }
-    if (tov instanceof BarrierVertex) {
-      permission = permission.intersection(((BarrierVertex) tov).getBarrierPermissions());
-    }
+    permission = BarrierCalculator.reducePermissions(permission, fromv, tov);
 
     return permission.allows(mode);
   }
@@ -339,15 +292,12 @@ public class StreetEdge
       return Double.NaN;
     }
 
-    final double speed =
-      switch (traverseMode) {
-        case WALK -> walkingBike ? preferences.bike().walkingSpeed() : preferences.walk().speed();
-        case BICYCLE, SCOOTER -> preferences.bike().speed();
-        case CAR -> getCarSpeed();
-        case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
-      };
-
-    return isStairs() ? (speed / preferences.walk().stairsTimeFactor()) : speed;
+    return switch (traverseMode) {
+      case WALK -> walkingBike ? preferences.bike().walkingSpeed() : preferences.walk().speed();
+      case BICYCLE, SCOOTER -> preferences.bike().speed();
+      case CAR -> getCarSpeed();
+      case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
+    };
   }
 
   /**
@@ -707,11 +657,14 @@ public class StreetEdge
     return true;
   }
 
-  public void shareData(StreetEdge reversedEdge) {
-    if (Arrays.equals(compactGeometry, reversedEdge.compactGeometry)) {
-      compactGeometry = reversedEdge.compactGeometry;
-    } else {
-      LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
+  @Override
+  public void shareData(Edge reversedEdge) {
+    if (reversedEdge instanceof StreetEdge otherStreetEdge) {
+      if (Arrays.equals(compactGeometry, otherStreetEdge.compactGeometry)) {
+        compactGeometry = otherStreetEdge.compactGeometry;
+      } else {
+        LOG.warn("Can't share geometry between {} and {}", this, reversedEdge);
+      }
     }
   }
 
@@ -740,7 +693,7 @@ public class StreetEdge
     return BitSetUtils.get(flags, BACK_FLAG_INDEX);
   }
 
-  public void setBack(boolean back) {
+  private void setBack(boolean back) {
     flags = BitSetUtils.set(flags, BACK_FLAG_INDEX, back);
   }
 
@@ -773,17 +726,6 @@ public class StreetEdge
   }
 
   /**
-   * This street is a staircase
-   */
-  public boolean isStairs() {
-    return BitSetUtils.get(flags, STAIRS_FLAG_INDEX);
-  }
-
-  public void setStairs(boolean stairs) {
-    flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
-  }
-
-  /**
    * The edge is part of an osm way, which is of type link
    */
   public boolean isLink() {
@@ -808,19 +750,6 @@ public class StreetEdge
 
   public void setSlopeOverride(boolean slopeOverride) {
     flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
-  }
-
-  /**
-   * Return the azimuth of the first segment in this edge in integer degrees clockwise from South.
-   * TODO change everything to clockwise from North
-   */
-  public int getInAngle() {
-    return (int) Math.round(this.inAngle * 180 / 128.0);
-  }
-
-  /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
-  public int getOutAngle() {
-    return (int) Math.round(this.outAngle * 180 / 128.0);
   }
 
   public void setCostExtension(StreetEdgeCostExtension costExtension) {
@@ -1310,7 +1239,7 @@ public class StreetEdge
         preferences,
         traverseMode,
         walkingBike,
-        isStairs()
+        false
       );
     return new TraversalCosts(time, weight);
   }
@@ -1350,7 +1279,7 @@ public class StreetEdge
       pref,
       TraverseMode.BICYCLE,
       false,
-      isStairs()
+      false
     );
     weight *= reluctance;
     return new TraversalCosts(time, weight);
@@ -1373,16 +1302,12 @@ public class StreetEdge
           preferences,
           getMaxSlope(),
           isWheelchairAccessible(),
-          isStairs()
+          false
         );
     } else {
       if (walkingBike) {
         // take slopes into account when walking bikes
         time = weight = (getEffectiveBikeDistance() / speed);
-        if (isStairs()) {
-          // we do allow walking the bike across a stairs but there is a very high default penalty
-          weight *= preferences.bike().stairsReluctance();
-        }
       } else {
         // take slopes into account when walking
         time = getEffectiveWalkDistance() / speed;
@@ -1399,7 +1324,7 @@ public class StreetEdge
           preferences,
           traverseMode,
           walkingBike,
-          isStairs()
+          false
         );
     }
 

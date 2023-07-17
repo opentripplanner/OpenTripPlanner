@@ -574,9 +574,7 @@ public class WalkableAreaBuilder {
         backStreet.setHasBogusName(true);
       }
 
-      if (areaEntity.isTagFalse("wheelchair")) {
-        backStreet.setWheelchairAccessible(false);
-      }
+      backStreet.setWheelchairAccessible(areaEntity.isWheelchairAccessible());
 
       backStreet.setLink(OsmFilter.isLink(areaEntity));
 

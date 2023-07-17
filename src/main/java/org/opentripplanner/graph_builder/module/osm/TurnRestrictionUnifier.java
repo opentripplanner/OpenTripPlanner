@@ -22,14 +22,14 @@ class TurnRestrictionUnifier {
           issueStore.add(new TurnRestrictionBad(restrictionTag.relationOSMID, "No to edge found"));
           continue;
         }
-        for (StreetEdge from : restrictionTag.possibleFrom) {
+        for (var from : restrictionTag.possibleFrom) {
           if (from == null) {
             issueStore.add(
               new TurnRestrictionBad(restrictionTag.relationOSMID, "from-edge is null")
             );
             continue;
           }
-          for (StreetEdge to : restrictionTag.possibleTo) {
+          for (var to : restrictionTag.possibleTo) {
             if (to == null) {
               issueStore.add(
                 new TurnRestrictionBad(restrictionTag.relationOSMID, "to-edge is null")

@@ -18,18 +18,28 @@ class StreetEdgeReluctanceCalculator {
     boolean walkingBike,
     boolean edgeIsStairs
   ) {
-    if (edgeIsStairs) {
-      return pref.walk().stairsReluctance();
-    } else {
-      return switch (traverseMode) {
-        case WALK -> walkingBike ? pref.bike().walkingReluctance() : pref.walk().reluctance();
-        case BICYCLE -> pref.bike().reluctance();
-        case CAR -> pref.car().reluctance();
-        default -> throw new IllegalArgumentException(
-          "getReluctance(): Invalid mode " + traverseMode
-        );
-      };
-    }
+    return switch (traverseMode) {
+      case WALK -> {
+        if (walkingBike) {
+          yield pref.bike().walkingReluctance();
+        } else if (edgeIsStairs) {
+          yield pref.walk().stairsReluctance();
+        } else {
+          yield pref.walk().reluctance();
+        }
+      }
+      case BICYCLE -> {
+        double bikeStairsReluctance = 1;
+        if (edgeIsStairs) {
+          bikeStairsReluctance = pref.bike().stairsReluctance();
+        }
+        yield pref.bike().reluctance() * bikeStairsReluctance;
+      }
+      case CAR -> pref.car().reluctance();
+      default -> throw new IllegalArgumentException(
+        "getReluctance(): Invalid mode " + traverseMode
+      );
+    };
   }
 
   static double computeWheelchairReluctance(

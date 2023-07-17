@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.street.model.RepeatingTimePeriod;
 import org.opentripplanner.street.model.TurnRestrictionType;
+import org.opentripplanner.street.model.edge.OsmEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseModeSet;
 

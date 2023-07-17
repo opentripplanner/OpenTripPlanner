@@ -199,12 +199,6 @@ public class StreetElevationExtension implements Serializable {
       );
     }
 
-    if (streetEdge.isStairs()) {
-      // Ignore elevation related costs for stairs, RouteRequest#stairsTimeFactor is used instead.
-      effectiveBikeDistanceFactor = 1.0;
-      effectiveWalkDistanceFactor = 1.0;
-    }
-
     return new StreetElevationExtension(
       streetEdge.getDistanceMeters(),
       computed,
