@@ -2,12 +2,19 @@ package org.opentripplanner.routing.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.error.RoutingValidationException;
 
-public class RouteRequestTest {
+class RouteRequestTest {
 
   @Test
   public void testRequest() {
@@ -62,7 +69,63 @@ public class RouteRequestTest {
     assertEquals(50, clone.numItineraries());
   }
 
+  @Test
+  void testValidateEmptyRequest() {
+    RouteRequest request = new RouteRequest();
+    try {
+      request.validateOriginAndDestination();
+      fail();
+    } catch (RoutingValidationException e) {
+      assertEquals(2, e.getRoutingErrors().size());
+    }
+  }
+
+  @Test
+  void testValidateMissingFrom() {
+    RouteRequest request = new RouteRequest();
+    request.setTo(randomLocation());
+    expectOneRoutingValidationException(
+      request::validateOriginAndDestination,
+      RoutingErrorCode.LOCATION_NOT_FOUND,
+      InputField.FROM_PLACE
+    );
+  }
+
+  @Test
+  void testValidateMissingTo() {
+    RouteRequest request = new RouteRequest();
+    request.setFrom(randomLocation());
+    expectOneRoutingValidationException(
+      request::validateOriginAndDestination,
+      RoutingErrorCode.LOCATION_NOT_FOUND,
+      InputField.TO_PLACE
+    );
+  }
+
+  @Test
+  void testValidateFromAndTo() {
+    RouteRequest request = new RouteRequest();
+    request.setFrom(randomLocation());
+    request.setTo(randomLocation());
+    request.validateOriginAndDestination();
+  }
+
   private GenericLocation randomLocation() {
     return new GenericLocation(Math.random(), Math.random());
+  }
+
+  private void expectOneRoutingValidationException(
+    Runnable body,
+    RoutingErrorCode expCode,
+    InputField expField
+  ) {
+    try {
+      body.run();
+      fail();
+    } catch (RoutingValidationException rve) {
+      List<RoutingError> errors = rve.getRoutingErrors();
+      assertEquals(1, errors.size());
+      assertTrue(errors.stream().anyMatch(e -> e.code == expCode && e.inputField == expField));
+    }
   }
 }

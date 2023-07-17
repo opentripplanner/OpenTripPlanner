@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -89,7 +90,7 @@ public class SiriAlertsUpdateHandlerTest extends GtfsTest {
           transitModel,
           transitAlertService,
           SiriFuzzyTripMatcher.of(transitService),
-          0
+          Duration.ZERO
         );
     }
   }

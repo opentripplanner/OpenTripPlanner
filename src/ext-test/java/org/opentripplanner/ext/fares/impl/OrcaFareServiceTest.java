@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.COMM_TRANS_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.KC_METRO_AGENCY_ID;
@@ -72,7 +73,7 @@ public class OrcaFareServiceTest {
   private static void calculateFare(List<Leg> legs, FareType fareType, Money expectedPrice) {
     ItineraryFares fare = new ItineraryFares();
     orcaFareService.populateFare(fare, USD, fareType, legs, null);
-    Assertions.assertEquals(expectedPrice, fare.getFare(fareType));
+    assertEquals(expectedPrice, fare.getFare(fareType));
   }
 
   private static void assertLegFareEquals(

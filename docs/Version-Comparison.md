@@ -158,13 +158,13 @@ guide [OTP2-MigrationGuide](OTP2-MigrationGuide.md).
 
 ## OTP Trip planning and Transit index APIs
 
-OTP1 have two APIs for trip planning, the REST API and an obsolete GraphQL API(early version of the
+OTP1 had two APIs for trip planning, the REST API and an obsolete GraphQL API(early version of the
 Digitransit GraphQL API). OTP2 still support the REST API and it is very similar in functionality
 compared with the OTP1 version. In the future we would like to create a new official OTP API using
 GraphQL replacing the REST API. We will probably support the REST API for a long time to allow
 everyone to migrate to the new GraphQL API. Today, OTP2 comes with two Sandbox extension APIs:
 
-- [HSL Legacy GraphQL API](sandbox/LegacyGraphQLApi.md) - HSL's GraphQL API used by the Digitransit
+- [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) - HSL's GraphQL API used by the Digitransit
   project.
 - [Transmodel API](sandbox/TransmodelApi.md) - Entur´s Transmodel API
 

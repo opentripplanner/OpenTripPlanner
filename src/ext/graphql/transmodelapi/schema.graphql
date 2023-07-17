@@ -185,6 +185,17 @@ type DestinationDisplay {
   via: [String]
 }
 
+"Individual step of an elevation profile."
+type ElevationProfileStep {
+  "The horizontal distance from the start of the step, in meters."
+  distance: Float
+  """
+  The elevation at this distance, in meters above sea level. It is negative if the
+  location is below sea level.
+  """
+  elevation: Float
+}
+
 "List of visits to quays as part of vehicle journeys. Updated with real time information where available"
 type EstimatedCall {
   "Actual time of arrival at quay. Updated from real time information if available."
@@ -295,6 +306,12 @@ type Leg {
   distance: Float!
   "The leg's duration in seconds"
   duration: Long!
+  """
+  The leg's elevation profile. All elevation values, including the first one, are in meters
+  above sea level. The elevation is negative for places below sea level. The profile
+  includes both the start and end coordinate.
+  """
+  elevationProfile: [ElevationProfileStep]!
   "The expected, realtime adjusted date and time this leg ends."
   expectedEndTime: DateTime!
   "The expected, realtime adjusted date and time this leg starts."
@@ -432,6 +449,12 @@ type PathGuidance {
   bogusName: Boolean
   "The distance in meters that this step takes."
   distance: Float
+  """
+  The step's elevation profile. All elevation values, including the first one, are in meters
+  above sea level. The elevation is negative for places below sea level. The profile
+  includes both the start and end coordinate.
+  """
+  elevationProfile: [ElevationProfileStep]!
   "When exiting a highway or traffic circle, the exit name/number."
   exit: String
   "The absolute direction of this step."
@@ -562,7 +585,9 @@ type Quay implements PlaceInterface {
   longitude: Float
   name(
     "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned."
-    lang: String
+    lang: String,
+    "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned."
+    language: String
   ): String!
   "Public code used to identify this quay within the stop place. For instance a platform code."
   publicCode: String
@@ -1091,8 +1116,10 @@ type StopPlace implements PlaceInterface {
   latitude: Float
   longitude: Float
   name(
-    "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned."
-    lang: String
+    "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exist, the default name is returned."
+    lang: String,
+    "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exist, the default name is returned."
+    language: String
   ): String!
   "Returns parent stop for this stop"
   parent: StopPlace
@@ -1477,6 +1504,7 @@ enum Mode {
   monorail
   rail
   scooter
+  taxi
   tram
   trolleybus
   water
@@ -1563,8 +1591,6 @@ enum RoutingErrorCode {
   outsideBounds
   "The date specified is outside the range of data currently loaded into the system"
   outsideServicePeriod
-  "The routing request timed out."
-  processingTimeout
   "An unknown error happened during the search. The details have been logged to the server logs"
   systemError
   "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
@@ -1641,6 +1667,7 @@ enum TransportMode {
   metro
   monorail
   rail
+  taxi
   tram
   trolleybus
   unknown

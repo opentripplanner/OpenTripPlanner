@@ -47,7 +47,7 @@ class AccessibilityPreferencesTest {
   void testEqualsAndHashCode() {
     var same = AccessibilityPreferences.ofCost(UNKNOWN_COST, INACCESSIBLE_COST);
     var other = AccessibilityPreferences.ofCost(2, 2);
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, same);
+    assertEqualsAndHashCode(subject, other, same);
   }
 
   @Test

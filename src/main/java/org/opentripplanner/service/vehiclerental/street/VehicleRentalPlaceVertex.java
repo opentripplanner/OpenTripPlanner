@@ -1,8 +1,8 @@
 package org.opentripplanner.service.vehiclerental.street;
 
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 
 /**
  * A vertex for a rental vehicle or station. It is connected to the streets by a
@@ -13,15 +13,14 @@ public class VehicleRentalPlaceVertex extends Vertex {
 
   private VehicleRentalPlace station;
 
-  public VehicleRentalPlaceVertex(Graph g, VehicleRentalPlace station) {
-    super(
-      g,
-      "vehicle rental station " + station.getId(),
-      station.getLongitude(),
-      station.getLatitude(),
-      station.getName()
-    );
+  public VehicleRentalPlaceVertex(VehicleRentalPlace station) {
+    super(station.getLongitude(), station.getLatitude(), station.getName());
     this.station = station;
+  }
+
+  @Override
+  public VertexLabel getLabel() {
+    return VertexLabel.string("vehicle rental station " + station.getId());
   }
 
   public VehicleRentalPlace getStation() {

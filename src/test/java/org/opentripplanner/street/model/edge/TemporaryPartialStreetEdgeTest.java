@@ -17,6 +17,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
@@ -247,7 +248,7 @@ public class TemporaryPartialStreetEdgeTest {
     String name,
     double length
   ) {
-    return new TemporaryPartialStreetEdge(
+    return TemporaryPartialStreetEdge.createTemporaryPartialStreetEdge(
       parentEdge,
       v1,
       v2,
@@ -258,7 +259,7 @@ public class TemporaryPartialStreetEdgeTest {
   }
 
   private IntersectionVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(graph, label, lat, lon);
+    return StreetModelForTest.intersectionVertex(label, lat, lon);
   }
 
   /**
@@ -270,14 +271,14 @@ public class TemporaryPartialStreetEdgeTest {
     double length,
     StreetTraversalPermission perm
   ) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
+    var labelA = vA.getLabel();
+    var labelB = vB.getLabel();
     String name = String.format("%s_%s", labelA, labelB);
     Coordinate[] coords = new Coordinate[2];
     coords[0] = vA.getCoordinate();
     coords[1] = vB.getCoordinate();
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
-    return new StreetEdge(vA, vB, geom, name, length, perm, false);
+    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, false);
   }
 }

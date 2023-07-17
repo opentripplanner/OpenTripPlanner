@@ -23,6 +23,8 @@ import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeOnLevelLabel;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class WalkableAreaBuilderTest {
@@ -79,7 +81,7 @@ public class WalkableAreaBuilderTest {
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals("osm:node:1025307935"))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(1025307935)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -94,12 +96,79 @@ public class WalkableAreaBuilderTest {
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals("osm:node:1025307935"))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(1025307935)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
     assertEquals(1, areas.size());
     assertFalse(areas.get(0).getAreas().isEmpty());
+  }
+
+  // test that entrance node in a stop area relation does not link across different levels and layers
+  // test also that entrance linking of stop area with multiple platforms works properly
+  @Test
+  @OsmFile("stopareas.pbf")
+  @Visibility(true)
+  public void test_entrance_stoparea_linking() {
+    // first platform has level 0, entrance below it has level -1 -> no links
+    var entranceAtWrongLevel = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143850)))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(0, entranceAtWrongLevel.size());
+
+    // second platform and its entrance both default to level zero, entrance gets connected
+    var entranceAtSameLevel = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> hasNodeId(a, -143832))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(1, entranceAtSameLevel.size());
+
+    // second platform also contains a stop position which is not considered as an entrance
+    // therefore it should not get linked
+    var stopPositionConnection = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143863)))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(0, stopPositionConnection.size());
+
+    // test that third platform and its entrance get connected
+    // and there are not too many connections (to remote platforms)
+    // third platform also tests the 'layer' tag
+    var connectionEdges = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> hasNodeId(a, -143845))
+      .toList();
+    // entrance is connected top 2 opposite corners of a single platform
+    // with two bidirectional edge pairs, and with the other entrance point
+    assertEquals(6, connectionEdges.size());
+
+    // test that semicolon separated list of elevator levals works in level matching
+    // e.g. 'level'='0;1'
+    var elevatorConnection = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> hasNodeId(a, -143861))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(1, elevatorConnection.size());
+  }
+
+  private static boolean hasNodeId(AreaEdge a, long nodeId) {
+    return (
+      a.getToVertex().getLabel() instanceof OsmNodeOnLevelLabel label && label.nodeId() == nodeId
+    );
   }
 
   // -- Infrastructure --

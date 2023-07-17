@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import java.util.Iterator;
 import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.raptor.api.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
@@ -29,8 +29,8 @@ public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
     // goes with destination and 'latestArrivalTime()' match origin.
     this(
       s.latestArrivalTime(),
-      s.searchWindowInSeconds(),
-      s.earliestDepartureTime(),
+      s.routerSearchWindowInSeconds(),
+      s.routerEarliestDepartureTime(),
       t.iterationDepartureStepInSeconds()
     );
   }

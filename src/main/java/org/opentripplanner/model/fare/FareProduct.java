@@ -44,15 +44,14 @@ public record FareProduct(
 
   @Override
   public String toString() {
-    var builder = ToStringBuilder
+    return ToStringBuilder
       .of(FareProduct.class)
       .addStr("id", id.toString())
-      .addObj("amount", price);
-    builder.addDuration("duration", validity);
-    builder.addObj("category", category);
-    builder.addObj("medium", medium);
-
-    return builder.toString();
+      .addObj("amount", price)
+      .addDuration("duration", validity)
+      .addObj("category", category)
+      .addObj("medium", medium)
+      .toString();
   }
 
   /**

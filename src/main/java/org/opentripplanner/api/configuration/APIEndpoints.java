@@ -5,9 +5,9 @@ import static org.opentripplanner.framework.application.OTPFeature.APIGraphInspe
 import static org.opentripplanner.framework.application.OTPFeature.APIServerInfo;
 import static org.opentripplanner.framework.application.OTPFeature.APIUpdaterStatus;
 import static org.opentripplanner.framework.application.OTPFeature.ActuatorAPI;
+import static org.opentripplanner.framework.application.OTPFeature.GtfsGraphQlApi;
 import static org.opentripplanner.framework.application.OTPFeature.ReportApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIGeocoder;
-import static org.opentripplanner.framework.application.OTPFeature.SandboxAPILegacyGraphQLApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIMapboxVectorTilesApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIParkAndRideApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPITransmodelApi;
@@ -26,7 +26,7 @@ import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.geocoder.GeocoderResource;
-import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLAPI;
+import org.opentripplanner.ext.gtfsgraphqlapi.GtfsGraphQLAPI;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
@@ -60,7 +60,7 @@ public class APIEndpoints {
     addIfEnabled(ActuatorAPI, ActuatorAPI.class);
     addIfEnabled(ReportApi, ReportResource.class);
     addIfEnabled(SandboxAPITransmodelApi, TransmodelAPI.class);
-    addIfEnabled(SandboxAPILegacyGraphQLApi, LegacyGraphQLAPI.class);
+    addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.class);
     addIfEnabled(SandboxAPIMapboxVectorTilesApi, VectorTilesResource.class);
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
     addIfEnabled(SandboxAPIGeocoder, GeocoderResource.class);

@@ -115,18 +115,26 @@ public class ModifiedTripBuilder {
     }
 
     var error = newTimes.validateNonIncreasingTimes();
+    final FeedScopedId id = newTimes.getTrip().getId();
     if (error.isPresent()) {
       var updateError = error.get();
-      final FeedScopedId id = newTimes.getTrip().getId();
       LOG.info(
-        "TripTimes are non-increasing after applying SIRI delay propagation - Trip {}. Stop index {}",
+        "Invalid SIRI-ET data for trip {} - TripTimes are non-increasing after applying SIRI delay propagation at stop index {}",
         id,
         updateError.stopIndex()
       );
       return TripTimesValidationMapper.toResult(id, updateError);
     }
 
-    if (newTimes.getNumStops() != pattern.numberOfStops()) {
+    int numStopsInUpdate = newTimes.getNumStops();
+    int numStopsInPattern = pattern.numberOfStops();
+    if (numStopsInUpdate != numStopsInPattern) {
+      LOG.info(
+        "Invalid SIRI-ET data for trip {} - Inconsistent number of updated stops ({}) and stops in pattern ({})",
+        id,
+        numStopsInUpdate,
+        numStopsInPattern
+      );
       return UpdateError.result(existingTripTimes.getTrip().getId(), TOO_FEW_STOPS);
     }
 

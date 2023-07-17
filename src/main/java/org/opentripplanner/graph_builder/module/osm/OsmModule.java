@@ -56,7 +56,7 @@ public class OsmModule implements GraphBuilderModule {
   private final VertexGenerator vertexGenerator;
   private final OsmDatabase osmdb;
 
-  public OsmModule(
+  OsmModule(
     Collection<OsmProvider> providers,
     Graph graph,
     DataImportIssueStore issueStore,
@@ -243,6 +243,7 @@ public class OsmModule implements GraphBuilderModule {
     long wayCount = osmdb.getWays().size();
     ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
     LOG.info(progress.startMessage());
+    var escalatorProcessor = new EscalatorProcessor(vertexGenerator.intersectionNodes());
 
     WAY:for (OSMWay way : osmdb.getWays()) {
       WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
@@ -254,7 +255,9 @@ public class OsmModule implements GraphBuilderModule {
         params.banDiscouragedBiking(),
         issueStore
       );
-      if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) continue;
+      if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) {
+        continue;
+      }
 
       // handle duplicate nodes in OSM ways
       // this is a workaround for crappy OSM data quality
@@ -371,22 +374,27 @@ public class OsmModule implements GraphBuilderModule {
             elevationData.put(endEndpoint, elevation);
           }
         }
-        StreetEdgePair streets = getEdgesForStreet(
-          startEndpoint,
-          endEndpoint,
-          way,
-          i,
-          permissions,
-          geometry
-        );
+        if (way.isEscalator()) {
+          var length = getGeometryLengthMeters(geometry);
+          escalatorProcessor.buildEscalatorEdge(way, length);
+        } else {
+          StreetEdgePair streets = getEdgesForStreet(
+            startEndpoint,
+            endEndpoint,
+            way,
+            i,
+            permissions,
+            geometry
+          );
 
         var street = streets.main;
         var backStreet = streets.back;
-        normalizer.applyWayProperties(street, backStreet, wayData, way);
+          normalizer.applyWayProperties(street, backStreet, wayData, way);
 
-        applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
-        startNode = endNode;
-        osmStartNode = osmdb.getNode(startNode);
+          applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
+          startNode = endNode;
+          osmStartNode = osmdb.getNode(startNode);
+        }
       }
 
       //Keep lambda! A method-ref would log incorrect class and line number
@@ -516,7 +524,7 @@ public class OsmModule implements GraphBuilderModule {
     } else {
       float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
-      StreetEdge street = new StreetEdge(from, to, geometry, name, length, permissions, back);
+      StreetEdge street = StreetEdge.createStreetEdge(from, to, geometry, name, length, permissions, back);
       street.setCarSpeed(carSpeed);
       street.setLink(OsmFilter.isLink(way));
 

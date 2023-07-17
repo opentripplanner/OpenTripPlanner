@@ -69,12 +69,17 @@ public class OtpNumberFormat {
   }
 
   public static String formatZeroDecimal(double value) {
-    var decimalFormat = new DecimalFormat("#,##0", DECIMAL_SYMBOLS);
-    return decimalFormat.format(value);
+    return formatDecimals(value, new DecimalFormat("#,##0", DECIMAL_SYMBOLS));
   }
 
   public static String formatTwoDecimals(double value) {
-    var decimalFormat = new DecimalFormat("#,##0.0#", DECIMAL_SYMBOLS);
+    return formatDecimals(value, new DecimalFormat("#,##0.0#", DECIMAL_SYMBOLS));
+  }
+
+  public static String formatDecimals(double value, DecimalFormat decimalFormat) {
+    if (value < -100_000_000 || value > 100_000_000) {
+      return Double.toString(value);
+    }
     return decimalFormat.format(value);
   }
 }

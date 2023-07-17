@@ -19,7 +19,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -67,7 +70,8 @@ public class Timetable implements Serializable {
    * Copy constructor: create an un-indexed Timetable with the same TripTimes as the specified
    * timetable.
    */
-  Timetable(Timetable tt, LocalDate serviceDate) {
+  Timetable(Timetable tt, @Nonnull LocalDate serviceDate) {
+    Objects.requireNonNull(serviceDate);
     tripTimes.addAll(tt.tripTimes);
     this.serviceDate = serviceDate;
     this.pattern = tt.pattern;
@@ -106,6 +110,7 @@ public class Timetable implements Serializable {
     return tripTimes.get(tripIndex);
   }
 
+  @Nullable
   public TripTimes getTripTimes(Trip trip) {
     for (TripTimes tt : tripTimes) {
       if (tt.getTrip() == trip) {
@@ -426,6 +431,7 @@ public class Timetable implements Serializable {
    * The ServiceDate for which this (updated) timetable is valid. If null, then it is valid for all
    * dates.
    */
+  @Nullable
   public LocalDate getServiceDate() {
     return serviceDate;
   }

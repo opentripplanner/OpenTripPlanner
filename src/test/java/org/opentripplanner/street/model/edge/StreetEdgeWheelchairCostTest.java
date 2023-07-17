@@ -62,7 +62,7 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("slopeCases")
   public void shouldScaleCostWithMaxSlope(double slope, double reluctance, long expectedCost) {
     double length = 1000;
-    var edge = new StreetEdge(
+    var edge = StreetEdge.createStreetEdge(
       V1,
       V2,
       null,
@@ -103,6 +103,56 @@ class StreetEdgeWheelchairCostTest {
     assertEquals(expectedCost, (long) result.weight);
   }
 
+  static Stream<Arguments> wheelchairStairsCases = Stream.of(
+    Arguments.of(1, 22),
+    Arguments.of(10, 225),
+    Arguments.of(100, 2255)
+  );
+
+  @ParameterizedTest(
+    name = "wheelchair stairs reluctance of {0} should lead to traversal costs of {1}"
+  )
+  @VariableSource("wheelchairStairsCases")
+  public void wheelchairStairsReluctance(double stairsReluctance, long expectedCost) {
+    double length = 10;
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
+    edge.setStairs(true);
+
+    var req = StreetSearchRequest.of();
+    req.withWheelchair(true);
+    req.withPreferences(preferences ->
+      preferences.withWheelchair(
+        WheelchairPreferences
+          .of()
+          .withTripOnlyAccessible()
+          .withStopOnlyAccessible()
+          .withElevatorOnlyAccessible()
+          .withInaccessibleStreetReluctance(25)
+          .withMaxSlope(0)
+          .withSlopeExceededReluctance(1.1)
+          .withStairsReluctance(stairsReluctance)
+          .build()
+      )
+    );
+
+    req.withPreferences(pref -> pref.withWalk(w -> w.withReluctance(1.0)));
+
+    var result = traverse(edge, req.build());
+    assertEquals(expectedCost, (long) result.weight);
+
+    edge.setStairs(false);
+    var notStairsResult = traverse(edge, req.build());
+    assertEquals(7, (long) notStairsResult.weight);
+  }
+
   static Stream<Arguments> inaccessibleStreetCases = Stream.of(
     Arguments.of(1f, 15),
     Arguments.of(10f, 150),
@@ -115,7 +165,15 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("inaccessibleStreetCases")
   public void inaccessibleStreet(float inaccessibleStreetReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
     edge.setWheelchairAccessible(false);
 
     var req = StreetSearchRequest.of();
@@ -157,7 +215,15 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("walkReluctanceCases")
   public void walkReluctance(double walkReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withReluctance(walkReluctance)));

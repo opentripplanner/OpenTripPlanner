@@ -7,8 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -27,6 +25,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -55,9 +54,16 @@ public class LinkStopToPlatformTest {
 
     for (int i = 0; i < platform.length; i++) {
       Coordinate c = platform[i];
-      vertices.add(
-        new IntersectionVertex(graph, String.valueOf(i), c.x, c.y, "Platform vertex " + i)
+      var vertex = new LabelledIntersectionVertex(
+        String.valueOf(i),
+        c.x,
+        c.y,
+        I18NString.of("Platform vertex " + i),
+        false,
+        false
       );
+      graph.addVertex(vertex);
+      vertices.add(vertex);
       closedGeom[i] = c;
     }
     closedGeom[platform.length] = closedGeom[0];
@@ -82,15 +88,21 @@ public class LinkStopToPlatformTest {
 
     for (int i = 0; i < platform.length; i++) {
       int next_i = (i + 1) % platform.length;
-      edges.add(createAreaEdge(vertices.get(i), vertices.get(next_i), areaEdgeList, "edge " + i));
-      edges.add(
-        createAreaEdge(
-          vertices.get(next_i),
-          vertices.get(i),
-          areaEdgeList,
-          "edge " + String.valueOf(i + platform.length)
-        )
+
+      var edge1 = createAreaEdge(vertices.get(i), vertices.get(next_i), areaEdgeList, "edge " + i);
+      var edge2 = createAreaEdge(
+        vertices.get(next_i),
+        vertices.get(i),
+        areaEdgeList,
+        "edge " + String.valueOf(i + platform.length)
       );
+      edges.add(edge1);
+      edges.add(edge2);
+      // make one corner surrounded by walk nothru edges
+      if (i < 2) {
+        edge1.setWalkNoThruTraffic(true);
+        edge2.setWalkNoThruTraffic(true);
+      }
     }
 
     RegularStop[] transitStops = new RegularStop[stops.length];
@@ -104,7 +116,8 @@ public class LinkStopToPlatformTest {
     graph.index(transitModel.getStopModel());
 
     for (RegularStop s : transitStops) {
-      new TransitStopVertexBuilder().withGraph(graph).withStop(s).build();
+      var v = new TransitStopVertexBuilder().withStop(s).build();
+      graph.addVertex(v);
     }
 
     return graph;
@@ -166,11 +179,23 @@ public class LinkStopToPlatformTest {
     // stop links to a new street vertex with 2 edges
     // new vertex connects to all 4 visibility points with 4*2 new edges
     assertEquals(18, graph.getEdges().size());
+
+    // transit stop is connected in one rectangle corner only to walk no thru trafic edges
+    // verify that new area edge connection is also walk no thru
+    // otherwise connection cannot be used to exit the area
+    var noThruEdges = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.isWalkNoThruTraffic())
+      .toList();
+    // original platform has 4 nothru edges, now 2 more got added
+    assertEquals(6, noThruEdges.size());
   }
 
   /**
    * Link stop which is very close to a platform vertex.
    * Linking snaps directly to the vertex.
+   * Connections to other vertices are not created.
    */
   @Test
   public void testLinkStopNearPlatformVertex() {
@@ -190,8 +215,7 @@ public class LinkStopToPlatformTest {
     linkStops(graph);
 
     // stop links to a existing vertex with 2 edges
-    // selected vertex connects to opposite corner with 2 new edges
-    assertEquals(12, graph.getEdges().size());
+    assertEquals(10, graph.getEdges().size());
   }
 
   /**
@@ -245,8 +269,14 @@ public class LinkStopToPlatformTest {
         LinkingDirection.BOTH_WAYS,
         (vertex, streetVertex) ->
           List.of(
-            new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
-            new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
+            StreetTransitStopLink.createStreetTransitStopLink(
+              (TransitStopVertex) vertex,
+              streetVertex
+            ),
+            StreetTransitStopLink.createStreetTransitStopLink(
+              streetVertex,
+              (TransitStopVertex) vertex
+            )
           )
       );
     }
@@ -262,7 +292,7 @@ public class LinkStopToPlatformTest {
       new Coordinate[] { v1.getCoordinate(), v2.getCoordinate() }
     );
     I18NString name = new LocalizedString(nameString);
-    return new AreaEdge(
+    return AreaEdge.createAreaEdge(
       v1,
       v2,
       line,

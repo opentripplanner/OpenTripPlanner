@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.transmodelapi;
 
-import graphql.GraphQLError;
 import graphql.execution.DataFetcherResult;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.Map;
 import org.opentripplanner.ext.transmodelapi.mapping.TripRequestMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.ViaRequestMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
-import org.opentripplanner.ext.transmodelapi.support.OTPProcessingTimeoutGraphQLException;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -42,23 +40,11 @@ public class TransmodelGraphQLPlanner {
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
       response.previousPageCursor = res.getPreviousPageCursor();
       response.nextPageCursor = res.getNextPageCursor();
-    } catch (OTPRequestTimeoutException e) {
+    } catch (OTPRequestTimeoutException te) {
+      throw te;
+    } catch (RoutingValidationException e) {
       response.plan = TripPlanMapper.mapTripPlan(request, List.of());
-      response.messages.add(new RoutingError(RoutingErrorCode.PROCESSING_TIMEOUT, null));
-      Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
-      return DataFetcherResult
-        .<PlanResponse>newResult()
-        .data(response)
-        .errors(
-          response.messages
-            .stream()
-            .map(routingError ->
-              (GraphQLError) new OTPProcessingTimeoutGraphQLException(routingError.code.name())
-            )
-            .toList()
-        )
-        .localContext(Map.of("locale", locale))
-        .build();
+      response.messages.addAll(e.getRoutingErrors());
     } catch (Exception e) {
       LOG.error("System error: {}", e.getMessage(), e);
       response.plan = TripPlanMapper.mapTripPlan(request, List.of());

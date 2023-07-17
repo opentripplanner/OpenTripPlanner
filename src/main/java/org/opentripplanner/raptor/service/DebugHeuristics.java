@@ -1,9 +1,9 @@
 package org.opentripplanner.raptor.service;
 
 import static java.util.Comparator.comparingInt;
-import static org.opentripplanner.raptor.api.RaptorConstants.N_TRANSFERS_UNREACHED;
-import static org.opentripplanner.raptor.api.RaptorConstants.UNREACHED_HIGH;
 import static org.opentripplanner.raptor.api.debug.DebugTopic.HEURISTICS;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.N_TRANSFERS_UNREACHED;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.UNREACHED_HIGH;
 
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.raptor.api.debug.DebugLogger;

@@ -9,8 +9,8 @@ import org.locationtech.jts.geom.LineString;
 public class FlexPath {
 
   private final Supplier<LineString> geometrySupplier;
-  public int distanceMeters;
-  public int durationSeconds;
+  public final int distanceMeters;
+  public final int durationSeconds;
   private LineString geometry;
 
   /**

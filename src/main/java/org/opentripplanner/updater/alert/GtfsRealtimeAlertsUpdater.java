@@ -1,9 +1,8 @@
 package org.opentripplanner.updater.alert;
 
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
-import java.io.InputStream;
 import java.net.URI;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -74,13 +73,12 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater implements Tr
 
   @Override
   protected void runPolling() {
-    try {
-      InputStream data = HttpUtils.getData(URI.create(url), this.headers.asMap());
-      if (data == null) {
-        throw new RuntimeException("Failed to get data from url " + url);
-      }
-
-      final FeedMessage feed = FeedMessage.PARSER.parseFrom(data);
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+      final FeedMessage feed = otpHttpClient.getAndMap(
+        URI.create(url),
+        this.headers.asMap(),
+        FeedMessage.PARSER::parseFrom
+      );
 
       long feedTimestamp = feed.getHeader().getTimestamp();
       if (feedTimestamp == lastTimestamp) {

@@ -38,6 +38,7 @@
       "allowedVersions": "/^[0-9]+\\.[0-9]+(\\.[0-9]+)?$/"
     },
     {
+      // at most monthly updates (as they tend to happen frequently)
       "matchPackageNames": [
         "org.onebusaway:onebusaway-gtfs",
         "com.google.cloud:libraries-bom",
@@ -47,15 +48,12 @@
         "@graphql-codegen/java-resolvers",
         "graphql"
       ],
-      "extends": [
-        "schedule:monthly"
-      ]
+      // we don't use the 'monthly' preset because that only fires on the first day of the month
+      // when there might already other PRs open
+      "schedule": "on the 7th through 10th day of the month"
     },
     {
       "description": "in order to keep review burden low, don't update these quite so frequently",
-      "matchPackageNames": [
-        "mkdocs-material"
-      ],
       "matchPackagePrefixes": [
         "org.apache.lucene:"
       ],
@@ -64,7 +62,17 @@
       ]
     },
     {
-      "description": "automatically merge test and logging dependencies",
+      "description": "automerge mkdocs-material every quarter",
+      "matchPackageNames": [
+        "mkdocs-material"
+      ],
+      "extends": [
+        "schedule:quarterly"
+      ],
+      "automerge": true
+    },
+    {
+      "description": "automatically merge test, logging and build dependencies",
       "matchPackageNames": [
         "org.mockito:mockito-core",
         "com.tngtech.archunit:archunit",
@@ -76,7 +84,8 @@
         "org.codehaus.mojo:build-helper-maven-plugin",
         "org.apache.maven.plugins:maven-gpg-plugin",
         "org.apache.maven.plugins:maven-source-plugin",
-        "io.github.git-commit-id:git-commit-id-maven-plugin"
+        "io.github.git-commit-id:git-commit-id-maven-plugin",
+        "com.hubspot.maven.plugins:prettier-maven-plugin"
       ],
       "matchPackagePrefixes": [
         "org.junit.jupiter:",

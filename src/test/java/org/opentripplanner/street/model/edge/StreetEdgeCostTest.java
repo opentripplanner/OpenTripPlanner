@@ -29,7 +29,15 @@ class StreetEdgeCostTest {
   @VariableSource("walkReluctanceCases")
   public void walkReluctance(double walkReluctance, long expectedCost) {
     double length = 100;
-    var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "edge",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withReluctance(walkReluctance)));
@@ -51,7 +59,15 @@ class StreetEdgeCostTest {
   @VariableSource("bikeReluctanceCases")
   public void bikeReluctance(double bikeReluctance, long expectedCost) {
     double length = 100;
-    var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "edge",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withBike(b -> b.withReluctance(bikeReluctance)));
@@ -74,7 +90,15 @@ class StreetEdgeCostTest {
   @VariableSource("carReluctanceCases")
   public void carReluctance(double carReluctance, long expectedCost) {
     double length = 100;
-    var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "edge",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withCar(c -> c.withReluctance(carReluctance)));
@@ -84,6 +108,74 @@ class StreetEdgeCostTest {
     assertEquals(expectedCost, (long) result.weight);
 
     assertEquals(9, result.getElapsedTimeSeconds());
+  }
+
+  static Stream<Arguments> stairsCases = Stream.of(
+    Arguments.of(1, 22),
+    Arguments.of(1.5, 33),
+    Arguments.of(3, 67)
+  );
+
+  @ParameterizedTest(name = "stairs reluctance of {0} should lead to traversal costs of {1}")
+  @VariableSource("stairsCases")
+  public void stairsReluctance(double stairsReluctance, long expectedCost) {
+    double length = 10;
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
+    edge.setStairs(true);
+
+    var req = StreetSearchRequest.of();
+    req.withPreferences(p -> p.withWalk(w -> w.withStairsReluctance(stairsReluctance)));
+    req.withMode(StreetMode.WALK);
+    var result = traverse(edge, req.build());
+    assertEquals(expectedCost, (long) result.weight);
+
+    assertEquals(23, result.getElapsedTimeSeconds());
+
+    edge.setStairs(false);
+    var notStairsResult = traverse(edge, req.build());
+    assertEquals(15, (long) notStairsResult.weight);
+  }
+
+  static Stream<Arguments> bikeStairsCases = Stream.of(
+    Arguments.of(1, 45),
+    Arguments.of(1.5, 67),
+    Arguments.of(3, 135)
+  );
+
+  @ParameterizedTest(name = "bike stairs reluctance of {0} should lead to traversal costs of {1}")
+  @VariableSource("bikeStairsCases")
+  public void bikeStairsReluctance(double stairsReluctance, long expectedCost) {
+    double length = 10;
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.PEDESTRIAN,
+      false
+    );
+    edge.setStairs(true);
+
+    var req = StreetSearchRequest.of();
+    req.withPreferences(p -> p.withBike(b -> b.withStairsReluctance(stairsReluctance)));
+    req.withMode(StreetMode.BIKE);
+    var result = traverse(edge, req.build());
+    assertEquals(expectedCost, (long) result.weight);
+
+    assertEquals(23, result.getElapsedTimeSeconds());
+
+    edge.setStairs(false);
+    var notStairsResult = traverse(edge, req.build());
+    assertEquals(37, (long) notStairsResult.weight);
   }
 
   static Stream<Arguments> walkSafetyCases = Stream.of(
@@ -96,7 +188,7 @@ class StreetEdgeCostTest {
   @VariableSource("walkSafetyCases")
   public void walkSafetyFactor(double walkSafetyFactor, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(
+    var edge = StreetEdge.createStreetEdge(
       V1,
       V2,
       null,

@@ -1,6 +1,6 @@
 {
   "otpFeatures" : {
-    "SandboxAPILegacyGraphQLApi": true,
+    "GtfsGraphQlApi": true,
     "VehicleToStopHeuristics": true
   }
 }

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.io.File;
 import javax.annotation.Nullable;
 import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
+import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,10 @@ public class OtpConfigLoader {
    * <p>
    */
   public OtpConfig loadOtpConfig() {
-    return new OtpConfig(loadFromFile(OTP_CONFIG_FILENAME), OTP_CONFIG_FILENAME, true);
+    return new OtpConfig(
+      new NodeAdapter(loadFromFile(OTP_CONFIG_FILENAME), OTP_CONFIG_FILENAME),
+      true
+    );
   }
 
   /**

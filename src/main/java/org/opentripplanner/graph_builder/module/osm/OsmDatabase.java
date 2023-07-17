@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import gnu.trove.iterator.TLongIterator;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -32,7 +34,6 @@ import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
-import org.opentripplanner.graph_builder.issues.PublicTransportRelationSkipped;
 import org.opentripplanner.graph_builder.issues.TooManyAreasInRelation;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
@@ -117,7 +118,7 @@ public class OsmDatabase {
    * Map of all transit stop nodes that lie within an area and which are connected to the area by
    * a relation. Keyed by the area's OSM way.
    */
-  private final Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<>();
+  private final Multimap<OSMWithTags, OSMNode> stopsInAreas = HashMultimap.create();
 
   /*
    * ID of the next virtual node we create during building phase. Negative to prevent conflicts
@@ -1098,37 +1099,39 @@ public class OsmDatabase {
    * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
    */
   private void processPublicTransportStopArea(OSMRelation relation) {
-    OSMWithTags platformArea = null;
-    Set<OSMNode> platformsNodes = new HashSet<>();
+    Set<OSMWithTags> platformAreas = new HashSet<>();
+    Set<OSMNode> platformNodes = new HashSet<>();
+    boolean skipped = false;
     for (OSMRelationMember member : relation.getMembers()) {
       if (
         "way".equals(member.getType()) &&
         "platform".equals(member.getRole()) &&
         areaWayIds.contains(member.getRef())
       ) {
-        if (platformArea == null) {
-          platformArea = areaWaysById.get(member.getRef());
-        } else {
-          issueStore.add(new TooManyAreasInRelation(relation));
-        }
+        platformAreas.add(areaWaysById.get(member.getRef()));
       } else if (
         "relation".equals(member.getType()) &&
         "platform".equals(member.getRole()) &&
         relationsById.containsKey(member.getRef())
       ) {
-        if (platformArea == null) {
-          platformArea = relationsById.get(member.getRef());
-        } else {
-          issueStore.add(new TooManyAreasInRelation(relation));
-        }
-      } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
-        platformsNodes.add(nodesById.get(member.getRef()));
+        platformAreas.add(relationsById.get(member.getRef()));
+      } else if (
+        "node".equals(member.getType()) &&
+        nodesById.containsKey(member.getRef()) &&
+        nodesById.get(member.getRef()).isEntrance()
+      ) {
+        platformNodes.add(nodesById.get(member.getRef()));
       }
     }
-    if (platformArea != null && !platformsNodes.isEmpty()) {
-      stopsInAreas.put(platformArea, platformsNodes);
-    } else {
-      issueStore.add(new PublicTransportRelationSkipped(relation));
+    for (OSMWithTags area : platformAreas) {
+      // single platform area presumably contains only one level in most cases
+      // a node inside it may specify several levels if it is an elevator
+      // make sure each node has access to the current platform level
+      final Set<String> filterLevels = area.getLevels();
+      platformNodes
+        .stream()
+        .filter(node -> node.getLevels().containsAll(filterLevels))
+        .forEach(node -> stopsInAreas.put(area, node));
     }
   }
 

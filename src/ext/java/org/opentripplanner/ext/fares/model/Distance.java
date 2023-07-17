@@ -1,7 +1,10 @@
 package org.opentripplanner.ext.fares.model;
 
+import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
+
 public class Distance {
 
+  private static final int METERS_PER_KM = 1000;
   private final double meters;
 
   /** Returns a Distance object representing the given number of meters */
@@ -16,12 +19,7 @@ public class Distance {
 
   /** Returns a Distance object representing the given number of kilometers */
   public static Distance ofKilometers(double value) {
-    return new Distance(value * 1000);
-  }
-
-  /** Returns the distance in kilometers */
-  public double toKilometers() {
-    return this.meters / 1000;
+    return new Distance(value * METERS_PER_KM);
   }
 
   /** Returns the distance in meters */
@@ -29,13 +27,21 @@ public class Distance {
     return this.meters;
   }
 
-  /** Returns whether this distance is greater that the given distance */
-  public boolean isAbove(Distance otherDistance) {
-    return this.toMeters() > otherDistance.toMeters();
+  @Override
+  public boolean equals(Object other) {
+    if (other instanceof Distance distance) {
+      return distance.meters == this.meters;
+    } else {
+      return false;
+    }
   }
 
-  /** Returns whether this distance is smaller than the given distance */
-  public boolean isBelow(Distance otherDistance) {
-    return this.toMeters() < otherDistance.toMeters();
+  @Override
+  public String toString() {
+    if (meters < METERS_PER_KM) {
+      return ValueObjectToStringBuilder.of().addNum(meters, "m").toString();
+    } else {
+      return ValueObjectToStringBuilder.of().addNum(meters / 1000, "km").toString();
+    }
   }
 }

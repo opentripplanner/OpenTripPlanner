@@ -17,7 +17,7 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
   private final int boardStopPos;
   private final int alightStopPos;
   private final RaptorConstrainedTransfer constrainedTransferAfterLeg;
-  private final int cost;
+  private final int generalizedCost;
   private final PathLeg<T> next;
   private final int boardStop;
   private final int alightStop;
@@ -29,7 +29,7 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
     int boardStopPos,
     int alightStopPos,
     RaptorConstrainedTransfer constrainedTransferAfterLeg,
-    int cost,
+    int generalizedCost,
     PathLeg<T> next
   ) {
     this.trip = trip;
@@ -38,7 +38,7 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
     this.boardStopPos = boardStopPos;
     this.alightStopPos = alightStopPos;
     this.constrainedTransferAfterLeg = constrainedTransferAfterLeg;
-    this.cost = cost;
+    this.generalizedCost = generalizedCost;
     this.next = next;
     this.boardStop = trip.pattern().stopIndex(boardStopPos);
     this.alightStop = trip.pattern().stopIndex(alightStopPos);
@@ -91,7 +91,7 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> implements PathL
 
   @Override
   public int generalizedCost() {
-    return cost;
+    return generalizedCost;
   }
 
   @Override

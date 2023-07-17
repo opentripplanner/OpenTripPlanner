@@ -45,6 +45,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | elevatorBoardTime                                                                                    |        `integer`       | How long does it take to get on an elevator, on average.                                                                                       | *Optional* | `90`                     |  2.0  |
 | elevatorHopCost                                                                                      |        `integer`       | What is the cost of travelling one floor on an elevator?                                                                                       | *Optional* | `20`                     |  2.0  |
 | elevatorHopTime                                                                                      |        `integer`       | How long does it take to advance one floor on an elevator?                                                                                     | *Optional* | `20`                     |  2.0  |
+| escalatorReluctance                                                                                  |        `double`        | A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time                                       | *Optional* | `1.5`                    |  2.4  |
 | geoidElevation                                                                                       |        `boolean`       | If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.                                           | *Optional* | `false`                  |  2.0  |
 | ignoreRealtimeUpdates                                                                                |        `boolean`       | When true, realtime updates are ignored during this search.                                                                                    | *Optional* | `false`                  |  2.0  |
 | [intersectionTraversalModel](#rd_intersectionTraversalModel)                                         |         `enum`         | The model that computes the costs of turns.                                                                                                    | *Optional* | `"simple"`               |  2.2  |
@@ -52,7 +53,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [maxAccessEgressDuration](#rd_maxAccessEgressDuration)                                               |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                            | *Optional* | `"PT45M"`                |  2.1  |
 | [maxDirectStreetDuration](#rd_maxDirectStreetDuration)                                               |       `duration`       | This is the maximum duration for a direct street search for each mode.                                                                         | *Optional* | `"PT4H"`                 |  2.1  |
 | [maxJourneyDuration](#rd_maxJourneyDuration)                                                         |       `duration`       | The expected maximum time a journey can last across all possible journeys for the current deployment.                                          | *Optional* | `"PT24H"`                |  2.1  |
-| [modes](RoutingModes.md)                                                                             |        `string`        | The set of access/egress/direct/transit modes to be used for the route search.                                                                 | *Optional* | `"TRANSIT,WALK"`         |  2.0  |
+| modes                                                                                                |        `string`        | The set of access/egress/direct/transit modes to be used for the route search.                                                                 | *Optional* | `"TRANSIT,WALK"`         |  2.0  |
 | nonpreferredTransferPenalty                                                                          |        `integer`       | Penalty (in seconds) for using a non-preferred transfer.                                                                                       | *Optional* | `180`                    |  2.0  |
 | numItineraries                                                                                       |        `integer`       | The maximum number of itineraries to return.                                                                                                   | *Optional* | `50`                     |  2.0  |
 | [optimize](#rd_optimize)                                                                             |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                                | *Optional* | `"safe"`                 |  2.0  |
@@ -72,6 +73,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [walkReluctance](#rd_walkReluctance)                                                                 |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`                    |  2.0  |
 | [walkSafetyFactor](#rd_walkSafetyFactor)                                                             |        `double`        | Factor for how much the walk safety is considered in routing.                                                                                  | *Optional* | `1.0`                    |  2.2  |
 | walkSpeed                                                                                            |        `double`        | The user's walking speed in meters/second.                                                                                                     | *Optional* | `1.33`                   |  2.0  |
+| [accessEgressPenalty](#rd_accessEgressPenalty)                                                       |  `enum map of object`  | Penalty for access/egress by street mode.                                                                                                      | *Optional* |                          |  2.4  |
 | [alightSlackForMode](#rd_alightSlackForMode)                                                         | `enum map of duration` | How much extra time should be given when alighting a vehicle for each given mode.                                                              | *Optional* |                          |  2.0  |
 | [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                             |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned.                                                              | *Optional* |                          |  2.1  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                           | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                               | *Optional* |                          |  2.0  |
@@ -387,6 +389,48 @@ high values.
 Factor for how much the walk safety is considered in routing.
 
 Value should be between 0 and 1. If the value is set to be 0, safety is ignored.
+
+<h3 id="rd_accessEgressPenalty">accessEgressPenalty</h3>
+
+**Since version:** `2.4` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults   
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+
+Penalty for access/egress by street mode.
+
+Use this to add a time and cost penalty to an access/egress legs for a given street
+mode. This will favour other street-modes and transit. This has a performance penalty,
+since the search-window is increased with the same amount as the maximum penalty for
+the access legs used. In other cases where the access(CAR) is faster than transit the
+performance will be better.
+
+Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
+
+**Time penalty**
+The time penalty is a linear function applied to the actual-time/duration of the leg. The time
+penalty consist of a `constant` and a `coefficient`. The penalty is not added to the actual
+time, like a slack. Instead, the penalty is *invisible* in the returned itinerary, but it is
+applied during routing.
+
+The penalty is a function of time(duration):
+```
+f(t) = a + b * t
+```
+where `a` is the constant time part, `b` is the time-coefficient. `f(t)` is the function to
+calculate the penalty-time. The penalty-time is added to the actual-time during routing. If
+`a=0s` and `b=0.0`, then the penalty is `0`(zero).
+
+Examples: `0s + 2.5t`, `10m + 0t` and `1h5m59s + 9.9t`
+
+The `constant` must be 0 or a positive duration.
+The `coefficient` must be in range `[0.0, 10.0]`.
+
+**Cost factor**
+
+The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
+time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
+extra cost, while 1.0 will add the same amount to both time and cost.
+
 
 <h3 id="rd_alightSlackForMode">alightSlackForMode</h3>
 
@@ -841,6 +885,7 @@ include stairs as a last result.
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
+    "escalatorReluctance" : 1.5,
     "vehicleRental" : {
       "pickupCost" : 120,
       "dropOffTime" : 30,

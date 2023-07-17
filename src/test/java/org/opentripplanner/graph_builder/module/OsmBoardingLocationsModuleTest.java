@@ -21,6 +21,8 @@ import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -50,17 +52,12 @@ class OsmBoardingLocationsModuleTest {
   static Stream<Arguments> testCases = Stream.of(
     Arguments.of(
       false,
-      Set.of(
-        "osm:node:302563833",
-        "osm:node:3223067049",
-        "osm:node:302563836",
-        "osm:node:3223067680",
-        "osm:node:302563834",
-        "osm:node:768590748",
-        "osm:node:302563839"
-      )
+      Stream
+        .of(302563833L, 3223067049L, 302563836L, 3223067680L, 302563834L, 768590748L, 302563839L)
+        .map(VertexLabel::osm)
+        .collect(Collectors.toSet())
     ),
-    Arguments.of(true, Set.of("osm:node:3223067049", "osm:node:768590748"))
+    Arguments.of(true, Set.of(VertexLabel.osm(3223067049L), VertexLabel.osm(768590748)))
   );
 
   @ParameterizedTest(
@@ -71,20 +68,17 @@ class OsmBoardingLocationsModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(new StopModel(), deduplicator);
+    var factory = new VertexFactory(graph);
 
     var provider = new OsmProvider(file, false);
-    var floatingBusVertex = new TransitStopVertexBuilder()
-      .withGraph(graph)
-      .withStop(floatingBusStop)
-      .withModes(Set.of(TransitMode.BUS))
-      .build();
-    var floatingBoardingLocation = new OsmBoardingLocationVertex(
-      graph,
+    var floatingBusVertex = factory.transitStop(
+      new TransitStopVertexBuilder().withStop(floatingBusStop).withModes(Set.of(TransitMode.BUS))
+    );
+    var floatingBoardingLocation = factory.osmBoardingLocation(
+      floatingBusVertex.getCoordinate(),
       "floating-bus-stop",
-      floatingBusVertex.getX(),
-      floatingBusVertex.getY(),
-      new NonLocalizedString("bus stop not connected to street network"),
-      Set.of(floatingBusVertex.getStop().getId().getId())
+      Set.of(floatingBusVertex.getStop().getId().getId()),
+      new NonLocalizedString("bus stop not connected to street network")
     );
     var osmModule = OsmModule
       .of(provider, graph)
@@ -94,16 +88,12 @@ class OsmBoardingLocationsModuleTest {
 
     osmModule.buildGraph();
 
-    var platformVertex = new TransitStopVertexBuilder()
-      .withGraph(graph)
-      .withStop(platform)
-      .withModes(Set.of(TransitMode.RAIL))
-      .build();
-    var busVertex = new TransitStopVertexBuilder()
-      .withGraph(graph)
-      .withStop(busStop)
-      .withModes(Set.of(TransitMode.BUS))
-      .build();
+    var platformVertex = factory.transitStop(
+      new TransitStopVertexBuilder().withStop(platform).withModes(Set.of(TransitMode.RAIL))
+    );
+    var busVertex = factory.transitStop(
+      new TransitStopVertexBuilder().withStop(busStop).withModes(Set.of(TransitMode.BUS))
+    );
 
     transitModel.index();
     graph.index(transitModel.getStopModel());

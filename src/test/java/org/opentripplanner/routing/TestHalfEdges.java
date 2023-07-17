@@ -15,8 +15,6 @@ import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.astar.model.GraphPath;
@@ -43,6 +41,7 @@ import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -64,27 +63,20 @@ public class TestHalfEdges {
   private TransitStopVertex station2;
   private TransitModel transitModel;
 
-  public LineString createGeometry(Vertex a, Vertex b) {
-    GeometryFactory factory = new GeometryFactory();
-    Coordinate[] cs = new Coordinate[2];
-    cs[0] = a.getCoordinate();
-    cs[1] = b.getCoordinate();
-    return factory.createLineString(cs);
-  }
-
   @BeforeEach
   public void setUp() {
     var deduplicator = new Deduplicator();
     graph = new Graph(deduplicator);
     transitModel = new TransitModel(new StopModel(), deduplicator);
+    var factory = new VertexFactory(graph);
     // a 0.1 degree x 0.1 degree square
-    tl = new IntersectionVertex(graph, "tl", -74.01, 40.01);
-    tr = new IntersectionVertex(graph, "tr", -74.0, 40.01);
-    bl = new IntersectionVertex(graph, "bl", -74.01, 40.0);
-    br = new IntersectionVertex(graph, "br", -74.00, 40.0);
+    tl = factory.intersection("tl", -74.01, 40.01);
+    tr = factory.intersection("tr", -74.0, 40.01);
+    bl = factory.intersection("bl", -74.01, 40.0);
+    br = factory.intersection("br", -74.00, 40.0);
 
     top =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         tl,
         tr,
         GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01),
@@ -94,7 +86,7 @@ public class TestHalfEdges {
         false
       );
     bottom =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         br,
         bl,
         GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0),
@@ -104,7 +96,7 @@ public class TestHalfEdges {
         false
       );
     left =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         bl,
         tl,
         GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01),
@@ -114,7 +106,7 @@ public class TestHalfEdges {
         false
       );
     right =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         br,
         tr,
         GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01),
@@ -125,7 +117,7 @@ public class TestHalfEdges {
       );
 
     @SuppressWarnings("unused")
-    StreetEdge topBack = new StreetEdge(
+    StreetEdge topBack = StreetEdge.createStreetEdge(
       tr,
       tl,
       top.getGeometry().reverse(),
@@ -135,7 +127,7 @@ public class TestHalfEdges {
       true
     );
     @SuppressWarnings("unused")
-    StreetEdge bottomBack = new StreetEdge(
+    StreetEdge bottomBack = StreetEdge.createStreetEdge(
       br,
       bl,
       bottom.getGeometry().reverse(),
@@ -145,7 +137,7 @@ public class TestHalfEdges {
       true
     );
     leftBack =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         tl,
         bl,
         left.getGeometry().reverse(),
@@ -155,7 +147,7 @@ public class TestHalfEdges {
         true
       );
     rightBack =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         tr,
         br,
         right.getGeometry().reverse(),
@@ -170,8 +162,8 @@ public class TestHalfEdges {
 
     transitModel.mergeStopModels(StopModel.of().withRegularStop(s1).withRegularStop(s2).build());
 
-    station1 = new TransitStopVertexBuilder().withGraph(graph).withStop(s1).build();
-    station2 = new TransitStopVertexBuilder().withGraph(graph).withStop(s2).build();
+    station1 = factory.transitStop(new TransitStopVertexBuilder().withStop(s1));
+    station2 = factory.transitStop(new TransitStopVertexBuilder().withStop(s2));
     station1.addMode(TransitMode.RAIL);
     station2.addMode(TransitMode.RAIL);
 

@@ -338,8 +338,9 @@ public class ConstantsForTests {
         station.realTimeData = false;
         station.isArrivingInRentalVehicleAtDestinationAllowed = true;
 
-        VehicleRentalPlaceVertex stationVertex = new VehicleRentalPlaceVertex(graph, station);
-        new VehicleRentalEdge(stationVertex, vehicleType.formFactor);
+        VehicleRentalPlaceVertex stationVertex = new VehicleRentalPlaceVertex(station);
+        graph.addVertex(stationVertex);
+        VehicleRentalEdge.createVehicleRentalEdge(stationVertex, vehicleType.formFactor);
 
         linker.linkVertexPermanently(
           stationVertex,
@@ -347,8 +348,14 @@ public class ConstantsForTests {
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) ->
             List.of(
-              new StreetVehicleRentalLink((VehicleRentalPlaceVertex) vertex, streetVertex),
-              new StreetVehicleRentalLink(streetVertex, (VehicleRentalPlaceVertex) vertex)
+              StreetVehicleRentalLink.createStreetVehicleRentalLink(
+                (VehicleRentalPlaceVertex) vertex,
+                streetVertex
+              ),
+              StreetVehicleRentalLink.createStreetVehicleRentalLink(
+                streetVertex,
+                (VehicleRentalPlaceVertex) vertex
+              )
             )
         );
       }

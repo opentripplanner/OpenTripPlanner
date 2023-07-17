@@ -4,10 +4,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.locationtech.jts.geom.Coordinate;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseMode;
@@ -22,12 +21,8 @@ public abstract class StreetVertex extends Vertex {
   /** All locations for flex transit, which this vertex is part of */
   public Set<AreaStop> areaStops;
 
-  public StreetVertex(Graph g, String label, Coordinate coord, I18NString streetName) {
-    this(g, label, coord.x, coord.y, streetName);
-  }
-
-  public StreetVertex(Graph g, String label, double x, double y, I18NString streetName) {
-    super(g, label, x, y, streetName);
+  StreetVertex(double x, double y, @Nullable I18NString streetName) {
+    super(x, y, streetName);
   }
 
   /**

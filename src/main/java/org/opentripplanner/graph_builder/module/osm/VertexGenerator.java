@@ -15,10 +15,10 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.ElevatorEdge;
 import org.opentripplanner.street.model.vertex.BarrierVertex;
-import org.opentripplanner.street.model.vertex.ExitVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.OsmVertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 
 /**
  * Tracks the generation of vertices and returns an existing instance if a vertex is encountered
@@ -27,18 +27,17 @@ import org.opentripplanner.street.model.vertex.OsmVertex;
 class VertexGenerator {
 
   private static final String nodeLabelFormat = "osm:node:%d";
-  private static final String levelnodeLabelFormat = nodeLabelFormat + ":level:%s";
 
   private final Map<Long, IntersectionVertex> intersectionNodes = new HashMap<>();
 
   private final HashMap<Long, Map<OSMLevel, OsmVertex>> multiLevelNodes = new HashMap<>();
   private final OsmDatabase osmdb;
-  private final Graph graph;
   private final Set<String> boardingAreaRefTags;
+  private final VertexFactory vertexFactory;
 
   public VertexGenerator(OsmDatabase osmdb, Graph graph, Set<String> boardingAreaRefTags) {
     this.osmdb = osmdb;
-    this.graph = graph;
+    this.vertexFactory = new VertexFactory(graph);
     this.boardingAreaRefTags = boardingAreaRefTags;
   }
 
@@ -66,36 +65,32 @@ class VertexGenerator {
     iv = intersectionNodes.get(nid);
     if (iv == null) {
       Coordinate coordinate = node.getCoordinate();
-      String label = String.format(nodeLabelFormat, node.getId());
       String highway = node.getTag("highway");
       if ("motorway_junction".equals(highway)) {
         String ref = node.getTag("ref");
         if (ref != null) {
-          ExitVertex ev = new ExitVertex(graph, label, coordinate.x, coordinate.y, nid);
-          ev.setExitName(ref);
-          iv = ev;
+          iv = vertexFactory.exit(nid, coordinate, ref);
         }
       }
 
       /* If the OSM node represents a transit stop and has a ref=(stop_code) tag, make a special vertex for it. */
       if (node.isBoardingLocation()) {
+        String label = String.format(nodeLabelFormat, node.getId());
         var refs = node.getMultiTagValues(boardingAreaRefTags);
         if (!refs.isEmpty()) {
           String name = node.getTag("name");
           iv =
-            new OsmBoardingLocationVertex(
-              graph,
+            vertexFactory.osmBoardingLocation(
+              coordinate,
               label,
-              coordinate.x,
-              coordinate.y,
-              NonLocalizedString.ofNullable(name),
-              refs
+              refs,
+              NonLocalizedString.ofNullable(name)
             );
         }
       }
 
       if (node.isBarrier()) {
-        BarrierVertex bv = new BarrierVertex(graph, label, coordinate.x, coordinate.y, nid);
+        BarrierVertex bv = vertexFactory.barrier(nid, coordinate);
         bv.setBarrierPermissions(
           OsmFilter.getPermissionsForEntity(node, BarrierVertex.defaultBarrierPermissions)
         );
@@ -104,13 +99,9 @@ class VertexGenerator {
 
       if (iv == null) {
         iv =
-          new OsmVertex(
-            graph,
-            label,
-            coordinate.x,
-            coordinate.y,
-            node.getId(),
-            new NonLocalizedString(label),
+          vertexFactory.osm(
+            coordinate,
+            node,
             node.hasHighwayTrafficLight(),
             node.hasCrossingTrafficLight()
           );
@@ -181,18 +172,7 @@ class VertexGenerator {
       multiLevelNodes.put(nodeId, vertices);
     }
     if (!vertices.containsKey(level)) {
-      Coordinate coordinate = node.getCoordinate();
-      String label = String.format(levelnodeLabelFormat, node.getId(), level.shortName);
-      OsmVertex vertex = new OsmVertex(
-        graph,
-        label,
-        coordinate.x,
-        coordinate.y,
-        node.getId(),
-        new NonLocalizedString(label),
-        false,
-        false
-      );
+      OsmVertex vertex = vertexFactory.levelledOsm(node, level.shortName);
       vertices.put(level, vertex);
 
       return vertex;

@@ -36,13 +36,13 @@ public class SiriHelper {
   }
 
   public static String createETServiceRequestAsXml(String requestorRef) throws JAXBException {
-    Siri request = createETServiceRequest(requestorRef, -1);
+    Siri request = createETServiceRequest(requestorRef, null);
     return SiriXml.toXml(request);
   }
 
-  public static String createETServiceRequestAsXml(String requestorRef, int previewIntervalMillis)
+  public static String createETServiceRequestAsXml(String requestorRef, Duration previewInterval)
     throws JAXBException {
-    Siri request = createETServiceRequest(requestorRef, previewIntervalMillis);
+    Siri request = createETServiceRequest(requestorRef, previewInterval);
     return SiriXml.toXml(request);
   }
 
@@ -78,7 +78,7 @@ public class SiriHelper {
     return request;
   }
 
-  private static Siri createETServiceRequest(String requestorRefValue, int previewIntervalMillis) {
+  private static Siri createETServiceRequest(String requestorRefValue, Duration previewInterval) {
     Siri request = createSiriObject();
 
     ServiceRequest serviceRequest = new ServiceRequest();
@@ -92,8 +92,8 @@ public class SiriHelper {
     etRequest.setRequestTimestamp(ZonedDateTime.now());
     etRequest.setVersion("2.0");
 
-    if (previewIntervalMillis > 0) {
-      etRequest.setPreviewInterval(Duration.ofMillis(previewIntervalMillis));
+    if (previewInterval != null) {
+      etRequest.setPreviewInterval(previewInterval);
     }
 
     MessageQualifierStructure messageIdentifier = new MessageQualifierStructure();
