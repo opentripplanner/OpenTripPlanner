@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -21,6 +22,7 @@ public class EscalatorEdge extends Edge {
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     // Only allow traversal by walking
     if (s0.currentMode() == TraverseMode.WALK && !s0.getRequest().wheelchair()) {

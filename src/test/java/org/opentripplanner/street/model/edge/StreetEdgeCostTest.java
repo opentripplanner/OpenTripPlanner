@@ -8,8 +8,6 @@ import static org.opentripplanner.street.model._data.StreetModelForTest.V2;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -108,74 +106,6 @@ class StreetEdgeCostTest {
     assertEquals(expectedCost, (long) result.weight);
 
     assertEquals(9, result.getElapsedTimeSeconds());
-  }
-
-  static Stream<Arguments> stairsCases = Stream.of(
-    Arguments.of(1, 22),
-    Arguments.of(1.5, 33),
-    Arguments.of(3, 67)
-  );
-
-  @ParameterizedTest(name = "stairs reluctance of {0} should lead to traversal costs of {1}")
-  @VariableSource("stairsCases")
-  public void stairsReluctance(double stairsReluctance, long expectedCost) {
-    double length = 10;
-    var edge = StreetEdge.createStreetEdge(
-      V1,
-      V2,
-      null,
-      "stairs",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
-    edge.setStairs(true);
-
-    var req = StreetSearchRequest.of();
-    req.withPreferences(p -> p.withWalk(w -> w.withStairsReluctance(stairsReluctance)));
-    req.withMode(StreetMode.WALK);
-    var result = traverse(edge, req.build());
-    assertEquals(expectedCost, (long) result.weight);
-
-    assertEquals(23, result.getElapsedTimeSeconds());
-
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req.build());
-    assertEquals(15, (long) notStairsResult.weight);
-  }
-
-  static Stream<Arguments> bikeStairsCases = Stream.of(
-    Arguments.of(1, 45),
-    Arguments.of(1.5, 67),
-    Arguments.of(3, 135)
-  );
-
-  @ParameterizedTest(name = "bike stairs reluctance of {0} should lead to traversal costs of {1}")
-  @VariableSource("bikeStairsCases")
-  public void bikeStairsReluctance(double stairsReluctance, long expectedCost) {
-    double length = 10;
-    var edge = StreetEdge.createStreetEdge(
-      V1,
-      V2,
-      null,
-      "stairs",
-      length,
-      StreetTraversalPermission.PEDESTRIAN,
-      false
-    );
-    edge.setStairs(true);
-
-    var req = StreetSearchRequest.of();
-    req.withPreferences(p -> p.withBike(b -> b.withStairsReluctance(stairsReluctance)));
-    req.withMode(StreetMode.BIKE);
-    var result = traverse(edge, req.build());
-    assertEquals(expectedCost, (long) result.weight);
-
-    assertEquals(23, result.getElapsedTimeSeconds());
-
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req.build());
-    assertEquals(37, (long) notStairsResult.weight);
   }
 
   static Stream<Arguments> walkSafetyCases = Stream.of(

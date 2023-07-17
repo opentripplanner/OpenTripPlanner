@@ -387,8 +387,8 @@ public class OsmModule implements GraphBuilderModule {
             geometry
           );
 
-        var street = streets.main;
-        var backStreet = streets.back;
+          var street = streets.main;
+          var backStreet = streets.back;
           normalizer.applyWayProperties(street, backStreet, wayData, way);
 
           applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
@@ -524,7 +524,15 @@ public class OsmModule implements GraphBuilderModule {
     } else {
       float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
-      StreetEdge street = StreetEdge.createStreetEdge(from, to, geometry, name, length, permissions, back);
+      StreetEdge street = StreetEdge.createStreetEdge(
+        from,
+        to,
+        geometry,
+        name,
+        length,
+        permissions,
+        back
+      );
       street.setCarSpeed(carSpeed);
       street.setLink(OsmFilter.isLink(way));
 

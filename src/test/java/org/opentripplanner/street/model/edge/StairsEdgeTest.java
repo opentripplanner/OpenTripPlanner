@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
@@ -53,7 +54,7 @@ class StairsEdgeTest {
       V1,
       V2,
       null,
-      "stairs",
+      I18NString.of("stairs"),
       LENGTH,
       StreetTraversalPermission.ALL,
       false
@@ -78,7 +79,15 @@ class StairsEdgeTest {
     assertEquals(expectedCost, result.weight, 0.5);
 
     assertEquals(22, result.getElapsedTimeSeconds());
-    var streetEdge = new StreetEdge(V1, V2, null, "stairs", LENGTH, PEDESTRIAN, false);
+    var streetEdge = new StreetEdge(
+      V1,
+      V2,
+      null,
+      I18NString.of("stairs"),
+      LENGTH,
+      PEDESTRIAN,
+      false
+    );
 
     var notStairsResult = traverse(streetEdge, req.build());
     assertEquals(37, (long) notStairsResult.weight);
@@ -117,7 +126,15 @@ class StairsEdgeTest {
     var result = traverse(STAIRS_EDGE, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
-    var edge = new StreetEdge(V1, V2, null, "stairs", LENGTH, StreetTraversalPermission.ALL, false);
+    var edge = new StreetEdge(
+      V1,
+      V2,
+      null,
+      I18NString.of("stairs"),
+      LENGTH,
+      StreetTraversalPermission.ALL,
+      false
+    );
     var notStairsResult = traverse(edge, req.build());
     assertEquals(7, (long) notStairsResult.weight);
   }

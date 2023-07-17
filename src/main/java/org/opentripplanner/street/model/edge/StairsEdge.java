@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -45,14 +46,15 @@ public class StairsEdge extends OsmEdge {
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
-    if (blockedByBarriers() || s0.getNonTransitMode().isInCar()) {
+    if (blockedByBarriers() || s0.currentMode().isInCar()) {
       return State.empty();
     }
 
     var prefs = s0.getPreferences();
     double speed =
-      switch (s0.getNonTransitMode()) {
+      switch (s0.currentMode()) {
         case WALK -> prefs.walk().speed();
         case BICYCLE, SCOOTER -> prefs.bike().walkingSpeed();
         case CAR, FLEX -> throw new IllegalStateException();
@@ -134,12 +136,7 @@ public class StairsEdge extends OsmEdge {
     if (s0.getRequest().wheelchair()) {
       return StreetEdgeReluctanceCalculator.computeWheelchairReluctance(prefs, 0, true, true);
     } else {
-      return StreetEdgeReluctanceCalculator.computeReluctance(
-        prefs,
-        s0.getNonTransitMode(),
-        false,
-        true
-      );
+      return StreetEdgeReluctanceCalculator.computeReluctance(prefs, s0.currentMode(), false, true);
     }
   }
 

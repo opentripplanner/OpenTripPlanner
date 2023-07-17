@@ -9,8 +9,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.framework.geometry.GeometryUtils;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -101,56 +99,6 @@ class StreetEdgeWheelchairCostTest {
     State result = traverse(edge, req.build());
     assertNotNull(result);
     assertEquals(expectedCost, (long) result.weight);
-  }
-
-  static Stream<Arguments> wheelchairStairsCases = Stream.of(
-    Arguments.of(1, 22),
-    Arguments.of(10, 225),
-    Arguments.of(100, 2255)
-  );
-
-  @ParameterizedTest(
-    name = "wheelchair stairs reluctance of {0} should lead to traversal costs of {1}"
-  )
-  @VariableSource("wheelchairStairsCases")
-  public void wheelchairStairsReluctance(double stairsReluctance, long expectedCost) {
-    double length = 10;
-    var edge = StreetEdge.createStreetEdge(
-      V1,
-      V2,
-      null,
-      "stairs",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
-    edge.setStairs(true);
-
-    var req = StreetSearchRequest.of();
-    req.withWheelchair(true);
-    req.withPreferences(preferences ->
-      preferences.withWheelchair(
-        WheelchairPreferences
-          .of()
-          .withTripOnlyAccessible()
-          .withStopOnlyAccessible()
-          .withElevatorOnlyAccessible()
-          .withInaccessibleStreetReluctance(25)
-          .withMaxSlope(0)
-          .withSlopeExceededReluctance(1.1)
-          .withStairsReluctance(stairsReluctance)
-          .build()
-      )
-    );
-
-    req.withPreferences(pref -> pref.withWalk(w -> w.withReluctance(1.0)));
-
-    var result = traverse(edge, req.build());
-    assertEquals(expectedCost, (long) result.weight);
-
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req.build());
-    assertEquals(7, (long) notStairsResult.weight);
   }
 
   static Stream<Arguments> inaccessibleStreetCases = Stream.of(
