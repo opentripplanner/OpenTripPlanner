@@ -96,9 +96,4 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
     }
     log.info(progress.completeMessage());
   }
-
-  @Override
-  public void checkInputs() {
-    //no file inputs
-  }
 }

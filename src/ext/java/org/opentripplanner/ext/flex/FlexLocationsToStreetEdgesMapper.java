@@ -74,9 +74,4 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
     }
     LOG.info(progress.completeMessage());
   }
-
-  @Override
-  public void checkInputs() {
-    // No inputs
-  }
 }

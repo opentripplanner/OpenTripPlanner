@@ -44,9 +44,4 @@ public class EdgeUpdaterModule implements GraphBuilderModule {
     // The bindings are needed to build the request context when routing
     graph.dataOverlayParameterBindings = this.parameterBindings;
   }
-
-  @Override
-  public void checkInputs() {
-    //nothing
-  }
 }
