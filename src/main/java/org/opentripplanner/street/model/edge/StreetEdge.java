@@ -1070,8 +1070,8 @@ public class StreetEdge
   }
 
   private static void applyRestrictionsToNewEdge(
-    OsmEdge fromEdge,
-    OsmEdge toEdge,
+    StreetEdge fromEdge,
+    StreetEdge toEdge,
     TurnRestriction restriction
   ) {
     TurnRestriction splitTurnRestriction = new TurnRestriction(

@@ -1,47 +1,32 @@
 package org.opentripplanner.street.model.edge;
 
 import javax.annotation.Nonnull;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.state.State;
 
 /**
  * Represents a flight of stairs that are derived from OSM data.
  */
-public class StairsEdge extends OsmEdge {
+public class StairsEdge extends Edge {
 
   // stairs are only allowed for walking and cycling/scootering
   private static final StreetTraversalPermission DEFAULT_PERMISSIONS =
     StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+  private static final LocalizedString NAME = new LocalizedString("name.stairs");
 
-  private final I18NString name;
-  private final byte[] compactGeometry;
+  private final LineString compactGeometry;
   private final double distance;
-  private float walkSafetyFactor = 1f;
 
-  public StairsEdge(
-    StreetVertex from,
-    StreetVertex to,
-    LineString geometry,
-    I18NString name,
-    double distance
-  ) {
-    super(from, to, geometry);
-    this.name = name;
-    this.compactGeometry =
-      CompactLineStringUtils.compactLineString(
-        from.getX(),
-        from.getY(),
-        to.getX(),
-        to.getY(),
-        geometry,
-        false
-      );
+  public StairsEdge(StreetVertex from, StreetVertex to, LineString geometry, double distance) {
+    super(from, to);
+    this.compactGeometry =geometry;
     this.distance = distance;
   }
 
@@ -64,9 +49,9 @@ public class StairsEdge extends OsmEdge {
 
     double time = distance / speed;
     double weight =
-      getEffectiveWalkSafetyDistance() *
+      getDistanceMeters() *
       prefs.walk().safetyFactor() +
-      getEffectiveWalkSafetyDistance() *
+      getDistanceMeters() *
       (1 - prefs.walk().safetyFactor());
     weight /= speed;
 
@@ -81,55 +66,17 @@ public class StairsEdge extends OsmEdge {
 
   @Override
   public I18NString getName() {
-    return this.name;
+    return NAME;
   }
 
   @Override
   public LineString getGeometry() {
-    return CompactLineStringUtils.uncompactLineString(
-      fromv.getX(),
-      fromv.getY(),
-      tov.getX(),
-      tov.getY(),
-      compactGeometry,
-      false
-    );
+      return compactGeometry;
   }
 
   @Override
   public double getDistanceMeters() {
     return distance;
-  }
-
-  @Override
-  public void setBicycleSafetyFactor(float bicycleSafety) {
-    // we ignore the bicycle safety factor, stairs are inherently unsafe and therefore have a separate
-    // reluctance
-  }
-
-  @Override
-  public void setWalkSafetyFactor(float walkSafety) {
-    this.walkSafetyFactor = walkSafety;
-  }
-
-  @Override
-  public void setMotorVehicleNoThruTraffic(boolean motorVehicleNoThrough) {
-    // we are ignoring no-through on stairs
-  }
-
-  @Override
-  public void setBicycleNoThruTraffic(boolean bicycleNoThrough) {
-    // we are ignoring no-through on stairs
-  }
-
-  @Override
-  public void setWalkNoThruTraffic(boolean walkNoThrough) {
-    // we are ignoring no-through on stairs
-  }
-
-  @Override
-  public void addTurnRestriction(TurnRestriction restriction) {
-    // we are ignoring turn restrictions on stairs
   }
 
   private static double reluctance(State s0, RoutingPreferences prefs) {
@@ -143,9 +90,5 @@ public class StairsEdge extends OsmEdge {
   private boolean blockedByBarriers() {
     var permission = BarrierCalculator.reducePermissions(DEFAULT_PERMISSIONS, fromv, tov);
     return permission.allowsNothing();
-  }
-
-  private double getEffectiveWalkSafetyDistance() {
-    return walkSafetyFactor * getDistanceMeters();
   }
 }

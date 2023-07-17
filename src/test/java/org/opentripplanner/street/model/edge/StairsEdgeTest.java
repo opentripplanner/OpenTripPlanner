@@ -13,7 +13,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -29,7 +28,6 @@ class StairsEdgeTest {
     V1,
     V2,
     GeometryUtils.makeLineString(V1.getCoordinate(), V2.getCoordinate()),
-    new NonLocalizedString("stairs"),
     LENGTH
   );
 
@@ -163,7 +161,6 @@ class StairsEdgeTest {
       V1,
       barrier,
       GeometryUtils.makeLineString(V1.getCoordinate(), V2.getCoordinate()),
-      new NonLocalizedString("stairs"),
       LENGTH
     );
 
@@ -174,7 +171,7 @@ class StairsEdgeTest {
     assertEquals(shouldBlockTraversal, State.isEmpty(result));
   }
 
-  private State traverse(OsmEdge edge, StreetSearchRequest request) {
+  private State traverse(Edge edge, StreetSearchRequest request) {
     var state = new State(V1, request);
     assertEquals(0, state.weight);
     return edge.traverse(state)[0];

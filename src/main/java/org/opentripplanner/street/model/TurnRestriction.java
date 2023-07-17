@@ -1,20 +1,20 @@
 package org.opentripplanner.street.model;
 
 import java.io.Serializable;
-import org.opentripplanner.street.model.edge.OsmEdge;
+import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.search.TraverseModeSet;
 
 public class TurnRestriction implements Serializable {
 
   public final TurnRestrictionType type;
-  public final OsmEdge from;
-  public final OsmEdge to;
+  public final StreetEdge from;
+  public final StreetEdge to;
   public final RepeatingTimePeriod time;
   public final TraverseModeSet modes;
 
   public TurnRestriction(
-    OsmEdge from,
-    OsmEdge to,
+    StreetEdge from,
+    StreetEdge to,
     TurnRestrictionType type,
     TraverseModeSet modes,
     RepeatingTimePeriod time

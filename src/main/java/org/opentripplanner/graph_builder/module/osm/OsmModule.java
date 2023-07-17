@@ -28,7 +28,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.StreetTraversalPermission;
-import org.opentripplanner.street.model.edge.OsmEdge;
 import org.opentripplanner.street.model.edge.StairsEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -107,7 +106,7 @@ public class OsmModule implements GraphBuilderModule {
     return elevationData;
   }
 
-  private record StreetEdgePair(OsmEdge main, OsmEdge back) {}
+  private record StreetEdgePair(StreetEdge main, StreetEdge back) {}
 
   private void build() {
     var parkingProcessor = new ParkingProcessor(
@@ -374,9 +373,12 @@ public class OsmModule implements GraphBuilderModule {
             elevationData.put(endEndpoint, elevation);
           }
         }
+        var length = getGeometryLengthMeters(geometry);
         if (way.isEscalator()) {
-          var length = getGeometryLengthMeters(geometry);
           escalatorProcessor.buildEscalatorEdge(way, length);
+        } else if (way.isSteps()) {
+          new StairsEdge(startEndpoint, endEndpoint, geometry, length);
+          new StairsEdge(endEndpoint, startEndpoint, geometry.reverse(), length);
         } else {
           StreetEdgePair streets = getEdgesForStreet(
             startEndpoint,
@@ -418,8 +420,8 @@ public class OsmModule implements GraphBuilderModule {
     OSMWay way,
     long startNode,
     long endNode,
-    OsmEdge street,
-    OsmEdge backStreet
+    StreetEdge street,
+    StreetEdge backStreet
   ) {
     /* Check if there are turn restrictions starting on this segment */
     Collection<TurnRestrictionTag> restrictionTags = osmdb.getFromWayTurnRestrictions(way.getId());
@@ -465,7 +467,7 @@ public class OsmModule implements GraphBuilderModule {
     }
 
     LineString backGeometry = geometry.reverse();
-    OsmEdge street = null, backStreet = null;
+    StreetEdge street = null, backStreet = null;
     double length = getGeometryLengthMeters(geometry);
 
     var permissionPair = OsmFilter.getPermissions(permissions, way);
@@ -505,7 +507,7 @@ public class OsmModule implements GraphBuilderModule {
     return new StreetEdgePair(street, backStreet);
   }
 
-  private OsmEdge getEdgeForStreet(
+  private StreetEdge getEdgeForStreet(
     IntersectionVertex from,
     IntersectionVertex to,
     OSMWay way,
@@ -519,40 +521,36 @@ public class OsmModule implements GraphBuilderModule {
     label = label.intern();
 
     I18NString name = params.edgeNamer().getNameForWay(way, label);
-    if (way.isSteps()) {
-      return new StairsEdge(from, to, geometry, name, length);
-    } else {
-      float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
+    float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
-      StreetEdge street = StreetEdge.createStreetEdge(
-        from,
-        to,
-        geometry,
-        name,
-        length,
-        permissions,
-        back
-      );
-      street.setCarSpeed(carSpeed);
-      street.setLink(OsmFilter.isLink(way));
+    StreetEdge street = StreetEdge.createStreetEdge(
+      from,
+      to,
+      geometry,
+      name,
+      length,
+      permissions,
+      back
+    );
+    street.setCarSpeed(carSpeed);
+    street.setLink(OsmFilter.isLink(way));
 
-      if (!way.hasTag("name") && !way.hasTag("ref")) {
-        street.setHasBogusName(true);
-      }
-
-      street.setRoundabout(way.isRoundabout());
-      street.setWheelchairAccessible(way.isWheelchairAccessible());
-
-      street.setSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way));
-
-      // < 0.04: account for
-      if (carSpeed < 0.04) {
-        issueStore.add(new StreetCarSpeedZero(way));
-      }
-
-      params.edgeNamer().recordEdge(way, street);
-
-      return street;
+    if (!way.hasTag("name") && !way.hasTag("ref")) {
+      street.setHasBogusName(true);
     }
+
+    street.setRoundabout(way.isRoundabout());
+    street.setWheelchairAccessible(way.isWheelchairAccessible());
+
+    street.setSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way));
+
+    // < 0.04: account for
+    if (carSpeed < 0.04) {
+      issueStore.add(new StreetCarSpeedZero(way));
+    }
+
+    params.edgeNamer().recordEdge(way, street);
+
+    return street;
   }
 }
