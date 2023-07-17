@@ -79,7 +79,7 @@
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
         <argLine/>
-        <plugin.prettier.version>0.19</plugin.prettier.version>
+        <plugin.prettier.version>0.20</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
 
     </properties>
@@ -923,7 +923,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>20.4</version>
+            <version>21.0</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
