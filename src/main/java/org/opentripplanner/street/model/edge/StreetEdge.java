@@ -1328,7 +1328,7 @@ public class StreetEdge
   private record TraversalCosts(double time, double weight) {}
 
   /**
-   * The angles of the first (in) segment and last (out) segment of a LineString, encoded on one
+   * The angles of the first (in) segment and last (out) segment of a LineString, encoded in one
    * byte.
    */
   private record LineStringInOutAngles(byte inAngle, byte outAngle) {

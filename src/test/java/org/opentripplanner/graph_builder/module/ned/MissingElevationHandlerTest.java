@@ -192,7 +192,6 @@ class MissingElevationHandlerTest {
     return new StreetEdgeBuilder<>()
       .withFromVertex(from)
       .withToVertex(to)
-      .withGeometry(null)
       .withName(new LocalizedStringFormat("%s%s", from.getName(), to.getName()))
       .withMeterLength(length)
       .withPermission(StreetTraversalPermission.ALL)

@@ -57,7 +57,7 @@ class StreetEdgeBuilderTest {
   void buildWithCustomLength() {
     StreetEdge streetEdge = buildStreetEdge();
     assertEquals(NAME, streetEdge.getName());
-    assetAllProperties(streetEdge);
+    assertAllProperties(streetEdge);
   }
 
   @Test
@@ -65,7 +65,7 @@ class StreetEdgeBuilderTest {
     StreetEdge original = buildStreetEdge();
     StreetEdge streetEdge = new StreetEdgeBuilder<>(original).withName(NEW_NAME).buildAndConnect();
     assertEquals(NEW_NAME, streetEdge.getName());
-    assetAllProperties(streetEdge);
+    assertAllProperties(streetEdge);
   }
 
   private static StreetEdge buildStreetEdge() {
@@ -89,7 +89,7 @@ class StreetEdgeBuilderTest {
       .buildAndConnect();
   }
 
-  private static void assetAllProperties(StreetEdge streetEdge) {
+  private static void assertAllProperties(StreetEdge streetEdge) {
     assertEquals(FROM_VERTEX, streetEdge.getFromVertex());
     assertEquals(TO_VERTEX, streetEdge.getToVertex());
     assertEquals(LENGTH, streetEdge.getDistanceMeters());
