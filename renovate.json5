@@ -72,7 +72,7 @@
       "automerge": true
     },
     {
-      "description": "automatically merge test and logging dependencies",
+      "description": "automatically merge test, logging and build dependencies",
       "matchPackageNames": [
         "org.mockito:mockito-core",
         "com.tngtech.archunit:archunit",
@@ -84,7 +84,8 @@
         "org.codehaus.mojo:build-helper-maven-plugin",
         "org.apache.maven.plugins:maven-gpg-plugin",
         "org.apache.maven.plugins:maven-source-plugin",
-        "io.github.git-commit-id:git-commit-id-maven-plugin"
+        "io.github.git-commit-id:git-commit-id-maven-plugin",
+        "com.hubspot.maven.plugins:prettier-maven-plugin"
       ],
       "matchPackagePrefixes": [
         "org.junit.jupiter:",
