@@ -141,12 +141,12 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     }
 
     s1.incrementWeight(
-      this.travelTime > DEFAULT_TRAVEL_TIME
+      this.travelTime > 0
         ? this.travelTime
         : (preferences.street().elevator().hopCost() * this.levels)
     );
     s1.incrementTimeInSeconds(
-      this.travelTime > DEFAULT_TRAVEL_TIME
+      this.travelTime > 0
         ? this.travelTime
         : (int) (preferences.street().elevator().hopTime() * this.levels)
     );
@@ -165,7 +165,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
 
   @Override
   public double getDistanceMeters() {
-    return DEFAULT_TRAVEL_TIME;
+    return 0;
   }
 
   @Override
