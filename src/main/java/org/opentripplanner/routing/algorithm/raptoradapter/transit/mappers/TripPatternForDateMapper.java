@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
@@ -50,6 +51,7 @@ public class TripPatternForDateMapper {
    * @param serviceDate The date to map the TripPatternForDate for - READ ONLY
    * @return TripPatternForDate for this timetable and serviceDate
    */
+  @Nullable
   public TripPatternForDate map(Timetable timetable, LocalDate serviceDate) {
     TIntSet serviceCodesRunning = serviceCodesRunningForDate.get(serviceDate);
 
