@@ -65,6 +65,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Upgrade to Apache HTTP Client 5 [#5228](https://github.com/opentripplanner/OpenTripPlanner/pull/5228)
 - Deduplicate vertex labels to save memory [#5223](https://github.com/opentripplanner/OpenTripPlanner/pull/5223)
 - Fix duplicate publishing of speed test data [#5237](https://github.com/opentripplanner/OpenTripPlanner/pull/5237)
+- Flex build time and memory optimization for large zones [#5233](https://github.com/opentripplanner/OpenTripPlanner/pull/5233)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
