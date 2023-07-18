@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - dev-2.x
+      - vertex-name
 
 jobs:
   perf-test:
