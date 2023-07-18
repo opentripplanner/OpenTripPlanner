@@ -39,6 +39,7 @@ class AreaStopsToVerticesMapperTest {
     .build();
 
   public static final TransitModel TRANSIT_MODEL = new TransitModel(STOP_MODEL, new Deduplicator());
+
   private final List<TestCase> testCases = List.of(
     new TestCase(BERLIN, ALL, Set.of(BERLIN_AREA_STOP)),
     new TestCase(BERLIN, PEDESTRIAN_AND_CAR, Set.of(BERLIN_AREA_STOP)),
