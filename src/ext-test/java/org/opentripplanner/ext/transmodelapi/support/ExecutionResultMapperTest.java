@@ -9,37 +9,44 @@ import org.junit.jupiter.api.Test;
 
 class ExecutionResultMapperTest {
 
-  private static ExecutionResult OK_RESULT_WITH_DATA_AND_ERROR = ExecutionResult.newExecutionResult()
+  private static ExecutionResult OK_RESULT_WITH_DATA_AND_ERROR = ExecutionResult
+    .newExecutionResult()
     .data("Test")
     .addError(GraphQLError.newError().message("Error").build())
-  .build();
+    .build();
 
-  private static String RESULT_SERIALIZED = quoteReplace("{" +
+  private static String RESULT_SERIALIZED = quoteReplace(
+    "{" +
     "'errors':[" +
     "{'message':'Error','locations':[],'extensions':{'classification':'DataFetchingException'}}" +
     "]," +
     "'data':'Test'" +
-    "}");
+    "}"
+  );
 
-  private static String TIMEOUT_RESPONSE = quoteReplace("{" +
+  private static String TIMEOUT_RESPONSE = quoteReplace(
+    "{" +
     "'errors':[{" +
     "'message':'TIMEOUT! The request is too resource intensive.'," +
     "'locations':[]," +
     "'extensions':{'classification':'ApiProcessingTimeout'}" +
     "}]" +
-    "}");
+    "}"
+  );
 
   public static final String SYSTEM_ERROR_MESSAGE = "A system error!";
 
-  public static final String SYSTEM_ERROR_RESPONSE = quoteReplace("{" +
+  public static final String SYSTEM_ERROR_RESPONSE = quoteReplace(
+    "{" +
     "'errors':[{" +
-    "'message':'" + SYSTEM_ERROR_MESSAGE + "'," +
+    "'message':'" +
+    SYSTEM_ERROR_MESSAGE +
+    "'," +
     "'locations':[]," +
     "'extensions':{'classification':'InternalServerError'}" +
     "}]" +
-    "}");
-
-
+    "}"
+  );
 
   @Test
   void okResponse() {

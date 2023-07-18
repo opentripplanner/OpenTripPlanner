@@ -100,6 +100,7 @@ public class PlannerResource extends RoutingResource {
       } else if (e.isToLocationNotFound()) {
         response.setError(new PlannerError(Message.GEOCODE_TO_NOT_FOUND));
       } else {
+        LOG.error("System error - unhandled error case?", e);
         response.setError(new PlannerError(Message.SYSTEM_ERROR));
       }
     } catch (OTPRequestTimeoutException e) {
