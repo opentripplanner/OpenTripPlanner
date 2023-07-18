@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -90,14 +92,14 @@ public abstract class StreetVertex extends Vertex {
    */
   public void addAreaStops(@Nonnull Collection<AreaStop> toBeAdded) {
     Objects.requireNonNull(toBeAdded);
-
     synchronized (this) {
       if (areaStops == EMPTY_SET) {
         areaStops = Set.copyOf(toBeAdded);
       } else {
-        var set = new HashSet<>(areaStops);
-        set.addAll(toBeAdded);
-        areaStops = Set.copyOf(set);
+        areaStops =
+          Stream
+            .concat(areaStops.stream(), toBeAdded.stream())
+            .collect(Collectors.toUnmodifiableSet());
       }
     }
   }
