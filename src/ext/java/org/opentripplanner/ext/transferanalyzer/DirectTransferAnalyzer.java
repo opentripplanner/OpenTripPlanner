@@ -180,11 +180,6 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     );
   }
 
-  @Override
-  public void checkInputs() {
-    // No inputs
-  }
-
   private static class TransferInfo {
 
     final RegularStop origin;
