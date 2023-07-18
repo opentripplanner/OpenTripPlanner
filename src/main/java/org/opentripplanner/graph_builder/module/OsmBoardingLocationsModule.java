@@ -48,6 +48,9 @@ import org.slf4j.LoggerFactory;
 public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(OsmBoardingLocationsModule.class);
+  private static final LocalizedString LOCALIZED_PLATFORM_NAME = new LocalizedString(
+    "name.platform"
+  );
   private final double searchRadiusDegrees = SphericalDistanceLibrary.metersToDegrees(250);
 
   private final Graph graph;
@@ -167,7 +170,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           .stream()
           .findFirst()
           .map(NamedArea::getName)
-          .orElse(new LocalizedString("name.platform"));
+          .orElse(LOCALIZED_PLATFORM_NAME);
         var label = "platform-centroid/%s".formatted(ts.getStop().getId().toString());
         var centroid = edgeList.getGeometry().getCentroid();
         var boardingLocation = vertexFactory.osmBoardingLocation(
@@ -190,7 +193,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       .withFromVertex(from)
       .withToVertex(to)
       .withGeometry(line)
-      .withName(new LocalizedString("name.platform"))
+      .withName(LOCALIZED_PLATFORM_NAME)
       .withMeterLength(SphericalDistanceLibrary.length(line))
       .withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE)
       .withBack(false)
