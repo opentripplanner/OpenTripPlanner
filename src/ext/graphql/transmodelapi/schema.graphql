@@ -1266,6 +1266,8 @@ type TripPattern {
   legs: [Leg!]!
   "Time that the trip departs."
   startTime: DateTime @deprecated
+  "How far the user has to walk, bike and/or drive in meters. It includes all street(none transit) modes."
+  streetDistance: Float
   "Get all system notices."
   systemNotices: [SystemNotice!]!
   "A cost calculated to favor transfer with higher priority. This field is meant for debugging only."
@@ -1274,8 +1276,7 @@ type TripPattern {
   waitTimeOptimizedCost: Int
   "How much time is spent waiting for transit to arrive, in seconds."
   waitingTime: Long
-  "How far the user has to walk, in meters."
-  walkDistance: Float
+  walkDistance: Float @deprecated
   "How much time is spent walking, in seconds."
   walkTime: Long
 }

@@ -141,9 +141,20 @@ public class TripPatternType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
+          .name("streetDistance")
+          .description(
+            "How far the user has to walk, bike and/or drive in meters. It includes " +
+            "all street(none transit) modes."
+          )
+          .type(Scalars.GraphQLFloat)
+          .dataFetcher(env -> itinerary(env).getNonTransitDistanceMeters())
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
           .name("walkDistance")
-          // TODO This unfortunately include BIKE and CAR
-          .description("How far the user has to walk, in meters.")
+          .deprecate("Replaced by `streetDistance`.")
           .type(Scalars.GraphQLFloat)
           .dataFetcher(env -> itinerary(env).getNonTransitDistanceMeters())
           .build()
