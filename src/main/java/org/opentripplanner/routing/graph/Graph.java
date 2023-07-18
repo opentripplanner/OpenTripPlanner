@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
@@ -45,7 +46,7 @@ public class Graph implements Serializable {
   public final StreetNotesService streetNotesService = new StreetNotesService();
 
   /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
-  private final Set<Vertex> vertices = new HashSet<>();
+  private final Set<Vertex> vertices = ConcurrentHashMap.newKeySet();
 
   public final transient Deduplicator deduplicator;
 
