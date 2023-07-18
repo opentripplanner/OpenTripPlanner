@@ -3,6 +3,7 @@ name: Performance test
 on:
   push:
     branches:
+      - introduce_street_edge_builder_test
       - dev-2.x
 
 jobs:
