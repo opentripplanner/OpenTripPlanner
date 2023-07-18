@@ -119,8 +119,11 @@ public class SpeedTestTimer {
 
   public void finishUp() {
     // close() sends the results to influxdb
-    if (uploadRegistry != null) {
-      uploadRegistry.close();
+    if (
+      uploadRegistry != null &&
+      uploadRegistry instanceof MeterRegistrySetup.CustomInfluxRegistry custom
+    ) {
+      custom.doPublish();
     }
   }
 

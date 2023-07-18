@@ -131,7 +131,9 @@ public class GeocoderResource {
     return LuceneIndex
       .forServer(serverContext)
       .queryStreetVertices(query, autocomplete)
-      .map(v -> new SearchResult(v.getLat(), v.getLon(), stringifyStreetVertex(v), v.getLabel()))
+      .map(v ->
+        new SearchResult(v.getLat(), v.getLon(), stringifyStreetVertex(v), v.getLabelString())
+      )
       .collect(Collectors.toList());
   }
 

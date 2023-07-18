@@ -76,7 +76,7 @@ public class TestHalfEdges {
     br = factory.intersection("br", -74.00, 40.0);
 
     top =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         tl,
         tr,
         GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01),
@@ -86,7 +86,7 @@ public class TestHalfEdges {
         false
       );
     bottom =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         br,
         bl,
         GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0),
@@ -96,7 +96,7 @@ public class TestHalfEdges {
         false
       );
     left =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         bl,
         tl,
         GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01),
@@ -106,7 +106,7 @@ public class TestHalfEdges {
         false
       );
     right =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         br,
         tr,
         GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01),
@@ -117,7 +117,7 @@ public class TestHalfEdges {
       );
 
     @SuppressWarnings("unused")
-    StreetEdge topBack = new StreetEdge(
+    StreetEdge topBack = StreetEdge.createStreetEdge(
       tr,
       tl,
       top.getGeometry().reverse(),
@@ -127,7 +127,7 @@ public class TestHalfEdges {
       true
     );
     @SuppressWarnings("unused")
-    StreetEdge bottomBack = new StreetEdge(
+    StreetEdge bottomBack = StreetEdge.createStreetEdge(
       br,
       bl,
       bottom.getGeometry().reverse(),
@@ -137,7 +137,7 @@ public class TestHalfEdges {
       true
     );
     leftBack =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         tl,
         bl,
         left.getGeometry().reverse(),
@@ -147,7 +147,7 @@ public class TestHalfEdges {
         true
       );
     rightBack =
-      new StreetEdge(
+      StreetEdge.createStreetEdge(
         tr,
         br,
         right.getGeometry().reverse(),

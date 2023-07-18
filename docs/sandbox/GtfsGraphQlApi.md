@@ -57,7 +57,7 @@ on this API and the [Transmodel GraphQL API](TransmodelApi.md). The new API will
 
 ## Changelog
 
-- Initial version of Legacy Graph QL API (September 2020)
+- Initial version of GTFS Graph QL API (September 2020)
 - Added ids parameter to bikeRentalStations query (May 2021, [#3450](https://github.com/opentripplanner/OpenTripPlanner/pull/3450))
 - Added capacity and allowOverloading fields to bike rental stations (not yet properly implemented) (May 2021, [#3450](https://github.com/opentripplanner/OpenTripPlanner/pull/3450))
 - Updated documentation and process for generating Java code from GraphQL schema definition (May 2021, [#3450](https://github.com/opentripplanner/OpenTripPlanner/pull/3450))
@@ -75,7 +75,7 @@ on this API and the [Transmodel GraphQL API](TransmodelApi.md). The new API will
 - Fix issue with GraphQL code generator (February 2022, [#3881](https://github.com/opentripplanner/OpenTripPlanner/pull/3881))
 - Add GBFS form factors for `rentalVehicle` (April 2022, [#4062](https://github.com/opentripplanner/OpenTripPlanner/pull/4062))
 - Implement allowedBikeRentalNetworks while deprecating it and add allowedVehicleRentalNetworks and bannedVehicleRentalNetworks. (July 2022, [#4279](https://github.com/opentripplanner/OpenTripPlanner/pull/4279))
-- Filters place types in legacy GraphQL API so that a bike park type is not returned if a vehicle parking has no bicycle spaces and car park type is not returned if a parking has no car spaces. (July 2022, [#4296](https://github.com/opentripplanner/OpenTripPlanner/pull/4296))
+- Filters place types in GTFS GraphQL API so that a bike park type is not returned if a vehicle parking has no bicycle spaces and car park type is not returned if a parking has no car spaces. (July 2022, [#4296](https://github.com/opentripplanner/OpenTripPlanner/pull/4296))
 - Include departures with skipped stops in the Stop type's stopTimesForPattern query. (July 2022, [#4299](https://github.com/opentripplanner/OpenTripPlanner/pull/4299))
 - Add built-in GraphQL client. (October 2022, [#4499](https://github.com/opentripplanner/OpenTripPlanner/pull/4499))
 - Implement support for omitCanceled parameter in some stop's stoptime queries (October 2022, [#4504]([#4504](https://github.com/opentripplanner/OpenTripPlanner/pull/4504)))

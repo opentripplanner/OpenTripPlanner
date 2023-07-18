@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.edge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.street.model.vertex.SimpleVertex;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -20,14 +21,14 @@ import org.opentripplanner.transit.model.site.PathwayMode;
 
 class PathwayEdgeTest {
 
-  Vertex from = new SimpleVertex("A", 10, 10);
-  Vertex to = new SimpleVertex("B", 10.001, 10.001);
+  Vertex from = intersectionVertex(10, 10);
+  Vertex to = intersectionVertex(10.001, 10.001);
 
   @Test
   void zeroLength() {
     // if elevators have a traversal time and distance of 0 we cannot interpolate the distance
     // from the vertices as they most likely have identical coordinates
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -45,7 +46,7 @@ class PathwayEdgeTest {
 
   @Test
   void zeroLengthWithSteps() {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -63,7 +64,7 @@ class PathwayEdgeTest {
 
   @Test
   void traversalTime() {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -83,7 +84,7 @@ class PathwayEdgeTest {
 
   @Test
   void traversalTimeOverridesLength() {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -105,7 +106,7 @@ class PathwayEdgeTest {
 
   @Test
   void distance() {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -125,7 +126,7 @@ class PathwayEdgeTest {
 
   @Test
   void wheelchair() {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,
@@ -168,7 +169,7 @@ class PathwayEdgeTest {
   @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
   @VariableSource("slopeCases")
   public void shouldScaleCostWithMaxSlope(double slope, long expectedCost) {
-    var edge = new PathwayEdge(
+    var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
       null,

@@ -159,7 +159,7 @@ public class AddTransitModelEntitiesToGraph {
         var platformVertex = stationElementNodes.get(boardingArea.getParentStop());
         boolean wheelchair = boardingArea.getWheelchairAccessibility() == Accessibility.POSSIBLE;
 
-        PathwayEdge.lowCost(
+        PathwayEdge.createLowCostPathwayEdge(
           boardingAreaVertex,
           platformVertex,
           boardingArea.getId(),
@@ -168,7 +168,7 @@ public class AddTransitModelEntitiesToGraph {
           PathwayMode.WALKWAY
         );
 
-        PathwayEdge.lowCost(
+        PathwayEdge.createLowCostPathwayEdge(
           platformVertex,
           boardingAreaVertex,
           boardingArea.getId(),
@@ -198,7 +198,7 @@ public class AddTransitModelEntitiesToGraph {
             .filter(l -> l > 0)
             .orElseGet(() -> distance(fromVertex.getCoordinate(), toVertex.getCoordinate()));
 
-          new PathwayEdge(
+          PathwayEdge.createPathwayEdge(
             fromVertex,
             toVertex,
             pathway.getId(),
@@ -211,7 +211,7 @@ public class AddTransitModelEntitiesToGraph {
             pathway.getPathwayMode()
           );
           if (pathway.isBidirectional()) {
-            new PathwayEdge(
+            PathwayEdge.createPathwayEdge(
               toVertex,
               fromVertex,
               pathway.getId(),
@@ -260,34 +260,44 @@ public class AddTransitModelEntitiesToGraph {
 
     ElevatorOffboardVertex fromOffboardVertex = vertexFactory.elevatorOffboard(
       fromVertex,
-      fromVertex.getLabel() + "_" + pathway.getId(),
+      elevatorLabel(fromVertex, pathway),
       fromLevel.name().toString()
     );
     ElevatorOffboardVertex toOffboardVertex = vertexFactory.elevatorOffboard(
       toVertex,
-      toVertex.getLabel() + "_" + pathway.getId() + "_offboard",
+      elevatorLabel(toVertex, pathway),
       toLevel.name().toString()
     );
 
-    PathwayEdge.lowCost(fromVertex, fromOffboardVertex, fromVertex.getName(), PathwayMode.ELEVATOR);
-    PathwayEdge.lowCost(toOffboardVertex, toVertex, toVertex.getName(), PathwayMode.ELEVATOR);
+    PathwayEdge.createLowCostPathwayEdge(
+      fromVertex,
+      fromOffboardVertex,
+      fromVertex.getName(),
+      PathwayMode.ELEVATOR
+    );
+    PathwayEdge.createLowCostPathwayEdge(
+      toOffboardVertex,
+      toVertex,
+      toVertex.getName(),
+      PathwayMode.ELEVATOR
+    );
 
     ElevatorOnboardVertex fromOnboardVertex = vertexFactory.elevatorOnboard(
       fromVertex,
-      fromVertex.getLabel() + "_" + pathway.getId(),
+      elevatorLabel(fromVertex, pathway),
       fromLevel.name().toString()
     );
     ElevatorOnboardVertex toOnboardVertex = vertexFactory.elevatorOnboard(
       toVertex,
-      toVertex.getLabel() + "_" + pathway.getId(),
+      elevatorLabel(toVertex, pathway),
       toLevel.name().toString()
     );
 
-    new ElevatorBoardEdge(fromOffboardVertex, fromOnboardVertex);
-    new ElevatorAlightEdge(toOnboardVertex, toOffboardVertex, toLevel.name());
+    ElevatorBoardEdge.createElevatorBoardEdge(fromOffboardVertex, fromOnboardVertex);
+    ElevatorAlightEdge.createElevatorAlightEdge(toOnboardVertex, toOffboardVertex, toLevel.name());
 
     StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
-    new ElevatorHopEdge(
+    ElevatorHopEdge.createElevatorHopEdge(
       fromOnboardVertex,
       toOnboardVertex,
       permission,
@@ -297,16 +307,25 @@ public class AddTransitModelEntitiesToGraph {
     );
 
     if (pathway.isBidirectional()) {
-      PathwayEdge.lowCost(
+      PathwayEdge.createLowCostPathwayEdge(
         fromOffboardVertex,
         fromVertex,
         fromVertex.getName(),
         PathwayMode.ELEVATOR
       );
-      PathwayEdge.lowCost(toVertex, toOffboardVertex, toVertex.getName(), PathwayMode.ELEVATOR);
-      new ElevatorBoardEdge(toOffboardVertex, toOnboardVertex);
-      new ElevatorAlightEdge(fromOnboardVertex, fromOffboardVertex, fromLevel.name());
-      new ElevatorHopEdge(
+      PathwayEdge.createLowCostPathwayEdge(
+        toVertex,
+        toOffboardVertex,
+        toVertex.getName(),
+        PathwayMode.ELEVATOR
+      );
+      ElevatorBoardEdge.createElevatorBoardEdge(toOffboardVertex, toOnboardVertex);
+      ElevatorAlightEdge.createElevatorAlightEdge(
+        fromOnboardVertex,
+        fromOffboardVertex,
+        fromLevel.name()
+      );
+      ElevatorHopEdge.createElevatorHopEdge(
         toOnboardVertex,
         fromOnboardVertex,
         permission,
@@ -315,6 +334,10 @@ public class AddTransitModelEntitiesToGraph {
         pathway.getTraversalTime()
       );
     }
+  }
+
+  private static String elevatorLabel(StationElementVertex fromVertex, Pathway pathway) {
+    return "%s_%s".formatted(fromVertex.getLabel(), pathway.getId());
   }
 
   private StopLevel getStopLevel(StationElementVertex vertex) {

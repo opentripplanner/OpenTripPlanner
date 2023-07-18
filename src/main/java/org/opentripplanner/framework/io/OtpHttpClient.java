@@ -13,21 +13,28 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.config.SocketConfig;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.config.ConnectionConfig;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpResponse;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
+import org.apache.hc.core5.http.io.SocketConfig;
+import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.apache.hc.core5.pool.PoolConcurrencyPolicy;
+import org.apache.hc.core5.pool.PoolReusePolicy;
+import org.apache.hc.core5.util.TimeValue;
+import org.apache.hc.core5.util.Timeout;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,10 +55,12 @@ import org.slf4j.LoggerFactory;
  *  <li>Connect timeout: the maximum waiting time for the first packet received from the server.
  *  <li>Socket timeout: the maximum waiting time between two packets received from the server.
  * </ul>
+ * The default timeout is set to 5 seconds.
  * <h3>Connection time-to-live</h3>
- * Optionally a maximum ttl can be set for the HTTP connections in the
- * connection pool. This is usually not required since HTTP 1.1 and HTTP/2 rely on persistent
- * connections.
+ * Maximum time an HTTP connection can stay in the connection pool before being closed.
+ * Note that HTTP 1.1 and HTTP/2 rely on persistent connections and the HTTP server is allowed to
+ * close idle connections at any time.
+ * The default connection time-to-live is set to 1 minute.
  * <h3>Resource management</h3>
  * It is recommended to use the <code>getAndMapXXX</code> and <code>postAndMapXXX</code> methods
  * in this class since they
@@ -59,7 +68,7 @@ import org.slf4j.LoggerFactory;
  * The method {@link #getAsInputStream} gives access to an input stream on the body response but
  * requires the caller to close this stream. For most use cases, this method is not recommended .
  * <h3>Connection Pooling</h3>
- * The connection pool holds a maximum of 20 connections, with maximum 2 connections per host.
+ * The connection pool holds a maximum of 25 connections, with maximum 5 connections per host.
  * <h3>Thread-safety</h3>
  * Instances of this class are thread-safe.
  */
@@ -68,13 +77,15 @@ public class OtpHttpClient implements AutoCloseable {
   private static final Logger LOG = LoggerFactory.getLogger(OtpHttpClient.class);
   private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
 
+  private static final Duration DEFAULT_TTL = Duration.ofMinutes(1);
+
   private final CloseableHttpClient httpClient;
 
   /**
-   * Creates an HTTP client with default timeout and unlimited connection time-to-live.
+   * Creates an HTTP client with default timeout and default connection time-to-live.
    */
   public OtpHttpClient() {
-    this(DEFAULT_TIMEOUT, null);
+    this(DEFAULT_TIMEOUT, DEFAULT_TTL);
   }
 
   /**
@@ -82,14 +93,28 @@ public class OtpHttpClient implements AutoCloseable {
    */
   public OtpHttpClient(Duration timeout, Duration connectionTtl) {
     Objects.requireNonNull(timeout);
+    Objects.requireNonNull(connectionTtl);
+
+    PoolingHttpClientConnectionManager connectionManager = PoolingHttpClientConnectionManagerBuilder
+      .create()
+      .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(Timeout.of(timeout)).build())
+      .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.STRICT)
+      .setConnPoolPolicy(PoolReusePolicy.LIFO)
+      .setDefaultConnectionConfig(
+        ConnectionConfig
+          .custom()
+          .setSocketTimeout(Timeout.of(timeout))
+          .setConnectTimeout(Timeout.of(timeout))
+          .setTimeToLive(TimeValue.of(connectionTtl))
+          .build()
+      )
+      .build();
+
     HttpClientBuilder httpClientBuilder = HttpClients
       .custom()
-      .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout((int) timeout.toMillis()).build())
+      .setConnectionManager(connectionManager)
       .setDefaultRequestConfig(requestConfig(timeout));
 
-    if (connectionTtl != null) {
-      httpClientBuilder.setConnectionTimeToLive(connectionTtl.toSeconds(), TimeUnit.SECONDS);
-    }
     httpClient = httpClientBuilder.build();
   }
 
@@ -111,7 +136,7 @@ public class OtpHttpClient implements AutoCloseable {
           LOG.warn(
             "Headers of resource {} unavailable. HTTP error code {}",
             sanitizeUri(uri),
-            response.getStatusLine().getStatusCode()
+            response.getCode()
           );
 
           return Collections.emptyList();
@@ -119,7 +144,7 @@ public class OtpHttpClient implements AutoCloseable {
         if (response.getEntity() == null || response.getEntity().getContent() == null) {
           throw new OtpHttpClientException("HTTP request failed: empty response");
         }
-        return Arrays.stream(response.getAllHeaders()).toList();
+        return Arrays.stream(response.getHeaders()).toList();
       }
     );
   }
@@ -256,7 +281,7 @@ public class OtpHttpClient implements AutoCloseable {
    * Executes an HTTP request and returns the body mapped according to the provided content mapper.
    */
   public <T> T executeAndMap(
-    HttpRequestBase httpRequest,
+    HttpUriRequestBase httpRequest,
     Duration timeout,
     Map<String, String> headers,
     ResponseMapper<T> contentMapper
@@ -268,7 +293,7 @@ public class OtpHttpClient implements AutoCloseable {
       response -> {
         if (isFailedRequest(response)) {
           throw new OtpHttpClientException(
-            "HTTP request failed with status code " + response.getStatusLine().getStatusCode()
+            "HTTP request failed with status code " + response.getCode()
           );
         }
         if (response.getEntity() == null || response.getEntity().getContent() == null) {
@@ -306,19 +331,19 @@ public class OtpHttpClient implements AutoCloseable {
     Objects.requireNonNull(timeout);
     Objects.requireNonNull(requestHeaders);
 
-    HttpRequestBase httpRequest = new HttpGet(uri);
+    HttpUriRequestBase httpRequest = new HttpGet(uri);
     httpRequest.setConfig(requestConfig(timeout));
     requestHeaders.forEach(httpRequest::addHeader);
-    HttpResponse response = httpClient.execute(httpRequest);
+    CloseableHttpResponse response = httpClient.execute(httpRequest);
 
     if (isFailedRequest(response)) {
       throw new IOException(
         "Service unavailable: " +
         uri +
         ". HTTP status code: " +
-        response.getStatusLine().getStatusCode() +
+        response.getCode() +
         " - " +
-        response.getStatusLine().getReasonPhrase()
+        response.getReasonPhrase()
       );
     }
     HttpEntity entity = response.getEntity();
@@ -333,10 +358,10 @@ public class OtpHttpClient implements AutoCloseable {
    * handler.
    */
   protected <T> T executeAndMapWithResponseHandler(
-    HttpRequestBase httpRequest,
+    HttpUriRequestBase httpRequest,
     Duration timeout,
     Map<String, String> requestHeaders,
-    final ResponseHandler<? extends T> responseHandler
+    final HttpClientResponseHandler<? extends T> responseHandler
   ) {
     Objects.requireNonNull(requestHeaders);
     if (timeout != null) {
@@ -355,12 +380,10 @@ public class OtpHttpClient implements AutoCloseable {
    */
 
   private static RequestConfig requestConfig(Duration timeout) {
-    int to = (int) timeout.toMillis();
     return RequestConfig
       .custom()
-      .setConnectionRequestTimeout(to)
-      .setConnectTimeout(to)
-      .setSocketTimeout(to)
+      .setResponseTimeout(Timeout.of(timeout))
+      .setConnectionRequestTimeout(Timeout.of(timeout))
       .build();
   }
 
@@ -368,7 +391,7 @@ public class OtpHttpClient implements AutoCloseable {
    * Returns true if the HTTP status code is not 200.
    */
   private static boolean isFailedRequest(HttpResponse response) {
-    return response.getStatusLine().getStatusCode() != 200;
+    return response.getCode() != 200;
   }
 
   /**

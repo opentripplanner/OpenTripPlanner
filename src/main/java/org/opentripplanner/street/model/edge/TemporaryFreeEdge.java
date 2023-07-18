@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import javax.annotation.Nonnull;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.state.State;
@@ -7,18 +8,26 @@ import org.opentripplanner.street.search.state.StateEditor;
 
 public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
 
-  public TemporaryFreeEdge(TemporaryVertex from, Vertex to) {
+  private TemporaryFreeEdge(TemporaryVertex from, Vertex to) {
     super((Vertex) from, to);
     if (from.isEndVertex()) {
       throw new IllegalStateException("A temporary edge is directed away from an end vertex");
     }
   }
 
-  public TemporaryFreeEdge(Vertex from, TemporaryVertex to) {
+  private TemporaryFreeEdge(Vertex from, TemporaryVertex to) {
     super(from, (Vertex) to);
     if (!to.isEndVertex()) {
       throw new IllegalStateException("A temporary edge is directed towards a start vertex");
     }
+  }
+
+  public static TemporaryFreeEdge createTemporaryFreeEdge(TemporaryVertex from, Vertex to) {
+    return connectToGraph(new TemporaryFreeEdge(from, to));
+  }
+
+  public static TemporaryFreeEdge createTemporaryFreeEdge(Vertex from, TemporaryVertex to) {
+    return connectToGraph(new TemporaryFreeEdge(from, to));
   }
 
   @Override
@@ -27,6 +36,7 @@ public class TemporaryFreeEdge extends FreeEdge implements TemporaryEdge {
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     StateEditor s1 = s0.edit(this);
     s1.incrementWeight(1);

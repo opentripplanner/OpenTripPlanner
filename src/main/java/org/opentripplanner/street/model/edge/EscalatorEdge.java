@@ -23,7 +23,7 @@ public class EscalatorEdge extends Edge {
   @Override
   public State[] traverse(State s0) {
     // Only allow traversal by walking
-    if (s0.getNonTransitMode() == TraverseMode.WALK && !s0.getRequest().wheelchair()) {
+    if (s0.currentMode() == TraverseMode.WALK && !s0.getRequest().wheelchair()) {
       var s1 = s0.edit(this);
       var time = getDistanceMeters() / HORIZONTAL_SPEED;
       s1.incrementWeight(s0.getPreferences().walk().escalatorReluctance() * time);

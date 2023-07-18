@@ -22,6 +22,7 @@ import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -51,17 +52,12 @@ class OsmBoardingLocationsModuleTest {
   static Stream<Arguments> testCases = Stream.of(
     Arguments.of(
       false,
-      Set.of(
-        "osm:node:302563833",
-        "osm:node:3223067049",
-        "osm:node:302563836",
-        "osm:node:3223067680",
-        "osm:node:302563834",
-        "osm:node:768590748",
-        "osm:node:302563839"
-      )
+      Stream
+        .of(302563833L, 3223067049L, 302563836L, 3223067680L, 302563834L, 768590748L, 302563839L)
+        .map(VertexLabel::osm)
+        .collect(Collectors.toSet())
     ),
-    Arguments.of(true, Set.of("osm:node:3223067049", "osm:node:768590748"))
+    Arguments.of(true, Set.of(VertexLabel.osm(3223067049L), VertexLabel.osm(768590748)))
   );
 
   @ParameterizedTest(

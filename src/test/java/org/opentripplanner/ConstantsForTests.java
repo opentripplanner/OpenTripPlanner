@@ -340,7 +340,7 @@ public class ConstantsForTests {
 
         VehicleRentalPlaceVertex stationVertex = new VehicleRentalPlaceVertex(station);
         graph.addVertex(stationVertex);
-        new VehicleRentalEdge(stationVertex, vehicleType.formFactor);
+        VehicleRentalEdge.createVehicleRentalEdge(stationVertex, vehicleType.formFactor);
 
         linker.linkVertexPermanently(
           stationVertex,
@@ -348,8 +348,14 @@ public class ConstantsForTests {
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) ->
             List.of(
-              new StreetVehicleRentalLink((VehicleRentalPlaceVertex) vertex, streetVertex),
-              new StreetVehicleRentalLink(streetVertex, (VehicleRentalPlaceVertex) vertex)
+              StreetVehicleRentalLink.createStreetVehicleRentalLink(
+                (VehicleRentalPlaceVertex) vertex,
+                streetVertex
+              ),
+              StreetVehicleRentalLink.createStreetVehicleRentalLink(
+                streetVertex,
+                (VehicleRentalPlaceVertex) vertex
+              )
             )
         );
       }
