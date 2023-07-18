@@ -50,9 +50,6 @@ public class CalculateWorldEnvelopeModule implements GraphBuilderModule {
     worldEnvelopeRepository.saveEnvelope(envelope);
   }
 
-  @Override
-  public void checkInputs() {}
-
   @SuppressWarnings("Convert2MethodRef")
   static WorldEnvelope build(
     Collection<? extends Vertex> vertices,

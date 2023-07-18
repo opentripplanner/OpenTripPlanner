@@ -85,9 +85,6 @@ public class DataImportIssueReporter implements GraphBuilderModule {
     }
   }
 
-  @Override
-  public void checkInputs() {}
-
   /**
    * Delete report if it exists, and return true if successful. Return {@code false} if the {@code
    * reportDirectory} is {@code null} or the directory can NOT be deleted.
