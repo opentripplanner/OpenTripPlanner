@@ -77,11 +77,6 @@ public class AreaStopsToVerticesMapper implements GraphBuilderModule {
     LOG.info(progress.completeMessage());
   }
 
-  @Override
-  public void checkInputs() {
-    // No inputs
-  }
-
   @Nonnull
   private static Stream<MatchResult> matchingVerticesForStop(
     StreetIndex streetIndex,
