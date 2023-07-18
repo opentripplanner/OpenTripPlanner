@@ -44,8 +44,9 @@ jobs:
         # to Maven Central open which then hang during the package phase because the Azure (Github Actions)
         # NAT drops them
         # https://github.com/actions/runner-images/issues/1499
+        # we set nodePath and npmPath to skip downloading the node binary, which frequently times out
         run: |
-          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node
+          mvn --batch-mode jacoco:prepare-agent test jacoco:report -P prettierCheck -Dprettier.nodePath=node -Dprettier.npmPath=npm
           mvn --batch-mode package -Dmaven.test.skip -P prettierSkip
 
       - name: Send coverage data to codecov.io
