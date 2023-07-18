@@ -433,7 +433,6 @@ public class SimpleIntersectionTraversalCalculatorTest {
       label,
       coord.y,
       coord.x,
-      null,
       hasHighwayLight,
       hasCrossingLight
     );

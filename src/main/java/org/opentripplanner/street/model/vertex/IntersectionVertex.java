@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
-import javax.annotation.Nullable;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.BitSetUtils;
 
@@ -22,16 +22,15 @@ public abstract class IntersectionVertex extends StreetVertex {
   protected IntersectionVertex(
     double x,
     double y,
-    @Nullable I18NString name,
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(x, y, name);
+    super(x, y);
     flags = initFlags(hasHighwayTrafficLight, hasCrossingTrafficLight);
   }
 
   protected IntersectionVertex(double x, double y) {
-    this(x, y, null, false, false);
+    this(x, y, false, false);
   }
 
   /**
@@ -72,5 +71,11 @@ public abstract class IntersectionVertex extends StreetVertex {
     flags = BitSetUtils.set(flags, HIGHWAY_TRAFFIC_LIGHT_INDEX, highwayTrafficLight);
     flags = BitSetUtils.set(flags, CROSSING_TRAFFIC_LIGHT_INDEX, crossingTrafficLight);
     return flags;
+  }
+
+  @Nonnull
+  @Override
+  public I18NString getName() {
+    return NO_NAME;
   }
 }

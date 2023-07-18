@@ -16,11 +16,10 @@ public class LabelledIntersectionVertex extends IntersectionVertex {
     @Nonnull String label,
     double x,
     double y,
-    @Nullable I18NString name,
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(x, y, name, hasHighwayTrafficLight, hasCrossingTrafficLight);
+    super(x, y, hasHighwayTrafficLight, hasCrossingTrafficLight);
     this.label = VertexLabel.string(label);
   }
 

@@ -1,8 +1,8 @@
 package org.opentripplanner.street.model.vertex;
 
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 
 /**
  * Represents a location on a street, somewhere between the two corners. This is used when computing
@@ -11,6 +11,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
  */
 public class StreetLocation extends StreetVertex {
 
+  private final I18NString name;
   private boolean wheelchairAccessible;
 
   private final VertexLabel label;
@@ -18,15 +19,9 @@ public class StreetLocation extends StreetVertex {
   // maybe name should just be pulled from street being split
   public StreetLocation(String id, Coordinate nearestPoint, I18NString name) {
     // calling constructor with null graph means this vertex is temporary
-    super(nearestPoint.x, nearestPoint.y, name);
-    label = VertexLabel.string(id);
-  }
-
-  //For tests only
-  public StreetLocation(String id, Coordinate nearestPoint, String name) {
-    // calling constructor with null graph means this vertex is temporary
-    super(nearestPoint.x, nearestPoint.y, new NonLocalizedString(name));
-    label = VertexLabel.string(id);
+    super(nearestPoint.x, nearestPoint.y);
+    this.label = VertexLabel.string(id);
+    this.name = name;
   }
 
   public boolean isWheelchairAccessible() {
@@ -44,7 +39,13 @@ public class StreetLocation extends StreetVertex {
 
   @Override
   public I18NString getIntersectionName() {
-    return super.getName();
+    return getName();
+  }
+
+  @Nonnull
+  @Override
+  public I18NString getName() {
+    return name;
   }
 
   @Override

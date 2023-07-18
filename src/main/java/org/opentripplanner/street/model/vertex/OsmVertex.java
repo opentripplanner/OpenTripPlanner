@@ -22,7 +22,7 @@ public class OsmVertex extends IntersectionVertex {
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(x, y, null, hasHighwayTrafficLight, hasCrossingTrafficLight);
+    super(x, y, hasHighwayTrafficLight, hasCrossingTrafficLight);
     this.nodeId = nodeId;
   }
 

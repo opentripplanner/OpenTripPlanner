@@ -4,7 +4,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
@@ -24,11 +23,11 @@ public class StreetModelForTest {
 
   public static IntersectionVertex intersectionVertex(double lat, double lon) {
     var label = "%s_%s".formatted(lat, lon);
-    return new LabelledIntersectionVertex(label, lat, lon, I18NString.of(label), false, false);
+    return new LabelledIntersectionVertex(label, lat, lon, false, false);
   }
 
   public static IntersectionVertex intersectionVertex(String label, double lat, double lon) {
-    return new LabelledIntersectionVertex(label, lat, lon, I18NString.of(label), false, false);
+    return new LabelledIntersectionVertex(label, lat, lon, false, false);
   }
 
   public static StreetEdge streetEdge(StreetVertex vA, StreetVertex vB) {

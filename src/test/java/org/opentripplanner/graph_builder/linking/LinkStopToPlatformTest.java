@@ -54,14 +54,7 @@ public class LinkStopToPlatformTest {
 
     for (int i = 0; i < platform.length; i++) {
       Coordinate c = platform[i];
-      var vertex = new LabelledIntersectionVertex(
-        String.valueOf(i),
-        c.x,
-        c.y,
-        I18NString.of("Platform vertex " + i),
-        false,
-        false
-      );
+      var vertex = new LabelledIntersectionVertex(String.valueOf(i), c.x, c.y, false, false);
       graph.addVertex(vertex);
       vertices.add(vertex);
       closedGeom[i] = c;
