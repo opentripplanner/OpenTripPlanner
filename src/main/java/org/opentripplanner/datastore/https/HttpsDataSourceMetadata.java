@@ -1,13 +1,13 @@
 package org.opentripplanner.datastore.https;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.http.Header;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.utils.DateUtils;
+import org.apache.hc.client5.http.utils.DateUtils;
+import org.apache.hc.core5.http.Header;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
@@ -66,9 +66,9 @@ class HttpsDataSourceMetadata {
 
   private static long parseDate(String lastModifiedHeader) {
     if (lastModifiedHeader != null) {
-      Date lastModifiedDate = DateUtils.parseDate(lastModifiedHeader);
+      Instant lastModifiedDate = DateUtils.parseStandardDate(lastModifiedHeader);
       if (lastModifiedDate != null) {
-        return lastModifiedDate.getTime();
+        return lastModifiedDate.toEpochMilli();
       }
     }
     return -1;

@@ -13,6 +13,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -428,10 +429,11 @@ public class SimpleIntersectionTraversalCalculatorTest {
     boolean hasHighwayLight,
     boolean hasCrossingLight
   ) {
-    IntersectionVertex v = new IntersectionVertex(
+    IntersectionVertex v = new LabelledIntersectionVertex(
       label,
       coord.y,
       coord.x,
+      null,
       hasHighwayLight,
       hasCrossingLight
     );
@@ -444,8 +446,8 @@ public class SimpleIntersectionTraversalCalculatorTest {
    * @param back true if this is a reverse edge
    */
   private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
+    var labelA = vA.getLabel();
+    var labelB = vB.getLabel();
     String name = String.format("%s_%s", labelA, labelB);
     Coordinate[] coords = new Coordinate[2];
     coords[0] = vA.getCoordinate();
@@ -453,6 +455,6 @@ public class SimpleIntersectionTraversalCalculatorTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdge(vA, vB, geom, name, length, perm, back);
+    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, back);
   }
 }

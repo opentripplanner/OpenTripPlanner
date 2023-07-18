@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.street.model.vertex.SimpleVertex;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -70,7 +70,7 @@ class StreetTransitEntityLinkTest {
   }
 
   private State[] traverse(RegularStop stop, boolean onlyAccessible) {
-    var from = new SimpleVertex("A", 10, 10);
+    var from = StreetModelForTest.intersectionVertex("A", 10, 10);
     var to = new TransitStopVertexBuilder()
       .withStop(stop)
       .withModes(Set.of(TransitMode.RAIL))
@@ -99,7 +99,7 @@ class StreetTransitEntityLinkTest {
       )
     );
 
-    var edge = new StreetTransitStopLink(from, to);
+    var edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);
     return edge.traverse(new State(from, req.build()));
   }
 }

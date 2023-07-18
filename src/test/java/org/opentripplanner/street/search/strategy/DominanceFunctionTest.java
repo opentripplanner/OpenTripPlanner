@@ -25,7 +25,7 @@ public class DominanceFunctionTest {
     // Test if domination works in the general case
 
     StreetSearchRequest streetSearchRequest = StreetSearchRequest.of().build();
-    StateData stateData = StateData.getInitialStateData(streetSearchRequest);
+    StateData stateData = StateData.getBaseCaseStateData(streetSearchRequest);
     State stateA = new State(fromVertex, Instant.EPOCH, stateData, streetSearchRequest);
     State stateB = new State(toVertex, Instant.EPOCH, stateData, streetSearchRequest);
     stateA.weight = 1;
@@ -48,7 +48,7 @@ public class DominanceFunctionTest {
 
     var req = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL).build();
 
-    StateData stateData = StateData.getInitialStateData(req);
+    StateData stateData = StateData.getBaseCaseStateData(req);
 
     State outsideZone = new State(fromVertex, Instant.EPOCH, stateData, req);
     assertFalse(outsideZone.isInsideNoRentalDropOffArea());

@@ -71,6 +71,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.DominanceFunctions;
@@ -99,7 +100,7 @@ class DisplayVertex {
   }
 
   public String toString() {
-    String label = vertex.getLabel();
+    String label = vertex.getLabelString();
     if (label.contains("osm node")) {
       label = vertex.getDefaultName();
     }
@@ -304,7 +305,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
       new Comparator<>() {
         @Override
         public int compare(Vertex arg0, Vertex arg1) {
-          return arg0.getLabel().compareTo(arg1.getLabel());
+          return arg0.getLabelString().compareTo(arg1.getLabelString());
         }
       }
     );
@@ -914,12 +915,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     zoomToNodeButton.addActionListener(
       new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-          String nodeName = (String) JOptionPane.showInputDialog(
+          String nodeName = JOptionPane.showInputDialog(
             frame,
             "Node id",
             JOptionPane.PLAIN_MESSAGE
           );
-          Vertex v = getGraph().getVertex(nodeName);
+          Vertex v = getGraph().getVertex(VertexLabel.string(nodeName));
           if (v == null) {
             System.out.println("no such node " + nodeName);
           } else {
@@ -983,7 +984,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             "Node id",
             JOptionPane.PLAIN_MESSAGE
           );
-          Vertex v = getGraph().getVertex(nodeName);
+          Vertex v = getGraph().getVertex(VertexLabel.string(nodeName));
           if (v == null) {
             System.out.println("no such node " + nodeName);
           } else {

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import org.apache.http.Header;
+import org.apache.hc.core5.http.Header;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;

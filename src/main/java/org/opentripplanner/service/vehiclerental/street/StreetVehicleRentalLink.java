@@ -1,6 +1,6 @@
 package org.opentripplanner.service.vehiclerental.street;
 
-import org.locationtech.jts.geom.LineString;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -14,14 +14,28 @@ public class StreetVehicleRentalLink extends Edge {
 
   private final VehicleRentalPlaceVertex vehicleRentalPlaceVertex;
 
-  public StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalPlaceVertex tov) {
+  private StreetVehicleRentalLink(StreetVertex fromv, VehicleRentalPlaceVertex tov) {
     super(fromv, tov);
     vehicleRentalPlaceVertex = tov;
   }
 
-  public StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, StreetVertex tov) {
+  private StreetVehicleRentalLink(VehicleRentalPlaceVertex fromv, StreetVertex tov) {
     super(fromv, tov);
     vehicleRentalPlaceVertex = fromv;
+  }
+
+  public static StreetVehicleRentalLink createStreetVehicleRentalLink(
+    StreetVertex fromv,
+    VehicleRentalPlaceVertex tov
+  ) {
+    return connectToGraph(new StreetVehicleRentalLink(fromv, tov));
+  }
+
+  public static StreetVehicleRentalLink createStreetVehicleRentalLink(
+    VehicleRentalPlaceVertex fromv,
+    StreetVertex tov
+  ) {
+    return connectToGraph(new StreetVehicleRentalLink(fromv, tov));
   }
 
   public String toString() {
@@ -29,6 +43,7 @@ public class StreetVehicleRentalLink extends Edge {
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     // Disallow traversing two StreetBikeRentalLinks in a row.
     // This prevents the router from using bike rental stations as shortcuts to get around
@@ -51,13 +66,5 @@ public class StreetVehicleRentalLink extends Edge {
   @Override
   public I18NString getName() {
     return vehicleRentalPlaceVertex.getName();
-  }
-
-  public LineString getGeometry() {
-    return null;
-  }
-
-  public double getDistanceMeters() {
-    return 0;
   }
 }

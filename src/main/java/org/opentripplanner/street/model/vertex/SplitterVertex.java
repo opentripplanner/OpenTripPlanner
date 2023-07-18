@@ -9,8 +9,16 @@ import org.opentripplanner.framework.i18n.I18NString;
  */
 public class SplitterVertex extends IntersectionVertex {
 
+  private final VertexLabel label;
+
   public SplitterVertex(String label, double x, double y, I18NString name) {
-    super(label, x, y, name, false, false);
+    super(x, y, name, false, false);
+    this.label = VertexLabel.string(label);
+  }
+
+  @Override
+  public VertexLabel getLabel() {
+    return label;
   }
 
   @Override

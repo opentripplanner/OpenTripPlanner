@@ -27,7 +27,15 @@ class StreetEdgeCostTest {
   @VariableSource("walkReluctanceCases")
   public void walkReluctance(double walkReluctance, long expectedCost) {
     double length = 100;
-    var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "edge",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withReluctance(walkReluctance)));
@@ -49,7 +57,15 @@ class StreetEdgeCostTest {
   @VariableSource("bikeReluctanceCases")
   public void bikeReluctance(double bikeReluctance, long expectedCost) {
     double length = 100;
-    var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "edge",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withBike(b -> b.withReluctance(bikeReluctance)));
@@ -72,7 +88,15 @@ class StreetEdgeCostTest {
   @VariableSource("carReluctanceCases")
   public void carReluctance(double carReluctance, long expectedCost) {
     double length = 100;
-    var edge = new StreetEdge(V1, V2, null, "edge", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "edge",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withCar(c -> c.withReluctance(carReluctance)));
@@ -94,7 +118,15 @@ class StreetEdgeCostTest {
   @VariableSource("stairsCases")
   public void stairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    var edge = StreetEdge.createStreetEdge(
+      V1,
+      V2,
+      null,
+      "stairs",
+      length,
+      StreetTraversalPermission.ALL,
+      false
+    );
     edge.setStairs(true);
 
     var req = StreetSearchRequest.of();
@@ -120,7 +152,7 @@ class StreetEdgeCostTest {
   @VariableSource("bikeStairsCases")
   public void bikeStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(
+    var edge = StreetEdge.createStreetEdge(
       V1,
       V2,
       null,
@@ -154,7 +186,7 @@ class StreetEdgeCostTest {
   @VariableSource("walkSafetyCases")
   public void walkSafetyFactor(double walkSafetyFactor, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(
+    var edge = StreetEdge.createStreetEdge(
       V1,
       V2,
       null,
