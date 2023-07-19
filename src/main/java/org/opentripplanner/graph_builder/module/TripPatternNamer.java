@@ -32,9 +32,6 @@ public class TripPatternNamer implements GraphBuilderModule {
     generateUniqueNames(transitModel.getAllTripPatterns());
   }
 
-  @Override
-  public void checkInputs() {}
-
   /**
    * Static method that creates unique human-readable names for a collection of TableTripPatterns.
    * Perhaps this should be in TripPattern, and apply to Frequency patterns as well. TODO: resolve

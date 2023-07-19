@@ -132,7 +132,7 @@ public class GraphBuilder implements Runnable {
     if (hasTransitData) {
       // Add links to flex areas after the streets has been split, so that also the split edges are connected
       if (OTPFeature.FlexRouting.isOn()) {
-        graphBuilder.addModule(factory.flexLocationsToStreetEdgesMapper());
+        graphBuilder.addModule(factory.areaStopsToVerticesMapper());
       }
 
       // This module will use streets or straight line distance depending on whether OSM data is found in the graph.

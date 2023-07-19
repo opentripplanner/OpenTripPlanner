@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.linking;
 
-import java.util.HashSet;
+import java.util.Set;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -16,12 +16,9 @@ class FlexLocationAdder {
     if (edge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN_AND_CAR)) {
       Point p = GeometryUtils.getGeometryFactory().createPoint(v0.getCoordinate());
       Envelope env = p.getEnvelopeInternal();
-      for (AreaStop location : stopModel.queryLocationIndex(env)) {
-        if (!location.getGeometry().disjoint(p)) {
-          if (v0.areaStops == null) {
-            v0.areaStops = new HashSet<>();
-          }
-          v0.areaStops.add(location);
+      for (AreaStop areaStop : stopModel.queryLocationIndex(env)) {
+        if (!areaStop.getGeometry().disjoint(p)) {
+          v0.addAreaStops(Set.of(areaStop));
         }
       }
     }

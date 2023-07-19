@@ -94,11 +94,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     LOG.info("Found {} OSM references which match a stop's id or code", successes);
   }
 
-  @Override
-  public void checkInputs() {
-    //no inputs
-  }
-
   private boolean connectVertexToStop(TransitStopVertex ts, StreetIndex index) {
     var stopCode = ts.getStop().getCode();
     var stopId = ts.getStop().getId().getId();

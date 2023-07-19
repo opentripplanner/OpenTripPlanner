@@ -82,6 +82,10 @@ class MeterRegistrySetup {
       super(config, clock);
     }
 
+    public void doPublish() {
+      publish();
+    }
+
     @Override
     protected Timer newTimer(
       Id id,

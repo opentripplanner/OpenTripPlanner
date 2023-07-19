@@ -33,8 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
@@ -78,7 +77,6 @@ import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
-@Execution(ExecutionMode.CONCURRENT)
 class GraphQLIntegrationTest {
 
   static final Graph graph = new Graph();
@@ -88,11 +86,12 @@ class GraphQLIntegrationTest {
     .toInstant();
   static final Instant ALERT_END_TIME = ALERT_START_TIME.plus(1, ChronoUnit.DAYS);
 
-  private static final GraphQLRequestContext context;
+  private static GraphQLRequestContext context;
 
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
 
-  static {
+  @BeforeAll
+  static void setup() {
     graph
       .getVehicleParkingService()
       .updateVehicleParking(
