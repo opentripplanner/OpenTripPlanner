@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
@@ -24,24 +25,15 @@ class TripTimesTest {
 
   private static final String TRIP_ID = "testTripId";
 
-  private static final FeedScopedId STOP_A = TransitModelForTest.id("A"); // 0
-  private static final FeedScopedId STOP_B = TransitModelForTest.id("B"); // 1
-  private static final FeedScopedId STOP_C = TransitModelForTest.id("C"); // 2
-  private static final FeedScopedId STOP_D = TransitModelForTest.id("D"); // 3
-  private static final FeedScopedId STOP_E = TransitModelForTest.id("E"); // 4
-  private static final FeedScopedId STOP_F = TransitModelForTest.id("F"); // 5
-  private static final FeedScopedId STOP_G = TransitModelForTest.id("G"); // 6
-  private static final FeedScopedId STOP_H = TransitModelForTest.id("H"); // 7
-
   private static final List<FeedScopedId> stops = List.of(
-    STOP_A,
-    STOP_B,
-    STOP_C,
-    STOP_D,
-    STOP_E,
-    STOP_F,
-    STOP_G,
-    STOP_H
+    id("A"),
+    id("B"),
+    id("C"),
+    id("D"),
+    id("E"),
+    id("F"),
+    id("G"),
+    id("H")
   );
 
   static TripTimes createInitialTripTimes() {
@@ -64,7 +56,7 @@ class TripTimesTest {
   }
 
   @Nested
-  class HeadsignTest {
+  class Headsign {
 
     private static final NonLocalizedString STOP_TEST_DIRECTION = new NonLocalizedString(
       "STOP TEST DIRECTION"
@@ -232,23 +224,27 @@ class TripTimesTest {
     assertFalse(updatedTripTimesA.isNoDataStop(2));
   }
 
-  @Test
-  void gtfsSequence() {
-    var stopIndex = createInitialTripTimes().gtfsSequenceOfStopIndex(2);
-    assertEquals(20, stopIndex);
-  }
+  @Nested
+  class GtfsStopSequence {
 
-  @Test
-  void stopIndexOfGtfsSequence() {
-    var stopIndex = createInitialTripTimes().stopIndexOfGtfsSequence(40);
-    assertTrue(stopIndex.isPresent());
-    assertEquals(4, stopIndex.getAsInt());
-  }
+    @Test
+    void gtfsSequence() {
+      var stopIndex = createInitialTripTimes().gtfsSequenceOfStopIndex(2);
+      assertEquals(20, stopIndex);
+    }
 
-  @Test
-  void unknownGtfsSequence() {
-    var stopIndex = createInitialTripTimes().stopIndexOfGtfsSequence(4);
-    assertTrue(stopIndex.isEmpty());
+    @Test
+    void stopIndexOfGtfsSequence() {
+      var stopIndex = createInitialTripTimes().stopIndexOfGtfsSequence(40);
+      assertTrue(stopIndex.isPresent());
+      assertEquals(4, stopIndex.getAsInt());
+    }
+
+    @Test
+    void unknownGtfsSequence() {
+      var stopIndex = createInitialTripTimes().stopIndexOfGtfsSequence(4);
+      assertTrue(stopIndex.isEmpty());
+    }
   }
 
   @Test

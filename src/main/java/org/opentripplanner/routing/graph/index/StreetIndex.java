@@ -111,18 +111,18 @@ public class StreetIndex {
         edgeLocation = fromv;
 
         if (endVertex) {
-          tempEdges.addEdge(new TemporaryFreeEdge(edgeLocation, location));
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(edgeLocation, location));
         } else {
-          tempEdges.addEdge(new TemporaryFreeEdge(location, edgeLocation));
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(location, edgeLocation));
         }
       } else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
         // no need to link to area edges caught on-end
         edgeLocation = tov;
 
         if (endVertex) {
-          tempEdges.addEdge(new TemporaryFreeEdge(edgeLocation, location));
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(edgeLocation, location));
         } else {
-          tempEdges.addEdge(new TemporaryFreeEdge(location, edgeLocation));
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(location, edgeLocation));
         }
       } else {
         // creates links from street head -> location -> street tail.
@@ -276,7 +276,7 @@ public class StreetIndex {
     double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
 
     if (endVertex) {
-      TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
+      TemporaryPartialStreetEdge temporaryPartialStreetEdge = TemporaryPartialStreetEdge.createTemporaryPartialStreetEdge(
         street,
         fromv,
         base,
@@ -291,7 +291,7 @@ public class StreetIndex {
       temporaryPartialStreetEdge.setLink(street.isLink());
       tempEdges.addEdge(temporaryPartialStreetEdge);
     } else {
-      TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
+      TemporaryPartialStreetEdge temporaryPartialStreetEdge = TemporaryPartialStreetEdge.createTemporaryPartialStreetEdge(
         street,
         base,
         tov,
@@ -364,9 +364,19 @@ public class StreetIndex {
         endVertex ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
         endVertex
           ? (vertex, streetVertex) ->
-            List.of(new TemporaryFreeEdge(streetVertex, (TemporaryStreetLocation) vertex))
+            List.of(
+              TemporaryFreeEdge.createTemporaryFreeEdge(
+                streetVertex,
+                (TemporaryStreetLocation) vertex
+              )
+            )
           : (vertex, streetVertex) ->
-            List.of(new TemporaryFreeEdge((TemporaryStreetLocation) vertex, streetVertex))
+            List.of(
+              TemporaryFreeEdge.createTemporaryFreeEdge(
+                (TemporaryStreetLocation) vertex,
+                streetVertex
+              )
+            )
       )
     );
 

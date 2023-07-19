@@ -527,7 +527,7 @@ public class WalkableAreaBuilder {
         endEndpoint.getLabel();
       I18NString name = namer.getNameForWay(areaEntity, label);
 
-      AreaEdge street = new AreaEdge(
+      AreaEdge street = AreaEdge.createAreaEdge(
         startEndpoint,
         endEndpoint,
         line,
@@ -558,7 +558,7 @@ public class WalkableAreaBuilder {
         startEndpoint.getLabel();
       name = namer.getNameForWay(areaEntity, label);
 
-      AreaEdge backStreet = new AreaEdge(
+      AreaEdge backStreet = AreaEdge.createAreaEdge(
         endEndpoint,
         startEndpoint,
         line.reverse(),

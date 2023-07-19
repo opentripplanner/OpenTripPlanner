@@ -55,7 +55,4 @@ public class TimeZoneAdjusterModule implements GraphBuilderModule {
           .forEach(frequencyEntry -> frequencyEntry.tripTimes.timeShift(timeShift));
       });
   }
-
-  @Override
-  public void checkInputs() {}
 }

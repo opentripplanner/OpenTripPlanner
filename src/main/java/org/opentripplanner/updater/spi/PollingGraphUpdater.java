@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.spi;
 
 import java.time.Duration;
+import java.util.concurrent.CancellationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,8 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
           }
         } catch (InterruptedException e) {
           throw e;
+        } catch (CancellationException e) {
+          LOG.info("OTP is shutting down, the polling updater {} was interrupted", this, e);
         } catch (Exception e) {
           LOG.error("Error while running polling updater {}", this, e);
           // TODO Should we cancel the task? Or after n consecutive failures? cancel();

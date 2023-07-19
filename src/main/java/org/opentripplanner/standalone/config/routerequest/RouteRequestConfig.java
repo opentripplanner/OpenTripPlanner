@@ -827,6 +827,15 @@ high values.
             "Value should be between 0 and 1." + " If the value is set to be 0, safety is ignored."
           )
           .asDouble(dft.safetyFactor())
+      )
+      .withEscalatorReluctance(
+        c
+          .of("escalatorReluctance")
+          .since(V2_4)
+          .summary(
+            "A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time"
+          )
+          .asDouble(dft.escalatorReluctance())
       );
   }
 }

@@ -16,6 +16,7 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.StreetSearchBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuristic;
@@ -54,8 +55,8 @@ public class UnroutableTest {
     RouteRequest options = new RouteRequest();
     options.journey().direct().setMode(StreetMode.BIKE);
 
-    Vertex from = graph.getVertex("osm:node:2003617278");
-    Vertex to = graph.getVertex("osm:node:40446276");
+    Vertex from = graph.getVertex(VertexLabel.osm(2003617278));
+    Vertex to = graph.getVertex(VertexLabel.osm(40446276));
     ShortestPathTree<State, Edge, Vertex> spt = StreetSearchBuilder
       .of()
       .setHeuristic(new EuclideanRemainingWeightHeuristic())

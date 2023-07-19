@@ -235,9 +235,9 @@ public class NearbyStopFinder {
         if (
           OTPFeature.FlexRouting.isOn() &&
           targetVertex instanceof StreetVertex &&
-          ((StreetVertex) targetVertex).areaStops != null
+          !((StreetVertex) targetVertex).areaStops().isEmpty()
         ) {
-          for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops) {
+          for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops()) {
             // This is for a simplification, so that we only return one vertex from each
             // stop location. All vertices are added to the multimap, which is filtered
             // below, so that only the closest vertex is added to stopsFound

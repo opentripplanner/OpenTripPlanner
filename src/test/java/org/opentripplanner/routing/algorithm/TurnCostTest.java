@@ -17,9 +17,9 @@ import org.opentripplanner.routing.api.request.request.StreetRequest;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model.TurnRestrictionType;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -126,11 +126,11 @@ public class TurnCostTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel());
-    assertEquals("main_2nd", states.get(2).getVertex().getLabel());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
+    assertEquals("main_2nd", states.get(2).getVertex().getLabelString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
 
     assertEquals(0, states.get(0).getElapsedTimeSeconds());
     assertEquals(50, states.get(1).getElapsedTimeSeconds()); // maple_main1 = 50
@@ -155,11 +155,11 @@ public class TurnCostTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel());
-    assertEquals("broad_1st", states.get(2).getVertex().getLabel());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
+    assertEquals("broad_1st", states.get(2).getVertex().getLabelString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
   }
 
   @Test
@@ -179,11 +179,11 @@ public class TurnCostTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel());
-    assertEquals("broad_1st", states.get(2).getVertex().getLabel());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
+    assertEquals("broad_1st", states.get(2).getVertex().getLabelString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
 
     assertEquals(0, states.get(0).getElapsedTimeSeconds());
     assertEquals(50, states.get(1).getElapsedTimeSeconds()); // maple_main1 = 50
@@ -229,7 +229,7 @@ public class TurnCostTest {
    ****/
 
   private StreetVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(label, lat, lon);
+    return StreetModelForTest.intersectionVertex(label, lat, lon);
   }
 
   /**
@@ -238,8 +238,8 @@ public class TurnCostTest {
    * @param back true if this is a reverse edge
    */
   private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
+    var labelA = vA.getLabel();
+    var labelB = vB.getLabel();
     String name = String.format("%s_%s", labelA, labelB);
     Coordinate[] coords = new Coordinate[2];
     coords[0] = vA.getCoordinate();
@@ -247,7 +247,7 @@ public class TurnCostTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    StreetEdge pse = new StreetEdge(vA, vB, geom, name, length, perm, back);
+    StreetEdge pse = StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, back);
     pse.setCarSpeed(1.0f);
     return pse;
   }

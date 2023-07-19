@@ -5,13 +5,13 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Nonnull;
-import org.apache.http.Header;
+import org.apache.hc.core5.http.Header;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.ZipStreamDataSourceDecorator;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
 
 /**
  * This data store accesses files in read-only mode over HTTPS.
@@ -67,12 +67,16 @@ public class HttpsDataSourceRepository implements DataSourceRepository {
       return new ZipStreamDataSourceDecorator(httpsSource);
     } else {
       throw new UnsupportedOperationException(
-        "Only ZIP archives are supported as composite sources for the HTTPS data source"
+        "Only ZIP archives are supported as composite sources for the HTTPS data source. URL: %s".formatted(
+            uri
+          )
       );
     }
   }
 
   protected List<Header> getHttpHeaders(URI uri) {
-    return HttpUtils.getHeaders(uri, HTTP_HEAD_REQUEST_TIMEOUT, Map.of());
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+      return otpHttpClient.getHeaders(uri, HTTP_HEAD_REQUEST_TIMEOUT, Map.of());
+    }
   }
 }

@@ -77,11 +77,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
     graph.calculateConvexHull();
   }
 
-  @Override
-  public void checkInputs() {
-    //no inputs
-  }
-
   public void linkTransitStops(Graph graph, TransitModel transitModel) {
     List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());
@@ -134,8 +129,14 @@ public class StreetLinkerModule implements GraphBuilderModule {
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) ->
             List.of(
-              new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
-              new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
+              StreetTransitStopLink.createStreetTransitStopLink(
+                (TransitStopVertex) vertex,
+                streetVertex
+              ),
+              StreetTransitStopLink.createStreetTransitStopLink(
+                streetVertex,
+                (TransitStopVertex) vertex
+              )
             )
         );
       //noinspection Convert2MethodRef
@@ -157,8 +158,14 @@ public class StreetLinkerModule implements GraphBuilderModule {
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) ->
             List.of(
-              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
-              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
+              StreetVehicleParkingLink.createStreetVehicleParkingLink(
+                (VehicleParkingEntranceVertex) vertex,
+                streetVertex
+              ),
+              StreetVehicleParkingLink.createStreetVehicleParkingLink(
+                streetVertex,
+                (VehicleParkingEntranceVertex) vertex
+              )
             )
         );
     }
@@ -172,8 +179,14 @@ public class StreetLinkerModule implements GraphBuilderModule {
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) ->
             List.of(
-              new StreetVehicleParkingLink((VehicleParkingEntranceVertex) vertex, streetVertex),
-              new StreetVehicleParkingLink(streetVertex, (VehicleParkingEntranceVertex) vertex)
+              StreetVehicleParkingLink.createStreetVehicleParkingLink(
+                (VehicleParkingEntranceVertex) vertex,
+                streetVertex
+              ),
+              StreetVehicleParkingLink.createStreetVehicleParkingLink(
+                streetVertex,
+                (VehicleParkingEntranceVertex) vertex
+              )
             )
         );
     }
@@ -190,8 +203,14 @@ public class StreetLinkerModule implements GraphBuilderModule {
           LinkingDirection.BOTH_WAYS,
           (vertex, streetVertex) ->
             List.of(
-              new StreetTransitEntranceLink((TransitEntranceVertex) vertex, streetVertex),
-              new StreetTransitEntranceLink(streetVertex, (TransitEntranceVertex) vertex)
+              StreetTransitEntranceLink.createStreetTransitEntranceLink(
+                (TransitEntranceVertex) vertex,
+                streetVertex
+              ),
+              StreetTransitEntranceLink.createStreetTransitEntranceLink(
+                streetVertex,
+                (TransitEntranceVertex) vertex
+              )
             )
         );
     }

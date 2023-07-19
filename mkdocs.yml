@@ -70,16 +70,17 @@ nav:
     - OTP2 Migration Guide: 'OTP2-MigrationGuide.md'
 - Configuration:
     - Introduction: 'Configuration.md'
-    - Build: 'BuildConfiguration.md'
-    - "Boarding Locations": 'BoardingLocations.md'
-    - "Stop Area Relations": 'StopAreas.md'
-    - "Street Graph Pruning": 'IslandPruning.md'
-    - Router: 'RouterConfiguration.md'
-    - Accessibility: 'Accessibility.md'
-    - "Route Request": 'RouteRequest.md'
-    - "Realtime Updaters": 'UpdaterConfig.md'
-    - "Routing Modes": "RoutingModes.md"
-    - "Logging": "Logging.md"
+    - Reference:
+        - Build: 'BuildConfiguration.md'
+        - Router: 'RouterConfiguration.md'
+        - "Route Request": 'RouteRequest.md'
+        - "Realtime Updaters": 'UpdaterConfig.md'
+    - Topic overviews:
+        - "Boarding Locations": 'BoardingLocations.md'
+        - "Stop Area Relations": 'StopAreas.md'
+        - "Street Graph Pruning": 'IslandPruning.md'
+        - Accessibility: 'Accessibility.md'
+        - "Logging": "Logging.md"
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
     - Localization: 'Localization.md'

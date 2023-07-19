@@ -84,10 +84,15 @@ class ElevatorProcessor {
       for (OSMLevel level : levels) {
         // get the node to build the elevator out from
         OsmVertex sourceVertex = vertices.get(level);
-        String sourceVertexLabel = sourceVertex.getLabel();
         String levelName = level.longName;
 
-        createElevatorVertices(graph, onboardVertices, sourceVertex, sourceVertexLabel, levelName);
+        createElevatorVertices(
+          graph,
+          onboardVertices,
+          sourceVertex,
+          sourceVertex.getLabelString(),
+          levelName
+        );
       }
       int travelTime = parseDuration(node).orElse(-1);
 
@@ -96,7 +101,7 @@ class ElevatorProcessor {
       createElevatorHopEdges(
         onboardVertices,
         wheelchair,
-        node.isTagTrue("bicycle"),
+        !node.isBicycleExplicitlyDenied(),
         levels.length,
         travelTime
       );
@@ -121,7 +126,7 @@ class ElevatorProcessor {
       for (int i = 0; i < nodes.size(); i++) {
         Long node = nodes.get(i);
         var sourceVertex = vertexGenerator.intersectionNodes().get(node);
-        String sourceVertexLabel = sourceVertex.getLabel();
+        String sourceVertexLabel = sourceVertex.getLabelString();
         String levelName = elevatorWay.getId() + " / " + i;
         createElevatorVertices(
           graph,
@@ -139,7 +144,7 @@ class ElevatorProcessor {
       createElevatorHopEdges(
         onboardVertices,
         wheelchair,
-        elevatorWay.isTagTrue("bicycle"),
+        !elevatorWay.isBicycleExplicitlyDenied(),
         levels,
         travelTime
       );
@@ -151,27 +156,27 @@ class ElevatorProcessor {
     Graph graph,
     ArrayList<Vertex> onboardVertices,
     IntersectionVertex sourceVertex,
-    String sourceVertexLabel,
+    String label,
     String levelName
   ) {
     var factory = new VertexFactory(graph);
     ElevatorOffboardVertex offboardVertex = factory.elevatorOffboard(
       sourceVertex,
-      sourceVertexLabel,
+      label,
       levelName
     );
 
-    new FreeEdge(sourceVertex, offboardVertex);
-    new FreeEdge(offboardVertex, sourceVertex);
+    FreeEdge.createFreeEdge(sourceVertex, offboardVertex);
+    FreeEdge.createFreeEdge(offboardVertex, sourceVertex);
 
-    ElevatorOnboardVertex onboardVertex = factory.elevatorOnboard(
-      sourceVertex,
-      sourceVertexLabel,
-      levelName
+    ElevatorOnboardVertex onboardVertex = factory.elevatorOnboard(sourceVertex, label, levelName);
+
+    ElevatorBoardEdge.createElevatorBoardEdge(offboardVertex, onboardVertex);
+    ElevatorAlightEdge.createElevatorAlightEdge(
+      onboardVertex,
+      offboardVertex,
+      new NonLocalizedString(levelName)
     );
-
-    new ElevatorBoardEdge(offboardVertex, onboardVertex);
-    new ElevatorAlightEdge(onboardVertex, offboardVertex, new NonLocalizedString(levelName));
 
     // accumulate onboard vertices to so they can be connected by hop edges later
     onboardVertices.add(onboardVertex);

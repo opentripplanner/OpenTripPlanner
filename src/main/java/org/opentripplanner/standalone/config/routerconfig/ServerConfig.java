@@ -36,7 +36,7 @@ domain, these are set in the routing request.
           """
 This timeout limits the server-side processing time for a given API request. This does not include
 network latency nor waiting time in the HTTP server thread pool. The default value is
-`-1s`(no timeout). The timeout is applied to all APIs (REST, Transmodel , Legacy GraphQL).
+`-1s`(no timeout). The timeout is applied to all APIs (REST, Transmodel & GTFS GraphQL).
 The timeout is not enforced when the parallel routing OTP feature is in use.
 """
         )

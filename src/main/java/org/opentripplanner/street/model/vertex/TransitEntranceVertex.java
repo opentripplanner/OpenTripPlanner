@@ -16,7 +16,7 @@ public class TransitEntranceVertex extends StationElementVertex {
    */
   public TransitEntranceVertex(Entrance entrance) {
     super(
-      entrance.getId().toString(),
+      entrance.getId(),
       entrance.getCoordinate().longitude(),
       entrance.getCoordinate().latitude(),
       entrance.getName()

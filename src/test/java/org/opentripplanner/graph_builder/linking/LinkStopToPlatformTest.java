@@ -25,6 +25,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -53,7 +54,14 @@ public class LinkStopToPlatformTest {
 
     for (int i = 0; i < platform.length; i++) {
       Coordinate c = platform[i];
-      var vertex = new IntersectionVertex(String.valueOf(i), c.x, c.y, "Platform vertex " + i);
+      var vertex = new LabelledIntersectionVertex(
+        String.valueOf(i),
+        c.x,
+        c.y,
+        I18NString.of("Platform vertex " + i),
+        false,
+        false
+      );
       graph.addVertex(vertex);
       vertices.add(vertex);
       closedGeom[i] = c;
@@ -261,8 +269,14 @@ public class LinkStopToPlatformTest {
         LinkingDirection.BOTH_WAYS,
         (vertex, streetVertex) ->
           List.of(
-            new StreetTransitStopLink((TransitStopVertex) vertex, streetVertex),
-            new StreetTransitStopLink(streetVertex, (TransitStopVertex) vertex)
+            StreetTransitStopLink.createStreetTransitStopLink(
+              (TransitStopVertex) vertex,
+              streetVertex
+            ),
+            StreetTransitStopLink.createStreetTransitStopLink(
+              streetVertex,
+              (TransitStopVertex) vertex
+            )
           )
       );
     }
@@ -278,7 +292,7 @@ public class LinkStopToPlatformTest {
       new Coordinate[] { v1.getCoordinate(), v2.getCoordinate() }
     );
     I18NString name = new LocalizedString(nameString);
-    return new AreaEdge(
+    return AreaEdge.createAreaEdge(
       v1,
       v2,
       line,

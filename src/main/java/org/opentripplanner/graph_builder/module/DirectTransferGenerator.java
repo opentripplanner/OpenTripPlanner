@@ -189,11 +189,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     );
   }
 
-  @Override
-  public void checkInputs() {
-    // No inputs
-  }
-
   private static Iterable<NearbyStop> findNearbyStops(
     NearbyStopFinder nearbyStopFinder,
     Vertex vertex,

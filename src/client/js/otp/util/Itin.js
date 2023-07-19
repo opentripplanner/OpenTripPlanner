@@ -239,9 +239,9 @@ otp.util.Itin = {
 
     vertexTypeStrings : {
         //TRANSLATORS: WALK/CYCLE distance to [Bicycle rental station]
-        'BIKESHARE_EMPTY': _tr('Bicycle rental station'),
+        'BIKESHARE_EMPTY': _tr('Vehicle rental station'),
         //TRANSLATORS: WALK/CYCLE distance to [Bicycle rental] {name}
-        'BIKESHARE': _tr('Bicycle rental'),
+        'BIKESHARE': _tr('Vehicle rental'),
         'TRANSIT': ""
     },
 
@@ -261,7 +261,14 @@ otp.util.Itin = {
                 vertexType += "_EMPTY";
             }
             if (vertexType in this.vertexTypeStrings) {
-                return this.vertexTypeStrings[vertexType] +  " " + place.name;
+                const name = `${this.vertexTypeStrings[vertexType]} ${place.name}`;
+                if (place.networks && place.networks.length) {
+                    const network = place.networks[0];
+                    return `${name} (${network})`;
+                } else {
+                    return name;
+                }
+
             } else {
                 if (vertexType !== "NORMAL") {
                     console.log(vertexType + " not found in strings!");

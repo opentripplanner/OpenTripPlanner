@@ -8,10 +8,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Map;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.utils.DateUtils;
+import org.apache.hc.client5.http.utils.DateUtils;
+import org.apache.hc.core5.http.HttpHeaders;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.datastore.api.FileType;
 
@@ -55,7 +54,7 @@ class HttpsFileDataSourceTest {
       HttpHeaders.CONTENT_LENGTH,
       "1024",
       HttpHeaders.LAST_MODIFIED,
-      DateUtils.formatDate(Date.from(now))
+      DateUtils.formatStandardDate(Instant.now())
     );
     HttpsDataSourceMetadata metadata = new HttpsDataSourceMetadata(headers);
     HttpsFileDataSource httpsFileDataSource = new HttpsFileDataSource(

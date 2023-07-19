@@ -94,11 +94,6 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     LOG.info("Found {} OSM references which match a stop's id or code", successes);
   }
 
-  @Override
-  public void checkInputs() {
-    //no inputs
-  }
-
   private boolean connectVertexToStop(TransitStopVertex ts, StreetIndex index) {
     var stopCode = ts.getStop().getCode();
     var stopId = ts.getStop().getId().getId();
@@ -185,7 +180,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
     var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
-    return new StreetEdge(
+    return StreetEdge.createStreetEdge(
       from,
       to,
       line,
@@ -201,8 +196,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     String stopCode,
     OsmBoardingLocationVertex boardingLocation
   ) {
-    new BoardingLocationToStopLink(ts, boardingLocation);
-    new BoardingLocationToStopLink(boardingLocation, ts);
+    BoardingLocationToStopLink.createBoardingLocationToStopLink(ts, boardingLocation);
+    BoardingLocationToStopLink.createBoardingLocationToStopLink(boardingLocation, ts);
     LOG.debug(
       "Connected {} ({}) to {} at {}",
       ts,

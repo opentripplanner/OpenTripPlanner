@@ -1,6 +1,7 @@
 package org.opentripplanner.street.model.edge;
 
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -30,7 +31,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   private final boolean wheelchairAccessible;
   private final FeedScopedId id;
 
-  public PathwayEdge(
+  private PathwayEdge(
     Vertex fromv,
     Vertex tov,
     FeedScopedId id,
@@ -54,10 +55,15 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   }
 
   /**
-   * {@link PathwayEdge#lowCost(Vertex, Vertex, FeedScopedId, I18NString, boolean, PathwayMode)}
+   * {@link PathwayEdge#createLowCostPathwayEdge(Vertex, Vertex, FeedScopedId, I18NString, boolean, PathwayMode)}
    */
-  public static PathwayEdge lowCost(Vertex fromV, Vertex toV, I18NString name, PathwayMode mode) {
-    return PathwayEdge.lowCost(fromV, toV, null, name, true, mode);
+  public static PathwayEdge createLowCostPathwayEdge(
+    Vertex fromV,
+    Vertex toV,
+    I18NString name,
+    PathwayMode mode
+  ) {
+    return PathwayEdge.createLowCostPathwayEdge(fromV, toV, null, name, true, mode);
   }
 
   /**
@@ -65,7 +71,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
    * <p>
    * These are for edges which have an implied cost of almost zero just like a FreeEdge has.
    */
-  public static PathwayEdge lowCost(
+  public static PathwayEdge createLowCostPathwayEdge(
     Vertex fromV,
     Vertex toV,
     FeedScopedId id,
@@ -73,10 +79,39 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     boolean wheelchairAccessible,
     PathwayMode mode
   ) {
-    return new PathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
+    return createPathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
+  }
+
+  public static PathwayEdge createPathwayEdge(
+    Vertex fromv,
+    Vertex tov,
+    FeedScopedId id,
+    I18NString name,
+    int traversalTime,
+    double distance,
+    int steps,
+    double slope,
+    boolean wheelchairAccessible,
+    PathwayMode mode
+  ) {
+    return connectToGraph(
+      new PathwayEdge(
+        fromv,
+        tov,
+        id,
+        name,
+        traversalTime,
+        distance,
+        steps,
+        slope,
+        wheelchairAccessible,
+        mode
+      )
+    );
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     StateEditor s1 = createEditorForWalking(s0, this);
     if (s1 == null) {
@@ -90,10 +125,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
 
     if (time == 0) {
       if (distance > 0) {
-        time = (int) (distance * preferences.walk().speed());
+        time = (int) (distance / preferences.walk().speed());
       } else if (isStairs()) {
         // 1 step corresponds to 20cm, doubling that to compensate for elevation;
-        time = (int) (0.4 * Math.abs(steps) * preferences.walk().speed());
+        time = (int) (0.4 * Math.abs(steps) / preferences.walk().speed());
       }
     }
 
@@ -112,7 +147,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
           StreetEdgeReluctanceCalculator.computeReluctance(
             preferences,
             TraverseMode.WALK,
-            s0.getNonTransitMode() == TraverseMode.BICYCLE,
+            s0.currentMode() == TraverseMode.BICYCLE,
             isStairs()
           );
       }

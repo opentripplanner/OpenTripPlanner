@@ -101,7 +101,7 @@ class ParkingProcessor {
       VehicleParkingEntranceVertex parkVertex = vertexFactory.vehicleParkingEntrance(
         vehicleParking
       );
-      new VehicleParkingEdge(parkVertex);
+      VehicleParkingEdge.createVehicleParkingEdge(parkVertex);
     }
 
     LOG.info("Created {} {} P+R nodes.", n, isCarParkAndRide ? "car" : "bike");
@@ -435,7 +435,7 @@ class ParkingProcessor {
     List<VehicleParking.VehicleParkingEntranceCreator> entrances = new ArrayList<>();
     var sortedAccessVertices = accessVertices
       .stream()
-      .sorted(Comparator.comparing(vn -> vn.vertex().getLabel()))
+      .sorted(Comparator.comparing(vn -> vn.vertex().getLabelString()))
       .toList();
 
     for (var access : sortedAccessVertices) {

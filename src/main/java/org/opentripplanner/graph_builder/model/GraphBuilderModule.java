@@ -9,5 +9,7 @@ public interface GraphBuilderModule {
   void buildGraph();
 
   /** Check that all inputs to the graphbuilder are valid; throw an exception if not. */
-  void checkInputs();
+  default void checkInputs() {
+    // the vast majority of modules don't have any checks
+  }
 }

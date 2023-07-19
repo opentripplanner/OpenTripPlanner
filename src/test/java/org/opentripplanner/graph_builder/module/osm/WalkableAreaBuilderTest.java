@@ -23,6 +23,8 @@ import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeOnLevelLabel;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class WalkableAreaBuilderTest {
@@ -79,7 +81,7 @@ public class WalkableAreaBuilderTest {
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals("osm:node:1025307935"))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(1025307935)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -94,7 +96,7 @@ public class WalkableAreaBuilderTest {
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals("osm:node:1025307935"))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(1025307935)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -112,7 +114,7 @@ public class WalkableAreaBuilderTest {
     var entranceAtWrongLevel = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143850"))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143850)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -122,7 +124,7 @@ public class WalkableAreaBuilderTest {
     var entranceAtSameLevel = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143832"))
+      .filter(a -> hasNodeId(a, -143832))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -133,7 +135,7 @@ public class WalkableAreaBuilderTest {
     var stopPositionConnection = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143863"))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143863)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -145,7 +147,7 @@ public class WalkableAreaBuilderTest {
     var connectionEdges = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143845"))
+      .filter(a -> hasNodeId(a, -143845))
       .toList();
     // entrance is connected top 2 opposite corners of a single platform
     // with two bidirectional edge pairs, and with the other entrance point
@@ -156,11 +158,17 @@ public class WalkableAreaBuilderTest {
     var elevatorConnection = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().startsWith("osm:node:-143861"))
+      .filter(a -> hasNodeId(a, -143861))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
     assertEquals(1, elevatorConnection.size());
+  }
+
+  private static boolean hasNodeId(AreaEdge a, long nodeId) {
+    return (
+      a.getToVertex().getLabel() instanceof OsmNodeOnLevelLabel label && label.nodeId() == nodeId
+    );
   }
 
   // -- Infrastructure --

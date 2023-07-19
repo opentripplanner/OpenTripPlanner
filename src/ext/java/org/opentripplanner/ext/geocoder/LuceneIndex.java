@@ -41,6 +41,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
@@ -139,9 +140,9 @@ public class LuceneIndex implements Serializable {
             addToIndex(
               directoryWriter,
               StreetVertex.class,
-              streetVertex.getLabel(),
+              streetVertex.getLabelString(),
               streetVertex.getIntersectionName(),
-              streetVertex.getLabel(),
+              streetVertex.getLabelString(),
               streetVertex.getLat(),
               streetVertex.getLon(),
               Set.of()
@@ -181,7 +182,7 @@ public class LuceneIndex implements Serializable {
 
   public Stream<StreetVertex> queryStreetVertices(String query, boolean autocomplete) {
     return matchingDocuments(StreetVertex.class, query, autocomplete)
-      .map(document -> (StreetVertex) graph.getVertex(document.get(ID)));
+      .map(document -> (StreetVertex) graph.getVertex(VertexLabel.string(document.get(ID))));
   }
 
   /**
