@@ -14,7 +14,6 @@ import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.PushConfig;
 import com.google.pubsub.v1.Subscription;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
@@ -28,7 +27,8 @@ import org.entur.protobuf.mapper.SiriMapper;
 import org.opentripplanner.ext.siri.EntityResolver;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.application.ApplicationShutdownSupport;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.text.FileSizeToTextConverter;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -166,7 +166,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
     while (!isPrimed() && !otpIsShuttingDown) { // Retrying until data is initialized successfully
       try {
-        initializeData(dataInitializationUrl, receiver);
+        initializeData(receiver);
       } catch (Exception e) {
         sleepPeriod = sleepPeriod * 2;
 
@@ -235,12 +235,14 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   private void addShutdownHook() {
     // TODO: This should probably be on a higher level?
-    try {
-      Runtime.getRuntime().addShutdownHook(new Thread(this::teardown));
-      LOG.info("Shutdown-hook to clean up Google Pubsub subscription has been added.");
-    } catch (IllegalStateException e) {
-      // Handling cornercase when instance is being shut down before it has been initialized
-      LOG.info("Instance is already shutting down - cleaning up immediately.", e);
+    Thread shutdownHook = new Thread(this::teardown, "siri-et-google-pubsub-shutdown");
+    boolean added = ApplicationShutdownSupport.addShutdownHook(
+      shutdownHook,
+      shutdownHook.getName()
+    );
+    if (!added) {
+      // Handling corner case when instance is being shut down before it has been initialized
+      LOG.info("Instance is already shutting down - cleaning up immediately.");
       teardown();
     }
   }
@@ -314,21 +316,11 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     return DurationUtils.durationToStr(Duration.between(startTime, Instant.now()));
   }
 
-  private void initializeData(
-    URI dataInitializationUrl,
-    EstimatedTimetableMessageReceiver receiver
-  ) throws IOException {
+  private void initializeData(EstimatedTimetableMessageReceiver receiver) {
     if (dataInitializationUrl != null) {
       LOG.info("Fetching initial data from {}", dataInitializationUrl);
       final long t1 = System.currentTimeMillis();
-
-      final InputStream data = HttpUtils.getData(
-        dataInitializationUrl,
-        initialGetDataTimeout,
-        Map.of("Content-Type", "application/x-protobuf")
-      );
-      ByteString value = ByteString.readFrom(data);
-
+      ByteString value = fetchInitialData();
       final long t2 = System.currentTimeMillis();
       LOG.info(
         "Fetching initial data - finished after {} ms, got {}",
@@ -437,6 +429,17 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
       // Ack only after all work for the message is complete.
       consumer.ack();
+    }
+  }
+
+  private ByteString fetchInitialData() {
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+      return otpHttpClient.getAndMap(
+        dataInitializationUrl,
+        initialGetDataTimeout,
+        Map.of("Content-Type", "application/x-protobuf"),
+        ByteString::readFrom
+      );
     }
   }
 }

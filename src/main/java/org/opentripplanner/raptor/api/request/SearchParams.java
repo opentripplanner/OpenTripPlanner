@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 
 /**
@@ -19,6 +19,7 @@ public class SearchParams {
   private final int earliestDepartureTime;
   private final int latestArrivalTime;
   private final int searchWindowInSeconds;
+  private final int searchWindowAccessSlackInSeconds;
   private final boolean preferLateArrival;
   private final int numberOfAdditionalTransfers;
   private final int maxNumberOfTransfers;
@@ -35,6 +36,7 @@ public class SearchParams {
     earliestDepartureTime = RaptorConstants.TIME_NOT_SET;
     latestArrivalTime = RaptorConstants.TIME_NOT_SET;
     searchWindowInSeconds = RaptorConstants.NOT_SET;
+    searchWindowAccessSlackInSeconds = 0;
     preferLateArrival = false;
     numberOfAdditionalTransfers = 5;
     maxNumberOfTransfers = RaptorConstants.NOT_SET;
@@ -49,6 +51,7 @@ public class SearchParams {
     this.earliestDepartureTime = builder.earliestDepartureTime();
     this.latestArrivalTime = builder.latestArrivalTime();
     this.searchWindowInSeconds = builder.searchWindowInSeconds();
+    this.searchWindowAccessSlackInSeconds = builder.searchWindowAccessSlackInSeconds();
     this.preferLateArrival = builder.preferLateArrival();
     this.numberOfAdditionalTransfers = builder.numberOfAdditionalTransfers();
     this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
@@ -68,6 +71,13 @@ public class SearchParams {
    */
   public int earliestDepartureTime() {
     return earliestDepartureTime;
+  }
+
+  /**
+   * The {@link #earliestDepartureTime()} including search-window-access-slack.
+   */
+  public int routerEarliestDepartureTime() {
+    return earliestDepartureTime - searchWindowAccessSlackInSeconds;
   }
 
   public boolean isEarliestDepartureTimeSet() {
@@ -104,6 +114,26 @@ public class SearchParams {
    */
   public int searchWindowInSeconds() {
     return searchWindowInSeconds;
+  }
+
+  /**
+   * The {@link #searchWindowInSeconds()} plus search-window-access-slack.
+   */
+  public int routerSearchWindowInSeconds() {
+    return searchWindowInSeconds == 0
+      ? 0
+      : searchWindowInSeconds() + searchWindowAccessSlackInSeconds;
+  }
+
+  /**
+   * A slack to force Raptor to start the iterations before the earliest-departure-time.
+   * This will enable paths starting before the earliest-departure-time to be included in the
+   * result. This is useful if these paths are used to prune other paths(filtering) or if a
+   * path only can be time-shifted AFTER the search - this enables us to add a time-penalty
+   * to access.
+   */
+  public int searchWindowAccessSlackInSeconds() {
+    return searchWindowAccessSlackInSeconds;
   }
 
   public boolean isSearchWindowSet() {

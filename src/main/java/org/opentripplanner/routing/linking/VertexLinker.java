@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.linking;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -30,11 +30,10 @@ import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporarySplitterVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.service.StopModel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class links transit stops to streets by splitting the streets (unless the stop is extremely
@@ -61,6 +60,8 @@ public class VertexLinker {
   private static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
   private static final int INITIAL_SEARCH_RADIUS_METERS = 100;
   private static final int MAX_SEARCH_RADIUS_METERS = 1000;
+  // exit a complex area maximally via this many exit points
+  private static final int MAX_AREA_LINKS = 300;
   private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
   /**
    * Spatial index of StreetEdges in the graph.
@@ -70,9 +71,10 @@ public class VertexLinker {
   private final Graph graph;
 
   private final StopModel stopModel;
+  private final VertexFactory vertexFactory;
 
   // TODO Temporary code until we refactor WalkableAreaBuilder  (#3152)
-  private Boolean addExtraEdgesToAreas = true;
+  private boolean addExtraEdgesToAreas = true;
 
   /**
    * Construct a new VertexLinker. NOTE: Only one VertexLinker should be active on a graph at any
@@ -81,6 +83,7 @@ public class VertexLinker {
   public VertexLinker(Graph graph, StopModel stopModel, EdgeSpatialIndex edgeSpatialIndex) {
     this.edgeSpatialIndex = edgeSpatialIndex;
     this.graph = graph;
+    this.vertexFactory = new VertexFactory(graph);
     this.stopModel = stopModel;
   }
 
@@ -338,6 +341,7 @@ public class VertexLinker {
     double length = SphericalDistanceLibrary.length(orig);
 
     IntersectionVertex start = null;
+    boolean snapped = true;
 
     // if we're very close to one end of the line or the other, or endwise, don't bother to split,
     // cut to the chase and link directly
@@ -361,6 +365,7 @@ public class VertexLinker {
     ) {
       start = (IntersectionVertex) edge.getToVertex();
     } else {
+      snapped = false;
       boolean split = true;
       // if vertex is inside an area, no need to snap to nearest edge and split it
       if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
@@ -380,12 +385,14 @@ public class VertexLinker {
       }
       if (split) {
         // split the edge, get the split vertex
-        start = (IntersectionVertex) split(edge, ll, scope, direction, tempEdges);
+        start = split(edge, ll, scope, direction, tempEdges);
       }
     }
 
     if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
-      addAreaVertex(start, aEdge.getArea(), scope, tempEdges);
+      if (!snapped || !aEdge.getArea().visibilityVertices.contains(start)) {
+        addAreaVertex(start, aEdge.getArea(), scope, tempEdges);
+      }
     }
     // TODO Consider moving this code
     if (OTPFeature.FlexRouting.isOn()) {
@@ -469,7 +476,7 @@ public class VertexLinker {
       tsv.setWheelchairAccessible(originalEdge.isWheelchairAccessible());
       v = tsv;
     } else {
-      v = new SplitterVertex(graph, uniqueSplitLabel, x, y, originalEdge.getName());
+      v = vertexFactory.splitter(originalEdge, x, y, uniqueSplitLabel);
     }
     v.addRentalRestriction(originalEdge.getFromVertex().rentalRestrictions());
     v.addRentalRestriction(originalEdge.getToVertex().rentalRestrictions());
@@ -540,7 +547,18 @@ public class VertexLinker {
 
     int added = 0;
 
+    // if area is too complex, consider only part of visibility nodes
+    float skip_ratio = (float) MAX_AREA_LINKS / (float) visibilityVertices.size();
+    int i = 0;
+    float sum_i = 0;
+
     for (IntersectionVertex v : visibilityVertices) {
+      sum_i += skip_ratio;
+      if (Math.floor(sum_i) < i + 1) {
+        continue;
+      }
+      i = (int) Math.floor(sum_i);
+
       LineString newGeometry = GEOMETRY_FACTORY.createLineString(
         new Coordinate[] { nearestPoints[0], v.getCoordinate() }
       );
@@ -566,6 +584,26 @@ public class VertexLinker {
     if (scope == Scope.PERMANENT) {
       visibilityVertices.add(newVertex);
     }
+  }
+
+  static final Set<TraverseMode> noThruModes = Set.of(
+    TraverseMode.WALK,
+    TraverseMode.BICYCLE,
+    TraverseMode.CAR
+  );
+
+  private Set<TraverseMode> getNoThruModes(Collection<Edge> edges) {
+    var modes = new HashSet<>(noThruModes);
+    for (Edge e : edges) {
+      if (e instanceof StreetEdge se) {
+        for (TraverseMode tm : noThruModes) {
+          if (!se.isNoThruTraffic(tm)) {
+            modes.remove(tm);
+          }
+        }
+      }
+    }
+    return modes;
   }
 
   private void createSegments(
@@ -597,7 +635,12 @@ public class VertexLinker {
       // If more than one area intersects, we pick one by random for the name & properties
       double length = SphericalDistanceLibrary.distance(to.getCoordinate(), from.getCoordinate());
 
-      AreaEdge ae = new AreaEdge(
+      // apply consistent NoThru restrictions
+      // if all joining edges are nothru, then the new edge should be as well
+      var incomingNoThruModes = getNoThruModes(to.getIncoming());
+      var outgoingNoThruModes = getNoThruModes(to.getIncoming());
+
+      AreaEdge ae = AreaEdge.createAreaEdge(
         from,
         to,
         line,
@@ -607,12 +650,16 @@ public class VertexLinker {
         false,
         ael
       );
+      for (TraverseMode tm : outgoingNoThruModes) {
+        ae.setNoThruTraffic(tm);
+      }
+
       if (scope != Scope.PERMANENT) {
         tempEdges.addEdge(ae);
       }
 
       ae =
-        new AreaEdge(
+        AreaEdge.createAreaEdge(
           to,
           from,
           line.reverse(),
@@ -622,6 +669,10 @@ public class VertexLinker {
           true,
           ael
         );
+      for (TraverseMode tm : incomingNoThruModes) {
+        ae.setNoThruTraffic(tm);
+      }
+
       if (scope != Scope.PERMANENT) {
         tempEdges.addEdge(ae);
       }

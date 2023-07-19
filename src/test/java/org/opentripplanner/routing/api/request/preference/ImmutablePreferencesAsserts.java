@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class ImmutablePreferencesAsserts {
 
-  public static <T> void assertEqualsAndHashCode(T dft, T subject, T other, T same) {
+  public static <T> void assertEqualsAndHashCode(T subject, T other, T same) {
     assertEquals(subject, same);
     assertEquals(subject.hashCode(), same.hashCode());
     assertNotEquals(subject, other);

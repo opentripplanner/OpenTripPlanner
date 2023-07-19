@@ -25,6 +25,7 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -141,6 +142,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
     public void run(Graph graph, TransitModel transitModel) {
       // Apply stations to graph
       Set<FeedScopedId> stationSet = new HashSet<>();
+      var vertexFactory = new VertexFactory(graph);
 
       /* add any new stations and update vehicle counts for existing stations */
       for (VehicleRentalPlace station : stations) {
@@ -148,15 +150,21 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         stationSet.add(station.getId());
         VehicleRentalPlaceVertex vehicleRentalVertex = verticesByStation.get(station.getId());
         if (vehicleRentalVertex == null) {
-          vehicleRentalVertex = new VehicleRentalPlaceVertex(graph, station);
+          vehicleRentalVertex = vertexFactory.vehicleRentalPlace(station);
           DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
             vehicleRentalVertex,
             new TraverseModeSet(TraverseMode.WALK),
             LinkingDirection.BOTH_WAYS,
             (vertex, streetVertex) ->
               List.of(
-                new StreetVehicleRentalLink((VehicleRentalPlaceVertex) vertex, streetVertex),
-                new StreetVehicleRentalLink(streetVertex, (VehicleRentalPlaceVertex) vertex)
+                StreetVehicleRentalLink.createStreetVehicleRentalLink(
+                  (VehicleRentalPlaceVertex) vertex,
+                  streetVertex
+                ),
+                StreetVehicleRentalLink.createStreetVehicleRentalLink(
+                  streetVertex,
+                  (VehicleRentalPlaceVertex) vertex
+                )
               )
           );
           if (vehicleRentalVertex.getOutgoing().isEmpty()) {
@@ -170,7 +178,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
             )
             .collect(Collectors.toSet());
           for (RentalFormFactor formFactor : formFactors) {
-            tempEdges.addEdge(new VehicleRentalEdge(vehicleRentalVertex, formFactor));
+            tempEdges.addEdge(
+              VehicleRentalEdge.createVehicleRentalEdge(vehicleRentalVertex, formFactor)
+            );
           }
           verticesByStation.put(station.getId(), vehicleRentalVertex);
           tempEdgesByStation.put(station.getId(), tempEdges);

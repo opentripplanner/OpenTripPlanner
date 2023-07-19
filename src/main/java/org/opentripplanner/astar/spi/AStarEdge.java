@@ -1,5 +1,7 @@
 package org.opentripplanner.astar.spi;
 
+import javax.annotation.Nonnull;
+
 public interface AStarEdge<
   State extends AStarState<State, Edge, Vertex>,
   Edge extends AStarEdge<State, Edge, Vertex>,
@@ -9,5 +11,6 @@ public interface AStarEdge<
 
   Vertex getToVertex();
 
+  @Nonnull
   State[] traverse(State u);
 }

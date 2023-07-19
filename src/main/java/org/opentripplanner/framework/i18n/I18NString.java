@@ -26,7 +26,7 @@ public interface I18NString {
    */
   String toString(Locale locale);
 
-  public static I18NString assertHasValue(I18NString value) {
+  static I18NString assertHasValue(I18NString value) {
     if (value == null || value.toString().isBlank()) {
       throw new IllegalArgumentException(
         "Value can not be null, empty or just whitespace: " +
@@ -34,5 +34,12 @@ public interface I18NString {
       );
     }
     return value;
+  }
+
+  /**
+   * Create an instance from a string.
+   */
+  static I18NString of(String value) {
+    return new NonLocalizedString(value);
   }
 }

@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.standard.stoparrivals.path;
 
-import static org.opentripplanner.raptor.api.RaptorConstants.TIME_NOT_SET;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import java.util.ArrayList;
 import java.util.List;

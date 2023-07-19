@@ -6,8 +6,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
@@ -53,7 +53,7 @@ public class PathStringBuilder {
     if (leg.isFree()) {
       return this;
     }
-    return legSep().text(leg.asString(false));
+    return legSep().text(leg.asString(false, false, null));
   }
 
   public PathStringBuilder transit(String description, int fromTime, int toTime) {

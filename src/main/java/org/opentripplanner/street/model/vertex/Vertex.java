@@ -8,12 +8,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
-import org.opentripplanner.framework.geometry.DirectionUtils;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.RentalRestrictionExtension;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -28,15 +29,15 @@ import org.slf4j.LoggerFactory;
 public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serializable, Cloneable {
 
   private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
+  private static final I18NString NO_NAME = I18NString.of("(no name provided)");
 
-  /**
-   * Short debugging name. This is a graph mathematical term as in https://en.wikipedia.org/wiki/Graph_labeling
-   */
-  private final String label;
   private final double x;
   private final double y;
+
   /* Longer human-readable name for the client */
-  private I18NString name;
+  @Nonnull
+  private final I18NString name;
+
   private transient Edge[] incoming = new Edge[0];
 
   private transient Edge[] outgoing = new Edge[0];
@@ -44,20 +45,14 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
 
   /* CONSTRUCTORS */
 
-  protected Vertex(Graph g, String label, double x, double y) {
-    this.label = label;
-    this.x = x;
-    this.y = y;
-    // null graph means temporary vertex
-    if (g != null) {
-      g.addVertex(this);
-    }
-    this.name = new NonLocalizedString("(no name provided)");
+  protected Vertex(double x, double y) {
+    this(x, y, NO_NAME);
   }
 
-  protected Vertex(Graph g, String label, double x, double y, I18NString name) {
-    this(g, label, x, y);
-    this.name = name;
+  protected Vertex(double x, double y, @Nullable I18NString name) {
+    this.x = x;
+    this.y = y;
+    this.name = Objects.requireNonNullElse(name, NO_NAME);
   }
 
   /* PUBLIC METHODS */
@@ -151,6 +146,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   /** If this vertex is located on only one street, get that street's name */
+  @Nonnull
   public I18NString getName() {
     return this.name;
   }
@@ -162,9 +158,20 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return this.name.toString();
   }
 
-  /** Every vertex has a label which is globally unique. */
-  public String getLabel() {
-    return label;
+  /**
+   *  Every vertex has a label which is globally unique.
+   * <p>
+   *  The name "label" is taken from graph theory: https://en.wikipedia.org/wiki/Graph_labeling
+   */
+  public abstract VertexLabel getLabel();
+
+  /**
+   * Return the label of the vertex converted to a string.
+   *
+   * @see Vertex#getLabel()
+   */
+  public String getLabelString() {
+    return getLabel().toString();
   }
 
   public Coordinate getCoordinate() {
@@ -210,6 +217,16 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return false;
   }
 
+  /**
+   * Compare two vertices and return {@code true} if they are close together - have the same
+   * location.
+   * @see org.opentripplanner.framework.geometry.WgsCoordinate#sameLocation(WgsCoordinate)
+   **/
+  public boolean sameLocation(Vertex other) {
+    return new WgsCoordinate(getLat(), getLon())
+      .sameLocation(new WgsCoordinate(other.getLat(), other.getLon()));
+  }
+
   public boolean rentalTraversalBanned(State currentState) {
     return rentalRestrictions.traversalBanned(currentState);
   }
@@ -227,7 +244,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   }
 
   public void removeRentalRestriction(RentalRestrictionExtension ext) {
-    rentalRestrictions.remove(ext);
+    rentalRestrictions = rentalRestrictions.remove(ext);
   }
 
   /**
@@ -254,8 +271,8 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
    */
   private Edge[] removeEdge(Edge[] existing, Edge e) {
     int nfound = 0;
-    for (int i = 0; i < existing.length; i++) {
-      if (existing[i] == e) nfound++;
+    for (Edge edge : existing) {
+      if (edge == e) nfound++;
     }
     if (nfound == 0) {
       LOG.debug(

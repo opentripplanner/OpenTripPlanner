@@ -20,6 +20,7 @@ import org.opentripplanner.ext.flex.flexpathcalculator.StreetFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -113,6 +114,7 @@ public class FlexRouter {
   }
 
   public Collection<Itinerary> createFlexOnlyItineraries() {
+    OTPRequestTimeoutException.checkForTimeout();
     calculateFlexAccessTemplates();
     calculateFlexEgressTemplates();
 
@@ -146,6 +148,7 @@ public class FlexRouter {
   }
 
   public Collection<FlexAccessEgress> createFlexAccesses() {
+    OTPRequestTimeoutException.checkForTimeout();
     calculateFlexAccessTemplates();
 
     return this.flexAccessTemplates.stream()
@@ -154,6 +157,7 @@ public class FlexRouter {
   }
 
   public Collection<FlexAccessEgress> createFlexEgresses() {
+    OTPRequestTimeoutException.checkForTimeout();
     calculateFlexEgressTemplates();
 
     return this.flexEgressTemplates.stream()

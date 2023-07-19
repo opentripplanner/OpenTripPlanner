@@ -252,7 +252,7 @@ public class GraphPathToItineraryMapper {
       // The first state is part of the previous leg
       .skip(1)
       .map(state -> {
-        var mode = state.getNonTransitMode();
+        var mode = state.currentMode();
 
         if (mode != null) {
           // Resolve correct mode if renting vehicle

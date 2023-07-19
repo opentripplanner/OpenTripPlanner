@@ -150,7 +150,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
       return null;
     }
 
-    return new FlexTripEdge(
+    return FlexTripEdge.createFlexTripEdge(
       accessEgress.state.getVertex(),
       flexToVertex,
       accessEgress.stop,

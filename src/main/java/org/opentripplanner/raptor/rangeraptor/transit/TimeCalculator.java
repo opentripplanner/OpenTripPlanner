@@ -1,6 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import org.opentripplanner.raptor.api.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 
 public interface TimeCalculator {
   /**

@@ -20,7 +20,7 @@ public class TemporarySplitterVertex extends SplitterVertex implements Temporary
     StreetEdge streetEdge,
     boolean endVertex
   ) {
-    super(null, label, x, y, streetEdge.getName());
+    super(label, x, y, streetEdge.getName());
     this.endVertex = endVertex;
     this.wheelchairAccessible = streetEdge.isWheelchairAccessible();
   }

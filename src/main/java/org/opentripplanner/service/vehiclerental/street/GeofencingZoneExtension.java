@@ -45,11 +45,7 @@ public final class GeofencingZoneExtension implements RentalRestrictionExtension
   public boolean dropOffBanned(State state) {
     if (state.isRentingVehicle()) {
       return (
-        zone.dropOffBanned() &&
-        (
-          state.unknownRentalNetwork() ||
-          zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
-        )
+        zone.dropOffBanned() && zone.id().getFeedId().equals(state.getVehicleRentalNetwork())
       );
     } else {
       return false;

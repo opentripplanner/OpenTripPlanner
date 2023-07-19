@@ -8,20 +8,15 @@ public record FareLegRule(
   @Nullable String legGroupId,
   @Nullable String networkId,
   @Nullable String fromAreaId,
-  @Nullable String toAreadId,
+  @Nullable String toAreaId,
   @Nullable FareDistance fareDistance,
   @Nonnull FareProduct fareProduct
 ) {
-  public FareLegRule(
-    String legGroupId,
-    String networkId,
-    String fromAreaId,
-    String toAreaId,
-    FareProduct fareProduct
-  ) {
-    this(legGroupId, networkId, fromAreaId, toAreaId, null, fareProduct);
-  }
   public String feedId() {
     return fareProduct.id().getFeedId();
+  }
+
+  public static FareLegRuleBuilder of(FareProduct fp) {
+    return new FareLegRuleBuilder(fp);
   }
 }

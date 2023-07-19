@@ -56,18 +56,18 @@
 
 
     <properties>
-        <otp.serialization.version.id>108</otp.serialization.version.id>
+        <otp.serialization.version.id>112</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>29.1</geotools.version>
-        <google.dagger.version>2.46.1</google.dagger.version>
+        <google.dagger.version>2.47</google.dagger.version>
         <jackson.version>2.15.2</jackson.version>
         <jersey.version>3.1.2</jersey.version>
         <junit.version>5.9.3</junit.version>
-        <micrometer.version>1.11.0</micrometer.version>
+        <micrometer.version>1.11.2</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
-        <logback.version>1.4.7</logback.version>
-        <lucene.version>9.5.0</lucene.version>
+        <logback.version>1.4.8</logback.version>
+        <lucene.version>9.7.0</lucene.version>
         <slf4j.version>2.0.7</slf4j.version>
         <netex-java-model.version>2.0.14</netex-java-model.version>
         <siri-java-model.version>1.21</siri-java-model.version>
@@ -79,7 +79,7 @@
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
         <argLine/>
-        <plugin.prettier.version>0.19</plugin.prettier.version>
+        <plugin.prettier.version>0.20</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
 
     </properties>
@@ -268,6 +268,13 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>me.fabriciorby</groupId>
+                        <artifactId>maven-surefire-junit5-tree-reporter</artifactId>
+                        <version>1.2.1</version>
+                    </dependency>
+                </dependencies>
                 <configuration>
                     <!-- we have to fork the JVM during tests so that the argLine is passed along -->
                     <forkCount>3</forkCount>
@@ -311,6 +318,20 @@
                     </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>true</disableXmlReport>
+                    <reportFormat>plain</reportFormat>
+                    <consoleOutputReporter>
+                        <disable>true</disable>
+                    </consoleOutputReporter>
+                    <statelessTestsetInfoReporter implementation="org.apache.maven.plugin.surefire.extensions.junit5.JUnit5StatelessTestsetInfoTreeReporter">
+                        <printStacktraceOnError>true</printStacktraceOnError>
+                        <printStacktraceOnFailure>true</printStacktraceOnFailure>
+                        <printStdoutOnError>true</printStdoutOnError>
+                        <printStdoutOnFailure>true</printStdoutOnFailure>
+                        <printStdoutOnSuccess>false</printStdoutOnSuccess>
+                        <printStderrOnError>true</printStderrOnError>
+                        <printStderrOnFailure>true</printStderrOnFailure>
+                        <printStderrOnSuccess>false</printStderrOnSuccess>
+                    </statelessTestsetInfoReporter>
                 </configuration>
             </plugin>
             <!-- code coverage report -->
@@ -368,7 +389,7 @@
                   properly if some input files are missing a terminating newline) -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -515,7 +536,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:3.19.2:exe:${os.detected.classifier}</protocArtifact>
+                    <protocArtifact>com.google.protobuf:protoc:3.22.0:exe:${os.detected.classifier}</protocArtifact>
                 </configuration>
             </plugin>
         </plugins>
@@ -576,7 +597,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.15.0</version>
+                <version>26.18.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -606,7 +627,7 @@
         <dependency>
             <groupId>net.logstash.logback</groupId>
             <artifactId>logstash-logback-encoder</artifactId>
-            <version>7.3</version>
+            <version>7.4</version>
         </dependency>
 
         <!-- dependency injection -->
@@ -748,7 +769,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.3.1</version>
+            <version>5.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -774,7 +795,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>32.0.0-jre</version>
+            <version>32.1.1-jre</version>
         </dependency>
         <!-- Jersey annotation-driven REST web services (JAX-RS implementation) -->
         <dependency>
@@ -902,7 +923,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>20.4</version>
+            <version>21.0</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -910,9 +931,9 @@
             <version>20.2</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.14</version>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.2.1</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>

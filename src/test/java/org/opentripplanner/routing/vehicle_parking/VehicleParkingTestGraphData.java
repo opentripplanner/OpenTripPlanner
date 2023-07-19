@@ -3,6 +3,7 @@ package org.opentripplanner.routing.vehicle_parking;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -22,8 +23,10 @@ public class VehicleParkingTestGraphData {
     transitModel = new TransitModel(stopModel, deduplicator);
     graph.hasStreets = true;
 
-    A = new IntersectionVertex(graph, "A", 0, 0);
-    B = new IntersectionVertex(graph, "B", 0.01, 0);
+    var intersection = new VertexFactory(graph);
+
+    A = intersection.intersection("A", 0, 0);
+    B = intersection.intersection("B", 0.01, 0);
 
     VehicleParkingTestUtil.createStreet(A, B, StreetTraversalPermission.PEDESTRIAN);
   }

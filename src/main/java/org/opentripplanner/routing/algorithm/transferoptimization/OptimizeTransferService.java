@@ -84,7 +84,7 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
     try {
       return optimizePathDomainService.findBestTransitPath(path);
     } catch (RuntimeException e) {
-      OPTIMIZATION_FAILED_LOG.error(
+      OPTIMIZATION_FAILED_LOG.warn(
         "Unable to optimize transfers in path. Details: {}, path: {}",
         e.getMessage(),
         path,

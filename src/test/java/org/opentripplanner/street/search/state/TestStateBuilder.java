@@ -2,10 +2,16 @@ package org.opentripplanner.street.search.state;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
+import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
@@ -14,6 +20,7 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
@@ -51,6 +58,10 @@ public class TestStateBuilder {
     return new TestStateBuilder(StreetMode.CAR);
   }
 
+  public static TestStateBuilder ofCarRental() {
+    return new TestStateBuilder(StreetMode.CAR_RENTAL);
+  }
+
   /**
    * Traverse a very plain street edge with no special characteristics.
    */
@@ -69,6 +80,30 @@ public class TestStateBuilder {
   }
 
   /**
+   * Traverse a street edge and switch to Car mode
+   */
+  public TestStateBuilder pickUpCar() {
+    count++;
+
+    var station = TestVehicleRentalStationBuilder.of().withVehicleTypeCar().build();
+
+    VehicleRentalPlaceVertex vertex = new VehicleRentalPlaceVertex(station);
+    var link = StreetVehicleRentalLink.createStreetVehicleRentalLink(
+      (StreetVertex) currentState.vertex,
+      vertex
+    );
+    currentState = link.traverse(currentState)[0];
+
+    var edge = VehicleRentalEdge.createVehicleRentalEdge(vertex, RentalFormFactor.CAR);
+
+    State[] traverse = edge.traverse(currentState);
+    currentState =
+      Arrays.stream(traverse).filter(it -> it.currentMode() == TraverseMode.CAR).findFirst().get();
+
+    return this;
+  }
+
+  /**
    * Traverse an elevator (onboard, hop and offboard edges).
    */
   public TestStateBuilder elevator() {
@@ -82,16 +117,20 @@ public class TestStateBuilder {
     var from = (StreetVertex) currentState.vertex;
     var link = StreetModelForTest.streetEdge(from, offboard1);
 
-    var boardEdge = new ElevatorBoardEdge(offboard1, onboard1);
+    var boardEdge = ElevatorBoardEdge.createElevatorBoardEdge(offboard1, onboard1);
 
-    var hopEdge = new ElevatorHopEdge(
+    var hopEdge = ElevatorHopEdge.createElevatorHopEdge(
       onboard1,
       onboard2,
       StreetTraversalPermission.PEDESTRIAN,
       Accessibility.POSSIBLE
     );
 
-    var alightEdge = new ElevatorAlightEdge(onboard2, offboard2, new NonLocalizedString("1"));
+    var alightEdge = ElevatorAlightEdge.createElevatorAlightEdge(
+      onboard2,
+      offboard2,
+      new NonLocalizedString("1")
+    );
 
     currentState =
       EdgeTraverser
@@ -102,14 +141,20 @@ public class TestStateBuilder {
 
   @Nonnull
   private static ElevatorOffboardVertex elevatorOffBoard(int count, String suffix) {
-    final String label = "elevator_off_board_" + suffix;
-    return new ElevatorOffboardVertex(null, label, count, count, new NonLocalizedString(label));
+    return new ElevatorOffboardVertex(
+      StreetModelForTest.intersectionVertex(count, count),
+      suffix,
+      suffix
+    );
   }
 
   @Nonnull
   private static ElevatorOnboardVertex elevatorOnBoard(int count, String suffix) {
-    final String label = "elevator_on_board_" + suffix;
-    return new ElevatorOnboardVertex(null, label, count, count, new NonLocalizedString(label));
+    return new ElevatorOnboardVertex(
+      StreetModelForTest.intersectionVertex(count, count),
+      suffix,
+      suffix
+    );
   }
 
   public State build() {

@@ -13,16 +13,20 @@ public class StreetLocation extends StreetVertex {
 
   private boolean wheelchairAccessible;
 
+  private final VertexLabel label;
+
   // maybe name should just be pulled from street being split
   public StreetLocation(String id, Coordinate nearestPoint, I18NString name) {
     // calling constructor with null graph means this vertex is temporary
-    super(null, id, nearestPoint.x, nearestPoint.y, name);
+    super(nearestPoint.x, nearestPoint.y, name);
+    label = VertexLabel.string(id);
   }
 
   //For tests only
   public StreetLocation(String id, Coordinate nearestPoint, String name) {
     // calling constructor with null graph means this vertex is temporary
-    super(null, id, nearestPoint.x, nearestPoint.y, new NonLocalizedString(name));
+    super(nearestPoint.x, nearestPoint.y, new NonLocalizedString(name));
+    label = VertexLabel.string(id);
   }
 
   public boolean isWheelchairAccessible() {
@@ -31,6 +35,11 @@ public class StreetLocation extends StreetVertex {
 
   public void setWheelchairAccessible(boolean wheelchairAccessible) {
     this.wheelchairAccessible = wheelchairAccessible;
+  }
+
+  @Override
+  public VertexLabel getLabel() {
+    return label;
   }
 
   @Override

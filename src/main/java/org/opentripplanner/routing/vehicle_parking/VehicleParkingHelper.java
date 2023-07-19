@@ -1,32 +1,35 @@
 package org.opentripplanner.routing.vehicle_parking;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 
 public class VehicleParkingHelper {
 
-  private VehicleParkingHelper() {}
+  private final VertexFactory vertexFactory;
 
-  public static void linkVehicleParkingToGraph(Graph graph, VehicleParking vehicleParking) {
-    var vehicleParkingVertices = VehicleParkingHelper.createVehicleParkingVertices(
-      graph,
-      vehicleParking
-    );
+  public VehicleParkingHelper(Graph graph) {
+    Objects.requireNonNull(graph);
+    this.vertexFactory = new VertexFactory(graph);
+  }
+
+  public void linkVehicleParkingToGraph(VehicleParking vehicleParking) {
+    var vehicleParkingVertices = createVehicleParkingVertices(vehicleParking);
     VehicleParkingHelper.linkVehicleParkingEntrances(vehicleParkingVertices);
   }
 
-  public static List<VehicleParkingEntranceVertex> createVehicleParkingVertices(
-    Graph graph,
+  public List<VehicleParkingEntranceVertex> createVehicleParkingVertices(
     VehicleParking vehicleParking
   ) {
     return vehicleParking
       .getEntrances()
       .stream()
-      .map(entrance -> new VehicleParkingEntranceVertex(graph, entrance))
+      .map(vertexFactory::vehicleParkingEntrance)
       .collect(Collectors.toList());
   }
 
@@ -36,24 +39,24 @@ public class VehicleParkingHelper {
     for (int i = 0; i < vehicleParkingVertices.size(); i++) {
       var currentVertex = vehicleParkingVertices.get(i);
       if (isUsableForParking(currentVertex, currentVertex)) {
-        new VehicleParkingEdge(currentVertex);
+        VehicleParkingEdge.createVehicleParkingEdge(currentVertex);
       }
       for (int j = i + 1; j < vehicleParkingVertices.size(); j++) {
         var nextVertex = vehicleParkingVertices.get(j);
         if (isUsableForParking(currentVertex, nextVertex)) {
-          new VehicleParkingEdge(currentVertex, nextVertex);
-          new VehicleParkingEdge(nextVertex, currentVertex);
+          VehicleParkingEdge.createVehicleParkingEdge(currentVertex, nextVertex);
+          VehicleParkingEdge.createVehicleParkingEdge(nextVertex, currentVertex);
         }
       }
     }
   }
 
   public static void linkToGraph(VehicleParkingEntranceVertex vehicleParkingEntrance) {
-    new StreetVehicleParkingLink(
+    StreetVehicleParkingLink.createStreetVehicleParkingLink(
       vehicleParkingEntrance,
       vehicleParkingEntrance.getParkingEntrance().getVertex()
     );
-    new StreetVehicleParkingLink(
+    StreetVehicleParkingLink.createStreetVehicleParkingLink(
       vehicleParkingEntrance.getParkingEntrance().getVertex(),
       vehicleParkingEntrance
     );

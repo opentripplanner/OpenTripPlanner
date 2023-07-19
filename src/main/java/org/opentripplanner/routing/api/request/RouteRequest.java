@@ -7,6 +7,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.time.DateUtils;
@@ -16,6 +18,10 @@ import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -197,6 +203,33 @@ public class RouteRequest implements Cloneable, Serializable {
       return itinerariesSortOrder().isSortedByArrivalTimeAcceding();
     }
     return pageCursor.type == PageType.NEXT_PAGE;
+  }
+
+  /**
+   * Validate that the routing request contains both an origin and a destination. Origin and
+   * destination can be specified either by a reference to a stop place or by geographical
+   * coordinates. Origin and destination are required in a one-to-one search, but not in a
+   * many-to-one or one-to-many.
+   * TODO - Refactor and make separate requests for one-to-one and the other searches.
+   *
+   * @throws RoutingValidationException if either origin or destination is missing.
+   */
+  public void validateOriginAndDestination() {
+    List<RoutingError> routingErrors = new ArrayList<>(2);
+
+    if (from == null || !from.isSpecified()) {
+      routingErrors.add(
+        new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
+      );
+    }
+
+    if (to == null || !to.isSpecified()) {
+      routingErrors.add(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE));
+    }
+
+    if (!routingErrors.isEmpty()) {
+      throw new RoutingValidationException(routingErrors);
+    }
   }
 
   public String toString(String sep) {

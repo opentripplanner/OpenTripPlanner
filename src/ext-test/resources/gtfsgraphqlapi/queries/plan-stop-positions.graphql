@@ -1,0 +1,48 @@
+{
+    plan(
+        fromPlace: "from",
+        toPlace: "to",
+        date: "2023-02-15",
+        time: "11:37"
+    ){
+        itineraries {
+            startTime
+            endTime
+            generalizedCost
+            accessibilityScore
+            legs {
+                mode
+                from {
+                    name
+                    lat
+                    lon
+                    departureTime
+                    arrivalTime
+                    stopPosition {
+                        __typename
+                        ... on PositionAtStop {
+                            position
+                        }
+                    }
+                }
+                to {
+                    name
+                    lat
+                    lon
+                    departureTime
+                    arrivalTime
+                    stopPosition {
+                        __typename
+                        ... on PositionAtStop {
+                            position
+                        }
+                    }
+                }
+                startTime
+                endTime
+                mode
+                generalizedCost
+            }
+        }
+    }
+}

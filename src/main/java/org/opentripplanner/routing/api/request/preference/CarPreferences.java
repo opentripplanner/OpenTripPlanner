@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.Units;
 
@@ -21,9 +22,9 @@ public final class CarPreferences implements Serializable {
   private final double speed;
   private final double reluctance;
   private final int parkTime;
-  private final int parkCost;
+  private final Cost parkCost;
   private final int pickupTime;
-  private final int pickupCost;
+  private final Cost pickupCost;
   private final int dropoffTime;
   private final double accelerationSpeed;
   private final double decelerationSpeed;
@@ -33,9 +34,9 @@ public final class CarPreferences implements Serializable {
     this.speed = 40.0;
     this.reluctance = 2.0;
     this.parkTime = 60;
-    this.parkCost = 120;
+    this.parkCost = Cost.costOfMinutes(2);
     this.pickupTime = 60;
-    this.pickupCost = 120;
+    this.pickupCost = Cost.costOfMinutes(2);
     this.dropoffTime = 120;
     this.accelerationSpeed = 2.9;
     this.decelerationSpeed = 2.9;
@@ -45,9 +46,9 @@ public final class CarPreferences implements Serializable {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
     this.parkTime = Units.duration(builder.parkTime);
-    this.parkCost = Units.cost(builder.parkCost);
+    this.parkCost = builder.parkCost;
     this.pickupTime = Units.duration(builder.pickupTime);
-    this.pickupCost = Units.cost(builder.pickupCost);
+    this.pickupCost = builder.pickupCost;
     this.dropoffTime = Units.duration(builder.dropoffTime);
     this.accelerationSpeed = Units.acceleration(builder.accelerationSpeed);
     this.decelerationSpeed = Units.acceleration(builder.decelerationSpeed);
@@ -81,7 +82,7 @@ public final class CarPreferences implements Serializable {
 
   /** Cost of parking a car. */
   public int parkCost() {
-    return parkCost;
+    return parkCost.toSeconds();
   }
 
   /** Time of getting in/out of a carPickup (taxi) */
@@ -91,7 +92,7 @@ public final class CarPreferences implements Serializable {
 
   /** Cost of getting in/out of a carPickup (taxi) */
   public int pickupCost() {
-    return pickupCost;
+    return pickupCost.toSeconds();
   }
 
   /**
@@ -127,9 +128,9 @@ public final class CarPreferences implements Serializable {
       DoubleUtils.doubleEquals(that.speed, speed) &&
       DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
       parkTime == that.parkTime &&
-      parkCost == that.parkCost &&
+      parkCost.equals(that.parkCost) &&
       pickupTime == that.pickupTime &&
-      pickupCost == that.pickupCost &&
+      pickupCost.equals(that.pickupCost) &&
       dropoffTime == that.dropoffTime &&
       DoubleUtils.doubleEquals(that.accelerationSpeed, accelerationSpeed) &&
       DoubleUtils.doubleEquals(that.decelerationSpeed, decelerationSpeed)
@@ -158,9 +159,9 @@ public final class CarPreferences implements Serializable {
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
       .addNum("parkTime", parkTime, DEFAULT.parkTime)
-      .addNum("parkCost", parkCost, DEFAULT.parkCost)
+      .addObj("parkCost", parkCost, DEFAULT.parkCost)
       .addNum("pickupTime", pickupTime, DEFAULT.pickupTime)
-      .addNum("pickupCost", pickupCost, DEFAULT.pickupCost)
+      .addObj("pickupCost", pickupCost, DEFAULT.pickupCost)
       .addNum("dropoffTime", dropoffTime, DEFAULT.dropoffTime)
       .addNum("accelerationSpeed", accelerationSpeed, DEFAULT.accelerationSpeed)
       .addNum("decelerationSpeed", decelerationSpeed, DEFAULT.decelerationSpeed)
@@ -174,9 +175,9 @@ public final class CarPreferences implements Serializable {
     private double speed;
     private double reluctance;
     private int parkTime;
-    private int parkCost;
+    private Cost parkCost;
     private int pickupTime;
-    private int pickupCost;
+    private Cost pickupCost;
     private int dropoffTime;
     private double accelerationSpeed;
     private double decelerationSpeed;
@@ -214,7 +215,7 @@ public final class CarPreferences implements Serializable {
     }
 
     public Builder withParkCost(int parkCost) {
-      this.parkCost = parkCost;
+      this.parkCost = Cost.costOfSeconds(parkCost);
       return this;
     }
 
@@ -224,7 +225,7 @@ public final class CarPreferences implements Serializable {
     }
 
     public Builder withPickupCost(int pickupCost) {
-      this.pickupCost = pickupCost;
+      this.pickupCost = Cost.costOfSeconds(pickupCost);
       return this;
     }
 

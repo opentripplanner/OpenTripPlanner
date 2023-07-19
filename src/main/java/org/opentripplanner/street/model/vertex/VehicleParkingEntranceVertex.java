@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
@@ -16,15 +15,18 @@ public class VehicleParkingEntranceVertex extends Vertex {
 
   private final VehicleParkingEntrance parkingEntrance;
 
-  public VehicleParkingEntranceVertex(Graph g, VehicleParkingEntrance parkingEntrance) {
+  public VehicleParkingEntranceVertex(VehicleParkingEntrance parkingEntrance) {
     super(
-      g,
-      "Vehicle parking " + parkingEntrance.getEntranceId(),
       parkingEntrance.getCoordinate().longitude(),
       parkingEntrance.getCoordinate().latitude(),
       parkingEntrance.getName()
     );
     this.parkingEntrance = parkingEntrance;
+  }
+
+  @Override
+  public VertexLabel getLabel() {
+    return VertexLabel.string("Vehicle parking " + parkingEntrance.getEntranceId());
   }
 
   public VehicleParkingEntrance getParkingEntrance() {

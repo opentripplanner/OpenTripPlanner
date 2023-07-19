@@ -368,10 +368,15 @@ public class NetexMapper {
 
     for (FlexibleStopPlace flexibleStopPlace : flexibleStopPlaces) {
       StopLocation stopLocation = flexStopsMapper.map(flexibleStopPlace);
-      if (stopLocation instanceof AreaStop) {
-        transitBuilder.getAreaStops().add((AreaStop) stopLocation);
+      if (stopLocation instanceof AreaStop areaStop) {
+        transitBuilder.getAreaStops().add(areaStop);
       } else if (stopLocation instanceof GroupStop groupStop) {
         transitBuilder.getGroupStops().add(groupStop);
+        for (var child : groupStop.getLocations()) {
+          if (child instanceof AreaStop areaStop) {
+            transitBuilder.getAreaStops().add(areaStop);
+          }
+        }
       }
     }
   }

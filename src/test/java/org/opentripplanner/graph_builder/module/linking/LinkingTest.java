@@ -11,7 +11,6 @@ import static org.opentripplanner.graph_builder.module.FakeGraph.link;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -22,9 +21,9 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -44,13 +43,13 @@ public class LinkingTest {
     double x = -122.123;
     double y = 37.363;
     for (double delta = 0; delta <= 2; delta += 0.005) {
-      StreetVertex v0 = new IntersectionVertex(null, "zero", x, y);
-      StreetVertex v1 = new IntersectionVertex(null, "one", x + delta, y + delta);
+      StreetVertex v0 = StreetModelForTest.intersectionVertex("zero", x, y);
+      StreetVertex v1 = StreetModelForTest.intersectionVertex("one", x + delta, y + delta);
       LineString geom = gf.createLineString(
         new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
       );
       double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
-      StreetEdge s0 = new StreetEdge(
+      StreetEdge s0 = StreetEdge.createStreetEdge(
         v0,
         v1,
         geom,
@@ -59,10 +58,10 @@ public class LinkingTest {
         StreetTraversalPermission.ALL,
         false
       );
-      StreetEdge s1 = new StreetEdge(
+      StreetEdge s1 = StreetEdge.createStreetEdge(
         v1,
         v0,
-        (LineString) geom.reverse(),
+        geom.reverse(),
         "back",
         dist,
         StreetTraversalPermission.ALL,
@@ -73,14 +72,12 @@ public class LinkingTest {
       double splitVal = Math.random() * 0.95 + 0.025;
 
       SplitterVertex sv0 = new SplitterVertex(
-        null,
         "split",
         x + delta * splitVal,
         y + delta * splitVal,
         new NonLocalizedString("split")
       );
       SplitterVertex sv1 = new SplitterVertex(
-        null,
         "split",
         x + delta * splitVal,
         y + delta * splitVal,
@@ -113,18 +110,21 @@ public class LinkingTest {
     TestOtpModel model = buildGraphNoTransit();
     Graph g1 = model.graph();
     TransitModel transitModel1 = model.transitModel();
-    addRegularStopGrid(g1, transitModel1);
+    addRegularStopGrid(g1);
     link(g1, transitModel1);
 
     TestOtpModel model2 = buildGraphNoTransit();
     Graph g2 = model2.graph();
     TransitModel transitModel2 = model2.transitModel();
-    addExtraStops(g2, transitModel2);
-    addRegularStopGrid(g2, transitModel2);
+    addExtraStops(g2);
+    addRegularStopGrid(g2);
     link(g2, transitModel2);
 
+    var transitStopVertices = g1.getVerticesOfType(TransitStopVertex.class);
+    assertEquals(1350, transitStopVertices.size());
+
     // compare the linkages
-    for (TransitStopVertex ts : g1.getVerticesOfType(TransitStopVertex.class)) {
+    for (TransitStopVertex ts : transitStopVertices) {
       List<StreetTransitStopLink> stls1 = outgoingStls(ts);
       assertTrue(stls1.size() >= 1);
 
@@ -149,6 +149,6 @@ public class LinkingTest {
       .filter(StreetTransitStopLink.class::isInstance)
       .map(StreetTransitStopLink.class::cast)
       .sorted(Comparator.comparing(e -> e.getGeometry().getLength()))
-      .collect(Collectors.toList());
+      .toList();
   }
 }

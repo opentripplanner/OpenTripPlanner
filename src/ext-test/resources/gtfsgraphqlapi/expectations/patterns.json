@@ -1,0 +1,53 @@
+{
+  "data" : {
+    "patterns" : [
+      {
+        "code" : "F:BUS",
+        "headsign" : null,
+        "trips" : [
+          {
+            "gtfsId" : "F:123",
+            "stoptimes" : [
+              {
+                "stop" : {
+                  "gtfsId" : "F:Stop_0",
+                  "name" : "Stop_0"
+                },
+                "scheduledArrival" : 39600,
+                "scheduledDeparture" : 39600,
+                "stopPosition" : 10,
+                "realtimeState" : "SCHEDULED",
+                "pickupType" : "SCHEDULED",
+                "dropoffType" : "SCHEDULED"
+              },
+              {
+                "stop" : {
+                  "gtfsId" : "F:Stop_1",
+                  "name" : "Stop_1"
+                },
+                "scheduledArrival" : 39900,
+                "scheduledDeparture" : 39900,
+                "stopPosition" : 20,
+                "realtimeState" : "SCHEDULED",
+                "pickupType" : "SCHEDULED",
+                "dropoffType" : "SCHEDULED"
+              },
+              {
+                "stop" : {
+                  "gtfsId" : "F:Stop_2",
+                  "name" : "Stop_2"
+                },
+                "scheduledArrival" : 40200,
+                "scheduledDeparture" : 40200,
+                "stopPosition" : 30,
+                "realtimeState" : "SCHEDULED",
+                "pickupType" : "SCHEDULED",
+                "dropoffType" : "SCHEDULED"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
