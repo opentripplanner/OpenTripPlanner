@@ -66,6 +66,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Deduplicate vertex labels to save memory [#5223](https://github.com/opentripplanner/OpenTripPlanner/pull/5223)
 - Fix duplicate publishing of speed test data [#5237](https://github.com/opentripplanner/OpenTripPlanner/pull/5237)
 - Flex build time and memory optimization for large zones [#5233](https://github.com/opentripplanner/OpenTripPlanner/pull/5233)
+- Fix pathway traversal time calculation when none is supplied [#5242](https://github.com/opentripplanner/OpenTripPlanner/pull/5242)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
