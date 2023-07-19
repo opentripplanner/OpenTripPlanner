@@ -23,6 +23,6 @@ public class ElevatorOffboardVertex extends StreetVertex {
   @Nonnull
   @Override
   public I18NString getName() {
-    return NO_NAME;
+    return I18NString.of(label);
   }
 }
