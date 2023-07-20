@@ -2,11 +2,14 @@ package org.opentripplanner.framework.io;
 
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.UriInfo;
+import java.nio.charset.StandardCharsets;
+import org.apache.hc.core5.http.ContentType;
 
 public final class HttpUtils {
 
   private HttpUtils() {}
 
+  public static final Object TEXT_PLAIN = ContentType.create("text/plain", StandardCharsets.UTF_8);
   public static final String APPLICATION_X_PROTOBUF = "application/x-protobuf";
 
   private static final String HEADER_X_FORWARDED_PROTO = "X-Forwarded-Proto";
