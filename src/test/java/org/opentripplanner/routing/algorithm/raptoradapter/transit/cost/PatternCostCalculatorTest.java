@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -23,7 +24,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Gener
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
-import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.test.support.TestTableParser;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RouteBuilder;
@@ -53,22 +54,6 @@ public class PatternCostCalculatorTest {
     null,
     null
   );
-
-  static Stream<Arguments> testCases = Stream
-    .of(
-      // !prefAgency | !prefRoute | unPrefA | unPrefR | expected cost
-      "       -      |      -     |    -    |    -    |     0",
-      "       -      |      -     |    -    |    x    |   300",
-      "       -      |      -     |    x    |    -    |   300",
-      "       -      |      x     |    -    |    -    |   300",
-      "       x      |      -     |    -    |    -    |   300",
-      "       -      |      -     |    x    |    x    |   300",
-      "       x      |      x     |    -    |    -    |   300",
-      "       x      |      -     |    -    |    x    |   600",
-      "       -      |      x     |    x    |    -    |   600",
-      "       x      |      x     |    x    |    x    |   600"
-    )
-    .map(Arguments::of);
 
   @Test
   @DisplayName("cost mapper should create penalty map")
@@ -112,10 +97,40 @@ public class PatternCostCalculatorTest {
     assertEquals(expected, actual);
   }
 
+  private static Stream<Arguments> preferencesPenaltyForRouteTestCases() {
+    return TestTableParser.of(
+      """
+        #prefAgency | !prefRoute | unPrefA | unPrefR | expected cost
+             -      |      -     |    -    |    -    |     0
+             -      |      -     |    -    |    x    |   300
+             -      |      -     |    x    |    -    |   300
+             -      |      x     |    -    |    -    |   300
+             x      |      -     |    -    |    -    |   300
+             -      |      -     |    x    |    x    |   300
+             x      |      x     |    -    |    -    |   300
+             x      |      -     |    -    |    x    |   600
+             -      |      x     |    x    |    -    |   600
+             x      |      x     |    x    |    x    |   600
+        """
+    );
+  }
+
   @ParameterizedTest(name = "should apply penalty for scenario: {0}")
-  @VariableSource("testCases")
-  public void testPreferencesPenaltyForRoute(String testCaseDescription) {
-    RoutePenaltyTC tc = new RoutePenaltyTC(testCaseDescription);
+  @MethodSource("preferencesPenaltyForRouteTestCases")
+  public void testPreferencesPenaltyForRoute(
+    boolean prefAgency,
+    boolean prefRoute,
+    boolean unPrefAgency,
+    boolean unPrefRoute,
+    int expectedCost
+  ) {
+    RoutePenaltyTC tc = new RoutePenaltyTC(
+      prefAgency,
+      prefRoute,
+      unPrefAgency,
+      unPrefRoute,
+      expectedCost
+    );
 
     var schedule = tc.createSchedule();
     var costCalculator = tc.createCostCalculator(schedule);
@@ -160,23 +175,13 @@ public class PatternCostCalculatorTest {
     return calc.boardingCost(true, 0, 5, 100, schedule, RaptorTransferConstraint.REGULAR_TRANSFER);
   }
 
-  private static class RoutePenaltyTC {
-
-    final boolean prefAgency;
-    final boolean prefRoute;
-    final boolean unPrefAgency;
-    final boolean unPrefRoute;
-    public final int expectedCost;
-
-    RoutePenaltyTC(String input) {
-      String[] cells = input.replace(" ", "").split("\\|");
-      this.prefAgency = "x".equalsIgnoreCase(cells[0]);
-      this.prefRoute = "x".equalsIgnoreCase(cells[1]);
-      this.unPrefAgency = "x".equalsIgnoreCase(cells[2]);
-      this.unPrefRoute = "x".equalsIgnoreCase(cells[3]);
-      this.expectedCost = Integer.parseInt(cells[4]);
-    }
-
+  private record RoutePenaltyTC(
+    boolean prefAgency,
+    boolean prefRoute,
+    boolean unPrefAgency,
+    boolean unPrefRoute,
+    int expectedCost
+  ) {
     @Override
     public String toString() {
       final StringBuilder sb = new StringBuilder();
