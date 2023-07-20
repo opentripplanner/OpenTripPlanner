@@ -190,11 +190,11 @@ public final class McRangeRaptorWorkerState<T extends RaptorTripSchedule>
   }
 
   private void addStopArrival(McStopArrival<T> arrival) {
-    // TODO: 2023-05-17 via pass through: this is a problem
+    // TODO: 2023-05-17 via pass through: this is a problem for passThrough searches
     //  we need to figure out how to perform heuristic optimization for via searches
-    //    if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {
-    //      return;
-    //    }
+    if (heuristics.rejectDestinationArrivalBasedOnHeuristic(arrival)) {
+      return;
+    }
     arrivals.addStopArrival(arrival);
   }
 
