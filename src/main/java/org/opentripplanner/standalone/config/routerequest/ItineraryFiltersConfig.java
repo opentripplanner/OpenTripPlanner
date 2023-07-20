@@ -152,7 +152,10 @@ For example if the function is `f(x) = 1800 + 2.0 x` and the smallest cost is `5
 non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
 """
           )
-          .asLinearFunction(dft.nonTransitGeneralizedCostLimit())
+          .asLinearFunctionOfTime(
+            dft.nonTransitGeneralizedCostLimit(),
+            (a, b) -> RequestFunctions.createLinearFunction(a.toSeconds(), b)
+          )
       )
       .withBikeRentalDistanceRatio(
         c
@@ -164,7 +167,7 @@ non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are d
           )
           .description(
             """
-This filters out results that consist of a long walk plus a relatively short bike rental leg. A 
+This filters out results that consist of a long walk plus a relatively short bike rental leg. A
 value of `0.3` means that a minimum of 30% of the total distance must be spent on the bike in order
 for the result to be included.
 """
@@ -181,8 +184,8 @@ for the result to be included.
           )
           .description(
             """
-This filters out results that consist of driving plus a very long walk leg at the end. A value of 
-`0.3` means that a minimum of 30% of the total time must be spent in the car in order for the 
+This filters out results that consist of driving plus a very long walk leg at the end. A value of
+`0.3` means that a minimum of 30% of the total time must be spent in the car in order for the
 result to be included. However, if there is only a single result, it is never filtered.
             """
           )
@@ -266,7 +269,10 @@ removed from list.
             "This function calculates the threshold for the filter, when the itineraries have " +
             "exactly the same arrival and departure times."
           )
-          .asLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
+          .asLinearFunctionOfTime(
+            transitGeneralizedCostLimit.costLimitFunction(),
+            (a, b) -> RequestFunctions.createLinearFunction(a.toSeconds(), b)
+          ),
         node
           .of("intervalRelaxFactor")
           .since(V2_2)

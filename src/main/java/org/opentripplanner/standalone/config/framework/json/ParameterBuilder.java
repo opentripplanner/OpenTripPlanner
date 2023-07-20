@@ -33,12 +33,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.LocalDateUtils;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.LinearFunctionOfTimeParser;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -408,8 +410,12 @@ public class ParameterBuilder {
     return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parseId(it.asText()));
   }
 
-  public DoubleAlgorithmFunction asLinearFunction(DoubleAlgorithmFunction defaultValue) {
-    return ofOptional(LINEAR_FUNCTION, defaultValue, n -> parseLinearFunction(n.asText()));
+  public <T> T asLinearFunctionOfTime(T defaultValue, BiFunction<Duration, Double, T> factory) {
+    return ofOptional(
+      LINEAR_FUNCTION,
+      defaultValue,
+      n -> LinearFunctionOfTimeParser.parse(n.asText(), factory).orElseThrow()
+    );
   }
 
   /* private method */

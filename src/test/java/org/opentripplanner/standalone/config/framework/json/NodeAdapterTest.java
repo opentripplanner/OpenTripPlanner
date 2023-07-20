@@ -26,6 +26,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.application.OtpAppException;
+import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class NodeAdapterTest {
@@ -479,10 +480,26 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void linearFunction() {
+  public void asLinearFunctionOfTime() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
-    assertEquals("f(x) = 400 + 8.0 x", subject.of("key").asLinearFunction(null).toString());
-    assertNull(subject.of("no-key").asLinearFunction(null));
+    assertEquals(
+      "f(x) = 400 + 8.0 x",
+      subject
+        .of("key")
+        .asLinearFunctionOfTime(
+          null,
+          (a, b) -> RequestFunctions.createLinearFunction(a.toSeconds(), b)
+        )
+        .toString()
+    );
+    assertNull(
+      subject
+        .of("no-key")
+        .asLinearFunctionOfTime(
+          null,
+          (a, b) -> RequestFunctions.createLinearFunction(a.toSeconds(), b)
+        )
+    );
   }
 
   @Test
