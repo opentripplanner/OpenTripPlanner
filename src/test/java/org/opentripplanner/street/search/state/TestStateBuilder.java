@@ -152,7 +152,7 @@ public class TestStateBuilder {
       .withStop(TransitModelForTest.stopForTest("stop", count, count))
       .build();
 
-    var edge = new StreetTransitStopLink(from, to);
+    var edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);
     var states = edge.traverse(currentState);
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");
