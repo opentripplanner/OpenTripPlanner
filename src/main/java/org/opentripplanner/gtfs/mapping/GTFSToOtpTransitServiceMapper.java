@@ -72,6 +72,7 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final FareTransferRuleMapper fareTransferRuleMapper;
 
+  private final StopAreaMapper stopAreasMapper;
   private final DirectionMapper directionMapper;
 
   private final DataImportIssueStore issueStore;
@@ -108,7 +109,10 @@ public class GTFSToOtpTransitServiceMapper {
     entranceMapper = new EntranceMapper(translationHelper, stationLookup);
     pathwayNodeMapper = new PathwayNodeMapper(translationHelper, stationLookup);
     boardingAreaMapper = new BoardingAreaMapper(translationHelper, stopLookup);
+    // location groups were replaced by stop areas in the spec
+    // this code will go away, please migrate now!
     locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper);
+    stopAreasMapper = new StopAreaMapper(feedId, stopMapper, locationMapper);
     pathwayMapper =
       new PathwayMapper(stopMapper, entranceMapper, pathwayNodeMapper, boardingAreaMapper);
     routeMapper = new RouteMapper(agencyMapper, issueStore, translationHelper);
@@ -158,6 +162,7 @@ public class GTFSToOtpTransitServiceMapper {
       // Stop areas and Stop groups are only used in FLEX routes
       builder.getAreaStops().addAll(locationMapper.map(data.getAllLocations()));
       builder.getGroupStops().addAll(locationGroupMapper.map(data.getAllLocationGroups()));
+      builder.getGroupStops().addAll(stopAreasMapper.map(data.getAllStopAreas()));
     }
 
     builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
