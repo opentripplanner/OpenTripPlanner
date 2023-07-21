@@ -258,12 +258,12 @@ public class SearchContext<T extends RaptorTripSchedule> {
     var forward = r.searchDirection().isForward();
     SearchParams s = r.searchParams();
 
-    if (r.multiCriteria().transitPassthroughRequest().isPresent()) {
+    if (r.multiCriteria().transitPassThroughRequest().isPresent()) {
       var requiredC2 = r
         .multiCriteria()
-        .transitPassthroughRequest()
+        .transitPassThroughRequest()
         .get()
-        .passthroughPoints()
+        .passThroughPoints()
         .size();
       if (forward) {
         return new PassThroughForwardRaptorTransitCalculator<>(s, t, requiredC2);

@@ -70,8 +70,10 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
       arrival = arrival.previous();
     }
 
-    // TODO: 2023-05-19 via pass through: can we set c2 through builder like that?
-    pathBuilder.c2(destinationArrival.c2());
+    if (destinationArrival.supportsC2()) {
+      // TODO: 2023-05-19 via pass through: can we set c2 through builder like that?
+      pathBuilder.c2(destinationArrival.c2());
+    }
 
     return pathBuilder.build();
   }

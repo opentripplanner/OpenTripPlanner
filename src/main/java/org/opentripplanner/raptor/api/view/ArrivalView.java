@@ -80,6 +80,11 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    */
   int c1();
 
+  // TODO: 2023-07-21 document
+  default boolean supportsC2() {
+    return false;
+  }
+
   /**
    * The accumulated criteria TWO. Can be used for any int criteria used during routing. A
    * state with c1 and c2 is created dynamically if c2 is in use, if not this method will
