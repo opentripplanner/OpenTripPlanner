@@ -14,11 +14,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 @Sandbox
 public class DigitransitEmissionsService implements EmissionsService {
 
-  private String url;
   private HashMap<String, DigitransitEmissionsAgency> emissionByAgency;
 
   public DigitransitEmissionsService(DigitransitEmissions[] emissions) {
-    this.url = url;
     this.emissionByAgency = new HashMap<>();
     for (DigitransitEmissions e : emissions) {
       DigitransitEmissionsMode mode = new DigitransitEmissionsMode(
@@ -93,11 +91,13 @@ public class DigitransitEmissionsService implements EmissionsService {
       .sum();
   }
 
-  public float getEmissionsForCarRoute(List<StreetLeg> carLegs) {
+  private float getEmissionsForCarRoute(List<StreetLeg> carLegs) {
     return (float) carLegs
       .stream()
       .mapToDouble(leg -> {
-        DigitransitEmissionsAgency digitransitEmissionsAgency = getEmissionsByAgencyId("CAR");
+        DigitransitEmissionsAgency digitransitEmissionsAgency = getEmissionsByAgencyId(
+          TraverseMode.CAR.toString()
+        );
         float avgCarEmissions = digitransitEmissionsAgency.getAverageCo2EmissionsByModePerPerson(
           leg.getMode().name()
         );

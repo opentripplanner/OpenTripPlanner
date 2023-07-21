@@ -64,7 +64,7 @@ Sections follow that describe particular settings in more depth.
 |    maxInterlineDistance                                                  |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.                                                  | *Optional* | `200`                             |  2.3  |
 |    removeRepeatedStops                                                   |  `boolean`  | Should consecutive identical stops be merged into one stop time entry.                                                                                         | *Optional* | `true`                            |  2.3  |
 |    [stationTransferPreference](#gd_stationTransferPreference)            |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                                                                 | *Optional* | `"allowed"`                       |  2.3  |
-| [hslEmissions](#hslEmissions)                                            |  `object[]` | Configure properties for emissions file.                                                                                                                       | *Optional* |                                   |  2.2  |
+| [DigitransitEmissions](#digitransitEmissions)                            |  `object[]` | Configure properties for emissions file.                                                                                                                       | *Optional* |                                   |  2.2  |
 | islandPruning                                                            |   `object`  | Settings for fixing street graph connectivity errors                                                                                                           | *Optional* |                                   |  2.3  |
 |    [adaptivePruningDistance](#islandPruning_adaptivePruningDistance)     |  `integer`  | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250`                             |  2.3  |
 |    [adaptivePruningFactor](#islandPruning_adaptivePruningFactor)         |   `double`  | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.3  |
@@ -768,17 +768,16 @@ This parameter sets the generic level of preference. What is the actual cost can
 with the `stopTransferCost` parameter in the router configuration.
 
 
-<h3 id="hslEmissions">hslEmissions</h3>
+<h3 id="digitransitEmissions">DigitransitEmissions</h3>
 
-**Since version:** `2.2` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.4` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Configure properties for emissions file.
 
-The emissions section of build-config.json allows you to override the default behavior of scanning
-for OpenStreetMap files in the base directory. You can specify data located outside the
-local filesystem (including cloud storage services) or at various different locations around
-the local filesystem.
+By specifying a URL to fetch emissions data, the program gains access to carbon dioxide (CO2) 
+emissions associated with various transportation modes and routes. This data is then used to perform
+emission calculations to different transport modes and car.
 
 
 <h3 id="islandPruning_adaptivePruningDistance">adaptivePruningDistance</h3>

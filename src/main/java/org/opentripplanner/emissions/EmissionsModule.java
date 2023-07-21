@@ -1,13 +1,14 @@
 package org.opentripplanner.emissions;
 
-import com.google.common.io.CharStreams;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.net.URI;
+import java.util.Map;
 import org.opentripplanner.ext.emissions.DigitransitEmissions;
 import org.opentripplanner.ext.emissions.DigitransitEmissionsService;
 import org.opentripplanner.ext.emissions.EmissionsService;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -44,18 +45,17 @@ public class EmissionsModule implements GraphBuilderModule {
     if (url != null && !url.isEmpty()) {
       LOG.info("Fetching data from {}", url);
       try {
-        var data = HttpUtils.getData(url);
+        var http = new OtpHttpClient();
+        var data = http.getAndMapAsJsonNode(new URI(url), Map.of(), new ObjectMapper());
         if (data == null) {
           throw new IOException("Did not find any emissions data from url " + url);
         }
 
-        var reader = new InputStreamReader(data);
-        var emissionJson = CharStreams.toString(reader);
         Gson gson = new Gson();
         EmissionsService emissionsService;
         if (config.emissions.getConfigName().equals("digitransitEmissions")) {
           DigitransitEmissions[] digitransitEmissions = gson.fromJson(
-            emissionJson,
+            String.valueOf(data),
             DigitransitEmissions[].class
           );
           emissionsService = new DigitransitEmissionsService(digitransitEmissions);

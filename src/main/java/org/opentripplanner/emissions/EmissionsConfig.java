@@ -1,7 +1,6 @@
 package org.opentripplanner.emissions;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
@@ -14,9 +13,9 @@ public class EmissionsConfig {
   private String configName;
 
   public EmissionsConfig(String parameterName, NodeAdapter root) {
-    var c = root.of(parameterName).since(V2_2).summary("Configuration for Emissions").asObject();
+    var c = root.of(parameterName).since(V2_4).summary("Configuration for Emissions").asObject();
 
-    this.url = c.of("url").since(NA).summary("foo").description("bar").asString("");
+    this.url = c.of("url").since(V2_4).description("Url to emissions json file").asString("");
     this.configName = parameterName;
   }
 
