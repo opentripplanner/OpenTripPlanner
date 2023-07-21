@@ -5,9 +5,7 @@ import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiLineString;
 
-public class DirectionUtils {
-
-  public static DirectionUtils instance;
+public final class DirectionUtils {
 
   private DirectionUtils() {}
 
@@ -15,7 +13,7 @@ public class DirectionUtils {
    * Returns the approximate azimuth from coordinate A to B in decimal degrees clockwise from North,
    * in the range (-180° to +180°). The computation is exact for small delta between A and B.
    */
-  public static synchronized double getAzimuth(Coordinate a, Coordinate b) {
+  public static double getAzimuth(Coordinate a, Coordinate b) {
     double cosLat = Math.cos(Math.toRadians((a.y + b.y) / 2.0));
     double dY = (b.y - a.y); // in degrees, we do not care about the units
     double dX = (b.x - a.x) * cosLat; // same
@@ -31,7 +29,7 @@ public class DirectionUtils {
    *
    * @param geometry a LineString or a MultiLineString
    */
-  public static synchronized double getLastAngle(Geometry geometry) {
+  public static double getLastAngle(Geometry geometry) {
     LineString line;
     if (geometry instanceof MultiLineString) {
       line = (LineString) geometry.getGeometryN(geometry.getNumGeometries() - 1);
@@ -58,7 +56,7 @@ public class DirectionUtils {
    *
    * @param geometry a LineString or a MultiLineString
    */
-  public static synchronized double getFirstAngle(Geometry geometry) {
+  public static double getFirstAngle(Geometry geometry) {
     LineString line;
     if (geometry instanceof MultiLineString) {
       line = (LineString) geometry.getGeometryN(0);
