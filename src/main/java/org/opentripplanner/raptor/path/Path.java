@@ -62,8 +62,8 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this.c2 = c2;
   }
 
-  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int c2) {
-    this(iterationDepartureTime, accessLeg, accessLeg.generalizedCostTotal(), c2);
+  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost) {
+    this(iterationDepartureTime, accessLeg, generalizedCost, 0);
   }
 
   /** Copy constructor */
