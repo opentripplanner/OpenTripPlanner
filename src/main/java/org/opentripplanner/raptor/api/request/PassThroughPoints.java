@@ -1,6 +1,8 @@
 package org.opentripplanner.raptor.api.request;
 
 import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
+import javax.annotation.Nullable;
 
 /**
  * Provides information for pass-through points used in the search.
@@ -14,13 +16,13 @@ public interface PassThroughPoints {
     }
 
     @Override
-    public void updateC2Value(int c2, IntConsumer update) {
-      throw new UnsupportedOperationException("This should never be called");
+    public void updateC2Value(int currentPathC2, IntConsumer update) {
+      throw new UnsupportedOperationException();
     }
 
     @Override
-    public int size() {
-      return 0;
+    public IntPredicate acceptC2AtDestination() {
+      return null;
     }
   };
 
@@ -32,10 +34,21 @@ public interface PassThroughPoints {
    */
   boolean isPassThroughPoint(int stopIndex);
 
-  void updateC2Value(int c2, IntConsumer update);
+  /**
+   * If the {@link #isPassThroughPoint(int)} is {@code true} Raptor will call this method to inject
+   * the new {@code c2} value for the current path. The implementation must verify the
+   * {@code currentPathC2} value, and ONLY call the {@code update} callback if a new value exist.
+   */
+  void updateC2Value(int currentPathC2, IntConsumer update);
 
   /**
-   * Get the number of pass-through points in the collection.
+   * Return a predicate witch can be used to reject paths with an undesired c2 value. This is
+   * used by Raptor to reject destination arrivals.
+   * <p>
+   * This method MUST return {@code null} if the mc-raptor do not use a second-criteria(c2).
+   * The reason for this is that the presence of this function will cause Raptor to get the
+   * c2 value - witch may not exist; hence throw an exception.
    */
-  int size();
+  @Nullable
+  IntPredicate acceptC2AtDestination();
 }

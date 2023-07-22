@@ -3,6 +3,9 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
+import java.util.function.IntPredicate;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
@@ -18,7 +21,7 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.raptor.spi.RaptorTripScheduleSearch;
 import org.opentripplanner.raptor.util.IntIterators;
 
-public class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
+public final class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
   extends ForwardTransitCalculator<T>
   implements RaptorTransitCalculator<T> {
 
@@ -27,12 +30,20 @@ public class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
   private final int latestAcceptableArrivalTime;
   private final int iterationStep;
 
-  public ForwardRaptorTransitCalculator(SearchParams s, RaptorTuningParameters t) {
+  @Nullable
+  private final IntPredicate acceptC2AtDestination;
+
+  public ForwardRaptorTransitCalculator(
+    SearchParams s,
+    RaptorTuningParameters t,
+    @Nullable IntPredicate acceptC2AtDestination
+  ) {
     this(
       s.routerEarliestDepartureTime(),
       s.routerSearchWindowInSeconds(),
       s.latestArrivalTime(),
-      t.iterationDepartureStepInSeconds()
+      t.iterationDepartureStepInSeconds(),
+      acceptC2AtDestination
     );
   }
 
@@ -40,7 +51,8 @@ public class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
     int earliestDepartureTime,
     int searchWindowInSeconds,
     int latestAcceptableArrivalTime,
-    int iterationStep
+    int iterationStep,
+    IntPredicate acceptC2AtDestination
   ) {
     this.earliestDepartureTime = earliestDepartureTime;
     this.searchWindowInSeconds = searchWindowInSeconds;
@@ -49,15 +61,17 @@ public class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
         ? unreachedTime()
         : latestAcceptableArrivalTime;
     this.iterationStep = iterationStep;
+    this.acceptC2AtDestination = acceptC2AtDestination;
   }
 
   @Override
-  public Collection<String> validate(ArrivalView<T> destArrival) {
+  public Collection<String> rejectDestinationArrival(ArrivalView<T> destArrival) {
     var errors = new ArrayList<String>();
 
     if (exceedsTimeLimit(destArrival.arrivalTime())) {
       errors.add(exceedsTimeLimitReason());
     }
+    rejectC2AtDestination(destArrival).ifPresent(errors::add);
 
     return errors;
   }
@@ -126,5 +140,15 @@ public class ForwardRaptorTransitCalculator<T extends RaptorTripSchedule>
   @Override
   public RaptorTripScheduleSearch<T> createExactTripSearch(RaptorTimeTable<T> pattern) {
     return new TripScheduleExactMatchSearch<>(createTripSearch(pattern), this, iterationStep);
+  }
+
+  /**
+   * Test if the c2 value is acceptable, or should be rejected. If ok return nothing, if rejected
+   * return the reason for the debug event log.
+   */
+  private Optional<String> rejectC2AtDestination(ArrivalView<T> destArrival) {
+    return acceptC2AtDestination == null || acceptC2AtDestination.test(destArrival.c2())
+      ? Optional.empty()
+      : Optional.of("C2 value rejected: " + destArrival.c2() + ".");
   }
 }

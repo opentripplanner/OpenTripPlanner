@@ -60,14 +60,16 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule>
     boolean forward
   ) {
     return forward
-      ? new ForwardRaptorTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60)
+      ? new ForwardRaptorTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60, null)
       : new ReverseRaptorTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60);
   }
 
   /**
-   * Generate a list of validation errors. If list is empty then validation was successful.
+   * Check if the destination arrival is a valid/optimal result. if ok, return an empty list, if
+   * not return a list of reject reasons. The reject messages are used to produce reject events in
+   * the debug trace log.
    */
-  Collection<String> validate(ArrivalView<T> destArrival);
+  Collection<String> rejectDestinationArrival(ArrivalView<T> destArrival);
 
   /**
    * Stop the search when the time exceeds the latest-acceptable-arrival-time. In a reverse search

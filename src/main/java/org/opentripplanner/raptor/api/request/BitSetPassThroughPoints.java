@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
 
 /**
  * IMPLEMENTATION DETAILS
@@ -19,10 +20,12 @@ import java.util.function.IntConsumer;
 public class BitSetPassThroughPoints implements PassThroughPoints {
 
   private final List<BitSet> passThroughPoints;
+  private final int expectedC2ValueAtDestination;
   private int currentPassThroughPointSeqNo = 0;
 
   private BitSetPassThroughPoints(final List<BitSet> passThroughPoints) {
     this.passThroughPoints = passThroughPoints;
+    this.expectedC2ValueAtDestination = passThroughPoints.size();
   }
 
   public static PassThroughPoints create(final List<int[]> passThroughStops) {
@@ -54,14 +57,14 @@ public class BitSetPassThroughPoints implements PassThroughPoints {
   }
 
   @Override
-  public void updateC2Value(int currentC2, IntConsumer update) {
-    if (currentPassThroughPointSeqNo == currentC2 + 1) {
+  public void updateC2Value(int currentPathC2, IntConsumer update) {
+    if (currentPassThroughPointSeqNo == currentPathC2 + 1) {
       update.accept(currentPassThroughPointSeqNo);
     }
   }
 
   @Override
-  public int size() {
-    return passThroughPoints.size();
+  public IntPredicate acceptC2AtDestination() {
+    return c2 -> c2 == expectedC2ValueAtDestination;
   }
 }

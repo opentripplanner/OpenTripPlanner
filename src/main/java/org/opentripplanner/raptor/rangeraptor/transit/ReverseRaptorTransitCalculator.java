@@ -54,7 +54,7 @@ public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
   }
 
   @Override
-  public Collection<String> validate(ArrivalView<T> destArrival) {
+  public Collection<String> rejectDestinationArrival(ArrivalView<T> destArrival) {
     var errors = new ArrayList<String>();
 
     if (exceedsTimeLimit(destArrival.arrivalTime())) {

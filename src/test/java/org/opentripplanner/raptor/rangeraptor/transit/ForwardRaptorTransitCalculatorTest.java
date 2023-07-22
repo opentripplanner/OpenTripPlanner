@@ -8,6 +8,7 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.D1m;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
@@ -21,6 +22,8 @@ public class ForwardRaptorTransitCalculatorTest {
   private int searchWindowSizeInSeconds = 2 * 60 * 60;
   private int latestAcceptableArrivalTime = hm2time(16, 0);
   private int iterationStep = 60;
+
+  private final AtomicInteger newC2Set = new AtomicInteger(-1);
 
   @Test
   public void exceedsTimeLimit() {
@@ -42,6 +45,12 @@ public class ForwardRaptorTransitCalculatorTest {
     subject = create();
     assertFalse(subject.exceedsTimeLimit(0));
     assertFalse(subject.exceedsTimeLimit(2_000_000_000));
+  }
+
+  @Test
+  public void acceptDestinationArrival() {
+    // TODO PT: Wrire a test that test that the exceedsTimeLimit and acceptC2 predicate is
+    //          done correct.
   }
 
   @Test
@@ -90,7 +99,11 @@ public class ForwardRaptorTransitCalculatorTest {
       earliestDepartureTime,
       searchWindowSizeInSeconds,
       latestAcceptableArrivalTime,
-      iterationStep
+      iterationStep,
+      c2 -> {
+        newC2Set.set(c2);
+        return true;
+      }
     );
   }
 

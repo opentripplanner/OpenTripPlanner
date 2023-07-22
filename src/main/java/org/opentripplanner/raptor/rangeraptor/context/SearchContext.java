@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntPredicate;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
@@ -28,7 +29,6 @@ import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.rangeraptor.transit.AccessPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.EgressPaths;
 import org.opentripplanner.raptor.rangeraptor.transit.ForwardRaptorTransitCalculator;
-import org.opentripplanner.raptor.rangeraptor.transit.PassThroughForwardRaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.ReverseRaptorTransitCalculator;
 import org.opentripplanner.raptor.rangeraptor.transit.RoundTracker;
@@ -258,25 +258,10 @@ public class SearchContext<T extends RaptorTripSchedule> {
     var forward = r.searchDirection().isForward();
     SearchParams s = r.searchParams();
 
-    if (r.multiCriteria().transitPassThroughRequest().isPresent()) {
-      var requiredC2 = r
-        .multiCriteria()
-        .transitPassThroughRequest()
-        .get()
-        .passThroughPoints()
-        .size();
-      if (forward) {
-        return new PassThroughForwardRaptorTransitCalculator<>(s, t, requiredC2);
-      } else {
-        // TODO: 2023-06-29 via pass through: we should have pass-through calculator for reverse as well
-        return new ReverseRaptorTransitCalculator<>(s, t);
-      }
+    if (forward) {
+      return new ForwardRaptorTransitCalculator<>(s, t, acceptC2AtDestination(r));
     } else {
-      if (forward) {
-        return new ForwardRaptorTransitCalculator<>(s, t);
-      } else {
-        return new ReverseRaptorTransitCalculator<>(s, t);
-      }
+      return new ReverseRaptorTransitCalculator<>(s, t);
     }
   }
 
@@ -317,5 +302,21 @@ public class SearchContext<T extends RaptorTripSchedule> {
     var params = request.searchParams();
     var paths = forward ? params.egressPaths() : params.accessPaths();
     return EgressPaths.create(paths, request.profile());
+  }
+
+  /**
+   * Currently only the pass-through has a constraint on the c2 value for accepting it at the
+   * destination. So, this method return the pass-through accept predicate if the request is a
+   * pass-through request, if not it returns {@code null}.
+   */
+  @Nullable
+  private static <T extends RaptorTripSchedule> IntPredicate acceptC2AtDestination(
+    RaptorRequest<T> r
+  ) {
+    return r
+      .multiCriteria()
+      .transitPassThroughRequest()
+      .map(it -> it.passThroughPoints().acceptC2AtDestination())
+      .orElse(null);
   }
 }

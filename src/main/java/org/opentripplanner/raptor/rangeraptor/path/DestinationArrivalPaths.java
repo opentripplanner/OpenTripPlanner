@@ -86,7 +86,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
       return;
     }
 
-    var errors = transitCalculator.validate(destArrival);
+    var errors = transitCalculator.rejectDestinationArrival(destArrival);
     if (!errors.isEmpty()) {
       debugReject(destArrival, String.join(" ", errors));
     } else {
