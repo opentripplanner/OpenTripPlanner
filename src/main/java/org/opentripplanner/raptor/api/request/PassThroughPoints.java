@@ -1,14 +1,21 @@
 package org.opentripplanner.raptor.api.request;
 
+import java.util.function.IntConsumer;
+
 /**
  * Provides information for pass-through points used in the search.
  */
 public interface PassThroughPoints {
   /** Implementation that answers negative for all stops. */
-  PassThroughPoints NO_PASS_THROUGH_POINTS = new PassThroughPoints() {
+  PassThroughPoints NOOP = new PassThroughPoints() {
     @Override
-    public boolean isPassThroughPoint(final int passThroughIndex, final int stop) {
+    public boolean isPassThroughPoint(final int stop) {
       return false;
+    }
+
+    @Override
+    public void updateC2Value(int c2, IntConsumer update) {
+      throw new UnsupportedOperationException("This should never be called");
     }
 
     @Override
@@ -20,11 +27,12 @@ public interface PassThroughPoints {
   /**
    * If a certain stop is a pass-through point of a certain position in the trip.
    *
-   * @param passThroughIndex the index position of the stop in the list of pass-through points, zero-based
-   * @param stop the stop index to check
-   * @return boolean true if the stop is a pass-through point on the specific position
+   * @param stopIndex the stop index to check
+   * @return boolean true if the stop is a pass-through point on the specific stop
    */
-  boolean isPassThroughPoint(int passThroughIndex, int stop);
+  boolean isPassThroughPoint(int stopIndex);
+
+  void updateC2Value(int c2, IntConsumer update);
 
   /**
    * Get the number of pass-through points in the collection.

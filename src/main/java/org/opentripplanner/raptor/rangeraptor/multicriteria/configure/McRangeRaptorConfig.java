@@ -1,10 +1,13 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
+import org.opentripplanner.raptor.api.request.PassThroughPoints;
+import org.opentripplanner.raptor.api.request.RaptorTransitPassThroughRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
@@ -14,7 +17,6 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.McStopArrivals;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.MultiCriteriaRoutingStrategy;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.PassThroughMultiCriteriaRoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.ArrivalParetoSetComparatorFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
@@ -81,26 +83,15 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     PatternRideFactory<T, R> factory,
     ParetoComparator<R> patternRideComparator
   ) {
-    if (context.multiCriteria().transitPassThroughRequest().isPresent()) {
-      return new PassThroughMultiCriteriaRoutingStrategy<>(
-        state,
-        context.createTimeBasedBoardingSupport(),
-        factory,
-        context.costCalculator(),
-        context.slackProvider(),
-        createPatternRideParetoSet(patternRideComparator),
-        context.multiCriteria().transitPassThroughRequest().get().passThroughPoints()
-      );
-    } else {
-      return new MultiCriteriaRoutingStrategy<>(
-        state,
-        context.createTimeBasedBoardingSupport(),
-        factory,
-        context.costCalculator(),
-        context.slackProvider(),
-        createPatternRideParetoSet(patternRideComparator)
-      );
-    }
+    return new MultiCriteriaRoutingStrategy<>(
+      state,
+      context.createTimeBasedBoardingSupport(),
+      factory,
+      passThroughPoints(),
+      context.costCalculator(),
+      context.slackProvider(),
+      createPatternRideParetoSet(patternRideComparator)
+    );
   }
 
   private McRangeRaptorWorkerState<T> createState(Heuristics heuristics) {
@@ -168,40 +159,45 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
    * Currently "transit-priority-groups" is the only feature using two multi-criteria(c2).
    */
   private boolean includeC2() {
-    return (
-      mcRequest().transitPassThroughRequest().isPresent() ||
-      mcRequest().transitPriorityCalculator().isPresent()
-    );
+    return mcRequest().includeC2();
   }
 
   private PatternRideFactory<T, PatternRideC2<T>> createPatternRideC2Factory() {
-    if (mcRequest().transitPassThroughRequest().isPresent()) {
-      return new PassThroughRideFactory<>();
-    } else if (mcRequest().transitPriorityCalculator().isPresent()) {
-      return new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator());
-    } else {
-      // TODO: 2023-05-19 via poss through: not sure if we should cover for this case
-      return null;
-    }
+    return createWithC2(
+      pt -> new PassThroughRideFactory<>(),
+      pg -> new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator())
+    );
   }
 
   @Nullable
   private DominanceFunction dominanceFunctionC2() {
-    if (mcRequest().transitPassThroughRequest().isPresent()) {
-      return mcRequest().transitPassThroughRequest().get().dominanceFunction();
-    } else if (mcRequest().transitPriorityCalculator().isPresent()) {
-      return mcRequest()
-        .transitPriorityCalculator()
-        .map(RaptorTransitPriorityGroupCalculator::dominanceFunction)
-        .orElse(null);
-    } else {
-      // TODO: 2023-05-19 via poss through: not sure if we should cover for this case
-      return null;
-    }
+    return createWithC2(
+      RaptorTransitPassThroughRequest::dominanceFunction,
+      RaptorTransitPriorityGroupCalculator::dominanceFunction
+    );
   }
 
   @Nullable
   private RaptorTransitPriorityGroupCalculator getTransitPriorityGroupCalculator() {
     return mcRequest().transitPriorityCalculator().orElse(null);
+  }
+
+  private PassThroughPoints passThroughPoints() {
+    return context
+      .multiCriteria()
+      .transitPassThroughRequest()
+      .map(RaptorTransitPassThroughRequest::passThroughPoints)
+      .orElse(PassThroughPoints.NOOP);
+  }
+
+  @Nullable
+  private <S> S createWithC2(
+    Function<RaptorTransitPassThroughRequest, S> createPassThrough,
+    Function<RaptorTransitPriorityGroupCalculator, S> createTransitPriority
+  ) {
+    return mcRequest()
+      .transitPassThroughRequest()
+      .map(createPassThrough)
+      .orElse(mcRequest().transitPriorityCalculator().map(createTransitPriority).orElse(null));
   }
 }

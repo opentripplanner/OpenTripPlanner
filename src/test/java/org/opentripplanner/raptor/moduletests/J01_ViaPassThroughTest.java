@@ -22,10 +22,12 @@ import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
+// TODO PT: doc
 public class J01_ViaPassThroughTest {
 
   private final TestTransitData data = new TestTransitData();
@@ -34,7 +36,7 @@ public class J01_ViaPassThroughTest {
     RaptorConfig.defaultConfigForTest()
   );
 
-  // TODO: 2023-05-22 via pass through: this comment is wrong
+  // TODO PT: 2023-05-22 via pass through: this comment is wrong
   /**
    * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
    * <p>
@@ -65,24 +67,29 @@ public class J01_ViaPassThroughTest {
       .searchWindow(Duration.ofMinutes(2))
       .timetable(true);
 
+    requestBuilder.clearOptimizations().profile(RaptorProfile.MULTI_CRITERIA);
+
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    // TODO: 2023-05-22 via pass through: this test won't work right now since via point is hardcoded
+    // TODO PT: 2023-05-22 via pass through: this test won't work right now since via point is hardcoded
     //  when it's implemented, make sure to include C as a via point in multiCriteriaRequest
 
-    var path =
-      "Walk 30s ~ A ~ BUS R1 0:02 0:20 ~ E ~ Walk 30s [0:01:30 0:20:30 19m 0tx $1800]\n" +
-      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m 0tx $3600]";
+    var path = "Walk 30s ~ A ~ BUS R1 0:02 0:20 ~ E ~ Walk 30s [0:01:30 0:20:30 19m 0tx $1800]";
 
-    // TODO: 2023-05-22 via pass through: inject via point to multi criteria request
+    // TODO PT: 2023-05-22 via pass through: inject via point to multi criteria request
+    // TODO PT: Add testcase with heuristics later: add(multiCriteria(), ...)
     return RaptorModuleTestCase.of().add(TC_MULTI_CRITERIA, path).build();
   }
 
+  // TODO PT: Renane test, what is the business rule we are testing here?
   @ParameterizedTest
   @MethodSource("testCases")
   void testRaptor(RaptorModuleTestCase testCase) {
+    // TODO PT: 2023-05-22 via pass through: this test won't work right now since via point is hardcoded
+    //  when it's implemented, make sure to include C as a via point in multiCriteriaRequest
+
     assertEquals(testCase.expected(), testCase.run(raptorService, data, requestBuilder));
   }
 }

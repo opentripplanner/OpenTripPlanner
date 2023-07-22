@@ -33,7 +33,7 @@ public class J02_ViaPassThroughTest {
     RaptorConfig.defaultConfigForTest()
   );
 
-  // TODO: 2023-05-22 via pass through this comment is wrong
+  // TODO PT: 2023-05-22 via pass through this comment is wrong
   /**
    * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
    * <p>
@@ -41,7 +41,7 @@ public class J02_ViaPassThroughTest {
    */
   @BeforeEach
   public void setup() {
-    // TODO: 2023-05-16 via pass through: add test case without walk egress
+    // TODO PT: 2023-05-16 via pass through: add test case without walk egress
     var r1 = route("R1", STOP_A, STOP_B, STOP_D).withTimetable(schedule("0:02 0:05 0:20"));
     var r2 = route("R2", STOP_A, STOP_C, STOP_D).withTimetable(schedule("0:02 0:10 0:50"));
 
@@ -68,14 +68,13 @@ public class J02_ViaPassThroughTest {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    // TODO: 2023-05-22 via pass through: this test won't work right now since via point is hardcoded
-    //  when it's implemented, make sure to include C as a via point in multiCriteriaRequest
+    // TODO PT: 2023-05-22 via pass through: this test won't work right now since via point is
+    //          hardcoded when it's implemented, make sure to include C as a via point in
+    //          multiCriteriaRequest
 
-    var path =
-      "Walk 30s ~ A ~ BUS R1 0:02 0:20 ~ E ~ Walk 30s [0:01:30 0:20:30 19m 0tx $1800]\n" +
-      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m 0tx $3600]";
+    var path = "Walk 30s ~ A ~ BUS R1 0:02 0:20 ~ D ~ Walk 30s [0:01:30 0:20:30 19m 0tx $1800]";
 
-    // TODO: 2023-05-22 via pass through: inject via point to multi criteria request
+    // TODO PT: 2023-05-22 via pass through: inject via point to multi criteria request
     return RaptorModuleTestCase.of().add(TC_MULTI_CRITERIA, path).build();
   }
 

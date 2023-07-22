@@ -1,13 +1,22 @@
 package org.opentripplanner.raptor.api.request;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static shadow.org.assertj.core.util.Lists.emptyList;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class BitSetPassThroughPointsTest {
+
+  public static final int PASS_THROUGH_SEQ_NO_1 = 1;
+  public static final int PASS_THROUGH_SEQ_NO_2 = 2;
 
   public static final int STOP_11 = 0;
   public static final int STOP_12 = 1;
@@ -18,40 +27,58 @@ class BitSetPassThroughPointsTest {
   public static final int STOP_23 = 5;
   public static final int[] STOPS_2 = new int[] { STOP_21, STOP_22, STOP_23 };
   public static final int STOP_31 = 6;
-  private static PassThroughPoints PASS_THROUGH_POINTS = BitSetPassThroughPoints.create(
+  private static final PassThroughPoints SUBJECT = BitSetPassThroughPoints.create(
     List.of(STOPS_1, STOPS_2)
   );
-  private static PassThroughPoints EMPTY_PASS_THROUGH_POINTS = BitSetPassThroughPoints.create(
-    emptyList()
-  );
 
-  @Test
-  void passThroughPoint() {
-    assertTrue(PASS_THROUGH_POINTS.isPassThroughPoint(0, STOP_11));
+  static Stream<Arguments> passThroughPointTestCases() {
+    return Stream.of(
+      Arguments.of(PASS_THROUGH_SEQ_NO_1, true, STOP_11),
+      Arguments.of(PASS_THROUGH_SEQ_NO_1, true, STOP_12),
+      Arguments.of(PASS_THROUGH_SEQ_NO_1, true, STOP_13),
+      Arguments.of(PASS_THROUGH_SEQ_NO_2, true, STOP_21),
+      Arguments.of(PASS_THROUGH_SEQ_NO_2, true, STOP_22),
+      Arguments.of(PASS_THROUGH_SEQ_NO_2, true, STOP_23)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("passThroughPointTestCases")
+  void passThroughPointTest(int expectedSeqNr, boolean isPassThroughPoint, int stopIndex) {
+    assertEquals(isPassThroughPoint, SUBJECT.isPassThroughPoint(stopIndex));
+    AtomicBoolean c2Updated = new AtomicBoolean(false);
+    SUBJECT.updateC2Value(
+      expectedSeqNr - 1,
+      newC2 -> {
+        assertEquals(expectedSeqNr, newC2);
+        c2Updated.set(true);
+      }
+    );
+    assertTrue(c2Updated.get(), "The c2 update is not performed");
+    SUBJECT.updateC2Value(
+      expectedSeqNr - 2,
+      newC2 -> fail("A visited pass-through-point should not increase the c2. New C2: " + newC2)
+    );
+    SUBJECT.updateC2Value(
+      expectedSeqNr,
+      newC2 ->
+        fail(
+          "A pass-through-point where the previous point is not visited should not increase the C2. New C2: " +
+          newC2
+        )
+    );
   }
 
   @Test
-  void passThroughPoint_secondPoint() {
-    assertTrue(PASS_THROUGH_POINTS.isPassThroughPoint(1, STOP_22));
+  void notAPassthroughPoint() {
+    assertFalse(SUBJECT.isPassThroughPoint(STOP_31));
   }
 
   @Test
-  void notAPassThroughPoint() {
-    assertFalse(PASS_THROUGH_POINTS.isPassThroughPoint(0, STOP_31));
-  }
-
-  @Test
-  void notAPassThroughPoint_passThroughPointOnIncorrectPosition() {
-    assertFalse(PASS_THROUGH_POINTS.isPassThroughPoint(0, STOP_21));
-  }
-
-  @Test
-  void notAPassThroughPoint_incorrectPassThroughPointIndex() {
-    assertFalse(PASS_THROUGH_POINTS.isPassThroughPoint(PASS_THROUGH_POINTS.size(), STOP_11));
-  }
-
-  @Test
-  void notAPassThroughPoint_empty() {
-    assertFalse(EMPTY_PASS_THROUGH_POINTS.isPassThroughPoint(0, STOP_11));
+  void notAPassthroughPoint_empty() {
+    assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_11));
+    assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_12));
+    assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_21));
+    assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_22));
   }
 }

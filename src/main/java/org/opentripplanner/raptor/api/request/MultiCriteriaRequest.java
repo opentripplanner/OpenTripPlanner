@@ -130,6 +130,10 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
       .toString();
   }
 
+  public boolean includeC2() {
+    return transitPassThroughRequest != null || transitPriorityCalculator != null;
+  }
+
   public static class Builder<T extends RaptorTripSchedule> {
 
     private final MultiCriteriaRequest<T> original;
