@@ -8,8 +8,8 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.D1m;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.lang.IntBox;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -23,7 +23,7 @@ public class ForwardRaptorTransitCalculatorTest {
   private int latestAcceptableArrivalTime = hm2time(16, 0);
   private int iterationStep = 60;
 
-  private final AtomicInteger newC2Set = new AtomicInteger(-1);
+  private final IntBox newC2Set = new IntBox(-1);
 
   @Test
   public void exceedsTimeLimit() {

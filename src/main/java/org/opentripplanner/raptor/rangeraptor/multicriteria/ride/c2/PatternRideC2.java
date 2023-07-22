@@ -116,4 +116,19 @@ public record PatternRideC2<T extends RaptorTripSchedule>(
       .addObj("trip", trip)
       .toString();
   }
+
+  @Override
+  public PatternRide<T> updateC2(int newC2) {
+    return new PatternRideC2<>(
+      prevArrival,
+      boardStopIndex,
+      boardPos,
+      boardTime,
+      boardC1,
+      relativeC1,
+      newC2,
+      tripSortIndex,
+      trip
+    );
+  }
 }

@@ -1,11 +1,19 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2;
 
+import org.opentripplanner.framework.lang.IntBox;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.request.PassThroughPoints;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
 
 public class PassThroughRideFactory<T extends RaptorTripSchedule>
   implements PatternRideFactory<T, PatternRideC2<T>> {
+
+  private final PassThroughPoints passThroughPoints;
+
+  public PassThroughRideFactory(PassThroughPoints passThroughPoints) {
+    this.passThroughPoints = passThroughPoints;
+  }
 
   @Override
   public PatternRideC2<T> createPatternRide(
@@ -24,24 +32,21 @@ public class PassThroughRideFactory<T extends RaptorTripSchedule>
       boardTime,
       boardCost1,
       relativeCost1,
-      prevArrival.c2(),
+      calculateC2(prevArrival),
       trip.tripSortIndex(),
       trip
     );
   }
 
-  @Override
-  public PatternRideC2<T> createPatternRide(PatternRideC2<T> ride, int c2) {
-    return new PatternRideC2<>(
-      ride.prevArrival(),
-      ride.boardStopIndex(),
-      ride.boardPos(),
-      ride.boardTime(),
-      ride.boardC1(),
-      ride.relativeC1(),
-      c2,
-      ride.tripSortIndex(),
-      ride.trip()
-    );
+  /**
+   * We need to update the c2 value if the board stop is a pass-through stop; Raptor only update
+   * the c2 value for "existing" rides. There is no need to check if the current stop is a
+   * pass-through stop, because the {@code passThroughPoints} service is stateful and already
+   * knows if the current stop is a pass-through stop.
+   */
+  private int calculateC2(McStopArrival<T> prevArrival) {
+    IntBox c2 = new IntBox(prevArrival.c2());
+    passThroughPoints.updateC2Value(c2.get(), c2::set);
+    return c2.get();
   }
 }

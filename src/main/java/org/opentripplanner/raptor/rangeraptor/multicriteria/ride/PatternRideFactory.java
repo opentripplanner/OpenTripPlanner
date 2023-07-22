@@ -15,10 +15,6 @@ public interface PatternRideFactory<T extends RaptorTripSchedule, R extends Patt
     T trip
   );
 
-  R createPatternRide(R ride, int c2);
-
-  // TODO: 2023-05-22 via pass through: create method createPatternRide(ride, c2)
-
   /**
    * This method is called for each pattern before boarding. It allows the factory
    * to compute and cache values for each pattern, which can be used when creating

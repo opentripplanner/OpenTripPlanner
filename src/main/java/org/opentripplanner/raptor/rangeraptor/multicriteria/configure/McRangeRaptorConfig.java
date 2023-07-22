@@ -164,7 +164,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private PatternRideFactory<T, PatternRideC2<T>> createPatternRideC2Factory() {
     return createWithC2(
-      pt -> new PassThroughRideFactory<>(),
+      pt -> new PassThroughRideFactory<>(pt.passThroughPoints()),
       pg -> new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator())
     );
   }

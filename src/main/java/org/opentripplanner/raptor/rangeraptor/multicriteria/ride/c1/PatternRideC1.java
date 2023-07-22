@@ -91,11 +91,6 @@ public record PatternRideC1<T extends RaptorTripSchedule>(
           trip
         );
       }
-
-      @Override
-      public PatternRideC1<T> createPatternRide(PatternRideC1<T> ride, int c2) {
-        return null;
-      }
     };
   }
 
@@ -147,5 +142,10 @@ public record PatternRideC1<T extends RaptorTripSchedule>(
       .addNum("tripSortIndex", tripSortIndex)
       .addObj("trip", trip)
       .toString();
+  }
+
+  @Override
+  public PatternRide<T> updateC2(int newC2) {
+    return this;
   }
 }

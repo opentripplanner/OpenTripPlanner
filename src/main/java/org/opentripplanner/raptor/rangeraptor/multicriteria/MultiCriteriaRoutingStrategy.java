@@ -73,20 +73,10 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
         // Replace existing ride with same ride with the C2 value updated. This only happens if
         // the stop is a pass-through point and the path has visited the pass-through points in the
         // right order so fare.
+        //noinspection unchecked
         passThroughPoints.updateC2Value(
           ride.c2(),
-          newC2 ->
-            patternRides.add(
-              patternRideFactory.createPatternRide(
-                ride.prevArrival(),
-                ride.boardStopIndex(),
-                ride.boardPos(),
-                ride.boardTime(),
-                ride.boardC1(),
-                newC2,
-                ride.trip()
-              )
-            )
+          newC2 -> patternRides.add((R) ride.updateC2(newC2))
         );
       }
     }
@@ -125,7 +115,6 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
     }
   }
 
-  @SuppressWarnings("unchecked")
   private void board(
     McStopArrival<T> prevArrival,
     final int stopIndex,
@@ -143,16 +132,17 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
 
     final int relativeBoardC1 = boardC1 + calculateOnTripRelativeCost(boardTime, trip);
 
-    R ride = patternRideFactory.createPatternRide(
-      prevArrival,
-      stopIndex,
-      boarding.stopPositionInPattern(),
-      boardTime,
-      boardC1,
-      relativeBoardC1,
-      trip
+    patternRides.add(
+      patternRideFactory.createPatternRide(
+        prevArrival,
+        stopIndex,
+        boarding.stopPositionInPattern(),
+        boardTime,
+        boardC1,
+        relativeBoardC1,
+        trip
+      )
     );
-    patternRides.add(ride);
   }
 
   private void boardWithRegularTransfer(

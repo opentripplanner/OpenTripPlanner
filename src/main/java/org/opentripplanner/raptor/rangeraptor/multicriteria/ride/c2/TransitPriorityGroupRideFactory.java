@@ -47,21 +47,6 @@ public class TransitPriorityGroupRideFactory<T extends RaptorTripSchedule>
   }
 
   @Override
-  public PatternRideC2<T> createPatternRide(PatternRideC2<T> ride, int c2) {
-    return new PatternRideC2<>(
-      ride.prevArrival(),
-      ride.boardStopIndex(),
-      ride.boardPos(),
-      ride.boardTime(),
-      ride.boardC1(),
-      ride.relativeC1(),
-      c2,
-      ride.tripSortIndex(),
-      ride.trip()
-    );
-  }
-
-  @Override
   public void prepareForTransitWith(RaptorTripPattern pattern) {
     this.currentPatternGroupPriority = pattern.priorityGroupId();
   }

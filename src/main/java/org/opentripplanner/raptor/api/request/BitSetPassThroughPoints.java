@@ -8,6 +8,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 
 /**
  * IMPLEMENTATION DETAILS
@@ -45,7 +46,8 @@ public class BitSetPassThroughPoints implements PassThroughPoints {
 
   @Override
   public boolean isPassThroughPoint(int stop) {
-    this.currentPassThroughPointSeqNo = 0;
+    // Make sure the c2 is NOT set if the stop is not a pass-through point
+    this.currentPassThroughPointSeqNo = RaptorConstants.NOT_SET;
 
     for (int i = 0; i < passThroughPoints.size(); ++i) {
       if (passThroughPoints.get(i).get(stop)) {
