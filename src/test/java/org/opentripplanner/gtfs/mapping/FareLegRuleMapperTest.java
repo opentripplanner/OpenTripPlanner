@@ -53,7 +53,7 @@ class FareLegRuleMapperTest {
             fp.setFareProductId(new AgencyAndId("1", "1"));
 
             var obaRule = new FareLegRule();
-            obaRule.setFareProduct(fp);
+            obaRule.setFareProductId(fp.getFareProductId());
             obaRule.setDistanceType(tc.distanceType);
             obaRule.setMinDistance(tc.minDistance);
             obaRule.setMaxDistance(tc.maxDistance);
