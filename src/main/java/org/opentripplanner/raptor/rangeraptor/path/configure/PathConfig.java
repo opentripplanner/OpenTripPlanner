@@ -60,16 +60,16 @@ public class PathConfig<T extends RaptorTripSchedule> {
   /* private members */
 
   private ParetoComparator<RaptorPath<T>> createPathParetoComparator(
-    boolean includeCost,
+    boolean includeC1,
     boolean includeC2
   ) {
     return paretoComparator(
-      includeCost,
+      includeC1,
+      includeC2,
       ctx.searchParams().timetable(),
       ctx.searchParams().preferLateArrival(),
       ctx.searchDirection(),
-      ctx.multiCriteria().relaxC1AtDestination(),
-      includeC2
+      ctx.multiCriteria().relaxC1AtDestination()
     );
   }
 

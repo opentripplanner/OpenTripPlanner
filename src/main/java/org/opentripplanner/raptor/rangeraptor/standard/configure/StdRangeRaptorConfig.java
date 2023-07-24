@@ -257,11 +257,11 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
         MIN_TRAVEL_DURATION.is(ctx.profile()),
         paretoComparator(
           false,
+          false,
           ctx.searchParams().timetable(),
           ctx.searchParams().preferLateArrival(),
           ctx.searchDirection(),
-          RelaxFunction.NORMAL,
-          false
+          RelaxFunction.NORMAL
         ),
         ctx.lifeCycle()
       ),

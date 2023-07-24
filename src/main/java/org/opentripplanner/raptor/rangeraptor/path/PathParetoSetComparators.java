@@ -38,32 +38,32 @@ public class PathParetoSetComparators {
    * TODO This method should have unit tests.
    */
   public static <T extends RaptorTripSchedule> ParetoComparator<RaptorPath<T>> paretoComparator(
-    boolean includeCost,
+    boolean includeC1,
+    boolean includeC2,
     boolean includeTimetable,
     boolean preferLateArrival,
     SearchDirection searchDirection,
-    RelaxFunction relaxC1,
-    boolean useC2
+    RelaxFunction relaxC1
   ) {
-    boolean includeRelaxedCost = includeCost && !relaxC1.isNormal();
+    boolean includeRelaxedCost = includeC1 && !relaxC1.isNormal();
     boolean preferLatestDeparture = preferLateArrival != searchDirection.isInReverse();
 
     if (includeRelaxedCost) {
       if (includeTimetable) {
-        if (useC2) {
+        if (includeC2) {
           return comparatorTimetableAndRelaxedC1AndC2(relaxC1);
         } else {
           return comparatorTimetableAndRelaxedC1(relaxC1);
         }
       }
       if (preferLateArrival) {
-        if (useC2) {
+        if (includeC2) {
           return comparatorDepartureTimeAndRelaxedC1AndC2(relaxC1);
         } else {
           return comparatorDepartureTimeAndRelaxedC1(relaxC1);
         }
       } else {
-        if (useC2) {
+        if (includeC2) {
           return comparatorArrivalTimeAndRelaxedC1AndC2(relaxC1);
         } else {
           return comparatorArrivalTimeAndRelaxedC1(relaxC1);
@@ -71,22 +71,22 @@ public class PathParetoSetComparators {
       }
     }
 
-    if (includeCost) {
+    if (includeC1) {
       if (includeTimetable) {
-        if (useC2) {
+        if (includeC2) {
           return comparatorTimetableAndC1AndC2();
         } else {
           return comparatorTimetableAndC1();
         }
       }
       if (preferLatestDeparture) {
-        if (useC2) {
+        if (includeC2) {
           return comparatorDepartureTimeAndC1AndC2();
         } else {
           return comparatorDepartureTimeAndC1();
         }
       }
-      if (useC2) {
+      if (includeC2) {
         return comparatorWithC1AndC2();
       } else {
         return comparatorWithC1();
@@ -94,20 +94,20 @@ public class PathParetoSetComparators {
     }
 
     if (includeTimetable) {
-      if (useC2) {
+      if (includeC2) {
         return comparatorTimetableAndC2();
       } else {
         return comparatorTimetable();
       }
     }
     if (preferLatestDeparture) {
-      if (useC2) {
+      if (includeC2) {
         return comparatorStandardDepartureTimeAndC2();
       } else {
         return comparatorStandardDepartureTime();
       }
     }
-    if (useC2) {
+    if (includeC2) {
       return comparatorStandardArrivalTimeAndC2();
     }
     return comparatorStandardArrivalTime();
