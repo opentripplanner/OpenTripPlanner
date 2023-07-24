@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.util.paretoset;
 
-import static java.lang.Math.round;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,6 +12,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.lang.IntUtils;
 
 public class ParetoSetTest {
 
@@ -242,7 +242,9 @@ public class ParetoSetTest {
   @Test
   public void testRelaxedCriteriaAcceptingTenPercentExtra() {
     // Given a set and function
-    ParetoSet<Vector> set = new ParetoSet<>((l, r) -> l.v1 < r.v1 || l.v2 <= round(r.v2 * 1.1));
+    ParetoSet<Vector> set = new ParetoSet<>((l, r) ->
+      l.v1 < r.v1 || l.v2 <= IntUtils.round(r.v2 * 1.1)
+    );
 
     // Add some values
     set.add(new Vector("a", 1, 110));

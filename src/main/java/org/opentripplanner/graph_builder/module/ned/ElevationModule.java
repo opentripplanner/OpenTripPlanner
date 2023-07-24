@@ -28,6 +28,7 @@ import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -590,8 +591,8 @@ public class ElevationModule implements GraphBuilderModule {
   private double getApproximateEllipsoidToGeoidDifference(double y, double x)
     throws TransformException {
     int geoidDifferenceCoordinateValueMultiplier = 100;
-    int xVal = (int) Math.round(x * geoidDifferenceCoordinateValueMultiplier);
-    int yVal = (int) Math.round(y * geoidDifferenceCoordinateValueMultiplier);
+    int xVal = IntUtils.round(x * geoidDifferenceCoordinateValueMultiplier);
+    int yVal = IntUtils.round(y * geoidDifferenceCoordinateValueMultiplier);
     // create a hash value that can be used to look up the value for the given rounded coordinate. The expected
     // value of xVal should never be less than -18000 (-180 * 100) or more than 18000 (180 * 100), so multiply the
     // yVal by a prime number of a magnitude larger so that there won't be any hash collisions.
