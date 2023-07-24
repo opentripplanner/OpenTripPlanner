@@ -86,6 +86,7 @@ public class TransferMapperTest {
         STOP_MAPPER,
         LOCATION_MAPPER,
         LOCATION_GROUP_MAPPER,
+        stopAreaMapper,
         new TripMapper(
           new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, TRANSLATION_HELPER),
           new DirectionMapper(ISSUE_STORE),

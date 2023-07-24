@@ -67,6 +67,7 @@ public class StopTimesMapperTest {
     stopMapper,
     locationMapper,
     locationGroupMapper,
+    stopAreaMapper,
     new TripMapper(
       new RouteMapper(new AgencyMapper(FEED_ID), ISSUE_STORE, translationHelper),
       new DirectionMapper(ISSUE_STORE),

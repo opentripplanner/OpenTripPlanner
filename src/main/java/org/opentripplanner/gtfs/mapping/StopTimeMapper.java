@@ -6,6 +6,7 @@ import java.util.Map;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopArea;
 import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTime;
@@ -20,6 +21,7 @@ class StopTimeMapper {
   private final LocationMapper locationMapper;
 
   private final LocationGroupMapper locationGroupMapper;
+  private final StopAreaMapper stopAreaMapper;
 
   private final TripMapper tripMapper;
   private final BookingRuleMapper bookingRuleMapper;
@@ -32,6 +34,7 @@ class StopTimeMapper {
     StopMapper stopMapper,
     LocationMapper locationMapper,
     LocationGroupMapper locationGroupMapper,
+    StopAreaMapper stopAreaMapper,
     TripMapper tripMapper,
     BookingRuleMapper bookingRuleMapper,
     TranslationHelper translationHelper
@@ -39,6 +42,7 @@ class StopTimeMapper {
     this.stopMapper = stopMapper;
     this.locationMapper = locationMapper;
     this.locationGroupMapper = locationGroupMapper;
+    this.stopAreaMapper = stopAreaMapper;
     this.tripMapper = tripMapper;
     this.bookingRuleMapper = bookingRuleMapper;
     this.translationHelper = translationHelper;
@@ -57,10 +61,12 @@ class StopTimeMapper {
     StopTime lhs = new StopTime();
 
     lhs.setTrip(tripMapper.map(rhs.getTrip()));
-    if (rhs.getStop() instanceof Stop) {
-      lhs.setStop(stopMapper.map((Stop) rhs.getStop()));
-    } else if (rhs.getStop() instanceof Location) {
-      lhs.setStop(locationMapper.map((Location) rhs.getStop()));
+    if (rhs.getStop() instanceof Stop stop) {
+      lhs.setStop(stopMapper.map(stop));
+    } else if (rhs.getStop() instanceof Location location) {
+      lhs.setStop(locationMapper.map(location));
+    } else if (rhs.getStop() instanceof StopArea stopArea) {
+      lhs.setStop(stopAreaMapper.map(stopArea));
     } else if (rhs.getStop() instanceof LocationGroup) {
       lhs.setStop(locationGroupMapper.map((LocationGroup) rhs.getStop()));
     }

@@ -12,6 +12,10 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.GroupStopBuilder;
 
+/**
+ * In the Flex spec this has been replaced with stop_areas.txt.
+ */
+@Deprecated
 public class LocationGroupMapper {
 
   private final StopMapper stopMapper;

@@ -124,6 +124,7 @@ public class GTFSToOtpTransitServiceMapper {
         stopMapper,
         locationMapper,
         locationGroupMapper,
+        stopAreaMapper,
         tripMapper,
         bookingRuleMapper,
         translationHelper

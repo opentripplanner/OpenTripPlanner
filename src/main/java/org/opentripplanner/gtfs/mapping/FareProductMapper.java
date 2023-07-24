@@ -32,7 +32,7 @@ public class FareProductMapper {
       price,
       duration,
       toInternalModel(rhs.getRiderCategory()),
-      toInternalModel(rhs.egetFareContainer())
+      toInternalModel(rhs.getFareMedium())
     );
     mappedFareProducts.add(fp);
     return fp;
@@ -77,7 +77,7 @@ public class FareProductMapper {
     };
   }
 
-  private static FareMedium toInternalModel(org.onebusaway.gtfs.model.FareContainer c) {
+  private static FareMedium toInternalModel(org.onebusaway.gtfs.model.FareMedium c) {
     if (c == null) {
       return null;
     } else {
