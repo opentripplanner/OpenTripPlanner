@@ -67,7 +67,6 @@ nav:
     - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
     - Comparing OTP2 to OTP1: 'Version-Comparison.md'
-    - OTP2 Migration Guide: 'OTP2-MigrationGuide.md'
 - Configuration:
     - Introduction: 'Configuration.md'
     - Reference:
