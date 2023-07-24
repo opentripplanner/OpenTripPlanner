@@ -70,13 +70,10 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
       arrival = arrival.previous();
     }
 
-    var path = pathBuilder.build();
+    // TODO: 2023-05-19 via pass through: can we set c2 through builder like that?
+    pathBuilder.c2(destinationArrival.c2());
 
-    // TODO: 2023-05-11 via pass through: this is only for testing purpose
-    //  figure out better way to populate path with c2
-    ((Path<T>) path).setC2(destinationArrival.c2());
-
-    return path;
+    return pathBuilder.build();
   }
 
   private static BoardAndAlightTimeSearch forwardSearch(boolean useApproximateTimeSearch) {
