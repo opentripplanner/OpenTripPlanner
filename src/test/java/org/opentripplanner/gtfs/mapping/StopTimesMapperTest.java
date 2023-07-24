@@ -62,6 +62,7 @@ public class StopTimesMapperTest {
     stopMapper,
     locationMapper
   );
+  private final StopAreaMapper stopAreaMapper = new StopAreaMapper(stopMapper, locationMapper);
   private final TranslationHelper translationHelper = new TranslationHelper();
   private final StopTimeMapper subject = new StopTimeMapper(
     stopMapper,

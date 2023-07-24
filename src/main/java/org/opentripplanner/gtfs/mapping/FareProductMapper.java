@@ -44,8 +44,8 @@ public class FareProductMapper {
     return allFareProducts.stream().map(this::map).toList();
   }
 
-  public Optional<FareProduct> getByFareProductId(FeedScopedId fareProductId) {
-    return mappedFareProducts.stream().filter(p -> p.id().equals(fareProductId)).findFirst();
+  public Collection<FareProduct> getByFareProductId(FeedScopedId fareProductId) {
+    return mappedFareProducts.stream().filter(p -> p.id().equals(fareProductId)).toList();
   }
 
   private static RiderCategory toInternalModel(

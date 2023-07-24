@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.PlanTestConstants.place;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import com.google.common.collect.Multimaps;
 import java.time.Duration;
@@ -28,11 +29,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
-  String LEG_GROUP1 = "leg-group1";
-  String LEG_GROUP2 = "leg-group2";
-  String LEG_GROUP3 = "leg-group3";
-  String LEG_GROUP4 = "leg-group4";
-  String LEG_GROUP5 = "leg-group5";
+  FeedScopedId LEG_GROUP1 = id("leg-group1");
+  FeedScopedId LEG_GROUP2 = id("leg-group2");
+  FeedScopedId LEG_GROUP3 = id("leg-group3");
+  FeedScopedId LEG_GROUP4 = id("leg-group4");
+  FeedScopedId LEG_GROUP5 = id("leg-group5");
   int ID = 100;
   String expressNetwork = "express";
   String localNetwork = "local";
@@ -126,19 +127,35 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
   GtfsFaresV2Service service = new GtfsFaresV2Service(
     List.of(
-      FareLegRule.of(single).withLegGroupId(LEG_GROUP1).build(),
-      FareLegRule.of(singleToOuter).withLegGroupId(LEG_GROUP1).withToAreaId(OUTER_ZONE).build(),
-      FareLegRule.of(singleFromOuter).withLegGroupId(LEG_GROUP1).withFromAreaId(OUTER_ZONE).build(),
-      FareLegRule.of(dayPass).withLegGroupId(LEG_GROUP1).build(),
-      FareLegRule.of(expressPass).withLegGroupId(LEG_GROUP1).withNetworkId(expressNetwork).build(),
-      FareLegRule.of(localPass).withLegGroupId(LEG_GROUP1).withNetworkId(localNetwork).build(),
+      FareLegRule.of(id("1"), single).withLegGroupId(LEG_GROUP1).build(),
       FareLegRule
-        .of(innerToOuterZoneSingle)
+        .of(id("2"), singleToOuter)
+        .withLegGroupId(LEG_GROUP1)
+        .withToAreaId(OUTER_ZONE)
+        .build(),
+      FareLegRule
+        .of(id("3"), singleFromOuter)
+        .withLegGroupId(LEG_GROUP1)
+        .withFromAreaId(OUTER_ZONE)
+        .build(),
+      FareLegRule.of(id("4"), dayPass).withLegGroupId(LEG_GROUP1).build(),
+      FareLegRule
+        .of(id("5"), expressPass)
+        .withLegGroupId(LEG_GROUP1)
+        .withNetworkId(expressNetwork)
+        .build(),
+      FareLegRule
+        .of(id("5"), localPass)
+        .withLegGroupId(LEG_GROUP1)
+        .withNetworkId(localNetwork)
+        .build(),
+      FareLegRule
+        .of(id("6"), innerToOuterZoneSingle)
         .withLegGroupId(LEG_GROUP1)
         .withFromAreaId(INNER_ZONE)
         .withToAreaId(OUTER_ZONE)
         .build(),
-      FareLegRule.of(monthlyPass).withLegGroupId("another-leg-group").build()
+      FareLegRule.of(monthlyPass.id(), monthlyPass).withLegGroupId(id("another-leg-group")).build()
     ),
     List.of(),
     Multimaps.forMap(
@@ -233,6 +250,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   @Nested
   class Transfers {
 
+    FeedScopedId TRANSFER_ID = id("transfer");
     FareProduct freeTransferFromInnerToOuter = new FareProduct(
       new FeedScopedId(FEED_ID, "free-transfer-from-inner-to-outer"),
       "Single ticket with free transfer from the inner to the outer zone",
@@ -254,30 +272,30 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     GtfsFaresV2Service service = new GtfsFaresV2Service(
       List.of(
         FareLegRule
-          .of(freeTransferFromInnerToOuter)
+          .of(id("6"), freeTransferFromInnerToOuter)
           .withLegGroupId(LEG_GROUP2)
           .withFromAreaId(INNER_ZONE)
           .withToAreaId(INNER_ZONE)
           .build(),
         FareLegRule
-          .of(single)
+          .of(id("7"), single)
           .withLegGroupId(LEG_GROUP3)
           .withFromAreaId(OUTER_ZONE)
           .withToAreaId(OUTER_ZONE)
           .build(),
-        FareLegRule.of(freeTransferSingle).withLegGroupId(LEG_GROUP4).build(),
+        FareLegRule.of(id("8"), freeTransferSingle).withLegGroupId(LEG_GROUP4).build(),
         FareLegRule
-          .of(singleToOuter)
+          .of(id("9"), singleToOuter)
           .withLegGroupId(LEG_GROUP5)
           .withFromAreaId(INNER_ZONE)
           .withToAreaId(OUTER_ZONE)
           .build()
       ),
       List.of(
-        new FareTransferRule(LEG_GROUP1, LEG_GROUP1, 1, null, freeTransfer),
-        new FareTransferRule(LEG_GROUP2, LEG_GROUP3, 1, null, freeTransfer),
-        new FareTransferRule(LEG_GROUP4, LEG_GROUP4, 1, null, freeTransfer),
-        new FareTransferRule(null, LEG_GROUP5, 1, null, freeTransfer)
+        new FareTransferRule(TRANSFER_ID, LEG_GROUP1, LEG_GROUP1, 1, null, List.of(freeTransfer)),
+        new FareTransferRule(TRANSFER_ID, LEG_GROUP2, LEG_GROUP3, 1, null, List.of(freeTransfer)),
+        new FareTransferRule(TRANSFER_ID, LEG_GROUP4, LEG_GROUP4, 1, null, List.of(freeTransfer)),
+        new FareTransferRule(TRANSFER_ID, null, LEG_GROUP5, 1, null, List.of(freeTransfer))
       ),
       Multimaps.forMap(
         Map.of(INNER_ZONE_STOP.stop.getId(), INNER_ZONE, OUTER_ZONE_STOP.stop.getId(), OUTER_ZONE)
@@ -307,6 +325,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   @Nested
   class DistanceFares {
 
+    FeedScopedId DISTANCE_ID = id("distance");
     FareProduct threeStopProduct = new FareProduct(
       new FeedScopedId(FEED_ID, "three-stop-product"),
       "three-stop-product",
@@ -359,22 +378,31 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     );
 
     List<FareLegRule> stopRules = List.of(
-      FareLegRule.of(threeStopProduct).withFareDistance(new FareDistance.Stops(0, 3)).build(),
-      FareLegRule.of(fiveStopProduct).withFareDistance(new FareDistance.Stops(5, 10)).build(),
-      FareLegRule.of(twelveStopProduct).withFareDistance(new FareDistance.Stops(12, 20)).build()
+      FareLegRule
+        .of(DISTANCE_ID, threeStopProduct)
+        .withFareDistance(new FareDistance.Stops(0, 3))
+        .build(),
+      FareLegRule
+        .of(DISTANCE_ID, fiveStopProduct)
+        .withFareDistance(new FareDistance.Stops(5, 10))
+        .build(),
+      FareLegRule
+        .of(DISTANCE_ID, twelveStopProduct)
+        .withFareDistance(new FareDistance.Stops(12, 20))
+        .build()
     );
 
     List<FareLegRule> distanceRules = List.of(
       FareLegRule
-        .of(tenKmProduct)
+        .of(DISTANCE_ID, tenKmProduct)
         .withFareDistance(new LinearDistance(Distance.ofKilometers(7), Distance.ofKilometers(10)))
         .build(),
       FareLegRule
-        .of(threeKmProduct)
+        .of(DISTANCE_ID, threeKmProduct)
         .withFareDistance(new LinearDistance(Distance.ofKilometers(3), Distance.ofKilometers(6)))
         .build(),
       FareLegRule
-        .of(twoKmProduct)
+        .of(DISTANCE_ID, twoKmProduct)
         .withFareDistance(new LinearDistance(Distance.ofMeters(0), Distance.ofMeters(2000)))
         .build()
     );
