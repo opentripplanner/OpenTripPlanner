@@ -144,7 +144,7 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
    * If this vertex is located on only one street, get that street's name in default localization
    */
   public String getDefaultName() {
-    return this.getName().toString();
+    return getName().toString();
   }
 
   /**
