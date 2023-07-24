@@ -69,26 +69,34 @@ public record PatternRideC1<T extends RaptorTripSchedule>(
   // Pareto vector: [relativeCost, tripSortIndex]
 
   public static <T extends RaptorTripSchedule> PatternRideFactory<T, PatternRideC1<T>> factory() {
-    return (
-        prevArrival,
-        boardStopIndex,
-        boardPos,
-        boardTime,
-        boardCost1,
-        relativeCost1,
-        trip,
-        c2
-      ) ->
-      new PatternRideC1<>(
-        prevArrival,
-        boardStopIndex,
-        boardPos,
-        boardTime,
-        boardCost1,
-        relativeCost1,
-        trip.tripSortIndex(),
-        trip
-      );
+    return new PatternRideFactory<T, PatternRideC1<T>>() {
+      @Override
+      public PatternRideC1<T> createPatternRide(
+        McStopArrival<T> prevArrival,
+        int boardStopIndex,
+        int boardPos,
+        int boardTime,
+        int boardCost1,
+        int relativeCost1,
+        T trip
+      ) {
+        return new PatternRideC1<>(
+          prevArrival,
+          boardStopIndex,
+          boardPos,
+          boardTime,
+          boardCost1,
+          relativeCost1,
+          trip.tripSortIndex(),
+          trip
+        );
+      }
+
+      @Override
+      public PatternRideC1<T> createPatternRide(PatternRideC1<T> ride, int c2) {
+        return null;
+      }
+    };
   }
 
   /**

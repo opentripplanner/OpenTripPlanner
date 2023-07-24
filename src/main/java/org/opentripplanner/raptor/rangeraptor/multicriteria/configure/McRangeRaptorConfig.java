@@ -25,6 +25,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFact
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.PatternRideC2;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.TransitPriorityGroupRideFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.ViaRideFactory;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
@@ -174,28 +175,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private PatternRideFactory<T, PatternRideC2<T>> createPatternRideC2Factory() {
     if (mcRequest().transitViaRequest().isPresent()) {
-      // TODO: 2023-05-19 via pass through: probably this should not be a lambda
-      return (
-          prevArrival,
-          boardStopIndex,
-          boardPos,
-          boardTime,
-          boardCost1,
-          relativeCost1,
-          trip,
-          c2
-        ) ->
-        new PatternRideC2<>(
-          prevArrival,
-          boardStopIndex,
-          boardPos,
-          boardTime,
-          boardCost1,
-          relativeCost1,
-          c2,
-          trip.tripSortIndex(),
-          trip
-        );
+      return new ViaRideFactory<>();
     } else if (mcRequest().transitPriorityCalculator().isPresent()) {
       return new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator());
     } else {

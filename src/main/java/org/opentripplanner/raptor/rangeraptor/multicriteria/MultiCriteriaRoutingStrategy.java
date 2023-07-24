@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import static org.opentripplanner.raptor.api.model.PathLegType.ACCESS;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -11,7 +10,6 @@ import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.PatternRideC2;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
@@ -74,25 +72,7 @@ public final class MultiCriteriaRoutingStrategy<
 
     for (R ride : patternRides) {
       if (ride.c2() == 0 && indexes.contains(stopIndex)) {
-        //        System.out.println("Reached Helsingborg C. Adding extra c2 value");
-        ride =
-          patternRideFactory.createPatternRide(
-            ride.prevArrival(),
-            ride.boardStopIndex(),
-            ride.boardPos(),
-            ride.boardTime(),
-            ride.boardC1(),
-            ride.relativeC1(),
-            ride.trip(),
-            1
-          );
-
-        var result = patternRides.add(ride);
-        if (ride.c2() != 0) {
-          //          System.out.println("Ride with via: ");
-          //          System.out.println(ride);
-          //          System.out.println("Added new element: " + result);
-        }
+        ride = patternRideFactory.createPatternRide(ride, 1);
       }
 
       state.transitToStop(ride, stopIndex, ride.trip().arrival(stopPos), alightSlack);
@@ -150,9 +130,7 @@ public final class MultiCriteriaRoutingStrategy<
       boardTime,
       boardC1,
       relativeBoardC1,
-      trip,
-      // TODO: 2023-05-19 via pass through: this is a problem since we cannot call c2() on AccessStopArrival
-      prevArrival.c2()
+      trip
     );
     patternRides.add(ride);
   }
