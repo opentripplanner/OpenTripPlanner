@@ -66,7 +66,7 @@ public class IntersectionVertexTest {
     assertEquals(0, iv.getDegreeIn());
     assertEquals(0, iv.getDegreeOut());
 
-    iv = new LabelledIntersectionVertex("vertex", 1.0, 2.0, null, true, false);
+    iv = new LabelledIntersectionVertex("vertex", 1.0, 2.0, true, false);
     assertTrue(iv.hasDrivingTrafficLight());
     assertTrue(iv.hasCyclingTrafficLight());
     assertFalse(iv.hasWalkingTrafficLight());
@@ -88,7 +88,7 @@ public class IntersectionVertexTest {
     assertFalse(iv.hasDrivingTrafficLight());
     assertTrue(iv.inferredFreeFlowing());
 
-    iv = new LabelledIntersectionVertex("vertex", 1.0, 2.0, null, false, true);
+    iv = new LabelledIntersectionVertex("vertex", 1.0, 2.0, false, true);
     iv.addIncoming(fromEdge);
     iv.addOutgoing(straightAheadEdge);
     assertTrue(iv.hasWalkingTrafficLight());

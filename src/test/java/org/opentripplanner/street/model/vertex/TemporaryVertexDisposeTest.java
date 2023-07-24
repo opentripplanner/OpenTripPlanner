@@ -2,7 +2,9 @@ package org.opentripplanner.street.model.vertex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.FreeEdge;
 
 public class TemporaryVertexDisposeTest {
@@ -228,6 +230,12 @@ public class TemporaryVertexDisposeTest {
     @Override
     public String toString() {
       return getLabelString();
+    }
+
+    @Nonnull
+    @Override
+    public I18NString getName() {
+      return NO_NAME;
     }
 
     @Override
