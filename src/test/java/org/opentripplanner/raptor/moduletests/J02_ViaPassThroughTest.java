@@ -6,7 +6,6 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_C;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_D;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_E;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T00_00;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
@@ -26,7 +25,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
 
-public class J01_ViaPassThroughTest {
+public class J02_ViaPassThroughTest {
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -34,7 +33,7 @@ public class J01_ViaPassThroughTest {
     RaptorConfig.defaultConfigForTest()
   );
 
-  // TODO: 2023-05-22 via pass through: this comment is wrong
+  // TODO: 2023-05-22 via pass through this comment is wrong
   /**
    * Schedule: Stop:   1       2       3 R1: 00:02 - 00:05 R2:         00:05 - 00:10
    * <p>
@@ -43,15 +42,11 @@ public class J01_ViaPassThroughTest {
   @BeforeEach
   public void setup() {
     // TODO: 2023-05-16 via pass through: add test case without walk egress
-    var r1 = route("R1", STOP_A, STOP_B, STOP_E).withTimetable(schedule("0:02 0:05 0:20"));
+    var r1 = route("R1", STOP_A, STOP_B, STOP_D).withTimetable(schedule("0:02 0:05 0:20"));
     var r2 = route("R2", STOP_A, STOP_C, STOP_D).withTimetable(schedule("0:02 0:10 0:50"));
 
     // STOP_C should be via point.
     // we should test that r1 is dropped
-
-    // test for:
-    // via point is on access stop
-    // via point is on egress stop
 
     data.withRoutes(r1, r2);
     data.mcCostParamsBuilder().transferCost(100);
@@ -59,11 +54,15 @@ public class J01_ViaPassThroughTest {
     requestBuilder
       .searchParams()
       .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
-      .addEgressPaths(TestAccessEgress.walk(STOP_D, D30s), TestAccessEgress.walk(STOP_E, D30s))
+      .addEgressPaths(TestAccessEgress.walk(STOP_D, D30s))
       .earliestDepartureTime(T00_00)
       .latestArrivalTime(T01_00)
       .searchWindow(Duration.ofMinutes(2))
       .timetable(true);
+
+    // Make sure the slack have values which prevent the normal from happening transfer.
+    // The test scenario have zero seconds to transfer, so any slack will do.
+    //    data.withSlackProvider(new DefaultSlackProvider(D30s, D20s, D10s));
 
     ModuleTestDebugLogging.setupDebugLogging(data, requestBuilder);
   }
