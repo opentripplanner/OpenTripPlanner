@@ -36,21 +36,21 @@ public class PathConfig<T extends RaptorTripSchedule> {
 
   /**
    * Create a new {@link DestinationArrivalPaths}.
-   * @param includeGeneralizedCost whether to include generalized cost in the pareto set criteria.
+   * @param includeC1Cost whether to include generalized cost in the pareto set criteria.
    *                               It will be generated for each leg and a total for the path.
    * @param includeC2Cost whether to include c2 cost in the pareto set criteria.
    *                      It will be generated for each leg and a total for the path.
    */
   public DestinationArrivalPaths<T> createDestArrivalPaths(
-    boolean includeGeneralizedCost,
+    boolean includeC1Cost,
     boolean includeC2Cost
   ) {
     return new DestinationArrivalPaths<>(
-      createPathParetoComparator(includeGeneralizedCost, includeC2Cost),
+      createPathParetoComparator(includeC1Cost, includeC2Cost),
       ctx.calculator(),
-      includeGeneralizedCost ? ctx.costCalculator() : null,
+      includeC1Cost ? ctx.costCalculator() : null,
       ctx.slackProvider(),
-      createPathMapper(includeGeneralizedCost),
+      createPathMapper(includeC1Cost),
       ctx.debugFactory(),
       ctx.stopNameResolver(),
       ctx.lifeCycle()
