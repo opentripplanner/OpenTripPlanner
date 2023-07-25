@@ -144,7 +144,7 @@ Details of those two APIs are available at the following pages:
 
 The plan is to merge the two APIs above, clean it up and make it the new official API. The HSL API
 uses GTFS terminology, while the Entur API is Transmodel(NeTEx) based. Both APIs are similar in
-semantics/structure and provide the same functionality. 
+semantics and structure, and provide the same functionality. 
 
 ## Additional characteristics added in OTP2
 

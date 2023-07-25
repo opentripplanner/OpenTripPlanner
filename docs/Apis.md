@@ -2,7 +2,7 @@
 
 ## APIs
 
-Several different services are built upon this routing library, and expose APIs:
+Several different services are built upon this routing library, and expose these APIs:
 
 ### GraphQL
 
