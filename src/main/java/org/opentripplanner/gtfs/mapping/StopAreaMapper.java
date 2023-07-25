@@ -25,8 +25,8 @@ public class StopAreaMapper {
     this.locationMapper = locationMapper;
   }
 
-  Collection<GroupStop> map(Collection<org.onebusaway.gtfs.model.StopArea> allLocationGroups) {
-    return MapUtils.mapToList(allLocationGroups, this::map);
+  Collection<GroupStop> map(Collection<org.onebusaway.gtfs.model.StopArea> allAreas) {
+    return MapUtils.mapToList(allAreas, this::map);
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */

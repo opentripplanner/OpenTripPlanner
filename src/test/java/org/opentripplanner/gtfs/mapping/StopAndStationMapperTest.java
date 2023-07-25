@@ -69,14 +69,14 @@ public class StopAndStationMapperTest {
   }
 
   @Test
-  public void testMapCollection() {
+  void testMapCollection() {
     assertNull(subject.map((Collection<Stop>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(STOP)).size());
   }
 
   @Test
-  public void testMap() {
+  void testMap() {
     RegularStop result = subject.map(STOP);
 
     assertEquals("A:1", result.getId().toString());
@@ -91,7 +91,7 @@ public class StopAndStationMapperTest {
   }
 
   @Test
-  public void testMapWithNulls() {
+  void testMapWithNulls() {
     Stop input = new Stop();
     input.setId(AGENCY_AND_ID);
     input.setName(NAME);
@@ -111,7 +111,7 @@ public class StopAndStationMapperTest {
   }
 
   @Test
-  public void verifyMissingCoordinateThrowsException() {
+  void verifyMissingCoordinateThrowsException() {
     Stop input = new Stop();
     input.setId(AGENCY_AND_ID);
     input.setName(NAME);
@@ -125,7 +125,7 @@ public class StopAndStationMapperTest {
 
   /** Mapping the same object twice, should return the the same instance. */
   @Test
-  public void testMapCache() {
+  void testMapCache() {
     RegularStop result1 = subject.map(STOP);
     RegularStop result2 = subject.map(STOP);
 
