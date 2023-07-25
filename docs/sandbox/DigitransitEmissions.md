@@ -1,4 +1,4 @@
-# Digitransit CO2 Emissions calcuation
+# Digitransit CO2 Emissions calculation
 
 ## Contact Info
 
