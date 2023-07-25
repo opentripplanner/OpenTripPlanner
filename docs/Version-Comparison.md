@@ -73,10 +73,8 @@ OTP2 brings significant improvements in speed and scalability, but does not reta
 OTP1. We have chosen to prioritize long-term maintainability, so only those features that are 
 "owned" by a team of professional developers will be carried over to OTP2.
 
-Features that have been removed to simplify the code base and improve maintainability may be removed
-permanently. Other missing features are still priorities for the organization leading OTP2
-development (Entur) but have not yet been adapted to the new transit routing system, and will be
-added in upcoming releases. Some features have been removed to reflect separation of concerns:
+Some features have been removed to simplify the code base and improve maintainability.
+Others have been removed to reflect separation of concerns:
 following principles of modular design they should be handled outside OTP, or are already covered by
 other projects where they are more actively developed.
 
