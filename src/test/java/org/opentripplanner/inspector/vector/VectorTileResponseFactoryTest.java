@@ -2,6 +2,7 @@ package org.opentripplanner.inspector.vector;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
@@ -62,6 +63,7 @@ class VectorTileResponseFactoryTest {
     var resp = computeResponse(List.of("yellow", "blue"));
 
     assertEquals(404, resp.getStatus());
+    assertEquals("text/plain; charset=UTF-8", resp.getHeaderString(HttpHeaders.CONTENT_TYPE));
     assertEquals(
       "Could not find vector tile layer(s). Requested layers: [yellow, blue]. Available layers: [red, green].",
       resp.getEntity()
@@ -73,6 +75,7 @@ class VectorTileResponseFactoryTest {
     var resp = computeResponse(List.of("red", "blue"));
 
     assertEquals(404, resp.getStatus());
+    assertEquals("text/plain; charset=UTF-8", resp.getHeaderString(HttpHeaders.CONTENT_TYPE));
     assertEquals(
       "Could not find vector tile layer(s). Requested layers: [red, blue]. Available layers: [red, green].",
       resp.getEntity()
@@ -82,7 +85,8 @@ class VectorTileResponseFactoryTest {
   @Test
   void return200WhenAllLayersFound() {
     var resp = computeResponse(List.of("red", "green"));
-
+    // framework will take care of setting it
+    assertEquals(null, resp.getHeaderString(HttpHeaders.CONTENT_TYPE));
     assertEquals(Response.Status.OK.getStatusCode(), resp.getStatus());
   }
 }
