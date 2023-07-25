@@ -47,6 +47,13 @@ public class TransitModelForTest {
     .withUrl("https://www.agency.com")
     .build();
 
+  public static final Agency OTHER_AGENCY = Agency
+    .of(id("AX"))
+    .withName("Other Agency Test")
+    .withTimezone(TIME_ZONE_ID)
+    .withUrl("https://www.otheragency.com")
+    .build();
+
   public static FeedScopedId id(String id) {
     return new FeedScopedId(FEED_ID, id);
   }
