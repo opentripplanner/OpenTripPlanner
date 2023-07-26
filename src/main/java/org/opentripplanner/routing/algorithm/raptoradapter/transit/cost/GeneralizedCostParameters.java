@@ -6,7 +6,6 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 
 /**
@@ -40,7 +39,7 @@ public class GeneralizedCostParameters {
     this.wheelchairEnabled = false;
     this.wheelchairAccessibility = AccessibilityPreferences.ofOnlyAccessible();
     this.unpreferredPatterns = new BitSet();
-    this.unpreferredCost = RequestFunctions.createLinearFunction(0.0, DEFAULT_TRANSIT_RELUCTANCE);
+    this.unpreferredCost = CostLinearFunction.of(0, DEFAULT_TRANSIT_RELUCTANCE);
   }
 
   GeneralizedCostParameters(GeneralizedCostParametersBuilder builder) {

@@ -17,7 +17,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
@@ -333,10 +333,7 @@ ferries, where the check-in process needs to be done in good time before ride.
             or for an unpreferred agency's departure. For example, 600 + 2.0 x
             """
           )
-          .asLinearFunctionOfTime(
-            dft.unpreferredCost(),
-            (a, b) -> RequestFunctions.createLinearFunction(a.toSeconds(), b)
-          )
+          .asLinearFunctionOfTime(dft.unpreferredCost(), CostLinearFunction::of)
       )
       .withRaptor(it ->
         c

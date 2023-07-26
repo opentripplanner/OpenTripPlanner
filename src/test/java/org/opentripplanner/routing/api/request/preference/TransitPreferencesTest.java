@@ -113,7 +113,7 @@ class TransitPreferencesTest {
       "alightSlack: DurationForTransitMode{default:15s, AIRPLANE:25m}, " +
       "reluctanceForMode: {AIRPLANE=2.1}, " +
       "otherThanPreferredRoutesPenalty: $350, " +
-      "unpreferredCost: f(x) = 300 + 1.15 x, " +
+      "unpreferredCost: 5m + 1.15 t, " +
       "ignoreRealtimeUpdates, " +
       "includePlannedCancellations, " +
       "includeRealtimeCancellations, " +

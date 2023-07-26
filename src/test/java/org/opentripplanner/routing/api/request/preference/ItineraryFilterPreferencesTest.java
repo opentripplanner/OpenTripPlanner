@@ -131,9 +131,9 @@ class ItineraryFilterPreferencesTest {
       "groupSimilarityKeepOne: 0.8, " +
       "groupSimilarityKeepThree: 0.5, " +
       "minBikeParkingDistance: 2,000.0, " +
-      "nonTransitGeneralizedCostLimit: f(x) = 4 + 5.0 x, " +
+      "nonTransitGeneralizedCostLimit: 4s + 5.0 t, " +
       "parkAndRideDurationRatio: 0.44, " +
-      "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=f(x) = 4 + 5.0 x, intervalRelaxFactor=3.0]" +
+      "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=4s + 5.0 t, intervalRelaxFactor=3.0]" +
       "}",
       subject.toString()
     );

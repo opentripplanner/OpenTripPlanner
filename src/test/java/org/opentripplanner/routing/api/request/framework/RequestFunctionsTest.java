@@ -18,14 +18,14 @@ class RequestFunctionsTest {
 
   @Test
   public void testToString() {
-    assertEquals("f(x) = 2 + 3.0 x", RequestFunctions.createLinearFunction(2.0, 3.0).toString());
+    assertEquals("2s + 3.0 t", RequestFunctions.createLinearFunction(2.0, 3.0).toString());
   }
 
   @Test
   public void parse() {
-    assertEquals("f(x) = 2 + 3.0 x", CostLinearFunction.of("2+3x").toString());
-    assertEquals("f(x) = 2 + 3.0 x", CostLinearFunction.of(" 2 + 3 X ").toString());
-    assertEquals("f(x) = 5 + 3.14 x", CostLinearFunction.of("5.123 + 3.1415 x").toString());
+    assertEquals("2s + 3.0 t", CostLinearFunction.of("2+3x").toString());
+    assertEquals("2s + 3.0 t", CostLinearFunction.of(" 2 + 2.95 X ").toString());
+    assertEquals("5s + 3.1 t", CostLinearFunction.of("5.123 + 3.1415 x").toString());
   }
 
   @Test

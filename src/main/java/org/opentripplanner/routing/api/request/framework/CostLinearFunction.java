@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.framework;
 
 import java.io.Serializable;
+import java.time.Duration;
 
 /**
  * OTP support injecting custom functions into the algorithm. These functions* must support this
@@ -17,6 +18,14 @@ import java.io.Serializable;
 public interface CostLinearFunction extends Serializable {
   /** Perform calculation */
   double calculate(double x);
+
+  static CostLinearFunction of(int constantSeconds, double coefficient) {
+    return RequestFunctions.createLinearFunction(constantSeconds, coefficient);
+  }
+
+  static CostLinearFunction of(Duration constant, double coefficient) {
+    return RequestFunctions.createLinearFunction(constant.toSeconds(), coefficient);
+  }
 
   static CostLinearFunction of(String text) {
     return RequestFunctions.parse(text);

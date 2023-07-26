@@ -483,7 +483,7 @@ public class NodeAdapterTest {
   public void asLinearFunctionOfTime() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
     assertEquals(
-      "f(x) = 400 + 8.0 x",
+      "6m40s + 8.0 t",
       subject
         .of("key")
         .asLinearFunctionOfTime(

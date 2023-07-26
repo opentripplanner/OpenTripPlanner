@@ -6,7 +6,6 @@ import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 /**
  * Group by Similarity filter parameters. See the configuration for documentation of each field.
@@ -40,11 +39,11 @@ public final class ItineraryFilterPreferences {
     this.groupSimilarityKeepOne = 0.85;
     this.groupSimilarityKeepThree = 0.68;
     this.minBikeParkingDistance = 0;
-    this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
+    this.nonTransitGeneralizedCostLimit = CostLinearFunction.of(3600, 2);
     this.parkAndRideDurationRatio = 0.0;
     this.removeItinerariesWithSameRoutesAndStops = false;
     this.transitGeneralizedCostLimit =
-      new TransitGeneralizedCostFilterParams(RequestFunctions.createLinearFunction(900, 1.5), 0.4);
+      new TransitGeneralizedCostFilterParams(CostLinearFunction.of(900, 1.5), 0.4);
   }
 
   private ItineraryFilterPreferences(Builder builder) {

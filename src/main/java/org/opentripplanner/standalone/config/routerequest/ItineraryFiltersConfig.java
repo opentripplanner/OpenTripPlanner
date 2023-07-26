@@ -8,7 +8,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -153,10 +152,7 @@ For example if the function is `f(x) = 1800 + 2.0 x` and the smallest cost is `5
 non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
 """
           )
-          .asLinearFunctionOfTime(
-            dft.nonTransitGeneralizedCostLimit(),
-            (a, b) -> RequestFunctions.createLinearFunction(a.toSeconds(), b)
-          )
+          .asLinearFunctionOfTime(dft.nonTransitGeneralizedCostLimit(), CostLinearFunction::of)
       )
       .withBikeRentalDistanceRatio(
         c
@@ -272,7 +268,7 @@ removed from list.
           )
           .asLinearFunctionOfTime(
             transitGeneralizedCostLimit.costLimitFunction(),
-            (a, b) -> RequestFunctions.createLinearFunction(a.toSeconds(), b)
+            CostLinearFunction::of
           ),
         node
           .of("intervalRelaxFactor")

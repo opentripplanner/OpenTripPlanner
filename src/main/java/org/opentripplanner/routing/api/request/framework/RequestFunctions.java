@@ -1,12 +1,11 @@
 package org.opentripplanner.routing.api.request.framework;
 
-import static org.opentripplanner.framework.lang.OtpNumberFormat.formatTwoDecimals;
-import static org.opentripplanner.framework.lang.OtpNumberFormat.formatZeroDecimal;
-
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 
 /**
@@ -100,12 +99,12 @@ public class RequestFunctions {
 
     @Override
     public String toString() {
-      return "f(x) = %s + %s x".formatted(formatZeroDecimal(a), formatTwoDecimals(b));
+      return serialize();
     }
 
     @Override
     public String serialize() {
-      return a + " + " + b + " x";
+      return LinearFunctionSerialization.serialize(Duration.ofSeconds(IntUtils.round(a)), b);
     }
   }
 }

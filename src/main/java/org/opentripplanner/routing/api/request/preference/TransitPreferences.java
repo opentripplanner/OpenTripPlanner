@@ -2,7 +2,6 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static java.util.Objects.requireNonNull;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
-import static org.opentripplanner.routing.api.request.framework.RequestFunctions.createLinearFunction;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -37,7 +36,7 @@ public final class TransitPreferences implements Serializable {
     this.boardSlack = this.alightSlack = DurationForEnum.of(TransitMode.class).build();
     this.reluctanceForMode = Map.of();
     this.otherThanPreferredRoutesPenalty = Cost.costOfMinutes(5);
-    this.unpreferredCost = createLinearFunction(0.0, DEFAULT_ROUTE_RELUCTANCE);
+    this.unpreferredCost = CostLinearFunction.of(0, DEFAULT_ROUTE_RELUCTANCE);
     this.ignoreRealtimeUpdates = false;
     this.includePlannedCancellations = false;
     this.includeRealtimeCancellations = false;

@@ -19,7 +19,7 @@ import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
@@ -119,8 +119,7 @@ public class RouteRequestMapper {
         // This is deprecated, if both are set, the proper one will override this
         callWith.argument(
           "unpreferred.useUnpreferredRoutesPenalty",
-          (Integer v) ->
-            tr.setUnpreferredCostString(RequestFunctions.createLinearFunction(v, 0.0).serialize())
+          (Integer v) -> tr.setUnpreferredCost(CostLinearFunction.of(Duration.ofSeconds(v), 0.0))
         );
         callWith.argument("unpreferred.unpreferredCost", tr::setUnpreferredCostString);
         callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
