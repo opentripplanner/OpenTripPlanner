@@ -1,10 +1,15 @@
 package org.opentripplanner.ext.transmodelapi.model.scalars;
 
+import graphql.GraphQLContext;
+import graphql.execution.CoercedVariables;
 import graphql.language.StringValue;
+import graphql.language.Value;
 import graphql.schema.Coercing;
 import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
+import java.util.Locale;
+import javax.annotation.Nonnull;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 public class CostLinearFunctionFactory {
@@ -24,12 +29,20 @@ public class CostLinearFunctionFactory {
       .coercing(
         new Coercing<CostLinearFunction, String>() {
           @Override
-          public String serialize(Object dataFetcherResult) {
+          public String serialize(
+            @Nonnull Object dataFetcherResult,
+            @Nonnull GraphQLContext graphQLContext,
+            @Nonnull Locale locale
+          ) {
             return ((CostLinearFunction) dataFetcherResult).serialize();
           }
 
           @Override
-          public CostLinearFunction parseValue(Object input) throws CoercingParseValueException {
+          public CostLinearFunction parseValue(
+            @Nonnull Object input,
+            @Nonnull GraphQLContext graphQLContext,
+            @Nonnull Locale locale
+          ) throws CoercingParseValueException {
             try {
               return CostLinearFunction.of((String) input);
             } catch (IllegalArgumentException e) {
@@ -38,10 +51,14 @@ public class CostLinearFunctionFactory {
           }
 
           @Override
-          public CostLinearFunction parseLiteral(Object input)
-            throws CoercingParseLiteralException {
-            if (input instanceof StringValue) {
-              return parseValue(((StringValue) input).getValue());
+          public CostLinearFunction parseLiteral(
+            @Nonnull Value<?> input,
+            @Nonnull CoercedVariables variables,
+            @Nonnull GraphQLContext graphQLContext,
+            @Nonnull Locale locale
+          ) throws CoercingParseLiteralException {
+            if (input instanceof StringValue stringValue) {
+              return parseValue(stringValue.getValue(), graphQLContext, locale);
             }
             return null;
           }
