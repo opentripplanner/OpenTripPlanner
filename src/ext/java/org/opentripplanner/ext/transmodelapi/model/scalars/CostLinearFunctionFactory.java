@@ -8,14 +8,14 @@ import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
-public class DoubleFunctionScalarFactory {
+public class CostLinearFunctionFactory {
 
   private static final String DOCUMENTATION =
     "A linear function to calculate a value(y) based on a parameter (x): " +
     "`y = f(x) = a + bx`. It allows setting both a constant(a) and a coefficient(b) and " +
     "the use those in the computation. Format: `a + b x`. Example: `1800 + 2.0 x`";
 
-  private DoubleFunctionScalarFactory() {}
+  private CostLinearFunctionFactory() {}
 
   public static GraphQLScalarType createDoubleFunctionScalar() {
     return GraphQLScalarType
