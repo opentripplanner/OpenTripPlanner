@@ -11,7 +11,21 @@ import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.time.DurationUtils;
 
 /**
- * Parse a linear function of time/duration/cost on the form: {@code 3h + 1.15 t}.
+ * This class can serialize and parse a linear function of time/duration/cost on the form
+ * {@code 3h + 1.15 t} to/from a string/text. The {@code t} is the variable in the function
+ * {@code f(t)}.
+ * <p>
+ * This class will parse/serialize the body of a linear function definition like:
+ * <pre>
+ * f(x) = 2h30m15s + 1.45 x
+ *       |---   body    ---|
+ *</pre>
+ * <p>
+ * The variable name can be one of `t`, `T`, `x` or `X`.
+ * <p>
+ * The constant is parsed with {@link DurationUtils#duration(String)}. In the case where
+ * the function is a function of cost the duration should be converted to a cost using
+ * {@link org.opentripplanner.framework.model.Cost#costOfSeconds(int)}.
  */
 public class LinearFunctionSerialization {
 
@@ -27,7 +41,10 @@ public class LinearFunctionSerialization {
   private LinearFunctionSerialization() {}
 
   /**
-   * Parse a string on the format: {@code 2m30s + 1.2 t ; 1.0 c }.
+   * Parse a string on the format: {@code 2m30s + 1.2 t }.
+   * <p>
+   * The coefficient must be a number between 0.0 and 100.0. and is normalized: if < 2.0 to
+   * 2 decimals, if 2.0 < 10.0 to 1 decimal and to hole numbers above 10.0.
    */
   public static <T> Optional<T> parse(String text, BiFunction<Duration, Double, T> factory) {
     if (StringUtils.hasNoValue(text)) {
@@ -37,7 +54,8 @@ public class LinearFunctionSerialization {
 
     if (m.matches()) {
       var constantText = m.group(1);
-      var coefficient = Units.normalizedFactor(Double.parseDouble(m.group(2)), 0.0, 100.0);
+      var coefficient = Double.parseDouble(m.group(2));
+      coefficient = Units.normalizedFactor(coefficient, 0.0, 100.0);
 
       var constant = constantText.matches("\\d+")
         ? Duration.ofSeconds(Integer.parseInt(constantText))
@@ -47,6 +65,10 @@ public class LinearFunctionSerialization {
     }
     // No function matched
     throw new IllegalArgumentException("Unable to parse function: '" + text + "'");
+  }
+
+  public static String serialize(AbstractLinearFunction<?> value) {
+    return serialize(value.constantAsDuration(), value.coefficient());
   }
 
   public static String serialize(Duration constant, double coefficient) {

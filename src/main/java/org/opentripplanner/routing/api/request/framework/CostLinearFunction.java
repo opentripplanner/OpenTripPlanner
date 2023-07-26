@@ -1,37 +1,56 @@
 package org.opentripplanner.routing.api.request.framework;
 
-import java.io.Serializable;
 import java.time.Duration;
+import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.framework.model.Cost;
 
 /**
- * OTP support injecting custom functions into the algorithm. These functions* must support this
- * interface.
- * <p>
- * The implementation must be a value-object. It must implement Serializable, have a nice
- * toString(), like  {@code f(x)= 23 + 1.33 * x}, and implement {@code equals()} and
- * {@code hashCode()} - the function is used as part of a key in a HashMap.
- * <p>
- * Use the {@link org.opentripplanner.routing.api.request.framework.RequestFunctions} to create new
- * objects of this type.
+ * A linear function to calculate a new cost based on a cost value input.
  */
-@FunctionalInterface
-public interface CostLinearFunction extends Serializable {
-  /** Perform calculation */
-  int calculate(int timeOrCostInSeconds);
+public final class CostLinearFunction extends AbstractLinearFunction<Cost> {
 
-  static CostLinearFunction of(int constantSeconds, double coefficient) {
-    return RequestFunctions.createLinearFunction(constantSeconds, coefficient);
+  public static CostLinearFunction ZERO = new CostLinearFunction(Cost.ZERO, 0.0);
+
+  private CostLinearFunction(Cost a, double b) {
+    super(a, b);
   }
 
-  static CostLinearFunction of(Duration constant, double coefficient) {
-    return RequestFunctions.createLinearFunction((int) constant.toSeconds(), coefficient);
+  public static CostLinearFunction of(Cost constant, double coefficient) {
+    if (constant.isZero() && coefficient == 0.0) {
+      return ZERO;
+    }
+    return new CostLinearFunction(constant, coefficient);
   }
 
-  static CostLinearFunction of(String text) {
-    return RequestFunctions.parse(text);
+  public static CostLinearFunction of(Duration constant, double coefficient) {
+    return of(Cost.fromDuration(constant), coefficient);
   }
 
-  default String serialize() {
-    return RequestFunctions.serialize(this);
+  public static CostLinearFunction of(String text) {
+    return LinearFunctionSerialization
+      .parse(text, (Duration a, Double b) -> of(Cost.fromDuration(a), b))
+      .orElseThrow();
+  }
+
+  public static String doc() {
+    return AbstractLinearFunction.doc("cost-linear-function");
+  }
+
+  public Cost calculate(Cost cost) {
+    return constant().plus(cost.multiply(coefficient()));
+  }
+
+  public int calculate(int valueInSeconds) {
+    return constant().toSeconds() + IntUtils.round(valueInSeconds * coefficient());
+  }
+
+  @Override
+  protected boolean isZero(Cost value) {
+    return value.isZero();
+  }
+
+  @Override
+  protected Duration constantAsDuration() {
+    return constant().asDuration();
   }
 }
