@@ -17,8 +17,6 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -333,7 +331,7 @@ ferries, where the check-in process needs to be done in good time before ride.
             or for an unpreferred agency's departure. For example: `5m + 2.0 t`
             """
           )
-          .asLinearFunctionOfTime(dft.unpreferredCost(), CostLinearFunction::of)
+          .asCostLinearFunction(dft.unpreferredCost())
       )
       .withRaptor(it ->
         c
@@ -536,17 +534,16 @@ ferries, where the check-in process needs to be done in good time before ride.
             
             **Time penalty**
             
-            {timePenaltyDoc} 
+            The `time-penalty` is used to add a penalty to the access/egress duration/time. The
+            time including the penalty is used in the algorithm when comparing paths, but the
+            actual duration is used when presented to the end user.
             
             **Cost factor**
             
             The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
             time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
             extra cost, while 1.0 will add the same amount to both time and cost.
-            """.replace(
-                "{timePenaltyDoc}",
-                TimePenalty.doc()
-              )
+            """
           )
           .asEnumMap(StreetMode.class, TimeAndCostPenaltyMapper::map)
       )

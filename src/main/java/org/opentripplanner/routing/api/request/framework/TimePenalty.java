@@ -26,10 +26,6 @@ public final class TimePenalty extends AbstractLinearFunction<Duration> {
     return LinearFunctionSerialization.parse(text, TimePenalty::new).orElse(ZERO);
   }
 
-  public static String doc() {
-    return AbstractLinearFunction.doc("time-penalty");
-  }
-
   @Override
   protected boolean isZero(Duration value) {
     return value.isZero();

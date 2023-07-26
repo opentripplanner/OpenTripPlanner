@@ -6,7 +6,6 @@ import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 
-import java.time.Duration;
 import java.util.BitSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,10 +33,7 @@ public class D03_UnpreferredRouteTest implements RaptorTestConstants {
     "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $%d]";
   private static final FeedScopedId ROUTE_ID_1 = TransitModelForTest.id("1");
   private static final FeedScopedId ROUTE_ID_2 = TransitModelForTest.id("2");
-  private static final CostLinearFunction UNPREFERRED_COST = CostLinearFunction.of(
-    Duration.ofSeconds(30000),
-    1.0
-  );
+  private static final CostLinearFunction UNPREFERRED_COST = CostLinearFunction.of("5m + 1t");
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(

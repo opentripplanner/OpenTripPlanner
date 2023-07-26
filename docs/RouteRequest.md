@@ -66,7 +66,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [transferPenalty](#rd_transferPenalty)                                                               |        `integer`       | An additional penalty added to boardings after the first.                                                                                      | *Optional* | `0`              |  2.0  |
 | [transferSlack](#rd_transferSlack)                                                                   |        `integer`       | The extra time needed to make a safe transfer in seconds.                                                                                      | *Optional* | `120`            |  2.0  |
 | turnReluctance                                                                                       |        `double`        | Multiplicative factor on expected turning time.                                                                                                | *Optional* | `1.0`            |  2.0  |
-| [unpreferredCost](#rd_unpreferredCost)                                                               |    `linear-function`   | A cost function used to calculate penalty for an unpreferred route.                                                                            | *Optional* | `"0s + 1.00 t"`  |  2.2  |
+| [unpreferredCost](#rd_unpreferredCost)                                                               | `cost-linear-function` | A cost function used to calculate penalty for an unpreferred route.                                                                            | *Optional* | `"0s + 1.00 t"`  |  2.2  |
 | [unpreferredVehicleParkingTagCost](#rd_unpreferredVehicleParkingTagCost)                             |        `integer`       | What cost to add if a parking facility doesn't contain a preferred tag.                                                                        | *Optional* | `300`            |  2.3  |
 | waitReluctance                                                                                       |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                              | *Optional* | `1.0`            |  2.0  |
 | walkBoardCost                                                                                        |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that is used when boarding while walking.             | *Optional* | `600`            |  2.0  |
@@ -86,11 +86,11 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    groupSimilarityKeepThree                                                                          |        `double`        | Reduce the number of itineraries to three itineraries by reducing each group of itineraries grouped by 68% similarity.                         | *Optional* | `0.68`           |  2.1  |
 |    [groupedOtherThanSameLegsMaxCostMultiplier](#rd_if_groupedOtherThanSameLegsMaxCostMultiplier)     |        `double`        | Filter grouped itineraries, where the non-grouped legs are more expensive than in the lowest cost one.                                         | *Optional* | `2.0`            |  2.1  |
 |    [minBikeParkingDistance](#rd_if_minBikeParkingDistance)                                           |        `double`        | Filter out bike park+ride results that have fewer meters of cycling than this value.                                                           | *Optional* | `0.0`            |  2.3  |
-|    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                           |    `linear-function`   | The function define a max-limit for generalized-cost for non-transit itineraries.                                                              | *Optional* | `"1h + 2.0 t"`   |  2.1  |
+|    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                           | `cost-linear-function` | The function define a max-limit for generalized-cost for non-transit itineraries.                                                              | *Optional* | `"1h + 2.0 t"`   |  2.1  |
 |    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                       |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                                  | *Optional* | `0.0`            |  2.1  |
 |    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)         |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                                        | *Optional* | `false`          |  2.2  |
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                                 |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                             | *Optional* |                  |  2.1  |
-|       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                      |    `linear-function`   | The base function used by the filter.                                                                                                          | *Optional* | `"15m + 1.50 t"` |  2.2  |
+|       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                      | `cost-linear-function` | The base function used by the filter.                                                                                                          | *Optional* | `"15m + 1.50 t"` |  2.2  |
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                  |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                             | *Optional* | `0.4`            |  2.2  |
 | [maxAccessEgressDurationForMode](#rd_maxAccessEgressDurationForMode)                                 | `enum map of duration` | Limit access/egress per street mode.                                                                                                           | *Optional* |                  |  2.1  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                 | `enum map of duration` | Limit direct route duration per street mode.                                                                                                   | *Optional* |                  |  2.2  |
@@ -349,7 +349,7 @@ alight-slack."
 
 <h3 id="rd_unpreferredCost">unpreferredCost</h3>
 
-**Since version:** `2.2` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"0s + 1.00 t"`   
+**Since version:** `2.2` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"0s + 1.00 t"`   
 **Path:** /routingDefaults 
 
 A cost function used to calculate penalty for an unpreferred route.
@@ -411,20 +411,9 @@ Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 
 **Time penalty**
 
-A linear function used to calculate time-penalty from a time/duration.
-
-Given a function of time:
-```
-f(t) = a + b * t
-```
-then `a` is the constant time part, `b` is the time-coefficient. If `a=0s` and `b=0.0`,
-then the cost is always `0`(zero).
-
-Examples: `0s + 2.5t`, `10m + 0t` and `1h5m59s + 9.9t`
-
-The `constant` must be 0 or a positive duration/cost.
-The `coefficient` must be in range: [0.0, 100.0]
-
+The `time-penalty` is used to add a penalty to the access/egress duration/time. The
+time including the penalty is used in the algorithm when comparing paths, but the
+actual duration is used when presented to the end user.
 
 **Cost factor**
 
@@ -576,7 +565,7 @@ Useful if you want to exclude those routes which have only a few meters of cycli
 
 <h3 id="rd_if_nonTransitGeneralizedCostLimit">nonTransitGeneralizedCostLimit</h3>
 
-**Since version:** `2.1` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"1h + 2.0 t"`   
+**Since version:** `2.1` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"1h + 2.0 t"`   
 **Path:** /routingDefaults/itineraryFilters 
 
 The function define a max-limit for generalized-cost for non-transit itineraries.
@@ -588,8 +577,8 @@ generalized-cost value is used as input to the function. The function is used to
 *generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
 set.
 
-For example if the function is `f(x) = 1800 + 2.0 x` and the smallest cost is `5000`, then all
-non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
+For example if the function is `f(x) = 30m + 2.0 x` and the smallest cost is `30m = 1800s`, then
+all non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
 
 
 <h3 id="rd_if_parkAndRideDurationRatio">parkAndRideDurationRatio</h3>
@@ -630,12 +619,14 @@ _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) 
 
 <h3 id="rd_if_transitGeneralizedCostLimit_costLimitFunction">costLimitFunction</h3>
 
-**Since version:** `2.2` ∙ **Type:** `linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"15m + 1.50 t"`   
+**Since version:** `2.2` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"15m + 1.50 t"`   
 **Path:** /routingDefaults/itineraryFilters/transitGeneralizedCostLimit 
 
 The base function used by the filter.
 
-This function calculates the threshold for the filter, when the itineraries have exactly the same arrival and departure times.
+This function calculates the threshold for the filter, when the itineraries have
+exactly the same arrival and departure times.
+
 
 <h3 id="rd_if_transitGeneralizedCostLimit_intervalRelaxFactor">intervalRelaxFactor</h3>
 

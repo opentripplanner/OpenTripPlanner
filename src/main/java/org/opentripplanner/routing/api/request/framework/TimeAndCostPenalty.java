@@ -23,8 +23,12 @@ public record TimeAndCostPenalty(TimePenalty timePenalty, double costFactor) {
     }
   }
 
+  public static TimeAndCostPenalty of(TimePenalty timePenalty, double costFactor) {
+    return new TimeAndCostPenalty(timePenalty, costFactor);
+  }
+
   public static TimeAndCostPenalty of(String timePenalty, double costFactor) {
-    return new TimeAndCostPenalty(TimePenalty.of(timePenalty), costFactor);
+    return of(TimePenalty.of(timePenalty), costFactor);
   }
 
   /**

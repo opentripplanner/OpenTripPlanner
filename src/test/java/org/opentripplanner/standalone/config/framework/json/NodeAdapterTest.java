@@ -26,7 +26,6 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.application.OtpAppException;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class NodeAdapterTest {
@@ -480,13 +479,17 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void asLinearFunctionOfTime() {
+  public void asCostLinearFunction() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
-    assertEquals(
-      "6m40s + 8.0 t",
-      subject.of("key").asLinearFunctionOfTime(null, CostLinearFunction::of).toString()
-    );
-    assertNull(subject.of("no-key").asLinearFunctionOfTime(null, CostLinearFunction::of));
+    assertEquals("6m40s + 8.0 t", subject.of("key").asCostLinearFunction(null).toString());
+    assertNull(subject.of("no-key").asCostLinearFunction(null));
+  }
+
+  @Test
+  public void asTimePenalty() {
+    NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
+    assertEquals("6m40s + 8.0 t", subject.of("key").asTimePenalty(null).toString());
+    assertNull(subject.of("no-key").asTimePenalty(null));
   }
 
   @Test

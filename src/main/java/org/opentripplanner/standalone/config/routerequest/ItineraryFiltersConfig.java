@@ -148,11 +148,11 @@ generalized-cost value is used as input to the function. The function is used to
 *generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
 set.
 
-For example if the function is `f(x) = 1800 + 2.0 x` and the smallest cost is `5000`, then all
-non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
+For example if the function is `f(x) = 30m + 2.0 x` and the smallest cost is `30m = 1800s`, then
+all non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
 """
           )
-          .asLinearFunctionOfTime(dft.nonTransitGeneralizedCostLimit(), CostLinearFunction::of)
+          .asCostLinearFunction(dft.nonTransitGeneralizedCostLimit())
       )
       .withBikeRentalDistanceRatio(
         c
@@ -263,13 +263,12 @@ removed from list.
           .since(V2_2)
           .summary("The base function used by the filter.")
           .description(
-            "This function calculates the threshold for the filter, when the itineraries have " +
-            "exactly the same arrival and departure times."
+            """
+            This function calculates the threshold for the filter, when the itineraries have
+            exactly the same arrival and departure times.
+            """
           )
-          .asLinearFunctionOfTime(
-            transitGeneralizedCostLimit.costLimitFunction(),
-            CostLinearFunction::of
-          ),
+          .asCostLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
         node
           .of("intervalRelaxFactor")
           .since(V2_2)

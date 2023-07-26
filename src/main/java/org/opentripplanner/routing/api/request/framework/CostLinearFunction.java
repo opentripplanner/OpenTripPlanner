@@ -32,10 +32,6 @@ public final class CostLinearFunction extends AbstractLinearFunction<Cost> {
       .orElseThrow();
   }
 
-  public static String doc() {
-    return AbstractLinearFunction.doc("cost-linear-function");
-  }
-
   public Cost calculate(Cost cost) {
     return constant().plus(cost.multiply(coefficient()));
   }

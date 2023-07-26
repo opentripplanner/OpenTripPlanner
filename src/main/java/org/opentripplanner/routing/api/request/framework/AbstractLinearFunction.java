@@ -17,27 +17,6 @@ abstract sealed class AbstractLinearFunction<T>
   implements Serializable
   permits CostLinearFunction, TimePenalty {
 
-  protected static String doc(String typeName) {
-    return """
-        A linear function used to calculate {typeName} from a time/duration.
-            
-        Given a function of time:
-        ```
-        f(t) = a + b * t
-        ```
-        then `a` is the constant time part, `b` is the time-coefficient. If `a=0s` and `b=0.0`,
-        then the cost is always `0`(zero).
-            
-        Examples: `0s + 2.5t`, `10m + 0t` and `1h5m59s + 9.9t`
-            
-        The `constant` must be 0 or a positive duration/cost.
-        The `coefficient` must be in range: [0.0, 100.0]
-        """.replace(
-        "{typeName}",
-        typeName
-      );
-  }
-
   private final T constant;
 
   private final double coefficient;
