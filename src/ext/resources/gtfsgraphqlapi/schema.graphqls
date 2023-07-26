@@ -1339,19 +1339,19 @@ type FareProductUse {
 
     When a day pass is valid for both legs in the itinerary it will appear for each leg but with the same use-`id`.
 
-    **Illustration*
-    ```
+    **Illustration**
+    ```yaml
     itinerary:
       leg1:
         fareProducts:
-          id: "AAA" // use id not product id
-          products:
+          id: "AAA" // use-id, not product id
+          product:
             id: "day-pass" // product id
             name: "Day Pass"
       leg2:
         fareProducts:
           id: "AAA" // identical to leg1. the passenger needs to buy ONE pass, not two.
-          products:
+          product:
             id: "day-pass"  // product id
             name: "Day Pass"
     ```
@@ -1365,11 +1365,11 @@ type FareProductUse {
     same `product.id` but different use-`id`.
 
     **Illustration**
-    ```
+    ```yaml
     itinerary:
       leg1:
         fareProducts:
-          id: "AAA" // use id, not product id
+          id: "AAA" // use-id, not product id
           product:
             id: "single-ticket" // product id
             name: "Single Ticket"
