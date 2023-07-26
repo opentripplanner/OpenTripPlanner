@@ -51,7 +51,7 @@ public class TimePenalty {
     if (StringUtils.hasNoValue(text)) {
       return ZERO;
     }
-    return LinearFunctionOfTimeParser.parse(text, TimePenalty::new).orElse(ZERO);
+    return LinearFunctionSerialization.parse(text, TimePenalty::new).orElse(ZERO);
   }
 
   public boolean isZero() {
@@ -73,7 +73,7 @@ public class TimePenalty {
 
   @Override
   public String toString() {
-    return LinearFunctionOfTimeParser.serialize(constant, coefficient);
+    return LinearFunctionSerialization.serialize(constant, coefficient);
   }
 
   public Duration calculate(int timeInSeconds) {

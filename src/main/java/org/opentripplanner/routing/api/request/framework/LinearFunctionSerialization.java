@@ -13,7 +13,7 @@ import org.opentripplanner.framework.time.DurationUtils;
 /**
  * Parse a linear function of time/duration/cost on the form: {@code 3h + 1.15 t}.
  */
-public class LinearFunctionOfTimeParser {
+public class LinearFunctionSerialization {
 
   private static final String SEP = "\\s*";
   private static final String NUM = "([\\d.,]+)";
@@ -24,7 +24,7 @@ public class LinearFunctionOfTimeParser {
     String.join(SEP, DUR, PLUS, NUM, VARIABLE)
   );
 
-  private LinearFunctionOfTimeParser() {}
+  private LinearFunctionSerialization() {}
 
   /**
    * Parse a string on the format: {@code 2m30s + 1.2 t ; 1.0 c }.

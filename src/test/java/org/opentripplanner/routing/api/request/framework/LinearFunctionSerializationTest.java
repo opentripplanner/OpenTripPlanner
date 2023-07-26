@@ -11,7 +11,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.test.support.VariableSource;
 
-class LinearFunctionOfTimeParserTest {
+class LinearFunctionSerializationTest {
 
   private static final Duration D2h9s = Duration.ofSeconds(129);
   private static final Duration D1h = Duration.ofSeconds(3600);
@@ -28,31 +28,31 @@ class LinearFunctionOfTimeParserTest {
   @ParameterizedTest
   @VariableSource("parseTestCases")
   void parseTest(String expected, String input) {
-    Optional<LinearFunction> result = LinearFunctionOfTimeParser.parse(input, LinearFunction::new);
+    Optional<LinearFunction> result = LinearFunctionSerialization.parse(input, LinearFunction::new);
     assertEquals(expected, result.orElseThrow().toString());
   }
 
   @Test
   void parseEmtpy() {
-    assertEquals(Optional.empty(), LinearFunctionOfTimeParser.parse(null, LinearFunction::new));
-    assertEquals(Optional.empty(), LinearFunctionOfTimeParser.parse("", LinearFunction::new));
-    assertEquals(Optional.empty(), LinearFunctionOfTimeParser.parse(" \r\n", LinearFunction::new));
+    assertEquals(Optional.empty(), LinearFunctionSerialization.parse(null, LinearFunction::new));
+    assertEquals(Optional.empty(), LinearFunctionSerialization.parse("", LinearFunction::new));
+    assertEquals(Optional.empty(), LinearFunctionSerialization.parse(" \r\n", LinearFunction::new));
   }
 
   @Test
   void serialize() {
-    assertEquals("0s + 0.00 t", LinearFunctionOfTimeParser.serialize(Duration.ZERO, 0));
-    assertEquals("2m9s + 0.01 t", LinearFunctionOfTimeParser.serialize(D2h9s, 0.0111));
-    assertEquals("1h + 0.11 t", LinearFunctionOfTimeParser.serialize(D1h, 0.111));
-    assertEquals("1h + 1.11 t", LinearFunctionOfTimeParser.serialize(D1h, 1.111));
-    assertEquals("1h + 2.1 t", LinearFunctionOfTimeParser.serialize(D1h, 2.111));
+    assertEquals("0s + 0.00 t", LinearFunctionSerialization.serialize(Duration.ZERO, 0));
+    assertEquals("2m9s + 0.01 t", LinearFunctionSerialization.serialize(D2h9s, 0.0111));
+    assertEquals("1h + 0.11 t", LinearFunctionSerialization.serialize(D1h, 0.111));
+    assertEquals("1h + 1.11 t", LinearFunctionSerialization.serialize(D1h, 1.111));
+    assertEquals("1h + 2.1 t", LinearFunctionSerialization.serialize(D1h, 2.111));
   }
 
   @Test
   void parseIllegalArgument() {
     var ex = assertThrows(
       IllegalArgumentException.class,
-      () -> LinearFunctionOfTimeParser.parse("foo", LinearFunction::new)
+      () -> LinearFunctionSerialization.parse("foo", LinearFunction::new)
     );
     assertEquals("Unable to parse function: 'foo'", ex.getMessage());
   }
@@ -60,7 +60,7 @@ class LinearFunctionOfTimeParserTest {
   private record LinearFunction(Duration a, double b) {
     @Override
     public String toString() {
-      return LinearFunctionOfTimeParser.serialize(a, b);
+      return LinearFunctionSerialization.serialize(a, b);
     }
   }
 }

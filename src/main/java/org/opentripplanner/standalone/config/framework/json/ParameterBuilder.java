@@ -40,7 +40,7 @@ import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.LocalDateUtils;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.LinearFunctionOfTimeParser;
+import org.opentripplanner.routing.api.request.framework.LinearFunctionSerialization;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -414,7 +414,7 @@ public class ParameterBuilder {
     return ofOptional(
       LINEAR_FUNCTION,
       defaultValue,
-      n -> LinearFunctionOfTimeParser.parse(n.asText(), factory).orElseThrow()
+      n -> LinearFunctionSerialization.parse(n.asText(), factory).orElseThrow()
     );
   }
 
