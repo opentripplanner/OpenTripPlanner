@@ -3,7 +3,7 @@ package org.opentripplanner.api.common;
 import jakarta.validation.constraints.NotNull;
 import java.util.function.Consumer;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -138,7 +138,7 @@ class RequestToPreferencesMapper {
       filter.withTransitGeneralizedCostLimit(mapTransitGeneralizedCostFilterParams(filter));
       setIfNotNull(
         req.nonTransitGeneralizedCostLimitFunction,
-        it -> filter.withNonTransitGeneralizedCostLimit(RequestFunctions.parse(it))
+        it -> filter.withNonTransitGeneralizedCostLimit(CostLinearFunction.of(it))
       );
     });
   }
@@ -150,7 +150,7 @@ class RequestToPreferencesMapper {
     if (req.transitGeneralizedCostLimitFunction != null) {
       result =
         new TransitGeneralizedCostFilterParams(
-          RequestFunctions.parse(req.transitGeneralizedCostLimitFunction),
+          CostLinearFunction.of(req.transitGeneralizedCostLimitFunction),
           result.intervalRelaxFactor()
         );
     }

@@ -17,4 +17,8 @@ import java.io.Serializable;
 public interface CostLinearFunction extends Serializable {
   /** Perform calculation */
   double calculate(double x);
+
+  static CostLinearFunction of(String text) {
+    return RequestFunctions.parse(text);
+  }
 }

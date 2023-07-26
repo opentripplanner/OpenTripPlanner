@@ -11,7 +11,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 class TransitPreferencesTest {
@@ -21,7 +20,7 @@ class TransitPreferencesTest {
     TransitMode.AIRPLANE,
     2.1
   );
-  private static final CostLinearFunction UNPREFERRED_COST = RequestFunctions.parse("300 + 1.15 x");
+  private static final CostLinearFunction UNPREFERRED_COST = CostLinearFunction.of("300 + 1.15 x");
   private static final Duration D15s = Duration.ofSeconds(15);
   private static final Duration D45s = Duration.ofSeconds(45);
   private static final Duration D25m = Duration.ofMinutes(25);

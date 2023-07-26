@@ -23,16 +23,16 @@ class RequestFunctionsTest {
 
   @Test
   public void parse() {
-    assertEquals("f(x) = 2 + 3.0 x", RequestFunctions.parse("2+3x").toString());
-    assertEquals("f(x) = 2 + 3.0 x", RequestFunctions.parse(" 2 + 3 X ").toString());
-    assertEquals("f(x) = 5 + 3.14 x", RequestFunctions.parse("5.123 + 3.1415 x").toString());
+    assertEquals("f(x) = 2 + 3.0 x", CostLinearFunction.of("2+3x").toString());
+    assertEquals("f(x) = 2 + 3.0 x", CostLinearFunction.of(" 2 + 3 X ").toString());
+    assertEquals("f(x) = 5 + 3.14 x", CostLinearFunction.of("5.123 + 3.1415 x").toString());
   }
 
   @Test
   public void parseIllegalValue() {
     assertThrows(
       IllegalArgumentException.class,
-      () -> RequestFunctions.parse("not-a-function"),
+      () -> CostLinearFunction.of("not-a-function"),
       "Unable to parse function: 'not-a-function'"
     );
   }
@@ -40,6 +40,6 @@ class RequestFunctionsTest {
   @Test
   public void parseIllegalNumber() {
     // Must use '.' as decimal separator, not ','
-    assertThrows(IllegalArgumentException.class, () -> RequestFunctions.parse("3,0 + 2.0 x"));
+    assertThrows(IllegalArgumentException.class, () -> CostLinearFunction.of("3,0 + 2.0 x"));
   }
 }

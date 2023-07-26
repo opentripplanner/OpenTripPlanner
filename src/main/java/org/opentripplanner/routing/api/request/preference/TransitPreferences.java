@@ -12,7 +12,6 @@ import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
@@ -284,7 +283,7 @@ public final class TransitPreferences implements Serializable {
     }
 
     public Builder setUnpreferredCostString(String constFunction) {
-      return setUnpreferredCost(RequestFunctions.parse(constFunction));
+      return setUnpreferredCost(CostLinearFunction.of(constFunction));
     }
 
     public Builder setIgnoreRealtimeUpdates(boolean ignoreRealtimeUpdates) {

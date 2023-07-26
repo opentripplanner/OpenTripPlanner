@@ -63,7 +63,7 @@ public class PatternCostCalculatorTest {
     routingRequest.journey().transit().setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
     routingRequest.journey().transit().setUnpreferredAgencies(List.of(UNPREFERRED_AGENCY_ID));
     routingRequest.withPreferences(p ->
-      p.withTransit(tr -> tr.setUnpreferredCost(RequestFunctions.parse("300 + 1.0 x")))
+      p.withTransit(tr -> tr.setUnpreferredCost(CostLinearFunction.of("300 + 1.0 x")))
     );
 
     var data = new TestTransitData();

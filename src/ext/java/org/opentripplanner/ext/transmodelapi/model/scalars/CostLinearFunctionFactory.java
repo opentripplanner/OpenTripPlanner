@@ -32,7 +32,7 @@ public class CostLinearFunctionFactory {
           @Override
           public CostLinearFunction parseValue(Object input) throws CoercingParseValueException {
             try {
-              return RequestFunctions.parse((String) input);
+              return CostLinearFunction.of((String) input);
             } catch (IllegalArgumentException e) {
               throw new CoercingParseValueException(e.getMessage(), e);
             }

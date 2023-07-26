@@ -7,6 +7,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -297,6 +298,6 @@ removed from list.
       """
     );
 
-    return new TransitGeneralizedCostFilterParams(RequestFunctions.parse(node.asText()), 0);
+    return new TransitGeneralizedCostFilterParams(CostLinearFunction.of(node.asText()), 0);
   }
 }
