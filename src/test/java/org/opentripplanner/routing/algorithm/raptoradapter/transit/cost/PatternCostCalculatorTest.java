@@ -23,7 +23,6 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.test.support.TestTableParser;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -36,13 +35,13 @@ public class PatternCostCalculatorTest {
   private static final int TRANSFER_COST_SEC = 2;
   private static final double WAIT_RELUCTANCE_FACTOR = 0.5;
   private static final int TRANSIT_TIME = 1000;
-  private static final double UNPREFERRED_ROUTE_PENALTY = 300.0;
+  private static final int UNPREFERRED_ROUTE_PENALTY = 300;
   private static final FeedScopedId UNPREFERRED_ROUTE_ID = id("999");
   private static final FeedScopedId UNPREFERRED_AGENCY_ID = id("contoso-travels");
   private static final Agency UNPREFERRED_AGENCY = agency(UNPREFERRED_AGENCY_ID.getId());
   private static final FeedScopedId DEFAULT_ROUTE_ID = id("101");
   // Default cost function: a + bx
-  private static final CostLinearFunction unprefCostFn = RequestFunctions.createLinearFunction(
+  private static final CostLinearFunction unprefCostFn = CostLinearFunction.of(
     RaptorCostConverter.toRaptorCost(UNPREFERRED_ROUTE_PENALTY),
     RaptorCostConverter.toRaptorCost(UNPREFERRED_ROUTE_RELUCTANCE)
   );
@@ -233,10 +232,7 @@ public class PatternCostCalculatorTest {
       request.withPreferences(preferences -> {
         preferences.withTransit(transit ->
           transit.setUnpreferredCost(
-            RequestFunctions.createLinearFunction(
-              UNPREFERRED_ROUTE_PENALTY,
-              UNPREFERRED_ROUTE_RELUCTANCE
-            )
+            CostLinearFunction.of(UNPREFERRED_ROUTE_PENALTY, UNPREFERRED_ROUTE_RELUCTANCE)
           )
         );
         preferences.withWalk(w -> w.withBoardCost(BOARD_COST_SEC));

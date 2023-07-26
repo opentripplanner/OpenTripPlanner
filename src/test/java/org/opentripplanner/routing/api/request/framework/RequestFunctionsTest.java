@@ -9,7 +9,7 @@ class RequestFunctionsTest {
 
   @Test
   public void calculate() {
-    CostLinearFunction f = RequestFunctions.createLinearFunction(2.0, 3.0);
+    CostLinearFunction f = CostLinearFunction.of(2, 3.0);
 
     assertEquals(f.calculate(0.0), 2.0, 1e-6);
     assertEquals(f.calculate(1.0), 5.0, 1e-6);
@@ -18,7 +18,7 @@ class RequestFunctionsTest {
 
   @Test
   public void testToString() {
-    assertEquals("2s + 3.0 t", RequestFunctions.createLinearFunction(2.0, 3.0).toString());
+    assertEquals("2s + 3.0 t", CostLinearFunction.of(2, 3.0).toString());
   }
 
   @Test

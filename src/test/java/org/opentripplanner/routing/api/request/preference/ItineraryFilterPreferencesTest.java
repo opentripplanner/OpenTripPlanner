@@ -7,7 +7,6 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 class ItineraryFilterPreferencesTest {
 
@@ -19,13 +18,13 @@ class ItineraryFilterPreferencesTest {
   private static final double GROUP_SIMILARITY_KEEP_ONE = 0.8;
   private static final double GROUP_SIMILARITY_KEEP_THREE = 0.5;
   private static final double MIN_BIKE_PARKING_DISTANCE = 2000.0;
-  private static final CostLinearFunction NON_TRANSIT_GENERALIZED_COST_LIMIT = RequestFunctions.createLinearFunction(
-    3.5,
+  private static final CostLinearFunction NON_TRANSIT_GENERALIZED_COST_LIMIT = CostLinearFunction.of(
+    4,
     5.0
   );
   private static final double PARK_AND_RIDE_DURATION_RATIO = 0.44;
   private static final TransitGeneralizedCostFilterParams TRANSIT_GENERALIZED_COST_LIMIT = new TransitGeneralizedCostFilterParams(
-    RequestFunctions.createLinearFunction(3.5, 5.0),
+    CostLinearFunction.of(4, 5.0),
     3.0
   );
 
