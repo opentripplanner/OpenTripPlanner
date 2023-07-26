@@ -53,7 +53,7 @@ public class PatternCostCalculatorTest {
   @Test
   @DisplayName("cost mapper should create penalty map")
   public void testMcCostParameterMapping() {
-    var unpreferredCostFunctionOtpDomain = CostLinearFunction.of(Duration.ofMinutes(5), 1.1);
+    var unpreferredCostFunctionOtpDomain = CostLinearFunction.of("5m + 1.1 t");
     RouteRequest routingRequest = new RouteRequest();
 
     routingRequest.journey().transit().setUnpreferredRoutes(List.of(UNPREFERRED_ROUTE_ID));
@@ -87,8 +87,10 @@ public class PatternCostCalculatorTest {
     assertFalse(unpreferredPatterns.get(defaultPattern.patternIndex()));
 
     // test creation of linear cost function, the cost is in Raptor centi-seconds
-    double expected = unpreferredCostFunctionOtpDomain.calculate(TRANSIT_TIME);
-    double actual = costParams.unnpreferredCost().calculate(TRANSIT_TIME);
+    double expected = RaptorCostConverter.toRaptorCost(
+      unpreferredCostFunctionOtpDomain.calculate(TRANSIT_TIME)
+    );
+    double actual = costParams.unnpreferredCost().calculateRaptorCost(TRANSIT_TIME);
     assertEquals(expected, actual);
   }
 

@@ -1,13 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.api;
 
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator;
 import org.opentripplanner.transit.model.network.Route;
 
 public interface DefaultTripPattern extends RaptorTripPattern {
   /**
-   * This is not used by the default calculator, but by the {@link PatternCostCalculator} to
-   * give unpreferred routes or agencies a generalized-cost penalty.
+   * This is used to calculate the unpreferred cost for routes or agencies.
    */
   Route route();
 }

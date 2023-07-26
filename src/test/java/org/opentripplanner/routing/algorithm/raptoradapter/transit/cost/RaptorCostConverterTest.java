@@ -16,6 +16,14 @@ public class RaptorCostConverterTest {
   }
 
   @Test
+  public void toOtpDomainFactor() {
+    assertEquals(-1, RaptorCostConverter.toOtpDomainFactor(-1));
+    assertEquals(0.49, RaptorCostConverter.toOtpDomainFactor(49));
+    assertEquals(0.5, RaptorCostConverter.toOtpDomainFactor(50));
+    assertEquals(1.33, RaptorCostConverter.toOtpDomainFactor(133));
+  }
+
+  @Test
   public void toRaptorCost() {
     assertEquals(-1, RaptorCostConverter.toOtpDomainCost(-1));
     assertEquals(0, RaptorCostConverter.toRaptorCost(0));

@@ -5,7 +5,6 @@ import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
-import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 
 import java.time.Duration;
 import java.util.BitSet;
@@ -35,9 +34,9 @@ public class D03_UnpreferredRouteTest implements RaptorTestConstants {
     "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $%d]";
   private static final FeedScopedId ROUTE_ID_1 = TransitModelForTest.id("1");
   private static final FeedScopedId ROUTE_ID_2 = TransitModelForTest.id("2");
-  private static final CostLinearFunction UNPREFER_COST = CostLinearFunction.of(
+  private static final CostLinearFunction UNPREFERRED_COST = CostLinearFunction.of(
     Duration.ofSeconds(30000),
-    DEFAULT_ROUTE_RELUCTANCE
+    1.0
   );
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -99,7 +98,7 @@ public class D03_UnpreferredRouteTest implements RaptorTestConstants {
       }
     }
     data.mcCostParamsBuilder().unpreferredPatterns(patterns);
-    data.mcCostParamsBuilder().unpreferredCost(UNPREFER_COST);
+    data.mcCostParamsBuilder().unpreferredCost(UNPREFERRED_COST);
   }
 
   private static String expected(String route, int cost) {

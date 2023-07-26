@@ -17,13 +17,9 @@ public class GeneralizedCostParametersBuilder {
   private boolean wheelchairEnabled;
   private AccessibilityPreferences wheelchairAccessibility;
   private BitSet unpreferredPatterns;
-  private CostLinearFunction unpreferredCost;
+  private RaptorCostLinearFunction unpreferredCost;
 
-  public GeneralizedCostParametersBuilder() {
-    this(GeneralizedCostParameters.DEFAULTS);
-  }
-
-  private GeneralizedCostParametersBuilder(GeneralizedCostParameters other) {
+  GeneralizedCostParametersBuilder(GeneralizedCostParameters other) {
     this.boardCost = other.boardCost();
     this.transferCost = other.transferCost();
     this.transitReluctanceFactors = other.transitReluctanceFactors();
@@ -31,6 +27,7 @@ public class GeneralizedCostParametersBuilder {
     this.wheelchairEnabled = other.wheelchairEnabled();
     this.wheelchairAccessibility = other.wheelchairAccessibility();
     this.unpreferredPatterns = other.unpreferredPatterns();
+    this.unpreferredCost = other.unnpreferredCost();
   }
 
   public int boardCost() {
@@ -100,12 +97,12 @@ public class GeneralizedCostParametersBuilder {
     return this;
   }
 
-  public CostLinearFunction unpreferredCost() {
+  public RaptorCostLinearFunction unpreferredCost() {
     return unpreferredCost;
   }
 
   public GeneralizedCostParametersBuilder unpreferredCost(CostLinearFunction unpreferredCost) {
-    this.unpreferredCost = unpreferredCost;
+    this.unpreferredCost = RaptorCostLinearFunction.of(unpreferredCost);
     return this;
   }
 
