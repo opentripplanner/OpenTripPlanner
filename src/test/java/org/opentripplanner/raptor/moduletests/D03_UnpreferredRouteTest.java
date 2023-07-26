@@ -18,7 +18,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -35,7 +35,7 @@ public class D03_UnpreferredRouteTest implements RaptorTestConstants {
     "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $%d]";
   private static final FeedScopedId ROUTE_ID_1 = TransitModelForTest.id("1");
   private static final FeedScopedId ROUTE_ID_2 = TransitModelForTest.id("2");
-  private static final DoubleAlgorithmFunction UNPREFER_COST = RequestFunctions.createLinearFunction(
+  private static final CostLinearFunction UNPREFER_COST = RequestFunctions.createLinearFunction(
     30000,
     DEFAULT_ROUTE_RELUCTANCE
   );

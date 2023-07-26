@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.LocalDateUtils;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.LinearFunctionOfTimeParser;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -675,7 +675,7 @@ public class ParameterBuilder {
     };
   }
 
-  private DoubleAlgorithmFunction parseLinearFunction(String text) {
+  private CostLinearFunction parseLinearFunction(String text) {
     try {
       return RequestFunctions.parse(text);
     } catch (IllegalArgumentException ignore) {

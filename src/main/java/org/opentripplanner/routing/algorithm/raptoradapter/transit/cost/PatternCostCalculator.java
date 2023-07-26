@@ -5,7 +5,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 public class PatternCostCalculator<T extends DefaultTripSchedule>
   implements RaptorCostCalculator<T> {
@@ -15,12 +15,12 @@ public class PatternCostCalculator<T extends DefaultTripSchedule>
 
   private final RaptorCostCalculator<T> delegate;
   private final BitSet unpreferredPatterns;
-  private final DoubleAlgorithmFunction unpreferredCost;
+  private final CostLinearFunction unpreferredCost;
 
   public PatternCostCalculator(
     @Nonnull RaptorCostCalculator<T> delegate,
     @Nonnull BitSet unpreferredPatterns,
-    @Nonnull DoubleAlgorithmFunction unpreferredCost
+    @Nonnull CostLinearFunction unpreferredCost
   ) {
     this.unpreferredPatterns = unpreferredPatterns;
     this.delegate = delegate;

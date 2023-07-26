@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
 /**
@@ -20,9 +20,9 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
  */
 public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
 
-  private final DoubleAlgorithmFunction costLimitFunction;
+  private final CostLinearFunction costLimitFunction;
 
-  public NonTransitGeneralizedCostFilter(DoubleAlgorithmFunction costLimitFunction) {
+  public NonTransitGeneralizedCostFilter(CostLinearFunction costLimitFunction) {
     this.costLimitFunction = costLimitFunction;
   }
 

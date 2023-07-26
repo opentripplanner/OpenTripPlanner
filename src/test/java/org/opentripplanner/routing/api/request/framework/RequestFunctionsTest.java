@@ -9,7 +9,7 @@ class RequestFunctionsTest {
 
   @Test
   public void calculate() {
-    DoubleAlgorithmFunction f = RequestFunctions.createLinearFunction(2.0, 3.0);
+    CostLinearFunction f = RequestFunctions.createLinearFunction(2.0, 3.0);
 
     assertEquals(f.calculate(0.0), 2.0, 1e-6);
     assertEquals(f.calculate(1.0), 5.0, 1e-6);

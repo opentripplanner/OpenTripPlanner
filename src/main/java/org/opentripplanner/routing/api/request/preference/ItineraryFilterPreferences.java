@@ -5,7 +5,7 @@ import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 /**
@@ -26,7 +26,7 @@ public final class ItineraryFilterPreferences {
   private final double groupSimilarityKeepOne;
   private final double groupSimilarityKeepThree;
   private final double minBikeParkingDistance;
-  private final DoubleAlgorithmFunction nonTransitGeneralizedCostLimit;
+  private final CostLinearFunction nonTransitGeneralizedCostLimit;
   private final double parkAndRideDurationRatio;
   private final boolean removeItinerariesWithSameRoutesAndStops;
   private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
@@ -105,7 +105,7 @@ public final class ItineraryFilterPreferences {
     return minBikeParkingDistance;
   }
 
-  public DoubleAlgorithmFunction nonTransitGeneralizedCostLimit() {
+  public CostLinearFunction nonTransitGeneralizedCostLimit() {
     return nonTransitGeneralizedCostLimit;
   }
 
@@ -220,7 +220,7 @@ public final class ItineraryFilterPreferences {
     private double groupSimilarityKeepOne;
     private double groupSimilarityKeepThree;
     public double minBikeParkingDistance;
-    private DoubleAlgorithmFunction nonTransitGeneralizedCostLimit;
+    private CostLinearFunction nonTransitGeneralizedCostLimit;
     private double parkAndRideDurationRatio;
     private boolean removeItinerariesWithSameRoutesAndStops;
     private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
@@ -274,7 +274,7 @@ public final class ItineraryFilterPreferences {
     }
 
     public Builder withNonTransitGeneralizedCostLimit(
-      DoubleAlgorithmFunction nonTransitGeneralizedCostLimit
+      CostLinearFunction nonTransitGeneralizedCostLimit
     ) {
       this.nonTransitGeneralizedCostLimit = nonTransitGeneralizedCostLimit;
       return this;

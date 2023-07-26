@@ -14,7 +14,7 @@ import java.io.Serializable;
  * objects of this type.
  */
 @FunctionalInterface
-public interface DoubleAlgorithmFunction extends Serializable {
+public interface CostLinearFunction extends Serializable {
   /** Perform calculation */
   double calculate(double x);
 }

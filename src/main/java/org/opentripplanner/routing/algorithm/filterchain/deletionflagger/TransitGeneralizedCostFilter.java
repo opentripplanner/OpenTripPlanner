@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
 /**
@@ -19,7 +19,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
  */
 public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
 
-  private final DoubleAlgorithmFunction costLimitFunction;
+  private final CostLinearFunction costLimitFunction;
 
   private final double intervalRelaxFactor;
 

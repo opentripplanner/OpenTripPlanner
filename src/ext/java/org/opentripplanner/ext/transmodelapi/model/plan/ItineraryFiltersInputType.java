@@ -11,7 +11,7 @@ import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
@@ -182,7 +182,7 @@ public class ItineraryFiltersInputType {
       (Map<String, ?> v) ->
         builder.withTransitGeneralizedCostLimit(
           new TransitGeneralizedCostFilterParams(
-            (DoubleAlgorithmFunction) v.get("costLimitFunction"),
+            (CostLinearFunction) v.get("costLimitFunction"),
             (double) v.get("intervalRelaxFactor")
           )
         )

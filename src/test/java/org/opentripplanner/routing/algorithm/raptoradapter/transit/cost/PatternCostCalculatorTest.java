@@ -22,7 +22,7 @@ import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.GeneralizedCostParametersMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.test.support.TestTableParser;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -42,7 +42,7 @@ public class PatternCostCalculatorTest {
   private static final Agency UNPREFERRED_AGENCY = agency(UNPREFERRED_AGENCY_ID.getId());
   private static final FeedScopedId DEFAULT_ROUTE_ID = id("101");
   // Default cost function: a + bx
-  private static final DoubleAlgorithmFunction unprefCostFn = RequestFunctions.createLinearFunction(
+  private static final CostLinearFunction unprefCostFn = RequestFunctions.createLinearFunction(
     RaptorCostConverter.toRaptorCost(UNPREFERRED_ROUTE_PENALTY),
     RaptorCostConverter.toRaptorCost(UNPREFERRED_ROUTE_RELUCTANCE)
   );

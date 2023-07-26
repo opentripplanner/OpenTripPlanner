@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 
 /**
@@ -17,7 +17,7 @@ public class GeneralizedCostParametersBuilder {
   private boolean wheelchairEnabled;
   private AccessibilityPreferences wheelchairAccessibility;
   private BitSet unpreferredPatterns;
-  private DoubleAlgorithmFunction unpreferredCost;
+  private CostLinearFunction unpreferredCost;
 
   public GeneralizedCostParametersBuilder() {
     this(GeneralizedCostParameters.DEFAULTS);
@@ -100,11 +100,11 @@ public class GeneralizedCostParametersBuilder {
     return this;
   }
 
-  public DoubleAlgorithmFunction unpreferredCost() {
+  public CostLinearFunction unpreferredCost() {
     return unpreferredCost;
   }
 
-  public GeneralizedCostParametersBuilder unpreferredCost(DoubleAlgorithmFunction unpreferredCost) {
+  public GeneralizedCostParametersBuilder unpreferredCost(CostLinearFunction unpreferredCost) {
     this.unpreferredCost = unpreferredCost;
     return this;
   }

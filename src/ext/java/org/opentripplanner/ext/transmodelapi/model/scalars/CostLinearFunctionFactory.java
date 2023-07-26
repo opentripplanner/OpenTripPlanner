@@ -5,7 +5,7 @@ import graphql.schema.Coercing;
 import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 public class CostLinearFunctionFactory {
@@ -23,15 +23,14 @@ public class CostLinearFunctionFactory {
       .name("DoubleFunction")
       .description(DOCUMENTATION)
       .coercing(
-        new Coercing<DoubleAlgorithmFunction, String>() {
+        new Coercing<CostLinearFunction, String>() {
           @Override
           public String serialize(Object dataFetcherResult) {
             return RequestFunctions.serialize(dataFetcherResult);
           }
 
           @Override
-          public DoubleAlgorithmFunction parseValue(Object input)
-            throws CoercingParseValueException {
+          public CostLinearFunction parseValue(Object input) throws CoercingParseValueException {
             try {
               return RequestFunctions.parse((String) input);
             } catch (IllegalArgumentException e) {
@@ -40,7 +39,7 @@ public class CostLinearFunctionFactory {
           }
 
           @Override
-          public DoubleAlgorithmFunction parseLiteral(Object input)
+          public CostLinearFunction parseLiteral(Object input)
             throws CoercingParseLiteralException {
             if (input instanceof StringValue) {
               return parseValue(((StringValue) input).getValue());

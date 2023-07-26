@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -28,7 +28,7 @@ public final class TransitPreferences implements Serializable {
   private final DurationForEnum<TransitMode> alightSlack;
   private final Map<TransitMode, Double> reluctanceForMode;
   private final Cost otherThanPreferredRoutesPenalty;
-  private final DoubleAlgorithmFunction unpreferredCost;
+  private final CostLinearFunction unpreferredCost;
   private final boolean ignoreRealtimeUpdates;
   private final boolean includePlannedCancellations;
   private final boolean includeRealtimeCancellations;
@@ -123,7 +123,7 @@ public final class TransitPreferences implements Serializable {
     return otherThanPreferredRoutesPenalty.toSeconds();
   }
 
-  public DoubleAlgorithmFunction unpreferredCost() {
+  public CostLinearFunction unpreferredCost() {
     return unpreferredCost;
   }
 
@@ -226,7 +226,7 @@ public final class TransitPreferences implements Serializable {
     private DurationForEnum<TransitMode> alightSlack;
     private Map<TransitMode, Double> reluctanceForMode;
     private Cost otherThanPreferredRoutesPenalty;
-    private DoubleAlgorithmFunction unpreferredCost;
+    private CostLinearFunction unpreferredCost;
     private boolean ignoreRealtimeUpdates;
     private boolean includePlannedCancellations;
     private boolean includeRealtimeCancellations;
@@ -278,7 +278,7 @@ public final class TransitPreferences implements Serializable {
       return this;
     }
 
-    public Builder setUnpreferredCost(DoubleAlgorithmFunction unpreferredCost) {
+    public Builder setUnpreferredCost(CostLinearFunction unpreferredCost) {
       this.unpreferredCost = unpreferredCost;
       return this;
     }
