@@ -323,7 +323,10 @@ public class ItineraryListFilterChainBuilder {
     if (transitGeneralizedCostFilterParams != null) {
       filters.add(
         new DeletionFlaggingFilter(
-          new TransitGeneralizedCostFilter(transitGeneralizedCostFilterParams)
+          new TransitGeneralizedCostFilter(
+            transitGeneralizedCostFilterParams.costLimitFunction(),
+            transitGeneralizedCostFilterParams.intervalRelaxFactor()
+          )
         )
       );
     }

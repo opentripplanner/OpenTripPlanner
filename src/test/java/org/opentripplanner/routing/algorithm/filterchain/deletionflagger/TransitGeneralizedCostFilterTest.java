@@ -8,7 +8,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
@@ -18,7 +17,8 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     // Create a filter with f(x) = 600 + 2x, without any penalty for waiting at the beginning or end.
     // Remove itineraries with a cost equivalent of 10 minutes and twice the min itinerary cost.
     final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
-      new TransitGeneralizedCostFilterParams(RequestFunctions.createLinearFunction(600, 2.0), 0.0)
+      RequestFunctions.createLinearFunction(600, 2.0),
+      0.0
     );
 
     // Walk all the way, not touched by the filter even if cost(7200) is higher than transit limit.
@@ -48,7 +48,8 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     // Remove itineraries with a cost equivalent of twice the itinerary cost plus half of the
     // waiting time.
     final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
-      new TransitGeneralizedCostFilterParams(RequestFunctions.createLinearFunction(0, 2.0), 0.5)
+      RequestFunctions.createLinearFunction(0, 2.0),
+      0.5
     );
 
     // Walk all the way, not touched by the filter even if cost(7200) is higher than transit limit.
@@ -78,7 +79,8 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     // Remove itineraries with a cost equivalent of twice the itinerary cost plus half of the
     // waiting time.
     final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
-      new TransitGeneralizedCostFilterParams(RequestFunctions.createLinearFunction(0, 2.0), 0.5)
+      RequestFunctions.createLinearFunction(0, 2.0),
+      0.5
     );
 
     // Walk all the way, not touched by the filter even if cost(7200) is higher than transit limit.

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.List;
-import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
@@ -16,7 +16,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
  * can take you to the destination much quicker.
  * <p>
  *
- * @see ItineraryFilterPreferences#nonTransitGeneralizedCostLimit
+ * @see ItineraryFilterPreferences#nonTransitGeneralizedCostLimit()
  */
 public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
 
@@ -34,16 +34,16 @@ public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     // ALL itineraries are considered here. Both transit and non-transit
-    OptionalDouble minGeneralizedCost = itineraries
+    OptionalInt minGeneralizedCost = itineraries
       .stream()
-      .mapToDouble(Itinerary::getGeneralizedCost)
+      .mapToInt(Itinerary::getGeneralizedCost)
       .min();
 
     if (minGeneralizedCost.isEmpty()) {
       return List.of();
     }
 
-    final double maxLimit = costLimitFunction.calculate(minGeneralizedCost.getAsDouble());
+    var maxLimit = costLimitFunction.calculate(minGeneralizedCost.getAsInt());
 
     return itineraries
       .stream()
