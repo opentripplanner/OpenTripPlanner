@@ -89,7 +89,7 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassthroughRequest(
+        mc.withTransitPassThroughRequest(
           new RaptorTransitPassThroughRequest(
             // Include desired pass-through point in the request
             BitSetPassThroughPoints.create(List.of(new int[] { STOP_D }))
@@ -127,7 +127,7 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassthroughRequest(
+        mc.withTransitPassThroughRequest(
           new RaptorTransitPassThroughRequest(
             // Include desired pass-through point in the request
             BitSetPassThroughPoints.create(List.of(new int[] { STOP_A }))
@@ -166,7 +166,7 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassthroughRequest(
+        mc.withTransitPassThroughRequest(
           // Include desired pass-through point in the request
           new RaptorTransitPassThroughRequest(
             BitSetPassThroughPoints.create(List.of(new int[] { STOP_C }))
@@ -205,7 +205,7 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassthroughRequest(
+        mc.withTransitPassThroughRequest(
           // Include desired pass-through point in the request
           new RaptorTransitPassThroughRequest(
             BitSetPassThroughPoints.create(List.of(new int[] { STOP_B }, new int[] { STOP_D }))
@@ -242,7 +242,7 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassthroughRequest(
+        mc.withTransitPassThroughRequest(
           // Include desired pass-through point in the request
           new RaptorTransitPassThroughRequest(
             BitSetPassThroughPoints.create(List.of(new int[] { STOP_B }, new int[] { STOP_C }))
@@ -278,7 +278,7 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassthroughRequest(
+        mc.withTransitPassThroughRequest(
           // Include desired pass-through point in the request
           new RaptorTransitPassThroughRequest(
             BitSetPassThroughPoints.create(
