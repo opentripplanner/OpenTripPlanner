@@ -90,8 +90,8 @@ public class PatternCostCalculatorTest {
     assertFalse(unpreferredPatterns.get(defaultPattern.patternIndex()));
 
     // test creation of linear cost function
-    double expected = 300 + 1.0 * TRANSIT_TIME;
-    double actual = costParams.unnpreferredCost().calculate(TRANSIT_TIME);
+    int expected = 300 + TRANSIT_TIME;
+    int actual = costParams.unnpreferredCost().calculate(TRANSIT_TIME);
 
     assertEquals(expected, actual);
   }

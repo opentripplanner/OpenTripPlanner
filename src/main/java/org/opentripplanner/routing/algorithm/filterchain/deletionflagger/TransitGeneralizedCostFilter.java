@@ -48,9 +48,7 @@ public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
   }
 
   private int calculateLimit(Itinerary it, Itinerary t) {
-    return (
-      IntUtils.round(costLimitFunction.calculate(t.getGeneralizedCost())) + getWaitTimeCost(t, it)
-    );
+    return costLimitFunction.calculate(t.getGeneralizedCost()) + getWaitTimeCost(t, it);
   }
 
   private int getWaitTimeCost(Itinerary a, Itinerary b) {

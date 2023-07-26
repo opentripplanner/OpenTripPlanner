@@ -59,10 +59,11 @@ public class PatternCostCalculator<T extends DefaultTripSchedule>
     T trip,
     int toStop
   ) {
-    int unpreferCost = 0;
+    int unpreferredCostValue = 0;
     if (unpreferredPatterns.get(trip.pattern().patternIndex())) {
       // calculate cost with linear function: fixed + reluctance * transitTime
-      unpreferCost += RaptorCostConverter.toRaptorCost(unpreferredCost.calculate(transitTime));
+      unpreferredCostValue +=
+        RaptorCostConverter.toRaptorCost(unpreferredCost.calculate(transitTime));
     }
     int defaultCost = delegate.transitArrivalCost(
       boardCost,
@@ -71,7 +72,7 @@ public class PatternCostCalculator<T extends DefaultTripSchedule>
       trip,
       toStop
     );
-    return defaultCost + unpreferCost;
+    return defaultCost + unpreferredCostValue;
   }
 
   @Override

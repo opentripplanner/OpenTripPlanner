@@ -14,18 +14,15 @@ import org.opentripplanner.routing.api.request.RouteRequest;
  * linear function for now, but it should be easy to extend with other type of functions if needed.
  * Use the {@link #parse(String)} method to create new functions from a string.
  * <p>
- * The following "kind" of functions are supported:
- * <ul>
- * <li>Linear function - ({@link #createLinearFunction(double, double)})
- * </ul>
  */
 public class RequestFunctions {
 
   private static final String SEP = "\\s*";
+  private static final String INT = "([\\d]+)";
   private static final String NUM = "([\\d.,]+)";
   public static final String PLUS = Pattern.quote("+");
   private static final Pattern LINEAR_FUNCTION_PATTERN = Pattern.compile(
-    NUM + SEP + PLUS + SEP + NUM + SEP + "[Xx]"
+    INT + SEP + PLUS + SEP + NUM + SEP + "[Xx]"
   );
 
   /** This is private to prevent this utility class from instantiation. */
@@ -51,7 +48,7 @@ public class RequestFunctions {
     Matcher m = LINEAR_FUNCTION_PATTERN.matcher(text);
 
     if (m.find()) {
-      return createLinearFunction(Double.parseDouble(m.group(1)), Double.parseDouble(m.group(2)));
+      return createLinearFunction(Integer.parseInt(m.group(1)), Double.parseDouble(m.group(2)));
     }
 
     // No function matched
@@ -63,7 +60,7 @@ public class RequestFunctions {
    * constant 'a' and a coefficient 'b' and the use those in the computation of a limit. The input
    * value 'x' is normally the min/max value across the sample set.
    */
-  public static CostLinearFunction createLinearFunction(double constant, double coefficient) {
+  public static CostLinearFunction createLinearFunction(int constant, double coefficient) {
     return new LinearFunction(constant, coefficient);
   }
 
@@ -82,19 +79,19 @@ public class RequestFunctions {
     // This class is package local to be unit testable.
 
     /** The constant part of the function. */
-    private final double a;
+    private final int a;
 
     /** The coefficient part of the function. */
     private final double b;
 
-    public LinearFunction(double constant, double coefficient) {
-      this.a = DoubleUtils.roundToZeroDecimals(constant);
+    public LinearFunction(int constant, double coefficient) {
+      this.a = constant;
       this.b = DoubleUtils.roundTo2Decimals(coefficient);
     }
 
     @Override
-    public double calculate(double x) {
-      return a + b * x;
+    public int calculate(int x) {
+      return a + IntUtils.round(b * x);
     }
 
     @Override

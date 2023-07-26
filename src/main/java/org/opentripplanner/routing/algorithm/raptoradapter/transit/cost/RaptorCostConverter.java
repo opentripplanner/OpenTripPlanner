@@ -42,7 +42,7 @@ public final class RaptorCostConverter {
    * Convert OTP domain model cost to Raptor internal cost.
    */
   public static int toRaptorCost(double domainCost) {
-    return (int) (domainCost * PRECISION + 0.5d);
+    return (int) Math.round(domainCost * PRECISION);
   }
 
   /**

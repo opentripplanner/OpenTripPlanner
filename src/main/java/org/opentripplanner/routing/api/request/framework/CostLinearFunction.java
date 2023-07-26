@@ -17,14 +17,14 @@ import java.time.Duration;
 @FunctionalInterface
 public interface CostLinearFunction extends Serializable {
   /** Perform calculation */
-  double calculate(double x);
+  int calculate(int timeOrCostInSeconds);
 
   static CostLinearFunction of(int constantSeconds, double coefficient) {
     return RequestFunctions.createLinearFunction(constantSeconds, coefficient);
   }
 
   static CostLinearFunction of(Duration constant, double coefficient) {
-    return RequestFunctions.createLinearFunction(constant.toSeconds(), coefficient);
+    return RequestFunctions.createLinearFunction((int) constant.toSeconds(), coefficient);
   }
 
   static CostLinearFunction of(String text) {
