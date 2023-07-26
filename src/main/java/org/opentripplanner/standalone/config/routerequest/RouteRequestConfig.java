@@ -330,7 +330,7 @@ ferries, where the check-in process needs to be done in good time before ride.
           .description(
             """
             Function should return number of seconds that we are willing to wait for preferred route
-            or for an unpreferred agency's departure. For example, 600 + 2.0 x
+            or for an unpreferred agency's departure. For example: `5m + 2.0 t`
             """
           )
           .asLinearFunctionOfTime(dft.unpreferredCost(), CostLinearFunction::of)
@@ -517,7 +517,6 @@ ferries, where the check-in process needs to be done in good time before ride.
           );
       })
       .withAccessEgressPenalty(
-        // The default value is NO-PENALTY and is not configurable
         c
           .of("accessEgressPenalty")
           .since(V2_4)
@@ -530,19 +529,24 @@ ferries, where the check-in process needs to be done in good time before ride.
             the access legs used. In other cases where the access(CAR) is faster than transit the
             performance will be better.
             
+            The default is no penalty, if not configured.
+            
             Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
             
+            
             **Time penalty**
-            """ +
-            TimePenalty.DOC +
-            """  
+            
+            {timePenaltyDoc} 
             
             **Cost factor**
             
             The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
             time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
             extra cost, while 1.0 will add the same amount to both time and cost.
-            """
+            """.replace(
+                "{timePenaltyDoc}",
+                TimePenalty.doc()
+              )
           )
           .asEnumMap(StreetMode.class, TimeAndCostPenaltyMapper::map)
       )

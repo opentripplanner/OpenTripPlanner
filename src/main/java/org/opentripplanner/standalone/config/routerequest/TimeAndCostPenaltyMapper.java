@@ -12,7 +12,7 @@ public class TimeAndCostPenaltyMapper {
       c
         .of("timePenalty")
         .summary("Penalty added to the time of a leg.")
-        .description(TimePenalty.DOC)
+        .description(TimePenalty.doc())
         .since(OtpVersion.V2_4)
         .asString(TimeAndCostPenalty.ZERO.timePenalty().toString()),
       c

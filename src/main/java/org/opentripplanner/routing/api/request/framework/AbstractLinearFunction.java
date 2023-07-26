@@ -13,7 +13,9 @@ import org.opentripplanner.framework.model.Units;
  * <p>
  * The class is a thread-safe, immutable value-object.
  */
-abstract sealed class AbstractLinearFunction<T> implements Serializable permits CostLinearFunction {
+abstract sealed class AbstractLinearFunction<T>
+  implements Serializable
+  permits CostLinearFunction, TimePenalty {
 
   protected static String doc(String typeName) {
     return """

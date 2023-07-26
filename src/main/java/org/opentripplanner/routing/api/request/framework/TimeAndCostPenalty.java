@@ -30,9 +30,16 @@ public record TimeAndCostPenalty(TimePenalty timePenalty, double costFactor) {
   /**
    * Calculate the time and the cost penalty.
    */
+  public TimeAndCost calculate(Duration time) {
+    Duration timePenaltyValue = this.timePenalty.calculate(time);
+    return new TimeAndCost(
+      timePenaltyValue,
+      Cost.costOfSeconds(timePenaltyValue.toSeconds() * costFactor)
+    );
+  }
+
   public TimeAndCost calculate(int timeInSeconds) {
-    Duration dt = timePenalty.calculate(timeInSeconds);
-    return new TimeAndCost(dt, Cost.costOfSeconds(dt.toSeconds() * costFactor));
+    return calculate(Duration.ofSeconds(timeInSeconds));
   }
 
   /**

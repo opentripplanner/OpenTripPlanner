@@ -355,7 +355,7 @@ alight-slack."
 A cost function used to calculate penalty for an unpreferred route.
 
 Function should return number of seconds that we are willing to wait for preferred route
-or for an unpreferred agency's departure. For example, 600 + 2.0 x
+or for an unpreferred agency's departure. For example: `5m + 2.0 t`
 
 
 <h3 id="rd_unpreferredVehicleParkingTagCost">unpreferredVehicleParkingTagCost</h3>
@@ -404,26 +404,27 @@ since the search-window is increased with the same amount as the maximum penalty
 the access legs used. In other cases where the access(CAR) is faster than transit the
 performance will be better.
 
+The default is no penalty, if not configured.
+
 Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 
-**Time penalty**
-The time penalty is a linear function applied to the actual-time/duration of the leg. The time
-penalty consist of a `constant` and a `coefficient`. The penalty is not added to the actual
-time, like a slack. Instead, the penalty is *invisible* in the returned itinerary, but it is
-applied during routing.
 
-The penalty is a function of time(duration):
+**Time penalty**
+
+A linear function used to calculate time-penalty from a time/duration.
+
+Given a function of time:
 ```
 f(t) = a + b * t
 ```
-where `a` is the constant time part, `b` is the time-coefficient. `f(t)` is the function to
-calculate the penalty-time. The penalty-time is added to the actual-time during routing. If
-`a=0s` and `b=0.0`, then the penalty is `0`(zero).
+then `a` is the constant time part, `b` is the time-coefficient. If `a=0s` and `b=0.0`,
+then the cost is always `0`(zero).
 
 Examples: `0s + 2.5t`, `10m + 0t` and `1h5m59s + 9.9t`
 
-The `constant` must be 0 or a positive duration.
-The `coefficient` must be in range `[0.0, 10.0]`.
+The `constant` must be 0 or a positive duration/cost.
+The `coefficient` must be in range: [0.0, 100.0]
+
 
 **Cost factor**
 
