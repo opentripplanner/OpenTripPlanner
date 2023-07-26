@@ -6,7 +6,6 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 
 public class CostLinearFunctionFactory {
 
@@ -26,7 +25,7 @@ public class CostLinearFunctionFactory {
         new Coercing<CostLinearFunction, String>() {
           @Override
           public String serialize(Object dataFetcherResult) {
-            return RequestFunctions.serialize(dataFetcherResult);
+            return ((CostLinearFunction) dataFetcherResult).serialize();
           }
 
           @Override

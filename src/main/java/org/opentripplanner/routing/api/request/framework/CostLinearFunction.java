@@ -21,4 +21,8 @@ public interface CostLinearFunction extends Serializable {
   static CostLinearFunction of(String text) {
     return RequestFunctions.parse(text);
   }
+
+  default String serialize() {
+    return RequestFunctions.serialize(this);
+  }
 }

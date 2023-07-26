@@ -68,7 +68,7 @@ public class RequestFunctions {
     return new LinearFunction(constant, coefficient);
   }
 
-  public static String serialize(Object function) {
+  public static String serialize(CostLinearFunction function) {
     if (function == null) {
       return null;
     }
@@ -103,7 +103,8 @@ public class RequestFunctions {
       return "f(x) = %s + %s x".formatted(formatZeroDecimal(a), formatTwoDecimals(b));
     }
 
-    String serialize() {
+    @Override
+    public String serialize() {
       return a + " + " + b + " x";
     }
   }

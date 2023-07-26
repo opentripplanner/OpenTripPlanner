@@ -120,9 +120,7 @@ public class RouteRequestMapper {
         callWith.argument(
           "unpreferred.useUnpreferredRoutesPenalty",
           (Integer v) ->
-            tr.setUnpreferredCostString(
-              RequestFunctions.serialize(RequestFunctions.createLinearFunction(v, 0.0))
-            )
+            tr.setUnpreferredCostString(RequestFunctions.createLinearFunction(v, 0.0).serialize())
         );
         callWith.argument("unpreferred.unpreferredCost", tr::setUnpreferredCostString);
         callWith.argument("ignoreRealtimeUpdates", tr::setIgnoreRealtimeUpdates);
