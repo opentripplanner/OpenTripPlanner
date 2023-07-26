@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.time.Duration;
 import java.util.List;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -31,19 +32,30 @@ class AccessEgressPenaltyDecoratorTest {
     2.0
   );
 
-  private static final DefaultAccessEgress WALK_W_PENALTY = WALK.withPenalty(
+  // We use the penalty to calculate the expected value, this is not pure, but the
+  // TimeAndCostPenalty is unit-tested elsewhere.
+  private static final DefaultAccessEgress EXP_WALK_W_PENALTY = WALK.withPenalty(
     PENALTY.calculate(DURATION_WALKING)
   );
-  private static final DefaultAccessEgress CAR_RENTAL_W_PENALTY = CAR_RENTAL.withPenalty(
+  private static final DefaultAccessEgress EXP_CAR_RENTAL_W_PENALTY = CAR_RENTAL.withPenalty(
     PENALTY.calculate(DURATION_CAR_RENTAL)
   );
+
+  @BeforeAll
+  static void verifyTestSetup() {
+    assertEquals("Walk 15m38s $238035 w/penalty(13m23s $1606) ~ 1", EXP_WALK_W_PENALTY.toString());
+    assertEquals(
+      "Walk 11m53s $237886 w/penalty(11m8s $1336) ~ 1",
+      EXP_CAR_RENTAL_W_PENALTY.toString()
+    );
+  }
 
   private static List<Arguments> decorateCarRentalTestCase() {
     return List.of(
       Arguments.of(List.of(), List.of()),
       Arguments.of(List.of(WALK), List.of(WALK)),
-      Arguments.of(List.of(CAR_RENTAL_W_PENALTY), List.of(CAR_RENTAL)),
-      Arguments.of(List.of(WALK, CAR_RENTAL_W_PENALTY), List.of(WALK, CAR_RENTAL))
+      Arguments.of(List.of(EXP_CAR_RENTAL_W_PENALTY), List.of(CAR_RENTAL)),
+      Arguments.of(List.of(WALK, EXP_CAR_RENTAL_W_PENALTY), List.of(WALK, CAR_RENTAL))
     );
   }
 
@@ -63,7 +75,7 @@ class AccessEgressPenaltyDecoratorTest {
   private static List<Arguments> decorateWalkTestCase() {
     return List.of(
       Arguments.of(List.of(), List.of()),
-      Arguments.of(List.of(WALK_W_PENALTY), List.of(WALK))
+      Arguments.of(List.of(EXP_WALK_W_PENALTY), List.of(WALK))
     );
   }
 
