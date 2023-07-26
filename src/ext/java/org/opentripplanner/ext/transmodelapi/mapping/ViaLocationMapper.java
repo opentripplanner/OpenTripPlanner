@@ -13,18 +13,14 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 class ViaLocationMapper {
 
   static ViaLocation mapViaLocation(Map<String, Object> viaLocation) {
-    validateViaLocation(viaLocation);
-
-    return new ViaLocation(
-      GenericLocationMapper.toGenericLocation(viaLocation),
-      false,
-      (Duration) viaLocation.get("minSlack"),
-      (Duration) viaLocation.get("maxSlack")
-    );
-  }
-
-  private static void validateViaLocation(Map<String, Object> viaLocation) {
-    if (viaLocation.get("place") == null && viaLocation.get("coordinates") == null) {
+    try {
+      return new ViaLocation(
+        GenericLocationMapper.toGenericLocation(viaLocation),
+        false,
+        (Duration) viaLocation.get("minSlack"),
+        (Duration) viaLocation.get("maxSlack")
+      );
+    } catch (IllegalArgumentException e) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, INTERMEDIATE_PLACE))
       );
