@@ -2,6 +2,7 @@ package org.opentripplanner.api.common;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -146,22 +147,16 @@ class RequestToPreferencesMapper {
   private TransitGeneralizedCostFilterParams mapTransitGeneralizedCostFilterParams(
     ItineraryFilterPreferences.Builder filter
   ) {
-    TransitGeneralizedCostFilterParams result = filter.original().transitGeneralizedCostLimit();
-    if (req.transitGeneralizedCostLimitFunction != null) {
-      result =
-        new TransitGeneralizedCostFilterParams(
-          CostLinearFunction.of(req.transitGeneralizedCostLimitFunction),
-          result.intervalRelaxFactor()
-        );
-    }
-    if (req.transitGeneralizedCostLimitIntervalRelaxFactor != null) {
-      result =
-        new TransitGeneralizedCostFilterParams(
-          result.costLimitFunction(),
-          req.transitGeneralizedCostLimitIntervalRelaxFactor
-        );
-    }
-    return result;
+    var costLimitFunction = (req.transitGeneralizedCostLimitFunction == null)
+      ? filter.original().transitGeneralizedCostLimit().costLimitFunction()
+      : CostLinearFunction.of(req.transitGeneralizedCostLimitFunction);
+
+    var intervalRelaxFactor = ObjectUtils.ifNotNull(
+      req.transitGeneralizedCostLimitIntervalRelaxFactor,
+      filter.original().transitGeneralizedCostLimit().intervalRelaxFactor()
+    );
+
+    return new TransitGeneralizedCostFilterParams(costLimitFunction, intervalRelaxFactor);
   }
 
   private void mapSystem() {
