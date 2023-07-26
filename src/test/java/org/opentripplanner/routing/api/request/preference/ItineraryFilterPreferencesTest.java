@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
@@ -19,12 +20,12 @@ class ItineraryFilterPreferencesTest {
   private static final double GROUP_SIMILARITY_KEEP_THREE = 0.5;
   private static final double MIN_BIKE_PARKING_DISTANCE = 2000.0;
   private static final CostLinearFunction NON_TRANSIT_GENERALIZED_COST_LIMIT = CostLinearFunction.of(
-    4,
+    Duration.ofSeconds(4),
     5.0
   );
   private static final double PARK_AND_RIDE_DURATION_RATIO = 0.44;
   private static final TransitGeneralizedCostFilterParams TRANSIT_GENERALIZED_COST_LIMIT = new TransitGeneralizedCostFilterParams(
-    CostLinearFunction.of(4, 5.0),
+    CostLinearFunction.of(Duration.ofSeconds(4), 5.0),
     3.0
   );
 

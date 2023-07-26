@@ -7,6 +7,7 @@ import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.PatternCostCalculator.DEFAULT_ROUTE_RELUCTANCE;
 
+import java.time.Duration;
 import java.util.BitSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +36,7 @@ public class D03_UnpreferredRouteTest implements RaptorTestConstants {
   private static final FeedScopedId ROUTE_ID_1 = TransitModelForTest.id("1");
   private static final FeedScopedId ROUTE_ID_2 = TransitModelForTest.id("2");
   private static final CostLinearFunction UNPREFER_COST = CostLinearFunction.of(
-    30000,
+    Duration.ofSeconds(30000),
     DEFAULT_ROUTE_RELUCTANCE
   );
   private final TestTransitData data = new TestTransitData();

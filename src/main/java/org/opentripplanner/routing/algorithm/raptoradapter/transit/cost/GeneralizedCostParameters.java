@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import java.time.Duration;
 import java.util.BitSet;
 import java.util.Objects;
 import javax.annotation.Nullable;
@@ -39,7 +40,7 @@ public class GeneralizedCostParameters {
     this.wheelchairEnabled = false;
     this.wheelchairAccessibility = AccessibilityPreferences.ofOnlyAccessible();
     this.unpreferredPatterns = new BitSet();
-    this.unpreferredCost = CostLinearFunction.of(0, DEFAULT_TRANSIT_RELUCTANCE);
+    this.unpreferredCost = CostLinearFunction.of(Duration.ZERO, DEFAULT_TRANSIT_RELUCTANCE);
   }
 
   GeneralizedCostParameters(GeneralizedCostParametersBuilder builder) {

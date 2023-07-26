@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Units;
@@ -39,11 +40,14 @@ public final class ItineraryFilterPreferences {
     this.groupSimilarityKeepOne = 0.85;
     this.groupSimilarityKeepThree = 0.68;
     this.minBikeParkingDistance = 0;
-    this.nonTransitGeneralizedCostLimit = CostLinearFunction.of(3600, 2);
+    this.nonTransitGeneralizedCostLimit = CostLinearFunction.of(Duration.ofHours(1), 2.0);
     this.parkAndRideDurationRatio = 0.0;
     this.removeItinerariesWithSameRoutesAndStops = false;
     this.transitGeneralizedCostLimit =
-      new TransitGeneralizedCostFilterParams(CostLinearFunction.of(900, 1.5), 0.4);
+      new TransitGeneralizedCostFilterParams(
+        CostLinearFunction.of(Duration.ofMinutes(15), 1.5),
+        0.4
+      );
   }
 
   private ItineraryFilterPreferences(Builder builder) {

@@ -5,10 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.test.support.VariableSource;
 
 class LinearFunctionSerializationTest {
@@ -18,25 +21,32 @@ class LinearFunctionSerializationTest {
 
   @SuppressWarnings("unused")
   static Stream<Arguments> parseTestCases = Stream.of(
-    Arguments.of("0s + 0.00 t", "0+0t"),
-    Arguments.of("1s + 0.01 t", "1+0.0111 t"),
-    Arguments.of("2m + 0.11 t", "120 + 0.111 t"),
-    Arguments.of("2h3m + 1.11 t", "2h3m + 1.111 t"),
-    Arguments.of("3h + 5.1 t", "3h + 5.111 t")
+    Arguments.of("0+0t", "0s", 0.00),
+    Arguments.of("1+0.0111 t", "1s", 0.01),
+    Arguments.of("120 + 0.111 t", "2m", 0.11),
+    Arguments.of("2h3m + 1.111 t", "2h3m", 1.11),
+    Arguments.of("2h3m + 2.111 t", "2h3m", 2.1),
+    Arguments.of("3h + 5.111 t", "3h", 5.1),
+    Arguments.of("7m + 10.1 x", "7m", 10.0)
   );
 
   @ParameterizedTest
   @VariableSource("parseTestCases")
-  void parseTest(String expected, String input) {
-    Optional<LinearFunction> result = LinearFunctionSerialization.parse(input, LinearFunction::new);
-    assertEquals(expected, result.orElseThrow().toString());
+  void parseTest(String input, String expectedConstant, double expectedCoefficient) {
+    Optional<MyTestLinearFunction> result = LinearFunctionSerialization.parse(
+      input,
+      MyTestLinearFunction::new
+    );
+    var f = result.orElseThrow();
+    assertEquals(DurationUtils.duration(expectedConstant), f.constant);
+    assertEquals(expectedCoefficient, f.coefficient);
   }
 
   @Test
   void parseEmtpy() {
-    assertEquals(Optional.empty(), LinearFunctionSerialization.parse(null, LinearFunction::new));
-    assertEquals(Optional.empty(), LinearFunctionSerialization.parse("", LinearFunction::new));
-    assertEquals(Optional.empty(), LinearFunctionSerialization.parse(" \r\n", LinearFunction::new));
+    assertEquals(Optional.empty(), LinearFunctionSerialization.parse(null, fail()));
+    assertEquals(Optional.empty(), LinearFunctionSerialization.parse("", fail()));
+    assertEquals(Optional.empty(), LinearFunctionSerialization.parse(" \r\n", fail()));
   }
 
   @Test
@@ -52,15 +62,19 @@ class LinearFunctionSerializationTest {
   void parseIllegalArgument() {
     var ex = assertThrows(
       IllegalArgumentException.class,
-      () -> LinearFunctionSerialization.parse("foo", LinearFunction::new)
+      () -> LinearFunctionSerialization.parse("foo", fail())
     );
     assertEquals("Unable to parse function: 'foo'", ex.getMessage());
   }
 
-  private record LinearFunction(Duration a, double b) {
+  private static BiFunction<Duration, Double, ?> fail() {
+    return (a, b) -> Assertions.fail("Factory method called, not expected!");
+  }
+
+  private record MyTestLinearFunction(Duration constant, double coefficient) {
     @Override
     public String toString() {
-      return LinearFunctionSerialization.serialize(a, b);
+      return LinearFunctionSerialization.serialize(constant, coefficient);
     }
   }
 }

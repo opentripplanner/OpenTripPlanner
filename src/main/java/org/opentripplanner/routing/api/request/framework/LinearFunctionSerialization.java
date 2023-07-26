@@ -37,7 +37,7 @@ public class LinearFunctionSerialization {
 
     if (m.matches()) {
       var constantText = m.group(1);
-      var coefficient = Double.parseDouble(m.group(2));
+      var coefficient = Units.normalizedFactor(Double.parseDouble(m.group(2)), 0.0, 100.0);
 
       var constant = constantText.matches("\\d+")
         ? Duration.ofSeconds(Integer.parseInt(constantText))

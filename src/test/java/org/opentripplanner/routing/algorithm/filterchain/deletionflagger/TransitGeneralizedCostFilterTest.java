@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
@@ -17,7 +18,7 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     // Create a filter with f(x) = 600 + 2x, without any penalty for waiting at the beginning or end.
     // Remove itineraries with a cost equivalent of 10 minutes and twice the min itinerary cost.
     final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
-      CostLinearFunction.of(600, 2.0),
+      CostLinearFunction.of(Duration.ofMinutes(10), 2.0),
       0.0
     );
 
@@ -48,7 +49,7 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     // Remove itineraries with a cost equivalent of twice the itinerary cost plus half of the
     // waiting time.
     final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
-      CostLinearFunction.of(0, 2.0),
+      CostLinearFunction.of(Duration.ZERO, 2.0),
       0.5
     );
 
@@ -79,7 +80,7 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     // Remove itineraries with a cost equivalent of twice the itinerary cost plus half of the
     // waiting time.
     final TransitGeneralizedCostFilter subject = new TransitGeneralizedCostFilter(
-      CostLinearFunction.of(0, 2.0),
+      CostLinearFunction.of(Duration.ZERO, 2.0),
       0.5
     );
 
