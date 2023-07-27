@@ -7,7 +7,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -256,43 +255,30 @@ removed from list.
       return transitGeneralizedCostLimit;
     }
 
-    if (node.isObject()) {
-      return new TransitGeneralizedCostFilterParams(
-        node
-          .of("costLimitFunction")
-          .since(V2_2)
-          .summary("The base function used by the filter.")
-          .description(
-            """
-            This function calculates the threshold for the filter, when the itineraries have
-            exactly the same arrival and departure times.
-            """
-          )
-          .asCostLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
-        node
-          .of("intervalRelaxFactor")
-          .since(V2_2)
-          .summary(
-            "How much the filter should be relaxed for itineraries that do not overlap in time."
-          )
-          .description(
-            """
-            This value is used to increase the filter threshold for itineraries further away in
-            time, compared to those, that have exactly the same arrival and departure times.
+    return new TransitGeneralizedCostFilterParams(
+      node
+        .of("costLimitFunction")
+        .since(V2_2)
+        .summary("The base function used by the filter.")
+        .description(
+          "This function calculates the threshold for the filter, when the itineraries have " +
+          "exactly the same arrival and departure times."
+        )
+        .asCostLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
+      node
+        .of("intervalRelaxFactor")
+        .since(V2_2)
+        .summary(
+          "How much the filter should be relaxed for itineraries that do not overlap in time."
+        )
+        .description(
+          """
+          This value is used to increase the filter threshold for itineraries further away in
+          time, compared to those, that have exactly the same arrival and departure times.
 
-            The unit is cost unit per second of time difference."""
-          )
-          .asDouble(transitGeneralizedCostLimit.intervalRelaxFactor())
-      );
-    }
-
-    LOG.warn(
-      """
-      The format of transitGeneralizedCostLimit has changed, please see the documentation for
-      new configuration format. The existing format will cease to work after OTP v2.2
-      """
+          The unit is cost unit per second of time difference."""
+        )
+        .asDouble(transitGeneralizedCostLimit.intervalRelaxFactor())
     );
-
-    return new TransitGeneralizedCostFilterParams(CostLinearFunction.of(node.asText()), 0);
   }
 }

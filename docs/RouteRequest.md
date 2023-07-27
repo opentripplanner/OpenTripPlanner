@@ -624,9 +624,7 @@ _1 hour plus 2 times cost_ use: `3600 + 2.0 x`. To set an absolute value(3000s) 
 
 The base function used by the filter.
 
-This function calculates the threshold for the filter, when the itineraries have
-exactly the same arrival and departure times.
-
+This function calculates the threshold for the filter, when the itineraries have exactly the same arrival and departure times.
 
 <h3 id="rd_if_transitGeneralizedCostLimit_intervalRelaxFactor">intervalRelaxFactor</h3>
 
