@@ -768,6 +768,8 @@ type QueryType {
   ): [StopPlace]! @timingData
   "Input type for executing a travel search for a trip between two locations. Returns trip patterns describing suggested alternatives for the trip."
   trip(
+    "Time and cost penalty on access/egress modes."
+    accessEgressPenalty: [PenaltyForStreetMode!] = [],
     "The alightSlack is the minimum extra time after exiting a public transport vehicle. This is the default value used, if not overridden by the 'alightSlackList'."
     alightSlackDefault: Int = 0,
     "List of alightSlack for a given set of modes. Defaults: []"
@@ -1930,6 +1932,23 @@ input Modes {
   egressMode: StreetMode
   "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
   transportModes: [TransportModes]
+}
+
+"A combination of street mode and penalty for time and cost."
+input PenaltyForStreetMode {
+  """
+      This is used to take the time-penalty and multiply by the `costFactor`.
+      The result is added to the generalized-cost.
+  """
+  costFactor: Float = 1.0
+  """
+  List of modes witch the given penalty is applied to. A street-mode should not be listed
+  in more than element. If empty or null the penalty is applied to all unlisted modes,
+  it become the default penalty for this query.
+  """
+  streetMode: StreetMode!
+  "Penalty applied to the time for the given list of modes."
+  timePenalty: LinearFunction!
 }
 
 "A combination of street mode and corresponding duration"

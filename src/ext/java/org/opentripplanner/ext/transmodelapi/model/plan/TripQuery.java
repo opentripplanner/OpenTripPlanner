@@ -15,12 +15,14 @@ import org.opentripplanner.ext.transmodelapi.model.DefaultRouteRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
+import org.opentripplanner.ext.transmodelapi.model.framework.PenaltyForStreetModeType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 public class TripQuery {
 
+  public static final String ACCESS_EGRESS_PENALTY = "accessEgressPenalty";
   public static final String MAX_ACCESS_EGRESS_DURATION_FOR_MODE = "maxAccessEgressDurationForMode";
   public static final String MAX_DIRECT_DURATION_FOR_MODE = "maxDirectDurationForMode";
 
@@ -28,6 +30,7 @@ public class TripQuery {
     DefaultRouteRequestType routing,
     GraphQLOutputType tripType,
     GraphQLInputObjectType durationPerStreetModeType,
+    GraphQLInputObjectType penaltyForStreetMode,
     GqlUtil gqlUtil
   ) {
     RoutingPreferences preferences = routing.request.preferences();
@@ -508,6 +511,17 @@ public class TripQuery {
             "FOR SERVER-SIDE TUNING AND IS AVAILABLE HERE FOR TESTING ONLY."
           )
           .type(ItineraryFiltersInputType.create(gqlUtil, preferences.itineraryFilter()))
+          .build()
+      )
+      .argument(
+        GraphQLArgument
+          .newArgument()
+          .name(ACCESS_EGRESS_PENALTY)
+          .description("Time and cost penalty on access/egress modes.")
+          .type(new GraphQLList(new GraphQLNonNull(penaltyForStreetMode)))
+          .defaultValueLiteral(
+            PenaltyForStreetModeType.mapToGraphQLValue(preferences.street().accessEgressPenalty())
+          )
           .build()
       )
       .argument(
