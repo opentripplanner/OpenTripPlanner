@@ -55,8 +55,6 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   private boolean reachedCurrentRound = false;
   private int iterationDepartureTime = -1;
 
-  // TODO: 2023-05-22 via pass through: we need to inject expected c2 value here
-  //  so that we can determine whether we should filter out results with c2 == 0
   public DestinationArrivalPaths(
     ParetoComparator<RaptorPath<T>> paretoComparator,
     RaptorTransitCalculator<T> transitCalculator,

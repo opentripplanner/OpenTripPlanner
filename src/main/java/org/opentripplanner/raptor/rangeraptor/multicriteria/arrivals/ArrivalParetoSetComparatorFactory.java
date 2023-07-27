@@ -59,7 +59,6 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
   > ArrivalParetoSetComparatorFactory<T> createFactoryC1AndC2(
     DominanceFunction c2DominanceFunction
   ) {
-    // TODO: 2023-05-19 via pass through: is this right?
     return new ArrivalParetoSetComparatorFactory<T>() {
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
@@ -103,7 +102,6 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
     DominanceFunction c2DominanceFunction
   ) {
     return new ArrivalParetoSetComparatorFactory<>() {
-      // TODO: 2023-05-19 via pass through: is this right?
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
         // If c2 dominates, then a slack is added to arrival-time and cost (c1)

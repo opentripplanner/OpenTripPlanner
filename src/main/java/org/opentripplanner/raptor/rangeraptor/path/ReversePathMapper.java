@@ -50,8 +50,6 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
 
   @Override
   public RaptorPath<T> mapToPath(final DestinationArrival<T> destinationArrival) {
-    // TODO: 2023-05-11 via pass through: do we need to include c2 here?
-
     var pathBuilder = PathBuilder.tailPathBuilder(
       slackProvider,
       destinationArrival.arrivalTime(),
