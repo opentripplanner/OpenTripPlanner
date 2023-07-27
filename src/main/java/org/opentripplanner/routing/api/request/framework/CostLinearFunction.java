@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.api.request.framework;
 
 import java.time.Duration;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.model.Cost;
 
 /**
@@ -34,10 +33,6 @@ public final class CostLinearFunction extends AbstractLinearFunction<Cost> {
 
   public Cost calculate(Cost cost) {
     return constant().plus(cost.multiply(coefficient()));
-  }
-
-  public int calculate(int valueInSeconds) {
-    return constant().toSeconds() + IntUtils.round(valueInSeconds * coefficient());
   }
 
   @Override

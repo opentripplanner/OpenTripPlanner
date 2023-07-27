@@ -12,12 +12,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.test.support.TestTableParser;
 
 class CostLinearFunctionTest {
 
-  public static final Duration D2m = Duration.ofMinutes(2);
+  private static final Duration D2m = Duration.ofMinutes(2);
+  private static final Cost COST_1s = Cost.costOfSeconds(1);
+  private static final Cost COST_2s = Cost.costOfSeconds(2);
+  private static final Cost COST_10s = Cost.costOfSeconds(10);
+  private static final Cost COST_11s = Cost.costOfSeconds(11);
+  private static final Cost COST_61s = Cost.costOfSeconds(61);
 
   @Test
   void parse() {
@@ -73,8 +79,8 @@ class CostLinearFunctionTest {
   static Stream<Arguments> calculateTestCases() {
     return TestTableParser.of(
       """
-      #  function  ||          expected values 
-      #            ||  0s |  1s |  2s |  10s | 11s | 61s 
+      #  function  ||          expected values
+      #            ||  0s |  1s |  2s |  10s | 11s | 61s
        0s + 0.0 t  ||   0 |   0 |   0 |   0  |   0 |   0
        7s + 0.0 t  ||   7 |   7 |   7 |   7  |   7 |   7
        0s + 1.0 t  ||   0 |   1 |   2 |  10  |  11 |  61
@@ -98,11 +104,11 @@ class CostLinearFunctionTest {
   ) {
     var subject = CostLinearFunction.of(function);
 
-    assertEquals(exp0s, subject.calculate(0));
-    assertEquals(exp1s, subject.calculate(1));
-    assertEquals(exp2s, subject.calculate(2));
-    assertEquals(exp10s, subject.calculate(10));
-    assertEquals(exp11s, subject.calculate(11));
-    assertEquals(exp61s, subject.calculate(61));
+    assertEquals(exp0s, subject.calculate(Cost.ZERO).toSeconds());
+    assertEquals(exp1s, subject.calculate(COST_1s).toSeconds());
+    assertEquals(exp2s, subject.calculate(COST_2s).toSeconds());
+    assertEquals(exp10s, subject.calculate(COST_10s).toSeconds());
+    assertEquals(exp11s, subject.calculate(COST_11s).toSeconds());
+    assertEquals(exp61s, subject.calculate(COST_61s).toSeconds());
   }
 }

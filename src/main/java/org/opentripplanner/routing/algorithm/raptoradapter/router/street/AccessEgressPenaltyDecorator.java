@@ -35,15 +35,15 @@ public class AccessEgressPenaltyDecorator {
     if (input.isEmpty()) {
       return input;
     }
-    // The routing request only have one access/egress street-mode set, so we can use it to
-    // find the "actual street-mode" of the access/egress. We assume the mode is WALK if all edges
-    // in AStar is WALK, if not we assume the mode is the mode set in the request input.
     var penaltyWalking = request
       .preferences()
       .street()
       .accessEgressPenalty()
       .valueOf(StreetMode.WALK);
 
+    // The routing request only have ONE access/egress street-mode set, So, if it is WALK, then we
+    // can assume all access/egress legs are also walking. There is no need to check the
+    // access/egress. This is an optimization for the most common use-ase.
     if (requestedMode == StreetMode.WALK) {
       return penaltyWalking.isEmpty()
         ? input
@@ -53,6 +53,9 @@ public class AccessEgressPenaltyDecorator {
           .toList();
     }
 
+    // The request mode is NOT WALK, and we need to apply a penalty to the access/egress based on
+    // the mode. We apply the walk penalty to all-walking access/egress and the penalty for the
+    // requested mode to all other access/egress paths.
     var penaltyRequestedMode = request
       .preferences()
       .street()
@@ -65,11 +68,10 @@ public class AccessEgressPenaltyDecorator {
 
     return input
       .stream()
-      .map(it ->
-        it.isWalkOnly()
-          ? it.withPenalty(penaltyWalking.calculate(it.durationInSeconds()))
-          : it.withPenalty(penaltyRequestedMode.calculate(it.durationInSeconds()))
-      )
+      .map(it -> {
+        var penalty = it.isWalkOnly() ? penaltyWalking : penaltyRequestedMode;
+        return it.withPenalty(penalty.calculate(it.durationInSeconds()));
+      })
       .toList();
   }
 }

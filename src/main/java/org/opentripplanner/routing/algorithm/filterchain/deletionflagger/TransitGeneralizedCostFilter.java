@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
@@ -47,8 +48,13 @@ public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
     return subject.getGeneralizedCost() > calculateLimit(subject, transitItinerary);
   }
 
-  private int calculateLimit(Itinerary it, Itinerary t) {
-    return costLimitFunction.calculate(t.getGeneralizedCost()) + getWaitTimeCost(t, it);
+  private int calculateLimit(Itinerary subject, Itinerary transitItinerary) {
+    return (
+      costLimitFunction
+        .calculate(Cost.costOfSeconds(transitItinerary.getGeneralizedCost()))
+        .toSeconds() +
+      getWaitTimeCost(transitItinerary, subject)
+    );
   }
 
   private int getWaitTimeCost(Itinerary a, Itinerary b) {

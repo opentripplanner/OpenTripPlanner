@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -87,9 +88,9 @@ public class PatternCostCalculatorTest {
     assertFalse(unpreferredPatterns.get(defaultPattern.patternIndex()));
 
     // test creation of linear cost function, the cost is in Raptor centi-seconds
-    double expected = RaptorCostConverter.toRaptorCost(
-      unpreferredCostFunctionOtpDomain.calculate(TRANSIT_TIME)
-    );
+    double expected = unpreferredCostFunctionOtpDomain
+      .calculate(Cost.costOfSeconds(TRANSIT_TIME))
+      .toCentiSeconds();
     double actual = costParams.unnpreferredCost().calculateRaptorCost(TRANSIT_TIME);
     assertEquals(expected, actual);
   }

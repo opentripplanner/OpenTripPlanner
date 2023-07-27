@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -43,7 +44,11 @@ public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger
       return List.of();
     }
 
-    var maxLimit = costLimitFunction.calculate(minGeneralizedCost.getAsInt());
+    // TODO: This is a bit ugly, but the filters should be refactored
+    //       to use the Cost type and not int.
+    var maxLimit = costLimitFunction
+      .calculate(Cost.costOfSeconds(minGeneralizedCost.getAsInt()))
+      .toSeconds();
 
     return itineraries
       .stream()
