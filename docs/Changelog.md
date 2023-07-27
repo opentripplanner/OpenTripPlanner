@@ -418,8 +418,6 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 ## 2.0.0 (2020-11-27)
 
-See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST API.
-
 - Sandbox for experimental features [#2745](https://github.com/opentripplanner/OpenTripPlanner/issues/2745)
 - Bugfix for Missing platforms for stops in GTFS import causes a NPE [#2804](https://github.com/opentripplanner/OpenTripPlanner/issues/2804)
 - Remove extra Djikstra implementations
