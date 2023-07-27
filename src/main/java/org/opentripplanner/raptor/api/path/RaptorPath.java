@@ -184,6 +184,6 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
   }
 
   static <T extends RaptorTripSchedule> boolean compareC2(RaptorPath<T> l, RaptorPath<T> r) {
-    return l.c2() > r.c2();
+    return l.c2() < r.c2();
   }
 }
