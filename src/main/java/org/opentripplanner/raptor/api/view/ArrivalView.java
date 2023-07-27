@@ -80,7 +80,10 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    */
   int c1();
 
-  // TODO: 2023-07-21 document
+  /**
+   * Whether the model supports accumulated criteria TWO. If C2 is not supported then calling
+   * {@link #c2()} will result in an exception.
+   */
   default boolean supportsC2() {
     return false;
   }
