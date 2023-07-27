@@ -9,49 +9,58 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import javax.annotation.Nonnull;
-import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.routing.api.request.framework.LinearFunctionSerialization;
 
-public class CostLinearFunctionFactory {
+public class LinearFunctionFactory {
 
   private static final String DOCUMENTATION =
-    "A linear function to calculate a value(y) based on a parameter (x): " +
-    "`y = f(x) = a + bx`. It allows setting both a constant(a) and a coefficient(b) and " +
-    "the use those in the computation. Format: `a + b x`. Example: `1800 + 2.0 x`";
+    """
+    A linear function`f(t)` to calculate a value based on a variable(t). The variable can be the
+    duration/time or cost for a leg or section of a path/itinerary. The function `f(t) = a + bt`
+    has a constant(a) and a coefficient(b) that will be used in OTP to compute `f(t)`.
+    
+    Format: `a + b t`. Example: `1800 + 2.0 t`. The constant `a` accept both whole numbers and
+    duration input format like: `60` = `60s` = `1m` and `3791` = `1h3m11s`. `b` must be a positive
+    decimal number between `0.0` and `100.0`.
+    """;
 
-  private CostLinearFunctionFactory() {}
+  private LinearFunctionFactory() {}
 
-  public static GraphQLScalarType createDoubleFunctionScalar() {
+  public static GraphQLScalarType createLinearFunctionScalar() {
     return GraphQLScalarType
       .newScalar()
-      .name("DoubleFunction")
+      .name("LinearFunction")
       .description(DOCUMENTATION)
       .coercing(
-        new Coercing<CostLinearFunction, String>() {
+        new Coercing<LinearFunction, String>() {
           @Override
           public String serialize(
             @Nonnull Object dataFetcherResult,
             @Nonnull GraphQLContext graphQLContext,
             @Nonnull Locale locale
           ) {
-            return ((CostLinearFunction) dataFetcherResult).serialize();
+            var value = (LinearFunction) dataFetcherResult;
+            return LinearFunctionSerialization.serialize(value.constant(), value.coefficient());
           }
 
           @Override
-          public CostLinearFunction parseValue(
+          public LinearFunction parseValue(
             @Nonnull Object input,
             @Nonnull GraphQLContext graphQLContext,
             @Nonnull Locale locale
           ) throws CoercingParseValueException {
             try {
-              return CostLinearFunction.of((String) input);
-            } catch (IllegalArgumentException e) {
+              String text = (String) input;
+              return LinearFunctionSerialization.parse(text, LinearFunction::new).orElseThrow();
+            } catch (IllegalArgumentException | NoSuchElementException e) {
               throw new CoercingParseValueException(e.getMessage(), e);
             }
           }
 
           @Override
-          public CostLinearFunction parseLiteral(
+          public LinearFunction parseLiteral(
             @Nonnull Value<?> input,
             @Nonnull CoercedVariables variables,
             @Nonnull GraphQLContext graphQLContext,

@@ -59,7 +59,7 @@ public class ItineraryFiltersInputType {
                 GraphQLInputObjectField
                   .newInputObjectField()
                   .name("costLimitFunction")
-                  .type(new GraphQLNonNull(gqlUtil.doubleFunctionScalar))
+                  .type(new GraphQLNonNull(gqlUtil.linearFunctionScalar))
                   .build()
               )
               .field(

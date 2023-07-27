@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.ext.transmodelapi.model.scalars.CostLinearFunctionFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory;
+import org.opentripplanner.ext.transmodelapi.model.scalars.LinearFunctionFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -35,7 +35,7 @@ public class GqlUtil {
 
   public final GraphQLScalarType dateTimeScalar;
   public final GraphQLScalarType dateScalar;
-  public final GraphQLScalarType doubleFunctionScalar;
+  public final GraphQLScalarType linearFunctionScalar;
   public final GraphQLScalarType localTimeScalar;
   public final GraphQLObjectType timeScalar;
   public final GraphQLScalarType durationScalar;
@@ -46,7 +46,7 @@ public class GqlUtil {
     this.dateTimeScalar =
       DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(timeZone);
     this.dateScalar = DateScalarFactory.createDateScalar();
-    this.doubleFunctionScalar = CostLinearFunctionFactory.createDoubleFunctionScalar();
+    this.linearFunctionScalar = LinearFunctionFactory.createLinearFunctionScalar();
     this.localTimeScalar = LocalTimeScalarFactory.createLocalTimeScalar();
     this.timeScalar = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
     this.durationScalar = DurationScalarFactory.createDurationScalar();
