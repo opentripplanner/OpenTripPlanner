@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.moduletests;
+package org.opentripplanner.raptor.moduletests.support;
 
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
@@ -31,7 +31,7 @@ public final class ModuleTestDebugLogging {
 
   private static final boolean DEBUG = false;
 
-  static void setupDebugLogging(
+  public static void setupDebugLogging(
     TestTransitData data,
     RaptorRequestBuilder<TestTripSchedule> requestBuilder
   ) {
