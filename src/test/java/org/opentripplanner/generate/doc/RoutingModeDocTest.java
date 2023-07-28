@@ -23,7 +23,6 @@ public class RoutingModeDocTest {
 
   @Test
   public void updateDocs() {
-
     // Read and close inout file (same as output file)
     String doc = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
@@ -36,10 +35,13 @@ public class RoutingModeDocTest {
     // Or add another field to the DocumentedEnum that would describe the enum as a whole?
     builder.addSection(StreetMode.CAR.typeDescription());
 
-    Arrays.stream(StreetMode.values()).filter(m -> m != StreetMode.NOT_SET).forEach(m -> {
-      builder.header(3, m.name(), m.name());
-      builder.addSection(m.enumValueDescription());
-    });
+    Arrays
+      .stream(StreetMode.values())
+      .filter(m -> m != StreetMode.NOT_SET)
+      .forEach(m -> {
+        builder.header(3, m.name(), m.name());
+        builder.addSection(m.enumValueDescription());
+      });
 
     doc = replaceSection(doc, "street-modes", builder.toString());
 
@@ -50,10 +52,12 @@ public class RoutingModeDocTest {
     // Or add another field to the DocumentedEnum that would describe the enum as a whole?
     builder.addSection(TransitMode.BUS.typeDescription());
 
-    Arrays.stream(TransitMode.values()).forEach(m -> {
-      builder.header(3, m.name(), m.name());
-      builder.addSection(m.enumValueDescription());
-    });
+    Arrays
+      .stream(TransitMode.values())
+      .forEach(m -> {
+        builder.header(3, m.name(), m.name());
+        builder.addSection(m.enumValueDescription());
+      });
 
     doc = replaceSection(doc, "transit-modes", builder.toString());
 
@@ -61,5 +65,4 @@ public class RoutingModeDocTest {
 
     assertFileEquals(original, OUT_FILE);
   }
-
 }
