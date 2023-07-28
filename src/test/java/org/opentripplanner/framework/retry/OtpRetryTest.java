@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.framework.retry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

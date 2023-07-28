@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.framework.io.OtpHttpClientException;
-import org.opentripplanner.framework.lang.OtpRetry;
-import org.opentripplanner.framework.lang.OtpRetryBuilder;
+import org.opentripplanner.framework.retry.OtpRetry;
+import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -24,7 +24,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
   private static final int RETRY_MAX_ATTEMPTS = 3;
-  private static final Duration RETRY_INITIAL_DELAY = Duration.ofMillis(5000);
+  private static final Duration RETRY_INITIAL_DELAY = Duration.ofSeconds(5);
   private static final int RETRY_BACKOFF = 2;
 
   private final String url;
@@ -113,7 +113,9 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         if (serviceDelivery.getSituationExchangeDeliveries() != null) {
           saveResultOnGraph.execute((graph, transitModel) -> {
             updateHandler.update(serviceDelivery);
-            if (markPrimed) primed = true;
+            if (markPrimed) {
+              primed = true;
+            }
           });
         }
       }

@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.framework.retry;
 
 import java.time.Duration;
 import java.util.function.Predicate;

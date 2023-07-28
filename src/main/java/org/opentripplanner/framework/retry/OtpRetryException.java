@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.lang;
+package org.opentripplanner.framework.retry;
 
 public class OtpRetryException extends RuntimeException {
 
