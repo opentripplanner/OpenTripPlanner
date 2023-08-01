@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.util.TestRaptorTripSchedule;
 
 public class PatternRideC2Test {
 
@@ -69,7 +68,7 @@ public class PatternRideC2Test {
     final var RELATIVE_C1 = 14;
     final var NEW_C2 = 15;
 
-    var originalRide = new PatternRideC2<TestRaptorTripSchedule>(
+    var originalRide = new PatternRideC2<>(
       null,
       BOARD_STOP_INDEX,
       BOARD_POS,

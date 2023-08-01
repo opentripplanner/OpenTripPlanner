@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.spi.RaptorCostCalculator.ZERO_COST;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.util.TestRaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 public class PatternRideC1Test {
 
@@ -52,7 +52,7 @@ public class PatternRideC1Test {
 
   @Test
   public void testUpdateC2() {
-    var originalRide = new PatternRideC1<TestRaptorTripSchedule>(null, 0, 0, 0, 0, 0, 0, null);
+    var originalRide = new PatternRideC1<RaptorTripSchedule>(null, 0, 0, 0, 0, 0, 0, null);
 
     var updatedRide = originalRide.updateC2(1);
 

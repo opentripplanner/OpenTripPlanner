@@ -142,7 +142,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private DestinationArrivalPaths<T> createDestinationArrivalPaths() {
     if (paths == null) {
-      paths = pathConfig.createDestArrivalPaths(true, includeC2());
+      paths = pathConfig.createDestArrivalPaths(true, includeC2() ? dominanceFunctionC2() : null);
     }
     return paths;
   }

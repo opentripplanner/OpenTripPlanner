@@ -182,8 +182,4 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
   ) {
     return l.c1() < relax.relax(r.c1());
   }
-
-  static <T extends RaptorTripSchedule> boolean compareC2(RaptorPath<T> l, RaptorPath<T> r) {
-    return l.c2() < r.c2();
-  }
 }

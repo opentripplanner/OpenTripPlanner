@@ -4,11 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.List;
-import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor._data.transit.TestRaptorPath;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 
 class RaptorPathTest {
@@ -16,9 +13,25 @@ class RaptorPathTest {
   private static final int VALUE = 150;
   private static final int SMALL = 100;
 
-  private final APath subject = new APath(VALUE, VALUE, VALUE, VALUE, VALUE, VALUE, VALUE);
-  private final APath same = new APath(VALUE, VALUE, VALUE, VALUE, VALUE, VALUE, VALUE);
-  private final APath smallIterationDepartureTime = new APath(
+  private final TestRaptorPath subject = new TestRaptorPath(
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE
+  );
+  private final TestRaptorPath same = new TestRaptorPath(
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE
+  );
+  private final TestRaptorPath smallIterationDepartureTime = new TestRaptorPath(
     SMALL,
     VALUE,
     VALUE,
@@ -27,7 +40,7 @@ class RaptorPathTest {
     VALUE,
     VALUE
   );
-  private final APath smallDepartureTime = new APath(
+  private final TestRaptorPath smallDepartureTime = new TestRaptorPath(
     VALUE,
     SMALL,
     VALUE,
@@ -36,9 +49,25 @@ class RaptorPathTest {
     VALUE,
     VALUE
   );
-  private final APath smallArrivalTime = new APath(VALUE, VALUE, SMALL, VALUE, VALUE, VALUE, VALUE);
-  private final APath smallDuration = new APath(VALUE, VALUE, VALUE, SMALL, VALUE, VALUE, VALUE);
-  private final APath smallNumberOfTransfers = new APath(
+  private final TestRaptorPath smallArrivalTime = new TestRaptorPath(
+    VALUE,
+    VALUE,
+    SMALL,
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE
+  );
+  private final TestRaptorPath smallDuration = new TestRaptorPath(
+    VALUE,
+    VALUE,
+    VALUE,
+    SMALL,
+    VALUE,
+    VALUE,
+    VALUE
+  );
+  private final TestRaptorPath smallNumberOfTransfers = new TestRaptorPath(
     VALUE,
     VALUE,
     VALUE,
@@ -47,8 +76,15 @@ class RaptorPathTest {
     VALUE,
     VALUE
   );
-  private final APath smallC1 = new APath(VALUE, VALUE, VALUE, VALUE, VALUE, SMALL, VALUE);
-  private final APath smallC2 = new APath(VALUE, VALUE, VALUE, VALUE, VALUE, VALUE, SMALL);
+  private final TestRaptorPath smallC1 = new TestRaptorPath(
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE,
+    VALUE,
+    SMALL,
+    VALUE
+  );
 
   @Test
   void compareIterationDepartureTime() {
@@ -111,78 +147,5 @@ class RaptorPathTest {
         RaptorPath.compareC1(GeneralizedCostRelaxFunction.of(1.25, 26), subject, smallArrivalTime)
       );
     });
-  }
-
-  @Test
-  void compareC2() {
-    assertAll(() -> {
-      assertFalse(RaptorPath.compareC2(subject, subject));
-      assertFalse(RaptorPath.compareC2(subject, same));
-      assertTrue(RaptorPath.compareC2(smallC2, subject));
-      assertFalse(RaptorPath.compareC2(subject, smallC2));
-    });
-  }
-
-  private record APath(
-    int rangeRaptorIterationDepartureTime,
-    int startTime,
-    int endTime,
-    int durationInSeconds,
-    int numberOfTransfers,
-    int c1,
-    int c2
-  )
-    implements RaptorPath<TestTripSchedule> {
-    @Override
-    public int numberOfTransfersExAccessEgress() {
-      return -1;
-    }
-
-    @Nullable
-    @Override
-    public AccessPathLeg<TestTripSchedule> accessLeg() {
-      return null;
-    }
-
-    @Nullable
-    @Override
-    public EgressPathLeg<TestTripSchedule> egressLeg() {
-      return null;
-    }
-
-    @Override
-    public List<Integer> listStops() {
-      return null;
-    }
-
-    @Override
-    public int waitTime() {
-      return 0;
-    }
-
-    @Override
-    public Stream<PathLeg<TestTripSchedule>> legStream() {
-      return null;
-    }
-
-    @Override
-    public Stream<TransitPathLeg<TestTripSchedule>> transitLegs() {
-      return null;
-    }
-
-    @Override
-    public String toStringDetailed(RaptorStopNameResolver stopNameResolver) {
-      return null;
-    }
-
-    @Override
-    public String toString(RaptorStopNameResolver stopNameTranslator) {
-      return null;
-    }
-
-    @Override
-    public int c2() {
-      return c2;
-    }
   }
 }

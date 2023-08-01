@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.path.configure;
 
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
+import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -34,6 +35,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
     this.ctx = context;
   }
 
+  // TODO: 2023-07-31 update documentation
   /**
    * Create a new {@link DestinationArrivalPaths}.
    * @param includeC1Cost whether to include generalized cost in the pareto set criteria.
@@ -43,10 +45,10 @@ public class PathConfig<T extends RaptorTripSchedule> {
    */
   public DestinationArrivalPaths<T> createDestArrivalPaths(
     boolean includeC1Cost,
-    boolean includeC2Cost
+    final DominanceFunction c2Comp
   ) {
     return new DestinationArrivalPaths<>(
-      createPathParetoComparator(includeC1Cost, includeC2Cost),
+      createPathParetoComparator(includeC1Cost, c2Comp),
       ctx.calculator(),
       includeC1Cost ? ctx.costCalculator() : null,
       ctx.slackProvider(),
@@ -61,15 +63,15 @@ public class PathConfig<T extends RaptorTripSchedule> {
 
   private ParetoComparator<RaptorPath<T>> createPathParetoComparator(
     boolean includeC1,
-    boolean includeC2
+    final DominanceFunction c2Comp
   ) {
     return paretoComparator(
       includeC1,
-      includeC2,
       ctx.searchParams().timetable(),
       ctx.searchParams().preferLateArrival(),
       ctx.searchDirection(),
-      ctx.multiCriteria().relaxC1AtDestination()
+      ctx.multiCriteria().relaxC1AtDestination(),
+      c2Comp
     );
   }
 
