@@ -2,12 +2,15 @@ package org.opentripplanner.inspector.vector;
 
 import edu.colorado.cires.cmg.mvt.VectorTile;
 import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import org.apache.hc.core5.http.ContentType;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.resource.WebMercatorTile;
+import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
 /**
@@ -37,6 +40,7 @@ public class VectorTileResponseFactory {
     if (!availableLayerNames.containsAll(requestedLayers)) {
       return Response
         .status(Response.Status.NOT_FOUND)
+        .header(HttpHeaders.CONTENT_TYPE, HttpUtils.TEXT_PLAIN)
         .entity(
           "Could not find vector tile layer(s). Requested layers: %s. Available layers: %s.".formatted(
               requestedLayers,

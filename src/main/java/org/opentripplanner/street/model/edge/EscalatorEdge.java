@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -13,13 +14,15 @@ public class EscalatorEdge extends Edge {
    * Using the angle of 30 degrees and a speed of 0.5 m/s gives a horizontal component
    * of approx. 0.43 m/s */
   private static final double HORIZONTAL_SPEED = 0.45;
+  private static final LocalizedString NAME = new LocalizedString("name.escalator");
   private final double length;
 
-  public EscalatorEdge(Vertex v1, Vertex v2, double length) {
+  private EscalatorEdge(Vertex v1, Vertex v2, double length) {
     super(v1, v2);
     this.length = length;
   }
 
+  @Nonnull
   @Override
   public State[] traverse(State s0) {
     // Only allow traversal by walking
@@ -40,6 +43,10 @@ public class EscalatorEdge extends Edge {
 
   @Override
   public I18NString getName() {
-    return new LocalizedString("name.escalator");
+    return NAME;
+  }
+
+  public static EscalatorEdge createEscalatorEdge(Vertex from, Vertex to, double length) {
+    return connectToGraph(new EscalatorEdge(from, to, length));
   }
 }

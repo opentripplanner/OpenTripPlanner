@@ -22,7 +22,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.TemporaryEdge;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryVertex;
@@ -147,7 +147,15 @@ public class TemporaryVerticesContainerTest {
       new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
     );
     double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
-    StreetEdge.createStreetEdge(v0, v1, geom, name, dist, StreetTraversalPermission.ALL, false);
+    new StreetEdgeBuilder<>()
+      .withFromVertex(v0)
+      .withToVertex(v1)
+      .withGeometry(geom)
+      .withName(name)
+      .withMeterLength(dist)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
   }
 
   private void assertVertexEdgeIsNotReferencingTemporaryElements(Vertex src, Edge e, Vertex v) {

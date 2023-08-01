@@ -1289,11 +1289,6 @@ enum RoutingErrorCode {
     increasing the walk reluctance.
     """
     WALKING_BETTER_THAN_TRANSIT
-
-    """
-    An unknown error happened during the search. The details have been added to the server logs.
-    """
-    SYSTEM_ERROR
 }
 
 enum InputField {

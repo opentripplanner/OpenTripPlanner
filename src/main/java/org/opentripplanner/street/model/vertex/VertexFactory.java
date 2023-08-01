@@ -62,7 +62,6 @@ public class VertexFactory {
         "area splitter at " + edgeCoordinate,
         edgeCoordinate.x,
         edgeCoordinate.y,
-        null,
         false,
         false
       )
@@ -71,9 +70,7 @@ public class VertexFactory {
 
   @Nonnull
   public IntersectionVertex intersection(String label, double longitude, double latitude) {
-    return addToGraph(
-      new LabelledIntersectionVertex(label, longitude, latitude, I18NString.of(label), false, false)
-    );
+    return addToGraph(new LabelledIntersectionVertex(label, longitude, latitude, false, false));
   }
 
   @Nonnull
