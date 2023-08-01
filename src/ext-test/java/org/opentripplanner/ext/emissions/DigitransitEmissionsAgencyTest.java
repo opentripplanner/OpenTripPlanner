@@ -20,12 +20,12 @@ class DigitransitEmissionsAgencyTest {
 
   @Test
   void testGetModeDefaultBehavior() {
-    assertEquals("BUS", agency.getMode(TransitMode.BUS).getName());
+    assertEquals("BUS", this.agency.getMode(TransitMode.BUS).getName());
   }
 
   @Test
-  void testGetModNotNull() {
-    assertNull(agency.getMode(TransitMode.AIRPLANE));
+  void testGetModeNull() {
+    assertNull(this.agency.getMode(TransitMode.AIRPLANE));
   }
 
   @Test

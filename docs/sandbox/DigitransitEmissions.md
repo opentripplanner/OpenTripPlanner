@@ -12,7 +12,7 @@ itinerary queries. The emissions are represented in grams per kilometer (g/Km) u
 
 Emissions data should be in json array with objects that have the following properties:
 
-`db`: database it refers to or CAR when referring to personal travel by car.
+`db`: database it refers to or CAR when referring to personal travel by car. For Example Linkki, HSL
 
 `agency_id`: agency id as appeared in GTFS or CAR when referring to personal travel by car.
 
@@ -20,7 +20,7 @@ Emissions data should be in json array with objects that have the following prop
 
 `mode`: mode of transportation it provides or CAR when referring to personal travel by car.
 
-`avg`: CO2 -eq value for that agency at grams/Km units
+`avg`: Carbon dioxide equivalent value for the `mode` at grams/Km units
 
 `p_avg`: Average passenger count for that mode of travel provided by that agency.
 
@@ -38,7 +38,7 @@ as part of the itinerary.
 
 ### Configuration
 To enable this functionality, you need to add the "co2Emissions"  feature in the
-`otp-config.json` file.  include the `digitransitEmissions` object in the
+`otp-config.json` file. Include the `digitransitEmissions` object in the
 `build-config.json` file. The `digitransitEmissions` object should contain a parameter called `url`,
 which should be set to the location where the emissions data is stored.
 

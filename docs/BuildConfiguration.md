@@ -776,7 +776,7 @@ with the `stopTransferCost` parameter in the router configuration.
 Configure properties for emissions file.
 
 By specifying a URL to fetch emissions data, the program gains access to carbon dioxide (CO2) 
-emissions associated with various transportation modes and routes. This data is then used to perform
+emissions associated with various transportation modes and routes. This data is then used for perform
 emission calculations to different transport modes and car.
 
 
