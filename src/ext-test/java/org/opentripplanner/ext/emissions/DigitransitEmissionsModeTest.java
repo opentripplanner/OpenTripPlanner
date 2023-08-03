@@ -15,6 +15,6 @@ class DigitransitEmissionsModeTest {
   @Test
   void EmissionsModeWithIncorrectAvg() {
     DigitransitEmissionsMode mode = new DigitransitEmissionsMode("BUS", "Foo", 12);
-    assertEquals(0, mode.getAvg());
+    assertEquals(-1, mode.getAvg());
   }
 }

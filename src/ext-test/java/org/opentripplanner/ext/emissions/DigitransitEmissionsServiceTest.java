@@ -34,7 +34,7 @@ class DigitransitEmissionsServiceTest {
     .toZonedDateTime();
 
   private static final Agency subject = Agency
-    .of(TransitModelForTest.id("1"))
+    .of(TransitModelForTest.id("F:1"))
     .withName("Foo_CO")
     .withTimezone("Europe/Helsinki")
     .build();
@@ -50,7 +50,7 @@ class DigitransitEmissionsServiceTest {
 
   @Test
   void getEmissionsByAgencyId() {
-    assertEquals("Foo_CO", eservice.getEmissionsByAgencyId("FOO").getAgency_name());
+    assertEquals("Foo_CO", eservice.getEmissionsByAgencyId("F:1").getAgency_name());
   }
 
   @Test
@@ -113,6 +113,6 @@ class DigitransitEmissionsServiceTest {
       .build();
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(235.83999633789062, eservice.getEmissionsForRoute(i));
+    assertEquals(235.83999633789062F, eservice.getEmissionsForRoute(i));
   }
 }

@@ -57,11 +57,14 @@ public class DigitransitEmissionsAgency implements Serializable {
    * @param modeName name of transit mode
    * @return CO2 emissions (g/km) per person
    */
-  public float getAverageCo2EmissionsByModePerPerson(String modeName) {
-    if (this.modes.containsKey(modeName)) {
-      return this.modes.get(modeName).getAverageCo2EmissionsPerPersonPerKm();
+  public double getAverageCo2EmissionsByModeAndDistancePerPerson(
+    String modeName,
+    double distanceInKm
+  ) {
+    if (this.modes.containsKey(modeName) && distanceInKm >= 0) {
+      return this.modes.get(modeName).getAverageCo2EmissionsPerPersonPerKm() * distanceInKm;
     }
-    return 0;
+    return -1;
   }
 
   /**
@@ -70,10 +73,17 @@ public class DigitransitEmissionsAgency implements Serializable {
    * @param modeName name of transit mode
    * @return CO2 emissions (g/km) per person
    */
-  public float getCo2EmissionsByModeAndNumberOfPassengers(String modeName, int numberOfPassengers) {
-    if (this.modes.containsKey(modeName)) {
-      return this.modes.get(modeName).getEmissionsPerPersonByNumberOfPassengers(numberOfPassengers);
+  public double getCo2EmissionsByModeAndDistanceAndNumberOfPassengers(
+    String modeName,
+    int numberOfPassengers,
+    double distanceInKm
+  ) {
+    if (this.modes.containsKey(modeName) && distanceInKm >= 0) {
+      return (
+        this.modes.get(modeName).getEmissionsPerPersonByNumberOfPassengers(numberOfPassengers) *
+        distanceInKm
+      );
     }
-    return 0;
+    return -1;
   }
 }

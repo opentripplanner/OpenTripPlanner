@@ -9,5 +9,5 @@ import org.opentripplanner.model.plan.Itinerary;
 public interface EmissionsService extends Serializable {
   HashMap<String, DigitransitEmissionsAgency> getEmissionByAgency();
 
-  float getEmissionsForRoute(Itinerary itinerary);
+  Float getEmissionsForRoute(Itinerary itinerary);
 }

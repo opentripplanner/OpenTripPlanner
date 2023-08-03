@@ -29,12 +29,22 @@ class DigitransitEmissionsAgencyTest {
   }
 
   @Test
-  void getAverageCo2EmissionsByModePerPerson() {
-    assertEquals(10, this.agency.getAverageCo2EmissionsByModePerPerson("BUS"));
+  void getAverageCo2EmissionsByModeAndDistancePerPerson() {
+    assertEquals(5, this.agency.getAverageCo2EmissionsByModeAndDistancePerPerson("BUS", 0.5));
   }
 
   @Test
-  void getAverageCo2EmissionsByModePerPersonNullMode() {
-    assertEquals(0, this.agency.getAverageCo2EmissionsByModePerPerson("AIRPLANE"));
+  void getAverageCo2EmissionsByModeAndDistancePerPersonNullMode() {
+    assertEquals(-1, this.agency.getAverageCo2EmissionsByModeAndDistancePerPerson("AIRPLANE", 1));
+  }
+
+  @Test
+  void getAverageCo2EmissionsByModeAndDistancePerPersonZeroDistance() {
+    assertEquals(0, this.agency.getAverageCo2EmissionsByModeAndDistancePerPerson("BUS", 0));
+  }
+
+  @Test
+  void getAverageCo2EmissionsByModeAndDistancePerPersonNegativeDistance() {
+    assertEquals(-1, this.agency.getAverageCo2EmissionsByModeAndDistancePerPerson("BUS", -1));
   }
 }

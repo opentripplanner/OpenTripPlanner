@@ -28,7 +28,7 @@ public class DigitransitEmissionsMode implements Serializable {
       this.avg = Float.parseFloat(avg);
     } catch (NumberFormatException e) {
       LOG.warn("Converting Digitransit emissions average value failed.", e);
-      this.avg = 0.0F;
+      this.avg = -1;
     }
     this.averageCo2EmissionsPerPersonPerKm = getEmissionsPerPersonByNumberOfPassengers(p_avg);
   }
@@ -50,6 +50,6 @@ public class DigitransitEmissionsMode implements Serializable {
   }
 
   public float getEmissionsPerPersonByNumberOfPassengers(int numberOfPassengers) {
-    return Math.round(this.avg / numberOfPassengers);
+    return this.avg >= 0 ? Math.round(this.avg / numberOfPassengers) : -1;
   }
 }

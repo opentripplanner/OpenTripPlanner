@@ -17,7 +17,7 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
     return itineraries
       .stream()
       .peek(i -> {
-        float emissions = emissionsService.getEmissionsForRoute(i);
+        Float emissions = emissionsService.getEmissionsForRoute(i);
         if (Objects.nonNull(emissions)) {
           i.setEmissions(emissions);
         }

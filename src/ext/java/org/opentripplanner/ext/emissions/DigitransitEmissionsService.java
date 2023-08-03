@@ -9,7 +9,6 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 @Sandbox
 public class DigitransitEmissionsService implements EmissionsService {
@@ -46,7 +45,7 @@ public class DigitransitEmissionsService implements EmissionsService {
     return null;
   }
 
-  public float getEmissionsForRoute(Itinerary itinerary) {
+  public Float getEmissionsForRoute(Itinerary itinerary) {
     List<TransitLeg> transitLegs = itinerary
       .getLegs()
       .stream()
@@ -55,7 +54,7 @@ public class DigitransitEmissionsService implements EmissionsService {
       .toList();
 
     if (!transitLegs.isEmpty()) {
-      return getEmissionsForTransitRoute(transitLegs);
+      return (float) getEmissionsForTransitRoute(transitLegs);
     }
 
     List<StreetLeg> carLegs = itinerary
@@ -67,43 +66,43 @@ public class DigitransitEmissionsService implements EmissionsService {
       .toList();
 
     if (!carLegs.isEmpty()) {
-      return getEmissionsForCarRoute(carLegs);
+      return (float) getEmissionsForCarRoute(carLegs);
     }
-
-    return 0.0F;
+    return null;
   }
 
-  private float getEmissionsForTransitRoute(List<TransitLeg> transitLegs) {
-    return (float) transitLegs
+  private double getEmissionsForTransitRoute(List<TransitLeg> transitLegs) {
+    return transitLegs
       .stream()
       .mapToDouble(leg -> {
-        FeedScopedId agencyIdFeedScoped = leg.getAgency().getId();
         double legDistanceInKm = leg.getDistanceMeters() / 1000;
         DigitransitEmissionsAgency digitransitEmissionsAgency = getEmissionsByAgencyId(
-          agencyIdFeedScoped.getId()
+          leg.getAgency().getId().getId()
         );
-        float emissionsForAgencyPerKm = digitransitEmissionsAgency != null
-          ? digitransitEmissionsAgency.getAverageCo2EmissionsByModePerPerson(leg.getMode().name())
-          : 0;
-        double emissionsPerLeg = legDistanceInKm * emissionsForAgencyPerKm;
-        return emissionsPerLeg;
+        return digitransitEmissionsAgency != null
+          ? digitransitEmissionsAgency.getAverageCo2EmissionsByModeAndDistancePerPerson(
+            leg.getMode().name(),
+            legDistanceInKm
+          )
+          : -1;
       })
       .sum();
   }
 
-  private float getEmissionsForCarRoute(List<StreetLeg> carLegs) {
-    return (float) carLegs
+  private double getEmissionsForCarRoute(List<StreetLeg> carLegs) {
+    return carLegs
       .stream()
       .mapToDouble(leg -> {
         DigitransitEmissionsAgency digitransitEmissionsAgency = getEmissionsByAgencyId(
           TraverseMode.CAR.toString()
         );
-        float avgCarEmissions = digitransitEmissionsAgency.getAverageCo2EmissionsByModePerPerson(
-          leg.getMode().name()
-        );
         double carLegDistanceInKm = leg.getDistanceMeters() / 1000;
-        double carEmissionsPerLeg = carLegDistanceInKm * avgCarEmissions;
-        return carEmissionsPerLeg;
+        return digitransitEmissionsAgency != null
+          ? digitransitEmissionsAgency.getAverageCo2EmissionsByModeAndDistancePerPerson(
+            leg.getMode().name(),
+            carLegDistanceInKm
+          )
+          : -1;
       })
       .sum();
   }
