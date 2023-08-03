@@ -56,6 +56,8 @@ Sections follow that describe particular settings in more depth.
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 | demDefaults                                                              |   `object`  | Default properties for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.3  |
 |    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)       |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                                                         | *Optional* | `1.0`                             |  2.3  |
+| [digitransitEmissions](#digitransitEmissions)                            |   `object`  | Configure properties for emissions file.                                                                                                                       | *Optional* |                                   |  2.4  |
+|    url                                                                   |   `string`  | Url to emissions json file.                                                                                                                                    | *Optional* | `""`                              |  2.4  |
 | [elevationBucket](#elevationBucket)                                      |   `object`  | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
 | [fares](sandbox/Fares.md)                                                |   `object`  | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
 | gtfsDefaults                                                             |   `object`  | The gtfsDefaults section allows you to specify default properties for GTFS files.                                                                              | *Optional* |                                   |  2.3  |
@@ -64,7 +66,6 @@ Sections follow that describe particular settings in more depth.
 |    maxInterlineDistance                                                  |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle.                                                  | *Optional* | `200`                             |  2.3  |
 |    removeRepeatedStops                                                   |  `boolean`  | Should consecutive identical stops be merged into one stop time entry.                                                                                         | *Optional* | `true`                            |  2.3  |
 |    [stationTransferPreference](#gd_stationTransferPreference)            |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station.                                                                 | *Optional* | `"allowed"`                       |  2.3  |
-| [DigitransitEmissions](#digitransitEmissions)                            |  `object[]` | Configure properties for emissions file.                                                                                                                       | *Optional* |                                   |  2.2  |
 | islandPruning                                                            |   `object`  | Settings for fixing street graph connectivity errors                                                                                                           | *Optional* |                                   |  2.3  |
 |    [adaptivePruningDistance](#islandPruning_adaptivePruningDistance)     |  `integer`  | Search distance for analyzing islands in pruning.                                                                                                              | *Optional* | `250`                             |  2.3  |
 |    [adaptivePruningFactor](#islandPruning_adaptivePruningFactor)         |   `double`  | Defines how much pruning thresholds grow maximally by distance.                                                                                                | *Optional* | `50.0`                            |  2.3  |
@@ -719,6 +720,18 @@ values are defined in meters in the source data. If, for example, decimetres are
 in the source data, this should be set to 0.1.
 
 
+<h3 id="digitransitEmissions">digitransitEmissions</h3>
+
+**Since version:** `2.4` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** / 
+
+Configure properties for emissions file.
+
+By specifying a URL to fetch emissions data, the program gains access to carbon dioxide (CO2)
+emissions associated with various transportation modes and routes. This data is then used
+for perform emission calculations to different transport modes and car.
+
+
 <h3 id="elevationBucket">elevationBucket</h3>
 
 **Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
@@ -766,18 +779,6 @@ Should there be some preference or aversion for transfers at stops that are part
 
 This parameter sets the generic level of preference. What is the actual cost can be changed
 with the `stopTransferCost` parameter in the router configuration.
-
-
-<h3 id="digitransitEmissions">DigitransitEmissions</h3>
-
-**Since version:** `2.4` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
-**Path:** / 
-
-Configure properties for emissions file.
-
-By specifying a URL to fetch emissions data, the program gains access to carbon dioxide (CO2) 
-emissions associated with various transportation modes and routes. This data is then used for perform
-emission calculations to different transport modes and car.
 
 
 <h3 id="islandPruning_adaptivePruningDistance">adaptivePruningDistance</h3>
@@ -1197,7 +1198,10 @@ case where this is not the case.
         "enabled" : true
       }
     }
-  ]
+  ],
+  "digitransitEmissions" : {
+    "url" : "foo.bar"
+  }
 }
 ```
 
