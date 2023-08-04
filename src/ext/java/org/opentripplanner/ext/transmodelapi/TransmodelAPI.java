@@ -98,21 +98,26 @@ public class TransmodelAPI {
       throw new BadRequestException("No query found in body");
     }
 
-    String query = (String) queryParameters.get("query");
+    if (!(queryParameters.get("query") instanceof String query)) {
+      throw new BadRequestException("Invalid format for query");
+    }
+
     Object queryVariables = queryParameters.getOrDefault("variables", null);
-    String operationName = (String) queryParameters.getOrDefault("operationName", null);
     Map<String, Object> variables;
-    if (queryVariables instanceof Map) {
-      variables = (Map) queryVariables;
-    } else if (queryVariables instanceof String && !((String) queryVariables).isEmpty()) {
+    if (queryVariables instanceof Map queryVariablesAsMap) {
+      variables = queryVariablesAsMap;
+    } else if (
+      queryVariables instanceof String queryVariablesAsString && !queryVariablesAsString.isEmpty()
+    ) {
       try {
-        variables = deserializer.readValue((String) queryVariables, Map.class);
+        variables = deserializer.readValue(queryVariablesAsString, Map.class);
       } catch (IOException e) {
         throw new BadRequestException("Variables must be a valid json object");
       }
     } else {
       variables = new HashMap<>();
     }
+    String operationName = (String) queryParameters.getOrDefault("operationName", null);
     return index.executeGraphQL(
       query,
       serverContext,
