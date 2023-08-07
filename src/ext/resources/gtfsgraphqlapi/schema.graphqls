@@ -1330,8 +1330,9 @@ type FareMedium {
 "A container for both a fare product (a ticket) and its relationship to the itinerary."
 type FareProductUse {
     """
-    Identifier local to the itinerary that allows to cross-reference and deduplicate
-    fare products that are applicable for more than one leg.
+    Represents the use of a single instance of a fare product throughout the itinerary. It can
+    be used to cross-reference and de-duplicate fare products that are applicable for more than one
+    leg.
 
     If you want to uniquely identify the fare product itself (not its use) use the product's `id`.
 
