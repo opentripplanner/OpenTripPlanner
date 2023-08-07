@@ -9,7 +9,12 @@ projects in production for many years. If your input data is mostly GTFS then th
 best choice as it uses the same vocabulary.
 
 The [Transmodel GraphQL API](sandbox/TransmodelApi.md) is the Transmodel API (version 3) used at
-Entur in production since 2020. If your input data is mostly NeTeX then you should use this.
+Entur in production since 2020. If your input data is mostly NeTeX then you might want to investigate
+this API as it uses the [Transmodel vocabulary](https://en.wikipedia.org/wiki/Transmodel) 
+to describe transit entities.
+
+The [Vector tiles API](sandbox/MapboxVectorTilesApi.md) is a special purpose API for displaying
+entities on a vector map.
 
 The [Actuator API](sandbox/ActuatorAPI.md) provides endpoints for checking the health status of the
 OTP instance. It can be useful when running OTP in a container.
