@@ -1,10 +1,8 @@
-# OTP APIs and Data Sources
-
-## APIs
+# APIs
 
 Several different services are built upon this routing library, and expose these APIs:
 
-### GraphQL
+## GraphQL
 
 The [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) has been used by the Digitransit and otp-react-redux 
 projects in production for many years. If your input data is mostly GTFS then this is probably your
@@ -18,7 +16,7 @@ OTP instance. It can be useful when running OTP in a container.
 
 The [Geocoder API](sandbox/GeocoderAPI.md) allows you to geocode street corners and stop names.
 
-### Legacy APIs (to be removed)
+## Legacy APIs (to be removed)
 
 The OTP REST API used to power many apps and frontends. For years it was the only way to access
 OTP programmatically.
