@@ -28,5 +28,5 @@ Now open [http://localhost:8080](http://localhost:8080) to see your running OTP 
 ## Additional notes
 Make sure to include the word "gtfs" when naming the gtfs files that you want to use for OTP. Otherwise, graph build will fail.
 
-If you want to set JVM options you can use the environment variable.
-A full example is `-e JAVA_TOOL_OPTIONS='-Xmx4g'` which you need to add to your docker command.
+If you want to set JVM options you can use the environment variable `JAVA_TOOL_OPTIONS`, so
+a full example to add to your docker command is `-e JAVA_TOOL_OPTIONS='-Xmx4g'`. 
