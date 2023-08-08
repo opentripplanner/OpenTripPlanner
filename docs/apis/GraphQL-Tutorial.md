@@ -88,25 +88,25 @@ Most people want to get routing results out of OTP, so lets see the query for th
             },
         ]) {
         itineraries {
-            startTime
-            endTime
+            start
+            end
             legs {
                 mode
-                startTime
-                endTime
+                start
+                end
                 from {
                     name
                     lat
                     lon
-                    departureTime
-                    arrivalTime
+                    departure
+                    arrival
                 }
                 to {
                     name
                     lat
                     lon
-                    departureTime
-                    arrivalTime
+                    departure
+                    arrival
                 }
                 route {
                     gtfsId

@@ -1646,18 +1646,8 @@ type RideHailingEstimate {
 scalar DateTime
 
 type Leg {
-    """
-    The date and time when this leg begins. Format: Unix timestamp in milliseconds.
-    """
-    startTime: Long
-
     start: DateTime
     end: DateTime
-
-    """
-    The date and time when this leg ends. Format: Unix timestamp in milliseconds.
-    """
-    endTime: Long
 
     """
     For transit leg, the offset from the scheduled departure time of the boarding
@@ -1833,6 +1823,17 @@ type Leg {
     that applies to multiple legs can appear several times.
     """
     fareProducts: [FareProductUse]
+
+    """
+    The date and time when this leg begins. Format: Unix timestamp in milliseconds.
+    """
+    startTime: Long @deprecated(reason: "Use `start` instead which contains timezone information.")
+
+    """
+    The date and time when this leg ends. Format: Unix timestamp in milliseconds.
+    """
+    endTime: Long @deprecated(reason: "Use `end` instead which contains timezone information.")
+
 }
 
 """A span of time."""
@@ -2267,15 +2268,11 @@ type Place {
     """Longitude of the place (WGS 84)"""
     lon: Float!
 
-    """
-    The time the rider will arrive at the place. Format: Unix timestamp in milliseconds.
-    """
-    arrivalTime: Long!
+    "The time the rider will arrive at the place."
+    arrival: DateTime
 
-    """
-    The time the rider will depart the place. Format: Unix timestamp in milliseconds.
-    """
-    departureTime: Long!
+    "The time the rider will depart the place."
+    departure: DateTime
 
     """The stop related to the place."""
     stop: Stop
@@ -2313,6 +2310,16 @@ type Place {
 
     """The car parking related to the place"""
     carPark: CarPark @deprecated(reason: "carPark is deprecated. Use vehicleParking instead.")
+
+    """
+    The time the rider will arrive at the place. Format: Unix timestamp in milliseconds.
+    """
+    arrivalTime: Long! @deprecated(reason: "Use `arrival` which includes timezone information.")
+
+    """
+    The time the rider will depart the place. Format: Unix timestamp in milliseconds.
+    """
+    departureTime: Long! @deprecated(reason: "Use `departure` which includes timezone information.")
 }
 
 type placeAtDistance implements Node {

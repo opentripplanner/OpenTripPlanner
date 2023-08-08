@@ -582,6 +582,8 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLPlace {
+    public DataFetcher<java.time.OffsetDateTime> arrival();
+
     public DataFetcher<Long> arrivalTime();
 
     public DataFetcher<VehicleParking> bikePark();
@@ -589,6 +591,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<VehicleRentalPlace> bikeRentalStation();
 
     public DataFetcher<VehicleParking> carPark();
+
+    public DataFetcher<java.time.OffsetDateTime> departure();
 
     public DataFetcher<Long> departureTime();
 

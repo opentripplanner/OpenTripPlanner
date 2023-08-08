@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.OffsetDateTime;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLVertexType;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
@@ -17,6 +18,12 @@ import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 
 public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
 
+  @Override
+  public DataFetcher<OffsetDateTime> arrival() {
+    return environment -> getSource(environment).arrival.toOffsetDateTime();
+  }
+
+  @Deprecated
   @Override
   public DataFetcher<Long> arrivalTime() {
     return environment -> getSource(environment).arrival.toInstant().toEpochMilli();
@@ -43,6 +50,12 @@ public class PlaceImpl implements GraphQLDataFetchers.GraphQLPlace {
   @Override
   public DataFetcher<VehicleParking> carPark() {
     return this::getCarPark;
+  }
+
+  @Deprecated
+  @Override
+  public DataFetcher<OffsetDateTime> departure() {
+    return environment -> getSource(environment).departure.toOffsetDateTime();
   }
 
   @Override

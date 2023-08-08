@@ -14,15 +14,15 @@
                 "name" : "A",
                 "lat" : 5.0,
                 "lon" : 8.0,
-                "departureTime" : 1580641200000,
-                "arrivalTime" : 1580641200000
+                "departure" : "2020-02-02T11:00:00Z",
+                "arrival" : "2020-02-02T11:00:00Z"
               },
               "to" : {
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
-                "departureTime" : 1580641220000,
-                "arrivalTime" : 1580641220000
+                "departure" : "2020-02-02T11:00:20Z",
+                "arrival" : "2020-02-02T11:00:20Z"
               },
               "route" : null,
               "legGeometry" : null
@@ -35,15 +35,15 @@
                 "name" : "B",
                 "lat" : 6.0,
                 "lon" : 8.5,
-                "departureTime" : 1580641260000,
-                "arrivalTime" : 1580641260000
+                "departure" : "2020-02-02T11:01:00Z",
+                "arrival" : "2020-02-02T11:01:00Z"
               },
               "to" : {
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
-                "departureTime" : 1580642100000,
-                "arrivalTime" : 1580642100000
+                "departure" : "2020-02-02T11:15:00Z",
+                "arrival" : "2020-02-02T11:15:00Z"
               },
               "route" : {
                 "gtfsId" : "F:BUS",
@@ -62,15 +62,15 @@
                 "name" : "C",
                 "lat" : 7.0,
                 "lon" : 9.0,
-                "departureTime" : 1580643000000,
-                "arrivalTime" : 1580643000000
+                "departure" : "2020-02-02T11:30:00Z",
+                "arrival" : "2020-02-02T11:30:00Z"
               },
               "to" : {
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
-                "departureTime" : 1580644200000,
-                "arrivalTime" : 1580644200000
+                "departure" : "2020-02-02T11:50:00Z",
+                "arrival" : "2020-02-02T11:50:00Z"
               },
               "route" : {
                 "gtfsId" : "F:2",
@@ -89,15 +89,15 @@
                 "name" : "D",
                 "lat" : 8.0,
                 "lon" : 9.5,
-                "departureTime" : 1580644200000,
-                "arrivalTime" : 1580644200000
+                "departure" : "2020-02-02T11:50:00Z",
+                "arrival" : "2020-02-02T11:50:00Z"
               },
               "to" : {
                 "name" : "E",
                 "lat" : 9.0,
                 "lon" : 10.0,
-                "departureTime" : 1580644800000,
-                "arrivalTime" : 1580644800000
+                "departure" : "2020-02-02T12:00:00Z",
+                "arrival" : "2020-02-02T12:00:00Z"
               },
               "route" : null,
               "legGeometry" : null
