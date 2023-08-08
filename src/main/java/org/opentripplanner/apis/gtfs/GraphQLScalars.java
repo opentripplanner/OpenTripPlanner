@@ -10,6 +10,10 @@ import graphql.schema.CoercingParseLiteralException;
 import graphql.schema.CoercingParseValueException;
 import graphql.schema.CoercingSerializeException;
 import graphql.schema.GraphQLScalarType;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
@@ -45,6 +49,34 @@ public class GraphQLScalars {
             return null;
           }
           return ((StringValue) input).getValue();
+        }
+      }
+    )
+    .build();
+
+  public static GraphQLScalarType dateTimeScalar = GraphQLScalarType
+    .newScalar()
+    .name("DateTime")
+    .coercing(
+      new Coercing<OffsetDateTime, String>() {
+        @Override
+        public String serialize(@Nonnull Object dataFetcherResult)
+          throws CoercingSerializeException {
+          if (dataFetcherResult instanceof ZonedDateTime zdt) {
+            return zdt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+          } else if (dataFetcherResult instanceof OffsetDateTime odt) {
+            return odt.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+          } else return null;
+        }
+
+        @Override
+        public OffsetDateTime parseValue(Object input) throws CoercingParseValueException {
+          return null;
+        }
+
+        @Override
+        public OffsetDateTime parseLiteral(Object input) throws CoercingParseLiteralException {
+          return null;
         }
       }
     )

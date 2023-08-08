@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -78,6 +79,12 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
+  public DataFetcher<OffsetDateTime> end() {
+    return environment -> getSource(environment).getStartTime().toOffsetDateTime();
+  }
+
+  @Override
+  @Deprecated
   public DataFetcher<Long> endTime() {
     return environment -> getSource(environment).getEndTime().toInstant().toEpochMilli();
   }
@@ -216,6 +223,12 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
+  public DataFetcher<OffsetDateTime> start() {
+    return environment -> getSource(environment).getStartTime().toOffsetDateTime();
+  }
+
+  @Override
+  @Deprecated
   public DataFetcher<Long> startTime() {
     return environment -> getSource(environment).getStartTime().toInstant().toEpochMilli();
   }

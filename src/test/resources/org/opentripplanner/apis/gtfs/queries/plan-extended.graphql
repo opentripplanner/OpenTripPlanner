@@ -28,6 +28,8 @@
             walkTime
             legs {
                 mode
+                start
+                end
                 from {
                     name
                     lat

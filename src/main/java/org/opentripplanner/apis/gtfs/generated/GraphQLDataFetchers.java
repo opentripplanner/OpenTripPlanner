@@ -440,6 +440,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> duration();
 
+    public DataFetcher<java.time.OffsetDateTime> end();
+
     public DataFetcher<Long> endTime();
 
     public DataFetcher<Iterable<FareProductUse>> fareProducts();
@@ -479,6 +481,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Route> route();
 
     public DataFetcher<String> serviceDate();
+
+    public DataFetcher<java.time.OffsetDateTime> start();
 
     public DataFetcher<Long> startTime();
 

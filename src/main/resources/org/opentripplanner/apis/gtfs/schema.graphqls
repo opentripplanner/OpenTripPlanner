@@ -1640,11 +1640,16 @@ type RideHailingEstimate {
     productName: String
 }
 
+scalar DateTime
+
 type Leg {
     """
     The date and time when this leg begins. Format: Unix timestamp in milliseconds.
     """
     startTime: Long
+
+    start: DateTime
+    end: DateTime
 
     """
     The date and time when this leg ends. Format: Unix timestamp in milliseconds.

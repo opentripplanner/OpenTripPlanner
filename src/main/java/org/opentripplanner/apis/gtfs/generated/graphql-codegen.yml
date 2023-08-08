@@ -26,6 +26,7 @@ config:
     Polyline: String
     GeoJson: org.locationtech.jts.geom.Geometry
     Grams: org.opentripplanner.framework.model.Grams
+    DateTime: java.time.OffsetDateTime
     Duration: java.time.Duration
   mappers:
     AbsoluteDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAbsoluteDirection#GraphQLAbsoluteDirection
