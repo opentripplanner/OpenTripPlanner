@@ -36,6 +36,7 @@ import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegTime;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -442,7 +443,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> duration();
 
-    public DataFetcher<java.time.OffsetDateTime> end();
+    public DataFetcher<LegTime> end();
 
     public DataFetcher<Long> endTime();
 
@@ -484,7 +485,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> serviceDate();
 
-    public DataFetcher<java.time.OffsetDateTime> start();
+    public DataFetcher<LegTime> start();
 
     public DataFetcher<Long> startTime();
 
@@ -497,6 +498,14 @@ public class GraphQLDataFetchers {
     public DataFetcher<Trip> trip();
 
     public DataFetcher<Boolean> walkingBike();
+  }
+
+  public interface GraphQLLegTime {
+    public DataFetcher<java.time.OffsetDateTime> actual();
+
+    public DataFetcher<java.time.Duration> delay();
+
+    public DataFetcher<java.time.OffsetDateTime> scheduled();
   }
 
   /** A span of time. */

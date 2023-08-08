@@ -163,6 +163,16 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
+  public LegTime start() {
+    return LegTime.of(startTime, getDepartureDelay());
+  }
+
+  @Override
+  public LegTime end() {
+    return LegTime.of(endTime, getArrivalDelay());
+  }
+
+  @Override
   @Nonnull
   public TransitMode getMode() {
     return getTrip().getMode();

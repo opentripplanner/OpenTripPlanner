@@ -92,8 +92,16 @@ Most people want to get routing results out of OTP, so lets see the query for th
             end
             legs {
                 mode
-                start
-                end
+                start {
+                    scheduled
+                    actual
+                    delay
+                }
+                end {
+                    scheduled
+                    actual
+                    delay
+                }
                 from {
                     name
                     lat

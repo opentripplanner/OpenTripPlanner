@@ -2,7 +2,6 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -19,6 +18,7 @@ import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.LegTime;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -79,8 +79,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<OffsetDateTime> end() {
-    return environment -> getSource(environment).getEndTime().toOffsetDateTime();
+  public DataFetcher<LegTime> end() {
+    return environment -> getSource(environment).end();
   }
 
   @Override
@@ -223,8 +223,8 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   }
 
   @Override
-  public DataFetcher<OffsetDateTime> start() {
-    return environment -> getSource(environment).getStartTime().toOffsetDateTime();
+  public DataFetcher<LegTime> start() {
+    return environment -> getSource(environment).start();
   }
 
   @Override

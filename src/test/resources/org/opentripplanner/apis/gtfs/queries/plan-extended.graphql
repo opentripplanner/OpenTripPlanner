@@ -31,8 +31,16 @@
             walkTime
             legs {
                 mode
-                start
-                end
+                start {
+                    scheduled
+                    actual
+                    delay
+                }
+                end {
+                    scheduled
+                    actual
+                    delay
+                }
                 from {
                     name
                     lat

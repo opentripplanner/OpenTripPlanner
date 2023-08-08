@@ -1645,9 +1645,16 @@ type RideHailingEstimate {
 
 scalar DateTime
 
+type LegTime {
+    scheduled: DateTime
+    actual: DateTime
+    delay: Duration
+}
+
 type Leg {
-    start: DateTime
-    end: DateTime
+
+    start: LegTime
+    end: LegTime
 
     """
     For transit leg, the offset from the scheduled departure time of the boarding
