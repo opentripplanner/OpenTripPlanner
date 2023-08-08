@@ -2,12 +2,12 @@ package org.opentripplanner.street.model.edge;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.Locale;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -24,7 +24,7 @@ class EscalatorEdgeTest {
   @ParameterizedTest(name = "escalatorReluctance of {0} should lead to traversal costs of {1}")
   @VariableSource("args")
   void testWalking(double escalatorReluctance, double expectedWeight) {
-    var edge = new EscalatorEdge(from, to, 45);
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 45);
     var req = StreetSearchRequest
       .of()
       .withPreferences(p -> p.withWalk(w -> w.withEscalatorReluctance(escalatorReluctance)))
@@ -37,7 +37,7 @@ class EscalatorEdgeTest {
 
   @Test
   void testCycling() {
-    var edge = new EscalatorEdge(from, to, 10);
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10);
     var req = StreetSearchRequest.of().withMode(StreetMode.BIKE);
     var res = edge.traverse(new State(from, req.build()));
     assertEquals(res.length, 0);
@@ -45,9 +45,16 @@ class EscalatorEdgeTest {
 
   @Test
   void testWheelchair() {
-    var edge = new EscalatorEdge(from, to, 10);
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10);
     var req = StreetSearchRequest.of().withMode(StreetMode.WALK).withWheelchair(true);
     var res = edge.traverse(new State(from, req.build()));
     assertEquals(res.length, 0);
+  }
+
+  @Test
+  void name() {
+    var edge = EscalatorEdge.createEscalatorEdge(from, to, 10);
+    assertEquals("Rolltreppe", edge.getName().toString(Locale.GERMANY));
+    assertEquals("escalator", edge.getName().toString(Locale.ENGLISH));
   }
 }

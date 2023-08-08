@@ -34,8 +34,8 @@ public class AssertSpeedTestSetup {
             numberOfPatternForTestDate,
             config.testDate,
             buildConfig.transitServiceStart,
-            buildConfig.transitServiceEnd,
             OtpFileNames.BUILD_CONFIG_FILENAME,
+            buildConfig.transitServiceEnd,
             OtpFileNames.BUILD_CONFIG_FILENAME
           )
       );

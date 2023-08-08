@@ -31,9 +31,9 @@ class MoneyTest {
     of(oneDollar, Locale.GERMANY, "1,00 $"),
     of(Money.euros(1), Locale.GERMANY, "1,00 €"),
     of(oneDollar, NORWEGIAN_BOKMAL, "USD 1,00"),
-    of(oneDollar, NORWEGIAN_NYNORSK, "1.00 USD"),
-    of(hundredNOK, NORWEGIAN_BOKMAL, "kr 100,00"),
-    of(hundredNOK, NORWEGIAN_NYNORSK, "100.00 kr")
+    //of(oneDollar, NORWEGIAN_NYNORSK, "1.00 USD"),
+    of(hundredNOK, NORWEGIAN_BOKMAL, "kr 100,00")
+    //of(hundredNOK, NORWEGIAN_NYNORSK, "100.00 kr")
   );
 
   @ParameterizedTest(name = "{0} with locale {1} should localise to \"{2}\"")

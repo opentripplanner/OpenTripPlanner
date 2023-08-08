@@ -19,6 +19,7 @@ import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -47,6 +48,9 @@ import org.slf4j.LoggerFactory;
 public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(OsmBoardingLocationsModule.class);
+  private static final LocalizedString LOCALIZED_PLATFORM_NAME = new LocalizedString(
+    "name.platform"
+  );
   private final double searchRadiusDegrees = SphericalDistanceLibrary.metersToDegrees(250);
 
   private final Graph graph;
@@ -161,7 +165,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           .stream()
           .findFirst()
           .map(NamedArea::getName)
-          .orElse(new LocalizedString("name.platform"));
+          .orElse(LOCALIZED_PLATFORM_NAME);
         var label = "platform-centroid/%s".formatted(ts.getStop().getId().toString());
         var centroid = edgeList.getGeometry().getCentroid();
         var boardingLocation = vertexFactory.osmBoardingLocation(
@@ -180,15 +184,15 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
     var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
-    return StreetEdge.createStreetEdge(
-      from,
-      to,
-      line,
-      new LocalizedString("name.platform"),
-      SphericalDistanceLibrary.length(line),
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      false
-    );
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(from)
+      .withToVertex(to)
+      .withGeometry(line)
+      .withName(LOCALIZED_PLATFORM_NAME)
+      .withMeterLength(SphericalDistanceLibrary.length(line))
+      .withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE)
+      .withBack(false)
+      .buildAndConnect();
   }
 
   private void linkBoardingLocationToStop(

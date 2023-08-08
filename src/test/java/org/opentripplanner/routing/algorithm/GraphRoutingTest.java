@@ -28,6 +28,7 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
@@ -109,21 +110,31 @@ public abstract class GraphRoutingTest {
       return vertexFactory.intersection(label, longitude, latitude);
     }
 
+    public StreetEdgeBuilder<?> streetBuilder(
+      StreetVertex from,
+      StreetVertex to,
+      int length,
+      StreetTraversalPermission permissions
+    ) {
+      return new StreetEdgeBuilder<>()
+        .withFromVertex(from)
+        .withToVertex(to)
+        .withGeometry(
+          GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon())
+        )
+        .withName(String.format("%s%s street", from.getLabel(), to.getLabel()))
+        .withMeterLength(length)
+        .withPermission(permissions)
+        .withBack(false);
+    }
+
     public StreetEdge street(
       StreetVertex from,
       StreetVertex to,
       int length,
       StreetTraversalPermission permissions
     ) {
-      return StreetEdge.createStreetEdge(
-        from,
-        to,
-        GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-        String.format("%s%s street", from.getLabel(), to.getLabel()),
-        length,
-        permissions,
-        false
-      );
+      return streetBuilder(from, to, length, permissions).buildAndConnect();
     }
 
     public List<StreetEdge> street(
@@ -134,24 +145,28 @@ public abstract class GraphRoutingTest {
       StreetTraversalPermission reversePermissions
     ) {
       return List.of(
-        StreetEdge.createStreetEdge(
-          from,
-          to,
-          GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-          String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
-          length,
-          forwardPermissions,
-          false
-        ),
-        StreetEdge.createStreetEdge(
-          to,
-          from,
-          GeometryUtils.makeLineString(to.getLat(), to.getLon(), from.getLat(), from.getLon()),
-          String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
-          length,
-          reversePermissions,
-          true
-        )
+        new StreetEdgeBuilder<>()
+          .withFromVertex(from)
+          .withToVertex(to)
+          .withGeometry(
+            GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon())
+          )
+          .withName(String.format("%s%s street", from.getDefaultName(), to.getDefaultName()))
+          .withMeterLength(length)
+          .withPermission(forwardPermissions)
+          .withBack(false)
+          .buildAndConnect(),
+        new StreetEdgeBuilder<>()
+          .withFromVertex(to)
+          .withToVertex(from)
+          .withGeometry(
+            GeometryUtils.makeLineString(to.getLat(), to.getLon(), from.getLat(), from.getLon())
+          )
+          .withName(String.format("%s%s street", from.getDefaultName(), to.getDefaultName()))
+          .withMeterLength(length)
+          .withPermission(reversePermissions)
+          .withBack(true)
+          .buildAndConnect()
       );
     }
 

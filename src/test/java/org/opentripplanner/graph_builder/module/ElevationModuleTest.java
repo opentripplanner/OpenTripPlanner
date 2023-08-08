@@ -16,6 +16,7 @@ import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.OsmVertex;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
@@ -80,15 +81,15 @@ public class ElevationModuleTest {
     for (int i = 1; i < coordinates.length; ++i) {
       length += SphericalDistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
     }
-    StreetEdge edge = StreetEdge.createStreetEdge(
-      from,
-      to,
-      geometry,
-      "Southwest College St",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
+    StreetEdge edge = new StreetEdgeBuilder<>()
+      .withFromVertex(from)
+      .withToVertex(to)
+      .withGeometry(geometry)
+      .withName("Southwest College St")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
 
     // create the elevation module
     File cacheDirectory = new File(ElevationModuleTest.class.getResource("ned").getFile());

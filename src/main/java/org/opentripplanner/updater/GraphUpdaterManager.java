@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.GraphUpdater;
+import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,10 @@ import org.slf4j.LoggerFactory;
 public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterStatus {
 
   private static final Logger LOG = LoggerFactory.getLogger(GraphUpdaterManager.class);
+  /**
+   * This ensures a reasonable level of parallelism even for instances with a low CPU count.
+   */
+  private static final int MIN_POLLING_UPDATER_THREADS = 6;
 
   /**
    * OTP's multi-version concurrency control model for graph updating allows simultaneous reads, but
@@ -45,12 +50,13 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
    */
   private final ScheduledExecutorService scheduler;
 
+  private final ScheduledExecutorService pollingUpdaterPool;
+
   /**
-   * A pool of threads on which the updaters will run. This creates a pool that will auto-scale up
+   * A pool of threads on which the non-polling updaters will run. This creates a pool that will auto-scale up
    * to any size (maximum pool size is MAX_INT).
-   * FIXME The polling updaters occupy an entire thread, sleeping in between polling operations.
    */
-  private final ExecutorService updaterPool;
+  private final ExecutorService nonPollingUpdaterPool;
 
   /**
    * Keep track of all updaters so we can cleanly free resources associated with them at shutdown.
@@ -74,7 +80,12 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
     // Thread factory used to create new threads, giving them more human-readable names.
     var threadFactory = new ThreadFactoryBuilder().setNameFormat("updater-%d").build();
     this.scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
-    this.updaterPool = Executors.newCachedThreadPool(threadFactory);
+    this.pollingUpdaterPool =
+      Executors.newScheduledThreadPool(
+        Math.max(MIN_POLLING_UPDATER_THREADS, Runtime.getRuntime().availableProcessors()),
+        threadFactory
+      );
+    this.nonPollingUpdaterPool = Executors.newCachedThreadPool(threadFactory);
 
     for (GraphUpdater updater : updaters) {
       updaterList.add(updater);
@@ -88,25 +99,63 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
    */
   public void startUpdaters() {
     for (GraphUpdater updater : updaterList) {
-      LOG.info("Starting new thread for updater {}", updater);
-      updaterPool.execute(() -> {
+      Runnable runUpdater = () -> {
         try {
           updater.run();
         } catch (Exception e) {
           LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
         }
-      });
+      };
+      if (updater instanceof PollingGraphUpdater pollingGraphUpdater) {
+        LOG.info("Scheduling polling updater {}", updater);
+        if (pollingGraphUpdater.runOnlyOnce()) {
+          pollingUpdaterPool.schedule(runUpdater, 0, TimeUnit.SECONDS);
+        } else {
+          pollingUpdaterPool.scheduleWithFixedDelay(
+            runUpdater,
+            0,
+            pollingGraphUpdater.pollingPeriod().toSeconds(),
+            TimeUnit.SECONDS
+          );
+        }
+      } else {
+        LOG.info("Starting new thread for updater {}", updater);
+        nonPollingUpdaterPool.execute(runUpdater);
+      }
     }
     reportReadinessForUpdaters();
   }
 
+  /**
+   * Initiate the graceful shutdown of thread pools.
+   * Running tasks will be cancelled.
+   * Pending tasks will be ignored.
+   */
   public void stop() {
-    // TODO: find a better way to stop these threads
+    stop(true);
+  }
 
+  /**
+   * Initiate the graceful shutdown of thread pools.
+   * Optionally wait for running tasks to be processed before stopping (useful in tests).
+   * Pending tasks will be ignored.
+   */
+  public void stop(boolean cancelRunningTasks) {
+    // TODO: find a better way to stop these threads
+    LOG.info("Stopping updater manager with {} updaters.", numberOfUpdaters());
     // Shutdown updaters
-    updaterPool.shutdownNow();
+    if (cancelRunningTasks) {
+      pollingUpdaterPool.shutdownNow();
+      nonPollingUpdaterPool.shutdownNow();
+    } else {
+      pollingUpdaterPool.shutdown();
+      nonPollingUpdaterPool.shutdown();
+    }
+
     try {
-      boolean ok = updaterPool.awaitTermination(30, TimeUnit.SECONDS);
+      boolean ok =
+        pollingUpdaterPool.awaitTermination(15, TimeUnit.SECONDS) &&
+        nonPollingUpdaterPool.awaitTermination(15, TimeUnit.SECONDS);
       if (!ok) {
         LOG.warn("Timeout waiting for updaters to finish.");
       }
@@ -132,6 +181,7 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
       // This should not happen
       LOG.warn("Interrupted while waiting for scheduled task to finish.");
     }
+    LOG.info("Stopped updater manager");
   }
 
   @Override
@@ -198,8 +248,12 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
     return updaterList;
   }
 
-  public ExecutorService getUpdaterPool() {
-    return updaterPool;
+  public ExecutorService getPollingUpdaterPool() {
+    return pollingUpdaterPool;
+  }
+
+  public ExecutorService getNonPollingUpdaterPool() {
+    return nonPollingUpdaterPool;
   }
 
   public ScheduledExecutorService getScheduler() {
@@ -223,7 +277,10 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
         while (!otpIsShuttingDown) {
           try {
             if (updaterList.stream().allMatch(GraphUpdater::isPrimed)) {
-              LOG.info("OTP UPDATERS INITIALIZED - OTP is ready for routing!");
+              LOG.info(
+                "OTP UPDATERS INITIALIZED ({} updaters) - OTP is ready for routing!",
+                updaterList.size()
+              );
               return;
             }
             //noinspection BusyWait

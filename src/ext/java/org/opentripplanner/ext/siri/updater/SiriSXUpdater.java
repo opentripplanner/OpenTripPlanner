@@ -53,8 +53,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         SiriFuzzyTripMatcher.of(new DefaultTransitService(transitModel)),
         config.earlyStart()
       );
-    siriHttpLoader =
-      new SiriHttpLoader(url, config.timeout(), requestorRef, config.requestHeaders());
+    siriHttpLoader = new SiriHttpLoader(url, config.timeout(), config.requestHeaders());
 
     LOG.info(
       "Creating real-time alert updater (SIRI SX) running every {} seconds : {}",
@@ -114,7 +113,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   private Siri getUpdates() {
     long t1 = System.currentTimeMillis();
     try {
-      Siri siri = siriHttpLoader.fetchSXFeed();
+      Siri siri = siriHttpLoader.fetchSXFeed(requestorRef);
 
       ServiceDelivery serviceDelivery = siri.getServiceDelivery();
       if (serviceDelivery == null) {
