@@ -152,7 +152,7 @@ class GbfsFeedLoaderTest {
     assertEquals("lillestrombysykkel", systemInformation.getData().getSystemId());
     assertEquals(LANGUAGE_NB, systemInformation.getData().getLanguage());
     assertEquals("Lillestrøm bysykkel", systemInformation.getData().getName());
-    assertEquals("Europe/Oslo", systemInformation.getData().getTimezone());
+    assertEquals("Europe/Oslo", systemInformation.getData().getTimezone().value());
     assertNull(systemInformation.getData().getEmail());
     assertNull(systemInformation.getData().getOperator());
     assertNull(systemInformation.getData().getPhoneNumber());
@@ -204,7 +204,7 @@ class GbfsFeedLoaderTest {
     assertEquals("HSL_FI_Helsinki", systemInformation.getData().getSystemId());
     assertEquals(LANGUAGE_EN, systemInformation.getData().getLanguage());
     assertEquals("HSL Bikes Share", systemInformation.getData().getName());
-    assertEquals("Europe/Helsinki", systemInformation.getData().getTimezone());
+    assertEquals("Europe/Helsinki", systemInformation.getData().getTimezone().value());
     assertNull(systemInformation.getData().getEmail());
     assertNull(systemInformation.getData().getOperator());
     assertNull(systemInformation.getData().getPhoneNumber());
