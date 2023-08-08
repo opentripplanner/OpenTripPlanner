@@ -980,7 +980,11 @@ public class GraphQLDataFetchers {
 
   /** Stoptime represents the time when a specific trip arrives to or departs from a specific stop. */
   public interface GraphQLStoptime {
+    public DataFetcher<LegTime> arrival();
+
     public DataFetcher<Integer> arrivalDelay();
+
+    public DataFetcher<LegTime> departure();
 
     public DataFetcher<Integer> departureDelay();
 
