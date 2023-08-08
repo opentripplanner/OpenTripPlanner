@@ -68,14 +68,17 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
       case BUS -> "Used for short- and long-distance bus routes.";
       case TRAM -> "Tram, streetcar or light rail. Used for any light rail or street level system within a metropolitan area.";
       case FERRY -> "Used for short- and long-distance boat service.";
-      case AIRPLANE -> "Part of the [Extended GTFS route types](https://developers.google.com/transit/gtfs/reference/extended-route-types): Taking an airplane";
+      case AIRPLANE -> "Taking an airplane";
       case CABLE_CAR -> "Used for street-level cable cars where the cable runs beneath the car.";
       case GONDOLA -> "Gondola or suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.";
       case FUNICULAR -> "Used for any rail system that moves on steep inclines with a cable traction system.";
       case TROLLEYBUS -> "Used for trolleybus systems which draw power from overhead wires using poles on the roof of the vehicle.";
       case MONORAIL -> "Used for any rail system that runs on a single rail.";
-      //TODO: More info on carpool
-      case CARPOOL -> "Car pooling";
+      case CARPOOL -> """
+       Private car trips shared with others.
+       
+       This is currently not specified in GTFS so we use the mode types values 1500-1560 which are in range of private taxis.
+       """;
       case TAXI -> "Using a taxi service";
     };
   }
