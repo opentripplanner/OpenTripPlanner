@@ -58,7 +58,7 @@ nav:
     - Visual Identity: 'Visual-Identity.md'
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
-    - APIs and Data Sources: 'Apis-Data-Sources.md'
+    - Data Sources: 'Data-Sources.md'
     - Getting OTP: 'Getting-OTP.md'
     - Container Image: 'Container-Image.md'
     - System Requirements and Suggestions: 'System-Requirements.md'
@@ -67,7 +67,9 @@ nav:
     - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
     - Comparing OTP2 to OTP1: 'Version-Comparison.md'
-    - OTP2 Migration Guide: 'OTP2-MigrationGuide.md'
+- APIs:
+    - Introduction: 'Apis.md'
+    - GraphQL Tutorial: 'GraphQL-Tutorial.md'
 - Configuration:
     - Introduction: 'Configuration.md'
     - Reference:

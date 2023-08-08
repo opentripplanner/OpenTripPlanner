@@ -23,6 +23,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -49,24 +50,24 @@ public class LinkingTest {
         new Coordinate[] { v0.getCoordinate(), v1.getCoordinate() }
       );
       double dist = SphericalDistanceLibrary.distance(v0.getCoordinate(), v1.getCoordinate());
-      StreetEdge s0 = StreetEdge.createStreetEdge(
-        v0,
-        v1,
-        geom,
-        "test",
-        dist,
-        StreetTraversalPermission.ALL,
-        false
-      );
-      StreetEdge s1 = StreetEdge.createStreetEdge(
-        v1,
-        v0,
-        geom.reverse(),
-        "back",
-        dist,
-        StreetTraversalPermission.ALL,
-        true
-      );
+      StreetEdge s0 = new StreetEdgeBuilder<>()
+        .withFromVertex(v0)
+        .withToVertex(v1)
+        .withGeometry(geom)
+        .withName("test")
+        .withMeterLength(dist)
+        .withPermission(StreetTraversalPermission.ALL)
+        .withBack(false)
+        .buildAndConnect();
+      StreetEdge s1 = new StreetEdgeBuilder<>()
+        .withFromVertex(v1)
+        .withToVertex(v0)
+        .withGeometry(geom.reverse())
+        .withName("back")
+        .withMeterLength(dist)
+        .withPermission(StreetTraversalPermission.ALL)
+        .withBack(true)
+        .buildAndConnect();
 
       // split it but not too close to the end
       double splitVal = Math.random() * 0.95 + 0.025;

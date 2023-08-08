@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdge;
+import static org.opentripplanner.street.model._data.StreetModelForTest.streetEdgeBuilder;
 
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,8 +84,9 @@ public class StreetEdgeTest {
 
   @Test
   public void testTraverseAsPedestrian() {
-    StreetEdge e1 = streetEdge(v1, v2, 100.0, StreetTraversalPermission.ALL);
-    e1.setCarSpeed(10.0f);
+    StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, StreetTraversalPermission.ALL)
+      .withCarSpeed(10.0f)
+      .buildAndConnect();
 
     StreetSearchRequest options = StreetSearchRequest
       .copyOf(proto)
@@ -103,8 +105,9 @@ public class StreetEdgeTest {
 
   @Test
   public void testTraverseAsCar() {
-    StreetEdge e1 = streetEdge(v1, v2, 100.0, StreetTraversalPermission.ALL);
-    e1.setCarSpeed(10.0f);
+    StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, StreetTraversalPermission.ALL)
+      .withCarSpeed(10.0f)
+      .buildAndConnect();
 
     State s0 = new State(v1, StreetSearchRequest.copyOf(proto).withMode(StreetMode.CAR).build());
     State s1 = e1.traverse(s0)[0];
@@ -142,14 +145,7 @@ public class StreetEdgeTest {
    */
   @Test
   public void testTraverseModeSwitchBike() {
-    var vWithTrafficLight = new LabelledIntersectionVertex(
-      "maple_1st",
-      2.0,
-      2.0,
-      null,
-      false,
-      true
-    );
+    var vWithTrafficLight = new LabelledIntersectionVertex("maple_1st", 2.0, 2.0, false, true);
     StreetEdge e0 = streetEdge(v0, vWithTrafficLight, 50.0, StreetTraversalPermission.PEDESTRIAN);
     StreetEdge e1 = streetEdge(
       vWithTrafficLight,
@@ -186,14 +182,7 @@ public class StreetEdgeTest {
    */
   @Test
   public void testTraverseModeSwitchWalk() {
-    var vWithTrafficLight = new LabelledIntersectionVertex(
-      "maple_1st",
-      2.0,
-      2.0,
-      null,
-      false,
-      true
-    );
+    var vWithTrafficLight = new LabelledIntersectionVertex("maple_1st", 2.0, 2.0, false, true);
     StreetEdge e0 = streetEdge(
       v0,
       vWithTrafficLight,
@@ -321,16 +310,17 @@ public class StreetEdgeTest {
 
     double length = 650.0;
 
-    StreetEdge testStreet = StreetEdge.createStreetEdge(
-      v1,
-      v2,
-      geometry,
-      "Test Lane",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
-    testStreet.setBicycleSafetyFactor(0.74f); // a safe street
+    StreetEdge testStreet = new StreetEdgeBuilder<>()
+      .withFromVertex(v1)
+      .withToVertex(v2)
+      .withGeometry(geometry)
+      .withName("Test Lane")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      // a safe street
+      .withBicycleSafetyFactor(0.74f)
+      .buildAndConnect();
 
     Coordinate[] profile = new Coordinate[] {
       new Coordinate(0, 0), // slope = 0.1

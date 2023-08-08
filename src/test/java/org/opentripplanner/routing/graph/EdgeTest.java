@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -29,33 +29,30 @@ public class EdgeTest {
     StreetVertex vb = intersectionVertex("B", 10.1, 10.1);
     StreetVertex vc = intersectionVertex("C", 10.2, 10.2);
     StreetVertex vd = intersectionVertex("D", 10.3, 10.3);
-    Edge eab = StreetEdge.createStreetEdge(
-      va,
-      vb,
-      null,
-      "AB",
-      10,
-      StreetTraversalPermission.ALL,
-      false
-    );
-    Edge ebc = StreetEdge.createStreetEdge(
-      vb,
-      vc,
-      null,
-      "BC",
-      10,
-      StreetTraversalPermission.ALL,
-      false
-    );
-    Edge ecd = StreetEdge.createStreetEdge(
-      vc,
-      vd,
-      null,
-      "CD",
-      10,
-      StreetTraversalPermission.ALL,
-      false
-    );
+    Edge eab = new StreetEdgeBuilder<>()
+      .withFromVertex(va)
+      .withToVertex(vb)
+      .withName("AB")
+      .withMeterLength(10)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+    Edge ebc = new StreetEdgeBuilder<>()
+      .withFromVertex(vb)
+      .withToVertex(vc)
+      .withName("BC")
+      .withMeterLength(10)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+    Edge ecd = new StreetEdgeBuilder<>()
+      .withFromVertex(vc)
+      .withToVertex(vd)
+      .withName("CD")
+      .withMeterLength(10)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
     // remove an edge that is not connected to this vertex
     va.removeOutgoing(ecd);
     assertEquals(va.getDegreeOut(), 1);

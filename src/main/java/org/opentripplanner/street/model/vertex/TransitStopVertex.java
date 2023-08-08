@@ -3,6 +3,7 @@ package org.opentripplanner.street.model.vertex;
 import java.util.HashSet;
 import java.util.Set;
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.transit.model.basic.Accessibility;

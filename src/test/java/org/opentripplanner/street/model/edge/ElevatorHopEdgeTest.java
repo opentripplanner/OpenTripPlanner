@@ -28,7 +28,7 @@ class ElevatorHopEdgeTest {
 
   @ParameterizedTest(name = "{0} should be allowed to traverse when requesting onlyAccessible")
   @VariableSource("noTraverse")
-  public void shouldNotTraverse(Accessibility wheelchair) {
+  void shouldNotTraverse(Accessibility wheelchair) {
     var req = StreetSearchRequest.of();
     AccessibilityPreferences feature = AccessibilityPreferences.ofOnlyAccessible();
     req
@@ -63,7 +63,7 @@ class ElevatorHopEdgeTest {
 
   @ParameterizedTest(name = "{0} should allowed to traverse with a cost of {1}")
   @VariableSource("all")
-  public void allowByDefault(Accessibility wheelchair, double expectedCost) {
+  void allowByDefault(Accessibility wheelchair, double expectedCost) {
     var req = StreetSearchRequest.of().build();
     var result = traverse(wheelchair, req)[0];
     assertNotNull(result);
