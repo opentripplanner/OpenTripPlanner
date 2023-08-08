@@ -80,7 +80,7 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
 
   @Override
   public DataFetcher<OffsetDateTime> end() {
-    return environment -> getSource(environment).getStartTime().toOffsetDateTime();
+    return environment -> getSource(environment).getEndTime().toOffsetDateTime();
   }
 
   @Override

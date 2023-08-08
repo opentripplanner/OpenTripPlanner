@@ -17,12 +17,12 @@
             },
         ]) {
         itineraries {
-            startTime
-            endTime
+            start
+            end
             legs {
                 mode
-                startTime
-                endTime
+                start
+                end
                 from {
                     name
                     lat
