@@ -25,7 +25,7 @@ public class SeptaSmokeTest {
     Set<String> modes = Set.of("TRANSIT", "WALK");
     SmokeTest.basicRouteTest(
       new SmokeTestRequest(airport, stPetersCemetary, modes),
-      List.of("WALK", "RAIL", "RAIL", "WALK", "SUBWAY", "WALK")
+      List.of("WALK", "RAIL", "WALK", "SUBWAY", "WALK")
     );
   }
 
