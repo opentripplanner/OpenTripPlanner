@@ -24,3 +24,7 @@ docker run -it --rm -p 8080:8080 -v "$(pwd)/berlin:/var/opentripplanner" docker.
 ```
 
 Now open [http://localhost:8080](http://localhost:8080) to see your running OTP instance.
+
+## Additional notes
+Make sure to include the word "gtfs" when naming the gtfs files that you want to use for OTP. Otherwise, graph build will fail.
+When building graph fails (out-of-memory) add an option <b> -e JAVA_OPTS='-Xmx4g' </b> to docker run command
