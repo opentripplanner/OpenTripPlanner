@@ -16,6 +16,9 @@
             }
         ]) {
         itineraries {
+            start
+            end
+            # next two are deprecated
             startTime
             endTime
             generalizedCost

@@ -1500,12 +1500,15 @@ type Itinerary {
     """
     Time when the user leaves from the origin. Format: Unix timestamp in milliseconds.
     """
-    startTime: Long
+    startTime: Long @deprecated(reason: "Use `start` instead which includes timezone information.")
 
     """
-    Time when the user arrives to the destination.. Format: Unix timestamp in milliseconds.
+    Time when the user arrives to the destination. Format: Unix timestamp in milliseconds.
     """
-    endTime: Long
+    endTime: Long @deprecated(reason: "Use `end` instead which includes timezone information.")
+
+    start: DateTime
+    end: DateTime
 
     """Duration of the trip on this itinerary, in seconds."""
     duration: Long
