@@ -1,10 +1,15 @@
 package org.opentripplanner.smoketest;
 
+import static org.opentripplanner.client.model.RequestMode.BICYCLE;
+import static org.opentripplanner.client.model.RequestMode.BUS;
+import static org.opentripplanner.client.model.RequestMode.TRANSIT;
+import static org.opentripplanner.client.model.RequestMode.WALK;
+
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.client.model.Coordinate;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 /**
@@ -16,12 +21,12 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
 @Tag("houston")
 public class HoustonSmokeTest {
 
-  WgsCoordinate galvestonRoad = new WgsCoordinate(29.6598, -95.2342);
-  WgsCoordinate northLindale = new WgsCoordinate(29.8158, -95.3697);
+  Coordinate galvestonRoad = new Coordinate(29.6598, -95.2342);
+  Coordinate northLindale = new Coordinate(29.8158, -95.3697);
 
   @Test
   public void routeFromSouthToNorth() {
-    Set<String> modes = Set.of("TRANSIT", "WALK");
+    var modes = Set.of(TRANSIT, WALK);
     SmokeTest.basicRouteTest(
       new SmokeTestRequest(galvestonRoad, northLindale, modes),
       List.of("WALK", "BUS", "BUS", "WALK", "TRAM", "WALK")
@@ -30,7 +35,7 @@ public class HoustonSmokeTest {
 
   @Test
   public void selectOnlyBusses() {
-    Set<String> modes = Set.of("BUS", "WALK");
+    var modes = Set.of(BUS, WALK);
     SmokeTest.basicRouteTest(
       new SmokeTestRequest(galvestonRoad, northLindale, modes),
       List.of("WALK", "BUS", "BUS", "WALK", "BUS", "WALK")
@@ -40,7 +45,7 @@ public class HoustonSmokeTest {
   @Test
   public void bikeRoute() {
     SmokeTest.basicRouteTest(
-      new SmokeTestRequest(galvestonRoad, northLindale, Set.of("BICYCLE")),
+      new SmokeTestRequest(galvestonRoad, northLindale, Set.of(BICYCLE)),
       List.of("BICYCLE")
     );
   }

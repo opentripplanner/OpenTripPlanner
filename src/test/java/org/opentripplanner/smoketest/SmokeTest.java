@@ -11,16 +11,20 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
-import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.resource.DebugOutput;
+import org.opentripplanner.client.OtpApiClient;
+import org.opentripplanner.client.model.TripPlan;
+import org.opentripplanner.client.model.TripPlan.Itinerary;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.smoketest.util.GraphQLClient;
-import org.opentripplanner.smoketest.util.RestClient;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 /**
@@ -72,12 +76,12 @@ public class SmokeTest {
    * modes.
    */
   static void assertThatItineraryHasModes(
-    List<ApiItinerary> itineraries,
+    List<Itinerary> itineraries,
     List<String> expectedModes
   ) {
     var itineraryModes = itineraries
       .stream()
-      .map(i -> i.legs.stream().map(l -> l.mode).toList())
+      .map(i -> i.legs().stream().map(l -> l.mode().toString()).toList())
       .toList();
     assertTrue(
       itineraryModes.contains(expectedModes),
@@ -89,13 +93,22 @@ public class SmokeTest {
     );
   }
 
-  static void basicRouteTest(SmokeTestRequest req, List<String> expectedModes) {
-    var otpResponse = RestClient.sendPlanRequest(req);
-    var itineraries = otpResponse.getPlan().itineraries;
+  static TripPlan basicRouteTest(SmokeTestRequest req, List<String> expectedModes) {
+    try {
+    var client = new OtpApiClient(ZoneId.of("America/New_York"), "localhost:8080");
 
-    assertTrue(itineraries.size() >= 1, "Expected to see some itineraries but got zero.");
+    TripPlan plan = client.plan(req.from(), req.to(), SmokeTest.nextMonday().atTime(LocalTime.of(12,0)), req.modes());
+      var itineraries = plan.itineraries();
 
-    assertThatItineraryHasModes(itineraries, expectedModes);
+      assertFalse(itineraries.isEmpty(), "Expected to see some itineraries but got zero.");
+
+      assertThatItineraryHasModes(itineraries, expectedModes);
+      return plan;
+    } catch (InterruptedException|IOException e) {
+      throw new RuntimeException(e);
+    }
+
+
   }
 
   static void assertThereArePatternsWithVehiclePositions() {
