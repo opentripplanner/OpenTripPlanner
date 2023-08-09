@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.Money;
@@ -36,6 +37,10 @@ public record FareProduct(
     Objects.requireNonNull(id);
     Objects.requireNonNull(name);
     Objects.requireNonNull(price);
+  }
+
+  public static FareProductBuilder of(FeedScopedId id, String name, Money price) {
+    return new FareProductBuilder(id, name, price);
   }
 
   public boolean coversDuration(Duration journeyDuration) {

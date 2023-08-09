@@ -38,83 +38,45 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   String expressNetwork = "express";
   String localNetwork = "local";
 
-  FareProduct single = new FareProduct(
-    new FeedScopedId(FEED_ID, "single"),
-    "Single one-way ticket",
-    Money.euros(1),
-    null,
-    null,
-    null
-  );
-  FareProduct singleToOuter = new FareProduct(
-    new FeedScopedId(FEED_ID, "single_to_outer"),
-    "Single one-way ticket to outer zone",
-    Money.euros(1),
-    null,
-    null,
-    null
-  );
-
-  FareProduct singleFromOuter = new FareProduct(
-    new FeedScopedId(FEED_ID, "single_from_outer"),
-    "Single one-way ticket from outer zone to anywhere",
-    Money.euros(1),
-    null,
-    null,
-    null
-  );
-
-  FareProduct dayPass = new FareProduct(
-    new FeedScopedId(FEED_ID, "day_pass"),
-    "Day Pass",
-    Money.euros(5),
-    Duration.ofDays(1),
-    null,
-    null
-  );
-  FareProduct innerToOuterZoneSingle = new FareProduct(
-    new FeedScopedId(FEED_ID, "zone_ab_single"),
-    "Day Pass",
-    Money.euros(5),
-    null,
-    null,
-    null
-  );
-  FareProduct monthlyPass = new FareProduct(
-    new FeedScopedId("another", "monthly_pass"),
-    "Monthly Pass",
-    Money.euros(30),
-    Duration.ofDays(30),
-    null,
-    null
-  );
-
-  FareProduct expressPass = new FareProduct(
-    new FeedScopedId(FEED_ID, "express_pass"),
-    "Express Pass",
-    Money.euros(50),
-    Duration.ofDays(1),
-    null,
-    null
-  );
-
-  FareProduct localPass = new FareProduct(
-    new FeedScopedId(FEED_ID, "local_pass"),
-    "Local Pass",
-    Money.euros(20),
-    Duration.ofDays(1),
-    null,
-    null
-  );
-
-  FareProduct freeTransfer = new FareProduct(
-    new FeedScopedId(FEED_ID, "free_transfer"),
-    "Free transfer",
-    Money.euros(0),
-    null,
-    null,
-    null
-  );
+  FareProduct single = FareProduct
+    .of(new FeedScopedId(FEED_ID, "single"), "Single one-way ticket", Money.euros(1))
+    .build();
+  FareProduct singleToOuter = FareProduct
+    .of(
+      new FeedScopedId(FEED_ID, "single_to_outer"),
+      "Single one-way ticket to outer zone",
+      Money.euros(1)
+    )
+    .build();
+  FareProduct singleFromOuter = FareProduct
+    .of(
+      new FeedScopedId(FEED_ID, "single_from_outer"),
+      "Single one-way ticket from outer zone to anywhere",
+      Money.euros(1)
+    )
+    .build();
+  FareProduct dayPass = FareProduct
+    .of(new FeedScopedId(FEED_ID, "day_pass"), "Day Pass", Money.euros(5))
+    .withValidity(Duration.ofDays(1))
+    .build();
+  FareProduct innerToOuterZoneSingle = FareProduct
+    .of(new FeedScopedId(FEED_ID, "zone_ab_single"), "Day Pass", Money.euros(5))
+    .build();
+  FareProduct monthlyPass = FareProduct
+    .of(new FeedScopedId("another", "monthly_pass"), "Monthly Pass", Money.euros(30))
+    .withValidity(Duration.ofDays(30))
+    .build();
+  FareProduct expressPass = FareProduct
+    .of(new FeedScopedId(FEED_ID, "express_pass"), "Express Pass", Money.euros(50))
+    .withValidity(Duration.ofDays(1))
+    .build();
+  FareProduct localPass = FareProduct
+    .of(new FeedScopedId(FEED_ID, "local_pass"), "Local Pass", Money.euros(20))
+    .withValidity(Duration.ofDays(1))
+    .build();
+  FareProduct freeTransfer = FareProduct
+    .of(new FeedScopedId(FEED_ID, "free_transfer"), "Free transfer", Money.euros(0))
+    .build();
 
   Place INNER_ZONE_STOP = Place.forStop(
     TransitModelForTest.stop("inner city stop").withCoordinate(1, 1).build()
@@ -251,23 +213,21 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   class Transfers {
 
     FeedScopedId TRANSFER_ID = id("transfer");
-    FareProduct freeTransferFromInnerToOuter = new FareProduct(
-      new FeedScopedId(FEED_ID, "free-transfer-from-inner-to-outer"),
-      "Single ticket with free transfer from the inner to the outer zone",
-      Money.euros(50),
-      null,
-      null,
-      null
-    );
+    FareProduct freeTransferFromInnerToOuter = FareProduct
+      .of(
+        new FeedScopedId(FEED_ID, "free-transfer-from-inner-to-outer"),
+        "Single ticket with free transfer from the inner to the outer zone",
+        Money.euros(50)
+      )
+      .build();
 
-    FareProduct freeTransferSingle = new FareProduct(
-      new FeedScopedId(FEED_ID, "free-transfer-from-anywhere-to-outer"),
-      "Single ticket with free transfer any zone",
-      Money.euros(10),
-      null,
-      null,
-      null
-    );
+    FareProduct freeTransferSingle = FareProduct
+      .of(
+        new FeedScopedId(FEED_ID, "free-transfer-from-anywhere-to-outer"),
+        "Single ticket with free transfer any zone",
+        Money.euros(10)
+      )
+      .build();
 
     GtfsFaresV2Service service = new GtfsFaresV2Service(
       List.of(
@@ -326,56 +286,31 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
   class DistanceFares {
 
     FeedScopedId DISTANCE_ID = id("distance");
-    FareProduct threeStopProduct = new FareProduct(
-      new FeedScopedId(FEED_ID, "three-stop-product"),
-      "three-stop-product",
-      Money.euros(1),
-      Duration.ofHours(1),
-      null,
-      null
-    );
+    FareProduct threeStopProduct = FareProduct
+      .of(new FeedScopedId(FEED_ID, "three-stop-product"), "three-stop-product", Money.euros(1))
+      .withValidity(Duration.ofHours(1))
+      .build();
+    FareProduct fiveStopProduct = FareProduct
+      .of(new FeedScopedId(FEED_ID, "five-stop-product"), "five-stop-product", Money.euros(1))
+      .withValidity(Duration.ofHours(1))
+      .build();
+    FareProduct twelveStopProduct = FareProduct
+      .of(new FeedScopedId(FEED_ID, "twelve-stop-product"), "twelve-stop-product", Money.euros(1))
+      .withValidity(Duration.ofHours(1))
+      .build();
 
-    FareProduct fiveStopProduct = new FareProduct(
-      new FeedScopedId(FEED_ID, "five-stop-product"),
-      "five-stop-product",
-      Money.euros(1),
-      Duration.ofHours(1),
-      null,
-      null
-    );
-    FareProduct twelveStopProduct = new FareProduct(
-      new FeedScopedId(FEED_ID, "twelve-stop-product"),
-      "twelve-stop-product",
-      Money.euros(1),
-      Duration.ofHours(1),
-      null,
-      null
-    );
-
-    FareProduct tenKmProduct = new FareProduct(
-      new FeedScopedId(FEED_ID, "ten-km-product"),
-      "ten-km-product",
-      Money.euros(1),
-      Duration.ofHours(1),
-      null,
-      null
-    );
-    FareProduct threeKmProduct = new FareProduct(
-      new FeedScopedId(FEED_ID, "three-km-product"),
-      "three-km-product",
-      Money.euros(1),
-      Duration.ofHours(1),
-      null,
-      null
-    );
-    FareProduct twoKmProduct = new FareProduct(
-      new FeedScopedId(FEED_ID, "two-km-product"),
-      "two-km-product",
-      Money.euros(1),
-      Duration.ofHours(1),
-      null,
-      null
-    );
+    FareProduct tenKmProduct = FareProduct
+      .of(new FeedScopedId(FEED_ID, "ten-km-product"), "ten-km-product", Money.euros(1))
+      .withValidity(Duration.ofHours(1))
+      .build();
+    FareProduct threeKmProduct = FareProduct
+      .of(new FeedScopedId(FEED_ID, "three-km-product"), "three-km-product", Money.euros(1))
+      .withValidity(Duration.ofHours(1))
+      .build();
+    FareProduct twoKmProduct = FareProduct
+      .of(new FeedScopedId(FEED_ID, "two-km-product"), "two-km-product", Money.euros(1))
+      .withValidity(Duration.ofHours(1))
+      .build();
 
     List<FareLegRule> stopRules = List.of(
       FareLegRule
