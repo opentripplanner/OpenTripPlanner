@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -21,6 +20,10 @@ public record FareLegRule(
   public FareLegRule {
     Objects.requireNonNull(id);
     Objects.requireNonNull(fareProducts);
+    if (fareProducts.isEmpty()) {
+      throw new IllegalArgumentException("fareProducts must contain at least one value");
+    }
+    fareProducts.forEach(Objects::requireNonNull);
   }
 
   public String feedId() {

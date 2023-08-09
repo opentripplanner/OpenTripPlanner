@@ -6,7 +6,6 @@ import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.Nullable;
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.basic.Money;
