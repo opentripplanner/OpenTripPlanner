@@ -75,10 +75,7 @@ public class SmokeTest {
    * Given a list of itineraries assert that at least one of them has legs that have the expected
    * modes.
    */
-  static void assertThatItineraryHasModes(
-    List<Itinerary> itineraries,
-    List<String> expectedModes
-  ) {
+  static void assertThatItineraryHasModes(List<Itinerary> itineraries, List<String> expectedModes) {
     var itineraryModes = itineraries
       .stream()
       .map(i -> i.legs().stream().map(l -> l.mode().toString()).toList())
@@ -95,20 +92,23 @@ public class SmokeTest {
 
   static TripPlan basicRouteTest(SmokeTestRequest req, List<String> expectedModes) {
     try {
-    var client = new OtpApiClient(ZoneId.of("America/New_York"), "localhost:8080");
+      var client = new OtpApiClient(ZoneId.of("America/New_York"), "localhost:8080");
 
-    TripPlan plan = client.plan(req.from(), req.to(), SmokeTest.nextMonday().atTime(LocalTime.of(12,0)), req.modes());
+      TripPlan plan = client.plan(
+        req.from(),
+        req.to(),
+        SmokeTest.nextMonday().atTime(LocalTime.of(12, 0)),
+        req.modes()
+      );
       var itineraries = plan.itineraries();
 
       assertFalse(itineraries.isEmpty(), "Expected to see some itineraries but got zero.");
 
       assertThatItineraryHasModes(itineraries, expectedModes);
       return plan;
-    } catch (InterruptedException|IOException e) {
+    } catch (InterruptedException | IOException e) {
       throw new RuntimeException(e);
     }
-
-
   }
 
   static void assertThereArePatternsWithVehiclePositions() {

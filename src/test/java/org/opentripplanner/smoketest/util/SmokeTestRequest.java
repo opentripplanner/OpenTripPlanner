@@ -13,5 +13,4 @@ public record SmokeTestRequest(
   public SmokeTestRequest(Coordinate from, Coordinate to, Set<RequestMode> modes) {
     this(from, to, modes, false);
   }
-
 }

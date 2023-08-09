@@ -29,10 +29,7 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
 public class AtlantaSmokeTest {
 
   Coordinate nearGeorgiaStateStation = new Coordinate(33.74139944890028, -84.38607215881348);
-  Coordinate powderSpringsInsideFlexZone1 = new Coordinate(
-    33.86916840022388,
-    -84.66315507888794
-  );
+  Coordinate powderSpringsInsideFlexZone1 = new Coordinate(33.86916840022388, -84.66315507888794);
 
   @Test
   public void regularRouteFromCentralAtlantaToPowderSprings() {
