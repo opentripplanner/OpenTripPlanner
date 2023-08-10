@@ -61,6 +61,12 @@ public class HSLFareServiceTest implements PlanTestConstants {
       .withTimezone("Europe/Helsinki")
       .build();
 
+    Agency agency3 = Agency
+      .of(new FeedScopedId("FEED2", "AG3"))
+      .withName("Agency 3")
+      .withTimezone("Europe/Helsinki")
+      .build();
+
     FareZone A = FareZone.of(new FeedScopedId(FEED_ID, "A")).build();
     FareZone B = FareZone.of(new FeedScopedId(FEED_ID, "B")).build();
     FareZone C = FareZone.of(new FeedScopedId(FEED_ID, "C")).build();
@@ -208,6 +214,13 @@ public class HSLFareServiceTest implements PlanTestConstants {
       .of(new FeedScopedId(FEED_ID, "R2"))
       .withAgency(agency2)
       .withLongName(new NonLocalizedString("Route agency 2"))
+      .withMode(TransitMode.BUS)
+      .build();
+
+    Route routeAgency3 = Route
+      .of(new FeedScopedId("FEED2", "R3"))
+      .withAgency(agency3)
+      .withLongName(new NonLocalizedString("Route agency 3"))
       .withMode(TransitMode.BUS)
       .build();
 
@@ -362,6 +375,21 @@ public class HSLFareServiceTest implements PlanTestConstants {
         "Bus ride within zone A, then another one outside of HSL's area",
         hslFareService,
         A1_A2_F,
+        List.of(fareAttributeAB.getId())
+      )
+    );
+
+    // Multifeed case
+    Itinerary A1_A2_2 = newItinerary(A1, T11_06)
+      .bus(routeAgency3, 1, T11_06, T11_14, A2)
+      .bus(routeAgency1, 2, T11_30, T11_50, A1)
+      .build();
+
+    args.add(
+      Arguments.of(
+        "Bus ride within zone A with two legs using different agencies from different feeds ",
+        hslFareService,
+        A1_A2_2,
         List.of(fareAttributeAB.getId())
       )
     );

@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
+import com.google.common.collect.Sets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -7,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.RouteOriginDestination;
@@ -51,6 +53,17 @@ public class HSLFareServiceImpl extends DefaultFareService {
     String agency = null;
     boolean singleAgency = true;
 
+    // Do not consider fares for legs that do not have fare rules in the same feed
+    Set<String> fareRuleFeedIds = fareRules
+      .stream()
+      .map(fr -> fr.getFareAttribute().getId().getFeedId())
+      .collect(Collectors.toSet());
+    Set<String> legFeedIds = legs
+      .stream()
+      .map(leg -> leg.getAgency().getId().getFeedId())
+      .collect(Collectors.toSet());
+    if (!Sets.difference(legFeedIds, fareRuleFeedIds).isEmpty()) return Optional.ofNullable(null);
+
     for (Leg leg : legs) {
       lastRideStartTime = leg.getStartTime();
       if (agency == null) {
@@ -58,11 +71,12 @@ public class HSLFareServiceImpl extends DefaultFareService {
       } else if (agency != leg.getAgency().getId().getId().toString()) {
         singleAgency = false;
       }
+
       /* HSL specific logic: all exception routes start and end from the defined zone set,
                but visit temporarily (maybe 1 stop only) an 'external' zone */
       Money bestSpecialFare = MAX_PRICE;
-      Set<String> ruleZones = null;
 
+      Set<String> ruleZones = null;
       for (FareRuleSet ruleSet : fareRules) {
         if (
           ruleSet.hasAgencyDefined() &&
@@ -114,6 +128,7 @@ public class HSLFareServiceImpl extends DefaultFareService {
           }
         }
       }
+
       if (ruleZones != null) { // the special case
         // evaluate boolean ride.zones AND rule.zones
         Set<String> zoneIntersection = new HashSet<String>(
