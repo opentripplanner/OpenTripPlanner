@@ -16,8 +16,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.client.model.Coordinate;
-import org.opentripplanner.client.model.RequestMode;
-import org.opentripplanner.smoketest.util.GraphQLClient;
+import org.opentripplanner.client.model.Route;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 @Tag("smoke-test")
@@ -50,14 +49,17 @@ public class SeattleSmokeTest {
 
   @Test
   public void monorailRoute() {
-    var modes = GraphQLClient
-      .routes()
-      .stream()
-      .map(GraphQLClient.Route::mode)
-      .map(Objects::toString)
-      .collect(Collectors.toSet());
-
-    assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS"), modes);
+    try {
+      Set<Object> modes = SmokeTest.API_CLIENT
+        .routes()
+        .stream()
+        .map(Route::mode)
+        .map(Objects::toString)
+        .collect(Collectors.toSet());
+      assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS"), modes);
+    } catch (IOException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Test

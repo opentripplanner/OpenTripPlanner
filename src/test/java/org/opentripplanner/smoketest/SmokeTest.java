@@ -23,8 +23,8 @@ import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.client.OtpApiClient;
 import org.opentripplanner.client.model.TripPlan;
 import org.opentripplanner.client.model.TripPlan.Itinerary;
+import org.opentripplanner.client.model.VehicleRentalStation;
 import org.opentripplanner.model.fare.ItineraryFares;
-import org.opentripplanner.smoketest.util.GraphQLClient;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 /**
@@ -38,6 +38,10 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
 public class SmokeTest {
 
   public static final ObjectMapper mapper;
+  public static final OtpApiClient API_CLIENT = new OtpApiClient(
+    ZoneId.of("America/New_York"),
+    "http://localhost:8080"
+  );
 
   static {
     var provider = new JSONObjectMapperProvider();
@@ -67,8 +71,12 @@ public class SmokeTest {
   }
 
   public static void assertThatThereAreVehicleRentalStations() {
-    var stations = GraphQLClient.vehicleRentalStations();
-    assertFalse(stations.isEmpty(), "Found no vehicle rental stations.");
+    try {
+      List<VehicleRentalStation> stations = API_CLIENT.vehicleRentalStations();
+      assertFalse(stations.isEmpty(), "Found no vehicle rental stations.");
+    } catch (IOException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -92,9 +100,7 @@ public class SmokeTest {
 
   static TripPlan basicRouteTest(SmokeTestRequest req, List<String> expectedModes) {
     try {
-      var client = new OtpApiClient(ZoneId.of("America/New_York"), "localhost:8080");
-
-      TripPlan plan = client.plan(
+      TripPlan plan = API_CLIENT.plan(
         req.from(),
         req.to(),
         SmokeTest.nextMonday().atTime(LocalTime.of(12, 0)),
@@ -112,18 +118,17 @@ public class SmokeTest {
   }
 
   static void assertThereArePatternsWithVehiclePositions() {
-    GraphQLClient.VehiclePositionResponse positions = GraphQLClient.patternWithVehiclePositionsQuery();
+    try {
+      var patterns = API_CLIENT.patterns();
+      var vehiclePositions = patterns.stream().flatMap(p -> p.vehiclePositions().stream()).toList();
 
-    var vehiclePositions = positions
-      .patterns()
-      .stream()
-      .flatMap(p -> p.vehiclePositions().stream())
-      .toList();
-
-    assertFalse(
-      vehiclePositions.isEmpty(),
-      "Found no patterns that have realtime vehicle positions."
-    );
+      assertFalse(
+        vehiclePositions.isEmpty(),
+        "Found no patterns that have realtime vehicle positions."
+      );
+    } catch (IOException | InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
