@@ -24,6 +24,7 @@ import org.opentripplanner.client.OtpApiClient;
 import org.opentripplanner.client.model.TripPlan;
 import org.opentripplanner.client.model.TripPlan.Itinerary;
 import org.opentripplanner.client.model.VehicleRentalStation;
+import org.opentripplanner.client.parameters.TripPlanParameters;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
@@ -100,12 +101,15 @@ public class SmokeTest {
 
   static TripPlan basicRouteTest(SmokeTestRequest req, List<String> expectedModes) {
     try {
-      TripPlan plan = API_CLIENT.plan(
-        req.from(),
-        req.to(),
-        SmokeTest.nextMonday().atTime(LocalTime.of(12, 0)),
-        req.modes()
-      );
+      var tpr = TripPlanParameters
+        .builder()
+        .withFrom(req.from())
+        .withTo(req.to())
+        .withModes(req.modes())
+        .withTime(SmokeTest.nextMonday().atTime(LocalTime.of(12, 0)))
+        .withSearchDirection(req.searchDirection())
+        .build();
+      var plan = API_CLIENT.plan(tpr);
       var itineraries = plan.itineraries();
 
       assertFalse(itineraries.isEmpty(), "Expected to see some itineraries but got zero.");

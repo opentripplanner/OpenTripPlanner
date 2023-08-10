@@ -53,7 +53,7 @@ jobs:
           restore-keys: |
             osm-${{ matrix.locations.name }}
 
-      - name: Build graph tests
+      - name: Build graph
         working-directory: smoke-tests
         run: |
           make build-${{ matrix.locations.name }}

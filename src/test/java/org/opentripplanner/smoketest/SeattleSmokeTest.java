@@ -49,13 +49,13 @@ public class SeattleSmokeTest {
 
   @Test
   public void monorailRoute() throws IOException, InterruptedException {
-      Set<Object> modes = SmokeTest.API_CLIENT
-        .routes()
-        .stream()
-        .map(Route::mode)
-        .map(Objects::toString)
-        .collect(Collectors.toSet());
-      assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS"), modes);
+    Set<Object> modes = SmokeTest.API_CLIENT
+      .routes()
+      .stream()
+      .map(Route::mode)
+      .map(Objects::toString)
+      .collect(Collectors.toSet());
+    assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS"), modes);
   }
 
   @Test

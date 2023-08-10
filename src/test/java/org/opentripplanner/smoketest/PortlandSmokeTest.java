@@ -18,13 +18,14 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
 public class PortlandSmokeTest {
 
   Coordinate cennentenial = new Coordinate(45.504602, -122.4968719);
+  Coordinate buckman = new Coordinate(45.51720, -122.652289867);
   Coordinate hazelwood = new Coordinate(45.52463, -122.5583);
   Coordinate piedmont = new Coordinate(45.5746, -122.6697);
   Coordinate mountTaborPark = new Coordinate(45.511399, -122.594203);
 
   @Test
   public void railTrip() {
-    // this used to be across the city by since the train is interrupter in April '23 this is a
+    // this used to be across the city by since the train is interrupted in April '23 this is a
     // much shorter trip
     SmokeTest.basicRouteTest(
       new SmokeTestRequest(cennentenial, hazelwood, Set.of(TRAM, WALK)),
@@ -36,11 +37,11 @@ public class PortlandSmokeTest {
    * Checks that a scooter rental finishes at the edge of the park area and is continued on
    * foot rather than scootering all the way to the destination.
    */
-  @ParameterizedTest(name = "scooter rental with arriveBy={0}")
+  @ParameterizedTest(name = "scooter rental in a geofencing zone with arriveBy={0}")
   @ValueSource(booleans = { true, false })
   public void geofencingZone(boolean arriveBy) {
     SmokeTest.basicRouteTest(
-      new SmokeTestRequest(cennentenial, mountTaborPark, Set.of(SCOOTER_RENT, WALK), arriveBy),
+      new SmokeTestRequest(buckman, mountTaborPark, Set.of(SCOOTER_RENT, WALK), arriveBy),
       List.of("WALK", "SCOOTER", "WALK")
     );
   }
