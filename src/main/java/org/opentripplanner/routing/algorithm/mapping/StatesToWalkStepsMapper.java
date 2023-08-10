@@ -18,6 +18,7 @@ import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.ExitVertex;
+import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -161,7 +162,14 @@ public class StatesToWalkStepsMapper {
     // generate a step for getting off an elevator (all elevator narrative generation occurs
     // when alighting). We don't need to know what came before or will come after
     if (edge instanceof ElevatorAlightEdge) {
-      createElevatorWalkStep(backState, forwardState, edge);
+      current = createElevatorWalkStep(backState, forwardState, edge);
+      steps.add(current);
+      return;
+    }
+
+    if (backState.getVertex() instanceof TransitEntranceVertex tev) {
+      current = createEnterStationStep(backState, forwardState, tev);
+      steps.add(current);
       return;
     }
 
@@ -317,22 +325,21 @@ public class StatesToWalkStepsMapper {
     // in this case, we have two left turns or two right turns in quick
     // succession; this is probably a U-turn.
 
-    var builder = lastStep;
-    builder.addDistance(twoBack.distance());
+    lastStep.addDistance(twoBack.distance());
 
     // A U-turn to the left, typical in the US.
     if (
       lastStep.relativeDirection() == RelativeDirection.LEFT ||
       lastStep.relativeDirection() == RelativeDirection.HARD_LEFT
     ) {
-      builder.withRelativeDirection(RelativeDirection.UTURN_LEFT);
+      lastStep.withRelativeDirection(RelativeDirection.UTURN_LEFT);
     } else {
-      builder.withRelativeDirection(RelativeDirection.UTURN_RIGHT);
+      lastStep.withRelativeDirection(RelativeDirection.UTURN_RIGHT);
     }
 
     // in this case, we're definitely staying on the same street
     // (since it's zag removal, the street names are the same)
-    builder.withStayOn(true);
+    lastStep.withStayOn(true);
   }
 
   /**
@@ -470,9 +477,9 @@ public class StatesToWalkStepsMapper {
     steps.add(current);
   }
 
-  private void createElevatorWalkStep(State backState, State forwardState, Edge edge) {
+  private WalkStepBuilder createElevatorWalkStep(State backState, State forwardState, Edge edge) {
     // don't care what came before or comes after
-    current = createWalkStep(forwardState, backState);
+    var step = createWalkStep(forwardState, backState);
 
     // tell the user where to get off the elevator using the exit notation, so the
     // i18n interface will say 'Elevator to <exit>'
@@ -480,11 +487,21 @@ public class StatesToWalkStepsMapper {
     // exit != null and uses to <exit>
     // the floor name is the AlightEdge name
     // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-    current.withStreetName(edge.getName());
+    step.withStreetName(edge.getName());
 
-    current.withRelativeDirection(RelativeDirection.ELEVATOR);
+    step.withRelativeDirection(RelativeDirection.ELEVATOR);
 
-    steps.add(current);
+    return step;
+  }
+
+  private WalkStepBuilder createEnterStationStep(
+    State backState,
+    State forwardState,
+    TransitEntranceVertex vertex
+  ) {
+    return createWalkStep(forwardState, backState)
+      .withStreetName(vertex.getEntrance().getName())
+      .withRelativeDirection(RelativeDirection.ENTER_STATION);
   }
 
   private WalkStepBuilder createWalkStep(State forwardState, State backState) {

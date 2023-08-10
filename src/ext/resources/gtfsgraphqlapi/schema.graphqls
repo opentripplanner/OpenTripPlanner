@@ -3330,6 +3330,7 @@ enum RelativeDirection {
   ELEVATOR
   UTURN_LEFT
   UTURN_RIGHT
+  ENTER_STATION
 }
 
 """The cardinal (compass) direction taken when engaging a walking/driving step."""

@@ -19,4 +19,5 @@ public enum ApiRelativeDirection {
   ELEVATOR,
   UTURN_LEFT,
   UTURN_RIGHT,
+  ENTER_STATION,
 }

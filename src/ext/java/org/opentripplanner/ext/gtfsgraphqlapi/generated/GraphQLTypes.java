@@ -2667,6 +2667,7 @@ public class GraphQLTypes {
     CONTINUE,
     DEPART,
     ELEVATOR,
+    ENTER_STATION,
     HARD_LEFT,
     HARD_RIGHT,
     LEFT,
