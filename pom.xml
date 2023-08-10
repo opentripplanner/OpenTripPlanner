@@ -1011,7 +1011,7 @@
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>otp-client</artifactId>
-            <version>0.0.7</version>
+            <version>0.0.9</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
