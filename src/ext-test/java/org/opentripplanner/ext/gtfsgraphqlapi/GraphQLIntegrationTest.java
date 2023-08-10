@@ -49,6 +49,7 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.WalkStepBuilder;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -135,11 +136,11 @@ class GraphQLIntegrationTest {
 
     routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
 
-    var step1 = walkStep("street");
-    step1.setRelativeDirection(RelativeDirection.DEPART);
-    step1.setAbsoluteDirection(20);
-    var step2 = walkStep("elevator");
-    step2.setRelativeDirection(RelativeDirection.ELEVATOR);
+    var step1 = walkStep("street")
+      .withRelativeDirection(RelativeDirection.DEPART)
+      .withAbsoluteDirection(20)
+      .build();
+    var step2 = walkStep("elevator").withRelativeDirection(RelativeDirection.ELEVATOR).build();
 
     Itinerary i1 = newItinerary(A, T11_00)
       .walk(20, B, List.of(step1, step2))
@@ -241,15 +242,12 @@ class GraphQLIntegrationTest {
   }
 
   @Nonnull
-  private static WalkStep walkStep(String name) {
-    return new WalkStep(
-      new NonLocalizedString(name),
-      WgsCoordinate.GREENWICH,
-      false,
-      10,
-      false,
-      false
-    );
+  private static WalkStepBuilder walkStep(String name) {
+    return WalkStep
+      .builder()
+      .withStreetName(new NonLocalizedString(name))
+      .withStartLocation(WgsCoordinate.GREENWICH)
+      .withAngle(10);
   }
 
   @Nonnull

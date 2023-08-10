@@ -97,7 +97,7 @@ public class StreetNotesService implements Serializable {
       if (maas2 != null) maas.addAll(maas2);
     }
     if (maas == null || maas.isEmpty()) {
-      return null;
+      return Set.of();
     }
 
     Set<StreetNote> notes = new HashSet<>(maas.size());
@@ -107,7 +107,7 @@ public class StreetNotesService implements Serializable {
       }
     }
     if (notes.isEmpty()) {
-      return null;
+      return Set.of();
     }
     return notes;
   }
