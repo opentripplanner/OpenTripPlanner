@@ -48,8 +48,7 @@ public class SeattleSmokeTest {
   }
 
   @Test
-  public void monorailRoute() {
-    try {
+  public void monorailRoute() throws IOException, InterruptedException {
       Set<Object> modes = SmokeTest.API_CLIENT
         .routes()
         .stream()
@@ -57,9 +56,6 @@ public class SeattleSmokeTest {
         .map(Objects::toString)
         .collect(Collectors.toSet());
       assertEquals(Set.of("MONORAIL", "TRAM", "FERRY", "BUS"), modes);
-    } catch (IOException | InterruptedException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   @Test
