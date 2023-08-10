@@ -53,11 +53,14 @@ jobs:
           restore-keys: |
             osm-${{ matrix.locations.name }}
 
-      - name: Run smoke tests
+      - name: Build graph tests
+        working-directory: smoke-tests
         run: |
-          cd smoke-tests
           make build-${{ matrix.locations.name }}
 
+      - name: Run smoke tests
+        working-directory: smoke-tests
+        run: |
           make run-${{ matrix.locations.name }} &
 
           # OTP needs a little while to start up so we sleep
