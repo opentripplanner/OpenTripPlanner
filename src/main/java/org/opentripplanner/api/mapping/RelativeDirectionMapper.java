@@ -24,6 +24,7 @@ public class RelativeDirectionMapper {
       case UTURN_LEFT -> ApiRelativeDirection.UTURN_LEFT;
       case UTURN_RIGHT -> ApiRelativeDirection.UTURN_RIGHT;
       case ENTER_STATION -> ApiRelativeDirection.ENTER_STATION;
+      case EXIT_STATION -> ApiRelativeDirection.EXIT_STATION;
     };
   }
 }

@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import static org.opentripplanner.model.plan.RelativeDirection.ENTER_STATION;
+import static org.opentripplanner.model.plan.RelativeDirection.EXIT_STATION;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -162,14 +165,13 @@ public class StatesToWalkStepsMapper {
     // generate a step for getting off an elevator (all elevator narrative generation occurs
     // when alighting). We don't need to know what came before or will come after
     if (edge instanceof ElevatorAlightEdge) {
-      current = createElevatorWalkStep(backState, forwardState, edge);
-      steps.add(current);
+      addStep(createElevatorWalkStep(backState, forwardState, edge));
       return;
-    }
-
-    if (backState.getVertex() instanceof TransitEntranceVertex tev) {
-      current = createEnterStationStep(backState, forwardState, tev);
-      steps.add(current);
+    } else if (backState.getVertex() instanceof TransitEntranceVertex tev) {
+      addStep(createStationTransitionVertex(backState, forwardState, tev, ENTER_STATION));
+      return;
+    } else if (forwardState.getVertex() instanceof TransitEntranceVertex tev) {
+      addStep(createStationTransitionVertex(backState, forwardState, tev, EXIT_STATION));
       return;
     }
 
@@ -286,6 +288,11 @@ public class StatesToWalkStepsMapper {
     lastAngle = DirectionUtils.getLastAngle(geom);
 
     current.addEdge(edge);
+  }
+
+  private void addStep(WalkStepBuilder backState) {
+    current = backState;
+    steps.add(current);
   }
 
   private void updateElevationProfile(State backState, Edge edge) {
@@ -494,14 +501,15 @@ public class StatesToWalkStepsMapper {
     return step;
   }
 
-  private WalkStepBuilder createEnterStationStep(
+  private WalkStepBuilder createStationTransitionVertex(
     State backState,
     State forwardState,
-    TransitEntranceVertex vertex
+    TransitEntranceVertex vertex,
+    RelativeDirection direction
   ) {
     return createWalkStep(forwardState, backState)
       .withStreetName(vertex.getEntrance().getName())
-      .withRelativeDirection(RelativeDirection.ENTER_STATION);
+      .withRelativeDirection(direction);
   }
 
   private WalkStepBuilder createWalkStep(State forwardState, State backState) {

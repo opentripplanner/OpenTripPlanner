@@ -19,7 +19,8 @@ public enum RelativeDirection {
   ELEVATOR,
   UTURN_LEFT,
   UTURN_RIGHT,
-  ENTER_STATION;
+  ENTER_STATION,
+  EXIT_STATION;
 
   public static RelativeDirection calculate(
     double lastAngle,

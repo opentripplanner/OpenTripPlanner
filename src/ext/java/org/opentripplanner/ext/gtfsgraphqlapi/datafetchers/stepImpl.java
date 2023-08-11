@@ -95,6 +95,7 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
         case UTURN_LEFT -> GraphQLRelativeDirection.UTURN_LEFT;
         case UTURN_RIGHT -> GraphQLRelativeDirection.UTURN_RIGHT;
         case ENTER_STATION -> GraphQLRelativeDirection.ENTER_STATION;
+        case EXIT_STATION -> GraphQLRelativeDirection.EXIT_STATION;
       };
   }
 

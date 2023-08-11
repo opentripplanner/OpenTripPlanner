@@ -2668,6 +2668,7 @@ public class GraphQLTypes {
     DEPART,
     ELEVATOR,
     ENTER_STATION,
+    EXIT_STATION,
     HARD_LEFT,
     HARD_RIGHT,
     LEFT,
