@@ -60,15 +60,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   }
 
   /**
-   * {@link PathwayEdge#createLowCostPathwayEdge(Vertex, Vertex, FeedScopedId, I18NString, boolean, PathwayMode)}
+   * {@link #createLowCostPathwayEdge(Vertex, Vertex, FeedScopedId, boolean, PathwayMode)}
    */
-  public static PathwayEdge createLowCostPathwayEdge(
-    Vertex fromV,
-    Vertex toV,
-    I18NString name,
-    PathwayMode mode
-  ) {
-    return PathwayEdge.createLowCostPathwayEdge(fromV, toV, null, name, true, mode);
+  public static PathwayEdge createLowCostPathwayEdge(Vertex fromV, Vertex toV, PathwayMode mode) {
+    return PathwayEdge.createLowCostPathwayEdge(fromV, toV, null, true, mode);
   }
 
   /**
@@ -80,18 +75,17 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     Vertex fromV,
     Vertex toV,
     FeedScopedId id,
-    I18NString name,
     boolean wheelchairAccessible,
     PathwayMode mode
   ) {
-    return createPathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
+    return createPathwayEdge(fromV, toV, id, null, 0, 0, 0, 0, wheelchairAccessible, mode);
   }
 
   public static PathwayEdge createPathwayEdge(
     Vertex fromv,
     Vertex tov,
     FeedScopedId id,
-    I18NString name,
+    I18NString signpostedAs,
     int traversalTime,
     double distance,
     int steps,
@@ -104,7 +98,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
         fromv,
         tov,
         id,
-        name,
+        signpostedAs,
         traversalTime,
         distance,
         steps,
@@ -182,7 +176,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
 
   @Override
   public boolean hasBogusName() {
-    return signpostedAs.equals(DEFAULT_NAME);
+    return signpostedAs == null;
   }
 
   public LineString getGeometry() {

@@ -2,14 +2,17 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import static org.opentripplanner.model.plan.RelativeDirection.ENTER_STATION;
 import static org.opentripplanner.model.plan.RelativeDirection.EXIT_STATION;
+import static org.opentripplanner.model.plan.RelativeDirection.FOLLOW_SIGNS;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.DirectionUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
@@ -19,9 +22,10 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
+import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.vertex.ExitVertex;
-import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
@@ -153,7 +157,12 @@ public class StatesToWalkStepsMapper {
     boolean createdNewStep = false;
     if (edge instanceof FreeEdge) {
       return;
+    } else if (edge instanceof StreetTransitEntranceLink link) {
+      var direction = relativeDirectionForTransitLink(link);
+      createAndSaveStep(backState, forwardState, link.getName(), direction, edge);
+      return;
     }
+
     if (forwardState.getBackMode() == null) {
       return;
     }
@@ -167,11 +176,8 @@ public class StatesToWalkStepsMapper {
     if (edge instanceof ElevatorAlightEdge) {
       addStep(createElevatorWalkStep(backState, forwardState, edge));
       return;
-    } else if (backState.getVertex() instanceof TransitEntranceVertex tev) {
-      addStep(createStationTransitionVertex(backState, forwardState, tev, ENTER_STATION));
-      return;
-    } else if (forwardState.getVertex() instanceof TransitEntranceVertex tev) {
-      addStep(createStationTransitionVertex(backState, forwardState, tev, EXIT_STATION));
+    } else if (edge instanceof PathwayEdge pwe && pwe.signpostedAs().isPresent()) {
+      createAndSaveStep(backState, forwardState, pwe.signpostedAs().get(), FOLLOW_SIGNS, edge);
       return;
     }
 
@@ -290,9 +296,19 @@ public class StatesToWalkStepsMapper {
     current.addEdge(edge);
   }
 
-  private void addStep(WalkStepBuilder backState) {
-    current = backState;
+  @Nonnull
+  private static RelativeDirection relativeDirectionForTransitLink(StreetTransitEntranceLink link) {
+    if (link.isExit()) {
+      return EXIT_STATION;
+    } else {
+      return ENTER_STATION;
+    }
+  }
+
+  private WalkStepBuilder addStep(WalkStepBuilder step) {
+    current = step;
     steps.add(current);
+    return step;
   }
 
   private void updateElevationProfile(State backState, Edge edge) {
@@ -501,15 +517,23 @@ public class StatesToWalkStepsMapper {
     return step;
   }
 
-  private WalkStepBuilder createStationTransitionVertex(
+  private void createAndSaveStep(
     State backState,
     State forwardState,
-    TransitEntranceVertex vertex,
-    RelativeDirection direction
+    I18NString name,
+    RelativeDirection direction,
+    Edge edge
   ) {
-    return createWalkStep(forwardState, backState)
-      .withStreetName(vertex.getEntrance().getName())
-      .withRelativeDirection(direction);
+    addStep(
+      createWalkStep(forwardState, backState)
+        .withStreetName(name)
+        .withBogusName(false)
+        .withRelativeDirection(direction)
+        .addDistance(edge.getDistanceMeters())
+    );
+
+    lastAngle = DirectionUtils.getLastAngle(edge.getGeometry());
+    current.addEdge(edge);
   }
 
   private WalkStepBuilder createWalkStep(State forwardState, State backState) {

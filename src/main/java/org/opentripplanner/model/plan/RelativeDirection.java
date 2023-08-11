@@ -20,7 +20,8 @@ public enum RelativeDirection {
   UTURN_LEFT,
   UTURN_RIGHT,
   ENTER_STATION,
-  EXIT_STATION;
+  EXIT_STATION,
+  FOLLOW_SIGNS;
 
   public static RelativeDirection calculate(
     double lastAngle,
