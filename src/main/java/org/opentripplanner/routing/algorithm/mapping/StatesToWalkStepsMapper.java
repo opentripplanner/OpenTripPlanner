@@ -528,11 +528,13 @@ public class StatesToWalkStepsMapper {
       createWalkStep(forwardState, backState)
         .withStreetName(name)
         .withBogusName(false)
+        .withDirections(lastAngle, DirectionUtils.getFirstAngle(edge.getGeometry()), false)
         .withRelativeDirection(direction)
         .addDistance(edge.getDistanceMeters())
     );
 
     lastAngle = DirectionUtils.getLastAngle(edge.getGeometry());
+    distance = edge.getDistanceMeters();
     current.addEdge(edge);
   }
 

@@ -68,17 +68,20 @@ public class WalkStepBuilder {
     return this;
   }
 
-  public void withExit(String exit) {
+  public WalkStepBuilder withExit(String exit) {
     this.exit = exit;
+    return this;
   }
 
-  public void withStayOn(boolean stayOn) {
+  public WalkStepBuilder withStayOn(boolean stayOn) {
     this.stayOn = stayOn;
+    return this;
   }
 
-  public void withDirections(double lastAngle, double thisAngle, boolean roundabout) {
+  public WalkStepBuilder withDirections(double lastAngle, double thisAngle, boolean roundabout) {
     relativeDirection = RelativeDirection.calculate(lastAngle, thisAngle, roundabout);
     withAbsoluteDirection(thisAngle);
+    return this;
   }
 
   public WalkStepBuilder withAbsoluteDirection(double thisAngle) {
