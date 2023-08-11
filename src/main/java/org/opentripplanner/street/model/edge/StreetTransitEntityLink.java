@@ -63,8 +63,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
     // if they are for the same stop.
     if (
-      s0.backEdge instanceof StreetTransitEntityLink &&
-      ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex == this.transitEntityVertex
+      s0.backEdge instanceof StreetTransitEntityLink<?> link &&
+      link.transitEntityVertex == this.transitEntityVertex
     ) {
       return State.empty();
     }
