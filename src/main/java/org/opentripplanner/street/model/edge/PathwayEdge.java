@@ -163,7 +163,8 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   }
 
   /**
-   * Return the sign to follow when traversing the pathway.
+   * Return the sign to follow when traversing the pathway. An empty optional means that this
+   * pathway does not have "signposted at" information.
    */
   public Optional<I18NString> signpostedAs() {
     return Optional.ofNullable(signpostedAs);
