@@ -1,7 +1,9 @@
 package org.opentripplanner.street.model.edge;
 
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -21,7 +23,10 @@ import org.opentripplanner.transit.model.site.PathwayMode;
 public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTraversalInformation {
 
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
-  private final I18NString name;
+
+  @Nullable
+  private final I18NString signpostedAs;
+
   private final int traversalTime;
   private final double distance;
   private final int steps;
@@ -35,7 +40,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     Vertex fromv,
     Vertex tov,
     FeedScopedId id,
-    I18NString name,
+    @Nullable I18NString signpostedAs,
     int traversalTime,
     double distance,
     int steps,
@@ -44,7 +49,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     PathwayMode mode
   ) {
     super(fromv, tov);
-    this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
+    this.signpostedAs = signpostedAs;
     this.id = id;
     this.traversalTime = traversalTime;
     this.steps = steps;
@@ -163,14 +168,21 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     return s1.makeStateArray();
   }
 
+  /**
+   * Return the sign to follow when traversing the pathway.
+   */
+  public Optional<I18NString> signpostedAs() {
+    return Optional.ofNullable(signpostedAs);
+  }
+
   @Override
   public I18NString getName() {
-    return name;
+    return Objects.requireNonNullElse(signpostedAs, DEFAULT_NAME);
   }
 
   @Override
   public boolean hasBogusName() {
-    return name.equals(DEFAULT_NAME);
+    return signpostedAs.equals(DEFAULT_NAME);
   }
 
   public LineString getGeometry() {
