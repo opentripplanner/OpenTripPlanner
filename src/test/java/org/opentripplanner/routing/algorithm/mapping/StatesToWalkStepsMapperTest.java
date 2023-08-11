@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.RelativeDirection.ENTER_STATION;
 import static org.opentripplanner.model.plan.RelativeDirection.EXIT_STATION;
+import static org.opentripplanner.model.plan.RelativeDirection.FOLLOW_SIGNS;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,17 @@ class StatesToWalkStepsMapperTest {
     assertEquals(3, walkSteps.size());
     var enter = walkSteps.get(2);
     assertEquals(enter.getRelativeDirection(), EXIT_STATION);
+  }
+
+  @Test
+  void signpostedPathway() {
+    final String sign = "follow signs to platform 1";
+    final TestStateBuilder builder = TestStateBuilder.ofWalking().streetEdge().pathway(sign);
+    var walkSteps = buildWalkSteps(builder);
+    assertEquals(2, walkSteps.size());
+    var step = walkSteps.get(1);
+    assertEquals(step.getRelativeDirection(), FOLLOW_SIGNS);
+    assertEquals(sign, step.getStreetName().toString());
   }
 
   private static List<WalkStep> buildWalkSteps(TestStateBuilder builder) {

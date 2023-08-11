@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
@@ -165,6 +166,27 @@ public class TestStateBuilder {
     var link = StreetTransitEntranceLink.createStreetTransitEntranceLink(entranceVertex, to);
     var states = link.traverse(state);
     currentState = states[0];
+    return this;
+  }
+
+  public TestStateBuilder pathway(String s) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var tov = StreetModelForTest.intersectionVertex(count, count);
+    var edge = PathwayEdge.createPathwayEdge(
+      from,
+      tov,
+      null,
+      I18NString.of(s),
+      60,
+      100,
+      0,
+      0,
+      true,
+      WALKWAY
+    );
+    var state = edge.traverse(currentState)[0];
+    currentState = state;
     return this;
   }
 
