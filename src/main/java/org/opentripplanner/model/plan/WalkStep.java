@@ -78,7 +78,7 @@ public final class WalkStep {
     this.exit = exit;
     this.elevationProfile = elevationProfile;
     this.stayOn = stayOn;
-    this.edges = Objects.requireNonNull(edges);
+    this.edges = List.copyOf(Objects.requireNonNull(edges));
   }
 
   public ElevationProfile getElevationProfile() {
@@ -138,7 +138,7 @@ public final class WalkStep {
    * This step is on an open area, such as a plaza or train platform, and thus the directions should
    * say something like "cross"
    */
-  public Boolean getArea() {
+  public boolean getArea() {
     return area;
   }
 

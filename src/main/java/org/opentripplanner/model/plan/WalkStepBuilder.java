@@ -131,9 +131,6 @@ public class WalkStepBuilder {
   }
 
   public WalkStepBuilder addStreetNotes(Set<StreetNote> notes) {
-    if (notes == null) {
-      return this;
-    }
     this.streetNotes.addAll(notes);
     return this;
   }
