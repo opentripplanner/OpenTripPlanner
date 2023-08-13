@@ -256,13 +256,6 @@ public interface Leg {
   double getDistanceMeters();
 
   /**
-   * The GTFS pathway id
-   */
-  default FeedScopedId getPathwayId() {
-    return null;
-  }
-
-  /**
    * Get the timezone offset in milliseconds.
    */
   default int getAgencyTimeZoneOffset() {

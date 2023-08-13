@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -35,7 +34,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       0,
       0,
@@ -53,7 +51,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       0,
       0,
@@ -71,7 +68,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       60,
       0,
@@ -91,7 +87,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       60,
       1000,
@@ -113,7 +108,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       0,
       60,
@@ -133,7 +127,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       0,
       60,
@@ -176,7 +169,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       60,
       100,
@@ -252,7 +244,6 @@ class PathwayEdgeTest {
       return PathwayEdge.createPathwayEdge(
         from,
         to,
-        id("1"),
         sign,
         60,
         100,
