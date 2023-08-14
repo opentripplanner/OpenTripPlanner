@@ -40,6 +40,10 @@
                 endTime
                 mode
                 generalizedCost
+                headsign
+                trip {
+                    tripHeadsign
+                }
                 alerts {
                     id
                     alertHeaderText

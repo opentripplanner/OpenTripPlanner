@@ -1632,7 +1632,15 @@ type Leg {
     Whether the destination of this leg (field `to`) is one of the intermediate places specified in the query.
     """
     intermediatePlace: Boolean
+
+    "The turn-by-turn navigation instructions."
     steps: [step]
+
+    """
+    For transit legs, the headsign that the vehicle shows at the stop where the passenger boards.
+    For non-transit legs, null.
+    """
+    headsign: String
 
     """
     This is used to indicate if boarding this leg is possible only with special arrangements.
@@ -3839,9 +3847,10 @@ type Trip implements Node {
     """List of dates when this trip is in service. Format: YYYYMMDD"""
     activeDates: [String]
     tripShortName: String
+
     """Headsign of the vehicle when running on this trip"""
     tripHeadsign(
-        """If translated headsign is found from gtfs translation.txt and wanted language is not same as
+        """If a translated headsign is found from GTFS translation.txt and wanted language is not same as
         feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
         """
         language: String): String
