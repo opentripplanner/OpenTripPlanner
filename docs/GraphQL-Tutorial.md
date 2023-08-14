@@ -7,8 +7,8 @@
 
 # GraphQL tutorial
 
-We want to give you a quick start tutorial on how to get started with OTP's GraphQL APIs. For this
-tutorial we will be using the GTFS GraphQL API as this is the most common one.
+This document will give you a quick start tutorial on how to get started with OTP's GraphQL APIs. For 
+this tutorial we will be using the [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) as this is the most commonly used one.
 
 First of all, make sure that you've loaded street and transit data into your instance by following
 the [basic tutorial](Basic-Tutorial.md)

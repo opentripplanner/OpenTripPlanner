@@ -1,6 +1,6 @@
 # APIs
 
-Several different services are built upon this routing library, and expose these APIs:
+Several services are built upon OTP's routing and transit data indexing engines. They expose these APIs:
 
 ## GraphQL
 
