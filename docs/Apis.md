@@ -1,17 +1,15 @@
 # APIs
 
-Several different services are built upon this routing library, and expose these APIs:
-
-## GraphQL
+Several services are built upon OTP's routing and transit data indexing engines. They expose these APIs:
 
 The [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) has been used by the Digitransit and otp-react-redux 
-projects in production for many years. If your input data is mostly GTFS then this is probably your
-best choice as it uses the same vocabulary.
+projects as a general purpose routing and transit data API in production for many years. 
+If your input data is mostly GTFS then this is probably your best choice as it uses the same vocabulary.
 
-The [Transmodel GraphQL API](sandbox/TransmodelApi.md) is the Transmodel API (version 3) used at
+The [Transmodel GraphQL API](sandbox/TransmodelApi.md) is the Transmodel API is used at
 Entur in production since 2020. If your input data is mostly NeTeX then you might want to investigate
-this API as it uses the [Transmodel vocabulary](https://en.wikipedia.org/wiki/Transmodel) 
-to describe transit entities.
+this API as it uses the [Transmodel vocabulary](https://en.wikipedia.org/wiki/Transmodel) to describe transit entities.
+Like the GTFS GraphQL API it is also a general purpose API.
 
 The [Vector tiles API](sandbox/MapboxVectorTilesApi.md) is a special purpose API for displaying
 entities on a vector map.

@@ -3,6 +3,7 @@ package org.opentripplanner.ext.smoovebikerental;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Map;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
@@ -32,7 +33,14 @@ public class SmooveBikeRentalDataSource
   private final RentalVehicleType vehicleType;
 
   public SmooveBikeRentalDataSource(SmooveBikeRentalDataSourceParameters config) {
-    super(config.url(), "result", config.httpHeaders());
+    this(config, new OtpHttpClient());
+  }
+
+  public SmooveBikeRentalDataSource(
+    SmooveBikeRentalDataSourceParameters config,
+    OtpHttpClient otpHttpClient
+  ) {
+    super(config.url(), "result", config.httpHeaders(), otpHttpClient);
     networkName = config.getNetwork(DEFAULT_NETWORK_NAME);
     vehicleType = RentalVehicleType.getDefaultType(networkName);
     overloadingAllowed = config.overloadingAllowed();

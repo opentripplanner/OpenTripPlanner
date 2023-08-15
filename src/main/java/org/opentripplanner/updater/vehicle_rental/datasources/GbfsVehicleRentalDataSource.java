@@ -15,6 +15,7 @@ import org.entur.gbfs.v2_3.system_information.GBFSSystemInformation;
 import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.service.vehiclerental.model.GeofencingZone;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
@@ -36,9 +37,14 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
   private GbfsFeedLoader loader;
   private List<GeofencingZone> geofencingZones = List.of();
+  private final OtpHttpClient otpHttpClient;
 
-  public GbfsVehicleRentalDataSource(GbfsVehicleRentalDataSourceParameters parameters) {
+  public GbfsVehicleRentalDataSource(
+    GbfsVehicleRentalDataSourceParameters parameters,
+    OtpHttpClient otpHttpClient
+  ) {
     this.params = parameters;
+    this.otpHttpClient = otpHttpClient;
   }
 
   @Override
@@ -129,7 +135,8 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
   @Override
   public void setup() {
-    loader = new GbfsFeedLoader(params.url(), params.httpHeaders(), params.language());
+    loader =
+      new GbfsFeedLoader(params.url(), params.httpHeaders(), params.language(), otpHttpClient);
   }
 
   @Override

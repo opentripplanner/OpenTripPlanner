@@ -30,13 +30,20 @@ public class GbfsFeedLoader {
   /** One updater per feed type(?) */
   private final Map<GBFSFeedName, GBFSFeedUpdater<?>> feedUpdaters = new HashMap<>();
   private final HttpHeaders httpHeaders;
+  private final OtpHttpClient otpHttpClient;
 
   static {
     objectMapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
   }
 
-  public GbfsFeedLoader(String url, HttpHeaders httpHeaders, String languageCode) {
+  public GbfsFeedLoader(
+    String url,
+    HttpHeaders httpHeaders,
+    String languageCode,
+    OtpHttpClient otpHttpClient
+  ) {
     this.httpHeaders = httpHeaders;
+    this.otpHttpClient = otpHttpClient;
     URI uri;
     try {
       uri = new URI(url);
@@ -90,6 +97,10 @@ public class GbfsFeedLoader {
     }
   }
 
+  GbfsFeedLoader(String url, HttpHeaders httpHeaders, String languageCode) {
+    this(url, httpHeaders, languageCode, new OtpHttpClient());
+  }
+
   /**
    * Checks if any of the feeds should be updated base on the TTL and fetches. Returns true, if any
    * feeds were updated.
@@ -124,7 +135,7 @@ public class GbfsFeedLoader {
   /* private static methods */
 
   private <T> T fetchFeed(URI uri, HttpHeaders httpHeaders, Class<T> clazz) {
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try {
       return otpHttpClient.getAndMapAsJsonObject(uri, httpHeaders.asMap(), objectMapper, clazz);
     } catch (OtpHttpClientException e) {
       LOG.warn("Error parsing vehicle rental feed from {}. Details: {}.", uri, e.getMessage(), e);

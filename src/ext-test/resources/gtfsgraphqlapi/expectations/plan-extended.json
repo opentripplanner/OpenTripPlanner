@@ -27,6 +27,8 @@
               "startTime" : 1580641200000,
               "endTime" : 1580641220000,
               "generalizedCost" : 40,
+              "headsign" : null,
+              "trip" : null,
               "alerts" : [ ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null
@@ -50,6 +52,10 @@
               "startTime" : 1580641260000,
               "endTime" : 1580642100000,
               "generalizedCost" : 992,
+              "headsign" : "Headsign at boarding (stop index 5)",
+              "trip" : {
+                "tripHeadsign" : "Trip headsign 122"
+              },
               "alerts" : [ ],
               "rideHailingEstimate" : null,
               "accessibilityScore" : null
@@ -73,6 +79,10 @@
               "startTime" : 1580643000000,
               "endTime" : 1580644200000,
               "generalizedCost" : 2040,
+              "headsign" : "Headsign at boarding (stop index 5)",
+              "trip" : {
+                "tripHeadsign" : "Trip headsign 439"
+              },
               "alerts" : [
                 {
                   "id" : "QWxlcnQ6Rjphbi1hbGVydA",
@@ -116,6 +126,8 @@
               "startTime" : 1580644200000,
               "endTime" : 1580644800000,
               "generalizedCost" : 1000,
+              "headsign" : null,
+              "trip" : null,
               "alerts" : [ ],
               "rideHailingEstimate" : {
                 "provider" : {

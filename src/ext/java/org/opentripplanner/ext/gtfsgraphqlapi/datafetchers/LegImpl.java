@@ -13,6 +13,7 @@ import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
 import org.opentripplanner.ext.gtfsgraphqlapi.mapping.NumberMapper;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
@@ -103,6 +104,12 @@ public class LegImpl implements GraphQLDataFetchers.GraphQLLeg {
   @Override
   public DataFetcher<Integer> generalizedCost() {
     return environment -> getSource(environment).getGeneralizedCost();
+  }
+
+  @Override
+  public DataFetcher<String> headsign() {
+    return environment ->
+      GraphQLUtils.getTranslation(getSource(environment).getHeadsign(), environment);
   }
 
   @Override
