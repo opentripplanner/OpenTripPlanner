@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -196,6 +197,7 @@ public class TransitModelForTest {
     var stopTime = TransitModelForTest.stopTime(trip, seq);
     stopTime.setArrivalTime(time);
     stopTime.setDepartureTime(time);
+    stopTime.setStopHeadsign(I18NString.of("Stop headsign at stop %s".formatted(seq)));
     return stopTime;
   }
 
