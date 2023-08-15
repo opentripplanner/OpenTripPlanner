@@ -20,6 +20,7 @@ public class JsonDataListDownloader<T> {
   private final Map<String, String> headers;
   private final Function<JsonNode, T> elementParser;
   private final String url;
+  private final OtpHttpClient otpHttpClient;
 
   public JsonDataListDownloader(
     String url,
@@ -27,10 +28,21 @@ public class JsonDataListDownloader<T> {
     Function<JsonNode, T> elementParser,
     Map<String, String> headers
   ) {
+    this(url, jsonParsePath, elementParser, headers, new OtpHttpClient());
+  }
+
+  public JsonDataListDownloader(
+    String url,
+    String jsonParsePath,
+    Function<JsonNode, T> elementParser,
+    Map<String, String> headers,
+    OtpHttpClient OtpHttpClient
+  ) {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
     this.headers = headers;
     this.elementParser = elementParser;
+    this.otpHttpClient = OtpHttpClient;
   }
 
   public List<T> download() {
@@ -38,7 +50,7 @@ public class JsonDataListDownloader<T> {
       log.warn("Cannot download updates, because url is null!");
       return null;
     }
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try {
       return otpHttpClient.getAndMap(
         URI.create(url),
         headers,

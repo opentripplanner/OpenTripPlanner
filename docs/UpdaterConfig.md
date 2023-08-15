@@ -268,11 +268,16 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 ## GBFS vehicle rental systems
 
 Besides GTFS-RT transit data, OTP can also fetch real-time data about vehicle rental networks
-including the number of bikes and free parking spaces at each station. We support vehicle rental
-systems that use the GBFS feed format.
+including the number of vehicles and free parking spaces at each station. We support vehicle rental
+systems that use the GBFS standard.
 
-[GBFS](https://github.com/NABSA/gbfs) is used for a variety of shared mobility services, with
-partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)).
+[GBFS](https://github.com/NABSA/gbfs) can be used for a variety of shared mobility services, with
+partial support for both v1 and v2.2 ([list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)). OTP supports the following
+GBFS form factors:
+
+- bicycle
+- scooter
+- car
 
 <!-- vehicle-rental BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->

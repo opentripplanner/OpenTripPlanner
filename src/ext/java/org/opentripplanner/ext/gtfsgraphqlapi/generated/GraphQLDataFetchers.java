@@ -432,6 +432,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Integer> generalizedCost();
 
+    public DataFetcher<String> headsign();
+
     public DataFetcher<Boolean> interlineWithPreviousLeg();
 
     public DataFetcher<Boolean> intermediatePlace();

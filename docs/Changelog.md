@@ -70,6 +70,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add check for null value of serviceCodesRunning in TripPatternForDateMapper [#5239](https://github.com/opentripplanner/OpenTripPlanner/pull/5239)
 - Improve error handling in TransmodelGraph [#5192](https://github.com/opentripplanner/OpenTripPlanner/pull/5192)
 - Fix SIRI SX retry logic [#5262](https://github.com/opentripplanner/OpenTripPlanner/pull/5262)
+- Fix filtering by submode [#5261](https://github.com/opentripplanner/OpenTripPlanner/pull/5261)
+- Add leg.headsign to GTFS GraphQL API [#5290](https://github.com/opentripplanner/OpenTripPlanner/pull/5290)
+- Return client error for invalid Transmodel query JSON format [#5277](https://github.com/opentripplanner/OpenTripPlanner/pull/5277)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
@@ -417,8 +420,6 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 
 ## 2.0.0 (2020-11-27)
-
-See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST API.
 
 - Sandbox for experimental features [#2745](https://github.com/opentripplanner/OpenTripPlanner/issues/2745)
 - Bugfix for Missing platforms for stops in GTFS import causes a NPE [#2804](https://github.com/opentripplanner/OpenTripPlanner/issues/2804)
