@@ -45,7 +45,7 @@ public class AccessEgressPenaltyDecorator {
     }
     var penaltyWalking = penalty.valueOf(StreetMode.WALK);
 
-    // The routing request only have ONE access/egress street-mode set, So, if it is WALK, then we
+    // The routing request only has ONE access/egress street-mode set, So, if it is WALK, then we
     // can assume all access/egress legs are also walking. There is no need to check the
     // access/egress. This is an optimization for the most common use-ase.
     if (requestedMode == StreetMode.WALK) {
