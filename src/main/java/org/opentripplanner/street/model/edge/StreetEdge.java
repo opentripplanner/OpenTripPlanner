@@ -140,7 +140,7 @@ public class StreetEdge
     this.setWalkSafetyFactor(builder.walkSafetyFactor());
     this.name = builder.name();
     this.setPermission(builder.permission());
-    carSpeed = builder.carSpeed();
+    this.carSpeed = builder.carSpeed();
     LineStringInOutAngles lineStringInOutAngles = LineStringInOutAngles.of(builder.geometry());
     inAngle = lineStringInOutAngles.inAngle();
     outAngle = lineStringInOutAngles.outAngle();
@@ -711,7 +711,7 @@ public class StreetEdge
     StreetEdge e2 = null;
 
     if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
-      TemporaryPartialStreetEdgeBuilder seb1 = new TemporaryPartialStreetEdgeBuilder()
+      var seb1 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
         .withFromVertex((StreetVertex) fromv)
         .withToVertex(v)
@@ -724,7 +724,7 @@ public class StreetEdge
       tempEdges.addEdge(e1);
     }
     if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
-      TemporaryPartialStreetEdgeBuilder seb2 = new TemporaryPartialStreetEdgeBuilder()
+      var seb2 = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
         .withFromVertex(v)
         .withToVertex((StreetVertex) tov)
