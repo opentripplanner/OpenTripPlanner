@@ -830,7 +830,7 @@ type QueryType {
     """
     relaxTransitSearchGeneralizedCostAtDestination: Float = null,
     """
-    The length of the search-window in minutes. This parameter is optional.
+    The length of the search-window in minutes. This parameter is optional. The maximum value is 1440 minutes (24 hours).
     
     The search-window is defined as the duration between the earliest-departure-time(EDT) and the latest-departure-time(LDT). OTP will search for all itineraries in this departure window. If `arriveBy=true` the `dateTime` parameter is the latest-arrival-time, so OTP will dynamically calculate the EDT. Using a short search-window is faster than using a longer one, but the search duration is not linear. Using a "too" short search-window will waste resources server side, while using a search-window that is too long will be slow.
     
