@@ -44,7 +44,7 @@ public class LinearFunctionSerialization {
    * Parse a string on the format: {@code 2m30s + 1.2 t }.
    * <p>
    * The coefficient must be a number between 0.0 and 100.0. and is normalized: if < 2.0 to
-   * 2 decimals, if 2.0 < 10.0 to 1 decimal and to hole numbers above 10.0.
+   * 2 decimals, if 2.0 < 10.0 to 1 decimal and to whole numbers above 10.0.
    */
   public static <T> Optional<T> parse(String text, BiFunction<Duration, Double, T> factory) {
     if (StringUtils.hasNoValue(text)) {
