@@ -1330,15 +1330,33 @@ type FareMedium {
 "A container for both a fare product (a ticket) and its relationship to the itinerary."
 type FareProductUse {
     """
-    Identifier local to the itinerary that allows to cross-reference and deduplicate
-    fare products that span more than one leg.
+    Represents the use of a single instance of a fare product throughout the itinerary. It can
+    be used to cross-reference and de-duplicate fare products that are applicable for more than one
+    leg.
 
     If you want to uniquely identify the fare product itself (not its use) use the product's `id`.
 
     ### Example: Day pass
 
-    When a day pass is valid for all three legs in the itinerary it will appear
-    for each leg but with the same use-`id`.
+    The day pass is valid for both legs in the itinerary. It is listed as the applicable `product` for each leg,
+    and the same FareProductUse id is shown, indicating that only one pass was used/bought.
+
+    **Illustration**
+    ```yaml
+    itinerary:
+      leg1:
+        fareProducts:
+          id: "AAA" // id of a FareProductUse instance
+          product:
+            id: "day-pass" // product id
+            name: "Day Pass"
+      leg2:
+        fareProducts:
+          id: "AAA" // identical to leg1. the passenger needs to buy ONE pass, not two.
+          product:
+            id: "day-pass"  // product id
+            name: "Day Pass"
+    ```
 
     *It is the responsibility of the API consumers to display the day pass as a product for the
     entire itinerary rather than three day passes!*
@@ -1347,6 +1365,24 @@ type FareProductUse {
 
     If you have two legs and need to buy two single tickets they will appear in each leg with the
     same `product.id` but different use-`id`.
+
+    **Illustration**
+    ```yaml
+    itinerary:
+      leg1:
+        fareProducts:
+          id: "AAA" // id of a FareProductUse instance, not product id
+          product:
+            id: "single-ticket" // product id
+            name: "Single Ticket"
+      leg2:
+        fareProducts:
+          id: "BBB" // different to leg1. the passenger needs to buy two single tickets.
+          product:
+            id: "single-ticket"  // product id
+            name: "Single Ticket"
+    ```
+
     """
     id: String!
 
