@@ -68,7 +68,9 @@ import org.slf4j.LoggerFactory;
  * The method {@link #getAsInputStream} gives access to an input stream on the body response but
  * requires the caller to close this stream. For most use cases, this method is not recommended .
  * <h3>Connection Pooling</h3>
- * The connection pool holds a maximum of 25 connections, with maximum 5 connections per host.
+ * The connection pool holds by default a maximum of 25 connections, with maximum 5 connections
+ * per host.
+ *
  * <h3>Thread-safety</h3>
  * Instances of this class are thread-safe.
  */
@@ -79,19 +81,41 @@ public class OtpHttpClient implements AutoCloseable {
 
   private static final Duration DEFAULT_TTL = Duration.ofMinutes(1);
 
+  /**
+   * see {@link PoolingHttpClientConnectionManager#DEFAULT_MAX_TOTAL_CONNECTIONS}
+   */
+  public static final int DEFAULT_MAX_TOTAL_CONNECTIONS = 25;
+
   private final CloseableHttpClient httpClient;
 
   /**
-   * Creates an HTTP client with default timeout and default connection time-to-live.
+   * Creates an HTTP client with default timeout, default connection time-to-live and default max
+   * number of connections.
    */
   public OtpHttpClient() {
     this(DEFAULT_TIMEOUT, DEFAULT_TTL);
   }
 
   /**
-   * Creates an HTTP client with the provided timeout and connection time-to-live.
+   * Creates an HTTP client with default timeout, default connection time-to-live and the given max
+   * number of connections.
+   */
+  public OtpHttpClient(int maxConnections) {
+    this(DEFAULT_TIMEOUT, DEFAULT_TTL, maxConnections);
+  }
+
+  /**
+   * Creates an HTTP client the given timeout and connection time-to-live and the default max
+   * number of connections.
    */
   public OtpHttpClient(Duration timeout, Duration connectionTtl) {
+    this(timeout, connectionTtl, DEFAULT_MAX_TOTAL_CONNECTIONS);
+  }
+
+  /**
+   * Creates an HTTP client with custom configuration.
+   */
+  private OtpHttpClient(Duration timeout, Duration connectionTtl, int maxConnections) {
     Objects.requireNonNull(timeout);
     Objects.requireNonNull(connectionTtl);
 
@@ -100,6 +124,7 @@ public class OtpHttpClient implements AutoCloseable {
       .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(Timeout.of(timeout)).build())
       .setPoolConcurrencyPolicy(PoolConcurrencyPolicy.STRICT)
       .setConnPoolPolicy(PoolReusePolicy.LIFO)
+      .setMaxConnTotal(maxConnections)
       .setDefaultConnectionConfig(
         ConnectionConfig
           .custom()
