@@ -72,6 +72,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix SIRI SX retry logic [#5262](https://github.com/opentripplanner/OpenTripPlanner/pull/5262)
 - Fix filtering by submode [#5261](https://github.com/opentripplanner/OpenTripPlanner/pull/5261)
 - Add leg.headsign to GTFS GraphQL API [#5290](https://github.com/opentripplanner/OpenTripPlanner/pull/5290)
+- Return client error for invalid Transmodel query JSON format [#5277](https://github.com/opentripplanner/OpenTripPlanner/pull/5277)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
