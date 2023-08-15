@@ -18,6 +18,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -115,7 +116,7 @@ public class TransmodelAPI {
         throw new BadRequestException("Variables must be a valid json object");
       }
     } else {
-      variables = new HashMap<>();
+      variables = Collections.emptyMap();
     }
     String operationName = (String) queryParameters.getOrDefault("operationName", null);
     return index.executeGraphQL(
