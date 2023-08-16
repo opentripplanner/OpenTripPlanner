@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor._data.transit;
+package org.opentripplanner.raptor._data.api;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -11,6 +11,11 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 
+/**
+ * This can be used to test the comparators and ParetoSet. Please use the real
+ * {@link org.opentripplanner.raptor.path.Path} implementation is other
+ * functionality is needed.
+ */
 public record TestRaptorPath(
   int rangeRaptorIterationDepartureTime,
   int startTime,
@@ -21,55 +26,53 @@ public record TestRaptorPath(
   int c2
 )
   implements RaptorPath<RaptorTripSchedule> {
+  private static final String NOT_IMPLEMENTED_MESSAGE =
+    "Use the real Path implementation if you need legs...";
+
   @Override
   public int numberOfTransfersExAccessEgress() {
-    return -1;
+    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MESSAGE);
   }
 
   @Nullable
   @Override
   public AccessPathLeg<RaptorTripSchedule> accessLeg() {
-    return null;
+    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MESSAGE);
   }
 
   @Nullable
   @Override
   public EgressPathLeg<RaptorTripSchedule> egressLeg() {
-    return null;
+    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MESSAGE);
   }
 
   @Override
   public List<Integer> listStops() {
-    return null;
+    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MESSAGE);
   }
 
   @Override
   public int waitTime() {
-    return 0;
+    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MESSAGE);
   }
 
   @Override
   public Stream<PathLeg<RaptorTripSchedule>> legStream() {
-    return null;
+    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MESSAGE);
   }
 
   @Override
   public Stream<TransitPathLeg<RaptorTripSchedule>> transitLegs() {
-    return null;
+    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MESSAGE);
   }
 
   @Override
   public String toStringDetailed(RaptorStopNameResolver stopNameResolver) {
-    return null;
+    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MESSAGE);
   }
 
   @Override
   public String toString(RaptorStopNameResolver stopNameTranslator) {
-    return null;
-  }
-
-  @Override
-  public int c2() {
-    return c2;
+    throw new UnsupportedOperationException(NOT_IMPLEMENTED_MESSAGE);
   }
 }

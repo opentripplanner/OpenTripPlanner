@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.raptor._data.transit.TestRaptorPath;
+import org.opentripplanner.raptor._data.api.TestRaptorPath;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 
 class RaptorPathTest {
