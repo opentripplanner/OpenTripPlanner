@@ -42,12 +42,12 @@ public interface PassThroughPoints {
   void updateC2Value(int currentPathC2, IntConsumer update);
 
   /**
-   * Return a predicate witch can be used to reject paths with an undesired c2 value. This is
+   * Return a predicate which can be used to reject paths with an undesired c2 value. This is
    * used by Raptor to reject destination arrivals.
    * <p>
-   * This method MUST return {@code null} if the mc-raptor do not use a second-criteria(c2).
+   * This method MUST return {@code null} if the mc-raptor do not use a second-criteria (c2).
    * The reason for this is that the presence of this function will cause Raptor to get the
-   * c2 value - witch may not exist; hence throw an exception.
+   * c2 value - which may not exist; hence throw an exception.
    */
   @Nullable
   IntPredicate acceptC2AtDestination();
