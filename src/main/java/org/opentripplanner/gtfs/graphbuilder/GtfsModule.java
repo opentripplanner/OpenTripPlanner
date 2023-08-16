@@ -13,8 +13,8 @@ import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.FareAttribute;
-import org.onebusaway.gtfs.model.FareContainer;
 import org.onebusaway.gtfs.model.FareLegRule;
+import org.onebusaway.gtfs.model.FareMedium;
 import org.onebusaway.gtfs.model.FareProduct;
 import org.onebusaway.gtfs.model.FareTransferRule;
 import org.onebusaway.gtfs.model.IdentityBean;
@@ -62,7 +62,7 @@ public class GtfsModule implements GraphBuilderModule {
     FareLegRule.class,
     FareTransferRule.class,
     RiderCategory.class,
-    FareContainer.class,
+    FareMedium.class,
     StopArea.class
   );
 
