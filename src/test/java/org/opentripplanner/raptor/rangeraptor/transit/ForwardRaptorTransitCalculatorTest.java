@@ -32,32 +32,51 @@ public class ForwardRaptorTransitCalculatorTest {
     latestAcceptableArrivalTime = 1200;
     var subject = create();
 
-    assertFalse(subject.exceedsTimeLimit(0));
-    assertFalse(subject.exceedsTimeLimit(1200));
-    assertTrue(subject.exceedsTimeLimit(1201));
+    assertTrue(subject.rejectDestinationArrival(new TestArrivalView(desiredC2, 0)).isEmpty());
+    assertTrue(
+      subject
+        .rejectDestinationArrival(new TestArrivalView(desiredC2, latestAcceptableArrivalTime))
+        .isEmpty()
+    );
+    assertFalse(
+      subject
+        .rejectDestinationArrival(new TestArrivalView(desiredC2, latestAcceptableArrivalTime + 1))
+        .isEmpty()
+    );
 
     latestAcceptableArrivalTime = hm2time(16, 0);
-
+    subject = create();
+    var errors = subject.rejectDestinationArrival(
+      new TestArrivalView(desiredC2, latestAcceptableArrivalTime + 1)
+    );
+    assertEquals(1, errors.size());
     assertEquals(
       "The arrival time exceeds the time limit, arrive to late: 16:00:00.",
-      create().exceedsTimeLimitReason()
+      errors.stream().findFirst().get()
     );
 
     latestAcceptableArrivalTime = RaptorConstants.TIME_NOT_SET;
     subject = create();
-    assertFalse(subject.exceedsTimeLimit(0));
-    assertFalse(subject.exceedsTimeLimit(2_000_000_000));
+    assertTrue(subject.rejectDestinationArrival(new TestArrivalView(desiredC2, 0)).isEmpty());
+    assertTrue(
+      subject.rejectDestinationArrival(new TestArrivalView(desiredC2, 2_000_000_000)).isEmpty()
+    );
   }
 
   @Test
-  public void acceptDestinationArrival() {
+  public void rejectC2AtDestination() {
     desiredC2 = 1;
     var subject = create();
 
-    var errors = subject.rejectDestinationArrival(new TestArrivalView(desiredC2));
+    var errors = subject.rejectDestinationArrival(
+      new TestArrivalView(desiredC2, latestAcceptableArrivalTime)
+    );
     assertTrue(errors.isEmpty());
 
-    errors = subject.rejectDestinationArrival(new TestArrivalView(desiredC2 + 1));
+    errors =
+      subject.rejectDestinationArrival(
+        new TestArrivalView(desiredC2 + 1, latestAcceptableArrivalTime)
+      );
     assertEquals(1, errors.size());
     assertEquals("C2 value rejected: 2.", errors.stream().findFirst().get());
   }
@@ -121,7 +140,7 @@ public class ForwardRaptorTransitCalculatorTest {
     assertFalse(it.hasNext());
   }
 
-  public record TestArrivalView(int c2) implements ArrivalView<TestTripSchedule> {
+  public record TestArrivalView(int c2, int arrivalTime) implements ArrivalView<TestTripSchedule> {
     @Override
     public int stop() {
       return c2;
@@ -134,7 +153,7 @@ public class ForwardRaptorTransitCalculatorTest {
 
     @Override
     public int arrivalTime() {
-      return 0;
+      return arrivalTime;
     }
 
     @Override
