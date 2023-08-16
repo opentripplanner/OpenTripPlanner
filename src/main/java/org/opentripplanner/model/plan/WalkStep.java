@@ -34,7 +34,7 @@ public final class WalkStep {
   private final WgsCoordinate startLocation;
   private final double distance;
   private final RelativeDirection relativeDirection;
-  private final I18NString streetName;
+  private final I18NString name;
   private final AbsoluteDirection absoluteDirection;
 
   private final Set<StreetNote> streetNotes;
@@ -54,7 +54,7 @@ public final class WalkStep {
     WgsCoordinate startLocation,
     RelativeDirection relativeDirection,
     AbsoluteDirection absoluteDirection,
-    I18NString streetName,
+    I18NString name,
     Set<StreetNote> streetNotes,
     String exit,
     ElevationProfile elevationProfile,
@@ -69,7 +69,7 @@ public final class WalkStep {
     this.distance = distance;
     this.relativeDirection = Objects.requireNonNull(relativeDirection);
     this.absoluteDirection = absoluteDirection;
-    this.streetName = streetName;
+    this.name = name;
     this.streetNotes = Set.copyOf(Objects.requireNonNull(streetNotes));
     this.startLocation = Objects.requireNonNull(startLocation);
     this.bogusName = bogusName;
@@ -107,8 +107,8 @@ public final class WalkStep {
   /**
    * The name of the street.
    */
-  public I18NString getStreetName() {
-    return streetName;
+  public I18NString getName() {
+    return name;
   }
 
   /**
@@ -124,14 +124,14 @@ public final class WalkStep {
   /**
    * When exiting a highway or traffic circle, the exit name/number.
    */
-  public String getExit() {
+  public String isExit() {
     return exit;
   }
 
   /**
    * Indicates whether a street changes direction at an intersection.
    */
-  public Boolean getStayOn() {
+  public Boolean isStayOn() {
     return stayOn;
   }
 
@@ -187,7 +187,7 @@ public final class WalkStep {
       .of(this.getClass())
       .addEnum("absoluteDirection", absoluteDirection)
       .addEnum("relativeDirection", relativeDirection)
-      .addStr("streetName", streetName.toString())
+      .addStr("streetName", name.toString())
       .addNum("distance", distance)
       .toString();
   }

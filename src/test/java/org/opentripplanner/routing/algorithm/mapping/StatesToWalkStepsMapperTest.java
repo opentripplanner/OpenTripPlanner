@@ -65,7 +65,7 @@ class StatesToWalkStepsMapperTest {
     assertEquals(2, walkSteps.size());
     var step = walkSteps.get(1);
     assertEquals(step.getRelativeDirection(), FOLLOW_SIGNS);
-    assertEquals(sign, step.getStreetName().toString());
+    assertEquals(sign, step.getName().toString());
   }
 
   private static List<WalkStep> buildWalkSteps(TestStateBuilder builder) {
