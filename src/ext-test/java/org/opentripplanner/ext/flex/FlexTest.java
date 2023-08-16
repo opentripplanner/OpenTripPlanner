@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex;
 
 import static graphql.Assert.assertTrue;
+import static org.opentripplanner.test.support.ResourceLoader.file;
 
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.File;
@@ -15,19 +16,20 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public abstract class FlexTest {
 
-  protected static final String ASPEN_GTFS = "/flex/aspen-flex-on-demand.gtfs.zip";
-  protected static final String COBB_FLEX_GTFS = "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip";
-  protected static final String COBB_BUS_30_GTFS = "/flex/cobblinc-bus-30-only.gtfs.zip";
-  protected static final String MARTA_BUS_856_GTFS = "/flex/marta-bus-856-only.gtfs.zip";
-  protected static final String LINCOLN_COUNTY_GBFS = "/flex/lincoln-county-flex.gtfs.zip";
-  protected static final String COBB_OSM = "/flex/cobb-county.filtered.osm.pbf";
+  protected static final File ASPEN_GTFS = file("/flex/aspen-flex-on-demand.gtfs.zip");
+  protected static final File COBB_FLEX_GTFS = file(
+    "/flex/cobblinc-scheduled-deviated-flex.gtfs.zip"
+  );
+  protected static final File COBB_BUS_30_GTFS = file("/flex/cobblinc-bus-30-only.gtfs.zip");
+  protected static final File MARTA_BUS_856_GTFS = file("/flex/marta-bus-856-only.gtfs.zip");
+  protected static final File LINCOLN_COUNTY_GBFS = file("/flex/lincoln-county-flex.gtfs.zip");
+  protected static final File COBB_OSM = file("/flex/cobb-county.filtered.osm.pbf");
 
   protected static final DirectFlexPathCalculator calculator = new DirectFlexPathCalculator();
   protected static final LocalDate serviceDate = LocalDate.of(2021, 4, 11);
@@ -38,9 +40,7 @@ public abstract class FlexTest {
     new TIntHashSet()
   );
 
-  protected static TestOtpModel buildFlexGraph(String fileName) {
-    File file = ResourceLoader.file(fileName);
-
+  protected static TestOtpModel buildFlexGraph(File file) {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(new StopModel(), deduplicator);

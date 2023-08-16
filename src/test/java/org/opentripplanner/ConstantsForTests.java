@@ -83,11 +83,11 @@ public class ConstantsForTests {
   public static final File BOEBLINGEN_OSM = osmFile("boeblingen-minimal.osm.pbf");
   public static final File VVS_BUS_764_ONLY = file("/gtfs/vvs-bus-764-only.gtfs.zip");
   public static final File VVS_BUS_751_ONLY = file("/gtfs/vvs-bus-751-only.gtfs.zip");
-  public static final File HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM = file(
-    "/osm/herrenberg-hindenburgstr-under-construction.osm.pbf"
+  public static final File HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM = osmFile(
+    "herrenberg-hindenburgstr-under-construction.osm.pbf"
   );
-  public static final File HERRENBERG_BARRIER_GATES_OSM = file(
-    "/osm/herrenberg-barrier-gates.osm.pbf"
+  public static final File HERRENBERG_BARRIER_GATES_OSM = osmFile(
+    "herrenberg-barrier-gates.osm.pbf"
   );
   public static final File HERRENBERG_OSM = osmFile("herrenberg-minimal.osm.pbf");
   public static final File ISLAND_PRUNE_OSM = osmFile("herrenberg-island-prune-nothru.osm.pbf");

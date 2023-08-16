@@ -57,16 +57,15 @@ public class FlexIntegrationTest {
   @BeforeAll
   static void setup() {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    var osmPath = ResourceLoader.file(FlexTest.COBB_OSM);
-    var cobblincGtfsPath = ResourceLoader.file(FlexTest.COBB_BUS_30_GTFS);
-    var martaGtfsPath = ResourceLoader.file(FlexTest.MARTA_BUS_856_GTFS);
-    var flexGtfsPath = ResourceLoader.file(FlexTest.COBB_FLEX_GTFS);
-
-    TestOtpModel model = ConstantsForTests.buildOsmGraph(osmPath);
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(FlexTest.COBB_OSM);
     graph = model.graph();
     transitModel = model.transitModel();
 
-    addGtfsToGraph(graph, transitModel, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
+    addGtfsToGraph(
+      graph,
+      transitModel,
+      List.of(FlexTest.COBB_BUS_30_GTFS, FlexTest.MARTA_BUS_856_GTFS, FlexTest.COBB_FLEX_GTFS)
+    );
     service = TestServerContext.createServerContext(graph, transitModel).routingService();
   }
 
