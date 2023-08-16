@@ -301,7 +301,7 @@ public class OsmModuleTest {
     var graph = new Graph();
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
-      .map(f -> new File(getClass().getResource("/osm/" + f).getFile()))
+      .map(f -> ResourceLoader.file("/osm/" + f))
       .map(f -> new OsmProvider(f, false))
       .toList();
     var module = OsmModule
