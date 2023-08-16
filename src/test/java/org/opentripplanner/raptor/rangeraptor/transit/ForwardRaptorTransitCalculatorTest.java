@@ -8,12 +8,15 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.D1m;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_A;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
 
+import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.lang.IntBox;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.spi.IntIterator;
 
 public class ForwardRaptorTransitCalculatorTest {
@@ -22,8 +25,7 @@ public class ForwardRaptorTransitCalculatorTest {
   private int searchWindowSizeInSeconds = 2 * 60 * 60;
   private int latestAcceptableArrivalTime = hm2time(16, 0);
   private int iterationStep = 60;
-
-  private final IntBox newC2Set = new IntBox(-1);
+  private int desiredC2 = 0;
 
   @Test
   public void exceedsTimeLimit() {
@@ -49,8 +51,15 @@ public class ForwardRaptorTransitCalculatorTest {
 
   @Test
   public void acceptDestinationArrival() {
-    // TODO PT: Write a test that test that the exceedsTimeLimit and acceptC2 predicate is
-    //          done correct.
+    desiredC2 = 1;
+    var subject = create();
+
+    var errors = subject.rejectDestinationArrival(new TestArrivalView(desiredC2));
+    assertTrue(errors.isEmpty());
+
+    errors = subject.rejectDestinationArrival(new TestArrivalView(desiredC2 + 1));
+    assertEquals(1, errors.size());
+    assertEquals("C2 value rejected: 2.", errors.stream().findFirst().get());
   }
 
   @Test
@@ -100,10 +109,7 @@ public class ForwardRaptorTransitCalculatorTest {
       searchWindowSizeInSeconds,
       latestAcceptableArrivalTime,
       iterationStep,
-      c2 -> {
-        newC2Set.set(c2);
-        return true;
-      }
+      c2 -> c2 == desiredC2
     );
   }
 
@@ -113,5 +119,48 @@ public class ForwardRaptorTransitCalculatorTest {
       assertEquals(v, it.next());
     }
     assertFalse(it.hasNext());
+  }
+
+  public record TestArrivalView(int c2) implements ArrivalView<TestTripSchedule> {
+    @Override
+    public int stop() {
+      return c2;
+    }
+
+    @Override
+    public int round() {
+      return 0;
+    }
+
+    @Override
+    public int arrivalTime() {
+      return 0;
+    }
+
+    @Override
+    public int c1() {
+      return 0;
+    }
+
+    @Override
+    public int c2() {
+      return c2;
+    }
+
+    @Nullable
+    @Override
+    public ArrivalView previous() {
+      return null;
+    }
+
+    @Override
+    public PathLegType arrivedBy() {
+      return null;
+    }
+
+    @Override
+    public boolean arrivedOnBoard() {
+      return false;
+    }
   }
 }
