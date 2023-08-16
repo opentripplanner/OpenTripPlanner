@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.List;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
@@ -37,7 +36,7 @@ public class FakeGraph {
     var gg = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
 
-    File file = ResourceLoader.file("/osm/columbus.osm.pbf");
+    File file = ResourceLoader.osmFile("columbus.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule osmModule = OsmModule.of(provider, gg).build();

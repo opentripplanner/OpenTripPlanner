@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gnu.trove.list.TLongList;
 import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -19,7 +17,7 @@ public class OpenStreetMapParserTest {
 
   @Test
   public void testBinaryParser() {
-    File osmFile = ResourceLoader.file("/osm/map.osm.pbf");
+    File osmFile = ResourceLoader.osmFile("map.osm.pbf");
     OsmProvider pr = new OsmProvider(osmFile, true);
     OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP, Set.of());
 

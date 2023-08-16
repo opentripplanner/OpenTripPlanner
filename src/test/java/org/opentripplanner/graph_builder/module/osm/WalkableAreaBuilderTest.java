@@ -44,7 +44,7 @@ public class WalkableAreaBuilderTest {
     final Set<String> boardingAreaRefTags = Set.of();
     final OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP, boardingAreaRefTags);
 
-    final File file = ResourceLoader.file("/osm/" + osmFile);
+    final File file = ResourceLoader.osmFile(osmFile);
     new OsmProvider(file, true).readOSM(osmdb);
     osmdb.postLoad();
 

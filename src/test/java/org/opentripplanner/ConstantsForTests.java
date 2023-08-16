@@ -1,6 +1,7 @@
 package org.opentripplanner;
 
 import static org.opentripplanner.test.support.ResourceLoader.file;
+import static org.opentripplanner.test.support.ResourceLoader.osmFile;
 
 import com.csvreader.CsvReader;
 import java.io.File;
@@ -78,8 +79,8 @@ public class ConstantsForTests {
   private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip/";
   private static final String NETEX_EPIP_DATA_DIR = NETEX_EPIP_DIR + "netex_epip_minimal/";
   /* Stuttgart area, Germany */
-  public static final File DEUFRINGEN_OSM = file("/osm/deufringen-minimal.osm.pbf");
-  public static final File BOEBLINGEN_OSM = file("/osm/boeblingen-minimal.osm.pbf");
+  public static final File DEUFRINGEN_OSM = osmFile("deufringen-minimal.osm.pbf");
+  public static final File BOEBLINGEN_OSM = osmFile("boeblingen-minimal.osm.pbf");
   public static final File VVS_BUS_764_ONLY = file("/gtfs/vvs-bus-764-only.gtfs.zip");
   public static final File VVS_BUS_751_ONLY = file("/gtfs/vvs-bus-751-only.gtfs.zip");
   public static final File HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM = file(
@@ -88,9 +89,9 @@ public class ConstantsForTests {
   public static final File HERRENBERG_BARRIER_GATES_OSM = file(
     "/osm/herrenberg-barrier-gates.osm.pbf"
   );
-  public static final File HERRENBERG_OSM = file("/osm/herrenberg-minimal.osm.pbf");
-  public static final File ISLAND_PRUNE_OSM = file("/osm/herrenberg-island-prune-nothru.osm.pbf");
-  public static final File ADAPTIVE_PRUNE_OSM = file("/osm/isoiiluoto.pbf");
+  public static final File HERRENBERG_OSM = osmFile("herrenberg-minimal.osm.pbf");
+  public static final File ISLAND_PRUNE_OSM = osmFile("herrenberg-island-prune-nothru.osm.pbf");
+  public static final File ADAPTIVE_PRUNE_OSM = osmFile("isoiiluoto.pbf");
 
   /* filenames encoded with cp437 and utf8 */
   public static final String UMLAUT_CP437_ZIP = "src/test/resources/umlaut-cp437.zip";

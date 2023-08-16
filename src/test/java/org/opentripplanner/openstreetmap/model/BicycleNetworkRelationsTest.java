@@ -2,14 +2,13 @@ package org.opentripplanner.openstreetmap.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.test.support.ResourceLoader.osmFile;
 
-import java.io.File;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.openstreetmap.OsmProvider;
-import org.opentripplanner.test.support.ResourceLoader;
 
 public class BicycleNetworkRelationsTest {
 
@@ -21,7 +20,7 @@ public class BicycleNetworkRelationsTest {
   public void testBicycleRouteRelations() {
     var issueStore = DataImportIssueStore.NOOP;
     var osmdb = new OsmDatabase(issueStore, Set.of());
-    var provider = new OsmProvider(ResourceLoader.file("/osm/ehningen-minimal.osm.pbf"), true);
+    var provider = new OsmProvider(osmFile("ehningen-minimal.osm.pbf"), true);
     provider.readOSM(osmdb);
     osmdb.postLoad();
 

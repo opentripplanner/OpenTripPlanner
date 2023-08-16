@@ -22,6 +22,13 @@ public class ResourceLoader {
   }
 
   /**
+   * Return a File instance for the given name from the /osm subfolder.
+   */
+  public static File osmFile(String osmFile) {
+    return file("/osm/" + osmFile);
+  }
+
+  /**
    * Return a URL for the given path.
    */
   public static URL url(String s) {
