@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.api.request;
 
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 
-public interface RaptorTransitPriorityGroupCalculator extends C2Request {
+public interface RaptorTransitPriorityGroupCalculator {
   /**
    * Merge in the trip transit priority group id with an existing set. Note! Both the set
    * and the group id type is {@code int}.

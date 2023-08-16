@@ -2,7 +2,7 @@ package org.opentripplanner.raptor.api.request;
 
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 
-public class RaptorTransitPassThroughRequest implements C2Request {
+public class RaptorTransitPassThroughRequest {
 
   private final PassThroughPointsService passThroughPointsService;
 
@@ -20,7 +20,6 @@ public class RaptorTransitPassThroughRequest implements C2Request {
    * It is critical that the implementation is "static" so it can be inlined, since it
    * is run in the innermost loop of Raptor.
    */
-  @Override
   public DominanceFunction dominanceFunction() {
     return (left, right) -> left > right;
   }
