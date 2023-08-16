@@ -1,5 +1,7 @@
 package org.opentripplanner;
 
+import static org.opentripplanner.test.support.ResourceLoader.file;
+
 import com.csvreader.CsvReader;
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +41,6 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
@@ -47,11 +48,11 @@ import org.opentripplanner.transit.service.TransitModel;
 
 public class ConstantsForTests {
 
-  public static final File CALTRAIN_GTFS = ResourceLoader.file("/gtfs/caltrain_gtfs.zip");
+  public static final File CALTRAIN_GTFS = file("/gtfs/caltrain_gtfs.zip");
 
-  public static final File PORTLAND_GTFS = ResourceLoader.file("/portland/portland.gtfs.zip");
+  public static final File PORTLAND_GTFS = file("/portland/portland.gtfs.zip");
 
-  public static final File PORTLAND_CENTRAL_OSM = ResourceLoader.file(
+  public static final File PORTLAND_CENTRAL_OSM = file(
     "/portland/portland-central-filtered.osm.pbf"
   );
 
@@ -63,15 +64,13 @@ public class ConstantsForTests {
 
   private static final String OSLO_EAST_OSM = "src/test/resources/osm/oslo-east-filtered.osm.pbf";
 
-  public static final File KCM_GTFS = ResourceLoader.file("/gtfs/kcm_gtfs.zip");
+  public static final File KCM_GTFS = file("/gtfs/kcm_gtfs.zip");
 
-  public static final File FAKE_GTFS = ResourceLoader.file("/gtfs/testagency/");
+  public static final File FAKE_GTFS = file("/gtfs/testagency/");
 
-  public static final File FARE_COMPONENT_GTFS = ResourceLoader.file(
-    "/gtfs/farecomponents.gtfs.zip"
-  );
+  public static final File FARE_COMPONENT_GTFS = file("/gtfs/farecomponents.gtfs.zip");
 
-  public static final File SHAPE_DIST_GTFS = ResourceLoader.file("/gtfs/shape_dist_traveled/");
+  public static final File SHAPE_DIST_GTFS = file("/gtfs/shape_dist_traveled/");
 
   private static final String NETEX_NORDIC_DIR = "src/test/resources/netex/nordic";
 
@@ -79,31 +78,19 @@ public class ConstantsForTests {
   private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip/";
   private static final String NETEX_EPIP_DATA_DIR = NETEX_EPIP_DIR + "netex_epip_minimal/";
   /* Stuttgart area, Germany */
-  public static final File DEUFRINGEN_OSM = ResourceLoader.file(
-    "/germany/deufringen-minimal.osm.pbf"
+  public static final File DEUFRINGEN_OSM = file("/osm/deufringen-minimal.osm.pbf");
+  public static final File BOEBLINGEN_OSM = file("/osm/boeblingen-minimal.osm.pbf");
+  public static final File VVS_BUS_764_ONLY = file("/gtfs/vvs-bus-764-only.gtfs.zip");
+  public static final File VVS_BUS_751_ONLY = file("/gtfs/vvs-bus-751-only.gtfs.zip");
+  public static final File HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM = file(
+    "/osm/herrenberg-hindenburgstr-under-construction.osm.pbf"
   );
-  public static final File BOEBLINGEN_OSM = ResourceLoader.file(
-    "/germany/boeblingen-minimal.osm.pbf"
+  public static final File HERRENBERG_BARRIER_GATES_OSM = file(
+    "/osm/herrenberg-barrier-gates.osm.pbf"
   );
-  public static final File VVS_BUS_764_ONLY = ResourceLoader.file(
-    "/germany/vvs-bus-764-only.gtfs.zip"
-  );
-  public static final File VVS_BUS_751_ONLY = ResourceLoader.file(
-    "/germany/vvs-bus-751-only.gtfs.zip"
-  );
-  public static final File HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM = ResourceLoader.file(
-    "/germany/herrenberg-hindenburgstr-under-construction.osm.pbf"
-  );
-  public static final File HERRENBERG_BARRIER_GATES_OSM = ResourceLoader.file(
-    "/germany/herrenberg-barrier-gates.osm.pbf"
-  );
-  public static final File HERRENBERG_OSM = ResourceLoader.file(
-    "/germany/herrenberg-minimal.osm.pbf"
-  );
-  public static final File ISLAND_PRUNE_OSM = ResourceLoader.file(
-    "/germany/herrenberg-island-prune-nothru.osm.pbf"
-  );
-  public static final File ADAPTIVE_PRUNE_OSM = ResourceLoader.file("/osm/isoiiluoto.pbf");
+  public static final File HERRENBERG_OSM = file("/osm/herrenberg-minimal.osm.pbf");
+  public static final File ISLAND_PRUNE_OSM = file("/osm/herrenberg-island-prune-nothru.osm.pbf");
+  public static final File ADAPTIVE_PRUNE_OSM = file("/osm/isoiiluoto.pbf");
 
   /* filenames encoded with cp437 and utf8 */
   public static final String UMLAUT_CP437_ZIP = "src/test/resources/umlaut-cp437.zip";

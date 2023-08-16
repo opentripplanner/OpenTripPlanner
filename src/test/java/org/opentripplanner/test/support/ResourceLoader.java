@@ -1,6 +1,7 @@
 package org.opentripplanner.test.support;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.net.URL;
@@ -17,7 +18,10 @@ public class ResourceLoader {
    */
   public static File file(String path) {
     final URL resource = ResourceLoader.class.getResource(path);
-    assertNotNull(resource, "Resource %s not found on file system".formatted(path));
-    return new File(URLDecoder.decode(resource.getFile(), StandardCharsets.UTF_8));
+    final String msg = "Resource %s not found on file system".formatted(path);
+    assertNotNull(resource, msg);
+    var file = new File(URLDecoder.decode(resource.getFile(), StandardCharsets.UTF_8));
+    assertTrue(file.exists(), msg);
+    return file;
   }
 }
