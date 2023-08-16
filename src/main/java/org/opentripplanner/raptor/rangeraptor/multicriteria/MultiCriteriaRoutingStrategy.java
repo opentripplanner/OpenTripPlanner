@@ -72,7 +72,7 @@ public class MultiCriteriaRoutingStrategy<T extends RaptorTripSchedule, R extend
       for (R ride : patternRides) {
         // Replace existing ride with same ride with the C2 value updated. This only happens if
         // the stop is a pass-through point and the path has visited the pass-through points in the
-        // right order so fare.
+        // correct order.
         //noinspection unchecked
         passThroughPoints.updateC2Value(
           ride.c2(),

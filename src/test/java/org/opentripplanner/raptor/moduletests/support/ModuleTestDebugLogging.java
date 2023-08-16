@@ -25,13 +25,16 @@ import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
  *  Accept  |  Access |   0 |     2 | 00:08:30 |    12 000 |      | Accepted element: Walk 30s ~ 2 (cost: 12000)
  * </pre>
  * <p>
- * You can enable debugging by setting variable DEBUG, an environment variable, or a system
- * property. If {@code debugRaptor} exist as either a system property or an environment variable
- * the module tests will log debug events.
+ * You can enable debug logging from the module tests by either:
+ * <ul>
+ *     <li> setting the variable 'DEBUG' below to true
+ *     <li> setting the environment variable 'debugRaptor' to an arbitrary value
+ *     <li> setting the system property 'debugRaptor' to an arbitrary value
+ * </ul>
  * <p>
  * Remember to revert to {@code DEBUG=false} before committing or use the other options.
  * <p>
- * Tip! Setting the system properties can be done on individual test in intellij, or in the JUnit
+ * Tip! Setting the system properties can be done on individual test in IntelliJ, or in the JUnit
  * template. Add {@code -DdebugRaptorOff} or {@code -DdebugRaptor} to the JUnit template. You can
  * easily change it when needed in the specific unit-test config, since the template is copied
  * before the first test run, and not before re-runs.

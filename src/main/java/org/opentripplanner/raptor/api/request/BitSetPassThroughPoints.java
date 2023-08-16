@@ -15,7 +15,7 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
  * <p>
  * We update the c2 value only if the current value is 1 less than the pass-through point
  * sequence number. This make sure pass-through points are visited in the right order.
- * The c2 value is equal to the last visited pass-through point sequence number. If 0(zero)
+ * The c2 value is equal to the last visited pass-through point sequence number. If zero
  * no pass-through point is visited yet.
  */
 public class BitSetPassThroughPoints implements PassThroughPoints {
@@ -46,15 +46,14 @@ public class BitSetPassThroughPoints implements PassThroughPoints {
 
   @Override
   public boolean isPassThroughPoint(int stop) {
-    // Make sure the c2 is NOT set if the stop is not a pass-through point
-    this.currentPassThroughPointSeqNo = RaptorConstants.NOT_SET;
-
     for (int i = 0; i < passThroughPoints.size(); ++i) {
       if (passThroughPoints.get(i).get(stop)) {
         currentPassThroughPointSeqNo = i + 1;
         return true;
       }
     }
+    // Make sure the c2 is NOT set if the stop is not a pass-through point
+    this.currentPassThroughPointSeqNo = RaptorConstants.NOT_SET;
     return false;
   }
 

@@ -10,7 +10,6 @@ public class RaptorTransitPassThroughRequest implements C2Request {
     this.passThroughPoints = passThroughPoints;
   }
 
-  // TODO: Should this method be part of the interface?
   public PassThroughPoints passThroughPoints() {
     return passThroughPoints;
   }

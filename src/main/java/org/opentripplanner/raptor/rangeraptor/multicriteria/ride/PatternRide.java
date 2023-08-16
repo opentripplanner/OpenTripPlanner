@@ -17,7 +17,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  * comparator used by the pareto-set of patternRides.
  * <p>
  * This implementation of the multi-criteria Range Raptor keeps all pareto-optimal _rides_ for each
- * pattern while possessing each stops down the line. This class keep the needed state for these
+ * pattern while possessing each stop down the line. This class keep the needed state for these
  * rides to avoid recalculating each value more than once and to be able to put them in a
  * {@link ParetoSet}.
  * <p>
@@ -34,7 +34,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  *    calculation.
  *  </li>
  *  <li>
- *    We do NOT allow a one trip to exclude the pattern-rides of another trip in the pareto-set.
+ *    We do NOT allow one trip to exclude the pattern-rides of another trip in the pareto-set.
  *    Two pattern-rides are both optimal, if they have boarded the same pattern, in the same round,
  *    but on different trips/vehicles. This have no measurable impact on performance, compared with
  *    allowing an earlier trip dominating a later one. But, it allows for a trip to be optimal at
@@ -48,7 +48,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
  *    of pattern-rides.
  *  </li>
  * </ul>
- * This interface extends the {@link PatternRideView} with methods witch mutate the PatternRide
+ * This interface extends the {@link PatternRideView} with methods which mutate the PatternRide
  * (a new copy is created, since the rides are immutable). The interface is used by Raptor to
  * perform the routing, while the view is used by other parts; hence only need read access.
  * <p>
@@ -57,7 +57,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoSet;
 public interface PatternRide<T extends RaptorTripSchedule>
   extends PatternRideView<T, McStopArrival<T>> {
   /**
-   * Change the ride by setting a new c2 value. Since, the ride is immutable the
+   * Change the ride by setting a new c2 value. Since the ride is immutable the
    * new ride is copied and returned.
    */
   PatternRide<T> updateC2(int newC2);

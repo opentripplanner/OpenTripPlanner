@@ -71,7 +71,7 @@ public class J01_PassThroughTest {
   }
 
   @Test
-  @DisplayName("Pass-through stop point as a first point in the journey.")
+  @DisplayName("Pass-through stop point as a last point in the journey.")
   public void passThroughPointOnEgress() {
     var data = new TestTransitData();
 
@@ -109,7 +109,7 @@ public class J01_PassThroughTest {
   }
 
   @Test
-  @DisplayName("Pass-through stop point as a last point in the journey.")
+  @DisplayName("Pass-through stop point as a first point in the journey.")
   public void passThroughPointOnAccess() {
     var data = new TestTransitData();
 
@@ -147,7 +147,7 @@ public class J01_PassThroughTest {
   }
 
   @Test
-  @DisplayName("Pass-through stop point as a intermediate point in the journey.")
+  @DisplayName("Pass-through stop point as an intermediate point in the journey.")
   public void passThroughPointInTheMiddle() {
     var data = new TestTransitData();
 

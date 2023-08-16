@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;

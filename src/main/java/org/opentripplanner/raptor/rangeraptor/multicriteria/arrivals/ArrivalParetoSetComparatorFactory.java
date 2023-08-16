@@ -63,16 +63,16 @@ public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundAndCost() {
         return (l, r) ->
-          c2DominanceFunction.leftDominateRight(l.c2(), r.c2()) || McStopArrival.compareBase(l, r);
+          McStopArrival.compareBase(l, r) || c2DominanceFunction.leftDominateRight(l.c2(), r.c2());
       }
 
       @Override
       public ParetoComparator<T> compareArrivalTimeRoundCostAndOnBoardArrival() {
         return (
           (l, r) ->
-            c2DominanceFunction.leftDominateRight(l.c2(), r.c2()) ||
             McStopArrival.compareBase(l, r) ||
-            McStopArrival.compareArrivedOnBoard(l, r)
+            McStopArrival.compareArrivedOnBoard(l, r) ||
+            c2DominanceFunction.leftDominateRight(l.c2(), r.c2())
         );
       }
     };

@@ -49,7 +49,7 @@ public class ForwardRaptorTransitCalculatorTest {
 
   @Test
   public void acceptDestinationArrival() {
-    // TODO PT: Wrire a test that test that the exceedsTimeLimit and acceptC2 predicate is
+    // TODO PT: Write a test that test that the exceedsTimeLimit and acceptC2 predicate is
     //          done correct.
   }
 
