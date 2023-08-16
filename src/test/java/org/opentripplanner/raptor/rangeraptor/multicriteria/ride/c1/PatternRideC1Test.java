@@ -56,9 +56,7 @@ public class PatternRideC1Test {
 
     var updatedRide = originalRide.updateC2(1);
 
-    assertAll(
-      () -> assertSame(originalRide, updatedRide),
-      () -> assertEquals(ZERO_COST, updatedRide.c2())
-    );
+    assertSame(originalRide, updatedRide);
+    assertEquals(ZERO_COST, updatedRide.c2());
   }
 }

@@ -81,14 +81,11 @@ public class PatternRideC2Test {
     );
 
     var updatedRide = originalRide.updateC2(NEW_C2);
-
-    assertAll(
-      () -> assertEquals(BOARD_STOP_INDEX, updatedRide.boardStopIndex()),
-      () -> assertEquals(BOARD_POS, updatedRide.boardPos()),
-      () -> assertEquals(BOARD_TIME, updatedRide.boardTime()),
-      () -> assertEquals(BOARD_C1, updatedRide.boardC1()),
-      () -> assertEquals(RELATIVE_C1, updatedRide.relativeC1()),
-      () -> assertEquals(NEW_C2, updatedRide.c2())
-    );
+    assertEquals(BOARD_STOP_INDEX, updatedRide.boardStopIndex());
+    assertEquals(BOARD_POS, updatedRide.boardPos());
+    assertEquals(BOARD_TIME, updatedRide.boardTime());
+    assertEquals(BOARD_C1, updatedRide.boardC1());
+    assertEquals(RELATIVE_C1, updatedRide.relativeC1());
+    assertEquals(NEW_C2, updatedRide.c2());
   }
 }

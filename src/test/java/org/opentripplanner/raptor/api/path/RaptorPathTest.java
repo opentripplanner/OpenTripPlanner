@@ -88,64 +88,52 @@ class RaptorPathTest {
 
   @Test
   void compareIterationDepartureTime() {
-    assertAll(() -> {
-      assertFalse(RaptorPath.compareIterationDepartureTime(subject, subject));
-      assertFalse(RaptorPath.compareIterationDepartureTime(subject, same));
-      assertTrue(RaptorPath.compareIterationDepartureTime(subject, smallIterationDepartureTime));
-      assertFalse(RaptorPath.compareIterationDepartureTime(smallIterationDepartureTime, subject));
-    });
+    assertFalse(RaptorPath.compareIterationDepartureTime(subject, subject));
+    assertFalse(RaptorPath.compareIterationDepartureTime(subject, same));
+    assertTrue(RaptorPath.compareIterationDepartureTime(subject, smallIterationDepartureTime));
+    assertFalse(RaptorPath.compareIterationDepartureTime(smallIterationDepartureTime, subject));
   }
 
   @Test
   void compareDepartureTime() {
-    assertAll(() -> {
-      assertFalse(RaptorPath.compareDepartureTime(subject, subject));
-      assertFalse(RaptorPath.compareDepartureTime(subject, same));
-      assertTrue(RaptorPath.compareDepartureTime(subject, smallDepartureTime));
-      assertFalse(RaptorPath.compareDepartureTime(smallDepartureTime, subject));
-    });
+    assertFalse(RaptorPath.compareDepartureTime(subject, subject));
+    assertFalse(RaptorPath.compareDepartureTime(subject, same));
+    assertTrue(RaptorPath.compareDepartureTime(subject, smallDepartureTime));
+    assertFalse(RaptorPath.compareDepartureTime(smallDepartureTime, subject));
   }
 
   @Test
   void compareArrivalTime() {
-    assertAll(() -> {
-      assertFalse(RaptorPath.compareArrivalTime(subject, subject));
-      assertFalse(RaptorPath.compareArrivalTime(subject, same));
-      assertFalse(RaptorPath.compareArrivalTime(subject, smallArrivalTime));
-      assertTrue(RaptorPath.compareArrivalTime(smallArrivalTime, subject));
-    });
+    assertFalse(RaptorPath.compareArrivalTime(subject, subject));
+    assertFalse(RaptorPath.compareArrivalTime(subject, same));
+    assertFalse(RaptorPath.compareArrivalTime(subject, smallArrivalTime));
+    assertTrue(RaptorPath.compareArrivalTime(smallArrivalTime, subject));
   }
 
   @Test
   void compareDuration() {
-    assertAll(() -> {
-      assertFalse(RaptorPath.compareDuration(subject, subject));
-      assertFalse(RaptorPath.compareDuration(subject, same));
-      assertFalse(RaptorPath.compareDuration(subject, smallDuration));
-      assertTrue(RaptorPath.compareDuration(smallDuration, subject));
-    });
+    assertFalse(RaptorPath.compareDuration(subject, subject));
+    assertFalse(RaptorPath.compareDuration(subject, same));
+    assertFalse(RaptorPath.compareDuration(subject, smallDuration));
+    assertTrue(RaptorPath.compareDuration(smallDuration, subject));
   }
 
   @Test
   void compareNumberOfTransfers() {
-    assertAll(() -> {
-      assertFalse(RaptorPath.compareNumberOfTransfers(subject, subject));
-      assertFalse(RaptorPath.compareNumberOfTransfers(subject, same));
-      assertFalse(RaptorPath.compareNumberOfTransfers(subject, smallNumberOfTransfers));
-      assertTrue(RaptorPath.compareNumberOfTransfers(smallNumberOfTransfers, subject));
-    });
+    assertFalse(RaptorPath.compareNumberOfTransfers(subject, subject));
+    assertFalse(RaptorPath.compareNumberOfTransfers(subject, same));
+    assertFalse(RaptorPath.compareNumberOfTransfers(subject, smallNumberOfTransfers));
+    assertTrue(RaptorPath.compareNumberOfTransfers(smallNumberOfTransfers, subject));
   }
 
   @Test
   void compareC1() {
-    assertAll(() -> {
-      assertFalse(RaptorPath.compareC1(subject, subject));
-      assertFalse(RaptorPath.compareC1(subject, same));
-      assertFalse(RaptorPath.compareC1(subject, smallC1));
-      assertTrue(RaptorPath.compareC1(smallC1, subject));
-      assertTrue(
-        RaptorPath.compareC1(GeneralizedCostRelaxFunction.of(1.25, 26), subject, smallArrivalTime)
-      );
-    });
+    assertFalse(RaptorPath.compareC1(subject, subject));
+    assertFalse(RaptorPath.compareC1(subject, same));
+    assertFalse(RaptorPath.compareC1(subject, smallC1));
+    assertTrue(RaptorPath.compareC1(smallC1, subject));
+    assertTrue(
+      RaptorPath.compareC1(GeneralizedCostRelaxFunction.of(1.25, 26), subject, smallArrivalTime)
+    );
   }
 }
