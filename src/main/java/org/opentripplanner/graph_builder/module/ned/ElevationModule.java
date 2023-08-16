@@ -40,7 +40,7 @@ import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFacto
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetElevationExtension;
+import org.opentripplanner.street.model.edge.StreetElevationExtensionBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -509,7 +509,12 @@ public class ElevationModule implements GraphBuilderModule {
 
   private void setEdgeElevationProfile(StreetEdge ee, PackedCoordinateSequence elevPCS) {
     try {
-      StreetElevationExtension.addToEdge(ee, elevPCS, false);
+      StreetElevationExtensionBuilder
+        .of(ee)
+        .withElevationProfile(elevPCS)
+        .withComputed(false)
+        .build()
+        .ifPresent(ee::setElevationExtension);
       if (ee.isElevationFlattened()) {
         issueStore.add(new ElevationFlattened(ee));
       }

@@ -11,7 +11,7 @@ import org.opentripplanner.graph_builder.issues.ElevationFlattened;
 import org.opentripplanner.graph_builder.issues.ElevationProfileFailure;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetElevationExtension;
+import org.opentripplanner.street.model.edge.StreetElevationExtensionBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -254,7 +254,12 @@ class MissingElevationHandler {
     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
     try {
-      StreetElevationExtension.addToEdge(edge, profile, true);
+      StreetElevationExtensionBuilder
+        .of(edge)
+        .withElevationProfile(profile)
+        .withComputed(true)
+        .build()
+        .ifPresent(edge::setElevationExtension);
 
       if (edge.isElevationFlattened()) {
         issueStore.add(new ElevationFlattened(edge));

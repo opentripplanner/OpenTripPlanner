@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedStringFormat;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
@@ -17,7 +16,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
-import org.opentripplanner.street.model.edge.StreetElevationExtension;
+import org.opentripplanner.street.model.edge.StreetElevationExtensionBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -210,7 +209,12 @@ class MissingElevationHandlerTest {
 
     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
-    StreetElevationExtension.addToEdge(edge, profile, true);
+    StreetElevationExtensionBuilder
+      .of(edge)
+      .withElevationProfile(profile)
+      .withComputed(true)
+      .build()
+      .ifPresent(edge::setElevationExtension);
   }
 
   private void assertNullElevation(StreetEdge edge) {

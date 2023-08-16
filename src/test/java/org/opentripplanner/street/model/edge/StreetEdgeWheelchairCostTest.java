@@ -75,8 +75,12 @@ class StreetEdgeWheelchairCostTest {
     };
 
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
-    StreetElevationExtension.addToEdge(edge, elev, true);
-
+    StreetElevationExtensionBuilder
+      .of(edge)
+      .withElevationProfile(elev)
+      .withComputed(true)
+      .build()
+      .ifPresent(edge::setElevationExtension);
     assertEquals(slope, edge.getMaxSlope(), 0.0001);
 
     var req = StreetSearchRequest.of();

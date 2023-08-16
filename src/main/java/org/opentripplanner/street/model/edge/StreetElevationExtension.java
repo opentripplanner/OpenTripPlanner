@@ -4,9 +4,6 @@ import java.io.Serializable;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.util.SlopeCosts;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class StreetElevationExtension implements Serializable {
 
@@ -35,7 +32,7 @@ public class StreetElevationExtension implements Serializable {
 
   private final boolean flattened;
 
-  private StreetElevationExtension(
+  StreetElevationExtension(
     double distanceMeters,
     boolean computed,
     PackedCoordinateSequence packedElevationProfile,
@@ -68,19 +65,6 @@ public class StreetElevationExtension implements Serializable {
     }
   }
 
-  public static void addToEdge(
-    StreetEdge streetEdge,
-    PackedCoordinateSequence elevationProfile,
-    boolean computed
-  ) {
-    if (elevationProfile != null && elevationProfile.size() >= 2) {
-      if (!streetEdge.isSlopeOverride() || computed) {
-        var extension = calculateForEdge(streetEdge, elevationProfile, computed);
-        streetEdge.setElevationExtension(extension);
-      }
-    }
-  }
-
   public PackedCoordinateSequence getElevationProfile() {
     if (compactedElevationProfile != null) {
       return CompactElevationProfile.uncompactElevationProfileWithRegularSamples(
@@ -93,7 +77,7 @@ public class StreetElevationExtension implements Serializable {
   }
 
   /**
-   * The distance multiplied by the {@link StreetEdge#bicycleSafetyFactor}, but also considering the
+   * The distance multiplied by the {@link StreetEdge#getBicycleSafetyFactor()} }, but also considering the
    * increased length caused by the slope.
    */
   public double getEffectiveBicycleSafetyDistance() {
@@ -125,7 +109,7 @@ public class StreetElevationExtension implements Serializable {
   }
 
   /**
-   * The distance multiplied by the {@link StreetEdge#walkSafetyFactor}, but also considering the
+   * The distance multiplied by the {@link StreetEdge#getWalkSafetyFactor()}, but also considering the
    * increased length caused by the slope.
    */
   public double getEffectiveWalkSafetyDistance() {
@@ -158,65 +142,5 @@ public class StreetElevationExtension implements Serializable {
       .addNum("effectiveWalkDistance", effectiveWalkDistance)
       .addNum("maxSlope", maxSlope)
       .toString();
-  }
-
-  private static StreetElevationExtension calculateForEdge(
-    StreetEdge streetEdge,
-    PackedCoordinateSequence elevationProfile,
-    boolean computed
-  ) {
-    boolean slopeLimit = streetEdge.getPermission().allows(StreetTraversalPermission.CAR);
-    SlopeCosts costs = ElevationUtils.getSlopeCosts(elevationProfile, slopeLimit);
-
-    var effectiveBikeDistanceFactor = costs.slopeSpeedFactor;
-    var effectiveBikeWorkFactor = costs.slopeWorkFactor;
-    var effectiveWalkDistanceFactor = costs.effectiveWalkFactor;
-    var maxSlope = (float) costs.maxSlope;
-    var flattened = costs.flattened;
-
-    float effectiveBicycleSafetyFactor = (float) (
-      streetEdge.getBicycleSafetyFactor() *
-      costs.lengthMultiplier +
-      costs.slopeSafetyCost /
-      streetEdge.getDistanceMeters()
-    );
-
-    if (
-      Double.isInfinite(effectiveBicycleSafetyFactor) || Double.isNaN(effectiveBicycleSafetyFactor)
-    ) {
-      throw new IllegalStateException(
-        "Elevation updated bicycleSafetyFactor is " + effectiveBicycleSafetyFactor
-      );
-    }
-
-    float effectiveWalkSafetyFactor = (float) (
-      streetEdge.getWalkSafetyFactor() * effectiveWalkDistanceFactor
-    );
-
-    if (Double.isInfinite(effectiveWalkSafetyFactor) || Double.isNaN(effectiveWalkSafetyFactor)) {
-      throw new IllegalStateException(
-        "Elevation updated walkSafetyFactor is " + effectiveWalkSafetyFactor
-      );
-    }
-
-    if (streetEdge.isStairs()) {
-      // Ignore elevation related costs for stairs, RouteRequest#stairsTimeFactor is used instead.
-      effectiveBikeDistanceFactor = 1.0;
-      effectiveWalkDistanceFactor = 1.0;
-    }
-
-    return new StreetElevationExtension(
-      streetEdge.getDistanceMeters(),
-      computed,
-      elevationProfile,
-      effectiveBicycleSafetyFactor,
-      effectiveBikeDistanceFactor,
-      effectiveBikeWorkFactor,
-      effectiveWalkDistanceFactor,
-      effectiveWalkSafetyFactor,
-      costs.lengthMultiplier,
-      maxSlope,
-      flattened
-    );
   }
 }
