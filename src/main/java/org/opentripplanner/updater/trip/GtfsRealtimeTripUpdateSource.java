@@ -26,12 +26,14 @@ public class GtfsRealtimeTripUpdateSource {
   private final HttpHeaders headers;
   private boolean fullDataset = true;
   private final ExtensionRegistry registry = ExtensionRegistry.newInstance();
+  private final OtpHttpClient otpHttpClient;
 
   public GtfsRealtimeTripUpdateSource(PollingTripUpdaterParameters config) {
     this.feedId = config.feedId();
     this.url = config.url();
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
     MfdzRealtimeExtensions.registerAllExtensions(registry);
+    otpHttpClient = new OtpHttpClient();
   }
 
   public List<TripUpdate> getUpdates() {
@@ -39,7 +41,7 @@ public class GtfsRealtimeTripUpdateSource {
     List<FeedEntity> feedEntityList;
     List<TripUpdate> updates = null;
     fullDataset = true;
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try {
       // Decode message
       feedMessage =
         otpHttpClient.getAndMap(
