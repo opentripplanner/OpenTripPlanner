@@ -28,6 +28,17 @@ class IntUtilsTest {
   }
 
   @Test
+  public void testRound() {
+    assertEquals(0, IntUtils.round(0.499));
+    assertEquals(1, IntUtils.round(0.5));
+    assertEquals(99, IntUtils.round(99.499));
+    assertEquals(100, IntUtils.round(99.5));
+    assertEquals(0, IntUtils.round(-0.5));
+    assertEquals(-99, IntUtils.round(-99.500));
+    assertEquals(-100, IntUtils.round(-99.501));
+  }
+
+  @Test
   void testShiftArray() {
     assertArrayEquals(new int[] {}, shiftArray(3, new int[] {}));
     assertArrayEquals(new int[] { 2, 6 }, shiftArray(3, new int[] { -1, 3 }));

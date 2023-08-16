@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Objects;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.TimeAndCost;
+import org.opentripplanner.framework.model.Units;
 
 /**
  * The time and cost penalty is used to calculate an extra penalty on time and cost.
@@ -22,16 +23,27 @@ public record TimeAndCostPenalty(TimePenalty timePenalty, double costFactor) {
     }
   }
 
+  public static TimeAndCostPenalty of(TimePenalty timePenalty, double costFactor) {
+    return new TimeAndCostPenalty(timePenalty, costFactor);
+  }
+
   public static TimeAndCostPenalty of(String timePenalty, double costFactor) {
-    return new TimeAndCostPenalty(TimePenalty.of(timePenalty), costFactor);
+    return of(TimePenalty.of(timePenalty), costFactor);
   }
 
   /**
    * Calculate the time and the cost penalty.
    */
+  public TimeAndCost calculate(Duration time) {
+    Duration timePenaltyValue = this.timePenalty.calculate(time);
+    return new TimeAndCost(
+      timePenaltyValue,
+      Cost.costOfSeconds(timePenaltyValue.toSeconds() * costFactor)
+    );
+  }
+
   public TimeAndCost calculate(int timeInSeconds) {
-    Duration dt = timePenalty.calculate(timeInSeconds);
-    return new TimeAndCost(dt, Cost.costOfSeconds(dt.toSeconds() * costFactor));
+    return calculate(Duration.ofSeconds(timeInSeconds));
   }
 
   /**

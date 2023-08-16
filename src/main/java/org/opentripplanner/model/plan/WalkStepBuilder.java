@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
 
@@ -85,7 +86,7 @@ public class WalkStepBuilder {
   }
 
   public WalkStepBuilder withAbsoluteDirection(double thisAngle) {
-    int octant = (int) (8 + Math.round(thisAngle * 8 / (Math.PI * 2))) % 8;
+    int octant = (8 + IntUtils.round(thisAngle * 8 / (Math.PI * 2))) % 8;
     absoluteDirection = AbsoluteDirection.values()[octant];
     return this;
   }

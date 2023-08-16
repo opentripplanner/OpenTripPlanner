@@ -34,6 +34,7 @@ import org.opentripplanner.raptor.util.BitSetIterator;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.CostCalculatorFactory;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParameters;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParametersBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
@@ -63,7 +64,7 @@ public class TestTransitData
   private final List<Set<Integer>> routeIndexesByStopIndex = new ArrayList<>();
   private final List<TestRoute> routes = new ArrayList<>();
   private final List<ConstrainedTransfer> constrainedTransfers = new ArrayList<>();
-  private final GeneralizedCostParametersBuilder costParamsBuilder = new GeneralizedCostParametersBuilder();
+  private final GeneralizedCostParametersBuilder costParamsBuilder = GeneralizedCostParameters.of();
 
   private RaptorSlackProvider slackProvider = SLACK_PROVIDER;
 

@@ -7,6 +7,7 @@ import java.util.Set;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;

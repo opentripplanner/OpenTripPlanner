@@ -19,6 +19,6 @@ public record TimeAndCost(Duration time, Cost cost) {
 
   @Override
   public String toString() {
-    return "(" + DurationUtils.durationToStr(time) + ", " + cost + ")";
+    return "(" + DurationUtils.durationToStr(time) + " " + cost + ")";
   }
 }

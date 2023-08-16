@@ -34,7 +34,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilt
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -62,7 +62,7 @@ public class ItineraryListFilterChainBuilder {
   private TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams;
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
-  private DoubleAlgorithmFunction nonTransitGeneralizedCostLimit;
+  private CostLinearFunction nonTransitGeneralizedCostLimit;
   private Instant latestDepartureTimeLimit = null;
   private Consumer<Itinerary> maxLimitReachedSubscriber;
   private boolean accessibilityScore;
@@ -156,7 +156,7 @@ public class ItineraryListFilterChainBuilder {
    * non-transit itineraries with a cost larger than {@code 1800 + 2 * 5000 = 11 800} is dropped.
    */
   public ItineraryListFilterChainBuilder withNonTransitGeneralizedCostLimit(
-    DoubleAlgorithmFunction value
+    CostLinearFunction value
   ) {
     this.nonTransitGeneralizedCostLimit = value;
     return this;
@@ -323,7 +323,10 @@ public class ItineraryListFilterChainBuilder {
     if (transitGeneralizedCostFilterParams != null) {
       filters.add(
         new DeletionFlaggingFilter(
-          new TransitGeneralizedCostFilter(transitGeneralizedCostFilterParams)
+          new TransitGeneralizedCostFilter(
+            transitGeneralizedCostFilterParams.costLimitFunction(),
+            transitGeneralizedCostFilterParams.intervalRelaxFactor()
+          )
         )
       );
     }

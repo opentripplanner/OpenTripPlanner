@@ -18,6 +18,7 @@ public class SiriHttpLoader {
   private final String url;
   private final Duration timeout;
   private final Duration previewInterval;
+  private final OtpHttpClient otpHttpClient;
 
   public SiriHttpLoader(String url, Duration timeout, HttpHeaders requestHeaders) {
     this(url, timeout, requestHeaders, null);
@@ -33,6 +34,7 @@ public class SiriHttpLoader {
     this.timeout = timeout;
     this.requestHeaders = requestHeaders;
     this.previewInterval = previewInterval;
+    this.otpHttpClient = new OtpHttpClient(timeout, timeout);
   }
 
   /**
@@ -58,7 +60,7 @@ public class SiriHttpLoader {
   }
 
   private Siri fetchFeed(String serviceRequest, RequestTimer requestTimer, String requestorRef) {
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient(timeout, timeout)) {
+    try {
       return otpHttpClient.postXmlAndMap(
         url,
         serviceRequest,

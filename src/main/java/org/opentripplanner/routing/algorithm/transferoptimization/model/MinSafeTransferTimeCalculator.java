@@ -4,6 +4,7 @@ import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds
 
 import java.util.Collection;
 import java.util.function.ToIntFunction;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
@@ -86,7 +87,7 @@ public class MinSafeTransferTimeCalculator<T extends RaptorTripSchedule> {
       return MIN_SAFE_TRANSFER_TIME_LIMIT_UPPER_BOUND;
     }
     int minTransitTime = list.stream().mapToInt(transitTimeSeconds).min().getAsInt();
-    int minSafeTransitTime = (int) Math.round(minTransitTime * P / 100.0);
+    int minSafeTransitTime = IntUtils.round(minTransitTime * P / 100.0);
     return bound(
       minSafeTransitTime,
       MIN_SAFE_TRANSFER_TIME_LIMIT_LOWER_BOUND,

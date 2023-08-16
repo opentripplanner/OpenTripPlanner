@@ -1,13 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapNullableId;
 
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Objects;
 import org.opentripplanner.ext.fares.model.FareTransferRule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class FareTransferRuleMapper {
 
@@ -32,31 +32,29 @@ public class FareTransferRuleMapper {
 
   private FareTransferRule doMap(org.onebusaway.gtfs.model.FareTransferRule rhs) {
     var fareProductId = mapAgencyAndId(rhs.getFareProductId());
+    var products = fareProductMapper.getByFareProductId(fareProductId);
+    if (products.isEmpty()) {
+      issueStore.add(
+        "UnknownFareProductId",
+        "Fare product with id %s referenced by fare transfer rule with id %s not found.".formatted(
+            fareProductId,
+            rhs.getId()
+          )
+      );
+      return null;
+    }
 
-    return fareProductMapper
-      .getByFareProductId(fareProductId)
-      .map(p -> {
-        Duration duration = null;
-        if (rhs.getDurationLimit() != MISSING_VALUE) {
-          duration = Duration.ofSeconds(rhs.getDurationLimit());
-        }
-        return new FareTransferRule(
-          mapNullableId(rhs.getFromLegGroupId()),
-          mapNullableId(rhs.getToLegGroupId()),
-          rhs.getTransferCount(),
-          duration,
-          p
-        );
-      })
-      .orElseGet(() -> {
-        issueStore.add(
-          "UnknownFareProductId",
-          "Fare product with id %s referenced by fare transfer rule with id %s not found.".formatted(
-              fareProductId,
-              rhs.getId()
-            )
-        );
-        return null;
-      });
+    Duration duration = null;
+    if (rhs.getDurationLimit() != MISSING_VALUE) {
+      duration = Duration.ofSeconds(rhs.getDurationLimit());
+    }
+    return new FareTransferRule(
+      new FeedScopedId(fareProductId.getFeedId(), rhs.getId()),
+      AgencyAndIdMapper.mapAgencyAndId(rhs.getFromLegGroupId()),
+      AgencyAndIdMapper.mapAgencyAndId(rhs.getToLegGroupId()),
+      rhs.getTransferCount(),
+      duration,
+      products
+    );
   }
 }

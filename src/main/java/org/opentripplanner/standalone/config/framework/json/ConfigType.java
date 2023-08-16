@@ -72,10 +72,44 @@ public enum ConfigType {
   ),
   TIME_ZONE(JsonType.string, "Time-Zone ID", "UTC", "Europe/Paris", "-05:00"),
   FEED_SCOPED_ID(JsonType.string, "FeedScopedId", "NO:1001", "1:101"),
-  LINEAR_FUNCTION(
+  COST_LINEAR_FUNCTION(
     JsonType.string,
-    "A linear function with one input parameter(x) used to calculate a value. Usually used " +
-    "to calculate a limit or cost."
+    """
+        A cost-linear-function used to calculate a cost from another cost or time/duration.
+            
+        Given a function of time:
+        ```
+        f(t) = a + b * t
+        ```
+        then `a` is the constant time part, `b` is the time-coefficient, and `t` is the variable. 
+        If `a=0s` and `b=0.0`, then the cost is always `0`(zero).
+            
+        Examples: `0s + 2.5t`, `10m + 0t` and `1h5m59s + 9.9t`
+            
+        The `constant` must be 0 or a positive number or duration. The unit is seconds unless
+        specified using the duration format. A duration is automatically converted to a cost.
+        The `coefficient` must be in range: [0.0, 100.0]
+      """
+  ),
+  TIME_PENALTY(
+    JsonType.string,
+    """
+        A time-penalty is used to add a penalty to the duration/arrival-time/depature-time for
+        a path. It will be invisible to the end user, but used during the routing when comparing
+        stop-arrival/paths.
+            
+        Given a function of time:
+        ```
+        f(t) = a + b * t
+        ```
+        then `a` is the constant time part, `b` is the time-coefficient, and `t` is the variable.
+        If `a=0s` and `b=0.0`, then the cost is always `0`(zero).
+            
+        Examples: `0s + 2.5t`, `10m + 0 x` and `1h5m59s + 9.9t`
+            
+        The `constant` must be 0 or a positive number(seconds) or a duration.
+        The `coefficient` must be in range: [0.0, 100.0]
+      """
   ),
   MAP(
     JsonType.object,

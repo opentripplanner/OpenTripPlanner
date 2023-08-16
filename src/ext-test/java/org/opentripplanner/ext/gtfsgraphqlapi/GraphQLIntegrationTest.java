@@ -39,6 +39,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -111,7 +112,7 @@ class GraphQLIntegrationTest {
     var transitModel = new TransitModel(stopModel.build(), DEDUPLICATOR);
 
     final TripPattern pattern = TransitModelForTest.pattern(BUS).build();
-    var trip = TransitModelForTest.trip("123").build();
+    var trip = TransitModelForTest.trip("123").withHeadsign(I18NString.of("Trip Headsign")).build();
     var stopTimes = TransitModelForTest.stopTimesEvery5Minutes(3, trip, T11_00);
     var tripTimes = new TripTimes(trip, stopTimes, DEDUPLICATOR);
     pattern.add(tripTimes);
@@ -150,7 +151,7 @@ class GraphQLIntegrationTest {
       .build();
 
     var busLeg = i1.getTransitLeg(1);
-    ScheduledTransitLeg railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
+    var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
     fares.addFare(FareType.regular, Money.euros(3.1f));
