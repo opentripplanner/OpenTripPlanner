@@ -23,7 +23,7 @@ import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.request.BitSetPassThroughPoints;
+import org.opentripplanner.raptor.api.request.BitSetPassThroughPointsService;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.RaptorTransitPassThroughRequest;
@@ -92,7 +92,7 @@ public class J01_PassThroughTest {
         mc.withTransitPassThroughRequest(
           new RaptorTransitPassThroughRequest(
             // Include desired pass-through point in the request
-            BitSetPassThroughPoints.create(List.of(new int[] { STOP_D }))
+            BitSetPassThroughPointsService.create(List.of(new int[] { STOP_D }))
           )
         )
       )
@@ -130,7 +130,7 @@ public class J01_PassThroughTest {
         mc.withTransitPassThroughRequest(
           new RaptorTransitPassThroughRequest(
             // Include desired pass-through point in the request
-            BitSetPassThroughPoints.create(List.of(new int[] { STOP_A }))
+            BitSetPassThroughPointsService.create(List.of(new int[] { STOP_A }))
           )
         )
       )
@@ -169,7 +169,7 @@ public class J01_PassThroughTest {
         mc.withTransitPassThroughRequest(
           // Include desired pass-through point in the request
           new RaptorTransitPassThroughRequest(
-            BitSetPassThroughPoints.create(List.of(new int[] { STOP_C }))
+            BitSetPassThroughPointsService.create(List.of(new int[] { STOP_C }))
           )
         )
       )
@@ -208,7 +208,9 @@ public class J01_PassThroughTest {
         mc.withTransitPassThroughRequest(
           // Include desired pass-through point in the request
           new RaptorTransitPassThroughRequest(
-            BitSetPassThroughPoints.create(List.of(new int[] { STOP_B }, new int[] { STOP_D }))
+            BitSetPassThroughPointsService.create(
+              List.of(new int[] { STOP_B }, new int[] { STOP_D })
+            )
           )
         )
       )
@@ -245,7 +247,9 @@ public class J01_PassThroughTest {
         mc.withTransitPassThroughRequest(
           // Include desired pass-through point in the request
           new RaptorTransitPassThroughRequest(
-            BitSetPassThroughPoints.create(List.of(new int[] { STOP_B }, new int[] { STOP_C }))
+            BitSetPassThroughPointsService.create(
+              List.of(new int[] { STOP_B }, new int[] { STOP_C })
+            )
           )
         )
       )
@@ -281,7 +285,7 @@ public class J01_PassThroughTest {
         mc.withTransitPassThroughRequest(
           // Include desired pass-through point in the request
           new RaptorTransitPassThroughRequest(
-            BitSetPassThroughPoints.create(
+            BitSetPassThroughPointsService.create(
               List.of(
                 // Both STOP_B and STOP_C is a valid pass-through point
                 new int[] { STOP_B, STOP_C }

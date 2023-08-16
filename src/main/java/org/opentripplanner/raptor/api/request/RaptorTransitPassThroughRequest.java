@@ -4,14 +4,15 @@ import org.opentripplanner.raptor.api.model.DominanceFunction;
 
 public class RaptorTransitPassThroughRequest implements C2Request {
 
-  private final PassThroughPoints passThroughPoints;
+  private final PassThroughPointsService passThroughPointsService;
 
-  public RaptorTransitPassThroughRequest(final PassThroughPoints passThroughPoints) {
-    this.passThroughPoints = passThroughPoints;
+  public RaptorTransitPassThroughRequest(final PassThroughPointsService passThroughPointsService) {
+    this.passThroughPointsService = passThroughPointsService;
   }
 
-  public PassThroughPoints passThroughPoints() {
-    return passThroughPoints;
+  // TODO: Should this method be part of the interface?
+  public PassThroughPointsService passThroughPoints() {
+    return passThroughPointsService;
   }
 
   /**

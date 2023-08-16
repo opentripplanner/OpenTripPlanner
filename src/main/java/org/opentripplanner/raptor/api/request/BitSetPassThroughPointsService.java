@@ -18,20 +18,20 @@ import org.opentripplanner.raptor.api.model.RaptorConstants;
  * The c2 value is equal to the last visited pass-through point sequence number. If zero
  * no pass-through point is visited yet.
  */
-public class BitSetPassThroughPoints implements PassThroughPoints {
+public class BitSetPassThroughPointsService implements PassThroughPointsService {
 
   private final List<BitSet> passThroughPoints;
   private final int expectedC2ValueAtDestination;
   private int currentPassThroughPointSeqNo = 0;
 
-  private BitSetPassThroughPoints(final List<BitSet> passThroughPoints) {
+  private BitSetPassThroughPointsService(final List<BitSet> passThroughPoints) {
     this.passThroughPoints = passThroughPoints;
     this.expectedC2ValueAtDestination = passThroughPoints.size();
   }
 
-  public static PassThroughPoints create(final List<int[]> passThroughStops) {
+  public static PassThroughPointsService create(final List<int[]> passThroughStops) {
     if (passThroughStops.isEmpty()) {
-      return PassThroughPoints.NOOP;
+      return PassThroughPointsService.NOOP;
     }
 
     return passThroughStops
@@ -41,7 +41,7 @@ public class BitSetPassThroughPoints implements PassThroughPoints {
         Arrays.stream(pts).forEach(tmpBitSet::set);
         return tmpBitSet;
       })
-      .collect(collectingAndThen(toList(), BitSetPassThroughPoints::new));
+      .collect(collectingAndThen(toList(), BitSetPassThroughPointsService::new));
   }
 
   @Override

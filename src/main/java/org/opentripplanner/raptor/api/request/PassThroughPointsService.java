@@ -7,9 +7,9 @@ import javax.annotation.Nullable;
 /**
  * Provides information for pass-through points used in the search.
  */
-public interface PassThroughPoints {
+public interface PassThroughPointsService {
   /** Implementation that answers negative for all stops. */
-  PassThroughPoints NOOP = new PassThroughPoints() {
+  PassThroughPointsService NOOP = new PassThroughPointsService() {
     @Override
     public boolean isPassThroughPoint(final int stop) {
       return false;

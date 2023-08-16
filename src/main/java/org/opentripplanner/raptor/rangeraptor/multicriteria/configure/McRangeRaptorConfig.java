@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
-import org.opentripplanner.raptor.api.request.PassThroughPoints;
+import org.opentripplanner.raptor.api.request.PassThroughPointsService;
 import org.opentripplanner.raptor.api.request.RaptorTransitPassThroughRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
@@ -182,12 +182,12 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     return mcRequest().transitPriorityCalculator().orElse(null);
   }
 
-  private PassThroughPoints passThroughPoints() {
+  private PassThroughPointsService passThroughPoints() {
     return context
       .multiCriteria()
       .transitPassThroughRequest()
       .map(RaptorTransitPassThroughRequest::passThroughPoints)
-      .orElse(PassThroughPoints.NOOP);
+      .orElse(PassThroughPointsService.NOOP);
   }
 
   @Nullable

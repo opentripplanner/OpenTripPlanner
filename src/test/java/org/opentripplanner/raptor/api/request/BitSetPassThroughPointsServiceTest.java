@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.api.request;
 
-import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -14,7 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class BitSetPassThroughPointsTest {
+class BitSetPassThroughPointsServiceTest {
 
   public static final int PASS_THROUGH_SEQ_NO_1 = 1;
   public static final int PASS_THROUGH_SEQ_NO_2 = 2;
@@ -29,7 +28,9 @@ class BitSetPassThroughPointsTest {
   public static final int[] STOPS_2 = new int[] { STOP_21, STOP_22, STOP_23 };
   public static final int STOP_31 = 6;
   private static final List<int[]> POINTS = List.of(STOPS_1, STOPS_2);
-  private static final PassThroughPoints SUBJECT = BitSetPassThroughPoints.create(POINTS);
+  private static final PassThroughPointsService SUBJECT = BitSetPassThroughPointsService.create(
+    POINTS
+  );
 
   static Stream<Arguments> passThroughPointTestCases() {
     return Stream.of(
@@ -77,10 +78,9 @@ class BitSetPassThroughPointsTest {
 
   @Test
   void notAPassthroughPoint_empty() {
-    assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_11));
-    assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_12));
-    assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_21));
-    assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_22));
-    assertFalse(BitSetPassThroughPoints.create(emptyList()).isPassThroughPoint(STOP_11));
+    assertFalse(BitSetPassThroughPointsService.NOOP.isPassThroughPoint(STOP_11));
+    assertFalse(BitSetPassThroughPointsService.NOOP.isPassThroughPoint(STOP_12));
+    assertFalse(BitSetPassThroughPointsService.NOOP.isPassThroughPoint(STOP_21));
+    assertFalse(BitSetPassThroughPointsService.NOOP.isPassThroughPoint(STOP_22));
   }
 }

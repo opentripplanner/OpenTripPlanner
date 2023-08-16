@@ -2,17 +2,17 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2;
 
 import org.opentripplanner.framework.lang.IntBox;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.PassThroughPoints;
+import org.opentripplanner.raptor.api.request.PassThroughPointsService;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
 
 public class PassThroughRideFactory<T extends RaptorTripSchedule>
   implements PatternRideFactory<T, PatternRideC2<T>> {
 
-  private final PassThroughPoints passThroughPoints;
+  private final PassThroughPointsService passThroughPointsService;
 
-  public PassThroughRideFactory(PassThroughPoints passThroughPoints) {
-    this.passThroughPoints = passThroughPoints;
+  public PassThroughRideFactory(PassThroughPointsService passThroughPointsService) {
+    this.passThroughPointsService = passThroughPointsService;
   }
 
   @Override
@@ -46,7 +46,7 @@ public class PassThroughRideFactory<T extends RaptorTripSchedule>
    */
   private int calculateC2(McStopArrival<T> prevArrival) {
     IntBox c2 = new IntBox(prevArrival.c2());
-    passThroughPoints.updateC2Value(c2.get(), c2::set);
+    passThroughPointsService.updateC2Value(c2.get(), c2::set);
     return c2.get();
   }
 }
