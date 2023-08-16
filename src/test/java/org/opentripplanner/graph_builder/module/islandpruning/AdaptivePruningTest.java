@@ -65,14 +65,13 @@ public class AdaptivePruningTest {
     );
   }
 
-  private static Graph buildOsmGraph(String osmPath) {
+  private static Graph buildOsmGraph(File file) {
     try {
       var deduplicator = new Deduplicator();
       var graph = new Graph(deduplicator);
       var transitModel = new TransitModel(new StopModel(), deduplicator);
       // Add street data from OSM
-      File osmFile = new File(osmPath);
-      OsmProvider osmProvider = new OsmProvider(osmFile, true);
+      OsmProvider osmProvider = new OsmProvider(file , true);
       OsmModule osmModule = OsmModule.of(osmProvider, graph).withEdgeNamer(new TestNamer()).build();
 
       osmModule.buildGraph();

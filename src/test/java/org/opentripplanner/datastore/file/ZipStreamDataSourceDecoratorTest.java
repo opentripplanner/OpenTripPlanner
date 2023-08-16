@@ -21,7 +21,7 @@ import org.opentripplanner.datastore.api.DataSource;
 class ZipStreamDataSourceDecoratorTest {
 
   private static final long TIME = 30 * 365 * 24 * 60 * 60 * 1000L;
-  private static final String FILENAME = ConstantsForTests.CALTRAIN_GTFS;
+  private static final String FILENAME = ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath();
   static final List<String> EXPECTED_ZIP_ENTRIES = List.of(
     "trips.txt",
     "agency.txt",

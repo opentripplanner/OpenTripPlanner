@@ -27,7 +27,7 @@ class GtfsModuleTest {
   public void addShapesForFrequencyTrips() {
     var model = buildTestModel();
 
-    var bundle = new GtfsBundle(new File(ConstantsForTests.FAKE_GTFS));
+    var bundle = new GtfsBundle(ConstantsForTests.FAKE_GTFS);
     var module = new GtfsModule(
       List.of(bundle),
       model.transitModel,

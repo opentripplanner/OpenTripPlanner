@@ -37,7 +37,7 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 class OsmBoardingLocationsModuleTest {
 
-  File file = new File(ConstantsForTests.HERRENBERG_OSM);
+  File file = ConstantsForTests.HERRENBERG_OSM;
   RegularStop platform = TransitModelForTest
     .stop("de:08115:4512:4:101")
     .withCoordinate(48.59328, 8.86128)

@@ -62,7 +62,7 @@ public class FlexIntegrationTest {
     var martaGtfsPath = ResourceLoader.file(FlexTest.MARTA_BUS_856_GTFS);
     var flexGtfsPath = ResourceLoader.file(FlexTest.COBB_FLEX_GTFS);
 
-    TestOtpModel model = ConstantsForTests.buildOsmGraph(osmPath.getAbsolutePath());
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(osmPath);
     graph = model.graph();
     transitModel = model.transitModel();
 

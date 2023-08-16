@@ -27,7 +27,7 @@ public class ZipFileDataSourceTest {
 
   // Sometime close to 2000-01-01
   private static final long TIME = 30 * 365 * 24 * 60 * 60 * 1000L;
-  private static final String FILENAME = ConstantsForTests.CALTRAIN_GTFS;
+  private static final String FILENAME = ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath();
 
   @Test
   public void testAccessorsForNoneExistingFile() throws IOException {
