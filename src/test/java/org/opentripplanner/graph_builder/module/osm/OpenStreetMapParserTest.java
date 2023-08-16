@@ -13,14 +13,13 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.test.support.ResourceLoader;
 
 public class OpenStreetMapParserTest {
 
   @Test
   public void testBinaryParser() {
-    File osmFile = new File(
-      URLDecoder.decode(getClass().getResource("map.osm.pbf").getPath(), StandardCharsets.UTF_8)
-    );
+    File osmFile = ResourceLoader.file("/osm/map.osm.pbf");
     OsmProvider pr = new OsmProvider(osmFile, true);
     OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP, Set.of());
 

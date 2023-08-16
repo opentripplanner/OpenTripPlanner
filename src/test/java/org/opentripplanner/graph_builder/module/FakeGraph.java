@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module;
 
 import java.io.File;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
@@ -18,6 +17,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -31,13 +31,13 @@ import org.opentripplanner.transit.service.TransitModel;
 public class FakeGraph {
 
   /** Build a graph in Columbus, OH with no transit */
-  public static TestOtpModel buildGraphNoTransit() throws URISyntaxException {
+  public static TestOtpModel buildGraphNoTransit() {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     var gg = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
 
-    File file = getFileForResource("columbus.osm.pbf");
+    File file = ResourceLoader.file("/osm/columbus.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule osmModule = OsmModule.of(provider, gg).build();
@@ -46,17 +46,11 @@ public class FakeGraph {
     return new TestOtpModel(gg, transitModel);
   }
 
-  public static File getFileForResource(String resource) throws URISyntaxException {
-    URL resourceUrl = FakeGraph.class.getResource(resource);
-    return new File(resourceUrl.toURI());
-  }
-
   /**
    * This introduces a 1MB test resource but is only used by TestIntermediatePlaces.
    */
-  public static void addPerpendicularRoutes(Graph graph, TransitModel transitModel)
-    throws URISyntaxException {
-    var input = List.of(new GtfsBundle(getFileForResource("addPerpendicularRoutes.gtfs.zip")));
+  public static void addPerpendicularRoutes(Graph graph, TransitModel transitModel) {
+    var input = List.of(new GtfsBundle(ResourceLoader.file("addPerpendicularRoutes.gtfs.zip")));
     new GtfsModule(input, transitModel, graph, ServiceDateInterval.unbounded()).buildGraph();
   }
 

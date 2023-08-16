@@ -76,7 +76,7 @@ public class TestIntermediatePlaces {
         );
     } catch (Exception e) {
       e.printStackTrace();
-      assert false : "Could not add transit data: " + e.toString();
+      assert false : "Could not add transit data: " + e;
     }
   }
 

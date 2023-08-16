@@ -48,9 +48,7 @@ public class ConstantsForTests {
 
   public static final String CALTRAIN_GTFS = "src/test/resources/gtfs/caltrain_gtfs.zip";
 
-  public static final String NETEX_MINIMAL = "src/test/resources/netex/netex_minimal.zip";
-
-  private static final String PORTLAND_GTFS = "src/test/resources/portland/portland.gtfs.zip";
+  static final String PORTLAND_GTFS = "src/test/resources/portland/portland.gtfs.zip";
 
   public static final String PORTLAND_CENTRAL_OSM =
     "src/test/resources/portland/portland-central-filtered.osm.pbf";
@@ -58,16 +56,14 @@ public class ConstantsForTests {
   private static final String PORTLAND_BIKE_SHARE_CSV =
     "src/test/resources/portland/portland-vehicle-rental.csv";
 
-  private static final String PORTLAND_NED = "src/test/resources/portland/portland-ned.tif";
-
   private static final String PORTLAND_NED_WITH_NODATA =
     "src/test/resources/portland/portland-ned-nodata.tif";
 
-  private static final String OSLO_EAST_OSM = "src/test/resources/oslo-east-filtered.osm.pbf";
+  private static final String OSLO_EAST_OSM = "src/test/resources/osm/oslo-east-filtered.osm.pbf";
 
   public static final String KCM_GTFS = "src/test/resources/gtfs/kcm_gtfs.zip";
 
-  public static final String FAKE_GTFS = "src/test/resources/testagency";
+  public static final String FAKE_GTFS = "src/test/resources/gtfs/testagency/";
 
   public static final String FARE_COMPONENT_GTFS =
     "src/test/resources/gtfs/farecomponents.gtfs.zip";
@@ -96,7 +92,7 @@ public class ConstantsForTests {
     "src/test/resources/germany/herrenberg-minimal.osm.pbf";
   public static final String ISLAND_PRUNE_OSM =
     "src/test/resources/germany/herrenberg-island-prune-nothru.osm.pbf";
-  public static final String ADAPTIVE_PRUNE_OSM = "src/test/resources/isoiiluoto.pbf";
+  public static final String ADAPTIVE_PRUNE_OSM = "src/test/resources/osm/isoiiluoto.pbf";
 
   /* filenames encoded with cp437 and utf8 */
   public static final String UMLAUT_CP437_ZIP = "src/test/resources/umlaut-cp437.zip";

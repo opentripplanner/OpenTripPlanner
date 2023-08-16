@@ -23,11 +23,11 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Override
   public String getFeedName() {
-    return "testagency";
+    return "gtfs/testagency";
   }
 
   @Test
-  void testPreviousLegs() throws Exception {
+  void testPreviousLegs() {
     var transitService = new DefaultTransitService(transitModel);
 
     var originalLeg = new ScheduledTransitLegReference(
@@ -63,7 +63,7 @@ class AlternativeLegsTest extends GtfsTest {
   }
 
   @Test
-  void testNextLegs() throws Exception {
+  void testNextLegs() {
     var transitService = new DefaultTransitService(transitModel);
 
     var originalLeg = new ScheduledTransitLegReference(

@@ -36,7 +36,7 @@ public class UnconnectedAreasTest {
   @Test
   public void unconnectedCarParkAndRide() {
     DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
-    Graph gg = buildOSMGraph("P+R.osm.pbf", issueStore);
+    Graph gg = buildOSMGraph("/osm/P+R.osm.pbf", issueStore);
 
     assertEquals(1, getParkAndRideUnlinkedIssueCount(issueStore));
 
@@ -53,7 +53,7 @@ public class UnconnectedAreasTest {
   @Test
   public void unconnectedBikeParkAndRide() {
     DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
-    Graph gg = buildOSMGraph("B+R.osm.pbf", issueStore);
+    Graph gg = buildOSMGraph("/osm/B+R.osm.pbf", issueStore);
 
     assertEquals(2, getParkAndRideUnlinkedIssueCount(issueStore));
 
@@ -75,7 +75,11 @@ public class UnconnectedAreasTest {
    */
   @Test
   public void testCoincidentNodeUnconnectedParkAndRide() {
-    List<VertexLabel> connections = testGeometricGraphWithClasspathFile("hackett_pr.osm.pbf", 4, 8);
+    List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
+      "/osm/hackett_pr.osm.pbf",
+      4,
+      8
+    );
 
     assertTrue(connections.contains(VertexLabel.osm(3096570222L)));
     assertTrue(connections.contains(VertexLabel.osm(3094264704L)));
@@ -90,7 +94,7 @@ public class UnconnectedAreasTest {
   @Test
   public void testRoadPassingOverNode() {
     List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
-      "coincident_pr.osm.pbf",
+      "/osm/coincident_pr.osm.pbf",
       1,
       2
     );
@@ -104,7 +108,7 @@ public class UnconnectedAreasTest {
   @Test
   public void testAreaPassingOverNode() {
     List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
-      "coincident_pr_reverse.osm.pbf",
+      "/osm/coincident_pr_reverse.osm.pbf",
       1,
       2
     );
@@ -118,7 +122,7 @@ public class UnconnectedAreasTest {
   @Test
   public void testRoadPassingOverDuplicatedNode() {
     List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
-      "coincident_pr_dupl.osm.pbf",
+      "/osm/coincident_pr_dupl.osm.pbf",
       1,
       2
     );
@@ -139,7 +143,7 @@ public class UnconnectedAreasTest {
   @Test
   public void testRoadPassingOverParkRide() {
     List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
-      "coincident_pr_overlap.osm.pbf",
+      "/osm/coincident_pr_overlap.osm.pbf",
       2,
       4
     );

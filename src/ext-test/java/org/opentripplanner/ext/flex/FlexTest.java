@@ -4,7 +4,6 @@ import static graphql.Assert.assertTrue;
 
 import gnu.trove.set.hash.TIntHashSet;
 import java.io.File;
-import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -12,11 +11,11 @@ import java.util.Map;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -40,12 +39,7 @@ public abstract class FlexTest {
   );
 
   protected static TestOtpModel buildFlexGraph(String fileName) {
-    File file = null;
-    try {
-      file = FakeGraph.getFileForResource(fileName);
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
+    File file = ResourceLoader.file(fileName);
 
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
