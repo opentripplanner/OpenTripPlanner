@@ -40,7 +40,8 @@ public class PathParetoSetComparators {
    * @param includeTimetable // TODO: 2023-07-31 What is this parameter doing exactly?
    * @param preferLateArrival // TODO: 2023-07-31 What is this parameter doing exactly?
    * @param relaxC1 Relax function for the generalized cost
-   * @param c2Comp Dominance function for accumulated criteria TWO. If function is null, C2 will not be included in the comparison.
+   * @param c2Comp Dominance function for accumulated criteria TWO. If function is null, C2 will
+   *               not be included in the comparison.
    */
   public static <T extends RaptorTripSchedule> ParetoComparator<RaptorPath<T>> paretoComparator(
     final boolean includeC1,
@@ -50,6 +51,17 @@ public class PathParetoSetComparators {
     final RelaxFunction relaxC1,
     final DominanceFunction c2Comp
   ) {
+    /*
+     * TODO pass-through: I would like to see if we can refactor this with something like this, and
+     *                    still get the same performance:
+     *
+     * if(c2Comp == null)  {
+     *   return paretoComparator(...);
+     * }
+     * else {
+     *   return paretoComparator(...) || c2Comp.leftDominateRight(l.c2(), r.c2());
+     * }
+     */
     boolean includeRelaxedCost = includeC1 && !relaxC1.isNormal();
     boolean preferLatestDeparture = preferLateArrival != searchDirection.isInReverse();
 
