@@ -33,11 +33,6 @@ class TimeAndCostPenaltyForEnumTest {
   }
 
   @Test
-  void type() {
-    assertEquals(Fish.class, subject.type());
-  }
-
-  @Test
   void valueOf() {
     assertEquals(PERCH_PENALTY, subject.valueOf(Fish.PERCH));
     assertEquals(TimeAndCostPenalty.ZERO, subject.valueOf(Fish.COD));
@@ -54,6 +49,11 @@ class TimeAndCostPenaltyForEnumTest {
     assertEquals(
       "TimeAndCostPenaltyForEnum{PERCH: (timePenalty: 11s + 1.20 t, costFactor: 1.50)}",
       subject.toString()
+    );
+    // Test toSting for builder
+    assertEquals(
+      "Builder{PERCH: (timePenalty: 11s + 1.20 t, costFactor: 1.50)}",
+      subject.copyOf().toString()
     );
   }
 

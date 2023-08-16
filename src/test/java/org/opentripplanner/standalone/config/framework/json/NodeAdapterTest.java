@@ -479,10 +479,17 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void linearFunction() {
+  public void asCostLinearFunction() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
-    assertEquals("f(x) = 400 + 8.0 x", subject.of("key").asLinearFunction(null).toString());
-    assertNull(subject.of("no-key").asLinearFunction(null));
+    assertEquals("6m40s + 8.0 t", subject.of("key").asCostLinearFunction(null).toString());
+    assertNull(subject.of("no-key").asCostLinearFunction(null));
+  }
+
+  @Test
+  public void asTimePenalty() {
+    NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
+    assertEquals("6m40s + 8.0 t", subject.of("key").asTimePenalty(null).toString());
+    assertNull(subject.of("no-key").asTimePenalty(null));
   }
 
   @Test

@@ -19,6 +19,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.BitSetUtils;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -607,12 +608,12 @@ public class StreetEdge
    * TODO change everything to clockwise from North
    */
   public int getInAngle() {
-    return (int) Math.round(this.inAngle * 180 / 128.0);
+    return IntUtils.round(this.inAngle * 180 / 128.0);
   }
 
   /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
   public int getOutAngle() {
-    return (int) Math.round(this.outAngle * 180 / 128.0);
+    return IntUtils.round(this.outAngle * 180 / 128.0);
   }
 
   public void setCostExtension(StreetEdgeCostExtension costExtension) {

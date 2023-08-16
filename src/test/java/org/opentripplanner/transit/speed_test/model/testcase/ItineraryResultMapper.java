@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
@@ -142,7 +143,7 @@ class ItineraryResultMapper {
         .getLegs()
         .stream()
         .filter(Leg::isWalkingLeg)
-        .mapToInt(l -> (int) Math.round(l.getDistanceMeters()))
+        .mapToInt(l -> IntUtils.round(l.getDistanceMeters()))
         .sum(),
       itinerary.startTime().get(ChronoField.SECOND_OF_DAY),
       itinerary.endTime().get(ChronoField.SECOND_OF_DAY),

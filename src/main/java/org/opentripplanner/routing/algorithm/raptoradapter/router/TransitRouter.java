@@ -197,7 +197,12 @@ public class TransitRouter {
     verifyAccessEgress(asyncAccessList, asyncEgressList);
 
     // Decorate access/egress with a penalty to make it less favourable than transit
-    var penaltyDecorator = new AccessEgressPenaltyDecorator(request);
+    var penaltyDecorator = new AccessEgressPenaltyDecorator(
+      request.journey().access().mode(),
+      request.journey().egress().mode(),
+      request.preferences().street().accessEgressPenalty()
+    );
+
     var accessList = penaltyDecorator.decorateAccess(asyncAccessList);
     var egressList = penaltyDecorator.decorateEgress(asyncEgressList);
 
