@@ -1266,6 +1266,8 @@ type TripPattern {
   legs: [Leg!]!
   "Time that the trip departs."
   startTime: DateTime @deprecated
+  "How far the user has to walk, bike and/or drive in meters. It includes all street(none transit) modes."
+  streetDistance: Float
   "Get all system notices."
   systemNotices: [SystemNotice!]!
   "A cost calculated to favor transfer with higher priority. This field is meant for debugging only."
@@ -1274,8 +1276,7 @@ type TripPattern {
   waitTimeOptimizedCost: Int
   "How much time is spent waiting for transit to arrive, in seconds."
   waitingTime: Long
-  "How far the user has to walk, in meters."
-  walkDistance: Float
+  walkDistance: Float @deprecated
   "How much time is spent walking, in seconds."
   walkTime: Long
 }
@@ -1591,8 +1592,6 @@ enum RoutingErrorCode {
   outsideBounds
   "The date specified is outside the range of data currently loaded into the system"
   outsideServicePeriod
-  "An unknown error happened during the search. The details have been logged to the server logs"
-  systemError
   "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
   walkingBetterThanTransit
 }
@@ -1899,7 +1898,7 @@ input ItineraryFilters {
   groupedOtherThanSameLegsMaxCostMultiplier: Float = 2.0
   "Add an additional cost for short transfers on long transit itineraries. See javaDoc on `AddMinSafeTransferCostFilter` details."
   minSafeTransferTimeFactor: Float @deprecated
-  "Set a relative limit for all transit itineraries. The limit is calculated based on the transit itinerary generalized-cost and the time between itineraries Itineraries without transit legs are excluded from this filter. Example: costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. If the lowest cost returned is 10 000, then the limit is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure or arrival times of the itinerary. Default: {\"costLimitFunction\": 900.0 + 1.5 x, \"intervalRelaxFactor\": 0.4}"
+  "Set a relative limit for all transit itineraries. The limit is calculated based on the transit itinerary generalized-cost and the time between itineraries Itineraries without transit legs are excluded from this filter. Example: costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. If the lowest cost returned is 10 000, then the limit is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure or arrival times of the itinerary. Default: {\"costLimitFunction\": 15m + 1.50 t, \"intervalRelaxFactor\": 0.4}"
   transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams
 }
 

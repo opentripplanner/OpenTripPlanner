@@ -1289,11 +1289,6 @@ enum RoutingErrorCode {
     increasing the walk reluctance.
     """
     WALKING_BETTER_THAN_TRANSIT
-
-    """
-    An unknown error happened during the search. The details have been added to the server logs.
-    """
-    SYSTEM_ERROR
 }
 
 enum InputField {
@@ -1335,23 +1330,59 @@ type FareMedium {
 "A container for both a fare product (a ticket) and its relationship to the itinerary."
 type FareProductUse {
     """
-    Identifier local to the itinerary that allows to cross-reference and deduplicate
-    fare products that span more than one leg.
+    Represents the use of a single instance of a fare product throughout the itinerary. It can
+    be used to cross-reference and de-duplicate fare products that are applicable for more than one
+    leg.
 
     If you want to uniquely identify the fare product itself (not its use) use the product's `id`.
 
     ### Example: Day pass
 
-    When a day pass is valid for all three legs in the itinerary it will appear
-    for each leg but with the same use-`id`.
+    The day pass is valid for both legs in the itinerary. It is listed as the applicable `product` for each leg,
+    and the same FareProductUse id is shown, indicating that only one pass was used/bought.
 
-    *It is the responsibility of the API consumers to display the day pass as a product for the
-    entire itinerary rather than three day passes!*
+    **Illustration**
+    ```yaml
+    itinerary:
+      leg1:
+        fareProducts:
+          id: "AAA" // id of a FareProductUse instance
+          product:
+            id: "day-pass" // product id
+            name: "Day Pass"
+      leg2:
+        fareProducts:
+          id: "AAA" // identical to leg1. the passenger needs to buy ONE pass, not two.
+          product:
+            id: "day-pass"  // product id
+            name: "Day Pass"
+    ```
+
+    **It is the responsibility of the API consumers to display the day pass as a product for the
+    entire itinerary rather than two day passes!**
 
     ### Example: Several single tickets
 
     If you have two legs and need to buy two single tickets they will appear in each leg with the
-    same `product.id` but different use-`id`.
+    same `FareProduct.id` but different `FareProductUse.id`.
+
+    **Illustration**
+    ```yaml
+    itinerary:
+      leg1:
+        fareProducts:
+          id: "AAA" // id of a FareProductUse instance, not product id
+          product:
+            id: "single-ticket" // product id
+            name: "Single Ticket"
+      leg2:
+        fareProducts:
+          id: "BBB" // different to leg1. the passenger needs to buy two single tickets.
+          product:
+            id: "single-ticket"  // product id
+            name: "Single Ticket"
+    ```
+
     """
     id: String!
 
@@ -1637,7 +1668,15 @@ type Leg {
     Whether the destination of this leg (field `to`) is one of the intermediate places specified in the query.
     """
     intermediatePlace: Boolean
+
+    "The turn-by-turn navigation instructions."
     steps: [step]
+
+    """
+    For transit legs, the headsign that the vehicle shows at the stop where the passenger boards.
+    For non-transit legs, null.
+    """
+    headsign: String
 
     """
     This is used to indicate if boarding this leg is possible only with special arrangements.
@@ -3844,9 +3883,10 @@ type Trip implements Node {
     """List of dates when this trip is in service. Format: YYYYMMDD"""
     activeDates: [String]
     tripShortName: String
+
     """Headsign of the vehicle when running on this trip"""
     tripHeadsign(
-        """If translated headsign is found from gtfs translation.txt and wanted language is not same as
+        """If a translated headsign is found from GTFS translation.txt and wanted language is not same as
         feed's language then returns wanted translation. Otherwise uses name from trip_headsign.txt.
         """
         language: String): String

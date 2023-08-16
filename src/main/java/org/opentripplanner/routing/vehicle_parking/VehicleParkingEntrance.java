@@ -2,6 +2,7 @@ package org.opentripplanner.routing.vehicle_parking;
 
 import java.io.Serializable;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -58,6 +59,7 @@ public class VehicleParkingEntrance implements Serializable {
     return coordinate;
   }
 
+  @Nullable
   public I18NString getName() {
     return name;
   }

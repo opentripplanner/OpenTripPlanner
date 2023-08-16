@@ -1,8 +1,12 @@
 package org.opentripplanner.framework.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.framework.model.Cost.ONE_HOUR_WITH_TRANSIT;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
@@ -13,18 +17,58 @@ class CostTest {
   private final Cost subject = Cost.costOfSeconds(VALUE_SECONDS);
 
   @Test
-  void testFactoryMethods() {
+  void oneHourWithTransit() {
+    assertEquals(60 * 60, ONE_HOUR_WITH_TRANSIT.toSeconds());
+  }
+
+  @Test
+  void testCostOfSeconds() {
     var a = Cost.costOfSeconds(11);
-    var b = Cost.costOfSeconds(11.004);
-    var c = Cost.costOfSeconds(10.995);
+    var b = Cost.costOfSeconds(11.499);
+    var c = Cost.costOfSeconds(10.5);
 
     assertEquals(a, b);
     assertEquals(a, c);
   }
 
   @Test
+  void testCostOfMinutes() {
+    assertEquals(660, Cost.costOfMinutes(11).toSeconds());
+  }
+
+  @Test
+  void testFromDuration() {
+    assertEquals(Cost.costOfSeconds(11), Cost.fromDuration(Duration.ofSeconds(11)));
+    assertEquals(Cost.costOfSeconds(11), Cost.fromDuration(Duration.ofMillis(11499)));
+    assertEquals(Cost.costOfSeconds(11), Cost.fromDuration(Duration.ofMillis(10500)));
+  }
+
+  @Test
+  void testFactoryMethods() {
+    var a = Cost.costOfSeconds(11);
+    var b = Cost.costOfSeconds(11.004);
+    var c = Cost.costOfSeconds(10.995);
+    var d = Cost.fromDuration(Duration.ofMillis(11004));
+
+    assertEquals(a, b);
+    assertEquals(a, c);
+    assertEquals(a, d);
+  }
+
+  @Test
   void testToCentiSeconds() {
     assertEquals(100 * VALUE_SECONDS, subject.toCentiSeconds());
+  }
+
+  @Test
+  void isZero() {
+    assertTrue(Cost.costOfSeconds(0).isZero());
+    assertFalse(subject.isZero());
+  }
+
+  @Test
+  void asDuration() {
+    assertEquals(Duration.ofSeconds(VALUE_SECONDS), subject.asDuration());
   }
 
   @Test

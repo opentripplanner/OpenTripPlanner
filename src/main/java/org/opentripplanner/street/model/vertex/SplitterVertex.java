@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 
 /**
@@ -10,10 +11,12 @@ import org.opentripplanner.framework.i18n.I18NString;
 public class SplitterVertex extends IntersectionVertex {
 
   private final VertexLabel label;
+  private final I18NString name;
 
   public SplitterVertex(String label, double x, double y, I18NString name) {
-    super(x, y, name, false, false);
+    super(x, y, false, false);
     this.label = VertexLabel.string(label);
+    this.name = name;
   }
 
   @Override
@@ -26,5 +29,11 @@ public class SplitterVertex extends IntersectionVertex {
     // splitter vertices don't represent something that exists in the world, so traversing them is
     // always free.
     return true;
+  }
+
+  @Nonnull
+  @Override
+  public I18NString getName() {
+    return name;
   }
 }

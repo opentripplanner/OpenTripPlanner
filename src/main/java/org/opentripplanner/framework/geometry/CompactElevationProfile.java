@@ -4,6 +4,7 @@ import java.io.Serializable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
+import org.opentripplanner.framework.lang.IntUtils;
 
 /**
  * Compact elevation profile. To optimize storage, we use the following tricks:
@@ -55,7 +56,7 @@ public final class CompactElevationProfile implements Serializable {
        * accumulating on long line strings.
        */
       Coordinate c = elevation.getCoordinate(i);
-      int iy = (int) Math.round(c.y * FIXED_FLOAT_MULT);
+      int iy = IntUtils.round(c.y * FIXED_FLOAT_MULT);
       int diy = iy - oiy;
       coords[i] = diy;
       oiy = iy;

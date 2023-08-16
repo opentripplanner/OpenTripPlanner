@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.astar.spi.AStarVertex;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -28,15 +26,11 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serializable, Cloneable {
 
+  public static final I18NString NO_NAME = I18NString.of("(no name provided)");
   private static final Logger LOG = LoggerFactory.getLogger(Vertex.class);
-  private static final I18NString NO_NAME = I18NString.of("(no name provided)");
 
   private final double x;
   private final double y;
-
-  /* Longer human-readable name for the client */
-  @Nonnull
-  private final I18NString name;
 
   private transient Edge[] incoming = new Edge[0];
 
@@ -46,13 +40,8 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
   /* CONSTRUCTORS */
 
   protected Vertex(double x, double y) {
-    this(x, y, NO_NAME);
-  }
-
-  protected Vertex(double x, double y, @Nullable I18NString name) {
     this.x = x;
     this.y = y;
-    this.name = Objects.requireNonNullElse(name, NO_NAME);
   }
 
   /* PUBLIC METHODS */
@@ -145,17 +134,17 @@ public abstract class Vertex implements AStarVertex<State, Edge, Vertex>, Serial
     return y;
   }
 
-  /** If this vertex is located on only one street, get that street's name */
+  /**
+   * Longer human-readable name for the client
+   */
   @Nonnull
-  public I18NString getName() {
-    return this.name;
-  }
+  public abstract I18NString getName();
 
   /**
    * If this vertex is located on only one street, get that street's name in default localization
    */
   public String getDefaultName() {
-    return this.name.toString();
+    return getName().toString();
   }
 
   /**

@@ -21,11 +21,12 @@ import org.slf4j.LoggerFactory;
 public class HslFacilitiesDownloader {
 
   private static final Logger log = LoggerFactory.getLogger(HslFacilitiesDownloader.class);
+  private static final ObjectMapper mapper = new ObjectMapper();
+
   private final String jsonParsePath;
   private final BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser;
   private final String url;
-
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private final OtpHttpClient otpHttpClient;
 
   public HslFacilitiesDownloader(
     String url,
@@ -35,6 +36,7 @@ public class HslFacilitiesDownloader {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
     this.facilitiesParser = facilitiesParser;
+    this.otpHttpClient = new OtpHttpClient();
   }
 
   public List<VehicleParking> downloadFacilities(
@@ -45,7 +47,7 @@ public class HslFacilitiesDownloader {
       return null;
     }
 
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try {
       return otpHttpClient.getAndMap(
         URI.create(url),
         Map.of(),

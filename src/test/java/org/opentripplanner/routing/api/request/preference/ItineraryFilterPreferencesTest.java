@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 class ItineraryFilterPreferencesTest {
 
@@ -19,13 +19,13 @@ class ItineraryFilterPreferencesTest {
   private static final double GROUP_SIMILARITY_KEEP_ONE = 0.8;
   private static final double GROUP_SIMILARITY_KEEP_THREE = 0.5;
   private static final double MIN_BIKE_PARKING_DISTANCE = 2000.0;
-  private static final DoubleAlgorithmFunction NON_TRANSIT_GENERALIZED_COST_LIMIT = RequestFunctions.createLinearFunction(
-    3.5,
+  private static final CostLinearFunction NON_TRANSIT_GENERALIZED_COST_LIMIT = CostLinearFunction.of(
+    Duration.ofSeconds(4),
     5.0
   );
   private static final double PARK_AND_RIDE_DURATION_RATIO = 0.44;
   private static final TransitGeneralizedCostFilterParams TRANSIT_GENERALIZED_COST_LIMIT = new TransitGeneralizedCostFilterParams(
-    RequestFunctions.createLinearFunction(3.5, 5.0),
+    CostLinearFunction.of(Duration.ofSeconds(4), 5.0),
     3.0
   );
 
@@ -131,9 +131,9 @@ class ItineraryFilterPreferencesTest {
       "groupSimilarityKeepOne: 0.8, " +
       "groupSimilarityKeepThree: 0.5, " +
       "minBikeParkingDistance: 2,000.0, " +
-      "nonTransitGeneralizedCostLimit: f(x) = 4 + 5.0 x, " +
+      "nonTransitGeneralizedCostLimit: 4s + 5.0 t, " +
       "parkAndRideDurationRatio: 0.44, " +
-      "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=f(x) = 4 + 5.0 x, intervalRelaxFactor=3.0]" +
+      "transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams[costLimitFunction=4s + 5.0 t, intervalRelaxFactor=3.0]" +
       "}",
       subject.toString()
     );

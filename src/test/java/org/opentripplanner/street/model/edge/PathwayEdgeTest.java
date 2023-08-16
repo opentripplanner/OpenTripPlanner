@@ -168,7 +168,7 @@ class PathwayEdgeTest {
    */
   @ParameterizedTest(name = "slope of {0} should lead to traversal costs of {1}")
   @VariableSource("slopeCases")
-  public void shouldScaleCostWithMaxSlope(double slope, long expectedCost) {
+  void shouldScaleCostWithMaxSlope(double slope, long expectedCost) {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,

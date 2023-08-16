@@ -1,7 +1,6 @@
 package org.opentripplanner.street.model.vertex;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 
 /**
@@ -10,22 +9,27 @@ import org.opentripplanner.framework.i18n.I18NString;
  */
 public class LabelledIntersectionVertex extends IntersectionVertex {
 
-  private final VertexLabel label;
+  private final String label;
 
   public LabelledIntersectionVertex(
     @Nonnull String label,
     double x,
     double y,
-    @Nullable I18NString name,
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(x, y, name, hasHighwayTrafficLight, hasCrossingTrafficLight);
-    this.label = VertexLabel.string(label);
+    super(x, y, hasHighwayTrafficLight, hasCrossingTrafficLight);
+    this.label = label;
   }
 
   @Override
   public VertexLabel getLabel() {
-    return label;
+    return VertexLabel.string(label);
+  }
+
+  @Nonnull
+  @Override
+  public I18NString getName() {
+    return I18NString.of(label);
   }
 }

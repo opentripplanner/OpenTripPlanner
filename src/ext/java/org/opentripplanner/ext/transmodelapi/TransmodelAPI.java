@@ -18,12 +18,12 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.ext.transmodelapi.support.GraphQLToWebResponseMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitModel;
@@ -99,22 +99,27 @@ public class TransmodelAPI {
       throw new BadRequestException("No query found in body");
     }
 
-    String query = (String) queryParameters.get("query");
+    if (!(queryParameters.get("query") instanceof String query)) {
+      throw new BadRequestException("Invalid format for query");
+    }
+
     Object queryVariables = queryParameters.getOrDefault("variables", null);
-    String operationName = (String) queryParameters.getOrDefault("operationName", null);
     Map<String, Object> variables;
-    if (queryVariables instanceof Map) {
-      variables = (Map) queryVariables;
-    } else if (queryVariables instanceof String && !((String) queryVariables).isEmpty()) {
+    if (queryVariables instanceof Map queryVariablesAsMap) {
+      variables = queryVariablesAsMap;
+    } else if (
+      queryVariables instanceof String queryVariablesAsString && !queryVariablesAsString.isEmpty()
+    ) {
       try {
-        variables = deserializer.readValue((String) queryVariables, Map.class);
+        variables = deserializer.readValue(queryVariablesAsString, Map.class);
       } catch (IOException e) {
         throw new BadRequestException("Variables must be a valid json object");
       }
     } else {
-      variables = new HashMap<>();
+      variables = Collections.emptyMap();
     }
-    var result = index.executeGraphQL(
+    String operationName = (String) queryParameters.getOrDefault("operationName", null);
+    return index.executeGraphQL(
       query,
       serverContext,
       variables,
@@ -122,7 +127,6 @@ public class TransmodelAPI {
       maxResolves,
       getTagsFromHeaders(headers)
     );
-    return GraphQLToWebResponseMapper.map(result);
   }
 
   @POST
@@ -133,7 +137,7 @@ public class TransmodelAPI {
     @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
     @Context HttpHeaders headers
   ) {
-    var result = index.executeGraphQL(
+    return index.executeGraphQL(
       query,
       serverContext,
       null,
@@ -141,7 +145,6 @@ public class TransmodelAPI {
       maxResolves,
       getTagsFromHeaders(headers)
     );
-    return GraphQLToWebResponseMapper.map(result);
   }
 
   private static Iterable<Tag> getTagsFromHeaders(HttpHeaders headers) {

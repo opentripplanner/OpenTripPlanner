@@ -11,12 +11,12 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEnum;
-import org.opentripplanner.routing.api.request.framework.Units;
 import org.opentripplanner.street.search.intersection_model.DrivingDirection;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
 

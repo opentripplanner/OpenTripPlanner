@@ -5,11 +5,11 @@
         {
           "startTime" : 1580641200000,
           "endTime" : 1580644800000,
-          "generalizedCost" : 4072,
-          "accessibilityScore" : 0.5,
           "legs" : [
             {
               "mode" : "WALK",
+              "startTime" : 1580641200000,
+              "endTime" : 1580641220000,
               "from" : {
                 "name" : "A",
                 "lat" : 5.0,
@@ -24,15 +24,13 @@
                 "departureTime" : 1580641220000,
                 "arrivalTime" : 1580641220000
               },
-              "startTime" : 1580641200000,
-              "endTime" : 1580641220000,
-              "generalizedCost" : 40,
-              "alerts" : [ ],
-              "rideHailingEstimate" : null,
-              "accessibilityScore" : null
+              "route" : null,
+              "legGeometry" : null
             },
             {
               "mode" : "BUS",
+              "startTime" : 1580641260000,
+              "endTime" : 1580642100000,
               "from" : {
                 "name" : "B",
                 "lat" : 6.0,
@@ -47,15 +45,19 @@
                 "departureTime" : 1580642100000,
                 "arrivalTime" : 1580642100000
               },
-              "startTime" : 1580641260000,
-              "endTime" : 1580642100000,
-              "generalizedCost" : 992,
-              "alerts" : [ ],
-              "rideHailingEstimate" : null,
-              "accessibilityScore" : null
+              "route" : {
+                "gtfsId" : "F:BUS",
+                "longName" : "Long name for BUS",
+                "shortName" : "RBUS"
+              },
+              "legGeometry" : {
+                "points" : "_{rc@_d{r@????_ibE_t`B"
+              }
             },
             {
               "mode" : "RAIL",
+              "startTime" : 1580643000000,
+              "endTime" : 1580644200000,
               "from" : {
                 "name" : "C",
                 "lat" : 7.0,
@@ -70,35 +72,19 @@
                 "departureTime" : 1580644200000,
                 "arrivalTime" : 1580644200000
               },
-              "startTime" : 1580643000000,
-              "endTime" : 1580644200000,
-              "generalizedCost" : 2040,
-              "alerts" : [
-                {
-                  "id" : "QWxlcnQ6Rjphbi1hbGVydA",
-                  "alertHeaderText" : "A header",
-                  "alertDescriptionText" : "A description",
-                  "alertEffect" : "REDUCED_SERVICE",
-                  "alertCause" : "MAINTENANCE",
-                  "alertSeverityLevel" : "SEVERE",
-                  "alertUrl" : "https://example.com",
-                  "effectiveStartDate" : 1676459008,
-                  "effectiveEndDate" : 1676545408,
-                  "entities" : [
-                    {
-                      "name" : "A",
-                      "gtfsId" : "F:A",
-                      "lat" : 5.0,
-                      "lon" : 8.0
-                    }
-                  ]
-                }
-              ],
-              "rideHailingEstimate" : null,
-              "accessibilityScore" : null
+              "route" : {
+                "gtfsId" : "F:2",
+                "longName" : null,
+                "shortName" : "R2"
+              },
+              "legGeometry" : {
+                "points" : "_evi@_y|u@????_ibE_t`B"
+              }
             },
             {
               "mode" : "CAR",
+              "startTime" : 1580644200000,
+              "endTime" : 1580644800000,
               "from" : {
                 "name" : "D",
                 "lat" : 8.0,
@@ -113,32 +99,8 @@
                 "departureTime" : 1580644800000,
                 "arrivalTime" : 1580644800000
               },
-              "startTime" : 1580644200000,
-              "endTime" : 1580644800000,
-              "generalizedCost" : 1000,
-              "alerts" : [ ],
-              "rideHailingEstimate" : {
-                "provider" : {
-                  "id" : "uber"
-                },
-                "productName" : "UberX",
-                "minPrice" : {
-                  "currency" : {
-                    "code" : "EUR",
-                    "digits" : 2
-                  },
-                  "amount" : 10.0
-                },
-                "maxPrice" : {
-                  "currency" : {
-                    "code" : "EUR",
-                    "digits" : 2
-                  },
-                  "amount" : 20.0
-                },
-                "arrival" : "PT10M"
-              },
-              "accessibilityScore" : null
+              "route" : null,
+              "legGeometry" : null
             }
           ]
         }

@@ -23,6 +23,7 @@ import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.ext.flex.FlexTest;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.model.GenericLocation;
@@ -277,7 +278,10 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       stopLocation,
       0,
       List.of(),
-      new State(new StreetLocation(id, new Coordinate(0, 0), id), StreetSearchRequest.of().build())
+      new State(
+        new StreetLocation(id, new Coordinate(0, 0), I18NString.of(id)),
+        StreetSearchRequest.of().build()
+      )
     );
   }
 

@@ -73,6 +73,14 @@ public class TemplateUtil {
       );
   }
 
+  public static String graphQlExample(String query) {
+    return """
+      ```graphql
+      %s
+      ```
+      """.formatted(query);
+  }
+
   /**
    * Create a JSON example for the node. The given source  from the node
    */

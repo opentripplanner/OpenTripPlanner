@@ -1,6 +1,7 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.framework.i18n.NonLocalizedString;
+import javax.annotation.Nonnull;
+import org.opentripplanner.framework.i18n.I18NString;
 
 public class ElevatorOffboardVertex extends StreetVertex {
 
@@ -9,7 +10,7 @@ public class ElevatorOffboardVertex extends StreetVertex {
   private final String label;
 
   public ElevatorOffboardVertex(Vertex sourceVertex, String label, String level) {
-    super(sourceVertex.getX(), sourceVertex.getY(), NonLocalizedString.ofNullable(level));
+    super(sourceVertex.getX(), sourceVertex.getY());
     this.level = level;
     this.label = label;
   }
@@ -17,5 +18,11 @@ public class ElevatorOffboardVertex extends StreetVertex {
   @Override
   public VertexLabel getLabel() {
     return VertexLabel.string(LABEL_TEMPLATE.formatted(label, level));
+  }
+
+  @Nonnull
+  @Override
+  public I18NString getName() {
+    return I18NString.of(label);
   }
 }

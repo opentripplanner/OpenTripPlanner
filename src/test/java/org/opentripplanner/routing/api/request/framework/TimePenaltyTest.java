@@ -39,9 +39,9 @@ class TimePenaltyTest {
     assertThrows(IllegalArgumentException.class, () -> TimePenalty.of(D2m, -0.01));
     var ex = assertThrows(
       IllegalArgumentException.class,
-      () -> TimePenalty.of(Duration.ZERO, 11.0)
+      () -> TimePenalty.of(Duration.ZERO, 100.1)
     );
-    assertEquals("The value is not in range[0.0, 10.0]: 11.0", ex.getMessage());
+    assertEquals("The value is not in range[0.0, 100.0]: 100.1", ex.getMessage());
   }
 
   @Test
@@ -62,6 +62,6 @@ class TimePenaltyTest {
   @Test
   void calculate() {
     var subject = TimePenalty.of(D2m, 0.5);
-    assertEquals(120 + 150, subject.calculate(300).toSeconds());
+    assertEquals(120 + 150, subject.calculate(Duration.ofMinutes(5)).toSeconds());
   }
 }

@@ -42,6 +42,7 @@
       "matchPackageNames": [
         "org.onebusaway:onebusaway-gtfs",
         "com.google.cloud:libraries-bom",
+        "com.google.guava:guava",
         "@graphql-codegen/add",
         "@graphql-codegen/cli",
         "@graphql-codegen/java",
@@ -64,6 +65,7 @@
     {
       "description": "automerge mkdocs-material every quarter",
       "matchPackageNames": [
+        "mkdocs",
         "mkdocs-material"
       ],
       "extends": [

@@ -17,7 +17,6 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -329,10 +328,10 @@ ferries, where the check-in process needs to be done in good time before ride.
           .description(
             """
             Function should return number of seconds that we are willing to wait for preferred route
-            or for an unpreferred agency's departure. For example, 600 + 2.0 x
+            or for an unpreferred agency's departure. For example: `5m + 2.0 t`
             """
           )
-          .asLinearFunction(dft.unpreferredCost())
+          .asCostLinearFunction(dft.unpreferredCost())
       )
       .withRaptor(it ->
         c
@@ -534,12 +533,16 @@ ferries, where the check-in process needs to be done in good time before ride.
             the access legs used. In other cases where the access(CAR) is faster than transit the
             performance will be better.
             
+            The default is no penalty, if not configured.
+            
             Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
             
+            
             **Time penalty**
-            """ +
-            TimePenalty.DOC +
-            """  
+            
+            The `time-penalty` is used to add a penalty to the access/egress duration/time. The
+            time including the penalty is used in the algorithm when comparing paths, but the
+            actual duration is used when presented to the end user.
             
             **Cost factor**
             

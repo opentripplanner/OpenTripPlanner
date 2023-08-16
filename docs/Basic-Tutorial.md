@@ -198,3 +198,7 @@ other choice. For example, `--load` implies `--serve`, so `--serve` is not neces
 additional effect when used together with `--load`.
 
 You can run the OTP .jar file with the `--help` option for a full list of command line parameters.
+
+## Exploring the API
+
+If you want to learn how to use OTP's API's, check out the [GraphQL tutorial](GraphQL-Tutorial.md).

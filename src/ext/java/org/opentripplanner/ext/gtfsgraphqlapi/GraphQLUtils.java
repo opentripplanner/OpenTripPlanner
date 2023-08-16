@@ -36,7 +36,6 @@ public class GraphQLUtils {
       case NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW -> GraphQLRoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW;
       case OUTSIDE_BOUNDS -> GraphQLRoutingErrorCode.OUTSIDE_BOUNDS;
       case OUTSIDE_SERVICE_PERIOD -> GraphQLRoutingErrorCode.OUTSIDE_SERVICE_PERIOD;
-      case SYSTEM_ERROR -> GraphQLRoutingErrorCode.SYSTEM_ERROR;
       case WALKING_BETTER_THAN_TRANSIT -> GraphQLRoutingErrorCode.WALKING_BETTER_THAN_TRANSIT;
     };
   }

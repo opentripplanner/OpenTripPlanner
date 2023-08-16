@@ -22,8 +22,8 @@ class TimeAndCostTest {
 
   @Test
   void testToString() {
-    assertEquals("(12m45s, $45)", subject.toString());
-    assertEquals("(0s, $0)", TimeAndCost.ZERO.toString());
+    assertEquals("(12m45s $45)", subject.toString());
+    assertEquals("(0s $0)", TimeAndCost.ZERO.toString());
   }
 
   @Test
