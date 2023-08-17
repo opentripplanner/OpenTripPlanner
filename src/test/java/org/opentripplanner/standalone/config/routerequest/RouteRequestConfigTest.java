@@ -88,11 +88,11 @@ class RouteRequestConfigTest {
 
     assertEquals(
       "(timePenalty: 2m + 1.10 t, costFactor: 1.70)",
-      streetPreferences.accessEgressPenalty().valueOf(StreetMode.FLEXIBLE).toString()
+      streetPreferences.accessEgress().penalty().valueOf(StreetMode.FLEXIBLE).toString()
     );
     assertEquals(
       "(timePenalty: 0s + 4.0 t)",
-      streetPreferences.accessEgressPenalty().valueOf(StreetMode.CAR).toString()
+      streetPreferences.accessEgress().penalty().valueOf(StreetMode.CAR).toString()
     );
   }
 }

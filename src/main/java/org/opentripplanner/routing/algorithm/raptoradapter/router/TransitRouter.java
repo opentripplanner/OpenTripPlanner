@@ -200,7 +200,7 @@ public class TransitRouter {
     var penaltyDecorator = new AccessEgressPenaltyDecorator(
       request.journey().access().mode(),
       request.journey().egress().mode(),
-      request.preferences().street().accessEgressPenalty()
+      request.preferences().street().accessEgress().penalty()
     );
 
     var accessList = penaltyDecorator.decorateAccess(asyncAccessList);
@@ -236,9 +236,10 @@ public class TransitRouter {
     Duration durationLimit = accessRequest
       .preferences()
       .street()
-      .maxAccessEgressDuration()
+      .accessEgress()
+      .maxDuration()
       .valueOf(streetRequest.mode());
-    int stopCountLimit = accessRequest.preferences().street().maxAccessEgressStopCount();
+    int stopCountLimit = accessRequest.preferences().street().accessEgress().maxStopCount();
 
     var nearbyStops = AccessEgressRouter.streetSearch(
       accessRequest,

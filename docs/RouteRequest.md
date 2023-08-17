@@ -74,7 +74,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | walkSpeed                                                                                            |        `double`        | The user's walking speed in meters/second.                                                                                                     | *Optional* | `1.33`           |  2.0  |
 | accessEgress                                                                                         |        `object`        | Parameters for access and egress routing.                                                                                                      | *Optional* |                  |  2.4  |
 |    [maxDuration](#rd_accessEgress_maxDuration)                                                       |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                            | *Optional* | `"PT45M"`        |  2.1  |
-|    [maxStopCount](#rd_accessEgress_maxStopCount)                                                     |        `integer`       | Maximal number of stops collected in access/egress routing                                                                                     | *Optional* | `0`              |  2.4  |
+|    [maxStopCount](#rd_accessEgress_maxStopCount)                                                     |        `integer`       | Maximal number of stops collected in access/egress routing                                                                                     | *Optional* | `500`            |  2.4  |
 |    [maxDurationForMode](#rd_accessEgress_maxDurationForMode)                                         | `enum map of duration` | Limit access/egress per street mode.                                                                                                           | *Optional* |                  |  2.1  |
 |    [penalty](#rd_accessEgress_penalty)                                                               |  `enum map of object`  | Penalty for access/egress by street mode.                                                                                                      | *Optional* |                  |  2.4  |
 |       FLEXIBLE                                                                                       |        `object`        | NA                                                                                                                                             | *Optional* |                  |  2.4  |
@@ -397,7 +397,7 @@ do not exist.
 
 <h3 id="rd_accessEgress_maxStopCount">maxStopCount</h3>
 
-**Since version:** `2.4` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`   
+**Since version:** `2.4` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `500`   
 **Path:** /routingDefaults/accessEgress 
 
 Maximal number of stops collected in access/egress routing
@@ -434,7 +434,6 @@ performance will be better.
 The default is no penalty, if not configured.
 
 Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
-
 
 **Time penalty**
 

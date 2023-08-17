@@ -95,7 +95,7 @@ public class TravelTimeResource {
       routingRequest.journey().transit().setFilters(List.of(request));
     }
 
-    var durationForMode = routingRequest.preferences().street().maxAccessEgressDuration();
+    var durationForMode = routingRequest.preferences().street().accessEgress().maxDuration();
     traveltimeRequest =
       new TravelTimeRequest(
         cutoffs.stream().map(DurationUtils::duration).toList(),
