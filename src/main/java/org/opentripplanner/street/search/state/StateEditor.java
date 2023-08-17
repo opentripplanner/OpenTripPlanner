@@ -41,8 +41,6 @@ public class StateEditor {
     child = parent.clone();
     child.backState = parent;
     child.backEdge = e;
-    // We clear child.next here, since it could have already been set in the parent
-    child.next = null;
 
     final Vertex parentVertex = parent.vertex;
 

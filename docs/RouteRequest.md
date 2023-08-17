@@ -932,7 +932,8 @@ include stairs as a last result.
       },
       "bikeRentalDistanceRatio" : 0.3,
       "accessibilityScore" : true,
-      "minBikeParkingDistance" : 300
+      "minBikeParkingDistance" : 300,
+      "debug" : "limit-to-search-window"
     },
     "carDecelerationSpeed" : 2.9,
     "carAccelerationSpeed" : 2.9,

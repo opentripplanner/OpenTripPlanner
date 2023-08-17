@@ -44,9 +44,6 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public Edge backEdge;
 
-  // allow traverse result chaining (multiple results)
-  protected State next;
-
   /* StateData contains data which is unlikely to change as often */
   public StateData stateData;
 

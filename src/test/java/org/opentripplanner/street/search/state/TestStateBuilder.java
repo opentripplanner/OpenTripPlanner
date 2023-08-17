@@ -1,10 +1,13 @@
 package org.opentripplanner.street.search.state;
 
+import static org.opentripplanner.transit.model.site.PathwayMode.WALKWAY;
+
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
@@ -17,6 +20,8 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
+import org.opentripplanner.street.model.edge.PathwayEdge;
+import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
@@ -158,6 +163,52 @@ public class TestStateBuilder {
       throw new IllegalStateException("Only single state transitions are supported.");
     }
     currentState = states[0];
+    return this;
+  }
+
+  public TestStateBuilder enterStation(String id) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    final var entranceVertex = StreetModelForTest.transitEntranceVertex(id, count, count);
+    var edge = StreetTransitEntranceLink.createStreetTransitEntranceLink(from, entranceVertex);
+    var states = edge.traverse(currentState);
+    currentState = states[0];
+    return this;
+  }
+
+  public TestStateBuilder exitStation(String id) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var entranceVertex = StreetModelForTest.transitEntranceVertex(id, count, count);
+    var edge = PathwayEdge.createLowCostPathwayEdge(from, entranceVertex, WALKWAY);
+    var state = edge.traverse(currentState)[0];
+
+    count++;
+    var to = StreetModelForTest.intersectionVertex(count, count);
+    var link = StreetTransitEntranceLink.createStreetTransitEntranceLink(entranceVertex, to);
+    var states = link.traverse(state);
+    currentState = states[0];
+    return this;
+  }
+
+  public TestStateBuilder pathway(String s) {
+    count++;
+    var from = (StreetVertex) currentState.vertex;
+    var tov = StreetModelForTest.intersectionVertex(count, count);
+    var edge = PathwayEdge.createPathwayEdge(
+      from,
+      tov,
+      null,
+      I18NString.of(s),
+      60,
+      100,
+      0,
+      0,
+      true,
+      WALKWAY
+    );
+    var state = edge.traverse(currentState)[0];
+    currentState = state;
     return this;
   }
 
