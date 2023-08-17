@@ -1008,6 +1008,12 @@
             <version>1.23.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opentripplanner</groupId>
+            <artifactId>otp-client</artifactId>
+            <version>0.0.10</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <profiles>

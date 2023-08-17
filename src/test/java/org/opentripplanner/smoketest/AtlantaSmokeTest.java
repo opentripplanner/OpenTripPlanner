@@ -1,14 +1,17 @@
 package org.opentripplanner.smoketest;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.client.model.RequestMode.FLEX_EGRESS;
+import static org.opentripplanner.client.model.RequestMode.TRANSIT;
+import static org.opentripplanner.client.model.RequestMode.WALK;
 import static org.opentripplanner.smoketest.SmokeTest.assertThatItineraryHasModes;
+import static org.opentripplanner.smoketest.SmokeTest.basicRouteTest;
 
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.smoketest.util.RestClient;
+import org.opentripplanner.client.model.Coordinate;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 /**
@@ -25,15 +28,12 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
 @Tag("atlanta")
 public class AtlantaSmokeTest {
 
-  WgsCoordinate nearGeorgiaStateStation = new WgsCoordinate(33.74139944890028, -84.38607215881348);
-  WgsCoordinate powderSpringsInsideFlexZone1 = new WgsCoordinate(
-    33.86916840022388,
-    -84.66315507888794
-  );
+  Coordinate nearGeorgiaStateStation = new Coordinate(33.74139944890028, -84.38607215881348);
+  Coordinate powderSpringsInsideFlexZone1 = new Coordinate(33.86916840022388, -84.66315507888794);
 
   @Test
   public void regularRouteFromCentralAtlantaToPowderSprings() {
-    Set<String> modes = Set.of("TRANSIT", "WALK");
+    var modes = Set.of(TRANSIT, WALK);
     SmokeTest.basicRouteTest(
       new SmokeTestRequest(nearGeorgiaStateStation, powderSpringsInsideFlexZone1, modes),
       List.of("WALK", "SUBWAY", "WALK", "BUS", "WALK", "BUS", "WALK")
@@ -42,27 +42,26 @@ public class AtlantaSmokeTest {
 
   @Test
   public void flexRouteFromCentralAtlantaToPowderSprings() {
-    var params = new SmokeTestRequest(
+    var req = new SmokeTestRequest(
       nearGeorgiaStateStation,
       powderSpringsInsideFlexZone1,
-      Set.of("FLEX_EGRESS", "WALK", "TRANSIT")
+      Set.of(FLEX_EGRESS, WALK, TRANSIT)
     );
-    var otpResponse = RestClient.sendPlanRequest(params);
-    var itineraries = otpResponse.getPlan().itineraries;
-
-    assertTrue(itineraries.size() > 0);
 
     var expectedModes = List.of("WALK", "SUBWAY", "WALK", "BUS", "WALK", "BUS");
+    var plan = basicRouteTest(req, expectedModes);
+    var itineraries = plan.itineraries();
+
     assertThatItineraryHasModes(itineraries, expectedModes);
 
     var transitLegs = itineraries
       .stream()
-      .flatMap(i -> i.legs.stream().filter(l -> l.transitLeg))
+      .flatMap(i -> i.legs().stream().filter(l -> l.route() != null))
       .toList();
 
     var usesZone1Route = transitLegs
       .stream()
-      .map(l -> l.routeShortName)
+      .map(l -> l.route().shortName())
       .anyMatch(name -> name.equals("Zone 1"));
 
     assertTrue(usesZone1Route);

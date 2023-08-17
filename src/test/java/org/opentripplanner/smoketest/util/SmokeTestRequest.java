@@ -1,39 +1,25 @@
 package org.opentripplanner.smoketest.util;
 
-import static java.util.Map.entry;
-
-import java.time.Duration;
-import java.util.Collection;
-import java.util.Map;
 import java.util.Set;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.smoketest.SmokeTest;
+import org.opentripplanner.client.model.Coordinate;
+import org.opentripplanner.client.model.RequestMode;
+import org.opentripplanner.client.parameters.TripPlanParameters;
 
 public record SmokeTestRequest(
-  WgsCoordinate from,
-  WgsCoordinate to,
-  Collection<String> modes,
+  Coordinate from,
+  Coordinate to,
+  Set<RequestMode> modes,
   boolean arriveBy
 ) {
-  public SmokeTestRequest(WgsCoordinate from, WgsCoordinate to, Set<String> modes) {
+  public SmokeTestRequest(Coordinate from, Coordinate to, Set<RequestMode> modes) {
     this(from, to, modes, false);
   }
 
-  public Map<String, String> toMap() {
-    return Map.ofEntries(
-      entry("fromPlace", toString(from)),
-      entry("toPlace", toString(to)),
-      entry("time", "1:00pm"),
-      entry("date", SmokeTest.nextMonday().toString()),
-      entry("mode", String.join(",", modes)),
-      entry("showIntermediateStops", "true"),
-      entry("locale", "en"),
-      entry("searchWindow", Long.toString(Duration.ofHours(2).toSeconds())),
-      entry("arriveBy", Boolean.toString(arriveBy))
-    );
-  }
-
-  private static String toString(WgsCoordinate c) {
-    return "%s,%s".formatted(c.latitude(), c.longitude());
+  public TripPlanParameters.SearchDirection searchDirection() {
+    if (arriveBy) {
+      return TripPlanParameters.SearchDirection.ARRIVE_BY;
+    } else {
+      return TripPlanParameters.SearchDirection.DEPART_AT;
+    }
   }
 }
