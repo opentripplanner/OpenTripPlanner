@@ -2,7 +2,6 @@ package org.opentripplanner.updater.vehicle_position;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.net.URISyntaxException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -12,7 +11,7 @@ public class VehiclePositionParsingTest {
 
   @Test
   public void parseFirstPositionsFeed() {
-    var vehiclePositionSource = getVehiclePositionSource("king-county-metro-1.pb");
+    var vehiclePositionSource = getVehiclePositionSource("king-county-metro-1.pbf");
     var positions = vehiclePositionSource.getPositions();
 
     Assertions.assertNotNull(positions);
@@ -25,7 +24,7 @@ public class VehiclePositionParsingTest {
 
   @Test
   public void parseSecondPositionsFeed() {
-    var vehiclePositionSource = getVehiclePositionSource("king-county-metro-2.pb");
+    var vehiclePositionSource = getVehiclePositionSource("king-county-metro-2.pbf");
     var positions = vehiclePositionSource.getPositions();
 
     Assertions.assertNotNull(positions);
@@ -37,13 +36,9 @@ public class VehiclePositionParsingTest {
   }
 
   private GtfsRealtimeHttpVehiclePositionSource getVehiclePositionSource(String filename) {
-    try {
-      return new GtfsRealtimeHttpVehiclePositionSource(
-        ResourceLoader.url("/gtfs-rt/vehicle-positions/" + filename).toURI(),
-        HttpHeaders.empty()
-      );
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
+    return new GtfsRealtimeHttpVehiclePositionSource(
+      ResourceLoader.uri("/gtfs-rt/vehicle-positions/" + filename),
+      HttpHeaders.empty()
+    );
   }
 }

@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
@@ -29,12 +31,23 @@ public class ResourceLoader {
   }
 
   /**
-   * Return a URL for the given path.
+   * Return a URL for the given resource.
    */
-  public static URL url(String s) {
-    var resource = ResourceLoader.class.getResource(s);
-    var msg = "Resource %s not found on file system".formatted(s);
+  public static URL url(String name) {
+    var resource = ResourceLoader.class.getResource(name);
+    var msg = "Resource %s not found on file system".formatted(resource);
     assertNotNull(resource, msg);
     return resource;
+  }
+
+  /**
+   * Return a URI for the given resource.
+   */
+  public static URI uri(String s) {
+    try {
+      return url(s).toURI();
+    } catch (URISyntaxException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 }
