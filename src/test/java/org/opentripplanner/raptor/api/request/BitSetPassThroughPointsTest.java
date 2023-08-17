@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.api.request;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -27,9 +28,8 @@ class BitSetPassThroughPointsTest {
   public static final int STOP_23 = 5;
   public static final int[] STOPS_2 = new int[] { STOP_21, STOP_22, STOP_23 };
   public static final int STOP_31 = 6;
-  private static final PassThroughPoints SUBJECT = BitSetPassThroughPoints.create(
-    List.of(STOPS_1, STOPS_2)
-  );
+  private static final List<int[]> POINTS = List.of(STOPS_1, STOPS_2);
+  private static final PassThroughPoints SUBJECT = BitSetPassThroughPoints.create(POINTS);
 
   static Stream<Arguments> passThroughPointTestCases() {
     return Stream.of(
@@ -67,6 +67,7 @@ class BitSetPassThroughPointsTest {
           newC2
         )
     );
+    assertTrue(SUBJECT.acceptC2AtDestination().test(POINTS.size()));
   }
 
   @Test
@@ -80,5 +81,6 @@ class BitSetPassThroughPointsTest {
     assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_12));
     assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_21));
     assertFalse(BitSetPassThroughPoints.NOOP.isPassThroughPoint(STOP_22));
+    assertFalse(BitSetPassThroughPoints.create(emptyList()).isPassThroughPoint(STOP_11));
   }
 }

@@ -37,6 +37,8 @@ class IntBoxTest {
     assertEquals(subject, subject);
     assertEquals(same, subject);
     assertNotEquals(other, subject);
+    assertNotEquals(subject, null);
+    assertNotEquals(subject, new Object());
 
     // hashCode
     assertEquals(subject.hashCode(), subject.hashCode());
