@@ -196,4 +196,11 @@ public class ItineraryFares {
         new FareProductUse(fareProduct.uniqueInstanceId(leg.getStartTime()), fareProduct)
       );
   }
+
+  /**
+   * Add several fare products to a leg.
+   */
+  public void addFareProduct(Leg leg, Collection<FareProduct> fareProduct) {
+    fareProduct.forEach(fp -> addFareProduct(leg, fp));
+  }
 }

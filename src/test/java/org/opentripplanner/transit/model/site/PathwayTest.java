@@ -26,7 +26,7 @@ class PathwayTest {
   private final Pathway subject = Pathway
     .of(TransitModelForTest.id(ID))
     .withPathwayMode(MODE)
-    .withName(NAME)
+    .withSignpostedAs(NAME)
     .withFromStop(FROM)
     .withToStop(TO)
     .withIsBidirectional(true)
@@ -38,23 +38,23 @@ class PathwayTest {
     assertEquals(ID, subject.getId().getId());
 
     // Make a copy, and set the same name (nothing is changed)
-    var copy = subject.copy().withName(NAME).build();
+    var copy = subject.copy().withSignpostedAs(NAME).build();
 
     assertSame(subject, copy);
 
     // Copy and change name
-    copy = subject.copy().withName("v2").build();
+    copy = subject.copy().withSignpostedAs("v2").build();
 
     // The two objects are not the same instance, but are equal(same id)
     assertNotSame(subject, copy);
     assertEquals(subject, copy);
 
     assertEquals(ID, copy.getId().getId());
-    assertEquals("v2", copy.getName());
+    assertEquals("v2", copy.getSignpostedAs());
     assertEquals(MODE, copy.getPathwayMode());
     assertEquals(FROM, copy.getFromStop());
     assertEquals(TO, copy.getToStop());
-    assertNull(copy.getReversedName());
+    assertNull(copy.getReverseSignpostedAs());
     assertEquals(TRAVERSAL_TIME, copy.getTraversalTime());
     assertEquals(0, copy.getLength());
     assertEquals(0, copy.getStairCount());
@@ -67,8 +67,8 @@ class PathwayTest {
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
     assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
-    assertFalse(subject.sameAs(subject.copy().withName("X").build()));
-    assertFalse(subject.sameAs(subject.copy().withReversedName("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withSignpostedAs("X").build()));
+    assertFalse(subject.sameAs(subject.copy().withReverseSignpostedAs("X").build()));
     assertFalse(subject.sameAs(subject.copy().withPathwayMode(PathwayMode.ELEVATOR).build()));
     assertFalse(subject.sameAs(subject.copy().withTraversalTime(200).build()));
     assertFalse(subject.sameAs(subject.copy().withSlope(1).build()));

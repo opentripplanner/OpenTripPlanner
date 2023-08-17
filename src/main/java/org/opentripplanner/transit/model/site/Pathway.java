@@ -14,9 +14,9 @@ public final class Pathway extends AbstractTransitEntity<Pathway, PathwayBuilder
 
   private final StationElement<?, ?> toStop;
 
-  private final String name;
+  private final String signpostedAs;
 
-  private final String reversedName;
+  private final String reverseSignpostedAs;
 
   private final int traversalTime;
 
@@ -36,8 +36,8 @@ public final class Pathway extends AbstractTransitEntity<Pathway, PathwayBuilder
     this.toStop = Objects.requireNonNull(builder.toStop());
 
     // Optional fields
-    this.name = builder.name();
-    this.reversedName = builder.reversedName();
+    this.signpostedAs = builder.signpostedAs();
+    this.reverseSignpostedAs = builder.reverseSignpostedAs();
     this.traversalTime = builder.traversalTime();
     this.length = builder.length();
     this.stairCount = builder.stairCount();
@@ -61,12 +61,12 @@ public final class Pathway extends AbstractTransitEntity<Pathway, PathwayBuilder
     return toStop;
   }
 
-  public String getName() {
-    return name;
+  public String getSignpostedAs() {
+    return signpostedAs;
   }
 
-  public String getReversedName() {
-    return reversedName;
+  public String getReverseSignpostedAs() {
+    return reverseSignpostedAs;
   }
 
   public int getTraversalTime() {
@@ -100,8 +100,8 @@ public final class Pathway extends AbstractTransitEntity<Pathway, PathwayBuilder
       Objects.equals(pathwayMode, other.getPathwayMode()) &&
       Objects.equals(fromStop, other.getFromStop()) &&
       Objects.equals(toStop, other.getToStop()) &&
-      Objects.equals(name, other.getName()) &&
-      Objects.equals(reversedName, other.getReversedName()) &&
+      Objects.equals(signpostedAs, other.getSignpostedAs()) &&
+      Objects.equals(reverseSignpostedAs, other.getReverseSignpostedAs()) &&
       Objects.equals(traversalTime, other.getTraversalTime()) &&
       Objects.equals(length, other.getLength()) &&
       Objects.equals(stairCount, other.getStairCount()) &&

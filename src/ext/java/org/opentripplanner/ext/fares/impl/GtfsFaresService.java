@@ -30,7 +30,7 @@ public record GtfsFaresService(DefaultFareService faresV1, GtfsFaresV2Service fa
       lp
         .products()
         .stream()
-        .map(LegProducts.ProductWithTransfer::product)
+        .map(LegProducts.ProductWithTransfer::products)
         .forEach(fp -> {
           fares.addFareProduct(lp.leg(), fp);
         });

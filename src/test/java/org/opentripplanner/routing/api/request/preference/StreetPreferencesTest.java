@@ -9,6 +9,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.street.search.intersection_model.DrivingDirection;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
 
@@ -22,7 +23,10 @@ class StreetPreferencesTest {
   private static final int ELEVATOR_BOARD_TIME = (int) Duration.ofMinutes(2).toSeconds();
   private static final IntersectionTraversalModel INTERSECTION_TRAVERSAL_MODEL =
     IntersectionTraversalModel.CONSTANT;
-  private static final TimeAndCostPenalty CAR_PENALTY = TimeAndCostPenalty.of("2m + 1.5t", 3.5);
+  private static final TimeAndCostPenalty CAR_PENALTY = TimeAndCostPenalty.of(
+    TimePenalty.of("2m + 1.5t"),
+    3.5
+  );
 
   private final StreetPreferences subject = StreetPreferences
     .of()

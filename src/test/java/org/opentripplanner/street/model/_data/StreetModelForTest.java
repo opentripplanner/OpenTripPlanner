@@ -1,15 +1,22 @@
 package org.opentripplanner.street.model._data;
 
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
+import org.opentripplanner.transit.model.site.Entrance;
 
 public class StreetModelForTest {
 
@@ -29,6 +36,16 @@ public class StreetModelForTest {
 
   public static IntersectionVertex intersectionVertex(String label, double lat, double lon) {
     return new LabelledIntersectionVertex(label, lat, lon, false, false);
+  }
+
+  @Nonnull
+  public static TransitEntranceVertex transitEntranceVertex(String id, double lat, double lon) {
+    var entrance = Entrance
+      .of(id(id))
+      .withCoordinate(new WgsCoordinate(lat, lon))
+      .withName(I18NString.of(id))
+      .build();
+    return new TransitEntranceVertex(entrance);
   }
 
   public static StreetEdge streetEdge(StreetVertex vA, StreetVertex vB) {

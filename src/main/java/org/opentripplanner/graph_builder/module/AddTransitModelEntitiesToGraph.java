@@ -163,7 +163,6 @@ public class AddTransitModelEntitiesToGraph {
           boardingAreaVertex,
           platformVertex,
           boardingArea.getId(),
-          boardingArea.getName(),
           wheelchair,
           PathwayMode.WALKWAY
         );
@@ -172,7 +171,6 @@ public class AddTransitModelEntitiesToGraph {
           platformVertex,
           boardingAreaVertex,
           boardingArea.getId(),
-          boardingArea.getName(),
           wheelchair,
           PathwayMode.WALKWAY
         );
@@ -202,7 +200,7 @@ public class AddTransitModelEntitiesToGraph {
             fromVertex,
             toVertex,
             pathway.getId(),
-            NonLocalizedString.ofNullable(pathway.getName()),
+            NonLocalizedString.ofNullable(pathway.getSignpostedAs()),
             pathway.getTraversalTime(),
             distance,
             pathway.getStairCount(),
@@ -215,7 +213,7 @@ public class AddTransitModelEntitiesToGraph {
               toVertex,
               fromVertex,
               pathway.getId(),
-              NonLocalizedString.ofNullable(pathway.getReversedName()),
+              NonLocalizedString.ofNullable(pathway.getReverseSignpostedAs()),
               pathway.getTraversalTime(),
               distance,
               -1 * pathway.getStairCount(),
@@ -269,18 +267,8 @@ public class AddTransitModelEntitiesToGraph {
       toLevel.name().toString()
     );
 
-    PathwayEdge.createLowCostPathwayEdge(
-      fromVertex,
-      fromOffboardVertex,
-      fromVertex.getName(),
-      PathwayMode.ELEVATOR
-    );
-    PathwayEdge.createLowCostPathwayEdge(
-      toOffboardVertex,
-      toVertex,
-      toVertex.getName(),
-      PathwayMode.ELEVATOR
-    );
+    PathwayEdge.createLowCostPathwayEdge(fromVertex, fromOffboardVertex, PathwayMode.ELEVATOR);
+    PathwayEdge.createLowCostPathwayEdge(toOffboardVertex, toVertex, PathwayMode.ELEVATOR);
 
     ElevatorOnboardVertex fromOnboardVertex = vertexFactory.elevatorOnboard(
       fromVertex,
@@ -307,18 +295,8 @@ public class AddTransitModelEntitiesToGraph {
     );
 
     if (pathway.isBidirectional()) {
-      PathwayEdge.createLowCostPathwayEdge(
-        fromOffboardVertex,
-        fromVertex,
-        fromVertex.getName(),
-        PathwayMode.ELEVATOR
-      );
-      PathwayEdge.createLowCostPathwayEdge(
-        toVertex,
-        toOffboardVertex,
-        toVertex.getName(),
-        PathwayMode.ELEVATOR
-      );
+      PathwayEdge.createLowCostPathwayEdge(fromOffboardVertex, fromVertex, PathwayMode.ELEVATOR);
+      PathwayEdge.createLowCostPathwayEdge(toVertex, toOffboardVertex, PathwayMode.ELEVATOR);
       ElevatorBoardEdge.createElevatorBoardEdge(toOffboardVertex, toOnboardVertex);
       ElevatorAlightEdge.createElevatorAlightEdge(
         fromOnboardVertex,

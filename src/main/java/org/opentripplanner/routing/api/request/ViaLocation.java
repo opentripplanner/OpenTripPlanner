@@ -24,13 +24,9 @@ public record ViaLocation(
   public ViaLocation {
     Objects.requireNonNull(minSlack);
     Objects.requireNonNull(maxSlack);
-  }
-
-  public ViaLocation(GenericLocation point, boolean passThroughPoint, Duration minSlack) {
-    this(point, passThroughPoint, minSlack, DEFAULT_MAX_SLACK);
-  }
-
-  public ViaLocation(GenericLocation point, boolean passThroughPoint) {
-    this(point, passThroughPoint, DEFAULT_MIN_SLACK, DEFAULT_MAX_SLACK);
+    Objects.requireNonNull(point);
+    if (!point.isSpecified()) {
+      throw new IllegalArgumentException("The Via location is not specified");
+    }
   }
 }

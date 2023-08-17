@@ -49,8 +49,8 @@ class PathwayMapper {
       .withPathwayMode(PathwayModeMapper.map(rhs.getPathwayMode()))
       .withFromStop(mapStationElement(rhs.getFromStop()))
       .withToStop(mapStationElement(rhs.getToStop()))
-      .withName(rhs.getSignpostedAs())
-      .withReversedName(rhs.getReversedSignpostedAs())
+      .withSignpostedAs(rhs.getSignpostedAs())
+      .withReverseSignpostedAs(rhs.getReversedSignpostedAs())
       .withIsBidirectional(rhs.getIsBidirectional() == 1);
 
     if (rhs.isTraversalTimeSet()) {

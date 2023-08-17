@@ -2,6 +2,7 @@ package org.opentripplanner.framework.geometry;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.framework.lang.IntUtils;
 
 /**
  * Compact line string. To optimize storage, we use the following tricks:
@@ -84,16 +85,16 @@ public final class CompactLineStringUtils {
     ) throw new IllegalArgumentException(
       "CompactLineStringUtils geometry must stick to given end points. If you need to relax this, please read source code."
     );
-    int oix = (int) Math.round(x0 * FIXED_FLOAT_MULT);
-    int oiy = (int) Math.round(y0 * FIXED_FLOAT_MULT);
+    int oix = IntUtils.round(x0 * FIXED_FLOAT_MULT);
+    int oiy = IntUtils.round(y0 * FIXED_FLOAT_MULT);
     int[] coords = new int[(c.length - 2) * 2];
     for (int i = 1; i < c.length - 1; i++) {
       /*
        * Note: We should do the rounding *before* the delta to prevent rounding errors from
        * accumulating on long line strings.
        */
-      int ix = (int) Math.round(c[i].x * FIXED_FLOAT_MULT);
-      int iy = (int) Math.round(c[i].y * FIXED_FLOAT_MULT);
+      int ix = IntUtils.round(c[i].x * FIXED_FLOAT_MULT);
+      int iy = IntUtils.round(c[i].y * FIXED_FLOAT_MULT);
       int dix = ix - oix;
       int diy = iy - oiy;
       coords[(i - 1) * 2] = dix;
@@ -147,8 +148,8 @@ public final class CompactLineStringUtils {
     double y1 = reverse ? ya : yb;
     c[0] = new Coordinate(x0, y0);
     if (coords != null) {
-      int oix = (int) Math.round(x0 * FIXED_FLOAT_MULT);
-      int oiy = (int) Math.round(y0 * FIXED_FLOAT_MULT);
+      int oix = IntUtils.round(x0 * FIXED_FLOAT_MULT);
+      int oiy = IntUtils.round(y0 * FIXED_FLOAT_MULT);
       for (int i = 1; i < c.length - 1; i++) {
         int ix = oix + coords[(i - 1) * 2];
         int iy = oiy + coords[(i - 1) * 2 + 1];
