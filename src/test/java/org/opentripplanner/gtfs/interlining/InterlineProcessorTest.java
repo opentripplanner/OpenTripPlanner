@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.interlining;
+package org.opentripplanner.gtfs.interlining;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
