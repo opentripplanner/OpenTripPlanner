@@ -3,11 +3,11 @@ package org.opentripplanner.raptor.api.request;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
+import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 
 /**
@@ -29,18 +29,10 @@ public class BitSetPassThroughPointsService implements PassThroughPointsService 
     this.expectedC2ValueAtDestination = passThroughPoints.size();
   }
 
-  public static PassThroughPointsService create(final List<int[]> passThroughStops) {
-    if (passThroughStops.isEmpty()) {
-      return PassThroughPointsService.NOOP;
-    }
-
-    return passThroughStops
+  public static PassThroughPointsService of(PassThroughPoints points) {
+    return points
       .stream()
-      .map(pts -> {
-        final BitSet tmpBitSet = new BitSet();
-        Arrays.stream(pts).forEach(tmpBitSet::set);
-        return tmpBitSet;
-      })
+      .map(PassThroughPoint::asBitSet)
       .collect(collectingAndThen(toList(), BitSetPassThroughPointsService::new));
   }
 
@@ -62,6 +54,11 @@ public class BitSetPassThroughPointsService implements PassThroughPointsService 
     if (currentPassThroughPointSeqNo == currentPathC2 + 1) {
       update.accept(currentPassThroughPointSeqNo);
     }
+  }
+
+  @Override
+  public DominanceFunction dominanceFunction() {
+    return (left, right) -> left > right;
   }
 
   @Override

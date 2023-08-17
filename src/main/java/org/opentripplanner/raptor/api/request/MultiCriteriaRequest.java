@@ -21,7 +21,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   private final RaptorTransitPriorityGroupCalculator transitPriorityCalculator;
 
   @Nullable
-  private final RaptorTransitPassThroughRequest transitPassThroughRequest;
+  private final PassThroughPoints passThroughPoints;
 
   @Nullable
   private final Double relaxCostAtDestination;
@@ -29,14 +29,14 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   private MultiCriteriaRequest() {
     this.relaxC1 = RelaxFunction.NORMAL;
     this.transitPriorityCalculator = null;
-    this.transitPassThroughRequest = null;
+    this.passThroughPoints = null;
     this.relaxCostAtDestination = null;
   }
 
   public MultiCriteriaRequest(Builder<T> builder) {
     this.relaxC1 = Objects.requireNonNull(builder.relaxC1());
     this.transitPriorityCalculator = builder.transitPriorityCalculator();
-    this.transitPassThroughRequest = builder.transitPassThroughRequest();
+    this.passThroughPoints = builder.passThroughPoints();
     this.relaxCostAtDestination = builder.relaxCostAtDestination();
   }
 
@@ -76,8 +76,8 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return Optional.ofNullable(transitPriorityCalculator);
   }
 
-  public Optional<RaptorTransitPassThroughRequest> transitPassThroughRequest() {
-    return Optional.ofNullable(transitPassThroughRequest);
+  public Optional<PassThroughPoints> passThroughPoints() {
+    return Optional.ofNullable(passThroughPoints);
   }
 
   /**
@@ -110,14 +110,19 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return (
       Objects.equals(relaxC1, that.relaxC1) &&
       Objects.equals(transitPriorityCalculator, that.transitPriorityCalculator) &&
-      Objects.equals(transitPassThroughRequest, that.transitPassThroughRequest) &&
+      Objects.equals(passThroughPoints, that.passThroughPoints) &&
       Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(relaxC1, transitPriorityCalculator, relaxCostAtDestination);
+    return Objects.hash(
+      relaxC1,
+      transitPriorityCalculator,
+      passThroughPoints,
+      relaxCostAtDestination
+    );
   }
 
   @Override
@@ -126,12 +131,13 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
       .of(MultiCriteriaRequest.class)
       .addObj("relaxC1", relaxC1, RelaxFunction.NORMAL)
       .addObj("transitPriorityCalculator", transitPriorityCalculator)
+      .addObj("passThroughPoints", passThroughPoints)
       .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .toString();
   }
 
   public boolean includeC2() {
-    return transitPassThroughRequest != null || transitPriorityCalculator != null;
+    return passThroughPoints != null || transitPriorityCalculator != null;
   }
 
   public static class Builder<T extends RaptorTripSchedule> {
@@ -139,7 +145,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     private final MultiCriteriaRequest<T> original;
     private RelaxFunction relaxC1;
     private RaptorTransitPriorityGroupCalculator transitPriorityCalculator = null;
-    private RaptorTransitPassThroughRequest transitPassThroughRequest = null;
+    private PassThroughPoints passThroughPoints = null;
     private Double relaxCostAtDestination = null;
 
     public Builder(MultiCriteriaRequest<T> original) {
@@ -168,13 +174,13 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     }
 
     @Nullable
-    public RaptorTransitPassThroughRequest transitPassThroughRequest() {
-      return transitPassThroughRequest;
+    public PassThroughPoints passThroughPoints() {
+      return passThroughPoints;
     }
 
     @Nullable
-    public Builder<T> withTransitPassThroughRequest(RaptorTransitPassThroughRequest value) {
-      transitPassThroughRequest = value;
+    public Builder<T> withPassThroughPoints(PassThroughPoints value) {
+      passThroughPoints = value;
       return this;
     }
 
@@ -201,6 +207,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
         .of(MultiCriteriaRequest.Builder.class)
         .addObj("relaxC1", relaxC1)
         .addObj("transitPriorityCalculator", transitPriorityCalculator)
+        .addObj("passThroughPoints", passThroughPoints)
         .addNum("relaxCostAtDestination", relaxCostAtDestination)
         .toString();
     }

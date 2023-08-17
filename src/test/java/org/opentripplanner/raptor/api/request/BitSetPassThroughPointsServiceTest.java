@@ -15,22 +15,27 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class BitSetPassThroughPointsServiceTest {
 
-  public static final int PASS_THROUGH_SEQ_NO_1 = 1;
-  public static final int PASS_THROUGH_SEQ_NO_2 = 2;
+  private static final int PASS_THROUGH_SEQ_NO_1 = 1;
+  private static final int PASS_THROUGH_SEQ_NO_2 = 2;
 
-  public static final int STOP_11 = 0;
-  public static final int STOP_12 = 1;
-  public static final int STOP_13 = 2;
-  public static final int[] STOPS_1 = new int[] { STOP_11, STOP_12, STOP_13 };
-  public static final int STOP_21 = 3;
-  public static final int STOP_22 = 4;
-  public static final int STOP_23 = 5;
-  public static final int[] STOPS_2 = new int[] { STOP_21, STOP_22, STOP_23 };
-  public static final int STOP_31 = 6;
-  private static final List<int[]> POINTS = List.of(STOPS_1, STOPS_2);
-  private static final PassThroughPointsService SUBJECT = BitSetPassThroughPointsService.create(
-    POINTS
+  private static final int STOP_11 = 0;
+  private static final int STOP_12 = 1;
+  private static final int STOP_13 = 2;
+  private static final int[] STOPS_1 = new int[] { STOP_11, STOP_12, STOP_13 };
+  private static final int STOP_21 = 3;
+  private static final int STOP_22 = 4;
+  private static final int STOP_23 = 5;
+  private static final int[] STOPS_2 = new int[] { STOP_21, STOP_22, STOP_23 };
+  private static final int STOP_31 = 6;
+
+  private static final PassThroughPointsService SUBJECT = BitSetPassThroughPointsService.of(
+    new PassThroughPoints(List.of(new PassThroughPoint(STOPS_1), new PassThroughPoint(STOPS_2)))
   );
+  /**
+   * We expect the c2 value at the destination to be the same as the number of pass-through
+   * points in the request.
+   */
+  private static final int EXPECTED_C2_AT_DESTINATION = 2;
 
   static Stream<Arguments> passThroughPointTestCases() {
     return Stream.of(
@@ -68,19 +73,13 @@ class BitSetPassThroughPointsServiceTest {
           newC2
         )
     );
-    assertTrue(SUBJECT.acceptC2AtDestination().test(POINTS.size()));
+    assertTrue(SUBJECT.acceptC2AtDestination().test(EXPECTED_C2_AT_DESTINATION));
+    assertFalse(SUBJECT.acceptC2AtDestination().test(EXPECTED_C2_AT_DESTINATION - 1));
+    assertFalse(SUBJECT.acceptC2AtDestination().test(EXPECTED_C2_AT_DESTINATION + 1));
   }
 
   @Test
   void notAPassthroughPoint() {
     assertFalse(SUBJECT.isPassThroughPoint(STOP_31));
-  }
-
-  @Test
-  void notAPassthroughPoint_empty() {
-    assertFalse(BitSetPassThroughPointsService.NOOP.isPassThroughPoint(STOP_11));
-    assertFalse(BitSetPassThroughPointsService.NOOP.isPassThroughPoint(STOP_12));
-    assertFalse(BitSetPassThroughPointsService.NOOP.isPassThroughPoint(STOP_21));
-    assertFalse(BitSetPassThroughPointsService.NOOP.isPassThroughPoint(STOP_22));
   }
 }

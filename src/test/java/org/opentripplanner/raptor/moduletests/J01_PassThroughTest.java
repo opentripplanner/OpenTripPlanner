@@ -23,10 +23,10 @@ import org.opentripplanner.raptor.RaptorService;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.request.BitSetPassThroughPointsService;
+import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.raptor.api.request.PassThroughPoints;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.api.request.RaptorTransitPassThroughRequest;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 
 /*
@@ -89,11 +89,9 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassThroughRequest(
-          new RaptorTransitPassThroughRequest(
-            // Include desired pass-through point in the request
-            BitSetPassThroughPointsService.create(List.of(new int[] { STOP_D }))
-          )
+        mc.withPassThroughPoints(
+          // Include desired pass-through point in the request
+          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_D })))
         )
       )
       .searchParams()
@@ -127,11 +125,9 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassThroughRequest(
-          new RaptorTransitPassThroughRequest(
-            // Include desired pass-through point in the request
-            BitSetPassThroughPointsService.create(List.of(new int[] { STOP_A }))
-          )
+        // Include desired pass-through point in the request
+        mc.withPassThroughPoints(
+          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_A })))
         )
       )
       .searchParams()
@@ -166,11 +162,9 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassThroughRequest(
-          // Include desired pass-through point in the request
-          new RaptorTransitPassThroughRequest(
-            BitSetPassThroughPointsService.create(List.of(new int[] { STOP_C }))
-          )
+        // Include desired pass-through point in the request
+        mc.withPassThroughPoints(
+          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_C })))
         )
       )
       .searchParams()
@@ -205,11 +199,12 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassThroughRequest(
+        mc.withPassThroughPoints(
           // Include desired pass-through point in the request
-          new RaptorTransitPassThroughRequest(
-            BitSetPassThroughPointsService.create(
-              List.of(new int[] { STOP_B }, new int[] { STOP_D })
+          new PassThroughPoints(
+            List.of(
+              new PassThroughPoint(new int[] { STOP_B }),
+              new PassThroughPoint(new int[] { STOP_D })
             )
           )
         )
@@ -244,11 +239,12 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassThroughRequest(
+        mc.withPassThroughPoints(
           // Include desired pass-through point in the request
-          new RaptorTransitPassThroughRequest(
-            BitSetPassThroughPointsService.create(
-              List.of(new int[] { STOP_B }, new int[] { STOP_C })
+          new PassThroughPoints(
+            List.of(
+              new PassThroughPoint(new int[] { STOP_B }),
+              new PassThroughPoint(new int[] { STOP_C })
             )
           )
         )
@@ -282,15 +278,11 @@ public class J01_PassThroughTest {
 
     requestBuilder
       .withMultiCriteria(mc ->
-        mc.withTransitPassThroughRequest(
+        mc.withPassThroughPoints(
           // Include desired pass-through point in the request
-          new RaptorTransitPassThroughRequest(
-            BitSetPassThroughPointsService.create(
-              List.of(
-                // Both STOP_B and STOP_C is a valid pass-through point
-                new int[] { STOP_B, STOP_C }
-              )
-            )
+          new PassThroughPoints(
+            // Both STOP_B and STOP_C is a valid pass-through point
+            List.of(new PassThroughPoint(new int[] { STOP_B, STOP_C }))
           )
         )
       )

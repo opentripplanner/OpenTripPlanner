@@ -1,13 +1,13 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.configure;
 
+import java.util.Objects;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.request.BitSetPassThroughPointsService;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.PassThroughPointsService;
-import org.opentripplanner.raptor.api.request.RaptorTransitPassThroughRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
@@ -43,12 +43,30 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private final SearchContext<T> context;
   private final PathConfig<T> pathConfig;
-
   private DestinationArrivalPaths<T> paths;
+  private PassThroughPointsService passThroughPointsService;
 
-  public McRangeRaptorConfig(SearchContext<T> context) {
-    this.context = context;
+  public McRangeRaptorConfig(
+    SearchContext<T> context,
+    PassThroughPointsService passThroughPointsService
+  ) {
+    this.context = Objects.requireNonNull(context);
+    this.passThroughPointsService = Objects.requireNonNull(passThroughPointsService);
     this.pathConfig = new PathConfig<>(context);
+  }
+
+  /**
+   * The PassThroughPointsService is injected into the transit-calculator, so it needs to be
+   * created before the context(witch create the calculator).So, to be able to do this, this
+   * factory is static, and the service is passed back in when this config is instantiated.
+   */
+  public static PassThroughPointsService passThroughPointsService(
+    MultiCriteriaRequest<?> multiCriteriaRequest
+  ) {
+    return multiCriteriaRequest
+      .passThroughPoints()
+      .map(BitSetPassThroughPointsService::of)
+      .orElse(PassThroughPointsService.NOOP);
   }
 
   /**
@@ -87,7 +105,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
       state,
       context.createTimeBasedBoardingSupport(),
       factory,
-      passThroughPoints(),
+      passThroughPointsService,
       context.costCalculator(),
       context.slackProvider(),
       createPatternRideParetoSet(patternRideComparator)
@@ -163,41 +181,35 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private PatternRideFactory<T, PatternRideC2<T>> createPatternRideC2Factory() {
-    return createWithC2(
-      pt -> new PassThroughRideFactory<>(pt.passThroughPoints()),
-      pg -> new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator())
-    );
+    if (isPassThrough()) {
+      return new PassThroughRideFactory<>(passThroughPointsService);
+    }
+    if (isTransitPriority()) {
+      return new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator());
+    }
+    throw new IllegalStateException("Only pass-through and transit-priority uses c2.");
   }
 
   @Nullable
   private DominanceFunction dominanceFunctionC2() {
-    return createWithC2(
-      RaptorTransitPassThroughRequest::dominanceFunction,
-      RaptorTransitPriorityGroupCalculator::dominanceFunction
-    );
+    if (isPassThrough()) {
+      return passThroughPointsService.dominanceFunction();
+    }
+    if (isTransitPriority()) {
+      return getTransitPriorityGroupCalculator().dominanceFunction();
+    }
+    return null;
   }
 
-  @Nullable
   private RaptorTransitPriorityGroupCalculator getTransitPriorityGroupCalculator() {
-    return mcRequest().transitPriorityCalculator().orElse(null);
+    return mcRequest().transitPriorityCalculator().orElseThrow();
   }
 
-  private PassThroughPointsService passThroughPoints() {
-    return context
-      .multiCriteria()
-      .transitPassThroughRequest()
-      .map(RaptorTransitPassThroughRequest::passThroughPoints)
-      .orElse(PassThroughPointsService.NOOP);
+  private boolean isPassThrough() {
+    return mcRequest().passThroughPoints().isPresent();
   }
 
-  @Nullable
-  private <S> S createWithC2(
-    Function<RaptorTransitPassThroughRequest, S> createPassThrough,
-    Function<RaptorTransitPriorityGroupCalculator, S> createTransitPriority
-  ) {
-    return mcRequest()
-      .transitPassThroughRequest()
-      .map(createPassThrough)
-      .orElse(mcRequest().transitPriorityCalculator().map(createTransitPriority).orElse(null));
+  private boolean isTransitPriority() {
+    return mcRequest().transitPriorityCalculator().isPresent();
   }
 }

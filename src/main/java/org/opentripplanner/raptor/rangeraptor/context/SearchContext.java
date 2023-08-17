@@ -66,19 +66,22 @@ public class SearchContext<T extends RaptorTripSchedule> {
   /** Lazy initialized */
   private RaptorCostCalculator<T> costCalculator = null;
 
+  /**
+   * @param acceptC2AtDestination Currently only the pass-through has a constraint on the c2 value
+   *                             for accepting it at the destination, if not this is {@code null}.
+   */
   public SearchContext(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
-    RaptorTransitDataProvider<T> transit
+    RaptorTransitDataProvider<T> transit,
+    IntPredicate acceptC2AtDestination
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
     this.transit = transit;
     this.accessPaths = accessPaths(request);
     this.egressPaths = egressPaths(request);
-
-    // Note that it is the "new" request that is passed in.
-    this.calculator = createCalculator(this.request, tuningParameters);
+    this.calculator = createCalculator(request, tuningParameters, acceptC2AtDestination);
     this.roundTracker =
       new RoundTracker(
         nRounds(),
@@ -253,13 +256,14 @@ public class SearchContext<T extends RaptorTripSchedule> {
    */
   private static <T extends RaptorTripSchedule> RaptorTransitCalculator<T> createCalculator(
     RaptorRequest<T> r,
-    RaptorTuningParameters t
+    RaptorTuningParameters t,
+    IntPredicate acceptC2AtDestination
   ) {
     var forward = r.searchDirection().isForward();
     SearchParams s = r.searchParams();
 
     if (forward) {
-      return new ForwardRaptorTransitCalculator<>(s, t, acceptC2AtDestination(r));
+      return new ForwardRaptorTransitCalculator<>(s, t, acceptC2AtDestination);
     } else {
       return new ReverseRaptorTransitCalculator<>(s, t);
     }
@@ -302,21 +306,5 @@ public class SearchContext<T extends RaptorTripSchedule> {
     var params = request.searchParams();
     var paths = forward ? params.egressPaths() : params.accessPaths();
     return EgressPaths.create(paths, request.profile());
-  }
-
-  /**
-   * Currently only the pass-through has a constraint on the c2 value for accepting it at the
-   * destination. So, this method return the pass-through accept predicate if the request is a
-   * pass-through request, if not it returns {@code null}.
-   */
-  @Nullable
-  private static <T extends RaptorTripSchedule> IntPredicate acceptC2AtDestination(
-    RaptorRequest<T> r
-  ) {
-    return r
-      .multiCriteria()
-      .transitPassThroughRequest()
-      .map(it -> it.passThroughPoints().acceptC2AtDestination())
-      .orElse(null);
   }
 }
