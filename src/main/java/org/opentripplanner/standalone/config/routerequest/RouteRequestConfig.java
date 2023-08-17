@@ -170,7 +170,7 @@ public class RouteRequestConfig {
       .description(
         """
 A cost is applied to boarding nonpreferred authorities or routes.
-                    
+
 The routing engine will add extra penalty - on the *unpreferred* routes and/or agencies using a
 cost function. The cost function (`unpreferredCost`) is defined as a linear function of the form
 `A + B x`, where `A` is a fixed cost (in seconds) and `B` is reluctance multiplier for transit leg
@@ -343,9 +343,9 @@ ferries, where the check-in process needs to be done in good time before ride.
                 Let c be the existing minimum pareto optimal generalized cost to beat. Then a trip
                 with cost c' is accepted if the following is true:
                 `c' < Math.round(c * relaxRaptorCostCriteria)`.
-                              
+
                 The parameter is optional. If not set a normal comparison is performed.
-                              
+
                 Values equals or less than zero is not allowed. Values greater than 2.0 are not
                 supported, due to performance reasons.
                 """
@@ -543,7 +543,7 @@ ferries, where the check-in process needs to be done in good time before ride.
 
             **Time penalty**
 
-            The `time-penalty` is used to add a penalty to the access/egress duration/time. The
+            The `timePenalty` is used to add a penalty to the access/egress duration/time. The
             time including the penalty is used in the algorithm when comparing paths, but the
             actual duration is used when presented to the end user.
 
@@ -565,7 +565,7 @@ ferries, where the check-in process needs to be done in good time before ride.
                 """
 This is a performance limit and should therefore be set high. Results close to the limit are not
 guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
-duration can be set per mode(`maxAccessEgressDurationForMode`), because some street modes searches
+duration can be set per mode(`maxDurationForMode`), because some street modes searches
 are much more resource intensive than others. A default value is applied if the mode specific value
 do not exist.
 """
@@ -577,7 +577,7 @@ do not exist.
               .summary("Limit access/egress per street mode.")
               .description(
                 """
-              Override the settings in `maxAccessEgressDuration` for specific street modes. This is
+              Override the settings in `maxDuration` for specific street modes. This is
               done because some street modes searches are much more resource intensive than others.
               """
               )
