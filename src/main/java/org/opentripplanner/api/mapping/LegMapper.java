@@ -118,8 +118,8 @@ public class LegMapper {
       api.transitLeg = false;
       api.mode = ModeMapper.mapToApi(streetLeg.getMode());
 
-        // TODO OTP2 - This should be set to the street name according to the JavaDoc
-        api.route = "";
+      // TODO OTP2 - This should be set to the street name according to the JavaDoc
+      api.route = "";
     }
 
     api.interlineWithPreviousLeg = domain.isInterlinedWithPreviousLeg();
