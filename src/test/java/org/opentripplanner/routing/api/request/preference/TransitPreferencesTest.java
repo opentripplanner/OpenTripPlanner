@@ -20,7 +20,7 @@ class TransitPreferencesTest {
     TransitMode.AIRPLANE,
     2.1
   );
-  private static final CostLinearFunction UNPREFERRED_COST = CostLinearFunction.of("300 + 1.15 x");
+  private static final CostLinearFunction UNPREFERRED_COST = CostLinearFunction.of("5m + 1.15 x");
   private static final Duration D15s = Duration.ofSeconds(15);
   private static final Duration D45s = Duration.ofSeconds(45);
   private static final Duration D25m = Duration.ofMinutes(25);

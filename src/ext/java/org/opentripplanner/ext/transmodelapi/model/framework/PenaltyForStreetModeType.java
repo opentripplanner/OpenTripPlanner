@@ -59,9 +59,9 @@ public class PenaltyForStreetModeType {
           .type(new GraphQLNonNull(STREET_MODE))
           .description(
             """
-            List of modes witch the given penalty is applied to. A street-mode should not be listed
-            in more than element. If empty or null the penalty is applied to all unlisted modes,
-            it become the default penalty for this query.
+            List of modes with the given penalty is applied to. A street-mode should not be listed
+            in more than one element. If empty or null the penalty is applied to all unlisted modes,
+            it becomes the default penalty for this query.
             """
           )
           .build()

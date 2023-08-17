@@ -21,7 +21,7 @@ public class LinearFunctionFactory {
     duration/time or cost for a leg or section of a path/itinerary. The function `f(t) = a + bt`
     has a constant(a) and a coefficient(b) that will be used in OTP to compute `f(t)`.
     
-    Format: `a + b t`. Example: `1800 + 2.0 t`. The constant `a` accept both whole numbers and
+    Format: `a + b t`. Example: `30m + 2.0 t`. The constant `a` accept both whole numbers and
     duration input format like: `60` = `60s` = `1m` and `3791` = `1h3m11s`. `b` must be a positive
     decimal number between `0.0` and `100.0`.
     """;
