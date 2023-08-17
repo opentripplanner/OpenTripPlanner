@@ -3,7 +3,9 @@ package org.opentripplanner.ext.fares.impl;
 import com.google.common.collect.Sets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -12,8 +14,11 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.RouteOriginDestination;
+import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
@@ -195,5 +200,46 @@ public class HSLFareServiceImpl extends DefaultFareService {
     return Optional
       .ofNullable(bestAttribute)
       .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
+  }
+
+  @Override
+  public ItineraryFares calculateFares(Itinerary itinerary) {
+    // Group legs and fare rules by the feed they are from
+    var legsByFeed = itinerary
+      .getLegs()
+      .stream()
+      .filter(leg -> leg instanceof ScheduledTransitLeg)
+      .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
+    var fareRulesByFeed = fareRulesPerType
+      .get(FareType.regular)
+      .stream()
+      .collect(Collectors.groupingBy(flr -> flr.getFareAttribute().getId().getFeedId()));
+
+    // Accumulate fares from different feeds
+    ItineraryFares res = ItineraryFares.empty();
+    List<FareComponent> components = new ArrayList<>();
+    Money total = Money.euros(0);
+    boolean hasFare = false;
+
+    for (String feed : legsByFeed.keySet()) {
+      if (fareRulesByFeed.get(feed) == null || fareRulesByFeed.get(feed).isEmpty()) continue;
+      ItineraryFares fare = ItineraryFares.empty();
+      hasFare =
+        populateFare(
+          fare,
+          Currency.getInstance("EUR"),
+          FareType.regular,
+          legsByFeed.get(feed),
+          fareRulesByFeed.get(feed)
+        ) ||
+        hasFare;
+      components.addAll(fare.getComponents(FareType.regular));
+      total = total.plus(fare.getFare(FareType.regular));
+    }
+
+    res.addFareComponent(FareType.regular, components);
+    res.addFare(FareType.regular, total);
+
+    return hasFare ? res : null;
   }
 }

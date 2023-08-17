@@ -153,6 +153,12 @@ public class HSLFareServiceTest implements PlanTestConstants {
       .setAgency(agency2.getId())
       .build();
 
+    FareAttribute fareAttributeAgency3 = FareAttribute
+      .of(new FeedScopedId("FEED2", "attribute"))
+      .setCurrencyType("EUR")
+      .setAgency(agency3.getId())
+      .build();
+
     // Fare rule sets
     FareRuleSet ruleSetAB = new FareRuleSet(fareAttributeAB);
     ruleSetAB.addContains("A");
@@ -189,6 +195,9 @@ public class HSLFareServiceTest implements PlanTestConstants {
     ruleSetD2.addContains("D");
     ruleSetD2.setAgency(agency2.getId());
 
+    FareRuleSet ruleSetAgency3 = new FareRuleSet(fareAttributeAgency3);
+    ruleSetAgency3.addContains("B");
+
     hslFareService.addFareRules(
       FareType.regular,
       List.of(
@@ -199,7 +208,8 @@ public class HSLFareServiceTest implements PlanTestConstants {
         ruleSetBCD,
         ruleSetABCD,
         ruleSetD,
-        ruleSetD2
+        ruleSetD2,
+        ruleSetAgency3
       )
     );
 
@@ -394,6 +404,34 @@ public class HSLFareServiceTest implements PlanTestConstants {
       )
     );
 
+    Itinerary i = newItinerary(D1, T11_06)
+      .bus(routeAgency1, 1, T11_06, T11_10, D2)
+      .walk(10, D1)
+      .bus(routeAgency2, 2, T11_20, T11_30, D2)
+      .build();
+
+    args.add(
+      Arguments.of(
+        "Multi-agency itinerary",
+        hslFareService,
+        i,
+        List.of(fareAttributeD.getId(), fareAttributeD2.getId())
+      )
+    );
+
+    Itinerary i2 = newItinerary(B1)
+      .bus(routeAgency1, 1, T11_06, T11_12, B1)
+      .bus(routeAgency3, 1, T11_14, T11_15, B2)
+      .build();
+
+    args.add(
+      Arguments.of(
+        "",
+        hslFareService,
+        i2,
+        List.of(fareAttributeAB.getId(), fareAttributeAgency3.getId())
+      )
+    );
     return args;
   }
 
