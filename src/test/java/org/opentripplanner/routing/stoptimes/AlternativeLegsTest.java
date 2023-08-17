@@ -23,7 +23,7 @@ class AlternativeLegsTest extends GtfsTest {
 
   @Override
   public String getFeedName() {
-    return "gtfs/testagency";
+    return "gtfs/simple";
   }
 
   @Test

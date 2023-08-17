@@ -30,7 +30,7 @@ class TransitModelTest {
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitModel,
-      ConstantsForTests.FAKE_GTFS,
+      ConstantsForTests.SIMPLE_GTFS,
       new DefaultFareServiceFactory(),
       FAKE_FEED_ID
     );
@@ -77,7 +77,7 @@ class TransitModelTest {
     ConstantsForTests.addGtfsToGraph(
       graph,
       transitModel,
-      ConstantsForTests.FAKE_GTFS,
+      ConstantsForTests.SIMPLE_GTFS,
       new DefaultFareServiceFactory(),
       FAKE_FEED_ID
     );

@@ -67,7 +67,7 @@ public class ConstantsForTests {
 
   public static final File KCM_GTFS = file("/gtfs/kcm_gtfs.zip");
 
-  public static final File FAKE_GTFS = file("/gtfs/testagency/");
+  public static final File SIMPLE_GTFS = file("/gtfs/simple/");
 
   public static final File FARE_COMPONENT_GTFS = file("/gtfs/farecomponents.gtfs.zip");
 
