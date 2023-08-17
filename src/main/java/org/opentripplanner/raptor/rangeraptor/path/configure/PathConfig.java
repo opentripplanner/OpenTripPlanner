@@ -35,13 +35,12 @@ public class PathConfig<T extends RaptorTripSchedule> {
     this.ctx = context;
   }
 
-  // TODO: 2023-07-31 update documentation
   /**
    * Create a new {@link DestinationArrivalPaths}.
    * @param includeC1Cost whether to include generalized cost in the pareto set criteria.
    *                               It will be generated for each leg and a total for the path.
-   * @param includeC2Cost whether to include c2 cost in the pareto set criteria.
-   *                      It will be generated for each leg and a total for the path.
+   * @param c2Comp c2 comparator function to be used in the pareto set criteria. If c2 comparator is null
+   *               then no c2 comparison will be used.
    */
   public DestinationArrivalPaths<T> createDestArrivalPaths(
     boolean includeC1Cost,
