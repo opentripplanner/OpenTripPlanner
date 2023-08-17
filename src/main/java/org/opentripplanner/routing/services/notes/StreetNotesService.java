@@ -69,7 +69,7 @@ public class StreetNotesService implements Serializable {
 
   private final List<StreetNotesSource> sources = new ArrayList<>();
 
-  private final StaticStreetNotesSource staticNotesSource = new StaticStreetNotesSource();
+  private final StreetNotesSource staticNotesSource = new StreetNotesSource();
 
   public StreetNotesService() {
     sources.add(staticNotesSource);
