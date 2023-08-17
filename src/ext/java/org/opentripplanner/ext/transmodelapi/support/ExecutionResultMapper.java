@@ -16,6 +16,10 @@ public class ExecutionResultMapper {
   private static final ErrorClassification API_PROCESSING_TIMEOUT = ErrorClassification.errorClassification(
     "ApiProcessingTimeout"
   );
+  private static final ErrorClassification BAD_REQUEST_ERROR = ErrorClassification.errorClassification(
+    "BadRequestError"
+  );
+
   private static final ErrorClassification INTERNAL_SERVER_ERROR = ErrorClassification.errorClassification(
     "InternalServerError"
   );
@@ -32,6 +36,12 @@ public class ExecutionResultMapper {
       .build();
     var result = ExecutionResult.newExecutionResult().addError(error).build();
     return response(result, OtpHttpStatus.STATUS_UNPROCESSABLE_ENTITY);
+  }
+
+  public static Response badRequestResponse(String message) {
+    var error = GraphQLError.newError().errorType(BAD_REQUEST_ERROR).message(message).build();
+    var result = ExecutionResult.newExecutionResult().addError(error).build();
+    return response(result, Response.Status.BAD_REQUEST);
   }
 
   public static Response systemErrorResponse(String message) {
