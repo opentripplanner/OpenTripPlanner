@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.request;
+package org.opentripplanner.raptor.rangeraptor.multicriteria.passthrough;
 
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
@@ -9,6 +9,9 @@ import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.request.PassThroughPoint;
+import org.opentripplanner.raptor.api.request.PassThroughPoints;
+import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 
 /**
  * IMPLEMENTATION DETAILS

@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.request;
+package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;

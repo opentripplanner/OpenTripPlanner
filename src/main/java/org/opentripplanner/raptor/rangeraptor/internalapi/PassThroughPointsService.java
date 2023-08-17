@@ -1,4 +1,4 @@
-package org.opentripplanner.raptor.api.request;
+package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
