@@ -498,7 +498,8 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "removeTransitWithHigherCostThanBestOnStreetOnly" : "60 + 1.3x",
       "bikeRentalDistanceRatio" : 0.3,
       "accessibilityScore" : true,
-      "minBikeParkingDistance" : 300
+      "minBikeParkingDistance" : 300,
+      "debug" : "limit-to-search-window"
     },
     "carDecelerationSpeed" : 2.9,
     "carAccelerationSpeed" : 2.9,

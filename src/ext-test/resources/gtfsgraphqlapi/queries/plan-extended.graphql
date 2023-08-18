@@ -1,0 +1,91 @@
+{
+    plan(
+        from: { lat: 52.3092, lon: 13.0291 }
+        to: { lat: 52.5147, lon: 13.3927 }
+        date: "2023-02-15",
+        time: "11:37",
+        parking: {
+            unpreferredCost: 555,
+            preferred: [{ not: [{tags: ["a", "b", "c"]}] }],
+            filters: [{ select: [{tags:["e"]}] }]
+        },
+        transportModes: [
+            {
+                mode: CAR,
+                qualifier: HAIL
+            }
+        ]) {
+        itineraries {
+            startTime
+            endTime
+            generalizedCost
+            accessibilityScore
+            legs {
+                mode
+                from {
+                    name
+                    lat
+                    lon
+                    departureTime
+                    arrivalTime
+                }
+                to {
+                    name
+                    lat
+                    lon
+                    departureTime
+                    arrivalTime
+                }
+                startTime
+                endTime
+                mode
+                generalizedCost
+                headsign
+                trip {
+                    tripHeadsign
+                }
+                alerts {
+                    id
+                    alertHeaderText
+                    alertDescriptionText
+                    alertEffect
+                    alertCause
+                    alertSeverityLevel
+                    alertUrl
+                    effectiveStartDate
+                    effectiveEndDate
+                    entities {
+                        ... on Stop {
+                            name
+                            gtfsId
+                            lat
+                            lon
+                        }
+                    }
+                }
+                rideHailingEstimate {
+                    provider {
+                        id
+                    }
+                    productName
+                    minPrice {
+                        currency {
+                            code
+                            digits
+                        }
+                        amount
+                    }
+                    maxPrice {
+                        currency {
+                            code
+                            digits
+                        }
+                        amount
+                    }
+                    arrival
+                }
+                accessibilityScore
+            }
+        }
+    }
+}

@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 
 public class TurnsTest {
@@ -24,29 +25,29 @@ public class TurnsTest {
     IntersectionVertex v1 = StreetModelForTest.intersectionVertex("v1", -0.10, 0);
     IntersectionVertex v2 = StreetModelForTest.intersectionVertex("v2", 0, 0);
 
-    StreetEdge leftEdge = StreetEdge.createStreetEdge(
-      v1,
-      v2,
-      geometry,
-      "morx",
-      10.0,
-      StreetTraversalPermission.ALL,
-      true
-    );
+    StreetEdge leftEdge = new StreetEdgeBuilder<>()
+      .withFromVertex(v1)
+      .withToVertex(v2)
+      .withGeometry(geometry)
+      .withName("morx")
+      .withMeterLength(10.0)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(true)
+      .buildAndConnect();
 
     LineString geometry2 = gf.createLineString(
       new Coordinate[] { new Coordinate(0, 0), new Coordinate(-0.10, 0) }
     );
 
-    StreetEdge rightEdge = StreetEdge.createStreetEdge(
-      v1,
-      v2,
-      geometry2,
-      "fleem",
-      10.0,
-      StreetTraversalPermission.ALL,
-      false
-    );
+    StreetEdge rightEdge = new StreetEdgeBuilder<>()
+      .withFromVertex(v1)
+      .withToVertex(v2)
+      .withGeometry(geometry2)
+      .withName("fleem")
+      .withMeterLength(10.0)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
 
     assertEquals(180, Math.abs(leftEdge.getOutAngle() - rightEdge.getOutAngle()));
   }

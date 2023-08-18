@@ -8,12 +8,9 @@ import java.util.Map;
 import org.opentripplanner.ext.transmodelapi.mapping.TripRequestMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.ViaRequestMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
-import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
-import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
@@ -40,16 +37,11 @@ public class TransmodelGraphQLPlanner {
       response.debugOutput = res.getDebugTimingAggregator().finishedRendering();
       response.previousPageCursor = res.getPreviousPageCursor();
       response.nextPageCursor = res.getNextPageCursor();
-    } catch (OTPRequestTimeoutException te) {
-      throw te;
     } catch (RoutingValidationException e) {
       response.plan = TripPlanMapper.mapTripPlan(request, List.of());
       response.messages.addAll(e.getRoutingErrors());
-    } catch (Exception e) {
-      LOG.error("System error: {}", e.getMessage(), e);
-      response.plan = TripPlanMapper.mapTripPlan(request, List.of());
-      response.messages.add(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null));
     }
+
     Locale locale = request == null ? serverContext.defaultLocale() : request.locale();
     return DataFetcherResult
       .<PlanResponse>newResult()
@@ -67,14 +59,6 @@ public class TransmodelGraphQLPlanner {
       response = ctx.getRoutingService().route(request);
     } catch (RoutingValidationException e) {
       response = new ViaRoutingResponse(Map.of(), List.of(), e.getRoutingErrors());
-    } catch (Exception e) {
-      LOG.error("System error: " + e.getMessage(), e);
-      response =
-        new ViaRoutingResponse(
-          Map.of(),
-          List.of(),
-          List.of(new RoutingError(RoutingErrorCode.SYSTEM_ERROR, null))
-        );
     }
 
     Locale defaultLocale = ctx.getServerContext().defaultLocale();

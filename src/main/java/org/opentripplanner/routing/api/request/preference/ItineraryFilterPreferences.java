@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
-import org.opentripplanner.routing.api.request.framework.Units;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
  * Group by Similarity filter parameters. See the configuration for documentation of each field.
@@ -26,11 +26,11 @@ public final class ItineraryFilterPreferences {
   private final double groupSimilarityKeepOne;
   private final double groupSimilarityKeepThree;
   private final double minBikeParkingDistance;
-  private final DoubleAlgorithmFunction nonTransitGeneralizedCostLimit;
+  private final CostLinearFunction nonTransitGeneralizedCostLimit;
   private final double parkAndRideDurationRatio;
   private final boolean removeItinerariesWithSameRoutesAndStops;
   private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
-  private final DoubleAlgorithmFunction removeTransitWithHigherCostThanBestOnStreetOnly;
+  private final CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
 
   private ItineraryFilterPreferences() {
     this.accessibilityScore = false;
@@ -41,13 +41,16 @@ public final class ItineraryFilterPreferences {
     this.groupSimilarityKeepOne = 0.85;
     this.groupSimilarityKeepThree = 0.68;
     this.minBikeParkingDistance = 0;
-    this.nonTransitGeneralizedCostLimit = RequestFunctions.createLinearFunction(3600, 2);
+    this.nonTransitGeneralizedCostLimit = CostLinearFunction.of(Duration.ofHours(1), 2.0);
     this.parkAndRideDurationRatio = 0.0;
     this.removeItinerariesWithSameRoutesAndStops = false;
     this.transitGeneralizedCostLimit =
-      new TransitGeneralizedCostFilterParams(RequestFunctions.createLinearFunction(900, 1.5), 0.4);
+      new TransitGeneralizedCostFilterParams(
+        CostLinearFunction.of(Duration.ofMinutes(15), 1.5),
+        0.4
+      );
     this.removeTransitWithHigherCostThanBestOnStreetOnly =
-      RequestFunctions.createLinearFunction(60, 1.3);
+      CostLinearFunction.of(Duration.ofMinutes(1), 1.3);
   }
 
   private ItineraryFilterPreferences(Builder builder) {
@@ -110,7 +113,7 @@ public final class ItineraryFilterPreferences {
     return minBikeParkingDistance;
   }
 
-  public DoubleAlgorithmFunction nonTransitGeneralizedCostLimit() {
+  public CostLinearFunction nonTransitGeneralizedCostLimit() {
     return nonTransitGeneralizedCostLimit;
   }
 
@@ -126,7 +129,7 @@ public final class ItineraryFilterPreferences {
     return transitGeneralizedCostLimit;
   }
 
-  public DoubleAlgorithmFunction removeTransitWithHigherCostThanBestOnStreetOnly() {
+  public CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly() {
     return removeTransitWithHigherCostThanBestOnStreetOnly;
   }
 
@@ -239,11 +242,11 @@ public final class ItineraryFilterPreferences {
     private double groupSimilarityKeepOne;
     private double groupSimilarityKeepThree;
     public double minBikeParkingDistance;
-    private DoubleAlgorithmFunction nonTransitGeneralizedCostLimit;
+    private CostLinearFunction nonTransitGeneralizedCostLimit;
     private double parkAndRideDurationRatio;
     private boolean removeItinerariesWithSameRoutesAndStops;
     private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
-    private DoubleAlgorithmFunction removeTransitWithHigherCostThanBestOnStreetOnly;
+    private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
 
     public ItineraryFilterPreferences original() {
       return original;
@@ -294,7 +297,7 @@ public final class ItineraryFilterPreferences {
     }
 
     public Builder withNonTransitGeneralizedCostLimit(
-      DoubleAlgorithmFunction nonTransitGeneralizedCostLimit
+      CostLinearFunction nonTransitGeneralizedCostLimit
     ) {
       this.nonTransitGeneralizedCostLimit = nonTransitGeneralizedCostLimit;
       return this;
@@ -320,7 +323,7 @@ public final class ItineraryFilterPreferences {
     }
 
     public Builder withRemoveTransitWithHigherCostThanBestOnStreetOnly(
-      DoubleAlgorithmFunction removeTransitWithHigherCostThanBestOnStreetOnly
+      CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly
     ) {
       this.removeTransitWithHigherCostThanBestOnStreetOnly =
         removeTransitWithHigherCostThanBestOnStreetOnly;

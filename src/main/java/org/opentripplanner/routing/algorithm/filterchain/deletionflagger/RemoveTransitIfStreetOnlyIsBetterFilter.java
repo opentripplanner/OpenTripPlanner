@@ -4,9 +4,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalDouble;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
  * Filter itineraries based on generalizedCost, compared with a on-street-all-the-way itinerary(if
@@ -15,9 +16,9 @@ import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction
  */
 public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletionFlagger {
 
-  private final DoubleAlgorithmFunction costLimitFunction;
+  private final CostLinearFunction costLimitFunction;
 
-  public RemoveTransitIfStreetOnlyIsBetterFilter(DoubleAlgorithmFunction costLimitFunction) {
+  public RemoveTransitIfStreetOnlyIsBetterFilter(CostLinearFunction costLimitFunction) {
     this.costLimitFunction = costLimitFunction;
   }
 
@@ -53,7 +54,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletio
       return List.of();
     }
 
-    final double limit = costLimitFunction.calculate(minStreetCost.getAsDouble());
+    final Cost limit = costLimitFunction.calculate(minStreetCost.getAsDouble());
 
     // Filter away itineraries that have higher cost than limit cost computed above
     List<Itinerary> filtered = itineraries

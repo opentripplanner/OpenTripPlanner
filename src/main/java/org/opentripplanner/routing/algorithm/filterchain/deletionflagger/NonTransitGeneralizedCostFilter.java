@@ -1,10 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.List;
-import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
 /**
@@ -16,13 +17,13 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
  * can take you to the destination much quicker.
  * <p>
  *
- * @see ItineraryFilterPreferences#nonTransitGeneralizedCostLimit
+ * @see ItineraryFilterPreferences#nonTransitGeneralizedCostLimit()
  */
 public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
 
-  private final DoubleAlgorithmFunction costLimitFunction;
+  private final CostLinearFunction costLimitFunction;
 
-  public NonTransitGeneralizedCostFilter(DoubleAlgorithmFunction costLimitFunction) {
+  public NonTransitGeneralizedCostFilter(CostLinearFunction costLimitFunction) {
     this.costLimitFunction = costLimitFunction;
   }
 
@@ -34,16 +35,20 @@ public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     // ALL itineraries are considered here. Both transit and non-transit
-    OptionalDouble minGeneralizedCost = itineraries
+    OptionalInt minGeneralizedCost = itineraries
       .stream()
-      .mapToDouble(Itinerary::getGeneralizedCost)
+      .mapToInt(Itinerary::getGeneralizedCost)
       .min();
 
     if (minGeneralizedCost.isEmpty()) {
       return List.of();
     }
 
-    final double maxLimit = costLimitFunction.calculate(minGeneralizedCost.getAsDouble());
+    // TODO: This is a bit ugly, but the filters should be refactored
+    //       to use the Cost type and not int.
+    var maxLimit = costLimitFunction
+      .calculate(Cost.costOfSeconds(minGeneralizedCost.getAsInt()))
+      .toSeconds();
 
     return itineraries
       .stream()

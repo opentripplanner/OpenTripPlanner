@@ -22,6 +22,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   private final String url;
 
   private final SiriHttpLoader siriHttpLoader;
+  private final String requestorRef;
 
   /**
    * True iff the last list with updates represent all updates that are active right now, i.e. all
@@ -34,15 +35,15 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
     this.feedId = parameters.feedId();
     this.url = parameters.url();
 
-    String requestorRef = parameters.requestorRef() == null || parameters.requestorRef().isEmpty()
-      ? "otp-" + UUID.randomUUID()
-      : parameters.requestorRef();
+    requestorRef =
+      parameters.requestorRef() == null || parameters.requestorRef().isEmpty()
+        ? "otp-" + UUID.randomUUID()
+        : parameters.requestorRef();
 
     siriHttpLoader =
       new SiriHttpLoader(
         url,
         parameters.timeout(),
-        requestorRef,
         parameters.httpRequestHeaders(),
         parameters.previewInterval()
       );
@@ -52,7 +53,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   public Siri getUpdates() {
     long t1 = System.currentTimeMillis();
     try {
-      Siri siri = siriHttpLoader.fetchETFeed();
+      Siri siri = siriHttpLoader.fetchETFeed(requestorRef);
 
       if (siri.getServiceDelivery().getResponseTimestamp().isBefore(lastTimestamp)) {
         LOG.info("Newer data has already been processed");

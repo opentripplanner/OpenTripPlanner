@@ -61,8 +61,8 @@ class FareTransferRuleMapperTest {
 
     var transferRule = map(fareProduct, rule);
 
-    assertEquals(groupId1.getId(), transferRule.fromLegGroup());
-    assertEquals(groupId2.getId(), transferRule.toLegGroup());
+    assertEquals(groupId1.getId(), transferRule.fromLegGroup().getId());
+    assertEquals(groupId2.getId(), transferRule.toLegGroup().getId());
   }
 
   @Nonnull

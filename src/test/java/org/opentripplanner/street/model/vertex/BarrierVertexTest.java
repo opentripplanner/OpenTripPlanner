@@ -14,6 +14,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 
@@ -168,6 +169,14 @@ public class BarrierVertexTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, back);
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(vA)
+      .withToVertex(vB)
+      .withGeometry(geom)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(perm)
+      .withBack(back)
+      .buildAndConnect();
   }
 }

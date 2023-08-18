@@ -29,25 +29,25 @@ class EscalatorProcessor {
 
     for (int i = 0; i < nodes.size() - 1; i++) {
       if (escalatorWay.isForwardEscalator()) {
-        new EscalatorEdge(
+        EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i)),
           intersectionNodes.get(nodes.get(i + 1)),
           length
         );
       } else if (escalatorWay.isBackwardEscalator()) {
-        new EscalatorEdge(
+        EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i + 1)),
           intersectionNodes.get(nodes.get(i)),
           length
         );
       } else {
-        new EscalatorEdge(
+        EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i)),
           intersectionNodes.get(nodes.get(i + 1)),
           length
         );
 
-        new EscalatorEdge(
+        EscalatorEdge.createEscalatorEdge(
           intersectionNodes.get(nodes.get(i + 1)),
           intersectionNodes.get(nodes.get(i)),
           length

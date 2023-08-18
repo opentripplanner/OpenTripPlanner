@@ -50,6 +50,7 @@ public class UberService extends CachingRideHailingService {
    * be hard to change it, should the need arise.
    */
   private final String wheelchairAccessibleProductId;
+  private final OtpHttpClient otpHttpClient;
 
   public UberService(RideHailingServiceParameters config) {
     this(
@@ -78,6 +79,7 @@ public class UberService extends CachingRideHailingService {
     this.timeEstimateUri = timeEstimateUri;
     this.bannedTypes = bannedTypes;
     this.wheelchairAccessibleProductId = wheelchairAccessibleProductId;
+    this.otpHttpClient = new OtpHttpClient();
   }
 
   @Override
@@ -177,9 +179,7 @@ public class UberService extends CachingRideHailingService {
   }
 
   private <T> T getUberEstimateResponse(URI finalUri, Class<T> clazz) throws IOException {
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
-      return otpHttpClient.getAndMapAsJsonObject(finalUri, headers(), MAPPER, clazz);
-    }
+    return otpHttpClient.getAndMapAsJsonObject(finalUri, headers(), MAPPER, clazz);
   }
 
   private boolean filterRides(Ride a, boolean wheelchairAccessible) {

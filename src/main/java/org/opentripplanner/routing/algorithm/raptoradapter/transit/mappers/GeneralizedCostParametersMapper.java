@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.routing.algorithm.raptoradapter.api.DefaultTripPattern;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParameters;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.GeneralizedCostParametersBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -19,7 +18,7 @@ public class GeneralizedCostParametersMapper {
     RouteRequest request,
     List<? extends DefaultTripPattern> patternIndex
   ) {
-    GeneralizedCostParametersBuilder builder = new GeneralizedCostParametersBuilder();
+    var builder = GeneralizedCostParameters.of();
     var preferences = request.preferences();
 
     builder

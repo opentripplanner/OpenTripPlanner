@@ -1,10 +1,9 @@
-package org.opentripplanner.raptor.spi;
+package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 public class RaptorCostConverterTest {
 
@@ -14,6 +13,14 @@ public class RaptorCostConverterTest {
     assertEquals(0, RaptorCostConverter.toOtpDomainCost(49));
     assertEquals(1, RaptorCostConverter.toOtpDomainCost(50));
     assertEquals(300, RaptorCostConverter.toOtpDomainCost(30_000));
+  }
+
+  @Test
+  public void toOtpDomainFactor() {
+    assertEquals(-1, RaptorCostConverter.toOtpDomainFactor(-1));
+    assertEquals(0.49, RaptorCostConverter.toOtpDomainFactor(49));
+    assertEquals(0.5, RaptorCostConverter.toOtpDomainFactor(50));
+    assertEquals(1.33, RaptorCostConverter.toOtpDomainFactor(133));
   }
 
   @Test

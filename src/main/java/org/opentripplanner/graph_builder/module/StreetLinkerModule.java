@@ -77,11 +77,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
     graph.calculateConvexHull();
   }
 
-  @Override
-  public void checkInputs() {
-    //no inputs
-  }
-
   public void linkTransitStops(Graph graph, TransitModel transitModel) {
     List<TransitStopVertex> vertices = graph.getVerticesOfType(TransitStopVertex.class);
     var progress = ProgressTracker.track("Linking transit stops to graph", 5000, vertices.size());

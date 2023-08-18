@@ -3,6 +3,7 @@ package org.opentripplanner.updater.spi;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import org.opentripplanner.framework.io.JsonDataListDownloader;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,10 +14,25 @@ public abstract class GenericJsonDataSource<T> implements DataSource<T> {
   private final String url;
   protected List<T> updates = List.of();
 
-  public GenericJsonDataSource(String url, String jsonParsePath, HttpHeaders headers) {
+  protected GenericJsonDataSource(String url, String jsonParsePath, HttpHeaders headers) {
+    this(url, jsonParsePath, headers, new OtpHttpClient());
+  }
+
+  protected GenericJsonDataSource(
+    String url,
+    String jsonParsePath,
+    HttpHeaders headers,
+    OtpHttpClient otpHttpClient
+  ) {
     this.url = url;
     jsonDataListDownloader =
-      new JsonDataListDownloader<>(url, jsonParsePath, this::parseElement, headers.asMap());
+      new JsonDataListDownloader<>(
+        url,
+        jsonParsePath,
+        this::parseElement,
+        headers.asMap(),
+        otpHttpClient
+      );
   }
 
   @Override

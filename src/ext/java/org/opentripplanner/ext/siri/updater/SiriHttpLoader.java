@@ -17,56 +17,50 @@ public class SiriHttpLoader {
   private final HttpHeaders requestHeaders;
   private final String url;
   private final Duration timeout;
-  private final String requestorRef;
   private final Duration previewInterval;
+  private final OtpHttpClient otpHttpClient;
 
-  public SiriHttpLoader(
-    String url,
-    Duration timeout,
-    String requestorRef,
-    HttpHeaders requestHeaders
-  ) {
-    this(url, timeout, requestorRef, requestHeaders, null);
+  public SiriHttpLoader(String url, Duration timeout, HttpHeaders requestHeaders) {
+    this(url, timeout, requestHeaders, null);
   }
 
   public SiriHttpLoader(
     String url,
     Duration timeout,
-    String requestorRef,
     HttpHeaders requestHeaders,
     Duration previewInterval
   ) {
     this.url = url;
     this.timeout = timeout;
-    this.requestorRef = requestorRef;
     this.requestHeaders = requestHeaders;
     this.previewInterval = previewInterval;
+    this.otpHttpClient = new OtpHttpClient(timeout, timeout);
   }
 
   /**
    * Send a SIRI-SX service request and unmarshal the response as JAXB.
    */
-  public Siri fetchSXFeed() throws JAXBException {
+  public Siri fetchSXFeed(String requestorRef) throws JAXBException {
     RequestTimer requestTimer = new RequestTimer("SX");
     requestTimer.init();
     String sxServiceRequest = SiriHelper.createSXServiceRequestAsXml(requestorRef);
     requestTimer.serviceRequestCreated();
-    return fetchFeed(sxServiceRequest, requestTimer);
+    return fetchFeed(sxServiceRequest, requestTimer, requestorRef);
   }
 
   /**
    * Send a SIRI-ET service request and unmarshal the response as JAXB.
    */
-  public Siri fetchETFeed() throws JAXBException {
+  public Siri fetchETFeed(String requestorRef) throws JAXBException {
     RequestTimer requestTimer = new RequestTimer("ET");
     requestTimer.init();
     String etServiceRequest = SiriHelper.createETServiceRequestAsXml(requestorRef, previewInterval);
     requestTimer.serviceRequestCreated();
-    return fetchFeed(etServiceRequest, requestTimer);
+    return fetchFeed(etServiceRequest, requestTimer, requestorRef);
   }
 
-  private Siri fetchFeed(String serviceRequest, RequestTimer requestTimer) {
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient(timeout, timeout)) {
+  private Siri fetchFeed(String serviceRequest, RequestTimer requestTimer, String requestorRef) {
+    try {
       return otpHttpClient.postXmlAndMap(
         url,
         serviceRequest,

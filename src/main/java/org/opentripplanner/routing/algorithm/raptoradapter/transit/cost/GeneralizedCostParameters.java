@@ -5,8 +5,6 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 
 /**
@@ -16,7 +14,10 @@ import org.opentripplanner.routing.api.request.preference.AccessibilityPreferenc
 public class GeneralizedCostParameters {
 
   public static final double DEFAULT_TRANSIT_RELUCTANCE = 1.0;
-
+  public static final RaptorCostLinearFunction UNPREFERRED_COST = RaptorCostLinearFunction.of(
+    0,
+    1.0
+  );
   public static final GeneralizedCostParameters DEFAULTS = new GeneralizedCostParameters();
 
   private final int boardCost;
@@ -26,11 +27,12 @@ public class GeneralizedCostParameters {
   private final boolean wheelchairEnabled;
   private final AccessibilityPreferences wheelchairAccessibility;
   private final BitSet unpreferredPatterns;
-  private final DoubleAlgorithmFunction unpreferredCost;
+  private final RaptorCostLinearFunction unpreferredCost;
 
   /**
    * Default constructor defines default values. These defaults are overridden by defaults in the
-   * {@link RouteRequest}.
+   * {@link RouteRequest}. The values here is just for unit-testing, make sure all request
+   * preferences are mapped.
    */
   private GeneralizedCostParameters() {
     this.boardCost = 600;
@@ -40,7 +42,7 @@ public class GeneralizedCostParameters {
     this.wheelchairEnabled = false;
     this.wheelchairAccessibility = AccessibilityPreferences.ofOnlyAccessible();
     this.unpreferredPatterns = new BitSet();
-    this.unpreferredCost = RequestFunctions.createLinearFunction(0.0, DEFAULT_TRANSIT_RELUCTANCE);
+    this.unpreferredCost = UNPREFERRED_COST;
   }
 
   GeneralizedCostParameters(GeneralizedCostParametersBuilder builder) {
@@ -50,8 +52,12 @@ public class GeneralizedCostParameters {
     this.waitReluctanceFactor = builder.waitReluctanceFactor();
     this.wheelchairEnabled = builder.wheelchairEnabled();
     this.wheelchairAccessibility = builder.wheelchairAccessibility();
-    this.unpreferredPatterns = builder.unpreferredPatterns();
-    this.unpreferredCost = builder.unpreferredCost();
+    this.unpreferredPatterns = Objects.requireNonNull(builder.unpreferredPatterns());
+    this.unpreferredCost = Objects.requireNonNull(builder.unpreferredCost());
+  }
+
+  public static GeneralizedCostParametersBuilder of() {
+    return new GeneralizedCostParametersBuilder(DEFAULTS);
   }
 
   public int boardCost() {
@@ -93,7 +99,7 @@ public class GeneralizedCostParameters {
     return unpreferredPatterns;
   }
 
-  public DoubleAlgorithmFunction unnpreferredCost() {
+  public RaptorCostLinearFunction unnpreferredCost() {
     return unpreferredCost;
   }
 
@@ -111,6 +117,7 @@ public class GeneralizedCostParameters {
       return false;
     }
     GeneralizedCostParameters that = (GeneralizedCostParameters) o;
+    // TODO - Why is not all parameters included here, doc if on purpose or add parameters
     return (
       boardCost == that.boardCost &&
       transferCost == that.transferCost &&
@@ -122,11 +129,12 @@ public class GeneralizedCostParameters {
   public String toString() {
     return ToStringBuilder
       .of(GeneralizedCostParameters.class)
-      .addNum("boardCost", boardCost, 0)
-      .addNum("transferCost", transferCost, 0)
-      .addNum("waitReluctanceFactor", waitReluctanceFactor, 1.0)
+      .addNum("boardCost", boardCost, DEFAULTS.boardCost)
+      .addNum("transferCost", transferCost, DEFAULTS.transferCost)
+      .addNum("waitReluctanceFactor", waitReluctanceFactor, DEFAULTS.waitReluctanceFactor)
       .addDoubles("transitReluctanceFactors", transitReluctanceFactors, 1.0)
       .addNum("unpreferredPatternsSize", unpreferredPatterns.size(), 0)
+      .addObj("unpreferredCost", unpreferredCost, UNPREFERRED_COST)
       .toString();
   }
 }

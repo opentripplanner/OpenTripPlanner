@@ -138,11 +138,6 @@ public class PruneIslands implements GraphBuilderModule {
     LOG.info("Removed {} edgeless street vertices", removed);
   }
 
-  @Override
-  public void checkInputs() {
-    //no inputs
-  }
-
   /**
    * island without stops and with less than this number of street vertices will be pruned
    */

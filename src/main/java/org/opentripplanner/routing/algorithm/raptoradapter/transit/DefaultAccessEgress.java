@@ -176,6 +176,6 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
    * in routing (not latestState).
    */
   private String summary() {
-    return penalty.isZero() ? null : "+" + penalty;
+    return penalty.isZero() ? null : "w/penalty" + penalty;
   }
 }

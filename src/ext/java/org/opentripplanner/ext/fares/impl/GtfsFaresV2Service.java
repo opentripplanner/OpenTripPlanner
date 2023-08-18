@@ -100,7 +100,7 @@ public final class GtfsFaresV2Service implements Serializable {
       .stream()
       .flatMap(p -> p.stream().filter(ps -> coversItinerary(itinerary, ps)))
       .map(LegProducts.ProductWithTransfer::legRule)
-      .map(FareLegRule::fareProduct)
+      .flatMap(r -> r.fareProducts().stream())
       .collect(Collectors.toSet());
   }
 
@@ -115,7 +115,7 @@ public final class GtfsFaresV2Service implements Serializable {
       (
         transitLegs.size() == 1 ||
         (
-          pwt.product().coversDuration(i.getTransitDuration()) &&
+          pwt.products().stream().anyMatch(p -> p.coversDuration(i.getTransitDuration())) &&
           appliesToAllLegs(pwt.legRule(), transitLegs)
         ) ||
         coversItineraryWithFreeTransfers(i, pwt)
@@ -139,7 +139,10 @@ public final class GtfsFaresV2Service implements Serializable {
 
     return (
       feedIdsInItinerary.size() == 1 &&
-      pwt.transferRules().stream().anyMatch(r -> r.fareProduct().price().isZero())
+      pwt
+        .transferRules()
+        .stream()
+        .anyMatch(r -> r.fareProducts().stream().anyMatch(fp -> fp.price().isZero()))
     );
   }
 
@@ -207,7 +210,7 @@ public final class GtfsFaresV2Service implements Serializable {
       .orElse(false);
   }
 
-  private Optional<FareLegRule> getFareLegRuleByGroupId(@Nonnull String groupId) {
+  private Optional<FareLegRule> getFareLegRuleByGroupId(@Nonnull FeedScopedId groupId) {
     return legRules.stream().filter(lr -> groupId.equals(lr.legGroupId())).findAny();
   }
 
@@ -267,11 +270,7 @@ public final class GtfsFaresV2Service implements Serializable {
         .filter(lp -> lp.leg().equals(leg))
         .findFirst()
         .map(l ->
-          l
-            .products()
-            .stream()
-            .map(LegProducts.ProductWithTransfer::product)
-            .collect(Collectors.toSet())
+          l.products().stream().flatMap(lp -> lp.products().stream()).collect(Collectors.toSet())
         )
         .orElse(Set.of());
     }

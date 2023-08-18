@@ -9,12 +9,16 @@ import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
  */
 public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEntranceVertex> {
 
+  private final boolean isEntrance;
+
   private StreetTransitEntranceLink(StreetVertex fromv, TransitEntranceVertex tov) {
     super(fromv, tov, tov.getWheelchairAccessibility());
+    isEntrance = true;
   }
 
   private StreetTransitEntranceLink(TransitEntranceVertex fromv, StreetVertex tov) {
     super(fromv, tov, fromv.getWheelchairAccessibility());
+    isEntrance = false;
   }
 
   public static StreetTransitEntranceLink createStreetTransitEntranceLink(
@@ -29,6 +33,14 @@ public class StreetTransitEntranceLink extends StreetTransitEntityLink<TransitEn
     StreetVertex tov
   ) {
     return connectToGraph(new StreetTransitEntranceLink(fromv, tov));
+  }
+
+  public boolean isEntrance() {
+    return isEntrance;
+  }
+
+  public boolean isExit() {
+    return !isEntrance;
   }
 
   public String toString() {

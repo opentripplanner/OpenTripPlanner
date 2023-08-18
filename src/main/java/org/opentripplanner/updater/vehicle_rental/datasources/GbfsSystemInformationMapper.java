@@ -42,7 +42,7 @@ public class GbfsSystemInformationMapper {
       systemInformation.getEmail(),
       systemInformation.getFeedContactEmail(),
       systemInformation.getLicenseUrl(),
-      systemInformation.getTimezone(),
+      systemInformation.getTimezone().value(),
       android,
       ios
     );

@@ -17,6 +17,7 @@ import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
@@ -155,6 +156,14 @@ public class GraphTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return StreetEdge.createStreetEdge(vA, vB, geom, name, length, perm, false);
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(vA)
+      .withToVertex(vB)
+      .withGeometry(geom)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(perm)
+      .withBack(false)
+      .buildAndConnect();
   }
 }

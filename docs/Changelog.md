@@ -65,6 +65,18 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Upgrade to Apache HTTP Client 5 [#5228](https://github.com/opentripplanner/OpenTripPlanner/pull/5228)
 - Deduplicate vertex labels to save memory [#5223](https://github.com/opentripplanner/OpenTripPlanner/pull/5223)
 - Fix duplicate publishing of speed test data [#5237](https://github.com/opentripplanner/OpenTripPlanner/pull/5237)
+- Flex build time and memory optimization for large zones [#5233](https://github.com/opentripplanner/OpenTripPlanner/pull/5233)
+- Fix pathway traversal time calculation when none is supplied [#5242](https://github.com/opentripplanner/OpenTripPlanner/pull/5242)
+- Add check for null value of serviceCodesRunning in TripPatternForDateMapper [#5239](https://github.com/opentripplanner/OpenTripPlanner/pull/5239)
+- Improve error handling in TransmodelGraph [#5192](https://github.com/opentripplanner/OpenTripPlanner/pull/5192)
+- Fix SIRI SX retry logic [#5262](https://github.com/opentripplanner/OpenTripPlanner/pull/5262)
+- Fix filtering by submode [#5261](https://github.com/opentripplanner/OpenTripPlanner/pull/5261)
+- Add leg.headsign to GTFS GraphQL API [#5290](https://github.com/opentripplanner/OpenTripPlanner/pull/5290)
+- Return client error for invalid Transmodel query JSON format [#5277](https://github.com/opentripplanner/OpenTripPlanner/pull/5277)
+- Validate missing intermediate location in via requests [#5253](https://github.com/opentripplanner/OpenTripPlanner/pull/5253)
+- Support Fares v2 FareMedium and update spec implementation [#5227](https://github.com/opentripplanner/OpenTripPlanner/pull/5227)
+- Replace DoubleFunction with linear function [#5267](https://github.com/opentripplanner/OpenTripPlanner/pull/5267)
+- Improve walk step narrative for entering/exiting stations and signposted pathways [#5285](https://github.com/opentripplanner/OpenTripPlanner/pull/5285)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
@@ -412,8 +424,6 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 
 ## 2.0.0 (2020-11-27)
-
-See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST API.
 
 - Sandbox for experimental features [#2745](https://github.com/opentripplanner/OpenTripPlanner/issues/2745)
 - Bugfix for Missing platforms for stops in GTFS import causes a NPE [#2804](https://github.com/opentripplanner/OpenTripPlanner/issues/2804)

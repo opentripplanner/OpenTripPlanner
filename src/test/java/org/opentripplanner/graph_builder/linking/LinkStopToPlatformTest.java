@@ -20,6 +20,7 @@ import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
+import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
@@ -54,14 +55,7 @@ public class LinkStopToPlatformTest {
 
     for (int i = 0; i < platform.length; i++) {
       Coordinate c = platform[i];
-      var vertex = new LabelledIntersectionVertex(
-        String.valueOf(i),
-        c.x,
-        c.y,
-        I18NString.of("Platform vertex " + i),
-        false,
-        false
-      );
+      var vertex = new LabelledIntersectionVertex(String.valueOf(i), c.x, c.y, false, false);
       graph.addVertex(vertex);
       vertices.add(vertex);
       closedGeom[i] = c;
@@ -84,25 +78,28 @@ public class LinkStopToPlatformTest {
     namedArea.setOriginalEdges(polygon);
     areaEdgeList.addArea(namedArea);
 
-    ArrayList<AreaEdge> edges = new ArrayList<>();
-
     for (int i = 0; i < platform.length; i++) {
       int next_i = (i + 1) % platform.length;
 
-      var edge1 = createAreaEdge(vertices.get(i), vertices.get(next_i), areaEdgeList, "edge " + i);
-      var edge2 = createAreaEdge(
+      var edgeBuilder1 = createAreaEdge(
+        vertices.get(i),
+        vertices.get(next_i),
+        areaEdgeList,
+        "edge " + i
+      );
+      var edgeBuilder2 = createAreaEdge(
         vertices.get(next_i),
         vertices.get(i),
         areaEdgeList,
         "edge " + String.valueOf(i + platform.length)
       );
-      edges.add(edge1);
-      edges.add(edge2);
       // make one corner surrounded by walk nothru edges
       if (i < 2) {
-        edge1.setWalkNoThruTraffic(true);
-        edge2.setWalkNoThruTraffic(true);
+        edgeBuilder1.withWalkNoThruTraffic(true);
+        edgeBuilder2.withWalkNoThruTraffic(true);
       }
+      edgeBuilder1.buildAndConnect();
+      edgeBuilder2.buildAndConnect();
     }
 
     RegularStop[] transitStops = new RegularStop[stops.length];
@@ -282,7 +279,7 @@ public class LinkStopToPlatformTest {
     }
   }
 
-  private AreaEdge createAreaEdge(
+  private AreaEdgeBuilder createAreaEdge(
     IntersectionVertex v1,
     IntersectionVertex v2,
     AreaEdgeList area,
@@ -292,14 +289,13 @@ public class LinkStopToPlatformTest {
       new Coordinate[] { v1.getCoordinate(), v2.getCoordinate() }
     );
     I18NString name = new LocalizedString(nameString);
-    return AreaEdge.createAreaEdge(
-      v1,
-      v2,
-      line,
-      name,
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      false,
-      area
-    );
+    return new AreaEdgeBuilder()
+      .withFromVertex(v1)
+      .withToVertex(v2)
+      .withGeometry(line)
+      .withName(name)
+      .withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE)
+      .withBack(false)
+      .withArea(area);
   }
 }

@@ -1,27 +1,28 @@
 {
     plan(
-        from: { lat: 52.3092, lon: 13.0291 }
-        to: { lat: 52.5147, lon: 13.3927 }
+        # these coordinate are in Portland, change this to YOUR origin
+        from: { lat: 45.5552, lon: -122.6534 }
+        # these coordinate are in Portland, change this to YOUR destination
+        to: { lat: 45.4908, lon: -122.5519 }
+        # use the correct date and time of your request
         date: "2023-02-15",
         time: "11:37",
-        parking: {
-            unpreferredCost: 555,
-            preferred: [{ not: [{tags: ["a", "b", "c"]}] }],
-            filters: [{ select: [{tags:["e"]}] }]
-        },
+        # choose the transport modes you need
         transportModes: [
             {
-                mode: CAR,
-                qualifier: HAIL
-            }
+                mode: WALK
+            },
+            {
+                mode: TRANSIT
+            },
         ]) {
         itineraries {
             startTime
             endTime
-            generalizedCost
-            accessibilityScore
             legs {
                 mode
+                startTime
+                endTime
                 from {
                     name
                     lat
@@ -36,51 +37,14 @@
                     departureTime
                     arrivalTime
                 }
-                startTime
-                endTime
-                mode
-                generalizedCost
-                alerts {
-                    id
-                    alertHeaderText
-                    alertDescriptionText
-                    alertEffect
-                    alertCause
-                    alertSeverityLevel
-                    alertUrl
-                    effectiveStartDate
-                    effectiveEndDate
-                    entities {
-                        ... on Stop {
-                            name
-                            gtfsId
-                            lat
-                            lon
-                        }
-                    }
+                route {
+                    gtfsId
+                    longName
+                    shortName
                 }
-                rideHailingEstimate {
-                    provider {
-                        id
-                    }
-                    productName
-                    minPrice {
-                        currency {
-                            code
-                            digits
-                        }
-                        amount
-                    }
-                    maxPrice {
-                        currency {
-                            code
-                            digits
-                        }
-                        amount
-                    }
-                    arrival
+                legGeometry {
+                    points
                 }
-                accessibilityScore
             }
         }
     }

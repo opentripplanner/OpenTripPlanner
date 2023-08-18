@@ -38,6 +38,10 @@ public record FareProduct(
     Objects.requireNonNull(price);
   }
 
+  public static FareProductBuilder of(FeedScopedId id, String name, Money price) {
+    return new FareProductBuilder(id, name, price);
+  }
+
   public boolean coversDuration(Duration journeyDuration) {
     return (Objects.nonNull(validity) && validity.toSeconds() > journeyDuration.toSeconds());
   }
