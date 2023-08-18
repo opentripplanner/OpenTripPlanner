@@ -74,17 +74,116 @@ class WalkPreferencesTest {
     assertEqualsAndHashCode(subject, other, copy);
 
     // Test that nothing breaks while adding wrapper objects for values
-    var copyWithSameValues = subject
-      .copyOf()
-      .withSpeed(subject.speed())
-      .withReluctance(subject.reluctance())
-      .withStairsReluctance(subject.stairsReluctance())
-      .withSafetyFactor(subject.safetyFactor())
-      .withEscalatorReluctance(subject.escalatorReluctance())
-      .withBoardCost(subject.boardCost())
+    var sameSpeed = 2.3;
+    var sameReluctance = 2.51;
+    var sameStairsReluctance = 3.2;
+    var sameSafetyFactor = 0.5;
+    var sameEscalatorReluctance = 2.45;
+    var sameBoardCost = 60;
+    var firstEqual = WalkPreferences
+      .of()
+      .withSpeed(sameSpeed)
+      .withReluctance(sameReluctance)
+      .withStairsReluctance(sameStairsReluctance)
+      .withSafetyFactor(sameSafetyFactor)
+      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withBoardCost(sameBoardCost)
       .build();
-    assertEquals(subject, copyWithSameValues);
-    assertEquals(subject.hashCode(), copyWithSameValues.hashCode());
+    var secondEqual = WalkPreferences
+      .of()
+      .withSpeed(sameSpeed)
+      .withReluctance(sameReluctance)
+      .withStairsReluctance(sameStairsReluctance)
+      .withSafetyFactor(sameSafetyFactor)
+      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withBoardCost(sameBoardCost)
+      .build();
+    assertEquals(firstEqual, secondEqual);
+    assertEquals(firstEqual.hashCode(), secondEqual.hashCode());
+
+    // Test that changing speed means preferences are not equal
+    var notSameSpeed = sameSpeed + 1;
+    var differentSpeedPreferences = WalkPreferences
+      .of()
+      .withSpeed(notSameSpeed)
+      .withReluctance(sameReluctance)
+      .withStairsReluctance(sameStairsReluctance)
+      .withSafetyFactor(sameSafetyFactor)
+      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withBoardCost(sameBoardCost)
+      .build();
+    assertNotEquals(firstEqual, differentSpeedPreferences);
+    assertNotEquals(firstEqual.hashCode(), differentSpeedPreferences.hashCode());
+
+    // Test that changing reluctance means preferences are not equal
+    var notSameReluctance = sameReluctance + 1;
+    var differentReluctancePreferences = WalkPreferences
+      .of()
+      .withSpeed(sameSpeed)
+      .withReluctance(notSameReluctance)
+      .withStairsReluctance(sameStairsReluctance)
+      .withSafetyFactor(sameSafetyFactor)
+      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withBoardCost(sameBoardCost)
+      .build();
+    assertNotEquals(firstEqual, differentReluctancePreferences);
+    assertNotEquals(firstEqual.hashCode(), differentReluctancePreferences.hashCode());
+
+    // Test that changing stairs reluctance means preferences are not equal
+    var notSameStairsReluctance = sameStairsReluctance + 1;
+    var differentStairsReluctancePreferences = WalkPreferences
+      .of()
+      .withSpeed(sameSpeed)
+      .withReluctance(sameReluctance)
+      .withStairsReluctance(notSameStairsReluctance)
+      .withSafetyFactor(sameSafetyFactor)
+      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withBoardCost(sameBoardCost)
+      .build();
+    assertNotEquals(firstEqual, differentStairsReluctancePreferences);
+    assertNotEquals(firstEqual.hashCode(), differentStairsReluctancePreferences.hashCode());
+
+    // Test that changing safety factor means preferences are not equal
+    var notSameSafetyFactor = sameSafetyFactor + 0.1;
+    var differentSafetyFactorPreferences = WalkPreferences
+      .of()
+      .withSpeed(sameSpeed)
+      .withReluctance(sameReluctance)
+      .withStairsReluctance(sameStairsReluctance)
+      .withSafetyFactor(notSameSafetyFactor)
+      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withBoardCost(sameBoardCost)
+      .build();
+    assertNotEquals(firstEqual, differentSafetyFactorPreferences);
+    assertNotEquals(firstEqual.hashCode(), differentSafetyFactorPreferences.hashCode());
+
+    // Test that changing escalator reluctance means preferences are not equal
+    var notSameEscalatorReluctance = sameEscalatorReluctance + 1;
+    var differentEscalatorReluctancePreferences = WalkPreferences
+      .of()
+      .withSpeed(sameSpeed)
+      .withReluctance(sameReluctance)
+      .withStairsReluctance(sameStairsReluctance)
+      .withSafetyFactor(sameSafetyFactor)
+      .withEscalatorReluctance(notSameEscalatorReluctance)
+      .withBoardCost(sameBoardCost)
+      .build();
+    assertNotEquals(firstEqual, differentEscalatorReluctancePreferences);
+    assertNotEquals(firstEqual.hashCode(), differentEscalatorReluctancePreferences.hashCode());
+
+    // Test that changing board cost means preferences are not equal
+    var notSameBoardCost = sameBoardCost + 1;
+    var differentBoardCostPreferences = WalkPreferences
+      .of()
+      .withSpeed(sameSpeed)
+      .withReluctance(sameReluctance)
+      .withStairsReluctance(sameStairsReluctance)
+      .withSafetyFactor(sameSafetyFactor)
+      .withEscalatorReluctance(sameEscalatorReluctance)
+      .withBoardCost(notSameBoardCost)
+      .build();
+    assertNotEquals(firstEqual, differentBoardCostPreferences);
+    assertNotEquals(firstEqual.hashCode(), differentBoardCostPreferences.hashCode());
   }
 
   @Test
