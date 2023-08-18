@@ -6,6 +6,7 @@ import static org.opentripplanner.framework.time.DurationUtils.requireNonNegativ
 import static org.opentripplanner.framework.time.DurationUtils.toIntMilliseconds;
 
 import java.time.Duration;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
@@ -79,6 +80,30 @@ public class DurationUtilsTest {
     assertEquals(D9s, DurationUtils.duration("PT9s", ChronoUnit.DAYS), "ignore unit");
     assertEquals(D9s, DurationUtils.duration("9", ChronoUnit.SECONDS));
     assertEquals(-D9s.toSeconds(), DurationUtils.duration("-9", ChronoUnit.SECONDS).toSeconds());
+  }
+
+  @Test
+  public void parseSecondsOrDuration() {
+    assertEquals(D9s, DurationUtils.parseSecondsOrDuration("9s").orElseThrow());
+    assertEquals(D9s, DurationUtils.parseSecondsOrDuration("9").orElseThrow());
+    assertEquals(D2h, DurationUtils.parseSecondsOrDuration("2h").orElseThrow());
+    assertEquals(D2h, DurationUtils.parseSecondsOrDuration("7200").orElseThrow());
+    assertEquals(D3d, DurationUtils.parseSecondsOrDuration("3D").orElseThrow());
+
+    // Negative values
+    assertEquals(D5m.negated(), DurationUtils.parseSecondsOrDuration("-5m").orElseThrow());
+    assertEquals(D5m.negated(), DurationUtils.parseSecondsOrDuration("-300").orElseThrow());
+
+    // Asserts handle bad input
+    assertEquals(
+      D3d,
+      DurationUtils.parseSecondsOrDuration(Integer.toString(3 * 24 * 60 * 60)).orElseThrow()
+    );
+
+    assertThrows(
+      DateTimeParseException.class,
+      () -> DurationUtils.parseSecondsOrDuration("not-a-duration").orElseThrow()
+    );
   }
 
   @Test
