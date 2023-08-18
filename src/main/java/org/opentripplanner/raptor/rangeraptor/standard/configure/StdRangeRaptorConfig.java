@@ -174,7 +174,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   private DestinationArrivalPaths<T> destinationArrivalPaths() {
-    var destinationArrivalPaths = pathConfig.createDestArrivalPathsWithoutGeneralizedCost();
+    var destinationArrivalPaths = pathConfig.createDestArrivalPaths(false, null);
 
     // Add egressArrivals to stops and bind them to the destination arrival paths. The
     // adapter notify the destination on each new egress stop arrival.
@@ -257,7 +257,8 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
           ctx.searchParams().timetable(),
           ctx.searchParams().preferLateArrival(),
           ctx.searchDirection(),
-          RelaxFunction.NORMAL
+          RelaxFunction.NORMAL,
+          null
         ),
         ctx.lifeCycle()
       ),

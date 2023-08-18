@@ -7,6 +7,9 @@ import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrivalFactory;
 
+/**
+ * This class is responsible for creating StopArrivals which support accumulated criteria ONE and TWO.
+ */
 public class StopArrivalFactoryC2<T extends RaptorTripSchedule> implements McStopArrivalFactory<T> {
 
   @Override

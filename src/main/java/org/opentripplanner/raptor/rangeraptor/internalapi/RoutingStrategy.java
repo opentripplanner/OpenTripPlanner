@@ -29,6 +29,14 @@ public interface RoutingStrategy<T extends RaptorTripSchedule> {
   void prepareForTransitWith(RaptorRoute<T> route);
 
   /**
+   * First the {@link #prepareForTransitWith(RaptorRoute)} is called, then this method is
+   * called before alight and board methods are called. This allows the strategy to update
+   * the state before alighting and boarding is processed. Especially if there is a change
+   * in the state as a result of passing through a stop this method might come in handy.
+   */
+  default void prepareForNextStop(int stopIndex, int stopPos) {}
+
+  /**
    * Alight the current trip at the given stop.
    */
   void alightOnlyRegularTransferExist(

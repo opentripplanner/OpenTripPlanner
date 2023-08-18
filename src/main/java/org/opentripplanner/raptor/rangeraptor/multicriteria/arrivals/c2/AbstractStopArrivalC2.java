@@ -49,6 +49,11 @@ abstract class AbstractStopArrivalC2<T extends RaptorTripSchedule> extends McSto
     this.c2 = c2;
   }
 
+  @Override
+  public boolean supportsC2() {
+    return true;
+  }
+
   public final int c2() {
     return c2;
   }

@@ -53,6 +53,9 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   @Nullable
   private final RaptorPathConstrainedTransferSearch<T> transferConstraintsSearch;
 
+  @Nullable
+  private int c2;
+
   // Path leg elements as a double linked list. This makes it easy to look at
   // legs before and after in the logic and easy to fork, building alternative
   // paths with the same path tail.
@@ -170,9 +173,14 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     add(PathBuilderLeg.egress(egress));
   }
 
+  public void c2(int c2) {
+    this.c2 = c2;
+  }
+
   public RaptorPath<T> build() {
     updateAggregatedFields();
-    return new Path<>(iterationDepartureTime, createPathLegs(costCalculator, slackProvider));
+    var pathLegs = createPathLegs(costCalculator, slackProvider);
+    return new Path<>(iterationDepartureTime, pathLegs, pathLegs.generalizedCostTotal(), c2);
   }
 
   @Override
