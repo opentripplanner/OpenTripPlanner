@@ -63,7 +63,7 @@ class WalkPreferencesTest {
   }
 
   @Test
-  void testEqualsAndHAshCode() {
+  void testEqualsAndHashCode() {
     // Return same object if no value is set
     assertSame(subject, subject.copyOf().build());
     assertSame(TransitPreferences.DEFAULT, TransitPreferences.of().build());
@@ -72,10 +72,23 @@ class WalkPreferencesTest {
     var other = subject.copyOf().withSpeed(10.0).build();
     var copy = other.copyOf().withSpeed(SPEED).build();
     assertEqualsAndHashCode(subject, other, copy);
+
+    // Test that nothing breaks while adding wrapper objects for values
+    var copyWithSameValues = subject
+      .copyOf()
+      .withSpeed(subject.speed())
+      .withReluctance(subject.reluctance())
+      .withStairsReluctance(subject.stairsReluctance())
+      .withSafetyFactor(subject.safetyFactor())
+      .withEscalatorReluctance(subject.escalatorReluctance())
+      .withBoardCost(subject.boardCost())
+      .build();
+    assertEquals(subject, copyWithSameValues);
+    assertEquals(subject.hashCode(), copyWithSameValues.hashCode());
   }
 
   @Test
-  void testToSting() {
+  void testToString() {
     assertEquals("WalkPreferences{}", WalkPreferences.DEFAULT.toString());
     assertEquals(
       "WalkPreferences{speed: 1.71, reluctance: 2.5, boardCost: $301, stairsReluctance: 3.0, stairsTimeFactor: 1.31, safetyFactor: 0.51}",
