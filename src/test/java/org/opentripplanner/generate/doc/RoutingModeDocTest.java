@@ -32,8 +32,6 @@ public class RoutingModeDocTest {
 
     // Street modes
     streetBuilder.header(2, "Street modes", "Street modes");
-    // TODO: Shouln't typedescription be static, as it is for the whole of StreetMode?
-    // Or add another field to the DocumentedEnum that would describe the enum as a whole?
     streetBuilder.addSection(StreetMode.CAR.typeDescription());
 
     Arrays
