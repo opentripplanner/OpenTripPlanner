@@ -77,7 +77,7 @@ public enum TransitMode implements DocumentedEnum<TransitMode> {
       case CARPOOL -> """
        Private car trips shared with others.
        
-       This is currently not specified in GTFS so we use the mode types values 1500-1560 which are in range of private taxis.
+       This is currently not specified in GTFS so we use the mode type values 1500-1560 which are in the range of private taxis.
        """;
       case TAXI -> "Using a taxi service";
     };
