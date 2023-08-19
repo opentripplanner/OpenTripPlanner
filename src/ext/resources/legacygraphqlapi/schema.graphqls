@@ -15,7 +15,7 @@ schema {
 }
 
 input AccessibilityPreferences {
-    enabled: Boolean
+    wheelchair: WheelchairPreferences
 }
 
 """A public transport agency"""
@@ -4140,4 +4140,8 @@ enum WheelchairBoarding {
 
     """Wheelchair boarding is not possible at this stop."""
     NOT_POSSIBLE
+}
+
+input WheelchairPreferences {
+    enabled: Boolean
 }
