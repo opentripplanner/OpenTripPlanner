@@ -1263,11 +1263,6 @@ input PlanLocation @oneOf {
     place: String
 }
 
-input PlanLocations {
-    origin: PlanLocation
-    destination: PlanLocation
-}
-
 input PlanPreferences {
     street: PlanStreetPreferences
     transit: TransitPreferences
@@ -3220,7 +3215,8 @@ type QueryType {
 
     planConnection(
         searchWindow: SearchWindowOptions
-        locations: PlanLocations
+        origin: PlanLocation
+        destination: PlanLocation
         preferences: PlanPreferences
         debugSettings: PlanDebugSettings
         locale: String
