@@ -1254,7 +1254,7 @@ input ParkingFilter {
 }
 
 input PlanDebugSettings {
-    debugItineraryFilter: Boolean
+    itineraryFilterDebugProfile: ItineraryFilterDebugProfile = OFF
 }
 
 input PlanLocation @oneOf {
@@ -4034,6 +4034,32 @@ type Trip implements Node {
         """
         types: [TripAlertType]
     ): [Alert]
+}
+
+"""
+Enable this to attach a system notice to itineraries instead of removing them. This is very
+convenient when tuning the itinerary-filter-chain.
+"""
+enum ItineraryFilterDebugProfile {
+  """
+  Only return the requested number of itineraries, counting both actual and deleted ones.
+  The top `numItineraries` using the request sort order is returned. This does not work
+  with paging, itineraries after the limit, but inside the search-window are skipped when
+  moving to the next page.
+  """
+  LIMIT_TO_NUMBER_OF_ITINERARIES
+
+  """
+  Return all itineraries, including deleted ones, inside the actual search-window used
+  (the requested search-window may differ).
+  """
+  LIMIT_TO_SEARCH_WINDOW
+
+  "List all itineraries, including all deleted itineraries."
+  LIST_ALL
+
+  "By default, the debug itinerary filters is turned off."
+  OFF
 }
 
 """Entities, which are relevant for a trip and can contain alerts"""
