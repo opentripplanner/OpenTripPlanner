@@ -1066,8 +1066,8 @@ type StopGeometries {
 }
 
 input Coordinate {
-    lat: Float!
-    lon: Float!
+    latitude: Float!
+    longitude: Float!
 }
 
 input InputBanned {
