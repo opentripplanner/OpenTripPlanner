@@ -879,8 +879,7 @@ input SearchWindowOptions @oneOf {
 }
 
 input SearchWindow {
-    dateTime: DateTime
-    timeZone: TimeZone
+    dateTime: DateTimeWithOffset
     before: SearchWindowRestriction
     after: SearchWindowRestriction
 }
@@ -1541,7 +1540,7 @@ type Money {
 """"
 An ISO-8601-formatted datetime with offset, i.e. `2023-06-13T14:30+03:00` for 2:30pm on June 13th 2023 at Helsinki's offset from UTC at that time.
 """
-scalar DateTime
+scalar DateTimeWithOffset
 
 """"
 An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
@@ -2331,7 +2330,7 @@ type Plan {
 }
 
 type PlanConnection {
-    searchDateTime: PlanDateTime
+    searchDateTime: DateTimeWithOffset
 
     locations: PlanPlaces
 
@@ -2342,11 +2341,6 @@ type PlanConnection {
     edges: [PlanEdge]
 
     pageInfo: PageInfo!
-}
-
-type PlanDateTime {
-    date: DateTime
-    timeZone: TimeZone
 }
 
 type PlanDebugInformation {
@@ -3888,8 +3882,6 @@ type TicketType implements Node {
     """
     zones: [String!]
 }
-
-scalar TimeZone
 
 input TransferPreferences {
     penalty: Int
