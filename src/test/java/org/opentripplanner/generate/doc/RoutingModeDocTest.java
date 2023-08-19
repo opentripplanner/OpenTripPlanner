@@ -51,8 +51,6 @@ public class RoutingModeDocTest {
     var transitBuilder = new DocBuilder();
     transitBuilder.header(2, "Transit modes", "Transit modes");
 
-    // TODO: Shouln't typedescription be static, as it is for the whole of TransitMode?
-    // Or add another field to the DocumentedEnum that would describe the enum as a whole?
     transitBuilder.addSection(TransitMode.BUS.typeDescription());
 
     Arrays
