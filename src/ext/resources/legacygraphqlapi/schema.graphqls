@@ -1937,9 +1937,6 @@ enum StreetMode {
     """CAR"""
     CAR
 
-    """"Private car trips shared with others."""
-    CARPOOL
-
     """Enables flexible transit for access and egress legs"""
     FLEX
 
@@ -2346,7 +2343,7 @@ type PlanConnection {
 type PlanDebugInformation {
     totalTime: Int
     pathCalculationTime: Int
-    searchWindowUsed: Long
+    searchWindowUsed: Duration
 }
 
 type PlanEdge {
