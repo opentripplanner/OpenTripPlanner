@@ -15,10 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A notes source of static notes, usually created at graph building stage and not modified
+ * A notes source of static notes, created at graph building stage and not modified
  * thereafter.
- *
- * @author laurent
  */
 public class StreetNotesSource implements Serializable {
 
