@@ -1257,10 +1257,10 @@ input PlanDebugSettings {
     itineraryFilterDebugProfile: ItineraryFilterDebugProfile = OFF
 }
 
-input PlanLocation @oneOf {
+input PlanLocation {
     coordinate: Coordinate
-    """TODO should place string be a scalar?"""
-    place: String
+    stop: FeedScopedId
+    label: String
 }
 
 input PlanPreferences {
@@ -1547,6 +1547,8 @@ scalar DateTimeWithOffset
 An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 """
 scalar Duration
+
+scalar FeedScopedId
 
 type RideHailingProvider {
     "The ID of the ride hailing provider."
