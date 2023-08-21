@@ -194,11 +194,4 @@ class WalkPreferencesTest {
       subject.toString()
     );
   }
-
-  void assertNotTheSame(Consumer<WalkPreferences.Builder> body) {
-    var copy = subject.copyOf();
-    body.accept(copy);
-    WalkPreferences walk = copy.build();
-    assertNotEquals(subject, walk);
-  }
 }
