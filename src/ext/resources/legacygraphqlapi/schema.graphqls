@@ -880,12 +880,13 @@ input SearchWindowOptions @oneOf {
 
 input SearchWindow {
     dateTime: DateTimeWithOffset
-    before: SearchWindowRestriction
-    after: SearchWindowRestriction
+    duration: Duration
+    numberOfItineraries: Int
+    gracePeriod: SearchWindowGracePeriod
 }
 
-input SearchWindowRestriction {
-    maxOffset: Duration
+input SearchWindowGracePeriod {
+    duration: Duration
     numberOfItineraries: Int
 }
 
