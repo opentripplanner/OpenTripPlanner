@@ -325,6 +325,9 @@ public final class StopPattern implements Serializable {
       return this;
     }
 
+    /**
+     * Replace the stop {@code old} in the stop pattern with ${code newStop}.
+     */
     public StopPatternBuilder replaceStop(FeedScopedId old, StopLocation newStop) {
       Objects.requireNonNull(old);
       Objects.requireNonNull(newStop);
