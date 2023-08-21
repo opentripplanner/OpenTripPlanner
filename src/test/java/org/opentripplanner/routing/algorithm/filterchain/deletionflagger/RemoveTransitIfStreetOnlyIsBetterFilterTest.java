@@ -4,11 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
+import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestConstants {
 
@@ -21,7 +22,9 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
     // When:
     List<Itinerary> result = DeletionFlaggerTestHelper.process(
       List.of(i1, i2),
-      new RemoveTransitIfStreetOnlyIsBetterFilter(RequestFunctions.createLinearFunction(200, 1.2))
+      new RemoveTransitIfStreetOnlyIsBetterFilter(
+        CostLinearFunction.of(Duration.ofSeconds(200), 1.2)
+      )
     );
 
     // Then:
@@ -49,7 +52,9 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
     // When:
     List<Itinerary> result = DeletionFlaggerTestHelper.process(
       List.of(i2, bicycle, walk, i1),
-      new RemoveTransitIfStreetOnlyIsBetterFilter(RequestFunctions.createLinearFunction(60, 1.2))
+      new RemoveTransitIfStreetOnlyIsBetterFilter(
+        CostLinearFunction.of(Duration.ofSeconds(60), 1.2)
+      )
     );
 
     // Then:

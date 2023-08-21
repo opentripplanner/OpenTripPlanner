@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 import java.util.Comparator;
 import java.util.List;
 import java.util.OptionalDouble;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
@@ -44,17 +45,19 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletio
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     // Find the best walk-all-the-way option
-    OptionalDouble minStreetCost = itineraries
+    OptionalInt minStreetCost = itineraries
       .stream()
       .filter(Itinerary::isOnStreetAllTheWay)
-      .mapToDouble(Itinerary::getGeneralizedCost)
+      .mapToInt(Itinerary::getGeneralizedCost)
       .min();
 
     if (minStreetCost.isEmpty()) {
       return List.of();
     }
 
-    final Cost limit = costLimitFunction.calculate(minStreetCost.getAsDouble());
+    var limit = costLimitFunction
+      .calculate(Cost.costOfSeconds(minStreetCost.getAsInt()))
+      .toSeconds();
 
     // Filter away itineraries that have higher cost than limit cost computed above
     List<Itinerary> filtered = itineraries

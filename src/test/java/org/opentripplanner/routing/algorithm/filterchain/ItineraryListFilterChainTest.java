@@ -11,6 +11,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 import static org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile.ofDebugEnabled;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.alertpatch.StopCondition;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -164,7 +165,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     ItineraryListFilterChain chain = createBuilder(false, false, 20)
       .withRemoveWalkAllTheWayResults(true)
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
-        RequestFunctions.createLinearFunction(0, 1.0)
+        CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
       )
       .build();
 
@@ -247,7 +248,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     return new ItineraryListFilterChainBuilder(sortOrder)
       .withMaxNumberOfItineraries(numOfItineraries)
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
-        RequestFunctions.createLinearFunction(0, 1.0)
+        CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
       )
       .withDebugEnabled(ofDebugEnabled(debug));
   }
@@ -314,7 +315,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
       // Enable filter and remove bus itinerary
       ItineraryListFilterChain chain = builder
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
-          RequestFunctions.createLinearFunction(0, 1.0)
+          CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
         )
         .build();
       assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
