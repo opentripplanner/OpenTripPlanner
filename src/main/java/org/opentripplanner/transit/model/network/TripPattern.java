@@ -415,14 +415,6 @@ public final class TripPattern
       : getTripHeadSignFromTripTimes(tripTimes);
   }
 
-  public I18NString getStopHeadsign(int stopIndex) {
-    var tripTimes = scheduledTimetable.getRepresentativeTripTimes();
-    if (tripTimes == null) {
-      return null;
-    }
-    return tripTimes.getHeadsign(stopIndex);
-  }
-
   public TripPattern clone() {
     try {
       return (TripPattern) super.clone();

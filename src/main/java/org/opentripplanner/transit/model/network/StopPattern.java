@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -320,6 +321,15 @@ public final class StopPattern implements Serializable {
         pickups[index] = PickDrop.CANCELLED;
         dropoffs[index] = PickDrop.CANCELLED;
       });
+      return this;
+    }
+
+    public StopPatternBuilder replaceStop(FeedScopedId old, StopLocation newStop) {
+      for(int i = 0; i < stops.length-1; i++) {
+        if(stops[i].getId().equals(old)){
+          stops[i] = newStop;
+        }
+      }
       return this;
     }
 

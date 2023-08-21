@@ -5,11 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.framework.geometry.GeometryUtils.makeLineString;
 
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 class TripPatternTest {
 
@@ -17,12 +21,35 @@ class TripPatternTest {
   private static final String NAME = "short name";
 
   private static final Route ROUTE = TransitModelForTest.route("routeId").build();
-  private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(10);
+  private static final RegularStop STOP_A = TransitModelForTest
+    .stop("A")
+    .withCoordinate(1, 1)
+    .build();
+  private static final RegularStop STOP_B = TransitModelForTest
+    .stop("B")
+    .withCoordinate(1.1, 1.1)
+    .build();
+  private static final RegularStop STOP_C = TransitModelForTest
+    .stop("C")
+    .withCoordinate(1.2, 1.2)
+    .build();
+  private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(
+    STOP_A,
+    STOP_B,
+    STOP_C
+  );
+
+  private static final List<LineString> HOP_GEOMETRIES = List.of(
+    makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()),
+    makeLineString(STOP_B.getCoordinate(), STOP_C.getCoordinate())
+  );
+
   private static final TripPattern subject = TripPattern
     .of(TransitModelForTest.id(ID))
     .withName(NAME)
     .withRoute(ROUTE)
     .withStopPattern(STOP_PATTERN)
+    .withHopGeometries(HOP_GEOMETRIES)
     .build();
 
   @Test
@@ -45,6 +72,9 @@ class TripPatternTest {
     assertEquals("v2", copy.getName());
     assertEquals(ROUTE, copy.getRoute());
     assertEquals(STOP_PATTERN, copy.getStopPattern());
+    assertEquals(subject.getHopGeometry(0), copy.getHopGeometry(0));
+    assertEquals(subject.getHopGeometry(1), copy.getHopGeometry(1));
+    assertEquals(HOP_GEOMETRIES.get(1), copy.getHopGeometry(1));
   }
 
   @Test
