@@ -11,23 +11,15 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
- * Filter itineraries based on generalizedCost, compared with a on-street-all-the-way itinerary(if
- * it exist). If an itinerary cost exceeds the limit computed from the best all-the-way-on-street itinerary, then the
- * transit itinerary is removed.
+ * Filter itineraries which contain more walking than a pure walk itinerary
  */
-public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletionFlagger {
-
-  private final CostLinearFunction costLimitFunction;
-
-  public RemoveTransitIfStreetOnlyIsBetterFilter(CostLinearFunction costLimitFunction) {
-    this.costLimitFunction = costLimitFunction;
-  }
+public class RemoveTransitWithMoreWalking implements ItineraryDeletionFlagger {
 
   /**
    * Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
    * to know which filters removed
    */
-  public static final String TAG = "transit-vs-street-filter";
+  public static final String TAG = "transit-vs-plain-walk-filter";
 
   @Override
   public String name() {
@@ -44,25 +36,22 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletio
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    // Find the best walk-all-the-way option
-    OptionalInt minStreetCost = itineraries
+    // Filter the most common silly itinerary case: transit itinerary has more walking than plain walk itinerary
+    // This never makes sense
+    OptionalDouble walkDistance = itineraries
       .stream()
-      .filter(Itinerary::isOnStreetAllTheWay)
-      .mapToInt(Itinerary::getGeneralizedCost)
+      .filter(Itinerary::isWalkingAllTheWay)
+      .mapToDouble(Itinerary::distanceMeters)
       .min();
 
-    if (minStreetCost.isEmpty()) {
+    if (walkDistance.isEmpty()) {
       return List.of();
     }
 
-    var limit = costLimitFunction
-      .calculate(Cost.costOfSeconds(minStreetCost.getAsInt()))
-      .toSeconds();
-
-    // Filter away itineraries that have higher cost than limit cost computed above
+    final double walkLimit = walkDistance.getAsDouble();
     return itineraries
       .stream()
-      .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCost() >= limit)
+      .filter(it -> !it.isOnStreetAllTheWay() && getWalkDistance(it) > walkLimit)
       .collect(Collectors.toList());
   }
 

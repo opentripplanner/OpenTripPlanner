@@ -23,6 +23,7 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveB
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitWithMoreWalking;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
@@ -72,6 +73,7 @@ public class ItineraryListFilterChainBuilder {
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
+  private boolean removeTransitWithMoreWalking = true;
 
   @Sandbox
   private ItineraryListFilter rideHailingFilter;
@@ -184,7 +186,7 @@ public class ItineraryListFilterChainBuilder {
   /**
    * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
    * cases we get "silly" transit itineraries that is marginally better on travel-duration compared
-   * with a on-street-all-the-way itinerary. Use this method to turn this filter on/off.
+   * with a on-street-all-the-way itinerary. Use this method to turn filter worse enough itineraries.
    * <p>
    * The filter remove all itineraries with a generalized-cost that is higher than the best
    * on-street-all-the-way itinerary.
@@ -196,6 +198,17 @@ public class ItineraryListFilterChainBuilder {
     CostLinearFunction value
   ) {
     this.removeTransitWithHigherCostThanBestOnStreetOnly = value;
+    return this;
+  }
+
+  /**
+   * An itinerary which has transit legs and more walking than the plain walk itinerary are silly.
+   * This filter removes such itineraries.
+   * <p>
+   * This filter only have an effect, if an on-street-all-the-way(WALK) itinerary exist.
+   */
+  public ItineraryListFilterChainBuilder withRemoveTransitWithMoreWalking(boolean value) {
+    this.removeTransitWithMoreWalking = value;
     return this;
   }
 
@@ -349,6 +362,10 @@ public class ItineraryListFilterChainBuilder {
           )
         )
       );
+    }
+
+    if (removeTransitWithMoreWalking) {
+      filters.add(new DeletionFlaggingFilter(new RemoveTransitWithMoreWalking()));
     }
 
     // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that

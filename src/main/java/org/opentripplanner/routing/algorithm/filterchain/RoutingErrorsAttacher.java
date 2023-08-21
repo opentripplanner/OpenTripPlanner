@@ -11,6 +11,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitWithMoreWalking;
 import org.opentripplanner.routing.api.response.RoutingError;
 
 /**
@@ -50,7 +51,16 @@ class RoutingErrorsAttacher {
           .getSystemNotices()
           .stream()
           .anyMatch(notice -> notice.tag.equals(RemoveTransitIfStreetOnlyIsBetterFilter.TAG));
-      if (filteredItineraries.stream().allMatch(isOnStreetAllTheWay.or(isWorseThanStreet))) {
+      Predicate<Itinerary> isWorseThanWalking = it ->
+        it
+          .getSystemNotices()
+          .stream()
+          .anyMatch(notice -> notice.tag.equals(RemoveTransitWithMoreWalking.TAG));
+      if (
+        filteredItineraries
+          .stream()
+          .allMatch(isOnStreetAllTheWay.or(isWorseThanStreet).or(isWorseThanWalking))
+      ) {
         var nonTransitIsWalking = filteredItineraries
           .stream()
           .flatMap(Itinerary::getStreetLegs)

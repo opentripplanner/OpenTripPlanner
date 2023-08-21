@@ -31,6 +31,7 @@ public final class ItineraryFilterPreferences {
   private final boolean removeItinerariesWithSameRoutesAndStops;
   private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
   private final CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
+  private final boolean removeTransitWithMoreWalking;
 
   private ItineraryFilterPreferences() {
     this.accessibilityScore = false;
@@ -51,6 +52,7 @@ public final class ItineraryFilterPreferences {
       );
     this.removeTransitWithHigherCostThanBestOnStreetOnly =
       CostLinearFunction.of(Duration.ofMinutes(1), 1.3);
+    this.removeTransitWithMoreWalking = false;
   }
 
   private ItineraryFilterPreferences(Builder builder) {
@@ -71,6 +73,7 @@ public final class ItineraryFilterPreferences {
     this.transitGeneralizedCostLimit = Objects.requireNonNull(builder.transitGeneralizedCostLimit);
     this.removeTransitWithHigherCostThanBestOnStreetOnly =
       Objects.requireNonNull(builder.removeTransitWithHigherCostThanBestOnStreetOnly);
+    this.removeTransitWithMoreWalking = builder.removeTransitWithMoreWalking;
   }
 
   public static Builder of() {
@@ -133,6 +136,10 @@ public final class ItineraryFilterPreferences {
     return removeTransitWithHigherCostThanBestOnStreetOnly;
   }
 
+  public boolean removeTransitWithMoreWalking() {
+    return removeTransitWithMoreWalking;
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder
@@ -180,6 +187,7 @@ public final class ItineraryFilterPreferences {
         "removeItinerariesWithSameRoutesAndStops",
         removeItinerariesWithSameRoutesAndStops
       )
+      .addBoolIfTrue("removeTransitWithMoreWalking", removeTransitWithMoreWalking)
       .toString();
   }
 
@@ -192,6 +200,7 @@ public final class ItineraryFilterPreferences {
       accessibilityScore == that.accessibilityScore &&
       Double.compare(that.bikeRentalDistanceRatio, bikeRentalDistanceRatio) == 0 &&
       debug == that.debug &&
+      removeTransitWithMoreWalking == that.removeTransitWithMoreWalking &&
       filterItinerariesWithSameFirstOrLastTrip == that.filterItinerariesWithSameFirstOrLastTrip &&
       Double.compare(
         that.groupedOtherThanSameLegsMaxCostMultiplier,
@@ -227,7 +236,8 @@ public final class ItineraryFilterPreferences {
       parkAndRideDurationRatio,
       removeItinerariesWithSameRoutesAndStops,
       transitGeneralizedCostLimit,
-      removeTransitWithHigherCostThanBestOnStreetOnly
+      removeTransitWithHigherCostThanBestOnStreetOnly,
+      removeTransitWithMoreWalking
     );
   }
 
@@ -247,6 +257,7 @@ public final class ItineraryFilterPreferences {
     private boolean removeItinerariesWithSameRoutesAndStops;
     private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
     private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
+    private boolean removeTransitWithMoreWalking;
 
     public ItineraryFilterPreferences original() {
       return original;
@@ -330,6 +341,11 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
+    public Builder withRemoveTransitWithMoreWalking(boolean removeTransitWithMoreWalking) {
+      this.removeTransitWithMoreWalking = removeTransitWithMoreWalking;
+      return this;
+    }
+
     public Builder(ItineraryFilterPreferences original) {
       this.original = original;
       this.accessibilityScore = original.accessibilityScore;
@@ -349,6 +365,7 @@ public final class ItineraryFilterPreferences {
       this.transitGeneralizedCostLimit = original.transitGeneralizedCostLimit;
       this.removeTransitWithHigherCostThanBestOnStreetOnly =
         original.removeTransitWithHigherCostThanBestOnStreetOnly;
+      this.removeTransitWithMoreWalking = original.removeTransitWithMoreWalking;
     }
 
     public Builder apply(Consumer<Builder> body) {
