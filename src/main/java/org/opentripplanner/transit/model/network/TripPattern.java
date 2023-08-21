@@ -5,9 +5,11 @@ import static java.util.Objects.requireNonNullElseGet;
 import static org.opentripplanner.framework.lang.ObjectUtils.requireNotInitialized;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
@@ -441,6 +443,23 @@ public final class TripPattern
   @Override
   public String logName() {
     return route.logName();
+  }
+
+  /**
+   * Does the pattern contain any stops passed in as argument?
+   * This method is not optimized for performance so don't use it where that is critical.
+   */
+  public boolean containsAnyStopId(Collection<FeedScopedId> ids) {
+    return ids
+      .stream()
+      .anyMatch(id ->
+        stopPattern
+          .getStops()
+          .stream()
+          .map(StopLocation::getId)
+          .collect(Collectors.toUnmodifiableSet())
+          .contains(id)
+      );
   }
 
   private static Coordinate coordinate(StopLocation s) {

@@ -1,7 +1,10 @@
 package org.opentripplanner.transit.model.network;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.stop;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.stopForTest;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -15,10 +18,10 @@ class StopPatternTest {
   @Test
   void boardingAlightingConditions() {
     // We have different types of stops, of which only regular stops should allow boarding/alighting
-    var s1 = TransitModelForTest.stopForTest("1", 60.0, 11.0);
-    var s2 = TransitModelForTest.stopForTest("2", 61.0, 11.0);
-    var s3 = TransitModelForTest.stopForTest("3", 62.0, 11.0);
-    var s4 = TransitModelForTest.stopForTest("4", 62.1, 11.0);
+    var s1 = stopForTest("1", 60.0, 11.0);
+    var s2 = stopForTest("2", 61.0, 11.0);
+    var s3 = stopForTest("3", 62.0, 11.0);
+    var s4 = stopForTest("4", 62.1, 11.0);
 
     var s34 = TransitModelForTest.groupStopForTest("3_4", List.of(s3, s4));
 
@@ -57,5 +60,20 @@ class StopPatternTest {
     assertTrue(stopPattern.canBoard(1), "Allowed at RegularStop");
     assertFalse(stopPattern.canBoard(2), "Forbidden at GroupStop");
     assertFalse(stopPattern.canBoard(3), "Forbidden at AreaStop");
+  }
+
+  @Test
+  void replaceStop() {
+    var s1 = stop("1").build();
+    var s2 = stop("2").build();
+    var s3 = stop("3").build();
+    var s4 = stop("4").build();
+
+    var pattern = TransitModelForTest.stopPattern(s1, s2, s3);
+
+    assertEquals(List.of(s1, s2, s3), pattern.getStops());
+
+    var updated = pattern.mutate().replaceStop(s2.getId(), s4).build();
+    assertEquals(List.of(s1, s4, s3), updated.getStops());
   }
 }

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
@@ -325,8 +326,10 @@ public final class StopPattern implements Serializable {
     }
 
     public StopPatternBuilder replaceStop(FeedScopedId old, StopLocation newStop) {
-      for(int i = 0; i < stops.length-1; i++) {
-        if(stops[i].getId().equals(old)){
+      Objects.requireNonNull(old);
+      Objects.requireNonNull(newStop);
+      for (int i = 0; i < stops.length; i++) {
+        if (stops[i].getId().equals(old)) {
           stops[i] = newStop;
         }
       }

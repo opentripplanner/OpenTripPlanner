@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.framework.geometry.GeometryUtils.makeLineString;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -45,7 +46,7 @@ class TripPatternTest {
   );
 
   private static final TripPattern subject = TripPattern
-    .of(TransitModelForTest.id(ID))
+    .of(id(ID))
     .withName(NAME)
     .withRoute(ROUTE)
     .withStopPattern(STOP_PATTERN)
@@ -80,7 +81,7 @@ class TripPatternTest {
   @Test
   void sameAs() {
     assertTrue(subject.sameAs(subject.copy().build()));
-    assertFalse(subject.sameAs(subject.copy().withId(TransitModelForTest.id("X")).build()));
+    assertFalse(subject.sameAs(subject.copy().withId(id("X")).build()));
     assertFalse(subject.sameAs(subject.copy().withName("X").build()));
     assertFalse(
       subject.sameAs(
@@ -101,11 +102,7 @@ class TripPatternTest {
   @Test
   void shouldAddName() {
     var name = "xyz";
-    var noNameYet = TripPattern
-      .of(TransitModelForTest.id(ID))
-      .withRoute(ROUTE)
-      .withStopPattern(STOP_PATTERN)
-      .build();
+    var noNameYet = TripPattern.of(id(ID)).withRoute(ROUTE).withStopPattern(STOP_PATTERN).build();
 
     noNameYet.initName(name);
 
@@ -115,11 +112,19 @@ class TripPatternTest {
   @Test
   void shouldResolveMode() {
     var patternWithoutExplicitMode = TripPattern
-      .of(TransitModelForTest.id(ID))
+      .of(id(ID))
       .withRoute(ROUTE)
       .withStopPattern(STOP_PATTERN)
       .build();
 
     assertEquals(patternWithoutExplicitMode.getMode(), ROUTE.getMode());
+  }
+
+  @Test
+  void containsAnyStopId() {
+    assertFalse(subject.containsAnyStopId(List.of()));
+    assertFalse(subject.containsAnyStopId(List.of(id("not-in-pattern"))));
+    assertTrue(subject.containsAnyStopId(List.of(STOP_A.getId())));
+    assertTrue(subject.containsAnyStopId(List.of(STOP_A.getId(), id("not-in-pattern"))));
   }
 }

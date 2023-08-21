@@ -23,6 +23,7 @@ import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.stopconsolidation.StopConsolidator;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -52,6 +53,7 @@ public interface GraphBuilderFactory {
   EdgeUpdaterModule dataOverlayFactory();
   DataImportIssueReporter dataImportIssueReporter();
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
+  StopConsolidator stopConsolidator();
 
   @Component.Builder
   interface Builder {

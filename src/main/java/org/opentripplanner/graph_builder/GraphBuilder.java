@@ -158,6 +158,8 @@ public class GraphBuilder implements Runnable {
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
 
+    graphBuilder.addModule(factory.stopConsolidator());
+
     return graphBuilder;
   }
 

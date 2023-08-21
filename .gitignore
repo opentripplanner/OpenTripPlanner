@@ -41,6 +41,8 @@ target/
 # for local dev only
 /src/test/resources/speedtest/travelSearch-results-*.csv
 src/ext/resources/reportapi/report.csv
+# IntelliJ temporary pid file information for connecting to a local JVM to debug
+.attach_pid*
 
 streetGraph.obj
 graph.obj

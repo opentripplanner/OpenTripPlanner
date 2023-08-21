@@ -27,6 +27,7 @@ import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryIm
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.stopconsolidation.StopConsolidator;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
@@ -258,8 +259,15 @@ public class GraphBuilderModules {
   }
 
   @Provides
+  @Singleton
   static DataImportIssueSummary providesDataImportIssueSummary(DataImportIssueStore issueStore) {
     return new DataImportIssueSummary(issueStore.listIssues());
+  }
+
+  @Provides
+  @Singleton
+  static StopConsolidator providesStopConsolidator(TransitModel transitModel) {
+    return new StopConsolidator(transitModel);
   }
 
   /* private methods */

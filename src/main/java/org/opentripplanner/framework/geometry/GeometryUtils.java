@@ -81,9 +81,13 @@ public class GeometryUtils {
     return factory.createLineString(coordinates.toArray(new Coordinate[] {}));
   }
 
-  public static LineString makeLineString(Coordinate[] coordinates) {
+  public static LineString makeLineString(Coordinate... coordinates) {
     GeometryFactory factory = getGeometryFactory();
     return factory.createLineString(coordinates);
+  }
+
+  public static LineString makeLineString(WgsCoordinate... coordinates) {
+    return makeLineString(Arrays.stream(coordinates).map(WgsCoordinate::asJtsCoordinate).toList());
   }
 
   public static <T> LineString concatenateLineStrings(
