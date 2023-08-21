@@ -772,7 +772,7 @@ input BikePreferences {
     reluctance: Float
     bikeWalking: WalkPreferences
     speed: Float
-    switchTime: Int
+    switchTime: Duration
     switchCost: Int
     optimize: OptimizationCriteria
     boardCost: Int
