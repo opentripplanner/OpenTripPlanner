@@ -323,6 +323,9 @@ public class RouteRequest implements Cloneable, Serializable {
     if (searchWindow != null && searchWindow.toSeconds() > TimeUtils.ONE_DAY_SECONDS) {
       throw new IllegalArgumentException("The search window cannot exceed 24 hours");
     }
+    if (searchWindow != null && searchWindow.isNegative()) {
+      throw new IllegalArgumentException("The search window must be a positive duration");
+    }
     this.searchWindow = searchWindow;
   }
 
