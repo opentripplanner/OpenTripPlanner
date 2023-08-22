@@ -76,7 +76,8 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
   public DataFetcher<String> streetName() {
-    return environment -> getSource(environment).getName().toString(environment.getLocale());
+    return environment ->
+      getSource(environment).getDirectionText().toString(environment.getLocale());
   }
 
   @Override

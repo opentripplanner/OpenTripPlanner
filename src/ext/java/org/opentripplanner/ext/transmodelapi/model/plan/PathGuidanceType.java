@@ -41,7 +41,10 @@ public class PathGuidanceType {
           .description("The name of the street.")
           .type(Scalars.GraphQLString)
           .dataFetcher(environment ->
-            GraphQLUtils.getTranslation(((WalkStep) environment.getSource()).getName(), environment)
+            GraphQLUtils.getTranslation(
+              ((WalkStep) environment.getSource()).getDirectionText(),
+              environment
+            )
           )
           .build()
       )
