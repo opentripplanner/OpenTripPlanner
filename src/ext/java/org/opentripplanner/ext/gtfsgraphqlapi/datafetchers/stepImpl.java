@@ -51,7 +51,7 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
   public DataFetcher<String> exit() {
-    return environment -> getSource(environment).isExit();
+    return environment -> getSource(environment).getExit();
   }
 
   @Override

@@ -7,7 +7,6 @@ import java.util.Set;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
@@ -124,14 +123,14 @@ public final class WalkStep {
   /**
    * When exiting a highway or traffic circle, the exit name/number.
    */
-  public String isExit() {
+  public String getExit() {
     return exit;
   }
 
   /**
    * Indicates whether a street changes direction at an intersection.
    */
-  public Boolean isStayOn() {
+  public boolean isStayOn() {
     return stayOn;
   }
 
