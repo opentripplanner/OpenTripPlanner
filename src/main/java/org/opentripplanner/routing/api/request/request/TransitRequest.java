@@ -32,7 +32,7 @@ public class TransitRequest implements Cloneable, Serializable {
 
   public void setBannedTripsFromString(String ids) {
     if (!ids.isEmpty()) {
-      this.bannedTrips = FeedScopedId.parseListOfIds(ids);
+      this.bannedTrips = FeedScopedId.parseList(ids);
     }
   }
 
@@ -55,7 +55,7 @@ public class TransitRequest implements Cloneable, Serializable {
   @Deprecated
   public void setPreferredAgenciesFromString(String s) {
     if (!s.isEmpty()) {
-      preferredAgencies = FeedScopedId.parseListOfIds(s);
+      preferredAgencies = FeedScopedId.parseList(s);
     }
   }
 
@@ -74,7 +74,7 @@ public class TransitRequest implements Cloneable, Serializable {
 
   public void setUnpreferredAgenciesFromString(String s) {
     if (!s.isEmpty()) {
-      unpreferredAgencies = FeedScopedId.parseListOfIds(s);
+      unpreferredAgencies = FeedScopedId.parseList(s);
     }
   }
 
@@ -92,7 +92,7 @@ public class TransitRequest implements Cloneable, Serializable {
   @Deprecated
   public void setPreferredRoutesFromString(String s) {
     if (!s.isEmpty()) {
-      preferredRoutes = List.copyOf(FeedScopedId.parseListOfIds(s));
+      preferredRoutes = List.copyOf(FeedScopedId.parseList(s));
     } else {
       preferredRoutes = List.of();
     }
@@ -113,7 +113,7 @@ public class TransitRequest implements Cloneable, Serializable {
 
   public void setUnpreferredRoutesFromString(String s) {
     if (!s.isEmpty()) {
-      unpreferredRoutes = List.copyOf(FeedScopedId.parseListOfIds(s));
+      unpreferredRoutes = List.copyOf(FeedScopedId.parseList(s));
     } else {
       unpreferredRoutes = List.of();
     }
