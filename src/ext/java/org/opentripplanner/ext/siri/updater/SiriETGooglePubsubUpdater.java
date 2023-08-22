@@ -49,8 +49,8 @@ import uk.org.siri.www.siri.SiriType;
  * <p>
  * NOTE: - Path to Google credentials (.json-file) MUST exist in environment-variable
  * "GOOGLE_APPLICATION_CREDENTIALS" as described here:
- * <a href="https://cloud.google.com/docs/authentication/getting-started">...</a> - ServiceAccount need access to
- * create subscription ("editor")
+ * <a href="https://cloud.google.com/docs/authentication/getting-started">ServiceAccount need access to
+ * create subscription ("editor")</a>
  * <p>
  * <p>
  * <p>
