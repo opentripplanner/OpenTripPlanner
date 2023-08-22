@@ -26,32 +26,26 @@ public class RemoveTransitWithMoreWalking implements ItineraryDeletionFlagger {
     return TAG;
   }
 
-  private double getWalkDistance(Itinerary it) {
-    return it
-      .getStreetLegs()
-      .filter(l -> l.isWalkingLeg())
-      .mapToDouble(Leg::getDistanceMeters)
-      .sum();
-  }
-
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     // Filter the most common silly itinerary case: transit itinerary has more walking than plain walk itinerary
     // This never makes sense
-    OptionalDouble walkDistance = itineraries
+
+    OptionalInt minWalkCost = itineraries
       .stream()
       .filter(Itinerary::isWalkingAllTheWay)
-      .mapToDouble(Itinerary::distanceMeters)
+      .mapToInt(Itinerary::getGeneralizedCost)
       .min();
 
-    if (walkDistance.isEmpty()) {
+    if (minWalkCost.isEmpty()) {
       return List.of();
     }
 
-    final double walkLimit = walkDistance.getAsDouble();
+    var limit = minWalkCost.getAsInt();
+
     return itineraries
       .stream()
-      .filter(it -> !it.isOnStreetAllTheWay() && getWalkDistance(it) > walkLimit)
+      .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCost() >= limit)
       .collect(Collectors.toList());
   }
 
