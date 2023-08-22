@@ -29,7 +29,7 @@ public class RemoveTransitWithMoreWalkingTest implements PlanTestConstants {
   }
 
   @Test
-  public void filterAwayLongTravelTimeWithoutWaitTime() {
+  public void filterAwayTransitWithLongerWalk() {
     // a walk itinerary
     Itinerary walk = newItinerary(A, 6).walk(D2m, E).build();
 
