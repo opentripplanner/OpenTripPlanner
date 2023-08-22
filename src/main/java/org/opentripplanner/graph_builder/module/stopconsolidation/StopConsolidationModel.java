@@ -15,26 +15,25 @@ public class StopConsolidationModel {
     parseId("kcm:280"),
     parseId("commtrans:1079")
   );
-  private final List<StopReplacement> replacements;
+  private final TransitModel transitModel;
 
   public StopConsolidationModel(TransitModel transitModel) {
-    this.replacements =
-      Stream
-        .of(TO_REPLACE)
-        .map(r -> {
-          var primaryStop = transitModel.getStopModel().getRegularStop(r.primary());
-          Objects.requireNonNull(primaryStop, "No stop with id %s".formatted(r.secondary()));
-          return new StopConsolidationModel.StopReplacement(primaryStop, r.secondary());
-        })
-        .toList();
+    this.transitModel =       transitModel;
   }
 
   public List<FeedScopedId> stopIdsToReplace() {
-    return replacements.stream().map(StopReplacement::child).toList();
+    return replacements().stream().map(StopReplacement::child).toList();
   }
 
   public List<StopReplacement> replacements() {
-    return replacements;
+    return Stream
+      .of(TO_REPLACE)
+      .map(r -> {
+        var primaryStop = transitModel.getStopModel().getRegularStop(r.primary());
+        Objects.requireNonNull(primaryStop, "No stop with id %s".formatted(r.secondary()));
+        return new StopConsolidationModel.StopReplacement(primaryStop, r.secondary());
+      })
+      .toList();
   }
 
   public record IdPair(FeedScopedId primary, FeedScopedId secondary) {

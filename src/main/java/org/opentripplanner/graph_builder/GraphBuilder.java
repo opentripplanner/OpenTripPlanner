@@ -158,7 +158,10 @@ public class GraphBuilder implements Runnable {
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
 
-    graphBuilder.addModule(factory.stopConsolidator());
+    // don't consolidate stops if there are none
+    if(hasTransitData){
+      graphBuilder.addModule(factory.stopConsolidator());
+    }
 
     return graphBuilder;
   }
