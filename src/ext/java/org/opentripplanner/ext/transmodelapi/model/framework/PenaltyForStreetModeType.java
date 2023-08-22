@@ -17,7 +17,7 @@ import graphql.schema.GraphQLNonNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.opentripplanner.ext.transmodelapi.model.scalars.LinearFunction;
+import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunction;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -70,7 +70,7 @@ public class PenaltyForStreetModeType {
         GraphQLInputObjectField
           .newInputObjectField()
           .name(FIELD_TIME_PENALTY)
-          .type(new GraphQLNonNull(gqlUtil.linearFunctionScalar))
+          .type(new GraphQLNonNull(gqlUtil.doubleFunctionScalar))
           .description(
             """
             Penalty applied to the time for the given list of modes.
@@ -123,7 +123,7 @@ public class PenaltyForStreetModeType {
 
     for (var entry : environment.<List<Map<String, ?>>>getArgument(fieldName)) {
       var streetMode = (StreetMode) entry.get(FIELD_STREET_MODE);
-      var timePenalty = ((LinearFunction) entry.get(FIELD_TIME_PENALTY)).asTimePenalty();
+      var timePenalty = ((DoubleFunction) entry.get(FIELD_TIME_PENALTY)).asTimePenalty();
       double costFactor = ObjectUtils.ifNotNull((Double) entry.get(FIELD_COST_FACTOR), 0.0);
       var value = TimeAndCostPenalty.of(timePenalty, costFactor);
       builder.with(streetMode, value);
