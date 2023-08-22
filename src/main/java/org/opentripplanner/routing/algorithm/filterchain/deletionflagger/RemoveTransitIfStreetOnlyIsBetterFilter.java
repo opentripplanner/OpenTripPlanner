@@ -34,14 +34,6 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletio
     return TAG;
   }
 
-  private double getWalkDistance(Itinerary it) {
-    return it
-      .getStreetLegs()
-      .filter(l -> l.isWalkingLeg())
-      .mapToDouble(Leg::getDistanceMeters)
-      .sum();
-  }
-
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     // Find the best walk-all-the-way option
