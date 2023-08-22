@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.stopconsolidation;
+package org.opentripplanner.ext.stopconsolidation;
 
 import java.util.List;
 import javax.annotation.Nonnull;
