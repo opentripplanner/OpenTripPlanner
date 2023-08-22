@@ -306,6 +306,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
       // Allow non-optimal bus itinerary pass through
       ItineraryListFilterChain chain = builder
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(null)
+        .withRemoveTransitWithMoreWalking(false)
         .build();
       assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
     }
