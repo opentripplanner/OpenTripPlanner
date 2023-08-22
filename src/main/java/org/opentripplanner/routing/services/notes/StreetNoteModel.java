@@ -18,9 +18,9 @@ import org.slf4j.LoggerFactory;
  * A notes source of static notes, created at graph building stage and not modified
  * thereafter.
  */
-public class StreetNotesSource implements Serializable {
+public class StreetNoteModel implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StreetNotesSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StreetNoteModel.class);
 
   /**
    * Notes for street edges. No need to synchronize access to the map as they will not be concurrent
@@ -34,7 +34,7 @@ public class StreetNotesSource implements Serializable {
    */
   private final transient Map<StreetNoteAndMatcher, StreetNoteAndMatcher> uniqueMatchers = new HashMap<>();
 
-  StreetNotesSource() {}
+  StreetNoteModel() {}
 
   /**
    * Return the set of notes applicable for this state / backedge pair.
