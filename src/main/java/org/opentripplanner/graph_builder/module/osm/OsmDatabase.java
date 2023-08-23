@@ -1115,14 +1115,18 @@ public class OsmDatabase {
         relationsById.containsKey(member.getRef())
       ) {
         platformAreas.add(relationsById.get(member.getRef()));
-      } else if (
-        "node".equals(member.getType()) &&
-        nodesById.containsKey(member.getRef()) &&
-        nodesById.get(member.getRef()).isEntrance()
-      ) {
-        platformNodes.add(nodesById.get(member.getRef()));
+      } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
+        var node = nodesById.get(member.getRef());
+        if (
+          node.isEntrance() ||
+          "bus_stop".equals(node.getTag("highway")) ||
+          "platform".equals(node.getTag("public_transport"))
+        ) {
+          platformNodes.add(node);
+        }
       }
     }
+
     for (OSMWithTags area : platformAreas) {
       // single platform area presumably contains only one level in most cases
       // a node inside it may specify several levels if it is an elevator
