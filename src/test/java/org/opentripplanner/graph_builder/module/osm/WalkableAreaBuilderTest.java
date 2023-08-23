@@ -124,7 +124,7 @@ public class WalkableAreaBuilderTest {
     var busStopConnection = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143854)))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143853)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
