@@ -120,6 +120,16 @@ public class WalkableAreaBuilderTest {
       .toList();
     assertEquals(0, entranceAtWrongLevel.size());
 
+    // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.
+    var busStopConnection = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143854)))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(1, busStopConnection.size());
+
     // second platform and its entrance both default to level zero, entrance gets connected
     var entranceAtSameLevel = graph
       .getEdgesOfType(AreaEdge.class)
