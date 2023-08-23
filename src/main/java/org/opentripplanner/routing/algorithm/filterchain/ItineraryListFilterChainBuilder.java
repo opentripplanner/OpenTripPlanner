@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
+import org.opentripplanner.ext.stopconsolidation.ConsolidatedStopNameFilter;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
@@ -68,12 +69,17 @@ public class ItineraryListFilterChainBuilder {
   private Consumer<Itinerary> maxLimitReachedSubscriber;
   private boolean accessibilityScore;
   private double wheelchairMaxSlope;
-  private FareService faresService;
   private TransitAlertService transitAlertService;
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
+
+  /**
+   * Sandbox filters which decorate the itineraries with extra information.
+   */
+  @Sandbox
+  private FareService faresService;
 
   @Sandbox
   private ItineraryListFilter rideHailingFilter;
@@ -426,6 +432,9 @@ public class ItineraryListFilterChainBuilder {
     if (rideHailingFilter != null) {
       filters.add(rideHailingFilter);
     }
+
+    filters.add(new ConsolidatedStopNameFilter());
+
 
     var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
 
