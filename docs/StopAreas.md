@@ -18,8 +18,11 @@ An  example: [Huopalahti railway station in Helsinki](https://www.openstreetmap.
 - Add platforms, which need special linking, as members of a `stop_area` tagged relation
 - Set role=platform to these platform members
 - Platforms must be also proper areas, tagged as routable highways and `area=yes`. Also a single tag `public_transport=platform` will do.
-- Model required entrance points inside platform geometry and make them relation members, too. No special tagging or role is required.
-- Connect entrance points to the street network
+- Model required entrance points and stop linking points inside platform geometry and make them relation members, too.
+  - Entrances can be tagged using `railway=subway_entrance`, `highway=elevator`, `entrance=yes` or `entrance=main`.
+  - Stop linking points should be tagged either as `highway=bus_stop` or `public_transport=platform`.
+- Connect entrance points to the street network. Stop linking points can have reference tags to instruct how to link them with public transit stops as
+instructed in the document about [boarding locations](BoardingLocations.md).
 - Platform and its entrance point must have the same `level` tag value. Also matching by default value zero is accepted.
 - If `level` tag is not set, `layer` tag is also considered
 
