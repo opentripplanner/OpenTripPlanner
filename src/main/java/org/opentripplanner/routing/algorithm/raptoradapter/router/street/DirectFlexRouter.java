@@ -41,7 +41,8 @@ public class DirectFlexRouter {
         request.journey().direct(),
         serverContext.dataOverlayContext(request),
         false,
-        serverContext.flexConfig().maxAccessWalkDuration()
+        serverContext.flexConfig().maxAccessWalkDuration(),
+        0
       );
       Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(
         request,
@@ -50,7 +51,8 @@ public class DirectFlexRouter {
         request.journey().direct(),
         serverContext.dataOverlayContext(request),
         true,
-        serverContext.flexConfig().maxEgressWalkDuration()
+        serverContext.flexConfig().maxEgressWalkDuration(),
+        0
       );
 
       FlexRouter flexRouter = new FlexRouter(
