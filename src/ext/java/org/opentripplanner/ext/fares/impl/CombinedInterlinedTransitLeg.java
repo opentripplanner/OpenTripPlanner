@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.collection.ListUtils;
+import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -54,6 +55,16 @@ class CombinedInterlinedTransitLeg implements TransitLeg {
   @Override
   public Trip getTrip() {
     return first.getTrip();
+  }
+
+  @Override
+  public PickDrop getBoardRule() {
+    return first.getBoardRule();
+  }
+
+  @Override
+  public PickDrop getAlightRule() {
+    return first.getAlightRule();
   }
 
   @Override
