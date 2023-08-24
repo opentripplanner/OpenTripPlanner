@@ -290,19 +290,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       if (filterByIds != null) {
         filterByStops =
           filterByIds.getGraphQLStops() != null
-            ? filterByIds
-              .getGraphQLStops()
-              .stream()
-              .map(FeedScopedId::parse)
-              .collect(Collectors.toList())
+            ? filterByIds.getGraphQLStops().stream().map(FeedScopedId::parse).toList()
             : null;
         filterByRoutes =
           filterByIds.getGraphQLRoutes() != null
-            ? filterByIds
-              .getGraphQLRoutes()
-              .stream()
-              .map(FeedScopedId::parse)
-              .collect(Collectors.toList())
+            ? filterByIds.getGraphQLRoutes().stream().map(FeedScopedId::parse).toList()
             : null;
         filterByBikeRentalStations = filterByIds.getGraphQLBikeRentalStations();
         filterByBikeParks = filterByIds.getGraphQLBikeParks();
