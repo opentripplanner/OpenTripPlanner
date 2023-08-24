@@ -77,6 +77,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     return feedId;
   }
 
+  @Nonnull
   public String getId() {
     return id;
   }

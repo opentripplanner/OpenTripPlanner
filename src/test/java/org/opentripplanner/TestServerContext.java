@@ -45,6 +45,7 @@ public class TestServerContext {
       createVehicleRentalService(),
       routerConfig.flexConfig(),
       List.of(),
+      null,
       null
     );
     creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());

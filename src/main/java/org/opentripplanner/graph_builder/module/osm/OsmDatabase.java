@@ -1044,7 +1044,7 @@ public class OsmDatabase {
    * <p>
    * This goes through all public_transport=stop_area relations and adds the parent (either an area
    * or multipolygon relation) as the key and a Set of transit stop nodes that should be included in
-   * the parent area as the value into stopsInAreas. This improves TransitToTaggedStopsGraphBuilder
+   * the parent area as the value into stopsInAreas. This improves {@link org.opentripplanner.graph_builder.module.OsmBoardingLocationsModule}
    * by enabling us to have unconnected stop nodes within the areas by creating relations.
    *
    * @author hannesj

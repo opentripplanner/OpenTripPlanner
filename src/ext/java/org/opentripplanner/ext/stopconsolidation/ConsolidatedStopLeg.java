@@ -10,11 +10,20 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
   private final I18NString toName;
 
   public ConsolidatedStopLeg(ScheduledTransitLeg original, I18NString fromName, I18NString toName) {
-    super(original.getTripTimes(), original.getTripPattern(),
-      original.getBoardStopPosInPattern(), original.getAlightStopPosInPattern(), original.getStartTime(),
-      original.getEndTime(), original.getServiceDate(), original.getZoneId(),
-      original.getTransferFromPrevLeg(), original.getTransferToNextLeg(), original.getGeneralizedCost(), original.accessibilityScore());
-
+    super(
+      original.getTripTimes(),
+      original.getTripPattern(),
+      original.getBoardStopPosInPattern(),
+      original.getAlightStopPosInPattern(),
+      original.getStartTime(),
+      original.getEndTime(),
+      original.getServiceDate(),
+      original.getZoneId(),
+      original.getTransferFromPrevLeg(),
+      original.getTransferToNextLeg(),
+      original.getGeneralizedCost(),
+      original.accessibilityScore()
+    );
     this.fromName = fromName;
     this.toName = toName;
   }
@@ -23,6 +32,7 @@ public class ConsolidatedStopLeg extends ScheduledTransitLeg {
   public Place getFrom() {
     return Place.forStop(super.getFrom().stop, fromName);
   }
+
   @Override
   public Place getTo() {
     return Place.forStop(super.getTo().stop, toName);

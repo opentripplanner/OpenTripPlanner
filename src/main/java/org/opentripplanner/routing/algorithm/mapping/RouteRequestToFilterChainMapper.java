@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.ridehailing.RideHailingFilter;
+import org.opentripplanner.ext.stopconsolidation.ConsolidatedStopNameFilter;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
@@ -93,6 +94,12 @@ public class RouteRequestToFilterChainMapper {
         new RideHailingFilter(context.rideHailingServices(), request.wheelchair())
       );
     }
+
+    context
+      .stopConsolidationModel()
+      .ifPresent(scm -> {
+        builder.withRideHailingFilter(new ConsolidatedStopNameFilter(scm));
+      });
 
     return builder.build();
   }

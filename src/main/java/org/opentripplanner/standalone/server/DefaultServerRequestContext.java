@@ -3,9 +3,11 @@ package org.opentripplanner.standalone.server;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationModel;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
@@ -44,6 +46,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final RealtimeVehicleService realtimeVehicleService;
   private final VehicleRentalService vehicleRentalService;
 
+  @Nullable
+  private final StopConsolidationModel stopConsolidationModel;
+
   /**
    * Make sure all mutable components are copied/cloned before calling this constructor.
    */
@@ -60,8 +65,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     List<RideHailingService> rideHailingServices,
-    TraverseVisitor traverseVisitor,
-    FlexConfig flexConfig
+    @Nullable StopConsolidationModel stopConsolidationModel,
+    FlexConfig flexConfig,
+    TraverseVisitor traverseVisitor
   ) {
     this.graph = graph;
     this.transitService = transitService;
@@ -77,6 +83,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.worldEnvelopeService = worldEnvelopeService;
     this.realtimeVehicleService = realtimeVehicleService;
     this.rideHailingServices = rideHailingServices;
+    this.stopConsolidationModel = stopConsolidationModel;
   }
 
   /**
@@ -95,6 +102,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleRentalService vehicleRentalService,
     FlexConfig flexConfig,
     List<RideHailingService> rideHailingServices,
+    @Nullable StopConsolidationModel stopConsolidationModel,
     @Nullable TraverseVisitor traverseVisitor
   ) {
     return new DefaultServerRequestContext(
@@ -110,8 +118,9 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       realtimeVehicleService,
       vehicleRentalService,
       rideHailingServices,
-      traverseVisitor,
-      flexConfig
+      stopConsolidationModel,
+      flexConfig,
+      traverseVisitor
     );
   }
 
@@ -180,6 +189,11 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public List<RideHailingService> rideHailingServices() {
     return rideHailingServices;
+  }
+
+  @Override
+  public Optional<StopConsolidationModel> stopConsolidationModel() {
+    return Optional.ofNullable(stopConsolidationModel);
   }
 
   @Override

@@ -8,9 +8,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
-import org.opentripplanner.ext.stopconsolidation.ConsolidatedStopNameFilter;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
@@ -83,6 +83,9 @@ public class ItineraryListFilterChainBuilder {
 
   @Sandbox
   private ItineraryListFilter rideHailingFilter;
+
+  @Sandbox
+  private ItineraryListFilter stopConsolidationFilter;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -305,6 +308,13 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withStopConsolidationFilter(
+    @Nullable ItineraryListFilter filter
+  ) {
+    this.stopConsolidationFilter = filter;
+    return this;
+  }
+
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
@@ -433,8 +443,9 @@ public class ItineraryListFilterChainBuilder {
       filters.add(rideHailingFilter);
     }
 
-    filters.add(new ConsolidatedStopNameFilter());
-
+    if (stopConsolidationFilter != null) {
+      filters.add(stopConsolidationFilter);
+    }
 
     var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
 

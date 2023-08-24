@@ -1,17 +1,16 @@
 package org.opentripplanner.ext.stopconsolidation;
 
 import java.util.List;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 public class ConsolidatedStopNameFilter implements ItineraryListFilter {
 
-  //private final StopConsolidationModel model;
+  private final StopConsolidationModel model;
 
-  public ConsolidatedStopNameFilter() {
-    //this.model = model;
+  public ConsolidatedStopNameFilter(StopConsolidationModel scm) {
+    this.model = scm;
   }
 
   @Override
@@ -21,18 +20,23 @@ public class ConsolidatedStopNameFilter implements ItineraryListFilter {
 
   private Itinerary changeNames(Itinerary i) {
     return i.transformTransitLegs(leg -> {
-
-      if (leg instanceof ScheduledTransitLeg stl) {
+      if (leg instanceof ScheduledTransitLeg stl && needsToRenameStops(stl)) {
+        var agency = stl.getAgency();
 
         return new ConsolidatedStopLeg(
           stl,
-          I18NString.of("CONSOLIDATED START"),
-          I18NString.of("CONSOLIDATED END")
+          model.agencySpecificName(agency, stl.getFrom().stop),
+          model.agencySpecificName(agency, stl.getTo().stop)
         );
       } else {
         return leg;
       }
     });
+  }
 
+  private boolean needsToRenameStops(ScheduledTransitLeg stl) {
+    return (
+      model.isConsolidatedStop(stl.getFrom().stop) || model.isConsolidatedStop(stl.getTo().stop)
+    );
   }
 }
