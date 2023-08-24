@@ -1117,11 +1117,7 @@ public class OsmDatabase {
         platformAreas.add(relationsById.get(member.getRef()));
       } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
         var node = nodesById.get(member.getRef());
-        if (
-          node.isEntrance() ||
-          "bus_stop".equals(node.getTag("highway")) ||
-          "platform".equals(node.getTag("public_transport"))
-        ) {
+        if (node.isEntrance() || node.isBoardingLocation()) {
           platformNodes.add(node);
         }
       }
