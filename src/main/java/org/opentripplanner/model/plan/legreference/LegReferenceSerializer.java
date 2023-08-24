@@ -101,7 +101,7 @@ public class LegReferenceSerializer {
   static LegReference readScheduledTransitLeg(ObjectInputStream objectInputStream)
     throws IOException {
     return new ScheduledTransitLegReference(
-      FeedScopedId.parseId(objectInputStream.readUTF()),
+      FeedScopedId.parse(objectInputStream.readUTF()),
       LocalDate.parse(objectInputStream.readUTF(), LENIENT_ISO_LOCAL_DATE),
       objectInputStream.readInt(),
       objectInputStream.readInt()

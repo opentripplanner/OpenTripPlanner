@@ -54,7 +54,7 @@ public class TransitIdMapper {
     if (fixedFeedId != null) {
       return new FeedScopedId(fixedFeedId, id);
     }
-    return FeedScopedId.parseId(id);
+    return FeedScopedId.parse(id);
   }
 
   /**
