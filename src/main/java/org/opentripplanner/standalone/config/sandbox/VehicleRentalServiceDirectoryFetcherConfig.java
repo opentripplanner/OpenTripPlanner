@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.config.sandbox;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.NA;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -24,24 +24,24 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
     }
 
     return new VehicleRentalServiceDirectoryFetcherParameters(
-      c.of("url").since(NA).summary("Endpoint for the VehicleRentalServiceDirectory").asUri(),
+      c.of("url").since(V2_1).summary("Endpoint for the VehicleRentalServiceDirectory").asUri(),
       c
         .of("sourcesName")
-        .since(NA)
+        .since(V2_1)
         .summary("Json tag name for updater sources.")
         .asString("systems"),
       c
         .of("updaterUrlName")
-        .since(NA)
+        .since(V2_1)
         .summary("Json tag name for endpoint urls for each source.")
         .asString("url"),
       c
         .of("updaterNetworkName")
-        .since(NA)
+        .since(V2_1)
         .summary("Json tag name for the network name for each source.")
         .asString("id"),
-      c.of("language").since(NA).summary("Language code.").asString(null),
-      HttpHeadersConfig.headers(c, NA)
+      c.of("language").since(V2_1).summary("Language code.").asString(null),
+      HttpHeadersConfig.headers(c, V2_1)
     );
   }
 }

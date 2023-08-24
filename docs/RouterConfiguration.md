@@ -68,12 +68,12 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                            | *Optional* |               |  1.5  |
 | [vectorTileLayers](sandbox/MapboxVectorTilesApi.md)                                       |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                                   | *Optional* |               |  2.0  |
 | vehicleRentalServiceDirectory                                                             |        `object`       | Configuration for the vehicle rental service directory.                                               | *Optional* |               |  2.0  |
-|    language                                                                               |        `string`       | Language code.                                                                                        | *Optional* |               |   na  |
-|    sourcesName                                                                            |        `string`       | Json tag name for updater sources.                                                                    | *Optional* | `"systems"`   |   na  |
-|    updaterNetworkName                                                                     |        `string`       | Json tag name for the network name for each source.                                                   | *Optional* | `"id"`        |   na  |
-|    updaterUrlName                                                                         |        `string`       | Json tag name for endpoint urls for each source.                                                      | *Optional* | `"url"`       |   na  |
-|    url                                                                                    |         `uri`         | Endpoint for the VehicleRentalServiceDirectory                                                        | *Required* |               |   na  |
-|    [headers](#vehicleRentalServiceDirectory_headers)                                      |    `map of string`    | HTTP headers to add to the request. Any header key, value can be inserted.                            | *Optional* |               |   na  |
+|    language                                                                               |        `string`       | Language code.                                                                                        | *Optional* |               |  2.1  |
+|    sourcesName                                                                            |        `string`       | Json tag name for updater sources.                                                                    | *Optional* | `"systems"`   |  2.1  |
+|    updaterNetworkName                                                                     |        `string`       | Json tag name for the network name for each source.                                                   | *Optional* | `"id"`        |  2.1  |
+|    updaterUrlName                                                                         |        `string`       | Json tag name for endpoint urls for each source.                                                      | *Optional* | `"url"`       |  2.1  |
+|    url                                                                                    |         `uri`         | Endpoint for the VehicleRentalServiceDirectory                                                        | *Required* |               |  2.1  |
+|    [headers](#vehicleRentalServiceDirectory_headers)                                      |    `map of string`    | HTTP headers to add to the request. Any header key, value can be inserted.                            | *Optional* |               |  2.1  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -417,7 +417,7 @@ Used to group requests when monitoring OTP.
 
 <h3 id="vehicleRentalServiceDirectory_headers">headers</h3>
 
-**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
+**Since version:** `2.1` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
 **Path:** /vehicleRentalServiceDirectory 
 
 HTTP headers to add to the request. Any header key, value can be inserted.
