@@ -1,4 +1,4 @@
-package org.opentripplanner.generate.doc.sandbox;
+package org.opentripplanner.ext.vehiclerentalservicedirectory.generatedoc;
 
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
@@ -29,7 +29,7 @@ public class VehicleRentalServiceDirectoryConfigDocTest {
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, DOCUMENT);
   private static final File OUT_FILE = new File(DOCS_ROOT, DOCUMENT);
   private static final String CONFIG_PATH =
-    "standalone/config/sandbox/build-config-vehicle-rental-service-directory.json";
+    "org/opentripplanner/ext/vehiclerentalservicedirectory/generatedoc/" + ROUTER_CONFIG_FILENAME;
   private static final String CONFIG_TAG = "vehicleRentalServiceDirectory";
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 

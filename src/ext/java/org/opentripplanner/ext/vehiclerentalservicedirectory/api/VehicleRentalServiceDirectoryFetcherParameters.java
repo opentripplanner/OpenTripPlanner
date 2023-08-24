@@ -1,6 +1,9 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory.api;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class VehicleRentalServiceDirectoryFetcherParameters {
@@ -17,13 +20,16 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
 
   private final String language;
 
+  private final Map<String, NetworkParameters> parametersForNetwork;
+
   public VehicleRentalServiceDirectoryFetcherParameters(
     URI url,
     String sourcesName,
     String updaterUrlName,
     String networkName,
     String language,
-    HttpHeaders headers
+    HttpHeaders headers,
+    Collection<NetworkParameters> networkParameters
   ) {
     this.url = url;
     this.sourcesName = sourcesName;
@@ -31,6 +37,8 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     this.sourceNetworkName = networkName;
     this.language = language;
     this.headers = headers;
+    this.parametersForNetwork =
+      networkParameters.stream().collect(Collectors.toMap(NetworkParameters::network, it -> it));
   }
 
   /**
@@ -80,5 +88,9 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
 
   public String getLanguage() {
     return language;
+  }
+
+  public NetworkParameters networkParameters(String network) {
+    return parametersForNetwork.get(network);
   }
 }
