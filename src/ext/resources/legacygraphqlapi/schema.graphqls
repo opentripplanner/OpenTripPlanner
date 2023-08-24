@@ -1538,17 +1538,17 @@ type Money {
     amount: Float!
 }
 
-""""
+"""
 An ISO-8601-formatted datetime with offset, i.e. `2023-06-13T14:30+03:00` for 2:30pm on June 13th 2023 at Helsinki's offset from UTC at that time.
 """
 scalar DateTimeWithOffset
 
-""""
+"""
 An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 """
 scalar Duration
 
-""""
+"""
 String representation of a duration in seconds. Examples of the format: `300s`, `1s`, `2.5s`, `3.14s` or `15.233s`.
 """
 scalar DurationInSeconds
@@ -1832,7 +1832,7 @@ enum Mode {
     """TRAM"""
     TRAM
 
-    """"Private car trips shared with others."""
+    """Private car trips shared with others."""
     CARPOOL
 
     """A taxi, possibly operated by a public transport agency."""
@@ -1882,7 +1882,7 @@ enum TransitMode {
     """TRAM"""
     TRAM
 
-    """"Private car trips shared with others."""
+    """Private car trips shared with others."""
     CARPOOL
 
     """A taxi, possibly operated by a public transport agency."""
