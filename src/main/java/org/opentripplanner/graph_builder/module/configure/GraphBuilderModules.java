@@ -11,7 +11,7 @@ import java.util.List;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
-import org.opentripplanner.ext.stopconsolidation.StopConsolidator;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -266,8 +266,8 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static StopConsolidator providesStopConsolidator(TransitModel transitModel) {
-    return new StopConsolidator(transitModel);
+  static StopConsolidationModule providesStopConsolidator(TransitModel transitModel) {
+    return new StopConsolidationModule(transitModel);
   }
 
   /* private methods */

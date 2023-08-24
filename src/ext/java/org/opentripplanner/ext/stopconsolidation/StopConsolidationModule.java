@@ -8,14 +8,14 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class StopConsolidator implements GraphBuilderModule {
+public class StopConsolidationModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
   private final StopConsolidationModel model;
   private final TransitModel transitModel;
 
-  public StopConsolidator(TransitModel transitModel) {
+  public StopConsolidationModule(TransitModel transitModel) {
     this.transitModel = transitModel;
     this.model = new StopConsolidationModel(transitModel);
   }
