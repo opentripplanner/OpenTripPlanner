@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
+import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.ridehailing.RideHailingFilter;
 import org.opentripplanner.ext.stopconsolidation.ConsolidatedStopNameFilter;
 import org.opentripplanner.model.plan.Itinerary;
@@ -74,7 +75,6 @@ public class RouteRequestToFilterChainMapper {
         params.useAccessibilityScore() && request.wheelchair(),
         request.preferences().wheelchair().maxSlope()
       )
-      .withFares(context.graph().getFareService())
       .withMinBikeParkingDistance(minBikeParkingDistance(request))
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
         params.removeItinerariesWithSameRoutesAndStops()
@@ -89,6 +89,11 @@ public class RouteRequestToFilterChainMapper {
       .withRemoveTransitIfWalkingIsBetter(true)
       .withDebugEnabled(params.debug());
 
+    var fareService = context.graph().getFareService();
+    if (fareService != null) {
+      builder.withFaresFilter(new FaresFilter(fareService));
+    }
+
     if (!context.rideHailingServices().isEmpty()) {
       builder.withRideHailingFilter(
         new RideHailingFilter(context.rideHailingServices(), request.wheelchair())
@@ -98,7 +103,7 @@ public class RouteRequestToFilterChainMapper {
     context
       .stopConsolidationModel()
       .ifPresent(scm -> {
-        builder.withRideHailingFilter(new ConsolidatedStopNameFilter(scm));
+        builder.withStopConsolidationFilter(new ConsolidatedStopNameFilter(scm));
       });
 
     return builder.build();

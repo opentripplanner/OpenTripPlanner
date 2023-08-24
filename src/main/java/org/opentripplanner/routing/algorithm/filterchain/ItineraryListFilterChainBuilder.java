@@ -10,7 +10,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
-import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
@@ -38,7 +37,6 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistanc
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.site.MultiModalStation;
@@ -79,7 +77,7 @@ public class ItineraryListFilterChainBuilder {
    * Sandbox filters which decorate the itineraries with extra information.
    */
   @Sandbox
-  private FareService faresService;
+  private ItineraryListFilter faresFilter;
 
   @Sandbox
   private ItineraryListFilter rideHailingFilter;
@@ -286,8 +284,8 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withFares(FareService fareService) {
-    this.faresService = fareService;
+  public ItineraryListFilterChainBuilder withFaresFilter(ItineraryListFilter filter) {
+    this.faresFilter = filter;
     return this;
   }
 
@@ -338,10 +336,6 @@ public class ItineraryListFilterChainBuilder {
 
     if (accessibilityScore) {
       filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
-    }
-
-    if (faresService != null) {
-      filters.add(new FaresFilter(faresService));
     }
 
     if (transitAlertService != null) {
@@ -438,6 +432,12 @@ public class ItineraryListFilterChainBuilder {
 
     // Do the final itineraries sort
     filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
+
+    // Sandbox filters to decorate itineraries
+
+    if (faresFilter != null) {
+      filters.add(faresFilter);
+    }
 
     if (rideHailingFilter != null) {
       filters.add(rideHailingFilter);
