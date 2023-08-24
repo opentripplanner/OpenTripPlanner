@@ -14,7 +14,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.PathwayMode;
 
 /**
@@ -34,12 +33,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   private final PathwayMode mode;
 
   private final boolean wheelchairAccessible;
-  private final FeedScopedId id;
 
   private PathwayEdge(
     Vertex fromv,
     Vertex tov,
-    FeedScopedId id,
     @Nullable I18NString signpostedAs,
     int traversalTime,
     double distance,
@@ -50,7 +47,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   ) {
     super(fromv, tov);
     this.signpostedAs = signpostedAs;
-    this.id = id;
     this.traversalTime = traversalTime;
     this.steps = steps;
     this.slope = slope;
@@ -60,10 +56,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   }
 
   /**
-   * {@link #createLowCostPathwayEdge(Vertex, Vertex, FeedScopedId, boolean, PathwayMode)}
+   * {@link #createLowCostPathwayEdge(Vertex, Vertex, boolean, PathwayMode)}
    */
   public static PathwayEdge createLowCostPathwayEdge(Vertex fromV, Vertex toV, PathwayMode mode) {
-    return PathwayEdge.createLowCostPathwayEdge(fromV, toV, null, true, mode);
+    return PathwayEdge.createLowCostPathwayEdge(fromV, toV, true, mode);
   }
 
   /**
@@ -74,17 +70,15 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   public static PathwayEdge createLowCostPathwayEdge(
     Vertex fromV,
     Vertex toV,
-    FeedScopedId id,
     boolean wheelchairAccessible,
     PathwayMode mode
   ) {
-    return createPathwayEdge(fromV, toV, id, null, 0, 0, 0, 0, wheelchairAccessible, mode);
+    return createPathwayEdge(fromV, toV, null, 0, 0, 0, 0, wheelchairAccessible, mode);
   }
 
   public static PathwayEdge createPathwayEdge(
     Vertex fromv,
     Vertex tov,
-    FeedScopedId id,
     I18NString signpostedAs,
     int traversalTime,
     double distance,
@@ -97,7 +91,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       new PathwayEdge(
         fromv,
         tov,
-        id,
         signpostedAs,
         traversalTime,
         distance,
@@ -208,10 +201,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
 
   public int getSteps() {
     return steps;
-  }
-
-  public FeedScopedId getId() {
-    return id;
   }
 
   @Override

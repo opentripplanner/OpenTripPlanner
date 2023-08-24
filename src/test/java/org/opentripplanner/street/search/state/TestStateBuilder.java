@@ -198,7 +198,6 @@ public class TestStateBuilder {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       tov,
-      null,
       I18NString.of(s),
       60,
       100,

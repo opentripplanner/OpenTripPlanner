@@ -8,7 +8,6 @@ import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLRela
 import org.opentripplanner.ext.gtfsgraphqlapi.mapping.DirectionMapper;
 import org.opentripplanner.ext.gtfsgraphqlapi.mapping.StreetNoteMapper;
 import org.opentripplanner.model.plan.ElevationProfile.Step;
-import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 
@@ -72,12 +71,13 @@ public class stepImpl implements GraphQLDataFetchers.GraphQLStep {
 
   @Override
   public DataFetcher<Boolean> stayOn() {
-    return environment -> getSource(environment).getStayOn();
+    return environment -> getSource(environment).isStayOn();
   }
 
   @Override
   public DataFetcher<String> streetName() {
-    return environment -> getSource(environment).getStreetName().toString(environment.getLocale());
+    return environment ->
+      getSource(environment).getDirectionText().toString(environment.getLocale());
   }
 
   @Override

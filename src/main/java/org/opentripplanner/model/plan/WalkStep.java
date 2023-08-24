@@ -7,7 +7,6 @@ import java.util.Set;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.note.StreetNote;
@@ -34,7 +33,7 @@ public final class WalkStep {
   private final WgsCoordinate startLocation;
   private final double distance;
   private final RelativeDirection relativeDirection;
-  private final I18NString streetName;
+  private final I18NString directionText;
   private final AbsoluteDirection absoluteDirection;
 
   private final Set<StreetNote> streetNotes;
@@ -54,7 +53,7 @@ public final class WalkStep {
     WgsCoordinate startLocation,
     RelativeDirection relativeDirection,
     AbsoluteDirection absoluteDirection,
-    I18NString streetName,
+    I18NString directionText,
     Set<StreetNote> streetNotes,
     String exit,
     ElevationProfile elevationProfile,
@@ -69,7 +68,7 @@ public final class WalkStep {
     this.distance = distance;
     this.relativeDirection = Objects.requireNonNull(relativeDirection);
     this.absoluteDirection = absoluteDirection;
-    this.streetName = streetName;
+    this.directionText = directionText;
     this.streetNotes = Set.copyOf(Objects.requireNonNull(streetNotes));
     this.startLocation = Objects.requireNonNull(startLocation);
     this.bogusName = bogusName;
@@ -105,10 +104,13 @@ public final class WalkStep {
   }
 
   /**
-   * The name of the street.
+   * A piece of information that {@link WalkStep#getRelativeDirection()} relates to.
+   * This could be the name of the street ("turn right at Main Street") but also a
+   * station entrance ("enter station at Entrance 4B") or what is on a sign
+   * ("follow signs for Platform 9").
    */
-  public I18NString getStreetName() {
-    return streetName;
+  public I18NString getDirectionText() {
+    return directionText;
   }
 
   /**
@@ -131,7 +133,7 @@ public final class WalkStep {
   /**
    * Indicates whether a street changes direction at an intersection.
    */
-  public Boolean getStayOn() {
+  public boolean isStayOn() {
     return stayOn;
   }
 
@@ -187,7 +189,7 @@ public final class WalkStep {
       .of(this.getClass())
       .addEnum("absoluteDirection", absoluteDirection)
       .addEnum("relativeDirection", relativeDirection)
-      .addStr("streetName", streetName.toString())
+      .addStr("streetName", directionText.toString())
       .addNum("distance", distance)
       .toString();
   }
