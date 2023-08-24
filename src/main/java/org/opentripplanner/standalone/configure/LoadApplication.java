@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationModel;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.graph.Graph;
@@ -52,7 +53,8 @@ public class LoadApplication {
       obj.graph,
       obj.transitModel,
       obj.worldEnvelopeRepository,
-      obj.issueSummary
+      obj.issueSummary,
+      obj.stopConsolidationModel
     );
   }
 
@@ -62,7 +64,8 @@ public class LoadApplication {
       factory.emptyGraph(),
       factory.emptyTransitModel(),
       factory.emptyWorldEnvelopeRepository(),
-      DataImportIssueSummary.empty()
+      DataImportIssueSummary.empty(),
+      new StopConsolidationModel(factory.emptyTransitModel())
     );
   }
 
@@ -81,7 +84,8 @@ public class LoadApplication {
     Graph graph,
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
-    DataImportIssueSummary issueSummary
+    DataImportIssueSummary issueSummary,
+    StopConsolidationModel stopConsolidationModel
   ) {
     return new ConstructApplication(
       cli,
@@ -90,7 +94,8 @@ public class LoadApplication {
       worldEnvelopeRepository,
       config(),
       graphBuilderDataSources(),
-      issueSummary
+      issueSummary,
+      stopConsolidationModel
     );
   }
 }

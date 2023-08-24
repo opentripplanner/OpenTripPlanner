@@ -4,6 +4,7 @@ import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationModel;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -70,7 +71,8 @@ public class ConstructApplication {
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
-    DataImportIssueSummary issueSummary
+    DataImportIssueSummary issueSummary,
+    StopConsolidationModel stopConsolidationModel
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -88,6 +90,7 @@ public class ConstructApplication {
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
         .dataImportIssueSummary(issueSummary)
+        .stopConsolidationModel(stopConsolidationModel)
         .build();
   }
 
@@ -237,6 +240,10 @@ public class ConstructApplication {
 
   public DataImportIssueSummary dataImportIssueSummary() {
     return factory.dataImportIssueSummary();
+  }
+
+  public StopConsolidationModel stopConsolidationModel() {
+    return factory.stopConsolidationModel();
   }
 
   public RealtimeVehicleRepository realtimeVehicleRepository() {

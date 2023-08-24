@@ -151,7 +151,8 @@ public class OTPMain {
         app.worldEnvelopeRepository(),
         config.buildConfig(),
         config.routerConfig(),
-        DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary())
+        DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),
+        app.stopConsolidationModel()
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator

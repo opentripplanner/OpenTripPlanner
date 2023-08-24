@@ -179,7 +179,8 @@ public class GraphSerializationTest {
       worldEnvelopeRepository,
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT,
-      DataImportIssueSummary.empty()
+      DataImportIssueSummary.empty(),
+      null
     );
     serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
     SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);

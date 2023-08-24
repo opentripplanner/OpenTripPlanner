@@ -5,6 +5,7 @@ import dagger.Component;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationModel;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -67,6 +68,9 @@ public interface ConstructApplicationFactory {
 
   MetricsLogging metricsLogging();
 
+  @Nullable
+  StopConsolidationModel stopConsolidationModel();
+
   @Component.Builder
   interface Builder {
     @BindsInstance
@@ -86,6 +90,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);
+
+    @BindsInstance
+    Builder stopConsolidationModel(@Nullable StopConsolidationModel model);
 
     ConstructApplicationFactory build();
   }

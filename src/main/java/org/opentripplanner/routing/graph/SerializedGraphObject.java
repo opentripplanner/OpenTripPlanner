@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationModel;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
@@ -73,6 +74,7 @@ public class SerializedGraphObject implements Serializable {
   private final List<SubMode> allTransitSubModes;
 
   public final DataImportIssueSummary issueSummary;
+  public final StopConsolidationModel stopConsolidationModel;
   private final int stopLocationCounter;
   private final int routingTripPatternCounter;
 
@@ -82,7 +84,8 @@ public class SerializedGraphObject implements Serializable {
     WorldEnvelopeRepository worldEnvelopeRepository,
     BuildConfig buildConfig,
     RouterConfig routerConfig,
-    DataImportIssueSummary issueSummary
+    DataImportIssueSummary issueSummary,
+    StopConsolidationModel stopConsolidationModel
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
@@ -94,6 +97,7 @@ public class SerializedGraphObject implements Serializable {
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.stopLocationCounter = StopLocation.indexCounter();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();
+    this.stopConsolidationModel = stopConsolidationModel;
   }
 
   public static void verifyTheOutputGraphIsWritableIfDataSourceExist(DataSource graphOutput) {
