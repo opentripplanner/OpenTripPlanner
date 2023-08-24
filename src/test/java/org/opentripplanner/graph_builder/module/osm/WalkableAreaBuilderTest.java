@@ -110,31 +110,31 @@ public class WalkableAreaBuilderTest {
   @OsmFile("stopareas.pbf")
   @Visibility(true)
   public void test_entrance_stoparea_linking() {
-    // first platform has level 0, entrance below it has level -1 -> no links
-    var entranceAtWrongLevel = graph
-      .getEdgesOfType(AreaEdge.class)
-      .stream()
-      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143850)))
-      .map(AreaEdge::getArea)
-      .distinct()
-      .toList();
-    assertEquals(0, entranceAtWrongLevel.size());
-
     // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.
     var busStopConnection = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143853)))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143853)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
     assertEquals(1, busStopConnection.size());
 
+    // first platform has level 0, entrance below it has level -1 -> no links
+    var entranceAtWrongLevel = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143850)))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(0, entranceAtWrongLevel.size());
+
     // second platform and its entrance both default to level zero, entrance gets connected
     var entranceAtSameLevel = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> hasNodeId(a, -143832))
+      .filter(a -> hasNodeId(a, 143832))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -145,7 +145,7 @@ public class WalkableAreaBuilderTest {
     var stopPositionConnection = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143863)))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143863)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -157,7 +157,7 @@ public class WalkableAreaBuilderTest {
     var connectionEdges = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> hasNodeId(a, -143845))
+      .filter(a -> hasNodeId(a, 143845))
       .toList();
     // entrance is connected top 2 opposite corners of a single platform
     // with two bidirectional edge pairs, and with the other entrance point
@@ -168,7 +168,7 @@ public class WalkableAreaBuilderTest {
     var elevatorConnection = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> hasNodeId(a, -143861))
+      .filter(a -> hasNodeId(a, 143861))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
