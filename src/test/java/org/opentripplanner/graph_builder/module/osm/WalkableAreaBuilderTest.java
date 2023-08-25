@@ -4,6 +4,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.lang.annotation.ElementType;
@@ -35,14 +36,15 @@ public class WalkableAreaBuilderTest {
     final Method testMethod = testInfo.getTestMethod().get();
     final String osmFile = testMethod.getAnnotation(OsmFile.class).value();
     final boolean visibility = testMethod.getAnnotation(Visibility.class).value();
+    final int maxAreaNodes = testMethod.getAnnotation(MaxAreaNodes.class).value();
     final boolean platformEntriesLinking = true;
-    final int maxAreaNodes = 5;
 
     final Set<String> boardingAreaRefTags = Set.of();
     final OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP, boardingAreaRefTags);
 
     final File file = new File(testInfo.getTestClass().get().getResource(osmFile).getFile());
-    new OsmProvider(file, true).readOSM(osmdb);
+    assertTrue(file.exists());
+    new OsmProvider(file, false).readOSM(osmdb);
     osmdb.postLoad();
 
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
@@ -76,6 +78,7 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(true)
+  @MaxAreaNodes(5)
   public void test_calculate_vertices_area(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     var areas = graph
@@ -92,6 +95,7 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(false)
+  @MaxAreaNodes(5)
   public void testSetup_calculate_vertices_area_without_visibility(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     var areas = graph
@@ -110,6 +114,7 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("stopareas.pbf")
   @Visibility(true)
+  @MaxAreaNodes(20)
   public void test_entrance_stoparea_linking(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.
@@ -195,5 +200,11 @@ public class WalkableAreaBuilderTest {
   @Target(ElementType.METHOD)
   public @interface Visibility {
     boolean value();
+  }
+
+  @Retention(RUNTIME)
+  @Target(ElementType.METHOD)
+  public @interface MaxAreaNodes {
+    int value();
   }
 }
