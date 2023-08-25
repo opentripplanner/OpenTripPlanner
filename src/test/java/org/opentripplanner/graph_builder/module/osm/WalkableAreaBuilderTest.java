@@ -14,9 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -25,15 +26,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeOnLevelLabel;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
+@Execution(ExecutionMode.SAME_THREAD)
 public class WalkableAreaBuilderTest {
 
-  private final Deduplicator deduplicator = new Deduplicator();
-  private final Graph graph = new Graph(deduplicator);
-
-  @BeforeEach
-  public void testSetup(final TestInfo testInfo) {
+  public Graph buildGraph(final TestInfo testInfo) {
+    var graph = new Graph();
     final Method testMethod = testInfo.getTestMethod().get();
     final String osmFile = testMethod.getAnnotation(OsmFile.class).value();
     final boolean visibility = testMethod.getAnnotation(Visibility.class).value();
@@ -70,6 +68,7 @@ public class WalkableAreaBuilderTest {
       : walkableAreaBuilder::buildWithoutVisibility;
 
     areaGroups.forEach(build);
+    return graph;
   }
 
   // -- Tests --
@@ -77,7 +76,8 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(true)
-  public void test_calculate_vertices_area() {
+  public void test_calculate_vertices_area(TestInfo testInfo) {
+    var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
@@ -92,7 +92,8 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(false)
-  public void testSetup_calculate_vertices_area_without_visibility() {
+  public void testSetup_calculate_vertices_area_without_visibility(TestInfo testInfo) {
+    var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
@@ -109,7 +110,8 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("stopareas.pbf")
   @Visibility(true)
-  public void test_entrance_stoparea_linking() {
+  public void test_entrance_stoparea_linking(TestInfo testInfo) {
+    var graph = buildGraph(testInfo);
     // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.
     var busStopConnection = graph
       .getEdgesOfType(AreaEdge.class)
