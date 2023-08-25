@@ -84,6 +84,7 @@ nav:
         - Accessibility: 'Accessibility.md'
         - "Logging": "Logging.md"
         - "Routing modes": 'RoutingModes.md'
+        - "In-station navigation": 'In-Station-Navigation.md'
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
     - Localization: 'Localization.md'
