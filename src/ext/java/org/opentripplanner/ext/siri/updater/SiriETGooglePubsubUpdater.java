@@ -49,8 +49,8 @@ import uk.org.siri.www.siri.SiriType;
  * <p>
  * NOTE: - Path to Google credentials (.json-file) MUST exist in environment-variable
  * "GOOGLE_APPLICATION_CREDENTIALS" as described here:
- * https://cloud.google.com/docs/authentication/getting-started - ServiceAccount need access to
- * create subscription ("editor")
+ * <a href="https://cloud.google.com/docs/authentication/getting-started">ServiceAccount need access to
+ * create subscription ("editor")</a>
  * <p>
  * <p>
  * <p>
@@ -93,24 +93,23 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
    */
   private final java.time.Duration initialGetDataTimeout;
 
-  private final ProjectSubscriptionName subscriptionName;
+  private final String subscriptionName;
   private final ProjectTopicName topic;
-  private Subscriber subscriber;
+  private final Subscriber subscriber;
   private final PushConfig pushConfig;
   private final String configRef;
   private final SiriTimetableSnapshotSource snapshotSource;
   private final SiriFuzzyTripMatcher fuzzyTripMatcher;
+  private final Instant startTime = Instant.now();
+  private final Consumer<UpdateResult> recordMetrics;
+  private final EntityResolver entityResolver;
 
   /**
    * Parent update manager. Is used to execute graph writer runnables.
    */
   private WriteToGraphCallback saveResultOnGraph;
 
-  private final Instant startTime = Instant.now();
-  private boolean primed;
-
-  private final Consumer<UpdateResult> recordMetrics;
-  private final EntityResolver entityResolver;
+  private volatile boolean primed;
 
   public SiriETGooglePubsubUpdater(
     SiriETGooglePubsubUpdaterParameters config,
@@ -135,7 +134,10 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
     String topicName = config.topicName();
 
-    this.subscriptionName = ProjectSubscriptionName.of(subscriptionProjectName, subscriptionId);
+    subscriptionName =
+      ProjectSubscriptionName.of(subscriptionProjectName, subscriptionId).toString();
+    subscriber =
+      Subscriber.newBuilder(subscriptionName, new EstimatedTimetableMessageReceiver()).build();
     this.topic = ProjectTopicName.of(topicProjectName, topicName);
     this.pushConfig = PushConfig.getDefaultInstance();
     TransitService transitService = new DefaultTransitService(transitModel);
@@ -155,10 +157,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   @Override
   public void run() {
     LOG.info("Creating subscription {}", subscriptionName);
-    Subscription subscription = createSubscription();
+    createSubscription();
     LOG.info("Created subscription {}", subscriptionName);
-
-    final EstimatedTimetableMessageReceiver receiver = new EstimatedTimetableMessageReceiver();
 
     int sleepPeriod = 1000;
     int attemptCounter = 1;
@@ -166,7 +166,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
     while (!isPrimed() && !otpIsShuttingDown) { // Retrying until data is initialized successfully
       try {
-        initializeData(receiver);
+        initializeData();
       } catch (Exception e) {
         sleepPeriod = sleepPeriod * 2;
 
@@ -189,18 +189,12 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
       }
     }
 
-    subscriber = null;
-
     while (!otpIsShuttingDown) {
       try {
-        subscriber = Subscriber.newBuilder(subscription.getName(), receiver).build();
         subscriber.startAsync().awaitRunning();
-
         subscriber.awaitTerminated();
       } catch (IllegalStateException e) {
-        if (subscriber != null) {
-          subscriber.stopAsync();
-        }
+        subscriber.stopAsync();
       }
       try {
         Thread.sleep(reconnectPeriod.toMillis());
@@ -261,13 +255,13 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     }
   }
 
-  private Subscription createSubscription() {
+  private void createSubscription() {
     try (SubscriptionAdminClient subscriptionAdminClient = SubscriptionAdminClient.create()) {
-      return subscriptionAdminClient.createSubscription(
+      subscriptionAdminClient.createSubscription(
         Subscription
           .newBuilder()
           .setTopic(topic.toString())
-          .setName(subscriptionName.toString())
+          .setName(subscriptionName)
           .setPushConfig(pushConfig)
           .setMessageRetentionDuration(
             // How long will an unprocessed message be kept - minimum 10 minutes
@@ -316,7 +310,7 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     return DurationUtils.durationToStr(Duration.between(startTime, Instant.now()));
   }
 
-  private void initializeData(EstimatedTimetableMessageReceiver receiver) {
+  private void initializeData() {
     if (dataInitializationUrl != null) {
       LOG.info("Fetching initial data from {}", dataInitializationUrl);
       final long t1 = System.currentTimeMillis();
@@ -327,108 +321,16 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         (t2 - t1),
         FileSizeToTextConverter.fileSizeToString(value.size())
       );
-
-      final PubsubMessage message = PubsubMessage.newBuilder().setData(value).build();
-      receiver.receiveMessage(
-        message,
-        new AckReplyConsumer() {
-          @Override
-          public void ack() {
-            primed = true;
-
-            LOG.info(
-              "Pubsub updater initialized after {} ms: [messages: {},  updates: {}, total size: {}, time since startup: {}]",
-              (System.currentTimeMillis() - t2),
-              MESSAGE_COUNTER.get(),
-              UPDATE_COUNTER.get(),
-              FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
-              getTimeSinceStartupString()
-            );
-          }
-
-          @Override
-          public void nack() {}
-        }
+      processSiriData(value);
+      primed = true;
+      LOG.info(
+        "Pubsub updater initialized after {} ms: [messages: {},  updates: {}, total size: {}, time since startup: {}]",
+        (System.currentTimeMillis() - t2),
+        MESSAGE_COUNTER.get(),
+        UPDATE_COUNTER.get(),
+        FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
+        getTimeSinceStartupString()
       );
-    }
-  }
-
-  class EstimatedTimetableMessageReceiver implements MessageReceiver {
-
-    @Override
-    public void receiveMessage(PubsubMessage message, AckReplyConsumer consumer) {
-      Siri siri;
-      try {
-        SIZE_COUNTER.addAndGet(message.getData().size());
-
-        final ByteString data = message.getData();
-
-        final SiriType siriType = SiriType.parseFrom(data);
-        siri = SiriMapper.mapToJaxb(siriType);
-      } catch (InvalidProtocolBufferException e) {
-        throw new RuntimeException(e);
-      }
-
-      if (siri.getServiceDelivery() != null) {
-        // Handle trip updates via graph writer runnable
-        List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries = siri
-          .getServiceDelivery()
-          .getEstimatedTimetableDeliveries();
-
-        int numberOfUpdatedTrips = 0;
-        try {
-          numberOfUpdatedTrips =
-            estimatedTimetableDeliveries
-              .get(0)
-              .getEstimatedJourneyVersionFrames()
-              .get(0)
-              .getEstimatedVehicleJourneies()
-              .size();
-        } catch (Exception e) {
-          //ignore
-        }
-        long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
-        long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
-
-        if (numberOfMessages % 1000 == 0) {
-          LOG.info(
-            "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
-            numberOfMessages,
-            numberOfUpdates,
-            FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
-            java.time.Duration
-              .between(siri.getServiceDelivery().getResponseTimestamp().toInstant(), Instant.now())
-              .toMillis(),
-            getTimeSinceStartupString()
-          );
-        }
-
-        var f = saveResultOnGraph.execute((graph, transitModel) -> {
-          var results = snapshotSource.applyEstimatedTimetable(
-            fuzzyTripMatcher,
-            entityResolver,
-            feedId,
-            false,
-            estimatedTimetableDeliveries
-          );
-
-          recordMetrics.accept(results);
-        });
-
-        if (!isPrimed()) {
-          try {
-            f.get();
-          } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(e);
-          } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-          }
-        }
-      }
-
-      // Ack only after all work for the message is complete.
-      consumer.ack();
     }
   }
 
@@ -440,6 +342,85 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
         Map.of("Content-Type", "application/x-protobuf"),
         ByteString::readFrom
       );
+    }
+  }
+
+  private void processSiriData(ByteString data) {
+    Siri siri;
+    try {
+      SIZE_COUNTER.addAndGet(data.size());
+      final SiriType siriType = SiriType.parseFrom(data);
+      siri = SiriMapper.mapToJaxb(siriType);
+    } catch (InvalidProtocolBufferException e) {
+      throw new RuntimeException(e);
+    }
+
+    if (siri.getServiceDelivery() != null) {
+      // Handle trip updates via graph writer runnable
+      List<EstimatedTimetableDeliveryStructure> estimatedTimetableDeliveries = siri
+        .getServiceDelivery()
+        .getEstimatedTimetableDeliveries();
+
+      int numberOfUpdatedTrips = 0;
+      try {
+        numberOfUpdatedTrips =
+          estimatedTimetableDeliveries
+            .get(0)
+            .getEstimatedJourneyVersionFrames()
+            .get(0)
+            .getEstimatedVehicleJourneies()
+            .size();
+      } catch (Exception e) {
+        //ignore
+      }
+      long numberOfUpdates = UPDATE_COUNTER.addAndGet(numberOfUpdatedTrips);
+      long numberOfMessages = MESSAGE_COUNTER.incrementAndGet();
+
+      if (numberOfMessages % 1000 == 0) {
+        LOG.info(
+          "Pubsub stats: [messages: {}, updates: {}, total size: {}, current delay {} ms, time since startup: {}]",
+          numberOfMessages,
+          numberOfUpdates,
+          FileSizeToTextConverter.fileSizeToString(SIZE_COUNTER.get()),
+          Duration
+            .between(siri.getServiceDelivery().getResponseTimestamp().toInstant(), Instant.now())
+            .toMillis(),
+          getTimeSinceStartupString()
+        );
+      }
+
+      var f = saveResultOnGraph.execute((graph, transitModel) -> {
+        var results = snapshotSource.applyEstimatedTimetable(
+          fuzzyTripMatcher,
+          entityResolver,
+          feedId,
+          false,
+          estimatedTimetableDeliveries
+        );
+
+        recordMetrics.accept(results);
+      });
+
+      if (!isPrimed()) {
+        try {
+          f.get();
+        } catch (InterruptedException e) {
+          Thread.currentThread().interrupt();
+          throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+  }
+
+  class EstimatedTimetableMessageReceiver implements MessageReceiver {
+
+    @Override
+    public void receiveMessage(PubsubMessage message, AckReplyConsumer consumer) {
+      processSiriData(message.getData());
+      // Ack only after all work for the message is complete.
+      consumer.ack();
     }
   }
 }

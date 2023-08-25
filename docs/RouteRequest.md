@@ -50,7 +50,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | ignoreRealtimeUpdates                                                                                        |        `boolean`       | When true, realtime updates are ignored during this search.                                                                                    | *Optional* | `false`          |  2.0  |
 | [intersectionTraversalModel](#rd_intersectionTraversalModel)                                                 |         `enum`         | The model that computes the costs of turns.                                                                                                    | *Optional* | `"simple"`       |  2.2  |
 | locale                                                                                                       |        `locale`        | TODO                                                                                                                                           | *Optional* | `"en_US"`        |  2.0  |
-| [maxAccessEgressDuration](#rd_maxAccessEgressDuration)                                                       |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                            | *Optional* | `"PT45M"`        |  2.1  |
 | [maxDirectStreetDuration](#rd_maxDirectStreetDuration)                                                       |       `duration`       | This is the maximum duration for a direct street search for each mode.                                                                         | *Optional* | `"PT4H"`         |  2.1  |
 | [maxJourneyDuration](#rd_maxJourneyDuration)                                                                 |       `duration`       | The expected maximum time a journey can last across all possible journeys for the current deployment.                                          | *Optional* | `"PT24H"`        |  2.1  |
 | modes                                                                                                        |        `string`        | The set of access/egress/direct/transit modes to be used for the route search.                                                                 | *Optional* | `"TRANSIT,WALK"` |  2.0  |
@@ -73,7 +72,14 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [walkReluctance](#rd_walkReluctance)                                                                         |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`            |  2.0  |
 | [walkSafetyFactor](#rd_walkSafetyFactor)                                                                     |        `double`        | Factor for how much the walk safety is considered in routing.                                                                                  | *Optional* | `1.0`            |  2.2  |
 | walkSpeed                                                                                                    |        `double`        | The user's walking speed in meters/second.                                                                                                     | *Optional* | `1.33`           |  2.0  |
-| [accessEgressPenalty](#rd_accessEgressPenalty)                                                               |  `enum map of object`  | Penalty for access/egress by street mode.                                                                                                      | *Optional* |                  |  2.4  |
+| accessEgress                                                                                                 |        `object`        | Parameters for access and egress routing.                                                                                                      | *Optional* |                  |  2.4  |
+|    [maxDuration](#rd_accessEgress_maxDuration)                                                               |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                            | *Optional* | `"PT45M"`        |  2.1  |
+|    [maxStopCount](#rd_accessEgress_maxStopCount)                                                             |        `integer`       | Maximal number of stops collected in access/egress routing                                                                                     | *Optional* | `500`            |  2.4  |
+|    [maxDurationForMode](#rd_accessEgress_maxDurationForMode)                                                 | `enum map of duration` | Limit access/egress per street mode.                                                                                                           | *Optional* |                  |  2.1  |
+|    [penalty](#rd_accessEgress_penalty)                                                                       |  `enum map of object`  | Penalty for access/egress by street mode.                                                                                                      | *Optional* |                  |  2.4  |
+|       FLEXIBLE                                                                                               |        `object`        | NA                                                                                                                                             | *Optional* |                  |  2.4  |
+|          costFactor                                                                                          |        `double`        | A factor multiplied with the time-penalty to get the cost-penalty.                                                                             | *Optional* | `0.0`            |  2.4  |
+|          timePenalty                                                                                         |     `time-penalty`     | Penalty added to the time of a path/leg.                                                                                                       | *Optional* | `"0s + 0.00 t"`  |  2.4  |
 | [alightSlackForMode](#rd_alightSlackForMode)                                                                 | `enum map of duration` | How much extra time should be given when alighting a vehicle for each given mode.                                                              | *Optional* |                  |  2.0  |
 | [bannedVehicleParkingTags](#rd_bannedVehicleParkingTags)                                                     |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned.                                                              | *Optional* |                  |  2.1  |
 | [boardSlackForMode](#rd_boardSlackForMode)                                                                   | `enum map of duration` | How much extra time should be given when boarding a vehicle for each given mode.                                                               | *Optional* |                  |  2.0  |
@@ -93,7 +99,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                                         |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                             | *Optional* |                  |  2.1  |
 |       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                              | `cost-linear-function` | The base function used by the filter.                                                                                                          | *Optional* | `"15m + 1.50 t"` |  2.2  |
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                          |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                             | *Optional* | `0.4`            |  2.2  |
-| [maxAccessEgressDurationForMode](#rd_maxAccessEgressDurationForMode)                                         | `enum map of duration` | Limit access/egress per street mode.                                                                                                           | *Optional* |                  |  2.1  |
 | [maxDirectStreetDurationForMode](#rd_maxDirectStreetDurationForMode)                                         | `enum map of duration` | Limit direct route duration per street mode.                                                                                                   | *Optional* |                  |  2.2  |
 | [preferredVehicleParkingTags](#rd_preferredVehicleParkingTags)                                               |       `string[]`       | Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.                       | *Optional* |                  |  2.3  |
 | [requiredVehicleParkingTags](#rd_requiredVehicleParkingTags)                                                 |       `string[]`       | Tags without which a vehicle parking will not be used. If empty, no tags are required.                                                         | *Optional* |                  |  2.1  |
@@ -190,20 +195,6 @@ The driving direction to use in the intersection traversal calculation
 **Enum values:** `simple` | `constant`
 
 The model that computes the costs of turns.
-
-<h3 id="rd_maxAccessEgressDuration">maxAccessEgressDuration</h3>
-
-**Since version:** `2.1` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT45M"`   
-**Path:** /routingDefaults 
-
-This is the maximum duration for access/egress for street searches.
-
-This is a performance limit and should therefore be set high. Results close to the limit are not
-guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
-duration can be set per mode(`maxAccessEgressDurationForMode`), because some street modes searches
-are much more resource intensive than others. A default value is applied if the mode specific value
-do not exist.
-
 
 <h3 id="rd_maxDirectStreetDuration">maxDirectStreetDuration</h3>
 
@@ -391,10 +382,46 @@ Factor for how much the walk safety is considered in routing.
 
 Value should be between 0 and 1. If the value is set to be 0, safety is ignored.
 
-<h3 id="rd_accessEgressPenalty">accessEgressPenalty</h3>
+<h3 id="rd_accessEgress_maxDuration">maxDuration</h3>
+
+**Since version:** `2.1` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT45M"`   
+**Path:** /routingDefaults/accessEgress 
+
+This is the maximum duration for access/egress for street searches.
+
+This is a performance limit and should therefore be set high. Results close to the limit are not
+guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
+duration can be set per mode(`maxDurationForMode`), because some street modes searches
+are much more resource intensive than others. A default value is applied if the mode specific value
+do not exist.
+
+
+<h3 id="rd_accessEgress_maxStopCount">maxStopCount</h3>
+
+**Since version:** `2.4` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `500`   
+**Path:** /routingDefaults/accessEgress 
+
+Maximal number of stops collected in access/egress routing
+
+Safety limit to prevent access to and egress from too many stops.
+
+
+<h3 id="rd_accessEgress_maxDurationForMode">maxDurationForMode</h3>
+
+**Since version:** `2.1` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/accessEgress   
+**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
+
+Limit access/egress per street mode.
+
+Override the settings in `maxDuration` for specific street modes. This is
+done because some street modes searches are much more resource intensive than others.
+
+
+<h3 id="rd_accessEgress_penalty">penalty</h3>
 
 **Since version:** `2.4` ∙ **Type:** `enum map of object` ∙ **Cardinality:** `Optional`   
-**Path:** /routingDefaults   
+**Path:** /routingDefaults/accessEgress   
 **Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
 
 Penalty for access/egress by street mode.
@@ -409,10 +436,9 @@ The default is no penalty, if not configured.
 
 Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 
-
 **Time penalty**
 
-The `time-penalty` is used to add a penalty to the access/egress duration/time. The
+The `timePenalty` is used to add a penalty to the access/egress duration/time. The
 time including the penalty is used in the algorithm when comparing paths, but the
 actual duration is used when presented to the end user.
 
@@ -654,18 +680,6 @@ This value is used to increase the filter threshold for itineraries further away
 time, compared to those, that have exactly the same arrival and departure times.
 
 The unit is cost unit per second of time difference.
-
-<h3 id="rd_maxAccessEgressDurationForMode">maxAccessEgressDurationForMode</h3>
-
-**Since version:** `2.1` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
-**Path:** /routingDefaults   
-**Enum keys:** `not-set` | `walk` | `bike` | `bike-to-park` | `bike-rental` | `scooter-rental` | `car` | `car-to-park` | `car-pickup` | `car-rental` | `car-hailing` | `flexible`
-
-Limit access/egress per street mode.
-
-Override the settings in `maxAccessEgressDuration` for specific street modes. This is
-done because some street modes searches are much more resource intensive than others.
-
 
 <h3 id="rd_maxDirectStreetDurationForMode">maxDirectStreetDurationForMode</h3>
 
@@ -915,8 +929,18 @@ include stairs as a last result.
     "transitReluctanceForMode" : {
       "RAIL" : 0.85
     },
-    "maxAccessEgressDurationForMode" : {
-      "BIKE_RENTAL" : "20m"
+    "accessEgress" : {
+      "maxDuration" : "45m",
+      "maxDurationForMode" : {
+        "BIKE_RENTAL" : "20m"
+      },
+      "maxStopCount" : 500,
+      "penalty" : {
+        "FLEXIBLE" : {
+          "timePenalty" : "2m + 1.1t",
+          "costFactor" : 1.7
+        }
+      }
     },
     "itineraryFilters" : {
       "transitGeneralizedCostLimit" : {

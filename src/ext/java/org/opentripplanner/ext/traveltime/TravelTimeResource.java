@@ -95,7 +95,7 @@ public class TravelTimeResource {
       routingRequest.journey().transit().setFilters(List.of(request));
     }
 
-    var durationForMode = routingRequest.preferences().street().maxAccessEgressDuration();
+    var durationForMode = routingRequest.preferences().street().accessEgress().maxDuration();
     traveltimeRequest =
       new TravelTimeRequest(
         cutoffs.stream().map(DurationUtils::duration).toList(),
@@ -186,7 +186,8 @@ public class TravelTimeResource {
       getAccessRequest(routingRequest),
       null,
       routingRequest.arriveBy(),
-      traveltimeRequest.maxAccessDuration
+      traveltimeRequest.maxAccessDuration,
+      0
     );
     return AccessEgressMapper.mapNearbyStops(accessStops, routingRequest.arriveBy());
   }

@@ -116,7 +116,7 @@ public final class WalkPreferences implements Serializable {
     return (
       doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
-      boardCost == that.boardCost &&
+      boardCost.equals(that.boardCost) &&
       doubleEquals(that.stairsReluctance, stairsReluctance) &&
       doubleEquals(that.stairsTimeFactor, stairsTimeFactor) &&
       doubleEquals(that.safetyFactor, safetyFactor) &&
@@ -132,7 +132,8 @@ public final class WalkPreferences implements Serializable {
       boardCost,
       stairsReluctance,
       stairsTimeFactor,
-      safetyFactor
+      safetyFactor,
+      escalatorReluctance
     );
   }
 

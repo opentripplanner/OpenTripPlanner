@@ -292,7 +292,6 @@ public abstract class GraphRoutingTest {
       return PathwayEdge.createPathwayEdge(
         from,
         to,
-        null,
         new NonLocalizedString(
           String.format("%s%s pathway", from.getDefaultName(), to.getDefaultName())
         ),

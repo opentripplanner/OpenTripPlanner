@@ -520,7 +520,7 @@ public class TripQuery {
           )
           .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
           .defaultValueLiteral(
-            mapDurationForStreetModeGraphQLValue(preferences.street().maxAccessEgressDuration())
+            mapDurationForStreetModeGraphQLValue(preferences.street().accessEgress().maxDuration())
           )
           .build()
       )

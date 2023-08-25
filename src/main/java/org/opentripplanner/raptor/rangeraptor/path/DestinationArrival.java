@@ -70,6 +70,11 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   }
 
   @Override
+  public boolean supportsC2() {
+    return false;
+  }
+
+  @Override
   public int c2() {
     return previous.c2();
   }

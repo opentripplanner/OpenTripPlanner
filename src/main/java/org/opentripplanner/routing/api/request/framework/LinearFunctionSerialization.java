@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -31,7 +32,7 @@ public class LinearFunctionSerialization {
 
   private static final String SEP = "\\s*";
   private static final String NUM = "([\\d.,]+)";
-  private static final String DUR = "(?:PT)?((?:[\\d]+[hms]?)+)";
+  private static final String DUR = "(?:PT)?([\\d\\.hms]+)";
   private static final String PLUS = Pattern.quote("+");
   private static final String VARIABLE = "[XxTt]";
   private static final Pattern PATTERN = Pattern.compile(
@@ -45,6 +46,8 @@ public class LinearFunctionSerialization {
    * <p>
    * The coefficient must be a number between 0.0 and 100.0. and is normalized: if < 2.0 to
    * 2 decimals, if 2.0 < 10.0 to 1 decimal and to whole numbers above 10.0.
+   * @throws NumberFormatException
+   * @throws IllegalArgumentException
    */
   public static <T> Optional<T> parse(String text, BiFunction<Duration, Double, T> factory) {
     if (StringUtils.hasNoValue(text)) {
@@ -54,11 +57,14 @@ public class LinearFunctionSerialization {
 
     if (m.matches()) {
       var constantText = m.group(1);
-      var coefficient = Double.parseDouble(m.group(2));
+      var coefficientText = m.group(2);
+      var coefficient = Double.parseDouble(coefficientText);
       coefficient = Units.normalizedFactor(coefficient, 0.0, 100.0);
 
-      var constant = constantText.matches("\\d+")
-        ? Duration.ofSeconds(Integer.parseInt(constantText))
+      // Unfortunately, to be backwards compatible we need to support decimal numbers.
+      // If a decimal number, then the value is converted to seconds
+      var constant = constantText.matches("\\d+(\\.\\d+)?")
+        ? Duration.ofSeconds(IntUtils.round(Double.parseDouble(constantText)))
         : DurationUtils.duration(constantText);
 
       return Optional.of(factory.apply(constant, coefficient));

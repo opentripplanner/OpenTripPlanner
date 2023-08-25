@@ -15,7 +15,7 @@ import org.opentripplanner.street.model.note.StreetNote;
 public class WalkStepBuilder {
 
   private final Set<StreetNote> streetNotes = new HashSet<>();
-  private I18NString streetName;
+  private I18NString directionText;
   private WgsCoordinate startLocation;
   private boolean bogusName = false;
   private double angle;
@@ -34,8 +34,8 @@ public class WalkStepBuilder {
 
   WalkStepBuilder() {}
 
-  public WalkStepBuilder withStreetName(I18NString streetName) {
-    this.streetName = streetName;
+  public WalkStepBuilder withDirectionText(I18NString streetName) {
+    this.directionText = streetName;
     return this;
   }
 
@@ -119,8 +119,8 @@ public class WalkStepBuilder {
   }
 
   @Nullable
-  public String streetNameNoParens() {
-    var str = streetName.toString();
+  public String directionTextNoParens() {
+    var str = directionText.toString();
     if (str == null) {
       return null; //Avoid null reference exceptions with pathways which don't have names
     }
@@ -136,8 +136,8 @@ public class WalkStepBuilder {
     return this;
   }
 
-  public I18NString streetName() {
-    return streetName;
+  public I18NString directionText() {
+    return directionText;
   }
 
   public boolean bogusName() {
@@ -153,7 +153,7 @@ public class WalkStepBuilder {
       startLocation,
       relativeDirection,
       absoluteDirection,
-      streetName,
+      directionText,
       streetNotes,
       exit,
       elevationProfile,
