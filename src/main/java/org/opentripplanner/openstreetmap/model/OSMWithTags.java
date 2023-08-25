@@ -502,6 +502,11 @@ public class OSMWithTags {
     return false;
   }
 
+  public boolean isLink() {
+    String highway = getTag("highway");
+    return highway != null && highway.endsWith(("_link"));
+  }
+
   /**
    * Returns true if this tag is explicitly access to this entity.
    */

@@ -543,7 +543,7 @@ public class WalkableAreaBuilder {
         streetEdgeBuilder.withWheelchairAccessible(false);
       }
 
-      streetEdgeBuilder.withLink(OsmFilter.isLink(areaEntity));
+      streetEdgeBuilder.withLink(areaEntity.isLink());
 
       label =
         "way (area) " +
@@ -573,7 +573,7 @@ public class WalkableAreaBuilder {
         backStreetEdgeBuilder.withWheelchairAccessible(false);
       }
 
-      backStreetEdgeBuilder.withLink(OsmFilter.isLink(areaEntity));
+      backStreetEdgeBuilder.withLink(areaEntity.isLink());
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
         WayProperties wayData = areaEntity

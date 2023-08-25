@@ -189,11 +189,6 @@ public class OsmFilter {
     return new StreetTraversalPermissionPair(permissionsFront, permissionsBack);
   }
 
-  public static boolean isLink(OSMWithTags way) {
-    String highway = way.getTag("highway");
-    return highway != null && highway.endsWith(("_link"));
-  }
-
   /**
    * Determine whether any mode can or should ever traverse the given way. If not, we leave the way
    * out of the OTP graph. Potentially routable ways are those that have the tags : highway=*

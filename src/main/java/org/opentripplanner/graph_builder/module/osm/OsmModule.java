@@ -528,7 +528,7 @@ public class OsmModule implements GraphBuilderModule {
       .withPermission(permissions)
       .withBack(back)
       .withCarSpeed(carSpeed)
-      .withLink(OsmFilter.isLink(way))
+      .withLink(way.isLink())
       .withRoundabout(way.isRoundabout())
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
       .withStairs(way.isSteps());
