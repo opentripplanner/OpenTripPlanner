@@ -2,15 +2,17 @@ package org.opentripplanner.openstreetmap.model;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
@@ -148,6 +150,7 @@ public class OSMWithTags {
   }
 
   /** @return a tag's value, converted to lower case. */
+  @Nullable
   public String getTag(String tag) {
     tag = tag.toLowerCase();
     if (tags != null && tags.containsKey(tag)) {
@@ -474,6 +477,11 @@ public class OSMWithTags {
 
   public void setOsmProvider(OsmProvider provider) {
     this.osmProvider = provider;
+  }
+
+  @Nonnull
+  public Optional<String> getTagOpt(String network) {
+    return Optional.ofNullable(getTag(network));
   }
 
   /**

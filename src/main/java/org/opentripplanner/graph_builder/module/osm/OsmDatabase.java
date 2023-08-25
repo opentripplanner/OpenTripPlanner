@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -34,7 +33,6 @@ import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.graph_builder.issues.DisconnectedOsmNode;
 import org.opentripplanner.graph_builder.issues.InvalidOsmGeometry;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
-import org.opentripplanner.graph_builder.issues.TooManyAreasInRelation;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
@@ -132,11 +130,9 @@ public class OsmDatabase {
    * the United States. This does not affect floor names from level maps.
    */
   public boolean noZeroLevels = true;
-  private final Set<String> boardingAreaRefTags;
 
-  public OsmDatabase(DataImportIssueStore issueStore, Set<String> boardingAreaRefTags) {
+  public OsmDatabase(DataImportIssueStore issueStore) {
     this.issueStore = issueStore;
-    this.boardingAreaRefTags = boardingAreaRefTags;
   }
 
   public OSMNode getNode(Long nodeId) {
@@ -298,7 +294,7 @@ public class OsmDatabase {
     }
 
     if (
-      relation.isTag("type", "multipolygon") &&
+      relation.isMultiPolygon() &&
       (OsmFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide()) ||
       relation.isBikeParking()
     ) {
@@ -316,18 +312,12 @@ public class OsmDatabase {
       }
       applyLevelsForWay(relation);
     } else if (
-      !(relation.isTag("type", "restriction")) &&
-      !(relation.isTag("type", "route") && relation.isTag("route", "road")) &&
-      !(relation.isTag("type", "multipolygon") && OsmFilter.isOsmEntityRoutable(relation)) &&
-      !(relation.isTag("type", "level_map")) &&
-      !(
-        relation.isTag("type", "public_transport") &&
-        relation.isTag("public_transport", "stop_area")
-      ) &&
-      !(
-        relation.isTag("type", "route") &&
-        (relation.isTag("route", "road") || relation.isTag("route", "bicycle"))
-      )
+      !relation.isRestriction() &&
+      !relation.isRoadRoute() &&
+      !(relation.isMultiPolygon() && OsmFilter.isOsmEntityRoutable(relation)) &&
+      !relation.isLevelMap() &&
+      !relation.isStopArea() &&
+      !(relation.isRoadRoute() || relation.isBicycleRoute())
     ) {
       return;
     }
@@ -740,7 +730,7 @@ public class OsmDatabase {
       }
       if (
         !(
-          relation.isTag("type", "multipolygon") &&
+          relation.isMultiPolygon() &&
           (
             OsmFilter.isOsmEntityRoutable(relation) ||
             relation.isParkAndRide() ||
@@ -842,14 +832,14 @@ public class OsmDatabase {
     LOG.debug("Processing relations...");
 
     for (OSMRelation relation : relationsById.valueCollection()) {
-      if (relation.isTag("type", "restriction")) {
+      if (relation.isRestriction()) {
         processRestriction(relation);
-      } else if (relation.isTag("type", "level_map")) {
+      } else if (relation.isLevelMap()) {
         processLevelMap(relation);
-      } else if (relation.isTag("type", "route")) {
+      } else if (relation.isRoute()) {
         processRoad(relation);
         processBicycleRoute(relation);
-      } else if (relation.isTag("type", "public_transport")) {
+      } else if (relation.isPublicTransport()) {
         processPublicTransportStopArea(relation);
       }
     }
@@ -861,28 +851,10 @@ public class OsmDatabase {
    * @see "https://wiki.openstreetmap.org/wiki/Tag:route%3Dbicycle"
    */
   private void processBicycleRoute(OSMRelation relation) {
-    if (relation.isTag("route", "bicycle")) {
-      var network = relation.getTag("network");
-
-      if (network == null) network = "lcn";
-      switch (network) {
-        case "lcn":
-          setNetworkForAllMembers(relation, "lcn");
-          break;
-        case "rcn":
-          setNetworkForAllMembers(relation, "rcn");
-          break;
-        case "ncn":
-          setNetworkForAllMembers(relation, "ncn");
-          break;
-        case "icn":
-          setNetworkForAllMembers(relation, "icn");
-          break;
-        // we treat networks without known network type like local networks
-        default:
-          setNetworkForAllMembers(relation, "lcn");
-          break;
-      }
+    if (relation.isBicycleRoute()) {
+      // we treat networks without known network type like local networks
+      var network = relation.getTagOpt("network").orElse("lcn");
+      setNetworkForAllMembers(relation, network);
     }
   }
 
@@ -1102,7 +1074,6 @@ public class OsmDatabase {
   private void processPublicTransportStopArea(OSMRelation relation) {
     Set<OSMWithTags> platformAreas = new HashSet<>();
     Set<OSMNode> platformNodes = new HashSet<>();
-    boolean skipped = false;
     for (OSMRelationMember member : relation.getMembers()) {
       switch (member.getType()) {
         case NODE:

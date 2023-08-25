@@ -65,7 +65,7 @@ public class OsmModule implements GraphBuilderModule {
     this.graph = graph;
     this.issueStore = issueStore;
     this.params = params;
-    this.osmdb = new OsmDatabase(issueStore, params.boardingAreaRefTags());
+    this.osmdb = new OsmDatabase(issueStore);
     this.vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags());
     this.normalizer = new SafetyValueNormalizer(graph, issueStore);
   }
