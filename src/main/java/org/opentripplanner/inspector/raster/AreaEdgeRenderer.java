@@ -41,7 +41,7 @@ public class AreaEdgeRenderer implements EdgeVertexRenderer {
     while (iterator.hasNext()) {
       if (iterator.next() instanceof AreaEdge ae) {
         AreaEdgeList list = ae.getArea();
-        if (list.visibilityVertices.contains(v)) {
+        if (list.visibilityVertices().contains(v)) {
           return vxType.VISIBILITY_VERTEX;
         }
         val = vxType.AREA_VERTEX;

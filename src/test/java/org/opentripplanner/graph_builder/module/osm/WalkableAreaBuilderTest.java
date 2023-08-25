@@ -114,7 +114,7 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("stopareas.pbf")
   @Visibility(true)
-  @MaxAreaNodes(20)
+  @MaxAreaNodes(50)
   public void test_entrance_stoparea_linking(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.

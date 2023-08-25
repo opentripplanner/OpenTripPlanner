@@ -9,7 +9,6 @@ on:
       - master
       - dev-1.x
       - dev-2.x
-      - flicker-test
   pull_request:
     branches:
       - master
