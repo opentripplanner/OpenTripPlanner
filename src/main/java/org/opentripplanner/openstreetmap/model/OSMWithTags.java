@@ -485,6 +485,24 @@ public class OSMWithTags {
   }
 
   /**
+   * Determines whether this OSM way is considered routable. The majority of routable ways are those
+   * with a highway= tag (which includes everything from motorways to hiking trails). Anything with
+   * a public_transport=platform or railway=platform tag is also considered routable even if it
+   * doesn't have a highway tag. Platforms are however filtered out if they are marked
+   * usage=tourism. This prevents miniature tourist railways like the one in Portland's Zoo from
+   * receiving a better score and pulling search endpoints away from real transit stops.
+   */
+  public boolean isRoutable() {
+    if (hasTag("highway")) {
+      return true;
+    }
+    if (isPlatform()) {
+      return !("tourism".equals(getTag("usage")));
+    }
+    return false;
+  }
+
+  /**
    * Returns true if this tag is explicitly access to this entity.
    */
   private boolean isTagDeniedAccess(String tagName) {

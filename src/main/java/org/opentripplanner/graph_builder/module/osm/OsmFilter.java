@@ -11,24 +11,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  */
 public class OsmFilter {
 
-  /**
-   * Determines whether this OSM way is considered routable. The majority of routable ways are those
-   * with a highway= tag (which includes everything from motorways to hiking trails). Anything with
-   * a public_transport=platform or railway=platform tag is also considered routable even if it
-   * doesn't have a highway tag. Platforms are however filtered out if they are marked
-   * usage=tourism. This prevents miniature tourist railways like the one in Portland's Zoo from
-   * receiving a better score and pulling search endpoints away from real transit stops.
-   */
-  public static boolean isOsmEntityRoutable(OSMWithTags osmEntity) {
-    if (osmEntity.hasTag("highway")) {
-      return true;
-    }
-    if (osmEntity.isPlatform()) {
-      return !("tourism".equals(osmEntity.getTag("usage")));
-    }
-    return false;
-  }
-
   public static StreetTraversalPermission getPermissionsForEntity(
     OSMWithTags entity,
     StreetTraversalPermission def
@@ -224,7 +206,7 @@ public class OsmFilter {
    * A whitelist for highway tags is an alternative to a blacklist.
    */
   static boolean isWayRoutable(OSMWithTags way) {
-    if (!isOsmEntityRoutable(way)) {
+    if (!(way.isRoutable())) {
       return false;
     }
 

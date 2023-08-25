@@ -295,7 +295,7 @@ public class OsmDatabase {
 
     if (
       relation.isMultiPolygon() &&
-      (OsmFilter.isOsmEntityRoutable(relation) || relation.isParkAndRide()) ||
+      (relation.isRoutable() || relation.isParkAndRide()) ||
       relation.isBikeParking()
     ) {
       // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
@@ -314,7 +314,7 @@ public class OsmDatabase {
     } else if (
       !relation.isRestriction() &&
       !relation.isRoadRoute() &&
-      !(relation.isMultiPolygon() && OsmFilter.isOsmEntityRoutable(relation)) &&
+      !(relation.isMultiPolygon() && relation.isRoutable()) &&
       !relation.isLevelMap() &&
       !relation.isStopArea() &&
       !(relation.isRoadRoute() || relation.isBicycleRoute())
@@ -731,11 +731,7 @@ public class OsmDatabase {
       if (
         !(
           relation.isMultiPolygon() &&
-          (
-            OsmFilter.isOsmEntityRoutable(relation) ||
-            relation.isParkAndRide() ||
-            relation.isBikeParking()
-          )
+          (relation.isRoutable() || relation.isParkAndRide() || relation.isBikeParking())
         )
       ) {
         continue;
@@ -811,9 +807,7 @@ public class OsmDatabase {
       area.parent,
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
     );
-    if (
-      OsmFilter.isOsmEntityRoutable(area.parent) && permissions != StreetTraversalPermission.NONE
-    ) {
+    if (area.parent.isRoutable() && permissions != StreetTraversalPermission.NONE) {
       walkableAreas.add(area);
     }
     // Please note: the same area can be both car P+R AND bike park.
