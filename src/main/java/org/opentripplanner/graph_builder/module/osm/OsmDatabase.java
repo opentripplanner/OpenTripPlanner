@@ -41,6 +41,7 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
+import org.opentripplanner.openstreetmap.model.OSMMemberType;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
@@ -788,7 +789,7 @@ public class OsmDatabase {
 
       for (OSMRelationMember member : relation.getMembers()) {
         // multipolygons for attribute mapping
-        if (!("way".equals(member.getType()) && waysById.containsKey(member.getRef()))) {
+        if (!(member.hasType(OSMMemberType.WAY) && waysById.containsKey(member.getRef()))) {
           continue;
         }
 
@@ -889,7 +890,7 @@ public class OsmDatabase {
     relation
       .getMembers()
       .forEach(member -> {
-        var isOsmWay = "way".equals(member.getType());
+        var isOsmWay = member.hasType(OSMMemberType.WAY);
         var way = waysById.get(member.getRef());
         // if it is an OSM way (rather than a node) and it it doesn't already contain the tag
         // we add it
@@ -1032,7 +1033,7 @@ public class OsmDatabase {
       issueStore
     );
     for (OSMRelationMember member : relation.getMembers()) {
-      if ("way".equals(member.getType()) && waysById.containsKey(member.getRef())) {
+      if (member.hasType(OSMMemberType.WAY) && waysById.containsKey(member.getRef())) {
         OSMWay way = waysById.get(member.getRef());
         if (way != null) {
           String role = member.getRole();
@@ -1055,7 +1056,7 @@ public class OsmDatabase {
    */
   private void processRoad(OSMRelation relation) {
     for (OSMRelationMember member : relation.getMembers()) {
-      if (!("way".equals(member.getType()) && waysById.containsKey(member.getRef()))) {
+      if (!(member.hasType(OSMMemberType.WAY) && waysById.containsKey(member.getRef()))) {
         continue;
       }
 
@@ -1103,23 +1104,23 @@ public class OsmDatabase {
     Set<OSMNode> platformNodes = new HashSet<>();
     boolean skipped = false;
     for (OSMRelationMember member : relation.getMembers()) {
-      if (
-        "way".equals(member.getType()) &&
-        "platform".equals(member.getRole()) &&
-        areaWayIds.contains(member.getRef())
-      ) {
-        platformAreas.add(areaWaysById.get(member.getRef()));
-      } else if (
-        "relation".equals(member.getType()) &&
-        "platform".equals(member.getRole()) &&
-        relationsById.containsKey(member.getRef())
-      ) {
-        platformAreas.add(relationsById.get(member.getRef()));
-      } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
-        var node = nodesById.get(member.getRef());
-        if (node.isEntrance() || node.isBoardingLocation()) {
-          platformNodes.add(node);
-        }
+      switch (member.getType()) {
+        case NODE:
+          var node = nodesById.get(member.getRef());
+          if (node != null && (node.isEntrance() || node.isBoardingLocation())) {
+            platformNodes.add(node);
+          }
+          break;
+        case WAY:
+          if ("platform".equals(member.getRole()) && areaWayIds.contains(member.getRef())) {
+            platformAreas.add(areaWaysById.get(member.getRef()));
+          }
+          break;
+        case RELATION:
+          if ("platform".equals(member.getRole()) && relationsById.containsKey(member.getRef())) {
+            platformAreas.add(relationsById.get(member.getRef()));
+          }
+          break;
       }
     }
 
