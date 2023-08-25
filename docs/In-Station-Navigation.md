@@ -51,18 +51,18 @@ contain as much precision as possible.
 One advantage that pathways offer is the possibility to add information like "follow signs for X"
 which OTP adds to the textual turn-by-turn instructions.
 
-#### Example: Transferring at Suedkreuz
+#### Example: Transferring at Südkreuz
 
-Here the pathways don't offer a lot of precision: In a railway hub in Berlin there are suboptimal
-instructions on how to move from one platform to another because the pathways only contain rudimentary
-information about how to move inside the station. (The red lines represent train lines with
-the grey line showing the walking path.)
+Here the pathways don't offer a lot of precision: In a [railway hub in Berlin](https://www.openstreetmap.org/#map=18/52.47572/13.36534&layers=T) 
+there are suboptimal instructions on how to move from one platform to another because the pathways 
+only contain rudimentary information about how to move inside the station. (The red lines represent 
+train lines with the grey line showing the walking path.)
 
 ![Transferring at Suedkreuz](images/transfer-suedkreuz.png)
 
 ### Transfers
 
-The above precendence rules of 
+The above precedence rules of 
 
 - GTFS pathways, if it exists
 - then OSM data 
@@ -101,3 +101,9 @@ for transferring.
 [GTFS minimum transfer times](https://github.com/google/transit/blob/master/gtfs/spec/en/reference.md#transferstxt) 
 are also supported but generally not advised. It is preferable to micromap your stations and
 improve the stop coordinates rather than force specific transfer times by adding this data.
+
+### Common data errors
+
+- Stop coordinates not where passengers are expected to board
+- All stops/platforms in a railway station having the same coordinates
+- OSM platforms [not connected to the street network](https://github.com/opentripplanner/OpenTripPlanner/issues/5029)
