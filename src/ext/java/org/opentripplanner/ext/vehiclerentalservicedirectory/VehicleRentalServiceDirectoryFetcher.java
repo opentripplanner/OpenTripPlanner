@@ -31,8 +31,21 @@ public class VehicleRentalServiceDirectoryFetcher {
   private static final Logger LOG = LoggerFactory.getLogger(
     VehicleRentalServiceDirectoryFetcher.class
   );
-
   private static final Duration DEFAULT_FREQUENCY = Duration.ofSeconds(15);
+
+  private final VertexLinker vertexLinker;
+  private final VehicleRentalRepository repository;
+  private final OtpHttpClient otpHttpClient;
+
+  public VehicleRentalServiceDirectoryFetcher(
+    VertexLinker vertexLinker,
+    VehicleRentalRepository repository,
+    OtpHttpClient otpHttpClient
+  ) {
+    this.vertexLinker = vertexLinker;
+    this.repository = repository;
+    this.otpHttpClient = otpHttpClient;
+  }
 
   public static List<GraphUpdater> createUpdatersFromEndpoint(
     VehicleRentalServiceDirectoryFetcherParameters parameters,
@@ -41,7 +54,6 @@ public class VehicleRentalServiceDirectoryFetcher {
   ) {
     LOG.info("Fetching list of updaters from {}", parameters.getUrl());
 
-    List<GraphUpdater> updaters = new ArrayList<>();
     var sources = listSources(parameters);
 
     if (sources.isEmpty()) {
@@ -50,6 +62,16 @@ public class VehicleRentalServiceDirectoryFetcher {
 
     int maxHttpConnections = sources.size();
     var otpHttpClient = new OtpHttpClient(maxHttpConnections);
+
+    return new VehicleRentalServiceDirectoryFetcher(vertexLinker, repository, otpHttpClient)
+      .createUpdatersFromEndpoint(parameters, sources);
+  }
+
+  public List<GraphUpdater> createUpdatersFromEndpoint(
+    VehicleRentalServiceDirectoryFetcherParameters parameters,
+    JsonNode sources
+  ) {
+    List<GraphUpdater> updaters = new ArrayList<>();
 
     for (JsonNode source : sources) {
       Optional<String> network = JsonUtils.asText(source, parameters.getSourceNetworkName());
@@ -60,44 +82,55 @@ public class VehicleRentalServiceDirectoryFetcher {
           "Error reading json from {}. Are json tag names configured properly?",
           parameters.getUrl()
         );
-        continue;
+      } else {
+        createUpdater(parameters, network.get(), updaterUrl.get()).ifPresent(updaters::add);
       }
-
-      var c = parameters.networkParameters(network.get());
-
-      VehicleRentalParameters vehicleRentalParameters = new VehicleRentalParameters(
-        "vehicle-rental-service-directory:" + network,
-        DEFAULT_FREQUENCY,
-        new GbfsVehicleRentalDataSourceParameters(
-          updaterUrl.get(),
-          parameters.getLanguage(),
-          // allowKeepingRentedVehicleAtDestination - not part of GBFS, not supported here
-          false,
-          parameters.getHeaders(),
-          network.get(),
-          c.geofencingZones(),
-          // overloadingAllowed - not part of GBFS, not supported here
-          false
-        )
-      );
-      LOG.info("Fetched updater info for {} at url {}", network.get(), updaterUrl.get());
-
-      var dataSource = VehicleRentalDataSourceFactory.create(
-        vehicleRentalParameters.sourceParameters(),
-        otpHttpClient
-      );
-      var updater = new VehicleRentalUpdater(
-        vehicleRentalParameters,
-        dataSource,
-        vertexLinker,
-        repository
-      );
-      updaters.add(updater);
     }
 
     LOG.info("{} updaters fetched", updaters.size());
 
     return updaters;
+  }
+
+  private Optional<VehicleRentalUpdater> createUpdater(
+    VehicleRentalServiceDirectoryFetcherParameters parameters,
+    String networkName,
+    String updaterUrl
+  ) {
+    var config = parameters.networkParameters(networkName);
+
+    if (config == null) {
+      LOG.info("Network not configured in OTP: {}", networkName);
+      return Optional.empty();
+    }
+
+    VehicleRentalParameters vehicleRentalParameters = new VehicleRentalParameters(
+      "vehicle-rental-service-directory:" + networkName,
+      DEFAULT_FREQUENCY,
+      new GbfsVehicleRentalDataSourceParameters(
+        updaterUrl,
+        parameters.getLanguage(),
+        // allowKeepingRentedVehicleAtDestination - not part of GBFS, not supported here
+        false,
+        parameters.getHeaders(),
+        networkName,
+        config.geofencingZones(),
+        // overloadingAllowed - not part of GBFS, not supported here
+        false
+      )
+    );
+    LOG.info("Fetched updater info for {} at url {}", networkName, updaterUrl);
+
+    var dataSource = VehicleRentalDataSourceFactory.create(
+      vehicleRentalParameters.sourceParameters(),
+      otpHttpClient
+    );
+    return Optional.of( new VehicleRentalUpdater(
+      vehicleRentalParameters,
+      dataSource,
+      vertexLinker,
+      repository
+    ));
   }
 
   private static JsonNode listSources(VehicleRentalServiceDirectoryFetcherParameters parameters) {
