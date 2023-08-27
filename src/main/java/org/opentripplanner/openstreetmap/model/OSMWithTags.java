@@ -185,7 +185,7 @@ public class OSMWithTags {
   /**
    * Checks is a tag contains the specified value.
    */
-  public Boolean isTag(String tag, String value) {
+  public boolean isTag(String tag, String value) {
     tag = tag.toLowerCase();
     if (tags != null && tags.containsKey(tag) && value != null) {
       return value.equals(tags.get(tag));
@@ -408,18 +408,18 @@ public class OSMWithTags {
    */
   public boolean isBoardingLocation() {
     return (
-      "bus_stop".equals(getTag("highway")) ||
-      "tram_stop".equals(getTag("railway")) ||
-      "station".equals(getTag("railway")) ||
-      "halt".equals(getTag("railway")) ||
-      "bus_station".equals(getTag("amenity")) ||
-      "ferry_terminal".equals(getTag("amenity")) ||
+      isTag("highway", "bus_stop") ||
+      isTag("railway", "tram_stop") ||
+      isTag("railway", "station") ||
+      isTag("railway", "halt") ||
+      isTag("amenity", "bus_station") ||
+      isTag("amenity", "ferry_terminal") ||
       isPlatform()
     );
   }
 
   public boolean isPlatform() {
-    return "platform".equals(getTag("public_transport")) || "platform".equals(getTag("railway"));
+    return isTag("public_transport", "platform") || isTag("railway", "platform");
   }
 
   /**
@@ -505,6 +505,10 @@ public class OSMWithTags {
   public boolean isLink() {
     String highway = getTag("highway");
     return highway != null && highway.endsWith(("_link"));
+  }
+
+  public boolean isElevator() {
+    return isTag("highway", "elevator");
   }
 
   /**

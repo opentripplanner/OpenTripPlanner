@@ -261,12 +261,7 @@ public class OsmDatabase {
 
     /* An area can be specified as such, or be one by default as an amenity */
     if (
-      (
-        way.isTag("area", "yes") ||
-        way.isTag("amenity", "parking") ||
-        way.isTag("amenity", "bicycle_parking") ||
-        way.isBoardingArea()
-      ) &&
+      (way.isArea() || way.isParkAndRide() || way.isBikeParking() || way.isBoardingArea()) &&
       way.getNodeRefs().size() > 2
     ) {
       // this is an area that's a simple polygon. So we can just add it straight
@@ -788,7 +783,7 @@ public class OsmDatabase {
             way.addTag(tag, relation.getTag(tag));
           }
         }
-        if (relation.isTag("railway", "platform") && !way.hasTag("railway")) {
+        if (relation.isPlatform() && !way.hasTag("railway")) {
           way.addTag("railway", "platform");
         }
         if (relation.isPlatform() && !way.hasTag("public_transport")) {

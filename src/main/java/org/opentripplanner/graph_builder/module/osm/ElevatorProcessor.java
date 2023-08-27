@@ -208,12 +208,10 @@ class ElevatorProcessor {
   }
 
   private boolean isElevatorWay(OSMWay way) {
-    if (!way.hasTag("highway")) {
+    if (!way.isElevator()) {
       return false;
     }
-    if (!"elevator".equals(way.getTag("highway"))) {
-      return false;
-    }
+
     if (osmdb.isAreaWay(way.getId())) {
       return false;
     }

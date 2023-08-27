@@ -129,7 +129,7 @@ public class OSMWay extends OSMWithTags {
 
   public boolean isEscalator() {
     return (
-      "steps".equals(this.getTag("highway")) &&
+      isTag("highway", "steps") &&
       this.getTag("conveying") != null &&
       Set.of("yes", "forward", "backward", "reversible").contains(this.getTag("conveying"))
     );
@@ -146,5 +146,9 @@ public class OSMWay extends OSMWithTags {
   @Override
   public String getOpenStreetMapLink() {
     return String.format("https://www.openstreetmap.org/way/%d", getId());
+  }
+
+  public boolean isArea() {
+    return isTag("area", "yes");
   }
 }
