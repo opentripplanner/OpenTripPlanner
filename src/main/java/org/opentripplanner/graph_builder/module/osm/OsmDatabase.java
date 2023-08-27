@@ -831,8 +831,7 @@ public class OsmDatabase {
       } else if (relation.isLevelMap()) {
         processLevelMap(relation);
       } else if (relation.isRoute()) {
-        processRoad(relation);
-        processBicycleRoute(relation);
+        processRoute(relation);
       } else if (relation.isPublicTransport()) {
         processPublicTransportStopArea(relation);
       }
@@ -1020,7 +1019,7 @@ public class OsmDatabase {
   /**
    * Handle route=road relations.
    */
-  private void processRoad(OSMRelation relation) {
+  private void processRoute(OSMRelation relation) {
     for (OSMRelationMember member : relation.getMembers()) {
       if (!(member.hasType(OSMMemberType.WAY) && waysById.containsKey(member.getRef()))) {
         continue;
@@ -1052,6 +1051,7 @@ public class OsmDatabase {
         }
       }
     }
+    processBicycleRoute(relation);
   }
 
   /**
