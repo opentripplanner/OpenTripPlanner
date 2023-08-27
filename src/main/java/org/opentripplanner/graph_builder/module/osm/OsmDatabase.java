@@ -740,7 +740,6 @@ public class OsmDatabase {
       ArrayList<OSMWay> innerWays = new ArrayList<>();
       ArrayList<OSMWay> outerWays = new ArrayList<>();
       for (OSMRelationMember member : relation.getMembers()) {
-        String role = member.getRole();
         OSMWay way = areaWaysById.get(member.getRef());
         if (way == null) {
           // relation includes way which does not exist in the data. Skip.
@@ -757,12 +756,12 @@ public class OsmDatabase {
             continue RELATION;
           }
         }
-        if (role.equals("inner")) {
+        if (member.hasRoleInner()) {
           innerWays.add(way);
-        } else if (role.equals("outer")) {
+        } else if (member.hasRoleOuter()) {
           outerWays.add(way);
         } else {
-          LOG.warn("Unexpected role {} in multipolygon", role);
+          LOG.warn("Unexpected role {} in multipolygon", member.getRole());
         }
       }
       processedAreas.add(relation);
@@ -857,7 +856,7 @@ public class OsmDatabase {
       .forEach(member -> {
         var isOsmWay = member.hasType(OSMMemberType.WAY);
         var way = waysById.get(member.getRef());
-        // if it is an OSM way (rather than a node) and it it doesn't already contain the tag
+        // if it is an OSM way (rather than a node) and it doesn't already contain the tag
         // we add it
         if (way != null && isOsmWay && !way.hasTag(key)) {
           way.addTag(key, "yes");
@@ -1070,22 +1069,22 @@ public class OsmDatabase {
     Set<OSMNode> platformNodes = new HashSet<>();
     for (OSMRelationMember member : relation.getMembers()) {
       switch (member.getType()) {
-        case NODE:
+        case NODE -> {
           var node = nodesById.get(member.getRef());
           if (node != null && (node.isEntrance() || node.isBoardingLocation())) {
             platformNodes.add(node);
           }
-          break;
-        case WAY:
-          if ("platform".equals(member.getRole()) && areaWayIds.contains(member.getRef())) {
+        }
+        case WAY -> {
+          if (member.hasRolePlatform() && areaWayIds.contains(member.getRef())) {
             platformAreas.add(areaWaysById.get(member.getRef()));
           }
-          break;
-        case RELATION:
-          if ("platform".equals(member.getRole()) && relationsById.containsKey(member.getRef())) {
+        }
+        case RELATION -> {
+          if (member.hasRolePlatform() && relationsById.containsKey(member.getRef())) {
             platformAreas.add(relationsById.get(member.getRef()));
           }
-          break;
+        }
       }
     }
 
