@@ -351,6 +351,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    */
   private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
     return (
+      transitLegBeforeTransfer == null ||
       transitLegBeforeTransfer.getTransferToNextLeg() == null ||
       !transitLegBeforeTransfer.getTransferToNextLeg().getTransferConstraint().isStaySeated()
     );
