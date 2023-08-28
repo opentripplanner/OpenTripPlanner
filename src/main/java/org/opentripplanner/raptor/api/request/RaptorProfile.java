@@ -67,4 +67,8 @@ public enum RaptorProfile {
   public boolean useApproximateTripSearch() {
     return is(MIN_TRAVEL_DURATION);
   }
+
+  public boolean producesGeneralizedCost() {
+    return is(MULTI_CRITERIA);
+  }
 }

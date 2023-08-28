@@ -26,10 +26,15 @@ class TimeAndCostPenaltyTest {
 
   @Test
   void calculate() {
-    assertEquals(
-      new TimeAndCost(DurationUtils.duration("27m35s"), Cost.costOfSeconds(4138)),
-      subject.calculate(1000)
+    int inputSeconds = 1000;
+    var inputTime = Duration.ofSeconds(inputSeconds);
+    var expectedTimeAndCost = new TimeAndCost(
+      DurationUtils.duration("27m35s"),
+      Cost.costOfSeconds(4138)
     );
+
+    assertEquals(expectedTimeAndCost, subject.calculate(inputTime));
+    assertEquals(expectedTimeAndCost, subject.calculate(inputSeconds));
   }
 
   @Test

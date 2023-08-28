@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>116</otp.serialization.version.id>
+        <otp.serialization.version.id>118</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>29.2</geotools.version>
         <google.dagger.version>2.47</google.dagger.version>
@@ -66,7 +66,7 @@
         <micrometer.version>1.11.3</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <netty.version>4.1.74.Final</netty.version>
-        <logback.version>1.4.8</logback.version>
+        <logback.version>1.4.11</logback.version>
         <lucene.version>9.7.0</lucene.version>
         <slf4j.version>2.0.7</slf4j.version>
         <netex-java-model.version>2.0.14</netex-java-model.version>
@@ -770,7 +770,7 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
-            <version>1.0.1</version>
+            <version>1.1.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -908,7 +908,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.4.3</version>
+            <version>1.4.4</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>

@@ -37,6 +37,7 @@ public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
   private float walkSafetyFactor;
   private float bicycleSafetyFactor;
   private short flags;
+  private StreetElevationExtension streetElevationExtension;
 
   public StreetEdgeBuilder() {
     this.defaultLength = true;
@@ -223,6 +224,28 @@ public class StreetEdgeBuilder<B extends StreetEdgeBuilder<B>> {
       case CAR, FLEX -> withMotorVehicleNoThruTraffic(true);
     }
     return instance();
+  }
+
+  public boolean slopeOverride() {
+    return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
+  }
+
+  public boolean stairs() {
+    return BitSetUtils.get(flags, STAIRS_FLAG_INDEX);
+  }
+
+  public B withFlags(short flags) {
+    this.flags = flags;
+    return instance();
+  }
+
+  public B withElevationExtension(StreetElevationExtension streetElevationExtension) {
+    this.streetElevationExtension = streetElevationExtension;
+    return instance();
+  }
+
+  public StreetElevationExtension streetElevationExtension() {
+    return streetElevationExtension;
   }
 
   @SuppressWarnings("unchecked")

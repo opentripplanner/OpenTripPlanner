@@ -19,6 +19,7 @@ import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.BitSetUtils;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -100,7 +101,7 @@ public class StreetEdge
   /**
    * The speed (meters / sec) at which an automobile can traverse this street segment.
    */
-  private float carSpeed;
+  private final float carSpeed;
 
   /**
    * The angle at the start of the edge geometry. Internal representation is -180 to +179 integer
@@ -140,10 +141,11 @@ public class StreetEdge
     this.setWalkSafetyFactor(builder.walkSafetyFactor());
     this.name = builder.name();
     this.setPermission(builder.permission());
-    this.setCarSpeed(builder.carSpeed());
+    this.carSpeed = builder.carSpeed();
     LineStringInOutAngles lineStringInOutAngles = LineStringInOutAngles.of(builder.geometry());
     inAngle = lineStringInOutAngles.inAngle();
     outAngle = lineStringInOutAngles.outAngle();
+    elevationExtension = builder.streetElevationExtension();
   }
 
   public StreetEdgeBuilder<?> toBuilder() {
@@ -586,16 +588,8 @@ public class StreetEdge
     return BitSetUtils.get(flags, CLASS_LINK);
   }
 
-  private void setLink(boolean link) {
-    flags = BitSetUtils.set(flags, CLASS_LINK, link);
-  }
-
   public float getCarSpeed() {
     return carSpeed;
-  }
-
-  private void setCarSpeed(float carSpeed) {
-    this.carSpeed = carSpeed;
   }
 
   public boolean isSlopeOverride() {
@@ -607,12 +601,12 @@ public class StreetEdge
    * TODO change everything to clockwise from North
    */
   public int getInAngle() {
-    return (int) Math.round(this.inAngle * 180 / 128.0);
+    return IntUtils.round(this.inAngle * 180 / 128.0);
   }
 
   /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
   public int getOutAngle() {
-    return (int) Math.round(this.outAngle * 180 / 128.0);
+    return IntUtils.round(this.outAngle * 180 / 128.0);
   }
 
   public void setCostExtension(StreetEdgeCostExtension costExtension) {
@@ -689,11 +683,17 @@ public class StreetEdge
       l2 = 1;
     }
 
-    StreetEdge se1 = seb1.withMilliMeterLength(l1).buildAndConnect();
-    StreetEdge se2 = seb2.withMilliMeterLength(l2).buildAndConnect();
+    seb1.withMilliMeterLength(l1);
+    seb2.withMilliMeterLength(l2);
 
-    copyPropertiesToSplitEdge(se1, 0, se1.getDistanceMeters());
-    copyPropertiesToSplitEdge(se2, se1.getDistanceMeters(), getDistanceMeters());
+    copyPropertiesToSplitEdge(seb1, 0, l1 / 1000.0);
+    copyPropertiesToSplitEdge(seb2, l1 / 1000.0, getDistanceMeters());
+
+    StreetEdge se1 = seb1.buildAndConnect();
+    StreetEdge se2 = seb2.buildAndConnect();
+
+    copyRentalRestrictionsToSplitEdge(se1);
+    copyRentalRestrictionsToSplitEdge(se2);
 
     var splitEdges = new SplitStreetEdge(se1, se2);
     copyRestrictionsToSplitEdges(this, splitEdges);
@@ -712,33 +712,33 @@ public class StreetEdge
     StreetEdge e2 = null;
 
     if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
-      e1 =
-        new TemporaryPartialStreetEdgeBuilder()
-          .withParentEdge(this)
-          .withFromVertex((StreetVertex) fromv)
-          .withToVertex(v)
-          .withGeometry(geoms.beginning())
-          .withName(name)
-          .withBack(isBack())
-          .buildAndConnect();
-      copyPropertiesToSplitEdge(e1, 0, e1.getDistanceMeters());
+      var seb1 = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(this)
+        .withFromVertex((StreetVertex) fromv)
+        .withToVertex(v)
+        .withGeometry(geoms.beginning())
+        .withName(name)
+        .withBack(isBack());
+      copyPropertiesToSplitEdge(seb1, 0, defaultMillimeterLength(geoms.beginning()) / 1000.0);
+      e1 = seb1.buildAndConnect();
+      copyRentalRestrictionsToSplitEdge(e1);
       tempEdges.addEdge(e1);
     }
     if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
-      e2 =
-        new TemporaryPartialStreetEdgeBuilder()
-          .withParentEdge(this)
-          .withFromVertex(v)
-          .withToVertex((StreetVertex) tov)
-          .withGeometry(geoms.ending())
-          .withName(name)
-          .withBack(isBack())
-          .buildAndConnect();
+      var seb2 = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(this)
+        .withFromVertex(v)
+        .withToVertex((StreetVertex) tov)
+        .withGeometry(geoms.ending())
+        .withName(name)
+        .withBack(isBack());
       copyPropertiesToSplitEdge(
-        e2,
-        getDistanceMeters() - e2.getDistanceMeters(),
+        seb2,
+        getDistanceMeters() - defaultMillimeterLength(geoms.ending()) / 1000.0,
         getDistanceMeters()
       );
+      e2 = seb2.buildAndConnect();
+      copyRentalRestrictionsToSplitEdge(e2);
       tempEdges.addEdge(e2);
     }
 
@@ -772,16 +772,17 @@ public class StreetEdge
       double lengthRatio = partial.getLength() / parent.getLength();
       double length = getDistanceMeters() * lengthRatio;
 
-      var tempEdge = new TemporaryPartialStreetEdgeBuilder()
+      var tpseb = new TemporaryPartialStreetEdgeBuilder()
         .withParentEdge(this)
         .withFromVertex(from)
         .withToVertex(to)
         .withGeometry(partial)
         .withName(getName())
-        .withMeterLength(length)
-        .buildAndConnect();
-      copyPropertiesToSplitEdge(tempEdge, start, start + length);
-      return Optional.of(tempEdge);
+        .withMeterLength(length);
+      copyPropertiesToSplitEdge(tpseb, start, start + length);
+      TemporaryPartialStreetEdge se = tpseb.buildAndConnect();
+      copyRentalRestrictionsToSplitEdge(se);
+      return Optional.of(se);
     } else {
       return Optional.empty();
     }
@@ -867,31 +868,38 @@ public class StreetEdge
     super.remove();
   }
 
+  /**
+   * Copy inherited properties from a parent edge to a split edge.
+   */
   protected void copyPropertiesToSplitEdge(
-    StreetEdge splitEdge,
+    StreetEdgeBuilder<?> seb,
     double fromDistance,
     double toDistance
   ) {
-    splitEdge.flags = this.flags;
-    splitEdge.setBicycleSafetyFactor(bicycleSafetyFactor);
-    splitEdge.setWalkSafetyFactor(walkSafetyFactor);
-    splitEdge.setLink(isLink());
-    splitEdge.setCarSpeed(getCarSpeed());
-    splitEdge.setElevationExtensionUsingParent(this, fromDistance, toDistance);
-    splitEdge.addRentalRestriction(fromv.rentalRestrictions());
-  }
+    seb.withFlags(flags);
+    seb.withBicycleSafetyFactor(bicycleSafetyFactor);
+    seb.withWalkSafetyFactor(walkSafetyFactor);
+    seb.withCarSpeed(carSpeed);
 
-  protected void setElevationExtensionUsingParent(
-    StreetEdge parentEdge,
-    double fromDistance,
-    double toDistance
-  ) {
-    var profile = ElevationUtils.getPartialElevationProfile(
-      parentEdge.getElevationProfile(),
+    var partialElevationProfileFromParent = ElevationUtils.getPartialElevationProfile(
+      getElevationProfile(),
       fromDistance,
       toDistance
     );
-    StreetElevationExtension.addToEdge(this, profile, true);
+
+    StreetElevationExtensionBuilder
+      .of(seb)
+      .withDistanceInMeters(defaultMillimeterLength(seb.geometry()) / 1000.)
+      .withElevationProfile(partialElevationProfileFromParent)
+      .build()
+      .ifPresent(seb::withElevationExtension);
+  }
+
+  /**
+   * Copy inherited rental restrictions from a parent edge to a split edge
+   */
+  protected void copyRentalRestrictionsToSplitEdge(StreetEdge splitEdge) {
+    splitEdge.addRentalRestriction(fromv.rentalRestrictions());
   }
 
   short getFlags() {
