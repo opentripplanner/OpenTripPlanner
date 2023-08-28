@@ -28,7 +28,6 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeOnLevelLabel;
 
-@Execution(ExecutionMode.SAME_THREAD)
 public class WalkableAreaBuilderTest {
 
   public Graph buildGraph(final TestInfo testInfo) {
@@ -79,7 +78,7 @@ public class WalkableAreaBuilderTest {
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(true)
   @MaxAreaNodes(5)
-  public void test_calculate_vertices_area(TestInfo testInfo) {
+  public void testCalculateVerticesArea(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
@@ -96,7 +95,7 @@ public class WalkableAreaBuilderTest {
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(false)
   @MaxAreaNodes(5)
-  public void testSetup_calculate_vertices_area_without_visibility(TestInfo testInfo) {
+  public void testSetupCalculateVerticesAreaWithoutVisibility(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
@@ -115,7 +114,7 @@ public class WalkableAreaBuilderTest {
   @OsmFile("stopareas.pbf")
   @Visibility(true)
   @MaxAreaNodes(50)
-  public void test_entrance_stoparea_linking(TestInfo testInfo) {
+  public void testEntranceStopAreaLinking(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.
     var busStopConnection = graph
