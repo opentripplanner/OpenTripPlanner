@@ -463,7 +463,7 @@ public final class TripPattern
   }
 
   private static Coordinate coordinate(StopLocation s) {
-    return new Coordinate(s.getLon(), s.getLat());
+    return s.getCoordinate().asJtsCoordinate();
   }
 
   @Override

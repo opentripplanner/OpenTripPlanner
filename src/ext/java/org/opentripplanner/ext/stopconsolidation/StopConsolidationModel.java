@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.stopconsolidation;
 
-import static org.opentripplanner.transit.model.framework.FeedScopedId.parseId;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
@@ -17,8 +15,8 @@ import org.opentripplanner.transit.service.TransitModel;
 public class StopConsolidationModel {
 
   private static final IdPair TO_REPLACE = new IdPair(
-    parseId("kcm:280"),
-    parseId("commtrans:1079")
+    FeedScopedId.parse("kcm:280"),
+    FeedScopedId.parse("commtrans:1079")
   );
   private final TransitModel transitModel;
 
@@ -37,7 +35,7 @@ public class StopConsolidationModel {
       .map(r -> {
         var primaryStop = transitModel.getStopModel().getRegularStop(r.primary());
         Objects.requireNonNull(primaryStop, "No stop with id %s".formatted(r.secondary()));
-        return new StopConsolidationModel.StopReplacement(primaryStop, r.secondary());
+        return new StopReplacement(primaryStop, r.secondary());
       })
       .toList();
   }
