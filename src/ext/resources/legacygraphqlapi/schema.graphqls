@@ -3221,9 +3221,10 @@ type QueryType {
     ): PlanConnection @async
 }
 
-input RealtimePreferences {
-    omitCanceled: Boolean
-    ignoreRealtimeUpdates: Boolean
+enum RealtimePreference {
+    USE_EVERYTHING
+    RETURN_NO_CANCELLATIONS
+    IGNORE_EVERYTHING
 }
 
 enum RealtimeState {
@@ -3901,7 +3902,7 @@ input TransitPreferences {
     board: BoardPreferences
     alight: AlightPreferences
     transfer: TransferPreferences
-    realtime: RealtimePreferences
+    realtime: RealtimePreference = USE_EVERYTHING
     modes: [TransitModePreference!]
 }
 
