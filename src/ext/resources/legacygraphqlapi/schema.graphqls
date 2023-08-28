@@ -858,11 +858,6 @@ type Cluster implements Node {
     stops: [Stop!]
 }
 
-input Cost @oneOf {
-    static: Float
-    function: CostFunction
-}
-
 scalar CostFunction
 
 type Coordinates {
@@ -3895,7 +3890,7 @@ input TransferPreferences {
 
 input TransitModePreferences {
     mode: TransitMode!
-    reluctance: Cost
+    reluctance: CostFunction
 }
 
 input TransitPreferences {
