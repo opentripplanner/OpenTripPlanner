@@ -100,7 +100,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
   }
 
   @Override
-  public List<VehicleRentalPlace> getVehicleRentalStationForEnvelope(
+  public List<VehicleRentalStation> getVehicleRentalStationForEnvelope(
     double minLon,
     double minLat,
     double maxLon,
@@ -116,6 +116,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
       .stream()
       .filter(VehicleRentalStation.class::isInstance)
       .filter(b -> envelope.contains(new Coordinate(b.getLongitude(), b.getLatitude())))
+      .map(VehicleRentalStation.class::cast)
       .toList();
   }
 }

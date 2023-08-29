@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.service.vehiclerental.VehicleRentalService;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -28,7 +26,7 @@ class DefaultVehicleRentalServiceTest {
     vehicleRentalVehicle.longitude = 2;
     defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalVehicle);
 
-    List<VehicleRentalPlace> vehicleRentalStationForEnvelope = defaultVehicleRentalService.getVehicleRentalStationForEnvelope(
+    List<VehicleRentalStation> vehicleRentalStationForEnvelope = defaultVehicleRentalService.getVehicleRentalStationForEnvelope(
       0,
       0,
       10,
