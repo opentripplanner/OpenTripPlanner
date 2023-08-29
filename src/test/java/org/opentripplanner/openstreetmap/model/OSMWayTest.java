@@ -34,6 +34,19 @@ public class OSMWayTest {
   }
 
   @Test
+  public void wheelchairAccessibleStairs() {
+    var osm1 = new OSMWay();
+    osm1.addTag("highway", "steps");
+    assertFalse(osm1.isWheelchairAccessible());
+
+    // explicitly suitable for wheelchair users, perhaps because of a ramp
+    var osm2 = new OSMWay();
+    osm2.addTag("highway", "steps");
+    osm2.addTag("wheelchair", "yes");
+    assertTrue(osm2.isWheelchairAccessible());
+  }
+
+  @Test
   public void testIsRoundabout() {
     OSMWay way = new OSMWay();
     assertFalse(way.isRoundabout());

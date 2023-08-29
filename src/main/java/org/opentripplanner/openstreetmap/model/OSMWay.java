@@ -57,7 +57,15 @@ public class OSMWay extends OSMWithTags {
    * Returns true if these are steps.
    */
   public boolean isSteps() {
-    return "steps".equals(getTag("highway"));
+    return isTag("highway", "steps");
+  }
+
+  public boolean isWheelchairAccessible() {
+    if (isSteps()) {
+      return isTagTrue("wheelchair");
+    } else {
+      return super.isWheelchairAccessible();
+    }
   }
 
   /**

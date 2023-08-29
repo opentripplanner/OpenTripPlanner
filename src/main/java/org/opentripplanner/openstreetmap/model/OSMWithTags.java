@@ -132,7 +132,7 @@ public class OSMWithTags {
     return isTrue(getTag(tag));
   }
 
-  public boolean doesTagAllowAccess(String tag) {
+  protected boolean doesTagAllowAccess(String tag) {
     if (tags == null) {
       return false;
     }
@@ -507,6 +507,15 @@ public class OSMWithTags {
 
   public boolean isElevator() {
     return isTag("highway", "elevator");
+  }
+
+  /**
+   * @return true if there is no explicit tag that makes this unsuitable for wheelchair use.
+   *         In other words: we assume that something is wheelchair-accessible in the absence
+   *         of other information.
+   */
+  public boolean isWheelchairAccessible() {
+    return !isTagFalse("wheelchair");
   }
 
   /**

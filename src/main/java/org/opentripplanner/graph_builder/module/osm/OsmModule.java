@@ -536,10 +536,7 @@ public class OsmModule implements GraphBuilderModule {
     if (!way.hasTag("name") && !way.hasTag("ref")) {
       seb.withBogusName(true);
     }
-    /* TODO: This should probably generalized somehow? */
-    if ((way.isTagFalse("wheelchair") || (way.isSteps() && !way.isTagTrue("wheelchair")))) {
-      seb.withWheelchairAccessible(false);
-    }
+    seb.withWheelchairAccessible(way.isWheelchairAccessible());
 
     // < 0.04: account for
     if (carSpeed < 0.04) {

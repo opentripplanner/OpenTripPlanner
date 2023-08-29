@@ -539,9 +539,7 @@ public class WalkableAreaBuilder {
         streetEdgeBuilder.withBogusName(true);
       }
 
-      if (areaEntity.isTagFalse("wheelchair")) {
-        streetEdgeBuilder.withWheelchairAccessible(false);
-      }
+      streetEdgeBuilder.withWheelchairAccessible(areaEntity.isWheelchairAccessible());
 
       streetEdgeBuilder.withLink(areaEntity.isLink());
 
@@ -569,9 +567,7 @@ public class WalkableAreaBuilder {
         backStreetEdgeBuilder.withBogusName(true);
       }
 
-      if (areaEntity.isTagFalse("wheelchair")) {
-        backStreetEdgeBuilder.withWheelchairAccessible(false);
-      }
+      backStreetEdgeBuilder.withWheelchairAccessible(areaEntity.isWheelchairAccessible());
 
       backStreetEdgeBuilder.withLink(areaEntity.isLink());
 

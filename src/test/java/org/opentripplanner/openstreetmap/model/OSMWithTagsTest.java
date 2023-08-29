@@ -195,6 +195,20 @@ public class OSMWithTagsTest {
   }
 
   @Test
+  public void isWheelchairAccessible() {
+    var osm1 = new OSMWithTags();
+    assertTrue(osm1.isWheelchairAccessible());
+
+    var osm2 = new OSMWithTags();
+    osm2.addTag("wheelchair", "no");
+    assertFalse(osm2.isWheelchairAccessible());
+
+    var osm3 = new OSMWithTags();
+    osm3.addTag("wheelchair", "yes");
+    assertTrue(osm3.isWheelchairAccessible());
+  }
+
+  @Test
   public void testGenerateI18NForPattern() {
     OSMWithTags osmTags = new OSMWithTags();
     osmTags.addTag("note", "Note EN");
