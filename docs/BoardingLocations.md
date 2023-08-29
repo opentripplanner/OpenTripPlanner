@@ -34,6 +34,10 @@ have one of the following tag combinations:
   the place where the train stops, not the waiting area.
 - The `railway` key is deprecated (even though still widespread) and you should use `public_transport` 
   instead.
+- OTP does not process isolated nodes, but only nodes, which are part of routable ways. Therefore, adding a single
+boarding location node to OSM has no effect. There is an exception, though: isolated nodes, which are members of
+`public_transport=stop_area` relation, will be considered and automatically linked with the street graph.
+For more information, check the [stop area](StopAreas.md) documentation.
 
 ## Cross-referencing
 
