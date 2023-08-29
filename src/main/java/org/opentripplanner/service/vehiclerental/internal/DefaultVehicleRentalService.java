@@ -114,6 +114,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
     return rentalPlaces
       .values()
       .stream()
+      .filter(VehicleRentalStation.class::isInstance)
       .filter(b -> envelope.contains(new Coordinate(b.getLongitude(), b.getLatitude())))
       .toList();
   }
