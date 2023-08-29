@@ -82,6 +82,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove pathway id from REST API [#5303](https://github.com/opentripplanner/OpenTripPlanner/pull/5303)
 - Remove Winkki street note updater [#5305](https://github.com/opentripplanner/OpenTripPlanner/pull/5305)
 - Extend stop area relation linking to include bus stop and platform nodes [#5319](https://github.com/opentripplanner/OpenTripPlanner/pull/5319)
+- Document in-station navigation [#5321](https://github.com/opentripplanner/OpenTripPlanner/pull/5321)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
