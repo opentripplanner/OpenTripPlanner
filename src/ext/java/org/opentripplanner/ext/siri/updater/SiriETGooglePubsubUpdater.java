@@ -29,6 +29,8 @@ import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.retry.OtpRetry;
+import org.opentripplanner.framework.retry.OtpRetryBuilder;
 import org.opentripplanner.framework.text.FileSizeToTextConverter;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -74,6 +76,11 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private static final AtomicLong UPDATE_COUNTER = new AtomicLong(0);
   private static final AtomicLong SIZE_COUNTER = new AtomicLong(0);
   private static final String SUBSCRIPTION_PREFIX = "siri-et-";
+
+  private static final int RETRY_MAX_ATTEMPTS = Integer.MAX_VALUE;
+  private static final Duration RETRY_INITIAL_DELAY = Duration.ofSeconds(1);
+  private static final int RETRY_BACKOFF = 2;
+
   /**
    * The URL used to fetch all initial updates
    */
@@ -103,6 +110,8 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   private final Instant startTime = Instant.now();
   private final Consumer<UpdateResult> recordMetrics;
   private final EntityResolver entityResolver;
+
+  private final OtpRetry retry;
 
   /**
    * Parent update manager. Is used to execute graph writer runnables.
@@ -147,6 +156,13 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     recordMetrics = TripUpdateMetrics.streaming(config);
 
     addShutdownHook();
+    retry =
+      new OtpRetryBuilder()
+        .withName("SIRI-ET Google PubSub Updater setup")
+        .withMaxAttempts(RETRY_MAX_ATTEMPTS)
+        .withInitialRetryInterval(RETRY_INITIAL_DELAY)
+        .withBackoffMultiplier(RETRY_BACKOFF)
+        .build();
   }
 
   @Override
@@ -156,55 +172,26 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
 
   @Override
   public void run() {
-    LOG.info("Creating subscription {}", subscriptionName);
-    createSubscription();
-    LOG.info("Created subscription {}", subscriptionName);
+    try {
+      LOG.info("Creating subscription {}", subscriptionName);
+      retry.execute(this::createSubscription);
+      LOG.info("Created subscription {}", subscriptionName);
 
-    int sleepPeriod = 1000;
-    int attemptCounter = 1;
-    boolean otpIsShuttingDown = false;
+      // Retrying until data is initialized successfully
+      retry.execute(this::initializeData);
 
-    while (!isPrimed() && !otpIsShuttingDown) { // Retrying until data is initialized successfully
-      try {
-        initializeData();
-      } catch (Exception e) {
-        sleepPeriod = sleepPeriod * 2;
-
-        LOG.warn(
-          "Caught Exception while initializing data, will retry after {} ms - attempt number {}. ({})",
-          sleepPeriod,
-          attemptCounter++,
-          e.toString()
-        );
-
+      while (true) {
         try {
-          Thread.sleep(sleepPeriod);
-        } catch (InterruptedException interruptedException) {
-          Thread.currentThread().interrupt();
-          otpIsShuttingDown = true;
-          LOG.info(
-            "OTP is shutting down, cancelling initialization of SIRI ET Google PubSub Updater."
-          );
+          subscriber.startAsync().awaitRunning();
+          subscriber.awaitTerminated();
+        } catch (IllegalStateException e) {
+          subscriber.stopAsync();
         }
-      }
-    }
-
-    while (!otpIsShuttingDown) {
-      try {
-        subscriber.startAsync().awaitRunning();
-        subscriber.awaitTerminated();
-      } catch (IllegalStateException e) {
-        subscriber.stopAsync();
-      }
-      try {
         Thread.sleep(reconnectPeriod.toMillis());
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-        otpIsShuttingDown = true;
-        LOG.info(
-          "OTP is shutting down, cancelling attempt to reconnect SIRI ET Google PubSub Updater."
-        );
       }
+    } catch (InterruptedException ie) {
+      Thread.currentThread().interrupt();
+      LOG.info("OTP is shutting down, stopping the SIRI ET Google PubSub Updater.");
     }
   }
 

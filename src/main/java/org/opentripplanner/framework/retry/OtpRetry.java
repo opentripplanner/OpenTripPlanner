@@ -35,7 +35,7 @@ public class OtpRetry {
     this.onRetry = onRetry;
   }
 
-  public void execute(Runnable retryable) {
+  public void execute(Runnable retryable) throws InterruptedException {
     int attempts = 0;
     long sleepTime = initialRetryInterval.toMillis();
     while (true) {
@@ -59,12 +59,7 @@ public class OtpRetry {
           sleepTime
         );
         onRetry.run();
-        try {
-          Thread.sleep(sleepTime);
-        } catch (InterruptedException ex) {
-          Thread.currentThread().interrupt();
-          throw new OtpRetryException(ex);
-        }
+        Thread.sleep(sleepTime);
         sleepTime = sleepTime * backoffMultiplier;
       }
     }
