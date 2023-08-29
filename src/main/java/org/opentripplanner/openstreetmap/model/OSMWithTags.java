@@ -160,10 +160,12 @@ public class OSMWithTags {
   }
 
   /**
-   * Returns true if both key and value matches.
+   *
+   * @return A tags value converted to lower case. An empty Optional if tags is not present.
    */
-  public boolean matchesKeyValue(String key, String value) {
-    return hasTag(key) && getTag(key).equals(value);
+  @Nonnull
+  public Optional<String> getTagOpt(String network) {
+    return Optional.ofNullable(getTag(network));
   }
 
   /**
@@ -460,6 +462,7 @@ public class OSMWithTags {
    * <p>
    * Values are split by semicolons.
    */
+  @Nonnull
   public Set<String> getMultiTagValues(Set<String> refTags) {
     return refTags
       .stream()
@@ -468,7 +471,7 @@ public class OSMWithTags {
       .flatMap(v -> Arrays.stream(v.split(";")))
       .map(String::strip)
       .filter(v -> !v.isBlank())
-      .collect(Collectors.toSet());
+      .collect(Collectors.toUnmodifiableSet());
   }
 
   public OsmProvider getOsmProvider() {
@@ -477,11 +480,6 @@ public class OSMWithTags {
 
   public void setOsmProvider(OsmProvider provider) {
     this.osmProvider = provider;
-  }
-
-  @Nonnull
-  public Optional<String> getTagOpt(String network) {
-    return Optional.ofNullable(getTag(network));
   }
 
   /**

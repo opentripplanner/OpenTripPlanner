@@ -85,6 +85,17 @@ public class OSMWithTagsTest {
   }
 
   @Test
+  public void isTag() {
+    var name = "Brendan";
+    var osm = new OSMWithTags();
+    osm.addTag("NAME", name);
+
+    assertTrue(osm.isTag("name", name));
+    assertTrue(osm.isTag("NAME", name));
+    assertFalse(osm.isTag("NAMEE", name));
+  }
+
+  @Test
   public void testDoesAllowTagAccess() {
     OSMWithTags o = new OSMWithTags();
     assertFalse(o.doesTagAllowAccess("foo"));

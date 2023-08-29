@@ -39,7 +39,6 @@ import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
-import org.opentripplanner.openstreetmap.model.OSMMemberType;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
@@ -769,7 +768,7 @@ public class OsmDatabase {
 
       for (OSMRelationMember member : relation.getMembers()) {
         // multipolygons for attribute mapping
-        if (!(member.hasType(OSMMemberType.WAY) && waysById.containsKey(member.getRef()))) {
+        if (!(member.hasTypeWay() && waysById.containsKey(member.getRef()))) {
           continue;
         }
 
@@ -849,7 +848,7 @@ public class OsmDatabase {
     relation
       .getMembers()
       .forEach(member -> {
-        var isOsmWay = member.hasType(OSMMemberType.WAY);
+        var isOsmWay = member.hasTypeWay();
         var way = waysById.get(member.getRef());
         // if it is an OSM way (rather than a node) and it doesn't already contain the tag
         // we add it
@@ -992,7 +991,7 @@ public class OsmDatabase {
       issueStore
     );
     for (OSMRelationMember member : relation.getMembers()) {
-      if (member.hasType(OSMMemberType.WAY) && waysById.containsKey(member.getRef())) {
+      if (member.hasTypeWay() && waysById.containsKey(member.getRef())) {
         OSMWay way = waysById.get(member.getRef());
         if (way != null) {
           String role = member.getRole();
@@ -1011,11 +1010,11 @@ public class OsmDatabase {
   }
 
   /**
-   * Handle route=road relations.
+   * Handle route=road and route=bicycle relations.
    */
   private void processRoute(OSMRelation relation) {
     for (OSMRelationMember member : relation.getMembers()) {
-      if (!(member.hasType(OSMMemberType.WAY) && waysById.containsKey(member.getRef()))) {
+      if (!(member.hasTypeWay() && waysById.containsKey(member.getRef()))) {
         continue;
       }
 
