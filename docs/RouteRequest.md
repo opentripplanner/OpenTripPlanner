@@ -334,8 +334,8 @@ The extra time needed to make a safe transfer in seconds.
 
 An expected transfer time in seconds that specifies the amount of time that must pass
 between exiting one public transport vehicle and boarding another. This time is in
-addition to time it might take to walk between stops, the board-slack, and the
-alight-slack."
+addition to time it might take to walk between stops plus `boardSlack` and
+`alightSlack`.
 
 
 <h3 id="rd_unpreferredCost">unpreferredCost</h3>
