@@ -1,12 +1,11 @@
-import Container from 'react-bootstrap/Container';
-import Navbar from 'react-bootstrap/Navbar';
+import {MapContainer} from "./MapContainer.tsx";
+import {NavBarContainer} from "./NavBarContainer.tsx";
 
 export function App() {
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
-      <Container>
-        <Navbar.Brand href="#home">OTP debug client (next)</Navbar.Brand>
-      </Container>
-    </Navbar>
+    <div className="app">
+      <NavBarContainer />
+      <MapContainer />
+    </div>
   );
 }
