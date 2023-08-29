@@ -37,6 +37,6 @@ type TripQueryHook = (variables?: TripQueryVariables) => [
 export const useTripQuery: TripQueryHook = (variables = {}) => {
   const [data, setData] = useState<TripQuery | null>(null);
   const callback = useCallback(async () =>
-    setData(await request(endpoint, query, variables)), [setData]);
+    setData(await request(endpoint, query, variables)), [setData, variables]);
   return [data, callback];
 }
