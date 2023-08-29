@@ -44,6 +44,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -76,15 +77,9 @@ public class RaptorPathToItineraryMapperTest {
     STOP_COSTS
   );
 
-  private static final RegularStop S1 = RegularStop
-    .of(new FeedScopedId("TestFeed", "STOP1"))
-    .withCoordinate(0.0, 0.0)
-    .build();
+  private static final RegularStop S1 = TransitModelForTest.stopForTest("STOP1", 0.0, 0.0);
 
-  private static final RegularStop S2 = RegularStop
-    .of(new FeedScopedId("TestFeed", "STOP2"))
-    .withCoordinate(0.0, 0.0)
-    .build();
+  private static final RegularStop S2 = TransitModelForTest.stopForTest("STOP2", 1.0, 1.0);
 
   @ParameterizedTest
   @ValueSource(strings = { "0", "3000", "-3000" })
