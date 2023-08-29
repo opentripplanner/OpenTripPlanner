@@ -28,9 +28,12 @@ const initialViewState = {
     zoom: 4
 };
 export function MapContainer() {
+
     return (
         <Map
+            // @ts-ignore // TODO: why TypeScript complaining about this
             mapLib={import('maplibre-gl')}
+            // @ts-ignore // TODO: why TypeScript complaining about this
             mapStyle={mapStyle}
             initialViewState={initialViewState}
             style={{width: "100%", height: " calc(100vh - 56px)"}}
