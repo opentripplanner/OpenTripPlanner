@@ -79,7 +79,7 @@ on a long-distance train (red line).
 
 #### Example: transferring between platforms at Oslo Central
 
-This example instructs the passenger get off a train, then walking down the stairs and via a tunnel
+This example instructs the passenger to get off a train, then walking down the stairs and via a tunnel
 to another platform.
 
 ![Transferring at Oslo 2](images/transfer-oslo-2.png)
