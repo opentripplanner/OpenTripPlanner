@@ -647,14 +647,6 @@ public class ParameterBuilder {
     }
   }
 
-  private Duration parseDuration(String value, ChronoUnit unit) {
-    try {
-      return DurationUtils.duration(value, unit);
-    } catch (DateTimeParseException e) {
-      throw error("The parameter value '%s' is not a duration.".formatted(value), e);
-    }
-  }
-
   /**
    * Somehow Java do not provide a parse method for parsing Locale on the standard form
    * {@code <Language>[_<country>[_<variant>]]}, so this little utility method does that.

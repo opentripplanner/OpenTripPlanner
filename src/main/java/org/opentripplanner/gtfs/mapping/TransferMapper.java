@@ -297,11 +297,4 @@ class TransferMapper {
     }
     return -1;
   }
-
-  private boolean sameBlockId(Trip a, Trip b) {
-    if (a == null || b == null) {
-      return false;
-    }
-    return a.getGtfsBlockId() != null && a.getGtfsBlockId().equals(b.getGtfsBlockId());
-  }
 }

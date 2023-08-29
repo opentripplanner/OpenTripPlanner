@@ -108,14 +108,6 @@ final class PageCursorSerializer {
     return Duration.ofSeconds(in.readInt());
   }
 
-  private static void writeBoolean(boolean value, ObjectOutputStream out) throws IOException {
-    out.writeBoolean(value);
-  }
-
-  private static boolean readBoolean(ObjectInputStream in) throws IOException {
-    return in.readBoolean();
-  }
-
   private static <T extends Enum<T>> void writeEnum(T value, ObjectOutputStream out)
     throws IOException {
     out.writeUTF(value.name());
