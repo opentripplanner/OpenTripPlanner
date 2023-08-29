@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 
 public class OSMWithTagsTest {
 
@@ -206,6 +207,11 @@ public class OSMWithTagsTest {
     var osm3 = new OSMWithTags();
     osm3.addTag("wheelchair", "yes");
     assertTrue(osm3.isWheelchairAccessible());
+  }
+
+  @Test
+  public void isRoutable() {
+    assertFalse(WayTestData.zooPlatform().isRoutable());
   }
 
   @Test

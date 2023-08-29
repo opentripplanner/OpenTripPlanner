@@ -208,4 +208,12 @@ public class WayTestData {
     way.addTag("smoothness", "excellent");
     return way;
   }
+
+  public static OSMWithTags zooPlatform() {
+    // https://www.openstreetmap.org/way/119108622
+    var way = new OSMWithTags();
+    way.addTag("public_transport", "platform");
+    way.addTag("usage", "tourism");
+    return way;
+  }
 }

@@ -495,7 +495,7 @@ public class OSMWithTags {
       return true;
     }
     if (isPlatform()) {
-      return !("tourism".equals(getTag("usage")));
+      return !isTag("usage", "tourism");
     }
     return false;
   }
