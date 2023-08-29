@@ -1,12 +1,12 @@
 import {MapContainer} from "./MapContainer.tsx";
 import {NavBarContainer} from "./NavBarContainer.tsx";
-import {JourneyPlannerRequestContainer} from "./JourneyPlannerRequestContainer.tsx";
+import {TripQueryContainer} from "./TripQueryContainer.tsx";
 
 export function App() {
   return (
     <div className="app">
       <NavBarContainer />
-      <JourneyPlannerRequestContainer />
+      <TripQueryContainer />
       <MapContainer />
     </div>
   );

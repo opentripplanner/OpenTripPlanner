@@ -29,12 +29,12 @@ const query = graphql(`
     }
 `)
 
-type JourneyPlannerRequestHook = (variables?: TripQueryVariables) => [
+type TripQueryHook = (variables?: TripQueryVariables) => [
   TripQuery | null,
   () => Promise<void>
 ]
 
-export const useJourneyPlannerRequest: JourneyPlannerRequestHook = (variables = {}) => {
+export const useTripQuery: TripQueryHook = (variables = {}) => {
   const [data, setData] = useState<TripQuery | null>(null);
   const callback = useCallback(async () =>
     setData(await request(endpoint, query, variables)), [setData]);
