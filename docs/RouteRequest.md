@@ -175,7 +175,7 @@ The boardSlack is the minimum extra time to board a public transport vehicle.
 The board time is added to the time when going from the stop (offboard) to onboard a transit
 vehicle.
 
-This is the same as the `minimumTransferTime`, except that this also apply to to the first
+This is the same as the `transferSlack`, except that this also apply to to the first
 transit leg in the trip. This is the default value used, if not overridden by the `boardSlackList`.
 
 
