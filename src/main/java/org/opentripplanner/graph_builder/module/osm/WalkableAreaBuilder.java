@@ -245,7 +245,7 @@ public class WalkableAreaBuilder {
           // variable to indicate if some additional entrance points have been added to area
           boolean linkPointsAdded = !entrances.isEmpty();
           // Add unconnected entries to area if platformEntriesLinking parameter is true
-          if (platformEntriesLinking && "platform".equals(area.parent.getTag("public_transport"))) {
+          if (platformEntriesLinking && area.parent.isPlatform()) {
             List<OsmVertex> endpointsWithin = platformLinkingEndpoints
               .stream()
               .filter(t ->
