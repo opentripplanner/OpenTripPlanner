@@ -34,8 +34,8 @@ class StreetPreferencesTest {
     .withTurnReluctance(TURN_RELUCTANCE)
     .withElevator(it -> it.withBoardTime(ELEVATOR_BOARD_TIME))
     .withIntersectionTraversalModel(INTERSECTION_TRAVERSAL_MODEL)
-    .withAccessEgressPenalty(Map.of(StreetMode.CAR_TO_PARK, CAR_PENALTY))
-    .withMaxAccessEgressDuration(MAX_ACCESS_EGRESS, Map.of())
+    .withAccessEgress(it -> it.withPenalty(Map.of(StreetMode.CAR_TO_PARK, CAR_PENALTY)))
+    .withAccessEgress(it -> it.withMaxDuration(MAX_ACCESS_EGRESS, Map.of()))
     .withMaxDirectDuration(MAX_DIRECT, Map.of())
     .withRoutingTimeout(ROUTING_TIMEOUT)
     .build();
@@ -52,13 +52,16 @@ class StreetPreferencesTest {
 
   @Test
   void accessEgressPenalty() {
-    assertEquals(TimeAndCostPenalty.ZERO, subject.accessEgressPenalty().valueOf(StreetMode.WALK));
-    assertEquals(CAR_PENALTY, subject.accessEgressPenalty().valueOf(StreetMode.CAR_TO_PARK));
+    assertEquals(
+      TimeAndCostPenalty.ZERO,
+      subject.accessEgress().penalty().valueOf(StreetMode.WALK)
+    );
+    assertEquals(CAR_PENALTY, subject.accessEgress().penalty().valueOf(StreetMode.CAR_TO_PARK));
   }
 
   @Test
   void maxAccessEgressDuration() {
-    assertEquals(MAX_ACCESS_EGRESS, subject.maxAccessEgressDuration().defaultValue());
+    assertEquals(MAX_ACCESS_EGRESS, subject.accessEgress().maxDuration().defaultValue());
   }
 
   @Test
@@ -106,10 +109,12 @@ class StreetPreferencesTest {
       "routingTimeout: 3s, " +
       "elevator: ElevatorPreferences{boardTime: 2m}, " +
       "intersectionTraversalModel: CONSTANT, " +
-      "accessEgressPenalty: TimeAndCostPenaltyForEnum{CAR_TO_PARK: " +
+      "accessEgress: AccessEgressPreferences{" +
+      "penalty: TimeAndCostPenaltyForEnum{CAR_TO_PARK: " +
       CAR_PENALTY +
       "}, " +
-      "maxAccessEgressDuration: DurationForStreetMode{default:5m}, " +
+      "maxDuration: DurationForStreetMode{default:5m}" +
+      "}, " +
       "maxDirectDuration: DurationForStreetMode{default:10m}" +
       "}",
       subject.toString()

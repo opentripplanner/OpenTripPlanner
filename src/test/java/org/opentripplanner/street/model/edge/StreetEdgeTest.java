@@ -286,12 +286,16 @@ public class StreetEdgeTest {
       0
     );
     var edge = streetEdge(v0, v1, 50.0, StreetTraversalPermission.ALL);
-    StreetElevationExtension.addToEdge(edge, elevationProfile, false);
-    StreetEdge e0 = edge;
+    StreetElevationExtensionBuilder
+      .of(edge)
+      .withElevationProfile(elevationProfile)
+      .withComputed(false)
+      .build()
+      .ifPresent(edge::setElevationExtension);
 
     assertArrayEquals(
       elevationProfile.toCoordinateArray(),
-      e0.getElevationProfile().toCoordinateArray()
+      edge.getElevationProfile().toCoordinateArray()
     );
   }
 
@@ -328,7 +332,12 @@ public class StreetEdgeTest {
       new Coordinate(length, 0), // slope = -0.1
     };
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
-    StreetElevationExtension.addToEdge(testStreet, elev, false);
+    StreetElevationExtensionBuilder
+      .of(testStreet)
+      .withElevationProfile(elev)
+      .withComputed(false)
+      .build()
+      .ifPresent(testStreet::setElevationExtension);
 
     SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
     double trueLength = costs.lengthMultiplier * length;

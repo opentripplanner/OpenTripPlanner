@@ -33,7 +33,6 @@ public class TransitPriorityGroupRideFactory<T extends RaptorTripSchedule>
     int relativeC1,
     T trip
   ) {
-    int c2 = calculateC2(prevArrival.c2());
     return new PatternRideC2<>(
       prevArrival,
       boardStopIndex,

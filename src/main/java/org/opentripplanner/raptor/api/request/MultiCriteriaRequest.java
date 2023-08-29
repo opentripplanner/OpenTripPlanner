@@ -21,17 +21,22 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   private final RaptorTransitPriorityGroupCalculator transitPriorityCalculator;
 
   @Nullable
+  private final PassThroughPoints passThroughPoints;
+
+  @Nullable
   private final Double relaxCostAtDestination;
 
   private MultiCriteriaRequest() {
     this.relaxC1 = RelaxFunction.NORMAL;
     this.transitPriorityCalculator = null;
+    this.passThroughPoints = null;
     this.relaxCostAtDestination = null;
   }
 
   public MultiCriteriaRequest(Builder<T> builder) {
     this.relaxC1 = Objects.requireNonNull(builder.relaxC1());
     this.transitPriorityCalculator = builder.transitPriorityCalculator();
+    this.passThroughPoints = builder.passThroughPoints();
     this.relaxCostAtDestination = builder.relaxCostAtDestination();
   }
 
@@ -71,6 +76,10 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return Optional.ofNullable(transitPriorityCalculator);
   }
 
+  public Optional<PassThroughPoints> passThroughPoints() {
+    return Optional.ofNullable(passThroughPoints);
+  }
+
   /**
    * Whether to accept non-optimal trips if they are close enough - if and only if they represent an
    * optimal path for their given iteration. In other words this slack only relaxes the pareto
@@ -101,13 +110,19 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return (
       Objects.equals(relaxC1, that.relaxC1) &&
       Objects.equals(transitPriorityCalculator, that.transitPriorityCalculator) &&
+      Objects.equals(passThroughPoints, that.passThroughPoints) &&
       Objects.equals(relaxCostAtDestination, that.relaxCostAtDestination)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(relaxC1, transitPriorityCalculator, relaxCostAtDestination);
+    return Objects.hash(
+      relaxC1,
+      transitPriorityCalculator,
+      passThroughPoints,
+      relaxCostAtDestination
+    );
   }
 
   @Override
@@ -116,8 +131,13 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
       .of(MultiCriteriaRequest.class)
       .addObj("relaxC1", relaxC1, RelaxFunction.NORMAL)
       .addObj("transitPriorityCalculator", transitPriorityCalculator)
+      .addObj("passThroughPoints", passThroughPoints)
       .addNum("relaxCostAtDestination", relaxCostAtDestination)
       .toString();
+  }
+
+  public boolean includeC2() {
+    return passThroughPoints != null || transitPriorityCalculator != null;
   }
 
   public static class Builder<T extends RaptorTripSchedule> {
@@ -125,6 +145,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     private final MultiCriteriaRequest<T> original;
     private RelaxFunction relaxC1;
     private RaptorTransitPriorityGroupCalculator transitPriorityCalculator = null;
+    private PassThroughPoints passThroughPoints = null;
     private Double relaxCostAtDestination = null;
 
     public Builder(MultiCriteriaRequest<T> original) {
@@ -153,6 +174,17 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     }
 
     @Nullable
+    public PassThroughPoints passThroughPoints() {
+      return passThroughPoints;
+    }
+
+    @Nullable
+    public Builder<T> withPassThroughPoints(PassThroughPoints value) {
+      passThroughPoints = value;
+      return this;
+    }
+
+    @Nullable
     @Deprecated
     public Double relaxCostAtDestination() {
       return relaxCostAtDestination;
@@ -175,6 +207,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
         .of(MultiCriteriaRequest.Builder.class)
         .addObj("relaxC1", relaxC1)
         .addObj("transitPriorityCalculator", transitPriorityCalculator)
+        .addObj("passThroughPoints", passThroughPoints)
         .addNum("relaxCostAtDestination", relaxCostAtDestination)
         .toString();
     }

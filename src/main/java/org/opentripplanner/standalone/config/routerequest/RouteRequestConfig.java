@@ -170,7 +170,7 @@ public class RouteRequestConfig {
       .description(
         """
 A cost is applied to boarding nonpreferred authorities or routes.
-                    
+
 The routing engine will add extra penalty - on the *unpreferred* routes and/or agencies using a
 cost function. The cost function (`unpreferredCost`) is defined as a linear function of the form
 `A + B x`, where `A` is a fixed cost (in seconds) and `B` is reluctance multiplier for transit leg
@@ -343,9 +343,9 @@ ferries, where the check-in process needs to be done in good time before ride.
                 Let c be the existing minimum pareto optimal generalized cost to beat. Then a trip
                 with cost c' is accepted if the following is true:
                 `c' < Math.round(c * relaxRaptorCostCriteria)`.
-                              
+
                 The parameter is optional. If not set a normal comparison is performed.
-                              
+
                 Values equals or less than zero is not allowed. Values greater than 2.0 are not
                 supported, due to performance reasons.
                 """
@@ -467,6 +467,12 @@ ferries, where the check-in process needs to be done in good time before ride.
 
   private static void mapStreetPreferences(NodeAdapter c, StreetPreferences.Builder builder) {
     var dft = builder.original();
+    NodeAdapter cae = c
+      .of("accessEgress")
+      .since(V2_4)
+      .summary("Parameters for access and egress routing.")
+      .asObject();
+
     builder
       .withTurnReluctance(
         c
@@ -514,66 +520,82 @@ ferries, where the check-in process needs to be done in good time before ride.
               .asInt(dftElevator.hopTime())
           );
       })
-      .withAccessEgressPenalty(
-        c
-          .of("accessEgressPenalty")
-          .since(V2_4)
-          .summary("Penalty for access/egress by street mode.")
-          .description(
-            """
+      .withAccessEgress(accessEgress -> {
+        var dftAccessEgress = dft.accessEgress();
+        accessEgress
+          .withPenalty(
+            // The default value is NO-PENALTY and is not configurable
+            cae
+              .of("penalty")
+              .since(V2_4)
+              .summary("Penalty for access/egress by street mode.")
+              .description(
+                """
             Use this to add a time and cost penalty to an access/egress legs for a given street
             mode. This will favour other street-modes and transit. This has a performance penalty,
             since the search-window is increased with the same amount as the maximum penalty for
             the access legs used. In other cases where the access(CAR) is faster than transit the
             performance will be better.
-            
+
             The default is no penalty, if not configured.
-            
+
             Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
-            
-            
+
             **Time penalty**
-            
-            The `time-penalty` is used to add a penalty to the access/egress duration/time. The
+
+            The `timePenalty` is used to add a penalty to the access/egress duration/time. The
             time including the penalty is used in the algorithm when comparing paths, but the
             actual duration is used when presented to the end user.
-            
+
             **Cost factor**
-            
+
             The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
             time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
             extra cost, while 1.0 will add the same amount to both time and cost.
             """
+              )
+              .asEnumMap(StreetMode.class, TimeAndCostPenaltyMapper::map)
           )
-          .asEnumMap(StreetMode.class, TimeAndCostPenaltyMapper::map)
-      )
-      .withMaxAccessEgressDuration(
-        c
-          .of("maxAccessEgressDuration")
-          .since(V2_1)
-          .summary("This is the maximum duration for access/egress for street searches.")
-          .description(
-            """
+          .withMaxDuration(
+            cae
+              .of("maxDuration")
+              .since(V2_1)
+              .summary("This is the maximum duration for access/egress for street searches.")
+              .description(
+                """
 This is a performance limit and should therefore be set high. Results close to the limit are not
 guaranteed to be optimal. Use itinerary-filters to limit what is presented to the client. The
-duration can be set per mode(`maxAccessEgressDurationForMode`), because some street modes searches
+duration can be set per mode(`maxDurationForMode`), because some street modes searches
 are much more resource intensive than others. A default value is applied if the mode specific value
 do not exist.
 """
+              )
+              .asDuration(dftAccessEgress.maxDuration().defaultValue()),
+            cae
+              .of("maxDurationForMode")
+              .since(V2_1)
+              .summary("Limit access/egress per street mode.")
+              .description(
+                """
+              Override the settings in `maxDuration` for specific street modes. This is
+              done because some street modes searches are much more resource intensive than others.
+              """
+              )
+              .asEnumMap(StreetMode.class, Duration.class)
           )
-          .asDuration(dft.maxAccessEgressDuration().defaultValue()),
-        c
-          .of("maxAccessEgressDurationForMode")
-          .since(V2_1)
-          .summary("Limit access/egress per street mode.")
-          .description(
-            """
-            Override the settings in `maxAccessEgressDuration` for specific street modes. This is
-            done because some street modes searches are much more resource intensive than others.
-            """
-          )
-          .asEnumMap(StreetMode.class, Duration.class)
-      )
+          .withMaxStopCount(
+            cae
+              .of("maxStopCount")
+              .since(V2_4)
+              .summary("Maximal number of stops collected in access/egress routing")
+              .description(
+                """
+              Safety limit to prevent access to and egress from too many stops.
+              """
+              )
+              .asInt(dftAccessEgress.maxStopCount())
+          );
+      })
       .withMaxDirectDuration(
         c
           .of("maxDirectStreetDuration")

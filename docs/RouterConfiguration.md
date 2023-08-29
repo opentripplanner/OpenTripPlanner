@@ -486,8 +486,18 @@ HTTP headers to add to the request. Any header key, value can be inserted.
     "transitReluctanceForMode" : {
       "RAIL" : 0.85
     },
-    "maxAccessEgressDurationForMode" : {
-      "BIKE_RENTAL" : "20m"
+    "accessEgress" : {
+      "maxDuration" : "45m",
+      "maxDurationForMode" : {
+        "BIKE_RENTAL" : "20m"
+      },
+      "maxStopCount" : 500,
+      "penalty" : {
+        "FLEXIBLE" : {
+          "timePenalty" : "2m + 1.1t",
+          "costFactor" : 1.7
+        }
+      }
     },
     "itineraryFilters" : {
       "transitGeneralizedCostLimit" : {
@@ -496,7 +506,8 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       },
       "bikeRentalDistanceRatio" : 0.3,
       "accessibilityScore" : true,
-      "minBikeParkingDistance" : 300
+      "minBikeParkingDistance" : 300,
+      "debug" : "limit-to-search-window"
     },
     "carDecelerationSpeed" : 2.9,
     "carAccelerationSpeed" : 2.9,

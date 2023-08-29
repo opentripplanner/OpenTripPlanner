@@ -13,21 +13,19 @@ public class StreetPreferencesMapper {
     DataFetchingEnvironment environment,
     StreetPreferences defaultPreferences
   ) {
-    street.withAccessEgressPenalty(builder ->
-      PenaltyForStreetModeType.mapPenaltyToDomain(
-        builder,
-        environment,
-        TripQuery.ACCESS_EGRESS_PENALTY
-      )
-    );
-    street.withMaxAccessEgressDuration(builder ->
-      StreetModeDurationInputType.mapDurationForStreetModeAndAssertValueIsGreaterThenDefault(
-        builder,
-        environment,
-        TripQuery.MAX_ACCESS_EGRESS_DURATION_FOR_MODE,
-        defaultPreferences.maxAccessEgressDuration()
-      )
-    );
+    street.withAccessEgress(ae -> {
+      ae.withPenalty(b ->
+        PenaltyForStreetModeType.mapPenaltyToDomain(b, environment, TripQuery.ACCESS_EGRESS_PENALTY)
+      );
+      ae.withMaxDuration(builder ->
+        StreetModeDurationInputType.mapDurationForStreetModeAndAssertValueIsGreaterThenDefault(
+          builder,
+          environment,
+          TripQuery.MAX_ACCESS_EGRESS_DURATION_FOR_MODE,
+          defaultPreferences.accessEgress().maxDuration()
+        )
+      );
+    });
 
     street.withMaxDirectDuration(builder ->
       StreetModeDurationInputType.mapDurationForStreetModeAndAssertValueIsGreaterThenDefault(

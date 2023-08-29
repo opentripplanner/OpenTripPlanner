@@ -520,7 +520,9 @@ public class TripQuery {
           .description("Time and cost penalty on access/egress modes.")
           .type(new GraphQLList(new GraphQLNonNull(penaltyForStreetMode)))
           .defaultValueLiteral(
-            PenaltyForStreetModeType.mapToGraphQLValue(preferences.street().accessEgressPenalty())
+            PenaltyForStreetModeType.mapToGraphQLValue(
+              preferences.street().accessEgress().penalty()
+            )
           )
           .build()
       )
@@ -534,7 +536,7 @@ public class TripQuery {
           )
           .type(new GraphQLList(new GraphQLNonNull(durationPerStreetModeType)))
           .defaultValueLiteral(
-            mapDurationForStreetModeGraphQLValue(preferences.street().maxAccessEgressDuration())
+            mapDurationForStreetModeGraphQLValue(preferences.street().accessEgress().maxDuration())
           )
           .build()
       )

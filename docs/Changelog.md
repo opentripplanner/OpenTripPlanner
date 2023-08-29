@@ -76,6 +76,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Validate missing intermediate location in via requests [#5253](https://github.com/opentripplanner/OpenTripPlanner/pull/5253)
 - Support Fares v2 FareMedium and update spec implementation [#5227](https://github.com/opentripplanner/OpenTripPlanner/pull/5227)
 - Replace DoubleFunction with linear function [#5267](https://github.com/opentripplanner/OpenTripPlanner/pull/5267)
+- Improve walk step narrative for entering/exiting stations and signposted pathways [#5285](https://github.com/opentripplanner/OpenTripPlanner/pull/5285)
+- Fix walk board cost comparison and add escalatorReluctance to hash [#5310](https://github.com/opentripplanner/OpenTripPlanner/pull/5310)
+- Stop count limit for access/egress routing and new accessEgress configuration object [#5214](https://github.com/opentripplanner/OpenTripPlanner/pull/5214)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 
