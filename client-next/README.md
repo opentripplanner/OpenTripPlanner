@@ -1,27 +1,36 @@
-# React + TypeScript + Vite
+# OTP debug client (next)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the next version of the debug client, intended to replace `../src/client`.
 
-Currently, two official plugins are available:
+It is designed to work with the Transmodel GraphQL API.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Stack notes
 
-## Expanding the ESLint configuration
+This is a true Single Page Application (SPA) written in TypeScript on the React framework. It uses `vite` to run 
+(locally) and for building static assets. It requires no server runtime, and can be served from a CDN and run entirely 
+in the browser.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+The design framework is Bootstrap with React support from `react-bootstrap`.
 
-- Configure the top-level `parserOptions` property like this:
+The map framework is MapLibre, using `MapLibre GL JS` with React support from `react-map-gl`.
 
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
+GraphQL integration is provided by `graphql-request`, with type support added with `@graphql-codegen`. Types are 
+generated during build and are not checked into the repository.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Prerequisites
+
+Use latest LTS version of Node/npm (currently v18). Recommend using av version manager such as `nvm`. 
+
+The dev and production builds require graphql schema to be present at
+`../src/ext/graphql/transmodelapi/schema.graphql`. 
+Running `maven verify` in parent project should solve that.
+
+## Getting started
+
+Change directory to `client-next` (current) if you haven't already.
+
+    npm install
+
+Then
+
+    npm run dev
