@@ -15,7 +15,7 @@ import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 public class OSMWithTagsTest {
 
   @Test
-  public void testHasTag() {
+  void testHasTag() {
     OSMWithTags o = new OSMWithTags();
     assertFalse(o.hasTag("foo"));
     assertFalse(o.hasTag("FOO"));
@@ -26,7 +26,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void testGetTag() {
+  void testGetTag() {
     OSMWithTags o = new OSMWithTags();
     assertNull(o.getTag("foo"));
     assertNull(o.getTag("FOO"));
@@ -37,7 +37,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void testIsFalse() {
+  void testIsFalse() {
     assertTrue(OSMWithTags.isFalse("no"));
     assertTrue(OSMWithTags.isFalse("0"));
     assertTrue(OSMWithTags.isFalse("false"));
@@ -51,7 +51,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void testIsTrue() {
+  void testIsTrue() {
     assertTrue(OSMWithTags.isTrue("yes"));
     assertTrue(OSMWithTags.isTrue("1"));
     assertTrue(OSMWithTags.isTrue("true"));
@@ -65,7 +65,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void testIsTagFalseOrTrue() {
+  void testIsTagFalseOrTrue() {
     OSMWithTags o = new OSMWithTags();
     assertFalse(o.isTagFalse("foo"));
     assertFalse(o.isTagFalse("FOO"));
@@ -86,7 +86,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void isTag() {
+  void isTag() {
     var name = "Brendan";
     var osm = new OSMWithTags();
     osm.addTag("NAME", name);
@@ -97,7 +97,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void testDoesAllowTagAccess() {
+  void testDoesAllowTagAccess() {
     OSMWithTags o = new OSMWithTags();
     assertFalse(o.doesTagAllowAccess("foo"));
 
@@ -112,7 +112,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void testIsGeneralAccessDenied() {
+  void testIsGeneralAccessDenied() {
     OSMWithTags o = new OSMWithTags();
     assertFalse(o.isGeneralAccessDenied());
 
@@ -127,7 +127,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void testBicycleDenied() {
+  void testBicycleDenied() {
     OSMWithTags tags = new OSMWithTags();
     assertFalse(tags.isBicycleExplicitlyDenied());
 
@@ -143,7 +143,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void getReferenceTags() {
+  void getReferenceTags() {
     var osm = new OSMWithTags();
     osm.addTag("ref", "A");
 
@@ -152,7 +152,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void getEmptyRefList() {
+  void getEmptyRefList() {
     var osm = new OSMWithTags();
     osm.addTag("ref", "A");
 
@@ -160,7 +160,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void ignoreRefCase() {
+  void ignoreRefCase() {
     var osm = new OSMWithTags();
     osm.addTag("ref:IFOPT", "A");
 
@@ -168,7 +168,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void readSemicolonSeparated() {
+  void readSemicolonSeparated() {
     var osm = new OSMWithTags();
     osm.addTag("ref:A", "A;A;B");
 
@@ -176,7 +176,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void removeBlankRef() {
+  void removeBlankRef() {
     var osm = new OSMWithTags();
     osm.addTag("ref1", " ");
     osm.addTag("ref2", "");
@@ -186,7 +186,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void shouldNotReturnNull() {
+  void shouldNotReturnNull() {
     var osm = new OSMWithTags();
     osm.addTag("ref1", " ");
     osm.addTag("ref2", "");
@@ -196,7 +196,7 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void isWheelchairAccessible() {
+  void isWheelchairAccessible() {
     var osm1 = new OSMWithTags();
     assertTrue(osm1.isWheelchairAccessible());
 
@@ -210,12 +210,12 @@ public class OSMWithTagsTest {
   }
 
   @Test
-  public void isRoutable() {
+  void isRoutable() {
     assertFalse(WayTestData.zooPlatform().isRoutable());
   }
 
   @Test
-  public void testGenerateI18NForPattern() {
+  void testGenerateI18NForPattern() {
     OSMWithTags osmTags = new OSMWithTags();
     osmTags.addTag("note", "Note EN");
     osmTags.addTag("description:fr", "Description FR");
