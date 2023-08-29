@@ -77,15 +77,16 @@ public class GraphUpdaterManager implements WriteToGraphCallback, GraphUpdaterSt
   public GraphUpdaterManager(Graph graph, TransitModel transitModel, List<GraphUpdater> updaters) {
     this.graph = graph;
     this.transitModel = transitModel;
-    // Thread factory used to create new threads, giving them more human-readable names.
-    var threadFactory = new ThreadFactoryBuilder().setNameFormat("updater-%d").build();
-    this.scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
+    // Thread factories used to create new threads, giving them more human-readable names.
+    var graphWriterThreadFactory = new ThreadFactoryBuilder().setNameFormat("graph-writer").build();
+    this.scheduler = Executors.newSingleThreadScheduledExecutor(graphWriterThreadFactory);
+    var updaterThreadFactory = new ThreadFactoryBuilder().setNameFormat("updater-%d").build();
     this.pollingUpdaterPool =
       Executors.newScheduledThreadPool(
         Math.max(MIN_POLLING_UPDATER_THREADS, Runtime.getRuntime().availableProcessors()),
-        threadFactory
+        updaterThreadFactory
       );
-    this.nonPollingUpdaterPool = Executors.newCachedThreadPool(threadFactory);
+    this.nonPollingUpdaterPool = Executors.newCachedThreadPool(updaterThreadFactory);
 
     for (GraphUpdater updater : updaters) {
       updaterList.add(updater);

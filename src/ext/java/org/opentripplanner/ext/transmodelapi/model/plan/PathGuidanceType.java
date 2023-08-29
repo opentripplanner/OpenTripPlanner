@@ -42,7 +42,7 @@ public class PathGuidanceType {
           .type(Scalars.GraphQLString)
           .dataFetcher(environment ->
             GraphQLUtils.getTranslation(
-              ((WalkStep) environment.getSource()).getStreetName(),
+              ((WalkStep) environment.getSource()).getDirectionText(),
               environment
             )
           )
@@ -74,7 +74,7 @@ public class PathGuidanceType {
           .name("stayOn")
           .description("Indicates whether or not a street changes direction at an intersection.")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(environment -> ((WalkStep) environment.getSource()).getStayOn())
+          .dataFetcher(environment -> ((WalkStep) environment.getSource()).isStayOn())
           .build()
       )
       .field(

@@ -20,7 +20,6 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.spi.GraphUpdater;
-import org.opentripplanner.updater.street_note.WinkkiPollingGraphUpdater;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.PollingTripUpdater;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
@@ -198,9 +197,6 @@ public class UpdaterConfigurator {
           graph.getVehicleParkingService()
         )
       );
-    }
-    for (var configItem : updatersParameters.getWinkkiPollingGraphUpdaterParameters()) {
-      updaters.add(new WinkkiPollingGraphUpdater(configItem, graph));
     }
     for (var configItem : updatersParameters.getSiriAzureETUpdaterParameters()) {
       updaters.add(

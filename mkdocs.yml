@@ -78,6 +78,7 @@ nav:
     - "Realtime Updaters": 'UpdaterConfig.md'
 - Topic overviews:
     - "Routing modes": 'RoutingModes.md'
+    - "In-station navigation": 'In-Station-Navigation.md'
     - "Boarding Locations": 'BoardingLocations.md'
     - "Stop Area Relations": 'StopAreas.md'
     - "Street Graph Pruning": 'IslandPruning.md'

@@ -2,18 +2,22 @@ package org.opentripplanner.openstreetmap.model;
 
 public class OSMRelationMember {
 
-  private String type;
+  private OSMMemberType type;
 
   private long ref;
 
   private String role;
 
-  public String getType() {
+  public OSMMemberType getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(OSMMemberType type) {
     this.type = type;
+  }
+
+  public boolean hasType(OSMMemberType type) {
+    return this.type == type;
   }
 
   public long getRef() {
