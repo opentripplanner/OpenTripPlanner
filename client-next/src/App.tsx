@@ -1,6 +1,6 @@
-import {MapContainer} from "./MapContainer.tsx";
-import {NavBarContainer} from "./NavBarContainer.tsx";
-import {TripQueryContainer} from "./TripQueryContainer.tsx";
+import { MapContainer } from './MapContainer.tsx';
+import { NavBarContainer } from './NavBarContainer.tsx';
+import { TripQueryContainer } from './TripQueryContainer.tsx';
 
 export function App() {
   return (
