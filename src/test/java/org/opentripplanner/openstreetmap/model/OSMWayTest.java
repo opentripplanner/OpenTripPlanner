@@ -8,6 +8,7 @@ import org.opentripplanner.graph_builder.module.osm.OsmFilter;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMWayTest {
@@ -337,6 +338,21 @@ public class OSMWayTest {
 
     assertTrue(permissionPair.main().allows(StreetTraversalPermission.CAR));
     assertFalse(permissionPair.back().allows(StreetTraversalPermission.CAR));
+  }
+
+  @Test
+  void escalator() {
+    assertFalse(WayTestData.cycleway().isEscalator());
+
+    var escalator = new OSMWay();
+    escalator.addTag("highway", "steps");
+    assertFalse(escalator.isEscalator());
+
+    escalator.addTag("conveying", "yes");
+    assertTrue(escalator.isEscalator());
+
+    escalator.addTag("conveying", "whoknows?");
+    assertFalse(escalator.isEscalator());
   }
 
   private StreetTraversalPermissionPair getWayProperties(OSMWay way) {

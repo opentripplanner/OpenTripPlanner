@@ -6,6 +6,12 @@ import java.util.Set;
 
 public class OSMWay extends OSMWithTags {
 
+  private static final Set<String> ESCALATOR_CONVEYING_TAGS = Set.of(
+    "yes",
+    "forward",
+    "backward",
+    "reversible"
+  );
   private final TLongList nodes = new TLongArrayList();
 
   public void addNodeRef(long nodeRef) {
@@ -136,11 +142,7 @@ public class OSMWay extends OSMWithTags {
   }
 
   public boolean isEscalator() {
-    return (
-      isTag("highway", "steps") &&
-      hasTag("conveying") &&
-      Set.of("yes", "forward", "backward", "reversible").contains(getTag("conveying"))
-    );
+    return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
   }
 
   public boolean isForwardEscalator() {

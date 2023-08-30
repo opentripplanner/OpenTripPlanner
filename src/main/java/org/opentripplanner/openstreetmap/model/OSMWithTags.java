@@ -197,6 +197,13 @@ public class OSMWithTags {
   }
 
   /**
+   * Takes a tag key and checks if the value is any of those in {@code onOfTags}.
+   */
+  public boolean isOneOfTags(String key, Set<String> oneOfTags) {
+    return oneOfTags.stream().anyMatch(value -> isTag(key, value));
+  }
+
+  /**
    * Returns a name-like value for an entity (if one exists). The otp: namespaced tags are created
    * by {@link OsmModule}
    */
