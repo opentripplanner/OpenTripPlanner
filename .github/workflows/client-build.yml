@@ -1,0 +1,28 @@
+# Temporary workflow for this branch -- we may want to build the client in the main
+# workflow (cibuild.yml).
+name: OTP Client CI build
+on:
+  push:
+    branches:
+      - debug-client-next
+    #paths:
+    #  - client-next/**
+  pull_request:
+    branches:
+      - debug-client-next
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v3.3.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Build and test
+        run: |
+          npm install
+          npm run build
+          npm run test
