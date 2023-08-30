@@ -250,8 +250,6 @@ public class OsmModule implements GraphBuilderModule {
       StreetTraversalPermission permissions = OsmFilter.getPermissionsForWay(
         way,
         wayData.getPermission(),
-        params.banDiscouragedWalking(),
-        params.banDiscouragedBiking(),
         issueStore
       );
       if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) {
