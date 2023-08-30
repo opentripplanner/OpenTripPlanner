@@ -5,6 +5,7 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.execution.ExecutionStrategy;
+import graphql.execution.UnknownOperationException;
 import graphql.execution.instrumentation.ChainedInstrumentation;
 import graphql.execution.instrumentation.Instrumentation;
 import graphql.schema.CoercingParseValueException;
@@ -69,8 +70,8 @@ class TransmodelGraph {
       return ExecutionResultMapper.okResponse(result);
     } catch (OTPRequestTimeoutException te) {
       return ExecutionResultMapper.timeoutResponse();
-    } catch (CoercingParseValueException cpve) {
-      return ExecutionResultMapper.badRequestResponse(cpve.getMessage());
+    } catch (CoercingParseValueException | UnknownOperationException e) {
+      return ExecutionResultMapper.badRequestResponse(e.getMessage());
     } catch (Exception systemError) {
       LOG.error(systemError.getMessage(), systemError);
       return ExecutionResultMapper.systemErrorResponse(systemError.getMessage());
