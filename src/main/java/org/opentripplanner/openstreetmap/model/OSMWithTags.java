@@ -2,7 +2,6 @@ package org.opentripplanner.openstreetmap.model;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.OptionalInt;
@@ -70,12 +69,13 @@ public class OSMWithTags {
   /**
    * Adds a tag.
    */
-  public void addTag(String key, String value) {
-    if (key == null || value == null) return;
+  public OSMWithTags addTag(String key, String value) {
+    if (key == null || value == null) return this;
 
     if (tags == null) tags = new HashMap<>();
 
     tags.put(key.toLowerCase(), value);
+    return this;
   }
 
   /**
