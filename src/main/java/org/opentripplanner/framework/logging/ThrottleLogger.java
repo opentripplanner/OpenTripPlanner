@@ -15,7 +15,7 @@ import org.slf4j.Logger;
  * because too many events are logged during a short period of time. This could happen if you are
  * parsing thousands or millions of records and each of them will cause a log event to happen.
  * <p>
- * This class is used to wrap the original logger and it will forward only one log event for pr
+ * This class is used to wrap the original logger, and it will forward only one log event per
  * second.
  * <p>
  * THREAD SAFETY - The implementation is very simple and do not do any synchronization, so it is
@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 public class ThrottleLogger extends AbstractFilterLogger {
 
   private static final int STALL_PERIOD_MILLISECONDS = 1000;
-  private long timeout = Long.MIN_VALUE;
+  private volatile long timeout = Long.MIN_VALUE;
 
   private ThrottleLogger(Logger delegate) {
     super(delegate);
@@ -59,7 +59,7 @@ public class ThrottleLogger extends AbstractFilterLogger {
    * <p>
    * In a worst case scenario, each thread keep their local version of the {@code timeout} and one
    * log message from each thread is printed every second. This can behave differently from one JVM
-   * to anther.
+   * to another.
    */
   private boolean throttle() {
     long time = System.currentTimeMillis();

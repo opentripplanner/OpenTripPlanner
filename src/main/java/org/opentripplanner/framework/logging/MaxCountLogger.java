@@ -21,14 +21,15 @@ public class MaxCountLogger extends AbstractFilterLogger {
   private static final int MAX_COUNT = 10;
   private int count = 0;
 
-  public MaxCountLogger(Logger delegate) {
+  private MaxCountLogger(Logger delegate) {
     super(delegate);
   }
 
   /**
-   * Wrap given logger, and throttle INFO, WARN and ERROR messages.
+   * Wrap given logger, and throttle INFO, WARN and ERROR messages. Maximum 10 messages is
+   * written to the log.
    */
-  public static MaxCountLogger maxCount(Logger log) {
+  public static MaxCountLogger of(Logger log) {
     return new MaxCountLogger(log);
   }
 
