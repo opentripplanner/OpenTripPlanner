@@ -2498,7 +2498,7 @@ type QueryType {
         maxResults: Int = 20
 
         """
-        Only return places that are one of these types, e.g. `STOP` or `BICYCLE_RENT`
+        Only return places that are one of these types, e.g. `STOP` or `VEHICLE_RENT`
         """
         filterByPlaceTypes: [FilterPlaceType]
 
