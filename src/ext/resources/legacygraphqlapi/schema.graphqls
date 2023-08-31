@@ -868,19 +868,18 @@ type Coordinates {
     lon: Float
 }
 
-input SearchWindowOptions @oneOf {
-    departure: SearchWindow
-    arrival: SearchWindow
+input PlanDateTimeInput @oneOf {
+    earliestDeparture: DateTimeWithOffset
+    latestArrival: DateTimeWithOffset
 }
 
-input SearchWindow {
-    dateTime: DateTimeWithOffset
+input SearchWindowInput {
     duration: Duration
     numberOfItineraries: Int
-    gracePeriod: SearchWindowGracePeriod
+    gracePeriod: SearchWindowGracePeriodInput
 }
 
-input SearchWindowGracePeriod {
+input SearchWindowGracePeriodInput {
     duration: Duration
     numberOfItineraries: Int
 }
@@ -3208,7 +3207,8 @@ type QueryType {
     ): Plan @async
 
     planConnection(
-        searchWindow: SearchWindowOptions
+        dateTime: PlanDateTimeInput
+        searchWindow: SearchWindowInput
         origin: PlanLocation
         destination: PlanLocation
         preferences: PlanPreferences
