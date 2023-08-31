@@ -12,4 +12,8 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
  * @param network The network name
  * @param geofencingZones enable geofencingZones for the given network
  */
-public record NetworkParameters(String network, boolean geofencingZones) {}
+public record NetworkParameters(String network, boolean geofencingZones) {
+  public NetworkParameters withName(String network) {
+    return new NetworkParameters(network, geofencingZones);
+  }
+}

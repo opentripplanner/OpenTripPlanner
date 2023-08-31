@@ -28,17 +28,17 @@ the `router-config.json`
 <!-- PARAMETERS-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter                                    |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
-|-----------------------------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| language                                            |     `string`    | Language code.                                                             | *Optional* |               |  2.1  |
-| sourcesName                                         |     `string`    | Json tag name for updater sources.                                         | *Optional* | `"systems"`   |  2.1  |
-| updaterNetworkName                                  |     `string`    | Json tag name for the network name for each source.                        | *Optional* | `"id"`        |  2.1  |
-| updaterUrlName                                      |     `string`    | Json tag name for endpoint urls for each source.                           | *Optional* | `"url"`       |  2.1  |
-| url                                                 |      `uri`      | Endpoint for the VehicleRentalServiceDirectory                             | *Required* |               |  2.1  |
-| [headers](#vehicleRentalServiceDirectory_headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.1  |
-| [networks](#vehicleRentalServiceDirectory_networks) |    `object[]`   | List all networks to include.                                              | *Optional* |               |  2.4  |
-|       geofencingZones                               |    `boolean`    | Enables geofencingZones for the given network                              | *Optional* | `false`       |  2.4  |
-|       network                                       |     `string`    | The network name                                                           | *Required* |               |  2.4  |
+| Config Parameter                                    |       Type      | Summary                                                                         |  Req./Opt. | Default Value | Since |
+|-----------------------------------------------------|:---------------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| language                                            |     `string`    | Language code.                                                                  | *Optional* |               |  2.1  |
+| sourcesName                                         |     `string`    | Json tag name for updater sources.                                              | *Optional* | `"systems"`   |  2.1  |
+| updaterNetworkName                                  |     `string`    | Json tag name for the network name for each source.                             | *Optional* | `"id"`        |  2.1  |
+| updaterUrlName                                      |     `string`    | Json tag name for endpoint urls for each source.                                | *Optional* | `"url"`       |  2.1  |
+| url                                                 |      `uri`      | Endpoint for the VehicleRentalServiceDirectory                                  | *Required* |               |  2.1  |
+| [headers](#vehicleRentalServiceDirectory_headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |  2.1  |
+| [networks](#vehicleRentalServiceDirectory_networks) |    `object[]`   | List all networks to include. Use "network": "default-network" to set defaults. | *Optional* |               |  2.4  |
+|       geofencingZones                               |    `boolean`    | Enables geofencingZones for the given network                                   | *Optional* | `false`       |  2.4  |
+|       network                                       |     `string`    | The network name                                                                | *Required* |               |  2.4  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -60,7 +60,13 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 **Since version:** `2.4` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
 **Path:** /vehicleRentalServiceDirectory 
 
-List all networks to include.
+List all networks to include. Use "network": "default-network" to set defaults.
+
+If no default network exist only the listed networks are used. Configure the a network
+with name "default-network" to include all unlisted networks. If not present, all
+unlisted networks is dropped. Note! The values int the "default-network" is not used to
+set missing field values in networks listed.
+
 
 
 <!-- PARAMETERS-DETAILS END -->

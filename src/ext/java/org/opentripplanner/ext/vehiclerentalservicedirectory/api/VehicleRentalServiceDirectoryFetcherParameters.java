@@ -4,10 +4,12 @@ import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class VehicleRentalServiceDirectoryFetcherParameters {
 
+  public static final String DEFAULT_NETWORK_NAME = "default-network";
   private final URI url;
 
   private final String sourcesName;
@@ -21,6 +23,9 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
   private final String language;
 
   private final Map<String, NetworkParameters> parametersForNetwork;
+
+  @Nullable
+  private final NetworkParameters defaultNetwork;
 
   public VehicleRentalServiceDirectoryFetcherParameters(
     URI url,
@@ -39,6 +44,7 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     this.headers = headers;
     this.parametersForNetwork =
       networkParameters.stream().collect(Collectors.toMap(NetworkParameters::network, it -> it));
+    this.defaultNetwork = parametersForNetwork.get(DEFAULT_NETWORK_NAME);
   }
 
   /**
@@ -90,7 +96,8 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     return language;
   }
 
+  @Nullable
   public NetworkParameters networkParameters(String network) {
-    return parametersForNetwork.get(network);
+    return parametersForNetwork.getOrDefault(network, defaultNetwork);
   }
 }
