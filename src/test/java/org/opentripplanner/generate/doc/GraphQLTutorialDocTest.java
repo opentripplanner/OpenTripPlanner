@@ -22,7 +22,7 @@ public class GraphQLTutorialDocTest {
 
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, "GraphQL-Tutorial.md");
 
-  private static final File OUT_FILE = new File(DOCS_ROOT, "GraphQL-Tutorial.md");
+  private static final File OUT_FILE = new File(DOCS_ROOT + "/apis", "GraphQL-Tutorial.md");
 
   /**
    * NOTE! This test updates the {@code docs/GraphQlTutorial.md} document based on the latest

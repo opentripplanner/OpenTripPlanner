@@ -8,10 +8,10 @@
 # GraphQL tutorial
 
 This document will give you a quick start tutorial on how to get started with OTP's GraphQL APIs. For 
-this tutorial we will be using the [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) as this is the most commonly used one.
+this tutorial we will be using the [GTFS GraphQL API](GTFS-GraphQL-API.md) as this is the most commonly used one.
 
 First of all, make sure that you've loaded street and transit data into your instance by following
-the [basic tutorial](Basic-Tutorial.md)
+the [basic tutorial](../Basic-Tutorial.md)
 
 ## Visual GraphQL API client
 
@@ -20,7 +20,7 @@ started OTP, visit [http://localhost:8080/graphiql](http://localhost:8080/graphi
 
 It should look like this:
 
-![GraphiQL](images/graphiql.png)
+![GraphiQL](../images/graphiql.png)
 
 ## Sending your first query
 
@@ -35,12 +35,12 @@ side panel.
 Now would be a good time to explore the auto-complete capabilities of the tool by moving the
 cursor into the query panel and hitting Ctrl-Space to see what other query parameters are possible.
 
-![GraphiQL](images/graphiql-autocomplete.png)
+![GraphiQL](../images/graphiql-autocomplete.png)
 
 The explorer also has documentation built into it. If you hover your pointer over a property on the 
 left hand side you can see its documentation.
 
-![GraphiQL](images/graphiql-documentation.png)
+![GraphiQL](../images/graphiql-documentation.png)
 
 ## A more advanced query
 

@@ -10,6 +10,14 @@ import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.api.resource.DebugOutput;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAbsoluteDirection;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertCauseType;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertEffectType;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
@@ -77,13 +85,13 @@ public class GraphQLDataFetchers {
   public interface GraphQLAlert {
     public DataFetcher<Agency> agency();
 
-    public DataFetcher<GraphQLTypes.GraphQLAlertCauseType> alertCause();
+    public DataFetcher<GraphQLAlertCauseType> alertCause();
 
     public DataFetcher<String> alertDescriptionText();
 
     public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations();
 
-    public DataFetcher<GraphQLTypes.GraphQLAlertEffectType> alertEffect();
+    public DataFetcher<GraphQLAlertEffectType> alertEffect();
 
     public DataFetcher<Integer> alertHash();
 
@@ -91,7 +99,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations();
 
-    public DataFetcher<GraphQLTypes.GraphQLAlertSeverityLevelType> alertSeverityLevel();
+    public DataFetcher<GraphQLAlertSeverityLevelType> alertSeverityLevel();
 
     public DataFetcher<String> alertUrl();
 
@@ -740,9 +748,9 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLRentalVehicleType {
-    public DataFetcher<GraphQLTypes.GraphQLFormFactor> formFactor();
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor> formFactor();
 
-    public DataFetcher<GraphQLTypes.GraphQLPropulsionType> propulsionType();
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPropulsionType> propulsionType();
   }
 
   /** An estimate for a ride on a hailed vehicle, like an Uber car. */
@@ -793,7 +801,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> longName();
 
-    public DataFetcher<GraphQLTypes.GraphQLTransitMode> mode();
+    public DataFetcher<GraphQLTransitMode> mode();
 
     public DataFetcher<Iterable<TripPattern>> patterns();
 
@@ -824,11 +832,11 @@ public class GraphQLDataFetchers {
 
   /** Description of the reason, why the planner did not return any results */
   public interface GraphQLRoutingError {
-    public DataFetcher<GraphQLTypes.GraphQLRoutingErrorCode> code();
+    public DataFetcher<GraphQLRoutingErrorCode> code();
 
     public DataFetcher<String> description();
 
-    public DataFetcher<GraphQLTypes.GraphQLInputField> inputField();
+    public DataFetcher<GraphQLInputField> inputField();
   }
 
   /**
@@ -889,7 +897,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Integer> vehicleType();
 
-    public DataFetcher<GraphQLTypes.GraphQLWheelchairBoarding> wheelchairBoarding();
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding> wheelchairBoarding();
 
     public DataFetcher<String> zoneId();
   }
@@ -1045,7 +1053,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> tripShortName();
 
-    public DataFetcher<GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible();
+    public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible();
   }
 
   /** This is used for alert entities that we don't explicitly handle or they are missing. */
@@ -1236,7 +1244,7 @@ public class GraphQLDataFetchers {
   }
 
   public interface GraphQLStep {
-    public DataFetcher<GraphQLTypes.GraphQLAbsoluteDirection> absoluteDirection();
+    public DataFetcher<GraphQLAbsoluteDirection> absoluteDirection();
 
     public DataFetcher<Iterable<TransitAlert>> alerts();
 
@@ -1254,7 +1262,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> lon();
 
-    public DataFetcher<GraphQLTypes.GraphQLRelativeDirection> relativeDirection();
+    public DataFetcher<GraphQLRelativeDirection> relativeDirection();
 
     public DataFetcher<Boolean> stayOn();
 
