@@ -1,7 +1,7 @@
 export default {
   introspection: {
     type: 'sdl',
-    paths: ['src/ext/resources/gtfsgraphqlapi/schema.graphqls'],
+    paths: ['src/main/resources/gtfsgraphqlapi/schema.graphqls'],
   },
   website: {
     template: 'carbon-multi-page',
