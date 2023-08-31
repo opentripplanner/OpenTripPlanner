@@ -166,6 +166,22 @@ public class TimeUtilsTest {
     );
   }
 
+  @Test
+  void testMsToString() {
+    assertEquals("0s", TimeUtils.msToString(0));
+    assertEquals("0.001s", TimeUtils.msToString(1));
+    assertEquals("0.012s", TimeUtils.msToString(12));
+    assertEquals("1s", TimeUtils.msToString(1000));
+    assertEquals("1.1s", TimeUtils.msToString(1100));
+    assertEquals("1.02s", TimeUtils.msToString(1020));
+    assertEquals("1.003s", TimeUtils.msToString(1003));
+    assertEquals("1.234s", TimeUtils.msToString(1234));
+
+    // Negative numbers
+    assertEquals("-1s", TimeUtils.msToString(-1000));
+    assertEquals("-1.234s", TimeUtils.msToString(-1234));
+  }
+
   private static int time(int hour, int min, int sec) {
     return 60 * (60 * hour + min) + sec;
   }
