@@ -3885,7 +3885,7 @@ type TicketType implements Node {
 }
 
 input TransferPreferences {
-    penalty: Int
+    costPenalty: Int
     minimumWaitingTime: Duration
 }
 
