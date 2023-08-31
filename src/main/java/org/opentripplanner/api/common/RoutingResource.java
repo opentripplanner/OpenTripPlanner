@@ -22,7 +22,7 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.lang.StringUtils;
-import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
@@ -115,7 +115,7 @@ public abstract class RoutingResource {
    * debugging purposes.
    */
   @QueryParam("searchWindow")
-  protected Integer searchWindow;
+  protected String searchWindow;
 
   /**
    * Use the cursor to go to the next "page" of itineraries. Copy the cursor from the last response
@@ -660,7 +660,6 @@ public abstract class RoutingResource {
    * Whether non-optimal transit paths at the destination should be returned.
    * This is optional. Use values between 1.0 and 2.0. For example to relax 10% use 1.1.
    * Values greater than 2.0 are not supported, due to performance reasons.
-   * {@link SearchParams#relaxCostAtDestination()}
    */
   @QueryParam("relaxTransitSearchGeneralizedCostAtDestination")
   protected Double relaxTransitSearchGeneralizedCostAtDestination;
@@ -727,7 +726,8 @@ public abstract class RoutingResource {
       }
     }
 
-    setIfNotNull(searchWindow, it -> request.setSearchWindow(Duration.ofSeconds(it)));
+    final Duration swDuration = DurationUtils.parseSecondsOrDuration(searchWindow).orElse(null);
+    setIfNotNull(searchWindow, it -> request.setSearchWindow(swDuration));
     setIfNotNull(pageCursor, request::setPageCursorFromEncoded);
     setIfNotNull(timetableView, request::setTimetableView);
     setIfNotNull(wheelchair, request::setWheelchair);
