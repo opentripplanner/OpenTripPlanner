@@ -1264,10 +1264,10 @@ input PlanPreferences {
 }
 
 input PlanStreetModes {
-    direct: StreetMode
-    access: StreetMode
-    egress: StreetMode
-    transfer: StreetMode
+    direct: [StreetModeInputOptions!]
+    access: [StreetModeInputOptions!]
+    egress: [StreetModeInputOptions!]
+    transfer: [StreetModeInputOptions!]
 }
 
 input PlanStreetPreferences {
@@ -1932,20 +1932,29 @@ type PageInfo {
     endCursor: String
 }
 
-enum StreetMode {
-    """BICYCLE"""
+enum StreetModeInputOptions {
     BICYCLE
 
-    """CAR"""
+    BICYCLE_RENTAL
+
+    BICYCLE_PARKING
+
     CAR
 
-    """Enables flexible transit for access and egress legs"""
+    CAR_RENTAL
+
+    CAR_PARKING
+
+    CAR_PICKUP
+
+    CAR_DROPOFF
+
     FLEX
 
-    """SCOOTER"""
     SCOOTER
 
-    """WALK"""
+    SCOOTER_RENTAL
+
     WALK
 }
 
