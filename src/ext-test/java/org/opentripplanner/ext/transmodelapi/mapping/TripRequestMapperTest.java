@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.digitransitemissions.DefaultEmissionsService;
+import org.opentripplanner.ext.digitransitemissions.DefaultEmissionsServiceRepository;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -75,6 +77,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository()),
           new DefaultVehiclePositionService(),
           new DefaultVehicleRentalService(),
+          new DefaultEmissionsService(new DefaultEmissionsServiceRepository()),
           RouterConfig.DEFAULT.flexConfig(),
           List.of(),
           null

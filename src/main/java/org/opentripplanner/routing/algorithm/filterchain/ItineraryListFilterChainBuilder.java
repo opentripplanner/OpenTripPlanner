@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
-import org.opentripplanner.ext.emissions.EmissionsFilter;
-import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
@@ -76,7 +74,7 @@ public class ItineraryListFilterChainBuilder {
   private double minBikeParkingDistance;
 
   @Sandbox
-  private EmissionsService emissionsService;
+  private ItineraryListFilter emissionsFilter;
 
   @Sandbox
   private ItineraryListFilter rideHailingFilter;
@@ -274,8 +272,8 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withEmissions(EmissionsService emissionsService) {
-    this.emissionsService = emissionsService;
+  public ItineraryListFilterChainBuilder withEmissions(ItineraryListFilter emissionsFilter) {
+    this.emissionsFilter = emissionsFilter;
     return this;
   }
 
@@ -325,8 +323,8 @@ public class ItineraryListFilterChainBuilder {
       filters.add(new FaresFilter(faresService));
     }
 
-    if (emissionsService != null) {
-      filters.add(new EmissionsFilter(emissionsService));
+    if (this.emissionsFilter != null) {
+      filters.add(this.emissionsFilter);
     }
 
     if (transitAlertService != null) {

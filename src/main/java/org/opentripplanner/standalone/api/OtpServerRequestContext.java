@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.ext.digitransitemissions.EmissionsService;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -93,6 +94,8 @@ public interface OtpServerRequestContext {
   List<RideHailingService> rideHailingServices();
 
   MeterRegistry meterRegistry();
+
+  EmissionsService emissionsService();
 
   /** Inspector/debug services */
   TileRendererManager tileRendererManager();

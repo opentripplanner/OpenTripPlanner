@@ -3,7 +3,9 @@ package org.opentripplanner.routing.algorithm.mapping;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
+import org.opentripplanner.ext.digitransitemissions.EmissionsFilter;
 import org.opentripplanner.ext.ridehailing.RideHailingFilter;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
@@ -66,7 +68,6 @@ public class RouteRequestToFilterChainMapper {
         request.preferences().wheelchair().maxSlope()
       )
       .withFares(context.graph().getFareService())
-      .withEmissions(context.graph().getEmissionsService())
       .withMinBikeParkingDistance(minBikeParkingDistance(request))
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
         params.removeItinerariesWithSameRoutesAndStops()
@@ -85,6 +86,10 @@ public class RouteRequestToFilterChainMapper {
       builder.withRideHailingFilter(
         new RideHailingFilter(context.rideHailingServices(), request.wheelchair())
       );
+    }
+
+    if (OTPFeature.Co2Emissions.isOn() && context.emissionsService() != null) {
+      builder.withEmissions(new EmissionsFilter(context.emissionsService()));
     }
 
     return builder.build();

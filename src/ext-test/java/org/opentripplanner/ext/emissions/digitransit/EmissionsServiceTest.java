@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.emissions;
+package org.opentripplanner.ext.emissions.digitransit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
@@ -7,10 +7,14 @@ import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.digitransitemissions.DigitransitEmissions;
+import org.opentripplanner.ext.digitransitemissions.DigitransitEmissionsService;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -25,9 +29,9 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-class DigitransitEmissionsServiceTest {
+class EmissionsServiceTest {
 
-  private DigitransitEmissionsService eservice;
+  private DigitransitEmissionsService eService;
 
   static final ZonedDateTime TIME = OffsetDateTime
     .parse("2023-07-20T17:49:06+03:00")
@@ -41,20 +45,14 @@ class DigitransitEmissionsServiceTest {
 
   @BeforeEach
   void SetUp() {
-    DigitransitEmissions e = new DigitransitEmissions("db", "F:1", "Foo_CO", "BUS", "120", 12);
-    DigitransitEmissions[] list = new DigitransitEmissions[2];
-    list[0] = e;
-    list[1] = new DigitransitEmissions("db", "CAR", "CAR", "CAR", "1100", 1);
-    this.eservice = new DigitransitEmissionsService(list);
+    Map<String, DigitransitEmissions> digitransitEmissions = new HashMap<>();
+    digitransitEmissions.put("F:F:1:BUS", new DigitransitEmissions(120, 12));
+    digitransitEmissions.put("CAR", new DigitransitEmissions(1100, 1));
+    this.eService = new DigitransitEmissionsService(digitransitEmissions);
   }
 
   @Test
-  void getEmissionsByAgencyId() {
-    assertEquals("Foo_CO", eservice.getEmissionsByAgencyId("F:1").getAgency_name());
-  }
-
-  @Test
-  void getEmissionsForRoute() {
+  void getEmissionsForItinerary() {
     var route = TransitModelForTest.route(id("2")).withAgency(subject).build();
     List<Leg> legs = new ArrayList<>();
     var pattern = TransitModelForTest
@@ -85,7 +83,7 @@ class DigitransitEmissionsServiceTest {
     );
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(0, eservice.getEmissionsForRoute(i));
+    assertEquals(0, eService.getEmissionsForItinerary(i));
   }
 
   @Test
@@ -113,6 +111,6 @@ class DigitransitEmissionsServiceTest {
       .build();
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(235.83999633789062F, eservice.getEmissionsForRoute(i));
+    assertEquals(235.83999633789062F, eService.getEmissionsForItinerary(i));
   }
 }

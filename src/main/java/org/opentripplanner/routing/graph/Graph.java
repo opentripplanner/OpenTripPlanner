@@ -16,7 +16,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
-import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -114,7 +113,6 @@ public class Graph implements Serializable {
    */
   public DataOverlayParameterBindings dataOverlayParameterBindings;
   private LuceneIndex luceneIndex;
-  private EmissionsService emissionsService;
 
   @Inject
   public Graph(
@@ -361,14 +359,6 @@ public class Graph implements Serializable {
 
   public void setFareService(FareService fareService) {
     this.fareService = fareService;
-  }
-
-  public EmissionsService getEmissionsService() {
-    return emissionsService;
-  }
-
-  public void setEmissionsService(EmissionsService emissionsService) {
-    this.emissionsService = emissionsService;
   }
 
   public LuceneIndex getLuceneIndex() {

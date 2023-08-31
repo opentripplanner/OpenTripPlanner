@@ -6,8 +6,9 @@ import jakarta.inject.Singleton;
 import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
-import org.opentripplanner.emissions.EmissionsModule;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
+import org.opentripplanner.ext.digitransitemissions.DigitransitEmissionsModule;
+import org.opentripplanner.ext.digitransitemissions.EmissionsServiceRepository;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.GraphBuilder;
@@ -38,9 +39,7 @@ public interface GraphBuilderFactory {
   GraphBuilder graphBuilder();
   OsmModule osmModule();
   GtfsModule gtfsModule();
-
-  EmissionsModule emissionsModule();
-
+  DigitransitEmissionsModule emissionsModule();
   NetexModule netexModule();
   TimeZoneAdjusterModule timeZoneAdjusterModule();
   TripPatternNamer tripPatternNamer();
@@ -78,5 +77,8 @@ public interface GraphBuilderFactory {
     Builder timeZoneId(@Nullable ZoneId zoneId);
 
     GraphBuilderFactory build();
+
+    @BindsInstance
+    Builder emissionsServiceRepository(EmissionsServiceRepository emissionsServiceRepository);
   }
 }

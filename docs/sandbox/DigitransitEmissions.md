@@ -32,12 +32,11 @@ For example:
 ]
 ```
 
-Emissions data is loaded from the provided source and embedded in graph building process
-as part of the itinerary.
+Emissions data is loaded from the provided source and embedded into the graph  during the build process.
 
 
 ### Configuration
-To enable this functionality, you need to add the "co2Emissions"  feature in the
+To enable this functionality, you need to add the "Co2Emissions"  feature in the
 `otp-config.json` file. Include the `digitransitEmissions` object in the
 `build-config.json` file. The `digitransitEmissions` object should contain a parameter called `url`,
 which should be set to the location where the emissions data is stored.
@@ -45,7 +44,7 @@ which should be set to the location where the emissions data is stored.
 ```json
 //otp-config.json
 {
-  "co2Emissions": true
+  "Co2Emissions": true
 }
 ```
 include the `digitransitEmissions` object in the
@@ -64,6 +63,6 @@ which should be set to the location where the emissions data is stored.
 
 ### OTP 2.4
 
-- Initial implementation of Emissions calculation
+- Initial implementation of the emissions calculation.
 
 

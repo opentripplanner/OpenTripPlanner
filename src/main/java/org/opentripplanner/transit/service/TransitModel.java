@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -107,8 +106,6 @@ public class TransitModel implements Serializable {
   private transient TransitLayerUpdater transitLayerUpdater;
 
   private transient TransitAlertService transitAlertService;
-
-  private EmissionsService emissionsService;
 
   @Inject
   public TransitModel(StopModel stopModel, Deduplicator deduplicator) {
@@ -578,13 +575,5 @@ public class TransitModel implements Serializable {
         LOG.debug("graph time zone set to {}", timeZone);
       }
     }
-  }
-
-  public EmissionsService getEmissionsService() {
-    return emissionsService;
-  }
-
-  public void setEmissionsService(EmissionsService emissionsService) {
-    this.emissionsService = emissionsService;
   }
 }

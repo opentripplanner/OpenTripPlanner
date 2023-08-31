@@ -9,9 +9,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.emissions.EmissionsModule;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
+import org.opentripplanner.ext.digitransitemissions.DigitransitEmissionsModule;
+import org.opentripplanner.ext.digitransitemissions.EmissionsServiceRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -111,14 +112,15 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static EmissionsModule provideEmissionsModule(
+  static DigitransitEmissionsModule provideEmissionsModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     Graph graph,
     TransitModel transitModel,
-    DataImportIssueStore issueStore
+    DataImportIssueStore issueStore,
+    EmissionsServiceRepository emissionsServiceRepository
   ) {
-    return new EmissionsModule(transitModel, graph, issueStore, config);
+    return new DigitransitEmissionsModule(config, emissionsServiceRepository);
   }
 
   @Provides

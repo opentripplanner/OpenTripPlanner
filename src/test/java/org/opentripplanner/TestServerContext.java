@@ -4,6 +4,9 @@ import static org.opentripplanner.standalone.configure.ConstructApplication.crea
 
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
+import org.opentripplanner.ext.digitransitemissions.DefaultEmissionsService;
+import org.opentripplanner.ext.digitransitemissions.DefaultEmissionsServiceRepository;
+import org.opentripplanner.ext.digitransitemissions.EmissionsService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
@@ -41,6 +44,7 @@ public class TestServerContext {
       createWorldEnvelopeService(),
       createVehiclePositionService(),
       createVehicleRentalService(),
+      createEmissionsService(),
       routerConfig.flexConfig(),
       List.of(),
       null
@@ -60,5 +64,9 @@ public class TestServerContext {
 
   public static VehicleRentalService createVehicleRentalService() {
     return new DefaultVehicleRentalService();
+  }
+
+  public static EmissionsService createEmissionsService() {
+    return new DefaultEmissionsService(new DefaultEmissionsServiceRepository());
   }
 }

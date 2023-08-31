@@ -728,8 +728,8 @@ in the source data, this should be set to 0.1.
 Configure properties for emissions file.
 
 By specifying a URL to fetch emissions data, the program gains access to carbon dioxide (CO2)
-emissions associated with various transportation modes and routes. This data is then used
-for perform emission calculations to different transport modes and car.
+emissions associated with transportation modes. This data is then used
+to perform emission calculations for public transport modes and car travel.
 
 
 <h3 id="elevationBucket">elevationBucket</h3>

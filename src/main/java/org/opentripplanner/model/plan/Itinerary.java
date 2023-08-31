@@ -51,7 +51,7 @@ public class Itinerary {
   /* Sandbox experimental properties */
   private Float accessibilityScore;
 
-  private float emissions;
+  private Float emissions;
 
   /* other properties */
 
@@ -592,11 +592,12 @@ public class Itinerary {
   /**
    * The co2 emissions of this itinerary.
    */
-  public void setEmissions(float emissions) {
+  public void setEmissions(Float emissions) {
     this.emissions = emissions;
   }
 
-  public float getEmissions() {
+  @Nullable
+  public Float getEmissions() {
     return this.emissions;
   }
 }
