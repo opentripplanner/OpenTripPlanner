@@ -13,9 +13,7 @@ public class SeverityMapper {
    * Returns GraphQL API string counter part for internal {@link AlertSeverity} enum. Defaults
    * to returning UNKNOWN_SEVERITY.
    */
-  public static GraphQLAlertSeverityLevelType getGraphQLSeverity(
-    AlertSeverity severity
-  ) {
+  public static GraphQLAlertSeverityLevelType getGraphQLSeverity(AlertSeverity severity) {
     if (severity == null) {
       return GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
     }
@@ -23,8 +21,7 @@ public class SeverityMapper {
       case INFO -> GraphQLAlertSeverityLevelType.INFO;
       case VERY_SLIGHT, SLIGHT, WARNING -> GraphQLAlertSeverityLevelType.WARNING;
       case VERY_SEVERE, SEVERE -> GraphQLAlertSeverityLevelType.SEVERE;
-      case UNDEFINED,
-        UNKNOWN_SEVERITY -> GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
+      case UNDEFINED, UNKNOWN_SEVERITY -> GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
     };
   }
 }
