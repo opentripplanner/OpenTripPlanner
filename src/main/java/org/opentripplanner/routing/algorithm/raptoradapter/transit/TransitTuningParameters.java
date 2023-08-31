@@ -48,6 +48,11 @@ public interface TransitTuningParameters {
     }
 
     @Override
+    public Duration maxSearchWindow() {
+      return Duration.ofHours(24);
+    }
+
+    @Override
     public List<Duration> pagingSearchWindowAdjustments() {
       return PAGING_SEARCH_WINDOW_ADJUSTMENTS;
     }
@@ -76,6 +81,8 @@ public interface TransitTuningParameters {
    * too large, more memory may be used than needed.
    */
   int transferCacheMaxSize();
+
+  Duration maxSearchWindow();
 
   /**
    * This parameter is used to reduce the number of pages a client have to step through for a

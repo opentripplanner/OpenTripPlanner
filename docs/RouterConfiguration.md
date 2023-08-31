@@ -50,6 +50,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                       | *Optional* |               |   na  |
 |    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                         | *Optional* | `60`          |   na  |
 |    [maxNumberOfTransfers](#transit_maxNumberOfTransfers)                                  |       `integer`       | This parameter is used to allocate enough memory space for Raptor.                                    | *Optional* | `12`          |   na  |
+|    [maxSearchWindow](#transit_maxSearchWindow)                                            |       `duration`      | Upper limit of the request parameter searchWindow.                                                    | *Optional* | `"PT24H"`     |  2.4  |
 |    [scheduledTripBinarySearchThreshold](#transit_scheduledTripBinarySearchThreshold)      |       `integer`       | This threshold is used to determine when to perform a binary trip schedule search.                    | *Optional* | `50`          |   na  |
 |    [searchThreadPoolSize](#transit_searchThreadPoolSize)                                  |       `integer`       | Split a travel search in smaller jobs and run them in parallel to improve performance.                | *Optional* | `0`           |   na  |
 |    [transferCacheMaxSize](#transit_transferCacheMaxSize)                                  |       `integer`       | The maximum number of distinct transfers parameters to cache pre-calculated transfers for.            | *Optional* | `25`          |   na  |
@@ -203,6 +204,15 @@ Set it to the maximum number of transfers for any given itinerary expected to be
 entire transit network. The memory overhead of setting this higher than the maximum number of
 transfers is very little so it is better to set it too high than to low.
 
+
+<h3 id="transit_maxSearchWindow">maxSearchWindow</h3>
+
+**Since version:** `2.4` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT24H"`   
+**Path:** /transit 
+
+Upper limit of the request parameter searchWindow.
+
+Maximum search window that can be set through the searchWindow API parameter.
 
 <h3 id="transit_scheduledTripBinarySearchThreshold">scheduledTripBinarySearchThreshold</h3>
 
