@@ -1,6 +1,7 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 
 /**
@@ -12,18 +13,18 @@ public class SeverityMapper {
    * Returns GraphQL API string counter part for internal {@link AlertSeverity} enum. Defaults
    * to returning UNKNOWN_SEVERITY.
    */
-  public static GraphQLTypes.GraphQLAlertSeverityLevelType getGraphQLSeverity(
+  public static GraphQLAlertSeverityLevelType getGraphQLSeverity(
     AlertSeverity severity
   ) {
     if (severity == null) {
-      return GraphQLTypes.GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
+      return GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
     }
     return switch (severity) {
-      case INFO -> GraphQLTypes.GraphQLAlertSeverityLevelType.INFO;
-      case VERY_SLIGHT, SLIGHT, WARNING -> GraphQLTypes.GraphQLAlertSeverityLevelType.WARNING;
-      case VERY_SEVERE, SEVERE -> GraphQLTypes.GraphQLAlertSeverityLevelType.SEVERE;
+      case INFO -> GraphQLAlertSeverityLevelType.INFO;
+      case VERY_SLIGHT, SLIGHT, WARNING -> GraphQLAlertSeverityLevelType.WARNING;
+      case VERY_SEVERE, SEVERE -> GraphQLAlertSeverityLevelType.SEVERE;
       case UNDEFINED,
-        UNKNOWN_SEVERITY -> GraphQLTypes.GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
+        UNKNOWN_SEVERITY -> GraphQLAlertSeverityLevelType.UNKNOWN_SEVERITY;
     };
   }
 }
