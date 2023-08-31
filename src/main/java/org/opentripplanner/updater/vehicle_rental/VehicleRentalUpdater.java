@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.lang.ObjectUtils;
-import org.opentripplanner.framework.logging.ThrottleLogger;
+import org.opentripplanner.framework.logging.Throttle;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -49,7 +49,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
 
-  private final Logger unlinkedPlaceLogger;
+  private final Throttle unlinkedPlaceThrottle;
 
   private final VehicleRentalDatasource source;
   private final String nameForLogging;
@@ -58,8 +58,8 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   private Map<StreetEdge, RentalRestrictionExtension> latestModifiedEdges = Map.of();
   private Set<GeofencingZone> latestAppliedGeofencingZones = Set.of();
-  Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
-  Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
+  private final Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
+  private final Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private final VertexLinker linker;
 
   private final VehicleRentalRepository service;
@@ -80,7 +80,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         parameters.sourceParameters().network(),
         parameters.sourceParameters().url()
       );
-    this.unlinkedPlaceLogger = ThrottleLogger.throttle(LOG);
+    this.unlinkedPlaceThrottle = Throttle.ofOneSecond();
 
     // Creation of network linker library will not modify the graph
     this.linker = vertexLinker;
@@ -186,11 +186,16 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
               )
           );
           if (vehicleRentalVertex.getOutgoing().isEmpty()) {
-            // the toString includes the text "Bike rental station"
-            unlinkedPlaceLogger.info(
-              "VehicleRentalPlace is unlinked for {}: {}",
-              nameForLogging,
-              vehicleRentalVertex
+            // Copy reference to pass into lambda
+            var vrv = vehicleRentalVertex;
+            unlinkedPlaceThrottle.throttle(() ->
+              // the toString includes the text "Bike rental station"
+              LOG.warn(
+                "VehicleRentalPlace is unlinked for {}: {}  {}",
+                nameForLogging,
+                vrv,
+                unlinkedPlaceThrottle.setupInfo()
+              )
             );
           }
           Set<RentalFormFactor> formFactors = Stream

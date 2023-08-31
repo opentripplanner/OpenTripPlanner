@@ -1,52 +1,48 @@
 package org.opentripplanner.framework.logging;
 
-import org.slf4j.Logger;
+import org.opentripplanner.framework.time.TimeUtils;
 
 /**
- * This class can be used to throttle logging events with level:
- * <ul>
- *     <li>INFO</li>
- *     <li>WARNING</li>
- *     <li>ERROR</li>
- * </ul>
- * DEBUG and TRACE events are not throttled.
+ * This class can be used to throttle (logging) events.
  * <p>
  * The primary use-case for this class is to prevent a logger for degrading the performance,
  * because too many events are logged during a short period of time. This could happen if you are
  * parsing thousands or millions of records and each of them will cause a log event to happen.
  * <p>
- * This class is used to wrap the original logger, and it will forward only one log event per
- * second.
+ * To use it, wrap the log statement:
+ * <pre>
+ * THROTTLE.throttle(() -> LOG.warn("Cost mismatch ...", ...));
+ * </pre>
+ * By wrapping the log statement only one log event will occur per second.
  * <p>
  * THREAD SAFETY - The implementation is very simple and do not do any synchronization, so it is
  * possible that more than 1 log event is logged for each second, but that is the only thread
- * safety issue. It is safe to use in multi-threaded cases. See the JavaDoc on the private
+ * safety issue. It is safe to use in a multithreaded cases. See the JavaDoc on the private
  * {@code throttle()} method for implementation details.
  */
-public class ThrottleLogger extends AbstractFilterLogger {
+public class Throttle {
 
-  private static final int STALL_PERIOD_MILLISECONDS = 1000;
-  private volatile long timeout = Long.MIN_VALUE;
+  private final int quietPeriodMilliseconds;
+  private long timeout = Long.MIN_VALUE;
+  private final String setupInfo;
 
-  private ThrottleLogger(Logger delegate) {
-    super(delegate);
-    delegate.info(
-      "Logger {} is throttled, only one messages is logged for every {} second interval.",
-      delegate.getName(),
-      STALL_PERIOD_MILLISECONDS / 1000
-    );
+  Throttle(int quietPeriodMilliseconds) {
+    this.quietPeriodMilliseconds = quietPeriodMilliseconds;
+    this.setupInfo = "(throttle " + TimeUtils.msToString(quietPeriodMilliseconds) + " interval)";
   }
 
-  /**
-   * Wrap given logger, and throttle INFO, WARN and ERROR messages.
-   */
-  public static Logger throttle(Logger log) {
-    return new ThrottleLogger(log);
+  public static Throttle ofOneSecond() {
+    return new Throttle(1000);
   }
 
-  @Override
-  boolean mute() {
-    return throttle();
+  public String setupInfo() {
+    return setupInfo;
+  }
+
+  public void throttle(Runnable body) {
+    if (!throttle()) {
+      body.run();
+    }
   }
 
   /**
@@ -57,17 +53,17 @@ public class ThrottleLogger extends AbstractFilterLogger {
    * least one event is logged for each throttle time period. This is guaranteed based on the
    * assumption that writing to the {@code timeout} (primitive long) is an atomic operation.
    * <p>
-   * In a worst case scenario, each thread keep their local version of the {@code timeout} and one
+   * In the worst case scenario, each thread keep their local version of the {@code timeout} and one
    * log message from each thread is printed every second. This can behave differently from one JVM
    * to another.
    */
-  private boolean throttle() {
+  public boolean throttle() {
     long time = System.currentTimeMillis();
 
     if (time < timeout) {
       return true;
     }
-    timeout = time + STALL_PERIOD_MILLISECONDS;
+    timeout = time + quietPeriodMilliseconds;
     return false;
   }
 }
