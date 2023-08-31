@@ -137,10 +137,10 @@ public class DefaultMapperTest {
     assertEquals(ALL, props.getPermission());
     assertEquals(.98, props.getBicycleSafetyFeatures().forward());
 
-    var discouraged = WayTestData.pedestrianTunnel().addTag("bicycle", "discouraged");
+    var discouraged = WayTestData.southeastLaBonitaWay().addTag("bicycle", "discouraged");
     var discouragedProps = wps.getDataForWay(discouraged);
-    assertEquals(PEDESTRIAN_AND_BICYCLE, discouragedProps.getPermission());
-    assertEquals(3.3, discouragedProps.getBicycleSafetyFeatures().forward(), epsilon);
+    assertEquals(ALL, discouragedProps.getPermission());
+    assertEquals(2.94, discouragedProps.getBicycleSafetyFeatures().forward(), epsilon);
   }
 
   /**
