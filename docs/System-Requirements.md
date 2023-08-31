@@ -18,4 +18,9 @@ Entur and the Digitransit project have found that the 3rd generation AMD process
 
 ### Azure
 
-For Azure, the Digitransit project did benchmarking of the available virtual machines types for OTP 2.3 in early 2023 and found that the D2as – D96as v5 family had the best performance of the reasonable priced virtual machines types. These machines use the 3rd generation AMD EPYCTM 7763v (Milan) processor. The 3rd generation Intel machines had a slightly worse performance and a slightly higher cost. Digitransit chose to use the D8as v5 machine as it had enough memory for running OTP in Finland and a reasonable number of vCPUs.
+For Azure, the Digitransit project did benchmarking of the available virtual machines types for OTP 2.3 in early 2023 and found that the `D2as – D96as v5` family had the best performance of the reasonable priced virtual machines types. These machines use the 3rd generation AMD EPYCTM 7763v (Milan) processor. The 3rd generation Intel machines had a slightly worse performance and a slightly higher cost. Digitransit chose to use the `D8as v5` machine as it had enough memory for running OTP in Finland and a reasonable number of vCPUs.
+
+### Google Cloud
+
+Entur uses a scalable fleet of instances of type `c2d-standard-8`.
+  

@@ -846,9 +846,12 @@ type debugOutput {
 }
 
 """
-Departure row is a location, which lists departures of a certain pattern from a
-stop. Departure rows are identified with the pattern, so querying departure rows
-will return only departures from one stop per pattern
+Departure row is a combination of a pattern and a stop of that pattern.
+
+They are de-duplicated so for each pattern there will only be a single departure row.
+
+This is useful if you want to show a list of stop/pattern combinations but want each pattern to be
+listed only once.
 """
 type DepartureRow implements Node & PlaceInterface {
     """
