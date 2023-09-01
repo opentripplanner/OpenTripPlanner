@@ -150,7 +150,10 @@ public class TransitRouter {
             serverContext.transitService().getTransferService(),
             requestTransitDataProvider,
             transitLayer.getStopBoardAlightCosts(),
-            request.preferences().transfer().optimization()
+            request.preferences().transfer().optimization(),
+            // TODO: 2023-09-01 Here we are injecting pass through points into TransferOptimizationService
+            //  we have to think about what's the best solution
+            raptorRequest.multiCriteria().passThroughPoints()
           )
           .optimize(transitResponse.paths());
     }

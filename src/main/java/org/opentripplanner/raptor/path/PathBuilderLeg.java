@@ -137,7 +137,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     c2PerStopPosition[pos] = c2;
   }
 
-
   @Nullable
   public RaptorConstrainedTransfer constrainedTransferAfterLeg() {
     return isTransit() ? asTransitLeg().constrainedTransferAfterLeg : null;
