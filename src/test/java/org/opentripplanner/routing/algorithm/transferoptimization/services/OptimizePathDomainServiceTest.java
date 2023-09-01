@@ -8,6 +8,7 @@ import static org.opentripplanner.routing.algorithm.transferoptimization.service
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
@@ -295,7 +296,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       null,
       0.0,
       TransferOptimizedFilterFactory.filter(true, waitTimeCalculator != null),
-      (new RaptorTestConstants() {})::stopIndexToName
+      (new RaptorTestConstants() {})::stopIndexToName,
+      List.of()
     );
   }
 
