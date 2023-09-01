@@ -35,12 +35,14 @@ public class AccessEgressRouter {
     StreetRequest streetRequest,
     DataOverlayContext dataOverlayContext,
     boolean fromTarget,
-    Duration durationLimit
+    Duration durationLimit,
+    int maxStopCount
   ) {
     OTPRequestTimeoutException.checkForTimeout();
     NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
       transitService,
       durationLimit,
+      maxStopCount,
       dataOverlayContext,
       true
     );

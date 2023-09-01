@@ -77,6 +77,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Support Fares v2 FareMedium and update spec implementation [#5227](https://github.com/opentripplanner/OpenTripPlanner/pull/5227)
 - Replace DoubleFunction with linear function [#5267](https://github.com/opentripplanner/OpenTripPlanner/pull/5267)
 - Improve walk step narrative for entering/exiting stations and signposted pathways [#5285](https://github.com/opentripplanner/OpenTripPlanner/pull/5285)
+- Fix walk board cost comparison and add escalatorReluctance to hash [#5310](https://github.com/opentripplanner/OpenTripPlanner/pull/5310)
+- Stop count limit for access/egress routing and new accessEgress configuration object [#5214](https://github.com/opentripplanner/OpenTripPlanner/pull/5214)
+- Remove pathway id from REST API [#5303](https://github.com/opentripplanner/OpenTripPlanner/pull/5303)
+- Remove Winkki street note updater [#5305](https://github.com/opentripplanner/OpenTripPlanner/pull/5305)
+- Extend stop area relation linking to include bus stop and platform nodes [#5319](https://github.com/opentripplanner/OpenTripPlanner/pull/5319)
+- Document in-station navigation [#5321](https://github.com/opentripplanner/OpenTripPlanner/pull/5321)
+- Add access/egress penalty transmodel api [#5268](https://github.com/opentripplanner/OpenTripPlanner/pull/5268)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 

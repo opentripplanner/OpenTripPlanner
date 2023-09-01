@@ -246,7 +246,7 @@ class GraphQLIntegrationTest {
   private static WalkStepBuilder walkStep(String name) {
     return WalkStep
       .builder()
-      .withStreetName(new NonLocalizedString(name))
+      .withDirectionText(new NonLocalizedString(name))
       .withStartLocation(WgsCoordinate.GREENWICH)
       .withAngle(10);
   }

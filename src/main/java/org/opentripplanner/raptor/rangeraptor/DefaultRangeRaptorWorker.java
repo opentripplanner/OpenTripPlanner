@@ -210,6 +210,8 @@ public final class DefaultRangeRaptorWorker<T extends RaptorTripSchedule>
           int stopPos = stop.next();
           int stopIndex = pattern.stopIndex(stopPos);
 
+          transitWorker.prepareForNextStop(stopIndex, stopPos);
+
           // attempt to alight if we're on board, this is done above the board search
           // so that we don't alight on first stop boarded
           if (calculator.alightingPossibleAt(pattern, stopPos)) {

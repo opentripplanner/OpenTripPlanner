@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.openstreetmap.osmosis.osmbinary.BinaryParser;
 import org.openstreetmap.osmosis.osmbinary.Osmformat;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
+import org.opentripplanner.openstreetmap.model.OSMMemberType;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMRelation;
 import org.opentripplanner.openstreetmap.model.OSMRelationMember;
@@ -86,11 +87,11 @@ class OpenStreetMapParser extends BinaryParser {
         relMember.setRole(internalize(getStringById(i.getRolesSid(j))));
 
         if (i.getTypes(j) == Osmformat.Relation.MemberType.NODE) {
-          relMember.setType("node");
+          relMember.setType(OSMMemberType.NODE);
         } else if (i.getTypes(j) == Osmformat.Relation.MemberType.WAY) {
-          relMember.setType("way");
+          relMember.setType(OSMMemberType.WAY);
         } else if (i.getTypes(j) == Osmformat.Relation.MemberType.RELATION) {
-          relMember.setType("relation");
+          relMember.setType(OSMMemberType.RELATION);
         } else {
           assert false; // TODO; Illegal file?
         }

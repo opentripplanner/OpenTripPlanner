@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
@@ -24,6 +25,11 @@ class ArrivalParetoSetComparatorFactoryTest {
   private static final ArrivalParetoSetComparatorFactory<A> comparatorC1 = ArrivalParetoSetComparatorFactory.factory(
     RelaxFunction.NORMAL,
     null
+  );
+
+  private static final ArrivalParetoSetComparatorFactory<A> comparatorC1AndC2 = ArrivalParetoSetComparatorFactory.factory(
+    RelaxFunction.NORMAL,
+    (left, right) -> left > right
   );
 
   @Test
@@ -62,6 +68,114 @@ class ArrivalParetoSetComparatorFactoryTest {
         .leftDominanceExist(
           new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT),
           new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
+        )
+    );
+  }
+
+  @Test
+  void compareArrivalTimeRoundAndCostWithC2() {
+    // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
+    assertFalse(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundAndCost()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_FOOT)
+        )
+    );
+    // Arrival-time is better
+    assertTrue(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundAndCost()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_777, COST_100, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
+        )
+    );
+    // Pareto-round is better
+    assertTrue(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundAndCost()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_BOARD)
+        )
+    );
+    // C1 is better
+    assertTrue(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundAndCost()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
+        )
+    );
+
+    // C2 is better
+    assertTrue(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundAndCost()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_777, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
+        )
+    );
+  }
+
+  @Test
+  void compareArrivalTimeRoundCostAndOnBoardArrivalWithC2() {
+    // Same values for arrival-time, pareto-round and c1. Ignore c2 and arrivedOnBoard
+    assertFalse(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
+        )
+    );
+    // Arrival-time is better
+    assertTrue(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_777, COST_100, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
+        )
+    );
+    // Pareto-round is better
+    assertTrue(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_BOARD)
+        )
+    );
+    // C1 is better
+    assertTrue(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_100, COST_100, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_777, COST_100, ARRIVED_ON_BOARD)
+        )
+    );
+    // Arrived on-board is better
+    assertTrue(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_777, COST_100, ARRIVED_ON_BOARD),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_FOOT)
+        )
+    );
+    // C2 is better
+    assertTrue(
+      comparatorC1AndC2
+        .compareArrivalTimeRoundCostAndOnBoardArrival()
+        .leftDominanceExist(
+          new A(ARRIVAL_TIME_LATE, PARETO_ROUND_TWO, COST_100, COST_777, ARRIVED_ON_FOOT),
+          new A(ARRIVAL_TIME_EARLY, PARETO_ROUND_ONE, COST_100, COST_100, ARRIVED_ON_BOARD)
         )
     );
   }

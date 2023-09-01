@@ -96,7 +96,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   }
 
   @Override
-  protected void runPolling() {
+  protected void runPolling() throws InterruptedException {
     retry.execute(this::updateSiri);
   }
 

@@ -486,12 +486,22 @@ HTTP headers to add to the request. Any header key, value can be inserted.
     "transitReluctanceForMode" : {
       "RAIL" : 0.85
     },
-    "maxAccessEgressDurationForMode" : {
-      "BIKE_RENTAL" : "20m"
+    "accessEgress" : {
+      "maxDuration" : "45m",
+      "maxDurationForMode" : {
+        "BIKE_RENTAL" : "20m"
+      },
+      "maxStopCount" : 500,
+      "penalty" : {
+        "FLEXIBLE" : {
+          "timePenalty" : "2m + 1.1t",
+          "costFactor" : 1.7
+        }
+      }
     },
     "itineraryFilters" : {
       "transitGeneralizedCostLimit" : {
-        "costLimitFunction" : "900 + 1.5 x",
+        "costLimitFunction" : "15m + 1.5 x",
         "intervalRelaxFactor" : 0.4
       },
       "bikeRentalDistanceRatio" : 0.3,
@@ -512,7 +522,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
         "HSL:456"
       ]
     },
-    "unpreferredCost" : "600 + 2.0 x",
+    "unpreferredCost" : "10m + 2.0 x",
     "streetRoutingTimeout" : "5s",
     "transferOptimization" : {
       "optimizeTransferWaitTime" : true,

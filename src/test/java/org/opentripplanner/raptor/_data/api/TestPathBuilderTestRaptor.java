@@ -15,7 +15,7 @@ import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
 /**
  * Test the PathBuilder to be sure that it works properly before using it in other tests.
  */
-public class TestPathBuilderTest implements RaptorTestConstants {
+public class TestPathBuilderTestRaptor implements RaptorTestConstants {
 
   private final TestPathBuilder subject = new TestPathBuilder(COST_CALCULATOR);
 

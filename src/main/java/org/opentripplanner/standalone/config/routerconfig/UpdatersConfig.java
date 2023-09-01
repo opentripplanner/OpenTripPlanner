@@ -15,7 +15,6 @@ import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.VEHICLE_POSITIONS;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.VEHICLE_RENTAL;
 import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.WEBSOCKET_GTFS_RT_UPDATER;
-import static org.opentripplanner.standalone.config.routerconfig.UpdatersConfig.Type.WINKKI_POLLING_UPDATER;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -40,7 +39,6 @@ import org.opentripplanner.standalone.config.routerconfig.updaters.SiriSXUpdater
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleParkingUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.VehicleRentalUpdaterConfig;
-import org.opentripplanner.standalone.config.routerconfig.updaters.WFSNotePollingGraphUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.WebsocketGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzureETUpdaterConfig;
 import org.opentripplanner.standalone.config.routerconfig.updaters.azure.SiriAzureSXUpdaterConfig;
@@ -48,7 +46,6 @@ import org.opentripplanner.standalone.config.sandbox.VehicleRentalServiceDirecto
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
-import org.opentripplanner.updater.street_note.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
 import org.opentripplanner.updater.trip.WebsocketGtfsRealtimeUpdaterParameters;
@@ -204,11 +201,6 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<WFSNotePollingGraphUpdaterParameters> getWinkkiPollingGraphUpdaterParameters() {
-    return getParameters(WINKKI_POLLING_UPDATER);
-  }
-
-  @Override
   public List<SiriAzureETUpdaterParameters> getSiriAzureETUpdaterParameters() {
     return getParameters(SIRI_AZURE_ET_UPDATER);
   }
@@ -234,7 +226,6 @@ public class UpdatersConfig implements UpdatersParameters {
     MQTT_GTFS_RT_UPDATER(MqttGtfsRealtimeUpdaterConfig::create),
     REAL_TIME_ALERTS(GtfsRealtimeAlertsUpdaterConfig::create),
     VEHICLE_POSITIONS(VehiclePositionsUpdaterConfig::create),
-    WINKKI_POLLING_UPDATER(WFSNotePollingGraphUpdaterConfig::create),
     SIRI_ET_UPDATER(SiriETUpdaterConfig::create),
     SIRI_ET_GOOGLE_PUBSUB_UPDATER(SiriETGooglePubsubUpdaterConfig::create),
     SIRI_SX_UPDATER(SiriSXUpdaterConfig::create),

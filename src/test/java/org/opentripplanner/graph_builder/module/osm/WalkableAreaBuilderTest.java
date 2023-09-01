@@ -4,6 +4,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static java.util.stream.Collectors.toMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.lang.annotation.ElementType;
@@ -14,9 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -25,26 +27,23 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeOnLevelLabel;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class WalkableAreaBuilderTest {
 
-  private final Deduplicator deduplicator = new Deduplicator();
-  private final Graph graph = new Graph(deduplicator);
-
-  @BeforeEach
-  public void testSetup(final TestInfo testInfo) {
+  public Graph buildGraph(final TestInfo testInfo) {
+    var graph = new Graph();
     final Method testMethod = testInfo.getTestMethod().get();
     final String osmFile = testMethod.getAnnotation(OsmFile.class).value();
     final boolean visibility = testMethod.getAnnotation(Visibility.class).value();
+    final int maxAreaNodes = testMethod.getAnnotation(MaxAreaNodes.class).value();
     final boolean platformEntriesLinking = true;
-    final int maxAreaNodes = 5;
 
     final Set<String> boardingAreaRefTags = Set.of();
     final OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP, boardingAreaRefTags);
 
     final File file = new File(testInfo.getTestClass().get().getResource(osmFile).getFile());
-    new OsmProvider(file, true).readOSM(osmdb);
+    assertTrue(file.exists());
+    new OsmProvider(file, false).readOSM(osmdb);
     osmdb.postLoad();
 
     final WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(
@@ -70,6 +69,7 @@ public class WalkableAreaBuilderTest {
       : walkableAreaBuilder::buildWithoutVisibility;
 
     areaGroups.forEach(build);
+    return graph;
   }
 
   // -- Tests --
@@ -77,7 +77,9 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(true)
-  public void test_calculate_vertices_area() {
+  @MaxAreaNodes(5)
+  public void testCalculateVerticesArea(TestInfo testInfo) {
+    var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
@@ -92,7 +94,9 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(false)
-  public void testSetup_calculate_vertices_area_without_visibility() {
+  @MaxAreaNodes(5)
+  public void testSetupCalculateVerticesAreaWithoutVisibility(TestInfo testInfo) {
+    var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
@@ -109,12 +113,24 @@ public class WalkableAreaBuilderTest {
   @Test
   @OsmFile("stopareas.pbf")
   @Visibility(true)
-  public void test_entrance_stoparea_linking() {
+  @MaxAreaNodes(50)
+  public void testEntranceStopAreaLinking(TestInfo testInfo) {
+    var graph = buildGraph(testInfo);
+    // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.
+    var busStopConnection = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143853)))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(1, busStopConnection.size());
+
     // first platform has level 0, entrance below it has level -1 -> no links
     var entranceAtWrongLevel = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143850)))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143850)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -124,7 +140,7 @@ public class WalkableAreaBuilderTest {
     var entranceAtSameLevel = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> hasNodeId(a, -143832))
+      .filter(a -> hasNodeId(a, 143832))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -135,7 +151,7 @@ public class WalkableAreaBuilderTest {
     var stopPositionConnection = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(-143863)))
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(143863)))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -147,7 +163,7 @@ public class WalkableAreaBuilderTest {
     var connectionEdges = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> hasNodeId(a, -143845))
+      .filter(a -> hasNodeId(a, 143845))
       .toList();
     // entrance is connected top 2 opposite corners of a single platform
     // with two bidirectional edge pairs, and with the other entrance point
@@ -158,7 +174,7 @@ public class WalkableAreaBuilderTest {
     var elevatorConnection = graph
       .getEdgesOfType(AreaEdge.class)
       .stream()
-      .filter(a -> hasNodeId(a, -143861))
+      .filter(a -> hasNodeId(a, 143861))
       .map(AreaEdge::getArea)
       .distinct()
       .toList();
@@ -183,5 +199,11 @@ public class WalkableAreaBuilderTest {
   @Target(ElementType.METHOD)
   public @interface Visibility {
     boolean value();
+  }
+
+  @Retention(RUNTIME)
+  @Target(ElementType.METHOD)
+  public @interface MaxAreaNodes {
+    int value();
   }
 }

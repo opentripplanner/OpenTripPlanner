@@ -391,7 +391,7 @@ public class VertexLinker {
     }
 
     if (this.addExtraEdgesToAreas && edge instanceof AreaEdge aEdge) {
-      if (!snapped || !aEdge.getArea().visibilityVertices.contains(start)) {
+      if (!snapped || !aEdge.getArea().visibilityVertices().contains(start)) {
         addAreaVertex(start, aEdge.getArea(), scope, tempEdges);
       }
     }
@@ -536,7 +536,6 @@ public class VertexLinker {
     List<NamedArea> areas = edgeList.getAreas();
     Geometry origPolygon = edgeList.getGeometry();
     Geometry polygon = origPolygon.union(origPolygon.getBoundary()).buffer(0.000001);
-    HashSet<IntersectionVertex> visibilityVertices = edgeList.visibilityVertices;
 
     // Due to truncating of precision in storage of the edge geometry, the new split vertex
     // might be located just outside the area, so we calculate the point closest to the polygon
@@ -549,11 +548,11 @@ public class VertexLinker {
     int added = 0;
 
     // if area is too complex, consider only part of visibility nodes
-    float skip_ratio = (float) MAX_AREA_LINKS / (float) visibilityVertices.size();
+    float skip_ratio = (float) MAX_AREA_LINKS / (float) edgeList.visibilityVertices().size();
     int i = 0;
     float sum_i = 0;
 
-    for (IntersectionVertex v : visibilityVertices) {
+    for (IntersectionVertex v : edgeList.visibilityVertices()) {
       sum_i += skip_ratio;
       if (Math.floor(sum_i) < i + 1) {
         continue;
@@ -578,12 +577,12 @@ public class VertexLinker {
     // TODO: Temporary fix for unconnected area edges. This should go away when moving walkable
     // area calculation to be done after stop linking
     if (added == 0) {
-      for (IntersectionVertex v : visibilityVertices) {
+      for (IntersectionVertex v : edgeList.visibilityVertices()) {
         createSegments(newVertex, v, edgeList, areas, scope, tempEdges);
       }
     }
     if (scope == Scope.PERMANENT) {
-      visibilityVertices.add(newVertex);
+      edgeList.addVisibilityVertex(newVertex);
     }
   }
 

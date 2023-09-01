@@ -4,7 +4,6 @@ import static org.opentripplanner.client.model.RequestMode.BICYCLE_RENT;
 import static org.opentripplanner.client.model.RequestMode.TRANSIT;
 import static org.opentripplanner.client.model.RequestMode.WALK;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
@@ -30,7 +29,7 @@ public class SeptaSmokeTest {
     var modes = Set.of(TRANSIT, WALK);
     SmokeTest.basicRouteTest(
       new SmokeTestRequest(airport, stPetersCemetary, modes),
-      List.of("WALK", "RAIL", "WALK", "SUBWAY", "WALK")
+      List.of("WALK", "RAIL", "RAIL", "WALK", "SUBWAY", "WALK")
     );
   }
 

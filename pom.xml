@@ -56,16 +56,15 @@
 
 
     <properties>
-        <otp.serialization.version.id>118</otp.serialization.version.id>
+        <otp.serialization.version.id>119</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>29.2</geotools.version>
-        <google.dagger.version>2.47</google.dagger.version>
+        <google.dagger.version>2.48</google.dagger.version>
         <jackson.version>2.15.2</jackson.version>
         <jersey.version>3.1.3</jersey.version>
         <junit.version>5.10.0</junit.version>
         <micrometer.version>1.11.3</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
-        <netty.version>4.1.74.Final</netty.version>
         <logback.version>1.4.11</logback.version>
         <lucene.version>9.7.0</lucene.version>
         <slf4j.version>2.0.7</slf4j.version>
@@ -79,7 +78,7 @@
              When running `mvn jacoco:prepare-agent test` argLine is replaced with the one activating the agent.
         -->
         <argLine/>
-        <plugin.prettier.version>0.20</plugin.prettier.version>
+        <plugin.prettier.version>0.21</plugin.prettier.version>
         <plugin.prettier.goal>write</plugin.prettier.goal>
 
         <junit.tags.included></junit.tags.included>
@@ -678,11 +677,6 @@
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt-wfs-ng</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
             <artifactId>gt-geojson-core</artifactId>
             <version>${geotools.version}</version>
         </dependency>
@@ -776,7 +770,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.4.0</version>
+            <version>5.5.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -942,7 +936,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java-extended-scalars</artifactId>
-            <version>20.2</version>
+            <version>21.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
@@ -998,7 +992,7 @@
         <dependency>
             <groupId>ch.poole</groupId>
             <artifactId>OpeningHoursParser</artifactId>
-            <version>0.27.0</version>
+            <version>0.27.1</version>
         </dependency>
 
         <!-- create zip test files-->
