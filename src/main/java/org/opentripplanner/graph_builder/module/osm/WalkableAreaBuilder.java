@@ -491,7 +491,7 @@ public class WalkableAreaBuilder {
         intersects.add(area);
       }
     }
-    if (intersects.size() == 0) {
+    if (intersects.isEmpty()) {
       // apparently our intersection here was bogus
       return Set.of();
     }

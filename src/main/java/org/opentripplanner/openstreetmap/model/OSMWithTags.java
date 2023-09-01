@@ -132,6 +132,14 @@ public class OSMWithTags {
     return isTrue(getTag(tag));
   }
 
+  /**
+   * Returns true if bicycle dismounts are forced.
+   */
+  public boolean isBicycleDismountForced() {
+    String bicycle = getTag("bicycle");
+    return isTag("cycleway", "dismount") || "dismount".equals(bicycle);
+  }
+
   protected boolean doesTagAllowAccess(String tag) {
     if (tags == null) {
       return false;

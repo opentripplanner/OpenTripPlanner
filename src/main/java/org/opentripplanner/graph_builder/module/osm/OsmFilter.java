@@ -1,7 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.graph_builder.issues.ConflictingBikeTags;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -64,75 +62,6 @@ public class OsmFilter {
       return def;
     }
     return permission;
-  }
-
-  /**
-   * Computes permissions for an OSMWay.
-   */
-  public static StreetTraversalPermission getPermissionsForWay(
-    OSMWay way,
-    StreetTraversalPermission def,
-    boolean banDiscouragedWalking,
-    boolean banDiscouragedBiking,
-    DataImportIssueStore issueStore
-  ) {
-    StreetTraversalPermission permissions = getPermissionsForEntity(way, def);
-
-    /*
-     * pedestrian rules: everything is two-way (assuming pedestrians are allowed at all) bicycle
-     * rules: default: permissions;
-     *
-     * cycleway=dismount means walk your bike -- the engine will automatically try walking bikes
-     * any time it is forbidden to ride them, so the only thing to do here is to remove bike
-     * permissions
-     *
-     * oneway=... sets permissions for cars and bikes oneway:bicycle overwrites these
-     * permissions for bikes only
-     *
-     * now, cycleway=opposite_lane, opposite, opposite_track can allow once oneway has been set
-     * by oneway:bicycle, but should give a warning if it conflicts with oneway:bicycle
-     *
-     * bicycle:backward=yes works like oneway:bicycle=no bicycle:backwards=no works like
-     * oneway:bicycle=yes
-     */
-
-    // Compute pedestrian permissions.
-    if (way.isPedestrianExplicitlyAllowed()) {
-      permissions = permissions.add(StreetTraversalPermission.PEDESTRIAN);
-    } else if (way.isPedestrianExplicitlyDenied()) {
-      permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
-    }
-
-    // Check for foot=discouraged, if applicable
-    if (banDiscouragedWalking && way.hasTag("foot") && way.getTag("foot").equals("discouraged")) {
-      permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
-    }
-
-    // Compute bike permissions, check consistency.
-    boolean forceBikes = false;
-    if (way.isBicycleExplicitlyAllowed()) {
-      permissions = permissions.add(StreetTraversalPermission.BICYCLE);
-      forceBikes = true;
-    }
-
-    if (
-      way.isBicycleDismountForced() ||
-      (banDiscouragedBiking && way.hasTag("bicycle") && way.getTag("bicycle").equals("discouraged"))
-    ) {
-      permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
-      if (forceBikes) {
-        issueStore.add(new ConflictingBikeTags(way));
-      }
-    }
-
-    return permissions;
-  }
-
-  public static StreetTraversalPermission getPermissionsForWay(
-    OSMWay way,
-    StreetTraversalPermission def
-  ) {
-    return getPermissionsForWay(way, def, false, false, DataImportIssueStore.NOOP);
   }
 
   /**

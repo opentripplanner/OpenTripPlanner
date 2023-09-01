@@ -359,10 +359,7 @@ public class OSMWayTest {
     WayPropertySet wayPropertySet = new WayPropertySet();
     WayProperties wayData = wayPropertySet.getDataForWay(way);
 
-    StreetTraversalPermission permissions = OsmFilter.getPermissionsForWay(
-      way,
-      wayData.getPermission()
-    );
-    return OsmFilter.getPermissions(permissions, way);
+    StreetTraversalPermission def = wayData.getPermission();
+    return OsmFilter.getPermissions(def, way);
   }
 }

@@ -247,13 +247,9 @@ public class OsmModule implements GraphBuilderModule {
     WAY:for (OSMWay way : osmdb.getWays()) {
       WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
       setWayName(way);
-      StreetTraversalPermission permissions = OsmFilter.getPermissionsForWay(
-        way,
-        wayData.getPermission(),
-        params.banDiscouragedWalking(),
-        params.banDiscouragedBiking(),
-        issueStore
-      );
+
+      var permissions = wayData.getPermission();
+
       if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) {
         continue;
       }

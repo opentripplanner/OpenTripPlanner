@@ -52,14 +52,6 @@ public class OSMWay extends OSMWithTags {
   }
 
   /**
-   * Returns true if bicycle dismounts are forced.
-   */
-  public boolean isBicycleDismountForced() {
-    String bicycle = getTag("bicycle");
-    return isTag("cycleway", "dismount") || "dismount".equals(bicycle);
-  }
-
-  /**
    * Returns true if these are steps.
    */
   public boolean isSteps() {

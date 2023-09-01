@@ -8,7 +8,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  */
 public class WayPropertiesBuilder {
 
-  private final StreetTraversalPermission permission;
+  private StreetTraversalPermission permission;
   private SafetyFeatures bicycleSafetyFeatures = null;
   private SafetyFeatures walkSafetyFeatures = null;
 
@@ -59,6 +59,11 @@ public class WayPropertiesBuilder {
    */
   public WayPropertiesBuilder walkSafety(double walkSafety, double walkSafetyBack) {
     this.walkSafetyFeatures = new SafetyFeatures(walkSafety, walkSafetyBack);
+    return this;
+  }
+
+  public WayPropertiesBuilder withPermission(StreetTraversalPermission permission) {
+    this.permission = permission;
     return this;
   }
 
