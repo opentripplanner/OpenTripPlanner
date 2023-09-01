@@ -16,7 +16,6 @@ import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ConflictingBikeTags;
-import org.opentripplanner.graph_builder.module.osm.OsmFilter;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
@@ -71,7 +70,7 @@ public class WayPropertySet {
     StreetTraversalPermission def,
     DataImportIssueStore issueStore
   ) {
-    StreetTraversalPermission permissions = OsmFilter.getPermissionsForEntity(way, def);
+    StreetTraversalPermission permissions = way.getPermissionsForEntity(def);
 
     /*
      * pedestrian rules: everything is two-way (assuming pedestrians are allowed at all) bicycle

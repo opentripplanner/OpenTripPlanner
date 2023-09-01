@@ -19,6 +19,7 @@ import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.openstreetmap.OsmProvider;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
@@ -44,6 +45,58 @@ public class OSMWithTags {
 
   public static boolean isTrue(String tagValue) {
     return ("yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue));
+  }
+
+  public StreetTraversalPermission getPermissionsForEntity(StreetTraversalPermission def) {
+    StreetTraversalPermission permission;
+
+    /*
+     * Only a few tags are examined here, because we only care about modes supported by OTP
+     * (wheelchairs are not of concern here)
+     *
+     * Only a few values are checked for, all other values are presumed to be permissive (=>
+     * This may not be perfect, but is closer to reality, since most people don't follow the
+     * rules perfectly ;-)
+     */
+    if (isGeneralAccessDenied()) {
+      // this can actually be overridden
+      permission = StreetTraversalPermission.NONE;
+    } else {
+      permission = def;
+    }
+
+    if (isVehicleExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+    } else if (isVehicleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.BICYCLE_AND_CAR);
+    }
+
+    if (isMotorcarExplicitlyDenied() || isMotorVehicleExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.CAR);
+    } else if (isMotorcarExplicitlyAllowed() || isMotorVehicleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.CAR);
+    }
+
+    if (isBicycleExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.BICYCLE);
+    } else if (isBicycleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.BICYCLE);
+    }
+
+    if (isPedestrianExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+    } else if (isPedestrianExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
+    }
+
+    if (isUnderConstruction()) {
+      permission = StreetTraversalPermission.NONE;
+    }
+
+    if (permission == null) {
+      return def;
+    }
+    return permission;
   }
 
   /**

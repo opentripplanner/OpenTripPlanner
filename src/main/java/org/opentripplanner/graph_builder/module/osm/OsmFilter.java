@@ -9,61 +9,6 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  */
 public class OsmFilter {
 
-  public static StreetTraversalPermission getPermissionsForEntity(
-    OSMWithTags entity,
-    StreetTraversalPermission def
-  ) {
-    StreetTraversalPermission permission = null;
-
-    /*
-     * Only a few tags are examined here, because we only care about modes supported by OTP
-     * (wheelchairs are not of concern here)
-     *
-     * Only a few values are checked for, all other values are presumed to be permissive (=>
-     * This may not be perfect, but is closer to reality, since most people don't follow the
-     * rules perfectly ;-)
-     */
-    if (entity.isGeneralAccessDenied()) {
-      // this can actually be overridden
-      permission = StreetTraversalPermission.NONE;
-    } else {
-      permission = def;
-    }
-
-    if (entity.isVehicleExplicitlyDenied()) {
-      permission = permission.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
-    } else if (entity.isVehicleExplicitlyAllowed()) {
-      permission = permission.add(StreetTraversalPermission.BICYCLE_AND_CAR);
-    }
-
-    if (entity.isMotorcarExplicitlyDenied() || entity.isMotorVehicleExplicitlyDenied()) {
-      permission = permission.remove(StreetTraversalPermission.CAR);
-    } else if (entity.isMotorcarExplicitlyAllowed() || entity.isMotorVehicleExplicitlyAllowed()) {
-      permission = permission.add(StreetTraversalPermission.CAR);
-    }
-
-    if (entity.isBicycleExplicitlyDenied()) {
-      permission = permission.remove(StreetTraversalPermission.BICYCLE);
-    } else if (entity.isBicycleExplicitlyAllowed()) {
-      permission = permission.add(StreetTraversalPermission.BICYCLE);
-    }
-
-    if (entity.isPedestrianExplicitlyDenied()) {
-      permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
-    } else if (entity.isPedestrianExplicitlyAllowed()) {
-      permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
-    }
-
-    if (entity.isUnderConstruction()) {
-      permission = StreetTraversalPermission.NONE;
-    }
-
-    if (permission == null) {
-      return def;
-    }
-    return permission;
-  }
-
   /**
    * Check OSM tags for various one-way and one-way-by-mode tags and return a pair of permissions
    * for travel along and against the way.

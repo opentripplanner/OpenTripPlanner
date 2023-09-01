@@ -796,8 +796,7 @@ public class OsmDatabase {
    * Handler for a new Area (single way area or multipolygon relations)
    */
   private void newArea(Area area) {
-    StreetTraversalPermission permissions = OsmFilter.getPermissionsForEntity(
-      area.parent,
+    StreetTraversalPermission permissions = area.parent.getPermissionsForEntity(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
     );
     if (area.parent.isRoutable() && permissions != StreetTraversalPermission.NONE) {
