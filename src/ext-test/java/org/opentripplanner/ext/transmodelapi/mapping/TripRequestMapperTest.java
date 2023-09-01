@@ -57,7 +57,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
     defaultRequest.withPreferences(pb ->
       pb.withStreet(sp ->
         sp
-          .withMaxAccessEgressDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
+          .withAccessEgress(ae -> ae.withMaxDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
+          )
           .withMaxDirectDuration(b -> b.with(StreetMode.FLEXIBLE, MAX_FLEXIBLE))
       )
     );
@@ -108,7 +109,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
     assertNotNull(preferences);
     var streetPreferences = preferences.street();
     assertNotNull(streetPreferences);
-    var maxAccessEgressDuration = streetPreferences.maxAccessEgressDuration();
+    var maxAccessEgressDuration = streetPreferences.accessEgress().maxDuration();
     assertNotNull(maxAccessEgressDuration);
 
     for (var entry : DURATIONS) {
@@ -141,7 +142,10 @@ public class TripRequestMapperTest implements PlanTestConstants {
 
   @Test
   public void testMaxAccessEgressDurationValidation() {
-    var defaultValue = StreetPreferences.DEFAULT.maxAccessEgressDuration().valueOf(StreetMode.WALK);
+    var defaultValue = StreetPreferences.DEFAULT
+      .accessEgress()
+      .maxDuration()
+      .valueOf(StreetMode.WALK);
     var duration = List.of(
       Map.of("streetMode", StreetMode.WALK, "duration", defaultValue.plusSeconds(1))
     );

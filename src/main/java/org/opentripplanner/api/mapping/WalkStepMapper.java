@@ -35,11 +35,11 @@ public class WalkStepMapper {
 
     api.distance = domain.getDistance();
     api.relativeDirection = mapRelativeDirection(domain.getRelativeDirection());
-    api.streetName = domain.getStreetName().toString(locale);
+    api.streetName = domain.getDirectionText().toString(locale);
     api.absoluteDirection =
       domain.getAbsoluteDirection().map(AbsoluteDirectionMapper::mapAbsoluteDirection).orElse(null);
     api.exit = domain.getExit();
-    api.stayOn = domain.getStayOn();
+    api.stayOn = domain.isStayOn();
     api.area = domain.getArea();
     api.bogusName = domain.getBogusName();
     if (domain.getStartLocation() != null) {

@@ -29,6 +29,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   private final int endTime;
   private final int numberOfTransfers;
   private final int generalizedCost;
+  private final int c2;
   private final AccessPathLeg<T> accessLeg;
   private final EgressPathLeg<T> egressLeg;
 
@@ -47,9 +48,10 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this.generalizedCost = generalizedCost;
     this.accessLeg = null;
     this.egressLeg = null;
+    this.c2 = 0;
   }
 
-  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost) {
+  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost, int c2) {
     this.iterationDepartureTime = iterationDepartureTime;
     this.startTime = accessLeg.fromTime();
     this.generalizedCost = generalizedCost;
@@ -57,15 +59,21 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this.egressLeg = findEgressLeg(accessLeg);
     this.numberOfTransfers = countNumberOfTransfers(accessLeg, egressLeg);
     this.endTime = egressLeg.toTime();
+    this.c2 = c2;
   }
 
-  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg) {
-    this(iterationDepartureTime, accessLeg, accessLeg.generalizedCostTotal());
+  public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost) {
+    this(iterationDepartureTime, accessLeg, generalizedCost, 0);
   }
 
   /** Copy constructor */
   protected Path(RaptorPath<T> original) {
-    this(original.rangeRaptorIterationDepartureTime(), original.accessLeg(), original.c1());
+    this(
+      original.rangeRaptorIterationDepartureTime(),
+      original.accessLeg(),
+      original.c1(),
+      original.c2()
+    );
   }
 
   /**
@@ -115,6 +123,11 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
   @Override
   public final int c1() {
     return generalizedCost;
+  }
+
+  @Override
+  public int c2() {
+    return c2;
   }
 
   @Override

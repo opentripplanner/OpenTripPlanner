@@ -68,7 +68,7 @@ public class LinkStopToPlatformTest {
     // visibility vertices are platform entrance points and convex corners
     // which should be directly linked with stops
     for (int i : visible) {
-      areaEdgeList.visibilityVertices.add(vertices.get(i));
+      areaEdgeList.addVisibilityVertex(vertices.get(i));
     }
 
     // AreaEdgeList must include a valid NamedArea which defines area atttributes

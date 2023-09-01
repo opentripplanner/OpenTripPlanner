@@ -15,14 +15,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A notes source of static notes, usually created at graph building stage and not modified
+ * A notes source of static notes, created at graph building stage and not modified
  * thereafter.
- *
- * @author laurent
  */
-public class StaticStreetNotesSource implements StreetNotesSource, Serializable {
+public class StreetNoteModel implements Serializable {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StaticStreetNotesSource.class);
+  private static final Logger LOG = LoggerFactory.getLogger(StreetNoteModel.class);
 
   /**
    * Notes for street edges. No need to synchronize access to the map as they will not be concurrent
@@ -36,14 +34,13 @@ public class StaticStreetNotesSource implements StreetNotesSource, Serializable 
    */
   private final transient Map<StreetNoteAndMatcher, StreetNoteAndMatcher> uniqueMatchers = new HashMap<>();
 
-  StaticStreetNotesSource() {}
+  StreetNoteModel() {}
 
   /**
    * Return the set of notes applicable for this state / backedge pair.
    *
    * @return The set of notes or null if empty.
    */
-  @Override
   public Set<StreetNoteAndMatcher> getNotes(Edge edge) {
     /* If the edge is temporary, we look for notes in it's parent edge. */
     if (edge instanceof TemporaryPartialStreetEdge) {

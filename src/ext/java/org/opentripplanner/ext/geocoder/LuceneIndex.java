@@ -171,13 +171,12 @@ public class LuceneIndex implements Serializable {
 
   public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
     return matchingDocuments(StopLocation.class, query, autocomplete)
-      .map(document -> transitService.getStopLocation(FeedScopedId.parseId(document.get(ID))));
+      .map(document -> transitService.getStopLocation(FeedScopedId.parse(document.get(ID))));
   }
 
   public Stream<StopLocationsGroup> queryStopLocationGroups(String query, boolean autocomplete) {
     return matchingDocuments(StopLocationsGroup.class, query, autocomplete)
-      .map(document -> transitService.getStopLocationsGroup(FeedScopedId.parseId(document.get(ID)))
-      );
+      .map(document -> transitService.getStopLocationsGroup(FeedScopedId.parse(document.get(ID))));
   }
 
   public Stream<StreetVertex> queryStreetVertices(String query, boolean autocomplete) {
@@ -199,7 +198,7 @@ public class LuceneIndex implements Serializable {
   }
 
   private static StopCluster toStopCluster(Document document) {
-    var id = FeedScopedId.parseId(document.get(ID));
+    var id = FeedScopedId.parse(document.get(ID));
     var name = document.get(NAME);
     var code = document.get(CODE);
     var lat = document.getField(LAT).numericValue().doubleValue();

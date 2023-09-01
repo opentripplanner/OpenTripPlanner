@@ -171,7 +171,7 @@ public class WalkableAreaBuilder {
             .filter(IntersectionVertex.class::isInstance)
             .map(IntersectionVertex.class::cast)
         )
-        .forEach(edgeList.visibilityVertices::add);
+        .forEach(edgeList::addVisibilityVertex);
 
       createNamedAreas(edgeList, ring, group.areas);
     }
@@ -238,7 +238,7 @@ public class WalkableAreaBuilder {
           platformLinkingVertices.add(vertex);
           visibilityNodes.add(node);
           startingNodes.add(node);
-          edgeList.visibilityVertices.add(vertex);
+          edgeList.addVisibilityVertex(vertex);
         }
 
         for (Ring outerRing : area.outermostRings) {
@@ -257,7 +257,7 @@ public class WalkableAreaBuilder {
               OSMNode node = osmdb.getNode(v.nodeId);
               visibilityNodes.add(node);
               startingNodes.add(node);
-              edgeList.visibilityVertices.add(v);
+              edgeList.addVisibilityVertex(v);
               linkPointsAdded = true;
             }
           }
@@ -283,12 +283,12 @@ public class WalkableAreaBuilder {
               (linkPointsAdded && (i == 0 || i == outerRing.nodes.size() / 2))
             ) {
               visibilityNodes.add(node);
-              edgeList.visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
+              edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }
             if (isStartingNode(node, osmWayIds)) {
               visibilityNodes.add(node);
               startingNodes.add(node);
-              edgeList.visibilityVertices.add(vertexBuilder.getVertexForOsmNode(node, areaEntity));
+              edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
             }
           }
           for (Ring innerRing : outerRing.getHoles()) {
@@ -302,23 +302,19 @@ public class WalkableAreaBuilder {
               // For holes, the internal angle is calculated, so we must swap the sign
               if (!innerRing.isNodeConvex(j)) {
                 visibilityNodes.add(node);
-                edgeList.visibilityVertices.add(
-                  vertexBuilder.getVertexForOsmNode(node, areaEntity)
-                );
+                edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
               }
               if (isStartingNode(node, osmWayIds)) {
                 visibilityNodes.add(node);
                 startingNodes.add(node);
-                edgeList.visibilityVertices.add(
-                  vertexBuilder.getVertexForOsmNode(node, areaEntity)
-                );
+                edgeList.addVisibilityVertex(vertexBuilder.getVertexForOsmNode(node, areaEntity));
               }
             }
           }
         }
       }
 
-      if (edgeList.visibilityVertices.size() == 0) {
+      if (edgeList.visibilityVertices().isEmpty()) {
         issueStore.add(new UnconnectedArea(group));
         // Area is not connected to graph. Remove it immediately before it causes any trouble.
         for (Edge edge : edges) {
@@ -669,13 +665,13 @@ public class WalkableAreaBuilder {
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
-      Double bicycleSafety = wayPropertiesCache
+      double bicycleSafety = wayPropertiesCache
         .get(areaEntity)
         .getBicycleSafetyFeatures()
         .forward();
       namedArea.setBicycleSafetyMultiplier(bicycleSafety);
 
-      Double walkSafety = wayPropertiesCache.get(areaEntity).getWalkSafetyFeatures().forward();
+      double walkSafety = wayPropertiesCache.get(areaEntity).getWalkSafetyFeatures().forward();
       namedArea.setWalkSafetyMultiplier(walkSafety);
 
       namedArea.setOriginalEdges(intersection);

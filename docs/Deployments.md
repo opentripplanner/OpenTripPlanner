@@ -20,21 +20,22 @@ The following are known deployments of OTP in a government- or agency-sponsored 
   real-time component.
 * **Finland Intercity** The Finnish intercity coach
   service [Matkahuolto](https://en.wikipedia.org/wiki/Matkahuolto)
-  has [developed a trip planner in partnership with Kyyti](https://www.kyyti.com/matkahuoltos-new-app-brings-real-travel-chains-within-the-reach-of-citizens-in-addition-to-coach-travel-hsl-tickets-are-also-available/)
-  .
-* **Lower Saxony, Germany** The [VBN](https://www.vbn.de/en/) transportation authority offers an [OTP instance](https://www.vbn.de/en/service/developer-information/opendata-and-openservice) as alternative to the [Hafas](https://www.hacon.de/en/portfolio/information-ticketing/#section_8294) passenger information system.
-* **Leipzig, Germany** As of summer 2020 [Leipzig Move](https://leipzig-move.de/) has been using
-  OpenTripPlanner.
+  has [developed a trip planner in partnership with Kyyti](https://www.kyyti.com/matkahuoltos-new-app-brings-real-travel-chains-within-the-reach-of-citizens-in-addition-to-coach-travel-hsl-tickets-are-also-available/).
+* **Skåne, Sweden**, the JourneyPlanner and mobile app for the regional transit agency [Skånetrafiken](https://www.skanetrafiken.se/)
+  uses OTP2 with the nordic profile of NeTEx and SIRI for realtime updates.
+* [**Northern Colorado**](https://discover.rideno.co/)
+* [**Philadelphia and surrounding areas**](https://plan.septa.org)
 * **Portland, Oregon** TriMet is the agency that originally started the OpenTripPlanner project.
   Their [Regional Trip Planner](http://ride.trimet.org) is based on OTP and provides about 40,000
   trip plans on a typical weekday.
+* [**New York City**](https://new.mta.info/)
 * **New York State** The State Department of
   Transportation's [transit trip planner](https://511ny.org/#TransitRegion-1) provides itineraries
   for public transit systems throughout the state in a single unified OTP instance.
 * **Los Angeles, California** The new [metro.net trip planner](https://www.metro.net/).
 * **Atlanta, Georgia** The Metropolitan Atlanta Rapid Transit Authority's (
   MARTA) [trip planner](http://itsmarta.com/planatrip.aspx) and the Atlanta region's transit
-  information hub [atltransit.org](https://atltransit.org/) both use OTP to power their website trip
+  information hub [https://atlrides.com/](https://atlrides.com/) both use OTP to power their website trip
   planners.
 * **Boston, Massachusetts**
   The [Massachusetts Bay Transportation Authority trip planner](https://www.mbta.com/trip-planner).
@@ -74,8 +75,9 @@ The following are known deployments of OTP in a government- or agency-sponsored 
   around the campus using multiple modes of transportation, including the USF Bull Runner campus
   shuttle, Share-A-Bull bike share, and pedestrian pathways.
   Open-sourced [on Github](https://github.com/CUTR-at-USF/usf-mobullity).
-* **Skåne, Sweden**, the JourneyPlanner and mobile app for the regional transit agency [Skånetrafiken](https://www.skanetrafiken.se/) 
-  uses OTP2 with the nordic profile of NeTEx and SIRI for realtime updates.
+* **Lower Saxony, Germany** The [VBN](https://www.vbn.de/en/) transportation authority offers an [OTP instance](https://www.vbn.de/en/service/developer-information/opendata-and-openservice) as alternative to the [Hafas](https://www.hacon.de/en/portfolio/information-ticketing/#section_8294) passenger information system.
+* **Leipzig, Germany** As of summer 2020 [Leipzig Move](https://leipzig-move.de/) has been using
+  OpenTripPlanner.
 
 ## Independent Production
 

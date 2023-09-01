@@ -13,13 +13,17 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
+import javax.annotation.Nonnull;
 
 public final class DateTimeScalarFactory {
 
   private static final String DOCUMENTATION =
-    "DateTime format accepting ISO 8601 dates with time zone offset.\n\n" +
-    "Format:  `YYYY-MM-DD'T'hh:mm[:ss](Z|±01:00)`\n\n" +
-    "Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`";
+    """
+      DateTime format accepting ISO 8601 dates with time zone offset.
+
+      Format:  `YYYY-MM-DD'T'hh:mm[:ss](Z|±01:00)`
+
+      Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`""";
 
   // We need to have two offsets, in order to parse both "+0200" and "+02:00". The first is not
   // really ISO-8601 compatible with the extended date and time. We need to make parsing strict, in
@@ -52,32 +56,35 @@ public final class DateTimeScalarFactory {
       .coercing(
         new Coercing<>() {
           @Override
-          public String serialize(Object input) {
-            if (input instanceof Long) {
-              return ((Instant.ofEpochMilli((Long) input))).atZone(timeZone).format(FORMATTER);
+          public String serialize(@Nonnull Object input) {
+            if (input instanceof Long inputAsLong) {
+              return Instant.ofEpochMilli(inputAsLong).atZone(timeZone).format(FORMATTER);
             }
             return null;
           }
 
           @Override
-          public Long parseValue(Object input) {
-            Instant instant;
-            try {
-              TemporalAccessor temporalAccessor = PARSER.parseBest(
-                (CharSequence) input,
-                OffsetDateTime::from,
-                ZonedDateTime::from,
-                LocalDateTime::from
-              );
+          public Long parseValue(@Nonnull Object input) {
+            Instant instant = null;
+            if (input instanceof CharSequence inputAsCharSequence) {
+              try {
+                TemporalAccessor temporalAccessor = PARSER.parseBest(
+                  inputAsCharSequence,
+                  OffsetDateTime::from,
+                  ZonedDateTime::from,
+                  LocalDateTime::from
+                );
 
-              if (temporalAccessor instanceof LocalDateTime) {
-                instant = ((LocalDateTime) temporalAccessor).atZone(timeZone).toInstant();
-              } else {
-                instant = Instant.from(temporalAccessor);
+                if (temporalAccessor instanceof LocalDateTime localDateTime) {
+                  instant = localDateTime.atZone(timeZone).toInstant();
+                } else {
+                  instant = Instant.from(temporalAccessor);
+                }
+              } catch (DateTimeParseException dtpe) {
+                // ignored
               }
-            } catch (DateTimeParseException dtpe) {
-              instant = null;
             }
+
             if (instant == null) {
               throw new CoercingParseValueException(
                 "Expected type 'DateTime' but was '" + input + "'."
@@ -88,9 +95,9 @@ public final class DateTimeScalarFactory {
           }
 
           @Override
-          public Long parseLiteral(Object input) {
-            if (input instanceof StringValue) {
-              return parseValue(((StringValue) input).getValue());
+          public Long parseLiteral(@Nonnull Object input) {
+            if (input instanceof StringValue inputAsStringValue) {
+              return parseValue(inputAsStringValue.getValue());
             }
             return null;
           }
