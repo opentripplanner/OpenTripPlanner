@@ -82,13 +82,13 @@ public class OsmTagMapperTest {
 
     var withoutFoo = new OSMWithTags();
     withoutFoo.addTag("tag", "imaginary");
-    assertEquals(2, wps.getDataForWay(withoutFoo).getBicycleSafetyFeatures().back());
+    assertEquals(2, wps.getDataForWay(withoutFoo).bicycleSafety().back());
 
     // the mixin for foo=bar reduces the bike safety factor
     var withFoo = new OSMWithTags();
     withFoo.addTag("tag", "imaginary");
     withFoo.addTag("foo", "bar");
-    assertEquals(1, wps.getDataForWay(withFoo).getBicycleSafetyFeatures().back());
+    assertEquals(1, wps.getDataForWay(withFoo).bicycleSafety().back());
   }
 
   public void testAccessNo() {

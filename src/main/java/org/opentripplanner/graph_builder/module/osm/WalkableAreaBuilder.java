@@ -661,13 +661,10 @@ public class WalkableAreaBuilder {
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
-      double bicycleSafety = wayPropertiesCache
-        .get(areaEntity)
-        .getBicycleSafetyFeatures()
-        .forward();
+      double bicycleSafety = wayPropertiesCache.get(areaEntity).bicycleSafety().forward();
       namedArea.setBicycleSafetyMultiplier(bicycleSafety);
 
-      double walkSafety = wayPropertiesCache.get(areaEntity).getWalkSafetyFeatures().forward();
+      double walkSafety = wayPropertiesCache.get(areaEntity).walkSafety().forward();
       namedArea.setWalkSafetyMultiplier(walkSafety);
 
       namedArea.setOriginalEdges(intersection);

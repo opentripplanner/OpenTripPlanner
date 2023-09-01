@@ -199,33 +199,39 @@ public class WayPropertySet {
       .mutate()
       .withPermission(permission)
       .bicycleSafety(
-        forwardResult.getBicycleSafetyFeatures() != null
-          ? forwardResult.getBicycleSafetyFeatures().forward()
-          : defaultBicycleSafetyForPermission.apply(permission, forwardSpeed, way),
-        backwardResult.getBicycleSafetyFeatures() != null
-          ? backwardResult.getBicycleSafetyFeatures().back()
-          : defaultBicycleSafetyForPermission.apply(backwardPermission, backSpeed, way)
+        forwardResult
+          .bicycleSafetyOpt()
+          .map(SafetyFeatures::forward)
+          .orElseGet(() -> defaultBicycleSafetyForPermission.apply(permission, forwardSpeed, way)),
+        backwardResult
+          .bicycleSafetyOpt()
+          .map(SafetyFeatures::back)
+          .orElseGet(() ->
+            defaultBicycleSafetyForPermission.apply(backwardPermission, backSpeed, way)
+          )
       )
       .walkSafety(
-        forwardResult.getWalkSafetyFeatures() != null
-          ? forwardResult.getWalkSafetyFeatures().forward()
-          : defaultWalkSafetyForPermission.apply(permission, forwardSpeed, way),
-        backwardResult.getWalkSafetyFeatures() != null
-          ? backwardResult.getWalkSafetyFeatures().back()
-          : defaultWalkSafetyForPermission.apply(backwardPermission, backSpeed, way)
+        forwardResult
+          .walkSafetyOpt()
+          .map(SafetyFeatures::forward)
+          .orElseGet(() -> defaultWalkSafetyForPermission.apply(permission, forwardSpeed, way)),
+        backwardResult
+          .walkSafetyOpt()
+          .map(SafetyFeatures::back)
+          .orElseGet(() -> defaultWalkSafetyForPermission.apply(backwardPermission, backSpeed, way))
       )
       .build();
 
     /* apply mixins */
-    if (backwardMixins.size() > 0) {
+    if (!backwardMixins.isEmpty()) {
       result = applyMixins(result, backwardMixins, true);
     }
-    if (forwardMixins.size() > 0) {
+    if (!forwardMixins.isEmpty()) {
       result = applyMixins(result, forwardMixins, false);
     }
     if (
       (bestBackwardScore == 0 || bestForwardScore == 0) &&
-      (backwardMixins.size() == 0 || forwardMixins.size() == 0)
+      (backwardMixins.isEmpty() || forwardMixins.isEmpty())
     ) {
       String all_tags = dumpTags(way);
       LOG.debug("Used default permissions: {}", all_tags);
@@ -323,9 +329,6 @@ public class WayPropertySet {
       if (specifier.matchScore(way) > 0) {
         out.add(noteProperties.generateNote(way));
       }
-    }
-    if (out.size() == 0) {
-      return null;
     }
     return out;
   }
@@ -533,10 +536,10 @@ public class WayPropertySet {
     List<MixinProperties> mixins,
     boolean backward
   ) {
-    SafetyFeatures bicycleSafetyFeatures = result.getBicycleSafetyFeatures();
+    SafetyFeatures bicycleSafetyFeatures = result.bicycleSafety();
     double forwardBicycle = bicycleSafetyFeatures.forward();
     double backBicycle = bicycleSafetyFeatures.back();
-    SafetyFeatures walkSafetyFeatures = result.getWalkSafetyFeatures();
+    SafetyFeatures walkSafetyFeatures = result.walkSafety();
     double forwardWalk = walkSafetyFeatures.forward();
     double backWalk = walkSafetyFeatures.back();
     for (var mixin : mixins) {

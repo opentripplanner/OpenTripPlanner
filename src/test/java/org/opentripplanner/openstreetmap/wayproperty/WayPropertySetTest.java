@@ -34,7 +34,7 @@ class WayPropertySetTest {
     var cycleway = WayTestData.cyclewayLeft();
     WayPropertySet wps = wps();
     SafetyFeatures expected = new SafetyFeatures(1, 5);
-    assertEquals(expected, wps.getDataForWay(cycleway).getBicycleSafetyFeatures());
+    assertEquals(expected, wps.getDataForWay(cycleway).bicycleSafety());
   }
 
   @Nonnull
