@@ -566,7 +566,7 @@ The file is created or overwritten if OTP saves the graph to the file
 Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
 
 Note! The preferred way to do this is to update the OSM data.
-See [Transferring within stations](#transferring-within-stations).
+See [In-station navigation](In-Station-Navigation.md).
 
 The ride locations for some modes of transport such as subways can be slow to reach from the street.
 When planning a trip, we need to allow additional time to reach these locations to properly inform

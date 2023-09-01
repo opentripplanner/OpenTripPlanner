@@ -391,7 +391,7 @@ all of the elevation values in the street edges.
         .description(
           """
 Note! The preferred way to do this is to update the OSM data.
-See [Transferring within stations](#transferring-within-stations).
+See [In-station navigation](In-Station-Navigation.md).
 
 The ride locations for some modes of transport such as subways can be slow to reach from the street.
 When planning a trip, we need to allow additional time to reach these locations to properly inform
