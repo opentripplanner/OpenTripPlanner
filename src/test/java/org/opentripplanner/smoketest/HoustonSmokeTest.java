@@ -38,7 +38,7 @@ public class HoustonSmokeTest {
     var modes = Set.of(BUS, WALK);
     SmokeTest.basicRouteTest(
       new SmokeTestRequest(galvestonRoad, northLindale, modes),
-      List.of("WALK", "BUS", "BUS", "WALK", "BUS", "WALK")
+      List.of("WALK", "BUS", "WALK", "BUS", "WALK", "BUS", "WALK")
     );
   }
 
