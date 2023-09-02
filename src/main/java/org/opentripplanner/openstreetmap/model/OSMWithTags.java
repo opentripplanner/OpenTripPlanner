@@ -47,7 +47,7 @@ public class OSMWithTags {
     return ("yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue));
   }
 
-  public StreetTraversalPermission getPermissionsForEntity(StreetTraversalPermission def) {
+  public StreetTraversalPermission reducePermissions(StreetTraversalPermission def) {
     StreetTraversalPermission permission;
 
     /*
@@ -95,6 +95,38 @@ public class OSMWithTags {
 
     if (permission == null) {
       return def;
+    }
+
+    /*
+     * pedestrian rules: everything is two-way (assuming pedestrians are allowed at all) bicycle
+     * rules: default: permissions;
+     *
+     * cycleway=dismount means walk your bike -- the engine will automatically try walking bikes
+     * any time it is forbidden to ride them, so the only thing to do here is to remove bike
+     * permissions
+     *
+     * oneway=... sets permissions for cars and bikes oneway:bicycle overwrites these
+     * permissions for bikes only
+     *
+     * now, cycleway=opposite_lane, opposite, opposite_track can allow once oneway has been set
+     * by oneway:bicycle, but should give a warning if it conflicts with oneway:bicycle
+     *
+     * bicycle:backward=yes works like oneway:bicycle=no bicycle:backwards=no works like
+     * oneway:bicycle=yes
+     */
+
+    // Compute bike permissions, check consistency.
+    boolean forceBikes = false;
+    if (isBicycleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.BICYCLE);
+      forceBikes = true;
+    }
+
+    if (isBicycleDismountForced()) {
+      permission = permission.remove(StreetTraversalPermission.BICYCLE);
+      if (forceBikes) {
+        //issueStore.add(new ConflictingBikeTags(way));
+      }
     }
     return permission;
   }
