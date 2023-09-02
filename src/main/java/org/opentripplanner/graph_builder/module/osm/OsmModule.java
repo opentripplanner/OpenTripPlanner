@@ -527,12 +527,12 @@ public class OsmModule implements GraphBuilderModule {
       .withLink(way.isLink())
       .withRoundabout(way.isRoundabout())
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
-      .withStairs(way.isSteps());
+      .withStairs(way.isSteps())
+      .withWheelchairAccessible(way.isWheelchairAccessible());
 
     if (!way.hasTag("name") && !way.hasTag("ref")) {
       seb.withBogusName(true);
     }
-    seb.withWheelchairAccessible(way.isWheelchairAccessible());
 
     // < 0.04: account for
     if (carSpeed < 0.04) {
