@@ -464,7 +464,7 @@ public class OsmModule implements GraphBuilderModule {
     StreetEdge backStreet = null;
     double length = getGeometryLengthMeters(geometry);
 
-    var permissionPair = OsmFilter.getPermissions(permissions, way);
+    var permissionPair = way.splitPermissions(permissions);
     var permissionsFront = permissionPair.main();
     var permissionsBack = permissionPair.back();
 

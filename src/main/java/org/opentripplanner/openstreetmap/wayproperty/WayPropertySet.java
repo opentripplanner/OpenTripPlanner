@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 /**
  * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc.
  * to edges based on OSM tags.
- * TODO rename so that the connection with OSM tags is obvious
  * <p>
  * WayPropertyPickers, CreativeNamePickers, SlopeOverridePickers, and SpeedPickers are applied to ways based on how well
  * their OSMSpecifiers match a given OSM way. Generally one OSMSpecifier will win out over all the others based on the
@@ -122,9 +121,7 @@ public class WayPropertySet {
 
     var permission = way.reducePermissions(forwardResult.getPermission());
 
-    var backwardPermission = way.reducePermissions(
-      backwardResult.getPermission()
-    );
+    var backwardPermission = way.reducePermissions(backwardResult.getPermission());
 
     WayProperties result = forwardResult
       .mutate()

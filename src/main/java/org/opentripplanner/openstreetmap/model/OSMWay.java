@@ -3,6 +3,8 @@ package org.opentripplanner.openstreetmap.model;
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import java.util.Set;
+import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMWay extends OSMWithTags {
 
@@ -13,6 +15,57 @@ public class OSMWay extends OSMWithTags {
     "reversible"
   );
   private final TLongList nodes = new TLongArrayList();
+
+  /**
+   * Check OSM tags for various one-way and one-way-by-mode tags and return a pair of permissions
+   * for travel along and against the way.
+   */
+  public StreetTraversalPermissionPair splitPermissions(StreetTraversalPermission permissions) {
+    StreetTraversalPermission permissionsFront = permissions;
+    StreetTraversalPermission permissionsBack = permissions;
+
+    // Check driving direction restrictions.
+    if (isOneWayForwardDriving() || isRoundabout()) {
+      permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+    }
+    if (isOneWayReverseDriving()) {
+      permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+    }
+
+    // Check bike direction restrictions.
+    if (isOneWayForwardBicycle()) {
+      permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
+    }
+    if (isOneWayReverseBicycle()) {
+      permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
+    }
+
+    // TODO(flamholz): figure out what this is for.
+    String oneWayBicycle = getTag("oneway:bicycle");
+    if (isFalse(oneWayBicycle) || isTagTrue("bicycle:backwards")) {
+      if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
+        permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
+        permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+      }
+    }
+
+    //This needs to be after adding permissions for oneway:bicycle=no
+    //removes bicycle permission when bicycles need to use sidepath
+    //TAG: bicycle:forward=use_sidepath
+    if (isForwardDirectionSidepath()) {
+      permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
+    }
+
+    //TAG bicycle:backward=use_sidepath
+    if (isReverseDirectionSidepath()) {
+      permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
+    }
+
+    if (isOpposableCycleway()) {
+      permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+    }
+    return new StreetTraversalPermissionPair(permissionsFront, permissionsBack);
+  }
 
   public void addNodeRef(long nodeRef) {
     nodes.add(nodeRef);
