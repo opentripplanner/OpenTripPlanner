@@ -67,7 +67,7 @@
         <netcdf4.version>5.5.3</netcdf4.version>
         <logback.version>1.4.11</logback.version>
         <lucene.version>9.7.0</lucene.version>
-        <slf4j.version>2.0.7</slf4j.version>
+        <slf4j.version>2.0.9</slf4j.version>
         <netex-java-model.version>2.0.14</netex-java-model.version>
         <siri-java-model.version>1.22</siri-java-model.version>
         <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
