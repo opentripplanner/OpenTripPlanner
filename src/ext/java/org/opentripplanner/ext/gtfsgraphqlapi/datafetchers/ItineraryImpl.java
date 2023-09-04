@@ -103,4 +103,9 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   private Itinerary getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
+
+  @Override
+  public DataFetcher<Double> emissions() {
+    return environment -> NumberMapper.toDouble(getSource(environment).getEmissions());
+  }
 }

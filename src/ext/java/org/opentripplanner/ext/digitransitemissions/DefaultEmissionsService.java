@@ -3,7 +3,6 @@ package org.opentripplanner.ext.digitransitemissions;
 import jakarta.inject.Inject;
 import java.io.Serializable;
 import java.util.Optional;
-import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;
 
 public class DefaultEmissionsService implements Serializable, EmissionsService {
