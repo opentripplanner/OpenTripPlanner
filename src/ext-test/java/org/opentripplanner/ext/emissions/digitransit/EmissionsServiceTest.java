@@ -63,7 +63,7 @@ class EmissionsServiceTest {
     var stoptimes = new ArrayList<StopTime>();
     stoptimes.add(stoptime);
     var trip = Trip
-      .of(FeedScopedId.parseId("FOO:BAR"))
+      .of(FeedScopedId.parse("FOO:BAR"))
       .withMode(TransitMode.BUS)
       .withRoute(route)
       .build();
@@ -98,7 +98,7 @@ class EmissionsServiceTest {
     var stoptimes = new ArrayList<StopTime>();
     stoptimes.add(stoptime);
     var trip = Trip
-      .of(FeedScopedId.parseId("F:A"))
+      .of(FeedScopedId.parse("F:A"))
       .withMode(TransitMode.BUS)
       .withRoute(route)
       .build();
