@@ -9,9 +9,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Timer;
 import io.micrometer.core.instrument.composite.CompositeMeterRegistry;
-import io.micrometer.core.instrument.config.MeterFilter;
 import io.micrometer.core.instrument.config.NamingConvention;
-import io.micrometer.core.instrument.distribution.DistributionStatisticConfig;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,22 +76,6 @@ public class SpeedTestTimer {
           Tag.of("git.branch", projectInfo().versionControl.branch),
           Tag.of("location", location)
         )
-      );
-
-    // record the lowest percentile of times
-    //noinspection NullableProblems
-    registry
-      .config()
-      .meterFilter(
-        new MeterFilter() {
-          @Override
-          public DistributionStatisticConfig configure(
-            Meter.Id id,
-            DistributionStatisticConfig config
-          ) {
-            return DistributionStatisticConfig.builder().percentiles(0.01).build().merge(config);
-          }
-        }
       );
   }
 
