@@ -7,7 +7,6 @@ import java.util.Set;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class StreetLegBuilder {
 
@@ -21,7 +20,6 @@ public class StreetLegBuilder {
   private LineString geometry;
   private ElevationProfile elevationProfile;
   private List<WalkStep> walkSteps;
-  private FeedScopedId pathwayId;
   private Boolean walkingBike;
   private Boolean rentedVehicle;
   private String vehicleRentalNetwork;
@@ -42,7 +40,6 @@ public class StreetLegBuilder {
       .withGeometry(leg.getLegGeometry())
       .withElevationProfile(leg.getElevationProfile())
       .withWalkSteps(leg.getWalkSteps())
-      .withPathwayId(leg.getPathwayId())
       .withWalkingBike(leg.getWalkingBike())
       .withRentedVehicle(leg.getRentedVehicle())
       .withVehicleRentalNetwork(leg.getVehicleRentalNetwork())
@@ -92,10 +89,6 @@ public class StreetLegBuilder {
 
   public List<WalkStep> getWalkSteps() {
     return walkSteps;
-  }
-
-  public FeedScopedId getPathwayId() {
-    return pathwayId;
   }
 
   public Boolean getWalkingBike() {
@@ -165,11 +158,6 @@ public class StreetLegBuilder {
 
   public StreetLegBuilder withWalkSteps(List<WalkStep> walkSteps) {
     this.walkSteps = walkSteps;
-    return this;
-  }
-
-  public StreetLegBuilder withPathwayId(FeedScopedId pathwayId) {
-    this.pathwayId = pathwayId;
     return this;
   }
 

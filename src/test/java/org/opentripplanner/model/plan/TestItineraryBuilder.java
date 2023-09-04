@@ -24,6 +24,8 @@ import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -411,7 +413,11 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   /** Create a dummy trip */
   private static Trip trip(String id, Route route) {
-    return TransitModelForTest.trip(id).withRoute(route).build();
+    return TransitModelForTest
+      .trip(id)
+      .withRoute(route)
+      .withHeadsign(I18NString.of("Trip headsign %s".formatted(id)))
+      .build();
   }
 
   private static Place stop(Place source) {
@@ -446,6 +452,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
     fromStopTime.setArrivalTime(start);
     fromStopTime.setDepartureTime(start);
     fromStopTime.setTrip(trip);
+    fromStopTime.setStopHeadsign(
+      I18NString.of("Headsign at boarding (stop index %s)".formatted(fromStopIndex))
+    );
 
     // Duplicate stop time for all stops prior to the last.
     for (int i = 0; i < toStopIndex; i++) {
@@ -566,7 +575,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   private int cost(float reluctance, int durationSeconds) {
-    return Math.round(reluctance * durationSeconds);
+    return IntUtils.round(reluctance * durationSeconds);
   }
 
   private int lastEndTime(int fallbackTime) {

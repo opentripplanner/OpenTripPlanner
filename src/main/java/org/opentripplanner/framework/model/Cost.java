@@ -1,6 +1,7 @@
 package org.opentripplanner.framework.model;
 
 import java.io.Serializable;
+import java.time.Duration;
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 
@@ -17,6 +18,8 @@ public final class Cost implements Serializable, Comparable<Cost> {
 
   public static final Cost ZERO = Cost.costOfSeconds(0);
 
+  public static final Cost ONE_HOUR_WITH_TRANSIT = Cost.fromDuration(Duration.ofHours(1));
+
   private final int value;
 
   private Cost(int value) {
@@ -27,16 +30,32 @@ public final class Cost implements Serializable, Comparable<Cost> {
     return costOfSeconds(value * 60);
   }
 
-  public static Cost costOfSeconds(int value) {
-    return new Cost(value);
+  public static Cost costOfSeconds(int transitSeconds) {
+    return new Cost(transitSeconds);
   }
 
   public static Cost costOfSeconds(double value) {
-    return costOfSeconds((int) Math.round(value));
+    return costOfSeconds(IntUtils.round(value));
+  }
+
+  public static Cost fromDuration(Duration value) {
+    return new Cost(IntUtils.round(value.toMillis() / 1000.0));
   }
 
   public int toSeconds() {
     return value;
+  }
+
+  public int toCentiSeconds() {
+    return value * CENTI_FACTOR;
+  }
+
+  public boolean isZero() {
+    return value == 0;
+  }
+
+  public Duration asDuration() {
+    return isZero() ? Duration.ZERO : Duration.ofSeconds(value);
   }
 
   public Cost plus(Cost other) {
@@ -52,7 +71,7 @@ public final class Cost implements Serializable, Comparable<Cost> {
   }
 
   public Cost multiply(double factor) {
-    return new Cost((int) Math.round(value * factor));
+    return new Cost(IntUtils.round(value * factor));
   }
 
   @Override
@@ -80,9 +99,5 @@ public final class Cost implements Serializable, Comparable<Cost> {
   @Override
   public int compareTo(Cost o) {
     return value - o.value;
-  }
-
-  public int toCentiSeconds() {
-    return value * CENTI_FACTOR;
   }
 }

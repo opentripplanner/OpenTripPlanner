@@ -18,6 +18,9 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializable {
 
   private final Class<E> type;
+
+  // Do not expose the 'values' outside the class, the EnumMap is mutable, and this class
+  // should be immutable.
   private final Map<E, TimeAndCostPenalty> values;
 
   public TimeAndCostPenaltyForEnum(Class<E> type) {
@@ -26,8 +29,8 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
   }
 
   private TimeAndCostPenaltyForEnum(TimeAndCostPenaltyForEnum.Builder<E> builder) {
-    this.type = Objects.requireNonNull(builder.type());
-    this.values = builder.valuesCopy();
+    this.type = Objects.requireNonNull(builder.original.type);
+    this.values = Objects.requireNonNull(builder.values);
   }
 
   public static <S extends Enum<S>> TimeAndCostPenaltyForEnum<S> ofDefault(Class<S> type) {
@@ -40,10 +43,6 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
 
   public TimeAndCostPenaltyForEnum.Builder<E> copyOf() {
     return new TimeAndCostPenaltyForEnum.Builder<>(this);
-  }
-
-  Class<E> type() {
-    return type;
   }
 
   public TimeAndCostPenalty valueOf(E type) {
@@ -60,18 +59,7 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
 
   @Override
   public String toString() {
-    var builder = ToStringBuilder.of(TimeAndCostPenaltyForEnum.class);
-
-    var sortedEntryList = values
-      .entrySet()
-      .stream()
-      .sorted(Comparator.comparingInt(e -> e.getKey().ordinal()))
-      .toList();
-
-    for (Map.Entry<E, TimeAndCostPenalty> e : sortedEntryList) {
-      builder.addObj(e.getKey().name(), e.getValue());
-    }
-    return builder.toString();
+    return toString(TimeAndCostPenaltyForEnum.class, values);
   }
 
   @Override
@@ -89,39 +77,47 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
     return Objects.hash(type, values);
   }
 
+  private EnumMap<E, TimeAndCostPenalty> copyValues() {
+    return values.isEmpty() ? new EnumMap<>(type) : new EnumMap<>(values);
+  }
+
+  private static <F extends Enum<F>> String toString(
+    Class<?> clazz,
+    Map<F, TimeAndCostPenalty> values
+  ) {
+    var builder = ToStringBuilder.of(clazz);
+
+    var sortedEntryList = values
+      .entrySet()
+      .stream()
+      .sorted(Comparator.comparingInt(e -> e.getKey().ordinal()))
+      .toList();
+
+    for (Map.Entry<F, TimeAndCostPenalty> e : sortedEntryList) {
+      builder.addObj(e.getKey().name(), e.getValue());
+    }
+    return builder.toString();
+  }
+
   @SuppressWarnings("UnusedReturnValue")
   public static class Builder<E extends Enum<E>> {
 
     private final TimeAndCostPenaltyForEnum<E> original;
-    private Map<E, TimeAndCostPenalty> values = null;
+    private final EnumMap<E, TimeAndCostPenalty> values;
 
     Builder(TimeAndCostPenaltyForEnum<E> original) {
       this.original = original;
-    }
-
-    Class<E> type() {
-      return original.type();
+      this.values = original.copyValues();
     }
 
     public Builder<E> with(E key, TimeAndCostPenalty value) {
-      // Lazy initialize the valueForEnum map
-      if (values == null) {
-        values = original.isEmpty() ? new EnumMap<>(original.type) : new EnumMap<>(original.values);
-      }
-      if (TimeAndCostPenalty.ZERO.equals(value)) {
+      Objects.requireNonNull(key);
+      if (value == null || value.isEmpty()) {
         values.remove(key);
       } else {
         values.put(key, value);
       }
       return this;
-    }
-
-    /**
-     * Build a copy of the current values. This will create a defensive copy of the builder values.
-     * Hence, the builder can be used to generate new values if desired.
-     * */
-    Map<E, TimeAndCostPenalty> valuesCopy() {
-      return values == null ? original.values : new EnumMap<>(values);
     }
 
     public Builder<E> withValues(Map<E, TimeAndCostPenalty> values) {
@@ -137,9 +133,13 @@ public class TimeAndCostPenaltyForEnum<E extends Enum<E>> implements Serializabl
     }
 
     public TimeAndCostPenaltyForEnum<E> build() {
-      var it = new TimeAndCostPenaltyForEnum<>(this);
-      // Return original if not changed
-      return original.equals(it) ? original : it;
+      var value = new TimeAndCostPenaltyForEnum<>(this);
+      return original.equals(value) ? original : value;
+    }
+
+    @Override
+    public String toString() {
+      return TimeAndCostPenaltyForEnum.toString(TimeAndCostPenaltyForEnum.Builder.class, values);
     }
   }
 }

@@ -71,11 +71,25 @@ public class SelectRequest implements Serializable {
     return true;
   }
 
-  public boolean matches(TripTimes tripTimes) {
+  /**
+   * Matches the select clause of a transit filter request.
+   */
+  public boolean matchesSelect(TripTimes tripTimes) {
     var trip = tripTimes.getTrip();
 
     return (
       this.transportModeFilter == null ||
+      this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode())
+    );
+  }
+
+  /**
+   * Matches the not clause of a transit filter request.
+   */
+  public boolean matchesNot(TripTimes tripTimes) {
+    var trip = tripTimes.getTrip();
+    return (
+      this.transportModeFilter != null &&
       this.transportModeFilter.match(trip.getMode(), trip.getNetexSubMode())
     );
   }
@@ -145,7 +159,7 @@ public class SelectRequest implements Serializable {
 
     public Builder withAgenciesFromString(String s) {
       if (!s.isEmpty()) {
-        this.agencies = FeedScopedId.parseListOfIds(s);
+        this.agencies = FeedScopedId.parseList(s);
       }
       return this;
     }
@@ -157,7 +171,7 @@ public class SelectRequest implements Serializable {
 
     public Builder withRoutesFromString(String s) {
       if (!s.isEmpty()) {
-        this.routes = FeedScopedId.parseListOfIds(s);
+        this.routes = FeedScopedId.parseList(s);
       }
       return this;
     }

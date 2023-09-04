@@ -33,6 +33,11 @@ public class RouteRequestToFilterChainMapper {
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
+    // Skip filtering itineraries if generalized-cost is not computed
+    if (!request.preferences().transit().raptor().profile().producesGeneralizedCost()) {
+      return builder.build();
+    }
+
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
     // Group by similar legs filter
     if (params.groupSimilarityKeepOne() >= 0.5) {

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -45,6 +46,13 @@ public class TransitModelForTest {
     .withName("Agency Test")
     .withTimezone(TIME_ZONE_ID)
     .withUrl("https://www.agency.com")
+    .build();
+
+  public static final Agency OTHER_AGENCY = Agency
+    .of(id("AX"))
+    .withName("Other Agency Test")
+    .withTimezone(TIME_ZONE_ID)
+    .withUrl("https://www.otheragency.com")
     .build();
 
   public static FeedScopedId id(String id) {
@@ -189,6 +197,7 @@ public class TransitModelForTest {
     var stopTime = TransitModelForTest.stopTime(trip, seq);
     stopTime.setArrivalTime(time);
     stopTime.setDepartureTime(time);
+    stopTime.setStopHeadsign(I18NString.of("Stop headsign at stop %s".formatted(seq)));
     return stopTime;
   }
 

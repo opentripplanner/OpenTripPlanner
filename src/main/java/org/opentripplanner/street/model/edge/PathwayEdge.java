@@ -1,7 +1,9 @@
 package org.opentripplanner.street.model.edge;
 
 import java.util.Objects;
+import java.util.Optional;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -12,7 +14,6 @@ import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateEditor;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.PathwayMode;
 
 /**
@@ -21,7 +22,10 @@ import org.opentripplanner.transit.model.site.PathwayMode;
 public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTraversalInformation {
 
   public static final I18NString DEFAULT_NAME = new NonLocalizedString("pathway");
-  private final I18NString name;
+
+  @Nullable
+  private final I18NString signpostedAs;
+
   private final int traversalTime;
   private final double distance;
   private final int steps;
@@ -29,13 +33,11 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   private final PathwayMode mode;
 
   private final boolean wheelchairAccessible;
-  private final FeedScopedId id;
 
   private PathwayEdge(
     Vertex fromv,
     Vertex tov,
-    FeedScopedId id,
-    I18NString name,
+    @Nullable I18NString signpostedAs,
     int traversalTime,
     double distance,
     int steps,
@@ -44,8 +46,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     PathwayMode mode
   ) {
     super(fromv, tov);
-    this.name = Objects.requireNonNullElse(name, DEFAULT_NAME);
-    this.id = id;
+    this.signpostedAs = signpostedAs;
     this.traversalTime = traversalTime;
     this.steps = steps;
     this.slope = slope;
@@ -55,15 +56,10 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   }
 
   /**
-   * {@link PathwayEdge#createLowCostPathwayEdge(Vertex, Vertex, FeedScopedId, I18NString, boolean, PathwayMode)}
+   * {@link #createLowCostPathwayEdge(Vertex, Vertex, boolean, PathwayMode)}
    */
-  public static PathwayEdge createLowCostPathwayEdge(
-    Vertex fromV,
-    Vertex toV,
-    I18NString name,
-    PathwayMode mode
-  ) {
-    return PathwayEdge.createLowCostPathwayEdge(fromV, toV, null, name, true, mode);
+  public static PathwayEdge createLowCostPathwayEdge(Vertex fromV, Vertex toV, PathwayMode mode) {
+    return PathwayEdge.createLowCostPathwayEdge(fromV, toV, true, mode);
   }
 
   /**
@@ -74,19 +70,16 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
   public static PathwayEdge createLowCostPathwayEdge(
     Vertex fromV,
     Vertex toV,
-    FeedScopedId id,
-    I18NString name,
     boolean wheelchairAccessible,
     PathwayMode mode
   ) {
-    return createPathwayEdge(fromV, toV, id, name, 0, 0, 0, 0, wheelchairAccessible, mode);
+    return createPathwayEdge(fromV, toV, null, 0, 0, 0, 0, wheelchairAccessible, mode);
   }
 
   public static PathwayEdge createPathwayEdge(
     Vertex fromv,
     Vertex tov,
-    FeedScopedId id,
-    I18NString name,
+    I18NString signpostedAs,
     int traversalTime,
     double distance,
     int steps,
@@ -98,8 +91,7 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
       new PathwayEdge(
         fromv,
         tov,
-        id,
-        name,
+        signpostedAs,
         traversalTime,
         distance,
         steps,
@@ -163,14 +155,22 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
     return s1.makeStateArray();
   }
 
+  /**
+   * Return the sign to follow when traversing the pathway. An empty optional means that this
+   * pathway does not have "signposted at" information.
+   */
+  public Optional<I18NString> signpostedAs() {
+    return Optional.ofNullable(signpostedAs);
+  }
+
   @Override
   public I18NString getName() {
-    return name;
+    return Objects.requireNonNullElse(signpostedAs, DEFAULT_NAME);
   }
 
   @Override
   public boolean hasBogusName() {
-    return name.equals(DEFAULT_NAME);
+    return signpostedAs == null;
   }
 
   public LineString getGeometry() {
@@ -201,10 +201,6 @@ public class PathwayEdge extends Edge implements BikeWalkableEdge, WheelchairTra
 
   public int getSteps() {
     return steps;
-  }
-
-  public FeedScopedId getId() {
-    return id;
   }
 
   @Override

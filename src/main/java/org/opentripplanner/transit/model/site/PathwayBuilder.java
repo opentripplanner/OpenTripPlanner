@@ -12,9 +12,9 @@ public class PathwayBuilder extends AbstractEntityBuilder<Pathway, PathwayBuilde
 
   private StationElement<?, ?> toStop;
 
-  private String name;
+  private String signpostedAs;
 
-  private String reversedName;
+  private String reverseSignpostedAs;
 
   private int traversalTime;
 
@@ -35,8 +35,8 @@ public class PathwayBuilder extends AbstractEntityBuilder<Pathway, PathwayBuilde
     this.pathwayMode = original.getPathwayMode();
     this.fromStop = original.getFromStop();
     this.toStop = original.getToStop();
-    this.name = original.getName();
-    this.reversedName = original.getReversedName();
+    this.signpostedAs = original.getSignpostedAs();
+    this.reverseSignpostedAs = original.getReverseSignpostedAs();
     this.traversalTime = original.getTraversalTime();
     this.length = original.getLength();
     this.stairCount = original.getStairCount();
@@ -71,21 +71,21 @@ public class PathwayBuilder extends AbstractEntityBuilder<Pathway, PathwayBuilde
     return this;
   }
 
-  public String name() {
-    return name;
+  public String signpostedAs() {
+    return signpostedAs;
   }
 
-  public PathwayBuilder withName(String name) {
-    this.name = name;
+  public PathwayBuilder withSignpostedAs(String name) {
+    this.signpostedAs = name;
     return this;
   }
 
-  public String reversedName() {
-    return reversedName;
+  public String reverseSignpostedAs() {
+    return reverseSignpostedAs;
   }
 
-  public PathwayBuilder withReversedName(String reversedName) {
-    this.reversedName = reversedName;
+  public PathwayBuilder withReverseSignpostedAs(String reversedName) {
+    this.reverseSignpostedAs = reversedName;
     return this;
   }
 

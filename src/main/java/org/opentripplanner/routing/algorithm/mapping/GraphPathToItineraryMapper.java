@@ -30,7 +30,6 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.note.StreetNote;
@@ -199,17 +198,6 @@ public class GraphPathToItineraryMapper {
     }
 
     return legsStates;
-  }
-
-  /**
-   * TODO: This is mindless. Why is this set on leg, rather than on a walk step? Now only the first pathway is used
-   */
-  private static void setPathwayInfo(StreetLegBuilder leg, List<State> legStates) {
-    for (State legsState : legStates) {
-      if (legsState.getBackEdge() instanceof PathwayEdge pe) {
-        leg.withPathwayId(pe.getId());
-      }
-    }
   }
 
   /**
@@ -420,8 +408,6 @@ public class GraphPathToItineraryMapper {
     }
 
     addStreetNotes(leg, states);
-
-    setPathwayInfo(leg, states);
 
     return leg.build();
   }

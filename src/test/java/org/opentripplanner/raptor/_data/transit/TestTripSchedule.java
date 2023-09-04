@@ -20,6 +20,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
  * <p>
  * The {@link DefaultTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }
  */
+// TODO : This class should implement RaptorTripSchedule not raptoradapter TripSchedule
 public class TestTripSchedule implements TripSchedule {
 
   private static final int DEFAULT_DEPARTURE_DELAY = 10;

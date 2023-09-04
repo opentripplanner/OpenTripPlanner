@@ -81,6 +81,14 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
   int c1();
 
   /**
+   * Whether the model supports accumulated criteria TWO. If C2 is not supported then calling
+   * {@link #c2()} will result in an exception.
+   */
+  default boolean supportsC2() {
+    return false;
+  }
+
+  /**
    * The accumulated criteria TWO. Can be used for any int criteria used during routing. A
    * state with c1 and c2 is created dynamically if c2 is in use, if not this method will
    * throw an exception.

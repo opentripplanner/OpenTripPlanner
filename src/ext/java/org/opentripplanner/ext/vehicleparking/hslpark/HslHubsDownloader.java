@@ -19,10 +19,12 @@ import org.slf4j.LoggerFactory;
 public class HslHubsDownloader {
 
   private static final Logger log = LoggerFactory.getLogger(HslHubsDownloader.class);
+  private static final ObjectMapper mapper = new ObjectMapper();
+
   private final String jsonParsePath;
   private final Function<JsonNode, Map<FeedScopedId, VehicleParkingGroup>> hubsParser;
   private final String url;
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private final OtpHttpClient otpHttpClient;
 
   public HslHubsDownloader(
     String url,
@@ -32,6 +34,7 @@ public class HslHubsDownloader {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
     this.hubsParser = hubsParser;
+    otpHttpClient = new OtpHttpClient();
   }
 
   public Map<FeedScopedId, VehicleParkingGroup> downloadHubs() {
@@ -39,7 +42,7 @@ public class HslHubsDownloader {
       log.warn("Cannot download updates, because url is null!");
       return null;
     }
-    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+    try {
       return otpHttpClient.getAndMap(
         URI.create(url),
         Map.of(),

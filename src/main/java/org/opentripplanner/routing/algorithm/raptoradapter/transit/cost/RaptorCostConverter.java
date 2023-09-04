@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
+import java.time.Duration;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 
 /**
@@ -16,6 +17,7 @@ public final class RaptorCostConverter {
 
   private static final int NOT_SET = -1;
   private static final int PRECISION = 100;
+  private static final long FACTOR_TO_MILLISECONDS = 1000 / PRECISION;
   private static final int HALF = PRECISION / 2;
 
   /* private constructor to prevent instantiation of utility class. */
@@ -32,6 +34,16 @@ public final class RaptorCostConverter {
   }
 
   /**
+   * Convert Raptor cost-factor to OTP domain model cost-factor.
+   */
+  public static double toOtpDomainFactor(int raptorFactor) {
+    if (raptorFactor == NOT_SET) {
+      return NOT_SET;
+    }
+    return raptorFactor / (double) PRECISION;
+  }
+
+  /**
    * Convert Raptor internal cost to a string with format $###.## (in seconds)
    */
   public static String toString(int raptorCost) {
@@ -39,10 +51,17 @@ public final class RaptorCostConverter {
   }
 
   /**
-   * Convert OTP domain model cost to Raptor internal cost.
+   * Convert OTP domain model cost(seconds) to Raptor internal cost(centi-seconds).
    */
   public static int toRaptorCost(double domainCost) {
-    return (int) (domainCost * PRECISION + 0.5d);
+    return (int) Math.round(domainCost * PRECISION);
+  }
+
+  /**
+   * Convert Raptor internal cost to a cost represented as a duration.
+   */
+  public static Duration raptorCostToDuration(int raptorCost) {
+    return Duration.ofMillis(raptorCost * FACTOR_TO_MILLISECONDS);
   }
 
   /**

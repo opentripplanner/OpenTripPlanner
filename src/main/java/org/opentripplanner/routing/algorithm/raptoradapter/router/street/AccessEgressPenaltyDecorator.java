@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.router.street;
 
 import java.util.Collection;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
-import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEnum;
 
 /**
  * This class is responsible for filtering the list of access and egress before
@@ -11,18 +11,26 @@ import org.opentripplanner.routing.api.request.StreetMode;
  */
 public class AccessEgressPenaltyDecorator {
 
-  private final RouteRequest request;
+  private final StreetMode accessMode;
+  private final StreetMode egressMode;
+  private final TimeAndCostPenaltyForEnum<StreetMode> penalty;
 
-  public AccessEgressPenaltyDecorator(RouteRequest request) {
-    this.request = request;
+  public AccessEgressPenaltyDecorator(
+    StreetMode accessMode,
+    StreetMode egressMode,
+    TimeAndCostPenaltyForEnum<StreetMode> penalty
+  ) {
+    this.accessMode = accessMode;
+    this.egressMode = egressMode;
+    this.penalty = penalty;
   }
 
   public Collection<DefaultAccessEgress> decorateAccess(Collection<DefaultAccessEgress> list) {
-    return decorate(list, request.journey().modes().accessMode);
+    return decorate(list, accessMode);
   }
 
   public Collection<DefaultAccessEgress> decorateEgress(Collection<DefaultAccessEgress> list) {
-    return decorate(list, request.journey().modes().egressMode);
+    return decorate(list, egressMode);
   }
 
   /**
@@ -35,15 +43,11 @@ public class AccessEgressPenaltyDecorator {
     if (input.isEmpty()) {
       return input;
     }
-    // The routing request only have one access/egress street-mode set, so we can use it to
-    // find the "actual street-mode" of the access/egress. We assume the mode is WALK if all edges
-    // in AStar is WALK, if not we assume the mode is the mode set in the request input.
-    var penaltyWalking = request
-      .preferences()
-      .street()
-      .accessEgressPenalty()
-      .valueOf(StreetMode.WALK);
+    var penaltyWalking = penalty.valueOf(StreetMode.WALK);
 
+    // The routing request only has ONE access/egress street-mode set, So, if it is WALK, then we
+    // can assume all access/egress legs are also walking. There is no need to check the
+    // access/egress. This is an optimization for the most common use-ase.
     if (requestedMode == StreetMode.WALK) {
       return penaltyWalking.isEmpty()
         ? input
@@ -53,11 +57,10 @@ public class AccessEgressPenaltyDecorator {
           .toList();
     }
 
-    var penaltyRequestedMode = request
-      .preferences()
-      .street()
-      .accessEgressPenalty()
-      .valueOf(requestedMode);
+    // The request mode is NOT WALK, and we need to apply a penalty to the access/egress based on
+    // the mode. We apply the walk penalty to all-walking access/egress and the penalty for the
+    // requested mode to all other access/egress paths.
+    var penaltyRequestedMode = penalty.valueOf(requestedMode);
 
     if (penaltyRequestedMode.isEmpty() && penaltyWalking.isEmpty()) {
       return input;
@@ -65,11 +68,10 @@ public class AccessEgressPenaltyDecorator {
 
     return input
       .stream()
-      .map(it ->
-        it.isWalkOnly()
-          ? it.withPenalty(penaltyWalking.calculate(it.durationInSeconds()))
-          : it.withPenalty(penaltyRequestedMode.calculate(it.durationInSeconds()))
-      )
+      .map(it -> {
+        var penalty = it.isWalkOnly() ? penaltyWalking : penaltyRequestedMode;
+        return it.withPenalty(penalty.calculate(it.durationInSeconds()));
+      })
       .toList();
   }
 }

@@ -39,6 +39,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -49,6 +50,7 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.WalkStep;
+import org.opentripplanner.model.plan.WalkStepBuilder;
 import org.opentripplanner.routing.alertpatch.AlertCause;
 import org.opentripplanner.routing.alertpatch.AlertEffect;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
@@ -110,7 +112,7 @@ class GraphQLIntegrationTest {
     var transitModel = new TransitModel(stopModel.build(), DEDUPLICATOR);
 
     final TripPattern pattern = TransitModelForTest.pattern(BUS).build();
-    var trip = TransitModelForTest.trip("123").build();
+    var trip = TransitModelForTest.trip("123").withHeadsign(I18NString.of("Trip Headsign")).build();
     var stopTimes = TransitModelForTest.stopTimesEvery5Minutes(3, trip, T11_00);
     var tripTimes = new TripTimes(trip, stopTimes, DEDUPLICATOR);
     pattern.add(tripTimes);
@@ -135,11 +137,11 @@ class GraphQLIntegrationTest {
 
     routes.forEach(route -> transitModel.getTransitModelIndex().addRoutes(route));
 
-    var step1 = walkStep("street");
-    step1.setRelativeDirection(RelativeDirection.DEPART);
-    step1.setAbsoluteDirection(20);
-    var step2 = walkStep("elevator");
-    step2.setRelativeDirection(RelativeDirection.ELEVATOR);
+    var step1 = walkStep("street")
+      .withRelativeDirection(RelativeDirection.DEPART)
+      .withAbsoluteDirection(20)
+      .build();
+    var step2 = walkStep("elevator").withRelativeDirection(RelativeDirection.ELEVATOR).build();
 
     Itinerary i1 = newItinerary(A, T11_00)
       .walk(20, B, List.of(step1, step2))
@@ -149,7 +151,7 @@ class GraphQLIntegrationTest {
       .build();
 
     var busLeg = i1.getTransitLeg(1);
-    ScheduledTransitLeg railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
+    var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
     fares.addFare(FareType.regular, Money.euros(3.1f));
@@ -241,15 +243,12 @@ class GraphQLIntegrationTest {
   }
 
   @Nonnull
-  private static WalkStep walkStep(String name) {
-    return new WalkStep(
-      new NonLocalizedString(name),
-      WgsCoordinate.GREENWICH,
-      false,
-      10,
-      false,
-      false
-    );
+  private static WalkStepBuilder walkStep(String name) {
+    return WalkStep
+      .builder()
+      .withDirectionText(new NonLocalizedString(name))
+      .withStartLocation(WgsCoordinate.GREENWICH)
+      .withAngle(10);
   }
 
   @Nonnull

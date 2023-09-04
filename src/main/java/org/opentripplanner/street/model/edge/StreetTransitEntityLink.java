@@ -50,10 +50,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
   }
 
-  public boolean isRoundabout() {
-    return false;
-  }
-
   @Override
   @Nonnull
   public State[] traverse(State s0) {
@@ -63,8 +59,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
     // if they are for the same stop.
     if (
-      s0.backEdge instanceof StreetTransitEntityLink &&
-      ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex == this.transitEntityVertex
+      s0.backEdge instanceof StreetTransitEntityLink<?> link &&
+      link.transitEntityVertex == this.transitEntityVertex
     ) {
       return State.empty();
     }
@@ -156,10 +152,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   public LineString getGeometry() {
     Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate() };
     return GeometryUtils.getGeometryFactory().createLineString(coordinates);
-  }
-
-  public double getDistanceMeters() {
-    return 0;
   }
 
   protected abstract int getStreetToStopTime();

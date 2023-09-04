@@ -7,8 +7,8 @@
 
 # GraphQL tutorial
 
-We want to give you a quick start tutorial on how to get started with OTP's GraphQL APIs. For this
-tutorial we will be using the GTFS GraphQL API as this is the most common one.
+This document will give you a quick start tutorial on how to get started with OTP's GraphQL APIs. For 
+this tutorial we will be using the [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) as this is the most commonly used one.
 
 First of all, make sure that you've loaded street and transit data into your instance by following
 the [basic tutorial](Basic-Tutorial.md)
@@ -51,7 +51,7 @@ After pressing the "Execute query" button you should see the result of the query
 side panel.
 
 Now would be a good time to explore the auto-complete capabilities of the tool by moving the
-cursor in the query panel and hitting Ctrl-Space to open see what other query parameters are possible.
+cursor into the query panel and hitting Ctrl-Space to see what other query parameters are possible.
 
 ![GraphiQL](images/graphiql-autocomplete.png)
 
@@ -70,11 +70,11 @@ Most people want to get routing results out of OTP, so lets see the query for th
 ```graphql
 {
     plan(
-        # change this to YOUR origin
-        from: { lat: 52.3092, lon: 13.0291 }
-        # change this to YOUR destination
-        to: { lat: 52.5147, lon: 13.3927 }
-        # the correct date and time of your request
+        # these coordinate are in Portland, change this to YOUR origin
+        from: { lat: 45.5552, lon: -122.6534 }
+        # these coordinate are in Portland, change this to YOUR destination
+        to: { lat: 45.4908, lon: -122.5519 }
+        # use the correct date and time of your request
         date: "2023-02-15",
         time: "11:37",
         # choose the transport modes you need
