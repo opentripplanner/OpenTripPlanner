@@ -177,8 +177,6 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
         boardTime,
         newOverallBestTime
       );
-    } else {
-      stopArrivalsState.rejectNewBestTransitTime(stop, arrivalTime, trip, boardStop, boardTime);
     }
   }
 
@@ -203,8 +201,6 @@ public final class StdRangeRaptorWorkerState<T extends RaptorTripSchedule>
 
     if (newOverallBestTime(toStop, arrivalTime)) {
       stopArrivalsState.setNewBestTransferTime(fromStop, arrivalTime, transfer);
-    } else {
-      stopArrivalsState.rejectNewBestTransferTime(fromStop, arrivalTime, transfer);
     }
   }
 
