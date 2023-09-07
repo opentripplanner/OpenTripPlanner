@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
@@ -100,23 +101,91 @@ public class DefaultFareService implements FareService {
 
     // If there are no rides, there's no fare.
     if (fareLegs.isEmpty()) {
+      System.out.println("No legs");
       return null;
     }
+    var fareLegsByFeed = fareLegs
+      .stream()
+      .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
+    var fareRulesByTypeAndFeed = fareRulesPerType
+      .entrySet()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          Map.Entry::getKey,
+          rules ->
+            rules
+              .getValue()
+              .stream()
+              .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
+        )
+      );
 
     ItineraryFares fare = ItineraryFares.empty();
     boolean hasFare = false;
-    for (Map.Entry<FareType, Collection<FareRuleSet>> kv : fareRulesPerType.entrySet()) {
-      FareType fareType = kv.getKey();
-      Collection<FareRuleSet> fareRules = kv.getValue();
-      // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
-      if (fareRules.size() > 0) {
-        Currency currency = Currency.getInstance(
-          fareRules.iterator().next().getFareAttribute().getCurrencyType()
+    for (FareType fareType : fareRulesPerType.keySet()) {
+      List<FareComponent> components = new ArrayList<>();
+      List<Money> fares = new ArrayList<>();
+      ItineraryFares currentFare = ItineraryFares.empty();
+      boolean legWithoutRulesFound = false;
+      for (String feedId : fareLegsByFeed.keySet()) {
+        var fareRules = fareRulesByTypeAndFeed.get(fareType).get(feedId);
+        System.out.println(
+          fareLegsByFeed
+            .get(feedId)
+            .stream()
+            .map(r -> r.getFareZones() + ", " + r.getFrom() + " - " + r.getTo())
+            .toList()
         );
-        hasFare = populateFare(fare, currency, fareType, fareLegs, fareRules);
+        // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
+        if (fareRules != null && fareRules.size() > 0) {
+          Currency currency = Currency.getInstance(
+            fareRules.iterator().next().getFareAttribute().getCurrencyType()
+          );
+          hasFare =
+            populateFare(currentFare, currency, fareType, fareLegsByFeed.get(feedId), fareRules) ||
+            hasFare; // Other feeds might still have fare for some legs
+
+          components.addAll(currentFare.getComponents(fareType));
+          fare.addFare(fareType, currentFare.getFare(fareType));
+          fares.add(currentFare.getFare(fareType));
+
+          // If all the legs are from one feed, consider itinerary products
+          if (fareLegs.equals(fareLegsByFeed.get(feedId))) fare.addItineraryProducts(
+            currentFare.getItineraryProducts()
+          );
+        } else {
+          legWithoutRulesFound = true;
+        }
+      }
+
+      fare.addFareComponent(fareType, components);
+
+      // No fares were found
+      if (!hasFare) {
+        System.out.println("No fares found");
+        return null;
+      }
+
+      // Accumulate the final price of the fare or indicate that no final fare could be found
+      if (legWithoutRulesFound) {
+        fare.addFare(
+          fareType,
+          Money.ofFractionalAmount(fares.get(0).currency(), Float.POSITIVE_INFINITY)
+        );
+      } else {
+        fare.addFare(
+          fareType,
+          fares
+            .stream()
+            .reduce(
+              Money.ofFractionalAmount(fare.getFare(fareType).currency(), 0),
+              (r1, r2) -> r1.plus(r2)
+            )
+        );
       }
     }
-    return hasFare ? fare : null;
+    return fare;
   }
 
   /**
@@ -202,14 +271,14 @@ public class DefaultFareService implements FareService {
     String startZone = firstRide.getFrom().stop.getFirstZoneAsString();
     String endZone = null;
     // stops don't really have an agency id, they have the per-feed default id
-    String feedId = firstRide.getTrip().getId().getFeedId();
+    String feedId = firstRide.getAgency().getId().getFeedId();//getTrip().getId().getFeedId();
     ZonedDateTime lastRideStartTime = null;
     ZonedDateTime lastRideEndTime = null;
     for (var leg : legs) {
-      if (!leg.getTrip().getId().getFeedId().equals(feedId)) {
-        LOG.debug("skipped multi-feed ride sequence {}", legs);
-        return Optional.empty();
-      }
+//      if (!leg.getTrip().getId().getFeedId().equals(feedId)) {
+//        LOG.debug("skipped multi-feed ride sequence {}", legs);
+//        return Optional.empty();
+//      }
       lastRideStartTime = leg.getStartTime();
       lastRideEndTime = leg.getEndTime();
       endZone = leg.getTo().stop.getFirstZoneAsString();
