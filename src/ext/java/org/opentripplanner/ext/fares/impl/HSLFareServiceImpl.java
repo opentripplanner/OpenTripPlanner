@@ -201,45 +201,4 @@ public class HSLFareServiceImpl extends DefaultFareService {
       .ofNullable(bestAttribute)
       .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
   }
-
-  @Override
-  public ItineraryFares calculateFares(Itinerary itinerary) {
-    // Group legs and fare rules by the feed they are from
-    var legsByFeed = itinerary
-      .getLegs()
-      .stream()
-      .filter(leg -> leg instanceof ScheduledTransitLeg)
-      .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
-    var fareRulesByFeed = fareRulesPerType
-      .get(FareType.regular)
-      .stream()
-      .collect(Collectors.groupingBy(flr -> flr.getFareAttribute().getId().getFeedId()));
-
-    // Accumulate fares from different feeds
-    ItineraryFares res = ItineraryFares.empty();
-    List<FareComponent> components = new ArrayList<>();
-    Money total = Money.euros(0);
-    boolean hasFare = false;
-
-    for (String feed : legsByFeed.keySet()) {
-      if (fareRulesByFeed.get(feed) == null || fareRulesByFeed.get(feed).isEmpty()) continue;
-      ItineraryFares fare = ItineraryFares.empty();
-      hasFare =
-        populateFare(
-          fare,
-          Currency.getInstance("EUR"),
-          FareType.regular,
-          legsByFeed.get(feed),
-          fareRulesByFeed.get(feed)
-        ) ||
-        hasFare;
-      components.addAll(fare.getComponents(FareType.regular));
-      total = total.plus(fare.getFare(FareType.regular));
-    }
-
-    res.addFareComponent(FareType.regular, components);
-    res.addFare(FareType.regular, total);
-
-    return hasFare ? res : null;
-  }
 }

@@ -61,11 +61,10 @@ class FareSearch {
 record FareAndId(Money fare, FeedScopedId fareId) {}
 
 /**
- * This fare service module handles the cases that GTFS handles within a single feed. It cannot
- * necessarily handle multi-feed graphs, because a rule-less fare attribute might be applied to
- * rides on routes in another feed, for example. For more interesting fare structures like New
- * York's MTA, or cities with multiple feeds and inter-feed transfer rules, you get to implement
- * your own FareService. See this thread on gtfs-changes explaining the proper interpretation of
+ * This fare service module handles GTFS fares in multiple feeds separately so that each fare attribute
+ * is only applicable for legs that operated by an agency within the same feed. Interfeed transfer rules
+ * are not considered in this fare service and for those situations you get to implement your own Fare Service
+ * See this thread on gtfs-changes explaining the proper interpretation of
  * fares.txt:
  * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
@@ -101,7 +100,6 @@ public class DefaultFareService implements FareService {
 
     // If there are no rides, there's no fare.
     if (fareLegs.isEmpty()) {
-      System.out.println("No legs");
       return null;
     }
     var fareLegsByFeed = fareLegs
@@ -130,13 +128,7 @@ public class DefaultFareService implements FareService {
       boolean legWithoutRulesFound = false;
       for (String feedId : fareLegsByFeed.keySet()) {
         var fareRules = fareRulesByTypeAndFeed.get(fareType).get(feedId);
-        System.out.println(
-          fareLegsByFeed
-            .get(feedId)
-            .stream()
-            .map(r -> r.getFareZones() + ", " + r.getFrom() + " - " + r.getTo())
-            .toList()
-        );
+
         // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
         if (fareRules != null && fareRules.size() > 0) {
           Currency currency = Currency.getInstance(
@@ -161,9 +153,8 @@ public class DefaultFareService implements FareService {
 
       fare.addFareComponent(fareType, components);
 
-      // No fares were found
+      // No fares will be discovered after this point
       if (!hasFare) {
-        System.out.println("No fares found");
         return null;
       }
 
@@ -271,14 +262,14 @@ public class DefaultFareService implements FareService {
     String startZone = firstRide.getFrom().stop.getFirstZoneAsString();
     String endZone = null;
     // stops don't really have an agency id, they have the per-feed default id
-    String feedId = firstRide.getAgency().getId().getFeedId();//getTrip().getId().getFeedId();
+    String feedId = firstRide.getAgency().getId().getFeedId(); //getTrip().getId().getFeedId();
     ZonedDateTime lastRideStartTime = null;
     ZonedDateTime lastRideEndTime = null;
     for (var leg : legs) {
-//      if (!leg.getTrip().getId().getFeedId().equals(feedId)) {
-//        LOG.debug("skipped multi-feed ride sequence {}", legs);
-//        return Optional.empty();
-//      }
+      //      if (!leg.getTrip().getId().getFeedId().equals(feedId)) {
+      //        LOG.debug("skipped multi-feed ride sequence {}", legs);
+      //        return Optional.empty();
+      //      }
       lastRideStartTime = leg.getStartTime();
       lastRideEndTime = leg.getEndTime();
       endZone = leg.getTo().stop.getFirstZoneAsString();
