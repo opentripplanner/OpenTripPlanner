@@ -27,7 +27,7 @@ const initialViewState = {
   longitude: 10.2332855,
   zoom: 4,
 };
-export function MapContainer() {
+export function MapView() {
   return (
     <Map
       // @ts-ignore // TODO: why TypeScript complaining about this

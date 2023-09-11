@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
-import { graphql } from './gql';
+import { graphql } from '../gql';
 import request from 'graphql-request';
-import { TripQuery, TripQueryVariables } from './gql/graphql.ts';
+import { TripQuery, TripQueryVariables } from '../gql/graphql.ts';
 
 // TODO: make this endpoint url configurable
 const endpoint = `https://api.entur.io/journey-planner/v3/graphql`;

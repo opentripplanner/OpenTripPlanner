@@ -1,6 +1,6 @@
-import { useTripQuery } from './useTripQuery.ts';
+import { useTripQuery } from '../hooks/useTripQuery.ts';
 
-export function TripQueryContainer() {
+export function SearchBarContainer() {
   const [data, callback] = useTripQuery();
 
   return (
