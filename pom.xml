@@ -948,7 +948,7 @@
         <dependency>
             <groupId>io.github.ci-cmg</groupId>
             <artifactId>mapbox-vector-tile</artifactId>
-            <version>4.0.5</version>
+            <version>4.0.6</version>
         </dependency>
         <dependency>
             <groupId>net.objecthunter</groupId>
