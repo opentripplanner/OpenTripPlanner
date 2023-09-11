@@ -193,16 +193,19 @@ public class PtSituationElementType {
           .name("description")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Description of situation in all different translations available")
-          .dataFetcher(environment -> {
-            I18NString descriptionText = environment.<TransitAlert>getSource().descriptionText();
-            if (descriptionText instanceof TranslatedString translatedString) {
-              return translatedString.getTranslations();
-            } else if (descriptionText != null) {
-              return List.of(new AbstractMap.SimpleEntry<>(null, descriptionText.toString()));
-            } else {
-              return emptyList();
-            }
-          })
+          .dataFetcher(environment ->
+            environment
+              .<TransitAlert>getSource()
+              .descriptionText()
+              .map(descriptionText -> {
+                if (descriptionText instanceof TranslatedString translatedString) {
+                  return translatedString.getTranslations();
+                } else {
+                  return List.of(new AbstractMap.SimpleEntry<>(null, descriptionText.toString()));
+                }
+              })
+              .orElse(emptyList())
+          )
           .build()
       )
       .field(

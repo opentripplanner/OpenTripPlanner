@@ -34,13 +34,8 @@ public class AlertMapper {
       api.alertHeaderText = domain.headerText().toString(locale);
     }
 
-    if (domain.descriptionText() != null) {
-      api.alertDescriptionText = domain.descriptionText().toString(locale);
-    }
-
-    if (domain.url() != null) {
-      api.alertUrl = domain.url().toString(locale);
-    }
+    api.alertDescriptionText = domain.descriptionText().map(t -> t.toString(locale)).orElse(null);
+    api.alertUrl = domain.url().map(u -> u.toString(locale)).orElse(null);
 
     api.effectiveStartDate = ofNullableInstant(domain.getEffectiveStartDate());
     api.effectiveEndDate = ofNullableInstant(domain.getEffectiveEndDate());

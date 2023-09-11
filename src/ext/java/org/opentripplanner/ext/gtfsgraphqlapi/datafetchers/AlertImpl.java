@@ -63,15 +63,16 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
   @Override
   public DataFetcher<String> alertDescriptionText() {
     return environment ->
-      getSource(environment).descriptionText().toString(environment.getLocale());
+      getSource(environment)
+        .descriptionText()
+        .map(t -> t.toString(environment.getLocale()))
+        .orElse(null);
   }
 
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations() {
-    return environment -> {
-      var text = getSource(environment).descriptionText();
-      return getTranslations(text);
-    };
+    return environment ->
+      getSource(environment).descriptionText().map(this::getTranslations).orElse(null);
   }
 
   @Override
@@ -115,18 +116,13 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
 
   @Override
   public DataFetcher<String> alertUrl() {
-    return environment -> {
-      var alertUrl = getSource(environment).url();
-      return alertUrl == null ? null : alertUrl.toString(environment.getLocale());
-    };
+    return environment ->
+      getSource(environment).url().map(u -> u.toString(environment.getLocale())).orElse(null);
   }
 
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertUrlTranslations() {
-    return environment -> {
-      var url = getSource(environment).url();
-      return getTranslations(url);
-    };
+    return environment -> getSource(environment).url().map(this::getTranslations).orElse(List.of());
   }
 
   @Override

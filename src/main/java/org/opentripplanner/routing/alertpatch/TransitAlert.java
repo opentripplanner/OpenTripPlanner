@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -65,8 +66,8 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return headerText;
   }
 
-  public I18NString descriptionText() {
-    return descriptionText;
+  public Optional<I18NString> descriptionText() {
+    return Optional.ofNullable(descriptionText);
   }
 
   public I18NString detailText() {
@@ -77,9 +78,8 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return adviceText;
   }
 
-  @Nullable
-  public I18NString url() {
-    return url;
+  public Optional<I18NString> url() {
+    return Optional.ofNullable(url);
   }
 
   public List<AlertUrl> siriUrls() {
