@@ -10,7 +10,7 @@
     "check-format": "prettier --check \"*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "format": "prettier --write \"*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "preview": "vite preview",
-    "prebuild": "npm run lint && npm run check-format && npm run codegen",
+    "prebuild": "npm run codegen && npm run lint && npm run check-format",
     "predev": "npm run codegen",
     "codegen": "graphql-codegen --config codegen.ts"
   },
