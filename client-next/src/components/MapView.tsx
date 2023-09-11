@@ -1,7 +1,8 @@
-import { Map, NavigationControl } from 'react-map-gl';
+import {Map, MapLib, NavigationControl} from 'react-map-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import {MapStyle} from "react-map-gl/dist/esm/types/style-spec-mapbox";
 
-const mapStyle = {
+const mapStyle: MapStyle = {
   version: 8,
   sources: {
     osm: {
@@ -30,7 +31,7 @@ const initialViewState = {
 export function MapView() {
   return (
     <Map
-      mapLib={import('maplibre-gl')}
+      mapLib={import('maplibre-gl') as Promise<MapLib<any>>}
       mapStyle={mapStyle}
       initialViewState={initialViewState}
       style={{ width: '100%', height: 'calc(100vh - 184px)' }}
