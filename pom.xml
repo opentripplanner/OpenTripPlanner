@@ -888,7 +888,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.4.4</version>
+            <version>1.4.5</version>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
