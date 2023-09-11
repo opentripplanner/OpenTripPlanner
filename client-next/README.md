@@ -23,7 +23,6 @@ Use latest LTS version of Node/npm (currently v18). Recommend using av version m
 
 The dev and production builds require graphql schema to be present at
 `../src/ext/graphql/transmodelapi/schema.graphql`.
-Running `maven verify` in parent project should solve that.
 
 ## Getting started
 
