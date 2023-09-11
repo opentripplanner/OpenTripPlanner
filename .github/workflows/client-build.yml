@@ -22,6 +22,7 @@ jobs:
         with:
           node-version: 18
       - name: Build and test
+        working-directory: ./client-next
         run: |
           npm install
           npm run build
