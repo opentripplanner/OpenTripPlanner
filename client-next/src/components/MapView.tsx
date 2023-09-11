@@ -1,4 +1,4 @@
-import { Map, NavigationControl } from 'react-map-gl';
+import {Map, NavigationControl} from 'react-map-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 const mapStyle = {
@@ -28,9 +28,12 @@ const initialViewState = {
   zoom: 4,
 };
 export function MapView() {
+
   return (
     <Map
+      // @ts-ignore
       mapLib={import('maplibre-gl')}
+      // @ts-ignore
       mapStyle={mapStyle}
       initialViewState={initialViewState}
       style={{ width: '100%', height: 'calc(100vh - 184px)' }}
