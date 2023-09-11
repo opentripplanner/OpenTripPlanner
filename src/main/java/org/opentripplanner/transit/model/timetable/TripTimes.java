@@ -382,7 +382,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   /**
    * When creating a scheduled TripTimes or wrapping it in updates, we could potentially imply
    * negative running or dwell times. We really don't want those being used in routing. This method
-   * checks that all times are increasing.
+   * checks that all times are increasing for stops that are not CANCELLED or NO_DATA, since they
+   * may not have real-time arrival or departure times associated with them.
    *
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
@@ -392,14 +393,18 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     for (int s = 0; s < nStops; s++) {
       final int arr = getArrivalTime(s);
       final int dep = getDepartureTime(s);
+      final boolean isCancelled = isCancelledStop(s);
+      final boolean isNoData = isNoDataStop(s);
 
-      if (dep < arr) {
-        return Optional.of(new ValidationError(NEGATIVE_DWELL_TIME, s));
+      if (!isCancelled && !isNoData) {
+        if (dep < arr) {
+          return Optional.of(new ValidationError(NEGATIVE_DWELL_TIME, s));
+        }
+        if (prevDep > arr) {
+          return Optional.of(new ValidationError(NEGATIVE_HOP_TIME, s));
+        }
+        prevDep = dep;
       }
-      if (prevDep > arr) {
-        return Optional.of(new ValidationError(NEGATIVE_HOP_TIME, s));
-      }
-      prevDep = dep;
     }
     return Optional.empty();
   }

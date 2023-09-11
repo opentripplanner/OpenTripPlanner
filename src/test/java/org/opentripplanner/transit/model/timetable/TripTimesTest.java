@@ -188,6 +188,108 @@ class TripTimesTest {
     assertEquals(NEGATIVE_HOP_TIME, error.get().code());
   }
 
+  /**
+   * Test negative hop time with stop cancellations.
+   * Scheduled: 5 at 300, 6 at 360, 7 at 420
+   * Test case: 5 at 421, 6 cancelled (with internal representation 481, since delays are propagated
+   * to later stops without arrival or departure), 7 at 420
+   * Result: Error to be present at stop 7, due to negative hop time
+   */
+  @Test
+  public void testNegativeHopTimeWithStopCancellations() {
+    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
+
+    updatedTripTimesB.updateDepartureTime(5, 421);
+    updatedTripTimesB.updateArrivalTime(6, 481);
+    updatedTripTimesB.updateDepartureTime(6, 481);
+    updatedTripTimesB.setCancelled(6);
+    updatedTripTimesB.updateArrivalTime(7, 420);
+
+    var error = updatedTripTimesB.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(7, error.get().stopIndex());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+  }
+
+  /**
+   * Test positive hop time with stop cancellations when buses run late.
+   * Scheduled: 5 at 300, 6 at 360, 7 at 420
+   * Test case: 5 at 400, 6 cancelled (with internal representation 460, since delays are propagated
+   * to later stops without arrival or departure), 7 at 420.
+   * Result: Expect no errors, since 6 is cancelled, and 5 is earlier than 7.
+   */
+  @Test
+  public void testPositiveHopTimeWithStopCancellationsLate() {
+    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
+
+    updatedTripTimesB.updateDepartureTime(5, 400);
+    updatedTripTimesB.updateArrivalTime(6, 460);
+    updatedTripTimesB.updateDepartureTime(6, 460);
+    updatedTripTimesB.setCancelled(6);
+    updatedTripTimesB.updateArrivalTime(7, 420);
+
+    var error = updatedTripTimesB.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
+  /**
+   * Test positive hop time with stop cancellations when buses run early.
+   * Scheduled: 5 at 300, 6 at 360, 7 at 420
+   * Test case: 5 at 300, 6 cancelled(with internal representation 360, since delays are propagated
+   * to later stops without arrival or departure), 7 at 320.
+   * Result: Expect no errors, since 6 is cancelled, and 5 is still earlier than 7.
+   */
+  @Test
+  public void testPositiveHopTimeWithStopCancellationsEarly() {
+    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
+
+    updatedTripTimesB.updateDepartureTime(5, 300);
+    updatedTripTimesB.setCancelled(6);
+    updatedTripTimesB.updateArrivalTime(7, 320);
+
+    var error = updatedTripTimesB.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
+  /**
+   * Test positive hop time with stop cancellations at the beginning of the trip.
+   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
+   * Test case: 0 and 1 cancelled, start trip at stop 2 at time 0.
+   * Result: Expect no errors, since 0 and 1 is cancelled, and 2 is still earlier than the others.
+   */
+  @Test
+  public void testPositiveHopTimeWithTerminalCancellation() {
+    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
+
+    updatedTripTimesB.setCancelled(0);
+    updatedTripTimesB.setCancelled(1);
+    updatedTripTimesB.updateArrivalTime(2, 0);
+    updatedTripTimesB.updateDepartureTime(2, 10);
+
+    var error = updatedTripTimesB.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
+  /**
+   * Test positive hop time with stop cancellations at the beginning of the trip.
+   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
+   * Test case: 0 and 1 have no real-time data, trip arrived at stop 2 at time 30.
+   * Result: Expect no errors, since 0 and 1 have no real-time data, and arrival at 2 can be earlier
+   * than scheduled time at 1.
+   */
+  @Test
+  public void testPositiveHopTimeWithTerminalNoData() {
+    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
+
+    updatedTripTimesB.setNoData(0);
+    updatedTripTimesB.setNoData(1);
+    updatedTripTimesB.updateArrivalTime(2, 30);
+    updatedTripTimesB.updateDepartureTime(2, 30);
+
+    var error = updatedTripTimesB.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
   @Test
   public void testNonIncreasingUpdateCrossingMidnight() {
     TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
