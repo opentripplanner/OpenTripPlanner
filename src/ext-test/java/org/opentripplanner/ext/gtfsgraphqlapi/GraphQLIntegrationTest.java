@@ -62,6 +62,8 @@ import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -128,7 +130,7 @@ class GraphQLIntegrationTest {
         TransitModelForTest
           .route(m.name())
           .withMode(m)
-          .withLongName(new NonLocalizedString("Long name for %s".formatted(m)))
+          .withLongName(I18NString.of("Long name for %s".formatted(m)))
           .build()
       )
       .toList();
@@ -175,27 +177,45 @@ class GraphQLIntegrationTest {
 
     railLeg.withAccessibilityScore(.3f);
 
+    var entitySelector = new EntitySelector.Stop(A.stop.getId());
     var alert = TransitAlert
       .of(id("an-alert"))
-      .withHeaderText(new NonLocalizedString("A header"))
-      .withDescriptionText(new NonLocalizedString("A description"))
-      .withUrl(new NonLocalizedString("https://example.com"))
+      .withHeaderText(I18NString.of("A header"))
+      .withDescriptionText(I18NString.of("A description"))
+      .withUrl(I18NString.of("https://example.com"))
       .withCause(AlertCause.MAINTENANCE)
       .withEffect(AlertEffect.REDUCED_SERVICE)
       .withSeverity(AlertSeverity.VERY_SEVERE)
-      .addEntity(new EntitySelector.Stop(A.stop.getId()))
+      .addEntity(entitySelector)
       .addTimePeriod(
         new TimePeriod(ALERT_START_TIME.getEpochSecond(), ALERT_END_TIME.getEpochSecond())
       )
       .build();
+
+    var alertWithNulls = TransitAlert
+      .of(id("nulls"))
+      .withHeaderText(I18NString.of("Just a header"))
+      .addEntity(entitySelector)
+      .build();
+
     railLeg.addAlert(alert);
 
     var transitService = new DefaultTransitService(transitModel) {
+      private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
+
       @Override
       public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
         return List.of(BUS, FERRY);
       }
+
+      @Override
+      public TransitAlertService getTransitAlertService() {
+        return alertService;
+      }
     };
+
+    transitService.getTransitAlertService().setAlerts(List.of(alert, alertWithNulls));
+
     context =
       new GraphQLRequestContext(
         new TestRoutingService(List.of(i1)),
@@ -246,7 +266,7 @@ class GraphQLIntegrationTest {
   private static WalkStepBuilder walkStep(String name) {
     return WalkStep
       .builder()
-      .withDirectionText(new NonLocalizedString(name))
+      .withDirectionText(I18NString.of(name))
       .withStartLocation(WgsCoordinate.GREENWICH)
       .withAngle(10);
   }

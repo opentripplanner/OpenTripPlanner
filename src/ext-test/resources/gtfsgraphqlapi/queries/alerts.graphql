@@ -1,0 +1,8 @@
+{
+    alerts {
+        id
+        alertHeaderText
+        alertDescriptionText
+        alertUrl
+    }
+}

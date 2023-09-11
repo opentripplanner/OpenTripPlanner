@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
@@ -62,11 +63,14 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
 
   @Override
   public DataFetcher<String> alertDescriptionText() {
-    return environment ->
-      getSource(environment)
+    return environment -> {
+      var alert = getSource(environment);
+      return alert
         .descriptionText()
+        .or(() -> Optional.ofNullable(alert.headerText()))
         .map(t -> t.toString(environment.getLocale()))
-        .orElse(null);
+        .orElse("");
+    };
   }
 
   @Override

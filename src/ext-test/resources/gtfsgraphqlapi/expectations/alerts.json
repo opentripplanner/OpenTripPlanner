@@ -1,0 +1,18 @@
+{
+  "data" : {
+    "alerts" : [
+      {
+        "id" : "QWxlcnQ6Rjphbi1hbGVydA",
+        "alertHeaderText" : "A header",
+        "alertDescriptionText" : "A description",
+        "alertUrl" : "https://example.com"
+      },
+      {
+        "id" : "QWxlcnQ6RjpudWxscw",
+        "alertHeaderText" : "Just a header",
+        "alertDescriptionText" : "Just a header",
+        "alertUrl" : null
+      }
+    ]
+  }
+}
