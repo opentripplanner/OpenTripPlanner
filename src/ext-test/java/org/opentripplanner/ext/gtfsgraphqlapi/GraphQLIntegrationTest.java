@@ -240,10 +240,10 @@ class GraphQLIntegrationTest {
       Locale.ENGLISH,
       context
     );
-    var actualJson = extracted(response);
+    var actualJson = responseBody(response);
     assertEquals(200, response.getStatus());
 
-    Path expectationFile = getPath(path);
+    Path expectationFile = getExpectation(path);
 
     if (!expectationFile.toFile().exists()) {
       Files.writeString(
@@ -307,7 +307,7 @@ class GraphQLIntegrationTest {
    * subdirectories are expected to be in the same directory.
    */
   @Nonnull
-  private static Path getPath(Path path) {
+  private static Path getExpectation(Path path) {
     return path
       .getParent()
       .getParent()
@@ -315,7 +315,7 @@ class GraphQLIntegrationTest {
       .resolve(path.getFileName().toString().replace(".graphql", ".json"));
   }
 
-  private static String extracted(Response response) {
+  private static String responseBody(Response response) {
     if (response instanceof OutboundJaxrsResponse outbound) {
       return (String) outbound.getContext().getEntity();
     }
