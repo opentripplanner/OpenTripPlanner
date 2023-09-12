@@ -266,10 +266,10 @@ public class DefaultFareService implements FareService {
     ZonedDateTime lastRideStartTime = null;
     ZonedDateTime lastRideEndTime = null;
     for (var leg : legs) {
-      //      if (!leg.getTrip().getId().getFeedId().equals(feedId)) {
-      //        LOG.debug("skipped multi-feed ride sequence {}", legs);
-      //        return Optional.empty();
-      //      }
+      if (!leg.getAgency().getId().getFeedId().equals(feedId)) {
+        LOG.debug("skipped multi-feed ride sequence {}", legs);
+        return Optional.empty();
+      }
       lastRideStartTime = leg.getStartTime();
       lastRideEndTime = leg.getEndTime();
       endZone = leg.getTo().stop.getFirstZoneAsString();
