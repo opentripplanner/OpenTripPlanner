@@ -394,9 +394,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       final int arr = getArrivalTime(s);
       final int dep = getDepartureTime(s);
       final boolean isCancelled = isCancelledStop(s);
-      final boolean isNoData = isNoDataStop(s);
 
-      if (!isCancelled && !isNoData) {
+      if (!isCancelled) {
         if (dep < arr) {
           return Optional.of(new ValidationError(NEGATIVE_DWELL_TIME, s));
         }

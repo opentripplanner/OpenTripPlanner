@@ -270,26 +270,6 @@ class TripTimesTest {
     assertFalse(error.isPresent());
   }
 
-  /**
-   * Test positive hop time with stop cancellations at the beginning of the trip.
-   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
-   * Test case: 0 and 1 have no real-time data, trip arrived at stop 2 at time 30.
-   * Result: Expect no errors, since 0 and 1 have no real-time data, and arrival at 2 can be earlier
-   * than scheduled time at 1.
-   */
-  @Test
-  public void testPositiveHopTimeWithTerminalNoData() {
-    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
-
-    updatedTripTimesB.setNoData(0);
-    updatedTripTimesB.setNoData(1);
-    updatedTripTimesB.updateArrivalTime(2, 30);
-    updatedTripTimesB.updateDepartureTime(2, 30);
-
-    var error = updatedTripTimesB.validateNonIncreasingTimes();
-    assertFalse(error.isPresent());
-  }
-
   @Test
   public void testNonIncreasingUpdateCrossingMidnight() {
     TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
