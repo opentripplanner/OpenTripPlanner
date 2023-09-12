@@ -428,7 +428,11 @@ public class OSMWithTags {
   }
 
   public boolean isPlatform() {
-    return isTag("public_transport", "platform") || isTag("railway", "platform");
+    return isTag("public_transport", "platform") || isRailwayPlatform();
+  }
+
+  public boolean isRailwayPlatform() {
+    return isTag("railway", "platform");
   }
 
   /**

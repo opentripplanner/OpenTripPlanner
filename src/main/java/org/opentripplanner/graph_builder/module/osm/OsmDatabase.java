@@ -782,7 +782,7 @@ public class OsmDatabase {
             way.addTag(tag, relation.getTag(tag));
           }
         }
-        if (relation.isPlatform() && !way.hasTag("railway")) {
+        if (relation.isRailwayPlatform() && !way.hasTag("railway")) {
           way.addTag("railway", "platform");
         }
         if (relation.isPlatform() && !way.hasTag("public_transport")) {
