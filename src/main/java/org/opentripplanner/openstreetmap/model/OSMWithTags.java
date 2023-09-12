@@ -70,9 +70,13 @@ public class OSMWithTags {
    * Adds a tag.
    */
   public OSMWithTags addTag(String key, String value) {
-    if (key == null || value == null) return this;
+    if (key == null || value == null) {
+      return this;
+    }
 
-    if (tags == null) tags = new HashMap<>();
+    if (tags == null) {
+      tags = new HashMap<>();
+    }
 
     tags.put(key.toLowerCase(), value);
     return this;
