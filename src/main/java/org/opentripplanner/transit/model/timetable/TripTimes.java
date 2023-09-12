@@ -385,7 +385,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * checks that all times are increasing for stops that are not CANCELLED or NO_DATA, since they
    * may not have real-time arrival or departure times associated with them. Note! The
    * `includeRealtimeCancellations` flag include canceled trips in the trip search, not individual
-   * canceled stops - so having none increasing  times in this case SHOULD work.  
+   * canceled stops - so having none increasing times in this case SHOULD work.
    *
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
