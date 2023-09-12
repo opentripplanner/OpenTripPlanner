@@ -197,7 +197,7 @@ public class OSMWithTags {
   }
 
   /**
-   * Takes a tag key and checks if the value is any of those in {@code onOfTags}.
+   * Takes a tag key and checks if the value is any of those in {@code oneOfTags}.
    */
   public boolean isOneOfTags(String key, Set<String> oneOfTags) {
     return oneOfTags.stream().anyMatch(value -> isTag(key, value));
