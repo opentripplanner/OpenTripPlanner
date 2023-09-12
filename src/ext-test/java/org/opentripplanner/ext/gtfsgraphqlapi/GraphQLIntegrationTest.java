@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,6 +39,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -72,6 +74,7 @@ import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -192,12 +195,6 @@ class GraphQLIntegrationTest {
       )
       .build();
 
-    var alertWithNulls = TransitAlert
-      .of(id("nulls"))
-      .withHeaderText(I18NString.of("Just a header"))
-      .addEntity(entitySelector)
-      .build();
-
     railLeg.addAlert(alert);
 
     var transitService = new DefaultTransitService(transitModel) {
@@ -214,7 +211,8 @@ class GraphQLIntegrationTest {
       }
     };
 
-    transitService.getTransitAlertService().setAlerts(List.of(alert, alertWithNulls));
+    var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
+    transitService.getTransitAlertService().setAlerts(alerts);
 
     context =
       new GraphQLRequestContext(
@@ -260,6 +258,27 @@ class GraphQLIntegrationTest {
 
     var expectedJson = Files.readString(expectationFile);
     assertEqualJson(expectedJson, actualJson);
+  }
+
+  @Nonnull
+  private static List<TransitAlert> getTransitAlert(EntitySelector.Stop entitySelector) {
+    var alertWithoutDescription = TransitAlert
+      .of(id("no-description"))
+      .withHeaderText(I18NString.of("Just a header"))
+      .addEntity(entitySelector);
+
+    var alertWithoutHeader = TransitAlert
+      .of(id("no-header"))
+      .withDescriptionText(I18NString.of("Just a description"))
+      .addEntity(entitySelector);
+    var alertWithNothing = TransitAlert
+      .of(id("neither-header-nor-description"))
+      .addEntity(entitySelector);
+
+    return Stream
+      .of(alertWithoutDescription, alertWithoutHeader, alertWithNothing)
+      .map(AbstractBuilder::build)
+      .toList();
   }
 
   @Nonnull

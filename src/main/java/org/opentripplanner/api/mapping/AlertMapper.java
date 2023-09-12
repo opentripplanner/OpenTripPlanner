@@ -30,10 +30,7 @@ public class AlertMapper {
 
   ApiAlert mapToApi(TransitAlert domain) {
     ApiAlert api = new ApiAlert();
-    if (domain.headerText() != null) {
-      api.alertHeaderText = domain.headerText().toString(locale);
-    }
-
+    api.alertHeaderText = domain.headerText().map(h -> h.toString(locale)).orElse(null);
     api.alertDescriptionText = domain.descriptionText().map(t -> t.toString(locale)).orElse(null);
     api.alertUrl = domain.url().map(u -> u.toString(locale)).orElse(null);
 

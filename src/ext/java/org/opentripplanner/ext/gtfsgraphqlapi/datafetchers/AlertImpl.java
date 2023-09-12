@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
@@ -24,7 +23,6 @@ import org.opentripplanner.ext.gtfsgraphqlapi.model.RouteTypeModel;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.StopOnRouteModel;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.StopOnTripModel;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.UnknownModel;
-import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -40,6 +38,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
 public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
+
+  private static final String FALLBACK_EMPTY_STRING = "";
 
   @Override
   public DataFetcher<Agency> agency() {
@@ -67,16 +67,16 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
       var alert = getSource(environment);
       return alert
         .descriptionText()
-        .or(() -> Optional.ofNullable(alert.headerText()))
+        .or(alert::headerText)
         .map(t -> t.toString(environment.getLocale()))
-        .orElse("");
+        .orElse(FALLBACK_EMPTY_STRING);
     };
   }
 
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations() {
     return environment ->
-      getSource(environment).descriptionText().map(this::getTranslations).orElse(null);
+      getSource(environment).descriptionText().map(this::getTranslations).orElse(List.of());
   }
 
   @Override
@@ -101,16 +101,20 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
 
   @Override
   public DataFetcher<String> alertHeaderText() {
-    return environment ->
-      GraphQLUtils.getTranslation(getSource(environment).headerText(), environment);
+    return environment -> {
+      var alert = getSource(environment);
+      return alert
+        .headerText()
+        .or(alert::descriptionText)
+        .map(h -> h.toString(environment.getLocale()))
+        .orElse(FALLBACK_EMPTY_STRING);
+    };
   }
 
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations() {
-    return environment -> {
-      var text = getSource(environment).headerText();
-      return getTranslations(text);
-    };
+    return environment ->
+      getSource(environment).headerText().map(this::getTranslations).orElse(List.of());
   }
 
   @Override

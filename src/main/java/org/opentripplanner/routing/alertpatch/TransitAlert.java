@@ -62,8 +62,8 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return new TransitAlertBuilder(id);
   }
 
-  public I18NString headerText() {
-    return headerText;
+  public Optional<I18NString> headerText() {
+    return Optional.ofNullable(headerText);
   }
 
   public Optional<I18NString> descriptionText() {

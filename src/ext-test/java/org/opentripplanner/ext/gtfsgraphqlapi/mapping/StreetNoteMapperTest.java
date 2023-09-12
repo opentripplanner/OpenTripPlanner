@@ -25,7 +25,7 @@ class StreetNoteMapperTest {
   void mapRegularAlert() {
     var note = note();
     TransitAlert alert = StreetNoteMapper.mapStreetNoteToAlert(note);
-    assertEquals(TEST_STREET_NOTE_HEADER, alert.headerText().toString(Locale.ROOT));
+    assertEquals(TEST_STREET_NOTE_HEADER, alert.headerText().get().toString(Locale.ROOT));
     assertEquals(TEST_STREET_NOTE_DESCRIPTION, alert.descriptionText().get().toString(Locale.ROOT));
     assertEquals(TEST_STREET_NOTE_URL, alert.url().get().toString(Locale.ROOT));
     assertEquals(START_INSTANCE, alert.getEffectiveStartDate());
