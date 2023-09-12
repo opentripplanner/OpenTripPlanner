@@ -383,7 +383,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * When creating a scheduled TripTimes or wrapping it in updates, we could potentially imply
    * negative running or dwell times. We really don't want those being used in routing. This method
    * checks that all times are increasing for stops that are not CANCELLED or NO_DATA, since they
-   * may not have real-time arrival or departure times associated with them.
+   * may not have real-time arrival or departure times associated with them. Note! The
+   * `includeRealtimeCancellations` flag include canceled trips in the trip search, not individual
+   * canceled stops - so having none increasing  times in this case SHOULD work.  
    *
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
