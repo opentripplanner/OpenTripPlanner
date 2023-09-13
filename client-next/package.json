@@ -7,14 +7,15 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --report-unused-disable-directives --max-warnings 0",
-    "check-format": "prettier --check \"*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-    "format": "prettier --write \"*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "check-format": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
     "preview": "vite preview",
     "prebuild": "npm run codegen && npm run lint && npm run check-format",
     "predev": "npm run codegen",
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
+    "@googlemaps/polyline-codec": "^1.0.28",
     "bootstrap": "^5.3.1",
     "graphql": "^16.8.0",
     "graphql-request": "^6.1.0",

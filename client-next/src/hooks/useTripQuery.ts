@@ -11,11 +11,18 @@ const endpoint = `https://api.entur.io/journey-planner/v3/graphql`;
   TODO: should live in a separate file, and split into fragments for readability
  */
 const query = graphql(`
-  query trip {
-    trip(from: { place: "NSR:StopPlace:337" }, to: { place: "NSR:StopPlace:1" }) {
+  query trip($from: Location!, $to: Location!) {
+    trip(from: $from, to: $to, numTripPatterns: 1) {
       tripPatterns {
+        aimedStartTime
+        aimedEndTime
+        duration
+        distance
         legs {
           id
+          pointsOnLink {
+            points
+          }
         }
       }
     }
@@ -24,7 +31,12 @@ const query = graphql(`
 
 type TripQueryHook = (variables?: TripQueryVariables) => [TripQuery | null, () => Promise<void>];
 
-export const useTripQuery: TripQueryHook = (variables = {}) => {
+export const useTripQuery: TripQueryHook = (
+  variables = {
+    from: { place: 'NSR:StopPlace:337' },
+    to: { place: 'NSR:StopPlace:1' },
+  },
+) => {
   const [data, setData] = useState<TripQuery | null>(null);
   const callback = useCallback(async () => setData(await request(endpoint, query, variables)), [setData, variables]);
   return [data, callback];
