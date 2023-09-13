@@ -38,7 +38,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBuilder> {
 
   // unscheduled trips can contain one or two stop_times
-  private static final Set<Integer> N_STOPS = Set.of(1, 2);
+  private static final Set<Integer> N_STOPS = Set.of(1, 2, 3);
 
   private final StopTimeWindow[] stopTimes;
 
@@ -94,7 +94,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     int toIndex = stopTimes.length - 1;
 
     // Check if trip is possible
-    if (fromIndex == -1 || fromIndex > toIndex || getDropOffType(toIndex).isNotRoutable()) {
+    if (fromIndex == -1 || fromIndex > toIndex || getBoardRule(toIndex).isNotRoutable()) {
       return Stream.empty();
     }
 
@@ -123,7 +123,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     int toIndex = getToIndex(egress);
 
     // Check if trip is possible
-    if (toIndex == -1 || fromIndex > toIndex || getPickupType(fromIndex).isNotRoutable()) {
+    if (toIndex == -1 || fromIndex > toIndex || getBoardRule(fromIndex).isNotRoutable()) {
       return Stream.empty();
     }
 
@@ -229,14 +229,6 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     return getToIndex(stop) != -1;
   }
 
-  public PickDrop getPickupType(int i) {
-    return stopTimes[i].pickupType();
-  }
-
-  public PickDrop getDropOffType(int i) {
-    return stopTimes[i].dropOffType();
-  }
-
   @Override
   public boolean sameAs(@Nonnull UnscheduledTrip other) {
     return (
@@ -261,7 +253,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   private int getFromIndex(NearbyStop accessEgress) {
     for (int i = 0; i < stopTimes.length; i++) {
-      if (getPickupType(i).isNotRoutable()) {
+      if (getBoardRule(i).isNotRoutable()) {
         continue;
       }
       StopLocation stop = stopTimes[i].stop();
@@ -280,7 +272,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   private int getToIndex(NearbyStop accessEgress) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
-      if (getDropOffType(i).isNotRoutable()) {
+      if (getBoardRule(i).isNotRoutable()) {
         continue;
       }
       StopLocation stop = stopTimes[i].stop();
