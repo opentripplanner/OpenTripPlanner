@@ -48,18 +48,6 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * You can also use the `package` goal instead of the `install` goal to avoid signing if you
       don't have the GPG certificate installed.
     * All tests should pass
-    * Run `MAVEN_OPTS="--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED" mvn com.webcohesion.enunciate:enunciate-maven-plugin:docs`
-    * This build will also create Enunciate API docs and Javadoc with the correct non-snapshot
-      version number
-* Deploy the documentation to AWS S3
-    * You have to do this right after the test release build to ensure the right version number in
-      the docs
-    * You will need AWSCLI tools (`sudo pip install -U awscli`)
-    * You will need AWS credentials with write access to the bucket `s3://dev.opentripplanner.org`
-    * `aws s3 cp --recursive target/site/apidocs s3://dev.opentripplanner.org/javadoc/x.y.z --acl public-read`
-    * `aws s3 cp --recursive target/site/enunciate/apidocs s3://dev.opentripplanner.org/apidoc/x.y.z --acl public-read`
-    * Check that docs are readable and show the correct version via
-      the [development documentation landing page](http://dev.opentripplanner.org).
 * Finally, if everything looks good, tag and push this release to make it official
     * `git tag -a vX.Y.Z -m "release X.Y.Z"`
     * `git push origin vX.Y.Z`
