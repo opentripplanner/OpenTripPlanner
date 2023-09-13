@@ -193,7 +193,7 @@ jobs:
         run: mvn --batch-mode compile -DskipTests -P prettierSkip
 
   container-image:
-    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
+    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     needs:
       - build-windows
