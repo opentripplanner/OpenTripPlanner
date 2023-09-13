@@ -141,9 +141,9 @@ jobs:
           
           if [ ${{ github.ref }} = 'refs/heads/master' ]; 
           then
-            mike deploy --branch $LOCAL_BRANCH --prefix en --title=$MASTER_BRANCH_VERSION --update-aliases v$MASTER_BRANCH_VERSION latest
+            mike deploy --branch $LOCAL_BRANCH --deploy-prefix en --title=$MASTER_BRANCH_VERSION --update-aliases v$MASTER_BRANCH_VERSION latest
           else
-            mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
+            mike deploy --branch $LOCAL_BRANCH --deploy-prefix en dev-2.x
           fi
           
           # commit and push the GraphQL documentation if the schema file is newer than the 
