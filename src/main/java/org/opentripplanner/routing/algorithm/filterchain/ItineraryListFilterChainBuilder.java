@@ -353,21 +353,6 @@ public class ItineraryListFilterChainBuilder {
       );
     }
 
-    // Filter transit itineraries by comparing against non-transit using generalized-cost
-    if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
-      filters.add(
-        new DeletionFlaggingFilter(
-          new RemoveTransitIfStreetOnlyIsBetterFilter(
-            removeTransitWithHigherCostThanBestOnStreetOnly
-          )
-        )
-      );
-    }
-
-    if (removeTransitIfWalkingIsBetter) {
-      filters.add(new DeletionFlaggingFilter(new RemoveTransitIfWalkingIsBetterFilter()));
-    }
-
     // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
     // remove elements/ based on the given itinerary properties - not considering other
     // itineraries. This may remove itineraries in the "groupBy" filters that are considered
@@ -378,6 +363,21 @@ public class ItineraryListFilterChainBuilder {
     // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
     // what we want, since both itineraries are none optimal.
     {
+    // Filter transit itineraries by comparing against non-transit using generalized-cost
+      if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
+        filters.add(
+          new DeletionFlaggingFilter(
+            new RemoveTransitIfStreetOnlyIsBetterFilter(
+              removeTransitWithHigherCostThanBestOnStreetOnly
+            )
+          )
+        );
+      }
+
+      if (removeTransitIfWalkingIsBetter) {
+        filters.add(new DeletionFlaggingFilter(new RemoveTransitIfWalkingIsBetterFilter()));
+      }
+
       if (removeWalkAllTheWayResults) {
         filters.add(new DeletionFlaggingFilter(new RemoveWalkOnlyFilter()));
       }
