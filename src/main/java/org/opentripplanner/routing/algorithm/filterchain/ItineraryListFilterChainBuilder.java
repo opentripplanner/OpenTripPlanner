@@ -23,7 +23,7 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveB
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitWithMoreWalking;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfWalkingIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
@@ -73,7 +73,7 @@ public class ItineraryListFilterChainBuilder {
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
-  private boolean removeTransitWithMoreWalking = true;
+  private boolean removeTransitIfWalkingIsBetter = true;
 
   @Sandbox
   private ItineraryListFilter rideHailingFilter;
@@ -364,8 +364,8 @@ public class ItineraryListFilterChainBuilder {
       );
     }
 
-    if (removeTransitWithMoreWalking) {
-      filters.add(new DeletionFlaggingFilter(new RemoveTransitWithMoreWalking()));
+    if (removeTransitIfWalkingIsBetter) {
+      filters.add(new DeletionFlaggingFilter(new RemoveTransitIfWalkingIsBetterFilter()));
     }
 
     // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
