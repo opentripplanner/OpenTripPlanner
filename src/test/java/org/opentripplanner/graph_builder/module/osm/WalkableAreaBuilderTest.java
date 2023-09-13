@@ -17,8 +17,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -179,6 +177,23 @@ public class WalkableAreaBuilderTest {
       .distinct()
       .toList();
     assertEquals(1, elevatorConnection.size());
+  }
+
+  @Test
+  @OsmFile("wendlingen-bahnhof.osm.pbf")
+  @Visibility(true)
+  @MaxAreaNodes(50)
+  public void testSeveralIntersections(TestInfo testInfo) {
+    var graph = buildGraph(testInfo);
+    var areas = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(2522105666L)))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(1, areas.size());
+    assertFalse(areas.get(0).getAreas().isEmpty());
   }
 
   private static boolean hasNodeId(AreaEdge a, long nodeId) {

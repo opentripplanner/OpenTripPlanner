@@ -139,7 +139,6 @@ public class WalkableAreaBuilder {
       // the points corresponding to concave or hole vertices
       // or those linked to ways
       HashSet<NodeEdge> alreadyAddedEdges = new HashSet<>();
-
       // we also want to fill in the edges of this area anyway, because we can,
       // and to avoid the numerical problems that they tend to cause
       for (Area area : group.areas) {
@@ -601,8 +600,7 @@ public class WalkableAreaBuilder {
         if (lineParts.getLength() > 0.000001) {
           Coordinate edgeCoordinate = null;
           // this is either a LineString or a MultiLineString (we hope)
-          if (lineParts instanceof MultiLineString) {
-            MultiLineString mls = (MultiLineString) lineParts;
+          if (lineParts instanceof MultiLineString mls) {
             boolean found = false;
             for (int i = 0; i < mls.getNumGeometries(); ++i) {
               LineString segment = (LineString) mls.getGeometryN(i);
@@ -618,8 +616,8 @@ public class WalkableAreaBuilder {
                 }
               }
             }
-          } else if (lineParts instanceof LineString) {
-            edgeCoordinate = ((LineString) lineParts).getEndPoint().getCoordinate();
+          } else if (lineParts instanceof LineString lineString) {
+            edgeCoordinate = lineString.getEndPoint().getCoordinate();
           } else {
             continue;
           }
@@ -681,8 +679,7 @@ public class WalkableAreaBuilder {
     boolean isCandidate = false;
     Vertex start = null;
     for (Edge e : osmVertex.getIncoming()) {
-      if (e instanceof StreetEdge && !(e instanceof AreaEdge)) {
-        StreetEdge se = (StreetEdge) e;
+      if (e instanceof StreetEdge se && !(e instanceof AreaEdge)) {
         if (Arrays.asList(1, 2, 3).contains(se.getPermission().code)) {
           isCandidate = true;
           start = se.getFromVertex();
