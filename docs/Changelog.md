@@ -5,6 +5,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 
 ## 2.5.0 (under development)
 
+- Gracefully handle nullable fields in TransitAlert [#5349](https://github.com/opentripplanner/OpenTripPlanner/pull/5349)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
