@@ -205,7 +205,7 @@ public class ItineraryListFilterChainBuilder {
    * An itinerary which has transit legs and more walking than the plain walk itinerary are silly.
    * This filter removes such itineraries.
    * <p>
-   * This filter only have an effect, if an on-street-all-the-way(WALK) itinerary exist.
+   * This filter only have an effect, if an walk-all-the-way itinerary exist.
    */
   public ItineraryListFilterChainBuilder withRemoveTransitWithMoreWalking(boolean value) {
     this.removeTransitWithMoreWalking = value;
