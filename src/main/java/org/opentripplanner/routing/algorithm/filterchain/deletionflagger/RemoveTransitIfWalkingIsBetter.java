@@ -13,13 +13,13 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 /**
  * Filter itineraries which contain more walking than a pure walk itinerary
  */
-public class RemoveTransitWithMoreWalking implements ItineraryDeletionFlagger {
+public class RemoveTransitIfWalkingIsBetterFilter implements ItineraryDeletionFlagger {
 
   /**
    * Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
    * to know which filters removed
    */
-  public static final String TAG = "transit-vs-plain-walk-filter";
+  public static final String TAG = "transit-vs-walk-filter";
 
   @Override
   public String name() {
