@@ -168,8 +168,8 @@ without transit legs are considered when calculating the minimum cost. The small
 generalized-cost value is used as input to the function. The function is used to calculate a
 *max-limit*. The max-limit is then used to filter *transit* itineraries by
 *generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
-	    set. Walking is handled with a different logic: if a transit itinerary has more walking than
-	    a plain walk itinerary, it will be removed even if the cost limit function would keep it.
+set. Walking is handled with a different logic: if a transit itinerary has higher cost than
+a plain walk itinerary, it will be removed even if the cost limit function would keep it.
 """
           )
           .asCostLinearFunction(dft.removeTransitWithHigherCostThanBestOnStreetOnly())
