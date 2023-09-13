@@ -35,7 +35,7 @@ public class OSMNode extends OSMWithTags {
    * @author mattwigway
    */
   public boolean isMultiLevel() {
-    return hasTag("highway") && "elevator".equals(getTag("highway"));
+    return isElevator();
   }
 
   public boolean hasHighwayTrafficLight() {

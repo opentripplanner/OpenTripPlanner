@@ -8,12 +8,13 @@ import org.opentripplanner.graph_builder.module.osm.OsmFilter;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
+import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMWayTest {
 
   @Test
-  public void testIsBicycleDismountForced() {
+  void testIsBicycleDismountForced() {
     OSMWay way = new OSMWay();
     assertFalse(way.isBicycleDismountForced());
 
@@ -22,7 +23,7 @@ public class OSMWayTest {
   }
 
   @Test
-  public void testIsSteps() {
+  void testIsSteps() {
     OSMWay way = new OSMWay();
     assertFalse(way.isSteps());
 
@@ -34,7 +35,20 @@ public class OSMWayTest {
   }
 
   @Test
-  public void testIsRoundabout() {
+  void wheelchairAccessibleStairs() {
+    var osm1 = new OSMWay();
+    osm1.addTag("highway", "steps");
+    assertFalse(osm1.isWheelchairAccessible());
+
+    // explicitly suitable for wheelchair users, perhaps because of a ramp
+    var osm2 = new OSMWay();
+    osm2.addTag("highway", "steps");
+    osm2.addTag("wheelchair", "yes");
+    assertTrue(osm2.isWheelchairAccessible());
+  }
+
+  @Test
+  void testIsRoundabout() {
     OSMWay way = new OSMWay();
     assertFalse(way.isRoundabout());
 
@@ -46,7 +60,7 @@ public class OSMWayTest {
   }
 
   @Test
-  public void testIsOneWayDriving() {
+  void testIsOneWayDriving() {
     OSMWay way = new OSMWay();
     assertFalse(way.isOneWayForwardDriving());
     assertFalse(way.isOneWayReverseDriving());
@@ -65,7 +79,7 @@ public class OSMWayTest {
   }
 
   @Test
-  public void testIsOneWayBicycle() {
+  void testIsOneWayBicycle() {
     OSMWay way = new OSMWay();
     assertFalse(way.isOneWayForwardBicycle());
     assertFalse(way.isOneWayReverseBicycle());
@@ -84,7 +98,7 @@ public class OSMWayTest {
   }
 
   @Test
-  public void testIsOneDirectionSidepath() {
+  void testIsOneDirectionSidepath() {
     OSMWay way = new OSMWay();
     assertFalse(way.isForwardDirectionSidepath());
     assertFalse(way.isReverseDirectionSidepath());
@@ -99,7 +113,7 @@ public class OSMWayTest {
   }
 
   @Test
-  public void testIsOpposableCycleway() {
+  void testIsOpposableCycleway() {
     OSMWay way = new OSMWay();
     assertFalse(way.isOpposableCycleway());
 
@@ -123,7 +137,7 @@ public class OSMWayTest {
    * Check for bug #1878 and PR #1880
    */
   @Test
-  public void testCarPermission() {
+  void testCarPermission() {
     OSMWay way = new OSMWay();
     way.addTag("highway", "unclassified");
 
@@ -140,7 +154,7 @@ public class OSMWayTest {
    * is no
    */
   @Test
-  public void testMotorCarTagAllowedPermissions() {
+  void testMotorCarTagAllowedPermissions() {
     OSMWay way = new OSMWay();
     way.addTag("highway", "residential");
     var permissionPair = getWayProperties(way);
@@ -174,7 +188,7 @@ public class OSMWayTest {
    * access is yes
    */
   @Test
-  public void testMotorCarTagDeniedPermissions() {
+  void testMotorCarTagDeniedPermissions() {
     OSMWay way = new OSMWay();
     way.addTag("highway", "residential");
     var permissionPair = getWayProperties(way);
@@ -206,7 +220,7 @@ public class OSMWayTest {
    * Support for motor_vehicle was added in #1881
    */
   @Test
-  public void testMotorVehicleTagAllowedPermissions() {
+  void testMotorVehicleTagAllowedPermissions() {
     OSMWay way = new OSMWay();
     way.addTag("highway", "residential");
     var permissionPair = getWayProperties(way);
@@ -242,7 +256,7 @@ public class OSMWayTest {
    * Support for motor_vehicle was added in #1881
    */
   @Test
-  public void testMotorVehicleTagDeniedPermissions() {
+  void testMotorVehicleTagDeniedPermissions() {
     OSMWay way = new OSMWay();
     way.addTag("highway", "residential");
     var permissionPair = getWayProperties(way);
@@ -268,7 +282,7 @@ public class OSMWayTest {
   }
 
   @Test
-  public void testSidepathPermissions() {
+  void testSidepathPermissions() {
     OSMWay way = new OSMWay();
     way.addTag("bicycle", "use_sidepath");
     way.addTag("highway", "primary");
@@ -324,6 +338,21 @@ public class OSMWayTest {
 
     assertTrue(permissionPair.main().allows(StreetTraversalPermission.CAR));
     assertFalse(permissionPair.back().allows(StreetTraversalPermission.CAR));
+  }
+
+  @Test
+  void escalator() {
+    assertFalse(WayTestData.cycleway().isEscalator());
+
+    var escalator = new OSMWay();
+    escalator.addTag("highway", "steps");
+    assertFalse(escalator.isEscalator());
+
+    escalator.addTag("conveying", "yes");
+    assertTrue(escalator.isEscalator());
+
+    escalator.addTag("conveying", "whoknows?");
+    assertFalse(escalator.isEscalator());
   }
 
   private StreetTraversalPermissionPair getWayProperties(OSMWay way) {

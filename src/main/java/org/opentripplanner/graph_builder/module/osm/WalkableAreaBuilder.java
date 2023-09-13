@@ -245,7 +245,7 @@ public class WalkableAreaBuilder {
           // variable to indicate if some additional entrance points have been added to area
           boolean linkPointsAdded = !entrances.isEmpty();
           // Add unconnected entries to area if platformEntriesLinking parameter is true
-          if (platformEntriesLinking && "platform".equals(area.parent.getTag("public_transport"))) {
+          if (platformEntriesLinking && area.parent.isPlatform()) {
             List<OsmVertex> endpointsWithin = platformLinkingEndpoints
               .stream()
               .filter(t ->
@@ -539,11 +539,9 @@ public class WalkableAreaBuilder {
         streetEdgeBuilder.withBogusName(true);
       }
 
-      if (areaEntity.isTagFalse("wheelchair")) {
-        streetEdgeBuilder.withWheelchairAccessible(false);
-      }
+      streetEdgeBuilder.withWheelchairAccessible(areaEntity.isWheelchairAccessible());
 
-      streetEdgeBuilder.withLink(OsmFilter.isLink(areaEntity));
+      streetEdgeBuilder.withLink(areaEntity.isLink());
 
       label =
         "way (area) " +
@@ -569,11 +567,9 @@ public class WalkableAreaBuilder {
         backStreetEdgeBuilder.withBogusName(true);
       }
 
-      if (areaEntity.isTagFalse("wheelchair")) {
-        backStreetEdgeBuilder.withWheelchairAccessible(false);
-      }
+      backStreetEdgeBuilder.withWheelchairAccessible(areaEntity.isWheelchairAccessible());
 
-      backStreetEdgeBuilder.withLink(OsmFilter.isLink(areaEntity));
+      backStreetEdgeBuilder.withLink(areaEntity.isLink());
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
         WayProperties wayData = areaEntity
