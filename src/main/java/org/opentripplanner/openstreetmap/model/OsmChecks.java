@@ -1,11 +1,11 @@
-package org.opentripplanner.graph_builder.module.osm;
-
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
+package org.opentripplanner.openstreetmap.model;
 
 /**
- *
+ * This class contains methods that are shared between {@link OSMWay} and {@link OSMRelation}.
+ * <p>
+ * These two classes have some things in common but not enough to create their own inheritance chain.
  */
-public class OsmFilter {
+class OsmChecks {
 
   /**
    * Determine whether any mode can or should ever traverse the given way. If not, we leave the way
@@ -18,11 +18,7 @@ public class OsmFilter {
    * <p>
    * A whitelist for highway tags is an alternative to a blacklist.
    */
-  static boolean isWayRoutable(OSMWithTags way) {
-    if (!(way.isRoutable())) {
-      return false;
-    }
-
+  protected static boolean isRoutable(OSMWithTags way) {
     String highway = way.getTag("highway");
     if (highway != null) {
       if (

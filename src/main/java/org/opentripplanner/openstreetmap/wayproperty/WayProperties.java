@@ -48,12 +48,12 @@ public class WayProperties {
   }
 
   @Nonnull
-  public Optional<SafetyFeatures> walkSafetyOpt() {
+  protected Optional<SafetyFeatures> walkSafetyOpt() {
     return Optional.ofNullable(walkSafetyFeatures);
   }
 
   @Nonnull
-  public Optional<SafetyFeatures> bicycleSafetyOpt() {
+  protected Optional<SafetyFeatures> bicycleSafetyOpt() {
     return Optional.ofNullable(bicycleSafetyFeatures);
   }
 

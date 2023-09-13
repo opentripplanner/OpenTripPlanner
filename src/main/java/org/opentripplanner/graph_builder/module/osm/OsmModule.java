@@ -250,7 +250,7 @@ public class OsmModule implements GraphBuilderModule {
 
       var permissions = wayData.getPermission();
 
-      if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) {
+      if (!way.isRoutable() || permissions.allowsNothing()) {
         continue;
       }
 

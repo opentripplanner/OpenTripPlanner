@@ -73,12 +73,12 @@ public class WayPropertiesBuilder {
   }
 
   @Nullable
-  public SafetyFeatures getBicycleSafetyFeatures() {
+  protected SafetyFeatures getBicycleSafetyFeatures() {
     return bicycleSafetyFeatures;
   }
 
   @Nullable
-  public SafetyFeatures getWalkSafetyFeatures() {
+  protected SafetyFeatures getWalkSafetyFeatures() {
     return walkSafetyFeatures;
   }
 
