@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
-public class RemoveTransitWithMoreWalkingTest implements PlanTestConstants {
+public class RemoveTransitIfWalkingIsBetterTest implements PlanTestConstants {
 
   @Test
   public void filterAwayNothingIfNoWalking() {
@@ -21,7 +21,7 @@ public class RemoveTransitWithMoreWalkingTest implements PlanTestConstants {
     // When:
     List<Itinerary> result = DeletionFlaggerTestHelper.process(
       List.of(i1, i2),
-      new RemoveTransitWithMoreWalking()
+      new RemoveTransitIfWalkingIsBetterFilter()
     );
 
     // Then:
@@ -44,7 +44,7 @@ public class RemoveTransitWithMoreWalkingTest implements PlanTestConstants {
 
     List<Itinerary> result = DeletionFlaggerTestHelper.process(
       List.of(i1, i2, bicycle, walk),
-      new RemoveTransitWithMoreWalking()
+      new RemoveTransitIfWalkingIsBetterFilter()
     );
 
     assertEquals(toStr(List.of(i2, bicycle, walk)), toStr(result));

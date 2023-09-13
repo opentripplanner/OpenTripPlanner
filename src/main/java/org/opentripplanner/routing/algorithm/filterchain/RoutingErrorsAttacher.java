@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitWithMoreWalking;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfWalkingIsBetterFilter;
 import org.opentripplanner.routing.api.response.RoutingError;
 
 /**
@@ -55,7 +55,7 @@ class RoutingErrorsAttacher {
         it
           .getSystemNotices()
           .stream()
-          .anyMatch(notice -> notice.tag.equals(RemoveTransitWithMoreWalking.TAG));
+          .anyMatch(notice -> notice.tag.equals(RemoveTransitIfWalkingIsBetterFilter.TAG));
       if (
         filteredItineraries
           .stream()

@@ -363,7 +363,7 @@ public class ItineraryListFilterChainBuilder {
     // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
     // what we want, since both itineraries are none optimal.
     {
-    // Filter transit itineraries by comparing against non-transit using generalized-cost
+      // Filter transit itineraries by comparing against non-transit using generalized-cost
       if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
         filters.add(
           new DeletionFlaggingFilter(
