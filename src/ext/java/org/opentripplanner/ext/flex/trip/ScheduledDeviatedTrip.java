@@ -31,7 +31,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * A scheduled deviated trip is similar to a regular scheduled trip, except that is continues stop
+ * A scheduled deviated trip is similar to a regular scheduled trip, except that it contains stop
  * locations, which are not stops, but other types, such as groups of stops or location areas.
  */
 public class ScheduledDeviatedTrip

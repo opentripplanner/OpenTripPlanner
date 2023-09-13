@@ -153,7 +153,7 @@ public class FlexRouter {
 
     return this.flexAccessTemplates.stream()
       .flatMap(template -> template.createFlexAccessEgressStream(graph, transitService))
-      .collect(Collectors.toList());
+      .toList();
   }
 
   public Collection<FlexAccessEgress> createFlexEgresses() {
@@ -162,7 +162,7 @@ public class FlexRouter {
 
     return this.flexEgressTemplates.stream()
       .flatMap(template -> template.createFlexAccessEgressStream(graph, transitService))
-      .collect(Collectors.toList());
+      .toList();
   }
 
   private void calculateFlexAccessTemplates() {
@@ -186,7 +186,7 @@ public class FlexRouter {
                 .getFlexAccessTemplates(it.accessEgress(), date, accessFlexPathCalculator, config)
             )
         )
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private void calculateFlexEgressTemplates() {
@@ -210,7 +210,7 @@ public class FlexRouter {
                 .getFlexEgressTemplates(it.accessEgress(), date, egressFlexPathCalculator, config)
             )
         )
-        .collect(Collectors.toList());
+        .toList();
   }
 
   private Stream<AccessEgressAndNearbyStop> getClosestFlexTrips(
