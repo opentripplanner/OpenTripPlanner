@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.gtfsgraphqlapi.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.note.StreetNote;
@@ -25,9 +25,9 @@ class StreetNoteMapperTest {
   void mapRegularAlert() {
     var note = note();
     TransitAlert alert = StreetNoteMapper.mapStreetNoteToAlert(note);
-    assertEquals(TEST_STREET_NOTE_HEADER, alert.headerText().toString(Locale.ROOT));
-    assertEquals(TEST_STREET_NOTE_DESCRIPTION, alert.descriptionText().toString(Locale.ROOT));
-    assertEquals(TEST_STREET_NOTE_URL, alert.url().toString(Locale.ROOT));
+    assertEquals(TEST_STREET_NOTE_HEADER, alert.headerText().get().toString(Locale.ROOT));
+    assertEquals(TEST_STREET_NOTE_DESCRIPTION, alert.descriptionText().get().toString(Locale.ROOT));
+    assertEquals(TEST_STREET_NOTE_URL, alert.url().get().toString(Locale.ROOT));
     assertEquals(START_INSTANCE, alert.getEffectiveStartDate());
     assertEquals(END_INSTANCE, alert.getEffectiveEndDate());
   }
@@ -37,7 +37,7 @@ class StreetNoteMapperTest {
     var note = note();
     note.url = null;
     TransitAlert alert = StreetNoteMapper.mapStreetNoteToAlert(note);
-    assertNull(alert.url());
+    assertEquals(Optional.empty(), alert.url());
   }
 
   @Test

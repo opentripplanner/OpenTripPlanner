@@ -31,13 +31,16 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -62,6 +65,8 @@ import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
@@ -70,6 +75,7 @@ import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -128,7 +134,7 @@ class GraphQLIntegrationTest {
         TransitModelForTest
           .route(m.name())
           .withMode(m)
-          .withLongName(new NonLocalizedString("Long name for %s".formatted(m)))
+          .withLongName(I18NString.of("Long name for %s".formatted(m)))
           .build()
       )
       .toList();
@@ -175,27 +181,40 @@ class GraphQLIntegrationTest {
 
     railLeg.withAccessibilityScore(.3f);
 
+    var entitySelector = new EntitySelector.Stop(A.stop.getId());
     var alert = TransitAlert
       .of(id("an-alert"))
-      .withHeaderText(new NonLocalizedString("A header"))
-      .withDescriptionText(new NonLocalizedString("A description"))
-      .withUrl(new NonLocalizedString("https://example.com"))
+      .withHeaderText(I18NString.of("A header"))
+      .withDescriptionText(I18NString.of("A description"))
+      .withUrl(I18NString.of("https://example.com"))
       .withCause(AlertCause.MAINTENANCE)
       .withEffect(AlertEffect.REDUCED_SERVICE)
       .withSeverity(AlertSeverity.VERY_SEVERE)
-      .addEntity(new EntitySelector.Stop(A.stop.getId()))
+      .addEntity(entitySelector)
       .addTimePeriod(
         new TimePeriod(ALERT_START_TIME.getEpochSecond(), ALERT_END_TIME.getEpochSecond())
       )
       .build();
+
     railLeg.addAlert(alert);
 
     var transitService = new DefaultTransitService(transitModel) {
+      private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);
+
       @Override
       public List<TransitMode> getModesOfStopLocation(StopLocation stop) {
         return List.of(BUS, FERRY);
       }
+
+      @Override
+      public TransitAlertService getTransitAlertService() {
+        return alertService;
+      }
     };
+
+    var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
+    transitService.getTransitAlertService().setAlerts(alerts);
+
     context =
       new GraphQLRequestContext(
         new TestRoutingService(List.of(i1)),
@@ -222,10 +241,10 @@ class GraphQLIntegrationTest {
       Locale.ENGLISH,
       context
     );
-    var actualJson = extracted(response);
+    var actualJson = responseBody(response);
     assertEquals(200, response.getStatus());
 
-    Path expectationFile = getPath(path);
+    Path expectationFile = getExpectation(path);
 
     if (!expectationFile.toFile().exists()) {
       Files.writeString(
@@ -243,10 +262,31 @@ class GraphQLIntegrationTest {
   }
 
   @Nonnull
+  private static List<TransitAlert> getTransitAlert(EntitySelector.Stop entitySelector) {
+    var alertWithoutDescription = TransitAlert
+      .of(id("no-description"))
+      .withHeaderText(I18NStrings.TRANSLATED_STRING_1)
+      .addEntity(entitySelector);
+
+    var alertWithoutHeader = TransitAlert
+      .of(id("no-header"))
+      .withDescriptionText(I18NStrings.TRANSLATED_STRING_2)
+      .addEntity(entitySelector);
+    var alertWithNothing = TransitAlert
+      .of(id("neither-header-nor-description"))
+      .addEntity(entitySelector);
+
+    return Stream
+      .of(alertWithoutDescription, alertWithoutHeader, alertWithNothing)
+      .map(AbstractBuilder::build)
+      .toList();
+  }
+
+  @Nonnull
   private static WalkStepBuilder walkStep(String name) {
     return WalkStep
       .builder()
-      .withDirectionText(new NonLocalizedString(name))
+      .withDirectionText(I18NString.of(name))
       .withStartLocation(WgsCoordinate.GREENWICH)
       .withAngle(10);
   }
@@ -268,7 +308,7 @@ class GraphQLIntegrationTest {
    * subdirectories are expected to be in the same directory.
    */
   @Nonnull
-  private static Path getPath(Path path) {
+  private static Path getExpectation(Path path) {
     return path
       .getParent()
       .getParent()
@@ -276,7 +316,7 @@ class GraphQLIntegrationTest {
       .resolve(path.getFileName().toString().replace(".graphql", ".json"));
   }
 
-  private static String extracted(Response response) {
+  private static String responseBody(Response response) {
     if (response instanceof OutboundJaxrsResponse outbound) {
       return (String) outbound.getContext().getEntity();
     }
