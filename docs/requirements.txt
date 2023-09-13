@@ -1,6 +1,4 @@
 mkdocs==1.5.2
 mkdocs-material==9.1.17
-mike==1.1.2
+mike@git+https://github.com/jimporter/mike.git@f0522f245e64687dd18384fbd86b721175711474
 mkdocs-no-sitemap-plugin==0.0.1
-# remove this after OTP 2.4.0 has been released
-mkdocs-redirects==1.2.1
