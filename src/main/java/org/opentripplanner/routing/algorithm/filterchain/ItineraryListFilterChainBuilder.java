@@ -207,7 +207,7 @@ public class ItineraryListFilterChainBuilder {
    * <p>
    * This filter only have an effect, if an walk-all-the-way itinerary exist.
    */
-  public ItineraryListFilterChainBuilder withRemoveTransitWithMoreWalking(boolean value) {
+  public ItineraryListFilterChainBuilder withRemoveTransitIfWalkingIsBetter(boolean value) {
     this.removeTransitWithMoreWalking = value;
     return this;
   }
