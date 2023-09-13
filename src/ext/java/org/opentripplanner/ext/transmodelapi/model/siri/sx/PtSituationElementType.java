@@ -186,7 +186,7 @@ public class PtSituationElementType {
                   return List.of(new AbstractMap.SimpleEntry<>(null, headerText.toString()));
                 }
               })
-              .orElse(List.of())
+              .orElse(emptyList())
           )
           .build()
       )
