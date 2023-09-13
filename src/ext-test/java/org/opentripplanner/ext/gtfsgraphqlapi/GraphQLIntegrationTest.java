@@ -36,6 +36,7 @@ import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
@@ -264,12 +265,12 @@ class GraphQLIntegrationTest {
   private static List<TransitAlert> getTransitAlert(EntitySelector.Stop entitySelector) {
     var alertWithoutDescription = TransitAlert
       .of(id("no-description"))
-      .withHeaderText(I18NString.of("Just a header"))
+      .withHeaderText(I18NStrings.TRANSLATED_STRING_1)
       .addEntity(entitySelector);
 
     var alertWithoutHeader = TransitAlert
       .of(id("no-header"))
-      .withDescriptionText(I18NString.of("Just a description"))
+      .withDescriptionText(I18NStrings.TRANSLATED_STRING_2)
       .addEntity(entitySelector);
     var alertWithNothing = TransitAlert
       .of(id("neither-header-nor-description"))

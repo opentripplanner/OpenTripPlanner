@@ -11,10 +11,23 @@
       },
       {
         "id" : "QWxlcnQ6Rjpuby1oZWFkZXI",
-        "alertHeaderText" : "Just a description",
-        "alertDescriptionText" : "Just a description",
+        "alertHeaderText" : "Second string",
+        "alertDescriptionText" : "Second string",
         "alertUrl" : null,
-        "alertDescriptionTextTranslations" : [ ],
+        "alertDescriptionTextTranslations" : [
+          {
+            "language" : null,
+            "text" : "Second string"
+          },
+          {
+            "language" : "de",
+            "text" : "Zweite Zeichenabfolge"
+          },
+          {
+            "language" : "fi",
+            "text" : "Etkö ole varma, mitä tämä tarkoittaa"
+          }
+        ],
         "alertHeaderTextTranslations" : [ ]
       },
       {
@@ -27,11 +40,24 @@
       },
       {
         "id" : "QWxlcnQ6Rjpuby1kZXNjcmlwdGlvbg",
-        "alertHeaderText" : "Just a header",
-        "alertDescriptionText" : "Just a header",
+        "alertHeaderText" : "First string",
+        "alertDescriptionText" : "First string",
         "alertUrl" : null,
         "alertDescriptionTextTranslations" : [ ],
-        "alertHeaderTextTranslations" : [ ]
+        "alertHeaderTextTranslations" : [
+          {
+            "text" : "First string",
+            "language" : null
+          },
+          {
+            "text" : "Erste Zeichenabfolge",
+            "language" : "de"
+          },
+          {
+            "text" : "Minulla ei ole aavistustakaan kuinka puhua suomea",
+            "language" : "fi"
+          }
+        ]
       }
     ]
   }
