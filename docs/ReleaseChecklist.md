@@ -5,16 +5,16 @@ the actions taken by the Maven release plugin. Based on past experience, the Mav
 can fail at various points in the process leaving the repo in a confusing state. Taking each action
 manually is more tedious, but keeps eyes on each step and is less prone to failure.
 
-* Make sure the documentation is up to date
-  * Check all links and references to the release and update to the target release version. Search
-    all files for with a regular expression: `2\.[012]\.0` and replace if appropriate with the new 
-    version.
 * Check that your local copy of the dev branch is up to date with no uncommitted changes
     * `git status`
     * `git checkout dev-2.x`
     * `git clean -df`
     * `git pull`
-* Verify that all dependencies in the POM are non-SNAPSHOT versions (e.g. with `grep`)
+* Make sure the documentation is up to date
+    * Check all links and references to the release and update to the target release version. Search
+      all files for with a regular expression: `2\.[012]\.0` and replace if appropriate with the new
+      version.
+    * In `docs/index.md` replace what is the latest version and add a new line for the previous one
 * Update `docs/Changelog.md`
     * Lines should have been added or updated as each pull request was merged
     * If you suspect any changes are not reflected in the Changelog, review the commit log and add
@@ -27,8 +27,8 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * This tells the GH Action that pushes the documentation on master what the name of the 
       current version is. 
       For version 2.3.0 Leonard has already done it: [Example commit](https://github.com/opentripplanner/OpenTripPlanner/commit/3cb061ab1e4253c3977a5d08fa5abab1b0baefd7)
-* Check [on GH Actions](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/) that
-  the build is currently passing
+* Verify that all dependencies in the POM are non-SNAPSHOT versions (e.g. with `grep`)
+* Check [on GH Actions](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/) that the build is currently passing
 * Switch to the HEAD of master branch, and ensure it's up to date with no uncommitted changes
     * `git checkout master`
     * `git status`
