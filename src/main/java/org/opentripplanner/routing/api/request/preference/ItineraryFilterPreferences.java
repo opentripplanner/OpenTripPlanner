@@ -365,7 +365,7 @@ public final class ItineraryFilterPreferences {
       this.transitGeneralizedCostLimit = original.transitGeneralizedCostLimit;
       this.removeTransitWithHigherCostThanBestOnStreetOnly =
         original.removeTransitWithHigherCostThanBestOnStreetOnly;
-      this.removeTransitWithMoreWalking = original.removeTransitWithMoreWalking;
+      this.removeTransitIfWalkingIsBetter = original.removeTransitIfWalkingIsBetter;
     }
 
     public Builder apply(Consumer<Builder> body) {
