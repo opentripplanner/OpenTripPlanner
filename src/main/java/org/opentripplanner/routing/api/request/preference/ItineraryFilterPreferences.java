@@ -200,7 +200,7 @@ public final class ItineraryFilterPreferences {
       accessibilityScore == that.accessibilityScore &&
       Double.compare(that.bikeRentalDistanceRatio, bikeRentalDistanceRatio) == 0 &&
       debug == that.debug &&
-      removeTransitWithMoreWalking == that.removeTransitWithMoreWalking &&
+     removeTransitIfWalkingIsBetter == that.removeTransitIfWalkingIsBetter &&
       filterItinerariesWithSameFirstOrLastTrip == that.filterItinerariesWithSameFirstOrLastTrip &&
       Double.compare(
         that.groupedOtherThanSameLegsMaxCostMultiplier,
