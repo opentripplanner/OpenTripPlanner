@@ -52,6 +52,7 @@ import org.opentripplanner.ext.transmodelapi.model.framework.InfoLinkType;
 import org.opentripplanner.ext.transmodelapi.model.framework.MultilingualStringType;
 import org.opentripplanner.ext.transmodelapi.model.framework.NoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.OperatorType;
+import org.opentripplanner.ext.transmodelapi.model.framework.PenaltyForStreetModeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.PointsOnLinkType;
 import org.opentripplanner.ext.transmodelapi.model.framework.RentalVehicleTypeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ServerInfoType;
@@ -350,11 +351,13 @@ public class TransmodelGraphQLSchema {
     );
 
     GraphQLInputObjectType durationPerStreetModeInput = StreetModeDurationInputType.create(gqlUtil);
+    GraphQLInputObjectType penaltyForStreetMode = PenaltyForStreetModeType.create(gqlUtil);
 
     GraphQLFieldDefinition tripQuery = TripQuery.create(
       routing,
       tripType,
       durationPerStreetModeInput,
+      penaltyForStreetMode,
       gqlUtil
     );
 

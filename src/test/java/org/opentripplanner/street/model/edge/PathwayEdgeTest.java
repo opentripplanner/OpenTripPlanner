@@ -5,14 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
+import java.util.Optional;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
-import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
@@ -31,7 +34,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       0,
       0,
@@ -49,7 +51,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       0,
       0,
@@ -67,7 +68,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       60,
       0,
@@ -87,7 +87,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       60,
       1000,
@@ -109,7 +108,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       0,
       60,
@@ -129,7 +127,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       0,
       60,
@@ -172,7 +169,6 @@ class PathwayEdgeTest {
     var edge = PathwayEdge.createPathwayEdge(
       from,
       to,
-      null,
       new NonLocalizedString("pathway"),
       60,
       100,
@@ -216,5 +212,46 @@ class PathwayEdgeTest {
 
     assertTrue(afterTraversal.getWeight() > 0);
     return afterTraversal;
+  }
+
+  @Nested
+  class SignpostedAs {
+
+    @Test
+    void signpostedAs() {
+      var sign = I18NString.of("sign");
+      var edge = pathwayEdge(sign);
+      assertEquals(Optional.of(sign), edge.signpostedAs());
+      assertEquals(sign, edge.getName());
+    }
+
+    @Test
+    void nullSignpostedAs() {
+      var edge = pathwayEdge(null);
+      assertEquals(Optional.empty(), edge.signpostedAs());
+      assertEquals(PathwayEdge.DEFAULT_NAME, edge.getName());
+    }
+
+    @Test
+    void emptySignpostedAs() {
+      var edge = PathwayEdge.createLowCostPathwayEdge(from, to, PathwayMode.WALKWAY);
+      assertEquals(Optional.empty(), edge.signpostedAs());
+      assertEquals(PathwayEdge.DEFAULT_NAME, edge.getName());
+    }
+
+    @Nonnull
+    private PathwayEdge pathwayEdge(I18NString sign) {
+      return PathwayEdge.createPathwayEdge(
+        from,
+        to,
+        sign,
+        60,
+        100,
+        0,
+        0,
+        false,
+        PathwayMode.WALKWAY
+      );
+    }
   }
 }

@@ -18,7 +18,10 @@ public enum RelativeDirection {
   CIRCLE_COUNTERCLOCKWISE,
   ELEVATOR,
   UTURN_LEFT,
-  UTURN_RIGHT;
+  UTURN_RIGHT,
+  ENTER_STATION,
+  EXIT_STATION,
+  FOLLOW_SIGNS;
 
   public static RelativeDirection calculate(
     double lastAngle,

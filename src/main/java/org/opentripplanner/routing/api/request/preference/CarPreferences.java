@@ -5,8 +5,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
  * The car preferences contain all speed, reluctance, cost and factor preferences for driving

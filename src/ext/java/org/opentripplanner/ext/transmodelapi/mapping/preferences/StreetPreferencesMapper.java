@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.mapping.preferences;
 
 import graphql.schema.DataFetchingEnvironment;
+import org.opentripplanner.ext.transmodelapi.model.framework.PenaltyForStreetModeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.StreetModeDurationInputType;
 import org.opentripplanner.ext.transmodelapi.model.plan.TripQuery;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
@@ -12,14 +13,19 @@ public class StreetPreferencesMapper {
     DataFetchingEnvironment environment,
     StreetPreferences defaultPreferences
   ) {
-    street.withMaxAccessEgressDuration(builder ->
-      StreetModeDurationInputType.mapDurationForStreetModeAndAssertValueIsGreaterThenDefault(
-        builder,
-        environment,
-        TripQuery.MAX_ACCESS_EGRESS_DURATION_FOR_MODE,
-        defaultPreferences.maxAccessEgressDuration()
-      )
-    );
+    street.withAccessEgress(ae -> {
+      ae.withPenalty(b ->
+        PenaltyForStreetModeType.mapPenaltyToDomain(b, environment, TripQuery.ACCESS_EGRESS_PENALTY)
+      );
+      ae.withMaxDuration(builder ->
+        StreetModeDurationInputType.mapDurationForStreetModeAndAssertValueIsGreaterThenDefault(
+          builder,
+          environment,
+          TripQuery.MAX_ACCESS_EGRESS_DURATION_FOR_MODE,
+          defaultPreferences.accessEgress().maxDuration()
+        )
+      );
+    });
 
     street.withMaxDirectDuration(builder ->
       StreetModeDurationInputType.mapDurationForStreetModeAndAssertValueIsGreaterThenDefault(

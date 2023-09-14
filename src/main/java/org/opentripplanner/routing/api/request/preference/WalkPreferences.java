@@ -6,8 +6,8 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
  * The walk preferences contain all speed, reluctance, cost and factor preferences for walking
@@ -116,7 +116,7 @@ public final class WalkPreferences implements Serializable {
     return (
       doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
-      boardCost == that.boardCost &&
+      boardCost.equals(that.boardCost) &&
       doubleEquals(that.stairsReluctance, stairsReluctance) &&
       doubleEquals(that.stairsTimeFactor, stairsTimeFactor) &&
       doubleEquals(that.safetyFactor, safetyFactor) &&
@@ -132,7 +132,8 @@ public final class WalkPreferences implements Serializable {
       boardCost,
       stairsReluctance,
       stairsTimeFactor,
-      safetyFactor
+      safetyFactor,
+      escalatorReluctance
     );
   }
 

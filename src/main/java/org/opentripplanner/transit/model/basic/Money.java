@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
+import org.opentripplanner.framework.lang.IntUtils;
 
 /**
  * Represents an amount of money.
@@ -66,7 +67,7 @@ public class Money implements Comparable<Money> {
   public static Money ofFractionalAmount(@Nonnull Currency currency, float fractionalAmount) {
     Objects.requireNonNull(currency);
     var fractionDigits = currency.getDefaultFractionDigits();
-    int amount = (int) Math.round(fractionalAmount * Math.pow(10, fractionDigits));
+    int amount = IntUtils.round(fractionalAmount * Math.pow(10, fractionDigits));
     return new Money(currency, amount);
   }
 

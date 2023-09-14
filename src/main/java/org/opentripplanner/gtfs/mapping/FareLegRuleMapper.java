@@ -1,12 +1,14 @@
 package org.opentripplanner.gtfs.mapping;
 
+import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
+
 import java.util.Collection;
 import java.util.Objects;
 import org.opentripplanner.ext.fares.model.Distance;
 import org.opentripplanner.ext.fares.model.FareDistance;
 import org.opentripplanner.ext.fares.model.FareLegRule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
-import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public final class FareLegRuleMapper {
 
@@ -24,16 +26,18 @@ public final class FareLegRuleMapper {
     return allFareLegRules
       .stream()
       .map(r -> {
-        FareProduct productForRule = fareProductMapper.map(r.getFareProduct());
-        FareDistance fareDistance = createFareDistance(r);
+        var fareProductId = mapAgencyAndId(r.getFareProductId());
+        var productsForRule = fareProductMapper.getByFareProductId(fareProductId);
 
-        if (productForRule != null) {
+        if (!productsForRule.isEmpty()) {
+          FareDistance fareDistance = createFareDistance(r);
+          var ruleId = new FeedScopedId(fareProductId.getFeedId(), r.getId());
           return FareLegRule
-            .of(productForRule)
-            .withLegGroupId(r.getLegGroupId())
+            .of(ruleId, productsForRule)
+            .withLegGroupId(mapAgencyAndId(r.getLegGroupId()))
             .withNetworkId(r.getNetworkId())
-            .withFromAreaId(r.getFromAreaId())
-            .withToAreaId(r.getToAreaId())
+            .withFromAreaId(areaId(r.getFromArea()))
+            .withToAreaId(areaId(r.getToArea()))
             .withFareDistance(fareDistance)
             .build();
         } else {
@@ -41,7 +45,7 @@ public final class FareLegRuleMapper {
             "UnknownFareProductId",
             "Fare leg rule %s refers to unknown fare product %s",
             r.getId(),
-            r.getFareProduct().getId()
+            fareProductId
           );
           return null;
         }
@@ -50,7 +54,17 @@ public final class FareLegRuleMapper {
       .toList();
   }
 
-  private FareDistance createFareDistance(org.onebusaway.gtfs.model.FareLegRule fareLegRule) {
+  private static String areaId(org.onebusaway.gtfs.model.Area area) {
+    if (area == null) {
+      return null;
+    } else {
+      return area.getAreaId();
+    }
+  }
+
+  private static FareDistance createFareDistance(
+    org.onebusaway.gtfs.model.FareLegRule fareLegRule
+  ) {
     final Integer distanceType = fareLegRule.getDistanceType();
     if (distanceType == null) {
       return null;

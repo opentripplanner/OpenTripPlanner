@@ -1,16 +1,17 @@
 package org.opentripplanner.standalone.config.framework.json;
 
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.BOOLEAN;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.COST_LINEAR_FUNCTION;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.DOUBLE;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.DURATION;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.FEED_SCOPED_ID;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.INTEGER;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.LINEAR_FUNCTION;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.LOCALE;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.LONG;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.REGEXP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.STRING;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.TIME_PENALTY;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.TIME_ZONE;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,8 +39,8 @@ import java.util.regex.Pattern;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.LocalDateUtils;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class ParameterBuilder {
@@ -399,17 +400,21 @@ public class ParameterBuilder {
   /* Custom OTP types */
 
   public FeedScopedId asFeedScopedId(FeedScopedId defaultValue) {
-    return exist() ? FeedScopedId.parseId(ofType(FEED_SCOPED_ID).asText()) : defaultValue;
+    return exist() ? FeedScopedId.parse(ofType(FEED_SCOPED_ID).asText()) : defaultValue;
   }
 
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
     setInfoOptional(defaultValues);
     info.withArray(FEED_SCOPED_ID);
-    return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parseId(it.asText()));
+    return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parse(it.asText()));
   }
 
-  public DoubleAlgorithmFunction asLinearFunction(DoubleAlgorithmFunction defaultValue) {
-    return ofOptional(LINEAR_FUNCTION, defaultValue, n -> parseLinearFunction(n.asText()));
+  public CostLinearFunction asCostLinearFunction(CostLinearFunction defaultValue) {
+    return ofOptional(COST_LINEAR_FUNCTION, defaultValue, n -> CostLinearFunction.of(n.asText()));
+  }
+
+  public TimePenalty asTimePenalty(TimePenalty defaultValue) {
+    return ofOptional(TIME_PENALTY, defaultValue, n -> TimePenalty.of(n.asText()));
   }
 
   /* private method */
@@ -667,19 +672,6 @@ public class ParameterBuilder {
         "'. Use: <Language>[_<country>[_<variant>]]."
       );
     };
-  }
-
-  private DoubleAlgorithmFunction parseLinearFunction(String text) {
-    try {
-      return RequestFunctions.parse(text);
-    } catch (IllegalArgumentException ignore) {
-      throw error(
-        "Unable to parse linear function: " +
-        text +
-        ". Expected format: " +
-        "\"a + b x\" (\"60 + 7.1 x\")."
-      );
-    }
   }
 
   private URI parseUri(String text) {

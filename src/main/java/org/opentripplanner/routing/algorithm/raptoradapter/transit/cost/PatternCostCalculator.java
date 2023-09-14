@@ -5,22 +5,17 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
 
-public class PatternCostCalculator<T extends DefaultTripSchedule>
-  implements RaptorCostCalculator<T> {
-
-  public static final double DEFAULT_ROUTE_RELUCTANCE = 1.0;
-  public static final double UNPREFERRED_ROUTE_RELUCTANCE = 2.0;
+class PatternCostCalculator<T extends DefaultTripSchedule> implements RaptorCostCalculator<T> {
 
   private final RaptorCostCalculator<T> delegate;
   private final BitSet unpreferredPatterns;
-  private final DoubleAlgorithmFunction unpreferredCost;
+  private final RaptorCostLinearFunction unpreferredCost;
 
-  public PatternCostCalculator(
+  PatternCostCalculator(
     @Nonnull RaptorCostCalculator<T> delegate,
     @Nonnull BitSet unpreferredPatterns,
-    @Nonnull DoubleAlgorithmFunction unpreferredCost
+    @Nonnull RaptorCostLinearFunction unpreferredCost
   ) {
     this.unpreferredPatterns = unpreferredPatterns;
     this.delegate = delegate;
@@ -59,11 +54,6 @@ public class PatternCostCalculator<T extends DefaultTripSchedule>
     T trip,
     int toStop
   ) {
-    int unpreferCost = 0;
-    if (unpreferredPatterns.get(trip.pattern().patternIndex())) {
-      // calculate cost with linear function: fixed + reluctance * transitTime
-      unpreferCost += RaptorCostConverter.toRaptorCost(unpreferredCost.calculate(transitTime));
-    }
     int defaultCost = delegate.transitArrivalCost(
       boardCost,
       alightSlack,
@@ -71,7 +61,14 @@ public class PatternCostCalculator<T extends DefaultTripSchedule>
       trip,
       toStop
     );
-    return defaultCost + unpreferCost;
+    boolean includeUnpreferredCost = unpreferredPatterns.get(trip.pattern().patternIndex());
+
+    if (includeUnpreferredCost) {
+      int unpreferredCostValue = unpreferredCost.calculateRaptorCost(transitTime);
+      return defaultCost + unpreferredCostValue;
+    } else {
+      return defaultCost;
+    }
   }
 
   @Override

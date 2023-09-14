@@ -159,7 +159,7 @@ public class SelectRequest implements Serializable {
 
     public Builder withAgenciesFromString(String s) {
       if (!s.isEmpty()) {
-        this.agencies = FeedScopedId.parseListOfIds(s);
+        this.agencies = FeedScopedId.parseList(s);
       }
       return this;
     }
@@ -171,7 +171,7 @@ public class SelectRequest implements Serializable {
 
     public Builder withRoutesFromString(String s) {
       if (!s.isEmpty()) {
-        this.routes = FeedScopedId.parseListOfIds(s);
+        this.routes = FeedScopedId.parseList(s);
       }
       return this;
     }

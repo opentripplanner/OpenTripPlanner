@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.api;
 
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
  * Input parameters for {@link TransitGeneralizedCostFilter}
@@ -14,11 +14,11 @@ import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction
  *                            itineraries, whichever is the greatest
  */
 public record TransitGeneralizedCostFilterParams(
-  DoubleAlgorithmFunction costLimitFunction,
+  CostLinearFunction costLimitFunction,
   double intervalRelaxFactor
 ) {
   public TransitGeneralizedCostFilterParams(
-    DoubleAlgorithmFunction costLimitFunction,
+    CostLinearFunction costLimitFunction,
     double intervalRelaxFactor
   ) {
     if (intervalRelaxFactor < 0.0) {

@@ -365,8 +365,6 @@ public class EstimatedCallType {
     StopLocation stop = tripTimeOnDate.getStop();
     FeedScopedId stopId = stop.getId();
 
-    FeedScopedId parentStopId = stop.getParentStation().getId();
-
     Collection<TransitAlert> allAlerts = new HashSet<>();
 
     TransitAlertService alertPatchService = transitService.getTransitAlertService();
@@ -386,13 +384,16 @@ public class EstimatedCallType {
     );
     allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(stopId, routeId, stopConditions));
     // StopPlace
-    allAlerts.addAll(alertPatchService.getStopAlerts(parentStopId, stopConditions));
-    allAlerts.addAll(
-      alertPatchService.getStopAndTripAlerts(parentStopId, tripId, serviceDate, stopConditions)
-    );
-    allAlerts.addAll(
-      alertPatchService.getStopAndRouteAlerts(parentStopId, routeId, stopConditions)
-    );
+    if (stop.getParentStation() != null) {
+      FeedScopedId parentStopId = stop.getParentStation().getId();
+      allAlerts.addAll(alertPatchService.getStopAlerts(parentStopId, stopConditions));
+      allAlerts.addAll(
+        alertPatchService.getStopAndTripAlerts(parentStopId, tripId, serviceDate, stopConditions)
+      );
+      allAlerts.addAll(
+        alertPatchService.getStopAndRouteAlerts(parentStopId, routeId, stopConditions)
+      );
+    }
     // Trip
     allAlerts.addAll(alertPatchService.getTripAlerts(tripId, serviceDate));
     // Route

@@ -768,6 +768,8 @@ type QueryType {
   ): [StopPlace]! @timingData
   "Input type for executing a travel search for a trip between two locations. Returns trip patterns describing suggested alternatives for the trip."
   trip(
+    "Time and cost penalty on access/egress modes."
+    accessEgressPenalty: [PenaltyForStreetMode!] = [],
     "The alightSlack is the minimum extra time after exiting a public transport vehicle. This is the default value used, if not overridden by the 'alightSlackList'."
     alightSlackDefault: Int = 0,
     "List of alightSlack for a given set of modes. Defaults: []"
@@ -1819,7 +1821,16 @@ Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`
 """
 scalar DateTime
 
-"A linear function to calculate a value(y) based on a parameter (x): `y = f(x) = a + bx`. It allows setting both a constant(a) and a coefficient(b) and the use those in the computation. Format: `a + b x`. Example: `1800 + 2.0 x`"
+"""
+A double function `f(t)` is used to calculate a value based on a variable(t). The variable can
+be the duration/time or cost for a leg or section of a path/itinerary. The function
+`f(t) = a + bt` has a constant(a) and a coefficient(b) that will be used in OTP to compute
+`f(t)`.
+
+Format: `a + b t`. Example: `30m + 2.0 t`. The constant `a` accept both whole numbers and
+duration input format like: `60` = `60s` = `1m` and `3791` = `1h3m11s`. `b` must be a positive
+decimal number between `0.0` and `100.0`.
+"""
 scalar DoubleFunction
 
 "Duration in a lenient ISO-8601 duration format. Example P2DT2H12M40S, 2d2h12m40s or 1h"
@@ -1898,7 +1909,7 @@ input ItineraryFilters {
   groupedOtherThanSameLegsMaxCostMultiplier: Float = 2.0
   "Add an additional cost for short transfers on long transit itineraries. See javaDoc on `AddMinSafeTransferCostFilter` details."
   minSafeTransferTimeFactor: Float @deprecated
-  "Set a relative limit for all transit itineraries. The limit is calculated based on the transit itinerary generalized-cost and the time between itineraries Itineraries without transit legs are excluded from this filter. Example: costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. If the lowest cost returned is 10 000, then the limit is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure or arrival times of the itinerary. Default: {\"costLimitFunction\": 900.0 + 1.5 x, \"intervalRelaxFactor\": 0.4}"
+  "Set a relative limit for all transit itineraries. The limit is calculated based on the transit itinerary generalized-cost and the time between itineraries Itineraries without transit legs are excluded from this filter. Example: costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. If the lowest cost returned is 10 000, then the limit is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure or arrival times of the itinerary. Default: {\"costLimitFunction\": 15m + 1.50 t, \"intervalRelaxFactor\": 0.4}"
   transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams
 }
 
@@ -1922,6 +1933,23 @@ input Modes {
   egressMode: StreetMode
   "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
   transportModes: [TransportModes]
+}
+
+"A combination of street mode and penalty for time and cost."
+input PenaltyForStreetMode {
+  """
+      This is used to take the time-penalty and multiply by the `costFactor`.
+      The result is added to the generalized-cost.
+  """
+  costFactor: Float = 1.0
+  """
+  List of modes with the given penalty is applied to. A street-mode should not be listed
+  in more than one element. If empty or null the penalty is applied to all unlisted modes,
+  it becomes the default penalty for this query.
+  """
+  streetMode: StreetMode!
+  "Penalty applied to the time for the given list of modes."
+  timePenalty: DoubleFunction!
 }
 
 "A combination of street mode and corresponding duration"

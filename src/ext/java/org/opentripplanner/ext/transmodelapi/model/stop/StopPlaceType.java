@@ -494,6 +494,10 @@ public class StopPlaceType {
     FeedScopedId id,
     DataFetchingEnvironment environment
   ) {
+    if (id == null) {
+      return null;
+    }
+
     TransitService transitService = GqlUtil.getTransitService(environment);
 
     Station station = transitService.getStationById(id);

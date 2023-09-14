@@ -3,9 +3,9 @@ package org.opentripplanner.service.vehiclerental.internal;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
@@ -22,7 +22,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
   @Inject
   public DefaultVehicleRentalService() {}
 
-  private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new HashMap<>();
+  private final Map<FeedScopedId, VehicleRentalPlace> rentalPlaces = new ConcurrentHashMap<>();
 
   @Override
   public Collection<VehicleRentalPlace> getVehicleRentalPlaces() {
@@ -39,7 +39,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
     return rentalPlaces
       .values()
       .stream()
-      .filter(vehicleRentalPlace -> vehicleRentalPlace instanceof VehicleRentalVehicle)
+      .filter(VehicleRentalVehicle.class::isInstance)
       .map(VehicleRentalVehicle.class::cast)
       .toList();
   }
@@ -47,8 +47,8 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
   @Override
   public VehicleRentalVehicle getVehicleRentalVehicle(FeedScopedId id) {
     VehicleRentalPlace vehicleRentalPlace = rentalPlaces.get(id);
-    return vehicleRentalPlace instanceof VehicleRentalVehicle
-      ? (VehicleRentalVehicle) vehicleRentalPlace
+    return vehicleRentalPlace instanceof VehicleRentalVehicle vehicleRentalVehicle
+      ? vehicleRentalVehicle
       : null;
   }
 
@@ -57,7 +57,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
     return rentalPlaces
       .values()
       .stream()
-      .filter(vehicleRentalPlace -> vehicleRentalPlace instanceof VehicleRentalStation)
+      .filter(VehicleRentalStation.class::isInstance)
       .map(VehicleRentalStation.class::cast)
       .toList();
   }
@@ -65,15 +65,13 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
   @Override
   public VehicleRentalStation getVehicleRentalStation(FeedScopedId id) {
     VehicleRentalPlace vehicleRentalPlace = rentalPlaces.get(id);
-    return vehicleRentalPlace instanceof VehicleRentalStation
-      ? (VehicleRentalStation) vehicleRentalPlace
+    return vehicleRentalPlace instanceof VehicleRentalStation vehicleRentalStation
+      ? vehicleRentalStation
       : null;
   }
 
   @Override
   public void addVehicleRentalStation(VehicleRentalPlace vehicleRentalStation) {
-    // Remove old reference first, as adding will be a no-op if already present
-    rentalPlaces.remove(vehicleRentalStation.getId());
     rentalPlaces.put(vehicleRentalStation.getId(), vehicleRentalStation);
   }
 

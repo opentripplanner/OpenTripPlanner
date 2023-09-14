@@ -90,7 +90,6 @@ public class LegMapper {
     api.headway = domain.getHeadway();
     api.distance = round3Decimals(domain.getDistanceMeters());
     api.generalizedCost = domain.getGeneralizedCost();
-    api.pathway = domain.getPathwayId() != null;
     api.agencyTimeZoneOffset = domain.getAgencyTimeZoneOffset();
 
     if (domain instanceof TransitLeg trLeg) {
@@ -119,12 +118,8 @@ public class LegMapper {
       api.transitLeg = false;
       api.mode = ModeMapper.mapToApi(streetLeg.getMode());
 
-      if (domain.getPathwayId() != null) {
-        api.route = FeedScopedIdMapper.mapToApi(domain.getPathwayId());
-      } else {
-        // TODO OTP2 - This should be set to the street name according to the JavaDoc
-        api.route = "";
-      }
+      // TODO OTP2 - This should be set to the street name according to the JavaDoc
+      api.route = "";
     }
 
     api.interlineWithPreviousLeg = domain.isInterlinedWithPreviousLeg();

@@ -40,10 +40,10 @@ public class PatternAtStop {
   public static PatternAtStop fromId(TransitService transitService, String id) {
     String[] parts = id.split(";", 2);
     Base64.Decoder decoder = Base64.getDecoder();
-    FeedScopedId stopId = FeedScopedId.parseId(
+    FeedScopedId stopId = FeedScopedId.parse(
       new String(decoder.decode(parts[0]), StandardCharsets.UTF_8)
     );
-    FeedScopedId patternId = FeedScopedId.parseId(
+    FeedScopedId patternId = FeedScopedId.parse(
       new String(decoder.decode(parts[1]), StandardCharsets.UTF_8)
     );
     return new PatternAtStop(

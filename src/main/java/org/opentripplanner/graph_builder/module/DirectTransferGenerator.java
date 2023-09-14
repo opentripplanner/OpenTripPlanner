@@ -71,6 +71,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
       new DefaultTransitService(transitModel),
       radiusByDuration,
+      0,
       null,
       graph.hasStreets
     );

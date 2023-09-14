@@ -259,7 +259,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
             environment.getArguments()
           );
           TripPattern pattern = transitService.getTripPatternForId(
-            FeedScopedId.parseId(args.getGraphQLId())
+            FeedScopedId.parse(args.getGraphQLId())
           );
 
           if (pattern == null) {

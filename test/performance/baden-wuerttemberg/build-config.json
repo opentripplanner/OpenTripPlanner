@@ -1,4 +1,6 @@
 {
+  "transitServiceStart": "2022-01-01",
+  "transitServiceEnd": "2022-12-31",
   "osmDefaults": {
     "osmTagMapping": "germany",
     "timeZone": "Europe/Berlin"

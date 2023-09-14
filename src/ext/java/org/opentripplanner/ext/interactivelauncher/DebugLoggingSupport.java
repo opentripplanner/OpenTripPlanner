@@ -6,6 +6,7 @@ import ch.qos.logback.classic.LoggerContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -17,12 +18,20 @@ import org.slf4j.LoggerFactory;
  */
 public class DebugLoggingSupport {
 
+  private static final String OTP = Pattern.quote("org.opentripplanner.") + ".*";
+  private static final String GRAPHQL = Pattern.quote("fea");
+  private static final String NAMED_LOGGERS = Pattern.quote("[A-Z0-9_]*");
+
+  private static final Pattern LOG_MATCHER_PATTERN = Pattern.compile(
+    "(" + OTP + "|" + GRAPHQL + "|" + NAMED_LOGGERS + ")"
+  );
+
   public static List<String> getLogs() {
     List<String> result = new ArrayList<>();
     LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
     for (Logger log : context.getLoggerList()) {
       var name = log.getName();
-      if (name.matches("(org\\.opentripplanner\\..*|[A-Z0-9_]*)") && !name.equals("ROOT")) {
+      if (!name.equals("ROOT") && LOG_MATCHER_PATTERN.matcher(name).matches()) {
         result.add(logDisplayName(name));
       }
     }

@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.Currency;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -32,7 +31,7 @@ public class FareProductMapper {
       price,
       duration,
       toInternalModel(rhs.getRiderCategory()),
-      toInternalModel(rhs.egetFareContainer())
+      toInternalModel(rhs.getFareMedium())
     );
     mappedFareProducts.add(fp);
     return fp;
@@ -44,8 +43,8 @@ public class FareProductMapper {
     return allFareProducts.stream().map(this::map).toList();
   }
 
-  public Optional<FareProduct> getByFareProductId(FeedScopedId fareProductId) {
-    return mappedFareProducts.stream().filter(p -> p.id().equals(fareProductId)).findFirst();
+  public Collection<FareProduct> getByFareProductId(FeedScopedId fareProductId) {
+    return mappedFareProducts.stream().filter(p -> p.id().equals(fareProductId)).toList();
   }
 
   private static RiderCategory toInternalModel(
@@ -77,7 +76,7 @@ public class FareProductMapper {
     };
   }
 
-  private static FareMedium toInternalModel(org.onebusaway.gtfs.model.FareContainer c) {
+  private static FareMedium toInternalModel(org.onebusaway.gtfs.model.FareMedium c) {
     if (c == null) {
       return null;
     } else {

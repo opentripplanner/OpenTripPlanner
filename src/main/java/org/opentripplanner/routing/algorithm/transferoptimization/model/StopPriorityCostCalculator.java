@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
+import org.opentripplanner.framework.lang.IntUtils;
+
 /**
  * This calculator is used to give the stop-priority-cost a boost, by multiplying it with a {@code
  * factor}.
@@ -15,6 +17,6 @@ public class StopPriorityCostCalculator {
   }
 
   int extraStopPriorityCost(int stop) {
-    return (int) Math.round((double) stopTransferCost[stop] * extraStopTransferCostFactor);
+    return IntUtils.round(stopTransferCost[stop] * extraStopTransferCostFactor);
   }
 }

@@ -8,11 +8,10 @@ import graphql.schema.GraphQLNonNull;
 import java.util.Map;
 import java.util.function.Consumer;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
+import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunction;
 import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
 public class ItineraryFiltersInputType {
@@ -84,7 +83,7 @@ public class ItineraryFiltersInputType {
             "is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure" +
             " or arrival times of the itinerary. " +
             "Default: {\"costLimitFunction\": " +
-            RequestFunctions.serialize(dft.transitGeneralizedCostLimit().costLimitFunction()) +
+            dft.transitGeneralizedCostLimit().costLimitFunction().serialize() +
             ", \"intervalRelaxFactor\": " +
             dft.transitGeneralizedCostLimit().intervalRelaxFactor() +
             "}"
@@ -182,7 +181,7 @@ public class ItineraryFiltersInputType {
       (Map<String, ?> v) ->
         builder.withTransitGeneralizedCostLimit(
           new TransitGeneralizedCostFilterParams(
-            (DoubleAlgorithmFunction) v.get("costLimitFunction"),
+            ((DoubleFunction) v.get("costLimitFunction")).asCostLinearFunction(),
             (double) v.get("intervalRelaxFactor")
           )
         )

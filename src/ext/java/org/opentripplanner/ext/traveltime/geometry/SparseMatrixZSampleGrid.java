@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.lang.IntUtils;
 
 /**
  * A generic indexed grid of Z samples.
@@ -228,8 +229,8 @@ public final class SparseMatrixZSampleGrid<TZ>
   @Override
   public int[] getLowerLeftIndex(Coordinate C) {
     return new int[] {
-      (int) Math.round((C.x - center.x - dX / 2) / dX),
-      (int) Math.round((C.y - center.y - dY / 2) / dY),
+      IntUtils.round((C.x - center.x - dX / 2) / dX),
+      IntUtils.round((C.y - center.y - dY / 2) / dY),
     };
   }
 

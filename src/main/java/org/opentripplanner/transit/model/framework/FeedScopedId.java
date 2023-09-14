@@ -1,9 +1,7 @@
-/* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.transit.model.framework;
 
 import static org.opentripplanner.framework.lang.StringUtils.assertHasValue;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +18,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    */
   private static final char ID_SEPARATOR = ':';
 
-  @Serial
   private final String feedId;
 
   private final String id;
@@ -46,7 +43,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    * @return an id object
    * @throws IllegalArgumentException if the id cannot be parsed
    */
-  public static FeedScopedId parseId(String value) throws IllegalArgumentException {
+  public static FeedScopedId parse(String value) throws IllegalArgumentException {
     if (value == null || value.isEmpty()) {
       return null;
     }
@@ -58,6 +55,13 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     }
   }
 
+  /**
+   * Parses a string consisting of concatenated FeedScopedIds to a List
+   */
+  public static List<FeedScopedId> parseList(String s) {
+    return Arrays.stream(s.split(",")).map(FeedScopedId::parse).collect(Collectors.toList());
+  }
+
   public static boolean isValidString(String value) throws IllegalArgumentException {
     return value != null && value.indexOf(ID_SEPARATOR) > -1;
   }
@@ -67,13 +71,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
    */
   public static String concatenateId(String feedId, String id) {
     return feedId + ID_SEPARATOR + id;
-  }
-
-  /**
-   * Parses a string consisting of concatenated FeedScopedIds to a List
-   */
-  public static List<FeedScopedId> parseListOfIds(String s) {
-    return Arrays.stream(s.split(",")).map(FeedScopedId::parseId).collect(Collectors.toList());
   }
 
   public String getFeedId() {
