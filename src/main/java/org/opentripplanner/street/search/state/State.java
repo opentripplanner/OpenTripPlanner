@@ -206,7 +206,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     );
   }
 
-  public boolean vehicleRentalIsFinished() {
+  private boolean vehicleRentalIsFinished() {
     return (
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       (
@@ -221,7 +221,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     );
   }
 
-  public boolean vehicleRentalNotStarted() {
+  private boolean vehicleRentalNotStarted() {
     return stateData.vehicleRentalState == VehicleRentalState.BEFORE_RENTING;
   }
 

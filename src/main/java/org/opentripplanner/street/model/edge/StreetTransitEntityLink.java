@@ -86,11 +86,12 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       }
     }
 
-    switch (s0.currentMode()) {
-      case BICYCLE:
+
+    return switch (s0.currentMode()) {
+      case BICYCLE, SCOOTER -> {
         // Forbid taking your own bike in the station if bike P+R activated.
         if (s0.getRequest().mode().includesParking() && !s0.isVehicleParked()) {
-          return State.empty();
+          yield State.empty();
         }
         // Forbid taking a (station) rental vehicle in the station. This allows taking along
         // floating rental vehicles.
@@ -101,32 +102,36 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
             s0.getRequest().rental().allowArrivingInRentedVehicleAtDestination()
           )
         ) {
-          return State.empty();
+          yield State.empty();
         }
-        // Allow taking an owned bike in the station
-        break;
-      case CAR:
+        yield buildState(s0, s1, pref);
+      }
+      // Allow taking an owned bike in the station
+      case CAR -> {
         // Forbid taking your own car in the station if bike P+R activated.
         if (s0.getRequest().mode().includesParking() && !s0.isVehicleParked()) {
-          return State.empty();
+          yield State.empty();
         }
         // For Kiss & Ride allow dropping of the passenger before entering the station
         if (s0.getCarPickupState() != null) {
           if (canDropOffAfterDriving(s0) && isLeavingStreetNetwork(s0.getRequest().arriveBy())) {
             dropOffAfterDriving(s0, s1);
           } else {
-            return State.empty();
+            yield State.empty();
           }
         }
-        // If Kiss & Ride (Taxi) mode is not enabled allow car traversal so that the Stop
-        // may be reached by car
-        break;
-      case WALK:
-        break;
-      default:
-        return State.empty();
-    }
+        yield buildState(s0, s1, pref);
+      }
+      // If Kiss & Ride (Taxi) mode is not enabled allow car traversal so that the Stop
+      // may be reached by car
+      case WALK -> buildState(s0, s1, pref);
+      case FLEX -> State.empty();
+    };
 
+  }
+
+  @Nonnull
+  private State[] buildState(State s0, StateEditor s1, RoutingPreferences pref) {
     if (
       s0.isRentingVehicleFromStation() &&
       s0.mayKeepRentedVehicleAtDestination() &&
