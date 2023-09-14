@@ -52,7 +52,7 @@ public final class ItineraryFilterPreferences {
       );
     this.removeTransitWithHigherCostThanBestOnStreetOnly =
       CostLinearFunction.of(Duration.ofMinutes(1), 1.3);
-    this.removeTransitWithMoreWalking = false;
+    this.removeTransitIfWalkingIsBetter = true;
   }
 
   private ItineraryFilterPreferences(Builder builder) {
