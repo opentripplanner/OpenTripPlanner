@@ -129,6 +129,7 @@ public class DefaultFareService implements FareService {
       ItineraryFares currentFare = ItineraryFares.empty();
       boolean legWithoutRulesFound = false;
       boolean legsWithoutMatchingRulesFound = false;
+      boolean fareTypeHasFare = false;
       for (String feedId : fareLegsByFeed.keySet()) {
         var fareRules = fareRulesByTypeAndFeed.get(fareType).get(feedId);
 
@@ -161,7 +162,7 @@ public class DefaultFareService implements FareService {
 
       // No fares will be discovered after this point
       if (!hasFare) {
-        return null;
+        continue;
       }
 
       // Accumulate the final price of the fare or indicate that no final fare could be found
@@ -182,7 +183,7 @@ public class DefaultFareService implements FareService {
         );
       }
     }
-    return fare;
+    return hasFare ? fare : null;
   }
 
   /**

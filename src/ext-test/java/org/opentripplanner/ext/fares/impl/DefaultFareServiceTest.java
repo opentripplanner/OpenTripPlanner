@@ -127,7 +127,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       resultComponents
     );
 
-    assertEquals(resultPrice, Money.usDollars(20));
+    assertEquals(Money.usDollars(20), resultPrice);
   }
 
   @Test
@@ -155,7 +155,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       resultComponents
     );
 
-    assertEquals(resultPrice, Money.usDollars(20));
+    assertEquals(Money.usDollars(20), resultPrice);
   }
 
   @Test
