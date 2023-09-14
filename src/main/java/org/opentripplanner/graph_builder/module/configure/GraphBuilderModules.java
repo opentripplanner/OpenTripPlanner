@@ -115,12 +115,9 @@ public class GraphBuilderModules {
   static DigitransitEmissionsModule provideEmissionsModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
-    Graph graph,
-    TransitModel transitModel,
-    DataImportIssueStore issueStore,
     EmissionsServiceRepository emissionsServiceRepository
   ) {
-    return new DigitransitEmissionsModule(config, emissionsServiceRepository);
+    return new DigitransitEmissionsModule(dataSources, config, emissionsServiceRepository);
   }
 
   @Provides

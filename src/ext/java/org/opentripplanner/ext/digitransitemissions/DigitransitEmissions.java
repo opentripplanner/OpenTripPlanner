@@ -9,6 +9,9 @@ public record DigitransitEmissions(double avg, int passengerAvg) {
   }
 
   public double getEmissionsPerPassenger() {
+    if (this.passengerAvg <= 1) {
+      return this.avg;
+    }
     return this.avg / this.passengerAvg;
   }
 }

@@ -2,10 +2,13 @@
 package org.opentripplanner.ext.gtfsgraphqlapi.generated;
 
 import graphql.relay.Connection;
+import graphql.relay.Connection;
+import graphql.relay.Edge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
 import java.util.Currency;
+import java.util.Map;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -20,7 +23,11 @@ import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLRela
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.RideHailingProvider;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.RouteTypeModel;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.StopOnRouteModel;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.StopOnTripModel;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.StopPosition;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.UnknownModel;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
@@ -41,6 +48,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
@@ -48,6 +57,7 @@ import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePositio
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Money;
@@ -309,9 +319,12 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Departure row is a location, which lists departures of a certain pattern from a
-   * stop. Departure rows are identified with the pattern, so querying departure rows
-   * will return only departures from one stop per pattern
+   * Departure row is a combination of a pattern and a stop of that pattern.
+   *
+   * They are de-duplicated so for each pattern there will only be a single departure row.
+   *
+   * This is useful if you want to show a list of stop/pattern combinations but want each pattern to be
+   * listed only once.
    */
   public interface GraphQLDepartureRow {
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
@@ -385,6 +398,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Double> elevationGained();
 
     public DataFetcher<Double> elevationLost();
+
+    public DataFetcher<Double> emissions();
 
     public DataFetcher<Long> endTime();
 

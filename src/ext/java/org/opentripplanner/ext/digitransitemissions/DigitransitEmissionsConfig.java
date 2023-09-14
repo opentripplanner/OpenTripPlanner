@@ -9,7 +9,8 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  */
 public class DigitransitEmissionsConfig {
 
-  private String url;
+  private int carAvgCo2;
+  private double carAvgOccupancy;
 
   public DigitransitEmissionsConfig(String parameterName, NodeAdapter root) {
     var c = root
@@ -25,10 +26,22 @@ public class DigitransitEmissionsConfig {
       )
       .asObject();
 
-    this.url = c.of("url").since(V2_4).summary("Url to emissions json file.").asString("");
+    this.carAvgCo2 =
+      c.of("carAvgCo2").since(V2_4).summary("The average CO2 emissions of a car.").asInt(1);
+
+    this.carAvgOccupancy =
+      c
+        .of("carAvgOccupancy")
+        .since(V2_4)
+        .summary("The average number of passengers in a car.")
+        .asDouble(1.1);
   }
 
-  public String getUrl() {
-    return url;
+  public int getCarAvgCo2() {
+    return carAvgCo2;
+  }
+
+  public double getCarAvgOccupancy() {
+    return carAvgOccupancy;
   }
 }

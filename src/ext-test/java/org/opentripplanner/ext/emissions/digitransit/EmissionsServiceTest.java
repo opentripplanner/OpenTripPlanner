@@ -48,7 +48,7 @@ class EmissionsServiceTest {
     Map<String, DigitransitEmissions> digitransitEmissions = new HashMap<>();
     digitransitEmissions.put("F:F:1:BUS", new DigitransitEmissions(120, 12));
     digitransitEmissions.put("CAR", new DigitransitEmissions(1100, 1));
-    this.eService = new DigitransitEmissionsService(digitransitEmissions);
+    this.eService = new DigitransitEmissionsService(digitransitEmissions, 131);
   }
 
   @Test

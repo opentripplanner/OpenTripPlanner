@@ -18,9 +18,14 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class DigitransitEmissionsService implements Serializable, EmissionsService {
 
   private Map<String, DigitransitEmissions> emissions;
+  private double carAvgEmissions;
 
-  public DigitransitEmissionsService(Map<String, DigitransitEmissions> emissions) {
+  public DigitransitEmissionsService(
+    Map<String, DigitransitEmissions> emissions,
+    double carAvgEmissions
+  ) {
     this.emissions = emissions;
+    this.carAvgEmissions = carAvgEmissions;
   }
 
   @Override
@@ -45,8 +50,7 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
       .toList();
 
     if (!carLegs.isEmpty()) {
-      float emis = (float) getEmissionsForCarItinerary(carLegs);
-      return emis;
+      return (float) getEmissionsForCarItinerary(carLegs);
     }
     return null;
   }
@@ -58,7 +62,15 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
         double legDistanceInKm = leg.getDistanceMeters() / 1000;
         FeedScopedId feedScopedAgencyId = leg.getAgency().getId();
         String modeName = leg.getMode().name();
-        String key = feedScopedAgencyId + ":" + modeName;
+
+        String key =
+          feedScopedAgencyId +
+          ":" +
+          leg.getRoute().getId().getId() +
+          ":" +
+          leg.getRoute().getShortName() +
+          ":" +
+          modeName;
 
         if (key != null && this.emissions.containsKey(key)) {
           return this.emissions.get(key).getEmissionsPerPassenger() * legDistanceInKm;
@@ -66,28 +78,20 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
         return -1;
       });
     DoubleSummaryStatistics stats = emissionsStream.summaryStatistics();
-    if (stats.getMin() < 0) {
+    Double sum = stats.getSum();
+    if (stats.getMin() < 0 || Double.isNaN(sum)) {
       return -1;
     }
-    Double sum = stats.getSum();
-
     return sum;
   }
 
   private double getEmissionsForCarItinerary(List<StreetLeg> carLegs) {
-    if (this.emissions.containsKey(TraverseMode.CAR.toString())) {
-      double emis = carLegs
-        .stream()
-        .mapToDouble(leg -> {
-          double carLegDistanceInKm = leg.getDistanceMeters() / 1000;
-          return (
-            this.emissions.get(TraverseMode.CAR.toString()).getEmissionsPerPassenger() *
-            carLegDistanceInKm
-          );
-        })
-        .sum();
-      return emis;
-    }
-    return -1;
+    return carLegs
+      .stream()
+      .mapToDouble(leg -> {
+        double carLegDistanceInKm = leg.getDistanceMeters() / 1000;
+        return (this.carAvgEmissions * carLegDistanceInKm);
+      })
+      .sum();
   }
 }
