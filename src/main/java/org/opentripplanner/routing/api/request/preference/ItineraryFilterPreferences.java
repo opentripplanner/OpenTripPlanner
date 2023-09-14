@@ -31,7 +31,7 @@ public final class ItineraryFilterPreferences {
   private final boolean removeItinerariesWithSameRoutesAndStops;
   private final TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
   private final CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
-  private final boolean removeTransitWithMoreWalking;
+  private final boolean removeTransitIfWalkingIsBetter;
 
   private ItineraryFilterPreferences() {
     this.accessibilityScore = false;
