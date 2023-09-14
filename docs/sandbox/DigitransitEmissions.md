@@ -10,7 +10,7 @@ CO2 Emissions and ability to show them via plan queries in itinerary by Digitran
 This implementation enables OTP to retrieve CO2 information, which is then utilized during 
 itinerary queries. The emissions are represented in grams per kilometer (g/Km) unit
 
-Emissions data is located in an emissions.txt file within a gtfs.zip and has the following properties:
+Emissions data is located in an emissions.txt file within a gtfs package and has the following properties:
 
 `route_id`: route id
 
@@ -31,7 +31,7 @@ route_id,agency_id,route_short_name,type,avg,p_avg
 2345,HSL,1,TRAM,0,0
 ```
 
-Emissions data is loaded from the gtfs.zip file(s) and embedded into the graph during the build process.
+Emissions data is loaded from the gtfs package and embedded into the graph during the build process.
 
 
 ### Configuration

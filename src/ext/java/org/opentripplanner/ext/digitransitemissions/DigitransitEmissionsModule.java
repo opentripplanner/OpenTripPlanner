@@ -4,12 +4,12 @@ import com.csvreader.CsvReader;
 import dagger.Module;
 import jakarta.inject.Inject;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -26,6 +26,7 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
   private BuildConfig config;
   private EmissionsServiceRepository emissionsServiceRepository;
   private GraphBuilderDataSources dataSources;
+  private Map<String, DigitransitEmissions> emissionsData = new HashMap<>();
 
   @Inject
   public DigitransitEmissionsModule(
@@ -46,36 +47,56 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
       double carAvgOccupancy = config.digitransitEmissions.getCarAvgOccupancy();
       double carAvgEmissions = carAvgCo2 / carAvgOccupancy;
 
+      for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+        if (gtfsData.dataSource().name().contains(".zip")) {
+          readGtfsZip(gtfsData.dataSource().path());
+        } else {
+          readGtfs(gtfsData.dataSource().path());
+        }
+      }
+
       this.emissionsServiceRepository.saveEmissionsService(
-          new DigitransitEmissionsService(readGtfs(), carAvgEmissions)
+          new DigitransitEmissionsService(this.emissionsData, carAvgEmissions)
         );
     }
   }
 
-  private Map<String, DigitransitEmissions> readGtfs() {
-    Map<String, DigitransitEmissions> emissionsData = new HashMap<>();
-
+  private void readGtfs(String filePath) {
     try {
-      for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
-        ZipFile zipFile = new ZipFile(new File(gtfsData.dataSource().path()), ZipFile.OPEN_READ);
-        String feedId = readFeedId(zipFile);
-        InputStream stream = zipFile.getInputStream(zipFile.getEntry("emissions.txt"));
-        CsvReader reader = new CsvReader(stream, StandardCharsets.UTF_8);
-        reader.readHeaders();
-        while (reader.readRecord()) {
-          emissionsData.put(getKey(reader, feedId), getEmissions(reader));
-        }
-        zipFile.close();
-      }
+      InputStream feedInfoStream = new FileInputStream(filePath + "/feed_info.txt");
+      String feedId = readFeedId(feedInfoStream);
+      feedInfoStream.close();
+
+      InputStream stream = new FileInputStream(filePath + "/emissions.txt");
+      readEmissions(stream, feedId);
+      stream.close();
     } catch (IOException e) {
       LOG.error("Reading emissions data failed.", e);
     }
-    return emissionsData;
   }
 
-  private String readFeedId(ZipFile zipFile) {
+  private void readGtfsZip(String filePath) {
     try {
-      InputStream stream = zipFile.getInputStream(zipFile.getEntry("feed_info.txt"));
+      ZipFile zipFile = new ZipFile(new File(filePath), ZipFile.OPEN_READ);
+      String feedId = readFeedId(zipFile.getInputStream(zipFile.getEntry("feed_info.txt")));
+      InputStream stream = zipFile.getInputStream(zipFile.getEntry("emissions.txt"));
+      readEmissions(stream, feedId);
+      zipFile.close();
+    } catch (IOException e) {
+      LOG.error("Reading emissions data failed.", e);
+    }
+  }
+
+  private void readEmissions(InputStream stream, String feedId) throws IOException {
+    CsvReader reader = new CsvReader(stream, StandardCharsets.UTF_8);
+    reader.readHeaders();
+    while (reader.readRecord()) {
+      this.emissionsData.put(getKey(reader, feedId), getEmissions(reader));
+    }
+  }
+
+  private String readFeedId(InputStream stream) {
+    try {
       CsvReader reader = new CsvReader(stream, StandardCharsets.UTF_8);
       reader.readHeaders();
       reader.readRecord();
