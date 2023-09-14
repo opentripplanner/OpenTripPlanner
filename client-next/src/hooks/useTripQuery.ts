@@ -12,7 +12,7 @@ const endpoint = `https://api.entur.io/journey-planner/v3/graphql`;
  */
 const query = graphql(`
   query trip($from: Location!, $to: Location!) {
-    trip(from: $from, to: $to, numTripPatterns: 1) {
+    trip(from: $from, to: $to, numTripPatterns: 3) {
       tripPatterns {
         aimedStartTime
         aimedEndTime
@@ -20,6 +20,7 @@ const query = graphql(`
         distance
         legs {
           id
+          mode
           pointsOnLink {
             points
           }

@@ -2,6 +2,7 @@ import { Layer, Map, Marker, NavigationControl, Source } from 'react-map-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripQuery, TripQueryVariables } from '../gql/graphql.ts';
 import { decode } from '@googlemaps/polyline-codec';
+import { getColorForMode } from '../util/getColorForMode.ts';
 
 const mapStyle = {
   version: 8,
@@ -29,6 +30,7 @@ const initialViewState = {
   longitude: 10.2332855,
   zoom: 4,
 };
+
 export function MapView({
   tripQueryVariables,
   setTripQueryVariables,
@@ -45,7 +47,7 @@ export function MapView({
       // @ts-ignore
       mapStyle={mapStyle}
       initialViewState={initialViewState}
-      style={{ width: '100%', height: 'calc(100vh - 184px)' }}
+      style={{ width: '100%', height: 'calc(100vh - 200px)' }}
       onDblClick={(e) => {
         e.preventDefault();
         if (!tripQueryVariables?.from.coordinates) {
@@ -89,7 +91,10 @@ export function MapView({
               from: { coordinates: { latitude: e.lngLat.lat, longitude: e.lngLat.lng } },
             });
           }}
-        />
+          anchor="bottom-right"
+        >
+          <img alt="" src="/img/marker-flag-start-shadowed.png" height={48} width={49} />
+        </Marker>
       )}
       {tripQueryVariables?.to.coordinates && (
         <Marker
@@ -102,7 +107,10 @@ export function MapView({
               to: { coordinates: { latitude: e.lngLat.lat, longitude: e.lngLat.lng } },
             });
           }}
-        />
+          anchor="bottom-right"
+        >
+          <img alt="" src="/img/marker-flag-end-shadowed.png" height={48} width={49} />
+        </Marker>
       )}
       {tripQueryResult &&
         tripQueryResult.trip.tripPatterns[0].legs.map(
@@ -110,7 +118,6 @@ export function MapView({
             leg.pointsOnLink && (
               <Source
                 key={leg.id}
-                //id="polylineLayer"
                 type="geojson"
                 data={{
                   type: 'Feature',
@@ -122,15 +129,13 @@ export function MapView({
                 }}
               >
                 <Layer
-                  //id="lineLayer"
                   type="line"
-                  //source="my-data"
                   layout={{
                     'line-join': 'round',
                     'line-cap': 'round',
                   }}
                   paint={{
-                    'line-color': 'rgba(3, 170, 238, 1)',
+                    'line-color': getColorForMode(leg.mode),
                     'line-width': 5,
                   }}
                 />
