@@ -72,8 +72,6 @@ public class OsmFilter {
   public static StreetTraversalPermission getPermissionsForWay(
     OSMWay way,
     StreetTraversalPermission def,
-    boolean banDiscouragedWalking,
-    boolean banDiscouragedBiking,
     DataImportIssueStore issueStore
   ) {
     StreetTraversalPermission permissions = getPermissionsForEntity(way, def);
@@ -103,11 +101,6 @@ public class OsmFilter {
       permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
     }
 
-    // Check for foot=discouraged, if applicable
-    if (banDiscouragedWalking && way.hasTag("foot") && way.getTag("foot").equals("discouraged")) {
-      permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
-    }
-
     // Compute bike permissions, check consistency.
     boolean forceBikes = false;
     if (way.isBicycleExplicitlyAllowed()) {
@@ -115,10 +108,7 @@ public class OsmFilter {
       forceBikes = true;
     }
 
-    if (
-      way.isBicycleDismountForced() ||
-      (banDiscouragedBiking && way.hasTag("bicycle") && way.getTag("bicycle").equals("discouraged"))
-    ) {
+    if (way.isBicycleDismountForced()) {
       permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
       if (forceBikes) {
         issueStore.add(new ConflictingBikeTags(way));
@@ -132,7 +122,7 @@ public class OsmFilter {
     OSMWay way,
     StreetTraversalPermission def
   ) {
-    return getPermissionsForWay(way, def, false, false, DataImportIssueStore.NOOP);
+    return getPermissionsForWay(way, def, DataImportIssueStore.NOOP);
   }
 
   /**

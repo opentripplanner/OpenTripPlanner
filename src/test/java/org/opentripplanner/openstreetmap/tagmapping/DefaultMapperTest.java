@@ -2,8 +2,11 @@ package org.opentripplanner.openstreetmap.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
+import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.SpeedPicker;
@@ -13,12 +16,15 @@ import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
 
 public class DefaultMapperTest {
 
-  static WayPropertySet wps = new WayPropertySet();
+  private WayPropertySet wps;
   float epsilon = 0.01f;
 
-  static {
+  @BeforeEach
+  public void setup() {
+    var wps = new WayPropertySet();
     DefaultMapper source = new DefaultMapper();
     source.populateProperties(wps);
+    this.wps = wps;
   }
 
   /**
@@ -109,6 +115,32 @@ public class DefaultMapperTest {
     // there is no special handling for stairs with ramps yet
     var props = wps.getDataForWay(WayTestData.stairs());
     assertEquals(PEDESTRIAN, props.getPermission());
+  }
+
+  @Test
+  void footDiscouraged() {
+    var regular = WayTestData.pedestrianTunnel();
+    var props = wps.getDataForWay(regular);
+    assertEquals(PEDESTRIAN_AND_BICYCLE, props.getPermission());
+    assertEquals(1, props.getWalkSafetyFeatures().forward());
+
+    var discouraged = WayTestData.pedestrianTunnel().addTag("foot", "discouraged");
+    var discouragedProps = wps.getDataForWay(discouraged);
+    assertEquals(PEDESTRIAN_AND_BICYCLE, discouragedProps.getPermission());
+    assertEquals(3, discouragedProps.getWalkSafetyFeatures().forward());
+  }
+
+  @Test
+  void bicycleDiscouraged() {
+    var regular = WayTestData.southeastLaBonitaWay();
+    var props = wps.getDataForWay(regular);
+    assertEquals(ALL, props.getPermission());
+    assertEquals(.98, props.getBicycleSafetyFeatures().forward());
+
+    var discouraged = WayTestData.southeastLaBonitaWay().addTag("bicycle", "discouraged");
+    var discouragedProps = wps.getDataForWay(discouraged);
+    assertEquals(ALL, discouragedProps.getPermission());
+    assertEquals(2.94, discouragedProps.getBicycleSafetyFeatures().forward(), epsilon);
   }
 
   /**
