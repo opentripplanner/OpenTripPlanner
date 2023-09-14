@@ -9,39 +9,21 @@ import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.ext.flex.FlexTest;
-import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.routing.graphfinder.NearbyStop;
-import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitModel;
 
-/**
- * This test makes sure that one of the example feeds in the GTFS-Flex repo works. It's the City of
- * Aspen Downtown taxi service which is a completely unscheduled trip that takes you door-to-door in
- * the city.
- * <p>
- * It only contains a single stop time which in GTFS static would not work but is valid in GTFS
- * Flex.
- */
-public class UnscheduledTripTest extends FlexTest {
+public class UnscheduledTripTest {
 
   private static final int STOP_A = 0;
   private static final int STOP_B = 1;
@@ -53,25 +35,8 @@ public class UnscheduledTripTest extends FlexTest {
 
   private static final StopLocation AREA_STOP = TransitModelForTest.areaStopForTest(
     "area",
-    GeometryUtils
-      .getGeometryFactory()
-      .createPolygon(
-        new Coordinate[] {
-          new Coordinate(11.0, 63.0),
-          new Coordinate(11.5, 63.0),
-          new Coordinate(11.5, 63.5),
-          new Coordinate(11.0, 63.5),
-          new Coordinate(11.0, 63.0),
-        }
-      )
+    Polygons.BERLIN
   );
-  static TransitModel transitModel;
-
-  @BeforeAll
-  static void setup() {
-    TestOtpModel model = FlexTest.buildFlexGraph(ASPEN_GTFS);
-    transitModel = model.transitModel();
-  }
 
   @Test
   void testIsUnscheduledTrip() {
@@ -116,57 +81,6 @@ public class UnscheduledTripTest extends FlexTest {
       isUnscheduledTrip(List.of(scheduledStop, scheduledStop, scheduledStop)),
       "Three scheduled stop times is not unscheduled"
     );
-  }
-
-  @Test
-  void parseAspenTaxiAsUnscheduledTrip() {
-    var flexTrips = transitModel.getAllFlexTrips();
-    assertFalse(flexTrips.isEmpty());
-    assertEquals(
-      Set.of("t_1289262_b_29084_tn_0", "t_1289257_b_28352_tn_0"),
-      flexTrips.stream().map(FlexTrip::getId).map(FeedScopedId::getId).collect(Collectors.toSet())
-    );
-
-    assertEquals(
-      Set.of(UnscheduledTrip.class),
-      flexTrips.stream().map(FlexTrip::getClass).collect(Collectors.toSet())
-    );
-  }
-
-  @Test
-  void calculateAccessTemplate() {
-    var trip = getFlexTrip();
-    var nearbyStop = getNearbyStop(trip);
-
-    var accesses = trip
-      .getFlexAccessTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
-      .toList();
-
-    assertEquals(1, accesses.size());
-
-    var access = accesses.get(0);
-    assertEquals(0, access.fromStopIndex);
-    assertEquals(0, access.toStopIndex);
-  }
-
-  @Test
-  void calculateEgressTemplate() {
-    var trip = getFlexTrip();
-    var nearbyStop = getNearbyStop(trip);
-    var egresses = trip
-      .getFlexEgressTemplates(nearbyStop, flexDate, calculator, FlexConfig.DEFAULT)
-      .toList();
-
-    assertEquals(1, egresses.size());
-
-    var egress = egresses.get(0);
-    assertEquals(0, egress.fromStopIndex);
-    assertEquals(0, egress.toStopIndex);
-  }
-
-  @Test
-  void shouldGeneratePatternForFlexTripWithSingleStop() {
-    assertFalse(transitModel.getAllTripPatterns().isEmpty());
   }
 
   @Test
@@ -558,16 +472,7 @@ public class UnscheduledTripTest extends FlexTest {
     return TimeUtils.timeToStrCompact(time, MISSING_VALUE, "MISSING_VALUE");
   }
 
-  private static NearbyStop getNearbyStop(FlexTrip<?, ?> trip) {
-    assertEquals(1, trip.getStops().size());
-    var stopLocation = trip.getStops().iterator().next();
-    return new NearbyStop(stopLocation, 0, List.of(), null);
-  }
 
-  private static FlexTrip<?, ?> getFlexTrip() {
-    var flexTrips = transitModel.getAllFlexTrips();
-    return flexTrips.iterator().next();
-  }
 
   private static StopTime area(String startTime, String endTime) {
     var stopTime = new StopTime();
