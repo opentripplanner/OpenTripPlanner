@@ -192,7 +192,7 @@ public class UnscheduledTripTest extends FlexTest {
     assertEquals(T15_00, trip.latestArrivalTime(STOP_B));
 
     assertEquals(PickDrop.SCHEDULED, trip.getBoardRule(STOP_A));
-    assertEquals(PickDrop.SCHEDULED, trip.getBoardRule(STOP_B));
+    assertEquals(PickDrop.SCHEDULED, trip.getAlightRule(STOP_B));
   }
 
   @Test
@@ -217,7 +217,7 @@ public class UnscheduledTripTest extends FlexTest {
     assertEquals(T14_00, trip.latestArrivalTime(STOP_B));
 
     assertEquals(PickDrop.SCHEDULED, trip.getBoardRule(STOP_A));
-    assertEquals(PickDrop.SCHEDULED, trip.getBoardRule(STOP_B));
+    assertEquals(PickDrop.SCHEDULED, trip.getAlightRule(STOP_B));
   }
 
   @Test
@@ -237,7 +237,7 @@ public class UnscheduledTripTest extends FlexTest {
       .build();
 
     assertEquals(PickDrop.SCHEDULED, trip.getBoardRule(STOP_A));
-    assertEquals(PickDrop.SCHEDULED, trip.getBoardRule(STOP_B));
+    assertEquals(PickDrop.SCHEDULED, trip.getAlightRule(STOP_B));
   }
 
   static Stream<TestCase> testRegularStopToAreaEarliestDepartureTimeTestCases() {
