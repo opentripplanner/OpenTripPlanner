@@ -95,7 +95,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [nonTransitGeneralizedCostLimit](#rd_if_nonTransitGeneralizedCostLimit)                                   | `cost-linear-function` | The function define a max-limit for generalized-cost for non-transit itineraries.                                                              | *Optional* | `"1h + 2.0 t"`   |  2.1  |
 |    [parkAndRideDurationRatio](#rd_if_parkAndRideDurationRatio)                                               |        `double`        | Filter P+R routes that consist of driving and walking by the minimum fraction of the driving using of _time_.                                  | *Optional* | `0.0`            |  2.1  |
 |    [removeItinerariesWithSameRoutesAndStops](#rd_if_removeItinerariesWithSameRoutesAndStops)                 |        `boolean`       | Set to true if you want to list only the first itinerary  which goes through the same stops and routes.                                        | *Optional* | `false`          |  2.2  |
-|    [removeTransitWithHigherCostThanBestOnStreetOnly](#rd_if_removeTransitWithHigherCostThanBestOnStreetOnly) | `cost-linear-function` | Limit function for generalized-cost computed from non-transit itineries for transit itineraries.                                               | *Optional* | `"1m + 1.30 t"`  |  2.4  |
+|    [removeTransitWithHigherCostThanBestOnStreetOnly](#rd_if_removeTransitWithHigherCostThanBestOnStreetOnly) | `cost-linear-function` | Limit function for generalized-cost computed from street-only itineries applied to transit itineraries.                                        | *Optional* | `"1m + 1.30 t"`  |  2.4  |
 |    [transitGeneralizedCostLimit](#rd_if_transitGeneralizedCostLimit)                                         |        `object`        | A relative limit for the generalized-cost for transit itineraries.                                                                             | *Optional* |                  |  2.1  |
 |       [costLimitFunction](#rd_if_transitGeneralizedCostLimit_costLimitFunction)                              | `cost-linear-function` | The base function used by the filter.                                                                                                          | *Optional* | `"15m + 1.50 t"` |  2.2  |
 |       [intervalRelaxFactor](#rd_if_transitGeneralizedCostLimit_intervalRelaxFactor)                          |        `double`        | How much the filter should be relaxed for itineraries that do not overlap in time.                                                             | *Optional* | `0.4`            |  2.2  |
@@ -634,7 +634,7 @@ Itineraries visiting the same set of stops and riding the exact same routes, dep
 **Since version:** `2.4` ∙ **Type:** `cost-linear-function` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"1m + 1.30 t"`   
 **Path:** /routingDefaults/itineraryFilters 
 
-Limit function for generalized-cost computed from non-transit itineries for transit itineraries.
+Limit function for generalized-cost computed from street-only itineries applied to transit itineraries.
 
 The max-limit is applied to itineraries with transit *legs*, and only itineraries
 without transit legs are considered when calculating the minimum cost. The smallest

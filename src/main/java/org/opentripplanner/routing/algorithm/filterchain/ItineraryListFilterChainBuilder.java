@@ -186,9 +186,9 @@ public class ItineraryListFilterChainBuilder {
   /**
    * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
    * cases we get "silly" transit itineraries that is marginally better on travel-duration compared
-   * with a on-street-all-the-way itinerary. Use this method to turn filter worse enough itineraries.
+   * with a on-street-all-the-way itinerary. Use this method to filter worse enough itineraries.
    * <p>
-   * The filter remove all itineraries with a generalized-cost that is higher than the best
+   * The filter removes all itineraries with a generalized-cost that is higher than the best
    * on-street-all-the-way itinerary.
    * <p>
    * This filter only have an effect, if an on-street-all-the-way(WALK, BICYCLE, CAR) itinerary
