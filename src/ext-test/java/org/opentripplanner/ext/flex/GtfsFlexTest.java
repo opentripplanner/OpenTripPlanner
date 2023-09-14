@@ -84,6 +84,7 @@ public class GtfsFlexTest extends FlexTest {
   void shouldGeneratePatternForFlexTripWithSingleStop() {
     assertFalse(transitModel.getAllTripPatterns().isEmpty());
   }
+
   private static NearbyStop getNearbyStop(FlexTrip<?, ?> trip) {
     assertEquals(1, trip.getStops().size());
     var stopLocation = trip.getStops().iterator().next();
@@ -94,5 +95,4 @@ public class GtfsFlexTest extends FlexTest {
     var flexTrips = transitModel.getAllFlexTrips();
     return flexTrips.iterator().next();
   }
-
 }

@@ -8,10 +8,14 @@ import static org.opentripplanner.ext.flex.trip.UnscheduledTripTest.TestCase.tc;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -19,6 +23,7 @@ import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -38,49 +43,52 @@ public class UnscheduledTripTest {
     Polygons.BERLIN
   );
 
-  @Test
-  void testIsUnscheduledTrip() {
-    var scheduledStop = new StopTime();
-    scheduledStop.setArrivalTime(30);
-    scheduledStop.setDepartureTime(60);
+  @Nested
+  class IsUnscheduledTrip {
 
-    var unscheduledStop = new StopTime();
-    unscheduledStop.setFlexWindowStart(30);
-    unscheduledStop.setFlexWindowEnd(300);
+    private static final StopTime SCHEDULED_STOP = new StopTime();
+    private static final StopTime UNSCHEDULED_STOP = new StopTime();
 
-    assertFalse(isUnscheduledTrip(List.of()), "Empty stop times is not a unscheduled trip");
-    assertFalse(
-      isUnscheduledTrip(List.of(scheduledStop)),
-      "Single scheduled stop time is not unscheduled"
-    );
-    assertTrue(
-      isUnscheduledTrip(List.of(unscheduledStop)),
-      "Single unscheduled stop time is unscheduled"
-    );
-    assertTrue(
-      isUnscheduledTrip(List.of(unscheduledStop, unscheduledStop)),
-      "Two unscheduled stop times is unscheduled"
-    );
-    assertTrue(
-      isUnscheduledTrip(List.of(unscheduledStop, scheduledStop)),
-      "Unscheduled + scheduled stop times is unscheduled"
-    );
-    assertTrue(
-      isUnscheduledTrip(List.of(scheduledStop, unscheduledStop)),
-      "Scheduled + unscheduled stop times is unscheduled"
-    );
-    assertFalse(
-      isUnscheduledTrip(List.of(scheduledStop, scheduledStop)),
-      "Two scheduled stop times is not unscheduled"
-    );
-    assertTrue(
-      isUnscheduledTrip(List.of(unscheduledStop, unscheduledStop, unscheduledStop)),
-      "Three unscheduled stop times is not unscheduled"
-    );
-    assertFalse(
-      isUnscheduledTrip(List.of(scheduledStop, scheduledStop, scheduledStop)),
-      "Three scheduled stop times is not unscheduled"
-    );
+    static {
+      SCHEDULED_STOP.setArrivalTime(30);
+      SCHEDULED_STOP.setDepartureTime(60);
+
+      UNSCHEDULED_STOP.setFlexWindowStart(30);
+      UNSCHEDULED_STOP.setFlexWindowEnd(300);
+    }
+
+    static Collection<Arguments> notUnscheduled = Stream
+      .of(
+        List.of(),
+        List.of(SCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, SCHEDULED_STOP),
+        List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
+        List.of(SCHEDULED_STOP, SCHEDULED_STOP),
+        List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP)
+      )
+      .map(Arguments::of)
+      .toList();
+
+    @ParameterizedTest
+    @VariableSource("notUnscheduled")
+    void isNotUnscheduled(List<StopTime> stopTimes) {
+      assertFalse(isUnscheduledTrip(stopTimes));
+    }
+
+    static Collection<Arguments> unscheduled = Stream
+      .of(
+        List.of(UNSCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP, UNSCHEDULED_STOP)
+      )
+      .map(Arguments::of)
+      .collect(Collectors.toList());
+
+    @ParameterizedTest
+    @VariableSource("unscheduled")
+    void isUnscheduled(List<StopTime> stopTimes) {
+      assertTrue(isUnscheduledTrip(stopTimes));
+    }
   }
 
   @Test
@@ -471,8 +479,6 @@ public class UnscheduledTripTest {
   private static String timeToString(int time) {
     return TimeUtils.timeToStrCompact(time, MISSING_VALUE, "MISSING_VALUE");
   }
-
-
 
   private static StopTime area(String startTime, String endTime) {
     var stopTime = new StopTime();
