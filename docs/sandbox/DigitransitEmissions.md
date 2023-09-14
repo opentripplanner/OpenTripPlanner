@@ -10,36 +10,33 @@ CO2 Emissions and ability to show them via plan queries in itinerary by Digitran
 This implementation enables OTP to retrieve CO2 information, which is then utilized during 
 itinerary queries. The emissions are represented in grams per kilometer (g/Km) unit
 
-Emissions data should be in json array with objects that have the following properties:
+Emissions data is located in an emissions.txt file within a gtfs.zip and has the following properties:
 
-`db`: database it refers to or CAR when referring to personal travel by car. For Example Linkki, HSL
+`route_id`: route id
 
-`agency_id`: agency id as appeared in GTFS or CAR when referring to personal travel by car.
+`agency_id`: agency id
 
-`agency_name`: Name of agency, or CAR when referring to personal travel by a car.
+`route_short_name`: Short name of the route.
 
-`mode`: mode of transportation it provides or CAR when referring to personal travel by car.
+`type`: Mode of transportation.
 
-`avg`: Carbon dioxide equivalent value for the `mode` at grams/Km units
+`avg`: Average carbon dioxide equivalent value for the vehicles used on the route at grams/Km units
 
-`p_avg`: Average passenger count for that mode of travel provided by that agency.
+`p_avg`: Average passenger count for the vehicles on the route.
 
 For example:
-```json
-[
-{"db": "FOO", "agency_id": "FOO", "agency_name": "FOO_CO", "mode": "BUS", "avg": "88.17", "p_avg": 32},
-{"db": "CAR", "agency_id": "CAR", "agency_name": "CAR", "mode": "CAR", "avg": "123.7", "p_avg": 1}
-]
+```csv
+route_id,agency_id,route_short_name,type,avg,p_avg
+1234,HSL,545,BUS,123,20
+2345,HSL,1,TRAM,0,0
 ```
 
-Emissions data is loaded from the provided source and embedded into the graph  during the build process.
+Emissions data is loaded from the gtfs.zip file(s) and embedded into the graph during the build process.
 
 
 ### Configuration
 To enable this functionality, you need to add the "Co2Emissions"  feature in the
-`otp-config.json` file. Include the `digitransitEmissions` object in the
-`build-config.json` file. The `digitransitEmissions` object should contain a parameter called `url`,
-which should be set to the location where the emissions data is stored.
+`otp-config.json` file. 
 
 ```json
 //otp-config.json
@@ -47,21 +44,23 @@ which should be set to the location where the emissions data is stored.
   "Co2Emissions": true
 }
 ```
-include the `digitransitEmissions` object in the
-`build-config.json` file. Object should contain `url` parameter,
-which should be set to the location where the emissions data is stored.
+Include the `digitransitEmissions` object in the
+`build-config.json` file. The `digitransitEmissions` object should contain parameters called
+`carAvgCo2` and `carAvgOccupancy`. The `carAvgCo2` provides the average emissions value for a car and
+the `carAvgOccupancy` provides the average number of passengers in a car.
 
 ```json
 //build-config.json
 {
   "digitransitEmissions": {
-    "url": "https://your-url"
+    "carAvgCo2": 170,
+    "carAvgOccupancy": 1.3
   }
 }
 ```
 ## Changelog
 
-### OTP 2.4
+### OTP 2.5
 
 - Initial implementation of the emissions calculation.
 

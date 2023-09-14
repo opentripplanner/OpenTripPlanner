@@ -17,6 +17,7 @@ import org.opentripplanner.TestServerContext;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.ext.digitransitemissions.DefaultEmissionsServiceRepository;
 import org.opentripplanner.ext.digitransitemissions.DigitransitEmissionsService;
+import org.opentripplanner.ext.digitransitemissions.EmissionsServiceRepository;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -115,7 +116,7 @@ public class SpeedTest {
         TestServerContext.createWorldEnvelopeService(),
         TestServerContext.createVehiclePositionService(),
         TestServerContext.createVehicleRentalService(),
-        null, //  new DigitransitEmissionsService(new DefaultEmissionsServiceRepository()),
+        null,
         config.flexConfig,
         List.of(),
         null

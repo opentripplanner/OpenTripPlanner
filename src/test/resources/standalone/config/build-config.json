@@ -75,6 +75,7 @@
     }
   ],
   "digitransitEmissions": {
-    "url": "foo.bar"
+    "carAvgCo2": 170,
+    "carAvgOccupancy": 1.3
   }
 }

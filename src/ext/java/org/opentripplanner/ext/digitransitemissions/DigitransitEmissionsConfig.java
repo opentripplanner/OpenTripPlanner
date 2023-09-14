@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.digitransitemissions;
 
-import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
-
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
@@ -15,7 +13,6 @@ public class DigitransitEmissionsConfig {
   public DigitransitEmissionsConfig(String parameterName, NodeAdapter root) {
     var c = root
       .of(parameterName)
-      .since(V2_4)
       .summary("Configure properties for emissions file.")
       .description(
         """
@@ -26,15 +23,10 @@ public class DigitransitEmissionsConfig {
       )
       .asObject();
 
-    this.carAvgCo2 =
-      c.of("carAvgCo2").since(V2_4).summary("The average CO2 emissions of a car.").asInt(1);
+    this.carAvgCo2 = c.of("carAvgCo2").summary("The average CO2 emissions of a car.").asInt(170);
 
     this.carAvgOccupancy =
-      c
-        .of("carAvgOccupancy")
-        .since(V2_4)
-        .summary("The average number of passengers in a car.")
-        .asDouble(1.1);
+      c.of("carAvgOccupancy").summary("The average number of passengers in a car.").asDouble(1.3);
   }
 
   public int getCarAvgCo2() {
