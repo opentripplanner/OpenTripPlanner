@@ -257,7 +257,7 @@ public final class ItineraryFilterPreferences {
     private boolean removeItinerariesWithSameRoutesAndStops;
     private TransitGeneralizedCostFilterParams transitGeneralizedCostLimit;
     private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
-    private boolean removeTransitWithMoreWalking;
+    private boolean removeTransitIfWalkingIsBetter;
 
     public ItineraryFilterPreferences original() {
       return original;
