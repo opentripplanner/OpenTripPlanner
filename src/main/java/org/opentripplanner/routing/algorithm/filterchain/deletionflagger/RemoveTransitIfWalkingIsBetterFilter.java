@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
- * Filter itineraries which contain more walking than a pure walk itinerary
+ * Filter itineraries which have a higher generalized-cost than a pure walk itinerary.
  */
 public class RemoveTransitIfWalkingIsBetterFilter implements ItineraryDeletionFlagger {
 
