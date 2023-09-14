@@ -341,8 +341,8 @@ public final class ItineraryFilterPreferences {
       return this;
     }
 
-    public Builder withRemoveTransitWithMoreWalking(boolean removeTransitWithMoreWalking) {
-      this.removeTransitWithMoreWalking = removeTransitWithMoreWalking;
+    public Builder withRemoveTransitIfWalkingIsBetter(boolean removeTransitIfWalkingIsBetter) {
+      this.removeTransitIfWalkingIsBetter = removeTransitIfWalkingIsBetter;
       return this;
     }
 
