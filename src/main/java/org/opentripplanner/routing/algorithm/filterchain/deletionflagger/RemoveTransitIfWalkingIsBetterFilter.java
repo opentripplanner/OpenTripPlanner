@@ -28,8 +28,6 @@ public class RemoveTransitIfWalkingIsBetterFilter implements ItineraryDeletionFl
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    // Filter the most common silly itinerary case: transit itinerary has more walking than plain walk itinerary
-    // This never makes sense
 
     OptionalInt minWalkCost = itineraries
       .stream()
