@@ -90,7 +90,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     // Find boarding index, also check if it's boardable
     final int fromIndex = getFromIndex(access);
 
-    // Alighting is always at the last stop for unscheduled trips
+    // templates will be generated from the boardingIndex to the end of the trip
     final int lastIndexInTrip = stopTimes.length - 1;
 
     // Check if trip is possible
@@ -134,27 +134,39 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     FlexPathCalculator calculator,
     FlexConfig config
   ) {
-    // Boarding is always at the first stop for unscheduled trips
-    int fromIndex = 0;
+    // templates will be generated from the first index to the toIndex
+    int firstIndexInStop = 0;
 
-    // Find alighting index
+    // Find alighting index, also check if alighting is allowed
     int toIndex = getToIndex(egress);
 
     // Check if trip is possible
-    if (
-      toIndex == INDEX_NOT_FOUND || fromIndex > toIndex || getBoardRule(fromIndex).isNotRoutable()
-    ) {
+    if (toIndex == INDEX_NOT_FOUND || firstIndexInStop > toIndex) {
       return Stream.empty();
     }
 
-    return expandStops(fromIndex)
-      .map(indexedStop ->
+    IntStream indices;
+    if (stopTimes.length == 1) {
+      indices = IntStream.of(toIndex);
+    } else {
+      indices = IntStream.range(firstIndexInStop, toIndex + 1);
+    }
+    // check for every stop after fromIndex if you can alight, if so return a template
+    return indices
+      // if you cannot board at this index, the trip is not possible
+      .filter(boardIndex -> getBoardRule(boardIndex).isRoutable())
+      // expand GroupStops and build IndexedStopLocations
+      .mapToObj(this::expandStops)
+      // flatten stream of streams
+      .flatMap(Function.identity())
+      // create template
+      .map(boardStop ->
         new FlexEgressTemplate(
           egress,
           this,
-          fromIndex,
           toIndex,
-          indexedStop.stop,
+          boardStop.index,
+          boardStop.stop,
           date,
           calculator,
           config

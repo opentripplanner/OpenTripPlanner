@@ -108,7 +108,7 @@ public class UnscheduledTripTest extends FlexTest {
       isUnscheduledTrip(List.of(scheduledStop, scheduledStop)),
       "Two scheduled stop times is not unscheduled"
     );
-    assertFalse(
+    assertTrue(
       isUnscheduledTrip(List.of(unscheduledStop, unscheduledStop, unscheduledStop)),
       "Three unscheduled stop times is not unscheduled"
     );
