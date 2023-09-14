@@ -54,6 +54,12 @@ public class TransitModelForTest {
     .withTimezone(TIME_ZONE_ID)
     .withUrl("https://www.otheragency.com")
     .build();
+  public static final Agency OTHER_FEED_AGENCY = Agency
+    .of(FeedScopedId.ofNullable("F2", "other.feed-agency"))
+    .withName("Other feed agency")
+    .withTimezone(TIME_ZONE_ID)
+    .withUrl("https:/www.otherfeedagency.com")
+    .build();
 
   public static FeedScopedId id(String id) {
     return new FeedScopedId(FEED_ID, id);
@@ -87,6 +93,10 @@ public class TransitModelForTest {
   /** Create a valid Bus Route to use in unit tests */
   public static TripBuilder trip(String id) {
     return Trip.of(id(id)).withRoute(route("R" + id).build());
+  }
+
+  public static TripBuilder trip(String feedId, String tripId) {
+    return Trip.of(FeedScopedId.ofNullable(feedId, tripId)).withRoute(route("R" + tripId).build());
   }
 
   public static RegularStop stopForTest(
