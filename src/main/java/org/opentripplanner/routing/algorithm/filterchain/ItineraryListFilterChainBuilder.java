@@ -202,8 +202,8 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * An itinerary which has transit legs and more walking than the plain walk itinerary are silly.
-   * This filter removes such itineraries.
+   * A transit itinerary with higher generalized-cost than a walk-only itinerary is silly. This filter removes such
+   * itineraries.
    * <p>
    * This filter only have an effect, if an walk-all-the-way itinerary exist.
    */
