@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -101,16 +102,16 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     if (stopTimes.length == 1) {
       indices = IntStream.of(fromIndex);
     } else {
-      indices = IntStream.range(fromIndex + 1, lastIndexInTrip);
+      indices = IntStream.range(fromIndex + 1, lastIndexInTrip + 1);
     }
     // check for every stop after fromIndex if you can alight, if so return a template
     return indices
-      // if you cannot alight at a certain index, the trip is not possible
+      // if you cannot alight at an index, the trip is not possible
       .filter(alightIndex -> getAlightRule(alightIndex).isRoutable())
       // expand GroupStops and build IndexedStopLocations
       .mapToObj(this::expandStops)
       // flatten stream of streams
-      .flatMap(s -> s)
+      .flatMap(Function.identity())
       // create template
       .map(alightStop ->
         new FlexAccessTemplate(
@@ -296,7 +297,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
 
   private int getToIndex(NearbyStop accessEgress) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
-      if (getBoardRule(i).isNotRoutable()) {
+      if (getAlightRule(i).isNotRoutable()) {
         continue;
       }
       StopLocation stop = stopTimes[i].stop();
