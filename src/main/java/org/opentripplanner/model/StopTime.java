@@ -3,7 +3,7 @@ package org.opentripplanner.model;
 
 import java.util.List;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -136,10 +136,6 @@ public final class StopTime implements Comparable<StopTime> {
     this.arrivalTime = arrivalTime;
   }
 
-  public void clearArrivalTime() {
-    this.arrivalTime = MISSING_VALUE;
-  }
-
   public boolean isDepartureTimeSet() {
     return departureTime != MISSING_VALUE;
   }
@@ -155,10 +151,6 @@ public final class StopTime implements Comparable<StopTime> {
     this.departureTime = departureTime;
   }
 
-  public void clearDepartureTime() {
-    this.departureTime = MISSING_VALUE;
-  }
-
   public boolean isTimepointSet() {
     return timepoint != MISSING_VALUE;
   }
@@ -172,10 +164,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   public void setTimepoint(int timepoint) {
     this.timepoint = timepoint;
-  }
-
-  public void clearTimepoint() {
-    this.timepoint = MISSING_VALUE;
   }
 
   public I18NString getStopHeadsign() {
@@ -220,10 +208,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   public void setShapeDistTraveled(double shapeDistTraveled) {
     this.shapeDistTraveled = shapeDistTraveled;
-  }
-
-  public void clearShapeDistTraveled() {
-    this.shapeDistTraveled = MISSING_VALUE;
   }
 
   public String getFarePeriodId() {
@@ -309,29 +293,16 @@ public final class StopTime implements Comparable<StopTime> {
     dropOffType = PickDrop.CANCELLED;
   }
 
-  public void cancelDropOff() {
-    dropOffType = PickDrop.CANCELLED;
-  }
-
-  public void cancelPickup() {
-    pickupType = PickDrop.CANCELLED;
-  }
-
   @Override
   public String toString() {
-    return (
-      "StopTime(seq=" +
-      getStopSequence() +
-      " stop=" +
-      getStop().getId() +
-      " trip=" +
-      getTrip().getId() +
-      " times=" +
-      TimeUtils.timeToStrLong(getArrivalTime()) +
-      "-" +
-      TimeUtils.timeToStrLong(getDepartureTime()) +
-      ")"
-    );
+    return ToStringBuilder
+      .of(this.getClass())
+      .addNum("seq", stopSequence)
+      .addObj("stop", stop)
+      .addObj("trip", trip)
+      .addServiceTime("arrival", arrivalTime)
+      .addServiceTime("departure", departureTime)
+      .toString();
   }
 
   private static int getAvailableTime(int... times) {

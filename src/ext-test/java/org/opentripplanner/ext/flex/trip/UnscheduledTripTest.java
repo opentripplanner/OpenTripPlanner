@@ -61,8 +61,6 @@ public class UnscheduledTripTest {
       .of(
         List.of(),
         List.of(SCHEDULED_STOP),
-        List.of(UNSCHEDULED_STOP, SCHEDULED_STOP),
-        List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
         List.of(SCHEDULED_STOP, SCHEDULED_STOP),
         List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP)
       )
@@ -78,6 +76,8 @@ public class UnscheduledTripTest {
     static Collection<Arguments> unscheduled = Stream
       .of(
         List.of(UNSCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, SCHEDULED_STOP),
+        List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
         List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP),
         List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP, UNSCHEDULED_STOP)
       )
