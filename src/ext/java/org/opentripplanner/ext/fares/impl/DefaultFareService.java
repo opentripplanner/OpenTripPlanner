@@ -138,8 +138,13 @@ public class DefaultFareService implements FareService {
           Currency currency = Currency.getInstance(
             fareRules.iterator().next().getFareAttribute().getCurrencyType()
           );
-          boolean feedHasFare =
-            populateFare(currentFare, currency, fareType, fareLegsByFeed.get(feedId), fareRules);
+          boolean feedHasFare = populateFare(
+            currentFare,
+            currency,
+            fareType,
+            fareLegsByFeed.get(feedId),
+            fareRules
+          );
 
           if (!feedHasFare) {
             legsWithoutMatchingRulesFound = true;
