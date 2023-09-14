@@ -138,11 +138,12 @@ public class DefaultFareService implements FareService {
           Currency currency = Currency.getInstance(
             fareRules.iterator().next().getFareAttribute().getCurrencyType()
           );
-          boolean feedHasFare = false;
-          feedHasFare =
+          boolean feedHasFare =
             populateFare(currentFare, currency, fareType, fareLegsByFeed.get(feedId), fareRules);
 
-          if (!feedHasFare) legsWithoutMatchingRulesFound = true;
+          if (!feedHasFare) {
+            legsWithoutMatchingRulesFound = true;
+          }
           hasFare = feedHasFare || hasFare; // Other feeds might still have fare for some legs
 
           components.addAll(currentFare.getComponents(fareType));
@@ -150,9 +151,9 @@ public class DefaultFareService implements FareService {
           fares.add(currentFare.getFare(fareType));
 
           // If all the legs are from one feed, consider itinerary products
-          if (fareLegs.equals(fareLegsByFeed.get(feedId))) fare.addItineraryProducts(
-            currentFare.getItineraryProducts()
-          );
+          if (fareLegs.equals(fareLegsByFeed.get(feedId))) {
+            fare.addItineraryProducts(currentFare.getItineraryProducts());
+          }
         } else {
           legWithoutRulesFound = true;
         }
@@ -269,7 +270,7 @@ public class DefaultFareService implements FareService {
     String startZone = firstRide.getFrom().stop.getFirstZoneAsString();
     String endZone = null;
     // stops don't really have an agency id, they have the per-feed default id
-    String feedId = firstRide.getAgency().getId().getFeedId(); //getTrip().getId().getFeedId();
+    String feedId = firstRide.getAgency().getId().getFeedId();
     ZonedDateTime lastRideStartTime = null;
     ZonedDateTime lastRideEndTime = null;
     for (var leg : legs) {

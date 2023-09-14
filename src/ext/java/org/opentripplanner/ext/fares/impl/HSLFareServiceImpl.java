@@ -67,7 +67,9 @@ public class HSLFareServiceImpl extends DefaultFareService {
       .stream()
       .map(leg -> leg.getAgency().getId().getFeedId())
       .collect(Collectors.toSet());
-    if (!Sets.difference(legFeedIds, fareRuleFeedIds).isEmpty()) return Optional.empty();
+    if (!Sets.difference(legFeedIds, fareRuleFeedIds).isEmpty()) {
+      return Optional.empty();
+    }
 
     for (Leg leg : legs) {
       lastRideStartTime = leg.getStartTime();
