@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.flex.FlexServiceDate;
@@ -85,22 +86,43 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     FlexPathCalculator calculator,
     FlexConfig config
   ) {
-    // Find boarding index
-    int fromIndex = getFromIndex(access);
+    // Find boarding index, also check if it's boardable
+    final int fromIndex = getFromIndex(access);
 
     // Alighting is always at the last stop for unscheduled trips
-    int toIndex = stopTimes.length - 1;
+    final int lastIndexInTrip = stopTimes.length - 1;
 
     // Check if trip is possible
-    if (
-      fromIndex == INDEX_NOT_FOUND || fromIndex > toIndex || getAlightRule(toIndex).isNotRoutable()
-    ) {
+    if (fromIndex == INDEX_NOT_FOUND || fromIndex > lastIndexInTrip) {
       return Stream.empty();
     }
 
-    return expandStops(stopTimes[toIndex].stop())
-      .map(stop ->
-        new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, date, calculator, config)
+    IntStream indices;
+    if (stopTimes.length == 1) {
+      indices = IntStream.of(fromIndex);
+    } else {
+      indices = IntStream.range(fromIndex + 1, lastIndexInTrip);
+    }
+    // check for every stop after fromIndex if you can alight, if so return a template
+    return indices
+      // if you cannot alight at a certain index, the trip is not possible
+      .filter(alightIndex -> getAlightRule(alightIndex).isRoutable())
+      // expand GroupStops and build IndexedStopLocations
+      .mapToObj(this::expandStops)
+      // flatten stream of streams
+      .flatMap(s -> s)
+      // create template
+      .map(alightStop ->
+        new FlexAccessTemplate(
+          access,
+          this,
+          fromIndex,
+          alightStop.index,
+          alightStop.stop,
+          date,
+          calculator,
+          config
+        )
       );
   }
 
@@ -124,9 +146,18 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       return Stream.empty();
     }
 
-    return expandStops(stopTimes[fromIndex].stop())
-      .map(stop ->
-        new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, date, calculator, config)
+    return expandStops(fromIndex)
+      .map(indexedStop ->
+        new FlexEgressTemplate(
+          egress,
+          this,
+          fromIndex,
+          toIndex,
+          indexedStop.stop,
+          date,
+          calculator,
+          config
+        )
       );
   }
 
@@ -237,10 +268,11 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     return new UnscheduledTripBuilder(this);
   }
 
-  private Stream<StopLocation> expandStops(StopLocation stop) {
+  private Stream<IndexedStopLocation> expandStops(int index) {
+    var stop = stopTimes[index].stop();
     return stop instanceof GroupStop groupStop
-      ? groupStop.getLocations().stream()
-      : Stream.of(stop);
+      ? groupStop.getLocations().stream().map(s -> new IndexedStopLocation(index, s))
+      : Stream.of(new IndexedStopLocation(index, stop));
   }
 
   private int getFromIndex(NearbyStop accessEgress) {
@@ -308,4 +340,6 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     // requested-arrival-time must be within
     return toTime.intersect(fromTimeShifted);
   }
+
+  private record IndexedStopLocation(int index, StopLocation stop) {}
 }
