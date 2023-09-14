@@ -13,10 +13,6 @@ strict: true
 plugins:
     - "no-sitemap"
     - search
-    # remove this after OTP 2.4.0 has been released
-    - redirects:
-        redirect_maps:
-          'sandbox/LegacyGraphQLApi.md': 'sandbox/GtfsGraphQlApi.md'
 
 theme:
     name: material

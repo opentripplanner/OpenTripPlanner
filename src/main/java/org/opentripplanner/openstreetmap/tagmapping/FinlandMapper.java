@@ -83,6 +83,11 @@ class FinlandMapper implements OsmTagMapper {
     props.setProperties("highway=service;access=private", withModes(NONE));
     props.setProperties("highway=trail", withModes(NONE));
 
+    // Remove ice/winter roads
+    props.setProperties("highway=*;seasonal=winter", withModes(NONE));
+    props.setProperties("highway=*;ice_road=yes", withModes(NONE));
+    props.setProperties("highway=*;winter_road=yes", withModes(NONE));
+
     // No biking on designated footways/sidewalks
     props.setProperties("highway=footway", withModes(PEDESTRIAN));
     props.setProperties("footway=sidewalk;highway=footway", withModes(PEDESTRIAN));

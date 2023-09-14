@@ -1,0 +1,64 @@
+{
+  "data" : {
+    "alerts" : [
+      {
+        "id" : "QWxlcnQ6RjpuZWl0aGVyLWhlYWRlci1ub3ItZGVzY3JpcHRpb24",
+        "alertHeaderText" : "",
+        "alertDescriptionText" : "",
+        "alertUrl" : null,
+        "alertDescriptionTextTranslations" : [ ],
+        "alertHeaderTextTranslations" : [ ]
+      },
+      {
+        "id" : "QWxlcnQ6Rjpuby1oZWFkZXI",
+        "alertHeaderText" : "Second string",
+        "alertDescriptionText" : "Second string",
+        "alertUrl" : null,
+        "alertDescriptionTextTranslations" : [
+          {
+            "language" : null,
+            "text" : "Second string"
+          },
+          {
+            "language" : "de",
+            "text" : "Zweite Zeichenabfolge"
+          },
+          {
+            "language" : "fi",
+            "text" : "Etkö ole varma, mitä tämä tarkoittaa"
+          }
+        ],
+        "alertHeaderTextTranslations" : [ ]
+      },
+      {
+        "id" : "QWxlcnQ6Rjphbi1hbGVydA",
+        "alertHeaderText" : "A header",
+        "alertDescriptionText" : "A description",
+        "alertUrl" : "https://example.com",
+        "alertDescriptionTextTranslations" : [ ],
+        "alertHeaderTextTranslations" : [ ]
+      },
+      {
+        "id" : "QWxlcnQ6Rjpuby1kZXNjcmlwdGlvbg",
+        "alertHeaderText" : "First string",
+        "alertDescriptionText" : "First string",
+        "alertUrl" : null,
+        "alertDescriptionTextTranslations" : [ ],
+        "alertHeaderTextTranslations" : [
+          {
+            "text" : "First string",
+            "language" : null
+          },
+          {
+            "text" : "Erste Zeichenabfolge",
+            "language" : "de"
+          },
+          {
+            "text" : "Minulla ei ole aavistustakaan kuinka puhua suomea",
+            "language" : "fi"
+          }
+        ]
+      }
+    ]
+  }
+}

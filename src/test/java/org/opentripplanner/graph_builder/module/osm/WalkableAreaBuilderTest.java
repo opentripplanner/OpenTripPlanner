@@ -39,7 +39,7 @@ public class WalkableAreaBuilderTest {
     final boolean platformEntriesLinking = true;
 
     final Set<String> boardingAreaRefTags = Set.of();
-    final OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP, boardingAreaRefTags);
+    final OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
 
     final File file = new File(testInfo.getTestClass().get().getResource(osmFile).getFile());
     assertTrue(file.exists());
