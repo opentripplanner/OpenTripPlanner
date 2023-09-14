@@ -59,9 +59,8 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
       for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
         ZipFile zipFile = new ZipFile(new File(gtfsData.dataSource().path()), ZipFile.OPEN_READ);
         String feedId = readFeedId(zipFile);
-        ZipEntry entry = zipFile.getEntry("emissions.txt");
-        InputStream stream = zipFile.getInputStream(entry);
-        CsvReader reader = new CsvReader(stream, ';', StandardCharsets.UTF_8);
+        InputStream stream = zipFile.getInputStream(zipFile.getEntry("emissions.txt"));
+        CsvReader reader = new CsvReader(stream, StandardCharsets.UTF_8);
         reader.readHeaders();
         while (reader.readRecord()) {
           emissionsData.put(getKey(reader, feedId), getEmissions(reader));
@@ -76,8 +75,7 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
 
   private String readFeedId(ZipFile zipFile) {
     try {
-      ZipEntry feedInfoEntry = zipFile.getEntry("feed_info.txt");
-      InputStream stream = zipFile.getInputStream(feedInfoEntry);
+      InputStream stream = zipFile.getInputStream(zipFile.getEntry("feed_info.txt"));
       CsvReader reader = new CsvReader(stream, StandardCharsets.UTF_8);
       reader.readHeaders();
       reader.readRecord();
