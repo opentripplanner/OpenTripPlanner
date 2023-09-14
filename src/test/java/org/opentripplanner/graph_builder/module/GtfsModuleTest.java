@@ -11,12 +11,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -73,18 +73,20 @@ class GtfsModuleTest {
       return b;
     }
 
-    static Stream<Arguments> interliningCases = Stream.of(
-      Arguments.of(List.of(bundle("A")), 2),
-      Arguments.of(List.of(bundle("A"), bundle("B")), 4),
-      Arguments.of(List.of(bundle("A"), bundle("B"), bundle("C")), 6)
-    );
+    static List<Arguments> interliningCases() {
+      return List.of(
+        Arguments.of(List.of(bundle("A")), 2),
+        Arguments.of(List.of(bundle("A"), bundle("B")), 4),
+        Arguments.of(List.of(bundle("A"), bundle("B"), bundle("C")), 6)
+      );
+    }
 
     /**
      * We test that the number of stay-seated transfers grows linearly (not exponentially) with the
      * number of GTFS input feeds.
      */
     @ParameterizedTest(name = "Bundles {0} should generate {1} stay-seated transfers")
-    @VariableSource("interliningCases")
+    @MethodSource("interliningCases")
     public void interline(List<GtfsBundle> bundles, int expectedTransfers) {
       var model = buildTestModel();
 
