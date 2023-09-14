@@ -72,6 +72,8 @@ public class DefaultFareService implements FareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultFareService.class);
 
+  private final float UNKNOWN_FARE_PRICE = -0.01f;
+
   /** For each fare type (regular, student, etc...) the collection of rules that apply. */
   protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
 
@@ -126,6 +128,7 @@ public class DefaultFareService implements FareService {
       List<Money> fares = new ArrayList<>();
       ItineraryFares currentFare = ItineraryFares.empty();
       boolean legWithoutRulesFound = false;
+      boolean legsWithoutMatchingRulesFound = false;
       for (String feedId : fareLegsByFeed.keySet()) {
         var fareRules = fareRulesByTypeAndFeed.get(fareType).get(feedId);
 
@@ -134,9 +137,12 @@ public class DefaultFareService implements FareService {
           Currency currency = Currency.getInstance(
             fareRules.iterator().next().getFareAttribute().getCurrencyType()
           );
-          hasFare =
-            populateFare(currentFare, currency, fareType, fareLegsByFeed.get(feedId), fareRules) ||
-            hasFare; // Other feeds might still have fare for some legs
+          boolean feedHasFare = false;
+          feedHasFare =
+            populateFare(currentFare, currency, fareType, fareLegsByFeed.get(feedId), fareRules);
+
+          if (!feedHasFare) legsWithoutMatchingRulesFound = true;
+          hasFare = feedHasFare || hasFare; // Other feeds might still have fare for some legs
 
           components.addAll(currentFare.getComponents(fareType));
           fare.addFare(fareType, currentFare.getFare(fareType));
@@ -159,10 +165,10 @@ public class DefaultFareService implements FareService {
       }
 
       // Accumulate the final price of the fare or indicate that no final fare could be found
-      if (legWithoutRulesFound) {
+      if (legWithoutRulesFound || legsWithoutMatchingRulesFound) {
         fare.addFare(
           fareType,
-          Money.ofFractionalAmount(fares.get(0).currency(), Float.POSITIVE_INFINITY)
+          Money.ofFractionalAmount(fares.get(0).currency(), UNKNOWN_FARE_PRICE)
         );
       } else {
         fare.addFare(

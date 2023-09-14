@@ -112,17 +112,22 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .walk(10, Place.forStop(OTHER_FEED_STOP))
       .bus(OTHER_FEED_ROUTE, 2, T11_20, T11_32, Place.forStop(OTHER_FEED_STOP))
       .build();
-    var result = service
-      .calculateFares(itin)
+    var result = service.calculateFares(itin);
+
+    var resultComponents = result
       .getComponents(FareType.regular)
       .stream()
       .map(r -> r.fareId())
       .toList();
 
+    var resultPrice = result.getFare(FareType.regular);
+
     assertEquals(
       List.of(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), OTHER_FEED_ATTRIBUTE.getId()),
-      result
+      resultComponents
     );
+
+    assertEquals(resultPrice, Money.usDollars(20));
   }
 
   @Test
@@ -136,16 +141,40 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .walk(10, Place.forStop(OTHER_FEED_STOP))
       .bus(OTHER_FEED_ROUTE, 2, T11_20, T11_32, Place.forStop(OTHER_FEED_STOP))
       .build();
-    var result = service
-      .calculateFares(itin)
+    var result = service.calculateFares(itin);
+
+    var resultComponents = result
       .getComponents(FareType.regular)
       .stream()
       .map(r -> r.fareId())
       .toList();
 
+    var resultPrice = result.getFare(FareType.regular);
     assertEquals(
       List.of(INSIDE_CITY_CENTER_SET.getFareAttribute().getId(), OTHER_FEED_ATTRIBUTE.getId()),
-      result
+      resultComponents
     );
+
+    assertEquals(resultPrice, Money.usDollars(20));
+  }
+
+  @Test
+  void multipleFeedsWithUnknownFareLegs() {
+    var service = new DefaultFareService();
+    service.addFareRules(FareType.regular, List.of(AIRPORT_TO_CITY_CENTER_SET, OTHER_FEED_SET));
+    var itin = newItinerary(Place.forStop(AIRPORT_STOP))
+      .bus(1, T11_00, T11_05, Place.forStop(OTHER_FEED_STOP))
+      .walk(10, Place.forStop(OTHER_FEED_STOP))
+      .bus(OTHER_FEED_ROUTE, 2, T11_20, T11_32, Place.forStop(OTHER_FEED_STOP))
+      .build();
+    var result = service.calculateFares(itin);
+    var resultComponents = result
+      .getComponents(FareType.regular)
+      .stream()
+      .map(r -> r.fareId())
+      .toList();
+    var resultPrice = result.getFare(FareType.regular);
+    assertEquals(List.of(OTHER_FEED_ATTRIBUTE.getId()), resultComponents);
+    assertEquals(Money.usDollars(-0.01f), resultPrice);
   }
 }
