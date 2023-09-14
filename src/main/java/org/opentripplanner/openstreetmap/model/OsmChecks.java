@@ -1,11 +1,29 @@
 package org.opentripplanner.openstreetmap.model;
 
+import java.util.Set;
+
 /**
  * This class contains methods that are shared between {@link OSMWay} and {@link OSMRelation}.
  * <p>
  * These two classes have some things in common but not enough to create their own inheritance chain.
  */
 class OsmChecks {
+
+  private static final Set<String> NON_ROUTABLE_HIGHWAYS = Set.of(
+    "proposed",
+    "planned",
+    "construction",
+    "razed",
+    "raceway",
+    "abandoned",
+    "historic",
+    "no",
+    "emergency_bay",
+    "rest_area",
+    "services",
+    "bus_guideway",
+    "escape"
+  );
 
   /**
    * Determine whether any mode can or should ever traverse the given way. If not, we leave the way
@@ -19,25 +37,8 @@ class OsmChecks {
    * A whitelist for highway tags is an alternative to a blacklist.
    */
   protected static boolean isRoutable(OSMWithTags way) {
-    String highway = way.getTag("highway");
-    if (highway != null) {
-      if (
-        highway.equals("proposed") ||
-        highway.equals("planned") ||
-        highway.equals("construction") ||
-        highway.equals("razed") ||
-        highway.equals("raceway") ||
-        highway.equals("abandoned") ||
-        highway.equals("historic") ||
-        highway.equals("no") ||
-        highway.equals("emergency_bay") ||
-        highway.equals("rest_area") ||
-        highway.equals("services") ||
-        highway.equals("bus_guideway") ||
-        highway.equals("escape")
-      ) {
-        return false;
-      }
+    if (way.isOneOfTags("highway", NON_ROUTABLE_HIGHWAYS)) {
+      return false;
     }
 
     if (way.isGeneralAccessDenied()) {

@@ -20,7 +20,7 @@ public class OSMRelation extends OSMWithTags {
   }
 
   @Override
-  public String getOpenStreetMapLink() {
+  public String url() {
     return String.format("https://www.openstreetmap.org/relation/%d", getId());
   }
 

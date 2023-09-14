@@ -47,90 +47,6 @@ public class OSMWithTags {
     return ("yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue));
   }
 
-  public StreetTraversalPermission reducePermissions(StreetTraversalPermission def) {
-    StreetTraversalPermission permission;
-
-    /*
-     * Only a few tags are examined here, because we only care about modes supported by OTP
-     * (wheelchairs are not of concern here)
-     *
-     * Only a few values are checked for, all other values are presumed to be permissive (=>
-     * This may not be perfect, but is closer to reality, since most people don't follow the
-     * rules perfectly ;-)
-     */
-    if (isGeneralAccessDenied()) {
-      // this can actually be overridden
-      permission = StreetTraversalPermission.NONE;
-    } else {
-      permission = def;
-    }
-
-    if (isVehicleExplicitlyDenied()) {
-      permission = permission.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
-    } else if (isVehicleExplicitlyAllowed()) {
-      permission = permission.add(StreetTraversalPermission.BICYCLE_AND_CAR);
-    }
-
-    if (isMotorcarExplicitlyDenied() || isMotorVehicleExplicitlyDenied()) {
-      permission = permission.remove(StreetTraversalPermission.CAR);
-    } else if (isMotorcarExplicitlyAllowed() || isMotorVehicleExplicitlyAllowed()) {
-      permission = permission.add(StreetTraversalPermission.CAR);
-    }
-
-    if (isBicycleExplicitlyDenied()) {
-      permission = permission.remove(StreetTraversalPermission.BICYCLE);
-    } else if (isBicycleExplicitlyAllowed()) {
-      permission = permission.add(StreetTraversalPermission.BICYCLE);
-    }
-
-    if (isPedestrianExplicitlyDenied()) {
-      permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
-    } else if (isPedestrianExplicitlyAllowed()) {
-      permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
-    }
-
-    if (isUnderConstruction()) {
-      permission = StreetTraversalPermission.NONE;
-    }
-
-    if (permission == null) {
-      return def;
-    }
-
-    /*
-     * pedestrian rules: everything is two-way (assuming pedestrians are allowed at all) bicycle
-     * rules: default: permissions;
-     *
-     * cycleway=dismount means walk your bike -- the engine will automatically try walking bikes
-     * any time it is forbidden to ride them, so the only thing to do here is to remove bike
-     * permissions
-     *
-     * oneway=... sets permissions for cars and bikes oneway:bicycle overwrites these
-     * permissions for bikes only
-     *
-     * now, cycleway=opposite_lane, opposite, opposite_track can allow once oneway has been set
-     * by oneway:bicycle, but should give a warning if it conflicts with oneway:bicycle
-     *
-     * bicycle:backward=yes works like oneway:bicycle=no bicycle:backwards=no works like
-     * oneway:bicycle=yes
-     */
-
-    // Compute bike permissions, check consistency.
-    boolean forceBikes = false;
-    if (isBicycleExplicitlyAllowed()) {
-      permission = permission.add(StreetTraversalPermission.BICYCLE);
-      forceBikes = true;
-    }
-
-    if (isBicycleDismountForced()) {
-      permission = permission.remove(StreetTraversalPermission.BICYCLE);
-      if (forceBikes) {
-        //issueStore.add(new ConflictingBikeTags(way));
-      }
-    }
-    return permission;
-  }
-
   /**
    * Gets the id.
    */
@@ -557,7 +473,7 @@ public class OSMWithTags {
     this.creativeName = creativeName;
   }
 
-  public String getOpenStreetMapLink() {
+  public String url() {
     return null;
   }
 
@@ -641,6 +557,94 @@ public class OSMWithTags {
       return Set.of("0");
     }
     return levels;
+  }
+
+  /**
+   * Given an assumed traversal permissions, check if there are explicit additional tags, like bicycle=no
+   * or bicycle=yes that override them.
+   */
+  public StreetTraversalPermission overridePermissions(StreetTraversalPermission def) {
+    StreetTraversalPermission permission;
+
+    /*
+     * Only a few tags are examined here, because we only care about modes supported by OTP
+     * (wheelchairs are not of concern here)
+     *
+     * Only a few values are checked for, all other values are presumed to be permissive (=>
+     * This may not be perfect, but is closer to reality, since most people don't follow the
+     * rules perfectly ;-)
+     */
+    if (isGeneralAccessDenied()) {
+      // this can actually be overridden
+      permission = StreetTraversalPermission.NONE;
+    } else {
+      permission = def;
+    }
+
+    if (isVehicleExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+    } else if (isVehicleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.BICYCLE_AND_CAR);
+    }
+
+    if (isMotorcarExplicitlyDenied() || isMotorVehicleExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.CAR);
+    } else if (isMotorcarExplicitlyAllowed() || isMotorVehicleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.CAR);
+    }
+
+    if (isBicycleExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.BICYCLE);
+    } else if (isBicycleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.BICYCLE);
+    }
+
+    if (isPedestrianExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+    } else if (isPedestrianExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
+    }
+
+    if (isUnderConstruction()) {
+      permission = StreetTraversalPermission.NONE;
+    }
+
+    if (permission == null) {
+      return def;
+    }
+
+    /*
+     * pedestrian rules: everything is two-way (assuming pedestrians are allowed at all) bicycle
+     * rules: default: permissions;
+     *
+     * cycleway=dismount means walk your bike -- the engine will automatically try walking bikes
+     * any time it is forbidden to ride them, so the only thing to do here is to remove bike
+     * permissions
+     *
+     * oneway=... sets permissions for cars and bikes oneway:bicycle overwrites these
+     * permissions for bikes only
+     *
+     * now, cycleway=opposite_lane, opposite, opposite_track can allow once oneway has been set
+     * by oneway:bicycle, but should give a warning if it conflicts with oneway:bicycle
+     *
+     * bicycle:backward=yes works like oneway:bicycle=no bicycle:backwards=no works like
+     * oneway:bicycle=yes
+     */
+
+    // Compute bike permissions, check consistency.
+    boolean forceBikes = false;
+    if (isBicycleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.BICYCLE);
+      forceBikes = true;
+    }
+
+    if (isBicycleDismountForced()) {
+      permission = permission.remove(StreetTraversalPermission.BICYCLE);
+      if (forceBikes) {
+        //issueStore.add(new ConflictingBikeTags(way));
+      }
+    }
+    return permission;
   }
 
   @Override

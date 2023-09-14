@@ -24,15 +24,21 @@ public class WayProperties {
 
   WayProperties(WayPropertiesBuilder wayPropertiesBuilder) {
     permission = Objects.requireNonNull(wayPropertiesBuilder.getPermission());
-    bicycleSafetyFeatures = wayPropertiesBuilder.getBicycleSafetyFeatures();
-    walkSafetyFeatures = wayPropertiesBuilder.getWalkSafetyFeatures();
+    bicycleSafetyFeatures = wayPropertiesBuilder.bicycleSafety();
+    walkSafetyFeatures = wayPropertiesBuilder.walkSafety();
   }
 
+  /**
+   * The value for the bicycle safety. If none has been set a default value of 1 is returned.
+   */
   @Nonnull
   public SafetyFeatures bicycleSafety() {
     return Objects.requireNonNullElse(bicycleSafetyFeatures, SafetyFeatures.DEFAULT);
   }
 
+  /**
+   * The value for the walk safety. If none has been set a default value of 1 is returned.
+   */
   @Nonnull
   public SafetyFeatures walkSafety() {
     return Objects.requireNonNullElse(walkSafetyFeatures, SafetyFeatures.DEFAULT);
@@ -43,15 +49,17 @@ public class WayProperties {
     return permission;
   }
 
-  public WayPropertiesBuilder mutate() {
-    return new WayPropertiesBuilder(this);
-  }
-
+  /**
+   * An optional value for the walk safety. If none has been set an empty Optional is returned.
+   */
   @Nonnull
   protected Optional<SafetyFeatures> walkSafetyOpt() {
     return Optional.ofNullable(walkSafetyFeatures);
   }
 
+  /**
+   * An optional value for the bicycle safety. If none has been set an empty Optional is returned.
+   */
   @Nonnull
   protected Optional<SafetyFeatures> bicycleSafetyOpt() {
     return Optional.ofNullable(bicycleSafetyFeatures);
@@ -72,5 +80,9 @@ public class WayProperties {
       );
     }
     return false;
+  }
+
+  public WayPropertiesBuilder mutate() {
+    return new WayPropertiesBuilder(this);
   }
 }

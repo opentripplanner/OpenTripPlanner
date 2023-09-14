@@ -499,7 +499,7 @@ public class WalkableAreaBuilder {
       Area area = intersects.get(0);
       OSMWithTags areaEntity = area.parent;
 
-      StreetTraversalPermission areaPermissions = areaEntity.reducePermissions(
+      StreetTraversalPermission areaPermissions = areaEntity.overridePermissions(
         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
       );
 
@@ -666,7 +666,7 @@ public class WalkableAreaBuilder {
 
       namedArea.setOriginalEdges(intersection);
 
-      StreetTraversalPermission permission = areaEntity.reducePermissions(
+      StreetTraversalPermission permission = areaEntity.overridePermissions(
         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
       );
       namedArea.setPermission(permission);

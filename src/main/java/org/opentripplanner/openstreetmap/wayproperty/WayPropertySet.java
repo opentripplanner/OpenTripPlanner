@@ -119,9 +119,9 @@ public class WayPropertySet {
     float forwardSpeed = getCarSpeedForWay(way, false);
     float backSpeed = getCarSpeedForWay(way, true);
 
-    var permission = way.reducePermissions(forwardResult.getPermission());
+    var permission = way.overridePermissions(forwardResult.getPermission());
 
-    var backwardPermission = way.reducePermissions(backwardResult.getPermission());
+    var backwardPermission = way.overridePermissions(backwardResult.getPermission());
 
     WayProperties result = forwardResult
       .mutate()
