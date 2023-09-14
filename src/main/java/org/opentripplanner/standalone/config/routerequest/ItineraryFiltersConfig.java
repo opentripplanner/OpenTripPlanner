@@ -159,7 +159,7 @@ all non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` a
           .of("removeTransitWithHigherCostThanBestOnStreetOnly")
           .since(V2_4)
           .summary(
-            "Limit function for generalized-cost computed from non-transit itineries for transit itineraries."
+            "Limit function for generalized-cost computed from street-only itineries applied to transit itineraries."
           )
           .description(
             """
