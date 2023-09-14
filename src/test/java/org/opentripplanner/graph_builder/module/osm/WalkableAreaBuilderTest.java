@@ -76,7 +76,7 @@ public class WalkableAreaBuilderTest {
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(true)
   @MaxAreaNodes(5)
-  public void testCalculateVerticesArea(TestInfo testInfo) {
+  void testCalculateVerticesArea(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
@@ -93,7 +93,7 @@ public class WalkableAreaBuilderTest {
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(false)
   @MaxAreaNodes(5)
-  public void testSetupCalculateVerticesAreaWithoutVisibility(TestInfo testInfo) {
+  void testSetupCalculateVerticesAreaWithoutVisibility(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
@@ -112,7 +112,7 @@ public class WalkableAreaBuilderTest {
   @OsmFile("stopareas.pbf")
   @Visibility(true)
   @MaxAreaNodes(50)
-  public void testEntranceStopAreaLinking(TestInfo testInfo) {
+  void testEntranceStopAreaLinking(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.
     var busStopConnection = graph
@@ -183,7 +183,7 @@ public class WalkableAreaBuilderTest {
   @OsmFile("wendlingen-bahnhof.osm.pbf")
   @Visibility(true)
   @MaxAreaNodes(50)
-  public void testSeveralIntersections(TestInfo testInfo) {
+  void testSeveralIntersections(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
