@@ -28,7 +28,6 @@ public class RemoveTransitIfWalkingIsBetterFilter implements ItineraryDeletionFl
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-
     OptionalInt minWalkCost = itineraries
       .stream()
       .filter(Itinerary::isWalkingAllTheWay)
