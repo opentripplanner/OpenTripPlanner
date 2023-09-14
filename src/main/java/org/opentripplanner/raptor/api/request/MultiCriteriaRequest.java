@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.api.request;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -21,7 +22,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   private final RaptorTransitPriorityGroupCalculator transitPriorityCalculator;
 
   @Nullable
-  private final PassThroughPoints passThroughPoints;
+  private final List<PassThroughPoint> passThroughPoints;
 
   @Nullable
   private final Double relaxCostAtDestination;
@@ -76,7 +77,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return Optional.ofNullable(transitPriorityCalculator);
   }
 
-  public Optional<PassThroughPoints> passThroughPoints() {
+  public Optional<List<PassThroughPoint>> passThroughPoints() {
     return Optional.ofNullable(passThroughPoints);
   }
 
@@ -144,13 +145,16 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
 
     private final MultiCriteriaRequest<T> original;
     private RelaxFunction relaxC1;
-    private RaptorTransitPriorityGroupCalculator transitPriorityCalculator = null;
-    private PassThroughPoints passThroughPoints = null;
-    private Double relaxCostAtDestination = null;
+    private RaptorTransitPriorityGroupCalculator transitPriorityCalculator;
+    private List<PassThroughPoint> passThroughPoints;
+    private Double relaxCostAtDestination;
 
     public Builder(MultiCriteriaRequest<T> original) {
       this.original = original;
       this.relaxC1 = original.relaxC1;
+      this.passThroughPoints = original.passThroughPoints;
+      this.transitPriorityCalculator = original.transitPriorityCalculator;
+      this.relaxCostAtDestination = original.relaxCostAtDestination;
     }
 
     @Nullable
@@ -174,13 +178,14 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     }
 
     @Nullable
-    public PassThroughPoints passThroughPoints() {
+    public List<PassThroughPoint> passThroughPoints() {
       return passThroughPoints;
     }
 
     @Nullable
-    public Builder<T> withPassThroughPoints(PassThroughPoints value) {
-      passThroughPoints = value;
+    public Builder<T> withPassThroughPoints(List<PassThroughPoint> points) {
+      // Prevent setting this to an empty list - here we use null to represent NOT_SET
+      passThroughPoints = (points == null || points.isEmpty()) ? null : points;
       return this;
     }
 

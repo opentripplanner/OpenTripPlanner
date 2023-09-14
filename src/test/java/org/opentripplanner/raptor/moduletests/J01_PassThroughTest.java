@@ -24,7 +24,6 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
-import org.opentripplanner.raptor.api.request.PassThroughPoints;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -46,6 +45,21 @@ group. It should be possible to define both stop A and B as a pass-through. Then
 pass either stop A or B should not be dropped.
  */
 public class J01_PassThroughTest {
+
+  public static final List<PassThroughPoint> PASS_THROUGH_STOP_A = List.of(point("A", STOP_A));
+  public static final List<PassThroughPoint> PASS_THROUGH_STOP_C = List.of(point("C", STOP_C));
+  public static final List<PassThroughPoint> PASS_THROUGH_STOP_D = List.of(point("D", STOP_D));
+  public static final List<PassThroughPoint> PASS_THROUGH_STOP_B_OR_C = List.of(
+    point("B&C", STOP_B, STOP_C)
+  );
+  public static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_C = List.of(
+    point("B", STOP_B),
+    point("C", STOP_C)
+  );
+  public static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_D = List.of(
+    point("B", STOP_B),
+    point("D", STOP_D)
+  );
 
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
@@ -88,12 +102,7 @@ public class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc ->
-        mc.withPassThroughPoints(
-          // Include desired pass-through point in the request
-          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_D }, "PT1")))
-        )
-      )
+      .withMultiCriteria(mc -> mc.withPassThroughPoints(PASS_THROUGH_STOP_D))
       .searchParams()
       .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
       .addEgressPaths(TestAccessEgress.walk(STOP_D, D30s))
@@ -126,9 +135,7 @@ public class J01_PassThroughTest {
     requestBuilder
       .withMultiCriteria(mc ->
         // Include desired pass-through point in the request
-        mc.withPassThroughPoints(
-          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_A }, "PT1")))
-        )
+        mc.withPassThroughPoints(PASS_THROUGH_STOP_A)
       )
       .searchParams()
       .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
@@ -161,12 +168,7 @@ public class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc ->
-        // Include desired pass-through point in the request
-        mc.withPassThroughPoints(
-          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_C }, "PT1")))
-        )
-      )
+      .withMultiCriteria(mc -> mc.withPassThroughPoints(PASS_THROUGH_STOP_C))
       .searchParams()
       .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
       .addEgressPaths(TestAccessEgress.walk(STOP_D, D30s));
@@ -198,17 +200,7 @@ public class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc ->
-        mc.withPassThroughPoints(
-          // Include desired pass-through point in the request
-          new PassThroughPoints(
-            List.of(
-              new PassThroughPoint(new int[] { STOP_B }, "PT1"),
-              new PassThroughPoint(new int[] { STOP_D }, "PT2")
-            )
-          )
-        )
-      )
+      .withMultiCriteria(mc -> mc.withPassThroughPoints(PASS_THROUGH_STOP_B_THEN_D))
       .searchParams()
       .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
       .addEgressPaths(TestAccessEgress.walk(STOP_F, D30s));
@@ -238,17 +230,7 @@ public class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc ->
-        mc.withPassThroughPoints(
-          // Include desired pass-through point in the request
-          new PassThroughPoints(
-            List.of(
-              new PassThroughPoint(new int[] { STOP_B }, "PT1"),
-              new PassThroughPoint(new int[] { STOP_C }, "PT2")
-            )
-          )
-        )
-      )
+      .withMultiCriteria(mc -> mc.withPassThroughPoints(PASS_THROUGH_STOP_B_THEN_C))
       .searchParams()
       .addAccessPaths(TestAccessEgress.walk(STOP_A, D30s))
       .addEgressPaths(TestAccessEgress.walk(STOP_D, D30s));
@@ -277,15 +259,7 @@ public class J01_PassThroughTest {
     var requestBuilder = prepareRequest();
 
     requestBuilder
-      .withMultiCriteria(mc ->
-        mc.withPassThroughPoints(
-          // Include desired pass-through point in the request
-          new PassThroughPoints(
-            // Both STOP_B and STOP_C is a valid pass-through point
-            List.of(new PassThroughPoint(new int[] { STOP_B, STOP_C }, "PT1"))
-          )
-        )
-      )
+      .withMultiCriteria(mc -> mc.withPassThroughPoints(PASS_THROUGH_STOP_B_OR_C))
       .searchParams()
       // Both routes are pareto optimal.
       // Route 2 is faster but it contains more walk
@@ -300,5 +274,9 @@ public class J01_PassThroughTest {
         Walk 30s ~ A ~ BUS R1 0:04 0:15 ~ E ~ Walk 30s [0:03:30 0:15:30 12m 0tx $1380]""",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
+  }
+
+  private static PassThroughPoint point(String name, int... stops) {
+    return new PassThroughPoint(name, stops);
   }
 }

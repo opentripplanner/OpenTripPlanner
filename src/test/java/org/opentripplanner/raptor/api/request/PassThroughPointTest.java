@@ -11,7 +11,7 @@ class PassThroughPointTest {
 
   private static final int[] STOPS = { 2, 7, 13 };
 
-  private final PassThroughPoint subject = new PassThroughPoint(STOPS, "PT1");
+  private final PassThroughPoint subject = new PassThroughPoint("PT1", STOPS);
 
   @Test
   void asBitSet() {
@@ -29,8 +29,8 @@ class PassThroughPointTest {
 
   @Test
   void testEqualsAndHashCode() {
-    var same = new PassThroughPoint(STOPS, "PT1");
-    var other = new PassThroughPoint(new int[] { 2, 7 }, "PT2");
+    var same = new PassThroughPoint("PT1", STOPS);
+    var other = new PassThroughPoint("PT2", 2, 7);
 
     assertEquals(subject, subject);
     assertEquals(same, subject);
@@ -42,7 +42,8 @@ class PassThroughPointTest {
 
   @Test
   void testToString() {
-    assertEquals("(name: 'PT1', stops: [2, 7, 13])", subject.toString());
-    assertEquals("(stops: [2, 7, 13])", new PassThroughPoint(STOPS, null).toString());
+    assertEquals("(PT1, stops: 2, 7, 13)", subject.toString());
+    assertEquals("(stops: 2, 7, 13)", new PassThroughPoint(" ", STOPS).toString());
+    assertEquals("(stops: 2, 7, 13)", new PassThroughPoint(null, STOPS).toString());
   }
 }
