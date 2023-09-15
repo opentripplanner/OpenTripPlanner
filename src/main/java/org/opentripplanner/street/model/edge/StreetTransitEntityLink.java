@@ -86,7 +86,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       }
     }
 
-
     return switch (s0.currentMode()) {
       case BICYCLE, SCOOTER -> {
         // Forbid taking your own bike in the station if bike P+R activated.
@@ -120,6 +119,9 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
             yield State.empty();
           }
         }
+        if (s0.isRentingVehicleFromStation()) {
+          yield State.empty();
+        }
         yield buildState(s0, s1, pref);
       }
       // If Kiss & Ride (Taxi) mode is not enabled allow car traversal so that the Stop
@@ -127,7 +129,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       case WALK -> buildState(s0, s1, pref);
       case FLEX -> State.empty();
     };
-
   }
 
   @Nonnull

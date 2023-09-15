@@ -471,6 +471,9 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       .addNum("weight", weight)
       .addObj("vertex", vertex)
       .addBoolIfTrue("VEHICLE_RENT", isRentingVehicle())
+      .addEnum("formFactor", vehicleRentalFormFactor())
+      .addBoolIfTrue("RENTING_FROM_STATION", isRentingVehicleFromStation())
+      .addBoolIfTrue("FREE_FLOATING", isRentingFloatingVehicle() && !isRentingVehicleFromStation())
       .addBoolIfTrue("VEHICLE_PARKED", isVehicleParked())
       .toString();
   }
