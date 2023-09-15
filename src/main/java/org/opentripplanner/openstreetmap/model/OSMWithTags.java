@@ -142,8 +142,7 @@ public class OSMWithTags {
    * Returns true if bicycle dismounts are forced.
    */
   public boolean isBicycleDismountForced() {
-    String bicycle = getTag("bicycle");
-    return isTag("cycleway", "dismount") || "dismount".equals(bicycle);
+    return isTag("bicycle", "dismount");
   }
 
   protected boolean doesTagAllowAccess(String tag) {
@@ -637,17 +636,12 @@ public class OSMWithTags {
      */
 
     // Compute bike permissions, check consistency.
-    boolean forceBikes = false;
     if (isBicycleExplicitlyAllowed()) {
       permission = permission.add(StreetTraversalPermission.BICYCLE);
-      forceBikes = true;
     }
 
     if (isBicycleDismountForced()) {
       permission = permission.remove(StreetTraversalPermission.BICYCLE);
-      if (forceBikes) {
-        //issueStore.add(new ConflictingBikeTags(way));
-      }
     }
     return permission;
   }
