@@ -152,7 +152,7 @@ jobs:
           # schema hasn't changed.
           # example commit: https://github.com/opentripplanner/docs/commit/45e6ddf8e4a4
           
-          SCHEMA_FILE_MODIFIED=`git log -n 1 --pretty=format:%ct src/main/resources/gtfsgraphqlapi/schema.graphqls`
+          SCHEMA_FILE_MODIFIED=`git log -n 1 --pretty=format:%ct src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls`
           echo "schema modified at ${SCHEMA_FILE_MODIFIED}"
           git checkout $LOCAL_BRANCH
           DOCS_MODIFIED=`git log -n 1 --pretty=format:%ct api/dev-2.x/graphql-gtfs/introduction.html`

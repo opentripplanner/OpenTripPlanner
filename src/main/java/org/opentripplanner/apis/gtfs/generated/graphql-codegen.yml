@@ -1,4 +1,4 @@
-schema: ../../../../../../resources/gtfsgraphqlapi/schema.graphqls
+schema: ../../../../../../resources/org/opentripplanner/apis/gtfs/schema.graphqls
 
 generates:
   GraphQLTypes.java:

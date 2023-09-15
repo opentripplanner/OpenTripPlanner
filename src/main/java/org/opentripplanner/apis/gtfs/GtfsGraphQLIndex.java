@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs;
 
-import com.google.common.io.Resources;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -17,11 +16,11 @@ import graphql.schema.idl.TypeDefinitionRegistry;
 import io.micrometer.core.instrument.Metrics;
 import jakarta.ws.rs.core.Response;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -103,7 +102,7 @@ class GtfsGraphQLIndex {
 
   protected static GraphQLSchema buildSchema() {
     try {
-      URL url = Resources.getResource("gtfsgraphqlapi/schema.graphqls");
+      URL url = Objects.requireNonNull(GtfsGraphQLIndex.class.getResource("schema.graphqls"));
       TypeDefinitionRegistry typeRegistry = new SchemaParser().parse(url.openStream());
       IntrospectionTypeWiring typeWiring = new IntrospectionTypeWiring(typeRegistry);
       RuntimeWiring runtimeWiring = RuntimeWiring
