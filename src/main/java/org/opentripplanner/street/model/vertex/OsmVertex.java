@@ -1,36 +1,42 @@
 package org.opentripplanner.street.model.vertex;
 
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.routing.graph.Graph;
 
 /**
  * A vertex coming from OpenStreetMap.
  * <p>
- * This class marks something that comes from the street network itself. It is used for linking
- * origins in Analyst to ensure that they are linked to the same locations regardless of changes in
- * the transit network between (or eventually within) graphs.
+ * This class marks something that comes from the street network itself.
  */
 public class OsmVertex extends IntersectionVertex {
 
   /** The OSM node ID from whence this came */
   public final long nodeId;
 
-  public OsmVertex(Graph g, String label, double x, double y, long nodeId) {
-    super(g, label, x, y);
+  public OsmVertex(double x, double y, long nodeId) {
+    super(x, y);
     this.nodeId = nodeId;
   }
 
   public OsmVertex(
-    Graph g,
-    String label,
     double x,
     double y,
     long nodeId,
-    I18NString name,
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(g, label, x, y, name, hasHighwayTrafficLight, hasCrossingTrafficLight);
+    super(x, y, hasHighwayTrafficLight, hasCrossingTrafficLight);
     this.nodeId = nodeId;
+  }
+
+  @Nonnull
+  @Override
+  public I18NString getName() {
+    return NO_NAME;
+  }
+
+  @Override
+  public VertexLabel getLabel() {
+    return new VertexLabel.OsmNodeLabel(nodeId);
   }
 }

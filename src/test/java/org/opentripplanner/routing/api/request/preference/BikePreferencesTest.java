@@ -106,7 +106,7 @@ class BikePreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withSpeed(0.7).build();
     var same = other.copyOf().withSpeed(SPEED).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, same);
+    assertEqualsAndHashCode(subject, other, same);
   }
 
   @Test
@@ -116,13 +116,13 @@ class BikePreferencesTest {
       "BikePreferences{" +
       "speed: 2.0, " +
       "reluctance: 1.2, " +
-      "boardCost: 660, " +
+      "boardCost: $660, " +
       "walkingSpeed: 1.15, " +
       "walkingReluctance: 1.45, " +
       "switchTime: 3m20s, " +
-      "switchCost: 450, " +
+      "switchCost: $450, " +
       "parkTime: 5m30s, " +
-      "parkCost: 950, " +
+      "parkCost: $950, " +
       "optimizeType: TRIANGLE, " +
       "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
       "}",

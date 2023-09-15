@@ -3,8 +3,7 @@
 It is often the case that the coordinates of stops are relatively far away from where the passengers
 are expected to the wait for the vehicle.
 
-A good example of this is [Buckhead subway station](https://www.openstreetmap.org/way/319512573) in 
-Atlanta.
+A good example of this is [Buckhead subway station](https://www.openstreetmap.org/way/319512573) in Atlanta.
 
 ![Buckhead station](images/buckhead-station.png)
 
@@ -34,6 +33,10 @@ have one of the following tag combinations:
   the place where the train stops, not the waiting area.
 - The `railway` key is deprecated (even though still widespread) and you should use `public_transport` 
   instead.
+- OTP does not process isolated nodes, but only nodes, which are part of routable ways. Therefore, adding a single , 
+isloated boarding location node to OSM has no effect. There is an exception, though: isolated nodes, which are members of
+`public_transport=stop_area` relation, will be considered and automatically linked with the street graph.
+For more information, check the [stop area](StopAreas.md) documentation.
 
 ## Cross-referencing
 

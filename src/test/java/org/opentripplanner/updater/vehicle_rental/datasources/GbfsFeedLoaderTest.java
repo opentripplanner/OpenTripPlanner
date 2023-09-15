@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.csvreader.CsvReader;
-import java.io.IOException;
-import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.entur.gbfs.v2_3.free_bike_status.GBFSFreeBikeStatus;
 import org.entur.gbfs.v2_3.geofencing_zones.GBFSGeofencingZones;
@@ -28,7 +28,7 @@ import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleType;
 import org.entur.gbfs.v2_3.vehicle_types.GBFSVehicleTypes;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.updater.spi.HttpHeaders;
 
 /**
@@ -89,26 +89,33 @@ class GbfsFeedLoaderTest {
 
   @Test
   @Disabled
-  void fetchAllPublicFeeds() throws IOException {
-    InputStream is = HttpUtils.getData(
-      "https://raw.githubusercontent.com/NABSA/gbfs/master/systems.csv"
-    );
-    CsvReader reader = new CsvReader(is, StandardCharsets.UTF_8);
-    reader.readHeaders();
-    List<Exception> exceptions = new ArrayList<>();
+  void fetchAllPublicFeeds() {
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+      List<Exception> exceptions = otpHttpClient.getAndMap(
+        URI.create("https://raw.githubusercontent.com/NABSA/gbfs/master/systems.csv"),
+        Map.of(),
+        is -> {
+          List<Exception> cvsExceptions = new ArrayList<>();
+          CsvReader reader = new CsvReader(is, StandardCharsets.UTF_8);
+          reader.readHeaders();
+          while (reader.readRecord()) {
+            try {
+              String url = reader.get("Auto-Discovery URL");
+              new GbfsFeedLoader(url, HttpHeaders.empty(), null).update();
+            } catch (Exception e) {
+              cvsExceptions.add(e);
+            }
+          }
 
-    while (reader.readRecord()) {
-      try {
-        String url = reader.get("Auto-Discovery URL");
-        new GbfsFeedLoader(url, HttpHeaders.empty(), null).update();
-      } catch (Exception e) {
-        exceptions.add(e);
-      }
+          return cvsExceptions;
+        }
+      );
+
+      assertTrue(
+        exceptions.isEmpty(),
+        exceptions.stream().map(Exception::getMessage).collect(Collectors.joining("\n"))
+      );
     }
-    assertTrue(
-      exceptions.isEmpty(),
-      exceptions.stream().map(Exception::getMessage).collect(Collectors.joining("\n"))
-    );
   }
 
   @Test
@@ -145,7 +152,7 @@ class GbfsFeedLoaderTest {
     assertEquals("lillestrombysykkel", systemInformation.getData().getSystemId());
     assertEquals(LANGUAGE_NB, systemInformation.getData().getLanguage());
     assertEquals("Lillestrøm bysykkel", systemInformation.getData().getName());
-    assertEquals("Europe/Oslo", systemInformation.getData().getTimezone());
+    assertEquals("Europe/Oslo", systemInformation.getData().getTimezone().value());
     assertNull(systemInformation.getData().getEmail());
     assertNull(systemInformation.getData().getOperator());
     assertNull(systemInformation.getData().getPhoneNumber());
@@ -197,7 +204,7 @@ class GbfsFeedLoaderTest {
     assertEquals("HSL_FI_Helsinki", systemInformation.getData().getSystemId());
     assertEquals(LANGUAGE_EN, systemInformation.getData().getLanguage());
     assertEquals("HSL Bikes Share", systemInformation.getData().getName());
-    assertEquals("Europe/Helsinki", systemInformation.getData().getTimezone());
+    assertEquals("Europe/Helsinki", systemInformation.getData().getTimezone().value());
     assertNull(systemInformation.getData().getEmail());
     assertNull(systemInformation.getData().getOperator());
     assertNull(systemInformation.getData().getPhoneNumber());

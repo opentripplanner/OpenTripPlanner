@@ -29,6 +29,7 @@ import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class OsmModule implements GraphBuilderModule {
   private final VertexGenerator vertexGenerator;
   private final OsmDatabase osmdb;
 
-  public OsmModule(
+  OsmModule(
     Collection<OsmProvider> providers,
     Graph graph,
     DataImportIssueStore issueStore,
@@ -64,7 +65,7 @@ public class OsmModule implements GraphBuilderModule {
     this.graph = graph;
     this.issueStore = issueStore;
     this.params = params;
-    this.osmdb = new OsmDatabase(issueStore, params.boardingAreaRefTags());
+    this.osmdb = new OsmDatabase(issueStore);
     this.vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags());
     this.normalizer = new SafetyValueNormalizer(graph, issueStore);
   }
@@ -241,6 +242,7 @@ public class OsmModule implements GraphBuilderModule {
     long wayCount = osmdb.getWays().size();
     ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
     LOG.info(progress.startMessage());
+    var escalatorProcessor = new EscalatorProcessor(vertexGenerator.intersectionNodes());
 
     WAY:for (OSMWay way : osmdb.getWays()) {
       WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
@@ -248,11 +250,11 @@ public class OsmModule implements GraphBuilderModule {
       StreetTraversalPermission permissions = OsmFilter.getPermissionsForWay(
         way,
         wayData.getPermission(),
-        params.banDiscouragedWalking(),
-        params.banDiscouragedBiking(),
         issueStore
       );
-      if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) continue;
+      if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) {
+        continue;
+      }
 
       // handle duplicate nodes in OSM ways
       // this is a workaround for crappy OSM data quality
@@ -369,22 +371,27 @@ public class OsmModule implements GraphBuilderModule {
             elevationData.put(endEndpoint, elevation);
           }
         }
-        StreetEdgePair streets = getEdgesForStreet(
-          startEndpoint,
-          endEndpoint,
-          way,
-          i,
-          permissions,
-          geometry
-        );
+        if (way.isEscalator()) {
+          var length = getGeometryLengthMeters(geometry);
+          escalatorProcessor.buildEscalatorEdge(way, length);
+        } else {
+          StreetEdgePair streets = getEdgesForStreet(
+            startEndpoint,
+            endEndpoint,
+            way,
+            i,
+            permissions,
+            geometry
+          );
 
-        StreetEdge street = streets.main;
-        StreetEdge backStreet = streets.back;
-        normalizer.applyWayProperties(street, backStreet, wayData, way);
+          StreetEdge street = streets.main;
+          StreetEdge backStreet = streets.back;
+          normalizer.applyWayProperties(street, backStreet, wayData, way);
 
-        applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
-        startNode = endNode;
-        osmStartNode = osmdb.getNode(startNode);
+          applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
+          startNode = endNode;
+          osmStartNode = osmdb.getNode(startNode);
+        }
       }
 
       //Keep lambda! A method-ref would log incorrect class and line number
@@ -455,7 +462,8 @@ public class OsmModule implements GraphBuilderModule {
     }
 
     LineString backGeometry = geometry.reverse();
-    StreetEdge street = null, backStreet = null;
+    StreetEdge street = null;
+    StreetEdge backStreet = null;
     double length = getGeometryLengthMeters(geometry);
 
     var permissionPair = OsmFilter.getPermissions(permissions, way);
@@ -491,13 +499,6 @@ public class OsmModule implements GraphBuilderModule {
     if (street != null && backStreet != null) {
       backStreet.shareData(street);
     }
-
-    /* mark edges that are on roundabouts */
-    if (way.isRoundabout()) {
-      if (street != null) street.setRoundabout(true);
-      if (backStreet != null) backStreet.setRoundabout(true);
-    }
-
     return new StreetEdgePair(street, backStreet);
   }
 
@@ -516,37 +517,31 @@ public class OsmModule implements GraphBuilderModule {
     I18NString name = params.edgeNamer().getNameForWay(way, label);
     float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
 
-    StreetEdge street = new StreetEdge(
-      startEndpoint,
-      endEndpoint,
-      geometry,
-      name,
-      length,
-      permissions,
-      back
-    );
-    street.setCarSpeed(carSpeed);
-    street.setLink(OsmFilter.isLink(way));
+    StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
+      .withFromVertex(startEndpoint)
+      .withToVertex(endEndpoint)
+      .withGeometry(geometry)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(permissions)
+      .withBack(back)
+      .withCarSpeed(carSpeed)
+      .withLink(way.isLink())
+      .withRoundabout(way.isRoundabout())
+      .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
+      .withStairs(way.isSteps());
 
     if (!way.hasTag("name") && !way.hasTag("ref")) {
-      street.setHasBogusName(true);
+      seb.withBogusName(true);
     }
-
-    boolean steps = way.isSteps();
-    street.setStairs(steps);
-
-    /* TODO: This should probably generalized somehow? */
-    if ((way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair")))) {
-      street.setWheelchairAccessible(false);
-    }
-
-    street.setSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way));
+    seb.withWheelchairAccessible(way.isWheelchairAccessible());
 
     // < 0.04: account for
     if (carSpeed < 0.04) {
       issueStore.add(new StreetCarSpeedZero(way));
     }
 
+    StreetEdge street = seb.buildAndConnect();
     params.edgeNamer().recordEdge(way, street);
 
     return street;

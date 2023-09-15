@@ -1,5 +1,5 @@
 {
-  "configVersion": "v2.3.0-EN000121",
+  "configVersion": "v2.4.0-EN000121",
   "server": {
     "apiProcessingTimeout": "7s",
     "traceParameters": [
@@ -28,6 +28,7 @@
     "elevatorBoardCost": 90,
     "elevatorHopTime": 20,
     "elevatorHopCost": 20,
+    "escalatorReluctance": 1.5,
     "vehicleRental": {
       "pickupCost": 120,
       "dropOffTime": 30,
@@ -51,17 +52,27 @@
     "transitReluctanceForMode": {
       "RAIL": 0.85
     },
-    "maxAccessEgressDurationForMode": {
-      "BIKE_RENTAL": "20m"
+    "accessEgress": {
+      "maxDuration": "45m",
+      "maxDurationForMode": {
+	"BIKE_RENTAL": "20m"
+      },
+      "maxStopCount": 500,
+      "penalty": {
+        "FLEXIBLE" : { "timePenalty": "2m + 1.1t", "costFactor": 1.7 }
+      }
     },
     "itineraryFilters": {
       "transitGeneralizedCostLimit": {
-        "costLimitFunction": "900 + 1.5 x",
+        "costLimitFunction": "15m + 1.5 x",
         "intervalRelaxFactor": 0.4
       },
+      "nonTransitGeneralizedCostLimit": "400 + 1.5x",
+      "removeTransitWithHigherCostThanBestOnStreetOnly": "60 + 1.3x",
       "bikeRentalDistanceRatio": 0.3,
       "accessibilityScore": true,
-      "minBikeParkingDistance": 300
+      "minBikeParkingDistance": 300,
+      "debug": "limit-to-search-window"
     },
     "carDecelerationSpeed": 2.9,
     "carAccelerationSpeed": 2.9,
@@ -72,7 +83,7 @@
       "agencies": ["HSL:123"],
       "routes": ["HSL:456"]
     },
-    "unpreferredCost": "600 + 2.0 x",
+    "unpreferredCost": "10m + 2.0 x",
     "streetRoutingTimeout": "5s",
     "transferOptimization": {
       "optimizeTransferWaitTime": true,

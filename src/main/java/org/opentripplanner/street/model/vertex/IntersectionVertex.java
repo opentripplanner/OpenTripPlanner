@@ -1,14 +1,11 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.BitSetUtils;
-import org.opentripplanner.routing.graph.Graph;
 
 /**
  * Represents an ordinary location in space, typically an intersection.
  */
-public class IntersectionVertex extends StreetVertex {
+public abstract class IntersectionVertex extends StreetVertex {
 
   private static final int HIGHWAY_TRAFFIC_LIGHT_INDEX = 0;
 
@@ -20,45 +17,18 @@ public class IntersectionVertex extends StreetVertex {
    */
   private final short flags;
 
-  //For testing only
-  public IntersectionVertex(Graph g, String label, double x, double y, String name) {
-    this(g, label, x, y, new NonLocalizedString(name), false, false);
-  }
-
-  public IntersectionVertex(
-    Graph g,
-    String label,
+  protected IntersectionVertex(
     double x,
     double y,
-    I18NString name,
     boolean hasHighwayTrafficLight,
     boolean hasCrossingTrafficLight
   ) {
-    super(g, label, x, y, name);
+    super(x, y);
     flags = initFlags(hasHighwayTrafficLight, hasCrossingTrafficLight);
   }
 
-  public IntersectionVertex(Graph g, String label, double x, double y) {
-    this(g, label, x, y, new NonLocalizedString(label), false, false);
-  }
-
-  public IntersectionVertex(
-    Graph g,
-    String label,
-    double x,
-    double y,
-    boolean hasHighwayTrafficLight,
-    boolean hasCrossingTrafficLight
-  ) {
-    this(
-      g,
-      label,
-      x,
-      y,
-      new NonLocalizedString(label),
-      hasHighwayTrafficLight,
-      hasCrossingTrafficLight
-    );
+  protected IntersectionVertex(double x, double y) {
+    this(x, y, false, false);
   }
 
   /**

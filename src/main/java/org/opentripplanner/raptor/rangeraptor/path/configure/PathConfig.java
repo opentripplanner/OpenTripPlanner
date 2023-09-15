@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.path.configure;
 
 import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
+import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.path.RaptorPath;
@@ -35,42 +36,41 @@ public class PathConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Create a new {@link DestinationArrivalPaths}. The generalized cost is included in the pareto
-   * set criteria and will be generated for each leg and a total for the path.
+   * Create a new {@link DestinationArrivalPaths}.
+   * @param includeC1Cost whether to include generalized cost in the pareto set criteria.
+   *                               It will be generated for each leg and a total for the path.
+   * @param c2Comp c2 comparator function to be used in the pareto set criteria. If c2 comparator is null
+   *               then no c2 comparison will be used.
    */
-  public DestinationArrivalPaths<T> createDestArrivalPathsWithGeneralizedCost() {
-    return createDestArrivalPaths(true);
-  }
-
-  /**
-   * Create a new {@link DestinationArrivalPaths} without generalized-cost.
-   */
-  public DestinationArrivalPaths<T> createDestArrivalPathsWithoutGeneralizedCost() {
-    return createDestArrivalPaths(false);
-  }
-
-  /* private members */
-
-  private DestinationArrivalPaths<T> createDestArrivalPaths(boolean includeCost) {
+  public DestinationArrivalPaths<T> createDestArrivalPaths(
+    boolean includeC1Cost,
+    final DominanceFunction c2Comp
+  ) {
     return new DestinationArrivalPaths<>(
-      createPathParetoComparator(includeCost),
+      createPathParetoComparator(includeC1Cost, c2Comp),
       ctx.calculator(),
-      includeCost ? ctx.costCalculator() : null,
+      includeC1Cost ? ctx.costCalculator() : null,
       ctx.slackProvider(),
-      createPathMapper(includeCost),
+      createPathMapper(includeC1Cost),
       ctx.debugFactory(),
       ctx.stopNameResolver(),
       ctx.lifeCycle()
     );
   }
 
-  private ParetoComparator<RaptorPath<T>> createPathParetoComparator(boolean includeCost) {
+  /* private members */
+
+  private ParetoComparator<RaptorPath<T>> createPathParetoComparator(
+    boolean includeC1,
+    final DominanceFunction c2Comp
+  ) {
     return paretoComparator(
-      includeCost,
+      includeC1,
       ctx.searchParams().timetable(),
       ctx.searchParams().preferLateArrival(),
       ctx.searchDirection(),
-      ctx.multiCriteria().relaxC1AtDestination()
+      ctx.multiCriteria().relaxC1AtDestination(),
+      c2Comp
     );
   }
 

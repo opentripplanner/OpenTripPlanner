@@ -21,40 +21,18 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
 
   private static final Logger LOG = LoggerFactory.getLogger(Edge.class);
 
-  protected enum ConnectToGraph {
-    CONNECT,
-    TEMPORARY_EDGE_NOT_CONNECTED_TO_GRAPH,
-  }
-
   protected final Vertex fromv;
 
   protected final Vertex tov;
 
   /**
-   * Recommended constructor for creating an edge.
-   * The edge is automatically added to the graph by updating the outgoing edge list of the
-   * origin ("from") vertex and the incoming edge list of the destination ("to") vertex.
+   * Create an edge from the origin vertex to the destination vertex.
+   * The created edge is disconnected from the graph.
+   * Call {@link #connectToGraph()} to connect the edge to the graph.
    * @param v1 origin vertex
    * @param v2 destination vertex
    */
   protected Edge(Vertex v1, Vertex v2) {
-    this(v1, v2, ConnectToGraph.CONNECT);
-  }
-
-  /**
-   * Constructor for creating an edge optionally disconnected from the graph.
-   * This constructor should be used only for the special case of a
-   * {@link org.opentripplanner.ext.flex.edgetype.FlexTripEdge}
-   * that is intended to remain disconnected from the graph.
-   * Use {@link Edge#Edge(Vertex, Vertex)} for the general use case.
-   * The edge is optionally added to the graph by updating the outgoing edge list of the
-   * origin ("from") vertex and the incoming edge list of the destination ("to") vertex.
-   * @param v1 origin vertex
-   * @param v2 destination vertex
-   * @param connectToGraph if the edge should be connected to the graph
-   */
-  protected Edge(Vertex v1, Vertex v2, ConnectToGraph connectToGraph) {
-    Objects.requireNonNull(connectToGraph);
     if (v1 == null || v2 == null) {
       String err = String.format(
         "%s constructed with null vertex : %s %s",
@@ -66,10 +44,6 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
     }
     this.fromv = v1;
     this.tov = v2;
-    if (connectToGraph == ConnectToGraph.CONNECT) {
-      fromv.addOutgoing(this);
-      tov.addIncoming(this);
-    }
   }
 
   public final Vertex getFromVertex() {
@@ -199,13 +173,28 @@ public abstract class Edge implements AStarEdge<State, Edge, Vertex>, Serializab
 
   public void removeTurnRestrictionsTo(Edge origin) {}
 
+  /**
+   * Connect the edge to the graph by adding it to the list of outgoing edges of the origin vertex
+   * and the list of incoming edges of the destination vertex. Once connected, the edge becomes
+   * visible from other threads. This should not be done inside the constructor, otherwise the edge
+   * might become reachable before being fully constructed.
+   */
+  protected void connectToGraph() {
+    fromv.addOutgoing(this);
+    tov.addIncoming(this);
+  }
+
+  protected static <T extends Edge> T connectToGraph(T edge) {
+    edge.connectToGraph();
+    return edge;
+  }
+
   /* SERIALIZATION */
 
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     in.defaultReadObject();
     // edge lists are transient, reconstruct them
-    fromv.addOutgoing(this);
-    tov.addIncoming(this);
+    connectToGraph();
   }
 
   private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {

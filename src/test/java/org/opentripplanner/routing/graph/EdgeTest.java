@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.graph;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
@@ -14,10 +15,9 @@ public class EdgeTest {
 
   @Test
   public void testConstruct() {
-    Graph graph = new Graph();
-    Vertex head = new SimpleConcreteVertex(graph, "head", 47.669457, -122.387577);
-    Vertex tail = new SimpleConcreteVertex(graph, "tail", 47.669462, -122.384739);
-    Edge e = new SimpleConcreteEdge(head, tail);
+    Vertex head = StreetModelForTest.intersectionVertex("head", 47.669457, -122.387577);
+    Vertex tail = StreetModelForTest.intersectionVertex("tail", 47.669462, -122.384739);
+    Edge e = SimpleConcreteEdge.createSimpleConcreteEdge(head, tail);
 
     assertEquals(head, e.getFromVertex());
     assertEquals(tail, e.getToVertex());
@@ -25,15 +25,34 @@ public class EdgeTest {
 
   @Test
   public void testEdgeRemoval() {
-    Graph graph = new Graph();
-    StreetVertex va = new IntersectionVertex(graph, "A", 10.0, 10.0);
-    StreetVertex vb = new IntersectionVertex(graph, "B", 10.1, 10.1);
-    StreetVertex vc = new IntersectionVertex(graph, "C", 10.2, 10.2);
-    StreetVertex vd = new IntersectionVertex(graph, "D", 10.3, 10.3);
-    Edge eab = new StreetEdge(va, vb, null, "AB", 10, StreetTraversalPermission.ALL, false);
-    Edge ebc = new StreetEdge(vb, vc, null, "BC", 10, StreetTraversalPermission.ALL, false);
-    Edge ecd = new StreetEdge(vc, vd, null, "CD", 10, StreetTraversalPermission.ALL, false);
-
+    StreetVertex va = intersectionVertex("A", 10.0, 10.0);
+    StreetVertex vb = intersectionVertex("B", 10.1, 10.1);
+    StreetVertex vc = intersectionVertex("C", 10.2, 10.2);
+    StreetVertex vd = intersectionVertex("D", 10.3, 10.3);
+    Edge eab = new StreetEdgeBuilder<>()
+      .withFromVertex(va)
+      .withToVertex(vb)
+      .withName("AB")
+      .withMeterLength(10)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+    Edge ebc = new StreetEdgeBuilder<>()
+      .withFromVertex(vb)
+      .withToVertex(vc)
+      .withName("BC")
+      .withMeterLength(10)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+    Edge ecd = new StreetEdgeBuilder<>()
+      .withFromVertex(vc)
+      .withToVertex(vd)
+      .withName("CD")
+      .withMeterLength(10)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
     // remove an edge that is not connected to this vertex
     va.removeOutgoing(ecd);
     assertEquals(va.getDegreeOut(), 1);

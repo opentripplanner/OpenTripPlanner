@@ -14,7 +14,6 @@ import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayParameterBindings;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
@@ -30,6 +29,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
@@ -47,7 +47,7 @@ public class Graph implements Serializable {
   public final StreetNotesService streetNotesService = new StreetNotesService();
 
   /* Ideally we could just get rid of vertex labels, but they're used in tests and graph building. */
-  private final Map<String, Vertex> vertices = new ConcurrentHashMap<>();
+  private final Map<VertexLabel, Vertex> vertices = new ConcurrentHashMap<>();
 
   public final transient Deduplicator deduplicator;
 
@@ -133,14 +133,7 @@ public class Graph implements Serializable {
   }
 
   /**
-   * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph,
-   * when they are constructed or deserialized.
-   * <p>
-   * TODO OTP2 - This strategy is error prune, problematic when testing and causes a cyclic
-   *           - dependency Graph -> Vertex -> Graph. A better approach is to lett the bigger
-   *           - whole (Graph) create and attach its smaller parts (Vertex). A way is to create
-   *           - a VertexCollection class, let the graph hold an instance of this collection,
-   *           - and create factory methods for each type of Vertex in the VertexCollection.
+   * Add the given vertex to the graph.
    */
   public void addVertex(Vertex v) {
     Vertex old = vertices.put(v.getLabel(), v);
@@ -148,7 +141,10 @@ public class Graph implements Serializable {
       if (old == v) {
         LOG.error("repeatedly added the same vertex: {}", v);
       } else {
-        LOG.error("duplicate vertex label in graph (added vertex to graph anyway): {}", v);
+        LOG.error(
+          "duplicate vertex label in graph (added vertex to graph anyway): {}",
+          v.getLabel()
+        );
       }
     }
   }
@@ -166,10 +162,26 @@ public class Graph implements Serializable {
     }
   }
 
-  /* Fetching vertices by label is convenient in tests and such, but avoid using in general. */
+  /**
+   * Fetching a vertex by its by label. This is convenient in tests and such, but avoid using in general.
+   *
+   * @see VertexLabel
+   */
   @VisibleForTesting
-  public Vertex getVertex(String label) {
+  @Nullable
+  public Vertex getVertex(VertexLabel label) {
     return vertices.get(label);
+  }
+
+  /**
+   * Converts the input to a string-based label and looks it up in the graph. Remember that there
+   * are other, non-string vertex labels for which this method will not work.
+   * @see VertexLabel
+   */
+  @VisibleForTesting
+  @Nullable
+  public Vertex getVertex(String label) {
+    return vertices.get(VertexLabel.string(label));
   }
 
   /**
@@ -229,14 +241,6 @@ public class Graph implements Serializable {
     if (v.getDegreeIn() == 0 && v.getDegreeOut() == 0) {
       remove(v);
     }
-  }
-
-  public Envelope getExtent() {
-    Envelope env = new Envelope();
-    for (Vertex v : getVertices()) {
-      env.expandToInclude(v.getCoordinate());
-    }
-    return env;
   }
 
   public int countVertices() {

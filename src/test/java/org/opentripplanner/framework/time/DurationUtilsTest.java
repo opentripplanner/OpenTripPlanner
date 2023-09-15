@@ -1,9 +1,12 @@
 package org.opentripplanner.framework.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.framework.time.DurationUtils.requireNonNegative;
 import static org.opentripplanner.framework.time.DurationUtils.toIntMilliseconds;
 
 import java.time.Duration;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
@@ -80,11 +83,41 @@ public class DurationUtilsTest {
   }
 
   @Test
+  public void parseSecondsOrDuration() {
+    assertEquals(D9s, DurationUtils.parseSecondsOrDuration("9s").orElseThrow());
+    assertEquals(D9s, DurationUtils.parseSecondsOrDuration("9").orElseThrow());
+    assertEquals(D2h, DurationUtils.parseSecondsOrDuration("2h").orElseThrow());
+    assertEquals(D2h, DurationUtils.parseSecondsOrDuration("7200").orElseThrow());
+    assertEquals(D3d, DurationUtils.parseSecondsOrDuration("3D").orElseThrow());
+
+    // Negative values
+    assertEquals(D5m.negated(), DurationUtils.parseSecondsOrDuration("-5m").orElseThrow());
+    assertEquals(D5m.negated(), DurationUtils.parseSecondsOrDuration("-300").orElseThrow());
+
+    // Asserts handle bad input
+    assertEquals(
+      D3d,
+      DurationUtils.parseSecondsOrDuration(Integer.toString(3 * 24 * 60 * 60)).orElseThrow()
+    );
+
+    assertThrows(
+      DateTimeParseException.class,
+      () -> DurationUtils.parseSecondsOrDuration("not-a-duration").orElseThrow()
+    );
+  }
+
+  @Test
   public void durations() {
     assertEquals(List.of(), DurationUtils.durations(""));
     assertEquals(List.of(Duration.ZERO), DurationUtils.durations("0s"));
     assertEquals(List.of(D9s, D2h, D5m), DurationUtils.durations("9s 2h 5m"));
     assertEquals(List.of(D9s, D2h, D5m), DurationUtils.durations("9s;2h,5m"));
+  }
+
+  @Test
+  public void testRequireNonNegative() {
+    assertThrows(NullPointerException.class, () -> requireNonNegative(null));
+    assertThrows(IllegalArgumentException.class, () -> requireNonNegative(Duration.ofSeconds(-1)));
   }
 
   @Test

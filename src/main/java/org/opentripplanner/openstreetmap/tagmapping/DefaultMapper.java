@@ -1,6 +1,7 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
 import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofBicycleSafety;
+import static org.opentripplanner.openstreetmap.wayproperty.MixinPropertiesBuilder.ofWalkSafety;
 import static org.opentripplanner.openstreetmap.wayproperty.WayPropertiesBuilder.withModes;
 import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.BICYCLE_AND_CAR;
@@ -617,6 +618,9 @@ class DefaultMapper implements OsmTagMapper {
     props.setMixinProperties("CCGIS:bicycle=caution_area", ofBicycleSafety(1.45));
     props.setMixinProperties("CCGIS:bicycle:right=caution_area", ofBicycleSafety(1.45, 1));
     props.setMixinProperties("CCGIS:bicycle:left=caution_area", ofBicycleSafety(1, 1.45));
+
+    props.setMixinProperties("foot=discouraged", ofWalkSafety(3));
+    props.setMixinProperties("bicycle=discouraged", ofBicycleSafety(3));
 
     populateNotesAndNames(props);
 

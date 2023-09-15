@@ -2,13 +2,9 @@ package org.opentripplanner.api.model.error;
 
 import java.util.List;
 import org.opentripplanner.api.common.Message;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /** This API response element represents an error in trip planning. */
 public class PlannerError {
-
-  private static final Logger LOG = LoggerFactory.getLogger(PlannerError.class);
 
   public final int id;
   public final String msg;

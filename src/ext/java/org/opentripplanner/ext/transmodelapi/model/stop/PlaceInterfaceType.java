@@ -45,7 +45,7 @@ public class PlaceInterfaceType {
         // Passing in the type itself in the constructor does not work, as the type has not been
         // created yet and you need the actual type and not just a reference to it. That is why
         // we get the type from the schema. This also follows how it is done in the
-        // LegacyGraphQLNodeTypeResolver.
+        // GtfsGraphQLNodeTypeResolver.
 
         if (o instanceof RegularStop) {
           return schema.getObjectType("Quay");

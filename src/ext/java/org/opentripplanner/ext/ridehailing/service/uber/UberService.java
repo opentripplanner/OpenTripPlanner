@@ -8,7 +8,7 @@ import static java.util.Map.entry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.UriBuilder;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URI;
 import java.time.Duration;
 import java.util.Currency;
 import java.util.List;
@@ -24,7 +24,7 @@ import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
 import org.opentripplanner.ext.ridehailing.service.oauth.OAuthService;
 import org.opentripplanner.ext.ridehailing.service.oauth.UrlEncodedOAuthService;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
@@ -50,6 +50,7 @@ public class UberService extends CachingRideHailingService {
    * be hard to change it, should the need arise.
    */
   private final String wheelchairAccessibleProductId;
+  private final OtpHttpClient otpHttpClient;
 
   public UberService(RideHailingServiceParameters config) {
     this(
@@ -78,6 +79,7 @@ public class UberService extends CachingRideHailingService {
     this.timeEstimateUri = timeEstimateUri;
     this.bannedTypes = bannedTypes;
     this.wheelchairAccessibleProductId = wheelchairAccessibleProductId;
+    this.otpHttpClient = new OtpHttpClient();
   }
 
   @Override
@@ -101,9 +103,10 @@ public class UberService extends CachingRideHailingService {
     }
 
     LOG.info("Made arrival time request to Uber API at following URL: {}", uri);
-
-    InputStream responseStream = HttpUtils.openInputStream(finalUri, headers());
-    var response = MAPPER.readValue(responseStream, UberArrivalEstimateResponse.class);
+    UberArrivalEstimateResponse response = getUberEstimateResponse(
+      finalUri,
+      UberArrivalEstimateResponse.class
+    );
 
     LOG.debug("Received {} Uber arrival time estimates", response.times().size());
 
@@ -146,8 +149,10 @@ public class UberService extends CachingRideHailingService {
 
     LOG.info("Made price estimate request to Uber API at following URL: {}", uri);
 
-    InputStream responseStream = HttpUtils.openInputStream(finalUri, headers());
-    var response = MAPPER.readValue(responseStream, UberTripTimeEstimateResponse.class);
+    UberTripTimeEstimateResponse response = getUberEstimateResponse(
+      finalUri,
+      UberTripTimeEstimateResponse.class
+    );
 
     if (response.prices() == null) {
       throw new IOException("Unexpected response format");
@@ -171,6 +176,10 @@ public class UberService extends CachingRideHailingService {
       })
       .filter(re -> filterRides(re, request.wheelchairAccessible()))
       .toList();
+  }
+
+  private <T> T getUberEstimateResponse(URI finalUri, Class<T> clazz) throws IOException {
+    return otpHttpClient.getAndMapAsJsonObject(finalUri, headers(), MAPPER, clazz);
   }
 
   private boolean filterRides(Ride a, boolean wheelchairAccessible) {

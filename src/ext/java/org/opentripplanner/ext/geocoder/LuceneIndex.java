@@ -41,6 +41,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.vertex.StreetVertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
@@ -139,9 +140,9 @@ public class LuceneIndex implements Serializable {
             addToIndex(
               directoryWriter,
               StreetVertex.class,
-              streetVertex.getLabel(),
+              streetVertex.getLabelString(),
               streetVertex.getIntersectionName(),
-              streetVertex.getLabel(),
+              streetVertex.getLabelString(),
               streetVertex.getLat(),
               streetVertex.getLon(),
               Set.of()
@@ -170,18 +171,17 @@ public class LuceneIndex implements Serializable {
 
   public Stream<StopLocation> queryStopLocations(String query, boolean autocomplete) {
     return matchingDocuments(StopLocation.class, query, autocomplete)
-      .map(document -> transitService.getStopLocation(FeedScopedId.parseId(document.get(ID))));
+      .map(document -> transitService.getStopLocation(FeedScopedId.parse(document.get(ID))));
   }
 
   public Stream<StopLocationsGroup> queryStopLocationGroups(String query, boolean autocomplete) {
     return matchingDocuments(StopLocationsGroup.class, query, autocomplete)
-      .map(document -> transitService.getStopLocationsGroup(FeedScopedId.parseId(document.get(ID)))
-      );
+      .map(document -> transitService.getStopLocationsGroup(FeedScopedId.parse(document.get(ID))));
   }
 
   public Stream<StreetVertex> queryStreetVertices(String query, boolean autocomplete) {
     return matchingDocuments(StreetVertex.class, query, autocomplete)
-      .map(document -> (StreetVertex) graph.getVertex(document.get(ID)));
+      .map(document -> (StreetVertex) graph.getVertex(VertexLabel.string(document.get(ID))));
   }
 
   /**
@@ -198,7 +198,7 @@ public class LuceneIndex implements Serializable {
   }
 
   private static StopCluster toStopCluster(Document document) {
-    var id = FeedScopedId.parseId(document.get(ID));
+    var id = FeedScopedId.parse(document.get(ID));
     var name = document.get(NAME);
     var code = document.get(CODE);
     var lat = document.getField(LAT).numericValue().doubleValue();

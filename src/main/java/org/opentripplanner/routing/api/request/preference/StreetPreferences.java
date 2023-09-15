@@ -11,10 +11,11 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.lang.DoubleUtils;
+import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.DurationForEnum;
-import org.opentripplanner.routing.api.request.framework.Units;
+import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.street.search.intersection_model.DrivingDirection;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
 
@@ -32,8 +33,8 @@ public final class StreetPreferences implements Serializable {
   private final double turnReluctance;
   private final DrivingDirection drivingDirection;
   private final ElevatorPreferences elevator;
+  private final AccessEgressPreferences accessEgress;
   private final IntersectionTraversalModel intersectionTraversalModel;
-  private final DurationForEnum<StreetMode> maxAccessEgressDuration;
   private final DurationForEnum<StreetMode> maxDirectDuration;
   private final Duration routingTimeout;
 
@@ -41,10 +42,9 @@ public final class StreetPreferences implements Serializable {
     this.turnReluctance = 1.0;
     this.drivingDirection = DrivingDirection.RIGHT;
     this.elevator = ElevatorPreferences.DEFAULT;
+    this.accessEgress = AccessEgressPreferences.DEFAULT;
     this.intersectionTraversalModel = IntersectionTraversalModel.SIMPLE;
-    this.maxAccessEgressDuration =
-      DurationForEnum.of(StreetMode.class).withDefault(ofMinutes(45)).build();
-    this.maxDirectDuration = DurationForEnum.of(StreetMode.class).withDefault(ofHours(4)).build();
+    this.maxDirectDuration = durationForStreetModeOf(ofHours(4));
     this.routingTimeout = Duration.ofSeconds(5);
   }
 
@@ -52,9 +52,9 @@ public final class StreetPreferences implements Serializable {
     this.turnReluctance = Units.reluctance(builder.turnReluctance);
     this.drivingDirection = requireNonNull(builder.drivingDirection);
     this.elevator = requireNonNull(builder.elevator);
+    this.accessEgress = requireNonNull(builder.accessEgress);
     this.intersectionTraversalModel = requireNonNull(builder.intersectionTraversalModel);
     this.maxDirectDuration = requireNonNull(builder.maxDirectDuration);
-    this.maxAccessEgressDuration = requireNonNull(builder.maxAccessEgressDuration);
     this.routingTimeout = requireNonNull(builder.routingTimeout);
   }
 
@@ -81,13 +81,14 @@ public final class StreetPreferences implements Serializable {
     return elevator;
   }
 
+  /** Preferences for access/egress routing */
+  public AccessEgressPreferences accessEgress() {
+    return accessEgress;
+  }
+
   /** This is the model that computes the costs of turns. */
   public IntersectionTraversalModel intersectionTraversalModel() {
     return intersectionTraversalModel;
-  }
-
-  public DurationForEnum<StreetMode> maxAccessEgressDuration() {
-    return maxAccessEgressDuration;
   }
 
   public DurationForEnum<StreetMode> maxDirectDuration() {
@@ -115,8 +116,8 @@ public final class StreetPreferences implements Serializable {
       elevator.equals(that.elevator) &&
       routingTimeout.equals(that.routingTimeout) &&
       intersectionTraversalModel == that.intersectionTraversalModel &&
-      maxAccessEgressDuration.equals(that.maxAccessEgressDuration) &&
-      maxDirectDuration.equals(that.maxDirectDuration)
+      maxDirectDuration.equals(that.maxDirectDuration) &&
+      accessEgress.equals(that.accessEgress)
     );
   }
 
@@ -126,9 +127,9 @@ public final class StreetPreferences implements Serializable {
       turnReluctance,
       drivingDirection,
       elevator,
+      accessEgress,
       routingTimeout,
       intersectionTraversalModel,
-      maxAccessEgressDuration,
       maxDirectDuration
     );
   }
@@ -146,7 +147,7 @@ public final class StreetPreferences implements Serializable {
         intersectionTraversalModel,
         DEFAULT.intersectionTraversalModel
       )
-      .addObj("maxAccessEgressDuration", maxAccessEgressDuration, DEFAULT.maxAccessEgressDuration)
+      .addObj("accessEgress", accessEgress, DEFAULT.accessEgress)
       .addObj("maxDirectDuration", maxDirectDuration, DEFAULT.maxDirectDuration)
       .toString();
   }
@@ -158,9 +159,9 @@ public final class StreetPreferences implements Serializable {
     private DrivingDirection drivingDirection;
     private ElevatorPreferences elevator;
     private IntersectionTraversalModel intersectionTraversalModel;
-    private DurationForEnum<StreetMode> maxAccessEgressDuration;
     private DurationForEnum<StreetMode> maxDirectDuration;
     private Duration routingTimeout;
+    private AccessEgressPreferences accessEgress;
 
     public Builder(StreetPreferences original) {
       this.original = original;
@@ -168,7 +169,7 @@ public final class StreetPreferences implements Serializable {
       this.drivingDirection = original.drivingDirection;
       this.elevator = original.elevator;
       this.intersectionTraversalModel = original.intersectionTraversalModel;
-      this.maxAccessEgressDuration = original.maxAccessEgressDuration;
+      this.accessEgress = original.accessEgress;
       this.maxDirectDuration = original.maxDirectDuration;
       this.routingTimeout = original.routingTimeout;
     }
@@ -192,22 +193,14 @@ public final class StreetPreferences implements Serializable {
       return this;
     }
 
+    public Builder withAccessEgress(Consumer<AccessEgressPreferences.Builder> body) {
+      this.accessEgress = accessEgress.copyOf().apply(body).build();
+      return this;
+    }
+
     public Builder withIntersectionTraversalModel(IntersectionTraversalModel model) {
       this.intersectionTraversalModel = model;
       return this;
-    }
-
-    public Builder withMaxAccessEgressDuration(Consumer<DurationForEnum.Builder<StreetMode>> body) {
-      this.maxAccessEgressDuration = this.maxAccessEgressDuration.copyOf().apply(body).build();
-      return this;
-    }
-
-    /** Utility method to simplify config parsing */
-    public Builder withMaxAccessEgressDuration(
-      Duration defaultValue,
-      Map<StreetMode, Duration> values
-    ) {
-      return withMaxAccessEgressDuration(b -> b.withDefault(defaultValue).withValues(values));
     }
 
     public Builder withMaxDirectDuration(Consumer<DurationForEnum.Builder<StreetMode>> body) {
@@ -234,5 +227,9 @@ public final class StreetPreferences implements Serializable {
       var value = new StreetPreferences(this);
       return original.equals(value) ? original : value;
     }
+  }
+
+  private static DurationForEnum<StreetMode> durationForStreetModeOf(Duration defaultValue) {
+    return DurationForEnum.of(StreetMode.class).withDefault(defaultValue).build();
   }
 }

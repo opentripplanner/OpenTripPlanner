@@ -2,12 +2,13 @@ package org.opentripplanner.ext.vehiclerentalservicedirectory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalServiceDirectoryFetcherParameters;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.updater.spi.GraphUpdater;
@@ -37,21 +38,24 @@ public class VehicleRentalServiceDirectoryFetcher {
     LOG.info("Fetching list of updaters from {}", parameters.getUrl());
 
     List<GraphUpdater> updaters = new ArrayList<>();
+    JsonNode node = null;
+    try (OtpHttpClient otpHttpClient = new OtpHttpClient()) {
+      node = otpHttpClient.getAndMapAsJsonNode(parameters.getUrl(), Map.of(), new ObjectMapper());
+    } catch (OtpHttpClientException e) {
+      LOG.warn("Error fetching list of vehicle rental endpoints from {}", parameters.getUrl(), e);
+    }
+    if (node == null || node.get(parameters.getSourcesName()) == null) {
+      LOG.warn(
+        "Error reading json from {}. Are json tag names configured properly?",
+        parameters.getUrl()
+      );
+      return updaters;
+    }
 
-    try {
-      InputStream is = HttpUtils.getData(parameters.getUrl());
-      JsonNode node = (new ObjectMapper()).readTree(is);
-
-      JsonNode sources = node.get(parameters.getSourcesName());
-
-      if (sources == null) {
-        LOG.warn(
-          "Error reading json from {}. Are json tag names configured properly?",
-          parameters.getUrl()
-        );
-        return updaters;
-      }
-
+    JsonNode sources = node.get(parameters.getSourcesName());
+    if (!sources.isEmpty()) {
+      int maxHttpConnections = sources.size();
+      OtpHttpClient otpHttpClient = new OtpHttpClient(maxHttpConnections);
       for (JsonNode source : sources) {
         JsonNode network = source.get(parameters.getSourceNetworkName());
         JsonNode updaterUrl = source.get(parameters.getSourceUrlName());
@@ -80,7 +84,8 @@ public class VehicleRentalServiceDirectoryFetcher {
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 
         var dataSource = VehicleRentalDataSourceFactory.create(
-          vehicleRentalParameters.sourceParameters()
+          vehicleRentalParameters.sourceParameters(),
+          otpHttpClient
         );
         GraphUpdater updater = new VehicleRentalUpdater(
           vehicleRentalParameters,
@@ -90,8 +95,6 @@ public class VehicleRentalServiceDirectoryFetcher {
         );
         updaters.add(updater);
       }
-    } catch (java.io.IOException e) {
-      LOG.warn("Error fetching list of vehicle rental endpoints from {}", parameters.getUrl(), e);
     }
 
     LOG.info("{} updaters fetched", updaters.size());

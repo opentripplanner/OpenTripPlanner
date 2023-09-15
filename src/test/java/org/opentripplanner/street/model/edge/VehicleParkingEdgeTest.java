@@ -9,7 +9,6 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -19,7 +18,6 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 class VehicleParkingEdgeTest {
 
-  Graph graph;
   VehicleParkingEdge vehicleParkingEdge;
   StreetSearchRequest request;
   VehicleParkingEntranceVertex vertex;
@@ -153,12 +151,10 @@ class VehicleParkingEdgeTest {
     VehicleParkingSpaces availability,
     boolean realtime
   ) {
-    graph = new Graph();
-
     var vehicleParking = createVehicleParking(bicyclePlaces, carPlaces, availability);
-    this.vertex = new VehicleParkingEntranceVertex(graph, vehicleParking.getEntrances().get(0));
+    this.vertex = new VehicleParkingEntranceVertex(vehicleParking.getEntrances().get(0));
 
-    vehicleParkingEdge = new VehicleParkingEdge(vertex);
+    vehicleParkingEdge = VehicleParkingEdge.createVehicleParkingEdge(vertex);
 
     var parking = new VehicleParkingRequest();
     parking.setUseAvailabilityInformation(realtime);

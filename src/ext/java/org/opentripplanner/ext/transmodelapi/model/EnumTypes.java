@@ -161,6 +161,7 @@ public class EnumTypes {
     .value("lift", TransitMode.GONDOLA)
     .value("rail", TransitMode.RAIL)
     .value("metro", TransitMode.SUBWAY)
+    .value("taxi", TransitMode.TAXI)
     .value("tram", TransitMode.TRAM)
     .value("trolleybus", TransitMode.TROLLEYBUS)
     .value("monorail", TransitMode.MONORAIL)
@@ -323,16 +324,6 @@ public class EnumTypes {
       "The date specified is outside the range of data currently loaded into the system"
     )
     .value(
-      "processingTimeout",
-      RoutingErrorCode.PROCESSING_TIMEOUT,
-      "The routing request timed out."
-    )
-    .value(
-      "systemError",
-      RoutingErrorCode.SYSTEM_ERROR,
-      "An unknown error happened during the search. The details have been logged to the server logs"
-    )
-    .value(
       "walkingBetterThanTransit",
       RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT,
       "The origin and destination are so close to each other, that walking is always better, but no direct mode was specified for the search"
@@ -455,6 +446,7 @@ public class EnumTypes {
     .value("lift", TransitMode.GONDOLA)
     .value("rail", TransitMode.RAIL)
     .value("metro", TransitMode.SUBWAY)
+    .value("taxi", TransitMode.TAXI)
     .value("tram", TransitMode.TRAM)
     .value("trolleybus", TransitMode.TROLLEYBUS)
     .value("monorail", TransitMode.MONORAIL)

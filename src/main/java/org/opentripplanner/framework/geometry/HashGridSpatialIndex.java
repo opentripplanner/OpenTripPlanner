@@ -9,12 +9,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.index.ItemVisitor;
 import org.locationtech.jts.index.SpatialIndex;
+import org.opentripplanner.framework.lang.IntBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,12 +118,11 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
 
   @Override
   public final boolean remove(Envelope envelope, final Object item) {
-    // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
-    // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
-    // insert logic is not trivial and would require additional testing of the spatial index.
-    // TODO determine why this is an atomic integer when nEntries is not. Is this intended to be threadsafe?
-    // Perhaps so it can be final and used inside a lambda function?
-    final AtomicInteger removedCount = new AtomicInteger();
+    // This iterates over the entire rectangular envelope of the edge rather than the segments
+    // making it up. It will be inefficient for very long edges, but creating a new remove method
+    // mirroring the more efficient insert logic is not trivial and would require additional
+    // testing of the spatial index.
+    final IntBox removedCount = new IntBox(0);
     visit(
       envelope,
       false,
@@ -131,7 +130,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
         boolean removed = bin.remove(item);
         if (removed) {
           nEntries--;
-          removedCount.addAndGet(1);
+          removedCount.inc();
         }
         return removed;
       }

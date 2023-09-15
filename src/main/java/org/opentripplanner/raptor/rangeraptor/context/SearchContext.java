@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntPredicate;
 import java.util.function.ToIntFunction;
 import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.debug.RaptorTimers;
@@ -65,19 +66,22 @@ public class SearchContext<T extends RaptorTripSchedule> {
   /** Lazy initialized */
   private RaptorCostCalculator<T> costCalculator = null;
 
+  /**
+   * @param acceptC2AtDestination Currently only the pass-through has a constraint on the c2 value
+   *                             for accepting it at the destination, if not this is {@code null}.
+   */
   public SearchContext(
     RaptorRequest<T> request,
     RaptorTuningParameters tuningParameters,
-    RaptorTransitDataProvider<T> transit
+    RaptorTransitDataProvider<T> transit,
+    IntPredicate acceptC2AtDestination
   ) {
     this.request = request;
     this.tuningParameters = tuningParameters;
     this.transit = transit;
     this.accessPaths = accessPaths(request);
     this.egressPaths = egressPaths(request);
-
-    // Note that it is the "new" request that is passed in.
-    this.calculator = createCalculator(this.request, tuningParameters);
+    this.calculator = createCalculator(request, tuningParameters, acceptC2AtDestination);
     this.roundTracker =
       new RoundTracker(
         nRounds(),
@@ -252,12 +256,17 @@ public class SearchContext<T extends RaptorTripSchedule> {
    */
   private static <T extends RaptorTripSchedule> RaptorTransitCalculator<T> createCalculator(
     RaptorRequest<T> r,
-    RaptorTuningParameters t
+    RaptorTuningParameters t,
+    IntPredicate acceptC2AtDestination
   ) {
+    var forward = r.searchDirection().isForward();
     SearchParams s = r.searchParams();
-    return r.searchDirection().isForward()
-      ? new ForwardRaptorTransitCalculator<>(s, t)
-      : new ReverseRaptorTransitCalculator<>(s, t);
+
+    if (forward) {
+      return new ForwardRaptorTransitCalculator<>(s, t, acceptC2AtDestination);
+    } else {
+      return new ReverseRaptorTransitCalculator<>(s, t);
+    }
   }
 
   private static DebugRequest debugRequest(RaptorRequest<?> request) {

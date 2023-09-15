@@ -12,18 +12,17 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.i18n.LocalizedStringFormat;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetElevationExtension;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.edge.StreetElevationExtensionBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 
 class MissingElevationHandlerTest {
 
   private static final DataImportIssueStore issueStore = DefaultDataImportIssueStore.NOOP;
-
-  private Graph graph;
 
   private StreetEdge AB, BC, CA, AB2, AD, ED, AF, FG, GB, FH, CJ, JI, AI, BJ;
 
@@ -33,7 +32,6 @@ class MissingElevationHandlerTest {
   void setUp() {
     IntersectionVertex A, B, C, D, E, F, G, H, I, J;
 
-    graph = new Graph();
     A = vertex("A");
     B = vertex("B");
     C = vertex("C");
@@ -186,19 +184,18 @@ class MissingElevationHandlerTest {
   }
 
   private IntersectionVertex vertex(String A) {
-    return new IntersectionVertex(graph, A, 0, 0);
+    return StreetModelForTest.intersectionVertex(A, 0, 0);
   }
 
   private StreetEdge edge(IntersectionVertex from, IntersectionVertex to, double length) {
-    return new StreetEdge(
-      from,
-      to,
-      null,
-      new LocalizedStringFormat("%s%s", from.getName(), to.getName()),
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(from)
+      .withToVertex(to)
+      .withName(new LocalizedStringFormat("%s%s", from.getName(), to.getName()))
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
   }
 
   private void assignElevation(StreetEdge edge, Map<Vertex, Double> elevations) {
@@ -212,7 +209,12 @@ class MissingElevationHandlerTest {
 
     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
-    StreetElevationExtension.addToEdge(edge, profile, true);
+    StreetElevationExtensionBuilder
+      .of(edge)
+      .withElevationProfile(profile)
+      .withComputed(true)
+      .build()
+      .ifPresent(edge::setElevationExtension);
   }
 
   private void assertNullElevation(StreetEdge edge) {

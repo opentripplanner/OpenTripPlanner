@@ -7,19 +7,26 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import java.time.Duration;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.street.search.intersection_model.DrivingDirection;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalModel;
 
 class StreetPreferencesTest {
 
   private static final double TURN_RELUCTANCE = 2.0;
+  private static final Duration MAX_ACCESS_EGRESS = Duration.ofMinutes(5);
+  private static final Duration MAX_DIRECT = Duration.ofMinutes(10);
+  private static final Duration ROUTING_TIMEOUT = Duration.ofSeconds(3);
   private static final DrivingDirection DRIVING_DIRECTION = DrivingDirection.LEFT;
   private static final int ELEVATOR_BOARD_TIME = (int) Duration.ofMinutes(2).toSeconds();
   private static final IntersectionTraversalModel INTERSECTION_TRAVERSAL_MODEL =
     IntersectionTraversalModel.CONSTANT;
-  private static final Duration MAX_ACCESS_EGRESS = Duration.ofMinutes(5);
-  private static final Duration MAX_DIRECT = Duration.ofMinutes(10);
-  public static final Duration ROUTING_TIMEOUT = Duration.ofSeconds(3);
+  private static final TimeAndCostPenalty CAR_PENALTY = TimeAndCostPenalty.of(
+    TimePenalty.of("2m + 1.5t"),
+    3.5
+  );
 
   private final StreetPreferences subject = StreetPreferences
     .of()
@@ -27,7 +34,8 @@ class StreetPreferencesTest {
     .withTurnReluctance(TURN_RELUCTANCE)
     .withElevator(it -> it.withBoardTime(ELEVATOR_BOARD_TIME))
     .withIntersectionTraversalModel(INTERSECTION_TRAVERSAL_MODEL)
-    .withMaxAccessEgressDuration(MAX_ACCESS_EGRESS, Map.of())
+    .withAccessEgress(it -> it.withPenalty(Map.of(StreetMode.CAR_TO_PARK, CAR_PENALTY)))
+    .withAccessEgress(it -> it.withMaxDuration(MAX_ACCESS_EGRESS, Map.of()))
     .withMaxDirectDuration(MAX_DIRECT, Map.of())
     .withRoutingTimeout(ROUTING_TIMEOUT)
     .build();
@@ -43,8 +51,17 @@ class StreetPreferencesTest {
   }
 
   @Test
+  void accessEgressPenalty() {
+    assertEquals(
+      TimeAndCostPenalty.ZERO,
+      subject.accessEgress().penalty().valueOf(StreetMode.WALK)
+    );
+    assertEquals(CAR_PENALTY, subject.accessEgress().penalty().valueOf(StreetMode.CAR_TO_PARK));
+  }
+
+  @Test
   void maxAccessEgressDuration() {
-    assertEquals(MAX_ACCESS_EGRESS, subject.maxAccessEgressDuration().defaultValue());
+    assertEquals(MAX_ACCESS_EGRESS, subject.accessEgress().maxDuration().defaultValue());
   }
 
   @Test
@@ -79,7 +96,7 @@ class StreetPreferencesTest {
     // Create a copy, make a change and set it back again to force creating a new object
     var other = subject.copyOf().withTurnReluctance(34.0).build();
     var copy = other.copyOf().withTurnReluctance(TURN_RELUCTANCE).build();
-    assertEqualsAndHashCode(StreetPreferences.DEFAULT, subject, other, copy);
+    assertEqualsAndHashCode(subject, other, copy);
   }
 
   @Test
@@ -92,7 +109,12 @@ class StreetPreferencesTest {
       "routingTimeout: 3s, " +
       "elevator: ElevatorPreferences{boardTime: 2m}, " +
       "intersectionTraversalModel: CONSTANT, " +
-      "maxAccessEgressDuration: DurationForStreetMode{default:5m}, " +
+      "accessEgress: AccessEgressPreferences{" +
+      "penalty: TimeAndCostPenaltyForEnum{CAR_TO_PARK: " +
+      CAR_PENALTY +
+      "}, " +
+      "maxDuration: DurationForStreetMode{default:5m}" +
+      "}, " +
       "maxDirectDuration: DurationForStreetMode{default:10m}" +
       "}",
       subject.toString()

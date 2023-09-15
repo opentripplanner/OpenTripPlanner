@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
@@ -34,11 +35,14 @@ public class AccessEgressRouter {
     StreetRequest streetRequest,
     DataOverlayContext dataOverlayContext,
     boolean fromTarget,
-    Duration durationLimit
+    Duration durationLimit,
+    int maxStopCount
   ) {
+    OTPRequestTimeoutException.checkForTimeout();
     NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
       transitService,
       durationLimit,
+      maxStopCount,
       dataOverlayContext,
       true
     );

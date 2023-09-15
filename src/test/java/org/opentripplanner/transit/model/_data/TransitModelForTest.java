@@ -3,8 +3,10 @@ package org.opentripplanner.transit.model._data;
 import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 
 import java.util.List;
+import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -46,6 +48,19 @@ public class TransitModelForTest {
     .withUrl("https://www.agency.com")
     .build();
 
+  public static final Agency OTHER_AGENCY = Agency
+    .of(id("AX"))
+    .withName("Other Agency Test")
+    .withTimezone(TIME_ZONE_ID)
+    .withUrl("https://www.otheragency.com")
+    .build();
+  public static final Agency OTHER_FEED_AGENCY = Agency
+    .of(FeedScopedId.ofNullable("F2", "other.feed-agency"))
+    .withName("Other feed agency")
+    .withTimezone(TIME_ZONE_ID)
+    .withUrl("https:/www.otherfeedagency.com")
+    .build();
+
   public static FeedScopedId id(String id) {
     return new FeedScopedId(FEED_ID, id);
   }
@@ -78,6 +93,10 @@ public class TransitModelForTest {
   /** Create a valid Bus Route to use in unit tests */
   public static TripBuilder trip(String id) {
     return Trip.of(id(id)).withRoute(route("R" + id).build());
+  }
+
+  public static TripBuilder trip(String feedId, String tripId) {
+    return Trip.of(FeedScopedId.ofNullable(feedId, tripId)).withRoute(route("R" + tripId).build());
   }
 
   public static RegularStop stopForTest(
@@ -188,7 +207,21 @@ public class TransitModelForTest {
     var stopTime = TransitModelForTest.stopTime(trip, seq);
     stopTime.setArrivalTime(time);
     stopTime.setDepartureTime(time);
+    stopTime.setStopHeadsign(I18NString.of("Stop headsign at stop %s".formatted(seq)));
     return stopTime;
+  }
+
+  /**
+   * Generates a list of stop times of length {@code count} where each stop is 5 minutes after
+   * the previous one.
+   * <p>
+   * The first stop has stop sequence 10, the following one has 20 and so on.
+   */
+  public static List<StopTime> stopTimesEvery5Minutes(int count, Trip trip, int startTime) {
+    return IntStream
+      .range(0, count)
+      .mapToObj(seq -> stopTime(trip, (seq + 1) * 10, startTime + (seq * 60 * 5)))
+      .toList();
   }
 
   public static StopPattern stopPattern(int numberOfStops) {

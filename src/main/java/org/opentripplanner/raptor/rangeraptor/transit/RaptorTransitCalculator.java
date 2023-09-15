@@ -1,12 +1,15 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.opentripplanner.framework.time.TimeUtils.hm2time;
-import static org.opentripplanner.raptor.api.RaptorConstants.TIME_NOT_SET;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
+import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
@@ -57,9 +60,16 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule>
     boolean forward
   ) {
     return forward
-      ? new ForwardRaptorTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60)
+      ? new ForwardRaptorTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60, null)
       : new ReverseRaptorTransitCalculator<>(hm2time(8, 0), 2 * 60 * 60, TIME_NOT_SET, 60);
   }
+
+  /**
+   * Check if the destination arrival is a valid/optimal result. if ok, return an empty list, if
+   * not return a list of reject reasons. The reject messages are used to produce reject events in
+   * the debug trace log.
+   */
+  Collection<String> rejectDestinationArrival(ArrivalView<T> destArrival);
 
   /**
    * Stop the search when the time exceeds the latest-acceptable-arrival-time. In a reverse search
@@ -79,7 +89,7 @@ public interface RaptorTransitCalculator<T extends RaptorTripSchedule>
    * search it will be the earliest possible departure time, while for reverse search it uses the
    * latest arrival time.
    * <p>
-   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible after the requested departure time
    */
   int departureTime(RaptorAccessEgress accessPath, int departureTime);

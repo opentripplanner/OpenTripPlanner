@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost;
 
 import java.util.BitSet;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 
 /**
@@ -17,13 +17,9 @@ public class GeneralizedCostParametersBuilder {
   private boolean wheelchairEnabled;
   private AccessibilityPreferences wheelchairAccessibility;
   private BitSet unpreferredPatterns;
-  private DoubleAlgorithmFunction unpreferredCost;
+  private RaptorCostLinearFunction unpreferredCost;
 
-  public GeneralizedCostParametersBuilder() {
-    this(GeneralizedCostParameters.DEFAULTS);
-  }
-
-  private GeneralizedCostParametersBuilder(GeneralizedCostParameters other) {
+  GeneralizedCostParametersBuilder(GeneralizedCostParameters other) {
     this.boardCost = other.boardCost();
     this.transferCost = other.transferCost();
     this.transitReluctanceFactors = other.transitReluctanceFactors();
@@ -31,6 +27,7 @@ public class GeneralizedCostParametersBuilder {
     this.wheelchairEnabled = other.wheelchairEnabled();
     this.wheelchairAccessibility = other.wheelchairAccessibility();
     this.unpreferredPatterns = other.unpreferredPatterns();
+    this.unpreferredCost = other.unnpreferredCost();
   }
 
   public int boardCost() {
@@ -100,12 +97,12 @@ public class GeneralizedCostParametersBuilder {
     return this;
   }
 
-  public DoubleAlgorithmFunction unpreferredCost() {
+  public RaptorCostLinearFunction unpreferredCost() {
     return unpreferredCost;
   }
 
-  public GeneralizedCostParametersBuilder unpreferredCost(DoubleAlgorithmFunction unpreferredCost) {
-    this.unpreferredCost = unpreferredCost;
+  public GeneralizedCostParametersBuilder unpreferredCost(CostLinearFunction unpreferredCost) {
+    this.unpreferredCost = RaptorCostLinearFunction.of(unpreferredCost);
     return this;
   }
 

@@ -2,7 +2,7 @@ package org.opentripplanner.service.vehiclerental.street;
 
 import java.util.Collections;
 import java.util.Set;
-import org.locationtech.jts.geom.LineString;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
@@ -18,14 +18,22 @@ import org.opentripplanner.street.search.state.StateEditor;
  */
 public class VehicleRentalEdge extends Edge {
 
-  public RentalFormFactor formFactor;
+  public final RentalFormFactor formFactor;
 
-  public VehicleRentalEdge(VehicleRentalPlaceVertex vertex, RentalFormFactor formFactor) {
+  private VehicleRentalEdge(VehicleRentalPlaceVertex vertex, RentalFormFactor formFactor) {
     super(vertex, vertex);
     this.formFactor = formFactor;
   }
 
+  public static VehicleRentalEdge createVehicleRentalEdge(
+    VehicleRentalPlaceVertex vertex,
+    RentalFormFactor formFactor
+  ) {
+    return connectToGraph(new VehicleRentalEdge(vertex, formFactor));
+  }
+
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     if (!s0.getRequest().mode().includesRenting()) {
       return State.empty();
@@ -65,7 +73,16 @@ public class VehicleRentalEdge extends Edge {
           pickedUp = false;
         }
         case RENTING_FLOATING -> {
-          if (!station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)) {
+          // a very special case: an arriveBy search has started in a no-drop-off zone.
+          // in such a case we mark this case in the state that speculatively picks up a vehicle
+          // when leaving the no-drop-off zone (has no network) and check it here so that we cannot
+          // begin the rental.
+          // reminder: in an arriveBy search we traverse backwards so beginFloatingVehicle means
+          // traversing from renting to walking.
+          if (
+            s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.contains(network) ||
+            !station.getAvailablePickupFormFactors(realtimeAvailability).contains(formFactor)
+          ) {
             return State.empty();
           }
           if (station.isFloatingVehicle()) {
@@ -157,21 +174,6 @@ public class VehicleRentalEdge extends Edge {
   @Override
   public I18NString getName() {
     return getToVertex().getName();
-  }
-
-  @Override
-  public boolean hasBogusName() {
-    return false;
-  }
-
-  @Override
-  public LineString getGeometry() {
-    return null;
-  }
-
-  @Override
-  public double getDistanceMeters() {
-    return 0;
   }
 
   /**

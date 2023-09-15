@@ -22,7 +22,7 @@ public class ServerConfig implements OTPWebApplicationParameters {
       .description(
         """
 These parameters are used to configure the router server. Many parameters are specific to a 
-domain, these are set tin the routing request.
+domain, these are set in the routing request.
 """
       )
       .asObject();
@@ -36,7 +36,7 @@ domain, these are set tin the routing request.
           """
 This timeout limits the server-side processing time for a given API request. This does not include
 network latency nor waiting time in the HTTP server thread pool. The default value is
-`-1s`(no timeout). The timeout is applied to all APIs (REST, Transmodel , Legacy GraphQL).
+`-1s`(no timeout). The timeout is applied to all APIs (REST, Transmodel & GTFS GraphQL).
 The timeout is not enforced when the parallel routing OTP feature is in use.
 """
         )
@@ -55,9 +55,9 @@ OTP supports tracing user requests across log events and "outside" services. OTP
 http-request-header parameters into all associated log events and into the http response. If the
 value is not present in the request, a unique value can be generated. The OTP generated value is
 a 6 characters long base 36[0-9a-z] character string.
-<p>
-<b>Use-case Correlation-ID</b>
-<p>
+
+**Use-case Correlation-ID**
+
 A common use-case in a service oriented environment is to use a _correlation-id_ to identify all log
 messages across multiple (micro-)services from the same user. This is done by setting the
 "X-Correlation-ID" http header in the http facade/gateway. Use the "traceParameters" to configure
@@ -94,7 +94,7 @@ Only log4j and logback support this.
               .since(V2_4)
               .summary(
                 "If `true` a unique value is generated if no http request header is provided, or " +
-                "the value is missing, then "
+                "the value is missing."
               )
               .asBoolean(false)
           )

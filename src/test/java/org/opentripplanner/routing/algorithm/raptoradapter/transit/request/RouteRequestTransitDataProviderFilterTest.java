@@ -44,7 +44,7 @@ import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-public class RouteRequestTransitDataProviderFilterTest {
+class RouteRequestTransitDataProviderFilterTest {
 
   private static final Route ROUTE = TransitModelForTest.route("1").build();
 
@@ -85,7 +85,7 @@ public class RouteRequestTransitDataProviderFilterTest {
    */
   @ParameterizedTest
   @VariableSource("wheelchairCases")
-  public void testWheelchairAccess(Accessibility wheelchair, WheelchairPreferences accessibility) {
+  void testWheelchairAccess(Accessibility wheelchair, WheelchairPreferences accessibility) {
     var firstStop = TransitModelForTest.stopForTest("TEST:START", wheelchair, 0.0, 0.0);
     var lastStop = TransitModelForTest.stopForTest("TEST:END", wheelchair, 0.0, 0.0);
 
@@ -195,7 +195,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void notFilteringExpectedTripPatternForDateTest() {
+  void notFilteringExpectedTripPatternForDateTest() {
     TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
 
     var filter = new RouteRequestTransitDataProviderFilter(
@@ -214,7 +214,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void bannedRouteFilteringTest() {
+  void bannedRouteFilteringTest() {
     TripPatternForDate tripPatternForDate = createTestTripPatternForDate();
 
     var filter = new RouteRequestTransitDataProviderFilter(
@@ -238,7 +238,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void bannedTripFilteringTest() {
+  void bannedTripFilteringTest() {
     TripTimes tripTimes = createTestTripTimes(
       TRIP_ID,
       ROUTE,
@@ -264,8 +264,121 @@ public class RouteRequestTransitDataProviderFilterTest {
     assertFalse(valid);
   }
 
+  /**
+   * Filtering trips with 2 filters: a selection by submode filter and an exclusion by agency filter.
+   * A trip matches if it matches either of them.
+   */
   @Test
-  public void transitModeFilteringTest() {
+  void matchModeFilterAndBannedAgencyFilter() {
+    TripTimes tripTimesMatchingSubModeMatchingAgency = createTestTripTimesWithSubmode(
+      TransmodelTransportSubmode.UNKNOWN.getValue()
+    );
+    TripTimes tripTimesFailingSubModeMatchingAgency = createTestTripTimesWithSubmode(
+      TransmodelTransportSubmode.LOCAL.getValue()
+    );
+
+    var filter = new RouteRequestTransitDataProviderFilter(
+      false,
+      false,
+      DEFAULT_ACCESSIBILITY,
+      false,
+      false,
+      Set.of(),
+      filterForModesAndFilterForBannedAgencies(
+        List.of(
+          new MainAndSubMode(
+            TransitMode.BUS,
+            SubMode.of(TransmodelTransportSubmode.UNKNOWN.getValue())
+          )
+        ),
+        List.of(TransitModelForTest.OTHER_AGENCY.getId())
+      )
+    );
+
+    assertTrue(filter.tripTimesPredicate(tripTimesMatchingSubModeMatchingAgency, true));
+    assertTrue(filter.tripTimesPredicate(tripTimesFailingSubModeMatchingAgency, true));
+  }
+
+  /**
+   * Filtering trips with one filter combining selection by submode amd exclusion by agency:
+   * a trip matches if it matches both of them.
+   */
+  @Test
+  void matchCombinedModesAndBannedAgencyFilter() {
+    TripTimes tripTimesMatchingSubModeMatchingAgency = createTestTripTimesWithSubmode(
+      TransmodelTransportSubmode.UNKNOWN.getValue()
+    );
+    TripTimes tripTimesFailingSubModeMatchingAgency = createTestTripTimesWithSubmode(
+      TransmodelTransportSubmode.LOCAL.getValue()
+    );
+
+    var filter = new RouteRequestTransitDataProviderFilter(
+      false,
+      false,
+      DEFAULT_ACCESSIBILITY,
+      false,
+      false,
+      Set.of(),
+      combinedFilterForModesAndBannedAgencies(
+        List.of(
+          new MainAndSubMode(
+            TransitMode.BUS,
+            SubMode.of(TransmodelTransportSubmode.UNKNOWN.getValue())
+          )
+        ),
+        List.of(TransitModelForTest.OTHER_AGENCY.getId())
+      )
+    );
+
+    assertTrue(filter.tripTimesPredicate(tripTimesMatchingSubModeMatchingAgency, true));
+    assertFalse(filter.tripTimesPredicate(tripTimesFailingSubModeMatchingAgency, true));
+  }
+
+  @Test
+  void matchSelectedAgencyExcludedSubMode() {
+    TripTimes tripTimesMatchingSubModeMatchingAgency = createTestTripTimesWithSubmode(
+      TransmodelTransportSubmode.UNKNOWN.getValue()
+    );
+    TripTimes tripTimesFailingSubModeMatchingAgency = createTestTripTimesWithSubmode(
+      TransmodelTransportSubmode.LOCAL.getValue()
+    );
+
+    var filter = new RouteRequestTransitDataProviderFilter(
+      false,
+      false,
+      DEFAULT_ACCESSIBILITY,
+      false,
+      false,
+      Set.of(),
+      List.of(
+        TransitFilterRequest
+          .of()
+          .addSelect(
+            SelectRequest.of().withAgencies(List.of(TransitModelForTest.AGENCY.getId())).build()
+          )
+          .addNot(
+            SelectRequest
+              .of()
+              .withTransportModes(
+                List.of(
+                  new MainAndSubMode(
+                    TransitMode.BUS,
+                    SubMode.of(TransmodelTransportSubmode.LOCAL.getValue())
+                  )
+                )
+              )
+              .build()
+          )
+          .build()
+      )
+    );
+
+    assertTrue(filter.tripTimesPredicate(tripTimesMatchingSubModeMatchingAgency, true));
+    assertFalse(filter.tripTimesPredicate(tripTimesFailingSubModeMatchingAgency, true));
+  }
+
+  @Test
+  void transitModeFilteringTest() {
     TripTimes tripTimes = createTestTripTimes(
       TRIP_ID,
       ROUTE,
@@ -291,7 +404,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void notFilteringExpectedTripTimesTest() {
+  void notFilteringExpectedTripTimesTest() {
     TripTimes tripTimes = createTestTripTimes(
       TRIP_ID,
       ROUTE,
@@ -318,7 +431,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void bikesAllowedFilteringTest() {
+  void bikesAllowedFilteringTest() {
     TripTimes tripTimes = createTestTripTimes(
       TRIP_ID,
       ROUTE,
@@ -345,7 +458,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void removeInaccessibleTrip() {
+  void removeInaccessibleTrip() {
     TripTimes tripTimes = createTestTripTimes(
       TRIP_ID,
       ROUTE,
@@ -372,7 +485,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void keepAccessibleTrip() {
+  void keepAccessibleTrip() {
     TripTimes wheelchairAccessibleTrip = createTestTripTimes(
       TRIP_ID,
       ROUTE,
@@ -399,7 +512,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void keepRealTimeAccessibleTrip() {
+  void keepRealTimeAccessibleTrip() {
     TripTimes realTimeWheelchairAccessibleTrip = createTestTripTimes(
       TRIP_ID,
       ROUTE,
@@ -428,7 +541,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void includePlannedCancellationsTest() {
+  void includePlannedCancellationsTest() {
     TripTimes tripTimesWithCancellation = createTestTripTimes(
       TRIP_ID,
       ROUTE,
@@ -492,7 +605,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void includeRealtimeCancellationsTest() {
+  void includeRealtimeCancellationsTest() {
     TripTimes tripTimes = createTestTripTimes(
       TRIP_ID,
       ROUTE,
@@ -558,7 +671,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void testBikesAllowed() {
+  void testBikesAllowed() {
     RouteBuilder routeBuilder = TransitModelForTest.route("1");
     TripBuilder trip = Trip.of(TransitModelForTest.id("T1")).withRoute(routeBuilder.build());
 
@@ -594,7 +707,7 @@ public class RouteRequestTransitDataProviderFilterTest {
   }
 
   @Test
-  public void multipleFilteringTest() {
+  void multipleFilteringTest() {
     TripTimes matchingTripTimes = createTestTripTimes(
       TRIP_ID,
       ROUTE,
@@ -721,6 +834,32 @@ public class RouteRequestTransitDataProviderFilterTest {
     );
   }
 
+  private List<TransitFilter> filterForModesAndFilterForBannedAgencies(
+    List<MainAndSubMode> modes,
+    List<FeedScopedId> agencyIds
+  ) {
+    return List.of(
+      TransitFilterRequest
+        .of()
+        .addSelect(SelectRequest.of().withTransportModes(List.copyOf(modes)).build())
+        .build(),
+      TransitFilterRequest.of().addNot(SelectRequest.of().withAgencies(agencyIds).build()).build()
+    );
+  }
+
+  private List<TransitFilter> combinedFilterForModesAndBannedAgencies(
+    List<MainAndSubMode> modes,
+    List<FeedScopedId> agencyIds
+  ) {
+    return List.of(
+      TransitFilterRequest
+        .of()
+        .addSelect(SelectRequest.of().withTransportModes(List.copyOf(modes)).build())
+        .addNot(SelectRequest.of().withAgencies(agencyIds).build())
+        .build()
+    );
+  }
+
   private TripTimes createTestTripTimes(
     FeedScopedId tripId,
     Route route,
@@ -747,6 +886,18 @@ public class RouteRequestTransitDataProviderFilterTest {
     stopTime.setStopSequence(0);
 
     return new TripTimes(trip, List.of(stopTime), new Deduplicator());
+  }
+
+  private TripTimes createTestTripTimesWithSubmode(String submode) {
+    return createTestTripTimes(
+      TRIP_ID,
+      ROUTE,
+      BikeAccess.NOT_ALLOWED,
+      TransitMode.BUS,
+      submode,
+      Accessibility.NOT_POSSIBLE,
+      null
+    );
   }
 
   private static StopTime getStopTime(String idAndName, PickDrop scheduled) {

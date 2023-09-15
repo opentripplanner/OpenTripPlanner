@@ -12,12 +12,26 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
  */
 public class BoardingLocationToStopLink extends StreetTransitEntityLink<TransitStopVertex> {
 
-  public BoardingLocationToStopLink(OsmBoardingLocationVertex fromv, TransitStopVertex tov) {
+  private BoardingLocationToStopLink(OsmBoardingLocationVertex fromv, TransitStopVertex tov) {
     super(fromv, tov, tov.getWheelchairAccessibility());
   }
 
-  public BoardingLocationToStopLink(TransitStopVertex fromv, OsmBoardingLocationVertex tov) {
+  private BoardingLocationToStopLink(TransitStopVertex fromv, OsmBoardingLocationVertex tov) {
     super(fromv, tov, fromv.getWheelchairAccessibility());
+  }
+
+  public static BoardingLocationToStopLink createBoardingLocationToStopLink(
+    OsmBoardingLocationVertex fromv,
+    TransitStopVertex tov
+  ) {
+    return connectToGraph(new BoardingLocationToStopLink(fromv, tov));
+  }
+
+  public static BoardingLocationToStopLink createBoardingLocationToStopLink(
+    TransitStopVertex fromv,
+    OsmBoardingLocationVertex tov
+  ) {
+    return connectToGraph(new BoardingLocationToStopLink(fromv, tov));
   }
 
   protected int getStreetToStopTime() {

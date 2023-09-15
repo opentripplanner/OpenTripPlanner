@@ -11,6 +11,7 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.BO
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -214,6 +215,21 @@ public class NodeAdapterTest {
     assertEquals(
       Collections.<AnEnum, Boolean>emptyMap(),
       subject.of("missing-key").asEnumMap(AnEnum.class, Boolean.class)
+    );
+    assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
+  }
+
+  @Test
+  public void asEnumMapWithCustomType() {
+    // With optional enum values in map
+    NodeAdapter subject = newNodeAdapterForTest("{ key : { A: {a:'Foo'} } }");
+    assertEquals(
+      Map.of(AnEnum.A, new ARecord("Foo")),
+      subject.of("key").asEnumMap(AnEnum.class, ARecord::fromJson)
+    );
+    assertEquals(
+      Collections.<AnEnum, Boolean>emptyMap(),
+      subject.of("missing-key").asEnumMap(AnEnum.class, ARecord::fromJson)
     );
     assertEquals(NON_UNUSED_PARAMETERS, unusedParams(subject));
   }
@@ -455,10 +471,7 @@ public class NodeAdapterTest {
       .of("key")
       .since(V2_0)
       .summary("Summary Array")
-      .asObjects(
-        List.of(),
-        n -> new ARecord(n.of("a").since(V2_1).summary("Summary Element").asString())
-      );
+      .asObjects(List.of(), ARecord::fromJson);
 
     assertEquals("[ARecord[a=I], ARecord[a=2]]", result.toString());
     assertEquals("[key : object[] = [] Since 2.0]", subject.parametersSorted().toString());
@@ -466,10 +479,17 @@ public class NodeAdapterTest {
   }
 
   @Test
-  public void linearFunction() {
+  public void asCostLinearFunction() {
     NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
-    assertEquals("f(x) = 400 + 8.0 x", subject.of("key").asLinearFunction(null).toString());
-    assertNull(subject.of("no-key").asLinearFunction(null));
+    assertEquals("6m40s + 8.0 t", subject.of("key").asCostLinearFunction(null).toString());
+    assertNull(subject.of("no-key").asCostLinearFunction(null));
+  }
+
+  @Test
+  public void asTimePenalty() {
+    NodeAdapter subject = newNodeAdapterForTest("{ key : '400+8x' }");
+    assertEquals("6m40s + 8.0 t", subject.of("key").asTimePenalty(null).toString());
+    assertNull(subject.of("no-key").asTimePenalty(null));
   }
 
   @Test
@@ -541,5 +561,9 @@ public class NodeAdapterTest {
     A_B_C,
   }
 
-  private record ARecord(String a) {}
+  private record ARecord(String a) {
+    static ARecord fromJson(NodeAdapter c) {
+      return new ARecord(c.of("a").since(V2_4).summary("Summary A").asString());
+    }
+  }
 }

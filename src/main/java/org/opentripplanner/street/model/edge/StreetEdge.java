@@ -6,9 +6,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
-import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
 import org.opentripplanner.framework.geometry.CompactLineStringUtils;
@@ -17,8 +18,8 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.geometry.SplitLineString;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.lang.BitSetUtils;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.linking.DisposableEdgeCollection;
 import org.opentripplanner.routing.linking.LinkingDirection;
@@ -51,20 +52,21 @@ public class StreetEdge
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
   private static final double GREENWAY_SAFETY_FACTOR = 0.1;
-  // TODO(flamholz): do something smarter with the car speed here.
-  public static final float DEFAULT_CAR_SPEED = 11.2f;
+
   /** If you have more than 16 flags, increase flags to short or int */
-  private static final int BACK_FLAG_INDEX = 0;
-  private static final int ROUNDABOUT_FLAG_INDEX = 1;
-  private static final int HASBOGUSNAME_FLAG_INDEX = 2;
-  private static final int MOTOR_VEHICLE_NOTHRUTRAFFIC = 3;
-  private static final int STAIRS_FLAG_INDEX = 4;
-  private static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
-  private static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
-  private static final int BICYCLE_NOTHRUTRAFFIC = 7;
-  private static final int WALK_NOTHRUTRAFFIC = 8;
-  private static final int CLASS_LINK = 9;
+  static final int BACK_FLAG_INDEX = 0;
+  static final int ROUNDABOUT_FLAG_INDEX = 1;
+  static final int HASBOGUSNAME_FLAG_INDEX = 2;
+  static final int MOTOR_VEHICLE_NOTHRUTRAFFIC = 3;
+  static final int STAIRS_FLAG_INDEX = 4;
+  static final int SLOPEOVERRIDE_FLAG_INDEX = 5;
+  static final int WHEELCHAIR_ACCESSIBLE_FLAG_INDEX = 6;
+  static final int BICYCLE_NOTHRUTRAFFIC = 7;
+  static final int WALK_NOTHRUTRAFFIC = 8;
+  static final int CLASS_LINK = 9;
+
   private StreetEdgeCostExtension costExtension;
+
   /** back, roundabout, stairs, ... */
   private short flags;
 
@@ -74,21 +76,21 @@ public class StreetEdge
    * double-precision floating point meters. Someday we might want to convert everything to fixed
    * point representations.
    */
-  private int length_mm;
+  private final int length_mm;
 
   /**
    * bicycleSafetyWeight = length * bicycleSafetyFactor. For example, a 100m street with a safety
    * factor of 2.0 will be considered in term of safety cost as the same as a 200m street with a
    * safety factor of 1.0.
    */
-  protected float bicycleSafetyFactor;
+  private float bicycleSafetyFactor;
 
   /**
    * walkSafetyFactor = length * walkSafetyFactor. For example, a 100m street with a safety
    * factor of 2.0 will be considered in term of safety cost as the same as a 200m street with a
    * safety factor of 1.0.
    */
-  protected float walkSafetyFactor;
+  private float walkSafetyFactor;
 
   private byte[] compactGeometry;
 
@@ -99,16 +101,16 @@ public class StreetEdge
   /**
    * The speed (meters / sec) at which an automobile can traverse this street segment.
    */
-  private float carSpeed;
+  private final float carSpeed;
 
   /**
    * The angle at the start of the edge geometry. Internal representation is -180 to +179 integer
    * degrees mapped to -128 to +127 (brads)
    */
-  private byte inAngle;
+  private final byte inAngle;
 
   /** The angle at the start of the edge geometry. Internal representation like that of inAngle. */
-  private byte outAngle;
+  private final byte outAngle;
 
   private StreetElevationExtension elevationExtension;
 
@@ -130,85 +132,24 @@ public class StreetEdge
    */
   private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
-  public StreetEdge(
-    StreetVertex v1,
-    StreetVertex v2,
-    LineString geometry,
-    I18NString name,
-    double length,
-    StreetTraversalPermission permission,
-    boolean back
-  ) {
-    super(v1, v2);
-    this.setBack(back);
-    this.setGeometry(geometry);
-    this.length_mm = (int) (length * 1000); // CONVERT FROM FLOAT METERS TO FIXED MILLIMETERS
-    if (this.length_mm == 0) {
-      LOG.warn(
-        "StreetEdge {} from {} to {} has length of 0. This is usually an error.",
-        name,
-        v1,
-        v2
-      );
-    }
-    this.bicycleSafetyFactor = 1.0f;
-    this.walkSafetyFactor = 1.0f;
-    this.name = name;
-    this.setPermission(permission);
-    this.setCarSpeed(DEFAULT_CAR_SPEED);
-    this.setWheelchairAccessible(true); // accessible by default
-    if (geometry != null) {
-      try {
-        for (Coordinate c : geometry.getCoordinates()) {
-          if (Double.isNaN(c.x)) {
-            System.out.println("X DOOM");
-          }
-          if (Double.isNaN(c.y)) {
-            System.out.println("Y DOOM");
-          }
-        }
-        // Conversion from radians to internal representation as a single signed byte.
-        // We also reorient the angles since OTP seems to use South as a reference
-        // while the azimuth functions use North.
-        // FIXME Use only North as a reference, not a mix of North and South!
-        // Range restriction happens automatically due to Java signed overflow behavior.
-        // 180 degrees exists as a negative rather than a positive due to the integer range.
-        double angleRadians = DirectionUtils.getLastAngle(geometry);
-        outAngle = (byte) Math.round(angleRadians * 128 / Math.PI + 128);
-        angleRadians = DirectionUtils.getFirstAngle(geometry);
-        inAngle = (byte) Math.round(angleRadians * 128 / Math.PI + 128);
-      } catch (IllegalArgumentException iae) {
-        LOG.error(
-          "exception while determining street edge angles. setting to zero. there is probably something wrong with this street segment's geometry."
-        );
-        inAngle = 0;
-        outAngle = 0;
-      }
-    }
+  protected StreetEdge(StreetEdgeBuilder<?> builder) {
+    super(builder.fromVertex(), builder.toVertex());
+    this.flags = builder.getFlags();
+    this.setGeometry(builder.geometry());
+    this.length_mm = computeLength(builder);
+    this.setBicycleSafetyFactor(builder.bicycleSafetyFactor());
+    this.setWalkSafetyFactor(builder.walkSafetyFactor());
+    this.name = builder.name();
+    this.setPermission(builder.permission());
+    this.carSpeed = builder.carSpeed();
+    LineStringInOutAngles lineStringInOutAngles = LineStringInOutAngles.of(builder.geometry());
+    inAngle = lineStringInOutAngles.inAngle();
+    outAngle = lineStringInOutAngles.outAngle();
+    elevationExtension = builder.streetElevationExtension();
   }
 
-  //For testing only
-  public StreetEdge(
-    StreetVertex v1,
-    StreetVertex v2,
-    LineString geometry,
-    String name,
-    double length,
-    StreetTraversalPermission permission,
-    boolean back
-  ) {
-    this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
-  }
-
-  public StreetEdge(
-    StreetVertex v1,
-    StreetVertex v2,
-    LineString geometry,
-    I18NString name,
-    StreetTraversalPermission permission,
-    boolean back
-  ) {
-    this(v1, v2, geometry, name, SphericalDistanceLibrary.length(geometry), permission, back);
+  public StreetEdgeBuilder<?> toBuilder() {
+    return new StreetEdgeBuilder<>(this);
   }
 
   /**
@@ -392,12 +333,10 @@ public class StreetEdge
 
     final boolean arriveByRental =
       s0.getRequest().mode().includesRenting() && s0.getRequest().arriveBy();
-
-    if (
-      arriveByRental &&
-      (tov.rentalTraversalBanned(s0) || hasStartedSearchInNoDropOffZoneAndIsExitingIt(s0))
-    ) {
+    if (arriveByRental && tov.rentalTraversalBanned(s0)) {
       return State.empty();
+    } else if (arriveByRental && hasStartedWalkingInNoDropOffZoneAndIsExitingIt(s0)) {
+      return splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(s0);
     }
     // if the traversal is banned for the current state because of a GBFS geofencing zone
     // we drop the vehicle and continue walking
@@ -425,11 +364,10 @@ public class StreetEdge
           s0.getVehicleRentalNetwork(),
           s0.getRequest().arriveBy()
         );
-        editor.resetStartedInNoDropOffZone();
       }
     }
     // If we are biking, or walking with a bike check if we may continue by biking or by walking
-    else if (s0.getNonTransitMode() == TraverseMode.BICYCLE) {
+    else if (s0.currentMode() == TraverseMode.BICYCLE) {
       if (canTraverse(TraverseMode.BICYCLE)) {
         editor = doTraverse(s0, TraverseMode.BICYCLE, false);
       } else if (canTraverse(TraverseMode.WALK)) {
@@ -437,8 +375,8 @@ public class StreetEdge
       } else {
         return State.empty();
       }
-    } else if (canTraverse(s0.getNonTransitMode())) {
-      editor = doTraverse(s0, s0.getNonTransitMode(), false);
+    } else if (canTraverse(s0.currentMode())) {
+      editor = doTraverse(s0, s0.currentMode(), false);
     } else {
       editor = null;
     }
@@ -499,33 +437,6 @@ public class StreetEdge
   }
 
   /**
-   * This is the state that starts a backwards search inside a restricted zone
-   * (no drop off, no traversal or outside business area) and is walking towards finding a rental
-   * vehicle. Once we are leaving a geofencing zone or are entering a business area we want to
-   * speculatively pick up a vehicle a ride towards an edge where there is one parked.
-   */
-  private boolean leavesZoneWithRentalRestrictionsWhenHavingRented(State s0) {
-    return (
-      s0.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED &&
-      !fromv.rentalRestrictions().hasRestrictions() &&
-      tov.rentalRestrictions().hasRestrictions()
-    );
-  }
-
-  /**
-   * If the reverse search has started in a no-drop off rental zone and you are exiting
-   * it .
-   */
-  private boolean hasStartedSearchInNoDropOffZoneAndIsExitingIt(State s0) {
-    return (
-      s0.isRentingVehicle() &&
-      !fromv.rentalDropOffBanned(s0) &&
-      tov.rentalDropOffBanned(s0) &&
-      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty()
-    );
-  }
-
-  /**
    * Gets non-localized I18NString (Used when splitting edges)
    *
    * @return non-localized Name
@@ -571,22 +482,6 @@ public class StreetEdge
   public void removeRentalExtension(RentalRestrictionExtension ext) {
     fromv.removeRentalRestriction(ext);
     tov.removeRentalRestriction(ext);
-  }
-
-  private void setGeometry(LineString geometry) {
-    this.compactGeometry =
-      CompactLineStringUtils.compactLineString(
-        fromv.getLon(),
-        fromv.getLat(),
-        tov.getLon(),
-        tov.getLat(),
-        isBack() ? geometry.reverse() : geometry,
-        isBack()
-      );
-  }
-
-  public void setRoundabout(boolean roundabout) {
-    flags = BitSetUtils.set(flags, ROUNDABOUT_FLAG_INDEX, roundabout);
   }
 
   @Override
@@ -639,16 +534,12 @@ public class StreetEdge
     return BitSetUtils.get(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX);
   }
 
-  public void setWheelchairAccessible(boolean wheelchairAccessible) {
-    flags = BitSetUtils.set(flags, WHEELCHAIR_ACCESSIBLE_FLAG_INDEX, wheelchairAccessible);
-  }
-
   public StreetTraversalPermission getPermission() {
     return permission;
   }
 
   public void setPermission(StreetTraversalPermission permission) {
-    this.permission = permission;
+    this.permission = Objects.requireNonNull(permission);
   }
 
   /**
@@ -657,14 +548,6 @@ public class StreetEdge
    */
   public boolean isBack() {
     return BitSetUtils.get(flags, BACK_FLAG_INDEX);
-  }
-
-  public void setBack(boolean back) {
-    flags = BitSetUtils.set(flags, BACK_FLAG_INDEX, back);
-  }
-
-  public void setHasBogusName(boolean hasBogusName) {
-    flags = BitSetUtils.set(flags, HASBOGUSNAME_FLAG_INDEX, hasBogusName);
   }
 
   public boolean isWalkNoThruTraffic() {
@@ -698,10 +581,6 @@ public class StreetEdge
     return BitSetUtils.get(flags, STAIRS_FLAG_INDEX);
   }
 
-  public void setStairs(boolean stairs) {
-    flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
-  }
-
   /**
    * The edge is part of an osm way, which is of type link
    */
@@ -709,24 +588,12 @@ public class StreetEdge
     return BitSetUtils.get(flags, CLASS_LINK);
   }
 
-  public void setLink(boolean link) {
-    flags = BitSetUtils.set(flags, CLASS_LINK, link);
-  }
-
   public float getCarSpeed() {
     return carSpeed;
   }
 
-  public void setCarSpeed(float carSpeed) {
-    this.carSpeed = carSpeed;
-  }
-
   public boolean isSlopeOverride() {
     return BitSetUtils.get(flags, SLOPEOVERRIDE_FLAG_INDEX);
-  }
-
-  public void setSlopeOverride(boolean slopeOverride) {
-    flags = BitSetUtils.set(flags, SLOPEOVERRIDE_FLAG_INDEX, slopeOverride);
   }
 
   /**
@@ -734,12 +601,12 @@ public class StreetEdge
    * TODO change everything to clockwise from North
    */
   public int getInAngle() {
-    return (int) Math.round(this.inAngle * 180 / 128.0);
+    return IntUtils.round(this.inAngle * 180 / 128.0);
   }
 
   /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
   public int getOutAngle() {
-    return (int) Math.round(this.outAngle * 180 / 128.0);
+    return IntUtils.round(this.outAngle * 180 / 128.0);
   }
 
   public void setCostExtension(StreetEdgeCostExtension costExtension) {
@@ -760,73 +627,75 @@ public class StreetEdge
   public SplitStreetEdge splitDestructively(SplitterVertex v) {
     SplitLineString geoms = GeometryUtils.splitGeometryAtPoint(getGeometry(), v.getCoordinate());
 
-    StreetEdge e1 = new StreetEdge(
-      (StreetVertex) fromv,
-      v,
-      geoms.beginning(),
-      name,
-      permission,
-      this.isBack()
-    );
-    StreetEdge e2 = new StreetEdge(
-      v,
-      (StreetVertex) tov,
-      geoms.ending(),
-      name,
-      permission,
-      this.isBack()
-    );
+    StreetEdgeBuilder<?> seb1 = new StreetEdgeBuilder<>()
+      .withFromVertex((StreetVertex) fromv)
+      .withToVertex(v)
+      .withGeometry(geoms.beginning())
+      .withName(name)
+      .withPermission(permission)
+      .withBack(isBack());
+
+    StreetEdgeBuilder<?> seb2 = new StreetEdgeBuilder<>()
+      .withFromVertex(v)
+      .withToVertex((StreetVertex) tov)
+      .withGeometry(geoms.ending())
+      .withName(name)
+      .withPermission(permission)
+      .withBack(isBack());
 
     // we have this code implemented in both directions, because splits are fudged half a millimeter
     // when the length of this is odd. We want to make sure the lengths of the split streets end up
     // exactly the same as their backStreets so that if they are split again the error does not accumulate
     // and so that the order in which they are split does not matter.
+    int l1 = defaultMillimeterLength(geoms.beginning());
+    int l2 = defaultMillimeterLength(geoms.ending());
     if (!isBack()) {
       // cast before the divide so that the sum is promoted
-      double frac = (double) e1.length_mm / (e1.length_mm + e2.length_mm);
-      e1.length_mm = (int) (length_mm * frac);
-      e2.length_mm = length_mm - e1.length_mm;
+      double frac = (double) l1 / (l1 + l2);
+      l1 = (int) (length_mm * frac);
+      l2 = length_mm - l1;
     } else {
       // cast before the divide so that the sum is promoted
-      double frac = (double) e2.length_mm / (e1.length_mm + e2.length_mm);
-      e2.length_mm = (int) (length_mm * frac);
-      e1.length_mm = length_mm - e2.length_mm;
+      double frac = (double) l2 / (l1 + l2);
+      l2 = (int) (length_mm * frac);
+      l1 = length_mm - l2;
     }
 
     // TODO: better handle this temporary fix to handle bad edge distance calculation
-    if (e1.length_mm <= 0) {
+    if (l1 <= 0) {
       LOG.error(
         "Edge 1 ({}) split at vertex at {},{} has length {} mm. Setting to 1 mm.",
-        e1.getName(),
+        name,
         v.getLat(),
         v.getLon(),
-        e1.length_mm
+        l1
       );
-      e1.length_mm = 1;
+      l1 = 1;
     }
-    if (e2.length_mm <= 0) {
+    if (l2 <= 0) {
       LOG.error(
         "Edge 2 ({}) split at vertex at {},{}  has length {} mm. Setting to 1 mm.",
-        e2.getName(),
+        name,
         v.getLat(),
         v.getLon(),
-        e2.length_mm
+        l2
       );
-      e2.length_mm = 1;
+      l2 = 1;
     }
 
-    if (e1.length_mm < 0 || e2.length_mm < 0) {
-      e1.tov.removeIncoming(e1);
-      e1.fromv.removeOutgoing(e1);
-      e2.tov.removeIncoming(e2);
-      e2.fromv.removeOutgoing(e2);
-      throw new IllegalStateException("Split street is longer than original street!");
-    }
+    seb1.withMilliMeterLength(l1);
+    seb2.withMilliMeterLength(l2);
 
-    copyPropertiesToSplitEdge(e1, 0, e1.getDistanceMeters());
-    copyPropertiesToSplitEdge(e2, e1.getDistanceMeters(), getDistanceMeters());
+    copyPropertiesToSplitEdge(seb1, 0, l1 / 1000.0);
+    copyPropertiesToSplitEdge(seb2, l1 / 1000.0, getDistanceMeters());
 
-    var splitEdges = new SplitStreetEdge(e1, e2);
+    StreetEdge se1 = seb1.buildAndConnect();
+    StreetEdge se2 = seb2.buildAndConnect();
+
+    copyRentalRestrictionsToSplitEdge(se1);
+    copyRentalRestrictionsToSplitEdge(se2);
+
+    var splitEdges = new SplitStreetEdge(se1, se2);
     copyRestrictionsToSplitEdges(this, splitEdges);
     return splitEdges;
   }
@@ -843,33 +712,33 @@ public class StreetEdge
     StreetEdge e2 = null;
 
     if (direction == LinkingDirection.OUTGOING || direction == LinkingDirection.BOTH_WAYS) {
-      e1 =
-        new TemporaryPartialStreetEdge(
-          this,
-          (StreetVertex) fromv,
-          v,
-          geoms.beginning(),
-          name,
-          this.isBack()
-        );
-      copyPropertiesToSplitEdge(e1, 0, e1.getDistanceMeters());
+      var seb1 = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(this)
+        .withFromVertex((StreetVertex) fromv)
+        .withToVertex(v)
+        .withGeometry(geoms.beginning())
+        .withName(name)
+        .withBack(isBack());
+      copyPropertiesToSplitEdge(seb1, 0, defaultMillimeterLength(geoms.beginning()) / 1000.0);
+      e1 = seb1.buildAndConnect();
+      copyRentalRestrictionsToSplitEdge(e1);
       tempEdges.addEdge(e1);
     }
     if (direction == LinkingDirection.INCOMING || direction == LinkingDirection.BOTH_WAYS) {
-      e2 =
-        new TemporaryPartialStreetEdge(
-          this,
-          v,
-          (StreetVertex) tov,
-          geoms.ending(),
-          name,
-          this.isBack()
-        );
+      var seb2 = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(this)
+        .withFromVertex(v)
+        .withToVertex((StreetVertex) tov)
+        .withGeometry(geoms.ending())
+        .withName(name)
+        .withBack(isBack());
       copyPropertiesToSplitEdge(
-        e2,
-        getDistanceMeters() - e2.getDistanceMeters(),
+        seb2,
+        getDistanceMeters() - defaultMillimeterLength(geoms.ending()) / 1000.0,
         getDistanceMeters()
       );
+      e2 = seb2.buildAndConnect();
+      copyRentalRestrictionsToSplitEdge(e2);
       tempEdges.addEdge(e2);
     }
 
@@ -903,9 +772,17 @@ public class StreetEdge
       double lengthRatio = partial.getLength() / parent.getLength();
       double length = getDistanceMeters() * lengthRatio;
 
-      var tempEdge = new TemporaryPartialStreetEdge(this, from, to, partial, getName(), length);
-      copyPropertiesToSplitEdge(tempEdge, start, start + length);
-      return Optional.of(tempEdge);
+      var tpseb = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(this)
+        .withFromVertex(from)
+        .withToVertex(to)
+        .withGeometry(partial)
+        .withName(getName())
+        .withMeterLength(length);
+      copyPropertiesToSplitEdge(tpseb, start, start + length);
+      TemporaryPartialStreetEdge se = tpseb.buildAndConnect();
+      copyRentalRestrictionsToSplitEdge(se);
+      return Optional.of(se);
     } else {
       return Optional.empty();
     }
@@ -991,31 +868,46 @@ public class StreetEdge
     super.remove();
   }
 
+  /**
+   * Copy inherited properties from a parent edge to a split edge.
+   */
   protected void copyPropertiesToSplitEdge(
-    StreetEdge splitEdge,
+    StreetEdgeBuilder<?> seb,
     double fromDistance,
     double toDistance
   ) {
-    splitEdge.flags = this.flags;
-    splitEdge.setBicycleSafetyFactor(bicycleSafetyFactor);
-    splitEdge.setWalkSafetyFactor(walkSafetyFactor);
-    splitEdge.setLink(isLink());
-    splitEdge.setCarSpeed(getCarSpeed());
-    splitEdge.setElevationExtensionUsingParent(this, fromDistance, toDistance);
-    splitEdge.addRentalRestriction(fromv.rentalRestrictions());
-  }
+    seb.withFlags(flags);
+    seb.withBicycleSafetyFactor(bicycleSafetyFactor);
+    seb.withWalkSafetyFactor(walkSafetyFactor);
+    seb.withCarSpeed(carSpeed);
 
-  protected void setElevationExtensionUsingParent(
-    StreetEdge parentEdge,
-    double fromDistance,
-    double toDistance
-  ) {
-    var profile = ElevationUtils.getPartialElevationProfile(
-      parentEdge.getElevationProfile(),
+    var partialElevationProfileFromParent = ElevationUtils.getPartialElevationProfile(
+      getElevationProfile(),
       fromDistance,
       toDistance
     );
-    StreetElevationExtension.addToEdge(this, profile, true);
+
+    StreetElevationExtensionBuilder
+      .of(seb)
+      .withDistanceInMeters(defaultMillimeterLength(seb.geometry()) / 1000.)
+      .withElevationProfile(partialElevationProfileFromParent)
+      .build()
+      .ifPresent(seb::withElevationExtension);
+  }
+
+  /**
+   * Copy inherited rental restrictions from a parent edge to a split edge
+   */
+  protected void copyRentalRestrictionsToSplitEdge(StreetEdge splitEdge) {
+    splitEdge.addRentalRestriction(fromv.rentalRestrictions());
+  }
+
+  short getFlags() {
+    return flags;
+  }
+
+  int getMillimeterLength() {
+    return length_mm;
   }
 
   /**
@@ -1066,6 +958,97 @@ public class StreetEdge
     );
     LOG.debug("Created new restriction for split edges: {}", splitTurnRestriction);
     fromEdge.addTurnRestriction(splitTurnRestriction);
+  }
+
+  private int computeLength(StreetEdgeBuilder<?> builder) {
+    int lengthInMillimeter = builder.hasDefaultLength()
+      ? defaultMillimeterLength(builder.geometry())
+      : builder.millimeterLength();
+    if (lengthInMillimeter == 0) {
+      LOG.warn(
+        "StreetEdge {} from {} to {} has length of 0. This is usually an error.",
+        name,
+        builder.fromVertex(),
+        builder.toVertex()
+      );
+    }
+    return lengthInMillimeter;
+  }
+
+  static int defaultMillimeterLength(LineString geometry) {
+    return (int) (SphericalDistanceLibrary.length(geometry) * 1000);
+  }
+
+  /**
+   * A very special case: an arriveBy rental search has started in a no-drop-off zone
+   * we don't know yet which rental network we will end up using.
+   * <p>
+   * So we speculatively assume that we can rent any by setting the network in the state data
+   * to null.
+   * <p>
+   * When we then leave the no drop off zone on foot we generate a state for each network that the
+   * zone applies to where we pick up a vehicle with a specific network.
+   */
+  @Nonnull
+  private State[] splitStatesAfterHavingExitedNoDropOffZoneWhenReverseSearching(State s0) {
+    var networks = Stream.concat(
+      // null is a special rental network that speculatively assumes that you can take any vehicle
+      // you have to check in the rental edge if this has search has been started in a no-drop off zone
+      Stream.of((String) null),
+      tov.rentalRestrictions().noDropOffNetworks().stream()
+    );
+
+    var states = networks.map(network -> {
+      var edit = doTraverse(s0, TraverseMode.WALK, false);
+      if (edit != null) {
+        edit.dropFloatingVehicle(s0.vehicleRentalFormFactor(), network, s0.getRequest().arriveBy());
+        if (network != null) {
+          edit.resetStartedInNoDropOffZone();
+        }
+        return edit.makeState();
+      }
+      return null;
+    });
+    return State.ofStream(states);
+  }
+
+  /**
+   * This is the state that starts a backwards search inside a restricted zone
+   * (no drop off, no traversal or outside business area) and is walking towards finding a rental
+   * vehicle. Once we are leaving a geofencing zone or are entering a business area we want to
+   * speculatively pick up a vehicle a ride towards an edge where there is one parked.
+   */
+  private boolean leavesZoneWithRentalRestrictionsWhenHavingRented(State s0) {
+    return (
+      s0.getVehicleRentalState() == VehicleRentalState.HAVE_RENTED &&
+      !fromv.rentalRestrictions().hasRestrictions() &&
+      tov.rentalRestrictions().hasRestrictions()
+    );
+  }
+
+  /**
+   * If the reverse search has started in a no-drop off rental zone and you are exiting
+   * it .
+   */
+  private boolean hasStartedWalkingInNoDropOffZoneAndIsExitingIt(State s0) {
+    return (
+      s0.currentMode() == TraverseMode.WALK &&
+      !s0.stateData.noRentalDropOffZonesAtStartOfReverseSearch.isEmpty() &&
+      fromv.rentalRestrictions().noDropOffNetworks().isEmpty() &&
+      !tov.rentalRestrictions().noDropOffNetworks().isEmpty()
+    );
+  }
+
+  private void setGeometry(LineString geometry) {
+    this.compactGeometry =
+      CompactLineStringUtils.compactLineString(
+        fromv.getLon(),
+        fromv.getLat(),
+        tov.getLon(),
+        tov.getLat(),
+        isBack() ? geometry.reverse() : geometry,
+        isBack()
+      );
   }
 
   private double getDistanceWithElevation() {
@@ -1305,6 +1288,7 @@ public class StreetEdge
           (1 - preferences.walk().safetyFactor());
         weight /= speed;
       }
+
       weight *=
         StreetEdgeReluctanceCalculator.computeReluctance(
           preferences,
@@ -1350,4 +1334,44 @@ public class StreetEdge
 
   /** Tuple to return time and weight from calculation */
   private record TraversalCosts(double time, double weight) {}
+
+  /**
+   * The angles of the first (in) segment and last (out) segment of a LineString, encoded in one
+   * byte.
+   */
+  private record LineStringInOutAngles(byte inAngle, byte outAngle) {
+    private static final LineStringInOutAngles DEFAULT = new LineStringInOutAngles(
+      (byte) 0,
+      (byte) 0
+    );
+
+    public static LineStringInOutAngles of(LineString geometry) {
+      if (geometry == null) {
+        return LineStringInOutAngles.DEFAULT;
+      }
+
+      try {
+        byte in = convertRadianToByte(DirectionUtils.getFirstAngle(geometry));
+        byte out = convertRadianToByte(DirectionUtils.getLastAngle(geometry));
+        return new LineStringInOutAngles(in, out);
+      } catch (Exception e) {
+        LOG.info(
+          "Exception while determining LineString angles. setting to zero. There is probably something wrong with this segment's geometry."
+        );
+        return LineStringInOutAngles.DEFAULT;
+      }
+    }
+
+    /**
+     * Conversion from radians to internal representation as a single signed byte.
+     * We also reorient the angles since OTP seems to use South as a reference
+     * while the azimuth functions use North.
+     * FIXME Use only North as a reference, not a mix of North and South!
+     * Range restriction happens automatically due to Java signed overflow behavior.
+     * 180 degrees exists as a negative rather than a positive due to the integer range.
+     */
+    private static byte convertRadianToByte(double angleRadians) {
+      return (byte) Math.round(angleRadians * 128 / Math.PI + 128);
+    }
+  }
 }

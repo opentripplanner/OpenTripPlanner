@@ -1,6 +1,5 @@
 package org.opentripplanner.street.model.vertex;
 
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 
@@ -14,8 +13,6 @@ import org.opentripplanner.street.model.edge.StreetEdge;
  * <p>
  * If start/end vertex of {@link StreetEdge} is BarrierVertex
  * edge isn't traversable with CAR.
- * <p>
- * Created by mabu on 11.5.2015.
  */
 public class BarrierVertex extends OsmVertex {
 
@@ -24,8 +21,8 @@ public class BarrierVertex extends OsmVertex {
     StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
   private StreetTraversalPermission barrierPermissions;
 
-  public BarrierVertex(Graph g, String label, double x, double y, long nodeId) {
-    super(g, label, x, y, nodeId);
+  public BarrierVertex(double x, double y, long nodeId) {
+    super(x, y, nodeId);
     barrierPermissions = defaultBarrierPermissions;
   }
 

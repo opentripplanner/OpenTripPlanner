@@ -60,15 +60,14 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("slopeCases")
   public void shouldScaleCostWithMaxSlope(double slope, double reluctance, long expectedCost) {
     double length = 1000;
-    var edge = new StreetEdge(
-      V1,
-      V2,
-      null,
-      "edge with elevation",
-      length,
-      StreetTraversalPermission.ALL,
-      false
-    );
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withName("edge with elevation")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
 
     Coordinate[] profile = new Coordinate[] {
       new Coordinate(0, 0),
@@ -76,8 +75,12 @@ class StreetEdgeWheelchairCostTest {
     };
 
     PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
-    StreetElevationExtension.addToEdge(edge, elev, true);
-
+    StreetElevationExtensionBuilder
+      .of(edge)
+      .withElevationProfile(elev)
+      .withComputed(true)
+      .build()
+      .ifPresent(edge::setElevationExtension);
     assertEquals(slope, edge.getMaxSlope(), 0.0001);
 
     var req = StreetSearchRequest.of();
@@ -113,8 +116,15 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("wheelchairStairsCases")
   public void wheelchairStairsReluctance(double stairsReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
-    edge.setStairs(true);
+    var stairEdge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withName("stairs")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .withStairs(true)
+      .buildAndConnect();
 
     var req = StreetSearchRequest.of();
     req.withWheelchair(true);
@@ -135,11 +145,11 @@ class StreetEdgeWheelchairCostTest {
 
     req.withPreferences(pref -> pref.withWalk(w -> w.withReluctance(1.0)));
 
-    var result = traverse(edge, req.build());
+    var result = traverse(stairEdge, req.build());
     assertEquals(expectedCost, (long) result.weight);
 
-    edge.setStairs(false);
-    var notStairsResult = traverse(edge, req.build());
+    StreetEdge noStairsEdge = stairEdge.toBuilder().withStairs(false).buildAndConnect();
+    var notStairsResult = traverse(noStairsEdge, req.build());
     assertEquals(7, (long) notStairsResult.weight);
   }
 
@@ -155,8 +165,15 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("inaccessibleStreetCases")
   public void inaccessibleStreet(float inaccessibleStreetReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
-    edge.setWheelchairAccessible(false);
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withName("stairs")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .withWheelchairAccessible(false)
+      .buildAndConnect();
 
     var req = StreetSearchRequest.of();
     req.withWheelchair(true);
@@ -179,8 +196,8 @@ class StreetEdgeWheelchairCostTest {
     assertEquals(expectedCost, (long) result.weight);
 
     // reluctance should have no effect when the edge is accessible
-    edge.setWheelchairAccessible(true);
-    var accessibleResult = traverse(edge, req.build());
+    StreetEdge accessibleEdge = edge.toBuilder().withWheelchairAccessible(true).buildAndConnect();
+    var accessibleResult = traverse(accessibleEdge, req.build());
     assertEquals(15, (long) accessibleResult.weight);
   }
 
@@ -197,7 +214,14 @@ class StreetEdgeWheelchairCostTest {
   @VariableSource("walkReluctanceCases")
   public void walkReluctance(double walkReluctance, long expectedCost) {
     double length = 10;
-    var edge = new StreetEdge(V1, V2, null, "stairs", length, StreetTraversalPermission.ALL, false);
+    var edge = new StreetEdgeBuilder<>()
+      .withFromVertex(V1)
+      .withToVertex(V2)
+      .withName("stairs")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
 
     var req = StreetSearchRequest.of();
     req.withPreferences(p -> p.withWalk(w -> w.withReluctance(walkReluctance)));

@@ -2,7 +2,9 @@ package org.opentripplanner.street.model.vertex;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.edge.FreeEdge;
 
 public class TemporaryVertexDisposeTest {
@@ -204,7 +206,7 @@ public class TemporaryVertexDisposeTest {
 
   // Factory method to create an edge
   private static void edge(Vertex a, Vertex b) {
-    new E(a, b);
+    E.createE(a, b);
   }
 
   /* private test helper classes */
@@ -218,13 +220,27 @@ public class TemporaryVertexDisposeTest {
 
   private static class V extends Vertex {
 
+    private final String label;
+
     private V(String label) {
-      super(null, label, ANY_LOC, ANY_LOC);
+      super(ANY_LOC, ANY_LOC);
+      this.label = label;
     }
 
     @Override
     public String toString() {
-      return getLabel();
+      return getLabelString();
+    }
+
+    @Nonnull
+    @Override
+    public I18NString getName() {
+      return NO_NAME;
+    }
+
+    @Override
+    public VertexLabel getLabel() {
+      return VertexLabel.string(label);
     }
   }
 
@@ -249,6 +265,10 @@ public class TemporaryVertexDisposeTest {
     @Override
     public String toString() {
       return getFromVertex().getLabel() + "->" + getToVertex().getLabel();
+    }
+
+    private static E createE(Vertex from, Vertex to) {
+      return connectToGraph(new E(from, to));
     }
   }
 }

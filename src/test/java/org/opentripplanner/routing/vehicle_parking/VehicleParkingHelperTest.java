@@ -23,7 +23,7 @@ class VehicleParkingHelperTest {
     Graph graph = new Graph();
     VehicleParking vehicleParking = createParingWithEntrances(1);
 
-    VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
+    new VehicleParkingHelper(graph).linkVehicleParkingToGraph(vehicleParking);
 
     assertGraph(graph, 1);
   }
@@ -33,7 +33,7 @@ class VehicleParkingHelperTest {
     Graph graph = new Graph();
     VehicleParking vehicleParking = createParingWithEntrances(3);
 
-    VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
+    new VehicleParkingHelper(graph).linkVehicleParkingToGraph(vehicleParking);
 
     assertGraph(graph, 3);
   }
@@ -60,7 +60,7 @@ class VehicleParkingHelperTest {
       .wheelchairAccessibleCarPlaces(true)
       .build();
 
-    VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
+    new VehicleParkingHelper(graph).linkVehicleParkingToGraph(vehicleParking);
 
     assertEquals(3, graph.getVerticesOfType(VehicleParkingEntranceVertex.class).size());
     assertEquals(7, graph.getEdgesOfType(VehicleParkingEdge.class).size());

@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module;
 import jakarta.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -18,10 +19,12 @@ import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.NamedArea;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.vertex.OsmBoardingLocationVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.service.TransitModel;
@@ -45,11 +48,15 @@ import org.slf4j.LoggerFactory;
 public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(OsmBoardingLocationsModule.class);
+  private static final LocalizedString LOCALIZED_PLATFORM_NAME = new LocalizedString(
+    "name.platform"
+  );
   private final double searchRadiusDegrees = SphericalDistanceLibrary.metersToDegrees(250);
 
   private final Graph graph;
 
   private final TransitModel transitModel;
+  private final VertexFactory vertexFactory;
 
   private VertexLinker linker;
 
@@ -57,6 +64,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
   public OsmBoardingLocationsModule(Graph graph, TransitModel transitModel) {
     this.graph = graph;
     this.transitModel = transitModel;
+    this.vertexFactory = new VertexFactory(graph);
   }
 
   @Override
@@ -80,7 +88,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
       if (alreadyLinked) continue;
       // only connect transit stops that are not part of a pathway network
       if (!ts.hasPathways()) {
-        if (!connectVertexToStop(ts, streetIndex, graph)) {
+        if (!connectVertexToStop(ts, streetIndex)) {
           LOG.debug("Could not connect {} at {}", ts.getStop().getCode(), ts.getCoordinate());
         } else {
           successes++;
@@ -90,12 +98,7 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     LOG.info("Found {} OSM references which match a stop's id or code", successes);
   }
 
-  @Override
-  public void checkInputs() {
-    //no inputs
-  }
-
-  private boolean connectVertexToStop(TransitStopVertex ts, StreetIndex index, Graph graph) {
+  private boolean connectVertexToStop(TransitStopVertex ts, StreetIndex index) {
     var stopCode = ts.getStop().getCode();
     var stopId = ts.getStop().getId().getId();
     Envelope envelope = new Envelope(ts.getCoordinate());
@@ -162,16 +165,14 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
           .stream()
           .findFirst()
           .map(NamedArea::getName)
-          .orElse(new LocalizedString("name.platform"));
+          .orElse(LOCALIZED_PLATFORM_NAME);
         var label = "platform-centroid/%s".formatted(ts.getStop().getId().toString());
         var centroid = edgeList.getGeometry().getCentroid();
-        var boardingLocation = new OsmBoardingLocationVertex(
-          graph,
+        var boardingLocation = vertexFactory.osmBoardingLocation(
+          new Coordinate(centroid.getX(), centroid.getY()),
           label,
-          centroid.getX(),
-          centroid.getY(),
-          name,
-          edgeList.references
+          edgeList.references,
+          name
         );
         linker.addPermanentAreaVertex(boardingLocation, edgeList);
         linkBoardingLocationToStop(ts, stopCode, boardingLocation);
@@ -183,15 +184,15 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
 
   private StreetEdge linkBoardingLocationToStreetNetwork(StreetVertex from, StreetVertex to) {
     var line = GeometryUtils.makeLineString(List.of(from.getCoordinate(), to.getCoordinate()));
-    return new StreetEdge(
-      from,
-      to,
-      line,
-      new LocalizedString("name.platform"),
-      SphericalDistanceLibrary.length(line),
-      StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE,
-      false
-    );
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(from)
+      .withToVertex(to)
+      .withGeometry(line)
+      .withName(LOCALIZED_PLATFORM_NAME)
+      .withMeterLength(SphericalDistanceLibrary.length(line))
+      .withPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE)
+      .withBack(false)
+      .buildAndConnect();
   }
 
   private void linkBoardingLocationToStop(
@@ -199,8 +200,8 @@ public class OsmBoardingLocationsModule implements GraphBuilderModule {
     String stopCode,
     OsmBoardingLocationVertex boardingLocation
   ) {
-    new BoardingLocationToStopLink(ts, boardingLocation);
-    new BoardingLocationToStopLink(boardingLocation, ts);
+    BoardingLocationToStopLink.createBoardingLocationToStopLink(ts, boardingLocation);
+    BoardingLocationToStopLink.createBoardingLocationToStopLink(boardingLocation, ts);
     LOG.debug(
       "Connected {} ({}) to {} at {}",
       ts,

@@ -52,6 +52,7 @@ import org.opentripplanner.ext.transmodelapi.model.framework.InfoLinkType;
 import org.opentripplanner.ext.transmodelapi.model.framework.MultilingualStringType;
 import org.opentripplanner.ext.transmodelapi.model.framework.NoticeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.OperatorType;
+import org.opentripplanner.ext.transmodelapi.model.framework.PenaltyForStreetModeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.PointsOnLinkType;
 import org.opentripplanner.ext.transmodelapi.model.framework.RentalVehicleTypeType;
 import org.opentripplanner.ext.transmodelapi.model.framework.ServerInfoType;
@@ -64,6 +65,7 @@ import org.opentripplanner.ext.transmodelapi.model.network.JourneyPatternType;
 import org.opentripplanner.ext.transmodelapi.model.network.LineType;
 import org.opentripplanner.ext.transmodelapi.model.network.PresentationType;
 import org.opentripplanner.ext.transmodelapi.model.network.StopToStopGeometryType;
+import org.opentripplanner.ext.transmodelapi.model.plan.ElevationProfileStepType;
 import org.opentripplanner.ext.transmodelapi.model.plan.LegType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PathGuidanceType;
 import org.opentripplanner.ext.transmodelapi.model.plan.PlanPlaceType;
@@ -318,7 +320,8 @@ public class TransmodelGraphQLSchema {
       rentalVehicleType,
       quayType
     );
-    GraphQLObjectType pathGuidanceType = PathGuidanceType.create();
+    GraphQLObjectType elevationStepType = ElevationProfileStepType.create();
+    GraphQLObjectType pathGuidanceType = PathGuidanceType.create(elevationStepType);
     GraphQLObjectType legType = LegType.create(
       bookingArrangementType,
       interchangeType,
@@ -333,6 +336,7 @@ public class TransmodelGraphQLSchema {
       ptSituationElementType,
       placeType,
       pathGuidanceType,
+      elevationStepType,
       gqlUtil
     );
     GraphQLObjectType tripPatternType = TripPatternType.create(systemNoticeType, legType, gqlUtil);
@@ -347,11 +351,13 @@ public class TransmodelGraphQLSchema {
     );
 
     GraphQLInputObjectType durationPerStreetModeInput = StreetModeDurationInputType.create(gqlUtil);
+    GraphQLInputObjectType penaltyForStreetMode = PenaltyForStreetModeType.create(gqlUtil);
 
     GraphQLFieldDefinition tripQuery = TripQuery.create(
       routing,
       tripType,
       durationPerStreetModeInput,
+      penaltyForStreetMode,
       gqlUtil
     );
 

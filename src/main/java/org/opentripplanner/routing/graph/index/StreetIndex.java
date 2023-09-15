@@ -29,6 +29,7 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
 import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
+import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TemporaryStreetLocation;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
@@ -111,18 +112,18 @@ public class StreetIndex {
         edgeLocation = fromv;
 
         if (endVertex) {
-          tempEdges.addEdge(new TemporaryFreeEdge(edgeLocation, location));
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(edgeLocation, location));
         } else {
-          tempEdges.addEdge(new TemporaryFreeEdge(location, edgeLocation));
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(location, edgeLocation));
         }
       } else if (SphericalDistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
         // no need to link to area edges caught on-end
         edgeLocation = tov;
 
         if (endVertex) {
-          tempEdges.addEdge(new TemporaryFreeEdge(edgeLocation, location));
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(edgeLocation, location));
         } else {
-          tempEdges.addEdge(new TemporaryFreeEdge(location, edgeLocation));
+          tempEdges.addEdge(TemporaryFreeEdge.createTemporaryFreeEdge(location, edgeLocation));
         }
       } else {
         // creates links from street head -> location -> street tail.
@@ -276,35 +277,33 @@ public class StreetIndex {
     double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
 
     if (endVertex) {
-      TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
-        street,
-        fromv,
-        base,
-        geometries.beginning(),
-        name,
-        lengthIn
-      );
-
-      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
-      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
-      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
-      temporaryPartialStreetEdge.setLink(street.isLink());
-      tempEdges.addEdge(temporaryPartialStreetEdge);
+      TemporaryPartialStreetEdge tpse = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(street)
+        .withFromVertex(fromv)
+        .withToVertex(base)
+        .withGeometry(geometries.beginning())
+        .withName(name)
+        .withMeterLength(lengthIn)
+        .withMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic())
+        .withBicycleNoThruTraffic(street.isBicycleNoThruTraffic())
+        .withWalkNoThruTraffic(street.isWalkNoThruTraffic())
+        .withLink(street.isLink())
+        .buildAndConnect();
+      tempEdges.addEdge(tpse);
     } else {
-      TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(
-        street,
-        base,
-        tov,
-        geometries.ending(),
-        name,
-        lengthOut
-      );
-
-      temporaryPartialStreetEdge.setLink(street.isLink());
-      temporaryPartialStreetEdge.setMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic());
-      temporaryPartialStreetEdge.setBicycleNoThruTraffic(street.isBicycleNoThruTraffic());
-      temporaryPartialStreetEdge.setWalkNoThruTraffic(street.isWalkNoThruTraffic());
-      tempEdges.addEdge(temporaryPartialStreetEdge);
+      TemporaryPartialStreetEdge tpse = new TemporaryPartialStreetEdgeBuilder()
+        .withParentEdge(street)
+        .withFromVertex(base)
+        .withToVertex(tov)
+        .withGeometry(geometries.ending())
+        .withName(name)
+        .withMeterLength(lengthOut)
+        .withLink(street.isLink())
+        .withMotorVehicleNoThruTraffic(street.isMotorVehicleNoThruTraffic())
+        .withBicycleNoThruTraffic(street.isBicycleNoThruTraffic())
+        .withWalkNoThruTraffic(street.isWalkNoThruTraffic())
+        .buildAndConnect();
+      tempEdges.addEdge(tpse);
     }
   }
 
@@ -364,9 +363,19 @@ public class StreetIndex {
         endVertex ? LinkingDirection.OUTGOING : LinkingDirection.INCOMING,
         endVertex
           ? (vertex, streetVertex) ->
-            List.of(new TemporaryFreeEdge(streetVertex, (TemporaryStreetLocation) vertex))
+            List.of(
+              TemporaryFreeEdge.createTemporaryFreeEdge(
+                streetVertex,
+                (TemporaryStreetLocation) vertex
+              )
+            )
           : (vertex, streetVertex) ->
-            List.of(new TemporaryFreeEdge((TemporaryStreetLocation) vertex, streetVertex))
+            List.of(
+              TemporaryFreeEdge.createTemporaryFreeEdge(
+                (TemporaryStreetLocation) vertex,
+                streetVertex
+              )
+            )
       )
     );
 

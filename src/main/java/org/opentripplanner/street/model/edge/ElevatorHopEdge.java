@@ -1,6 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
-import org.locationtech.jts.geom.LineString;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -18,14 +18,17 @@ import org.opentripplanner.transit.model.basic.Accessibility;
  */
 public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTraversalInformation {
 
+  private static final double DEFAULT_LEVELS = 1;
+  private static final int DEFAULT_TRAVEL_TIME = 0;
+
   private final StreetTraversalPermission permission;
 
   private final Accessibility wheelchairAccessibility;
 
-  private double levels = 1;
-  private int travelTime = 0;
+  private final double levels;
+  private final int travelTime;
 
-  public ElevatorHopEdge(
+  private ElevatorHopEdge(
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
@@ -33,20 +36,20 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     double levels,
     int travelTime
   ) {
-    this(from, to, permission, wheelchairAccessibility);
+    super(from, to);
+    this.permission = permission;
+    this.wheelchairAccessibility = wheelchairAccessibility;
     this.levels = levels;
     this.travelTime = travelTime;
   }
 
-  public ElevatorHopEdge(
+  private ElevatorHopEdge(
     Vertex from,
     Vertex to,
     StreetTraversalPermission permission,
     Accessibility wheelchairAccessibility
   ) {
-    super(from, to);
-    this.permission = permission;
-    this.wheelchairAccessibility = wheelchairAccessibility;
+    this(from, to, permission, wheelchairAccessibility, DEFAULT_LEVELS, DEFAULT_TRAVEL_TIME);
   }
 
   public static void bidirectional(
@@ -57,8 +60,8 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     int levels,
     int travelTime
   ) {
-    new ElevatorHopEdge(from, to, permission, wheelchairBoarding, levels, travelTime);
-    new ElevatorHopEdge(to, from, permission, wheelchairBoarding, levels, travelTime);
+    createElevatorHopEdge(from, to, permission, wheelchairBoarding, levels, travelTime);
+    createElevatorHopEdge(to, from, permission, wheelchairBoarding, levels, travelTime);
   }
 
   public static void bidirectional(
@@ -67,8 +70,30 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
     StreetTraversalPermission permission,
     Accessibility wheelchairBoarding
   ) {
-    new ElevatorHopEdge(from, to, permission, wheelchairBoarding);
-    new ElevatorHopEdge(to, from, permission, wheelchairBoarding);
+    createElevatorHopEdge(from, to, permission, wheelchairBoarding);
+    createElevatorHopEdge(to, from, permission, wheelchairBoarding);
+  }
+
+  public static ElevatorHopEdge createElevatorHopEdge(
+    Vertex from,
+    Vertex to,
+    StreetTraversalPermission permission,
+    Accessibility wheelchairAccessibility,
+    double levels,
+    int travelTime
+  ) {
+    return connectToGraph(
+      new ElevatorHopEdge(from, to, permission, wheelchairAccessibility, levels, travelTime)
+    );
+  }
+
+  public static ElevatorHopEdge createElevatorHopEdge(
+    Vertex from,
+    Vertex to,
+    StreetTraversalPermission permission,
+    Accessibility wheelchairAccessibility
+  ) {
+    return connectToGraph(new ElevatorHopEdge(from, to, permission, wheelchairAccessibility));
   }
 
   public StreetTraversalPermission getPermission() {
@@ -81,6 +106,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   }
 
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     RoutingPreferences preferences = s0.getPreferences();
 
@@ -99,7 +125,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
       }
     }
 
-    TraverseMode mode = s0.getNonTransitMode();
+    TraverseMode mode = s0.currentMode();
 
     if (mode == TraverseMode.WALK && !permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
       return State.empty();
@@ -129,16 +155,6 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge, WheelchairTra
   @Override
   public I18NString getName() {
     return null;
-  }
-
-  @Override
-  public LineString getGeometry() {
-    return null;
-  }
-
-  @Override
-  public double getDistanceMeters() {
-    return 0;
   }
 
   @Override

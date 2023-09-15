@@ -38,7 +38,7 @@ public class OsmTagMapperTest {
 
   @Test
   public void constantSpeedCarRouting() {
-    OsmTagMapper osmTagMapper = new ConstantSpeedMapper(20f);
+    OsmTagMapper osmTagMapper = new ConstantSpeedFinlandMapper(20f);
 
     var slowWay = new OSMWithTags();
     slowWay.addTag("highway", "residential");

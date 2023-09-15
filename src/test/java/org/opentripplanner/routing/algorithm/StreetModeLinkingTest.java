@@ -54,13 +54,14 @@ public class StreetModeLinkingTest extends GraphRoutingTest {
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
           );
 
-          street(
+          streetBuilder(
             intersection("D1", 47.500, 19.03),
             intersection("D2", 47.502, 19.03),
             100,
             StreetTraversalPermission.PEDESTRIAN
           )
-            .setWheelchairAccessible(false);
+            .withWheelchairAccessible(false)
+            .buildAndConnect();
 
           street(
             intersection("E1", 47.500, 19.04),

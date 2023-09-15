@@ -15,11 +15,13 @@ import org.opentripplanner.astar.model.ShortestPathTree;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.ComposingSkipEdgeStrategy;
 import org.opentripplanner.astar.strategy.DurationSkipEdgeStrategy;
+import org.opentripplanner.astar.strategy.MaxCountSkipEdgeStrategy;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.ext.vehicletostopheuristics.BikeToStopSkipEdgeStrategy;
 import org.opentripplanner.ext.vehicletostopheuristics.VehicleToStopSkipEdgeStrategy;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
@@ -61,6 +63,7 @@ public class NearbyStopFinder {
   private final TransitService transitService;
 
   private final Duration durationLimit;
+  private final int maxStopCount;
   private final DataOverlayContext dataOverlayContext;
 
   private DirectGraphFinder directGraphFinder;
@@ -74,6 +77,7 @@ public class NearbyStopFinder {
   public NearbyStopFinder(
     TransitService transitService,
     Duration durationLimit,
+    int maxStopCount,
     DataOverlayContext dataOverlayContext,
     boolean useStreets
   ) {
@@ -81,6 +85,7 @@ public class NearbyStopFinder {
     this.dataOverlayContext = dataOverlayContext;
     this.useStreets = useStreets;
     this.durationLimit = durationLimit;
+    this.maxStopCount = maxStopCount;
 
     if (!useStreets) {
       // We need to accommodate straight line distance (in meters) but when streets are present we
@@ -188,6 +193,8 @@ public class NearbyStopFinder {
     RouteRequest request,
     StreetRequest streetRequest
   ) {
+    OTPRequestTimeoutException.checkForTimeout();
+
     List<NearbyStop> stopsFound = createDirectlyConnectedStops(
       originVertices,
       reverseDirection,
@@ -228,9 +235,9 @@ public class NearbyStopFinder {
         if (
           OTPFeature.FlexRouting.isOn() &&
           targetVertex instanceof StreetVertex &&
-          ((StreetVertex) targetVertex).areaStops != null
+          !((StreetVertex) targetVertex).areaStops().isEmpty()
         ) {
-          for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops) {
+          for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops()) {
             // This is for a simplification, so that we only return one vertex from each
             // stop location. All vertices are added to the multimap, which is filtered
             // below, so that only the closest vertex is added to stopsFound
@@ -304,6 +311,13 @@ public class NearbyStopFinder {
       var strategy = new BikeToStopSkipEdgeStrategy(transitService::getTripsForStop);
       return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else {
+      if (maxStopCount > 0) {
+        var strategy = new MaxCountSkipEdgeStrategy<>(
+          maxStopCount,
+          NearbyStopFinder::isTransitVertex
+        );
+        return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
+      }
       return durationSkipEdgeStrategy;
     }
   }
@@ -349,5 +363,12 @@ public class NearbyStopFinder {
       .anyMatch(e ->
         e instanceof StreetEdge && ((StreetEdge) e).getPermission().allows(TraverseMode.CAR)
       );
+  }
+
+  /**
+   * Checks if the {@code state} as at a transit vertex.
+   */
+  public static boolean isTransitVertex(State state) {
+    return state.getVertex() instanceof TransitStopVertex;
   }
 }

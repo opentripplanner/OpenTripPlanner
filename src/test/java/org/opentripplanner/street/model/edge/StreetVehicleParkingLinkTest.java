@@ -58,7 +58,7 @@ class StreetVehicleParkingLinkTest {
       .carAccessible(true)
       .build();
 
-    var entranceVertex = new VehicleParkingEntranceVertex(null, entrance);
+    var entranceVertex = new VehicleParkingEntranceVertex(entrance);
     var parkingReq = new VehicleParkingRequest();
 
     Set<VehicleParkingFilter> notFilter = Set.of(new VehicleParkingFilter.TagsFilter(not));
@@ -71,7 +71,10 @@ class StreetVehicleParkingLinkTest {
     req.withParking(parkingReq);
     req.withPreferences(p -> p.withBike(bike -> bike.withParkCost(0)));
 
-    var edge = new StreetVehicleParkingLink(streetVertex, entranceVertex);
+    var edge = StreetVehicleParkingLink.createStreetVehicleParkingLink(
+      streetVertex,
+      entranceVertex
+    );
 
     var result = traverse(streetVertex, edge, req.build());
     if (shouldTraverse) {

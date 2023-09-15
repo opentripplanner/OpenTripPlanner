@@ -2,8 +2,6 @@ package org.opentripplanner.street.model.edge;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.street.model.vertex.StreetVertex;
 
 public final class TemporaryPartialStreetEdge extends StreetEdge implements TemporaryEdge {
 
@@ -21,36 +19,15 @@ public final class TemporaryPartialStreetEdge extends StreetEdge implements Temp
    * is negative, a new length is calculated from the geometry. The elevation data is calculated
    * using the 'parentEdge' and given 'length'.
    */
-  public TemporaryPartialStreetEdge(
-    StreetEdge parentEdge,
-    StreetVertex v1,
-    StreetVertex v2,
-    LineString geometry,
-    I18NString name,
-    double length
-  ) {
-    super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
-    v1.addRentalRestriction(parentEdge.getFromVertex().rentalRestrictions());
-    v2.addRentalRestriction(parentEdge.getToVertex().rentalRestrictions());
-    this.parentEdge = parentEdge;
-    this.geometry = super.getGeometry();
-  }
-
-  /**
-   * Create a new partial street edge along the given 'parentEdge' from 'v1' to 'v2'. The length is
-   * calculated using the provided geometry. The elevation data is calculated using the 'parentEdge'
-   * and the calculated 'length'.
-   */
-  TemporaryPartialStreetEdge(
-    StreetEdge parentEdge,
-    StreetVertex v1,
-    StreetVertex v2,
-    LineString geometry,
-    I18NString name,
-    boolean back
-  ) {
-    super(v1, v2, geometry, name, parentEdge.getPermission(), back);
-    this.parentEdge = parentEdge;
+  TemporaryPartialStreetEdge(TemporaryPartialStreetEdgeBuilder builder) {
+    super(builder);
+    builder
+      .fromVertex()
+      .addRentalRestriction(builder.parentEdge().getFromVertex().rentalRestrictions());
+    builder
+      .toVertex()
+      .addRentalRestriction(builder.parentEdge().getToVertex().rentalRestrictions());
+    this.parentEdge = builder.parentEdge();
     this.geometry = super.getGeometry();
   }
 

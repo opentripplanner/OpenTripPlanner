@@ -7,9 +7,6 @@
 
 # Configuring OpenTripPlanner
 
-_Note: if you are familiar with OTP1 configuration and are migrating to OTP2, please read the
-[OTP2 Migration Guide](OTP2-MigrationGuide.md) to learn what has changed._
-
 ## Base Directory
 
 On the OTP2 command line you must always specify a single directory after all the switches. This
@@ -149,7 +146,7 @@ text inserted is valid JSON (starts with `{` and ends with `}`).
 Variable substitution is performed on configuration file after the include file directive; Hence
 variable substitution is also performed on the text in the injected file.
 
-Here is an example including variable substitution, assuming version 2.3.0 of OTP:
+Here is an example including variable substitution, assuming version 2.4.0 of OTP:
 
 ```JSON
 // build-config.json
@@ -173,7 +170,7 @@ The result will look like this:
 {
       "transitFeeds": [
         {
-          "source": "netex-v2.3.0.obj"
+          "source": "netex-v2.4.0.obj"
         }
       ]
 } 

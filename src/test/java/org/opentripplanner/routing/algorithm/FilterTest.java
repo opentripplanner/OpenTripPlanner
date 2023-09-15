@@ -721,7 +721,7 @@ public class FilterTest {
       .addSelect(
         SelectRequest
           .of()
-          .withGroupOfRoutes(List.of(FeedScopedId.parseId("F:" + GROUP_OF_Routes_ID_1)))
+          .withGroupOfRoutes(List.of(FeedScopedId.parse("F:" + GROUP_OF_Routes_ID_1)))
           .build()
       )
       .build();
@@ -759,7 +759,7 @@ public class FilterTest {
       .addNot(
         SelectRequest
           .of()
-          .withGroupOfRoutes(List.of(FeedScopedId.parseId("F:" + GROUP_OF_Routes_ID_1)))
+          .withGroupOfRoutes(List.of(FeedScopedId.parse("F:" + GROUP_OF_Routes_ID_1)))
           .build()
       )
       .build();

@@ -7,7 +7,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
@@ -26,25 +27,22 @@ public class GtfsRealtimeHttpVehiclePositionSource {
    * URL to grab GTFS-RT feed from
    */
   private final URI url;
-
   private final HttpHeaders headers;
+  private final OtpHttpClient otpHttpClient;
 
   public GtfsRealtimeHttpVehiclePositionSource(URI url, HttpHeaders headers) {
     this.url = url;
     this.headers = HttpHeaders.of().acceptProtobuf().add(headers).build();
+    this.otpHttpClient = new OtpHttpClient();
   }
 
   /**
    * Parses raw GTFS-RT data into vehicle positions
    */
   public List<VehiclePosition> getPositions() {
-    try (InputStream is = HttpUtils.openInputStream(url.toString(), headers.asMap())) {
-      if (is == null) {
-        LOG.warn("Failed to get data from url {}", url);
-        return List.of();
-      }
-      return this.getPositions(is);
-    } catch (IOException e) {
+    try {
+      return otpHttpClient.getAndMap(url, headers.asMap(), this::getPositions);
+    } catch (OtpHttpClientException e) {
       LOG.warn("Error reading vehicle positions from {}", url, e);
     }
     return List.of();

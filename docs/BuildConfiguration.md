@@ -20,8 +20,6 @@ Sections follow that describe particular settings in more depth.
 | Config Parameter                                                         |     Type    | Summary                                                                                                                                                        |  Req./Opt. | Default Value                     | Since |
 |--------------------------------------------------------------------------|:-----------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------|:----------:|-----------------------------------|:-----:|
 | [areaVisibility](#areaVisibility)                                        |  `boolean`  | Perform visibility calculations.                                                                                                                               | *Optional* | `false`                           |  1.5  |
-| banDiscouragedBiking                                                     |  `boolean`  | Should biking be allowed on OSM ways tagged with `bicycle=discouraged`                                                                                         | *Optional* | `false`                           |  2.0  |
-| banDiscouragedWalking                                                    |  `boolean`  | Should walking be allowed on OSM ways tagged with `foot=discouraged`                                                                                           | *Optional* | `false`                           |  2.0  |
 | [buildReportDir](#buildReportDir)                                        |    `uri`    | URI to the directory where the graph build report should be written to.                                                                                        | *Optional* |                                   |  2.0  |
 | [configVersion](#configVersion)                                          |   `string`  | Deployment version of the *build-config.json*.                                                                                                                 | *Optional* |                                   |  2.1  |
 | [dataImportReport](#dataImportReport)                                    |  `boolean`  | Generate nice HTML report of Graph errors/warnings                                                                                                             | *Optional* | `false`                           |  2.0  |
@@ -206,25 +204,6 @@ general better than trying to be exact. The period and date format follow the IS
   "transitServiceEnd" : "P1Y6M5D"
 }
 ```
-
-
-<h2 id="transferring-within-stations">Transferring within stations</h2>
-
-Subway systems tend to exist in their own layer of the city separate from the surface, though there
-are exceptions where tracks lie right below the street and transfers happen via the surface. In
-systems where the subway is quite deep and transfers happen via tunnels, the time required for an
-in-station transfer is often less than that for a surface transfer.
-
-One way to resolve this problem is by ensuring that the GTFS feed codes each platform as a separate
-stop, then micro-mapping stations in OSM. When OSM data contains a detailed description of walkways,
-stairs, and platforms within a station, GTFS stops can be linked to the nearest platform and
-transfers will happen via the OSM ways, which should yield very realistic transfer time
-expectations. This works particularly well in above-ground train stations where the layering of
-non-intersecting ways is less prevalent. See [BoardingLocations](BoardingLocations.md) for more 
-details.
-
-An alternative approach is to use GTFS pathways to model entrances and platforms within stations.
-
 
 ## OpenStreetMap(OSM) configuration
 
@@ -585,7 +564,7 @@ The file is created or overwritten if OTP saves the graph to the file
 Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.
 
 Note! The preferred way to do this is to update the OSM data.
-See [Transferring within stations](#transferring-within-stations).
+See [In-station navigation](In-Station-Navigation.md).
 
 The ride locations for some modes of transport such as subways can be slow to reach from the street.
 When planning a trip, we need to allow additional time to reach these locations to properly inform
@@ -965,7 +944,7 @@ the local filesystem.
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /osm/[0]   
-**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constantspeed`
+**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
 
 The named set of mapping rules applied when parsing OSM tags. Overrides the value specified in `osmDefaults`.
 
@@ -973,7 +952,7 @@ The named set of mapping rules applied when parsing OSM tags. Overrides the valu
 
 **Since version:** `2.2` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"default"`   
 **Path:** /osmDefaults   
-**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constantspeed`
+**Enum values:** `default` | `norway` | `uk` | `finland` | `germany` | `atlanta` | `houston` | `portland` | `constant-speed-finland`
 
 The named set of mapping rules applied when parsing OSM tags.
 

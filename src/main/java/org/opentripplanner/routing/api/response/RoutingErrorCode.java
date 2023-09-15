@@ -36,11 +36,4 @@ public enum RoutingErrorCode {
    * The location was found, but no stops could be found within the search radius.
    */
   NO_STOPS_IN_RANGE,
-
-  /**
-   * The routing request timed out.
-   */
-  PROCESSING_TIMEOUT,
-
-  SYSTEM_ERROR,
 }

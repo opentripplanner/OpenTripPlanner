@@ -5,7 +5,9 @@ import static org.opentripplanner.framework.lang.ObjectUtils.requireNotInitializ
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.AStarState;
@@ -42,9 +44,6 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
 
   public Edge backEdge;
 
-  // allow traverse result chaining (multiple results)
-  protected State next;
-
   /* StateData contains data which is unlikely to change as often */
   public StateData stateData;
 
@@ -62,7 +61,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     this(
       vertex,
       streetSearchRequest.startTime(),
-      StateData.getInitialStateData(streetSearchRequest),
+      StateData.getBaseCaseStateData(streetSearchRequest),
       streetSearchRequest
     );
   }
@@ -78,7 +77,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     this.vertex = vertex;
     this.backState = null;
     this.stateData = stateData;
-    if (!vertex.rentalRestrictions().noDropOffNetworks().isEmpty()) {
+    if (request.arriveBy() && !vertex.rentalRestrictions().noDropOffNetworks().isEmpty()) {
       this.stateData.noRentalDropOffZonesAtStartOfReverseSearch =
         vertex.rentalRestrictions().noDropOffNetworks();
     }
@@ -148,6 +147,13 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
    */
   public static boolean isEmpty(State[] s) {
     return s.length == 0;
+  }
+
+  /**
+   * Takes a stream of states and converts it to an array while removing nulls.
+   */
+  public static State[] ofStream(Stream<State> states) {
+    return states.filter(Objects::nonNull).toArray(State[]::new);
   }
 
   /**
@@ -300,13 +306,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   }
 
   /**
-   * This method is on State rather than RouteRequest because we care whether the user is in
-   * possession of a rented bike.
-   *
-   * @return BICYCLE if routing with an owned bicycle, or if at this state the user is holding on to
-   * a rented bicycle.
+   * @return The current mode of this state. When doing a rental request, this can for example
+   * indicate if the state is currently using a vehicle or not.
    */
-  public TraverseMode getNonTransitMode() {
+  public TraverseMode currentMode() {
     return stateData.currentMode;
   }
 
@@ -390,7 +393,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
         }
       }
       if (orig.isVehicleParked() != orig.getBackState().isVehicleParked()) {
-        editor.setVehicleParked(true, orig.getBackState().getNonTransitMode());
+        editor.setVehicleParked(true, orig.getBackState().currentMode());
       }
 
       ret = editor.makeState();
@@ -427,13 +430,28 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
   public boolean containsModeCar() {
     var state = this;
     while (state != null) {
-      if (state.getNonTransitMode().isInCar()) {
+      if (state.currentMode().isInCar()) {
         return true;
       } else {
         state = state.getBackState();
       }
     }
     return false;
+  }
+
+  /**
+   * Check all edges is traversed on foot {@code mode=WALK}.
+   * <p>
+   * DO NOT USE THIS IN ROUTING IT WILL NOT PERFORM WELL!
+   */
+  public boolean containsOnlyWalkMode() {
+    // The for-loop has the best performance
+    for (var s = this; s != null; s = s.backState) {
+      if (!s.stateData.currentMode.isWalking()) {
+        return false;
+      }
+    }
+    return true;
   }
 
   protected State clone() {

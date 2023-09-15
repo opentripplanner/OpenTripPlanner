@@ -2,6 +2,8 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
@@ -9,7 +11,7 @@ import org.opentripplanner.model.plan.WalkStep;
 
 public class PathGuidanceType {
 
-  public static GraphQLObjectType create() {
+  public static GraphQLObjectType create(GraphQLObjectType elevationStepType) {
     return GraphQLObjectType
       .newObject()
       .name("PathGuidance")
@@ -40,7 +42,7 @@ public class PathGuidanceType {
           .type(Scalars.GraphQLString)
           .dataFetcher(environment ->
             GraphQLUtils.getTranslation(
-              ((WalkStep) environment.getSource()).getStreetName(),
+              ((WalkStep) environment.getSource()).getDirectionText(),
               environment
             )
           )
@@ -72,7 +74,7 @@ public class PathGuidanceType {
           .name("stayOn")
           .description("Indicates whether or not a street changes direction at an intersection.")
           .type(Scalars.GraphQLBoolean)
-          .dataFetcher(environment -> ((WalkStep) environment.getSource()).getStayOn())
+          .dataFetcher(environment -> ((WalkStep) environment.getSource()).isStayOn())
           .build()
       )
       .field(
@@ -116,6 +118,19 @@ public class PathGuidanceType {
           .type(Scalars.GraphQLFloat)
           .dataFetcher(environment ->
             ((WalkStep) environment.getSource()).getStartLocation().longitude()
+          )
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
+          .name("elevationProfile")
+          .description(ElevationProfileStepType.makeDescription("step"))
+          .type(new GraphQLNonNull(new GraphQLList(elevationStepType)))
+          .dataFetcher(environment ->
+            ElevationProfileStepType.mapElevationProfile(
+              ((WalkStep) environment.getSource()).getElevationProfile()
+            )
           )
           .build()
       )

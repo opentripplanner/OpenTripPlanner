@@ -5,8 +5,8 @@ import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.logging.ThrottleLogger;
-import org.opentripplanner.raptor.api.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
@@ -84,8 +84,9 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
       return;
     }
 
-    if (transitCalculator.exceedsTimeLimit(destArrival.arrivalTime())) {
-      debugRejectByTimeLimitOptimization(destArrival);
+    var errors = transitCalculator.rejectDestinationArrival(destArrival);
+    if (!errors.isEmpty()) {
+      debugReject(destArrival, String.join(" ", errors));
     } else {
       RaptorPath<T> path = pathMapper.mapToPath(destArrival);
 

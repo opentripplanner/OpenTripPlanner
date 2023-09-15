@@ -1,13 +1,16 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import org.opentripplanner.framework.time.TimeUtils;
-import org.opentripplanner.raptor.api.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.spi.IntIterator;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorTimeTable;
@@ -29,8 +32,8 @@ public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
     // goes with destination and 'latestArrivalTime()' match origin.
     this(
       s.latestArrivalTime(),
-      s.searchWindowInSeconds(),
-      s.earliestDepartureTime(),
+      s.routerSearchWindowInSeconds(),
+      s.routerEarliestDepartureTime(),
       t.iterationDepartureStepInSeconds()
     );
   }
@@ -48,6 +51,17 @@ public final class ReverseRaptorTransitCalculator<T extends RaptorTripSchedule>
         ? unreachedTime()
         : earliestAcceptableDepartureTime;
     this.iterationStep = iterationStep;
+  }
+
+  @Override
+  public Collection<String> rejectDestinationArrival(ArrivalView<T> destArrival) {
+    var errors = new ArrayList<String>();
+
+    if (exceedsTimeLimit(destArrival.arrivalTime())) {
+      errors.add(exceedsTimeLimitReason());
+    }
+
+    return errors;
   }
 
   @Override

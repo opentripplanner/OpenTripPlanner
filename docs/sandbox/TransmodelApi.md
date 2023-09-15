@@ -73,7 +73,7 @@ at: `http://localhost:8080/otp/routers/default/transmodel/index/graphql`
 ### OTP2 Official GraphQL API (Not available)
 
 We **plan** to make a new offical OTP2 API, replacing the REST API. The plan is to base the new API
-on this API and the [Legacy GraphQL Api](LegacyGraphQLApi.md). The new API will most likely have 2
+on this API and the [GTFS GraphQL API](GtfsGraphQlApi.md). The new API will most likely have two
 "translations": A GTFS version and a Transmodel version, we will try to keep the semantics the same.
 
 ### Configuration

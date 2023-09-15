@@ -39,11 +39,13 @@
     "transitReluctanceForMode" : {
       "RAIL" : 0.85
     },
-    "maxAccessEgressDurationForMode": {
-      "BIKE_RENTAL": "20m"
+    "accessEgress": {
+      "maxDurationForMode": {
+	"BIKE_RENTAL": "20m"
+      }
     },
     "itineraryFilters" : {
-      "transitGeneralizedCostLimit" : "3600 + 2.5 x",
+      "transitGeneralizedCostLimit" : "1h + 2.5 x",
       "bikeRentalDistanceRatio": 0.3
     },
     "carDecelerationSpeed": 2.9,

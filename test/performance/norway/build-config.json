@@ -14,8 +14,6 @@
     "islandWithoutStopsMaxSize": 5,
     "islandWithStopsMaxSize": 5
   },
-  "banDiscouragedWalking": false,
-  "banDiscouragedBiking": false,
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
   "boardingLocationTags": [],

@@ -14,10 +14,12 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class VehicleParkingLinkingTest {
@@ -27,6 +29,10 @@ public class VehicleParkingLinkingTest {
   private IntersectionVertex A;
   private IntersectionVertex B;
 
+  private VertexFactory vertexFactory;
+
+  private VehicleParkingHelper helper;
+
   @BeforeEach
   public void setup() {
     VehicleParkingTestGraphData graphData = new VehicleParkingTestGraphData();
@@ -35,6 +41,8 @@ public class VehicleParkingLinkingTest {
     transitModel = graphData.getTransitModel();
     A = graphData.getAVertex();
     B = graphData.getBVertex();
+    vertexFactory = new VertexFactory(graph);
+    helper = new VehicleParkingHelper(graph);
   }
 
   @Test
@@ -45,7 +53,7 @@ public class VehicleParkingLinkingTest {
         builder.entranceId(id("1")).coordinate(new WgsCoordinate(A.getCoordinate())).vertex(A)
       )
       .build();
-    var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
+    var parkingVertex = vertexFactory.vehicleParkingEntrance(parking);
 
     StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
@@ -68,7 +76,7 @@ public class VehicleParkingLinkingTest {
           .walkAccessible(true)
       )
       .build();
-    var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
+    var parkingVertex = vertexFactory.vehicleParkingEntrance(parking.getEntrances().get(0));
 
     StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
@@ -82,8 +90,12 @@ public class VehicleParkingLinkingTest {
 
   @Test
   public void carParkingEntranceToAllTraversableStreetLinkingTest() {
-    var C = new IntersectionVertex(graph, "C", 0.0001, 0.0001);
-    var D = new IntersectionVertex(graph, "D", 0.01, 0.01);
+    var C = StreetModelForTest.intersectionVertex("C", 0.0001, 0.0001);
+    var D = StreetModelForTest.intersectionVertex("D", 0.01, 0.01);
+
+    graph.addVertex(C);
+    graph.addVertex(D);
+
     VehicleParkingTestUtil.createStreet(C, D, StreetTraversalPermission.CAR);
 
     VehicleParkingTestUtil.createStreet(A, C, StreetTraversalPermission.NONE);
@@ -98,7 +110,7 @@ public class VehicleParkingLinkingTest {
           .walkAccessible(true)
       )
       .build();
-    var parkingVertex = new VehicleParkingEntranceVertex(graph, parking.getEntrances().get(0));
+    var parkingVertex = vertexFactory.vehicleParkingEntrance(parking.getEntrances().get(0));
 
     StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
 
@@ -132,7 +144,7 @@ public class VehicleParkingLinkingTest {
       )
       .build();
 
-    VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
+    helper.linkVehicleParkingToGraph(vehicleParking);
 
     graph.remove(A);
 
@@ -163,7 +175,7 @@ public class VehicleParkingLinkingTest {
 
     var vehicleParkingService = graph.getVehicleParkingService();
     vehicleParkingService.updateVehicleParking(List.of(vehicleParking), List.of());
-    VehicleParkingHelper.linkVehicleParkingToGraph(graph, vehicleParking);
+    helper.linkVehicleParkingToGraph(vehicleParking);
 
     graph.remove(A);
 

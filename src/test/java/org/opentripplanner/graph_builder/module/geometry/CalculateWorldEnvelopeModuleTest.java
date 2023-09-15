@@ -4,8 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.stop;
 
 import java.util.List;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 class CalculateWorldEnvelopeModuleTest {
@@ -40,7 +43,18 @@ class CalculateWorldEnvelopeModuleTest {
   static class V extends Vertex {
 
     protected V(double x, double y) {
-      super(null, "V-" + x + "-" + y, x, y);
+      super(x, y);
+    }
+
+    @Override
+    public VertexLabel getLabel() {
+      return VertexLabel.string("%s/%s".formatted(getX(), getY()));
+    }
+
+    @Nonnull
+    @Override
+    public I18NString getName() {
+      return I18NString.of(getLabel().toString());
     }
   }
 }

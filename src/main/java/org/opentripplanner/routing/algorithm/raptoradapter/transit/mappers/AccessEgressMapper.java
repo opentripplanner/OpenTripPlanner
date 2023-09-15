@@ -12,18 +12,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 public class AccessEgressMapper {
 
-  public DefaultAccessEgress mapNearbyStop(NearbyStop nearbyStop, boolean isEgress) {
-    if (!(nearbyStop.stop instanceof RegularStop)) {
-      return null;
-    }
-
-    return new DefaultAccessEgress(
-      nearbyStop.stop.getIndex(),
-      isEgress ? nearbyStop.state.reverse() : nearbyStop.state
-    );
-  }
-
-  public List<DefaultAccessEgress> mapNearbyStops(
+  public static List<DefaultAccessEgress> mapNearbyStops(
     Collection<NearbyStop> accessStops,
     boolean isEgress
   ) {
@@ -34,7 +23,7 @@ public class AccessEgressMapper {
       .collect(Collectors.toList());
   }
 
-  public Collection<DefaultAccessEgress> mapFlexAccessEgresses(
+  public static Collection<DefaultAccessEgress> mapFlexAccessEgresses(
     Collection<FlexAccessEgress> flexAccessEgresses,
     boolean isEgress
   ) {
@@ -42,5 +31,16 @@ public class AccessEgressMapper {
       .stream()
       .map(flexAccessEgress -> new FlexAccessEgressAdapter(flexAccessEgress, isEgress))
       .collect(Collectors.toList());
+  }
+
+  private static DefaultAccessEgress mapNearbyStop(NearbyStop nearbyStop, boolean isEgress) {
+    if (!(nearbyStop.stop instanceof RegularStop)) {
+      return null;
+    }
+
+    return new DefaultAccessEgress(
+      nearbyStop.stop.getIndex(),
+      isEgress ? nearbyStop.state.reverse() : nearbyStop.state
+    );
   }
 }

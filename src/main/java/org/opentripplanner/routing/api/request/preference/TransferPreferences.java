@@ -6,9 +6,10 @@ import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
-import org.opentripplanner.routing.api.request.framework.Units;
 
 /**
  * Parameters for doing transfers between transit legs.
@@ -21,33 +22,33 @@ public final class TransferPreferences implements Serializable {
   public static final TransferPreferences DEFAULT = new TransferPreferences();
   private static final int MAX_NUMBER_OF_TRANSFERS = 30;
 
-  private final int cost;
+  private final Cost cost;
   private final int slack;
   private final double waitReluctance;
   private final int maxTransfers;
   private final int maxAdditionalTransfers;
   private final TransferOptimizationParameters optimization;
-  private final int nonpreferredCost;
+  private final Cost nonpreferredCost;
 
   private TransferPreferences() {
-    this.cost = 0;
+    this.cost = Cost.ZERO;
     this.slack = 120;
     this.waitReluctance = 1.0;
     this.maxTransfers = 12;
     this.maxAdditionalTransfers = 5;
     this.optimization = TransferOptimizationPreferences.DEFAULT;
-    this.nonpreferredCost = 180;
+    this.nonpreferredCost = Cost.costOfMinutes(3);
   }
 
   private TransferPreferences(Builder builder) {
-    this.cost = Units.cost(builder.cost);
+    this.cost = builder.cost;
     this.slack = Units.duration(builder.slack);
     this.waitReluctance = Units.reluctance(builder.waitReluctance);
     this.maxTransfers = Units.count(builder.maxTransfers, MAX_NUMBER_OF_TRANSFERS);
     this.maxAdditionalTransfers =
       Units.count(builder.maxAdditionalTransfers, MAX_NUMBER_OF_TRANSFERS);
     this.optimization = requireNonNull(builder.optimization);
-    this.nonpreferredCost = Units.cost(builder.nonpreferredCost);
+    this.nonpreferredCost = builder.nonpreferredCost;
   }
 
   public static Builder of() {
@@ -73,7 +74,7 @@ public final class TransferPreferences implements Serializable {
    * that's what we'll return.
    */
   public int cost() {
-    return cost;
+    return cost.toSeconds();
   }
 
   /**
@@ -145,7 +146,7 @@ public final class TransferPreferences implements Serializable {
    * so it does work similar as before.
    */
   public int nonpreferredCost() {
-    return nonpreferredCost;
+    return nonpreferredCost.toSeconds();
   }
 
   @Override
@@ -154,13 +155,13 @@ public final class TransferPreferences implements Serializable {
     if (o == null || getClass() != o.getClass()) return false;
     TransferPreferences that = (TransferPreferences) o;
     return (
-      cost == that.cost &&
+      cost.equals(that.cost) &&
       slack == that.slack &&
       doubleEquals(that.waitReluctance, waitReluctance) &&
       maxTransfers == that.maxTransfers &&
       maxAdditionalTransfers == that.maxAdditionalTransfers &&
       optimization.equals(that.optimization) &&
-      nonpreferredCost == that.nonpreferredCost
+      nonpreferredCost.equals(that.nonpreferredCost)
     );
   }
 
@@ -181,27 +182,26 @@ public final class TransferPreferences implements Serializable {
   public String toString() {
     return ToStringBuilder
       .of(TransferPreferences.class)
-      .addNum("cost", cost, DEFAULT.cost)
+      .addObj("cost", cost, DEFAULT.cost)
       .addNum("slack", slack, DEFAULT.slack)
       .addNum("waitReluctance", waitReluctance, DEFAULT.waitReluctance)
       .addNum("maxTransfers", maxTransfers, DEFAULT.maxTransfers)
       .addNum("maxAdditionalTransfers", maxAdditionalTransfers, DEFAULT.maxAdditionalTransfers)
       .addObj("optimization", optimization, DEFAULT.optimization)
-      .addNum("nonpreferredCost", nonpreferredCost, DEFAULT.nonpreferredCost)
+      .addObj("nonpreferredCost", nonpreferredCost, DEFAULT.nonpreferredCost)
       .toString();
   }
 
   public static class Builder {
 
     private final TransferPreferences original;
-    private int cost;
+    private Cost cost;
     private int slack;
-    private int nonpreferredCost;
-    private double waitReluctance;
-
-    private TransferOptimizationParameters optimization;
     private Integer maxTransfers;
     private Integer maxAdditionalTransfers;
+    private double waitReluctance;
+    private TransferOptimizationParameters optimization;
+    private Cost nonpreferredCost;
 
     public Builder(TransferPreferences original) {
       this.original = original;
@@ -219,7 +219,7 @@ public final class TransferPreferences implements Serializable {
     }
 
     public Builder withCost(int cost) {
-      this.cost = cost;
+      this.cost = Cost.costOfSeconds(cost);
       return this;
     }
 
@@ -229,7 +229,7 @@ public final class TransferPreferences implements Serializable {
     }
 
     public Builder withNonpreferredCost(int nonpreferredCost) {
-      this.nonpreferredCost = nonpreferredCost;
+      this.nonpreferredCost = Cost.costOfSeconds(nonpreferredCost);
       return this;
     }
 

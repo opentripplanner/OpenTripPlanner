@@ -5,7 +5,7 @@
 **OpenTripPlanner** (OTP) is an open source multi-modal trip planner, focusing on travel by
 scheduled public transportation in combination with bicycling, walking, and mobility services
 including bike share and ride hailing. Its server component runs on any platform with a Java virtual
-machine (including Linux, Mac, and Windows). It exposes REST and GraphQL APIs that can be accessed
+machine (including Linux, Mac, and Windows). It exposes GraphQL APIs that can be accessed
 by various clients including open source Javascript components and native mobile applications. It
 builds its representation of the transportation network from open data in open standard file
 formats (primarily GTFS and OpenStreetMap). It applies real-time updates and alerts with immediate
@@ -26,7 +26,8 @@ the selector in the upper left of the published documentation.
 
 **Releases**
  
-- [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.3 (the git master branch)
+- [Latest](http://docs.opentripplanner.org/en/latest) - Version 2.4.0 (the git master branch)
+- [v2.3.0](http://docs.opentripplanner.org/en/v2.3.0) - Version 2.3
 - [v2.2.0](http://docs.opentripplanner.org/en/v2.2.0) - Version 2.2
 - [v2.1.0](http://docs.opentripplanner.org/en/v2.1.0) - Version 2.1
 - [v2.0.0](http://docs.opentripplanner.org/en/v2.0.0) - Version 2.0

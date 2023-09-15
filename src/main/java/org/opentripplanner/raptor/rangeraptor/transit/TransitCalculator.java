@@ -1,8 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
-import static org.opentripplanner.raptor.api.RaptorConstants.TIME_NOT_SET;
+import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
@@ -64,7 +65,7 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
    * search it will be the earliest possible departure time, while for reverse search it uses the
    * latest arrival time.
    * <p>
-   * Returns {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET} if transfer
+   * Returns {@link RaptorConstants#TIME_NOT_SET} if transfer
    * is not possible after the requested departure time
    */
   int departureTime(RaptorAccessEgress accessPath, int departureTime);
@@ -79,7 +80,7 @@ public interface TransitCalculator<T extends RaptorTripSchedule> extends TimeCal
    * leaves on-board) and then time-shift the egress.
    * <p>
    * It returns the calculated departure time or
-   * {@link org.opentripplanner.raptor.api.RaptorConstants#TIME_NOT_SET}
+   * {@link RaptorConstants#TIME_NOT_SET}
    * if boarding is not possible.
    */
   default int calculateEgressDepartureTime(

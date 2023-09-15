@@ -28,11 +28,11 @@ import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.TemporaryFreeEdge;
-import org.opentripplanner.street.model.vertex.ElevatorOffboardVertex;
 import org.opentripplanner.street.model.vertex.ElevatorOnboardVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
@@ -43,6 +43,8 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.street.model.vertex.VertexFactory;
+import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -73,12 +75,16 @@ public abstract class GraphRoutingTest {
 
     private final Graph graph;
     private final TransitModel transitModel;
+    private final VertexFactory vertexFactory;
+    private final VehicleParkingHelper vehicleParkingHelper;
 
     protected Builder() {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
       graph = new Graph(deduplicator);
       transitModel = new TransitModel(stopModel, deduplicator);
+      vertexFactory = new VertexFactory(graph);
+      vehicleParkingHelper = new VehicleParkingHelper(graph);
     }
 
     public abstract void build();
@@ -91,17 +97,35 @@ public abstract class GraphRoutingTest {
       return transitModel;
     }
 
-    public <T> T v(String label) {
+    public <T extends Vertex> T v(VertexLabel label) {
       return vertex(label);
     }
 
-    public <T> T vertex(String label) {
+    public <T extends Vertex> T vertex(VertexLabel label) {
       return (T) graph.getVertex(label);
     }
 
     // -- Street network
     public IntersectionVertex intersection(String label, double latitude, double longitude) {
-      return new IntersectionVertex(graph, label, longitude, latitude);
+      return vertexFactory.intersection(label, longitude, latitude);
+    }
+
+    public StreetEdgeBuilder<?> streetBuilder(
+      StreetVertex from,
+      StreetVertex to,
+      int length,
+      StreetTraversalPermission permissions
+    ) {
+      return new StreetEdgeBuilder<>()
+        .withFromVertex(from)
+        .withToVertex(to)
+        .withGeometry(
+          GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon())
+        )
+        .withName(String.format("%s%s street", from.getLabel(), to.getLabel()))
+        .withMeterLength(length)
+        .withPermission(permissions)
+        .withBack(false);
     }
 
     public StreetEdge street(
@@ -110,15 +134,7 @@ public abstract class GraphRoutingTest {
       int length,
       StreetTraversalPermission permissions
     ) {
-      return new StreetEdge(
-        from,
-        to,
-        GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-        String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
-        length,
-        permissions,
-        false
-      );
+      return streetBuilder(from, to, length, permissions).buildAndConnect();
     }
 
     public List<StreetEdge> street(
@@ -129,24 +145,28 @@ public abstract class GraphRoutingTest {
       StreetTraversalPermission reversePermissions
     ) {
       return List.of(
-        new StreetEdge(
-          from,
-          to,
-          GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon()),
-          String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
-          length,
-          forwardPermissions,
-          false
-        ),
-        new StreetEdge(
-          to,
-          from,
-          GeometryUtils.makeLineString(to.getLat(), to.getLon(), from.getLat(), from.getLon()),
-          String.format("%s%s street", from.getDefaultName(), to.getDefaultName()),
-          length,
-          reversePermissions,
-          true
-        )
+        new StreetEdgeBuilder<>()
+          .withFromVertex(from)
+          .withToVertex(to)
+          .withGeometry(
+            GeometryUtils.makeLineString(from.getLat(), from.getLon(), to.getLat(), to.getLon())
+          )
+          .withName(String.format("%s%s street", from.getDefaultName(), to.getDefaultName()))
+          .withMeterLength(length)
+          .withPermission(forwardPermissions)
+          .withBack(false)
+          .buildAndConnect(),
+        new StreetEdgeBuilder<>()
+          .withFromVertex(to)
+          .withToVertex(from)
+          .withGeometry(
+            GeometryUtils.makeLineString(to.getLat(), to.getLon(), from.getLat(), from.getLon())
+          )
+          .withName(String.format("%s%s street", from.getDefaultName(), to.getDefaultName()))
+          .withMeterLength(length)
+          .withPermission(reversePermissions)
+          .withBack(true)
+          .buildAndConnect()
       );
     }
 
@@ -159,26 +179,20 @@ public abstract class GraphRoutingTest {
         var boardLabel = String.format("%s-onboard", level);
         var alightLabel = String.format("%s-offboard", level);
 
-        var onboard = new ElevatorOnboardVertex(
-          graph,
-          boardLabel,
-          v.getX(),
-          v.getY(),
-          new NonLocalizedString(boardLabel)
-        );
-        var offboard = new ElevatorOffboardVertex(
-          graph,
-          alightLabel,
-          v.getX(),
-          v.getY(),
-          new NonLocalizedString(alightLabel)
-        );
+        var onboard = vertexFactory.elevatorOnboard(v, v.getLabelString(), boardLabel);
+        var offboard = vertexFactory.elevatorOffboard(v, v.getLabelString(), alightLabel);
 
-        new FreeEdge(v, offboard);
-        new FreeEdge(offboard, v);
+        FreeEdge.createFreeEdge(v, offboard);
+        FreeEdge.createFreeEdge(offboard, v);
 
-        edges.add(new ElevatorBoardEdge(offboard, onboard));
-        edges.add(new ElevatorAlightEdge(onboard, offboard, new NonLocalizedString(level)));
+        edges.add(ElevatorBoardEdge.createElevatorBoardEdge(offboard, onboard));
+        edges.add(
+          ElevatorAlightEdge.createElevatorAlightEdge(
+            onboard,
+            offboard,
+            new NonLocalizedString(level)
+          )
+        );
 
         onboardVertices.add(onboard);
       }
@@ -187,8 +201,12 @@ public abstract class GraphRoutingTest {
         var from = onboardVertices.get(i - 1);
         var to = onboardVertices.get(i);
 
-        edges.add(new ElevatorHopEdge(from, to, permission, Accessibility.POSSIBLE));
-        edges.add(new ElevatorHopEdge(to, from, permission, Accessibility.POSSIBLE));
+        edges.add(
+          ElevatorHopEdge.createElevatorHopEdge(from, to, permission, Accessibility.POSSIBLE)
+        );
+        edges.add(
+          ElevatorHopEdge.createElevatorHopEdge(to, from, permission, Accessibility.POSSIBLE)
+        );
       }
 
       return edges;
@@ -237,22 +255,21 @@ public abstract class GraphRoutingTest {
       double longitude,
       boolean noTransfers
     ) {
-      return new TransitStopVertexBuilder()
-        .withGraph(graph)
-        .withStop(stopEntity(id, latitude, longitude, noTransfers))
-        .build();
+      return vertexFactory.transitStop(
+        new TransitStopVertexBuilder().withStop(stopEntity(id, latitude, longitude, noTransfers))
+      );
     }
 
     public TransitEntranceVertex entrance(String id, double latitude, double longitude) {
-      return new TransitEntranceVertex(graph, entranceEntity(id, latitude, longitude));
+      return new TransitEntranceVertex(entranceEntity(id, latitude, longitude));
     }
 
     public StreetTransitEntranceLink link(StreetVertex from, TransitEntranceVertex to) {
-      return new StreetTransitEntranceLink(from, to);
+      return StreetTransitEntranceLink.createStreetTransitEntranceLink(from, to);
     }
 
     public StreetTransitEntranceLink link(TransitEntranceVertex from, StreetVertex to) {
-      return new StreetTransitEntranceLink(from, to);
+      return StreetTransitEntranceLink.createStreetTransitEntranceLink(from, to);
     }
 
     public List<StreetTransitEntranceLink> biLink(StreetVertex from, TransitEntranceVertex to) {
@@ -260,11 +277,11 @@ public abstract class GraphRoutingTest {
     }
 
     public StreetTransitStopLink link(StreetVertex from, TransitStopVertex to) {
-      return new StreetTransitStopLink(from, to);
+      return StreetTransitStopLink.createStreetTransitStopLink(from, to);
     }
 
     public StreetTransitStopLink link(TransitStopVertex from, StreetVertex to) {
-      return new StreetTransitStopLink(from, to);
+      return StreetTransitStopLink.createStreetTransitStopLink(from, to);
     }
 
     public List<StreetTransitStopLink> biLink(StreetVertex from, TransitStopVertex to) {
@@ -272,10 +289,9 @@ public abstract class GraphRoutingTest {
     }
 
     public PathwayEdge pathway(Vertex from, Vertex to, int time, int length) {
-      return new PathwayEdge(
+      return PathwayEdge.createPathwayEdge(
         from,
         to,
-        null,
         new NonLocalizedString(
           String.format("%s%s pathway", from.getDefaultName(), to.getDefaultName())
         ),
@@ -304,11 +320,11 @@ public abstract class GraphRoutingTest {
     }
 
     public TemporaryFreeEdge link(TemporaryVertex from, StreetVertex to) {
-      return new TemporaryFreeEdge(from, to);
+      return TemporaryFreeEdge.createTemporaryFreeEdge(from, to);
     }
 
     public TemporaryFreeEdge link(StreetVertex from, TemporaryVertex to) {
-      return new TemporaryFreeEdge(from, to);
+      return TemporaryFreeEdge.createTemporaryFreeEdge(from, to);
     }
 
     // -- Vehicle rental
@@ -339,10 +355,12 @@ public abstract class GraphRoutingTest {
       String network
     ) {
       var vertex = new VehicleRentalPlaceVertex(
-        graph,
         vehicleRentalStationEntity(id, latitude, longitude, network)
       );
-      new VehicleRentalEdge(vertex, RentalVehicleType.getDefaultType(network).formFactor);
+      VehicleRentalEdge.createVehicleRentalEdge(
+        vertex,
+        RentalVehicleType.getDefaultType(network).formFactor
+      );
       return vertex;
     }
 
@@ -355,11 +373,11 @@ public abstract class GraphRoutingTest {
     }
 
     public StreetVehicleRentalLink link(StreetVertex from, VehicleRentalPlaceVertex to) {
-      return new StreetVehicleRentalLink(from, to);
+      return StreetVehicleRentalLink.createStreetVehicleRentalLink(from, to);
     }
 
     public StreetVehicleRentalLink link(VehicleRentalPlaceVertex from, StreetVertex to) {
-      return new StreetVehicleRentalLink(from, to);
+      return StreetVehicleRentalLink.createStreetVehicleRentalLink(from, to);
     }
 
     public List<StreetVehicleRentalLink> biLink(StreetVertex from, VehicleRentalPlaceVertex to) {
@@ -399,7 +417,7 @@ public abstract class GraphRoutingTest {
         .tags(List.of(tags))
         .build();
 
-      var vertices = VehicleParkingHelper.createVehicleParkingVertices(graph, vehicleParking);
+      var vertices = vehicleParkingHelper.createVehicleParkingVertices(vehicleParking);
       VehicleParkingHelper.linkVehicleParkingEntrances(vertices);
       vertices.forEach(v -> biLink(v.getParkingEntrance().getVertex(), v));
       return vehicleParking;
@@ -422,11 +440,11 @@ public abstract class GraphRoutingTest {
     }
 
     public StreetVehicleParkingLink link(StreetVertex from, VehicleParkingEntranceVertex to) {
-      return new StreetVehicleParkingLink(from, to);
+      return StreetVehicleParkingLink.createStreetVehicleParkingLink(from, to);
     }
 
     public StreetVehicleParkingLink link(VehicleParkingEntranceVertex from, StreetVertex to) {
-      return new StreetVehicleParkingLink(from, to);
+      return StreetVehicleParkingLink.createStreetVehicleParkingLink(from, to);
     }
 
     public List<StreetVehicleParkingLink> biLink(

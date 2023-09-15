@@ -13,7 +13,7 @@ import org.opentripplanner._support.arch.Package;
 
 public class FrameworkArchitectureTest {
 
-  private static final Package APACHE_HTTP = Package.of("org.apache.http..");
+  private static final Package APACHE_HTTP = Package.of("org.apache.hc..");
   private static final Package GUAVA_COLLECTIONS = Package.of("com.google.common.collect");
 
   private static final Module XML_MODULES = Module.of(
@@ -23,6 +23,7 @@ public class FrameworkArchitectureTest {
   );
   private static final Package APPLICATION = FRAMEWORK.subPackage("application");
   private static final Package COLLECTION = FRAMEWORK.subPackage("collection");
+  private static final Package FUNCTIONAL = FRAMEWORK.subPackage("functional");
   private static final Package GEOMETRY = FRAMEWORK.subPackage("geometry");
   private static final Package I18N = FRAMEWORK.subPackage("i18n");
   private static final Package IO = FRAMEWORK.subPackage("io");
@@ -41,6 +42,11 @@ public class FrameworkArchitectureTest {
   @Test
   void enforceCollectionPackageDependencies() {
     COLLECTION.dependsOn(GNU_TROVE).verify();
+  }
+
+  @Test
+  void enforceFunctionalPackageDependencies() {
+    FUNCTIONAL.verify();
   }
 
   @Test

@@ -12,7 +12,9 @@ import org.opentripplanner.graph_builder.module.osm.OsmFilter;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 
@@ -27,9 +29,8 @@ public class BarrierVertexTest {
     assertFalse(simpleBarier.isBollard());
     simpleBarier.addTag("barrier", "bollard");
     assertTrue(simpleBarier.isBollard());
-    Graph graph = new Graph();
     String label = "simpleBarrier";
-    BarrierVertex bv = new BarrierVertex(graph, label, simpleBarier.lon, simpleBarier.lat, 0);
+    BarrierVertex bv = new BarrierVertex(simpleBarier.lon, simpleBarier.lat, 0);
     bv.setBarrierPermissions(
       OsmFilter.getPermissionsForEntity(simpleBarier, BarrierVertex.defaultBarrierPermissions)
     );
@@ -95,9 +96,9 @@ public class BarrierVertexTest {
   public void testStreetsWithBollard() {
     Graph graph = new Graph();
     //default permissions are PEDESTRIAND and BICYCLE
-    BarrierVertex bv = new BarrierVertex(graph, "start_bollard", 2.0, 2.0, 0);
+    BarrierVertex bv = new BarrierVertex(2.0, 2.0, 0);
 
-    StreetVertex endVertex = new IntersectionVertex(graph, "end_vertex", 1.0, 2.0);
+    StreetVertex endVertex = StreetModelForTest.intersectionVertex("end_vertex", 1.0, 2.0);
 
     StreetEdge bv_to_endVertex_forward = edge(bv, endVertex, 100, false);
 
@@ -140,7 +141,7 @@ public class BarrierVertexTest {
     assertTrue(endVertex_to_bv_forward.canTraverse(TraverseMode.WALK));
 
     //tests bollard which doesn't allow cycling
-    BarrierVertex noBicycleBollard = new BarrierVertex(graph, "no_bike_bollard", 1.5, 1, 0);
+    BarrierVertex noBicycleBollard = new BarrierVertex(1.5, 1, 0);
     noBicycleBollard.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN);
     StreetEdge no_bike_to_endVertex = edge(noBicycleBollard, endVertex, 100, false);
 
@@ -159,8 +160,8 @@ public class BarrierVertexTest {
    * @param back true if this is a reverse edge
    */
   private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
+    var labelA = vA.getLabel();
+    var labelB = vB.getLabel();
     String name = String.format("%s_%s", labelA, labelB);
     Coordinate[] coords = new Coordinate[2];
     coords[0] = vA.getCoordinate();
@@ -168,6 +169,14 @@ public class BarrierVertexTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdge(vA, vB, geom, name, length, perm, back);
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(vA)
+      .withToVertex(vB)
+      .withGeometry(geom)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(perm)
+      .withBack(back)
+      .buildAndConnect();
   }
 }

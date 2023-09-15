@@ -73,7 +73,7 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
       return null;
     }
 
-    return new FlexTripEdge(
+    return FlexTripEdge.createFlexTripEdge(
       flexFromVertex,
       accessEgress.state.getVertex(),
       transferStop,

@@ -1,0 +1,110 @@
+{
+  "data" : {
+    "plan" : {
+      "itineraries" : [
+        {
+          "startTime" : 1580641200000,
+          "endTime" : 1580644800000,
+          "legs" : [
+            {
+              "mode" : "WALK",
+              "startTime" : 1580641200000,
+              "endTime" : 1580641220000,
+              "from" : {
+                "name" : "A",
+                "lat" : 5.0,
+                "lon" : 8.0,
+                "departureTime" : 1580641200000,
+                "arrivalTime" : 1580641200000
+              },
+              "to" : {
+                "name" : "B",
+                "lat" : 6.0,
+                "lon" : 8.5,
+                "departureTime" : 1580641220000,
+                "arrivalTime" : 1580641220000
+              },
+              "route" : null,
+              "legGeometry" : null
+            },
+            {
+              "mode" : "BUS",
+              "startTime" : 1580641260000,
+              "endTime" : 1580642100000,
+              "from" : {
+                "name" : "B",
+                "lat" : 6.0,
+                "lon" : 8.5,
+                "departureTime" : 1580641260000,
+                "arrivalTime" : 1580641260000
+              },
+              "to" : {
+                "name" : "C",
+                "lat" : 7.0,
+                "lon" : 9.0,
+                "departureTime" : 1580642100000,
+                "arrivalTime" : 1580642100000
+              },
+              "route" : {
+                "gtfsId" : "F:BUS",
+                "longName" : "Long name for BUS",
+                "shortName" : "RBUS"
+              },
+              "legGeometry" : {
+                "points" : "_{rc@_d{r@????_ibE_t`B"
+              }
+            },
+            {
+              "mode" : "RAIL",
+              "startTime" : 1580643000000,
+              "endTime" : 1580644200000,
+              "from" : {
+                "name" : "C",
+                "lat" : 7.0,
+                "lon" : 9.0,
+                "departureTime" : 1580643000000,
+                "arrivalTime" : 1580643000000
+              },
+              "to" : {
+                "name" : "D",
+                "lat" : 8.0,
+                "lon" : 9.5,
+                "departureTime" : 1580644200000,
+                "arrivalTime" : 1580644200000
+              },
+              "route" : {
+                "gtfsId" : "F:2",
+                "longName" : null,
+                "shortName" : "R2"
+              },
+              "legGeometry" : {
+                "points" : "_evi@_y|u@????_ibE_t`B"
+              }
+            },
+            {
+              "mode" : "CAR",
+              "startTime" : 1580644200000,
+              "endTime" : 1580644800000,
+              "from" : {
+                "name" : "D",
+                "lat" : 8.0,
+                "lon" : 9.5,
+                "departureTime" : 1580644200000,
+                "arrivalTime" : 1580644200000
+              },
+              "to" : {
+                "name" : "E",
+                "lat" : 9.0,
+                "lon" : 10.0,
+                "departureTime" : 1580644800000,
+                "arrivalTime" : 1580644800000
+              },
+              "route" : null,
+              "legGeometry" : null
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

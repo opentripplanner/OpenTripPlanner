@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ public class JsonDataListDownloader<T> {
   private final Map<String, String> headers;
   private final Function<JsonNode, T> elementParser;
   private final String url;
+  private final OtpHttpClient otpHttpClient;
 
   public JsonDataListDownloader(
     String url,
@@ -26,10 +28,21 @@ public class JsonDataListDownloader<T> {
     Function<JsonNode, T> elementParser,
     Map<String, String> headers
   ) {
+    this(url, jsonParsePath, elementParser, headers, new OtpHttpClient());
+  }
+
+  public JsonDataListDownloader(
+    String url,
+    String jsonParsePath,
+    Function<JsonNode, T> elementParser,
+    Map<String, String> headers,
+    OtpHttpClient OtpHttpClient
+  ) {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
     this.headers = headers;
     this.elementParser = elementParser;
+    this.otpHttpClient = OtpHttpClient;
   }
 
   public List<T> download() {
@@ -37,21 +50,27 @@ public class JsonDataListDownloader<T> {
       log.warn("Cannot download updates, because url is null!");
       return null;
     }
-
-    try (InputStream data = HttpUtils.openInputStream(url, headers)) {
-      if (data == null) {
-        log.warn("Failed to get data from url {}", url);
-        return null;
-      }
-      return parseJSON(data);
-    } catch (IllegalArgumentException e) {
-      log.warn("Error parsing bike rental feed from {}", url, e);
-    } catch (JsonProcessingException e) {
-      log.warn("Error parsing bike rental feed from {} (bad JSON of some sort)", url, e);
-    } catch (IOException e) {
-      log.warn("Error reading bike rental feed from {}", url, e);
+    try {
+      return otpHttpClient.getAndMap(
+        URI.create(url),
+        headers,
+        is -> {
+          try {
+            return parseJSON(is);
+          } catch (IllegalArgumentException e) {
+            log.warn("Error parsing bike rental feed from {}", url, e);
+          } catch (JsonProcessingException e) {
+            log.warn("Error parsing bike rental feed from {} (bad JSON of some sort)", url, e);
+          } catch (IOException e) {
+            log.warn("Error reading bike rental feed from {}", url, e);
+          }
+          return null;
+        }
+      );
+    } catch (OtpHttpClientException e) {
+      log.warn("Failed to get data from url {}", url);
+      return null;
     }
-    return null;
   }
 
   private static String convertStreamToString(java.io.InputStream is) {

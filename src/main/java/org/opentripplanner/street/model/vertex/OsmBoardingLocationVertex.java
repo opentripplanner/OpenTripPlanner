@@ -1,11 +1,12 @@
 package org.opentripplanner.street.model.vertex;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.graph.Graph;
 
 /**
  * A vertex for an OSM node that represents a transit stop and has a tag to cross-reference this to
@@ -17,20 +18,21 @@ import org.opentripplanner.routing.graph.Graph;
  * <p>
  * If the source is an area (way) then the centroid is computed and used.
  */
-public class OsmBoardingLocationVertex extends IntersectionVertex {
+public class OsmBoardingLocationVertex extends LabelledIntersectionVertex {
 
   public final Set<String> references;
+  private final I18NString name;
 
   public OsmBoardingLocationVertex(
-    Graph g,
     String label,
     double x,
     double y,
     @Nullable I18NString name,
     Collection<String> references
   ) {
-    super(g, label, x, y, name, false, false);
+    super(label, x, y, false, false);
     this.references = Set.copyOf(references);
+    this.name = Objects.requireNonNullElse(name, NO_NAME);
   }
 
   @Override
@@ -40,5 +42,11 @@ public class OsmBoardingLocationVertex extends IntersectionVertex {
 
   public boolean isConnectedToStreetNetwork() {
     return (getOutgoing().size() + getIncoming().size()) > 0;
+  }
+
+  @Nonnull
+  @Override
+  public I18NString getName() {
+    return name;
   }
 }

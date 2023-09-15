@@ -1,5 +1,6 @@
 package org.opentripplanner.street.model.edge;
 
+import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
@@ -25,13 +26,21 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   private final Accessibility wheelchairAccessibility;
 
-  public StreetTransitEntityLink(StreetVertex fromv, T tov, Accessibility wheelchairAccessibility) {
+  protected StreetTransitEntityLink(
+    StreetVertex fromv,
+    T tov,
+    Accessibility wheelchairAccessibility
+  ) {
     super(fromv, tov);
     this.transitEntityVertex = tov;
     this.wheelchairAccessibility = wheelchairAccessibility;
   }
 
-  public StreetTransitEntityLink(T fromv, StreetVertex tov, Accessibility wheelchairAccessibility) {
+  protected StreetTransitEntityLink(
+    T fromv,
+    StreetVertex tov,
+    Accessibility wheelchairAccessibility
+  ) {
     super(fromv, tov);
     this.transitEntityVertex = fromv;
     this.wheelchairAccessibility = wheelchairAccessibility;
@@ -41,11 +50,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     return ToStringBuilder.of(this.getClass()).addObj("from", fromv).addObj("to", tov).toString();
   }
 
-  public boolean isRoundabout() {
-    return false;
-  }
-
   @Override
+  @Nonnull
   public State[] traverse(State s0) {
     // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
     // avoids spurious leg transitions. As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815,
@@ -53,8 +59,8 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
     // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
     // if they are for the same stop.
     if (
-      s0.backEdge instanceof StreetTransitEntityLink &&
-      ((StreetTransitEntityLink<?>) s0.backEdge).transitEntityVertex == this.transitEntityVertex
+      s0.backEdge instanceof StreetTransitEntityLink<?> link &&
+      link.transitEntityVertex == this.transitEntityVertex
     ) {
       return State.empty();
     }
@@ -80,7 +86,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       }
     }
 
-    switch (s0.getNonTransitMode()) {
+    switch (s0.currentMode()) {
       case BICYCLE:
         // Forbid taking your own bike in the station if bike P+R activated.
         if (s0.getRequest().mode().includesParking() && !s0.isVehicleParked()) {
@@ -146,10 +152,6 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
   public LineString getGeometry() {
     Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate() };
     return GeometryUtils.getGeometryFactory().createLineString(coordinates);
-  }
-
-  public double getDistanceMeters() {
-    return 0;
   }
 
   protected abstract int getStreetToStopTime();

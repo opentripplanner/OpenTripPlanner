@@ -2,9 +2,13 @@ package org.opentripplanner.routing.linking;
 
 import com.google.common.collect.Sets;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
@@ -118,6 +122,24 @@ public class SameEdgeAdjuster {
     StreetVertex to,
     DisposableEdgeCollection tempEdges
   ) {
+    validateDistinctVertices(from, to);
     streetEdge.createPartialEdge(from, to).ifPresent(tempEdges::addEdge);
+  }
+
+  /**
+   * If the origin and destination are very close to each other (within meters), they can be
+   * projected on the same street edge at the same geographical location, in which case there is no
+   * point in further processing the request. This method raises a
+   * {@link RoutingErrorCode#WALKING_BETTER_THAN_TRANSIT} in this case.
+   *
+   * @throws RoutingValidationException if the from and to vertices are at the same geographical
+   *                                    location.
+   */
+  private static void validateDistinctVertices(StreetVertex from, StreetVertex to) {
+    if (from.sameLocation(to)) {
+      throw new RoutingValidationException(
+        List.of(new RoutingError(RoutingErrorCode.WALKING_BETTER_THAN_TRANSIT, null))
+      );
+    }
   }
 }

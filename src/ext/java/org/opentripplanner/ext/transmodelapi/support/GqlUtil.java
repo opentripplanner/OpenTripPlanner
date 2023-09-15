@@ -12,13 +12,15 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLScalarType;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Locale;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory;
-import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunctionScalarFactory;
+import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunctionFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
+import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
@@ -44,7 +46,7 @@ public class GqlUtil {
     this.dateTimeScalar =
       DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(timeZone);
     this.dateScalar = DateScalarFactory.createDateScalar();
-    this.doubleFunctionScalar = DoubleFunctionScalarFactory.createDoubleFunctionScalar();
+    this.doubleFunctionScalar = DoubleFunctionFactory.createDoubleFunctionScalar();
     this.localTimeScalar = LocalTimeScalarFactory.createLocalTimeScalar();
     this.timeScalar = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
     this.durationScalar = DurationScalarFactory.createDurationScalar();
@@ -103,5 +105,15 @@ public class GqlUtil {
 
   public static <T> List<T> listOfNullSafe(T element) {
     return element == null ? List.of() : List.of(element);
+  }
+
+  /**
+   * Helper method to support the deprecated 'lang' argument.
+   */
+  public static Locale getLocale(DataFetchingEnvironment environment) {
+    String lang = environment.getArgument("lang");
+    return lang != null
+      ? GraphQLUtils.getLocale(environment, lang)
+      : GraphQLUtils.getLocale(environment);
   }
 }

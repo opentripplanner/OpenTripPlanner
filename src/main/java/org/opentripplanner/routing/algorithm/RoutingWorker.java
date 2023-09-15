@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
@@ -86,6 +87,8 @@ public class RoutingWorker {
   }
 
   public RoutingResponse route() {
+    OTPRequestTimeoutException.checkForTimeout();
+
     // If no direct mode is set, then we set one.
     // See {@link FilterTransitWhenDirectModeIsEmpty}
     var emptyDirectModeHandler = new FilterTransitWhenDirectModeIsEmpty(
@@ -170,14 +173,6 @@ public class RoutingWorker {
       debugTimingAggregator,
       serverContext.transitService()
     );
-  }
-
-  private List<RideHailingService> rideHailingServices() {
-    if (request.journey().modes().contains(StreetMode.CAR_HAILING)) {
-      return serverContext.rideHailingServices();
-    } else {
-      return List.of();
-    }
   }
 
   private static AdditionalSearchDays createAdditionalSearchDays(

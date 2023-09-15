@@ -1,16 +1,17 @@
 package org.opentripplanner.standalone.config.framework.json;
 
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.BOOLEAN;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.COST_LINEAR_FUNCTION;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.DOUBLE;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.DURATION;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.FEED_SCOPED_ID;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.INTEGER;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.LINEAR_FUNCTION;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.LOCALE;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.LONG;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.OBJECT;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.REGEXP;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.STRING;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.TIME_PENALTY;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.TIME_ZONE;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -38,8 +39,8 @@ import java.util.regex.Pattern;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.LocalDateUtils;
-import org.opentripplanner.routing.api.request.framework.DoubleAlgorithmFunction;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
+import org.opentripplanner.routing.api.request.framework.TimePenalty;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class ParameterBuilder {
@@ -274,6 +275,39 @@ public class ParameterBuilder {
   }
 
   /**
+   * Add a map of a custom type with an enum as the key. You must provide a mapper for the
+   * custom type.
+   *
+   * @param <E>  The enum type
+   * @param <T>  The map value type.
+   * @return a map of T by enum values as keys, or an empty map if not set.
+   */
+  public <T, E extends Enum<E>> Map<E, T> asEnumMap(
+    Class<E> enumType,
+    Function<NodeAdapter, T> typeMapper
+  ) {
+    info.withOptional().withEnumMap(enumType, OBJECT);
+
+    var mapNode = buildObject();
+
+    if (mapNode.isEmpty()) {
+      return Map.of();
+    }
+    EnumMap<E, T> result = new EnumMap<>(enumType);
+
+    Iterator<String> it = mapNode.listExistingChildNodes();
+    while (it.hasNext()) {
+      String name = it.next();
+      Optional<E> key = parseOptionalEnum(name, enumType);
+      if (key.isPresent()) {
+        var child = mapNode.pathUndocumentedChild(name, info.since());
+        result.put(key.get(), typeMapper.apply(child));
+      }
+    }
+    return result;
+  }
+
+  /**
    * Get a map of enum values listed in the config like the {@link #asEnumMap(Class, Class)}, but
    * verify that all enum keys are listed. This can be used for settings where there is no
    * appropriate default value. Note! This method return {@code null}, not an empty map, if the
@@ -366,17 +400,21 @@ public class ParameterBuilder {
   /* Custom OTP types */
 
   public FeedScopedId asFeedScopedId(FeedScopedId defaultValue) {
-    return exist() ? FeedScopedId.parseId(ofType(FEED_SCOPED_ID).asText()) : defaultValue;
+    return exist() ? FeedScopedId.parse(ofType(FEED_SCOPED_ID).asText()) : defaultValue;
   }
 
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
     setInfoOptional(defaultValues);
     info.withArray(FEED_SCOPED_ID);
-    return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parseId(it.asText()));
+    return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parse(it.asText()));
   }
 
-  public DoubleAlgorithmFunction asLinearFunction(DoubleAlgorithmFunction defaultValue) {
-    return ofOptional(LINEAR_FUNCTION, defaultValue, n -> parseLinearFunction(n.asText()));
+  public CostLinearFunction asCostLinearFunction(CostLinearFunction defaultValue) {
+    return ofOptional(COST_LINEAR_FUNCTION, defaultValue, n -> CostLinearFunction.of(n.asText()));
+  }
+
+  public TimePenalty asTimePenalty(TimePenalty defaultValue) {
+    return ofOptional(TIME_PENALTY, defaultValue, n -> TimePenalty.of(n.asText()));
   }
 
   /* private method */
@@ -609,14 +647,6 @@ public class ParameterBuilder {
     }
   }
 
-  private Duration parseDuration(String value, ChronoUnit unit) {
-    try {
-      return DurationUtils.duration(value, unit);
-    } catch (DateTimeParseException e) {
-      throw error("The parameter value '%s' is not a duration.".formatted(value), e);
-    }
-  }
-
   /**
    * Somehow Java do not provide a parse method for parsing Locale on the standard form
    * {@code <Language>[_<country>[_<variant>]]}, so this little utility method does that.
@@ -634,19 +664,6 @@ public class ParameterBuilder {
         "'. Use: <Language>[_<country>[_<variant>]]."
       );
     };
-  }
-
-  private DoubleAlgorithmFunction parseLinearFunction(String text) {
-    try {
-      return RequestFunctions.parse(text);
-    } catch (IllegalArgumentException ignore) {
-      throw error(
-        "Unable to parse linear function: " +
-        text +
-        ". Expected format: " +
-        "\"a + b x\" (\"60 + 7.1 x\")."
-      );
-    }
   }
 
   private URI parseUri(String text) {

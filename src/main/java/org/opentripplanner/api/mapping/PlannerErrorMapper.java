@@ -34,6 +34,9 @@ public class PlannerErrorMapper {
         } else if (domain.inputField.equals(InputField.TO_PLACE)) {
           api = new PlannerError(Message.GEOCODE_TO_NOT_FOUND);
           api.setMissing(List.of(domain.inputField.name()));
+        } else if (domain.inputField.equals(InputField.INTERMEDIATE_PLACE)) {
+          api = new PlannerError(Message.GEOCODE_INTERMEDIATE_NOT_FOUND);
+          api.setMissing(List.of(domain.inputField.name()));
         } else {
           throw new IllegalArgumentException();
         }
@@ -44,9 +47,6 @@ public class PlannerErrorMapper {
         break;
       case WALKING_BETTER_THAN_TRANSIT:
         api = new PlannerError(Message.TOO_CLOSE);
-        break;
-      case SYSTEM_ERROR:
-        api = new PlannerError(Message.SYSTEM_ERROR);
         break;
       default:
         throw new IllegalArgumentException();

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,10 +17,9 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.StreetSearchBuilder;
@@ -30,8 +30,6 @@ import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuris
 
 public class TurnRestrictionTest {
 
-  private Graph graph;
-
   private Vertex topRight;
 
   private Vertex bottomLeft;
@@ -40,20 +38,18 @@ public class TurnRestrictionTest {
 
   @BeforeEach
   public void before() {
-    graph = new Graph();
-
     // Graph for a fictional grid city with turn restrictions
-    StreetVertex maple1 = vertex("maple_1st", 2.0, 2.0);
-    StreetVertex maple2 = vertex("maple_2nd", 1.0, 2.0);
-    StreetVertex maple3 = vertex("maple_3rd", 0.0, 2.0);
+    StreetVertex maple1 = intersectionVertex("maple_1st", 2.0, 2.0);
+    StreetVertex maple2 = intersectionVertex("maple_2nd", 1.0, 2.0);
+    StreetVertex maple3 = intersectionVertex("maple_3rd", 0.0, 2.0);
 
-    StreetVertex main1 = vertex("main_1st", 2.0, 1.0);
-    StreetVertex main2 = vertex("main_2nd", 1.0, 1.0);
-    StreetVertex main3 = vertex("main_3rd", 0.0, 1.0);
+    StreetVertex main1 = intersectionVertex("main_1st", 2.0, 1.0);
+    StreetVertex main2 = intersectionVertex("main_2nd", 1.0, 1.0);
+    StreetVertex main3 = intersectionVertex("main_3rd", 0.0, 1.0);
 
-    StreetVertex broad1 = vertex("broad_1st", 2.0, 0.0);
-    StreetVertex broad2 = vertex("broad_2nd", 1.0, 0.0);
-    StreetVertex broad3 = vertex("broad_3rd", 0.0, 0.0);
+    StreetVertex broad1 = intersectionVertex("broad_1st", 2.0, 0.0);
+    StreetVertex broad2 = intersectionVertex("broad_2nd", 1.0, 0.0);
+    StreetVertex broad3 = intersectionVertex("broad_3rd", 0.0, 0.0);
 
     // Each block along the main streets has unit length and is one-way
     StreetEdge maple1_2 = edge(maple1, maple2, 100.0, false);
@@ -120,11 +116,11 @@ public class TurnRestrictionTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel());
-    assertEquals("main_2nd", states.get(2).getVertex().getLabel());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
+    assertEquals("main_2nd", states.get(2).getVertex().getLabelString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
   }
 
   @Test
@@ -150,11 +146,11 @@ public class TurnRestrictionTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel());
-    assertEquals("main_2nd", states.get(2).getVertex().getLabel());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
+    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
+    assertEquals("main_2nd", states.get(2).getVertex().getLabelString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
   }
 
   @Test
@@ -182,19 +178,11 @@ public class TurnRestrictionTest {
     List<State> states = path.states;
     assertEquals(5, states.size());
 
-    assertEquals("maple_1st", states.get(0).getVertex().getLabel());
-    assertEquals("main_1st", states.get(1).getVertex().getLabel());
-    assertEquals("broad_1st", states.get(2).getVertex().getLabel());
-    assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
-    assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
-  }
-
-  /****
-   * Private Methods
-   ****/
-
-  private StreetVertex vertex(String label, double lat, double lon) {
-    return new IntersectionVertex(graph, label, lat, lon);
+    assertEquals("maple_1st", states.get(0).getVertex().getLabelString());
+    assertEquals("main_1st", states.get(1).getVertex().getLabelString());
+    assertEquals("broad_1st", states.get(2).getVertex().getLabelString());
+    assertEquals("broad_2nd", states.get(3).getVertex().getLabelString());
+    assertEquals("broad_3rd", states.get(4).getVertex().getLabelString());
   }
 
   /**
@@ -203,8 +191,8 @@ public class TurnRestrictionTest {
    * @param back true if this is a reverse edge
    */
   private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
+    var labelA = vA.getLabel();
+    var labelB = vB.getLabel();
     String name = String.format("%s_%s", labelA, labelB);
     Coordinate[] coords = new Coordinate[2];
     coords[0] = vA.getCoordinate();
@@ -212,7 +200,15 @@ public class TurnRestrictionTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdge(vA, vB, geom, name, length, perm, back);
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(vA)
+      .withToVertex(vB)
+      .withGeometry(geom)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(perm)
+      .withBack(back)
+      .buildAndConnect();
   }
 
   private void DisallowTurn(StreetEdge from, StreetEdge to) {

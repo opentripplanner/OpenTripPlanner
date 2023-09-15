@@ -6,11 +6,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.standalone.config.framework.json.JsonSupport.newNodeAdapterForTest;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.routing.api.request.StreetMode;
 
 class RouteRequestConfigTest {
 
   @Test
-  public void loadFromJson() {
+  public void testWheelchairAccessibility() {
     var nodeAdapter = newNodeAdapterForTest(
       """
       {
@@ -65,5 +66,33 @@ class RouteRequestConfigTest {
     assertEquals(.085, accessibility.maxSlope());
     assertEquals(9.0, accessibility.slopeExceededReluctance());
     assertEquals(10.0, accessibility.inaccessibleStreetReluctance());
+  }
+
+  @Test
+  public void testAccessEgressPenalty() {
+    var nodeAdapter = newNodeAdapterForTest(
+      """
+      {
+	  "accessEgress": {
+	      "penalty": {
+		  "FLEXIBLE" : { "timePenalty": "2m + 1.1t", "costFactor": 1.7 },
+		      "CAR" : { "timePenalty": "0s + 4t" }
+	      }
+	  }
+      }
+      """
+    );
+
+    var subject = RouteRequestConfig.mapRouteRequest(nodeAdapter);
+    var streetPreferences = subject.preferences().street();
+
+    assertEquals(
+      "(timePenalty: 2m + 1.10 t, costFactor: 1.70)",
+      streetPreferences.accessEgress().penalty().valueOf(StreetMode.FLEXIBLE).toString()
+    );
+    assertEquals(
+      "(timePenalty: 0s + 4.0 t)",
+      streetPreferences.accessEgress().penalty().valueOf(StreetMode.CAR).toString()
+    );
   }
 }

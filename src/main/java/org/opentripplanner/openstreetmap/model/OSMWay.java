@@ -2,9 +2,16 @@ package org.opentripplanner.openstreetmap.model;
 
 import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
+import java.util.Set;
 
 public class OSMWay extends OSMWithTags {
 
+  private static final Set<String> ESCALATOR_CONVEYING_TAGS = Set.of(
+    "yes",
+    "forward",
+    "backward",
+    "reversible"
+  );
   private final TLongList nodes = new TLongArrayList();
 
   public void addNodeRef(long nodeRef) {
@@ -56,7 +63,15 @@ public class OSMWay extends OSMWithTags {
    * Returns true if these are steps.
    */
   public boolean isSteps() {
-    return "steps".equals(getTag("highway"));
+    return isTag("highway", "steps");
+  }
+
+  public boolean isWheelchairAccessible() {
+    if (isSteps()) {
+      return isTagTrue("wheelchair");
+    } else {
+      return super.isWheelchairAccessible();
+    }
   }
 
   /**
@@ -126,8 +141,24 @@ public class OSMWay extends OSMWithTags {
     );
   }
 
+  public boolean isEscalator() {
+    return (isTag("highway", "steps") && isOneOfTags("conveying", ESCALATOR_CONVEYING_TAGS));
+  }
+
+  public boolean isForwardEscalator() {
+    return isEscalator() && "forward".equals(this.getTag("conveying"));
+  }
+
+  public boolean isBackwardEscalator() {
+    return isEscalator() && "backward".equals(this.getTag("conveying"));
+  }
+
   @Override
   public String getOpenStreetMapLink() {
     return String.format("https://www.openstreetmap.org/way/%d", getId());
+  }
+
+  public boolean isArea() {
+    return isTag("area", "yes");
   }
 }

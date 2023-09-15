@@ -10,10 +10,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
+import org.opentripplanner.street.model.vertex.LabelledIntersectionVertex;
 import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -26,13 +27,10 @@ import org.opentripplanner.street.search.TraverseMode;
  */
 public class SimpleIntersectionTraversalCalculatorTest {
 
-  private Graph graph;
-
   public SimpleIntersectionTraversalCalculator calculator;
 
   @BeforeEach
   public void before() {
-    graph = new Graph();
     calculator = new SimpleIntersectionTraversalCalculator(DrivingDirection.RIGHT);
   }
 
@@ -245,7 +243,6 @@ public class SimpleIntersectionTraversalCalculatorTest {
     // A vertex for each. No light.
     IntersectionVertex u = vertex("from_v", a, false, false);
     SplitterVertex v = new SplitterVertex(
-      graph,
       "intersection",
       b.getX(),
       b.getY(),
@@ -433,8 +430,7 @@ public class SimpleIntersectionTraversalCalculatorTest {
     boolean hasHighwayLight,
     boolean hasCrossingLight
   ) {
-    IntersectionVertex v = new IntersectionVertex(
-      graph,
+    IntersectionVertex v = new LabelledIntersectionVertex(
       label,
       coord.y,
       coord.x,
@@ -450,8 +446,8 @@ public class SimpleIntersectionTraversalCalculatorTest {
    * @param back true if this is a reverse edge
    */
   private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length, boolean back) {
-    String labelA = vA.getLabel();
-    String labelB = vB.getLabel();
+    var labelA = vA.getLabel();
+    var labelB = vB.getLabel();
     String name = String.format("%s_%s", labelA, labelB);
     Coordinate[] coords = new Coordinate[2];
     coords[0] = vA.getCoordinate();
@@ -459,6 +455,14 @@ public class SimpleIntersectionTraversalCalculatorTest {
     LineString geom = GeometryUtils.getGeometryFactory().createLineString(coords);
 
     StreetTraversalPermission perm = StreetTraversalPermission.ALL;
-    return new StreetEdge(vA, vB, geom, name, length, perm, back);
+    return new StreetEdgeBuilder<>()
+      .withFromVertex(vA)
+      .withToVertex(vB)
+      .withGeometry(geom)
+      .withName(name)
+      .withMeterLength(length)
+      .withPermission(perm)
+      .withBack(back)
+      .buildAndConnect();
   }
 }

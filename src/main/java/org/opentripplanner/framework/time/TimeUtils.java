@@ -189,7 +189,22 @@ public class TimeUtils {
     }
     BUSY_WAIT_GRACE_PERIOD_TIMEOUT.set(time + 5L * waitMs);
 
-    long waitUntil = time + waitMs;
+    return busyWait(waitMs);
+  }
+
+  /**
+   * Wait (compute) until the given {@code waitMs} is past. The returned long is a very random
+   * number.
+   * <p>
+   * This method does a "busy" wait - it is not affected by a thread interrupt like
+   * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic witch uses the interrupt
+   * flag.
+   * <p>
+   * THIS CODE IS NOT MEANT FOR PRODUCTION!
+   */
+  @SuppressWarnings("unused")
+  public static long busyWait(int waitMs) {
+    long waitUntil = System.currentTimeMillis() + waitMs;
 
     Random rnd = new SecureRandom();
     long value = rnd.nextLong();

@@ -30,7 +30,6 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.note.StreetNote;
@@ -202,17 +201,6 @@ public class GraphPathToItineraryMapper {
   }
 
   /**
-   * TODO: This is mindless. Why is this set on leg, rather than on a walk step? Now only the first pathway is used
-   */
-  private static void setPathwayInfo(StreetLegBuilder leg, List<State> legStates) {
-    for (State legsState : legStates) {
-      if (legsState.getBackEdge() instanceof PathwayEdge pe) {
-        leg.withPathwayId(pe.getId());
-      }
-    }
-  }
-
-  /**
    * Calculate the elevationGained and elevationLost fields of an {@link Itinerary}.
    *
    * @param itinerary The itinerary to calculate the elevation changes for
@@ -252,7 +240,7 @@ public class GraphPathToItineraryMapper {
       // The first state is part of the previous leg
       .skip(1)
       .map(state -> {
-        var mode = state.getNonTransitMode();
+        var mode = state.currentMode();
 
         if (mode != null) {
           // Resolve correct mode if renting vehicle
@@ -420,8 +408,6 @@ public class GraphPathToItineraryMapper {
     }
 
     addStreetNotes(leg, states);
-
-    setPathwayInfo(leg, states);
 
     return leg.build();
   }

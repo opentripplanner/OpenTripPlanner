@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.transmodelapi.support;
 
 import graphql.execution.AsyncExecutionStrategy;
-import graphql.execution.ExecutionContext;
 import graphql.schema.DataFetchingEnvironment;
+import java.io.Closeable;
 import java.util.concurrent.CompletableFuture;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.logging.ProgressTracker;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  * This will prevent unresolved data-fetchers to be called. The exception is not handled
  * gracefully.
  */
-public class AbortOnTimeoutExecutionStrategy extends AsyncExecutionStrategy {
+public class AbortOnTimeoutExecutionStrategy extends AsyncExecutionStrategy implements Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbortOnTimeoutExecutionStrategy.class);
   public static final int LOG_STEPS = 25_000;
@@ -26,7 +26,6 @@ public class AbortOnTimeoutExecutionStrategy extends AsyncExecutionStrategy {
 
   @Override
   protected <T> CompletableFuture<T> handleFetchingException(
-    ExecutionContext executionContext,
     DataFetchingEnvironment environment,
     Throwable e
   ) {
@@ -34,7 +33,7 @@ public class AbortOnTimeoutExecutionStrategy extends AsyncExecutionStrategy {
       logTimeoutProgress();
       throw te;
     }
-    return super.handleFetchingException(executionContext, environment, e);
+    return super.handleFetchingException(environment, e);
   }
 
   @SuppressWarnings("Convert2MethodRef")
@@ -43,7 +42,8 @@ public class AbortOnTimeoutExecutionStrategy extends AsyncExecutionStrategy {
   }
 
   @SuppressWarnings("Convert2MethodRef")
-  public void tearDown() {
+  @Override
+  public void close() {
     timeoutProgressTracker.completeIfHasSteps(m -> LOG.info(m));
   }
 }

@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
+import org.opentripplanner.framework.io.OtpHttpClientException;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingGroup;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -19,11 +21,12 @@ import org.slf4j.LoggerFactory;
 public class HslFacilitiesDownloader {
 
   private static final Logger log = LoggerFactory.getLogger(HslFacilitiesDownloader.class);
+  private static final ObjectMapper mapper = new ObjectMapper();
+
   private final String jsonParsePath;
   private final BiFunction<JsonNode, Map<FeedScopedId, VehicleParkingGroup>, VehicleParking> facilitiesParser;
-  private String url;
-
-  private static final ObjectMapper mapper = new ObjectMapper();
+  private final String url;
+  private final OtpHttpClient otpHttpClient;
 
   public HslFacilitiesDownloader(
     String url,
@@ -33,6 +36,7 @@ public class HslFacilitiesDownloader {
     this.url = url;
     this.jsonParsePath = jsonParsePath;
     this.facilitiesParser = facilitiesParser;
+    this.otpHttpClient = new OtpHttpClient();
   }
 
   public List<VehicleParking> downloadFacilities(
@@ -43,20 +47,27 @@ public class HslFacilitiesDownloader {
       return null;
     }
 
-    try (InputStream data = HttpUtils.openInputStream(url, null)) {
-      if (data == null) {
-        log.warn("Failed to get data from url {}", url);
-        return null;
-      }
-      return parseJSON(data, hubForPark);
-    } catch (IllegalArgumentException e) {
-      log.warn("Error parsing facilities from {}", url, e);
-    } catch (JsonProcessingException e) {
-      log.warn("Error parsing facilities from {} (bad JSON of some sort)", url, e);
-    } catch (IOException e) {
-      log.warn("Error reading facilities from {}", url, e);
+    try {
+      return otpHttpClient.getAndMap(
+        URI.create(url),
+        Map.of(),
+        is -> {
+          try {
+            return parseJSON(is, hubForPark);
+          } catch (IllegalArgumentException e) {
+            log.warn("Error parsing facilities from {}", url, e);
+          } catch (JsonProcessingException e) {
+            log.warn("Error parsing facilities from {} (bad JSON of some sort)", url, e);
+          } catch (IOException e) {
+            log.warn("Error reading facilities from {}", url, e);
+          }
+          return null;
+        }
+      );
+    } catch (OtpHttpClientException e) {
+      log.warn("Failed to get data from url {}", url);
+      return null;
     }
-    return null;
   }
 
   private static String convertStreamToString(java.io.InputStream is) {

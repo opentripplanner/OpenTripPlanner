@@ -24,12 +24,14 @@ import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.ext.ridehailing.model.RideHailingLeg;
 import org.opentripplanner.ext.ridehailing.model.RideHailingProvider;
+import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
-import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Money;
@@ -220,14 +222,12 @@ public class TestItineraryBuilder implements PlanTestConstants {
       FlexConfig.DEFAULT
     );
 
-    var fromv = new SimpleConcreteVertex(
-      null,
+    var fromv = StreetModelForTest.intersectionVertex(
       "v1",
       lastPlace.coordinate.latitude(),
       lastPlace.coordinate.longitude()
     );
-    var tov = new SimpleConcreteVertex(
-      null,
+    var tov = StreetModelForTest.intersectionVertex(
       "v2",
       to.coordinate.latitude(),
       to.coordinate.longitude()
@@ -236,7 +236,15 @@ public class TestItineraryBuilder implements PlanTestConstants {
     var flexPath = new DirectFlexPathCalculator()
       .calculateFlexPath(fromv, tov, template.fromStopIndex, template.toStopIndex);
 
-    var edge = new FlexTripEdge(fromv, tov, lastPlace.stop, to.stop, flexTrip, template, flexPath);
+    var edge = FlexTripEdge.createFlexTripEdge(
+      fromv,
+      tov,
+      lastPlace.stop,
+      to.stop,
+      flexTrip,
+      template,
+      flexPath
+    );
 
     FlexibleTransitLeg leg = new FlexibleTransitLeg(edge, newTime(start), newTime(end), legCost);
 
@@ -405,7 +413,11 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
   /** Create a dummy trip */
   private static Trip trip(String id, Route route) {
-    return TransitModelForTest.trip(id).withRoute(route).build();
+    return TransitModelForTest
+      .trip(id)
+      .withRoute(route)
+      .withHeadsign(I18NString.of("Trip headsign %s".formatted(id)))
+      .build();
   }
 
   private static Place stop(Place source) {
@@ -440,6 +452,9 @@ public class TestItineraryBuilder implements PlanTestConstants {
     fromStopTime.setArrivalTime(start);
     fromStopTime.setDepartureTime(start);
     fromStopTime.setTrip(trip);
+    fromStopTime.setStopHeadsign(
+      I18NString.of("Headsign at boarding (stop index %s)".formatted(fromStopIndex))
+    );
 
     // Duplicate stop time for all stops prior to the last.
     for (int i = 0; i < toStopIndex; i++) {
@@ -560,7 +575,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
   }
 
   private int cost(float reluctance, int durationSeconds) {
-    return Math.round(reluctance * durationSeconds);
+    return IntUtils.round(reluctance * durationSeconds);
   }
 
   private int lastEndTime(int fallbackTime) {

@@ -175,16 +175,19 @@ public class PtSituationElementType {
           .name("summary")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Summary of situation in all different translations available")
-          .dataFetcher(environment -> {
-            I18NString headerText = environment.<TransitAlert>getSource().headerText();
-            if (headerText instanceof TranslatedString translatedString) {
-              return translatedString.getTranslations();
-            } else if (headerText != null) {
-              return List.of(new AbstractMap.SimpleEntry<>(null, headerText.toString()));
-            } else {
-              return emptyList();
-            }
-          })
+          .dataFetcher(environment ->
+            environment
+              .<TransitAlert>getSource()
+              .headerText()
+              .map(headerText -> {
+                if (headerText instanceof TranslatedString translatedString) {
+                  return translatedString.getTranslations();
+                } else {
+                  return List.of(new AbstractMap.SimpleEntry<>(null, headerText.toString()));
+                }
+              })
+              .orElse(emptyList())
+          )
           .build()
       )
       .field(
@@ -193,16 +196,19 @@ public class PtSituationElementType {
           .name("description")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
           .description("Description of situation in all different translations available")
-          .dataFetcher(environment -> {
-            I18NString descriptionText = environment.<TransitAlert>getSource().descriptionText();
-            if (descriptionText instanceof TranslatedString translatedString) {
-              return translatedString.getTranslations();
-            } else if (descriptionText != null) {
-              return List.of(new AbstractMap.SimpleEntry<>(null, descriptionText.toString()));
-            } else {
-              return emptyList();
-            }
-          })
+          .dataFetcher(environment ->
+            environment
+              .<TransitAlert>getSource()
+              .descriptionText()
+              .map(descriptionText -> {
+                if (descriptionText instanceof TranslatedString translatedString) {
+                  return translatedString.getTranslations();
+                } else {
+                  return List.of(new AbstractMap.SimpleEntry<>(null, descriptionText.toString()));
+                }
+              })
+              .orElse(emptyList())
+          )
           .build()
       )
       .field(

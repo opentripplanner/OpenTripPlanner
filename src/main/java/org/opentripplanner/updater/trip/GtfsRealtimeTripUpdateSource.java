@@ -6,11 +6,10 @@ import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import de.mfdz.MfdzRealtimeExtensions;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import org.opentripplanner.framework.io.HttpUtils;
+import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
@@ -27,12 +26,14 @@ public class GtfsRealtimeTripUpdateSource {
   private final HttpHeaders headers;
   private boolean fullDataset = true;
   private final ExtensionRegistry registry = ExtensionRegistry.newInstance();
+  private final OtpHttpClient otpHttpClient;
 
   public GtfsRealtimeTripUpdateSource(PollingTripUpdaterParameters config) {
     this.feedId = config.feedId();
     this.url = config.url();
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
     MfdzRealtimeExtensions.registerAllExtensions(registry);
+    otpHttpClient = new OtpHttpClient();
   }
 
   public List<TripUpdate> getUpdates() {
@@ -41,31 +42,31 @@ public class GtfsRealtimeTripUpdateSource {
     List<TripUpdate> updates = null;
     fullDataset = true;
     try {
-      InputStream is = HttpUtils.openInputStream(URI.create(url), this.headers.asMap());
-      if (is != null) {
-        // Decode message
-        feedMessage = FeedMessage.parseFrom(is, registry);
-        feedEntityList = feedMessage.getEntityList();
+      // Decode message
+      feedMessage =
+        otpHttpClient.getAndMap(
+          URI.create(url),
+          this.headers.asMap(),
+          is -> FeedMessage.parseFrom(is, registry)
+        );
+      feedEntityList = feedMessage.getEntityList();
 
-        // Change fullDataset value if this is an incremental update
-        if (
-          feedMessage.hasHeader() &&
-          feedMessage.getHeader().hasIncrementality() &&
-          feedMessage
-            .getHeader()
-            .getIncrementality()
-            .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)
-        ) {
-          fullDataset = false;
-        }
+      // Change fullDataset value if this is an incremental update
+      if (
+        feedMessage.hasHeader() &&
+        feedMessage.getHeader().hasIncrementality() &&
+        feedMessage
+          .getHeader()
+          .getIncrementality()
+          .equals(GtfsRealtime.FeedHeader.Incrementality.DIFFERENTIAL)
+      ) {
+        fullDataset = false;
+      }
 
-        // Create List of TripUpdates
-        updates = new ArrayList<>(feedEntityList.size());
-        for (FeedEntity feedEntity : feedEntityList) {
-          if (feedEntity.hasTripUpdate()) updates.add(feedEntity.getTripUpdate());
-        }
-      } else {
-        LOG.error("GTFS-RT feed at {} did not return usable data", url);
+      // Create List of TripUpdates
+      updates = new ArrayList<>(feedEntityList.size());
+      for (FeedEntity feedEntity : feedEntityList) {
+        if (feedEntity.hasTripUpdate()) updates.add(feedEntity.getTripUpdate());
       }
     } catch (Exception e) {
       LOG.error("Failed to parse GTFS-RT feed from {}", url, e);

@@ -31,6 +31,11 @@ public class RouteRequestToFilterChainMapper {
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
+    // Skip filtering itineraries if generalized-cost is not computed
+    if (!request.preferences().transit().raptor().profile().producesGeneralizedCost()) {
+      return builder.build();
+    }
+
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
     // Group by similar legs filter
     if (params.groupSimilarityKeepOne() >= 0.5) {
@@ -60,6 +65,9 @@ public class RouteRequestToFilterChainMapper {
       .withBikeRentalDistanceRatio(params.bikeRentalDistanceRatio())
       .withParkAndRideDurationRatio(params.parkAndRideDurationRatio())
       .withNonTransitGeneralizedCostLimit(params.nonTransitGeneralizedCostLimit())
+      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+        params.removeTransitWithHigherCostThanBestOnStreetOnly()
+      )
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip())
       .withAccessibilityScore(
         params.useAccessibilityScore() && request.wheelchair(),
@@ -74,10 +82,10 @@ public class RouteRequestToFilterChainMapper {
         context.transitService().getTransitAlertService(),
         context.transitService()::getMultiModalStationForStation
       )
-      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
       .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
+      .withRemoveTransitIfWalkingIsBetter(true)
       .withDebugEnabled(params.debug());
 
     if (!context.rideHailingServices().isEmpty()) {

@@ -1,5 +1,6 @@
 package org.opentripplanner.openstreetmap.wayproperty.specifier;
 
+import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public class WayTestData {
@@ -99,8 +100,8 @@ public class WayTestData {
     return way;
   }
 
-  public static OSMWithTags cycleway() {
-    var way = new OSMWithTags();
+  public static OSMWay cycleway() {
+    var way = new OSMWay();
     way.addTag("highway", "residential");
     way.addTag("cycleway", "lane");
     return way;
@@ -206,6 +207,14 @@ public class WayTestData {
     way.addTag("segregated", "no");
     way.addTag("surface", "asphalt");
     way.addTag("smoothness", "excellent");
+    return way;
+  }
+
+  public static OSMWithTags zooPlatform() {
+    // https://www.openstreetmap.org/way/119108622
+    var way = new OSMWithTags();
+    way.addTag("public_transport", "platform");
+    way.addTag("usage", "tourism");
     return way;
   }
 }

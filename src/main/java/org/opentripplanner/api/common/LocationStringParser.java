@@ -67,7 +67,7 @@ public class LocationStringParser {
       lat = Double.parseDouble(matcher.group(1));
       lon = Double.parseDouble(matcher.group(4));
     } else if (FeedScopedId.isValidString(place)) {
-      placeId = FeedScopedId.parseId(place);
+      placeId = FeedScopedId.parse(place);
     }
     return new GenericLocation(label, placeId, lat, lon);
   }

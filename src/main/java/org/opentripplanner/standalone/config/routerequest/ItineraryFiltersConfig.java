@@ -5,9 +5,9 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.api.request.framework.RequestFunctions;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -148,11 +148,31 @@ generalized-cost value is used as input to the function. The function is used to
 *generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
 set.
 
-For example if the function is `f(x) = 1800 + 2.0 x` and the smallest cost is `5000`, then all
-non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
+For example if the function is `f(x) = 30m + 2.0 x` and the smallest cost is `30m = 1800s`, then
+all non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are dropped.
 """
           )
-          .asLinearFunction(dft.nonTransitGeneralizedCostLimit())
+          .asCostLinearFunction(dft.nonTransitGeneralizedCostLimit())
+      )
+      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+        c
+          .of("removeTransitWithHigherCostThanBestOnStreetOnly")
+          .since(V2_4)
+          .summary(
+            "Limit function for generalized-cost computed from street-only itineries applied to transit itineraries."
+          )
+          .description(
+            """
+The max-limit is applied to itineraries with transit *legs*, and only itineraries
+without transit legs are considered when calculating the minimum cost. The smallest
+generalized-cost value is used as input to the function. The function is used to calculate a
+*max-limit*. The max-limit is then used to filter *transit* itineraries by
+*generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
+set. Walking is handled with a different logic: if a transit itinerary has higher cost than
+a plain walk itinerary, it will be removed even if the cost limit function would keep it.
+"""
+          )
+          .asCostLinearFunction(dft.removeTransitWithHigherCostThanBestOnStreetOnly())
       )
       .withBikeRentalDistanceRatio(
         c
@@ -164,7 +184,7 @@ non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` are d
           )
           .description(
             """
-This filters out results that consist of a long walk plus a relatively short bike rental leg. A 
+This filters out results that consist of a long walk plus a relatively short bike rental leg. A
 value of `0.3` means that a minimum of 30% of the total distance must be spent on the bike in order
 for the result to be included.
 """
@@ -181,8 +201,8 @@ for the result to be included.
           )
           .description(
             """
-This filters out results that consist of driving plus a very long walk leg at the end. A value of 
-`0.3` means that a minimum of 30% of the total time must be spent in the car in order for the 
+This filters out results that consist of driving plus a very long walk leg at the end. A value of
+`0.3` means that a minimum of 30% of the total time must be spent in the car in order for the
 result to be included. However, if there is only a single result, it is never filtered.
             """
           )
@@ -256,41 +276,30 @@ removed from list.
       return transitGeneralizedCostLimit;
     }
 
-    if (node.isObject()) {
-      return new TransitGeneralizedCostFilterParams(
-        node
-          .of("costLimitFunction")
-          .since(V2_2)
-          .summary("The base function used by the filter.")
-          .description(
-            "This function calculates the threshold for the filter, when the itineraries have " +
-            "exactly the same arrival and departure times."
-          )
-          .asLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
-        node
-          .of("intervalRelaxFactor")
-          .since(V2_2)
-          .summary(
-            "How much the filter should be relaxed for itineraries that do not overlap in time."
-          )
-          .description(
-            """
-            This value is used to increase the filter threshold for itineraries further away in
-            time, compared to those, that have exactly the same arrival and departure times.
+    return new TransitGeneralizedCostFilterParams(
+      node
+        .of("costLimitFunction")
+        .since(V2_2)
+        .summary("The base function used by the filter.")
+        .description(
+          "This function calculates the threshold for the filter, when the itineraries have " +
+          "exactly the same arrival and departure times."
+        )
+        .asCostLinearFunction(transitGeneralizedCostLimit.costLimitFunction()),
+      node
+        .of("intervalRelaxFactor")
+        .since(V2_2)
+        .summary(
+          "How much the filter should be relaxed for itineraries that do not overlap in time."
+        )
+        .description(
+          """
+          This value is used to increase the filter threshold for itineraries further away in
+          time, compared to those, that have exactly the same arrival and departure times.
 
-            The unit is cost unit per second of time difference."""
-          )
-          .asDouble(transitGeneralizedCostLimit.intervalRelaxFactor())
-      );
-    }
-
-    LOG.warn(
-      """
-      The format of transitGeneralizedCostLimit has changed, please see the documentation for
-      new configuration format. The existing format will cease to work after OTP v2.2
-      """
+          The unit is cost unit per second of time difference."""
+        )
+        .asDouble(transitGeneralizedCostLimit.intervalRelaxFactor())
     );
-
-    return new TransitGeneralizedCostFilterParams(RequestFunctions.parse(node.asText()), 0);
   }
 }
