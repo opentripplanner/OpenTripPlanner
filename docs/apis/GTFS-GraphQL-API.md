@@ -1,13 +1,12 @@
 # GTFS GraphQL API
 
-The GTFS GraphQL API was created for the Digitransit project and is used heavily by
-[digitransit-ui](https://github.com/HSLdevcom/digitransit-ui).
+The GTFS GraphQL API is a general purpose API which was created for the Digitransit project and is 
+used heavily by [digitransit-ui](https://github.com/HSLdevcom/digitransit-ui).
 
-[otp-react-redux](https://github.com/opentripplanner/otp-react-redux) has also migrated to this API
-in 2023.
+[otp-react-redux](https://github.com/opentripplanner/otp-react-redux) has also migrated to this API in 2023.
 
 ## URLs 
- - GraphQL endpoint: `http://localhost:8080/otp/routers/default/index/graphql`
+ - GraphQL endpoint: [`http://localhost:8080/otp/routers/default/index/graphql`](http://localhost:8080/otp/routers/default/index/graphql)
  - HTML schema documentation: [https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/](https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/)
  - Built-in visual GraphQL client: [http://localhost:8080/graphiql](http://localhost:8080/graphiql)
 
