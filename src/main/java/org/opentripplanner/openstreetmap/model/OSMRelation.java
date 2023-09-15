@@ -56,11 +56,6 @@ public class OSMRelation extends OSMWithTags {
     return isPublicTransport() && isTag("public_transport", "stop_area");
   }
 
-  @Override
-  public boolean isRoutable() {
-    return super.isRoutable() && OsmChecks.isRoutable(this);
-  }
-
   private boolean isType(String type) {
     return isTag("type", type);
   }

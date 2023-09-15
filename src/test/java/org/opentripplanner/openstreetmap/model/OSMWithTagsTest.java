@@ -215,6 +215,11 @@ public class OSMWithTagsTest {
   }
 
   @Test
+  void isPlatform() {
+    assertFalse(WayTestData.zooPlatform().isPlatform());
+  }
+
+  @Test
   void testGenerateI18NForPattern() {
     OSMWithTags osmTags = new OSMWithTags();
     osmTags.addTag("note", "Note EN");

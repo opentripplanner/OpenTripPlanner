@@ -32,11 +32,6 @@ public class OSMWay extends OSMWithTags {
     return "osm way " + id;
   }
 
-  @Override
-  public boolean isRoutable() {
-    return super.isRoutable() && OsmChecks.isRoutable(this);
-  }
-
   /**
    * Returns true if way geometry is a closed loop
    */

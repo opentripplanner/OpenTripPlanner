@@ -25,8 +25,26 @@ import org.opentripplanner.transit.model.basic.Accessibility;
 /**
  * A base class for OSM entities containing common methods.
  */
-
 public class OSMWithTags {
+
+  /**
+   * highway=* values that we don't want to even consider when building the graph.
+   */
+  public static final Set<String> NON_ROUTABLE_HIGHWAYS = Set.of(
+    "proposed",
+    "planned",
+    "construction",
+    "razed",
+    "raceway",
+    "abandoned",
+    "historic",
+    "no",
+    "emergency_bay",
+    "rest_area",
+    "services",
+    "bus_guideway",
+    "escape"
+  );
 
   /* To save memory this is only created when an entity actually has tags. */
   private Map<String, String> tags;
@@ -90,7 +108,7 @@ public class OSMWithTags {
    * The tags of an entity.
    */
   public Map<String, String> getTags() {
-    return tags;
+    return Objects.requireNonNullElse(tags, Map.of());
   }
 
   /**
@@ -440,8 +458,16 @@ public class OSMWithTags {
     );
   }
 
+  /**
+   * Determines if an entity is a platform.
+   * <p>
+   * However, they are filtered out if they are tagged usage=tourism. This prevents miniature tourist
+   * railways like the one in Portland's Zoo (https://www.openstreetmap.org/way/119108622)
+   * from being linked to transit stops that are underneath it.
+   **/
   public boolean isPlatform() {
-    return isTag("public_transport", "platform") || isRailwayPlatform();
+    var isPlatform = isTag("public_transport", "platform") || isRailwayPlatform();
+    return isPlatform && !isTag("usage", "tourism");
   }
 
   public boolean isRailwayPlatform() {
@@ -510,17 +536,25 @@ public class OSMWithTags {
    * Determines whether this OSM way is considered routable. The majority of routable ways are those
    * with a highway= tag (which includes everything from motorways to hiking trails). Anything with
    * a public_transport=platform or railway=platform tag is also considered routable even if it
-   * doesn't have a highway tag. Platforms are however filtered out if they are marked
-   * usage=tourism. This prevents miniature tourist railways like the one in Portland's Zoo from
-   * receiving a better score and pulling search endpoints away from real transit stops.
+   * doesn't have a highway tag.
    */
   public boolean isRoutable() {
-    if (hasTag("highway")) {
+    if (isOneOfTags("highway", NON_ROUTABLE_HIGHWAYS)) {
+      return false;
+    } else if (hasTag("highway") || isPlatform()) {
+      if (isGeneralAccessDenied()) {
+        // There are exceptions.
+        return (
+          isMotorcarExplicitlyAllowed() ||
+          isBicycleExplicitlyAllowed() ||
+          isPedestrianExplicitlyAllowed() ||
+          isMotorVehicleExplicitlyAllowed() ||
+          isVehicleExplicitlyAllowed()
+        );
+      }
       return true;
     }
-    if (isPlatform()) {
-      return !isTag("usage", "tourism");
-    }
+
     return false;
   }
 
