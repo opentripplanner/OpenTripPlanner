@@ -1,9 +1,12 @@
 package org.opentripplanner.openstreetmap.tagmapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.street.model.StreetTraversalPermission.NONE;
 
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 
 public class FinlandMapperTest {
@@ -189,5 +192,29 @@ public class FinlandMapperTest {
       wps.getDataForWay(wayWithMixinsAndCustomSafety).getWalkSafetyFeatures().forward(),
       epsilon
     );
+  }
+
+  @Test
+  public void testTagMapping() {
+    OSMWithTags way;
+    WayProperties wayData;
+
+    way = new OSMWay();
+    way.addTag("highway", "unclassified");
+    way.addTag("seasonal", "winter");
+    wayData = wps.getDataForWay(way);
+    assertEquals(wayData.getPermission(), NONE);
+
+    way = new OSMWay();
+    way.addTag("highway", "trunk");
+    way.addTag("ice_road", "yes");
+    wayData = wps.getDataForWay(way);
+    assertEquals(wayData.getPermission(), NONE);
+
+    way = new OSMWay();
+    way.addTag("highway", "track");
+    way.addTag("winter_road", "yes");
+    wayData = wps.getDataForWay(way);
+    assertEquals(wayData.getPermission(), NONE);
   }
 }

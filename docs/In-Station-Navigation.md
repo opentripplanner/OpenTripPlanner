@@ -15,7 +15,7 @@ tunnels and other infrastructure help OTP to generate good walking instructions.
 
 #### Example: exiting a railway platform
 
-The train arrives in a [railway station in Stuttgart](https://www.openstreetmap.org/#map=19/48.73761/9.11627&layers=N)
+The train arrives in a [railway station in Stuttgart](https://www.openstreetmap.org/#map=19/48.73761/9.11627)
 (green line), the passenger alights and is instructed (grey line) to walk along the platform,
 up the stairs and across a [bridge](https://www.openstreetmap.org/way/22908778) to continue to 
 their final destination.
@@ -71,7 +71,7 @@ also apply when computing transfers from one stop to another.
 
 #### Example: transferring from tram to rail at Oslo Central
 
-Here the passenger arrives in a local tram (blue line) near the [main station in Oslo](https://www.openstreetmap.org/#map=17/59.90964/10.75503&layers=N). They are 
+Here the passenger arrives in a local tram (blue line) near the [main station in Oslo](https://www.openstreetmap.org/#map=17/59.90964/10.75503). They are 
 instructed (grey line) to walk into the station right onto the correct platform and leave
 on a long-distance train (red line).
 

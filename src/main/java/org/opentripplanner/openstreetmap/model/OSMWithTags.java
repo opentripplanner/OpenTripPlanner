@@ -2,15 +2,17 @@ package org.opentripplanner.openstreetmap.model;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
@@ -70,12 +72,17 @@ public class OSMWithTags {
   /**
    * Adds a tag.
    */
-  public void addTag(String key, String value) {
-    if (key == null || value == null) return;
+  public OSMWithTags addTag(String key, String value) {
+    if (key == null || value == null) {
+      return this;
+    }
 
-    if (tags == null) tags = new HashMap<>();
+    if (tags == null) {
+      tags = new HashMap<>();
+    }
 
     tags.put(key.toLowerCase(), value);
+    return this;
   }
 
   /**
@@ -130,7 +137,7 @@ public class OSMWithTags {
     return isTrue(getTag(tag));
   }
 
-  public boolean doesTagAllowAccess(String tag) {
+  protected boolean doesTagAllowAccess(String tag) {
     if (tags == null) {
       return false;
     }
@@ -148,6 +155,7 @@ public class OSMWithTags {
   }
 
   /** @return a tag's value, converted to lower case. */
+  @Nullable
   public String getTag(String tag) {
     tag = tag.toLowerCase();
     if (tags != null && tags.containsKey(tag)) {
@@ -157,10 +165,12 @@ public class OSMWithTags {
   }
 
   /**
-   * Returns true if both key and value matches.
+   *
+   * @return A tags value converted to lower case. An empty Optional if tags is not present.
    */
-  public boolean matchesKeyValue(String key, String value) {
-    return hasTag(key) && getTag(key).equals(value);
+  @Nonnull
+  public Optional<String> getTagOpt(String network) {
+    return Optional.ofNullable(getTag(network));
   }
 
   /**
@@ -182,13 +192,20 @@ public class OSMWithTags {
   /**
    * Checks is a tag contains the specified value.
    */
-  public Boolean isTag(String tag, String value) {
+  public boolean isTag(String tag, String value) {
     tag = tag.toLowerCase();
     if (tags != null && tags.containsKey(tag) && value != null) {
       return value.equals(tags.get(tag));
     }
 
     return false;
+  }
+
+  /**
+   * Takes a tag key and checks if the value is any of those in {@code oneOfTags}.
+   */
+  public boolean isOneOfTags(String key, Set<String> oneOfTags) {
+    return oneOfTags.stream().anyMatch(value -> isTag(key, value));
   }
 
   /**
@@ -405,18 +422,22 @@ public class OSMWithTags {
    */
   public boolean isBoardingLocation() {
     return (
-      "bus_stop".equals(getTag("highway")) ||
-      "tram_stop".equals(getTag("railway")) ||
-      "station".equals(getTag("railway")) ||
-      "halt".equals(getTag("railway")) ||
-      "bus_station".equals(getTag("amenity")) ||
-      "ferry_terminal".equals(getTag("amenity")) ||
+      isTag("highway", "bus_stop") ||
+      isTag("railway", "tram_stop") ||
+      isTag("railway", "station") ||
+      isTag("railway", "halt") ||
+      isTag("amenity", "bus_station") ||
+      isTag("amenity", "ferry_terminal") ||
       isPlatform()
     );
   }
 
   public boolean isPlatform() {
-    return "platform".equals(getTag("public_transport")) || "platform".equals(getTag("railway"));
+    return isTag("public_transport", "platform") || isRailwayPlatform();
+  }
+
+  public boolean isRailwayPlatform() {
+    return isTag("railway", "platform");
   }
 
   /**
@@ -457,6 +478,7 @@ public class OSMWithTags {
    * <p>
    * Values are split by semicolons.
    */
+  @Nonnull
   public Set<String> getMultiTagValues(Set<String> refTags) {
     return refTags
       .stream()
@@ -465,7 +487,7 @@ public class OSMWithTags {
       .flatMap(v -> Arrays.stream(v.split(";")))
       .map(String::strip)
       .filter(v -> !v.isBlank())
-      .collect(Collectors.toSet());
+      .collect(Collectors.toUnmodifiableSet());
   }
 
   public OsmProvider getOsmProvider() {
@@ -474,6 +496,42 @@ public class OSMWithTags {
 
   public void setOsmProvider(OsmProvider provider) {
     this.osmProvider = provider;
+  }
+
+  /**
+   * Determines whether this OSM way is considered routable. The majority of routable ways are those
+   * with a highway= tag (which includes everything from motorways to hiking trails). Anything with
+   * a public_transport=platform or railway=platform tag is also considered routable even if it
+   * doesn't have a highway tag. Platforms are however filtered out if they are marked
+   * usage=tourism. This prevents miniature tourist railways like the one in Portland's Zoo from
+   * receiving a better score and pulling search endpoints away from real transit stops.
+   */
+  public boolean isRoutable() {
+    if (hasTag("highway")) {
+      return true;
+    }
+    if (isPlatform()) {
+      return !isTag("usage", "tourism");
+    }
+    return false;
+  }
+
+  public boolean isLink() {
+    String highway = getTag("highway");
+    return highway != null && highway.endsWith(("_link"));
+  }
+
+  public boolean isElevator() {
+    return isTag("highway", "elevator");
+  }
+
+  /**
+   * @return true if there is no explicit tag that makes this unsuitable for wheelchair use.
+   *         In other words: we assume that something is wheelchair-accessible in the absence
+   *         of other information.
+   */
+  public boolean isWheelchairAccessible() {
+    return !isTagFalse("wheelchair");
   }
 
   /**

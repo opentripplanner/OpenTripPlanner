@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
@@ -60,17 +61,18 @@ class FareSearch {
 record FareAndId(Money fare, FeedScopedId fareId) {}
 
 /**
- * This fare service module handles the cases that GTFS handles within a single feed. It cannot
- * necessarily handle multi-feed graphs, because a rule-less fare attribute might be applied to
- * rides on routes in another feed, for example. For more interesting fare structures like New
- * York's MTA, or cities with multiple feeds and inter-feed transfer rules, you get to implement
- * your own FareService. See this thread on gtfs-changes explaining the proper interpretation of
+ * This fare service module handles GTFS fares in multiple feeds separately so that each fare attribute
+ * is only applicable for legs that operated by an agency within the same feed. Interfeed transfer rules
+ * are not considered in this fare service and for those situations you get to implement your own Fare Service
+ * See this thread on gtfs-changes explaining the proper interpretation of
  * fares.txt:
  * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
 public class DefaultFareService implements FareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultFareService.class);
+
+  private final float UNKNOWN_FARE_PRICE = -0.01f;
 
   /** For each fare type (regular, student, etc...) the collection of rules that apply. */
   protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
@@ -102,18 +104,89 @@ public class DefaultFareService implements FareService {
     if (fareLegs.isEmpty()) {
       return null;
     }
+    var fareLegsByFeed = fareLegs
+      .stream()
+      .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
+    var fareRulesByTypeAndFeed = fareRulesPerType
+      .entrySet()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          Map.Entry::getKey,
+          rules ->
+            rules
+              .getValue()
+              .stream()
+              .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
+        )
+      );
 
     ItineraryFares fare = ItineraryFares.empty();
     boolean hasFare = false;
-    for (Map.Entry<FareType, Collection<FareRuleSet>> kv : fareRulesPerType.entrySet()) {
-      FareType fareType = kv.getKey();
-      Collection<FareRuleSet> fareRules = kv.getValue();
-      // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
-      if (fareRules.size() > 0) {
-        Currency currency = Currency.getInstance(
-          fareRules.iterator().next().getFareAttribute().getCurrencyType()
+    for (FareType fareType : fareRulesPerType.keySet()) {
+      List<FareComponent> components = new ArrayList<>();
+      List<Money> fares = new ArrayList<>();
+      ItineraryFares currentFare = ItineraryFares.empty();
+      boolean legWithoutRulesFound = false;
+      boolean legsWithoutMatchingRulesFound = false;
+      boolean fareTypeHasFare = false;
+      for (String feedId : fareLegsByFeed.keySet()) {
+        var fareRules = fareRulesByTypeAndFeed.get(fareType).get(feedId);
+
+        // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
+        if (fareRules != null && fareRules.size() > 0) {
+          Currency currency = Currency.getInstance(
+            fareRules.iterator().next().getFareAttribute().getCurrencyType()
+          );
+          boolean feedHasFare = populateFare(
+            currentFare,
+            currency,
+            fareType,
+            fareLegsByFeed.get(feedId),
+            fareRules
+          );
+
+          if (!feedHasFare) {
+            legsWithoutMatchingRulesFound = true;
+          }
+          hasFare = feedHasFare || hasFare; // Other feeds might still have fare for some legs
+
+          components.addAll(currentFare.getComponents(fareType));
+          fare.addFare(fareType, currentFare.getFare(fareType));
+          fares.add(currentFare.getFare(fareType));
+
+          // If all the legs are from one feed, consider itinerary products
+          if (fareLegs.equals(fareLegsByFeed.get(feedId))) {
+            fare.addItineraryProducts(currentFare.getItineraryProducts());
+          }
+        } else {
+          legWithoutRulesFound = true;
+        }
+      }
+
+      fare.addFareComponent(fareType, components);
+
+      // No fares will be discovered after this point
+      if (!hasFare) {
+        continue;
+      }
+
+      // Accumulate the final price of the fare or indicate that no final fare could be found
+      if (legWithoutRulesFound || legsWithoutMatchingRulesFound) {
+        fare.addFare(
+          fareType,
+          Money.ofFractionalAmount(fares.get(0).currency(), UNKNOWN_FARE_PRICE)
         );
-        hasFare = populateFare(fare, currency, fareType, fareLegs, fareRules);
+      } else {
+        fare.addFare(
+          fareType,
+          fares
+            .stream()
+            .reduce(
+              Money.ofFractionalAmount(fare.getFare(fareType).currency(), 0),
+              (r1, r2) -> r1.plus(r2)
+            )
+        );
       }
     }
     return hasFare ? fare : null;
@@ -202,11 +275,11 @@ public class DefaultFareService implements FareService {
     String startZone = firstRide.getFrom().stop.getFirstZoneAsString();
     String endZone = null;
     // stops don't really have an agency id, they have the per-feed default id
-    String feedId = firstRide.getTrip().getId().getFeedId();
+    String feedId = firstRide.getAgency().getId().getFeedId();
     ZonedDateTime lastRideStartTime = null;
     ZonedDateTime lastRideEndTime = null;
     for (var leg : legs) {
-      if (!leg.getTrip().getId().getFeedId().equals(feedId)) {
+      if (!leg.getAgency().getId().getFeedId().equals(feedId)) {
         LOG.debug("skipped multi-feed ride sequence {}", legs);
         return Optional.empty();
       }

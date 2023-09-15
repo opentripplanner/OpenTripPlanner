@@ -1,0 +1,18 @@
+{
+    alerts {
+        id
+        alertHeaderText
+        alertDescriptionText
+        alertUrl
+        # these translations are a bit questionable, the above fields are already translated into the
+        # language selected in the request
+        alertDescriptionTextTranslations {
+            language
+            text
+        }
+        alertHeaderTextTranslations {
+            text
+            language
+        }
+    }
+}

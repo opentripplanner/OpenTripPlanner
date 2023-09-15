@@ -1,5 +1,7 @@
 package org.opentripplanner.openstreetmap.model;
 
+import static org.opentripplanner.openstreetmap.model.OSMMemberType.WAY;
+
 public class OSMRelationMember {
 
   private OSMMemberType type;
@@ -16,10 +18,6 @@ public class OSMRelationMember {
     this.type = type;
   }
 
-  public boolean hasType(OSMMemberType type) {
-    return this.type == type;
-  }
-
   public long getRef() {
     return ref;
   }
@@ -34,6 +32,22 @@ public class OSMRelationMember {
 
   public void setRole(String role) {
     this.role = role;
+  }
+
+  public boolean hasRoleOuter() {
+    return "outer".equals(role);
+  }
+
+  public boolean hasRoleInner() {
+    return "inner".equals(role);
+  }
+
+  public boolean hasRolePlatform() {
+    return "platform".equals(role);
+  }
+
+  public boolean hasTypeWay() {
+    return type == WAY;
   }
 
   @Override

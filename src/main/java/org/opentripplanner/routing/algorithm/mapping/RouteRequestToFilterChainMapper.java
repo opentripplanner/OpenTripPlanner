@@ -65,6 +65,9 @@ public class RouteRequestToFilterChainMapper {
       .withBikeRentalDistanceRatio(params.bikeRentalDistanceRatio())
       .withParkAndRideDurationRatio(params.parkAndRideDurationRatio())
       .withNonTransitGeneralizedCostLimit(params.nonTransitGeneralizedCostLimit())
+      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+        params.removeTransitWithHigherCostThanBestOnStreetOnly()
+      )
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip())
       .withAccessibilityScore(
         params.useAccessibilityScore() && request.wheelchair(),
@@ -79,10 +82,10 @@ public class RouteRequestToFilterChainMapper {
         context.transitService().getTransitAlertService(),
         context.transitService()::getMultiModalStationForStation
       )
-      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
       .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
+      .withRemoveTransitIfWalkingIsBetter(true)
       .withDebugEnabled(params.debug());
 
     if (!context.rideHailingServices().isEmpty()) {

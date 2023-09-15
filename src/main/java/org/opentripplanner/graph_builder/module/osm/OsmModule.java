@@ -65,7 +65,7 @@ public class OsmModule implements GraphBuilderModule {
     this.graph = graph;
     this.issueStore = issueStore;
     this.params = params;
-    this.osmdb = new OsmDatabase(issueStore, params.boardingAreaRefTags());
+    this.osmdb = new OsmDatabase(issueStore);
     this.vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags());
     this.normalizer = new SafetyValueNormalizer(graph, issueStore);
   }
@@ -250,8 +250,6 @@ public class OsmModule implements GraphBuilderModule {
       StreetTraversalPermission permissions = OsmFilter.getPermissionsForWay(
         way,
         wayData.getPermission(),
-        params.banDiscouragedWalking(),
-        params.banDiscouragedBiking(),
         issueStore
       );
       if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) {
@@ -528,7 +526,7 @@ public class OsmModule implements GraphBuilderModule {
       .withPermission(permissions)
       .withBack(back)
       .withCarSpeed(carSpeed)
-      .withLink(OsmFilter.isLink(way))
+      .withLink(way.isLink())
       .withRoundabout(way.isRoundabout())
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
       .withStairs(way.isSteps());
@@ -536,10 +534,7 @@ public class OsmModule implements GraphBuilderModule {
     if (!way.hasTag("name") && !way.hasTag("ref")) {
       seb.withBogusName(true);
     }
-    /* TODO: This should probably generalized somehow? */
-    if ((way.isTagFalse("wheelchair") || (way.isSteps() && !way.isTagTrue("wheelchair")))) {
-      seb.withWheelchairAccessible(false);
-    }
+    seb.withWheelchairAccessible(way.isWheelchairAccessible());
 
     // < 0.04: account for
     if (carSpeed < 0.04) {

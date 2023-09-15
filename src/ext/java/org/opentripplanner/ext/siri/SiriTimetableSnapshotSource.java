@@ -218,7 +218,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       /* commit */
-      return addTripToGraphAndBuffer(result.successValue(), journey, entityResolver);
+      return addTripToGraphAndBuffer(result.successValue());
     } catch (Exception e) {
       LOG.warn(
         "{} EstimatedJourney {} failed.",
@@ -359,11 +359,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * Add a (new) trip to the transitModel and the buffer
    */
-  private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(
-    TripUpdate tripUpdate,
-    EstimatedVehicleJourney estimatedVehicleJourney,
-    EntityResolver entityResolver
-  ) {
+  private Result<UpdateSuccess, UpdateError> addTripToGraphAndBuffer(TripUpdate tripUpdate) {
     Trip trip = tripUpdate.tripTimes().getTrip();
     LocalDate serviceDate = tripUpdate.serviceDate();
 
