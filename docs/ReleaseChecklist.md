@@ -87,19 +87,19 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * Mention the new version number.
     * Provide links to the new developer documentation.
     * Provide links to the artifacts directory on Maven Central.
-* Prepare for the next release in GitHub by renaming the released millstone and creating a new
-  millstone for the next release. Then make sure all issues and PRs are tagged with the correct
-  millstone.
-    * Close open PRs older than 2 years, make sure the millstone is set to `Rejected`.
-    * Rename the old millstone from `x.y (Next Release)` to `x.y`. All issues and PRs assigned to 
-      this millstone is updated.
-    * Create a new millstone: `x.y+1 (Next Release)`
-    * All PullRequests SHOULD have a millstone (except some very old ones) 
-        * Assign all *open* PRs to this new millstone `x.y+1 (Next Release)`.
-        * Assign all *closed* PRs without a millstone in the release to the released millstone 
+* Prepare for the next release in GitHub by renaming the released milestone and creating a new
+  milestone for the next release. Then make sure all issues and PRs are tagged with the correct
+  milestone.
+    * Close open PRs older than 2 years, make sure the milestone is set to `Rejected`.
+    * Rename the old milestone from `x.y (Next Release)` to `x.y`. All issues and PRs assigned to 
+      this milestone is updated.
+    * Create a new milestone: `x.y+1 (Next Release)`
+    * All PullRequests SHOULD have a milestone (except some very old ones) 
+        * Assign all *open* PRs to this new milestone `x.y+1 (Next Release)`.
+        * Assign all *closed* PRs without a milestone in the release to the released milestone 
           `x.y`. Make sure NOT to include very old PRs or PRs merged after the release(if any).
-    * Some issues have a millstone, but not all.
-        * Move all open issues with the released millstone `x.y` to the next release 
+    * Some issues have a milestone, but not all.
+        * Move all open issues with the released milestone `x.y` to the next release 
           `x.y+1 (Next Release)`. 
 
 ## Artifact Signing
