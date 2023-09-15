@@ -1,6 +1,6 @@
 # OTP Architecture
 
-OTP is developed over more than 10 years, and most of the design documentation is in the code as
+OTP is developed over more than 15 years, and most of the design documentation is in the code as
 comments and JavaDoc. Over the years the complexity have increased, and the natural developer
 turnover creates a demand for more architecture and design documentation. The new OTP2 documentation
 is put together with the source; hopefully making it easier to maintain. Instead of documenting
@@ -10,6 +10,10 @@ as an index to all existing top-level documented components.
 This document is far from complete - hopefully it can evolve over time and become a good
 introduction to OTP architecture. The OTP project GitHub issues are a good place to look for
 detailed discussions on many design decisions.
+
+We document Architectural Decision in a log. Make sure you as a developer is familiar with the
+decisions and follow them. Reviewers should use them actively when reviewing code and may use them
+to ask for changes.
 
 Be sure to also read the [developer documentation](docs/Developers-Guide.md).
 

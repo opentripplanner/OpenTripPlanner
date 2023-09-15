@@ -12,21 +12,6 @@ These conventions are not "hard" rules, and often there might be other forces wh
 decision in another direction, in that case documenting your choice is often enough to pass the
 review.
 
-## Best practices - in focus
-
-- [ ] Document `public` interfaces, classes and methods - especially those part of a module api.
-- [ ] Leave Things BETTER than you found them - clean up code you visit or/and add unit tests.
-- [ ] [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself) - Do not repeat yourself. Avoid implementing the same business rule in two places -> refactor.
-- [ ] [Feature envy](https://refactoring.guru/smells/feature-envy)
-- [ ] Make types immutable if possible. References to other Entities might need to be mutable, if
-      so try to init them once, and throw an exception if set again.
-      Example:
-
-```java
-Builder initStop(Stop stop) {
-   this.stop = requireNotInitialized(this.stop, stop);
-}
-```
 
 ## Naming Conventions
 
@@ -104,7 +89,15 @@ stop = stop.copyOf().withPrivateCode("TEX").build();
 ## Records, POJOs and Builders
 
 We prefer immutable typesafe types over flexibility and "short" class definitions. This make
-the code more robust and less error-prune.
+the code more robust and less error-prune. References to other entities might need to be mutable, 
+if so try to init them once, and throw an exception if set again. Example:
+
+```java
+Builder initStop(Stop stop) {
+   this.stop = requireNotInitialized(this.stop, stop);
+}
+```
+
 
 ### Records
 
