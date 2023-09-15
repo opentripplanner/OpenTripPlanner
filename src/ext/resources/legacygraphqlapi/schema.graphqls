@@ -1975,10 +1975,6 @@ enum PlanDirectMode {
 
     CAR_PARKING
 
-    CAR_PICKUP
-
-    CAR_DROPOFF
-
     FLEX
 
     SCOOTER
