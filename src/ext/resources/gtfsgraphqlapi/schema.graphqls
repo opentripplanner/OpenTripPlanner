@@ -1284,6 +1284,7 @@ input PlanStreetPreferences {
     car: CarPreferences
     walk: WalkPreferences
     rental: RentalPreferences
+    parking: VehicleParkingInput
 }
 
 """
