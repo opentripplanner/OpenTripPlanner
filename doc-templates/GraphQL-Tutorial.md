@@ -51,4 +51,4 @@ Most people want to get routing results out of OTP, so lets see the query for th
 Again, please use the autocomplete and documentation viewers to figure out what each input parameter
 and property means.
 
-More examples for a variety of queries can also be found [in the test code](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/test/resources/gtfsgraphqlapi/queries).
+More examples for a variety of queries can also be found [in the test code](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/test/resources/org/opentripplanner/apis/gtfs/queries).
