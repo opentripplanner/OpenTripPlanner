@@ -1264,10 +1264,14 @@ input PlanPreferences {
 }
 
 input PlanStreetModes {
-    direct: [StreetModeInputOptions!]
-    access: [StreetModeInputOptions!]
-    egress: [StreetModeInputOptions!]
-    transfer: [StreetModeInputOptions!]
+    """Selection of only one allowed for now."""
+    direct: [PlanDirectMode!]
+    """Selection of only one allowed for now."""
+    access: [PlanAccessEgressMode!]
+    """Selection of only one allowed for now."""
+    egress: [PlanAccessEgressMode!]
+    """Selection of only one allowed for now."""
+    transfer: [PlanTransferMode!]
 }
 
 input PlanStreetPreferences {
@@ -1932,7 +1936,7 @@ type PageInfo {
     endCursor: String
 }
 
-enum StreetModeInputOptions {
+enum PlanAccessEgressMode {
     BICYCLE
 
     BICYCLE_RENTAL
@@ -1954,6 +1958,40 @@ enum StreetModeInputOptions {
     SCOOTER
 
     SCOOTER_RENTAL
+
+    WALK
+}
+
+enum PlanDirectMode {
+    BICYCLE
+
+    BICYCLE_RENTAL
+
+    BICYCLE_PARKING
+
+    CAR
+
+    CAR_RENTAL
+
+    CAR_PARKING
+
+    CAR_PICKUP
+
+    CAR_DROPOFF
+
+    FLEX
+
+    SCOOTER
+
+    SCOOTER_RENTAL
+
+    WALK
+}
+
+enum PlanTransferMode {
+    BICYCLE
+
+    SCOOTER
 
     WALK
 }
