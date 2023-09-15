@@ -4091,6 +4091,8 @@ type TicketType implements Node {
 input TransferPreferences {
     costPenalty: Int
     minimumWaitingTime: Duration
+    maximumAdditionalTransfers: Int = 5
+    maximumTransfers: Int = 12
 }
 
 input TransitModePreferences {
