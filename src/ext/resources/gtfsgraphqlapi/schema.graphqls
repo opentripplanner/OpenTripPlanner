@@ -770,10 +770,8 @@ enum BikesAllowed {
 
 input BikePreferences {
     reluctance: Float
-    bikeWalking: WalkPreferences
+    bikeWalking: VehicleWalkPreferences
     speed: Float
-    switchTime: Duration
-    switchCost: Int
     optimize: OptimizationCriteria
     boardCost: Int
 }
@@ -3622,7 +3620,7 @@ enum AbsoluteDirection {
 
 input ScooterPreferences {
     reluctance: Float
-    scooterWalking: WalkPreferences
+    scooterWalking: VehicleWalkPreferences
     speed: Float
     optimize: OptimizationCriteria
     boardCost: Int
@@ -4320,6 +4318,28 @@ enum VertexType {
 
     """PARKANDRIDE"""
     PARKANDRIDE
+}
+
+input VehicleWalkPreferences {
+    """Speed when walking a vehicle."""
+    speed: Float
+
+    """
+    Reluctance in a format of `30s + 2.0 x` where the static cost is applied
+    both when getting off the vehicle and when getting on the vehicle again.
+    However, these static costs are not applied when getting on a rented vehicle
+    for the first time or off the vehicle when returning the vehicle. The multiplier
+    is for how bad walking the vehicle is compared to being in transit for equal
+    lengths of time.
+    """
+    reluctance: CostFunction
+
+    """"
+    How long it takes to hop on or off a vehicle when switching to walking the vehicle
+    or when getting on the vehicle again. However, this is not applied when getting
+    on a rented vehicle for the first time or off the vehicle when returning the vehicle.
+    """
+    hopOnOrOffTime: Int
 }
 
 input WalkPreferences {
