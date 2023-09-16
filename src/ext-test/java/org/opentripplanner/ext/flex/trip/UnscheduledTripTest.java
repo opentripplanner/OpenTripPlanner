@@ -8,9 +8,8 @@ import static org.opentripplanner.ext.flex.trip.UnscheduledTripTest.TestCase.tc;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -57,15 +56,14 @@ public class UnscheduledTripTest {
       UNSCHEDULED_STOP.setFlexWindowEnd(300);
     }
 
-    static Collection<Arguments> notUnscheduled = Stream
+    static Stream<Arguments> notUnscheduled = Stream
       .of(
         List.of(),
         List.of(SCHEDULED_STOP),
         List.of(SCHEDULED_STOP, SCHEDULED_STOP),
         List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP)
       )
-      .map(Arguments::of)
-      .toList();
+      .map(Arguments::of);
 
     @ParameterizedTest
     @VariableSource("notUnscheduled")
@@ -73,16 +71,16 @@ public class UnscheduledTripTest {
       assertFalse(isUnscheduledTrip(stopTimes));
     }
 
-    static Collection<Arguments> unscheduled = Stream
+    static Stream<Arguments> unscheduled = Stream
       .of(
         List.of(UNSCHEDULED_STOP),
         List.of(UNSCHEDULED_STOP, SCHEDULED_STOP),
         List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
         List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP),
-        List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP, UNSCHEDULED_STOP)
+        List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP, UNSCHEDULED_STOP),
+        Collections.nCopies(10, UNSCHEDULED_STOP)
       )
-      .map(Arguments::of)
-      .collect(Collectors.toList());
+      .map(Arguments::of);
 
     @ParameterizedTest
     @VariableSource("unscheduled")

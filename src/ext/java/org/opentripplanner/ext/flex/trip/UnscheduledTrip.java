@@ -36,8 +36,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
  */
 public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBuilder> {
 
-  // unscheduled trips can contain one or two stop_times
-  private static final Set<Integer> N_STOPS = Set.of(1, 2, 3);
+  private static final Set<Integer> N_STOPS = Set.of(1, 2);
   private static final int INDEX_NOT_FOUND = -1;
 
   private final StopTimeWindow[] stopTimes;
@@ -68,16 +67,32 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     return new UnscheduledTripBuilder(id);
   }
 
+  /**
+   * Tests if the stop times constitute an {@link UnscheduledTrip}.
+   * <p>
+   * Returns true for the following cases:
+   *  - A single fixed scheduled stop followed by a flexible one
+   *  - One or more stop times with a flexible time window but no fixed stop in between them
+   */
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
     Predicate<StopTime> hasFlexWindow = st ->
       st.getFlexWindowStart() != MISSING_VALUE || st.getFlexWindowEnd() != MISSING_VALUE;
     Predicate<StopTime> notContinuousStop = stopTime ->
       stopTime.getFlexContinuousDropOff() == NONE && stopTime.getFlexContinuousPickup() == NONE;
-    return (
-      N_STOPS.contains(stopTimes.size()) &&
-      stopTimes.stream().anyMatch(hasFlexWindow) &&
-      stopTimes.stream().allMatch(notContinuousStop)
-    );
+    if (stopTimes.isEmpty()) {
+      return false;
+    }
+    if (N_STOPS.contains(stopTimes.size())) {
+      return (
+        N_STOPS.contains(stopTimes.size()) &&
+        stopTimes.stream().anyMatch(hasFlexWindow) &&
+        stopTimes.stream().allMatch(notContinuousStop)
+      );
+    } else {
+      return (
+        stopTimes.stream().allMatch(hasFlexWindow) && stopTimes.stream().allMatch(notContinuousStop)
+      );
+    }
   }
 
   @Override
