@@ -8,19 +8,26 @@ import static org.opentripplanner.ext.flex.trip.UnscheduledTripTest.TestCase.tc;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
+import gnu.trove.set.hash.TIntHashSet;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.geometry.Polygons;
+import org.opentripplanner.ext.flex.FlexServiceDate;
+import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -30,6 +37,7 @@ public class UnscheduledTripTest {
 
   private static final int STOP_A = 0;
   private static final int STOP_B = 1;
+  private static final int STOP_C = 2;
   private static final int T10_00 = TimeUtils.hm2time(10, 0);
   private static final int T11_00 = TimeUtils.hm2time(11, 0);
   private static final int T14_00 = TimeUtils.hm2time(14, 0);
@@ -55,7 +63,7 @@ public class UnscheduledTripTest {
       UNSCHEDULED_STOP.setFlexWindowEnd(300);
     }
 
-    static List<List<StopTime>> notUnscheduled = List.of(
+    static final List<List<StopTime>> notUnscheduled = List.of(
       List.of(),
       List.of(SCHEDULED_STOP),
       List.of(SCHEDULED_STOP, SCHEDULED_STOP),
@@ -68,7 +76,7 @@ public class UnscheduledTripTest {
       assertFalse(isUnscheduledTrip(stopTimes));
     }
 
-    static List<List<StopTime>> unscheduled = List.of(
+    static final List<List<StopTime>> unscheduled = List.of(
       List.of(UNSCHEDULED_STOP),
       List.of(UNSCHEDULED_STOP, SCHEDULED_STOP),
       List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
@@ -469,6 +477,81 @@ public class UnscheduledTripTest {
     );
   }
 
+  static Stream<TestCase> multipleAreasEarliestDepartureTimeTestCases() {
+    var from = area("10:00", "10:05");
+    var middle = area("10:10", "10:15");
+    var to = area("10:20", "10:25");
+
+    var tc = new TestCase.Builder(from, to).withStopTimes(List.of(from, middle, to));
+
+    return Stream.of(
+      tc
+        .expected(
+          "Requested departure time is after flex service departure window start, duration 21m",
+          "10:01"
+        )
+        .request("10:01", "21m")
+        .build(),
+      tc
+        .expected(
+          "Requested departure time is before flex service departure window start, duration 1h",
+          "10:00"
+        )
+        .request("09:50", "24m")
+        .build()
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("multipleAreasEarliestDepartureTimeTestCases")
+  void testMultipleAreasEarliestDepartureTime(TestCase tc) {
+    assertEquals(
+      timeToString(tc.expectedTime),
+      timeToString(
+        tc.trip().earliestDepartureTime(tc.requestedTime, STOP_A, STOP_C, tc.tripDuration)
+      )
+    );
+  }
+
+  @Nested
+  class FlexTemplates {
+
+    private static final DirectFlexPathCalculator CALCULATOR = new DirectFlexPathCalculator();
+
+    @Test
+    void templates() {
+      var from = area("10:00", "10:05");
+      var middle = area("10:10", "10:15");
+      var to = area("10:20", "10:25");
+
+      var trip = new TestCase.Builder(from, to)
+        .withStopTimes(List.of(from, middle, to))
+        .build()
+        .trip();
+
+      var nearbyStop = new NearbyStop(to.getStop(), 100, List.of(), null);
+      var flexServiceDate = new FlexServiceDate(
+        LocalDate.of(2023, 9, 16),
+        to.getFlexWindowStart(),
+        new TIntHashSet()
+      );
+
+      var templates = trip
+        .getFlexAccessTemplates(nearbyStop, flexServiceDate, CALCULATOR, FlexConfig.DEFAULT)
+        .toList();
+
+      assertEquals(2, templates.size());
+
+      var first = templates.get(0);
+      assertEquals(first.fromStopIndex, 0);
+      assertEquals(first.toStopIndex, 1);
+
+      var second = templates.get(1);
+      assertEquals(second.fromStopIndex, 0);
+      assertEquals(second.toStopIndex, 2);
+    }
+  }
+
   private static String timeToString(int time) {
     return TimeUtils.timeToStrCompact(time, MISSING_VALUE, "MISSING_VALUE");
   }
@@ -500,6 +583,7 @@ public class UnscheduledTripTest {
   record TestCase(
     StopTime from,
     StopTime to,
+    List<StopTime> stopTimes,
     String expectedDescription,
     int expectedTime,
     int requestedTime,
@@ -510,7 +594,7 @@ public class UnscheduledTripTest {
     }
 
     UnscheduledTrip trip() {
-      return UnscheduledTrip.of(id("UNSCHEDULED")).withStopTimes(List.of(from, to)).build();
+      return UnscheduledTrip.of(id("UNSCHEDULED")).withStopTimes(stopTimes).build();
     }
 
     @Override
@@ -549,6 +633,7 @@ public class UnscheduledTripTest {
       private final StopTime from;
       private final StopTime to;
       private String expectedDescription;
+      private List<StopTime> stopTimes;
       private int expectedTime;
       private int requestedTime;
       private int tripDuration;
@@ -556,6 +641,11 @@ public class UnscheduledTripTest {
       public Builder(StopTime from, StopTime to) {
         this.from = from;
         this.to = to;
+      }
+
+      public Builder withStopTimes(List<StopTime> stopTimes) {
+        this.stopTimes = stopTimes;
+        return this;
       }
 
       Builder expected(String expectedDescription, String expectedTime) {
@@ -580,6 +670,7 @@ public class UnscheduledTripTest {
         return new TestCase(
           from,
           to,
+          Objects.requireNonNullElse(stopTimes, List.of(from, to)),
           expectedDescription,
           expectedTime,
           requestedTime,
