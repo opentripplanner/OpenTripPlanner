@@ -79,19 +79,17 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
       st.getFlexWindowStart() != MISSING_VALUE || st.getFlexWindowEnd() != MISSING_VALUE;
     Predicate<StopTime> notContinuousStop = stopTime ->
       stopTime.getFlexContinuousDropOff() == NONE && stopTime.getFlexContinuousPickup() == NONE;
+    boolean noContinuousStops = stopTimes.stream().allMatch(notContinuousStop);
     if (stopTimes.isEmpty()) {
       return false;
-    }
-    if (N_STOPS.contains(stopTimes.size())) {
+    } else if (N_STOPS.contains(stopTimes.size())) {
       return (
         N_STOPS.contains(stopTimes.size()) &&
         stopTimes.stream().anyMatch(hasFlexWindow) &&
-        stopTimes.stream().allMatch(notContinuousStop)
+        noContinuousStops
       );
     } else {
-      return (
-        stopTimes.stream().allMatch(hasFlexWindow) && stopTimes.stream().allMatch(notContinuousStop)
-      );
+      return stopTimes.stream().allMatch(hasFlexWindow) && noContinuousStops;
     }
   }
 

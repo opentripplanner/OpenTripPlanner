@@ -14,7 +14,6 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -56,14 +55,12 @@ public class UnscheduledTripTest {
       UNSCHEDULED_STOP.setFlexWindowEnd(300);
     }
 
-    static Stream<Arguments> notUnscheduled = Stream
-      .of(
-        List.of(),
-        List.of(SCHEDULED_STOP),
-        List.of(SCHEDULED_STOP, SCHEDULED_STOP),
-        List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP)
-      )
-      .map(Arguments::of);
+    static List<List<StopTime>> notUnscheduled = List.of(
+      List.of(),
+      List.of(SCHEDULED_STOP),
+      List.of(SCHEDULED_STOP, SCHEDULED_STOP),
+      List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP)
+    );
 
     @ParameterizedTest
     @VariableSource("notUnscheduled")
@@ -71,16 +68,14 @@ public class UnscheduledTripTest {
       assertFalse(isUnscheduledTrip(stopTimes));
     }
 
-    static Stream<Arguments> unscheduled = Stream
-      .of(
-        List.of(UNSCHEDULED_STOP),
-        List.of(UNSCHEDULED_STOP, SCHEDULED_STOP),
-        List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
-        List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP),
-        List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP, UNSCHEDULED_STOP),
-        Collections.nCopies(10, UNSCHEDULED_STOP)
-      )
-      .map(Arguments::of);
+    static List<List<StopTime>> unscheduled = List.of(
+      List.of(UNSCHEDULED_STOP),
+      List.of(UNSCHEDULED_STOP, SCHEDULED_STOP),
+      List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
+      List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP),
+      List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP, UNSCHEDULED_STOP),
+      Collections.nCopies(10, UNSCHEDULED_STOP)
+    );
 
     @ParameterizedTest
     @VariableSource("unscheduled")
