@@ -856,6 +856,8 @@ type Cluster implements Node {
     stops: [Stop!]
 }
 
+scalar Cost
+
 scalar CostFunction
 
 type Coordinates {
@@ -3443,6 +3445,10 @@ input RentalPreferences {
     keepingVehicleAtDestinationCost: Int
     allowedNetworks: [String!]
     bannedNetworks: [String!]
+    pickupTime: Duration
+    pickupCost: Cost
+    dropOffTime: Duration
+    dropOffCost: Cost
 }
 
 """
