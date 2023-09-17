@@ -768,11 +768,11 @@ enum BikesAllowed {
     NOT_ALLOWED
 }
 
-input BikePreferences {
+input BicyclePreferences {
     reluctance: Reluctance
     bikeWalking: VehicleWalkPreferences
     speed: Speed
-    optimize: OptimizationCriteria
+    optimize: InputCyclingOptimizationCriteria
     boardCost: Cost
 }
 
@@ -1283,7 +1283,7 @@ input PlanStreetModes {
 
 input PlanStreetPreferences {
     modes: PlanStreetModes
-    bike: BikePreferences
+    bicycle: BicyclePreferences
     scooter: ScooterPreferences
     car: CarPreferences
     walk: WalkPreferences
@@ -1308,11 +1308,32 @@ input InputTriangle {
 
 """
 Relative importances of optimization factors. Only effective for bicycling legs.
-Invariant: `safety + flatness + time == 1`
+Invariant: `cyclingFriendliness + flatness + time == 1`
 """
-input InputTriangleFactors {
-    """Relative importance of safety"""
-    safety: WeightingFactor
+input InputTriangleCyclingFactors {
+    """
+    Relative importance of cycling friendliness. Factors that are used to evaluate
+    cycling friendliness include safety, convenience and general cyclist preferences.
+    """
+    cyclingFriendliness: WeightingFactor
+
+    """Relative importance of flat terrain"""
+    flatness: WeightingFactor
+
+    """Relative importance of duration"""
+    time: WeightingFactor
+}
+
+"""
+Relative importances of optimization factors. Only effective for scooter legs.
+Invariant: `scooterFriendliness + flatness + time == 1`
+"""
+input InputTriangleScooterFactors {
+    """
+    Relative importance of scoooter friendliness. Factors that are used to evaluate
+    scoooter friendliness include safety, convenience and general preferences.
+    """
+    scooterFriendliness: WeightingFactor
 
     """Relative importance of flat terrain"""
     flatness: WeightingFactor
@@ -2334,16 +2355,87 @@ type BookingInfo {
     dropOffMessage: String
 }
 
-input OptimizationCriteria @oneOf {
-    type: OptimizationType
-    triangle: InputTriangleFactors
+input InputCyclingOptimizationCriteria @oneOf {
+    type: CyclingOptimizationType
+    triangle: InputTriangleCyclingFactors
 }
 
-enum OptimizationType {
-    QUICK
-    SAFE
-    FLAT
-    GREENWAYS
+"""
+Predefined optimization alternatives for bicycling routing. For more customization,
+one can use the triangle factors.
+"""
+enum CyclingOptimizationType {
+    """
+    Search for routes with the shortest duration while ignoring the cycling friendliness
+    of the streets (the routes should still follow local regulations). Routes can include
+    steep streets, if they are the fastest alternatives. This option was previously called
+    `QUICK`.
+    """
+    SHORTEST_DURATION
+
+    """
+    Emphasize flatness over other aspects of cycling friendliness or duration of the route.
+    This option was previously called `FLAT`.
+    """
+    FLATTEST_STREETS
+
+    """
+    Emphasize cycling friendliness over flatness or duration of the route. Factors that
+    are used to evaluate for cycling friendliness include safety, convenience and general cyclist
+    preferences. This option was previously called `SAFE`.
+    """
+    CYCLING_FRIENDLY_STREETS
+
+    """
+    Completely ignore the elevation differences and prefer the streets that are evaluated
+    to be cycling friendliest even more than with the `CYCLING_FRIENDLY_STREETS` option.
+    Factors that are used to evaluate cycling friendliness include safety, convenience
+    and general cyclist preferences. This option was previously called `GREENWAYS`.
+    """
+    CYCLING_FRIENDLIEST_STREETS
+}
+
+input InputScooterOptimizationCriteria @oneOf {
+    type: ScooterOptimizationType
+    triangle: InputTriangleScooterFactors
+}
+
+"""
+Predefined optimization alternatives for scooter routing. For more customization,
+one can use the triangle factors.
+"""
+enum ScooterOptimizationType {
+    """
+    Search for routes with the shortest duration while ignoring the scooter friendliness
+    of the streets. The routes should still follow local regulations, but currently scooters
+    are only allowed on the same streets as bicycles which might not be accurate for each country
+    or with different types of scooters. Routes can include steep streets, if they are
+    the fastest alternatives. This option was previously called `QUICK`.
+    """
+    SHORTEST_DURATION
+
+    """
+    Emphasize flatness over other aspects of scooter friendliness or duration of the route.
+    This option was previously called `FLAT`.
+    """
+    FLATTEST_STREETS
+
+    """
+    Emphasize scooter friendliness over flatness or duration of the route. Factors that
+    are used to evaluate for scooter friendliness include safety, convenience and general
+    preferences. Note, currently the same criteria is used both for cycling and scooter travel
+    to determine how cycling or scooter friendly streets are. This option was previously called `SAFE`.
+    """
+    SCOOTER_FRIENDLY_STREETS
+
+    """
+    Completely ignore the elevation differences and prefer the streets that are evaluated
+    to be scooter friendliest even more than with the `SCOOTER_FRIENDLY_STREETS` option.
+    Factors that are used to evaluate scooter friendliness include safety, convenience
+    and general preferences.  Note, currently the same criteria is used both for cycling and scooter travel
+    to determine how cycling or scooter friendly streets are. This option was previously called `GREENWAYS`.
+    """
+    SCOOTER_FRIENDLIEST_STREETS
 }
 
 scalar Speed
@@ -3651,7 +3743,7 @@ input ScooterPreferences {
     reluctance: Reluctance
     scooterWalking: VehicleWalkPreferences
     speed: Speed
-    optimize: OptimizationCriteria
+    optimize: InputScooterOptimizationCriteria
     boardCost: Cost
 }
 
@@ -4374,7 +4466,7 @@ input VehicleWalkPreferences {
 input WalkPreferences {
     speed: Speed
     reluctance: Reluctance
-    safetyFactor: WeightingFactor
+    walkFriendlinessFactor: WeightingFactor
     boardCost: Cost
 }
 
