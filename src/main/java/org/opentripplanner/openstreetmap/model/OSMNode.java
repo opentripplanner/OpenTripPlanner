@@ -1,6 +1,7 @@
 package org.opentripplanner.openstreetmap.model;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMNode extends OSMWithTags {
 
@@ -57,6 +58,18 @@ public class OSMNode extends OSMWithTags {
       isMotorVehicleExplicitlyDenied() ||
       isGeneralAccessDenied()
     );
+  }
+
+  /**
+   * Consider barrier tag in  permissions. Leave the rest for the super class.
+   */
+  @Override
+  public StreetTraversalPermission overridePermissions(StreetTraversalPermission def) {
+    StreetTraversalPermission permission = def;
+    if (isBollard()) {
+      permission = permission.remove(StreetTraversalPermission.CAR);
+    }
+    return super.overridePermissions(permission);
   }
 
   @Override
