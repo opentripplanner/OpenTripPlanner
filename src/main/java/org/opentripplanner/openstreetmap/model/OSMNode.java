@@ -67,6 +67,7 @@ public class OSMNode extends OSMWithTags {
   public StreetTraversalPermission overridePermissions(StreetTraversalPermission def) {
     StreetTraversalPermission permission = def;
     if (isBollard()) {
+      //According to OSM default permissions are access=no, foot=yes, bicycle=yes
       permission = permission.remove(StreetTraversalPermission.CAR);
     }
     return super.overridePermissions(permission);
