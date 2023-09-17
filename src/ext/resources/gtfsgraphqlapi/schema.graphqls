@@ -280,7 +280,7 @@ enum AlertSeverityLevelType {
 }
 
 input AlightPreferences {
-    slack: Int
+    slack: Duration
 }
 
 type OpeningHours {
@@ -769,16 +769,16 @@ enum BikesAllowed {
 }
 
 input BikePreferences {
-    reluctance: Float
+    reluctance: Reluctance
     bikeWalking: VehicleWalkPreferences
-    speed: Float
+    speed: Speed
     optimize: OptimizationCriteria
-    boardCost: Int
+    boardCost: Cost
 }
 
 input BoardPreferences {
-    waitReluctance: Float
-    slack: Int
+    waitReluctance: Reluctance
+    slack: Duration
 }
 
 """Car park represents a location where cars can be parked."""
@@ -826,7 +826,7 @@ type CarPark implements Node & PlaceInterface {
 }
 
 input CarPreferences {
-    reluctance: Float
+    reluctance: Reluctance
 }
 
 """Cluster is a list of stops grouped by name and proximity"""
@@ -859,6 +859,8 @@ type Cluster implements Node {
 scalar Cost
 
 scalar CostFunction
+
+scalar Coordinate
 
 type Coordinates {
     """Latitude (WGS 84)"""
@@ -1062,9 +1064,9 @@ type StopGeometries {
     googleEncoded: [Geometry]
 }
 
-input Coordinate {
-    latitude: Float!
-    longitude: Float!
+input InputPlanCoordinates {
+    latitude: Coordinate!
+    longitude: Coordinate!
 }
 
 input InputBanned {
@@ -1190,6 +1192,8 @@ input InputPreferred {
     otherThanPreferredRoutesPenalty: Int
 }
 
+scalar Locale
+
 """
 Preferences for parking facilities used during the routing.
 """
@@ -1255,7 +1259,7 @@ input PlanDebugSettings {
 }
 
 input PlanLocation {
-    coordinate: Coordinate
+    coordinate: InputPlanCoordinates
     stop: FeedScopedId
     label: String
 }
@@ -1300,6 +1304,21 @@ input InputTriangle {
 
     """Relative importance of duration"""
     timeFactor: Float
+}
+
+"""
+Relative importances of optimization factors. Only effective for bicycling legs.
+Invariant: `safety + flatness + time == 1`
+"""
+input InputTriangleFactors {
+    """Relative importance of safety"""
+    safety: WeightingFactor
+
+    """Relative importance of flat terrain"""
+    flatness: WeightingFactor
+
+    """Relative importance of duration"""
+    time: WeightingFactor
 }
 
 input InputUnpreferred {
@@ -2317,7 +2336,7 @@ type BookingInfo {
 
 input OptimizationCriteria @oneOf {
     type: OptimizationType
-    triangle: InputTriangle
+    triangle: InputTriangleFactors
 }
 
 enum OptimizationType {
@@ -2326,6 +2345,8 @@ enum OptimizationType {
     FLAT
     GREENWAYS
 }
+
+scalar Speed
 
 "The board/alight position in between two stops of the pattern of a trip with continuous pickup/drop off."
 type PositionBetweenStops {
@@ -2528,7 +2549,7 @@ type PlanConnection {
 }
 
 type PlanDebugInformation {
-    totalTime: Int
+    totalTime: DurationInSeconds
     pathCalculationTime: DurationInSeconds
     searchWindowUsed: Duration
 }
@@ -3400,7 +3421,7 @@ type QueryType {
         destination: PlanLocation
         preferences: PlanPreferences
         debugSettings: PlanDebugSettings
-        locale: String
+        locale: Locale
         before: String
         after: String
         first: Int
@@ -3440,9 +3461,11 @@ enum RealtimeState {
     MODIFIED
 }
 
+scalar Reluctance
+
 input RentalPreferences {
     allowKeepingVehicleAtDestination: Boolean
-    keepingVehicleAtDestinationCost: Int
+    keepingVehicleAtDestinationCost: Cost
     allowedNetworks: [String!]
     bannedNetworks: [String!]
     pickupTime: Duration
@@ -3625,11 +3648,11 @@ enum AbsoluteDirection {
 }
 
 input ScooterPreferences {
-    reluctance: Float
+    reluctance: Reluctance
     scooterWalking: VehicleWalkPreferences
-    speed: Float
+    speed: Speed
     optimize: OptimizationCriteria
-    boardCost: Int
+    boardCost: Cost
 }
 
 type step {
@@ -4093,7 +4116,7 @@ type TicketType implements Node {
 }
 
 input TransferPreferences {
-    costPenalty: Int
+    costPenalty: Cost
     minimumWaitingTime: Duration
     maximumAdditionalTransfers: Int = 5
     maximumTransfers: Int = 12
@@ -4328,7 +4351,7 @@ enum VertexType {
 
 input VehicleWalkPreferences {
     """Speed when walking a vehicle."""
-    speed: Float
+    speed: Speed
 
     """
     Reluctance in a format of `30s + 2.0 x` where the static cost is applied
@@ -4345,15 +4368,18 @@ input VehicleWalkPreferences {
     or when getting on the vehicle again. However, this is not applied when getting
     on a rented vehicle for the first time or off the vehicle when returning the vehicle.
     """
-    hopOnOrOffTime: Int
+    hopOnOrOffTimeSeconds: Int
 }
 
 input WalkPreferences {
-    speed: Float
-    reluctance: Float
-    safetyFactor: Float
-    boardCost: Int
+    speed: Speed
+    reluctance: Reluctance
+    safetyFactor: WeightingFactor
+    boardCost: Cost
 }
+
+"""A fractional multiplier between 0 and 1, for example 0.25."""
+scalar WeightingFactor
 
 enum WheelchairBoarding {
     """There is no accessibility information for the stop."""
