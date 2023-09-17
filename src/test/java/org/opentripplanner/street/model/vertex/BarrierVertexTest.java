@@ -94,8 +94,8 @@ public class BarrierVertexTest {
   @Test
   public void testStreetsWithBollard() {
     Graph graph = new Graph();
-    //default permissions are PEDESTRIAND and BICYCLE
     BarrierVertex bv = new BarrierVertex(2.0, 2.0, 0);
+    bv.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
     StreetVertex endVertex = StreetModelForTest.intersectionVertex("end_vertex", 1.0, 2.0);
 
@@ -139,18 +139,18 @@ public class BarrierVertexTest {
     assertTrue(endVertex_to_bv_forward.canTraverse(TraverseMode.BICYCLE));
     assertTrue(endVertex_to_bv_forward.canTraverse(TraverseMode.WALK));
 
-    //tests bollard which doesn't allow cycling
-    BarrierVertex noBicycleBollard = new BarrierVertex(1.5, 1, 0);
-    noBicycleBollard.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN);
-    StreetEdge no_bike_to_endVertex = edge(noBicycleBollard, endVertex, 100, false);
+    //tests bollard which allows only walking
+    BarrierVertex onlyWalkBollard = new BarrierVertex(1.5, 1, 0);
+    onlyWalkBollard.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge edge = edge(onlyWalkBollard, endVertex, 100, false);
 
-    assertTrue(no_bike_to_endVertex.canTraverse(new TraverseModeSet(TraverseMode.CAR)));
-    assertTrue(no_bike_to_endVertex.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
-    assertTrue(no_bike_to_endVertex.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
+    assertTrue(edge.canTraverse(new TraverseModeSet(TraverseMode.CAR)));
+    assertTrue(edge.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
+    assertTrue(edge.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
 
-    assertFalse(no_bike_to_endVertex.canTraverse(TraverseMode.CAR));
-    assertFalse(no_bike_to_endVertex.canTraverse(TraverseMode.BICYCLE));
-    assertTrue(no_bike_to_endVertex.canTraverse(TraverseMode.WALK));
+    assertFalse(edge.canTraverse(TraverseMode.CAR));
+    assertFalse(edge.canTraverse(TraverseMode.BICYCLE));
+    assertTrue(edge.canTraverse(TraverseMode.WALK));
   }
 
   /**
