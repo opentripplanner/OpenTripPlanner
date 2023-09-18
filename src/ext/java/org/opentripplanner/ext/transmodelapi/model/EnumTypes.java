@@ -195,7 +195,7 @@ public class EnumTypes {
     .name("OccupancyStatus")
     .value(
       "noData",
-      OccupancyStatus.NO_DATA,
+      OccupancyStatus.NO_DATA_AVAILABLE,
       "The vehicle or carriage doesn't have any occupancy data available."
     )
     .value(
@@ -205,7 +205,7 @@ public class EnumTypes {
     )
     .value(
       "fewSeatsAvailable",
-      OccupancyStatus.SEATS_AVAILABLE,
+      OccupancyStatus.FEW_SEATS_AVAILABLE,
       "The vehicle or carriage has a few seats available."
     )
     .value(

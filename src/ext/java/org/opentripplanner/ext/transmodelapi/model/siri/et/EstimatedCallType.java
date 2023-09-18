@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import org.opentripplanner.ext.transmodelapi.mapping.OccupancyStatusMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -202,7 +203,9 @@ public class EstimatedCallType {
           .name("occupancyStatus")
           .type(new GraphQLNonNull(EnumTypes.OCCUPANCY_STATUS))
           .dataFetcher(environment ->
-            ((TripTimeOnDate) environment.getSource()).getOccupancyStatus()
+            OccupancyStatusMapper.mapStatus(
+              ((TripTimeOnDate) environment.getSource()).getOccupancyStatus()
+            )
           )
           .build()
       )
