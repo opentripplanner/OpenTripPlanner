@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -517,38 +518,63 @@ public class UnscheduledTripTest {
   class FlexTemplates {
 
     private static final DirectFlexPathCalculator CALCULATOR = new DirectFlexPathCalculator();
+    static final StopTime FIRST = area("10:00", "10:05");
+    static final StopTime SECOND = area("10:10", "10:15");
+    static final StopTime THIRD = area("10:20", "10:25");
+    static final StopTime FOURTH = area("10:30", "10:35");
+    private static final FlexServiceDate FLEX_SERVICE_DATE = new FlexServiceDate(
+      LocalDate.of(2023, 9, 16),
+      0,
+      new TIntHashSet()
+    );
 
     @Test
-    void templates() {
-      var from = area("10:00", "10:05");
-      var middle = area("10:10", "10:15");
-      var to = area("10:20", "10:25");
+    void accessTemplates() {
+      var trip = trip(List.of(FIRST, SECOND, THIRD, FOURTH));
 
-      var trip = new TestCase.Builder(from, to)
-        .withStopTimes(List.of(from, middle, to))
-        .build()
-        .trip();
-
-      var nearbyStop = new NearbyStop(to.getStop(), 100, List.of(), null);
-      var flexServiceDate = new FlexServiceDate(
-        LocalDate.of(2023, 9, 16),
-        to.getFlexWindowStart(),
-        new TIntHashSet()
-      );
+      var nearbyStop = new NearbyStop(FOURTH.getStop(), 100, List.of(), null);
 
       var templates = trip
-        .getFlexAccessTemplates(nearbyStop, flexServiceDate, CALCULATOR, FlexConfig.DEFAULT)
+        .getFlexAccessTemplates(nearbyStop, FLEX_SERVICE_DATE, CALCULATOR, FlexConfig.DEFAULT)
+        .toList();
+
+      assertEquals(3, templates.size());
+
+      List
+        .of(0, 1, 2)
+        .forEach(index -> {
+          var template = templates.get(index);
+          assertEquals(template.fromStopIndex, 0);
+          assertEquals(template.toStopIndex, index + 1);
+        });
+    }
+
+    @Test
+    void accessTemplatesNoAlighting() {
+      var second = area("10:10", "10:15");
+      second.setDropOffType(PickDrop.NONE);
+
+      var trip = trip(List.of(FIRST, second, THIRD, FOURTH));
+
+      var nearbyStop = new NearbyStop(FOURTH.getStop(), 100, List.of(), null);
+
+      var templates = trip
+        .getFlexAccessTemplates(nearbyStop, FLEX_SERVICE_DATE, CALCULATOR, FlexConfig.DEFAULT)
         .toList();
 
       assertEquals(2, templates.size());
+      List
+        .of(0, 1)
+        .forEach(index -> {
+          var template = templates.get(index);
+          assertEquals(template.fromStopIndex, 0);
+          assertEquals(template.toStopIndex, index + 2);
+        });
+    }
 
-      var first = templates.get(0);
-      assertEquals(first.fromStopIndex, 0);
-      assertEquals(first.toStopIndex, 1);
-
-      var second = templates.get(1);
-      assertEquals(second.fromStopIndex, 0);
-      assertEquals(second.toStopIndex, 2);
+    @Nonnull
+    private static UnscheduledTrip trip(List<StopTime> stopTimes) {
+      return new TestCase.Builder(FIRST, THIRD).withStopTimes(stopTimes).build().trip();
     }
   }
 
