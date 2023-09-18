@@ -2387,8 +2387,8 @@ enum CyclingOptimizationType {
     CYCLING_FRIENDLY_STREETS
 
     """
-    Completely ignore the elevation differences and prefer the streets that are evaluated
-    to be cycling friendliest even more than with the `CYCLING_FRIENDLY_STREETS` option.
+    Completely ignore the elevation differences and prefer the streets, that are evaluated
+    to be cycling friendliest, even more than with the `CYCLING_FRIENDLY_STREETS` option.
     Factors that are used to evaluate cycling friendliness include safety, convenience
     and general cyclist preferences. This option was previously called `GREENWAYS`.
     """
@@ -2429,8 +2429,8 @@ enum ScooterOptimizationType {
     SCOOTER_FRIENDLY_STREETS
 
     """
-    Completely ignore the elevation differences and prefer the streets that are evaluated
-    to be scooter friendliest even more than with the `SCOOTER_FRIENDLY_STREETS` option.
+    Completely ignore the elevation differences and prefer the streets, that are evaluated
+    to be scooter friendliest, even more than with the `SCOOTER_FRIENDLY_STREETS` option.
     Factors that are used to evaluate scooter friendliness include safety, convenience
     and general preferences.  Note, currently the same criteria is used both for cycling and scooter travel
     to determine how cycling or scooter friendly streets are. This option was previously called `GREENWAYS`.
