@@ -148,13 +148,13 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     FlexConfig config
   ) {
     // templates will be generated from the first index to the toIndex
-    int firstIndexInStop = 0;
+    int firstIndexInTrip = 0;
 
     // Find alighting index, also check if alighting is allowed
     int toIndex = getToIndex(egress);
 
     // Check if trip is possible
-    if (toIndex == INDEX_NOT_FOUND || firstIndexInStop > toIndex) {
+    if (toIndex == INDEX_NOT_FOUND || firstIndexInTrip > toIndex) {
       return Stream.empty();
     }
 
@@ -162,7 +162,7 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
     if (stopTimes.length == 1) {
       indices = IntStream.of(toIndex);
     } else {
-      indices = IntStream.range(firstIndexInStop, toIndex + 1);
+      indices = IntStream.range(firstIndexInTrip, toIndex + 1);
     }
     // check for every stop after fromIndex if you can alight, if so return a template
     return indices

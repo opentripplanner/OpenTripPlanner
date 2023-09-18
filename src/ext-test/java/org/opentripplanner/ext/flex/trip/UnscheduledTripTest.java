@@ -22,6 +22,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
+import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
+import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -527,16 +529,18 @@ public class UnscheduledTripTest {
       0,
       new TIntHashSet()
     );
+    private static final NearbyStop NEARBY_STOP = new NearbyStop(
+      FOURTH.getStop(),
+      100,
+      List.of(),
+      null
+    );
 
     @Test
     void accessTemplates() {
       var trip = trip(List.of(FIRST, SECOND, THIRD, FOURTH));
 
-      var nearbyStop = new NearbyStop(FOURTH.getStop(), 100, List.of(), null);
-
-      var templates = trip
-        .getFlexAccessTemplates(nearbyStop, FLEX_SERVICE_DATE, CALCULATOR, FlexConfig.DEFAULT)
-        .toList();
+      var templates = accessTemplates(trip);
 
       assertEquals(3, templates.size());
 
@@ -544,8 +548,8 @@ public class UnscheduledTripTest {
         .of(0, 1, 2)
         .forEach(index -> {
           var template = templates.get(index);
-          assertEquals(template.fromStopIndex, 0);
-          assertEquals(template.toStopIndex, index + 1);
+          assertEquals(0, template.fromStopIndex);
+          assertEquals(index + 1, template.toStopIndex);
         });
     }
 
@@ -556,11 +560,7 @@ public class UnscheduledTripTest {
 
       var trip = trip(List.of(FIRST, second, THIRD, FOURTH));
 
-      var nearbyStop = new NearbyStop(FOURTH.getStop(), 100, List.of(), null);
-
-      var templates = trip
-        .getFlexAccessTemplates(nearbyStop, FLEX_SERVICE_DATE, CALCULATOR, FlexConfig.DEFAULT)
-        .toList();
+      var templates = accessTemplates(trip);
 
       assertEquals(2, templates.size());
       List
@@ -572,9 +572,35 @@ public class UnscheduledTripTest {
         });
     }
 
+    @Test
+    void egressTemplates() {
+      var trip = trip(List.of(FIRST, SECOND, THIRD, FOURTH));
+
+      var templates = egressTemplates(trip);
+
+      assertEquals(4, templates.size());
+      var template = templates.get(0);
+      assertEquals(template.fromStopIndex, 3);
+      assertEquals(template.toStopIndex, 0);
+    }
+
     @Nonnull
     private static UnscheduledTrip trip(List<StopTime> stopTimes) {
       return new TestCase.Builder(FIRST, THIRD).withStopTimes(stopTimes).build().trip();
+    }
+
+    @Nonnull
+    private static List<FlexAccessTemplate> accessTemplates(UnscheduledTrip trip) {
+      return trip
+        .getFlexAccessTemplates(NEARBY_STOP, FLEX_SERVICE_DATE, CALCULATOR, FlexConfig.DEFAULT)
+        .toList();
+    }
+
+    @Nonnull
+    private static List<FlexEgressTemplate> egressTemplates(UnscheduledTrip trip) {
+      return trip
+        .getFlexEgressTemplates(NEARBY_STOP, FLEX_SERVICE_DATE, CALCULATOR, FlexConfig.DEFAULT)
+        .toList();
     }
   }
 
