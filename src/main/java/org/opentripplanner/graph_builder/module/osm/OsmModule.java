@@ -30,6 +30,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.slf4j.Logger;
@@ -143,6 +144,7 @@ public class OsmModule implements GraphBuilderModule {
 
     buildBasicGraph();
     buildWalkableAreas(!params.areaVisibility());
+    validateBarriers();
 
     if (params.staticParkAndRide()) {
       List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
@@ -398,6 +400,36 @@ public class OsmModule implements GraphBuilderModule {
     } // END loop over OSM ways
 
     LOG.info(progress.completeMessage());
+  }
+
+  /*
+   * Barrier vertex at the end of a way does not make sense, because
+   * it creates discontunuity of routing in a single point.
+   * Remove all traversal limitations from such vertices.
+   */
+  private void validateBarriers() {
+    List<BarrierVertex> vertices = graph.getVerticesOfType(BarrierVertex.class);
+
+    for (BarrierVertex bv : vertices) {
+      var edgeCount = bv.getDegreeOut() + bv.getDegreeIn();
+      var needsFix = false;
+      if (edgeCount == 1) {
+        needsFix = true;
+      } else if (edgeCount == 2) {
+        var out = bv.getOutgoing();
+        var in = bv.getIncoming();
+        if (
+          out.isEmpty() ||
+          in.isEmpty() ||
+          out.iterator().next().getToVertex() == in.iterator().next().getFromVertex()
+        ) {
+          needsFix = true;
+        }
+      }
+      if (needsFix) {
+        bv.setBarrierPermissions(StreetTraversalPermission.ALL);
+      }
+    }
   }
 
   private void setWayName(OSMWithTags way) {
