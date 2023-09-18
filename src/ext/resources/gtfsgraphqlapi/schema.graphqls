@@ -14,7 +14,7 @@ schema {
     query: QueryType
 }
 
-input AccessibilityPreferences {
+input InputAccessibilityPreferences {
     wheelchair: WheelchairPreferences
 }
 
@@ -279,7 +279,7 @@ enum AlertSeverityLevelType {
     SEVERE
 }
 
-input AlightPreferences {
+input InputAlightPreferences {
     slack: Duration
 }
 
@@ -768,7 +768,7 @@ enum BikesAllowed {
     NOT_ALLOWED
 }
 
-input BicyclePreferences {
+input InputBicyclePreferences {
     reluctance: Reluctance
     bikeWalking: VehicleWalkPreferences
     speed: Speed
@@ -776,7 +776,7 @@ input BicyclePreferences {
     boardCost: Cost
 }
 
-input BoardPreferences {
+input InputBoardPreferences {
     waitReluctance: Reluctance
     slack: Duration
 }
@@ -825,7 +825,7 @@ type CarPark implements Node & PlaceInterface {
     openingHours: OpeningHours
 }
 
-input CarPreferences {
+input InputCarPreferences {
     reluctance: Reluctance
 }
 
@@ -870,18 +870,18 @@ type Coordinates {
     lon: Float
 }
 
-input PlanDateTimeInput @oneOf {
+input InputPlanDateTimeInput @oneOf {
     earliestDeparture: DateTimeWithOffset
     latestArrival: DateTimeWithOffset
 }
 
-input SearchWindowInput {
+input InputSearchWindowInput {
     duration: Duration
     numberOfItineraries: Int
     gracePeriod: SearchWindowGracePeriodInput
 }
 
-input SearchWindowGracePeriodInput {
+input InputSearchWindowGracePeriodInput {
     duration: Duration
     numberOfItineraries: Int
 }
@@ -1254,23 +1254,23 @@ input ParkingFilter {
     select: [ParkingFilterOperation!]
 }
 
-input PlanDebugSettings {
+input InputPlanDebugSettings {
     itineraryFilterDebugProfile: ItineraryFilterDebugProfile = OFF
 }
 
-input PlanLocation {
+input InputPlanLocation {
     coordinate: InputPlanCoordinates
     stop: FeedScopedId
     label: String
 }
 
-input PlanPreferences {
+input InputPlanPreferences {
     street: PlanStreetPreferences
     transit: TransitPreferences
     accessibility: AccessibilityPreferences
 }
 
-input PlanStreetModes {
+input InputPlanStreetModes {
     """Selection of only one allowed for now."""
     direct: [PlanDirectMode!]
     """Selection of only one allowed for now."""
@@ -1281,7 +1281,7 @@ input PlanStreetModes {
     transfer: [PlanTransferMode!]
 }
 
-input PlanStreetPreferences {
+input InputPlanStreetPreferences {
     modes: PlanStreetModes
     bicycle: BicyclePreferences
     scooter: ScooterPreferences
@@ -3555,7 +3555,7 @@ enum RealtimeState {
 
 scalar Reluctance
 
-input RentalPreferences {
+input InputRentalPreferences {
     allowKeepingVehicleAtDestination: Boolean
     keepingVehicleAtDestinationCost: Cost
     allowedNetworks: [String!]
@@ -3739,7 +3739,7 @@ enum AbsoluteDirection {
   NORTHWEST
 }
 
-input ScooterPreferences {
+input InputScooterPreferences {
     reluctance: Reluctance
     scooterWalking: VehicleWalkPreferences
     speed: Speed
@@ -4207,19 +4207,19 @@ type TicketType implements Node {
     zones: [String!]
 }
 
-input TransferPreferences {
+input InputTransferPreferences {
     costPenalty: Cost
     minimumWaitingTime: Duration
     maximumAdditionalTransfers: Int = 5
     maximumTransfers: Int = 12
 }
 
-input TransitModePreferences {
+input InputTransitModePreferences {
     mode: TransitMode!
     reluctance: CostFunction
 }
 
-input TransitPreferences {
+input InputTransitPreferences {
     """TODO should we reuse this or make a new design"""
     unpreferred: InputUnpreferred
     """TODO should we reuse this or make a new design"""
@@ -4441,7 +4441,7 @@ enum VertexType {
     PARKANDRIDE
 }
 
-input VehicleWalkPreferences {
+input InputVehicleWalkPreferences {
     """Speed when walking a vehicle."""
     speed: Speed
 
@@ -4463,7 +4463,7 @@ input VehicleWalkPreferences {
     hopOnOrOffTimeSeconds: Int
 }
 
-input WalkPreferences {
+input InputWalkPreferences {
     speed: Speed
     reluctance: Reluctance
     walkFriendlinessFactor: WeightingFactor
@@ -4486,6 +4486,6 @@ enum WheelchairBoarding {
     NOT_POSSIBLE
 }
 
-input WheelchairPreferences {
+input InputWheelchairPreferences {
     enabled: Boolean
 }
