@@ -5,6 +5,7 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StationBuilder;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
@@ -21,7 +22,7 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
 class StationMapper {
 
   /** @see StationMapper (this class JavaDoc) for way we need this. */
-  private final Map<org.onebusaway.gtfs.model.Stop, Station> mappedStops = new HashMap<>();
+  private final Map<Stop, Station> mappedStops = new HashMap<>();
 
   private final TranslationHelper translationHelper;
   private final StopTransferPriority stationTransferPreference;
@@ -35,17 +36,18 @@ class StationMapper {
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  Station map(org.onebusaway.gtfs.model.Stop orginal) {
+  Station map(Stop orginal) {
     return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
   }
 
-  private Station doMap(org.onebusaway.gtfs.model.Stop rhs) {
-    if (rhs.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION) {
+  private Station doMap(Stop rhs) {
+    if (rhs.getLocationType() != Stop.LOCATION_TYPE_STATION) {
       throw new IllegalArgumentException(
-        "Expected type " +
-        org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION +
-        ", but got " +
-        rhs.getLocationType()
+        "Expected location_type %s, but got %s for stops.txt entry %s".formatted(
+            Stop.LOCATION_TYPE_STATION,
+            rhs.getLocationType(),
+            rhs
+          )
       );
     }
     StationBuilder builder = Station
@@ -54,30 +56,15 @@ class StationMapper {
       .withCode(rhs.getCode());
 
     builder.withName(
-      translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
-        "name",
-        rhs.getId().getId(),
-        rhs.getName()
-      )
+      translationHelper.getTranslation(Stop.class, "name", rhs.getId().getId(), rhs.getName())
     );
 
     builder.withDescription(
-      translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
-        "desc",
-        rhs.getId().getId(),
-        rhs.getDesc()
-      )
+      translationHelper.getTranslation(Stop.class, "desc", rhs.getId().getId(), rhs.getDesc())
     );
 
     builder.withUrl(
-      translationHelper.getTranslation(
-        org.onebusaway.gtfs.model.Stop.class,
-        "url",
-        rhs.getId().getId(),
-        rhs.getUrl()
-      )
+      translationHelper.getTranslation(Stop.class, "url", rhs.getId().getId(), rhs.getUrl())
     );
 
     builder.withPriority(stationTransferPreference);

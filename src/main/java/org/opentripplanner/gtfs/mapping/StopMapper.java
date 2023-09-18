@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
@@ -37,12 +38,11 @@ class StopMapper {
   private RegularStop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
     if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
       throw new IllegalArgumentException(
-        "Expected type " +
-        org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP +
-        ", but got " +
-        gtfsStop.getLocationType() +
-        " from stop " +
-        gtfsStop
+        "Expected location_type %s, but got %s for stops.txt entry %s".formatted(
+            Stop.LOCATION_TYPE_STOP,
+            gtfsStop.getLocationType(),
+            gtfsStop
+          )
       );
     }
 
