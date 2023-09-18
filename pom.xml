@@ -714,7 +714,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.9</version>
         </dependency>
 
         <!-- TESTING -->
