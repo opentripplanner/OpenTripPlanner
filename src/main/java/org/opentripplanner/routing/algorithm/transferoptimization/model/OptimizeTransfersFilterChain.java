@@ -4,4 +4,5 @@ import java.util.Set;
 
 public interface OptimizeTransfersFilterChain<T> {
   Set<T> filter(Set<T> elements);
+  Set<T> finalizeFilter(Set<T> elements);
 }

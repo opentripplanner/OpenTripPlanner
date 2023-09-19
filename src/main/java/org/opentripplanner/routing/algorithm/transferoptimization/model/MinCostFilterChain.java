@@ -50,4 +50,9 @@ public class MinCostFilterChain<T> implements OptimizeTransfersFilterChain<T> {
     }
     return result;
   }
+
+  @Override
+  public Set<T> finalizeFilter(Set<T> elements) {
+    return elements;
+  }
 }
