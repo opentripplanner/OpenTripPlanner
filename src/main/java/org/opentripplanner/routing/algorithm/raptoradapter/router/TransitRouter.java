@@ -142,20 +142,16 @@ public class TransitRouter {
     Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
 
     if (OTPFeature.OptimizeTransfers.isOn() && !transitResponse.containsUnknownPaths()) {
-      paths =
-        TransferOptimizationServiceConfigurator
-          .createOptimizeTransferService(
-            transitLayer::getStopByIndex,
-            requestTransitDataProvider.stopNameResolver(),
-            serverContext.transitService().getTransferService(),
-            requestTransitDataProvider,
-            transitLayer.getStopBoardAlightCosts(),
-            request.preferences().transfer().optimization(),
-            // TODO: 2023-09-01 Here we are injecting pass through points into TransferOptimizationService
-            //  we have to think about what's the best solution
-            raptorRequest.multiCriteria().passThroughPoints()
-          )
-          .optimize(transitResponse.paths());
+      var service = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
+        transitLayer::getStopByIndex,
+        requestTransitDataProvider.stopNameResolver(),
+        serverContext.transitService().getTransferService(),
+        requestTransitDataProvider,
+        transitLayer.getStopBoardAlightCosts(),
+        request.preferences().transfer().optimization(),
+        raptorRequest.multiCriteria()
+      );
+      paths = service.optimize(transitResponse.paths());
     }
 
     // Create itineraries

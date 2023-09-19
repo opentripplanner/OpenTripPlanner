@@ -5,20 +5,24 @@ import java.util.List;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizeTransfersFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
-public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule> {
+public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule>
+  implements FilterFactory<T> {
 
-  public static <T extends RaptorTripSchedule> MinCostFilterChain<OptimizedPathTail<T>> filter(
-    boolean transferPriority,
-    boolean optimizeWaitTime
-  ) {
-    return new TransferOptimizedFilterFactory<T>().create(transferPriority, optimizeWaitTime);
+  private final boolean transferPriority;
+  private final boolean optimizeWaitTime;
+
+  public TransferOptimizedFilterFactory(boolean transferPriority, boolean optimizeWaitTime) {
+    this.transferPriority = transferPriority;
+    this.optimizeWaitTime = optimizeWaitTime;
   }
 
-  private MinCostFilterChain<OptimizedPathTail<T>> create(
-    boolean transferPriority,
-    boolean optimizeWaitTime
+  @Override
+  public OptimizeTransfersFilterChain<OptimizedPathTail<T>> createFilter(
+    List<List<TripToTripTransfer<T>>> possibleTransfers
   ) {
     List<ToIntFunction<OptimizedPathTail<T>>> filters = new ArrayList<>(3);
 

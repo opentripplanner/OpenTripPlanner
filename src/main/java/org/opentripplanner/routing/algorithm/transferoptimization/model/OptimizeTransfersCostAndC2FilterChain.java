@@ -32,4 +32,9 @@ public class OptimizeTransfersCostAndC2FilterChain<T> implements OptimizeTransfe
     }
     return result;
   }
+
+  @Override
+  public Set<T> finalizeFilter(Set<T> elements) {
+    return elements.stream().filter(tail -> getC2.apply(tail) == 0).collect(toSet());
+  }
 }
