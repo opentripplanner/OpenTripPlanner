@@ -145,9 +145,24 @@ class LuceneIndexTest {
   @Nested
   class StopClusters {
 
-    @Test
-    void stopClusters() {
-      var result1 = index.queryStopClusters("alex").toList();
+    @ParameterizedTest
+    @ValueSource(
+      strings = {
+        "Alexanderplatz",
+        "alex",
+        "Alexnderplatz",
+        "Alexnaderplatz",
+        "alexnaderplaz",
+        "Alexanderplat",
+        "alexanderplat",
+        "alexand",
+        "alexander platz",
+        "alexander-platz",
+        "alexander",
+      }
+    )
+    void stopClustersWithTypos(String searchTerm) {
+      var result1 = index.queryStopClusters(searchTerm).toList();
       assertEquals(List.of(mapper.map(ALEXANDERPLATZ_STATION)), result1);
     }
 
@@ -167,7 +182,25 @@ class LuceneIndexTest {
     @ParameterizedTest
     @ValueSource(
       strings = {
-        "five", "five ", "five p", "five po", "five poi", "five poin", "five point", "five points",
+        "five",
+        "five ",
+        "five p",
+        "five po",
+        "five poi",
+        "five poin",
+        "five point",
+        "five points",
+        "fife point",
+        "five poits",
+        "fife",
+        "points",
+        "the five points",
+        "five @ points",
+        "five@points",
+        "five at points",
+        "five&points",
+        "five & points",
+        "five and points",
       }
     )
     void stopClustersWithSpace(String query) {

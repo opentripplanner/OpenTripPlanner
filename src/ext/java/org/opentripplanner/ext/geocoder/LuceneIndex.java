@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.core.SimpleAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.codecs.Codec;
@@ -24,9 +24,12 @@ import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.FuzzyQuery;
+import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.suggest.document.Completion90PostingsFormat;
 import org.apache.lucene.search.suggest.document.CompletionAnalyzer;
@@ -70,7 +73,7 @@ public class LuceneIndex implements Serializable {
     this.analyzer =
       new PerFieldAnalyzerWrapper(
         new StandardAnalyzer(),
-        Map.of(NAME, new SimpleAnalyzer(), SUGGEST, new CompletionAnalyzer(new StandardAnalyzer()))
+        Map.of(NAME, new EnglishAnalyzer(), SUGGEST, new CompletionAnalyzer(new StandardAnalyzer()))
       );
 
     var directory = new ByteBuffersDirectory();
@@ -194,7 +197,7 @@ public class LuceneIndex implements Serializable {
    *    one of those is chosen at random and returned.
    */
   public Stream<StopCluster> queryStopClusters(String query) {
-    return matchingDocuments(StopCluster.class, query, true).map(LuceneIndex::toStopCluster);
+    return matchingDocuments(StopCluster.class, query, false).map(LuceneIndex::toStopCluster);
   }
 
   private static StopCluster toStopCluster(Document document) {
@@ -279,6 +282,7 @@ public class LuceneIndex implements Serializable {
           3
         );
         var query = new ContextQuery(completionQuery);
+
         query.addContext(type.getSimpleName());
 
         var topDocs = searcher.suggest(query, 25, true);
@@ -293,8 +297,12 @@ public class LuceneIndex implements Serializable {
             }
           });
       } else {
-        var parser = new QueryParser(CODE, analyzer);
-        var nameQuery = parser.createPhraseQuery(NAME, searchTerms);
+        var parser = new QueryParser(NAME, analyzer);
+        var nameQuery = parser.parse(searchTerms);
+        var fuzzyNameQuery = new FuzzyQuery(new Term(NAME, analyzer.normalize(NAME, searchTerms)));
+        var prefixNameQuery = new PrefixQuery(
+          new Term(NAME, analyzer.normalize(NAME, searchTerms))
+        );
         var codeQuery = new TermQuery(new Term(CODE, analyzer.normalize(CODE, searchTerms)));
         var typeQuery = new TermQuery(
           new Term(TYPE, analyzer.normalize(TYPE, type.getSimpleName()))
@@ -303,11 +311,10 @@ public class LuceneIndex implements Serializable {
         var builder = new BooleanQuery.Builder()
           .setMinimumNumberShouldMatch(1)
           .add(typeQuery, Occur.MUST)
-          .add(codeQuery, Occur.SHOULD);
-
-        if (nameQuery != null) {
-          builder.add(nameQuery, Occur.SHOULD);
-        }
+          .add(codeQuery, Occur.SHOULD)
+          .add(nameQuery, Occur.SHOULD)
+          .add(fuzzyNameQuery, Occur.SHOULD)
+          .add(prefixNameQuery, Occur.SHOULD);
 
         var query = builder.build();
 
@@ -323,7 +330,7 @@ public class LuceneIndex implements Serializable {
             }
           });
       }
-    } catch (IOException ex) {
+    } catch (IOException | ParseException ex) {
       throw new RuntimeException(ex);
     }
   }
