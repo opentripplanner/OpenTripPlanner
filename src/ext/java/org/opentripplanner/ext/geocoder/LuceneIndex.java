@@ -12,14 +12,9 @@ import java.util.Set;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CharArraySet;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.core.LowerCaseFilter;
-import org.apache.lucene.analysis.core.StopFilter;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.codecs.Codec;
 import org.apache.lucene.codecs.PostingsFormat;
 import org.apache.lucene.codecs.lucene95.Lucene95Codec;
@@ -74,19 +69,6 @@ public class LuceneIndex implements Serializable {
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
 
-  public static class MyCustomAnalyzer extends Analyzer {
-
-    static final CharArraySet CODE_STOP_WORDS = new CharArraySet(Set.of("#"), true);
-
-    @Override
-    protected TokenStreamComponents createComponents(String fieldName) {
-      StandardTokenizer src = new StandardTokenizer();
-      TokenStream result = new LowerCaseFilter(src);
-      result = new StopFilter(result, CODE_STOP_WORDS);
-      return new TokenStreamComponents(src, result);
-    }
-  }
-
   public LuceneIndex(Graph graph, TransitService transitService) {
     this.graph = graph;
     this.transitService = transitService;
@@ -96,8 +78,7 @@ public class LuceneIndex implements Serializable {
         new StandardAnalyzer(),
         Map.ofEntries(
           entry(NAME, new EnglishAnalyzer()),
-          entry(SUGGEST, new CompletionAnalyzer(new StandardAnalyzer())),
-          entry(CODE, new MyCustomAnalyzer())
+          entry(SUGGEST, new CompletionAnalyzer(new StandardAnalyzer()))
         )
       );
 
@@ -322,16 +303,16 @@ public class LuceneIndex implements Serializable {
             }
           });
       } else {
-        var parser = new QueryParser(NAME, analyzer);
-        var nameQuery = parser.parse(searchTerms);
+        var nameParser = new QueryParser(NAME, analyzer);
+        var nameQuery = nameParser.parse(searchTerms);
         var fuzzyNameQuery = new FuzzyQuery(new Term(NAME, analyzer.normalize(NAME, searchTerms)));
         var prefixNameQuery = new PrefixQuery(
           new Term(NAME, analyzer.normalize(NAME, searchTerms))
         );
         var codeQuery = new TermQuery(new Term(CODE, analyzer.normalize(CODE, searchTerms)));
-        var prefixCodeQuery = new PrefixQuery(
-          new Term(CODE, analyzer.normalize(CODE, searchTerms))
-        );
+
+        var prefixCodeQuery = new PrefixQuery(new Term(CODE, analyzer.normalize(CODE, searchTerms)));
+
         var typeQuery = new TermQuery(
           new Term(TYPE, analyzer.normalize(TYPE, type.getSimpleName()))
         );

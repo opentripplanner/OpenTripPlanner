@@ -9,15 +9,9 @@ import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -157,6 +151,8 @@ class LuceneIndexTest {
         "Alexanderplatz",
         "Alexa",
         "alex",
+        "aleyanderplazt",
+        "alexnderplazt",
         "Alexnderplatz",
         "Alexnaderplatz",
         "alexnaderplaz",
@@ -203,13 +199,14 @@ class LuceneIndexTest {
         "points",
         "the five points",
         "five @ points",
+        "five @ the points",
         "five@points",
         "five at points",
         "five&points",
         "five & points",
-        "five and points",
+        "five and the points",
         "points five",
-        "points fife",
+        "points fife"
       }
     )
     void stopClustersWithSpace(String query) {
@@ -218,28 +215,11 @@ class LuceneIndexTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "4456", "445", "#445" })
+    @ValueSource(strings = { "4456", "445" })
     void fuzzyStopCode(String query) {
       var result = index.queryStopClusters(query).toList();
       assertEquals(1, result.size());
       assertEquals(ARTS_CENTER.getName().toString(), result.get(0).name());
-    }
-
-    @Test
-    void analyzer() throws IOException {
-      var x = analyze("#444", new StandardAnalyzer());
-      assertEquals(x, "444");
-    }
-
-    public List<String> analyze(String text, Analyzer analyzer) throws IOException {
-      List<String> result = new ArrayList<String>();
-      TokenStream tokenStream = analyzer.tokenStream("code", text);
-      CharTermAttribute attr = tokenStream.addAttribute(CharTermAttribute.class);
-      tokenStream.reset();
-      while (tokenStream.incrementToken()) {
-        result.add(attr.toString());
-      }
-      return result;
     }
 
     @Test
