@@ -41,7 +41,7 @@ public class StreetGraphFinder implements GraphFinder {
       visitor,
       visitor.getSkipEdgeStrategy()
     );
-    return visitor.stopsFound;
+    return visitor.stopsFound();
   }
 
   @Override
