@@ -4,11 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
-import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
-import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.WayTestData;
-import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMWayTest {
 

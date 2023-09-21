@@ -91,6 +91,7 @@ public class OsmTagMapperTest {
     assertEquals(1, wps.getDataForWay(withFoo).bicycleSafety().back());
   }
 
+  @Test
   public void testAccessNo() {
     OSMWithTags tags = new OSMWithTags();
     OsmTagMapper osmTagMapper = new DefaultMapper();
