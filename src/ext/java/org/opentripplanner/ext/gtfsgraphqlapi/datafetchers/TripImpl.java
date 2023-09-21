@@ -20,7 +20,9 @@ import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLUtils;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLWheelchairBoarding;
+import org.opentripplanner.ext.gtfsgraphqlapi.mapping.BikeAccessMapper;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
@@ -165,13 +167,9 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   }
 
   @Override
-  public DataFetcher<String> bikesAllowed() {
+  public DataFetcher<GraphQLBikesAllowed> bikesAllowed() {
     return environment ->
-      switch (getSource(environment).getBikesAllowed()) {
-        case UNKNOWN -> "NO_INFORMATION";
-        case ALLOWED -> "POSSIBLE";
-        case NOT_ALLOWED -> "NOT_POSSIBLE";
-      };
+      BikeAccessMapper.map(getSource(environment).getBikesAllowed());
   }
 
   @Override
