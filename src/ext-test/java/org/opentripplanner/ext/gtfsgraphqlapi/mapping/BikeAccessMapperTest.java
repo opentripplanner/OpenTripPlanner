@@ -11,11 +11,11 @@ class BikeAccessMapperTest {
   @Test
   void mapping() {
     Arrays
-      .stream(BikeAccess.values()).filter(ba -> ba != BikeAccess.UNKNOWN)
+      .stream(BikeAccess.values())
+      .filter(ba -> ba != BikeAccess.UNKNOWN)
       .forEach(d -> {
         var mapped = BikeAccessMapper.map(d);
         assertEquals(d.toString(), mapped.toString());
       });
   }
-
 }

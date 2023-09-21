@@ -5,6 +5,7 @@ import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
 import org.opentripplanner.transit.model.network.BikeAccess;
 
 public class BikeAccessMapper {
+
   @Nonnull
   public static GraphQLTypes.GraphQLBikesAllowed map(BikeAccess bikesAllowed) {
     return switch (bikesAllowed) {

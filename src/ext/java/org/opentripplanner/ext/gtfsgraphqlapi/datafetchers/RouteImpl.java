@@ -134,8 +134,7 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
 
   @Override
   public DataFetcher<GraphQLBikesAllowed> bikesAllowed() {
-    return environment ->
-      BikeAccessMapper.map(getSource(environment).getBikesAllowed());
+    return environment -> BikeAccessMapper.map(getSource(environment).getBikesAllowed());
   }
 
   @Override
