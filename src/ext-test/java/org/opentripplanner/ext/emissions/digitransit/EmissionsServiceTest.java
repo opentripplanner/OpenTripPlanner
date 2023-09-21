@@ -46,8 +46,7 @@ class EmissionsServiceTest {
   @BeforeEach
   void SetUp() {
     Map<String, DigitransitEmissions> digitransitEmissions = new HashMap<>();
-    digitransitEmissions.put("F:F:1:BUS", new DigitransitEmissions(120, 12));
-    digitransitEmissions.put("CAR", new DigitransitEmissions(1100, 1));
+    digitransitEmissions.put("F:2", new DigitransitEmissions(120, 12));
     this.eService = new DigitransitEmissionsService(digitransitEmissions, 131);
   }
 
@@ -111,6 +110,6 @@ class EmissionsServiceTest {
       .build();
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(235.83999633789062F, eService.getEmissionsForItinerary(i));
+    assertEquals(28.0864F, eService.getEmissionsForItinerary(i));
   }
 }

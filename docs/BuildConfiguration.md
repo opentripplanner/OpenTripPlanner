@@ -56,8 +56,9 @@ Sections follow that describe particular settings in more depth.
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 | demDefaults                                                              |   `object`  | Default properties for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.3  |
 |    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)       |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                                                         | *Optional* | `1.0`                             |  2.3  |
-| [digitransitEmissions](#digitransitEmissions)                            |   `object`  | Configure properties for emissions file.                                                                                                                       | *Optional* |                                   |  2.4  |
-|    url                                                                   |   `string`  | Url to emissions json file.                                                                                                                                    | *Optional* | `""`                              |  2.4  |
+| [digitransitEmissions](#digitransitEmissions)                            |   `object`  | Configure properties for emissions file.                                                                                                                       | *Optional* |                                   |   na  |
+|    carAvgCo2                                                             |  `integer`  | The average CO2 emissions of a car.                                                                                                                            | *Optional* | `170`                             |   na  |
+|    carAvgOccupancy                                                       |   `double`  | The average number of passengers in a car.                                                                                                                     | *Optional* | `1.3`                             |   na  |
 | [elevationBucket](#elevationBucket)                                      |   `object`  | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
 | [fares](sandbox/Fares.md)                                                |   `object`  | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
 | gtfsDefaults                                                             |   `object`  | The gtfsDefaults section allows you to specify default properties for GTFS files.                                                                              | *Optional* |                                   |  2.3  |
@@ -703,7 +704,7 @@ in the source data, this should be set to 0.1.
 
 <h3 id="digitransitEmissions">digitransitEmissions</h3>
 
-**Since version:** `2.4` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
 **Path:** / 
 
 Configure properties for emissions file.
@@ -1181,7 +1182,8 @@ case where this is not the case.
     }
   ],
   "digitransitEmissions" : {
-    "url" : "foo.bar"
+    "carAvgCo2" : 170,
+    "carAvgOccupancy" : 1.3
   }
 }
 ```
