@@ -91,7 +91,13 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
     CsvReader reader = new CsvReader(stream, StandardCharsets.UTF_8);
     reader.readHeaders();
     while (reader.readRecord()) {
-      this.emissionsData.put(getKey(reader, feedId), getEmissions(reader));
+      String routeId = reader.get("route_id");
+      Double avgCo2PerVehiclePerKm = Double.parseDouble(reader.get("avg_co2_per_vehicle_per_km"));
+      int avgPassengerCount = Integer.parseInt(reader.get("avg_passenger_count"));
+      this.emissionsData.put(
+          feedId + ":" + routeId,
+          new DigitransitEmissions(avgCo2PerVehiclePerKm, avgPassengerCount)
+        );
     }
   }
 
@@ -105,19 +111,5 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
       LOG.error("Reading feed id for emissions failed.", e);
       throw new RuntimeException(e);
     }
-  }
-
-  private String getKey(CsvReader reader, String feedId) throws IOException {
-    String routeId = reader.get("route_id");
-    String agencyId = reader.get("agency_id");
-    String routeShortName = reader.get("route_short_name");
-    String type = reader.get("type");
-    return feedId + ":" + agencyId + ":" + routeId + ":" + routeShortName + ":" + type;
-  }
-
-  private DigitransitEmissions getEmissions(CsvReader reader) throws IOException {
-    Double avg = Double.parseDouble(reader.get("avg"));
-    int pAvg = Integer.parseInt(reader.get("p_avg"));
-    return new DigitransitEmissions(avg, pAvg);
   }
 }

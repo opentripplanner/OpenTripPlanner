@@ -14,21 +14,15 @@ Emissions data is located in an emissions.txt file within a gtfs package and has
 
 `route_id`: route id
 
-`agency_id`: agency id
+`avg_co2_per_vehicle_per_km`: Average carbon dioxide equivalent value for the vehicles used on the route at grams/Km units.
 
-`route_short_name`: Short name of the route.
-
-`type`: Mode of transportation.
-
-`avg`: Average carbon dioxide equivalent value for the vehicles used on the route at grams/Km units
-
-`p_avg`: Average passenger count for the vehicles on the route.
+`avg_passenger_count`: Average passenger count for the vehicles on the route.
 
 For example:
 ```csv
-route_id,agency_id,route_short_name,type,avg,p_avg
-1234,HSL,545,BUS,123,20
-2345,HSL,1,TRAM,0,0
+route_id,avg_co2_per_vehicle_per_km,avg_passenger_count
+1234,123,20
+2345,0,0
 ```
 
 Emissions data is loaded from the gtfs package and embedded into the graph during the build process.

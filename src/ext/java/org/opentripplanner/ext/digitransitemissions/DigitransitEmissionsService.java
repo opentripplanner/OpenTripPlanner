@@ -60,20 +60,10 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
       .stream()
       .mapToDouble(leg -> {
         double legDistanceInKm = leg.getDistanceMeters() / 1000;
-        FeedScopedId feedScopedAgencyId = leg.getAgency().getId();
-        String modeName = leg.getMode().name();
-
-        String key =
-          feedScopedAgencyId +
-          ":" +
-          leg.getRoute().getId().getId() +
-          ":" +
-          leg.getRoute().getShortName() +
-          ":" +
-          modeName;
-
-        if (key != null && this.emissions.containsKey(key)) {
-          return this.emissions.get(key).getEmissionsPerPassenger() * legDistanceInKm;
+        String feedScopedRouteId =
+          leg.getAgency().getId().getFeedId() + ":" + leg.getRoute().getId().getId();
+        if (feedScopedRouteId != null && this.emissions.containsKey(feedScopedRouteId)) {
+          return this.emissions.get(feedScopedRouteId).getEmissionsPerPassenger() * legDistanceInKm;
         }
         return -1;
       });
