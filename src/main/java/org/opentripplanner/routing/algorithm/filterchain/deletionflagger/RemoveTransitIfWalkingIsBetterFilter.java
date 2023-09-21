@@ -11,23 +11,15 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
- * Filter itineraries based on generalizedCost, compared with a on-street-all-the-way itinerary(if
- * it exist). If an itinerary cost exceeds the limit computed from the best all-the-way-on-street itinerary, then the
- * transit itinerary is removed.
+ * Filter itineraries which have a higher generalized-cost than a pure walk itinerary.
  */
-public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletionFlagger {
-
-  private final CostLinearFunction costLimitFunction;
-
-  public RemoveTransitIfStreetOnlyIsBetterFilter(CostLinearFunction costLimitFunction) {
-    this.costLimitFunction = costLimitFunction;
-  }
+public class RemoveTransitIfWalkingIsBetterFilter implements ItineraryDeletionFlagger {
 
   /**
    * Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
    * to know which filters removed
    */
-  public static final String TAG = "transit-vs-street-filter";
+  public static final String TAG = "transit-vs-walk-filter";
 
   @Override
   public String name() {
@@ -36,22 +28,18 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletio
 
   @Override
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
-    // Find the best street-all-the-way option
-    OptionalInt minStreetCost = itineraries
+    OptionalInt minWalkCost = itineraries
       .stream()
-      .filter(Itinerary::isOnStreetAllTheWay)
+      .filter(Itinerary::isWalkingAllTheWay)
       .mapToInt(Itinerary::getGeneralizedCost)
       .min();
 
-    if (minStreetCost.isEmpty()) {
+    if (minWalkCost.isEmpty()) {
       return List.of();
     }
 
-    var limit = costLimitFunction
-      .calculate(Cost.costOfSeconds(minStreetCost.getAsInt()))
-      .toSeconds();
+    var limit = minWalkCost.getAsInt();
 
-    // Filter away itineraries that have higher cost than limit cost computed above
     return itineraries
       .stream()
       .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCost() >= limit)

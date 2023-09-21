@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Contains the logic for extracting elevator data from OSM and converting it to edges.
  * <p>
- * I depends heavily on the idiosyncratic processing of the OSM data in {@link OsmModule}
+ * It depends heavily on the idiosyncratic processing of the OSM data in {@link OsmModule}
  * which is the reason this is not a public class.
  */
 class ElevatorProcessor {
@@ -208,12 +208,10 @@ class ElevatorProcessor {
   }
 
   private boolean isElevatorWay(OSMWay way) {
-    if (!way.hasTag("highway")) {
+    if (!way.isElevator()) {
       return false;
     }
-    if (!"elevator".equals(way.getTag("highway"))) {
-      return false;
-    }
+
     if (osmdb.isAreaWay(way.getId())) {
       return false;
     }

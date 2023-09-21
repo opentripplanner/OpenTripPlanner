@@ -23,8 +23,6 @@ public class OsmModuleBuilder {
   private boolean platformEntriesLinking = false;
   private boolean staticParkAndRide = false;
   private boolean staticBikeParkAndRide = false;
-  private boolean banDiscouragedWalking = false;
-  private boolean banDiscouragedBiking = false;
   private int maxAreaNodes;
 
   OsmModuleBuilder(Collection<OsmProvider> providers, Graph graph) {
@@ -67,16 +65,6 @@ public class OsmModuleBuilder {
     return this;
   }
 
-  public OsmModuleBuilder withBanDiscouragedWalking(boolean banDiscouragedWalking) {
-    this.banDiscouragedWalking = banDiscouragedWalking;
-    return this;
-  }
-
-  public OsmModuleBuilder withBanDiscouragedBiking(boolean banDiscouragedBiking) {
-    this.banDiscouragedBiking = banDiscouragedBiking;
-    return this;
-  }
-
   public OsmModuleBuilder withMaxAreaNodes(int maxAreaNodes) {
     this.maxAreaNodes = maxAreaNodes;
     return this;
@@ -94,9 +82,7 @@ public class OsmModuleBuilder {
         areaVisibility,
         platformEntriesLinking,
         staticParkAndRide,
-        staticBikeParkAndRide,
-        banDiscouragedWalking,
-        banDiscouragedBiking
+        staticBikeParkAndRide
       )
     );
   }

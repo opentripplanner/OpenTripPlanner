@@ -44,6 +44,7 @@ The following are known deployments of OTP in a government- or agency-sponsored 
   the [OneBusAway native apps](http://onebusaway.org/) in the Puget Sound region. Technical details
   are [here](https://github.com/OneBusAway/onebusaway-android/blob/master/SYSTEM_ARCHITECTURE.md#add-trip-planning-andor-bike-share-optional)
   .
+* [**Ride Metro Houston**](https://planyourtrip.ridemetro.org/)
 * **Tampa, Florida** Hillsoborough Area Regional Transit uses an OpenTripPlanner server to power the
   trip planning feature of the [OneBusAway native apps](http://onebusaway.org/) in their region.
   Technical details

@@ -65,7 +65,7 @@ public class OsmModule implements GraphBuilderModule {
     this.graph = graph;
     this.issueStore = issueStore;
     this.params = params;
-    this.osmdb = new OsmDatabase(issueStore, params.boardingAreaRefTags());
+    this.osmdb = new OsmDatabase(issueStore);
     this.vertexGenerator = new VertexGenerator(osmdb, graph, params.boardingAreaRefTags());
     this.normalizer = new SafetyValueNormalizer(graph, issueStore);
   }
@@ -247,14 +247,10 @@ public class OsmModule implements GraphBuilderModule {
     WAY:for (OSMWay way : osmdb.getWays()) {
       WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
       setWayName(way);
-      StreetTraversalPermission permissions = OsmFilter.getPermissionsForWay(
-        way,
-        wayData.getPermission(),
-        params.banDiscouragedWalking(),
-        params.banDiscouragedBiking(),
-        issueStore
-      );
-      if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) {
+
+      var permissions = wayData.getPermission();
+
+      if (!way.isRoutable() || permissions.allowsNothing()) {
         continue;
       }
 
@@ -468,7 +464,7 @@ public class OsmModule implements GraphBuilderModule {
     StreetEdge backStreet = null;
     double length = getGeometryLengthMeters(geometry);
 
-    var permissionPair = OsmFilter.getPermissions(permissions, way);
+    var permissionPair = way.splitPermissions(permissions);
     var permissionsFront = permissionPair.main();
     var permissionsBack = permissionPair.back();
 
@@ -528,17 +524,14 @@ public class OsmModule implements GraphBuilderModule {
       .withPermission(permissions)
       .withBack(back)
       .withCarSpeed(carSpeed)
-      .withLink(OsmFilter.isLink(way))
+      .withLink(way.isLink())
       .withRoundabout(way.isRoundabout())
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
-      .withStairs(way.isSteps());
+      .withStairs(way.isSteps())
+      .withWheelchairAccessible(way.isWheelchairAccessible());
 
     if (!way.hasTag("name") && !way.hasTag("ref")) {
       seb.withBogusName(true);
-    }
-    /* TODO: This should probably generalized somehow? */
-    if ((way.isTagFalse("wheelchair") || (way.isSteps() && !way.isTagTrue("wheelchair")))) {
-      seb.withWheelchairAccessible(false);
     }
 
     // < 0.04: account for

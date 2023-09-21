@@ -53,7 +53,7 @@ public class PortlandMapperTest {
   void walkSafety(OSMWithTags way, double expected) {
     var score = wps.getDataForWay(way);
 
-    var ws = score.getWalkSafetyFeatures();
+    var ws = score.walkSafety();
     assertEquals(expected, ws.forward(), delta);
     assertEquals(expected, ws.back(), delta);
   }

@@ -23,6 +23,7 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveB
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfWalkingIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
@@ -56,7 +57,7 @@ public class ItineraryListFilterChainBuilder {
   private ItineraryFilterDebugProfile debug = ItineraryFilterDebugProfile.OFF;
   private int maxNumberOfItineraries = NOT_SET;
   private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
-  private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
+  private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
   private boolean removeWalkAllTheWayResults;
   private boolean sameFirstOrLastTripFilter;
   private TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams;
@@ -72,6 +73,7 @@ public class ItineraryListFilterChainBuilder {
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
+  private boolean removeTransitIfWalkingIsBetter = true;
 
   @Sandbox
   private ItineraryListFilter rideHailingFilter;
@@ -184,18 +186,29 @@ public class ItineraryListFilterChainBuilder {
   /**
    * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
    * cases we get "silly" transit itineraries that is marginally better on travel-duration compared
-   * with a on-street-all-the-way itinerary. Use this method to turn this filter on/off.
+   * with a on-street-all-the-way itinerary. Use this method to filter worse enough itineraries.
    * <p>
-   * The filter remove all itineraries with a generalized-cost that is higher than the best
+   * The filter removes all itineraries with a generalized-cost that is higher than the best
    * on-street-all-the-way itinerary.
    * <p>
    * This filter only have an effect, if an on-street-all-the-way(WALK, BICYCLE, CAR) itinerary
    * exist.
    */
   public ItineraryListFilterChainBuilder withRemoveTransitWithHigherCostThanBestOnStreetOnly(
-    boolean value
+    CostLinearFunction value
   ) {
     this.removeTransitWithHigherCostThanBestOnStreetOnly = value;
+    return this;
+  }
+
+  /**
+   * A transit itinerary with higher generalized-cost than a walk-only itinerary is silly. This filter removes such
+   * itineraries.
+   * <p>
+   * This filter only have an effect, if an walk-all-the-way itinerary exist.
+   */
+  public ItineraryListFilterChainBuilder withRemoveTransitIfWalkingIsBetter(boolean value) {
+    this.removeTransitIfWalkingIsBetter = value;
     return this;
   }
 
@@ -350,8 +363,19 @@ public class ItineraryListFilterChainBuilder {
     // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
     // what we want, since both itineraries are none optimal.
     {
-      if (removeTransitWithHigherCostThanBestOnStreetOnly) {
-        filters.add(new DeletionFlaggingFilter(new RemoveTransitIfStreetOnlyIsBetterFilter()));
+      // Filter transit itineraries by comparing against non-transit using generalized-cost
+      if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
+        filters.add(
+          new DeletionFlaggingFilter(
+            new RemoveTransitIfStreetOnlyIsBetterFilter(
+              removeTransitWithHigherCostThanBestOnStreetOnly
+            )
+          )
+        );
+      }
+
+      if (removeTransitIfWalkingIsBetter) {
+        filters.add(new DeletionFlaggingFilter(new RemoveTransitIfWalkingIsBetterFilter()));
       }
 
       if (removeWalkAllTheWayResults) {
