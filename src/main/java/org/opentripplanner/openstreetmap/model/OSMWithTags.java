@@ -19,13 +19,32 @@ import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.openstreetmap.OsmProvider;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
  * A base class for OSM entities containing common methods.
  */
-
 public class OSMWithTags {
+
+  /**
+   * highway=* values that we don't want to even consider when building the graph.
+   */
+  public static final Set<String> NON_ROUTABLE_HIGHWAYS = Set.of(
+    "proposed",
+    "planned",
+    "construction",
+    "razed",
+    "raceway",
+    "abandoned",
+    "historic",
+    "no",
+    "emergency_bay",
+    "rest_area",
+    "services",
+    "bus_guideway",
+    "escape"
+  );
 
   /* To save memory this is only created when an entity actually has tags. */
   private Map<String, String> tags;
@@ -89,7 +108,7 @@ public class OSMWithTags {
    * The tags of an entity.
    */
   public Map<String, String> getTags() {
-    return tags;
+    return Objects.requireNonNullElse(tags, Map.of());
   }
 
   /**
@@ -135,6 +154,13 @@ public class OSMWithTags {
     }
 
     return isTrue(getTag(tag));
+  }
+
+  /**
+   * Returns true if bicycle dismounts are forced.
+   */
+  public boolean isBicycleDismountForced() {
+    return isTag("bicycle", "dismount");
   }
 
   protected boolean doesTagAllowAccess(String tag) {
@@ -432,8 +458,16 @@ public class OSMWithTags {
     );
   }
 
+  /**
+   * Determines if an entity is a platform.
+   * <p>
+   * However, they are filtered out if they are tagged usage=tourism. This prevents miniature tourist
+   * railways like the one in Portland's Zoo (https://www.openstreetmap.org/way/119108622)
+   * from being linked to transit stops that are underneath it.
+   **/
   public boolean isPlatform() {
-    return isTag("public_transport", "platform") || isRailwayPlatform();
+    var isPlatform = isTag("public_transport", "platform") || isRailwayPlatform();
+    return isPlatform && !isTag("usage", "tourism");
   }
 
   public boolean isRailwayPlatform() {
@@ -469,7 +503,7 @@ public class OSMWithTags {
     this.creativeName = creativeName;
   }
 
-  public String getOpenStreetMapLink() {
+  public String url() {
     return null;
   }
 
@@ -502,17 +536,25 @@ public class OSMWithTags {
    * Determines whether this OSM way is considered routable. The majority of routable ways are those
    * with a highway= tag (which includes everything from motorways to hiking trails). Anything with
    * a public_transport=platform or railway=platform tag is also considered routable even if it
-   * doesn't have a highway tag. Platforms are however filtered out if they are marked
-   * usage=tourism. This prevents miniature tourist railways like the one in Portland's Zoo from
-   * receiving a better score and pulling search endpoints away from real transit stops.
+   * doesn't have a highway tag.
    */
   public boolean isRoutable() {
-    if (hasTag("highway")) {
+    if (isOneOfTags("highway", NON_ROUTABLE_HIGHWAYS)) {
+      return false;
+    } else if (hasTag("highway") || isPlatform()) {
+      if (isGeneralAccessDenied()) {
+        // There are exceptions.
+        return (
+          isMotorcarExplicitlyAllowed() ||
+          isBicycleExplicitlyAllowed() ||
+          isPedestrianExplicitlyAllowed() ||
+          isMotorVehicleExplicitlyAllowed() ||
+          isVehicleExplicitlyAllowed()
+        );
+      }
       return true;
     }
-    if (isPlatform()) {
-      return !isTag("usage", "tourism");
-    }
+
     return false;
   }
 
@@ -553,6 +595,89 @@ public class OSMWithTags {
       return Set.of("0");
     }
     return levels;
+  }
+
+  /**
+   * Given an assumed traversal permissions, check if there are explicit additional tags, like bicycle=no
+   * or bicycle=yes that override them.
+   */
+  public StreetTraversalPermission overridePermissions(StreetTraversalPermission def) {
+    StreetTraversalPermission permission;
+
+    /*
+     * Only a few tags are examined here, because we only care about modes supported by OTP
+     * (wheelchairs are not of concern here)
+     *
+     * Only a few values are checked for, all other values are presumed to be permissive (=>
+     * This may not be perfect, but is closer to reality, since most people don't follow the
+     * rules perfectly ;-)
+     */
+    if (isGeneralAccessDenied()) {
+      // this can actually be overridden
+      permission = StreetTraversalPermission.NONE;
+    } else {
+      permission = def;
+    }
+
+    if (isVehicleExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+    } else if (isVehicleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.BICYCLE_AND_CAR);
+    }
+
+    if (isMotorcarExplicitlyDenied() || isMotorVehicleExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.CAR);
+    } else if (isMotorcarExplicitlyAllowed() || isMotorVehicleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.CAR);
+    }
+
+    if (isBicycleExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.BICYCLE);
+    } else if (isBicycleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.BICYCLE);
+    }
+
+    if (isPedestrianExplicitlyDenied()) {
+      permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+    } else if (isPedestrianExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
+    }
+
+    if (isUnderConstruction()) {
+      permission = StreetTraversalPermission.NONE;
+    }
+
+    if (permission == null) {
+      return def;
+    }
+
+    /*
+     * pedestrian rules: everything is two-way (assuming pedestrians are allowed at all) bicycle
+     * rules: default: permissions;
+     *
+     * cycleway=dismount means walk your bike -- the engine will automatically try walking bikes
+     * any time it is forbidden to ride them, so the only thing to do here is to remove bike
+     * permissions
+     *
+     * oneway=... sets permissions for cars and bikes oneway:bicycle overwrites these
+     * permissions for bikes only
+     *
+     * now, cycleway=opposite_lane, opposite, opposite_track can allow once oneway has been set
+     * by oneway:bicycle, but should give a warning if it conflicts with oneway:bicycle
+     *
+     * bicycle:backward=yes works like oneway:bicycle=no bicycle:backwards=no works like
+     * oneway:bicycle=yes
+     */
+
+    // Compute bike permissions, check consistency.
+    if (isBicycleExplicitlyAllowed()) {
+      permission = permission.add(StreetTraversalPermission.BICYCLE);
+    }
+
+    if (isBicycleDismountForced()) {
+      permission = permission.remove(StreetTraversalPermission.BICYCLE);
+    }
+    return permission;
   }
 
   @Override
