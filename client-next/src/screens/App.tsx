@@ -1,5 +1,5 @@
 import { Stack } from 'react-bootstrap';
-import { MapView } from '../components/MapView.tsx';
+import { MapView } from '../components/MapView/MapView.tsx';
 import { NavBarContainer } from '../components/NavBarContainer.tsx';
 import { SearchBarContainer } from '../components/SearchBarContainer.tsx';
 import { ItineraryListContainer } from '../components/ItineraryListContainer.tsx';

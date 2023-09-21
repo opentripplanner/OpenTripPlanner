@@ -2,11 +2,15 @@
   background-color: #fff;
 }
 
+.navbar-container {
+  margin-left: 1rem;
+}
+
 .navbar-brand {
   color: #4078bc;
 }
 
-.itinterary-list-container {
+.itinerary-list-container {
   width: 36rem;
   height: calc(100vh - 200px);
   overflow: scroll;

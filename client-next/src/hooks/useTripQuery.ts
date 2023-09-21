@@ -12,7 +12,7 @@ const endpoint = `https://api.entur.io/journey-planner/v3/graphql`;
  */
 const query = graphql(`
   query trip($from: Location!, $to: Location!) {
-    trip(from: $from, to: $to, numTripPatterns: 3) {
+    trip(from: $from, to: $to) {
       tripPatterns {
         aimedStartTime
         aimedEndTime
@@ -32,13 +32,14 @@ const query = graphql(`
 
 type TripQueryHook = (variables?: TripQueryVariables) => [TripQuery | null, () => Promise<void>];
 
-export const useTripQuery: TripQueryHook = (
-  variables = {
-    from: { place: 'NSR:StopPlace:337' },
-    to: { place: 'NSR:StopPlace:1' },
-  },
-) => {
+export const useTripQuery: TripQueryHook = (variables) => {
   const [data, setData] = useState<TripQuery | null>(null);
-  const callback = useCallback(async () => setData(await request(endpoint, query, variables)), [setData, variables]);
+  const callback = useCallback(async () => {
+    if (variables) {
+      setData(await request(endpoint, query, variables));
+    } else {
+      console.warn("Can't search without variables");
+    }
+  }, [setData, variables]);
   return [data, callback];
 };

@@ -3,7 +3,7 @@ import { Card } from 'react-bootstrap';
 
 export function ItineraryListContainer({ tripQueryResult }: { tripQueryResult: TripQuery | null }) {
   return (
-    <section className="itinterary-list-container">
+    <section className="itinerary-list-container">
       <h2>Itineraries</h2>
       {tripQueryResult &&
         tripQueryResult.trip.tripPatterns.map((tripPattern) => (

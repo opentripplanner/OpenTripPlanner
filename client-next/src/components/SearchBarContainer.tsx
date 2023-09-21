@@ -50,7 +50,6 @@ export function SearchBarContainer({
             }
           />
         </Form.Group>
-
         <Button variant="primary" onClick={onRoute}>
           Route
         </Button>
