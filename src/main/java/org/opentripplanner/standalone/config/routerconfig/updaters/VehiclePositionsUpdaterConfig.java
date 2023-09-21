@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config.routerconfig.updaters;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
 import java.time.Duration;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -25,7 +26,19 @@ public class VehiclePositionsUpdaterConfig {
       .since(V2_2)
       .summary("The URL of GTFS-RT protobuf HTTP resource to download the positions from.")
       .asUri();
+    var fuzzyTripMatching = c
+      .of("fuzzyTripMatching")
+      .since(V2_5)
+      .summary("Whether to match trips fuzzily.")
+      .asBoolean(false);
     var headers = HttpHeadersConfig.headers(c, V2_3);
-    return new VehiclePositionsUpdaterParameters(updaterRef, feedId, url, frequency, headers);
+    return new VehiclePositionsUpdaterParameters(
+      updaterRef,
+      feedId,
+      url,
+      frequency,
+      headers,
+      fuzzyTripMatching
+    );
   }
 }

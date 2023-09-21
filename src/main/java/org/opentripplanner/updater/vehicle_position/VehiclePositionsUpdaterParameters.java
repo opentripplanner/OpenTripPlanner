@@ -11,7 +11,8 @@ public record VehiclePositionsUpdaterParameters(
   String feedId,
   URI url,
   Duration frequency,
-  HttpHeaders headers
+  HttpHeaders headers,
+  boolean fuzzyTripMatching
 )
   implements PollingGraphUpdaterParameters {
   public VehiclePositionsUpdaterParameters {

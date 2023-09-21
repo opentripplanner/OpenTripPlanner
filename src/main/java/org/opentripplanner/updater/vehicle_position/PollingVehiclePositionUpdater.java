@@ -8,7 +8,9 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.PollingGraphUpdater;
 import org.opentripplanner.updater.spi.WriteToGraphCallback;
 import org.slf4j.Logger;
@@ -42,6 +44,9 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
     this.vehiclePositionSource =
       new GtfsRealtimeHttpVehiclePositionSource(params.url(), params.headers());
     var index = transitModel.getTransitModelIndex();
+    var fuzzyTripMatcher = params.fuzzyTripMatching()
+      ? new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel))
+      : null;
     this.vehiclePositionPatternMatcher =
       new VehiclePositionPatternMatcher(
         params.feedId(),
@@ -49,7 +54,8 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
         trip -> index.getPatternForTrip().get(trip),
         (trip, date) -> getPatternIncludingRealtime(transitModel, trip, date),
         vehiclePositionService,
-        transitModel.getTimeZone()
+        transitModel.getTimeZone(),
+        fuzzyTripMatcher
       );
 
     LOG.info(

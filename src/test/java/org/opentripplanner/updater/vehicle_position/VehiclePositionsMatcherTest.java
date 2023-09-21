@@ -81,7 +81,8 @@ public class VehiclePositionsMatcherTest {
       ignored -> pattern,
       (id, time) -> pattern,
       service,
-      zoneId
+      zoneId,
+      null
     );
 
     var positions = List.of(vehiclePosition(secondTripId));
@@ -112,7 +113,8 @@ public class VehiclePositionsMatcherTest {
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
       service,
-      zoneId
+      zoneId,
+      null
     );
 
     var pos = VehiclePosition
@@ -165,7 +167,8 @@ public class VehiclePositionsMatcherTest {
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
       service,
-      zoneId
+      zoneId,
+      null
     );
 
     var positions = List.of(pos);
@@ -220,7 +223,8 @@ public class VehiclePositionsMatcherTest {
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
       service,
-      zoneId
+      zoneId,
+      null
     );
 
     var pos1 = vehiclePosition(tripId1);

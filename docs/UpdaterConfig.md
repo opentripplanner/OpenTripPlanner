@@ -228,6 +228,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 | type = "vehicle-positions" |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
 | feedId                     |     `string`    | Feed ID to which the update should be applied.                             | *Required* |               |  2.2  |
 | frequency                  |    `duration`   | How often the positions should be updated.                                 | *Optional* | `"PT1M"`      |  2.2  |
+| fuzzyTripMatching          |    `boolean`    | Whether to match trips fuzzily.                                            | *Optional* | `false`       |  2.5  |
 | url                        |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from.  | *Required* |               |  2.2  |
 | [headers](#u__6__headers)  | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
 

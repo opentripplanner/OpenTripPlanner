@@ -40,6 +40,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -62,6 +63,7 @@ public class VehiclePositionPatternMatcher {
   private final Function<FeedScopedId, Trip> getTripForId;
   private final Function<Trip, TripPattern> getStaticPattern;
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
+  private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
   private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
@@ -71,7 +73,8 @@ public class VehiclePositionPatternMatcher {
     Function<Trip, TripPattern> getStaticPattern,
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
     VehiclePositionRepository repository,
-    ZoneId timeZoneId
+    ZoneId timeZoneId,
+    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher
   ) {
     this.feedId = feedId;
     this.getTripForId = getTripForId;
@@ -79,6 +82,7 @@ public class VehiclePositionPatternMatcher {
     this.getRealtimePattern = getRealtimePattern;
     this.repository = repository;
     this.timeZoneId = timeZoneId;
+    this.fuzzyTripMatcher = fuzzyTripMatcher;
   }
 
   /**
@@ -308,6 +312,11 @@ public class VehiclePositionPatternMatcher {
     }
   }
 
+  private VehiclePosition fuzzilySetTrip(VehiclePosition vehiclePosition) {
+    var trip = fuzzyTripMatcher.match(feedId, vehiclePosition.getTrip());
+    return vehiclePosition.toBuilder().setTrip(trip).build();
+  }
+
   private Result<PatternAndVehiclePosition, UpdateError> toRealtimeVehiclePosition(
     String feedId,
     VehiclePosition vehiclePosition
@@ -320,7 +329,11 @@ public class VehiclePositionPatternMatcher {
       return Result.failure(UpdateError.noTripId(INVALID_INPUT_STRUCTURE));
     }
 
-    var tripId = vehiclePosition.getTrip().getTripId();
+    var vehiclePositionWithTripId = fuzzyTripMatcher == null
+      ? vehiclePosition
+      : fuzzilySetTrip(vehiclePosition);
+
+    var tripId = vehiclePositionWithTripId.getTrip().getTripId();
 
     if (StringUtils.hasNoValue(tripId)) {
       return Result.failure(UpdateError.noTripId(UpdateError.UpdateErrorType.NO_TRIP_ID));
@@ -338,7 +351,7 @@ public class VehiclePositionPatternMatcher {
     }
 
     var serviceDate = Optional
-      .of(vehiclePosition.getTrip().getStartDate())
+      .of(vehiclePositionWithTripId.getTrip().getStartDate())
       .map(Strings::emptyToNull)
       .flatMap(ServiceDateUtils::parseStringToOptional)
       .orElseGet(() -> inferServiceDate(trip));
@@ -359,7 +372,7 @@ public class VehiclePositionPatternMatcher {
 
     // Add position to pattern
     var newPosition = mapVehiclePosition(
-      vehiclePosition,
+      vehiclePositionWithTripId,
       pattern.getStops(),
       trip,
       staticTripTimes::stopIndexOfGtfsSequence
