@@ -115,7 +115,8 @@ class GraphQLIntegrationTest {
 
     var stopModel = StopModel.of();
     PlanTestConstants.listStops().forEach(sl -> stopModel.withRegularStop((RegularStop) sl));
-    var transitModel = new TransitModel(stopModel.build(), DEDUPLICATOR);
+    var model = stopModel.build();
+    var transitModel = new TransitModel(model, DEDUPLICATOR);
 
     final TripPattern pattern = TransitModelForTest.pattern(BUS).build();
     var trip = TransitModelForTest.trip("123").withHeadsign(I18NString.of("Trip Headsign")).build();

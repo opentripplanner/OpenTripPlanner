@@ -122,12 +122,12 @@ public class DefaultMapperTest {
     var regular = WayTestData.pedestrianTunnel();
     var props = wps.getDataForWay(regular);
     assertEquals(PEDESTRIAN_AND_BICYCLE, props.getPermission());
-    assertEquals(1, props.getWalkSafetyFeatures().forward());
+    assertEquals(1, props.walkSafety().forward());
 
     var discouraged = WayTestData.pedestrianTunnel().addTag("foot", "discouraged");
     var discouragedProps = wps.getDataForWay(discouraged);
     assertEquals(PEDESTRIAN_AND_BICYCLE, discouragedProps.getPermission());
-    assertEquals(3, discouragedProps.getWalkSafetyFeatures().forward());
+    assertEquals(3, discouragedProps.walkSafety().forward());
   }
 
   @Test
@@ -135,12 +135,12 @@ public class DefaultMapperTest {
     var regular = WayTestData.southeastLaBonitaWay();
     var props = wps.getDataForWay(regular);
     assertEquals(ALL, props.getPermission());
-    assertEquals(.98, props.getBicycleSafetyFeatures().forward());
+    assertEquals(.98, props.bicycleSafety().forward());
 
     var discouraged = WayTestData.southeastLaBonitaWay().addTag("bicycle", "discouraged");
     var discouragedProps = wps.getDataForWay(discouraged);
     assertEquals(ALL, discouragedProps.getPermission());
-    assertEquals(2.94, discouragedProps.getBicycleSafetyFeatures().forward(), epsilon);
+    assertEquals(2.94, discouragedProps.bicycleSafety().forward(), epsilon);
   }
 
   /**

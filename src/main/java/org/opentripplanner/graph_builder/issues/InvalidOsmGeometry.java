@@ -14,6 +14,6 @@ public record InvalidOsmGeometry(OSMWithTags entity) implements DataImportIssue 
 
   @Override
   public String getHTMLMessage() {
-    return String.format(HTMLFMT, entity.getOpenStreetMapLink(), entity.getId());
+    return String.format(HTMLFMT, entity.url(), entity.getId());
   }
 }

@@ -247,12 +247,10 @@ public class OsmModule implements GraphBuilderModule {
     WAY:for (OSMWay way : osmdb.getWays()) {
       WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
       setWayName(way);
-      StreetTraversalPermission permissions = OsmFilter.getPermissionsForWay(
-        way,
-        wayData.getPermission(),
-        issueStore
-      );
-      if (!OsmFilter.isWayRoutable(way) || permissions.allowsNothing()) {
+
+      var permissions = wayData.getPermission();
+
+      if (!way.isRoutable() || permissions.allowsNothing()) {
         continue;
       }
 
@@ -466,7 +464,7 @@ public class OsmModule implements GraphBuilderModule {
     StreetEdge backStreet = null;
     double length = getGeometryLengthMeters(geometry);
 
-    var permissionPair = OsmFilter.getPermissions(permissions, way);
+    var permissionPair = way.splitPermissions(permissions);
     var permissionsFront = permissionPair.main();
     var permissionsBack = permissionPair.back();
 
@@ -529,12 +527,12 @@ public class OsmModule implements GraphBuilderModule {
       .withLink(way.isLink())
       .withRoundabout(way.isRoundabout())
       .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
-      .withStairs(way.isSteps());
+      .withStairs(way.isSteps())
+      .withWheelchairAccessible(way.isWheelchairAccessible());
 
     if (!way.hasTag("name") && !way.hasTag("ref")) {
       seb.withBogusName(true);
     }
-    seb.withWheelchairAccessible(way.isWheelchairAccessible());
 
     // < 0.04: account for
     if (carSpeed < 0.04) {
