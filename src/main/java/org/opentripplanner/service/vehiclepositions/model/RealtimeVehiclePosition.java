@@ -4,6 +4,7 @@ import java.time.Instant;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -32,7 +33,12 @@ public record RealtimeVehiclePosition(
    * Status of the vehicle, ie. if approaching the next stop or if it is there already.
    */
   StopRelationship stop,
-  Trip trip
+  Trip trip,
+
+  /**
+   * How full the vehicle is and is it still accepting passengers.
+   */
+  OccupancyStatus occupancyStatus
 ) {
   public static RealtimeVehiclePositionBuilder builder() {
     return new RealtimeVehiclePositionBuilder();

@@ -7,6 +7,7 @@ import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePositio
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopStatus;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class RealtimeVehiclePositionBuilder {
@@ -20,6 +21,7 @@ public class RealtimeVehiclePositionBuilder {
   private StopStatus stopStatus = StopStatus.IN_TRANSIT_TO;
   private StopLocation stop;
   private Trip trip;
+  private OccupancyStatus occupancyStatus;
 
   public RealtimeVehiclePositionBuilder setVehicleId(FeedScopedId vehicleId) {
     this.vehicleId = vehicleId;
@@ -66,6 +68,11 @@ public class RealtimeVehiclePositionBuilder {
     return this;
   }
 
+  public RealtimeVehiclePositionBuilder setOccupancyStatus(OccupancyStatus occupancyStatus) {
+    this.occupancyStatus = occupancyStatus;
+    return this;
+  }
+
   public RealtimeVehiclePosition build() {
     var stop = Optional
       .ofNullable(this.stop)
@@ -79,7 +86,8 @@ public class RealtimeVehiclePositionBuilder {
       heading,
       time,
       stop,
-      trip
+      trip,
+      occupancyStatus
     );
   }
 }

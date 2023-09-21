@@ -37,6 +37,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.ResultLogger;
@@ -226,7 +227,7 @@ public class VehiclePositionPatternMatcher {
     }
 
     if (vehiclePosition.hasCurrentStatus()) {
-      newPosition.setStopStatus(toModel(vehiclePosition.getCurrentStatus()));
+      newPosition.setStopStatus(stopStatusToModel(vehiclePosition.getCurrentStatus()));
     }
 
     // we prefer the to get the current stop from the stop_id
@@ -259,6 +260,10 @@ public class VehiclePositionPatternMatcher {
 
     newPosition.setTrip(trip);
 
+    if (vehiclePosition.hasOccupancyStatus()) {
+      newPosition.setOccupancyStatus(occupancyStatusToModel(vehiclePosition.getOccupancyStatus()));
+    }
+
     return newPosition.build();
   }
 
@@ -271,11 +276,27 @@ public class VehiclePositionPatternMatcher {
 
   private record TemporalDistance(LocalDate date, long distance) {}
 
-  private static StopStatus toModel(VehicleStopStatus currentStatus) {
+  private static StopStatus stopStatusToModel(VehicleStopStatus currentStatus) {
     return switch (currentStatus) {
       case IN_TRANSIT_TO -> StopStatus.IN_TRANSIT_TO;
       case INCOMING_AT -> StopStatus.INCOMING_AT;
       case STOPPED_AT -> StopStatus.STOPPED_AT;
+    };
+  }
+
+  private static OccupancyStatus occupancyStatusToModel(
+    VehiclePosition.OccupancyStatus occupancyStatus
+  ) {
+    return switch (occupancyStatus) {
+      case NO_DATA_AVAILABLE -> OccupancyStatus.NO_DATA_AVAILABLE;
+      case EMPTY -> OccupancyStatus.EMPTY;
+      case MANY_SEATS_AVAILABLE -> OccupancyStatus.MANY_SEATS_AVAILABLE;
+      case FEW_SEATS_AVAILABLE -> OccupancyStatus.FEW_SEATS_AVAILABLE;
+      case STANDING_ROOM_ONLY -> OccupancyStatus.STANDING_ROOM_ONLY;
+      case CRUSHED_STANDING_ROOM_ONLY -> OccupancyStatus.CRUSHED_STANDING_ROOM_ONLY;
+      case FULL -> OccupancyStatus.FULL;
+      case NOT_ACCEPTING_PASSENGERS -> OccupancyStatus.NOT_ACCEPTING_PASSENGERS;
+      case NOT_BOARDABLE -> OccupancyStatus.NOT_BOARDABLE;
     };
   }
 
