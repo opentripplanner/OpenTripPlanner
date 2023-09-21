@@ -21,12 +21,14 @@ import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLUtils;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLWheelchairBoarding;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.TripOccupancy;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -372,6 +374,17 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     return environment -> GraphQLUtils.toGraphQL(getSource(environment).getWheelchairBoarding());
   }
 
+  @Override
+  public DataFetcher<TripOccupancy> occupancy() {
+    return environment -> {
+      Trip trip = getSource(environment);
+      TripPattern pattern = getTransitService(environment).getPatternForTrip(trip);
+      return new TripOccupancy(
+        getVehiclePositionsService(environment).getVehicleOccupancyStatus(pattern, trip.getId())
+      );
+    };
+  }
+
   private List<Object> getStops(DataFetchingEnvironment environment) {
     TripPattern tripPattern = getTripPattern(environment);
     if (tripPattern == null) {
@@ -394,6 +407,10 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {
     return environment.<GraphQLRequestContext>getContext().transitService();
+  }
+
+  private VehiclePositionService getVehiclePositionsService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().vehiclePositionService();
   }
 
   private Trip getSource(DataFetchingEnvironment environment) {

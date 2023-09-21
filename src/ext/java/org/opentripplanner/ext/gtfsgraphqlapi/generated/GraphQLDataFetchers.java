@@ -21,6 +21,7 @@ import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLRout
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.RideHailingProvider;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.StopPosition;
+import org.opentripplanner.ext.gtfsgraphqlapi.model.TripOccupancy;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
@@ -309,9 +310,12 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Departure row is a location, which lists departures of a certain pattern from a
-   * stop. Departure rows are identified with the pattern, so querying departure rows
-   * will return only departures from one stop per pattern
+   * Departure row is a combination of a pattern and a stop of that pattern.
+   *
+   * They are de-duplicated so for each pattern there will only be a single departure row.
+   *
+   * This is useful if you want to show a list of stop/pattern combinations but want each pattern to be
+   * listed only once.
    */
   public interface GraphQLDepartureRow {
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
@@ -1029,6 +1033,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
+    public DataFetcher<TripOccupancy> occupancy();
+
     public DataFetcher<TripPattern> pattern();
 
     public DataFetcher<Route> route();
@@ -1054,6 +1060,14 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> tripShortName();
 
     public DataFetcher<org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible();
+  }
+
+  /**
+   * Occupancy of a vehicle on a trip. This should include the most recent occupancy information
+   * available for a trip. Historic data might not be available.
+   */
+  public interface GraphQLTripOccupancy {
+    public DataFetcher<Object> occupancyStatus();
   }
 
   /** This is used for alert entities that we don't explicitly handle or they are missing. */

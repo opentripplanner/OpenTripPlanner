@@ -3394,6 +3394,65 @@ enum AbsoluteDirection {
   NORTHWEST
 }
 
+"""Occupancy status of a vehicle."""
+enum OccupancyStatus {
+  """Default. There is no occupancy-data on this departure."""
+  NO_DATA_AVAILABLE
+
+  """
+  The vehicle is considered empty by most measures, and has few or no passengers onboard, but is
+  still accepting passengers. There isn't a big difference between this and MANY_SEATS_AVAILABLE
+  so it's possible to handle them as the same value, if one wants to limit the number of different
+  values.
+  """
+  EMPTY
+
+  """
+  The vehicle or carriage has a large number of seats available. The amount of free seats out of
+  the total seats available to be considered large enough to fall into this category is
+  determined at the discretion of the producer. There isn't a big difference between this and
+  EMPTY so it's possible to handle them as the same value, if one wants to limit the number of
+  different values.
+  """
+  MANY_SEATS_AVAILABLE
+
+  """
+  The vehicle or carriage has a small number of seats available. The amount of free seats out of
+  the total seats available to be considered small enough to fall into this category is
+  determined at the discretion of the producer.
+  """
+  FEW_SEATS_AVAILABLE
+
+  """The vehicle or carriage can currently accommodate only standing passengers."""
+  STANDING_ROOM_ONLY
+
+  """
+  The vehicle or carriage can currently accommodate only standing passengers and has limited
+  space for them. There isn't a big difference between this and FULL so it's possible to handle
+  them as the same value, if one wants to limit the number of different values.
+  """
+  CRUSHED_STANDING_ROOM_ONLY
+
+  """
+  The vehicle is considered full by most measures, but may still be allowing passengers to
+  board.
+  """
+  FULL
+
+  """
+  The vehicle or carriage is not accepting passengers. The vehicle or carriage usually accepts
+  passengers for boarding.
+  """
+  NOT_ACCEPTING_PASSENGERS
+
+  """
+  The vehicle or carriage is not boardable and never accepts passengers. Useful for special
+  vehicles or carriages (engine, maintenance carriage, etc…). It might not make sense to show
+  these types of trips to passengers at all.
+  """
+  NOT_BOARDABLE
+}
+
 type step {
     """The distance in meters that this step takes."""
     distance: Float
@@ -3972,6 +4031,12 @@ type Trip implements Node {
         """
         types: [TripAlertType]
     ): [Alert]
+
+    """
+    The latest realtime occupancy information for the latest occurance of this
+    trip.
+    """
+    occupancy: TripOccupancy
 }
 
 """Entities, which are relevant for a trip and can contain alerts"""
@@ -3996,6 +4061,17 @@ enum TripAlertType {
     Some of the alerts can only affect the trip or its route on the stop.
     """
     STOPS_ON_TRIP
+}
+
+"""
+Occupancy of a vehicle on a trip. This should include the most recent occupancy information
+available for a trip. Historic data might not be available.
+"""
+type TripOccupancy {
+    """
+    Occupancy information mapped to a limited set of descriptive states.
+    """
+    occupancyStatus: OccupancyStatus
 }
 
 """

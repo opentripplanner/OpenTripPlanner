@@ -85,6 +85,7 @@ config:
     TicketType: org.opentripplanner.ext.fares.model.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
     Trip: org.opentripplanner.transit.model.timetable.Trip#Trip
+    TripOccupancy: org.opentripplanner.ext.gtfsgraphqlapi.model.TripOccupancy#TripOccupancy
     Unknown: org.opentripplanner.ext.gtfsgraphqlapi.model.UnknownModel#UnknownModel
     VehicleParking: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     VehicleParkingSpaces: org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces#VehicleParkingSpaces
