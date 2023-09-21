@@ -17,8 +17,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.naming.DefaultNamer;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -78,7 +76,7 @@ public class WalkableAreaBuilderTest {
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(true)
   @MaxAreaNodes(5)
-  public void testCalculateVerticesArea(TestInfo testInfo) {
+  void testCalculateVerticesArea(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
@@ -95,7 +93,7 @@ public class WalkableAreaBuilderTest {
   @OsmFile("lund-station-sweden.osm.pbf")
   @Visibility(false)
   @MaxAreaNodes(5)
-  public void testSetupCalculateVerticesAreaWithoutVisibility(TestInfo testInfo) {
+  void testSetupCalculateVerticesAreaWithoutVisibility(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     var areas = graph
       .getEdgesOfType(AreaEdge.class)
@@ -114,7 +112,7 @@ public class WalkableAreaBuilderTest {
   @OsmFile("stopareas.pbf")
   @Visibility(true)
   @MaxAreaNodes(50)
-  public void testEntranceStopAreaLinking(TestInfo testInfo) {
+  void testEntranceStopAreaLinking(TestInfo testInfo) {
     var graph = buildGraph(testInfo);
     // first platform contains isolated node tagged as highway=bus_stop. Those are linked if level matches.
     var busStopConnection = graph
@@ -179,6 +177,23 @@ public class WalkableAreaBuilderTest {
       .distinct()
       .toList();
     assertEquals(1, elevatorConnection.size());
+  }
+
+  @Test
+  @OsmFile("wendlingen-bahnhof.osm.pbf")
+  @Visibility(true)
+  @MaxAreaNodes(50)
+  void testSeveralIntersections(TestInfo testInfo) {
+    var graph = buildGraph(testInfo);
+    var areas = graph
+      .getEdgesOfType(AreaEdge.class)
+      .stream()
+      .filter(a -> a.getToVertex().getLabel().equals(VertexLabel.osm(2522105666L)))
+      .map(AreaEdge::getArea)
+      .distinct()
+      .toList();
+    assertEquals(1, areas.size());
+    assertFalse(areas.get(0).getAreas().isEmpty());
   }
 
   private static boolean hasNodeId(AreaEdge a, long nodeId) {

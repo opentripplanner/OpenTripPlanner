@@ -20,6 +20,6 @@ public record LevelAmbiguous(String layerName, OSMWithTags entity) implements Da
 
   @Override
   public String getHTMLMessage() {
-    return String.format(HTMLFMT, entity.getOpenStreetMapLink(), layerName, entity.getId());
+    return String.format(HTMLFMT, entity.url(), layerName, entity.getId());
   }
 }
