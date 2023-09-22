@@ -33,6 +33,10 @@ module.exports = {
     ],
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
-    '@typescript-eslint/ban-ts-comment': "off"
+    '@typescript-eslint/ban-ts-comment': "off",
+
+    // TODO: this is a temporary fix for
+    //  https://github.com/typescript-eslint/typescript-eslint/issues/154
+    "import/named": "off"
   },
 }
