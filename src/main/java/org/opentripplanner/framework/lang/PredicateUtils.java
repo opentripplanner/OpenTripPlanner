@@ -16,6 +16,8 @@ public class PredicateUtils {
    * <p>
    * This is useful for removing duplicates from a stream where the key to be compared is not the
    * entity itself but a field of it.
+   * <p>
+   * Note: Duplicate check is based on equality not identity.
    */
   public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
     Map<Object, Boolean> seen = new ConcurrentHashMap<>();
