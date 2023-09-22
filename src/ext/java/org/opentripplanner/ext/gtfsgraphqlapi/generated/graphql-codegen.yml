@@ -59,6 +59,7 @@ config:
     Leg: org.opentripplanner.model.plan.Leg#Leg
     Mode: String
     TransitMode: org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLTransitMode#GraphQLTransitMode
+    OccupancyStatus: String
     PageInfo: Object
     Pattern: org.opentripplanner.transit.model.network.TripPattern#TripPattern
     PickupDropoffType: String

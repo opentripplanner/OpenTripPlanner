@@ -73,6 +73,7 @@ import org.opentripplanner.ext.gtfsgraphqlapi.datafetchers.SystemNoticeImpl;
 import org.opentripplanner.ext.gtfsgraphqlapi.datafetchers.TicketTypeImpl;
 import org.opentripplanner.ext.gtfsgraphqlapi.datafetchers.TranslatedStringImpl;
 import org.opentripplanner.ext.gtfsgraphqlapi.datafetchers.TripImpl;
+import org.opentripplanner.ext.gtfsgraphqlapi.datafetchers.TripOccupancyImpl;
 import org.opentripplanner.ext.gtfsgraphqlapi.datafetchers.UnknownImpl;
 import org.opentripplanner.ext.gtfsgraphqlapi.datafetchers.VehicleParkingImpl;
 import org.opentripplanner.ext.gtfsgraphqlapi.datafetchers.VehiclePositionImpl;
@@ -172,6 +173,7 @@ class GtfsGraphQLIndex {
         .type(typeWiring.build(CurrencyImpl.class))
         .type(typeWiring.build(FareProductUseImpl.class))
         .type(typeWiring.build(DefaultFareProductImpl.class))
+        .type(typeWiring.build(TripOccupancyImpl.class))
         .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);

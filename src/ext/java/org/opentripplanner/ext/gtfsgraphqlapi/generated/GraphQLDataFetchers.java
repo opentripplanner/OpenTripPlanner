@@ -1067,7 +1067,7 @@ public class GraphQLDataFetchers {
    * available for a trip. Historic data might not be available.
    */
   public interface GraphQLTripOccupancy {
-    public DataFetcher<Object> occupancyStatus();
+    public DataFetcher<String> occupancyStatus();
   }
 
   /** This is used for alert entities that we don't explicitly handle or they are missing. */
