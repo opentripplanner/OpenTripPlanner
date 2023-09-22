@@ -58,6 +58,7 @@ public class LuceneIndex implements Serializable {
   private static final String ID = "id";
   private static final String SUGGEST = "suggest";
   private static final String NAME = "name";
+  private static final String NAME_NGRAM = "name_ngram";
   private static final String CODE = "code";
   private static final String LAT = "latitude";
   private static final String LON = "longitude";
@@ -78,6 +79,7 @@ public class LuceneIndex implements Serializable {
         new StandardAnalyzer(),
         Map.ofEntries(
           entry(NAME, new EnglishAnalyzer()),
+          entry(NAME_NGRAM, new EnglishNGramAnalyzer()),
           entry(SUGGEST, new CompletionAnalyzer(new StandardAnalyzer()))
         )
       );
@@ -249,6 +251,7 @@ public class LuceneIndex implements Serializable {
     document.add(new StoredField(ID, id));
     document.add(new TextField(TYPE, typeName, Store.YES));
     document.add(new TextField(NAME, Objects.toString(name), Store.YES));
+    document.add(new TextField(NAME_NGRAM, Objects.toString(name), Store.YES));
     document.add(new ContextSuggestField(SUGGEST, Objects.toString(name), 1, typeName));
     document.add(new StoredField(LAT, latitude));
     document.add(new StoredField(LON, longitude));
@@ -305,13 +308,20 @@ public class LuceneIndex implements Serializable {
       } else {
         var nameParser = new QueryParser(NAME, analyzer);
         var nameQuery = nameParser.parse(searchTerms);
+
+        var ngramNameQuery = new TermQuery(
+          new Term(NAME_NGRAM, analyzer.normalize(NAME_NGRAM, searchTerms))
+        );
+
         var fuzzyNameQuery = new FuzzyQuery(new Term(NAME, analyzer.normalize(NAME, searchTerms)));
         var prefixNameQuery = new PrefixQuery(
           new Term(NAME, analyzer.normalize(NAME, searchTerms))
         );
         var codeQuery = new TermQuery(new Term(CODE, analyzer.normalize(CODE, searchTerms)));
 
-        var prefixCodeQuery = new PrefixQuery(new Term(CODE, analyzer.normalize(CODE, searchTerms)));
+        var prefixCodeQuery = new PrefixQuery(
+          new Term(CODE, analyzer.normalize(CODE, searchTerms))
+        );
 
         var typeQuery = new TermQuery(
           new Term(TYPE, analyzer.normalize(TYPE, type.getSimpleName()))
@@ -324,7 +334,8 @@ public class LuceneIndex implements Serializable {
           .add(prefixCodeQuery, Occur.SHOULD)
           .add(nameQuery, Occur.SHOULD)
           .add(fuzzyNameQuery, Occur.SHOULD)
-          .add(prefixNameQuery, Occur.SHOULD);
+          .add(prefixNameQuery, Occur.SHOULD)
+          .add(ngramNameQuery, Occur.SHOULD);
 
         var query = builder.build();
 

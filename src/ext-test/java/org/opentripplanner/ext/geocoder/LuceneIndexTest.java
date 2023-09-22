@@ -155,6 +155,8 @@ class LuceneIndexTest {
         "alexnderplazt",
         "Alexnderplatz",
         "Alexnaderplatz",
+        "xande",
+        "xanderpla",
         "alexnaderplaz",
         "Alexanderplat",
         "alexanderplat",
@@ -197,6 +199,7 @@ class LuceneIndexTest {
         "five poits",
         "fife",
         "points",
+        "ife points",
         "the five points",
         "five @ points",
         "five @ the points",
@@ -206,7 +209,7 @@ class LuceneIndexTest {
         "five & points",
         "five and the points",
         "points five",
-        "points fife"
+        "points fife",
       }
     )
     void stopClustersWithSpace(String query) {
