@@ -57,7 +57,8 @@ public class PollingVehiclePositionUpdater extends PollingGraphUpdater {
         (trip, date) -> getPatternIncludingRealtime(transitModel, trip, date),
         realtimeVehicleRepository,
         transitModel.getTimeZone(),
-        fuzzyTripMatcher
+        fuzzyTripMatcher,
+        params.vehiclePositionFeatures()
       );
 
     LOG.info(

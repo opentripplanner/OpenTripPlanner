@@ -25,6 +25,7 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -82,7 +83,11 @@ public class RealtimeVehicleMatcherTest {
       (id, time) -> pattern,
       service,
       zoneId,
-      null
+      null,
+      Set.of(
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION,
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION
+      )
     );
 
     var positions = List.of(vehiclePosition(secondTripId));
@@ -114,7 +119,11 @@ public class RealtimeVehicleMatcherTest {
       (id, time) -> patternForTrip.get(id),
       service,
       zoneId,
-      null
+      null,
+      Set.of(
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION,
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION
+      )
     );
 
     var pos = VehiclePosition
@@ -168,7 +177,11 @@ public class RealtimeVehicleMatcherTest {
       (id, time) -> patternForTrip.get(id),
       service,
       zoneId,
-      null
+      null,
+      Set.of(
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION,
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION
+      )
     );
 
     var positions = List.of(pos);
@@ -224,7 +237,11 @@ public class RealtimeVehicleMatcherTest {
       (id, time) -> patternForTrip.get(id),
       service,
       zoneId,
-      null
+      null,
+      Set.of(
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION,
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION
+      )
     );
 
     var pos1 = vehiclePosition(tripId1);

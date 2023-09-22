@@ -31,6 +31,11 @@ public class VehiclePositionsUpdaterConfig {
       .since(V2_5)
       .summary("Whether to match trips fuzzily.")
       .asBoolean(false);
+    var features = c
+      .of("features")
+      .since(V2_5)
+      .summary("Which features of GTFS RT vehicle positions should be loaded into OTP.")
+      .asEnumSet(VehiclePositionFeature.class);
     var headers = HttpHeadersConfig.headers(c, V2_3);
     return new VehiclePositionsUpdaterParameters(
       updaterRef,
@@ -38,7 +43,14 @@ public class VehiclePositionsUpdaterConfig {
       url,
       frequency,
       headers,
-      fuzzyTripMatching
+      fuzzyTripMatching,
+      features
     );
+  }
+
+  public enum VehiclePositionFeature {
+    POSITION,
+    STOP_POSITION,
+    OCCUPANCY,
   }
 }

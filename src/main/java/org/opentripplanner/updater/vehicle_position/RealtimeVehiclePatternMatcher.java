@@ -33,6 +33,7 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus;
+import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -64,6 +65,7 @@ public class RealtimeVehiclePatternMatcher {
   private final Function<Trip, TripPattern> getStaticPattern;
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
   private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+  private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
 
   private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
@@ -74,7 +76,8 @@ public class RealtimeVehiclePatternMatcher {
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
     RealtimeVehicleRepository repository,
     ZoneId timeZoneId,
-    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher
+    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures
   ) {
     this.feedId = feedId;
     this.getTripForId = getTripForId;
@@ -83,6 +86,7 @@ public class RealtimeVehiclePatternMatcher {
     this.repository = repository;
     this.timeZoneId = timeZoneId;
     this.fuzzyTripMatcher = fuzzyTripMatcher;
+    this.vehiclePositionFeatures = vehiclePositionFeatures;
   }
 
   /**
@@ -204,7 +208,12 @@ public class RealtimeVehiclePatternMatcher {
   ) {
     var newVehicle = RealtimeVehicle.builder();
 
-    if (vehiclePosition.hasPosition()) {
+    if (
+      vehiclePositionFeatures.contains(
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION
+      ) &&
+      vehiclePosition.hasPosition()
+    ) {
       var position = vehiclePosition.getPosition();
       newVehicle.setCoordinates(new WgsCoordinate(position.getLatitude(), position.getLongitude()));
 
@@ -228,41 +237,52 @@ public class RealtimeVehiclePatternMatcher {
       newVehicle.setTime(Instant.ofEpochSecond(vehiclePosition.getTimestamp()));
     }
 
-    if (vehiclePosition.hasCurrentStatus()) {
-      newVehicle.setStopStatus(stopStatusToModel(vehiclePosition.getCurrentStatus()));
-    }
-
-    // we prefer the to get the current stop from the stop_id
-    if (vehiclePosition.hasStopId()) {
-      var matchedStops = stopsOnVehicleTrip
-        .stream()
-        .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
-        .toList();
-      if (matchedStops.size() == 1) {
-        newVehicle.setStop(matchedStops.get(0));
-      } else {
-        LOG.warn(
-          "Stop ID {} is not in trip {}. Not setting stopRelationship.",
-          vehiclePosition.getStopId(),
-          trip.getId()
-        );
+    if (
+      vehiclePositionFeatures.contains(
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION
+      )
+    ) {
+      if (vehiclePosition.hasCurrentStatus()) {
+        newVehicle.setStopStatus(stopStatusToModel(vehiclePosition.getCurrentStatus()));
       }
-    }
-    // but if stop_id isn't there we try current_stop_sequence
-    else if (vehiclePosition.hasCurrentStopSequence()) {
-      stopIndexOfGtfsSequence
-        .apply(vehiclePosition.getCurrentStopSequence())
-        .ifPresent(stopIndex -> {
-          if (validStopIndex(stopIndex, stopsOnVehicleTrip)) {
-            var stop = stopsOnVehicleTrip.get(stopIndex);
-            newVehicle.setStop(stop);
-          }
-        });
+
+      // we prefer the to get the current stop from the stop_id
+      if (vehiclePosition.hasStopId()) {
+        var matchedStops = stopsOnVehicleTrip
+          .stream()
+          .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
+          .toList();
+        if (matchedStops.size() == 1) {
+          newVehicle.setStop(matchedStops.get(0));
+        } else {
+          LOG.warn(
+            "Stop ID {} is not in trip {}. Not setting stopRelationship.",
+            vehiclePosition.getStopId(),
+            trip.getId()
+          );
+        }
+      }
+      // but if stop_id isn't there we try current_stop_sequence
+      else if (vehiclePosition.hasCurrentStopSequence()) {
+        stopIndexOfGtfsSequence
+          .apply(vehiclePosition.getCurrentStopSequence())
+          .ifPresent(stopIndex -> {
+            if (validStopIndex(stopIndex, stopsOnVehicleTrip)) {
+              var stop = stopsOnVehicleTrip.get(stopIndex);
+              newVehicle.setStop(stop);
+            }
+          });
+      }
     }
 
     newVehicle.setTrip(trip);
 
-    if (vehiclePosition.hasOccupancyStatus()) {
+    if (
+      vehiclePositionFeatures.contains(
+        VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY
+      ) &&
+      vehiclePosition.hasOccupancyStatus()
+    ) {
       newVehicle.setOccupancyStatus(occupancyStatusToModel(vehiclePosition.getOccupancyStatus()));
     }
 
