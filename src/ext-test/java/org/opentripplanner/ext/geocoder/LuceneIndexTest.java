@@ -113,7 +113,7 @@ class LuceneIndexTest {
         }
       }
     };
-    index = new LuceneIndex(graph, transitService);
+    index = new LuceneIndex(transitService);
     mapper = new StopClusterMapper(transitService);
   }
 

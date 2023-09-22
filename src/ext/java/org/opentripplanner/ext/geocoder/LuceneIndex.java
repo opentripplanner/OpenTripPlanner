@@ -43,10 +43,7 @@ import org.apache.lucene.store.ByteBuffersDirectory;
 import org.opentripplanner.ext.geocoder.StopCluster.Coordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.street.model.vertex.StreetVertex;
-import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
@@ -64,14 +61,11 @@ public class LuceneIndex implements Serializable {
   private static final String LON = "longitude";
   private static final String MODE = "mode";
 
-  private final Graph graph;
-
   private final TransitService transitService;
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
 
-  public LuceneIndex(Graph graph, TransitService transitService) {
-    this.graph = graph;
+  public LuceneIndex(TransitService transitService) {
     this.transitService = transitService;
 
     this.analyzer =
@@ -141,24 +135,6 @@ public class LuceneIndex implements Serializable {
               stopCluster.modes()
             )
           );
-
-        graph
-          .getVertices()
-          .stream()
-          .filter(v -> v instanceof StreetVertex)
-          .map(v -> (StreetVertex) v)
-          .forEach(streetVertex ->
-            addToIndex(
-              directoryWriter,
-              StreetVertex.class,
-              streetVertex.getLabelString(),
-              streetVertex.getIntersectionName(),
-              streetVertex.getLabelString(),
-              streetVertex.getLat(),
-              streetVertex.getLon(),
-              Set.of()
-            )
-          );
       }
 
       DirectoryReader indexReader = DirectoryReader.open(directory);
@@ -175,7 +151,7 @@ public class LuceneIndex implements Serializable {
       return existingIndex;
     }
 
-    var newIndex = new LuceneIndex(graph, serverContext.transitService());
+    var newIndex = new LuceneIndex(serverContext.transitService());
     graph.setLuceneIndex(newIndex);
     return newIndex;
   }
@@ -188,11 +164,6 @@ public class LuceneIndex implements Serializable {
   public Stream<StopLocationsGroup> queryStopLocationGroups(String query, boolean autocomplete) {
     return matchingDocuments(StopLocationsGroup.class, query, autocomplete)
       .map(document -> transitService.getStopLocationsGroup(FeedScopedId.parse(document.get(ID))));
-  }
-
-  public Stream<StreetVertex> queryStreetVertices(String query, boolean autocomplete) {
-    return matchingDocuments(StreetVertex.class, query, autocomplete)
-      .map(document -> (StreetVertex) graph.getVertex(VertexLabel.string(document.get(ID))));
   }
 
   /**
