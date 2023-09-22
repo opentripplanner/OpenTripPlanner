@@ -33,6 +33,13 @@ public class BarrierVertex extends OsmVertex {
     this.barrierPermissions = barrierPermissions;
   }
 
+  /*
+   * Barrier vertex at the end of a way does not make sense, because
+   * it creates discontinuity of routing in a single point.
+   * This method examines if traversal limitations can be removed.
+   * The logic examines edges referring to the vertex, so it should be
+   * applied only after the vertex has been linked to the graph.
+   */
   public void makeBarrierAtEndReachable() {
     var edgeCount = this.getDegreeOut() + this.getDegreeIn();
     var needsFix = false;

@@ -402,11 +402,6 @@ public class OsmModule implements GraphBuilderModule {
     LOG.info(progress.completeMessage());
   }
 
-  /*
-   * Barrier vertex at the end of a way does not make sense, because
-   * it creates discontunuity of routing in a single point.
-   * Remove all traversal limitations from such vertices.
-   */
   private void validateBarriers() {
     List<BarrierVertex> vertices = graph.getVerticesOfType(BarrierVertex.class);
     vertices.forEach(bv -> bv.makeBarrierAtEndReachable());
