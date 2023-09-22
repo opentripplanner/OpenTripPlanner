@@ -21,17 +21,19 @@ public class VehiclePositionImpl implements GraphQLVehiclePosition {
 
   @Override
   public DataFetcher<Long> lastUpdated() {
-    return env -> getSource(env).time().getEpochSecond();
+    return env -> getSource(env).time() != null ? getSource(env).time().getEpochSecond() : null;
   }
 
   @Override
   public DataFetcher<Double> lat() {
-    return env -> getSource(env).coordinates().latitude();
+    return env ->
+      getSource(env).coordinates() != null ? getSource(env).coordinates().latitude() : null;
   }
 
   @Override
   public DataFetcher<Double> lon() {
-    return env -> getSource(env).coordinates().longitude();
+    return env ->
+      getSource(env).coordinates() != null ? getSource(env).coordinates().longitude() : null;
   }
 
   @Override
@@ -51,7 +53,7 @@ public class VehiclePositionImpl implements GraphQLVehiclePosition {
 
   @Override
   public DataFetcher<String> vehicleId() {
-    return env -> getSource(env).vehicleId().toString();
+    return env -> getSource(env).vehicleId() != null ? getSource(env).vehicleId().toString() : null;
   }
 
   private RealtimeVehicle getSource(DataFetchingEnvironment environment) {
