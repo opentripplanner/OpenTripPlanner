@@ -23,7 +23,7 @@ public interface AStarEdge<
   /**
    * Traverse the edge from a given state and return the result of the traversal.
    *
-   * @param u The 'current' state when arriving at the fromVertex.
+   * @param s0 The 'current' state when arriving at the fromVertex.
    * @return The array of states that are the result of the state (the passenger) moving (traversing)
    *         through the edge.
    *         <p>
@@ -44,5 +44,5 @@ public interface AStarEdge<
    *         that the destination is inside the zone.
    */
   @Nonnull
-  State[] traverse(State u);
+  State[] traverse(State s0);
 }
