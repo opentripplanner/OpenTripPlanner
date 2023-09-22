@@ -28,7 +28,7 @@ import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -380,7 +380,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
       Trip trip = getSource(environment);
       TripPattern pattern = getTransitService(environment).getPatternForTrip(trip);
       return new TripOccupancy(
-        getVehiclePositionsService(environment).getVehicleOccupancyStatus(pattern, trip.getId())
+        getRealtimeVehiclesService(environment).getVehicleOccupancyStatus(pattern, trip.getId())
       );
     };
   }
@@ -409,8 +409,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
     return environment.<GraphQLRequestContext>getContext().transitService();
   }
 
-  private VehiclePositionService getVehiclePositionsService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().vehiclePositionService();
+  private RealtimeVehicleService getRealtimeVehiclesService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().realtimeVehicleService();
   }
 
   private Trip getSource(DataFetchingEnvironment environment) {

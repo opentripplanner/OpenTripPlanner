@@ -6,8 +6,8 @@ import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
-import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
@@ -39,7 +39,7 @@ public class TestServerContext {
       Metrics.globalRegistry,
       routerConfig.vectorTileLayers(),
       createWorldEnvelopeService(),
-      createVehiclePositionService(),
+      createRealtimeVehicleService(),
       createVehicleRentalService(),
       routerConfig.flexConfig(),
       List.of(),
@@ -54,8 +54,8 @@ public class TestServerContext {
     return new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository());
   }
 
-  public static VehiclePositionService createVehiclePositionService() {
-    return new DefaultVehiclePositionService();
+  public static RealtimeVehicleService createRealtimeVehicleService() {
+    return new DefaultRealtimeVehicleService();
   }
 
   public static VehicleRentalService createVehicleRentalService() {

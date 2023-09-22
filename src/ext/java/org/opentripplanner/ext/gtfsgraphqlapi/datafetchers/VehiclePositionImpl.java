@@ -3,8 +3,8 @@ package org.opentripplanner.ext.gtfsgraphqlapi.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers.GraphQLVehiclePosition;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class VehiclePositionImpl implements GraphQLVehiclePosition {
@@ -54,7 +54,7 @@ public class VehiclePositionImpl implements GraphQLVehiclePosition {
     return env -> getSource(env).vehicleId().toString();
   }
 
-  private RealtimeVehiclePosition getSource(DataFetchingEnvironment environment) {
+  private RealtimeVehicle getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

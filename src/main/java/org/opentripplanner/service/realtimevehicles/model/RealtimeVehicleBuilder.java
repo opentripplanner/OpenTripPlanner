@@ -1,16 +1,16 @@
-package org.opentripplanner.service.vehiclepositions.model;
+package org.opentripplanner.service.realtimevehicles.model;
 
 import java.time.Instant;
 import java.util.Optional;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopStatus;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 
-public class RealtimeVehiclePositionBuilder {
+public class RealtimeVehicleBuilder {
 
   private FeedScopedId vehicleId;
   private String label;
@@ -23,62 +23,62 @@ public class RealtimeVehiclePositionBuilder {
   private Trip trip;
   private OccupancyStatus occupancyStatus;
 
-  public RealtimeVehiclePositionBuilder setVehicleId(FeedScopedId vehicleId) {
+  public RealtimeVehicleBuilder setVehicleId(FeedScopedId vehicleId) {
     this.vehicleId = vehicleId;
     return this;
   }
 
-  public RealtimeVehiclePositionBuilder setLabel(String label) {
+  public RealtimeVehicleBuilder setLabel(String label) {
     this.label = label;
     return this;
   }
 
-  public RealtimeVehiclePositionBuilder setCoordinates(WgsCoordinate c) {
+  public RealtimeVehicleBuilder setCoordinates(WgsCoordinate c) {
     this.coordinates = c;
     return this;
   }
 
-  public RealtimeVehiclePositionBuilder setSpeed(double speed) {
+  public RealtimeVehicleBuilder setSpeed(double speed) {
     this.speed = speed;
     return this;
   }
 
-  public RealtimeVehiclePositionBuilder setHeading(double heading) {
+  public RealtimeVehicleBuilder setHeading(double heading) {
     this.heading = heading;
     return this;
   }
 
-  public RealtimeVehiclePositionBuilder setTime(Instant time) {
+  public RealtimeVehicleBuilder setTime(Instant time) {
     this.time = time;
     return this;
   }
 
-  public RealtimeVehiclePositionBuilder setStopStatus(StopStatus stopStatus) {
+  public RealtimeVehicleBuilder setStopStatus(StopStatus stopStatus) {
     this.stopStatus = stopStatus;
     return this;
   }
 
-  public RealtimeVehiclePositionBuilder setStop(StopLocation stop) {
+  public RealtimeVehicleBuilder setStop(StopLocation stop) {
     this.stop = stop;
     return this;
   }
 
-  public RealtimeVehiclePositionBuilder setTrip(Trip trip) {
+  public RealtimeVehicleBuilder setTrip(Trip trip) {
     this.trip = trip;
     return this;
   }
 
-  public RealtimeVehiclePositionBuilder setOccupancyStatus(OccupancyStatus occupancyStatus) {
+  public RealtimeVehicleBuilder setOccupancyStatus(OccupancyStatus occupancyStatus) {
     this.occupancyStatus = occupancyStatus;
     return this;
   }
 
-  public RealtimeVehiclePosition build() {
+  public RealtimeVehicle build() {
     var stop = Optional
       .ofNullable(this.stop)
       .map(s -> new StopRelationship(s, stopStatus))
       .orElse(null);
-    return new RealtimeVehiclePosition(
+    return new RealtimeVehicle(
       vehicleId,
       label,
       coordinates,

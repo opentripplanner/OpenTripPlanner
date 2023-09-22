@@ -1,4 +1,4 @@
-package org.opentripplanner.service.vehiclepositions.model;
+package org.opentripplanner.service.realtimevehicles.model;
 
 import java.time.Instant;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -8,9 +8,9 @@ import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
- * Internal model of a realtime vehicle position.
+ * Internal model of a realtime vehicle.
  */
-public record RealtimeVehiclePosition(
+public record RealtimeVehicle(
   FeedScopedId vehicleId,
   String label,
   WgsCoordinate coordinates,
@@ -25,7 +25,7 @@ public record RealtimeVehiclePosition(
   Double heading,
 
   /**
-   * When the realtime position was recorded
+   * When the realtime vehicle was recorded
    */
   Instant time,
 
@@ -40,8 +40,8 @@ public record RealtimeVehiclePosition(
    */
   OccupancyStatus occupancyStatus
 ) {
-  public static RealtimeVehiclePositionBuilder builder() {
-    return new RealtimeVehiclePositionBuilder();
+  public static RealtimeVehicleBuilder builder() {
+    return new RealtimeVehicleBuilder();
   }
 
   public enum StopStatus {

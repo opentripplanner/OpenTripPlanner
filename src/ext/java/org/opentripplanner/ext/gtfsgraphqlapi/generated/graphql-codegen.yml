@@ -92,8 +92,8 @@ config:
     VehicleParkingState: org.opentripplanner.routing.vehicle_parking.VehicleParkingState#VehicleParkingState
     VertexType: String
     SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice
-    VehiclePosition: org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition#RealtimeVehiclePosition
-    StopRelationship: org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship#StopRelationship
+    VehiclePosition: org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle#RealtimeVehicle
+    StopRelationship: org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship#StopRelationship
     WheelchairBoarding: org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLWheelchairBoarding
     FormFactor: org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLFormFactor
     PropulsionType: org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLPropulsionType

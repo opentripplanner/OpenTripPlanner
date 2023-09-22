@@ -29,7 +29,7 @@ import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
-import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -51,7 +51,7 @@ class RouteRequestMapperTest implements PlanTestConstants {
         new DefaultFareService(),
         graph.getVehicleParkingService(),
         new DefaultVehicleRentalService(),
-        new DefaultVehiclePositionService(),
+        new DefaultRealtimeVehicleService(),
         GraphFinder.getInstance(graph, transitService::findRegularStop),
         new RouteRequest()
       );

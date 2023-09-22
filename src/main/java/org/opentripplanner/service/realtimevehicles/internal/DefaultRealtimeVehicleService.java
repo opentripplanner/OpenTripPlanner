@@ -1,4 +1,4 @@
-package org.opentripplanner.service.vehiclepositions.internal;
+package org.opentripplanner.service.realtimevehicles.internal;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -7,42 +7,42 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 
 @Singleton
-public class DefaultVehiclePositionService
-  implements VehiclePositionService, VehiclePositionRepository {
+public class DefaultRealtimeVehicleService
+  implements RealtimeVehicleService, RealtimeVehicleRepository {
 
-  private final Map<TripPattern, List<RealtimeVehiclePosition>> positions = new ConcurrentHashMap<>();
+  private final Map<TripPattern, List<RealtimeVehicle>> vehicles = new ConcurrentHashMap<>();
 
   @Inject
-  public DefaultVehiclePositionService() {}
+  public DefaultRealtimeVehicleService() {}
 
   @Override
-  public void setVehiclePositions(TripPattern pattern, List<RealtimeVehiclePosition> updates) {
-    positions.put(pattern, List.copyOf(updates));
+  public void setRealtimeVehicles(TripPattern pattern, List<RealtimeVehicle> updates) {
+    vehicles.put(pattern, List.copyOf(updates));
   }
 
   @Override
-  public void clearVehiclePositions(TripPattern pattern) {
-    positions.remove(pattern);
+  public void clearRealtimeVehicles(TripPattern pattern) {
+    vehicles.remove(pattern);
   }
 
   @Override
-  public List<RealtimeVehiclePosition> getVehiclePositions(TripPattern pattern) {
+  public List<RealtimeVehicle> getRealtimeVehicles(TripPattern pattern) {
     // the list is made immutable during insertion, so we can safely return them
-    return positions.getOrDefault(pattern, List.of());
+    return vehicles.getOrDefault(pattern, List.of());
   }
 
   @Nonnull
   @Override
   public OccupancyStatus getVehicleOccupancyStatus(TripPattern pattern, FeedScopedId tripId) {
-    return positions
+    return vehicles
       .getOrDefault(pattern, List.of())
       .stream()
       .filter(vehicle -> tripId.equals(vehicle.trip().getId()))

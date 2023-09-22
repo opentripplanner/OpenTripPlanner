@@ -44,8 +44,8 @@ import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
@@ -560,7 +560,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<Trip>> tripsForDate();
 
-    public DataFetcher<Iterable<RealtimeVehiclePosition>> vehiclePositions();
+    public DataFetcher<Iterable<RealtimeVehicle>> vehiclePositions();
   }
 
   public interface GraphQLPlace {

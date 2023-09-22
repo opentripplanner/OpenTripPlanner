@@ -4,7 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers.GraphQLStopRelationship;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLVehicleStopStatus;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
 
 public class StopRelationshipImpl implements GraphQLStopRelationship {
 

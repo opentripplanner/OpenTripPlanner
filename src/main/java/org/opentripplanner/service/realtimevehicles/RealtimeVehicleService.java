@@ -1,16 +1,16 @@
-package org.opentripplanner.service.vehiclepositions;
+package org.opentripplanner.service.realtimevehicles;
 
 import java.util.List;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 
-public interface VehiclePositionService {
+public interface RealtimeVehicleService {
   /**
-   * Get the vehicle positions for a certain trip.
+   * Get the realtime vehicles for a certain trip pattern.
    */
-  List<RealtimeVehiclePosition> getVehiclePositions(TripPattern pattern);
+  List<RealtimeVehicle> getRealtimeVehicles(TripPattern pattern);
 
   /**
    * Get the latest occupancy status for a certain trip.
