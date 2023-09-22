@@ -32,4 +32,25 @@ public class BarrierVertex extends OsmVertex {
   public void setBarrierPermissions(StreetTraversalPermission barrierPermissions) {
     this.barrierPermissions = barrierPermissions;
   }
+
+  public void makeBarrierAtEndReachable() {
+    var edgeCount = this.getDegreeOut() + this.getDegreeIn();
+    var needsFix = false;
+    if (edgeCount == 1) {
+      needsFix = true;
+    } else if (edgeCount == 2) {
+      var out = this.getOutgoing();
+      var in = this.getIncoming();
+      if (
+        out.isEmpty() ||
+        in.isEmpty() ||
+        out.iterator().next().getToVertex() == in.iterator().next().getFromVertex()
+      ) {
+        needsFix = true;
+      }
+    }
+    if (needsFix) {
+      this.barrierPermissions = StreetTraversalPermission.ALL;
+    }
+  }
 }

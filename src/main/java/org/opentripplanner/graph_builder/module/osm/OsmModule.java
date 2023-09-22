@@ -409,27 +409,7 @@ public class OsmModule implements GraphBuilderModule {
    */
   private void validateBarriers() {
     List<BarrierVertex> vertices = graph.getVerticesOfType(BarrierVertex.class);
-
-    for (BarrierVertex bv : vertices) {
-      var edgeCount = bv.getDegreeOut() + bv.getDegreeIn();
-      var needsFix = false;
-      if (edgeCount == 1) {
-        needsFix = true;
-      } else if (edgeCount == 2) {
-        var out = bv.getOutgoing();
-        var in = bv.getIncoming();
-        if (
-          out.isEmpty() ||
-          in.isEmpty() ||
-          out.iterator().next().getToVertex() == in.iterator().next().getFromVertex()
-        ) {
-          needsFix = true;
-        }
-      }
-      if (needsFix) {
-        bv.setBarrierPermissions(StreetTraversalPermission.ALL);
-      }
-    }
+    vertices.forEach(bv -> bv.makeBarrierAtEndReachable());
   }
 
   private void setWayName(OSMWithTags way) {
