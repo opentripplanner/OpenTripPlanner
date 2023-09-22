@@ -1,5 +1,8 @@
 package org.opentripplanner.updater.vehicle_position;
 
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY;
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION;
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
@@ -208,12 +211,7 @@ public class RealtimeVehiclePatternMatcher {
   ) {
     var newVehicle = RealtimeVehicle.builder();
 
-    if (
-      vehiclePositionFeatures.contains(
-        VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION
-      ) &&
-      vehiclePosition.hasPosition()
-    ) {
+    if (vehiclePositionFeatures.contains(POSITION) && vehiclePosition.hasPosition()) {
       var position = vehiclePosition.getPosition();
       newVehicle.withCoordinates(
         new WgsCoordinate(position.getLatitude(), position.getLongitude())
@@ -239,11 +237,7 @@ public class RealtimeVehiclePatternMatcher {
       newVehicle.withTime(Instant.ofEpochSecond(vehiclePosition.getTimestamp()));
     }
 
-    if (
-      vehiclePositionFeatures.contains(
-        VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION
-      )
-    ) {
+    if (vehiclePositionFeatures.contains(STOP_POSITION)) {
       if (vehiclePosition.hasCurrentStatus()) {
         newVehicle.withStopStatus(stopStatusToModel(vehiclePosition.getCurrentStatus()));
       }
@@ -279,12 +273,7 @@ public class RealtimeVehiclePatternMatcher {
 
     newVehicle.withTrip(trip);
 
-    if (
-      vehiclePositionFeatures.contains(
-        VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY
-      ) &&
-      vehiclePosition.hasOccupancyStatus()
-    ) {
+    if (vehiclePositionFeatures.contains(OCCUPANCY) && vehiclePosition.hasOccupancyStatus()) {
       newVehicle.withOccupancyStatus(occupancyStatusToModel(vehiclePosition.getOccupancyStatus()));
     }
 
