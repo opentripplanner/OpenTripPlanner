@@ -87,7 +87,7 @@ public class JsonDataListDownloader<T> {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode rootNode = mapper.readTree(rentalString);
 
-    if (!jsonParsePath.equals("")) {
+    if (!jsonParsePath.isEmpty()) {
       String delimiter = "/";
       String[] parseElement = jsonParsePath.split(delimiter);
       for (String s : parseElement) {
