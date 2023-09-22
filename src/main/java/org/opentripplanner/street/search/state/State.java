@@ -473,7 +473,10 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       .addBoolIfTrue("VEHICLE_RENT", isRentingVehicle())
       .addEnum("formFactor", vehicleRentalFormFactor())
       .addBoolIfTrue("RENTING_FROM_STATION", isRentingVehicleFromStation())
-      .addBoolIfTrue("FREE_FLOATING", isRentingFloatingVehicle() && !isRentingVehicleFromStation())
+      .addBoolIfTrue(
+        "RENTING_FREE_FLOATING",
+        isRentingFloatingVehicle() && !isRentingVehicleFromStation()
+      )
       .addBoolIfTrue("VEHICLE_PARKED", isVehicleParked())
       .toString();
   }
