@@ -215,13 +215,15 @@ public class RealtimeVehiclePatternMatcher {
       vehiclePosition.hasPosition()
     ) {
       var position = vehiclePosition.getPosition();
-      newVehicle.setCoordinates(new WgsCoordinate(position.getLatitude(), position.getLongitude()));
+      newVehicle.withCoordinates(
+        new WgsCoordinate(position.getLatitude(), position.getLongitude())
+      );
 
       if (position.hasSpeed()) {
-        newVehicle.setSpeed(position.getSpeed());
+        newVehicle.withSpeed(position.getSpeed());
       }
       if (position.hasBearing()) {
-        newVehicle.setHeading(position.getBearing());
+        newVehicle.withHeading(position.getBearing());
       }
     }
 
@@ -229,12 +231,12 @@ public class RealtimeVehiclePatternMatcher {
       var vehicle = vehiclePosition.getVehicle();
       var id = new FeedScopedId(feedId, vehicle.getId());
       newVehicle
-        .setVehicleId(id)
-        .setLabel(Optional.ofNullable(vehicle.getLabel()).orElse(vehicle.getLicensePlate()));
+        .withVehicleId(id)
+        .withLabel(Optional.ofNullable(vehicle.getLabel()).orElse(vehicle.getLicensePlate()));
     }
 
     if (vehiclePosition.hasTimestamp()) {
-      newVehicle.setTime(Instant.ofEpochSecond(vehiclePosition.getTimestamp()));
+      newVehicle.withTime(Instant.ofEpochSecond(vehiclePosition.getTimestamp()));
     }
 
     if (
@@ -243,7 +245,7 @@ public class RealtimeVehiclePatternMatcher {
       )
     ) {
       if (vehiclePosition.hasCurrentStatus()) {
-        newVehicle.setStopStatus(stopStatusToModel(vehiclePosition.getCurrentStatus()));
+        newVehicle.withStopStatus(stopStatusToModel(vehiclePosition.getCurrentStatus()));
       }
 
       // we prefer the to get the current stop from the stop_id
@@ -253,7 +255,7 @@ public class RealtimeVehiclePatternMatcher {
           .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
           .toList();
         if (matchedStops.size() == 1) {
-          newVehicle.setStop(matchedStops.get(0));
+          newVehicle.withStop(matchedStops.get(0));
         } else {
           LOG.warn(
             "Stop ID {} is not in trip {}. Not setting stopRelationship.",
@@ -269,13 +271,13 @@ public class RealtimeVehiclePatternMatcher {
           .ifPresent(stopIndex -> {
             if (validStopIndex(stopIndex, stopsOnVehicleTrip)) {
               var stop = stopsOnVehicleTrip.get(stopIndex);
-              newVehicle.setStop(stop);
+              newVehicle.withStop(stop);
             }
           });
       }
     }
 
-    newVehicle.setTrip(trip);
+    newVehicle.withTrip(trip);
 
     if (
       vehiclePositionFeatures.contains(
@@ -283,7 +285,7 @@ public class RealtimeVehiclePatternMatcher {
       ) &&
       vehiclePosition.hasOccupancyStatus()
     ) {
-      newVehicle.setOccupancyStatus(occupancyStatusToModel(vehiclePosition.getOccupancyStatus()));
+      newVehicle.withOccupancyStatus(occupancyStatusToModel(vehiclePosition.getOccupancyStatus()));
     }
 
     return newVehicle.build();

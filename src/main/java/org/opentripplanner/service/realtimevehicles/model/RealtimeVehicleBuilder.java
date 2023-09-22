@@ -23,52 +23,52 @@ public class RealtimeVehicleBuilder {
   private Trip trip;
   private OccupancyStatus occupancyStatus;
 
-  public RealtimeVehicleBuilder setVehicleId(FeedScopedId vehicleId) {
+  public RealtimeVehicleBuilder withVehicleId(FeedScopedId vehicleId) {
     this.vehicleId = vehicleId;
     return this;
   }
 
-  public RealtimeVehicleBuilder setLabel(String label) {
+  public RealtimeVehicleBuilder withLabel(String label) {
     this.label = label;
     return this;
   }
 
-  public RealtimeVehicleBuilder setCoordinates(WgsCoordinate c) {
+  public RealtimeVehicleBuilder withCoordinates(WgsCoordinate c) {
     this.coordinates = c;
     return this;
   }
 
-  public RealtimeVehicleBuilder setSpeed(double speed) {
+  public RealtimeVehicleBuilder withSpeed(double speed) {
     this.speed = speed;
     return this;
   }
 
-  public RealtimeVehicleBuilder setHeading(double heading) {
+  public RealtimeVehicleBuilder withHeading(double heading) {
     this.heading = heading;
     return this;
   }
 
-  public RealtimeVehicleBuilder setTime(Instant time) {
+  public RealtimeVehicleBuilder withTime(Instant time) {
     this.time = time;
     return this;
   }
 
-  public RealtimeVehicleBuilder setStopStatus(StopStatus stopStatus) {
+  public RealtimeVehicleBuilder withStopStatus(StopStatus stopStatus) {
     this.stopStatus = stopStatus;
     return this;
   }
 
-  public RealtimeVehicleBuilder setStop(StopLocation stop) {
+  public RealtimeVehicleBuilder withStop(StopLocation stop) {
     this.stop = stop;
     return this;
   }
 
-  public RealtimeVehicleBuilder setTrip(Trip trip) {
+  public RealtimeVehicleBuilder withTrip(Trip trip) {
     this.trip = trip;
     return this;
   }
 
-  public RealtimeVehicleBuilder setOccupancyStatus(OccupancyStatus occupancyStatus) {
+  public RealtimeVehicleBuilder withOccupancyStatus(OccupancyStatus occupancyStatus) {
     this.occupancyStatus = occupancyStatus;
     return this;
   }
