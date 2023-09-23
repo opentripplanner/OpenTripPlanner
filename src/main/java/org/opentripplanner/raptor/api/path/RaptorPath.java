@@ -56,6 +56,8 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
    */
   int c1();
 
+  int c2();
+
   /**
    * The first leg/path of this journey - which is linked to the next and so on. The leg can contain
    * sub-legs, for example: walk-flex-walk.

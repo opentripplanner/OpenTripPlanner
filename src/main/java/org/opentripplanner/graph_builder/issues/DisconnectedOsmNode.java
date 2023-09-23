@@ -21,11 +21,11 @@ public record DisconnectedOsmNode(OSMNode node, OSMWithTags way, OSMWithTags are
   public String getHTMLMessage() {
     return String.format(
       HTMLFMT,
-      node.getOpenStreetMapLink(),
+      node.url(),
       node.getId(),
-      way.getOpenStreetMapLink(),
+      way.url(),
       way.getId(),
-      area.getOpenStreetMapLink(),
+      area.url(),
       area.getId()
     );
   }

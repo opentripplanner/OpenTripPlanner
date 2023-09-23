@@ -5,8 +5,10 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.execution.ExecutionStrategy;
+import graphql.execution.UnknownOperationException;
 import graphql.execution.instrumentation.ChainedInstrumentation;
 import graphql.execution.instrumentation.Instrumentation;
+import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLSchema;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
@@ -68,6 +70,8 @@ class TransmodelGraph {
       return ExecutionResultMapper.okResponse(result);
     } catch (OTPRequestTimeoutException te) {
       return ExecutionResultMapper.timeoutResponse();
+    } catch (CoercingParseValueException | UnknownOperationException e) {
+      return ExecutionResultMapper.badRequestResponse(e.getMessage());
     } catch (Exception systemError) {
       LOG.error(systemError.getMessage(), systemError);
       return ExecutionResultMapper.systemErrorResponse(systemError.getMessage());

@@ -108,25 +108,6 @@ general better than trying to be exact. The period and date format follow the IS
 }
 ```
 
-
-<h2 id="transferring-within-stations">Transferring within stations</h2>
-
-Subway systems tend to exist in their own layer of the city separate from the surface, though there
-are exceptions where tracks lie right below the street and transfers happen via the surface. In
-systems where the subway is quite deep and transfers happen via tunnels, the time required for an
-in-station transfer is often less than that for a surface transfer.
-
-One way to resolve this problem is by ensuring that the GTFS feed codes each platform as a separate
-stop, then micro-mapping stations in OSM. When OSM data contains a detailed description of walkways,
-stairs, and platforms within a station, GTFS stops can be linked to the nearest platform and
-transfers will happen via the OSM ways, which should yield very realistic transfer time
-expectations. This works particularly well in above-ground train stations where the layering of
-non-intersecting ways is less prevalent. See [BoardingLocations](BoardingLocations.md) for more 
-details.
-
-An alternative approach is to use GTFS pathways to model entrances and platforms within stations.
-
-
 ## OpenStreetMap(OSM) configuration
 
 It is possible to adjust how OSM data is interpreted by OpenTripPlanner when building the road part

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import gnu.trove.list.TLongList;
 import java.io.File;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -19,7 +18,7 @@ public class OpenStreetMapParserTest {
   public void testBinaryParser() {
     File osmFile = ResourceLoader.osmFile("map.osm.pbf");
     OsmProvider pr = new OsmProvider(osmFile, true);
-    OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP, Set.of());
+    OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
 
     pr.readOSM(osmdb);
 

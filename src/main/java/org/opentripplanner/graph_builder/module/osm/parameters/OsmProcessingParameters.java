@@ -13,10 +13,6 @@ import org.opentripplanner.graph_builder.services.osm.EdgeNamer;
  * @param platformEntriesLinking Whether platform entries should be linked
  * @param staticParkAndRide      Whether we should create car P+R stations from OSM data.
  * @param staticBikeParkAndRide  Whether we should create bike P+R stations from OSM data.
- * @param banDiscouragedWalking  Whether ways tagged foot=discouraged should be marked as
- *                               inaccessible.
- * @param banDiscouragedBiking   Whether ways tagged bicycle=discouraged should be marked as
- *                               inaccessible.
  */
 public record OsmProcessingParameters(
   Set<String> boardingAreaRefTags,
@@ -25,9 +21,7 @@ public record OsmProcessingParameters(
   boolean areaVisibility,
   boolean platformEntriesLinking,
   boolean staticParkAndRide,
-  boolean staticBikeParkAndRide,
-  boolean banDiscouragedWalking,
-  boolean banDiscouragedBiking
+  boolean staticBikeParkAndRide
 ) {
   public OsmProcessingParameters {
     boardingAreaRefTags = Set.copyOf(Objects.requireNonNull(boardingAreaRefTags));

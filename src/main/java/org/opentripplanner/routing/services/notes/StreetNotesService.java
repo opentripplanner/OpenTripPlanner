@@ -67,9 +67,9 @@ public class StreetNotesService implements Serializable {
     }
   };
 
-  private final List<StreetNotesSource> sources = new ArrayList<>();
+  private final List<StreetNoteModel> sources = new ArrayList<>();
 
-  private final StaticStreetNotesSource staticNotesSource = new StaticStreetNotesSource();
+  private final StreetNoteModel staticNotesSource = new StreetNoteModel();
 
   public StreetNotesService() {
     sources.add(staticNotesSource);
@@ -79,7 +79,7 @@ public class StreetNotesService implements Serializable {
    * Add a new note source. The list is not transient so any source added before the graph is saved
    * will be serialized!
    */
-  public void addNotesSource(StreetNotesSource source) {
+  public void addNotesSource(StreetNoteModel source) {
     sources.add(source);
   }
 
@@ -92,7 +92,7 @@ public class StreetNotesService implements Serializable {
     Edge edge = state.getBackEdge();
     Set<StreetNoteAndMatcher> maas = new HashSet<>();
 
-    for (StreetNotesSource source : sources) {
+    for (StreetNoteModel source : sources) {
       Set<StreetNoteAndMatcher> maas2 = source.getNotes(edge);
       if (maas2 != null) maas.addAll(maas2);
     }

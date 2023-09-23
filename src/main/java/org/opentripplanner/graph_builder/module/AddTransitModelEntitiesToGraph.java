@@ -162,7 +162,6 @@ public class AddTransitModelEntitiesToGraph {
         PathwayEdge.createLowCostPathwayEdge(
           boardingAreaVertex,
           platformVertex,
-          boardingArea.getId(),
           wheelchair,
           PathwayMode.WALKWAY
         );
@@ -170,7 +169,6 @@ public class AddTransitModelEntitiesToGraph {
         PathwayEdge.createLowCostPathwayEdge(
           platformVertex,
           boardingAreaVertex,
-          boardingArea.getId(),
           wheelchair,
           PathwayMode.WALKWAY
         );
@@ -199,7 +197,6 @@ public class AddTransitModelEntitiesToGraph {
           PathwayEdge.createPathwayEdge(
             fromVertex,
             toVertex,
-            pathway.getId(),
             NonLocalizedString.ofNullable(pathway.getSignpostedAs()),
             pathway.getTraversalTime(),
             distance,
@@ -212,7 +209,6 @@ public class AddTransitModelEntitiesToGraph {
             PathwayEdge.createPathwayEdge(
               toVertex,
               fromVertex,
-              pathway.getId(),
               NonLocalizedString.ofNullable(pathway.getReverseSignpostedAs()),
               pathway.getTraversalTime(),
               distance,

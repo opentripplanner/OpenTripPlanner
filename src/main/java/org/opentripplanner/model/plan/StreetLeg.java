@@ -12,7 +12,6 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.street.search.TraverseMode;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place using
@@ -32,7 +31,6 @@ public class StreetLeg implements Leg {
   private final Set<StreetNote> streetNotes;
   private final ElevationProfile elevationProfile;
 
-  private final FeedScopedId pathwayId;
   private final Boolean walkingBike;
   private final Boolean rentedVehicle;
   private final String vehicleRentalNetwork;
@@ -50,7 +48,6 @@ public class StreetLeg implements Leg {
     this.legGeometry = builder.getGeometry();
     this.walkSteps = builder.getWalkSteps();
     this.streetNotes = Set.copyOf(builder.getStreetNotes());
-    this.pathwayId = builder.getPathwayId();
     this.walkingBike = builder.getWalkingBike();
     this.rentedVehicle = builder.getRentedVehicle();
     this.vehicleRentalNetwork = builder.getVehicleRentalNetwork();
@@ -93,11 +90,6 @@ public class StreetLeg implements Leg {
   @Override
   public double getDistanceMeters() {
     return distanceMeters;
-  }
-
-  @Override
-  public FeedScopedId getPathwayId() {
-    return pathwayId;
   }
 
   @Override
@@ -201,7 +193,6 @@ public class StreetLeg implements Leg {
       .addEnum("mode", mode)
       .addNum("distance", distanceMeters, "m")
       .addNum("cost", generalizedCost)
-      .addObj("gtfsPathwayId", pathwayId)
       .addObj("legGeometry", legGeometry)
       .addObj("legElevation", elevationProfile)
       .addCol("walkSteps", walkSteps)

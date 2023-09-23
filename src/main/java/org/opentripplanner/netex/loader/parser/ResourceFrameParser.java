@@ -57,16 +57,18 @@ class ResourceFrameParser extends NetexParser<ResourceFrame_VersionFrameStructur
   /* private methods */
 
   private void parseOrganization(OrganisationsInFrame_RelStructure elements) {
-    for (JAXBElement<?> e : elements.getOrganisation_()) {
-      parseOrganization((Organisation_VersionStructure) e.getValue());
+    if (elements != null) {
+      for (JAXBElement<?> e : elements.getOrganisation_()) {
+        parseOrganization((Organisation_VersionStructure) e.getValue());
+      }
     }
   }
 
   private void parseOrganization(Organisation_VersionStructure element) {
-    if (element instanceof Authority) {
-      authorities.add((Authority) element);
-    } else if (element instanceof Operator) {
-      operators.add((Operator) element);
+    if (element instanceof Authority authority) {
+      authorities.add(authority);
+    } else if (element instanceof Operator operator) {
+      operators.add(operator);
     } else {
       warnOnMissingMapping(LOG, element);
     }

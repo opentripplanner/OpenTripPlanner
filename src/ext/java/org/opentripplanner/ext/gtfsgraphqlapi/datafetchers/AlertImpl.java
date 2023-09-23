@@ -23,7 +23,6 @@ import org.opentripplanner.ext.gtfsgraphqlapi.model.RouteTypeModel;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.StopOnRouteModel;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.StopOnTripModel;
 import org.opentripplanner.ext.gtfsgraphqlapi.model.UnknownModel;
-import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
@@ -39,6 +38,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 
 public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
+
+  private static final String FALLBACK_EMPTY_STRING = "";
 
   @Override
   public DataFetcher<Agency> agency() {
@@ -62,16 +63,20 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
 
   @Override
   public DataFetcher<String> alertDescriptionText() {
-    return environment ->
-      getSource(environment).descriptionText().toString(environment.getLocale());
+    return environment -> {
+      var alert = getSource(environment);
+      return alert
+        .descriptionText()
+        .or(alert::headerText)
+        .map(t -> t.toString(environment.getLocale()))
+        .orElse(FALLBACK_EMPTY_STRING);
+    };
   }
 
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations() {
-    return environment -> {
-      var text = getSource(environment).descriptionText();
-      return getTranslations(text);
-    };
+    return environment ->
+      getSource(environment).descriptionText().map(this::getTranslations).orElse(List.of());
   }
 
   @Override
@@ -96,16 +101,20 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
 
   @Override
   public DataFetcher<String> alertHeaderText() {
-    return environment ->
-      GraphQLUtils.getTranslation(getSource(environment).headerText(), environment);
+    return environment -> {
+      var alert = getSource(environment);
+      return alert
+        .headerText()
+        .or(alert::descriptionText)
+        .map(h -> h.toString(environment.getLocale()))
+        .orElse(FALLBACK_EMPTY_STRING);
+    };
   }
 
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations() {
-    return environment -> {
-      var text = getSource(environment).headerText();
-      return getTranslations(text);
-    };
+    return environment ->
+      getSource(environment).headerText().map(this::getTranslations).orElse(List.of());
   }
 
   @Override
@@ -115,18 +124,13 @@ public class AlertImpl implements GraphQLDataFetchers.GraphQLAlert {
 
   @Override
   public DataFetcher<String> alertUrl() {
-    return environment -> {
-      var alertUrl = getSource(environment).url();
-      return alertUrl == null ? null : alertUrl.toString(environment.getLocale());
-    };
+    return environment ->
+      getSource(environment).url().map(u -> u.toString(environment.getLocale())).orElse(null);
   }
 
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertUrlTranslations() {
-    return environment -> {
-      var url = getSource(environment).url();
-      return getTranslations(url);
-    };
+    return environment -> getSource(environment).url().map(this::getTranslations).orElse(List.of());
   }
 
   @Override

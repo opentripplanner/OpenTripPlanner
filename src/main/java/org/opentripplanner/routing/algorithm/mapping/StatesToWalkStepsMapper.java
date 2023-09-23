@@ -266,8 +266,8 @@ public class StatesToWalkStepsMapper {
         WalkStepBuilder twoBack = steps.get(lastIndex - 1);
         WalkStepBuilder lastStep = steps.get(lastIndex);
         boolean isOnSameStreet = lastStep
-          .streetNameNoParens()
-          .equals(threeBack.streetNameNoParens());
+          .directionTextNoParens()
+          .equals(threeBack.directionTextNoParens());
         if (twoBack.distance() < MAX_ZAG_DISTANCE && isOnSameStreet) {
           if (isUTurn(twoBack, lastStep)) {
             steps.remove(lastIndex - 1);
@@ -430,8 +430,8 @@ public class StatesToWalkStepsMapper {
 
   private boolean continueOnSameStreet(Edge edge, String streetNameNoParens) {
     return !(
-      current.streetName().toString() != null &&
-      !(java.util.Objects.equals(current.streetNameNoParens(), streetNameNoParens)) &&
+      current.directionText().toString() != null &&
+      !(java.util.Objects.equals(current.directionTextNoParens(), streetNameNoParens)) &&
       (!current.bogusName() || !edge.hasBogusName())
     );
   }
@@ -510,7 +510,7 @@ public class StatesToWalkStepsMapper {
     // exit != null and uses to <exit>
     // the floor name is the AlightEdge name
     // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-    step.withStreetName(edge.getName());
+    step.withDirectionText(edge.getName());
 
     step.withRelativeDirection(RelativeDirection.ELEVATOR);
 
@@ -526,7 +526,7 @@ public class StatesToWalkStepsMapper {
   ) {
     addStep(
       createWalkStep(forwardState, backState)
-        .withStreetName(name)
+        .withDirectionText(name)
         .withBogusName(false)
         .withDirections(lastAngle, DirectionUtils.getFirstAngle(edge.getGeometry()), false)
         .withRelativeDirection(direction)
@@ -543,7 +543,7 @@ public class StatesToWalkStepsMapper {
 
     return WalkStep
       .builder()
-      .withStreetName(en.getName())
+      .withDirectionText(en.getName())
       .withStartLocation(new WgsCoordinate(backState.getVertex().getCoordinate()))
       .withBogusName(en.hasBogusName())
       .withAngle(DirectionUtils.getFirstAngle(forwardState.getBackEdge().getGeometry()))

@@ -4,7 +4,6 @@ import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 
-@FunctionalInterface
 public interface PatternRideFactory<T extends RaptorTripSchedule, R extends PatternRide<T>> {
   R createPatternRide(
     McStopArrival<T> prevArrival,

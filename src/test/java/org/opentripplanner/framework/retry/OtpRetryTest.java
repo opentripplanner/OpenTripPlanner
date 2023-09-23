@@ -28,13 +28,13 @@ class OtpRetryTest {
   }
 
   @Test
-  void testNoInitialFailureNoRetryAttempt() {
+  void testNoInitialFailureNoRetryAttempt() throws InterruptedException {
     otpRetryBuilder.withMaxAttempts(0).build().execute(() -> {});
     assertFalse(hasRetried.isDone());
   }
 
   @Test
-  void testNoInitialFailureOneRetryAttempt() {
+  void testNoInitialFailureOneRetryAttempt() throws InterruptedException {
     otpRetryBuilder.withMaxAttempts(1).build().execute(() -> {});
     assertFalse(hasRetried.isDone());
   }
@@ -83,7 +83,7 @@ class OtpRetryTest {
   }
 
   @Test
-  void testInitialFailureWithRecoveryAndOneRetryAttempt() {
+  void testInitialFailureWithRecoveryAndOneRetryAttempt() throws InterruptedException {
     OtpRetry retry = otpRetryBuilder.withMaxAttempts(1).build();
     retry.execute(() -> {
       if (!hasRetried.isDone()) {

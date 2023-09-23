@@ -400,13 +400,13 @@ public class ParameterBuilder {
   /* Custom OTP types */
 
   public FeedScopedId asFeedScopedId(FeedScopedId defaultValue) {
-    return exist() ? FeedScopedId.parseId(ofType(FEED_SCOPED_ID).asText()) : defaultValue;
+    return exist() ? FeedScopedId.parse(ofType(FEED_SCOPED_ID).asText()) : defaultValue;
   }
 
   public List<FeedScopedId> asFeedScopedIds(List<FeedScopedId> defaultValues) {
     setInfoOptional(defaultValues);
     info.withArray(FEED_SCOPED_ID);
-    return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parseId(it.asText()));
+    return buildAndListSimpleArrayElements(defaultValues, it -> FeedScopedId.parse(it.asText()));
   }
 
   public CostLinearFunction asCostLinearFunction(CostLinearFunction defaultValue) {
@@ -642,14 +642,6 @@ public class ParameterBuilder {
   private Duration parseDuration(String value) {
     try {
       return DurationUtils.duration(value);
-    } catch (DateTimeParseException e) {
-      throw error("The parameter value '%s' is not a duration.".formatted(value), e);
-    }
-  }
-
-  private Duration parseDuration(String value, ChronoUnit unit) {
-    try {
-      return DurationUtils.duration(value, unit);
     } catch (DateTimeParseException e) {
       throw error("The parameter value '%s' is not a duration.".formatted(value), e);
     }

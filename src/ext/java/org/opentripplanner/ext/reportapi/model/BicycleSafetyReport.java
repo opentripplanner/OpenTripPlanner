@@ -31,7 +31,7 @@ public class BicycleSafetyReport {
         buf.addBoolean(false);
         buf.addText(p.properties().getPermission().toString());
 
-        var safetyProps = p.properties().getBicycleSafetyFeatures();
+        var safetyProps = p.properties().bicycleSafety();
         if (safetyProps != null) {
           buf.addNumber(safetyProps.forward());
           buf.addNumber(safetyProps.back());

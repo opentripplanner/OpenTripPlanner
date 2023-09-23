@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.test.support.TestTableParser;
 import org.opentripplanner.test.support.VariableSource;
 
 class LinearFunctionSerializationTest {
@@ -20,14 +21,21 @@ class LinearFunctionSerializationTest {
   private static final Duration D1h = Duration.ofSeconds(3600);
 
   @SuppressWarnings("unused")
-  static Stream<Arguments> parseTestCases = Stream.of(
-    Arguments.of("0+0t", "0s", 0.00),
-    Arguments.of("1+0.0111 t", "1s", 0.01),
-    Arguments.of("120 + 0.111 t", "2m", 0.11),
-    Arguments.of("2h3m + 1.111 t", "2h3m", 1.11),
-    Arguments.of("2h3m + 2.111 t", "2h3m", 2.1),
-    Arguments.of("3h + 5.111 t", "3h", 5.1),
-    Arguments.of("7m + 10.1 x", "7m", 10.0)
+  static Stream<Arguments> parseTestCases = TestTableParser.of(
+    """
+    #        INPUT    ||       EXPECTED
+    #                 ||  CONSTANT | COEFFICIENT
+               0+0t   ||       0s  |   0.0
+         1+0.0111 t   ||       1s  |   0.01
+      120 + 0.111 t   ||       2m  |   0.11
+      120 + 0.111 t   ||       2m  |   0.11
+         12.0 + 0 t   ||      12s  |   0.0
+     2h3m + 1.111 t   ||     2h3m  |   1.11
+     2h3m + 2.111 t   ||     2h3m  |   2.1
+       3h + 5.111 t   ||       3h  |   5.1
+        7m + 10.1 x   ||       7m  |  10.0
+      PT7s + 10.1 x   ||       7s  |  10.0
+    """
   );
 
   @ParameterizedTest

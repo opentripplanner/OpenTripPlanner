@@ -116,10 +116,6 @@ class NoticeAssignmentMapper {
     return noticiesByEntity;
   }
 
-  private StopTimeKey lookupStopTimeKey(String timeTablePassingTimeId) {
-    return stopTimesByNetexId.get(timeTablePassingTimeId).getId();
-  }
-
   @Nullable
   private Notice getOrMapNotice(NoticeAssignment assignment) {
     org.rutebanken.netex.model.Notice notice = assignment.getNotice() != null
