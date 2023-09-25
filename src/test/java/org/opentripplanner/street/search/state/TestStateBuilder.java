@@ -34,6 +34,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
  * Builds up a state chain for use in tests.
@@ -184,23 +185,16 @@ public class TestStateBuilder {
     return this;
   }
 
+  public TestStateBuilder stop(RegularStop stop) {
+    return arriveAtStop(stop);
+  }
+
   /**
    * Add a state that arrives at a transit stop.
    */
   public TestStateBuilder stop() {
     count++;
-    var from = (StreetVertex) currentState.vertex;
-    var to = new TransitStopVertexBuilder()
-      .withStop(TransitModelForTest.stopForTest("stop", count, count))
-      .build();
-
-    var edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);
-    var states = edge.traverse(currentState);
-    if (states.length != 1) {
-      throw new IllegalStateException("Only single state transitions are supported.");
-    }
-    currentState = states[0];
-    return this;
+    return arriveAtStop(TransitModelForTest.stopForTest("stop", count, count));
   }
 
   public TestStateBuilder enterStation(String id) {
@@ -244,6 +238,20 @@ public class TestStateBuilder {
       WALKWAY
     );
     currentState = edge.traverse(currentState)[0];
+    return this;
+  }
+
+  @Nonnull
+  private TestStateBuilder arriveAtStop(RegularStop stop) {
+    var from = (StreetVertex) currentState.vertex;
+    var to = new TransitStopVertexBuilder().withStop(stop).build();
+
+    var edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);
+    var states = edge.traverse(currentState);
+    if (states.length != 1) {
+      throw new IllegalStateException("Only single state transitions are supported.");
+    }
+    currentState = states[0];
     return this;
   }
 

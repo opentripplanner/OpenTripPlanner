@@ -9,6 +9,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove transit with higher cost than best on-street itinerary filter [#5222](https://github.com/opentripplanner/OpenTripPlanner/pull/5222)
 - Remove banDiscouragedCycling and banDiscouragedWalking [#5341](https://github.com/opentripplanner/OpenTripPlanner/pull/5341)
 - Fix rental scooter access [#5361](https://github.com/opentripplanner/OpenTripPlanner/pull/5361)
+- De-duplicate stops returned by `stopsByRadius` [#5366](https://github.com/opentripplanner/OpenTripPlanner/pull/5366)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
