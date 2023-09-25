@@ -63,7 +63,7 @@ public class ConstantsForTests {
   private static final String PORTLAND_NED_WITH_NODATA =
     "src/test/resources/portland/portland-ned-nodata.tif";
 
-  private static final String OSLO_EAST_OSM = "src/test/resources/osm/oslo-east-filtered.osm.pbf";
+  private static final File OSLO_EAST_OSM = RES.file("oslo-east-filtered.osm.pbf");
 
   public static final File SIMPLE_GTFS = RES.file("/gtfs/simple/");
 
@@ -74,12 +74,6 @@ public class ConstantsForTests {
   private static final String NETEX_NORDIC_FILENAME = "netex_minimal.zip";
   private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip/";
   private static final String NETEX_EPIP_DATA_DIR = NETEX_EPIP_DIR + "netex_epip_minimal/";
-
-  /* filenames encoded with cp437 and utf8 */
-  public static final String UMLAUT_CP437_ZIP = "src/test/resources/umlaut-cp437.zip";
-  public static final String UMLAUT_TXT = "ümläüt.txt";
-  public static final String UMLAUT_UTF8_ZIP = "src/test/resources/umlaut-utf8.zip";
-  public static final String UMLAUT_UTF8_ZIP_NO_EFS = "src/test/resources/umlaut-utf8-no-efs.zip";
 
   private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
     new File(NETEX_NORDIC_DIR, NETEX_NORDIC_FILENAME),
@@ -219,9 +213,7 @@ public class ConstantsForTests {
       var transitModel = new TransitModel(stopModel, deduplicator);
       // Add street data from OSM
       {
-        File osmFile = new File(OSLO_EAST_OSM);
-
-        OsmProvider osmProvider = new OsmProvider(osmFile, false);
+        OsmProvider osmProvider = new OsmProvider(OSLO_EAST_OSM, false);
         OsmModule osmModule = OsmModule.of(osmProvider, graph).build();
         osmModule.buildGraph();
       }

@@ -22,12 +22,19 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.test.support.ResourceLoader;
 
 public class ZipFileDataSourceTest {
 
   // Sometime close to 2000-01-01
   private static final long TIME = 30 * 365 * 24 * 60 * 60 * 1000L;
   private static final String FILENAME = ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath();
+  private static final ResourceLoader RES = ResourceLoader.of(ZipFileDataSourceTest.class);
+  /* filenames encoded with cp437 and utf8 */
+  public static final File UMLAUT_CP437_ZIP = RES.file("umlaut-cp437.zip");
+  public static final String UMLAUT_TXT = "ümläüt.txt";
+  public static final File UMLAUT_UTF8_ZIP = RES.file("umlaut-utf8.zip");
+  public static final File UMLAUT_UTF8_ZIP_NO_EFS = RES.file("umlaut-utf8-no-efs.zip");
 
   @Test
   public void testAccessorsForNoneExistingFile() throws IOException {
@@ -108,7 +115,7 @@ public class ZipFileDataSourceTest {
   @Test
   public void testUnsupportedDelete() {
     // Given:
-    File target = new File(FILENAME);
+    var target = new File(FILENAME);
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
 
     // When: delete entry is not implemented
@@ -118,25 +125,25 @@ public class ZipFileDataSourceTest {
   @Test
   public void testEntryEncoding() {
     // has worked before #4835, for verification remove the attempt to set to code page to cp437
-    File target = new File(ConstantsForTests.UMLAUT_UTF8_ZIP);
+    File target = UMLAUT_UTF8_ZIP;
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
     DataSource entry = subject.content().iterator().next();
 
-    assertEquals(ConstantsForTests.UMLAUT_TXT, entry.name());
+    assertEquals(UMLAUT_TXT, entry.name());
 
     // has worked before #4835, for verification remove the attempt to set to code page to cp437
-    target = new File(ConstantsForTests.UMLAUT_UTF8_ZIP_NO_EFS);
+    target = UMLAUT_UTF8_ZIP_NO_EFS;
     subject = new ZipFileDataSource(target, GTFS);
     entry = subject.content().iterator().next();
 
-    assertEquals(ConstantsForTests.UMLAUT_TXT, entry.name());
+    assertEquals(UMLAUT_TXT, entry.name());
 
     // only works after #4835, will fail with "Invalid CEN header (bad entry name)" when verifying
-    target = new File(ConstantsForTests.UMLAUT_CP437_ZIP);
+    target = UMLAUT_CP437_ZIP;
     subject = new ZipFileDataSource(target, GTFS);
     entry = subject.content().iterator().next();
 
-    assertEquals(ConstantsForTests.UMLAUT_TXT, entry.name());
+    assertEquals(UMLAUT_TXT, entry.name());
   }
 
   /*
@@ -147,14 +154,14 @@ public class ZipFileDataSourceTest {
   public static void main(String[] args) throws FileNotFoundException, IOException {
     /* cp437 encoded file names in zip */
     final ZipArchiveOutputStream zos = new ZipArchiveOutputStream(
-      new FileOutputStream(ConstantsForTests.UMLAUT_CP437_ZIP)
+      new FileOutputStream(UMLAUT_CP437_ZIP)
     );
     /* set original ZIP character encoding aka OEM-US or DOS-US */
     zos.setEncoding("Cp437");
 
     final byte[] data = {};
 
-    ZipArchiveEntry entry = new ZipArchiveEntry(ConstantsForTests.UMLAUT_TXT);
+    ZipArchiveEntry entry = new ZipArchiveEntry(UMLAUT_TXT);
     entry.setSize(data.length);
     entry.setTime(FileTime.fromMillis(0));
     zos.putArchiveEntry(entry);
@@ -165,12 +172,12 @@ public class ZipFileDataSourceTest {
 
     /* utf-8 encoded file names in zip */
     final ZipArchiveOutputStream zos2 = new ZipArchiveOutputStream(
-      new FileOutputStream(ConstantsForTests.UMLAUT_UTF8_ZIP)
+      new FileOutputStream(UMLAUT_UTF8_ZIP)
     );
     /* explicitely set Apache Commons default for documentation */
     zos2.setEncoding("utf-8");
 
-    ZipArchiveEntry entry2 = new ZipArchiveEntry(ConstantsForTests.UMLAUT_TXT);
+    ZipArchiveEntry entry2 = new ZipArchiveEntry(UMLAUT_TXT);
     entry2.setSize(data.length);
     entry2.setTime(FileTime.fromMillis(0));
     zos2.putArchiveEntry(entry2);
@@ -185,14 +192,14 @@ public class ZipFileDataSourceTest {
      * http://web.archive.org/web/20150718122844/https://blogs.oracle.com/xuemingshen/entry/non_utf_8_encoding_in
      */
     final ZipArchiveOutputStream zos3 = new ZipArchiveOutputStream(
-      new FileOutputStream(ConstantsForTests.UMLAUT_UTF8_ZIP_NO_EFS)
+      new FileOutputStream(UMLAUT_UTF8_ZIP_NO_EFS)
     );
     /* explicitely set Apache Commons default for documentation */
     zos3.setEncoding("utf-8");
     /* no EFS flag! */
     zos3.setUseLanguageEncodingFlag(false);
 
-    ZipArchiveEntry entry3 = new ZipArchiveEntry(ConstantsForTests.UMLAUT_TXT);
+    ZipArchiveEntry entry3 = new ZipArchiveEntry(UMLAUT_TXT);
     entry3.setSize(data.length);
     entry3.setTime(FileTime.fromMillis(0));
     zos3.putArchiveEntry(entry3);
