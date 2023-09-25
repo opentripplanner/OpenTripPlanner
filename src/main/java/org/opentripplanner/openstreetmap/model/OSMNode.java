@@ -6,6 +6,8 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMNode extends OSMWithTags {
 
+  static final Set<String> MOTOR_VEHICLE_BARRIERS = Set.of("bollard", "bar", "chain");
+
   public double lat;
   public double lon;
 
@@ -36,15 +38,13 @@ public class OSMNode extends OSMWithTags {
     return hasTag("crossing") && "traffic_signals".equals(getTag("crossing"));
   }
 
-  static final Set<String> motorVehicleBarriers = Set.of("bollard", "bar", "chain");
-
   /* Checks if this node is a barrier which prevents motor vehicle traffic
    *
    * @return true if it is
    */
   public boolean isMotorVehicleBarrier() {
     var barrier = this.getTag("barrier");
-    return barrier != null && motorVehicleBarriers.contains(barrier);
+    return barrier != null && MOTOR_VEHICLE_BARRIERS.contains(barrier);
   }
 
   /**
