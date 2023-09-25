@@ -28,6 +28,7 @@ import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs;
 import org.opentripplanner.apis.gtfs.mapping.RouteRequestMapper;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.ext.fares.impl.GtfsFaresService;
@@ -721,7 +722,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<Connection<NearbyStop>> stopsByRadius() {
     return environment -> {
       // TODO implement rest of the args
-      GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs args = new GraphQLTypes.GraphQLQueryTypeStopsByRadiusArgs(
+      GraphQLQueryTypeStopsByRadiusArgs args = new GraphQLQueryTypeStopsByRadiusArgs(
         environment.getArguments()
       );
 

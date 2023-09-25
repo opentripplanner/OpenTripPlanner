@@ -1,5 +1,6 @@
 package org.opentripplanner.street.search.state;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model.site.PathwayMode.WALKWAY;
 
 import java.time.Instant;
@@ -10,7 +11,9 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
@@ -31,6 +34,7 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.site.RegularStop;
 
 /**
  * Builds up a state chain for use in tests.
@@ -70,6 +74,26 @@ public class TestStateBuilder {
     return new TestStateBuilder(StreetMode.CAR_RENTAL);
   }
 
+  public static TestStateBuilder ofScooterRental() {
+    return new TestStateBuilder(StreetMode.SCOOTER_RENTAL);
+  }
+
+  public static TestStateBuilder ofBikeRental() {
+    return new TestStateBuilder(StreetMode.BIKE_RENTAL);
+  }
+
+  public static TestStateBuilder ofCycling() {
+    return new TestStateBuilder(StreetMode.BIKE);
+  }
+
+  public static TestStateBuilder ofBikeAndRide() {
+    return new TestStateBuilder(StreetMode.BIKE_TO_PARK);
+  }
+
+  public static TestStateBuilder parkAndRide() {
+    return new TestStateBuilder(StreetMode.CAR_TO_PARK);
+  }
+
   /**
    * Traverse a very plain street edge with no special characteristics.
    */
@@ -90,25 +114,39 @@ public class TestStateBuilder {
   /**
    * Traverse a street edge and switch to Car mode
    */
-  public TestStateBuilder pickUpCar() {
-    count++;
-
-    var station = TestVehicleRentalStationBuilder.of().withVehicleTypeCar().build();
-
-    VehicleRentalPlaceVertex vertex = new VehicleRentalPlaceVertex(station);
-    var link = StreetVehicleRentalLink.createStreetVehicleRentalLink(
-      (StreetVertex) currentState.vertex,
-      vertex
+  public TestStateBuilder pickUpCarFromStation() {
+    return pickUpRentalVehicle(
+      RentalFormFactor.CAR,
+      TestVehicleRentalStationBuilder.of().withVehicleTypeCar().build()
     );
-    currentState = link.traverse(currentState)[0];
+  }
 
-    var edge = VehicleRentalEdge.createVehicleRentalEdge(vertex, RentalFormFactor.CAR);
+  public TestStateBuilder pickUpFreeFloatingCar() {
+    return pickUpRentalVehicle(
+      RentalFormFactor.CAR,
+      TestFreeFloatingRentalVehicleBuilder.of().withVehicleCar().build()
+    );
+  }
 
-    State[] traverse = edge.traverse(currentState);
-    currentState =
-      Arrays.stream(traverse).filter(it -> it.currentMode() == TraverseMode.CAR).findFirst().get();
+  public TestStateBuilder pickUpFreeFloatingScooter() {
+    return pickUpRentalVehicle(
+      RentalFormFactor.SCOOTER,
+      TestFreeFloatingRentalVehicleBuilder.of().withVehicleScooter().build()
+    );
+  }
 
-    return this;
+  public TestStateBuilder pickUpBikeFromStation() {
+    return pickUpRentalVehicle(
+      RentalFormFactor.BICYCLE,
+      TestVehicleRentalStationBuilder.of().withVehicleTypeBicycle().build()
+    );
+  }
+
+  public TestStateBuilder pickUpFreeFloatingBike() {
+    return pickUpRentalVehicle(
+      RentalFormFactor.BICYCLE,
+      TestFreeFloatingRentalVehicleBuilder.of().withVehicleBicycle().build()
+    );
   }
 
   /**
@@ -147,23 +185,16 @@ public class TestStateBuilder {
     return this;
   }
 
+  public TestStateBuilder stop(RegularStop stop) {
+    return arriveAtStop(stop);
+  }
+
   /**
    * Add a state that arrives at a transit stop.
    */
   public TestStateBuilder stop() {
     count++;
-    var from = (StreetVertex) currentState.vertex;
-    var to = new TransitStopVertexBuilder()
-      .withStop(TransitModelForTest.stopForTest("stop", count, count))
-      .build();
-
-    var edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);
-    var states = edge.traverse(currentState);
-    if (states.length != 1) {
-      throw new IllegalStateException("Only single state transitions are supported.");
-    }
-    currentState = states[0];
-    return this;
+    return arriveAtStop(TransitModelForTest.stopForTest("stop", count, count));
   }
 
   public TestStateBuilder enterStation(String id) {
@@ -206,8 +237,21 @@ public class TestStateBuilder {
       true,
       WALKWAY
     );
-    var state = edge.traverse(currentState)[0];
-    currentState = state;
+    currentState = edge.traverse(currentState)[0];
+    return this;
+  }
+
+  @Nonnull
+  private TestStateBuilder arriveAtStop(RegularStop stop) {
+    var from = (StreetVertex) currentState.vertex;
+    var to = new TransitStopVertexBuilder().withStop(stop).build();
+
+    var edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);
+    var states = edge.traverse(currentState);
+    if (states.length != 1) {
+      throw new IllegalStateException("Only single state transitions are supported.");
+    }
+    currentState = states[0];
     return this;
   }
 
@@ -227,6 +271,35 @@ public class TestStateBuilder {
       suffix,
       suffix
     );
+  }
+
+  private TestStateBuilder pickUpRentalVehicle(
+    RentalFormFactor rentalFormFactor,
+    VehicleRentalPlace place
+  ) {
+    count++;
+    VehicleRentalPlaceVertex vertex = new VehicleRentalPlaceVertex(place);
+    var link = StreetVehicleRentalLink.createStreetVehicleRentalLink(
+      (StreetVertex) currentState.vertex,
+      vertex
+    );
+    currentState = link.traverse(currentState)[0];
+
+    var edge = VehicleRentalEdge.createVehicleRentalEdge(vertex, rentalFormFactor);
+
+    State[] traverse = edge.traverse(currentState);
+    currentState =
+      Arrays.stream(traverse).filter(it -> it.currentMode() != TraverseMode.WALK).findFirst().get();
+
+    assertTrue(currentState.isRentingVehicle());
+
+    var linkBack = StreetVehicleRentalLink.createStreetVehicleRentalLink(
+      (VehicleRentalPlaceVertex) currentState.vertex,
+      StreetModelForTest.intersectionVertex(count, count)
+    );
+    currentState = linkBack.traverse(currentState)[0];
+
+    return this;
   }
 
   public State build() {

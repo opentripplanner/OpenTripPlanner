@@ -206,7 +206,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     );
   }
 
-  public boolean vehicleRentalIsFinished() {
+  private boolean vehicleRentalIsFinished() {
     return (
       stateData.vehicleRentalState == VehicleRentalState.HAVE_RENTED ||
       (
@@ -221,7 +221,7 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
     );
   }
 
-  public boolean vehicleRentalNotStarted() {
+  private boolean vehicleRentalNotStarted() {
     return stateData.vehicleRentalState == VehicleRentalState.BEFORE_RENTING;
   }
 
@@ -471,6 +471,12 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       .addNum("weight", weight)
       .addObj("vertex", vertex)
       .addBoolIfTrue("VEHICLE_RENT", isRentingVehicle())
+      .addEnum("formFactor", vehicleRentalFormFactor())
+      .addBoolIfTrue("RENTING_FROM_STATION", isRentingVehicleFromStation())
+      .addBoolIfTrue(
+        "RENTING_FREE_FLOATING",
+        isRentingFloatingVehicle() && !isRentingVehicleFromStation()
+      )
       .addBoolIfTrue("VEHICLE_PARKED", isVehicleParked())
       .toString();
   }
