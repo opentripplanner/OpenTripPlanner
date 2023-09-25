@@ -1,14 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.io.File;
 import java.util.List;
-import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.graph_builder.module.osm.OsmModuleTest;
-import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
-import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
@@ -17,11 +9,8 @@ import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
-import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -29,16 +18,6 @@ import org.opentripplanner.transit.service.TransitModel;
  * testing.
  */
 public class FakeGraph {
-
-  private static final ResourceLoader RES = ResourceLoader.of(OsmModuleTest.class);
-
-  /**
-   * This introduces a 1MB test resource but is only used by TestIntermediatePlaces.
-   */
-  public static void addPerpendicularRoutes(Graph graph, TransitModel transitModel) {
-    var input = List.of(new GtfsBundle(RES.file("addPerpendicularRoutes.gtfs.zip")));
-    new GtfsModule(input, transitModel, graph, ServiceDateInterval.unbounded()).buildGraph();
-  }
 
   /** Add a regular grid of stops to the graph */
   public static void addRegularStopGrid(Graph graph) {

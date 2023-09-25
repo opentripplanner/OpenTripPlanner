@@ -51,9 +51,9 @@ public class ConstantsForTests {
 
   public static final File CALTRAIN_GTFS = RES.file("/gtfs/caltrain_gtfs.zip");
 
-  public static final File PORTLAND_GTFS = RES.file("/portland/portland.gtfs.zip");
+  private static final File PORTLAND_GTFS = RES.file("/portland/portland.gtfs.zip");
 
-  public static final File PORTLAND_CENTRAL_OSM = RES.file(
+  private static final File PORTLAND_CENTRAL_OSM = RES.file(
     "/portland/portland-central-filtered.osm.pbf"
   );
 
@@ -64,8 +64,6 @@ public class ConstantsForTests {
     "src/test/resources/portland/portland-ned-nodata.tif";
 
   private static final String OSLO_EAST_OSM = "src/test/resources/osm/oslo-east-filtered.osm.pbf";
-
-  public static final File KCM_GTFS = RES.file("/gtfs/kcm_gtfs.zip");
 
   public static final File SIMPLE_GTFS = RES.file("/gtfs/simple/");
 
@@ -130,8 +128,7 @@ public class ConstantsForTests {
       var transitModel = new TransitModel(new StopModel(), deduplicator);
       // Add street data from OSM
       {
-        File osmFile = PORTLAND_CENTRAL_OSM;
-        OsmProvider osmProvider = new OsmProvider(osmFile, false);
+        OsmProvider osmProvider = new OsmProvider(PORTLAND_CENTRAL_OSM, false);
         OsmModule osmModule = OsmModule
           .of(osmProvider, graph)
           .withStaticParkAndRide(true)

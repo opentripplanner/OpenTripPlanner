@@ -109,7 +109,7 @@ public class FaresIntegrationTest {
   @Test
   public void testFareComponent() {
     TestOtpModel model = ConstantsForTests.buildGtfsGraph(
-      ResourceLoader.of(this).file("/gtfs/farecomponents.gtfs.zip")
+      ResourceLoader.of(this).file("farecomponents.gtfs.zip")
     );
     Graph graph = model.graph();
     TransitModel transitModel = model.transitModel();

@@ -67,7 +67,7 @@ class GtfsModuleTest {
   class Interlining {
 
     static GtfsBundle bundle(String feedId) {
-      var b = new GtfsBundle(ResourceLoader.of(GtfsModuleTest.class).file("interlining"));
+      var b = new GtfsBundle(ResourceLoader.of(GtfsModuleTest.class).file("/gtfs/interlining"));
       b.setFeedId(new GtfsFeedId.Builder().id(feedId).build());
       return b;
     }
