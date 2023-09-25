@@ -11,8 +11,8 @@ const endpoint = `https://api.entur.io/journey-planner/v3/graphql`;
   TODO: should live in a separate file, and split into fragments for readability
  */
 const query = graphql(`
-  query trip($from: Location!, $to: Location!) {
-    trip(from: $from, to: $to) {
+  query trip($from: Location!, $to: Location!, $arriveBy: Boolean) {
+    trip(from: $from, to: $to, arriveBy: $arriveBy) {
       tripPatterns {
         aimedStartTime
         aimedEndTime

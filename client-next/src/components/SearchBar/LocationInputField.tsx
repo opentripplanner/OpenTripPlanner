@@ -2,7 +2,7 @@ import { Form } from 'react-bootstrap';
 import { COORDINATE_PRECISION } from './constants.ts';
 import { Location } from '../../gql/graphql.ts';
 
-export function LocationInputField({ location, id, label }: { location?: Location; id: string; label: string }) {
+export function LocationInputField({ location, id, label }: { location: Location; id: string; label: string }) {
   return (
     <Form.Group>
       <Form.Label htmlFor={id}>{label}</Form.Label>
@@ -11,12 +11,15 @@ export function LocationInputField({ location, id, label }: { location?: Locatio
         id={id}
         size="sm"
         placeholder="[Click in map]"
+        // Intentionally empty for now, but needed because of
+        // https://react.dev/reference/react-dom/components/input#controlling-an-input-with-a-state-variable
+        onChange={() => {}}
         value={
-          location
+          location.coordinates
             ? `${location.coordinates?.latitude.toPrecision(
                 COORDINATE_PRECISION,
               )} ${location.coordinates?.longitude.toPrecision(COORDINATE_PRECISION)}`
-            : undefined
+            : ''
         }
       />
     </Form.Group>

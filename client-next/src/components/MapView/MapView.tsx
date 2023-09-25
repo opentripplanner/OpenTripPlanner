@@ -18,7 +18,7 @@ export function MapView({
   setTripQueryVariables,
   tripQueryResult,
 }: {
-  tripQueryVariables?: TripQueryVariables;
+  tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (variables: TripQueryVariables) => void;
   tripQueryResult: TripQuery | null;
 }) {

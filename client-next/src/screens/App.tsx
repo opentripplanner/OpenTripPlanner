@@ -8,14 +8,23 @@ import { useState } from 'react';
 import { TripQueryVariables } from '../gql/graphql.ts';
 import { useTripQuery } from '../hooks/useTripQuery.ts';
 
+const INITIAL_VARIABLES: TripQueryVariables = {
+  from: {},
+  to: {},
+};
+
 export function App() {
-  const [tripQueryVariables, setTripQueryVariables] = useState<TripQueryVariables | undefined>();
+  const [tripQueryVariables, setTripQueryVariables] = useState<TripQueryVariables>(INITIAL_VARIABLES);
   const [tripQueryResult, callback] = useTripQuery(tripQueryVariables);
 
   return (
     <div className="app">
       <NavBarContainer />
-      <SearchBar onRoute={callback} tripQueryVariables={tripQueryVariables} />
+      <SearchBar
+        onRoute={callback}
+        tripQueryVariables={tripQueryVariables}
+        setTripQueryVariables={setTripQueryVariables}
+      />
       <Stack direction="horizontal" gap={0}>
         <ItineraryListContainer tripQueryResult={tripQueryResult} />
         <MapView

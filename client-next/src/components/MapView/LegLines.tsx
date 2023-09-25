@@ -8,10 +8,10 @@ export function LegLines({ tripQueryResult }: { tripQueryResult: TripQuery | nul
     <>
       {tripQueryResult?.trip.tripPatterns.length &&
         tripQueryResult.trip.tripPatterns[0].legs.map(
-          (leg) =>
+          (leg, i) =>
             leg.pointsOnLink && (
               <Source
-                key={leg.id}
+                key={leg.id || `footleg_${i}`}
                 type="geojson"
                 data={{
                   type: 'Feature',

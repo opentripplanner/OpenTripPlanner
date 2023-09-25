@@ -5,12 +5,12 @@ export function NavigationMarkers({
   tripQueryVariables,
   setTripQueryVariables,
 }: {
-  tripQueryVariables?: TripQueryVariables;
+  tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (variables: TripQueryVariables) => void;
 }) {
   return (
     <>
-      {tripQueryVariables?.from.coordinates && (
+      {tripQueryVariables.from.coordinates && (
         <Marker
           draggable
           latitude={tripQueryVariables.from.coordinates?.latitude}
@@ -26,7 +26,7 @@ export function NavigationMarkers({
           <img alt="" src="/img/marker-flag-start-shadowed.png" height={48} width={49} />
         </Marker>
       )}
-      {tripQueryVariables?.to.coordinates && (
+      {tripQueryVariables.to.coordinates && (
         <Marker
           draggable
           latitude={tripQueryVariables.to.coordinates?.latitude}

@@ -2,46 +2,36 @@ import { useCallback } from 'react';
 import { TripQueryVariables } from '../../gql/graphql.ts';
 import { LngLat, MapLayerMouseEvent } from 'react-map-gl';
 
-const setFromCoordinates = (tripQueryVariables: TripQueryVariables, lngLat: LngLat) => ({
+const setCoordinates = (tripQueryVariables: TripQueryVariables, lngLat: LngLat, key: 'from' | 'to') => ({
   ...tripQueryVariables,
-  from: {
+  [key]: {
     coordinates: {
       latitude: lngLat.lat,
       longitude: lngLat.lng,
-    },
-  },
-  to: {
-    coordinates: {
-      latitude: 0.0,
-      longitude: 0.0,
     },
   },
 });
 
-const setToCoordinates = (tripQueryVariables: TripQueryVariables, lngLat: LngLat) => ({
-  ...tripQueryVariables,
-  to: {
-    coordinates: {
-      latitude: lngLat.lat,
-      longitude: lngLat.lng,
-    },
-  },
-});
+const setFromCoordinates = (tripQueryVariables: TripQueryVariables, lngLat: LngLat) =>
+  setCoordinates(tripQueryVariables, lngLat, 'from');
+
+const setToCoordinates = (tripQueryVariables: TripQueryVariables, lngLat: LngLat) =>
+  setCoordinates(tripQueryVariables, lngLat, 'to');
 
 export function useMapDoubleClick({
   tripQueryVariables,
   setTripQueryVariables,
 }: {
-  tripQueryVariables?: TripQueryVariables;
+  tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (variables: TripQueryVariables) => void;
 }) {
   return useCallback(
     (event: MapLayerMouseEvent) => {
       event.preventDefault();
-      if (!tripQueryVariables?.from.coordinates) {
-        setTripQueryVariables(setFromCoordinates(tripQueryVariables!, event.lngLat));
+      if (!tripQueryVariables.from.coordinates) {
+        setTripQueryVariables(setFromCoordinates(tripQueryVariables, event.lngLat));
       } else {
-        setTripQueryVariables(setToCoordinates(tripQueryVariables!, event.lngLat));
+        setTripQueryVariables(setToCoordinates(tripQueryVariables, event.lngLat));
       }
     },
     [tripQueryVariables, setTripQueryVariables],
