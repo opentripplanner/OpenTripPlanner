@@ -5,11 +5,16 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.rutebanken.netex.model.LocationStructure;
 
 public class TestVehicleRentalStationBuilder {
 
   public static final String NETWORK_1 = "Network-1";
+  public static final double DEFAULT_LATITUDE = 47.510;
+  public static final double DEFAULT_LONGITUDE = 18.99;
 
+  private double latitude = DEFAULT_LATITUDE;
+  private double longitude = DEFAULT_LONGITUDE;
   private int vehicles = 10;
   private int spaces = 10;
   private boolean overloadingAllowed = false;
@@ -18,6 +23,16 @@ public class TestVehicleRentalStationBuilder {
 
   public static TestVehicleRentalStationBuilder of() {
     return new TestVehicleRentalStationBuilder();
+  }
+
+  public TestVehicleRentalStationBuilder withLatitude(double latitude) {
+    this.latitude = latitude;
+    return this;
+  }
+
+  public TestVehicleRentalStationBuilder withLongitude(double longitude) {
+    this.longitude = longitude;
+    return this;
   }
 
   public TestVehicleRentalStationBuilder withVehicles(int vehicles) {
@@ -66,8 +81,8 @@ public class TestVehicleRentalStationBuilder {
     var stationName = "FooStation";
     station.id = new FeedScopedId(NETWORK_1, stationName);
     station.name = new NonLocalizedString(stationName);
-    station.latitude = 47.510;
-    station.longitude = 18.99;
+    station.latitude = latitude;
+    station.longitude = longitude;
     station.vehiclesAvailable = vehicles;
     station.spacesAvailable = spaces;
     station.vehicleTypesAvailable = Map.of(vehicleType, vehicles);

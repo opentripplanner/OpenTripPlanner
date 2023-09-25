@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
@@ -54,12 +55,7 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
 
   @Override
   public List<VehicleRentalStation> getVehicleRentalStations() {
-    return rentalPlaces
-      .values()
-      .stream()
-      .filter(VehicleRentalStation.class::isInstance)
-      .map(VehicleRentalStation.class::cast)
-      .toList();
+    return getVehicleRentalStationsAsStream().toList();
   }
 
   @Override
@@ -111,12 +107,16 @@ public class DefaultVehicleRentalService implements VehicleRentalService, Vehicl
       new Coordinate(maxLon, maxLat)
     );
 
+    return getVehicleRentalStationsAsStream()
+      .filter(b -> envelope.contains(new Coordinate(b.getLongitude(), b.getLatitude())))
+      .toList();
+  }
+
+  private Stream<VehicleRentalStation> getVehicleRentalStationsAsStream() {
     return rentalPlaces
       .values()
       .stream()
       .filter(VehicleRentalStation.class::isInstance)
-      .filter(b -> envelope.contains(new Coordinate(b.getLongitude(), b.getLatitude())))
-      .map(VehicleRentalStation.class::cast)
-      .toList();
+      .map(VehicleRentalStation.class::cast);
   }
 }

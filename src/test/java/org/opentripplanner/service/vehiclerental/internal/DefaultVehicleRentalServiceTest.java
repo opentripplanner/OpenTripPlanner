@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
+import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -14,16 +16,16 @@ class DefaultVehicleRentalServiceTest {
   void getVehicleRentalStationForEnvelopeShouldExcludeVehicleRentalVehicle() {
     DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
 
-    VehicleRentalStation vehicleRentalStation = new VehicleRentalStation();
-    vehicleRentalStation.id = new FeedScopedId("Feed1", "VehicleRentalStation1");
-    vehicleRentalStation.latitude = 1;
-    vehicleRentalStation.longitude = 1;
+    VehicleRentalStation vehicleRentalStation = new TestVehicleRentalStationBuilder()
+      .withLatitude(1)
+      .withLongitude(1)
+      .build();
     defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalStation);
 
-    VehicleRentalVehicle vehicleRentalVehicle = new VehicleRentalVehicle();
-    vehicleRentalVehicle.id = new FeedScopedId("Feed1", "VehicleRentalVehicle1");
-    vehicleRentalVehicle.latitude = 2;
-    vehicleRentalVehicle.longitude = 2;
+    VehicleRentalVehicle vehicleRentalVehicle = new TestFreeFloatingRentalVehicleBuilder()
+      .withLatitude(2)
+      .withLongitude(2)
+      .build();
     defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalVehicle);
 
     List<VehicleRentalStation> vehicleRentalStationForEnvelope = defaultVehicleRentalService.getVehicleRentalStationForEnvelope(
