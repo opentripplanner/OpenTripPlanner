@@ -164,13 +164,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   }
 
   @Override
-  public DataFetcher<String> bikesAllowed() {
-    return environment ->
-      switch (getSource(environment).getBikesAllowed()) {
-        case UNKNOWN -> "NO_INFORMATION";
-        case ALLOWED -> "POSSIBLE";
-        case NOT_ALLOWED -> "NOT_POSSIBLE";
-      };
+  public DataFetcher<GraphQLBikesAllowed> bikesAllowed() {
+    return environment -> BikesAllowedMapper.map(getSource(environment).getBikesAllowed());
   }
 
   @Override

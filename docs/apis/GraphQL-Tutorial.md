@@ -41,6 +41,7 @@ GraphQL query in the left hand panel of the page:
             name
         }
         mode
+        bikesAllowed
     }
 }
 ```

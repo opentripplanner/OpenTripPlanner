@@ -21,6 +21,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
@@ -309,9 +310,12 @@ public class GraphQLDataFetchers {
   }
 
   /**
-   * Departure row is a location, which lists departures of a certain pattern from a
-   * stop. Departure rows are identified with the pattern, so querying departure rows
-   * will return only departures from one stop per pattern
+   * Departure row is a combination of a pattern and a stop of that pattern.
+   *
+   * They are de-duplicated so for each pattern there will only be a single departure row.
+   *
+   * This is useful if you want to show a list of stop/pattern combinations but want each pattern to be
+   * listed only once.
    */
   public interface GraphQLDepartureRow {
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
@@ -789,7 +793,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<TransitAlert>> alerts();
 
-    public DataFetcher<String> bikesAllowed();
+    public DataFetcher<GraphQLBikesAllowed> bikesAllowed();
 
     public DataFetcher<String> color();
 
@@ -1015,7 +1019,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<TripTimeOnDate> arrivalStoptime();
 
-    public DataFetcher<String> bikesAllowed();
+    public DataFetcher<GraphQLBikesAllowed> bikesAllowed();
 
     public DataFetcher<String> blockId();
 
