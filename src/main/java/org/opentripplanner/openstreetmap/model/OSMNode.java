@@ -1,5 +1,6 @@
 package org.opentripplanner.openstreetmap.model;
 
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
@@ -35,13 +36,15 @@ public class OSMNode extends OSMWithTags {
     return hasTag("crossing") && "traffic_signals".equals(getTag("crossing"));
   }
 
-  /**
-   * Checks if this node is bollard
+  static final Set<String> motorVehicleBarriers = Set.of("bollard", "bar", "chain");
+
+  /* Checks if this node is a barrier which prevents motor vehicle traffic
    *
    * @return true if it is
    */
-  public boolean isBollard() {
-    return isTag("barrier", "bollard");
+  public boolean isMotorVehicleBarrier() {
+    var barrier = this.getTag("barrier");
+    return barrier != null && motorVehicleBarriers.contains(barrier);
   }
 
   /**
@@ -51,7 +54,7 @@ public class OSMNode extends OSMWithTags {
    */
   public boolean isBarrier() {
     return (
-      isBollard() ||
+      isMotorVehicleBarrier() ||
       isPedestrianExplicitlyDenied() ||
       isBicycleExplicitlyDenied() ||
       isMotorcarExplicitlyDenied() ||
@@ -66,8 +69,7 @@ public class OSMNode extends OSMWithTags {
   @Override
   public StreetTraversalPermission overridePermissions(StreetTraversalPermission def) {
     StreetTraversalPermission permission = def;
-    if (isBollard()) {
-      //According to OSM default permissions are access=no, foot=yes, bicycle=yes
+    if (isMotorVehicleBarrier()) {
       permission = permission.remove(StreetTraversalPermission.CAR);
     }
     return super.overridePermissions(permission);
