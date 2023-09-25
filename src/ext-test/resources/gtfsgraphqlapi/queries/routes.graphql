@@ -8,5 +8,6 @@
             name
         }
         mode
+        bikesAllowed
     }
 }
