@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType;
 import org.opentripplanner.routing.alertpatch.AlertSeverity;
 
@@ -10,7 +9,7 @@ import org.opentripplanner.routing.alertpatch.AlertSeverity;
 public class SeverityMapper {
 
   /**
-   * Returns GraphQL API string counter part for internal {@link AlertSeverity} enum. Defaults
+   * Returns GraphQL API counterpart for internal {@link AlertSeverity} enum. Defaults
    * to returning UNKNOWN_SEVERITY.
    */
   public static GraphQLAlertSeverityLevelType getGraphQLSeverity(AlertSeverity severity) {
