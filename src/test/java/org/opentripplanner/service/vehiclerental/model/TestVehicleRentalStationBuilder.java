@@ -5,7 +5,6 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.rutebanken.netex.model.LocationStructure;
 
 public class TestVehicleRentalStationBuilder {
 
