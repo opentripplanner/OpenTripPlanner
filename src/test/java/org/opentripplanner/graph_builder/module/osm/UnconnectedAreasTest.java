@@ -78,11 +78,7 @@ public class UnconnectedAreasTest {
    */
   @Test
   public void testCoincidentNodeUnconnectedParkAndRide() {
-    List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
-      "hackett_pr.osm.pbf",
-      4,
-      8
-    );
+    List<VertexLabel> connections = testGeometricGraphWithClasspathFile("hackett_pr.osm.pbf", 4, 8);
 
     assertTrue(connections.contains(VertexLabel.osm(3096570222L)));
     assertTrue(connections.contains(VertexLabel.osm(3094264704L)));

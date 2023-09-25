@@ -42,9 +42,7 @@ public class BarrierRoutingTest {
   @BeforeAll
   public static void createGraph() {
     TestOtpModel model = ConstantsForTests.buildOsmGraph(
-      ResourceLoader.of(BarrierRoutingTest.class).file(
-        "herrenberg-barrier-gates.osm.pbf"
-      )
+      ResourceLoader.of(BarrierRoutingTest.class).file("herrenberg-barrier-gates.osm.pbf")
     );
     graph = model.graph();
     graph.index(model.transitModel().getStopModel());

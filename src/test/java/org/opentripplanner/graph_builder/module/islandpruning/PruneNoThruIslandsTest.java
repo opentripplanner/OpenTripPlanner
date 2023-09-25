@@ -22,7 +22,12 @@ public class PruneNoThruIslandsTest {
 
   @BeforeAll
   static void setup() {
-    graph = buildOsmGraph(ResourceLoader.of(PruneNoThruIslandsTest.class).file("herrenberg-island-prune-nothru.osm.pbf"));
+    graph =
+      buildOsmGraph(
+        ResourceLoader
+          .of(PruneNoThruIslandsTest.class)
+          .file("herrenberg-island-prune-nothru.osm.pbf")
+      );
   }
 
   @Test
