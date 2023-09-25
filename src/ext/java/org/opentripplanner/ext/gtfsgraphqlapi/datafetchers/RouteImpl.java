@@ -11,7 +11,9 @@ import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLRequestContext;
 import org.opentripplanner.ext.gtfsgraphqlapi.GraphQLUtils;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLDataFetchers;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLTransitMode;
+import org.opentripplanner.ext.gtfsgraphqlapi.mapping.BikesAllowedMapper;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -131,13 +133,8 @@ public class RouteImpl implements GraphQLDataFetchers.GraphQLRoute {
   }
 
   @Override
-  public DataFetcher<String> bikesAllowed() {
-    return environment ->
-      switch (getSource(environment).getBikesAllowed()) {
-        case UNKNOWN -> "NO_INFORMATION";
-        case ALLOWED -> "POSSIBLE";
-        case NOT_ALLOWED -> "NOT_POSSIBLE";
-      };
+  public DataFetcher<GraphQLBikesAllowed> bikesAllowed() {
+    return environment -> BikesAllowedMapper.map(getSource(environment).getBikesAllowed());
   }
 
   @Override
