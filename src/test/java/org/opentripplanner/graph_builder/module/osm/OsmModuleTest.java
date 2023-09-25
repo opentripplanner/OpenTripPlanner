@@ -168,7 +168,6 @@ public class OsmModuleTest {
     OSMWithTags way = new OSMWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
-    way.addTag("access", "no");
     way.addTag("surface", "gravel");
 
     WayPropertySet wayPropertySet = new WayPropertySet();
@@ -176,10 +175,10 @@ public class OsmModuleTest {
     // where there are no way specifiers, the default is used
     WayProperties wayData = wayPropertySet.getDataForWay(way);
     assertEquals(wayData.getPermission(), ALL);
-    assertEquals(wayData.getWalkSafetyFeatures().forward(), 1.0);
-    assertEquals(wayData.getWalkSafetyFeatures().back(), 1.0);
-    assertEquals(wayData.getBicycleSafetyFeatures().forward(), 1.0);
-    assertEquals(wayData.getBicycleSafetyFeatures().back(), 1.0);
+    assertEquals(wayData.walkSafety().forward(), 1.0);
+    assertEquals(wayData.walkSafety().back(), 1.0);
+    assertEquals(wayData.bicycleSafety().forward(), 1.0);
+    assertEquals(wayData.bicycleSafety().back(), 1.0);
 
     // add two equal matches: lane only...
     OsmSpecifier lane_only = new BestMatchSpecifier("cycleway=lane");
@@ -217,7 +216,7 @@ public class OsmModuleTest {
     wayPropertySet.setMixinProperties(gravel, gravel_is_dangerous);
 
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(dataForWay.getBicycleSafetyFeatures().forward(), 1.5);
+    assertEquals(dataForWay.bicycleSafety().forward(), 1.5);
 
     // test a left-right distinction
     way = new OSMWay();
@@ -234,9 +233,9 @@ public class OsmModuleTest {
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
     // right (with traffic) comes from track
-    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().forward());
+    assertEquals(0.25, dataForWay.bicycleSafety().forward());
     // left comes from lane
-    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().back());
+    assertEquals(0.75, dataForWay.bicycleSafety().back());
 
     way = new OSMWay();
     way.addTag("highway", "footway");

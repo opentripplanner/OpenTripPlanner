@@ -1,6 +1,7 @@
 package org.opentripplanner.service.vehiclerental.model;
 
 import java.util.Map;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -39,12 +40,21 @@ public class TestVehicleRentalStationBuilder {
     return this;
   }
 
+  public TestVehicleRentalStationBuilder withVehicleTypeBicycle() {
+    return buildVehicleType(RentalFormFactor.BICYCLE);
+  }
+
   public TestVehicleRentalStationBuilder withVehicleTypeCar() {
+    return buildVehicleType(RentalFormFactor.CAR);
+  }
+
+  @Nonnull
+  private TestVehicleRentalStationBuilder buildVehicleType(RentalFormFactor rentalFormFactor) {
     this.vehicleType =
       new RentalVehicleType(
-        new FeedScopedId(TestVehicleRentalStationBuilder.NETWORK_1, "car"),
-        "car",
-        RentalFormFactor.CAR,
+        new FeedScopedId(TestVehicleRentalStationBuilder.NETWORK_1, rentalFormFactor.name()),
+        rentalFormFactor.name(),
+        rentalFormFactor,
         RentalVehicleType.PropulsionType.ELECTRIC,
         100000d
       );

@@ -36,11 +36,11 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
 
   TransitAlertBuilder(TransitAlert original) {
     super(original);
-    this.headerText = original.headerText();
-    this.descriptionText = original.descriptionText();
+    this.headerText = original.headerText().orElse(null);
+    this.descriptionText = original.descriptionText().orElse(null);
     this.detailText = original.detailText();
     this.adviceText = original.adviceText();
-    this.url = original.url();
+    this.url = original.url().orElse(null);
     this.siriUrls.addAll(original.siriUrls());
     this.type = original.type();
     this.severity = original.severity();

@@ -110,7 +110,7 @@ public sealed interface Condition {
   record Equals(String key, String value) implements Condition {
     @Override
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
-      return way.hasTag(exKey) && way.matchesKeyValue(exKey, value);
+      return way.hasTag(exKey) && way.isTag(exKey, value);
     }
   }
 
@@ -165,7 +165,7 @@ public sealed interface Condition {
   record EqualsAnyIn(String key, String... values) implements Condition {
     @Override
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
-      return Arrays.stream(values).anyMatch(value -> way.matchesKeyValue(exKey, value));
+      return Arrays.stream(values).anyMatch(value -> way.isTag(exKey, value));
     }
   }
 
@@ -178,8 +178,7 @@ public sealed interface Condition {
     @Override
     public boolean isExtendedKeyMatch(OSMWithTags way, String exKey) {
       return (
-        !way.hasTag(exKey) ||
-        Arrays.stream(values).anyMatch(value -> way.matchesKeyValue(exKey, value))
+        !way.hasTag(exKey) || Arrays.stream(values).anyMatch(value -> way.isTag(exKey, value))
       );
     }
   }

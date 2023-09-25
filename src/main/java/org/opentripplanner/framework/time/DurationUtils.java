@@ -3,36 +3,32 @@ package org.opentripplanner.framework.time;
 import static java.util.Locale.ROOT;
 
 import java.time.Duration;
-import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * This class extend the Java {@link LocalTime} and with the ability to span multiple days and be
- * negative.
+ * This class extend the Java {@link Duration} with utility functionality to parse and convert
+ * integer and text to a {@link Duration}.
  * <p>
- * The class is used to track time relative to a {@link java.time.LocalDate}.
- * <p>
- * The RelativeTime can also be used relative to some other time, in which case it is similar to the
- * JAva {@link Duration}.
- * <p>
- * The primary usage of this class is to convert "number of seconds" into a string in the given
- * context. Here is some examples:
+ * OTP make have use of the Duration in a lenient ISO-8601 duration format. For example:
  * <pre>
- *   Service date time:
- *   23:59:59     // One second to midnight
- *   2:00+1d      // 26 hours (1d2h) past midnight of service date
- *   12:05-3d     // 5 past noon on service-date minus 3 days
- *   -11:00+1d    // 1 day and 11 hours before midnight service-date
- *   2d4h12s      // 2 days 4 hours and 12 seconds (relative to time in context)
- *   -3m          // 3 minutes before  (relative to time in context)
+ *   1s          // one second
+ *   15m         // 15 minutes
+ *   2h          // 2 hours
+ *   2d          // 2 days
+ *   2d3h12m40s  // 2 days, 3 hours, 12 minutes and 40 seconds
+ *   -3m30s      // 3.5 minutes before  (relative to time in context)
  * </pre>
  */
 public class DurationUtils {
+
+  private static final Pattern DECIMAL_NUMBER_PATTERN = Pattern.compile("[-+]?\\d+");
 
   private DurationUtils() {}
 
@@ -125,6 +121,26 @@ public class DurationUtils {
         e.getErrorIndex()
       );
     }
+  }
+
+  /**
+   * This is used to parse a string witch may be a number {@code NNNN}(number of seconds) or a
+   * duration with format {@code NhNmNs}, where {@code N} is a decimal number and
+   * {@code h} is hours, {@code m} minutes and {@code s} seconds.
+   * <p>
+   * This method
+   */
+  public static Optional<Duration> parseSecondsOrDuration(String duration) {
+    if (duration == null || duration.isBlank()) {
+      return Optional.empty();
+    }
+    var s = duration.trim();
+
+    return Optional.of(
+      DECIMAL_NUMBER_PATTERN.matcher(s).matches()
+        ? Duration.ofSeconds(Integer.parseInt(s))
+        : duration(s)
+    );
   }
 
   /**

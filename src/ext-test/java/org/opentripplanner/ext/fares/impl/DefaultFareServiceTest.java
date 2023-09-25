@@ -8,6 +8,10 @@ import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_TO_CIT
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_A_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_B_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.INSIDE_CITY_CENTER_SET;
+import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_ATTRIBUTE;
+import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_ROUTE;
+import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_SET;
+import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.SUBURB_STOP;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
@@ -97,5 +101,80 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var firstBusLeg = itin.firstTransitLeg().get();
     assertEquals(List.of(firstBusLeg), component.legs());
+  }
+
+  @Test
+  void multipleFeeds() {
+    var service = new DefaultFareService();
+    service.addFareRules(FareType.regular, List.of(AIRPORT_TO_CITY_CENTER_SET, OTHER_FEED_SET));
+    var itin = newItinerary(Place.forStop(AIRPORT_STOP))
+      .bus(1, T11_00, T11_05, Place.forStop(CITY_CENTER_A_STOP))
+      .walk(10, Place.forStop(OTHER_FEED_STOP))
+      .bus(OTHER_FEED_ROUTE, 2, T11_20, T11_32, Place.forStop(OTHER_FEED_STOP))
+      .build();
+    var result = service.calculateFares(itin);
+
+    var resultComponents = result
+      .getComponents(FareType.regular)
+      .stream()
+      .map(r -> r.fareId())
+      .toList();
+
+    var resultPrice = result.getFare(FareType.regular);
+
+    assertEquals(
+      List.of(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), OTHER_FEED_ATTRIBUTE.getId()),
+      resultComponents
+    );
+
+    assertEquals(Money.usDollars(20), resultPrice);
+  }
+
+  @Test
+  void multipleFeedsWithTransfersWithinFeed() {
+    var service = new DefaultFareService();
+    service.addFareRules(FareType.regular, List.of(INSIDE_CITY_CENTER_SET, OTHER_FEED_SET));
+    var itin = newItinerary(Place.forStop(OTHER_FEED_STOP))
+      .bus(OTHER_FEED_ROUTE, 2, T11_00, T11_05, Place.forStop(OTHER_FEED_STOP))
+      .walk(10, Place.forStop(CITY_CENTER_A_STOP))
+      .bus(1, T11_00, T11_05, Place.forStop(CITY_CENTER_A_STOP))
+      .walk(10, Place.forStop(OTHER_FEED_STOP))
+      .bus(OTHER_FEED_ROUTE, 2, T11_20, T11_32, Place.forStop(OTHER_FEED_STOP))
+      .build();
+    var result = service.calculateFares(itin);
+
+    var resultComponents = result
+      .getComponents(FareType.regular)
+      .stream()
+      .map(r -> r.fareId())
+      .toList();
+
+    var resultPrice = result.getFare(FareType.regular);
+    assertEquals(
+      List.of(INSIDE_CITY_CENTER_SET.getFareAttribute().getId(), OTHER_FEED_ATTRIBUTE.getId()),
+      resultComponents
+    );
+
+    assertEquals(Money.usDollars(20), resultPrice);
+  }
+
+  @Test
+  void multipleFeedsWithUnknownFareLegs() {
+    var service = new DefaultFareService();
+    service.addFareRules(FareType.regular, List.of(AIRPORT_TO_CITY_CENTER_SET, OTHER_FEED_SET));
+    var itin = newItinerary(Place.forStop(AIRPORT_STOP))
+      .bus(1, T11_00, T11_05, Place.forStop(OTHER_FEED_STOP))
+      .walk(10, Place.forStop(OTHER_FEED_STOP))
+      .bus(OTHER_FEED_ROUTE, 2, T11_20, T11_32, Place.forStop(OTHER_FEED_STOP))
+      .build();
+    var result = service.calculateFares(itin);
+    var resultComponents = result
+      .getComponents(FareType.regular)
+      .stream()
+      .map(r -> r.fareId())
+      .toList();
+    var resultPrice = result.getFare(FareType.regular);
+    assertEquals(List.of(OTHER_FEED_ATTRIBUTE.getId()), resultComponents);
+    assertEquals(Money.usDollars(-0.01f), resultPrice);
   }
 }

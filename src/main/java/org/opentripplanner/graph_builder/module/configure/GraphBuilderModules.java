@@ -73,8 +73,6 @@ public class GraphBuilderModules {
       .withPlatformEntriesLinking(config.platformEntriesLinking)
       .withStaticParkAndRide(config.staticParkAndRide)
       .withStaticBikeParkAndRide(config.staticBikeParkAndRide)
-      .withBanDiscouragedWalking(config.banDiscouragedWalking)
-      .withBanDiscouragedBiking(config.banDiscouragedBiking)
       .withMaxAreaNodes(config.maxAreaNodes)
       .withBoardingAreaRefTags(config.boardingLocationTags)
       .withIssueStore(issueStore)

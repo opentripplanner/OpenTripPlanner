@@ -13,7 +13,7 @@ no need to add an explicit edge, which connects the entrance point with the actu
 
 An  example: [Huopalahti railway station in Helsinki](https://www.openstreetmap.org/relation/6815620)
 
-#### Instructions:
+#### Instructions
 
 - Add platforms, which need special linking, as members of a `stop_area` tagged relation
 - Set role=platform to these platform members

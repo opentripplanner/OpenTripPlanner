@@ -1,8 +1,11 @@
 package org.opentripplanner.ext.transmodelapi.model.scalars;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner._support.time.ZoneIds.OSLO;
 
+import graphql.schema.Coercing;
+import graphql.schema.CoercingParseValueException;
 import graphql.schema.GraphQLScalarType;
 import java.time.Instant;
 import java.util.stream.Stream;
@@ -43,5 +46,11 @@ class DateTimeScalarFactoryTest {
   void parse(String input) {
     var result = subject.getCoercing().parseValue(input);
     assertEquals(EPOCH_MILLIS, result);
+  }
+
+  @Test
+  void parseInvalidInputType() {
+    Coercing<?, ?> coercing = subject.getCoercing();
+    assertThrows(CoercingParseValueException.class, () -> coercing.parseValue(Boolean.TRUE));
   }
 }
