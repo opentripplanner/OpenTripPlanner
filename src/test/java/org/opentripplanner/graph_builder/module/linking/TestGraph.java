@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.graph_builder.module.linking;
 
 import java.util.List;
 import org.opentripplanner.routing.graph.Graph;
@@ -17,7 +17,7 @@ import org.opentripplanner.transit.service.TransitModel;
  * Get graphs of Columbus Ohio with real OSM streets and a synthetic transit system for use in
  * testing.
  */
-public class FakeGraph {
+class TestGraph {
 
   /** Add a regular grid of stops to the graph */
   public static void addRegularStopGrid(Graph graph) {

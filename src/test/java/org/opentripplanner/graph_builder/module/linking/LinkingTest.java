@@ -3,12 +3,11 @@ package org.opentripplanner.graph_builder.module.linking;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.graph_builder.module.FakeGraph.addExtraStops;
-import static org.opentripplanner.graph_builder.module.FakeGraph.addRegularStopGrid;
-import static org.opentripplanner.graph_builder.module.FakeGraph.link;
+import static org.opentripplanner.graph_builder.module.linking.TestGraph.addExtraStops;
+import static org.opentripplanner.graph_builder.module.linking.TestGraph.addRegularStopGrid;
+import static org.opentripplanner.graph_builder.module.linking.TestGraph.link;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -111,7 +110,7 @@ public class LinkingTest {
    * We do this by building the graphs and then comparing the stop tree caches.
    */
   @Test
-  public void testStopsLinkedIdentically() throws URISyntaxException {
+  public void testStopsLinkedIdentically() {
     // build the graph without the added stops
     TestOtpModel model = buildGraphNoTransit();
     Graph g1 = model.graph();
