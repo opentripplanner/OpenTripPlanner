@@ -44,14 +44,18 @@ public class BarrierVertex extends OsmVertex {
     var edgeCount = this.getDegreeOut() + this.getDegreeIn();
     var needsFix = false;
     if (edgeCount == 1) {
+      // only one edge connects the vertex, must be end point
       needsFix = true;
     } else if (edgeCount == 2) {
       var out = this.getOutgoing();
       var in = this.getIncoming();
       if (
+        // if only outgoing edges or incoming edges -> vertex does not act as a pass-through point and barrier makes no sense
         out.isEmpty() ||
         in.isEmpty() ||
-        out.iterator().next().getToVertex() == in.iterator().next().getFromVertex()
+        // in+out edge pair connects the vertex to a single adjacent vertex -> must be street end point
+        out.iterator().next().getToVertex() ==
+        in.iterator().next().getFromVertex()
       ) {
         needsFix = true;
       }
