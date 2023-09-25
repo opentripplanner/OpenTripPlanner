@@ -13,7 +13,6 @@ import java.net.URL;
  */
 public class ResourceLoader {
 
-
   final Class<?> clazz;
 
   private ResourceLoader(Class<?> clazz) {
@@ -36,13 +35,6 @@ public class ResourceLoader {
     var file = new File(resource.getFile());
     assertTrue(file.exists(), "File %s not found on file system".formatted(file.getAbsolutePath()));
     return file;
-  }
-
-  /**
-   * Return a File instance for the given name from the /osm subfolder.
-   */
-  public File osmFile(String osmFile) {
-    return file("/osm/" + osmFile);
   }
 
   /**

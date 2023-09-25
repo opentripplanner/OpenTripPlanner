@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.FakeGraph.addExtraStops;
 import static org.opentripplanner.graph_builder.module.FakeGraph.addRegularStopGrid;
-import static org.opentripplanner.graph_builder.module.FakeGraph.buildGraphNoTransit;
 import static org.opentripplanner.graph_builder.module.FakeGraph.link;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Comparator;
 import java.util.List;
@@ -19,6 +19,8 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -29,6 +31,9 @@ import org.opentripplanner.street.model.vertex.SplitterVertex;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
+import org.opentripplanner.test.support.ResourceLoader;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class LinkingTest {
@@ -141,6 +146,22 @@ public class LinkingTest {
         assertEquals(v1.getLon(), v2.getLon(), 1e-10);
       }
     }
+  }
+
+  /** Build a graph in Columbus, OH with no transit */
+  public static TestOtpModel buildGraphNoTransit() {
+    var deduplicator = new Deduplicator();
+    var stopModel = new StopModel();
+    var gg = new Graph(deduplicator);
+    var transitModel = new TransitModel(stopModel, deduplicator);
+
+    File file = ResourceLoader.of(LinkingTest.class).file("columbus.osm.pbf");
+    OsmProvider provider = new OsmProvider(file, false);
+
+    OsmModule osmModule = OsmModule.of(provider, gg).build();
+
+    osmModule.buildGraph();
+    return new TestOtpModel(gg, transitModel);
   }
 
   private static List<StreetTransitStopLink> outgoingStls(final TransitStopVertex tsv) {

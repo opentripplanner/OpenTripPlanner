@@ -45,7 +45,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class OsmModuleTest {
 
-  private final static ResourceLoader RES = ResourceLoader.of(OsmModuleTest.class);
+  private static final ResourceLoader RES = ResourceLoader.of(OsmModuleTest.class);
 
   @Test
   public void testGraphBuilder() {

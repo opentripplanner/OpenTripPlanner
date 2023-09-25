@@ -35,7 +35,7 @@ public class UnroutableTest {
     var deduplicator = new Deduplicator();
     graph = new Graph(deduplicator);
 
-    var osmDataFile = ResourceLoader.of(UnroutableTest.class).osmFile("bridge_construction.osm.pbf");
+    var osmDataFile = ResourceLoader.of(UnroutableTest.class).file("bridge_construction.osm.pbf");
     OsmProvider provider = new OsmProvider(osmDataFile, true);
     OsmModule osmBuilder = OsmModule.of(provider, graph).withAreaVisibility(true).build();
     osmBuilder.buildGraph();

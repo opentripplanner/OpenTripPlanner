@@ -5,11 +5,11 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -26,7 +26,7 @@ public class AdaptivePruningTest {
 
   @BeforeAll
   static void setup() {
-    graph = buildOsmGraph(ConstantsForTests.ADAPTIVE_PRUNE_OSM);
+    graph = buildOsmGraph(ResourceLoader.of(AdaptivePruningTest.class).file("isoiiluoto.pbf"));
   }
 
   @Test

@@ -30,23 +30,7 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 public class FakeGraph {
 
-  private final static ResourceLoader RES = ResourceLoader.of(OsmModuleTest.class);
-
-  /** Build a graph in Columbus, OH with no transit */
-  public static TestOtpModel buildGraphNoTransit() {
-    var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    var gg = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
-
-    File file = RES.file("columbus.osm.pbf");
-    OsmProvider provider = new OsmProvider(file, false);
-
-    OsmModule osmModule = OsmModule.of(provider, gg).build();
-
-    osmModule.buildGraph();
-    return new TestOtpModel(gg, transitModel);
-  }
+  private static final ResourceLoader RES = ResourceLoader.of(OsmModuleTest.class);
 
   /**
    * This introduces a 1MB test resource but is only used by TestIntermediatePlaces.

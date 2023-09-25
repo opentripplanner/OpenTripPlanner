@@ -3,11 +3,9 @@ package org.opentripplanner.graph_builder.module.osm;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.service.DefaultDataImportIssueStore;
@@ -19,11 +17,16 @@ import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class UnconnectedAreasTest {
+
+  private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(
+    UnconnectedAreasTest.class
+  );
 
   /**
    * The P+R.osm.pbf file contains 2 park and ride, one a single way area and the other a
@@ -36,7 +39,7 @@ public class UnconnectedAreasTest {
   @Test
   public void unconnectedCarParkAndRide() {
     DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
-    Graph gg = buildOSMGraph("/osm/P+R.osm.pbf", issueStore);
+    Graph gg = buildOSMGraph("P+R.osm.pbf", issueStore);
 
     assertEquals(1, getParkAndRideUnlinkedIssueCount(issueStore));
 
@@ -53,7 +56,7 @@ public class UnconnectedAreasTest {
   @Test
   public void unconnectedBikeParkAndRide() {
     DefaultDataImportIssueStore issueStore = new DefaultDataImportIssueStore();
-    Graph gg = buildOSMGraph("/osm/B+R.osm.pbf", issueStore);
+    Graph gg = buildOSMGraph("B+R.osm.pbf", issueStore);
 
     assertEquals(2, getParkAndRideUnlinkedIssueCount(issueStore));
 
@@ -76,7 +79,7 @@ public class UnconnectedAreasTest {
   @Test
   public void testCoincidentNodeUnconnectedParkAndRide() {
     List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
-      "/osm/hackett_pr.osm.pbf",
+      "hackett_pr.osm.pbf",
       4,
       8
     );
@@ -94,7 +97,7 @@ public class UnconnectedAreasTest {
   @Test
   public void testRoadPassingOverNode() {
     List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
-      "/osm/coincident_pr.osm.pbf",
+      "coincident_pr.osm.pbf",
       1,
       2
     );
@@ -108,7 +111,7 @@ public class UnconnectedAreasTest {
   @Test
   public void testAreaPassingOverNode() {
     List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
-      "/osm/coincident_pr_reverse.osm.pbf",
+      "coincident_pr_reverse.osm.pbf",
       1,
       2
     );
@@ -122,7 +125,7 @@ public class UnconnectedAreasTest {
   @Test
   public void testRoadPassingOverDuplicatedNode() {
     List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
-      "/osm/coincident_pr_dupl.osm.pbf",
+      "coincident_pr_dupl.osm.pbf",
       1,
       2
     );
@@ -143,7 +146,7 @@ public class UnconnectedAreasTest {
   @Test
   public void testRoadPassingOverParkRide() {
     List<VertexLabel> connections = testGeometricGraphWithClasspathFile(
-      "/osm/coincident_pr_overlap.osm.pbf",
+      "coincident_pr_overlap.osm.pbf",
       2,
       4
     );
@@ -161,11 +164,7 @@ public class UnconnectedAreasTest {
     var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
-    var fileUrl = getClass().getResource(osmFileName);
-    Assertions.assertNotNull(fileUrl);
-    File file = new File(fileUrl.getFile());
-
-    OsmProvider provider = new OsmProvider(file, false);
+    OsmProvider provider = new OsmProvider(RESOURCE_LOADER.file(osmFileName), false);
     OsmModule loader = OsmModule
       .of(provider, graph)
       .withIssueStore(issueStore)

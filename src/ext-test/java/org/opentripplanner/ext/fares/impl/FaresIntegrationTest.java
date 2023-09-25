@@ -108,7 +108,9 @@ public class FaresIntegrationTest {
 
   @Test
   public void testFareComponent() {
-    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ResourceLoader.of(this).file("/gtfs/farecomponents.gtfs.zip"));
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(
+      ResourceLoader.of(this).file("/gtfs/farecomponents.gtfs.zip")
+    );
     Graph graph = model.graph();
     TransitModel transitModel = model.transitModel();
     String feedId = transitModel.getFeedIds().iterator().next();
