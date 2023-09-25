@@ -13,10 +13,25 @@ import java.net.URL;
  */
 public class ResourceLoader {
 
+
+  final Class<?> clazz;
+
+  private ResourceLoader(Class<?> clazz) {
+    this.clazz = clazz;
+  }
+
+  public static ResourceLoader of(Class<?> clazz) {
+    return new ResourceLoader(clazz);
+  }
+
+  public static ResourceLoader of(Object object) {
+    return new ResourceLoader(object.getClass());
+  }
+
   /**
    * Return a File instance for the given path.
    */
-  public static File file(String path) {
+  public File file(String path) {
     URL resource = url(path);
     var file = new File(resource.getFile());
     assertTrue(file.exists(), "File %s not found on file system".formatted(file.getAbsolutePath()));
@@ -26,16 +41,16 @@ public class ResourceLoader {
   /**
    * Return a File instance for the given name from the /osm subfolder.
    */
-  public static File osmFile(String osmFile) {
+  public File osmFile(String osmFile) {
     return file("/osm/" + osmFile);
   }
 
   /**
    * Return a URL for the given resource.
    */
-  public static URL url(String name) {
-    var resource = ResourceLoader.class.getResource(name);
-    var msg = "Resource %s not found on file system".formatted(resource);
+  public URL url(String name) {
+    var resource = clazz.getResource(name);
+    var msg = "Resource '%s' not found on in package '%s'".formatted(name, clazz.getPackageName());
     assertNotNull(resource, msg);
     return resource;
   }
@@ -43,7 +58,7 @@ public class ResourceLoader {
   /**
    * Return a URI for the given resource.
    */
-  public static URI uri(String s) {
+  public URI uri(String s) {
     try {
       return url(s).toURI();
     } catch (URISyntaxException e) {

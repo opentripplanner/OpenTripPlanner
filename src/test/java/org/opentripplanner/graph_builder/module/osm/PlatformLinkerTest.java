@@ -25,7 +25,7 @@ public class PlatformLinkerTest {
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
 
-    File file = ResourceLoader.osmFile("skoyen.osm.pbf");
+    File file = ResourceLoader.of(this).file("skoyen.osm.pbf");
 
     OsmProvider provider = new OsmProvider(file, false);
 

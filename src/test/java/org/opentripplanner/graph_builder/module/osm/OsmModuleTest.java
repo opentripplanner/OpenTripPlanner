@@ -45,12 +45,14 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class OsmModuleTest {
 
+  private final static ResourceLoader RES = ResourceLoader.of(OsmModuleTest.class);
+
   @Test
   public void testGraphBuilder() {
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
 
-    File file = ResourceLoader.osmFile("map.osm.pbf");
+    File file = RES.file("map.osm.pbf");
 
     OsmProvider provider = new OsmProvider(file, true);
 
@@ -108,7 +110,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
 
-    File file = ResourceLoader.osmFile("NYC_small.osm.pbf");
+    File file = RES.file("NYC_small.osm.pbf");
     OsmProvider provider = new OsmProvider(file, true);
     OsmModule osmModule = OsmModule.of(provider, gg).withAreaVisibility(true).build();
 
@@ -300,7 +302,7 @@ public class OsmModuleTest {
     var graph = new Graph();
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
-      .map(ResourceLoader::osmFile)
+      .map(RES::file)
       .map(f -> new OsmProvider(f, false))
       .toList();
     var module = OsmModule
@@ -325,7 +327,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
 
-    File file = ResourceLoader.osmFile("usf_area.osm.pbf");
+    File file = RES.file("usf_area.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule loader = OsmModule.of(provider, graph).withAreaVisibility(!skipVisibility).build();

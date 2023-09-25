@@ -37,7 +37,7 @@ public class VehiclePositionParsingTest {
 
   private GtfsRealtimeHttpVehiclePositionSource getVehiclePositionSource(String filename) {
     return new GtfsRealtimeHttpVehiclePositionSource(
-      ResourceLoader.uri("/gtfs-rt/vehicle-positions/" + filename),
+      ResourceLoader.of(this).uri("/gtfs-rt/vehicle-positions/" + filename),
       HttpHeaders.empty()
     );
   }

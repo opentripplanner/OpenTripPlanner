@@ -22,6 +22,7 @@ import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFil
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.TransitModel;
@@ -107,7 +108,7 @@ public class FaresIntegrationTest {
 
   @Test
   public void testFareComponent() {
-    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FARE_COMPONENT_GTFS);
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ResourceLoader.of(this).file("/gtfs/farecomponents.gtfs.zip"));
     Graph graph = model.graph();
     TransitModel transitModel = model.transitModel();
     String feedId = transitModel.getFeedIds().iterator().next();

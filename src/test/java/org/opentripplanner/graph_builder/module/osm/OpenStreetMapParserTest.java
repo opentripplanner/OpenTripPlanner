@@ -16,7 +16,7 @@ public class OpenStreetMapParserTest {
 
   @Test
   public void testBinaryParser() {
-    File osmFile = ResourceLoader.osmFile("map.osm.pbf");
+    File osmFile = ResourceLoader.of(this).file("map.osm.pbf");
     OsmProvider pr = new OsmProvider(osmFile, true);
     OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
 

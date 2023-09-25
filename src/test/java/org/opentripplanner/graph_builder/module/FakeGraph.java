@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.osm.OsmModuleTest;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -29,6 +30,8 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 public class FakeGraph {
 
+  private final static ResourceLoader RES = ResourceLoader.of(OsmModuleTest.class);
+
   /** Build a graph in Columbus, OH with no transit */
   public static TestOtpModel buildGraphNoTransit() {
     var deduplicator = new Deduplicator();
@@ -36,7 +39,7 @@ public class FakeGraph {
     var gg = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
 
-    File file = ResourceLoader.osmFile("columbus.osm.pbf");
+    File file = RES.file("columbus.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule osmModule = OsmModule.of(provider, gg).build();
@@ -49,7 +52,7 @@ public class FakeGraph {
    * This introduces a 1MB test resource but is only used by TestIntermediatePlaces.
    */
   public static void addPerpendicularRoutes(Graph graph, TransitModel transitModel) {
-    var input = List.of(new GtfsBundle(ResourceLoader.file("addPerpendicularRoutes.gtfs.zip")));
+    var input = List.of(new GtfsBundle(RES.file("addPerpendicularRoutes.gtfs.zip")));
     new GtfsModule(input, transitModel, graph, ServiceDateInterval.unbounded()).buildGraph();
   }
 
