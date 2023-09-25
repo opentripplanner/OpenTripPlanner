@@ -1,7 +1,7 @@
-package org.opentripplanner.ext.gtfsgraphqlapi.mapping;
+package org.opentripplanner.apis.gtfs.mapping;
 
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLBikesAllowed;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.transit.model.network.BikeAccess;
 
 public class BikesAllowedMapper {

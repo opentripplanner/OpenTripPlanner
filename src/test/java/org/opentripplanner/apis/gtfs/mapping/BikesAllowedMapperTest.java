@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.gtfsgraphqlapi.mapping;
+package org.opentripplanner.apis.gtfs.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
