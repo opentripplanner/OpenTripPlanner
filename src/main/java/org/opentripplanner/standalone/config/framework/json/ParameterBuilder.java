@@ -4,6 +4,7 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.BO
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.COST_LINEAR_FUNCTION;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.DOUBLE;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.DURATION;
+import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.FEED_SCOPED_ID;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.INTEGER;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.LOCALE;
@@ -234,6 +235,19 @@ public class ParameterBuilder {
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
     return result.isEmpty() ? EnumSet.noneOf(enumClass) : EnumSet.copyOf(result);
+  }
+
+  public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass, Collection<T> defaultValues) {
+    List<T> dft = (defaultValues instanceof List<T>)
+      ? (List<T>) defaultValues
+      : List.copyOf(defaultValues);
+    info.withOptional(dft.toString()).withEnumSet(enumClass);
+    List<Optional<T>> optionalList = buildAndListSimpleArrayElements(
+      List.of(),
+      it -> parseOptionalEnum(it.asText(), enumClass)
+    );
+    List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
+    return result.isEmpty() ? Set.copyOf(dft) : EnumSet.copyOf(result);
   }
 
   /**
