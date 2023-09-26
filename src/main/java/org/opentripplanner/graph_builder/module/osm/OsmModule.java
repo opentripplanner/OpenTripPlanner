@@ -30,6 +30,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetEdgeBuilder;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.slf4j.Logger;
@@ -143,6 +144,7 @@ public class OsmModule implements GraphBuilderModule {
 
     buildBasicGraph();
     buildWalkableAreas(!params.areaVisibility());
+    validateBarriers();
 
     if (params.staticParkAndRide()) {
       List<AreaGroup> areaGroups = groupAreas(osmdb.getParkAndRideAreas());
@@ -398,6 +400,11 @@ public class OsmModule implements GraphBuilderModule {
     } // END loop over OSM ways
 
     LOG.info(progress.completeMessage());
+  }
+
+  private void validateBarriers() {
+    List<BarrierVertex> vertices = graph.getVerticesOfType(BarrierVertex.class);
+    vertices.forEach(bv -> bv.makeBarrierAtEndReachable());
   }
 
   private void setWayName(OSMWithTags way) {

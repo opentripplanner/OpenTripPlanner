@@ -46,6 +46,8 @@ public class OSMWithTags {
     "escape"
   );
 
+  static final Set<String> LEVEL_TAGS = Set.of("level", "layer");
+
   /* To save memory this is only created when an entity actually has tags. */
   private Map<String, String> tags;
 
@@ -54,8 +56,6 @@ public class OSMWithTags {
   protected I18NString creativeName;
 
   private OsmProvider osmProvider;
-
-  static final Set<String> levelTags = Set.of("level", "layer");
 
   public static boolean isFalse(String tagValue) {
     return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
@@ -589,7 +589,7 @@ public class OSMWithTags {
    * Some entities can have a semicolon separated list of levels (e.g. elevators)
    */
   public Set<String> getLevels() {
-    var levels = getMultiTagValues(levelTags);
+    var levels = getMultiTagValues(LEVEL_TAGS);
     if (levels.isEmpty()) {
       // default
       return Set.of("0");

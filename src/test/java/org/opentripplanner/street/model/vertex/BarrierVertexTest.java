@@ -24,42 +24,42 @@ public class BarrierVertexTest {
 
   @Test
   public void testBarrierPermissions() {
-    OSMNode simpleBarier = new OSMNode();
-    assertFalse(simpleBarier.isBollard());
-    simpleBarier.addTag("barrier", "bollard");
-    assertTrue(simpleBarier.isBollard());
+    OSMNode simpleBarrier = new OSMNode();
+    assertFalse(simpleBarrier.isMotorVehicleBarrier());
+    simpleBarrier.addTag("barrier", "bollard");
+    assertTrue(simpleBarrier.isMotorVehicleBarrier());
     String label = "simpleBarrier";
-    BarrierVertex bv = new BarrierVertex(simpleBarier.lon, simpleBarier.lat, 0);
+    BarrierVertex bv = new BarrierVertex(simpleBarrier.lon, simpleBarrier.lat, 0);
     bv.setBarrierPermissions(
-      simpleBarier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
+      simpleBarrier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
 
-    simpleBarier.addTag("foot", "yes");
+    simpleBarrier.addTag("foot", "yes");
     bv.setBarrierPermissions(
-      simpleBarier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
+      simpleBarrier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
-    simpleBarier.addTag("bicycle", "yes");
+    simpleBarrier.addTag("bicycle", "yes");
     bv.setBarrierPermissions(
-      simpleBarier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
+      simpleBarrier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
-    simpleBarier.addTag("access", "no");
+    simpleBarrier.addTag("access", "no");
     bv.setBarrierPermissions(
-      simpleBarier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
-    );
-    assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
-
-    simpleBarier.addTag("motor_vehicle", "no");
-    bv.setBarrierPermissions(
-      simpleBarier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
+      simpleBarrier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
 
-    simpleBarier.addTag("bicycle", "no");
+    simpleBarrier.addTag("motor_vehicle", "no");
     bv.setBarrierPermissions(
-      simpleBarier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
+      simpleBarrier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
+    );
+    assertEquals(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, bv.getBarrierPermissions());
+
+    simpleBarrier.addTag("bicycle", "no");
+    bv.setBarrierPermissions(
+      simpleBarrier.overridePermissions(BarrierVertex.defaultBarrierPermissions)
     );
     assertEquals(StreetTraversalPermission.PEDESTRIAN, bv.getBarrierPermissions());
 
@@ -94,8 +94,8 @@ public class BarrierVertexTest {
   @Test
   public void testStreetsWithBollard() {
     Graph graph = new Graph();
-    //default permissions are PEDESTRIAND and BICYCLE
     BarrierVertex bv = new BarrierVertex(2.0, 2.0, 0);
+    bv.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
     StreetVertex endVertex = StreetModelForTest.intersectionVertex("end_vertex", 1.0, 2.0);
 
@@ -139,18 +139,18 @@ public class BarrierVertexTest {
     assertTrue(endVertex_to_bv_forward.canTraverse(TraverseMode.BICYCLE));
     assertTrue(endVertex_to_bv_forward.canTraverse(TraverseMode.WALK));
 
-    //tests bollard which doesn't allow cycling
-    BarrierVertex noBicycleBollard = new BarrierVertex(1.5, 1, 0);
-    noBicycleBollard.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN);
-    StreetEdge no_bike_to_endVertex = edge(noBicycleBollard, endVertex, 100, false);
+    //tests bollard which allows only walking
+    BarrierVertex onlyWalkBollard = new BarrierVertex(1.5, 1, 0);
+    onlyWalkBollard.setBarrierPermissions(StreetTraversalPermission.PEDESTRIAN);
+    StreetEdge edge = edge(onlyWalkBollard, endVertex, 100, false);
 
-    assertTrue(no_bike_to_endVertex.canTraverse(new TraverseModeSet(TraverseMode.CAR)));
-    assertTrue(no_bike_to_endVertex.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
-    assertTrue(no_bike_to_endVertex.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
+    assertTrue(edge.canTraverse(new TraverseModeSet(TraverseMode.CAR)));
+    assertTrue(edge.canTraverse(new TraverseModeSet(TraverseMode.BICYCLE)));
+    assertTrue(edge.canTraverse(new TraverseModeSet(TraverseMode.WALK)));
 
-    assertFalse(no_bike_to_endVertex.canTraverse(TraverseMode.CAR));
-    assertFalse(no_bike_to_endVertex.canTraverse(TraverseMode.BICYCLE));
-    assertTrue(no_bike_to_endVertex.canTraverse(TraverseMode.WALK));
+    assertFalse(edge.canTraverse(TraverseMode.CAR));
+    assertFalse(edge.canTraverse(TraverseMode.BICYCLE));
+    assertTrue(edge.canTraverse(TraverseMode.WALK));
   }
 
   /**
