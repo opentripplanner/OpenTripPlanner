@@ -12,6 +12,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - De-duplicate stops returned by `stopsByRadius` [#5366](https://github.com/opentripplanner/OpenTripPlanner/pull/5366)
 - Fix value mapping for bikesAllowed in GTFS GraphQL API [#5368](https://github.com/opentripplanner/OpenTripPlanner/pull/5368)
 - Apply correct traversal permissions to barrier vertex [#5369](https://github.com/opentripplanner/OpenTripPlanner/pull/5369)
+- Move GTFS GraphQL API out of the sandbox [#5339](https://github.com/opentripplanner/OpenTripPlanner/pull/5339)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
