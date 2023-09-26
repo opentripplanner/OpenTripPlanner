@@ -2,7 +2,7 @@ import { Stack } from 'react-bootstrap';
 import { MapView } from '../components/MapView/MapView.tsx';
 import { NavBarContainer } from '../components/NavBarContainer.tsx';
 import { SearchBar } from '../components/SearchBar/SearchBar.tsx';
-import { ItineraryListContainer } from '../components/ItineraryListContainer.tsx';
+import { ItineraryListContainer } from '../components/ItineraryList/ItineraryListContainer.tsx';
 import { DetailsViewContainer } from '../components/DetailsViewContainer.tsx';
 import { useState } from 'react';
 import { TripQueryVariables } from '../gql/graphql.ts';

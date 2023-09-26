@@ -1,13 +1,16 @@
-import { TripPattern, TripQuery } from '../gql/graphql.ts';
+import { TripPattern, TripQuery } from '../../gql/graphql.ts';
 import { Accordion } from 'react-bootstrap';
-import { useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useContainerWidth } from './useContainerWidth.ts';
 
 function ItineraryHeaderContent({
+  containerWidth,
   tripPattern,
   itineraryIndex,
   earliestStartTime,
   latestEndTime,
 }: {
+  containerWidth: number;
   tripPattern: TripPattern;
   itineraryIndex: number;
   earliestStartTime: string | null;
@@ -31,17 +34,15 @@ function ItineraryHeaderContent({
     [tripPattern.aimedStartTime, tripPattern.aimedEndTime],
   );
 
-  // TODO this should be calculated from DOM
-  const containerWidth = 300;
+  const CONTAINER_WIDTH_PADDING = 90;
+  const paddedContainerWidth = containerWidth - CONTAINER_WIDTH_PADDING;
 
   // var timeWidth = 40;
   const timeWidth = 40;
   // var startPx = 20 + timeWidth,
   const startPx = 20 + timeWidth;
   //   endPx = div.width() - timeWidth - (itin.groupSize ? 48 : 0);
-  const endPx = containerWidth || 300 - timeWidth;
-
-  console.log({ maxSpan, startPct, itinSpan, endPx });
+  const endPx = paddedContainerWidth - timeWidth;
 
   // var pxSpan = endPx - startPx;
   const pxSpan = endPx - startPx;
@@ -94,152 +95,10 @@ function ItineraryHeaderContent({
   );
 }
 
-{
-  /*<div*/
-}
-{
-  /*  style={{*/
-}
-{
-  /*    position: 'absolute',*/
-}
-{
-  /*    width: '142.2935254296129px',*/
-}
-{
-  /*    height: '2px',*/
-}
-{
-  /*    left: '58px',*/
-}
-{
-  /*    top: '9px',*/
-}
-{
-  /*    background: 'black',*/
-}
-{
-  /*  }}*/
-}
-{
-  /*></div>*/
-}
-{
-  /*<div className="otp-itinsAccord-header-time" style={{ left: '20px' }}>*/
-}
-{
-  /*  {tripPattern.aimedStartTime}*/
-}
-{
-  /*</div>*/
-}
-{
-  /*<div className="otp-itinsAccord-header-time" style={{ left: '199.2935254296129px' }}>*/
-}
-{
-  /*  {tripPattern.aimedEndTime}*/
-}
-{
-  /*</div>*/
-}
-{
-  /*<div*/
-}
-{
-  /*  className="otp-itinsAccord-header-segment"*/
-}
-{
-  /*  title="WALK"*/
-}
-{
-  /*  style="width: 41.0712px; left: 61px; color: rgb(255, 255, 255); background: rgb(68, 68, 68);"*/
-}
-{
-  /*>*/
-}
-{
-  /*  <div*/
-}
-{
-  /*    className="mode-icon"*/
-}
-{
-  /*    style="background: #fff; mask-image: url(images/mode/walk.png); -webkit-mask-image: url(images/mode/walk.png)"*/
-}
-{
-  /*  ></div>*/
-}
-{
-  /*</div>*/
-}
-{
-  /*<div*/
-}
-{
-  /*  className="otp-itinsAccord-header-segment"*/
-}
-{
-  /*  title="SUBWAY Ruter 3 Kolsås - Mortensrud"*/
-}
-{
-  /*  style="width: 45.0753px; left: 103.071px; color: rgb(255, 255, 255); background: rgb(236, 112, 12);"*/
-}
-{
-  /*>*/
-}
-{
-  /*  <div*/
-}
-{
-  /*    className="mode-icon"*/
-}
-{
-  /*    style="background: #FFFFFF; mask-image: url(images/mode/subway.png); -webkit-mask-image: url(images/mode/subway.png)"*/
-}
-{
-  /*  ></div>*/
-}
-{
-  /*  <span>3</span>*/
-}
-{
-  /*</div>*/
-}
-{
-  /*<div*/
-}
-{
-  /*  className="otp-itinsAccord-header-segment"*/
-}
-{
-  /*  title="WALK"*/
-}
-{
-  /*  style="width: 48.147px; left: 149.147px; color: rgb(255, 255, 255); background: rgb(68, 68, 68);"*/
-}
-{
-  /*>*/
-}
-{
-  /*  <div*/
-}
-{
-  /*    className="mode-icon"*/
-}
-{
-  /*    style="background: #fff; mask-image: url(images/mode/walk.png); -webkit-mask-image: url(images/mode/walk.png)"*/
-}
-{
-  /*  ></div>*/
-}
-{
-  /*</div>*/
-}
-
 export function ItineraryListContainer({
   tripQueryResult, //selectedTripPatternIndex,
-  //setSelectedTripPatternIndex,
-}: {
+} //setSelectedTripPatternIndex,
+: {
   tripQueryResult: TripQuery | null;
   //selectedTripPatternIndex: number;
   //setSelectedTripPatternIndex: (selectedTripPatternIndex: number) => void;
@@ -268,16 +127,17 @@ export function ItineraryListContainer({
     );
   }, [tripQueryResult?.trip]);
 
-  console.log({ earliestStartTime, latestEndTime });
+  const { containerRef, containerWidth } = useContainerWidth();
 
   return (
-    <section className="itinerary-list-container">
+    <section className="itinerary-list-container" ref={containerRef}>
       <Accordion defaultActiveKey="0">
         {tripQueryResult &&
           tripQueryResult.trip.tripPatterns.map((tripPattern, itineraryIndex) => (
             <Accordion.Item eventKey={`${itineraryIndex}`} key={`${itineraryIndex}`}>
               <Accordion.Header>
                 <ItineraryHeaderContent
+                  containerWidth={containerWidth}
                   tripPattern={tripPattern}
                   itineraryIndex={itineraryIndex}
                   earliestStartTime={earliestStartTime}
