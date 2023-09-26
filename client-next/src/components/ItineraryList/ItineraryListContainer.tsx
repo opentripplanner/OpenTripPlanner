@@ -13,27 +13,25 @@ export function ItineraryListContainer({
   //selectedTripPatternIndex: number;
   //setSelectedTripPatternIndex: (selectedTripPatternIndex: number) => void;
 }) {
-  // TODO is this the right way?
   const earliestStartTime = useMemo(() => {
     return (
       tripQueryResult?.trip.tripPatterns.reduce((acc, current) => {
         if (acc === null) {
-          return current?.aimedStartTime;
+          return current?.expectedStartTime;
         } else {
-          return new Date(current?.aimedStartTime) < new Date(acc) ? current.aimedStartTime : acc;
+          return new Date(current?.expectedStartTime) < new Date(acc) ? current.expectedStartTime : acc;
         }
       }, null) || null
     );
   }, [tripQueryResult?.trip]);
 
-  // TODO is this the right way?
   const latestEndTime = useMemo<string | null>(() => {
     return (
       tripQueryResult?.trip.tripPatterns.reduce((acc, current) => {
         if (acc === null) {
-          return current?.aimedEndTime;
+          return current?.expectedEndTime;
         } else {
-          return new Date(current?.aimedEndTime) > new Date(acc) ? current.aimedEndTime : acc;
+          return new Date(current?.expectedEndTime) > new Date(acc) ? current.expectedEndTime : acc;
         }
       }, null) || null
     );

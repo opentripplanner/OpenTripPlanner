@@ -16,11 +16,16 @@ const query = graphql(`
       tripPatterns {
         aimedStartTime
         aimedEndTime
+
+        expectedEndTime
+        expectedStartTime
+
         duration
         distance
         legs {
           id
           mode
+
           pointsOnLink {
             points
           }

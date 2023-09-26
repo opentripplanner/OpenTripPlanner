@@ -14,25 +14,19 @@ export function ItineraryHeaderContent({
   earliestStartTime: string | null;
   latestEndTime: string | null;
 }) {
-  // TODO are we using the correct values
-  // var maxSpan = itin.tripPlan.latestEndTime - itin.tripPlan.earliestStartTime;
   const maxSpan = useMemo(
     () => new Date(latestEndTime!).getTime() - new Date(earliestStartTime!).getTime(),
     [earliestStartTime, latestEndTime],
   );
 
-  // TODO are we using the correct values
-  // var startPct = (itin.itinData.startTime - itin.tripPlan.earliestStartTime) / maxSpan;
   const startPct = useMemo(
-    () => (new Date(tripPattern.aimedStartTime).getTime() - new Date(earliestStartTime!).getTime()) / maxSpan,
-    [tripPattern.aimedStartTime, earliestStartTime],
+    () => (new Date(tripPattern.expectedStartTime).getTime() - new Date(earliestStartTime!).getTime()) / maxSpan,
+    [tripPattern.expectedStartTime, earliestStartTime],
   );
 
-  // TODO are we using the correct values
-  // var itinSpan = itin.getEndTime() - itin.getStartTime();
   const itinSpan = useMemo(
-    () => new Date(tripPattern.aimedEndTime).getTime() - new Date(tripPattern.aimedStartTime).getTime(),
-    [tripPattern.aimedStartTime, tripPattern.aimedEndTime],
+    () => new Date(tripPattern.expectedEndTime).getTime() - new Date(tripPattern.expectedStartTime).getTime(),
+    [tripPattern.expectedStartTime, tripPattern.expectedEndTime],
   );
 
   const CONTAINER_WIDTH_PADDING = 90;
@@ -73,7 +67,7 @@ export function ItineraryHeaderContent({
           color: 'white',
         }}
       >
-        {new Date(tripPattern.aimedStartTime).toLocaleTimeString('en-US', {
+        {new Date(tripPattern.expectedStartTime).toLocaleTimeString('en-US', {
           timeStyle: 'short',
           hourCycle: 'h24',
         })}
@@ -87,7 +81,7 @@ export function ItineraryHeaderContent({
           color: 'white',
         }}
       >
-        {new Date(tripPattern.aimedEndTime).toLocaleTimeString('en-US', {
+        {new Date(tripPattern.expectedEndTime).toLocaleTimeString('en-US', {
           timeStyle: 'short',
           hourCycle: 'h24',
         })}
