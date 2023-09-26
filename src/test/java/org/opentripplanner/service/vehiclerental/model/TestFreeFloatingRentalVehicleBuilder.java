@@ -8,11 +8,26 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class TestFreeFloatingRentalVehicleBuilder {
 
   public static final String NETWORK_1 = "Network-1";
+  public static final double DEFAULT_LATITUDE = 47.520;
+  public static final double DEFAULT_LONGITUDE = 19.01;
+
+  private double latitude = DEFAULT_LATITUDE;
+  private double longitude = DEFAULT_LONGITUDE;
 
   private RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(NETWORK_1);
 
   public static TestFreeFloatingRentalVehicleBuilder of() {
     return new TestFreeFloatingRentalVehicleBuilder();
+  }
+
+  public TestFreeFloatingRentalVehicleBuilder withLatitude(double latitude) {
+    this.latitude = latitude;
+    return this;
+  }
+
+  public TestFreeFloatingRentalVehicleBuilder withLongitude(double longitude) {
+    this.longitude = longitude;
+    return this;
   }
 
   public TestFreeFloatingRentalVehicleBuilder withVehicleScooter() {
@@ -45,8 +60,8 @@ public class TestFreeFloatingRentalVehicleBuilder {
     var stationName = "free-floating-" + vehicleType.formFactor.name().toLowerCase();
     vehicle.id = new FeedScopedId(NETWORK_1, stationName);
     vehicle.name = new NonLocalizedString(stationName);
-    vehicle.latitude = 47.510;
-    vehicle.longitude = 18.99;
+    vehicle.latitude = latitude;
+    vehicle.longitude = longitude;
     vehicle.vehicleType = vehicleType;
     return vehicle;
   }
