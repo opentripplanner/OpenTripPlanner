@@ -1523,6 +1523,19 @@ enum MultiModalMode {
 }
 
 enum OccupancyStatus {
+  """
+  The vehicle or carriage can currently accommodate only standing passengers and has limited
+  space for them. There isn't a big difference between this and `full` so it's possible to handle
+  them as the same value, if one wants to limit the number of different values.
+  """
+  crushedStandingRoomOnly
+  """
+  The vehicle is considered empty by most measures, and has few or no passengers onboard, but is
+  still accepting passengers. There isn't a big difference between this and `manySeatsAvailable`
+  so it's possible to handle them as the same value, if one wants to limit the number of different
+  values.
+  """
+  empty
   "The vehicle or carriage has a few seats available."
   fewSeatsAvailable
   "The vehicle or carriage is considered full by most measures, but may still be allowing passengers to board."

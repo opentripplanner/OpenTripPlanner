@@ -309,7 +309,7 @@ public class RealtimeVehiclePatternMatcher {
       case CRUSHED_STANDING_ROOM_ONLY -> OccupancyStatus.CRUSHED_STANDING_ROOM_ONLY;
       case FULL -> OccupancyStatus.FULL;
       case NOT_ACCEPTING_PASSENGERS -> OccupancyStatus.NOT_ACCEPTING_PASSENGERS;
-      case NOT_BOARDABLE -> OccupancyStatus.NOT_BOARDABLE;
+      case NOT_BOARDABLE -> OccupancyStatus.NOT_ACCEPTING_PASSENGERS;
     };
   }
 

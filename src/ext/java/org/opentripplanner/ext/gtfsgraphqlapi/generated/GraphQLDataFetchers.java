@@ -16,6 +16,7 @@ import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLAler
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLAlertEffectType;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLAlertSeverityLevelType;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLInputField;
+import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLOccupancyStatus;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.ext.gtfsgraphqlapi.generated.GraphQLTypes.GraphQLTransitMode;
@@ -1067,7 +1068,7 @@ public class GraphQLDataFetchers {
    * available for a trip. Historic data might not be available.
    */
   public interface GraphQLTripOccupancy {
-    public DataFetcher<String> occupancyStatus();
+    public DataFetcher<GraphQLOccupancyStatus> occupancyStatus();
   }
 
   /** This is used for alert entities that we don't explicitly handle or they are missing. */

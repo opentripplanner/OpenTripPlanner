@@ -44,13 +44,7 @@ public enum OccupancyStatus {
    */
   FULL,
   /**
-   * The vehicle or carriage is not accepting passengers. The vehicle or carriage usually accepts
-   * passengers for boarding.
+   * The vehicle or carriage is not accepting passengers.
    */
   NOT_ACCEPTING_PASSENGERS,
-  /**
-   * The vehicle or carriage is not boardable and never accepts passengers. Useful for special
-   * vehicles or carriages (engine, maintenance carriage, etc…).
-   */
-  NOT_BOARDABLE,
 }

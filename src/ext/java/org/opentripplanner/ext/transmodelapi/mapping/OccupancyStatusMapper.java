@@ -15,11 +15,13 @@ public class OccupancyStatusMapper {
   public static OccupancyStatus mapStatus(OccupancyStatus occupancyStatus) {
     return switch (occupancyStatus) {
       case NO_DATA_AVAILABLE -> OccupancyStatus.NO_DATA_AVAILABLE;
-      case MANY_SEATS_AVAILABLE, EMPTY -> OccupancyStatus.MANY_SEATS_AVAILABLE;
+      case EMPTY -> OccupancyStatus.EMPTY;
+      case MANY_SEATS_AVAILABLE -> OccupancyStatus.MANY_SEATS_AVAILABLE;
       case FEW_SEATS_AVAILABLE -> OccupancyStatus.FEW_SEATS_AVAILABLE;
-      case STANDING_ROOM_ONLY, CRUSHED_STANDING_ROOM_ONLY -> OccupancyStatus.STANDING_ROOM_ONLY;
+      case STANDING_ROOM_ONLY -> OccupancyStatus.STANDING_ROOM_ONLY;
+      case CRUSHED_STANDING_ROOM_ONLY -> occupancyStatus.CRUSHED_STANDING_ROOM_ONLY;
       case FULL -> OccupancyStatus.FULL;
-      case NOT_ACCEPTING_PASSENGERS, NOT_BOARDABLE -> OccupancyStatus.NOT_ACCEPTING_PASSENGERS;
+      case NOT_ACCEPTING_PASSENGERS -> OccupancyStatus.NOT_ACCEPTING_PASSENGERS;
     };
   }
 }

@@ -199,6 +199,16 @@ public class EnumTypes {
       "The vehicle or carriage doesn't have any occupancy data available."
     )
     .value(
+      "empty",
+      OccupancyStatus.EMPTY,
+      """
+      The vehicle is considered empty by most measures, and has few or no passengers onboard, but is
+      still accepting passengers. There isn't a big difference between this and `manySeatsAvailable`
+      so it's possible to handle them as the same value, if one wants to limit the number of different
+      values.
+      """
+    )
+    .value(
       "manySeatsAvailable",
       OccupancyStatus.MANY_SEATS_AVAILABLE,
       "The vehicle or carriage has a large number of seats available."
@@ -212,6 +222,15 @@ public class EnumTypes {
       "standingRoomOnly",
       OccupancyStatus.STANDING_ROOM_ONLY,
       "The vehicle or carriage only has standing room available."
+    )
+    .value(
+      "crushedStandingRoomOnly",
+      OccupancyStatus.CRUSHED_STANDING_ROOM_ONLY,
+      """
+        The vehicle or carriage can currently accommodate only standing passengers and has limited
+        space for them. There isn't a big difference between this and `full` so it's possible to handle
+        them as the same value, if one wants to limit the number of different values.
+        """
     )
     .value(
       "full",
