@@ -8,8 +8,8 @@ import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;
  */
 public class MixinPropertiesBuilder {
 
-  private SafetyFeatures bicycleSafety = new SafetyFeatures(1, 1);
-  private SafetyFeatures walkSafety = new SafetyFeatures(1, 1);
+  private SafetyFeatures bicycleSafety = SafetyFeatures.DEFAULT;
+  private SafetyFeatures walkSafety = SafetyFeatures.DEFAULT;
 
   public static MixinPropertiesBuilder ofWalkSafety(double safety) {
     return new MixinPropertiesBuilder().walkSafety(safety);

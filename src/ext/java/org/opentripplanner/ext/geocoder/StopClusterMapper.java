@@ -2,13 +2,10 @@ package org.opentripplanner.ext.geocoder;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.lang.PredicateUtils;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.service.TransitService;
@@ -44,7 +41,7 @@ class StopClusterMapper {
       .filter(sl -> sl.getName() != null)
       // if they are very close to each other and have the same name, only one is chosen (at random)
       .filter(
-        distinctByKey(sl ->
+        PredicateUtils.distinctByKey(sl ->
           new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate10m())
         )
       )
@@ -82,11 +79,6 @@ class StopClusterMapper {
 
   private static StopCluster.Coordinate toCoordinate(WgsCoordinate c) {
     return new StopCluster.Coordinate(c.latitude(), c.longitude());
-  }
-
-  private static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-    Set<Object> seen = ConcurrentHashMap.newKeySet();
-    return t -> seen.add(keyExtractor.apply(t));
   }
 
   private record DeduplicationKey(I18NString name, WgsCoordinate coordinate) {}

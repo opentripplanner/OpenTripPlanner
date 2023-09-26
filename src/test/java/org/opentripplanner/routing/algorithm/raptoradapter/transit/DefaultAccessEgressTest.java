@@ -90,7 +90,7 @@ class DefaultAccessEgressTest {
     var subject = new DefaultAccessEgress(0, stateWalk);
     assertTrue(subject.isWalkOnly());
 
-    var carRentalState = TestStateBuilder.ofCarRental().streetEdge().pickUpCar().build();
+    var carRentalState = TestStateBuilder.ofCarRental().streetEdge().pickUpCarFromStation().build();
     subject = new DefaultAccessEgress(0, carRentalState);
     assertFalse(subject.isWalkOnly());
   }

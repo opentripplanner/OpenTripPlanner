@@ -125,7 +125,7 @@ class StateTest {
     );
 
     assertFalse(
-      ofCarRental().streetEdge().pickUpCar().build().containsOnlyWalkMode(),
+      ofCarRental().streetEdge().pickUpCarFromStation().build().containsOnlyWalkMode(),
       "Walk + CAR"
     );
   }

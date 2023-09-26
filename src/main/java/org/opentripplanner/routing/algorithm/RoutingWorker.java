@@ -175,14 +175,6 @@ public class RoutingWorker {
     );
   }
 
-  private List<RideHailingService> rideHailingServices() {
-    if (request.journey().modes().contains(StreetMode.CAR_HAILING)) {
-      return serverContext.rideHailingServices();
-    } else {
-      return List.of();
-    }
-  }
-
   private static AdditionalSearchDays createAdditionalSearchDays(
     RaptorTuningParameters raptorTuningParameters,
     ZoneId zoneId,

@@ -434,7 +434,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 ```JSON
 // router-config.json
 {
-  "configVersion" : "v2.3.0-EN000121",
+  "configVersion" : "v2.4.0-EN000121",
   "server" : {
     "apiProcessingTimeout" : "7s",
     "traceParameters" : [
@@ -504,6 +504,8 @@ HTTP headers to add to the request. Any header key, value can be inserted.
         "costLimitFunction" : "15m + 1.5 x",
         "intervalRelaxFactor" : 0.4
       },
+      "nonTransitGeneralizedCostLimit" : "400 + 1.5x",
+      "removeTransitWithHigherCostThanBestOnStreetOnly" : "60 + 1.3x",
       "bikeRentalDistanceRatio" : 0.3,
       "accessibilityScore" : true,
       "minBikeParkingDistance" : 300,

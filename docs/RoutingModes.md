@@ -17,7 +17,7 @@ Cycling for the entirety of the route or taking a bicycle onto the public transp
 
 Taking a rented, shared-mobility bike for part or the entirety of the route.
 
-_Prerequisite:_ Vehicle or station location need to be added to OTP from dynamic data feeds.
+_Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
 See [Configuring GBFS](UpdaterConfig.md#gbfs-vehicle-rental-systems) on how to add one.
 
 
@@ -25,6 +25,7 @@ See [Configuring GBFS](UpdaterConfig.md#gbfs-vehicle-rental-systems) on how to a
 
 Leaving the bicycle at the departure station and walking from the arrival station to the destination.
 This mode needs to be combined with at least one transit mode otherwise it behaves like an ordinary bicycle journey.
+
 _Prerequisite:_ Bicycle parking stations present in the OSM file and visible to OTP by enabling the property `staticBikeParkAndRide` during graph build.
 
 
@@ -51,7 +52,7 @@ Walking to a pickup point along the road, driving to a drop-off point along the 
 Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
 This can include car rental at fixed locations or free-floating services.
 
-_Prerequisite:_ Vehicle or station location need to be added to OTP from dynamic data feeds.
+_Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
 See [Configuring GBFS](UpdaterConfig.md#gbfs-vehicle-rental-systems) on how to add one.
 
 
@@ -64,14 +65,14 @@ _Prerequisite:_ Park-and-ride areas near the stations need to be present in the 
 
 <h4 id="FLEXIBLE">FLEXIBLE</h4>
 
-Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTex Flexible Stop Places.
+Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTEx Flexible Stop Places.
 
 <h4 id="SCOOTER_RENTAL">SCOOTER_RENTAL</h4>
 
 Walking to a scooter rental point, riding a scooter to a scooter rental drop-off point, and walking the rest of the way.
 This can include scooter rental at fixed locations or free-floating services.
 
-_Prerequisite:_ Vehicle or station location need to be added to OTP from dynamic data feeds.
+_Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
 See [Configuring GBFS](UpdaterConfig.md#gbfs-vehicle-rental-systems) on how to add one.
 
 

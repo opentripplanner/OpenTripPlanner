@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.File;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
@@ -19,7 +18,7 @@ public class BicycleNetworkRelationsTest {
   @Test
   public void testBicycleRouteRelations() {
     var issueStore = DataImportIssueStore.NOOP;
-    var osmdb = new OsmDatabase(issueStore, Set.of());
+    var osmdb = new OsmDatabase(issueStore);
     var provider = new OsmProvider(
       new File("src/test/resources/germany/ehningen-minimal.osm.pbf"),
       true
