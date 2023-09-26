@@ -1,10 +1,15 @@
 package org.opentripplanner.ext.vehiclerentalservicedirectory.api;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.opentripplanner.updater.spi.HttpHeaders;
 
 public class VehicleRentalServiceDirectoryFetcherParameters {
 
+  public static final String DEFAULT_NETWORK_NAME = "default-network";
   private final URI url;
 
   private final String sourcesName;
@@ -17,13 +22,19 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
 
   private final String language;
 
+  private final Map<String, NetworkParameters> parametersForNetwork;
+
+  @Nullable
+  private final NetworkParameters defaultNetwork;
+
   public VehicleRentalServiceDirectoryFetcherParameters(
     URI url,
     String sourcesName,
     String updaterUrlName,
     String networkName,
     String language,
-    HttpHeaders headers
+    HttpHeaders headers,
+    Collection<NetworkParameters> networkParameters
   ) {
     this.url = url;
     this.sourcesName = sourcesName;
@@ -31,6 +42,9 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     this.sourceNetworkName = networkName;
     this.language = language;
     this.headers = headers;
+    this.parametersForNetwork =
+      networkParameters.stream().collect(Collectors.toMap(NetworkParameters::network, it -> it));
+    this.defaultNetwork = parametersForNetwork.get(DEFAULT_NETWORK_NAME);
   }
 
   /**
@@ -80,5 +94,10 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
 
   public String getLanguage() {
     return language;
+  }
+
+  @Nullable
+  public NetworkParameters networkParameters(String network) {
+    return parametersForNetwork.getOrDefault(network, defaultNetwork);
   }
 }

@@ -1,10 +1,10 @@
-package org.opentripplanner.generate.doc;
+package org.opentripplanner.ext.vehiclerentalservicedirectory.generatedoc;
 
 import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
-import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_3;
+import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceJsonExample;
@@ -18,63 +18,51 @@ import org.opentripplanner.generate.doc.framework.GeneratesDocumentation;
 import org.opentripplanner.generate.doc.framework.ParameterDetailsList;
 import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
+import org.opentripplanner.generate.doc.framework.TemplateUtil;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 @GeneratesDocumentation
-public class RouterConfigurationDocTest {
+public class VehicleRentalServiceDirectoryConfigDocTest {
 
-  private static final File TEMPLATE = new File(TEMPLATE_ROOT, "RouterConfiguration.md");
-  private static final File OUT_FILE = new File(DOCS_ROOT, "RouterConfiguration.md");
+  private static final String DOCUMENT = "sandbox/VehicleRentalServiceDirectory.md";
+  private static final File TEMPLATE = new File(TEMPLATE_ROOT, DOCUMENT);
+  private static final File OUT_FILE = new File(DOCS_ROOT, DOCUMENT);
+  private static final String CONFIG_PATH =
+    "org/opentripplanner/ext/vehiclerentalservicedirectory/generatedoc/" + ROUTER_CONFIG_FILENAME;
+  private static final String CONFIG_TAG = "vehicleRentalServiceDirectory";
+  private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
 
-  private static final String CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
-  private static final SkipNodes SKIP_NODES = SkipNodes
-    .of()
-    .skip("flex", "sandbox/Flex.md")
-    .skip("routingDefaults", "RouteRequest.md")
-    .skip("updaters", "UpdaterConfig.md")
-    .skip("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
-    .skipNestedElements("transferCacheRequests", "RouteRequest.md")
-    .skip("rideHailingServices", "sandbox/RideHailing.md")
-    .skip("vehicleRentalServiceDirectory", "sandbox/VehicleRentalServiceDirectory.md")
-    .build();
-
-  /**
-   * NOTE! This test updates the {@code docs/Configuration.md} document based on the latest
-   * version of the code. The following is auto generated:
-   * <ul>
-   *   <li>The configuration type table</li>
-   *   <li>The list of OTP features</li>
-   * </ul>
-   */
   @Test
-  public void updateBuildConfigurationDoc() {
-    NodeAdapter node = readRouterConfig();
+  public void updateConfigurationDoc() {
+    NodeAdapter node = readConfigDefaults();
 
     // Read and close inout file (same as output file)
     String doc = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 
     doc = replaceParametersTable(doc, getParameterSummaryTable(node));
-    doc = replaceParametersDetails(doc, getParameterDetailsTable(node));
-    doc = replaceJsonExample(doc, node, ROUTER_CONFIG_FILENAME);
+    doc = replaceParametersDetails(doc, getParameterDetailsList(node));
+
+    var example = TemplateUtil.jsonExampleBuilder(node.rawNode()).wrapInObject(CONFIG_TAG).build();
+    doc = replaceJsonExample(doc, example, ROUTER_CONFIG_FILENAME);
 
     writeFile(OUT_FILE, doc);
 
     assertFileEquals(original, OUT_FILE);
   }
 
-  private NodeAdapter readRouterConfig() {
+  private NodeAdapter readConfigDefaults() {
     var json = jsonNodeFromResource(CONFIG_PATH);
-    var conf = new RouterConfig(json, CONFIG_PATH, true);
-    return conf.asNodeAdapter();
+    var conf = new RouterConfig(json, CONFIG_PATH, false);
+    return conf.asNodeAdapter().child(CONFIG_TAG);
   }
 
   private String getParameterSummaryTable(NodeAdapter node) {
     return new ParameterSummaryTable(SKIP_NODES).createTable(node).toMarkdownTable();
   }
 
-  private String getParameterDetailsTable(NodeAdapter node) {
-    return ParameterDetailsList.listParametersWithDetails(node, SKIP_NODES, HEADER_3);
+  private String getParameterDetailsList(NodeAdapter node) {
+    return ParameterDetailsList.listParametersWithDetails(node, SKIP_NODES, HEADER_4);
   }
 }

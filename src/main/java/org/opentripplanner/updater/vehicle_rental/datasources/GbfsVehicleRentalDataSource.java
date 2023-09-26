@@ -22,6 +22,8 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalSystem;
 import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicleRentalDataSourceParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by demory on 2017-03-14.
@@ -33,11 +35,14 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
  */
 class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
+  private static final Logger LOG = LoggerFactory.getLogger(GbfsVehicleRentalDataSource.class);
+
   private final GbfsVehicleRentalDataSourceParameters params;
 
+  private final OtpHttpClient otpHttpClient;
   private GbfsFeedLoader loader;
   private List<GeofencingZone> geofencingZones = List.of();
-  private final OtpHttpClient otpHttpClient;
+  private boolean logGeofencingZonesDoesNotExistWarning = true;
 
   public GbfsVehicleRentalDataSource(
     GbfsVehicleRentalDataSourceParameters parameters,
@@ -126,9 +131,18 @@ class GbfsVehicleRentalDataSource implements VehicleRentalDatasource {
 
     if (params.geofencingZones()) {
       var zones = loader.getFeed(GBFSGeofencingZones.class);
-
-      var mapper = new GbfsGeofencingZoneMapper(system.systemId);
-      this.geofencingZones = mapper.mapGeofencingZone(zones);
+      if (zones != null) {
+        var mapper = new GbfsGeofencingZoneMapper(system.systemId);
+        this.geofencingZones = mapper.mapGeofencingZone(zones);
+      } else {
+        if (logGeofencingZonesDoesNotExistWarning) {
+          LOG.warn(
+            "GeofencingZones is enabled in OTP, but no zones exist for network: {}",
+            params.network()
+          );
+        }
+        logGeofencingZonesDoesNotExistWarning = false;
+      }
     }
     return stations;
   }
