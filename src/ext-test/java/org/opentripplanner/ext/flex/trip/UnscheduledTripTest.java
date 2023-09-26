@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTrip.isUnscheduledTrip;
 import static org.opentripplanner.ext.flex.trip.UnscheduledTripTest.TestCase.tc;
+import static org.opentripplanner.model.PickDrop.NONE;
 import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
@@ -33,6 +34,7 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -516,6 +518,31 @@ public class UnscheduledTripTest {
     );
   }
 
+  @Test
+  void boardingAlighting() {
+    var AREA_STOP1 = TransitModelForTest.areaStopForTest("area-1", Polygons.BERLIN);
+    var AREA_STOP2 = TransitModelForTest.areaStopForTest("area-2", Polygons.BERLIN);
+    var AREA_STOP3 = TransitModelForTest.areaStopForTest("area-3", Polygons.BERLIN);
+
+    var first = area(AREA_STOP1, "10:00", "10:05");
+    first.setDropOffType(NONE);
+    var second = area(AREA_STOP2, "10:10", "10:15");
+    second.setPickupType(NONE);
+    var third = area(AREA_STOP3, "10:20", "10:25");
+
+    var trip = TestCase
+      .tc(first, third)
+      .withStopTimes(List.of(first, second, third))
+      .build()
+      .trip();
+
+    assertTrue(trip.isBoardingPossible(nearbyStop(AREA_STOP1)));
+    assertFalse(trip.isAlightingPossible(nearbyStop(AREA_STOP1)));
+
+    assertFalse(trip.isBoardingPossible(nearbyStop(AREA_STOP2)));
+    assertTrue(trip.isAlightingPossible(nearbyStop(AREA_STOP2)));
+  }
+
   @Nested
   class FlexTemplates {
 
@@ -556,7 +583,7 @@ public class UnscheduledTripTest {
     @Test
     void accessTemplatesNoAlighting() {
       var second = area("10:10", "10:15");
-      second.setDropOffType(PickDrop.NONE);
+      second.setDropOffType(NONE);
 
       var trip = trip(List.of(FIRST, second, THIRD, FOURTH));
 
@@ -609,8 +636,13 @@ public class UnscheduledTripTest {
   }
 
   private static StopTime area(String startTime, String endTime) {
+    return area(AREA_STOP, endTime, startTime);
+  }
+
+  @Nonnull
+  private static StopTime area(StopLocation areaStop, String endTime, String startTime) {
     var stopTime = new StopTime();
-    stopTime.setStop(AREA_STOP);
+    stopTime.setStop(areaStop);
     stopTime.setFlexWindowStart(TimeUtils.time(startTime));
     stopTime.setFlexWindowEnd(TimeUtils.time(endTime));
     return stopTime;
@@ -630,6 +662,11 @@ public class UnscheduledTripTest {
     stopTime.setArrivalTime(arrivalTime);
     stopTime.setDepartureTime(departureTime);
     return stopTime;
+  }
+
+  @Nonnull
+  private static NearbyStop nearbyStop(AreaStop stop) {
+    return new NearbyStop(stop, 1000, List.of(), null);
   }
 
   record TestCase(
