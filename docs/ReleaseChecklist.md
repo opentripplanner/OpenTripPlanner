@@ -92,7 +92,7 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
   milestone.
     * Close open PRs older than 2 years, make sure the milestone is set to `Rejected`.
     * Rename the old milestone from `x.y (Next Release)` to `x.y`. All issues and PRs assigned to 
-      this milestone is updated.
+      this milestone are automatically updated.
     * Create a new milestone: `x.y+1 (Next Release)`
     * All PullRequests SHOULD have a milestone (except some very old ones) 
         * Assign all *open* PRs to this new milestone `x.y+1 (Next Release)`.
