@@ -297,6 +297,41 @@ public class OsmModuleTest {
       });
   }
 
+  /**
+   * Test that a barrier vertex created when street ends to an access restriction
+   * will not prevent routing to that vertex
+   */
+  @Test
+  private void testBarrierAtEnd() {
+    var deduplicator = new Deduplicator();
+    var graph = new Graph(deduplicator);
+
+    File file = new File(
+      URLDecoder.decode(
+        getClass().getResource("noaccess-at-end.pbf").getFile(),
+        StandardCharsets.UTF_8
+      )
+    );
+    OsmProvider provider = new OsmProvider(file, false);
+    OsmModule loader = OsmModule.of(provider, graph).build();
+    loader.buildGraph();
+
+    RouteRequest request = new RouteRequest();
+
+    // Route along a simple 3 vertex highway which ends to a 'access=none' node
+    Vertex start = graph.getVertex(VertexLabel.osm(1));
+    Vertex end = graph.getVertex(VertexLabel.osm(3));
+
+    GraphPathFinder graphPathFinder = new GraphPathFinder(null);
+    List<GraphPath<State, Edge, Vertex>> pathList = graphPathFinder.graphPathFinderEntryPoint(
+      request,
+      Set.of(start),
+      Set.of(end)
+    );
+    assertNotNull(pathList);
+    assertFalse(pathList.isEmpty());
+  }
+
   @Nonnull
   private Graph buildParkingLots() {
     var graph = new Graph();

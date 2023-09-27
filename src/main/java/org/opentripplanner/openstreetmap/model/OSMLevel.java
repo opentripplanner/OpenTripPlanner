@@ -69,7 +69,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
     /* get short and long level names by splitting on = character */
     String shortName = "";
     String longName = "";
-    Integer indexEquals = spec.indexOf('=');
+    int indexEquals = spec.indexOf('=');
     if (indexEquals >= 1) {
       shortName = spec.substring(0, indexEquals);
       longName = spec.substring(indexEquals + 1);

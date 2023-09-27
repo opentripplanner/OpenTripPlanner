@@ -136,7 +136,7 @@ GraphQL API, the only supported way of sending requests to the OTP routing engin
 Details of those two APIs are available at the following pages:
 
 
-- [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) - HSL's GraphQL API used by the Digitransit
+- [GTFS GraphQL API](apis/GTFS-GraphQL-API.md) - HSL's GraphQL API used by the Digitransit
   project.
 - [Transmodel API](sandbox/TransmodelApi.md) - Entur´s Transmodel API
 
