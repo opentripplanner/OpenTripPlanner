@@ -45,14 +45,14 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class OsmModuleTest {
 
-  private static final ResourceLoader RES = ResourceLoader.of(OsmModuleTest.class);
+  private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(OsmModuleTest.class);
 
   @Test
   public void testGraphBuilder() {
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
 
-    File file = RES.file("map.osm.pbf");
+    File file = RESOURCE_LOADER.file("map.osm.pbf");
 
     OsmProvider provider = new OsmProvider(file, true);
 
@@ -110,7 +110,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
 
-    File file = RES.file("NYC_small.osm.pbf");
+    File file = RESOURCE_LOADER.file("NYC_small.osm.pbf");
     OsmProvider provider = new OsmProvider(file, true);
     OsmModule osmModule = OsmModule.of(provider, gg).withAreaVisibility(true).build();
 
@@ -306,7 +306,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
 
-    File file = RES.file("accessno-at-end.pbf");
+    File file = RESOURCE_LOADER.file("accessno-at-end.pbf");
     OsmProvider provider = new OsmProvider(file, false);
     OsmModule loader = OsmModule.of(provider, graph).build();
     loader.buildGraph();
@@ -332,7 +332,7 @@ public class OsmModuleTest {
     var graph = new Graph();
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
-      .map(RES::file)
+      .map(RESOURCE_LOADER::file)
       .map(f -> new OsmProvider(f, false))
       .toList();
     var module = OsmModule
@@ -357,7 +357,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
 
-    File file = RES.file("usf_area.osm.pbf");
+    File file = RESOURCE_LOADER.file("usf_area.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule loader = OsmModule.of(provider, graph).withAreaVisibility(!skipVisibility).build();

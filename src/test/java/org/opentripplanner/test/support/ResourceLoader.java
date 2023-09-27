@@ -9,7 +9,11 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
- * Loads files from the resources folder.
+ * Loads files from the resources folder relative to the package name of the class/instances
+ * passed to initializers.
+ * <p>
+ * So if your class' package is org.opentripplanner.foo, then the corresponding resources
+ * must be placed in src/test/resources/org/opentripplanner/foo.
  */
 public class ResourceLoader {
 
@@ -19,10 +23,16 @@ public class ResourceLoader {
     this.clazz = clazz;
   }
 
+  /**
+   * Initialize a loader with the given class' package.
+   */
   public static ResourceLoader of(Class<?> clazz) {
     return new ResourceLoader(clazz);
   }
 
+  /**
+   * Initialize a loader with the given instances' class' package.
+   */
   public static ResourceLoader of(Object object) {
     return new ResourceLoader(object.getClass());
   }
