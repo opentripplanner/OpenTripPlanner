@@ -50,6 +50,10 @@ public class OSMRelationMember {
     return type == WAY;
   }
 
+  public String url() {
+    return "https://www.openstreetmap.org/%s/%s".formatted(type.toString().toLowerCase(), ref);
+  }
+
   @Override
   public String toString() {
     return "osm rel " + type + ":" + role + ":" + ref;
