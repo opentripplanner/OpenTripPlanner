@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Fetches GBFS endpoints from the micromobility aggregation service located at
- * https://github.com/entur/lahmu, which is an API for aggregating GBFS endpoints.
+ * https://github.com/entur/lamassu, which is an API for aggregating GBFS endpoints.
  */
 public class VehicleRentalServiceDirectoryFetcher {
 
