@@ -3,6 +3,7 @@ package org.opentripplanner.ext.vehiclerentalservicedirectory.api;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.updater.spi.HttpHeaders;
@@ -96,8 +97,7 @@ public class VehicleRentalServiceDirectoryFetcherParameters {
     return language;
   }
 
-  @Nullable
-  public NetworkParameters networkParameters(String network) {
-    return parametersForNetwork.getOrDefault(network, defaultNetwork);
+  public Optional<NetworkParameters> networkParameters(String network) {
+    return Optional.ofNullable(parametersForNetwork.getOrDefault(network, defaultNetwork));
   }
 }

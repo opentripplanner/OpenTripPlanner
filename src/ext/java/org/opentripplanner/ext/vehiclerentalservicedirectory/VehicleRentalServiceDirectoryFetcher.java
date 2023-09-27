@@ -99,9 +99,8 @@ public class VehicleRentalServiceDirectoryFetcher {
         var networkName = network.get();
         var config = parameters.networkParameters(networkName);
 
-        if (config == null) {
-          LOG.warn("Network not configured in OTP: {}", networkName);
-        } else {
+        if (config.isPresent()) {
+          var networkParams = config.get();
           dataSources.add(
             new GbfsVehicleRentalDataSourceParameters(
               updaterUrl.get(),
@@ -110,11 +109,13 @@ public class VehicleRentalServiceDirectoryFetcher {
               false,
               parameters.getHeaders(),
               networkName,
-              config.geofencingZones(),
+              networkParams.geofencingZones(),
               // overloadingAllowed - not part of GBFS, not supported here
               false
             )
           );
+        } else {
+          LOG.warn("Network not configured in OTP: {}", networkName);
         }
       }
     }
