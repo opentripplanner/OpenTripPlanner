@@ -33,7 +33,10 @@ public class ResourceLoader {
   public File file(String path) {
     URL resource = url(path);
     var file = new File(resource.getFile());
-    assertTrue(file.exists(), "File '%s' not found on file system.".formatted(file.getAbsolutePath()));
+    assertTrue(
+      file.exists(),
+      "File '%s' not found on file system.".formatted(file.getAbsolutePath())
+    );
     return file;
   }
 
@@ -42,7 +45,7 @@ public class ResourceLoader {
    */
   public URL url(String name) {
     var resource = clazz.getResource(name);
-    var msg = "Resource '%s' not found on in package '%s'".formatted(name, clazz.getPackageName());
+    var msg = "Resource '%s' not found in package '%s'".formatted(name, clazz.getPackageName());
     assertNotNull(resource, msg);
     return resource;
   }

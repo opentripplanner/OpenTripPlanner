@@ -28,7 +28,6 @@ public class ZipFileDataSourceTest {
 
   // Sometime close to 2000-01-01
   private static final long TIME = 30 * 365 * 24 * 60 * 60 * 1000L;
-  private static final String FILENAME = ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath();
   private static final ResourceLoader RES = ResourceLoader.of(ZipFileDataSourceTest.class);
   /* filenames encoded with cp437 and utf8 */
   public static final File UMLAUT_CP437_ZIP = RES.file("umlaut-cp437.zip");
@@ -39,8 +38,8 @@ public class ZipFileDataSourceTest {
   @Test
   public void testAccessorsForNoneExistingFile() throws IOException {
     // Given:
-    File target = new File(FILENAME);
-    File copyTarget = new File(FILENAME);
+    File target = new File(ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath());
+    File copyTarget = new File(ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath());
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
     CompositeDataSource copySubject = new ZipFileDataSource(copyTarget, GTFS);
     String expectedPath = target.getPath();
@@ -69,7 +68,7 @@ public class ZipFileDataSourceTest {
   @Test
   public void testIO() throws IOException {
     // Given:
-    File target = new File(FILENAME);
+    File target = new File(ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath());
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
 
     Collection<DataSource> content = subject.content();
@@ -98,7 +97,7 @@ public class ZipFileDataSourceTest {
   @Test
   public void testEntryProperties() {
     // Given:
-    File target = new File(FILENAME);
+    File target = new File(ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath());
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
     DataSource entry = subject.entry("trips.txt");
 
@@ -115,7 +114,7 @@ public class ZipFileDataSourceTest {
   @Test
   public void testUnsupportedDelete() {
     // Given:
-    var target = new File(FILENAME);
+    var target = new File(ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath());
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
 
     // When: delete entry is not implemented
