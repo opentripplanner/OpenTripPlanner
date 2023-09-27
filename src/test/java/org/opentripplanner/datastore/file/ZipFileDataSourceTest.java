@@ -38,8 +38,8 @@ public class ZipFileDataSourceTest {
   @Test
   public void testAccessorsForNoneExistingFile() throws IOException {
     // Given:
-    File target = new File(ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath());
-    File copyTarget = new File(ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath());
+    File target = ConstantsForTests.CALTRAIN_GTFS;
+    File copyTarget = ConstantsForTests.CALTRAIN_GTFS;
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
     CompositeDataSource copySubject = new ZipFileDataSource(copyTarget, GTFS);
     String expectedPath = target.getPath();
@@ -68,7 +68,7 @@ public class ZipFileDataSourceTest {
   @Test
   public void testIO() throws IOException {
     // Given:
-    File target = new File(ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath());
+    File target = ConstantsForTests.CALTRAIN_GTFS;
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
 
     Collection<DataSource> content = subject.content();
@@ -97,7 +97,7 @@ public class ZipFileDataSourceTest {
   @Test
   public void testEntryProperties() {
     // Given:
-    File target = new File(ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath());
+    File target = ConstantsForTests.CALTRAIN_GTFS;
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
     DataSource entry = subject.entry("trips.txt");
 
@@ -114,7 +114,7 @@ public class ZipFileDataSourceTest {
   @Test
   public void testUnsupportedDelete() {
     // Given:
-    var target = new File(ConstantsForTests.CALTRAIN_GTFS.getAbsolutePath());
+    var target = ConstantsForTests.CALTRAIN_GTFS;
     CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
 
     // When: delete entry is not implemented
