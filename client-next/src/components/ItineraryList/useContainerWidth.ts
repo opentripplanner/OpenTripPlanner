@@ -22,7 +22,7 @@ export function useContainerWidth() {
     return () => {
       window.removeEventListener('resize', listener);
     };
-  }, [containerRef.current]);
+  }, []);
 
   return { containerRef, containerWidth };
 }

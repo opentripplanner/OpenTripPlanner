@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { graphql } from '../gql';
 import request from 'graphql-request';
-import { TripQuery, TripQueryVariables } from '../gql/graphql.ts';
+import { QueryType, TripQueryVariables } from '../gql/graphql.ts';
 
 // TODO: make this endpoint url configurable
 const endpoint = `https://api.entur.io/journey-planner/v3/graphql`;
@@ -16,10 +16,8 @@ const query = graphql(`
       tripPatterns {
         aimedStartTime
         aimedEndTime
-
         expectedEndTime
         expectedStartTime
-
         duration
         distance
         legs {
@@ -35,13 +33,13 @@ const query = graphql(`
   }
 `);
 
-type TripQueryHook = (variables?: TripQueryVariables) => [TripQuery | null, () => Promise<void>];
+type TripQueryHook = (variables?: TripQueryVariables) => [QueryType | null, () => Promise<void>];
 
 export const useTripQuery: TripQueryHook = (variables) => {
-  const [data, setData] = useState<TripQuery | null>(null);
+  const [data, setData] = useState<QueryType | null>(null);
   const callback = useCallback(async () => {
     if (variables) {
-      setData(await request(endpoint, query, variables));
+      setData((await request(endpoint, query, variables)) as QueryType);
     } else {
       console.warn("Can't search without variables");
     }

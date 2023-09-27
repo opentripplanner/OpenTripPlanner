@@ -1,42 +1,12 @@
-import { TripQuery } from '../../gql/graphql.ts';
+import { QueryType } from '../../gql/graphql.ts';
 import { Accordion } from 'react-bootstrap';
-import { useMemo } from 'react';
 import { useContainerWidth } from './useContainerWidth.ts';
 import { ItineraryHeaderContent } from './ItineraryHeaderContent.tsx';
+import { useEarliestAndLatestTimes } from './useEarliestAndLatestTimes.ts';
 
 // TODO itinerary (accordion) selection should propagate to map view
-export function ItineraryListContainer({
-  tripQueryResult, //selectedTripPatternIndex,
-  //setSelectedTripPatternIndex,
-}: {
-  tripQueryResult: TripQuery | null;
-  //selectedTripPatternIndex: number;
-  //setSelectedTripPatternIndex: (selectedTripPatternIndex: number) => void;
-}) {
-  const earliestStartTime = useMemo(() => {
-    return (
-      tripQueryResult?.trip.tripPatterns.reduce((acc, current) => {
-        if (acc === null) {
-          return current?.expectedStartTime;
-        } else {
-          return new Date(current?.expectedStartTime) < new Date(acc) ? current.expectedStartTime : acc;
-        }
-      }, null) || null
-    );
-  }, [tripQueryResult?.trip]);
-
-  const latestEndTime = useMemo<string | null>(() => {
-    return (
-      tripQueryResult?.trip.tripPatterns.reduce((acc, current) => {
-        if (acc === null) {
-          return current?.expectedEndTime;
-        } else {
-          return new Date(current?.expectedEndTime) > new Date(acc) ? current.expectedEndTime : acc;
-        }
-      }, null) || null
-    );
-  }, [tripQueryResult?.trip]);
-
+export function ItineraryListContainer({ tripQueryResult }: { tripQueryResult: QueryType | null }) {
+  const [earliestStartTime, latestEndTime] = useEarliestAndLatestTimes(tripQueryResult);
   const { containerRef, containerWidth } = useContainerWidth();
 
   return (
