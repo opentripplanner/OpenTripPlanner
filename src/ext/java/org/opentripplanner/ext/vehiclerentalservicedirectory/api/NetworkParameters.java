@@ -7,7 +7,7 @@ import org.opentripplanner.updater.vehicle_rental.datasources.params.GbfsVehicle
  * <p>
  * The {@link GbfsVehicleRentalDataSourceParameters} support  {@code overloadingAllowed} and
  * {@code allowKeepingRentedVehicleAtDestination} is not included here since they are not part of
- * the GBFS specification. I there is a demand for these, they can be added.
+ * the GBFS specification. If there is a demand for these, they can be added.
  * <p>
  * @param network The network name
  * @param geofencingZones enable geofencingZones for the given network

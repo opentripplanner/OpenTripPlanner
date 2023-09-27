@@ -2,7 +2,7 @@
 
 This adds support for the GBFS service directory endpoint component located
 at https://github.com/entur/lamassu. OTP use the service directory to lookup and connect to all GBFS
-endpoints registered in the directory. This simplify the management of the GBFS endpoints, since
+endpoints registered in the directory. This simplifies the management of the GBFS endpoints, since
 multiple services/components like OTP can connect to the directory and get the necessary
 configuration from it.
 
