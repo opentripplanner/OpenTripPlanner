@@ -13,7 +13,7 @@ import java.net.URL;
  */
 public class ResourceLoader {
 
-  final Class<?> clazz;
+  private final Class<?> clazz;
 
   private ResourceLoader(Class<?> clazz) {
     this.clazz = clazz;
@@ -33,7 +33,7 @@ public class ResourceLoader {
   public File file(String path) {
     URL resource = url(path);
     var file = new File(resource.getFile());
-    assertTrue(file.exists(), "File %s not found on file system".formatted(file.getAbsolutePath()));
+    assertTrue(file.exists(), "File '%s' not found on file system.".formatted(file.getAbsolutePath()));
     return file;
   }
 

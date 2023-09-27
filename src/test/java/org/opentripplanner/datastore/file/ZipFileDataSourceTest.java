@@ -125,22 +125,19 @@ public class ZipFileDataSourceTest {
   @Test
   public void testEntryEncoding() {
     // has worked before #4835, for verification remove the attempt to set to code page to cp437
-    File target = UMLAUT_UTF8_ZIP;
-    CompositeDataSource subject = new ZipFileDataSource(target, GTFS);
+    CompositeDataSource subject = new ZipFileDataSource(UMLAUT_UTF8_ZIP, GTFS);
     DataSource entry = subject.content().iterator().next();
 
     assertEquals(UMLAUT_TXT, entry.name());
 
     // has worked before #4835, for verification remove the attempt to set to code page to cp437
-    target = UMLAUT_UTF8_ZIP_NO_EFS;
-    subject = new ZipFileDataSource(target, GTFS);
+    subject = new ZipFileDataSource(UMLAUT_UTF8_ZIP_NO_EFS, GTFS);
     entry = subject.content().iterator().next();
 
     assertEquals(UMLAUT_TXT, entry.name());
 
     // only works after #4835, will fail with "Invalid CEN header (bad entry name)" when verifying
-    target = UMLAUT_CP437_ZIP;
-    subject = new ZipFileDataSource(target, GTFS);
+    subject = new ZipFileDataSource(UMLAUT_CP437_ZIP, GTFS);
     entry = subject.content().iterator().next();
 
     assertEquals(UMLAUT_TXT, entry.name());
