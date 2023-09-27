@@ -306,12 +306,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
 
-    File file = new File(
-      URLDecoder.decode(
-        getClass().getResource("noaccess-at-end.pbf").getFile(),
-        StandardCharsets.UTF_8
-      )
-    );
+    File file = RES.file("accessno-at-end.pbf");
     OsmProvider provider = new OsmProvider(file, false);
     OsmModule loader = OsmModule.of(provider, graph).build();
     loader.buildGraph();
