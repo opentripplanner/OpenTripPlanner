@@ -4,6 +4,7 @@ import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import java.util.Set;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
+import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMWay extends OSMWithTags {
@@ -205,5 +206,9 @@ public class OSMWay extends OSMWithTags {
   @Override
   public String url() {
     return String.format("https://www.openstreetmap.org/way/%d", getId());
+  }
+
+  public boolean slopeOverride() {
+    return getOsmProvider().getWayPropertySet().getSlopeOverride(this);
   }
 }

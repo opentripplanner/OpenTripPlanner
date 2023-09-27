@@ -8,6 +8,7 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTR
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.SpeedPicker;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
@@ -32,34 +33,34 @@ public class DefaultMapperTest {
    */
   @Test
   public void testCarSpeeds() {
-    OSMWithTags way;
+    OSMWay way;
 
-    way = new OSMWithTags();
+    way = new OSMWay();
     way.addTag("maxspeed", "60");
     assertTrue(within(kmhAsMs(60), wps.getCarSpeedForWay(way, false), epsilon));
     assertTrue(within(kmhAsMs(60), wps.getCarSpeedForWay(way, true), epsilon));
 
-    way = new OSMWithTags();
+    way = new OSMWay();
     way.addTag("maxspeed:forward", "80");
     way.addTag("maxspeed:backward", "20");
     way.addTag("maxspeed", "40");
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, false), epsilon));
     assertTrue(within(kmhAsMs(20), wps.getCarSpeedForWay(way, true), epsilon));
 
-    way = new OSMWithTags();
+    way = new OSMWay();
     way.addTag("maxspeed", "40");
     way.addTag("maxspeed:lanes", "60|80|40");
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, false), epsilon));
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, true), epsilon));
 
-    way = new OSMWithTags();
+    way = new OSMWay();
     way.addTag("maxspeed", "20");
     way.addTag("maxspeed:motorcar", "80");
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, false), epsilon));
     assertTrue(within(kmhAsMs(80), wps.getCarSpeedForWay(way, true), epsilon));
 
     // test with english units
-    way = new OSMWithTags();
+    way = new OSMWay();
     way.addTag("maxspeed", "35 mph");
     assertTrue(within(kmhAsMs(35 * 1.609f), wps.getCarSpeedForWay(way, false), epsilon));
     assertTrue(within(kmhAsMs(35 * 1.609f), wps.getCarSpeedForWay(way, true), epsilon));
@@ -71,7 +72,7 @@ public class DefaultMapperTest {
     wps.addSpeedPicker(getSpeedPicker("surface=gravel", kmhAsMs(10)));
     wps.defaultSpeed = kmhAsMs(25);
 
-    way = new OSMWithTags();
+    way = new OSMWay();
 
     // test default speeds
     assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, false), epsilon));
@@ -81,18 +82,18 @@ public class DefaultMapperTest {
     assertTrue(within(kmhAsMs(35), wps.getCarSpeedForWay(way, false), epsilon));
     assertTrue(within(kmhAsMs(35), wps.getCarSpeedForWay(way, true), epsilon));
 
-    way = new OSMWithTags();
+    way = new OSMWay();
     way.addTag("surface", "gravel");
     assertTrue(within(kmhAsMs(10), wps.getCarSpeedForWay(way, false), epsilon));
     assertTrue(within(kmhAsMs(10), wps.getCarSpeedForWay(way, true), epsilon));
 
-    way = new OSMWithTags();
+    way = new OSMWay();
     way.addTag("highway", "motorway");
     assertTrue(within(kmhAsMs(100), wps.getCarSpeedForWay(way, false), epsilon));
     assertTrue(within(kmhAsMs(100), wps.getCarSpeedForWay(way, true), epsilon));
 
     // make sure that 0-speed ways can't exist
-    way = new OSMWithTags();
+    way = new OSMWay();
     way.addTag("maxspeed", "0");
     assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, false), epsilon));
     assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, true), epsilon));

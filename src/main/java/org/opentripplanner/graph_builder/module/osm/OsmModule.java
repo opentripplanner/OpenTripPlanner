@@ -247,7 +247,7 @@ public class OsmModule implements GraphBuilderModule {
     var escalatorProcessor = new EscalatorProcessor(vertexGenerator.intersectionNodes());
 
     WAY:for (OSMWay way : osmdb.getWays()) {
-      WayProperties wayData = way.getOsmProvider().getWayPropertySet().getDataForWay(way);
+      WayProperties wayData = way.wayProperties();
       setWayName(way);
 
       var permissions = wayData.getPermission();
@@ -409,7 +409,7 @@ public class OsmModule implements GraphBuilderModule {
 
   private void setWayName(OSMWithTags way) {
     if (!way.hasTag("name")) {
-      I18NString creativeName = way.getOsmProvider().getWayPropertySet().getCreativeNameForWay(way);
+      I18NString creativeName = way.creativeName();
       if (creativeName != null) {
         way.setCreativeName(creativeName);
       }
@@ -520,7 +520,7 @@ public class OsmModule implements GraphBuilderModule {
     String label = "way " + way.getId() + " from " + index;
     label = label.intern();
     I18NString name = params.edgeNamer().getNameForWay(way, label);
-    float carSpeed = way.getOsmProvider().getOsmTagMapper().getCarSpeedForWay(way, back);
+    float carSpeed = way.carSpeed(back);
 
     StreetEdgeBuilder<?> seb = new StreetEdgeBuilder<>()
       .withFromVertex(startEndpoint)
@@ -533,7 +533,7 @@ public class OsmModule implements GraphBuilderModule {
       .withCarSpeed(carSpeed)
       .withLink(way.isLink())
       .withRoundabout(way.isRoundabout())
-      .withSlopeOverride(way.getOsmProvider().getWayPropertySet().getSlopeOverride(way))
+      .withSlopeOverride(way.slopeOverride())
       .withStairs(way.isSteps())
       .withWheelchairAccessible(way.isWheelchairAccessible());
 

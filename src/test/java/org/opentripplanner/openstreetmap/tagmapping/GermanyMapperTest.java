@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.WayPropertySet;
 import org.opentripplanner.street.model.StreetTraversalPermission;
@@ -266,7 +267,7 @@ public class GermanyMapperTest {
   @Test
   void testGermanAutobahnSpeed() {
     // https://www.openstreetmap.org/way/10879847
-    var alzentalstr = new OSMWithTags();
+    var alzentalstr = new OSMWay();
     alzentalstr.addTag("highway", "residential");
     alzentalstr.addTag("lit", "yes");
     alzentalstr.addTag("maxspeed", "30");
@@ -274,7 +275,7 @@ public class GermanyMapperTest {
     alzentalstr.addTag("surface", "asphalt");
     assertEquals(8.33333969116211, wps.getCarSpeedForWay(alzentalstr, false), epsilon);
 
-    var autobahn = new OSMWithTags();
+    var autobahn = new OSMWay();
     autobahn.addTag("highway", "motorway");
     autobahn.addTag("maxspeed", "none");
     assertEquals(33.33000183105469, wps.getCarSpeedForWay(autobahn, false), epsilon);

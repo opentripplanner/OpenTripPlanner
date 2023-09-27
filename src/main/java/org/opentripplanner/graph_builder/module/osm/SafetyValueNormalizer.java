@@ -5,7 +5,6 @@ import java.util.Set;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.openstreetmap.tagmapping.OsmTagMapper;
 import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
@@ -79,15 +78,11 @@ class SafetyValueNormalizer {
     WayProperties wayData,
     OSMWithTags way
   ) {
-    OsmTagMapper tagMapperForWay = way.getOsmProvider().getOsmTagMapper();
+    Set<StreetNoteAndMatcher> notes = way.notes();
 
-    Set<StreetNoteAndMatcher> notes = way.getOsmProvider().getWayPropertySet().getNoteForWay(way);
-
-    boolean motorVehicleNoThrough = tagMapperForWay.isMotorVehicleThroughTrafficExplicitlyDisallowed(
-      way
-    );
-    boolean bicycleNoThrough = tagMapperForWay.isBicycleNoThroughTrafficExplicitlyDisallowed(way);
-    boolean walkNoThrough = tagMapperForWay.isWalkNoThroughTrafficExplicitlyDisallowed(way);
+    boolean motorVehicleNoThrough = way.isMotorVehicleThroughTrafficExplicitlyDisallowed();
+    boolean bicycleNoThrough = way.isBicycleNoThroughTrafficExplicitlyDisallowed();
+    boolean walkNoThrough = way.isWalkNoThroughTrafficExplicitlyDisallowed();
 
     if (street != null) {
       double bicycleSafety = wayData.bicycleSafety().forward();

@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.functional.FunctionUtils.TriFunction;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.BestMatchSpecifier;
 import org.opentripplanner.openstreetmap.wayproperty.specifier.OsmSpecifier;

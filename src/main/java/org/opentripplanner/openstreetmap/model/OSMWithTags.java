@@ -1,5 +1,6 @@
 package org.opentripplanner.openstreetmap.model;
 
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,7 +20,9 @@ import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.openstreetmap.OsmProvider;
+import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.street.model.StreetTraversalPermission;
+import org.opentripplanner.street.model.note.StreetNoteAndMatcher;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
 /**
@@ -161,6 +164,40 @@ public class OSMWithTags {
    */
   public boolean isBicycleDismountForced() {
     return isTag("bicycle", "dismount");
+  }
+
+  public ZoneId zoneId() {
+    return getOsmProvider().getZoneId();
+  }
+
+  public I18NString creativeName() {
+    return getOsmProvider().getWayPropertySet().getCreativeNameForWay(this);
+  }
+
+  public Set<StreetNoteAndMatcher> notes() {
+    return getOsmProvider().getWayPropertySet().getNoteForWay(this);
+  }
+
+  public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed() {
+    return getOsmProvider()
+      .getOsmTagMapper()
+      .isMotorVehicleThroughTrafficExplicitlyDisallowed(this);
+  }
+
+  public boolean isBicycleNoThroughTrafficExplicitlyDisallowed() {
+    return getOsmProvider().getOsmTagMapper().isBicycleNoThroughTrafficExplicitlyDisallowed(this);
+  }
+
+  public boolean isWalkNoThroughTrafficExplicitlyDisallowed() {
+    return getOsmProvider().getOsmTagMapper().isWalkNoThroughTrafficExplicitlyDisallowed(this);
+  }
+
+  public float carSpeed(boolean backward) {
+    return getOsmProvider().getWayPropertySet().getCarSpeedForWay(this, backward);
+  }
+
+  public WayProperties wayProperties() {
+    return getOsmProvider().getWayPropertySet().getDataForWay(this);
   }
 
   protected boolean doesTagAllowAccess(String tag) {
@@ -524,7 +561,7 @@ public class OSMWithTags {
       .collect(Collectors.toUnmodifiableSet());
   }
 
-  public OsmProvider getOsmProvider() {
+  protected OsmProvider getOsmProvider() {
     return osmProvider;
   }
 

@@ -133,7 +133,7 @@ class ParkingProcessor {
   private OHCalendar parseOpeningHours(OSMWithTags entity) {
     final var openingHoursTag = entity.getTag("opening_hours");
     if (openingHoursTag != null) {
-      final ZoneId zoneId = entity.getOsmProvider().getZoneId();
+      final ZoneId zoneId = entity.zoneId();
       final var id = entity.getId();
       final var link = entity.url();
       try {
@@ -401,8 +401,7 @@ class ParkingProcessor {
     I18NString creativeName = osmWithTags.getAssumedName();
     if (creativeName == null) {
       // ... otherwise resort to "CreativeNamer"s
-      creativeName =
-        osmWithTags.getOsmProvider().getWayPropertySet().getCreativeNameForWay(osmWithTags);
+      creativeName = osmWithTags.creativeName();
     }
     if (creativeName == null) {
       creativeName =

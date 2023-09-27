@@ -503,10 +503,7 @@ public class WalkableAreaBuilder {
         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
       );
 
-      float carSpeed = areaEntity
-        .getOsmProvider()
-        .getWayPropertySet()
-        .getCarSpeedForWay(areaEntity, false);
+      float carSpeed = areaEntity.carSpeed(false);
 
       double length = SphericalDistanceLibrary.distance(
         startEndpoint.getCoordinate(),
@@ -570,10 +567,7 @@ public class WalkableAreaBuilder {
       backStreetEdgeBuilder.withLink(areaEntity.isLink());
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
-        WayProperties wayData = areaEntity
-          .getOsmProvider()
-          .getWayPropertySet()
-          .getDataForWay(areaEntity);
+        WayProperties wayData = areaEntity.wayProperties();
         wayPropertiesCache.put(areaEntity, wayData);
       }
 
@@ -651,10 +645,7 @@ public class WalkableAreaBuilder {
       namedArea.setName(name);
 
       if (!wayPropertiesCache.containsKey(areaEntity)) {
-        WayProperties wayData = areaEntity
-          .getOsmProvider()
-          .getWayPropertySet()
-          .getDataForWay(areaEntity);
+        WayProperties wayData = areaEntity.wayProperties();
         wayPropertiesCache.put(areaEntity, wayData);
       }
 

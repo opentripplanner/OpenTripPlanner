@@ -949,7 +949,7 @@ public class OsmDatabase {
             relation.getTag("day_off"),
             relation.getTag("hour_on"),
             relation.getTag("hour_off"),
-            relation.getOsmProvider()::getZoneId
+            relation::zoneId
           );
       } catch (NumberFormatException e) {
         LOG.info("Unparseable turn restriction: {}", relation.getId());

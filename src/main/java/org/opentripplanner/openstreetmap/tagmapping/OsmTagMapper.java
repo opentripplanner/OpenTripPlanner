@@ -23,7 +23,7 @@ public interface OsmTagMapper {
   }
 
   default float getCarSpeedForWay(OSMWithTags way, boolean backward) {
-    return way.getOsmProvider().getWayPropertySet().getCarSpeedForWay(way, backward);
+    return way.carSpeed(backward);
   }
 
   default boolean isGeneralNoThroughTraffic(OSMWithTags way) {
