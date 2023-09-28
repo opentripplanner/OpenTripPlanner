@@ -79,7 +79,7 @@ public class HslHubsDownloader {
 
     JsonNode rootNode = mapper.readTree(hubsString);
 
-    if (!jsonParsePath.equals("")) {
+    if (!jsonParsePath.isEmpty()) {
       String delimiter = "/";
       String[] parseElement = jsonParsePath.split(delimiter);
       for (String s : parseElement) {

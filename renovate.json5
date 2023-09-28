@@ -87,7 +87,9 @@
         "org.apache.maven.plugins:maven-gpg-plugin",
         "org.apache.maven.plugins:maven-source-plugin",
         "io.github.git-commit-id:git-commit-id-maven-plugin",
-        "com.hubspot.maven.plugins:prettier-maven-plugin"
+        "com.hubspot.maven.plugins:prettier-maven-plugin",
+        "com.google.cloud.tools:jib-maven-plugin",
+        "org.apache.maven.plugins:maven-shade-plugin"
       ],
       "matchPackagePrefixes": [
         "org.junit.jupiter:",

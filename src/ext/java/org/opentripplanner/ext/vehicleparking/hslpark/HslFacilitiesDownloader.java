@@ -86,7 +86,7 @@ public class HslFacilitiesDownloader {
 
     JsonNode rootNode = mapper.readTree(facilitiesString);
 
-    if (!jsonParsePath.equals("")) {
+    if (!jsonParsePath.isEmpty()) {
       String delimiter = "/";
       String[] parseElement = jsonParsePath.split(delimiter);
       for (String s : parseElement) {
