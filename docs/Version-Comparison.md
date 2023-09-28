@@ -126,7 +126,7 @@ OTP2 to simplify the code base and make it easier to reason about security.
 Less parameters are available on the OTP2 REST API than in OTP1. Often there is no practical loss of
 functionality, just a different way of expressing things due to the new routing algorithms. A
 summary of parameters that have been removed and their replacements can be found in the [migration
-guide](Version-Comparison.md#Migration guide)
+guide](Version-Comparison.md#migration-guide)
 
 ## OTP Trip planning and Transit index APIs
 
