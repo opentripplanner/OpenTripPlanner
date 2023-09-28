@@ -43,8 +43,7 @@ public class OSMNode extends OSMWithTags {
    * @return true if it is
    */
   public boolean isMotorVehicleBarrier() {
-    var barrier = this.getTag("barrier");
-    return barrier != null && MOTOR_VEHICLE_BARRIERS.contains(barrier);
+    return isOneOfTags("barrier", MOTOR_VEHICLE_BARRIERS);
   }
 
   /**
