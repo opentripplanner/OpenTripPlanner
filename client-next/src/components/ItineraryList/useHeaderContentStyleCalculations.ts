@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { TripPattern } from '../../gql/graphql.ts';
 
-const CONTAINER_WIDTH_PADDING = 90;
+const CONTAINER_WIDTH_PADDING = 70;
 const START_PX_PADDING = 20;
 
-export const TIME_WIDTH = 40;
+// Width of time box
+export const TIME_BOX_WIDTH = 40;
 
 export function useHeaderContentStyleCalculations(
   tripPattern: TripPattern,
@@ -27,13 +28,16 @@ export function useHeaderContentStyleCalculations(
     [tripPattern.expectedStartTime, tripPattern.expectedEndTime],
   );
 
-  const startPx = START_PX_PADDING + TIME_WIDTH;
-  const endPx = containerWidth - CONTAINER_WIDTH_PADDING - TIME_WIDTH;
+  const startPx = START_PX_PADDING + TIME_BOX_WIDTH;
+  const endPx = containerWidth - CONTAINER_WIDTH_PADDING - TIME_BOX_WIDTH;
   const pxSpan = endPx - startPx;
   const leftPx = startPx + startPct * pxSpan;
   const widthPx = pxSpan * (itinSpan / maxSpan);
 
   return {
+    maxSpan,
+    startPx,
+    pxSpan,
     widthPx,
     leftPx,
   };

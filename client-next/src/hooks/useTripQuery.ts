@@ -23,7 +23,13 @@ const query = graphql(`
         legs {
           id
           mode
-
+          aimedStartTime
+          aimedEndTime
+          expectedEndTime
+          expectedStartTime
+          line {
+            publicCode
+          }
           pointsOnLink {
             points
           }

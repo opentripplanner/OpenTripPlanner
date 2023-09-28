@@ -1,5 +1,6 @@
 import { TripPattern } from '../../gql/graphql.ts';
-import { TIME_WIDTH, useHeaderContentStyleCalculations } from './useHeaderContentStyleCalculations.ts';
+import { TIME_BOX_WIDTH, useHeaderContentStyleCalculations } from './useHeaderContentStyleCalculations.ts';
+import { ItineraryHeaderLegContent } from './ItineraryHeaderLegContent.tsx';
 
 export function ItineraryHeaderContent({
   tripPattern,
@@ -14,7 +15,7 @@ export function ItineraryHeaderContent({
   earliestStartTime: string | null;
   latestEndTime: string | null;
 }) {
-  const { widthPx, leftPx } = useHeaderContentStyleCalculations(
+  const { maxSpan, pxSpan, startPx, widthPx, leftPx } = useHeaderContentStyleCalculations(
     tripPattern,
     containerWidth,
     earliestStartTime,
@@ -37,9 +38,15 @@ export function ItineraryHeaderContent({
       <div
         style={{
           position: 'absolute',
-          left: `${leftPx - TIME_WIDTH}px`,
+          left: `${leftPx - TIME_BOX_WIDTH}px`,
           background: 'black',
           color: 'white',
+          fontSize: '12px',
+          width: '38px',
+          height: '15px',
+          textAlign: 'center',
+          top: 2,
+          padding: 1,
         }}
       >
         {new Date(tripPattern.expectedStartTime).toLocaleTimeString('en-US', {
@@ -48,12 +55,28 @@ export function ItineraryHeaderContent({
         })}
       </div>
 
+      {tripPattern.legs.map((leg) => (
+        <ItineraryHeaderLegContent
+          leg={leg}
+          earliestStartTime={earliestStartTime}
+          startPx={startPx}
+          maxSpan={maxSpan}
+          pxSpan={pxSpan}
+        />
+      ))}
+
       <div
         style={{
           position: 'absolute',
           left: `${leftPx + widthPx + 2}px`,
           background: 'black',
           color: 'white',
+          fontSize: '12px',
+          width: '38px',
+          height: '15px',
+          textAlign: 'center',
+          top: 2,
+          padding: 1,
         }}
       >
         {new Date(tripPattern.expectedEndTime).toLocaleTimeString('en-US', {
