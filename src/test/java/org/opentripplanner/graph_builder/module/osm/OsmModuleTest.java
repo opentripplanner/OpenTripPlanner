@@ -37,6 +37,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -304,17 +305,16 @@ public class OsmModuleTest {
   }
 
   /**
-   * Test that a barrier vertex created when street ends to an access restriction
-   * will not prevent routing to that vertex
+   * Test that a barrier vertex at ending street will get no access limit
    */
   @Test
-  private void testBarrierAtEnd() {
+  void testBarrierAtEnd() {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
 
     File file = new File(
       URLDecoder.decode(
-        getClass().getResource("noaccess-at-end.pbf").getFile(),
+        getClass().getResource("accessno-at-end.pbf").getFile(),
         StandardCharsets.UTF_8
       )
     );
@@ -322,20 +322,16 @@ public class OsmModuleTest {
     OsmModule loader = OsmModule.of(provider, graph).build();
     loader.buildGraph();
 
-    RouteRequest request = new RouteRequest();
-
-    // Route along a simple 3 vertex highway which ends to a 'access=none' node
     Vertex start = graph.getVertex(VertexLabel.osm(1));
     Vertex end = graph.getVertex(VertexLabel.osm(3));
 
-    GraphPathFinder graphPathFinder = new GraphPathFinder(null);
-    List<GraphPath<State, Edge, Vertex>> pathList = graphPathFinder.graphPathFinderEntryPoint(
-      request,
-      Set.of(start),
-      Set.of(end)
-    );
-    assertNotNull(pathList);
-    assertFalse(pathList.isEmpty());
+    assertNotNull(start);
+    assertNotNull(end);
+    assertEquals(end.getClass(), BarrierVertex.class);
+    var barrier = (BarrierVertex) end;
+
+    // assert that pruning removed traversal restrictions
+    assertEquals(barrier.getBarrierPermissions(), ALL);
   }
 
   @Nonnull
