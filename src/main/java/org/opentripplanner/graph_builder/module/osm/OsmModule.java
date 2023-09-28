@@ -85,7 +85,7 @@ public class OsmModule implements GraphBuilderModule {
       LOG.info("Gathering OSM from provider: {}", provider);
       LOG.info(
         "Using OSM way configuration from {}.",
-        provider.getOsmTagMapper().getClass().getSimpleName()
+        provider.tagMapper().getClass().getSimpleName()
       );
       provider.readOSM(osmdb);
     }

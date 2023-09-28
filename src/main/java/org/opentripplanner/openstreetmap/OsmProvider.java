@@ -140,11 +140,11 @@ public class OsmProvider {
     return zoneId;
   }
 
-  public OsmTagMapper getOsmTagMapper() {
+  public OsmTagMapper tagMapper() {
     return osmTagMapper;
   }
 
-  public WayPropertySet getWayPropertySet() {
+  public WayPropertySet wayPropertySet() {
     return wayPropertySet;
   }
 }

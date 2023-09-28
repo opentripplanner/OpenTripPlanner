@@ -4,7 +4,6 @@ import gnu.trove.list.TLongList;
 import gnu.trove.list.array.TLongArrayList;
 import java.util.Set;
 import org.opentripplanner.graph_builder.module.osm.StreetTraversalPermissionPair;
-import org.opentripplanner.openstreetmap.wayproperty.WayProperties;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMWay extends OSMWithTags {
@@ -209,6 +208,6 @@ public class OSMWay extends OSMWithTags {
   }
 
   public boolean slopeOverride() {
-    return getOsmProvider().getWayPropertySet().getSlopeOverride(this);
+    return osmProvider().wayPropertySet().getSlopeOverride(this);
   }
 }

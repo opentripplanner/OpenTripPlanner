@@ -167,37 +167,35 @@ public class OSMWithTags {
   }
 
   public ZoneId zoneId() {
-    return getOsmProvider().getZoneId();
+    return osmProvider().getZoneId();
   }
 
   public I18NString creativeName() {
-    return getOsmProvider().getWayPropertySet().getCreativeNameForWay(this);
+    return osmProvider().wayPropertySet().getCreativeNameForWay(this);
   }
 
   public Set<StreetNoteAndMatcher> notes() {
-    return getOsmProvider().getWayPropertySet().getNoteForWay(this);
+    return osmProvider().wayPropertySet().getNoteForWay(this);
   }
 
   public boolean isMotorVehicleThroughTrafficExplicitlyDisallowed() {
-    return getOsmProvider()
-      .getOsmTagMapper()
-      .isMotorVehicleThroughTrafficExplicitlyDisallowed(this);
+    return osmProvider().tagMapper().isMotorVehicleThroughTrafficExplicitlyDisallowed(this);
   }
 
   public boolean isBicycleNoThroughTrafficExplicitlyDisallowed() {
-    return getOsmProvider().getOsmTagMapper().isBicycleNoThroughTrafficExplicitlyDisallowed(this);
+    return osmProvider().tagMapper().isBicycleNoThroughTrafficExplicitlyDisallowed(this);
   }
 
   public boolean isWalkNoThroughTrafficExplicitlyDisallowed() {
-    return getOsmProvider().getOsmTagMapper().isWalkNoThroughTrafficExplicitlyDisallowed(this);
+    return osmProvider().tagMapper().isWalkNoThroughTrafficExplicitlyDisallowed(this);
   }
 
   public float carSpeed(boolean backward) {
-    return getOsmProvider().getWayPropertySet().getCarSpeedForWay(this, backward);
+    return osmProvider().wayPropertySet().getCarSpeedForWay(this, backward);
   }
 
   public WayProperties wayProperties() {
-    return getOsmProvider().getWayPropertySet().getDataForWay(this);
+    return osmProvider().wayPropertySet().getDataForWay(this);
   }
 
   protected boolean doesTagAllowAccess(String tag) {
@@ -561,11 +559,11 @@ public class OSMWithTags {
       .collect(Collectors.toUnmodifiableSet());
   }
 
-  protected OsmProvider getOsmProvider() {
+  protected OsmProvider osmProvider() {
     return osmProvider;
   }
 
-  public void setOsmProvider(OsmProvider provider) {
+  public void withOsmProvider(OsmProvider provider) {
     this.osmProvider = provider;
   }
 

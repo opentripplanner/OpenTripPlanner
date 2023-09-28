@@ -65,7 +65,7 @@ class OpenStreetMapParser extends BinaryParser {
     for (Osmformat.Relation i : rels) {
       OSMRelation tmp = new OSMRelation();
       tmp.setId(i.getId());
-      tmp.setOsmProvider(provider);
+      tmp.withOsmProvider(provider);
 
       for (int j = 0; j < i.getKeysCount(); j++) {
         OSMTag tag = new OSMTag();
@@ -124,7 +124,7 @@ class OpenStreetMapParser extends BinaryParser {
       double latf = parseLat(lat), lonf = parseLon(lon);
 
       tmp.setId(id);
-      tmp.setOsmProvider(provider);
+      tmp.withOsmProvider(provider);
       tmp.lat = latf;
       tmp.lon = lonf;
 
@@ -157,7 +157,7 @@ class OpenStreetMapParser extends BinaryParser {
     for (Osmformat.Node i : nodes) {
       OSMNode tmp = new OSMNode();
       tmp.setId(i.getId());
-      tmp.setOsmProvider(provider);
+      tmp.withOsmProvider(provider);
       tmp.lat = parseLat(i.getLat());
       tmp.lon = parseLon(i.getLon());
 
@@ -184,7 +184,7 @@ class OpenStreetMapParser extends BinaryParser {
     for (Osmformat.Way i : ways) {
       OSMWay tmp = new OSMWay();
       tmp.setId(i.getId());
-      tmp.setOsmProvider(provider);
+      tmp.withOsmProvider(provider);
 
       for (int j = 0; j < i.getKeysCount(); j++) {
         OSMTag tag = new OSMTag();
