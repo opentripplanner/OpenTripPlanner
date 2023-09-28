@@ -1,10 +1,14 @@
 package org.opentripplanner.service.realtimevehicles.internal;
 
+import static org.opentripplanner.transit.model.timetable.OccupancyStatus.NO_DATA_AVAILABLE;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.Nonnull;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
@@ -46,8 +50,9 @@ public class DefaultRealtimeVehicleService
       .getOrDefault(pattern, List.of())
       .stream()
       .filter(vehicle -> tripId.equals(vehicle.trip().getId()))
-      .max(Comparator.comparing(vehicle -> vehicle.time()))
+      .max(Comparator.comparing(vehicle -> vehicle.time().orElse(Instant.MIN)))
       .map(vehicle -> vehicle.occupancyStatus())
-      .orElse(OccupancyStatus.NO_DATA_AVAILABLE);
+      .orElse(Optional.empty())
+      .orElse(NO_DATA_AVAILABLE);
   }
 }

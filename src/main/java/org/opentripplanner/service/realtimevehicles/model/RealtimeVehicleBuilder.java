@@ -1,9 +1,7 @@
 package org.opentripplanner.service.realtimevehicles.model;
 
 import java.time.Instant;
-import java.util.Optional;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
-import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -23,9 +21,17 @@ public class RealtimeVehicleBuilder {
   private Trip trip;
   private OccupancyStatus occupancyStatus;
 
+  public FeedScopedId vehicleId() {
+    return vehicleId;
+  }
+
   public RealtimeVehicleBuilder withVehicleId(FeedScopedId vehicleId) {
     this.vehicleId = vehicleId;
     return this;
+  }
+
+  public String label() {
+    return label;
   }
 
   public RealtimeVehicleBuilder withLabel(String label) {
@@ -33,9 +39,17 @@ public class RealtimeVehicleBuilder {
     return this;
   }
 
+  public WgsCoordinate coordinates() {
+    return coordinates;
+  }
+
   public RealtimeVehicleBuilder withCoordinates(WgsCoordinate c) {
     this.coordinates = c;
     return this;
+  }
+
+  public Double speed() {
+    return speed;
   }
 
   public RealtimeVehicleBuilder withSpeed(double speed) {
@@ -43,9 +57,17 @@ public class RealtimeVehicleBuilder {
     return this;
   }
 
+  public Double heading() {
+    return heading;
+  }
+
   public RealtimeVehicleBuilder withHeading(double heading) {
     this.heading = heading;
     return this;
+  }
+
+  public Instant time() {
+    return time;
   }
 
   public RealtimeVehicleBuilder withTime(Instant time) {
@@ -53,9 +75,17 @@ public class RealtimeVehicleBuilder {
     return this;
   }
 
+  public StopStatus stopStatus() {
+    return stopStatus;
+  }
+
   public RealtimeVehicleBuilder withStopStatus(StopStatus stopStatus) {
     this.stopStatus = stopStatus;
     return this;
+  }
+
+  public StopLocation stop() {
+    return stop;
   }
 
   public RealtimeVehicleBuilder withStop(StopLocation stop) {
@@ -63,9 +93,17 @@ public class RealtimeVehicleBuilder {
     return this;
   }
 
+  public Trip trip() {
+    return trip;
+  }
+
   public RealtimeVehicleBuilder withTrip(Trip trip) {
     this.trip = trip;
     return this;
+  }
+
+  public OccupancyStatus occupancyStatus() {
+    return occupancyStatus;
   }
 
   public RealtimeVehicleBuilder withOccupancyStatus(OccupancyStatus occupancyStatus) {
@@ -74,20 +112,6 @@ public class RealtimeVehicleBuilder {
   }
 
   public RealtimeVehicle build() {
-    var stop = Optional
-      .ofNullable(this.stop)
-      .map(s -> new StopRelationship(s, stopStatus))
-      .orElse(null);
-    return new RealtimeVehicle(
-      vehicleId,
-      label,
-      coordinates,
-      speed,
-      heading,
-      time,
-      stop,
-      trip,
-      occupancyStatus
-    );
+    return new RealtimeVehicle(this);
   }
 }

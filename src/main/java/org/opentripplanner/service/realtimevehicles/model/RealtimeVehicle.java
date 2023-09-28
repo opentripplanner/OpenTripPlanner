@@ -1,6 +1,8 @@
 package org.opentripplanner.service.realtimevehicles.model;
 
 import java.time.Instant;
+import java.util.Optional;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -10,36 +12,94 @@ import org.opentripplanner.transit.model.timetable.Trip;
 /**
  * Internal model of a realtime vehicle.
  */
-public record RealtimeVehicle(
-  FeedScopedId vehicleId,
-  String label,
-  WgsCoordinate coordinates,
+public class RealtimeVehicle {
+
+  private final FeedScopedId vehicleId;
+
+  private final String label;
+
+  private final WgsCoordinate coordinates;
+
   /**
    * Speed in meters per second
    */
-  Double speed,
+  private final Double speed;
   /**
    * Bearing, in degrees, clockwise from North, i.e., 0 is North and 90 is East. This can be the
    * compass bearing, or the direction towards the next stop or intermediate location.
    */
-  Double heading,
+  private final Double heading;
 
   /**
    * When the realtime vehicle was recorded
    */
-  Instant time,
+  private final Instant time;
 
   /**
    * Status of the vehicle, ie. if approaching the next stop or if it is there already.
    */
-  StopRelationship stop,
-  Trip trip,
+  private final StopRelationship stop;
+
+  private final Trip trip;
 
   /**
    * How full the vehicle is and is it still accepting passengers.
    */
-  OccupancyStatus occupancyStatus
-) {
+  private final OccupancyStatus occupancyStatus;
+
+  RealtimeVehicle(RealtimeVehicleBuilder builder) {
+    var stopRelationship = Optional
+      .ofNullable(builder.stop())
+      .map(s -> new StopRelationship(s, builder.stopStatus()))
+      .orElse(null);
+    vehicleId = builder.vehicleId();
+    label = builder().label();
+    coordinates = builder.coordinates();
+    speed = builder().speed();
+    heading = builder().heading();
+    time = builder.time();
+    stop = stopRelationship;
+    trip = builder.trip();
+    occupancyStatus = builder.occupancyStatus();
+  }
+
+  public Optional<FeedScopedId> vehicleId() {
+    return Optional.ofNullable(vehicleId);
+  }
+
+  public Optional<String> label() {
+    return Optional.ofNullable(label);
+  }
+
+  public Optional<WgsCoordinate> coordinates() {
+    return Optional.ofNullable(coordinates);
+  }
+
+  public Optional<Double> speed() {
+    return Optional.ofNullable(speed);
+  }
+
+  public Optional<Double> heading() {
+    return Optional.ofNullable(heading);
+  }
+
+  public Optional<Instant> time() {
+    return Optional.ofNullable(time);
+  }
+
+  public Optional<StopRelationship> stop() {
+    return Optional.ofNullable(stop);
+  }
+
+  @Nonnull
+  public Trip trip() {
+    return trip;
+  }
+
+  public Optional<OccupancyStatus> occupancyStatus() {
+    return Optional.ofNullable(occupancyStatus);
+  }
+
   public static RealtimeVehicleBuilder builder() {
     return new RealtimeVehicleBuilder();
   }
