@@ -18,6 +18,7 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 public class TestServerContext {
 
@@ -30,6 +31,7 @@ public class TestServerContext {
   ) {
     transitModel.index();
     final RouterConfig routerConfig = RouterConfig.DEFAULT;
+    var transitService = new DefaultTransitService(transitModel);
     DefaultServerRequestContext context = DefaultServerRequestContext.create(
       routerConfig.transitTuningConfig(),
       routerConfig.routingRequestDefaults(),
@@ -39,7 +41,7 @@ public class TestServerContext {
       Metrics.globalRegistry,
       routerConfig.vectorTileLayers(),
       createWorldEnvelopeService(),
-      createRealtimeVehicleService(),
+      createRealtimeVehicleService(transitService),
       createVehicleRentalService(),
       routerConfig.flexConfig(),
       List.of(),
@@ -54,8 +56,8 @@ public class TestServerContext {
     return new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository());
   }
 
-  public static RealtimeVehicleService createRealtimeVehicleService() {
-    return new DefaultRealtimeVehicleService();
+  public static RealtimeVehicleService createRealtimeVehicleService(TransitService transitService) {
+    return new DefaultRealtimeVehicleService(transitService);
   }
 
   public static VehicleRentalService createVehicleRentalService() {

@@ -90,9 +90,11 @@ public class SpeedTest {
     this.testCaseDefinitions = tcIO.readTestCaseDefinitions();
     this.expectedResultsByTcId = tcIO.readExpectedResults();
 
+    var transitService = new DefaultTransitService(transitModel);
+
     UpdaterConfigurator.configure(
       graph,
-      new DefaultRealtimeVehicleService(),
+      new DefaultRealtimeVehicleService(transitService),
       new DefaultVehicleRentalService(),
       transitModel,
       config.updatersConfig
@@ -111,7 +113,7 @@ public class SpeedTest {
         timer.getRegistry(),
         List::of,
         TestServerContext.createWorldEnvelopeService(),
-        TestServerContext.createRealtimeVehicleService(),
+        TestServerContext.createRealtimeVehicleService(transitService),
         TestServerContext.createVehicleRentalService(),
         config.flexConfig,
         List.of(),

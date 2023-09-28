@@ -374,9 +374,8 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   public DataFetcher<TripOccupancy> occupancy() {
     return environment -> {
       Trip trip = getSource(environment);
-      TripPattern pattern = getTransitService(environment).getPatternForTrip(trip);
       return new TripOccupancy(
-        getRealtimeVehiclesService(environment).getVehicleOccupancyStatus(pattern, trip.getId())
+        getRealtimeVehiclesService(environment).getVehicleOccupancyStatus(trip)
       );
     };
   }

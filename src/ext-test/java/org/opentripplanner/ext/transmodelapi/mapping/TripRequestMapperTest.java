@@ -73,7 +73,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           Metrics.globalRegistry,
           RouterConfig.DEFAULT.vectorTileLayers(),
           new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository()),
-          new DefaultRealtimeVehicleService(),
+          new DefaultRealtimeVehicleService(transitService),
           new DefaultVehicleRentalService(),
           RouterConfig.DEFAULT.flexConfig(),
           List.of(),
