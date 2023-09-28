@@ -1,8 +1,8 @@
 # Vehicle Rental Service Directory API support.
 
-This adds support for the GBFS service directory endpoint component located
-at https://github.com/entur/lamassu. OTP use the service directory to lookup and connect to all GBFS
-endpoints registered in the directory. This simplify the management of the GBFS endpoints, since
+This adds support for the GBFS service directory endpoint component located at 
+https://github.com/entur/lamassu. OTP uses the service directory to lookup and connect to all GBFS
+endpoints registered in the directory. This simplifies the management of the GBFS endpoints, since
 multiple services/components like OTP can connect to the directory and get the necessary
 configuration from it.
 
@@ -16,6 +16,7 @@ configuration from it.
 
 - Initial implementation of bike share updater API support
 - Make json tag names configurable [#3447](https://github.com/opentripplanner/OpenTripPlanner/pull/3447)
+- Enable GBFS geofencing with VehicleRentalServiceDirectory [#5324](https://github.com/opentripplanner/OpenTripPlanner/pull/5324)
 
 
 ## Configuration
@@ -62,10 +63,10 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 
 List all networks to include. Use "network": "default-network" to set defaults.
 
-If no default network exist only the listed networks are used. Configure the a network
-with name "default-network" to include all unlisted networks. If not present, all
-unlisted networks is dropped. Note! The values int the "default-network" is not used to
-set missing field values in networks listed.
+If no default network exist only the listed networks are used. Configure the a network with
+name "default-network" to include all unlisted networks. If not present, all unlisted
+networks is dropped. Note! The values in the "default-network" are not used to set
+missing field values in networks listed.
 
 
 
