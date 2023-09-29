@@ -15,7 +15,7 @@ schema {
 }
 
 input InputAccessibilityPreferences {
-    wheelchair: WheelchairPreferences
+    wheelchair: InputWheelchairPreferences
 }
 
 """A public transport agency"""
@@ -770,7 +770,7 @@ enum BikesAllowed {
 
 input InputBicyclePreferences {
     reluctance: Reluctance
-    bikeWalking: VehicleWalkPreferences
+    bikeWalking: InputVehicleWalkPreferences
     speed: Speed
     optimize: InputCyclingOptimizationCriteria
     boardCost: Cost
@@ -870,18 +870,18 @@ type Coordinates {
     lon: Float
 }
 
-input InputPlanDateTimeInput @oneOf {
+input InputPlanDateTime @oneOf {
     earliestDeparture: DateTimeWithOffset
     latestArrival: DateTimeWithOffset
 }
 
-input InputSearchWindowInput {
+input InputSearchWindow {
     duration: Duration
     numberOfItineraries: Int
-    gracePeriod: SearchWindowGracePeriodInput
+    gracePeriod: InputSearchWindowGracePeriod
 }
 
-input InputSearchWindowGracePeriodInput {
+input InputSearchWindowGracePeriod {
     duration: Duration
     numberOfItineraries: Int
 }
@@ -1265,9 +1265,9 @@ input InputPlanLocation {
 }
 
 input InputPlanPreferences {
-    street: PlanStreetPreferences
-    transit: TransitPreferences
-    accessibility: AccessibilityPreferences
+    street: InputPlanStreetPreferences
+    transit: InputTransitPreferences
+    accessibility: InputAccessibilityPreferences
 }
 
 input InputPlanStreetModes {
@@ -1282,12 +1282,12 @@ input InputPlanStreetModes {
 }
 
 input InputPlanStreetPreferences {
-    modes: PlanStreetModes
-    bicycle: BicyclePreferences
-    scooter: ScooterPreferences
-    car: CarPreferences
-    walk: WalkPreferences
-    rental: RentalPreferences
+    modes: InputPlanStreetModes
+    bicycle: InputBicyclePreferences
+    scooter: InputScooterPreferences
+    car: InputCarPreferences
+    walk: InputWalkPreferences
+    rental: InputRentalPreferences
     parking: VehicleParkingInput
 }
 
@@ -3507,24 +3507,18 @@ type QueryType {
     ): Plan @async
 
     planConnection(
-        dateTime: PlanDateTimeInput
-        searchWindow: SearchWindowInput
-        origin: PlanLocation
-        destination: PlanLocation
-        preferences: PlanPreferences
-        debugSettings: PlanDebugSettings
+        dateTime: InputPlanDateTime
+        searchWindow: InputSearchWindow
+        origin: InputPlanLocation
+        destination: InputPlanLocation
+        preferences: InputPlanPreferences
+        debugSettings: InputPlanDebugSettings
         locale: Locale
         before: String
         after: String
         first: Int
         last: Int
     ): PlanConnection @async
-}
-
-enum RealtimePreference {
-    USE_EVERYTHING
-    RETURN_NO_CANCELLATIONS
-    IGNORE_EVERYTHING
 }
 
 enum RealtimeState {
@@ -3741,7 +3735,7 @@ enum AbsoluteDirection {
 
 input InputScooterPreferences {
     reluctance: Reluctance
-    scooterWalking: VehicleWalkPreferences
+    scooterWalking: InputVehicleWalkPreferences
     speed: Speed
     optimize: InputScooterOptimizationCriteria
     boardCost: Cost
@@ -4207,6 +4201,34 @@ type TicketType implements Node {
     zones: [String!]
 }
 
+input InputTimetablePreferences {
+    """
+    When true, realtime updates are considered during the routing.
+    In practice, when this option is set as false, some of the suggestions might not be
+    realistic as the transfers could be invalid due to delays,
+    trips can be cancelled or stops can be skipped.
+    """
+    includeRealtimeUpdates: Boolean = true
+
+    """
+    When true, departures that have been cancelled ahead of time will be
+    included during the routing. This means that an itinerary can include
+    a cancelled departure while some other alternative that contains no cancellations
+    could be filtered out as the alternative containing a cancellation would normally
+    be better.
+    """
+    includePlannedCancellations: Boolean = false
+
+    """
+    When true, departures that have been cancelled through a realtime feed will be
+    included during the routing. This means that an itinerary can include
+    a cancelled departure while some other alternative that contains no cancellations
+    could be filtered out as the alternative containing a cancellation would normally
+    be better. This option can't be set to true while `includeRealtimeUpdates` is false.
+    """
+    includeRealtimeCancellations: Boolean = false
+}
+
 input InputTransferPreferences {
     costPenalty: Cost
     minimumWaitingTime: Duration
@@ -4224,11 +4246,11 @@ input InputTransitPreferences {
     unpreferred: InputUnpreferred
     """TODO should we reuse this or make a new design"""
     banned: InputBanned
-    board: BoardPreferences
-    alight: AlightPreferences
-    transfer: TransferPreferences
-    realtime: RealtimePreference = USE_EVERYTHING
-    modes: [TransitModePreference!]
+    board: InputBoardPreferences
+    alight: InputAlightPreferences
+    transfer: InputTransferPreferences
+    timetable: InputTimetablePreferences
+    modes: [InputTransitModePreference!]
 }
 
 """Text with language"""
