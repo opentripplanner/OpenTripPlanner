@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -43,21 +44,30 @@ public class DefaultRealtimeVehicleService
   }
 
   @Override
-  public List<RealtimeVehicle> getRealtimeVehicles(TripPattern pattern) {
+  public List<RealtimeVehicle> getRealtimeVehicles(@Nonnull TripPattern pattern) {
     // the list is made immutable during insertion, so we can safely return them
     return vehicles.getOrDefault(pattern, List.of());
   }
 
   @Nonnull
   @Override
-  public OccupancyStatus getVehicleOccupancyStatus(Trip trip) {
-    TripPattern pattern = transitService.getPatternForTrip(trip);
+  public OccupancyStatus getVehicleOccupancyStatus(@Nonnull Trip trip) {
+    return getOccupancyStatus(trip.getId(), transitService.getPatternForTrip(trip));
+  }
+
+  /**
+   * Get the latest occupancy status for a certain trip. Service contains all the vehicles that
+   * exist in input feeds but doesn't store any historical data. This method is an alternative to
+   * {@link #getVehicleOccupancyStatus(Trip)} and works even when {@link TransitService} is not
+   * provided to the service.
+   */
+  public OccupancyStatus getOccupancyStatus(FeedScopedId tripId, TripPattern pattern) {
     return vehicles
       .getOrDefault(pattern, List.of())
       .stream()
-      .filter(vehicle -> trip.getId().equals(vehicle.trip().getId()))
+      .filter(vehicle -> tripId.equals(vehicle.trip().getId()))
       .max(Comparator.comparing(vehicle -> vehicle.time().orElse(Instant.MIN)))
-      .map(vehicle -> vehicle.occupancyStatus())
+      .map(RealtimeVehicle::occupancyStatus)
       .orElse(Optional.empty())
       .orElse(NO_DATA_AVAILABLE);
   }
