@@ -52,7 +52,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    */
   private int timeShift;
 
-  /** Implementation notes: not final because these are set later, after TripTimes construction. */
+  /** Implementation notes: not final because these are set after construction. */
   private int serviceCode = -1;
   /** Implementation notes: Non-final to allow updates. */
   private int[] arrivalTimes;
@@ -295,39 +295,36 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   /**
-   * @return true if this TripTimes represents an unmodified, scheduled trip from a published
-   * timetable or false if it is a updated, cancelled, or otherwise modified one. This method
-   * differs from {@link #getRealTimeState()} in that it checks whether real-time information is
-   * actually available in this TripTimes.
+   * Return {@code true} if the trip is unmodified, a scheduled trip from a published timetable.
+   * Return {@code false} if the trip is an updated, cancelled, or otherwise modified one. This
+   * method differs from {@link #getRealTimeState()} in that it checks whether real-time
+   * information is actually available.
    */
   public boolean isScheduled() {
     return realTimeState == RealTimeState.SCHEDULED;
   }
 
   /**
-   * @return true if this TripTimes is canceled or soft-deleted
+   * Return {@code true} if canceled or soft-deleted
    */
   public boolean isCanceledOrDeleted() {
     return isCanceled() || isDeleted();
   }
 
   /**
-   * @return true if this TripTimes is canceled
+   * Return {@code true} if canceled
    */
   public boolean isCanceled() {
     return realTimeState == RealTimeState.CANCELED;
   }
 
   /**
-   * @return true if this TripTimes is soft-deleted, and should not be visible to the user
+   * Return true if trip is soft-deleted, and should not be visible to the user
    */
   public boolean isDeleted() {
     return realTimeState == RealTimeState.DELETED;
   }
 
-  /**
-   * @return the real-time state of this TripTimes
-   */
   public RealTimeState getRealTimeState() {
     return realTimeState;
   }
@@ -481,7 +478,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     return scheduledArrivalTimes.length;
   }
 
-  /** Sort TripTimes based on first departure time. */
+  /** Sort trips based on first departure time. */
   @Override
   public int compareTo(final TripTimes other) {
     return this.getDepartureTime(0) - other.getDepartureTime(0);
@@ -557,7 +554,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     this.serviceCode = serviceCode;
   }
 
-  /** The trips whose arrivals and departures are represented by this TripTimes */
+  /** The trips whose arrivals and departures are represented by this class */
   public Trip getTrip() {
     return trip;
   }
