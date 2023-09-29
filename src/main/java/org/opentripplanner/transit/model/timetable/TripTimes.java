@@ -59,12 +59,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   /** Implementation notes: Non-final to allow updates. */
   private int[] departureTimes;
 
-  /**
-   * States of the stops in the trip. If the state is DEFAULT for a stop,
-   * {@link #realTimeState} should determine the realtime state of the stop.
-   * <p>
-   * This is only for API-purposes (does not affect routing). Non-final to allow updates.
-   */
+  /** Implementation notes:  Non-final to allow updates. */
   private StopRealTimeState[] stopRealTimeStates;
 
   /**
@@ -245,57 +240,35 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   public void setRecorded(int stop) {
-    prepareForRealTimeUpdates();
-    stopRealTimeStates[stop] = StopRealTimeState.RECORDED;
+    setStopRealTimeStates(stop, StopRealTimeState.RECORDED);
   }
 
   public void setCancelled(int stop) {
-    prepareForRealTimeUpdates();
-    stopRealTimeStates[stop] = StopRealTimeState.CANCELLED;
+    setStopRealTimeStates(stop, StopRealTimeState.CANCELLED);
   }
 
   public void setNoData(int stop) {
-    prepareForRealTimeUpdates();
-    stopRealTimeStates[stop] = StopRealTimeState.NO_DATA;
+    setStopRealTimeStates(stop, StopRealTimeState.NO_DATA);
   }
 
   public void setPredictionInaccurate(int stop) {
-    prepareForRealTimeUpdates();
-    stopRealTimeStates[stop] = StopRealTimeState.INACCURATE_PREDICTIONS;
+    setStopRealTimeStates(stop, StopRealTimeState.INACCURATE_PREDICTIONS);
   }
 
-  /**
-   * The real-time states for a given stops. If the state is DEFAULT for a stop,
-   * the {@link #getRealTimeState()} should determine the realtime state of the stop.
-   * <p>
-   * This is only for API-purposes (does not affect routing).
-   */
   public boolean isCancelledStop(int stop) {
-    if (stopRealTimeStates == null) {
-      return false;
-    }
-    return stopRealTimeStates[stop] == StopRealTimeState.CANCELLED;
+    return isStopRealTimeStates(stop, StopRealTimeState.CANCELLED);
   }
 
   public boolean isRecordedStop(int stop) {
-    if (stopRealTimeStates == null) {
-      return false;
-    }
-    return stopRealTimeStates[stop] == StopRealTimeState.RECORDED;
+    return isStopRealTimeStates(stop, StopRealTimeState.RECORDED);
   }
 
   public boolean isNoDataStop(int stop) {
-    if (stopRealTimeStates == null) {
-      return false;
-    }
-    return stopRealTimeStates[stop] == StopRealTimeState.NO_DATA;
+    return isStopRealTimeStates(stop, StopRealTimeState.NO_DATA);
   }
 
   public boolean isPredictionInaccurate(int stop) {
-    if (stopRealTimeStates == null) {
-      return false;
-    }
-    return stopRealTimeStates[stop] == StopRealTimeState.INACCURATE_PREDICTIONS;
+    return isStopRealTimeStates(stop, StopRealTimeState.INACCURATE_PREDICTIONS);
   }
 
   public void setOccupancyStatus(int stop, OccupancyStatus occupancyStatus) {
@@ -649,6 +622,23 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       }
     }
     return hasAdjustedTimes;
+  }
+
+  /* private member methods */
+
+  private void setStopRealTimeStates(int stop, StopRealTimeState state) {
+    prepareForRealTimeUpdates();
+    this.stopRealTimeStates[stop] = state;
+  }
+
+  /**
+   * The real-time states for a given stops. If the state is DEFAULT for a stop,
+   * the {@link #getRealTimeState()} should determine the realtime state of the stop.
+   * <p>
+   * This is only for API-purposes (does not affect routing).
+   */
+  private boolean isStopRealTimeStates(int stop, StopRealTimeState state) {
+    return stopRealTimeStates != null && stopRealTimeStates[stop] == state;
   }
 
   /**
