@@ -47,7 +47,43 @@
                 "pickupType" : "SCHEDULED",
                 "dropoffType" : "SCHEDULED"
               }
-            ]
+            ],
+            "occupancy" : {
+              "occupancyStatus" : "FEW_SEATS_AVAILABLE"
+            }
+          }
+        ],
+        "vehiclePositions" : [
+          {
+            "vehicleId" : "F:vehicle-1",
+            "label" : null,
+            "lat" : null,
+            "lon" : null,
+            "stopRelationship" : null,
+            "speed" : null,
+            "heading" : null,
+            "lastUpdated" : 31556889864403199,
+            "trip" : {
+              "gtfsId" : "F:123"
+            }
+          },
+          {
+            "vehicleId" : "F:vehicle-2",
+            "label" : "vehicle2",
+            "lat" : 60.0,
+            "lon" : 80.0,
+            "stopRelationship" : {
+              "status" : "IN_TRANSIT_TO",
+              "stop" : {
+                "gtfsId" : "F:Stop_0"
+              }
+            },
+            "speed" : 10.2,
+            "heading" : 80.0,
+            "lastUpdated" : -31557014167219200,
+            "trip" : {
+              "gtfsId" : "F:123"
+            }
           }
         ]
       }
