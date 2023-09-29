@@ -31,84 +31,47 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
-  /** The trips whose arrivals and departures are represented by this TripTimes */
   private final Trip trip;
-  /**
-   * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS fields.
-   * If the headsigns array is null, we will report the trip_headsign (which may also be null) at
-   * every stop on the trip. If all the stop_headsigns are the same as the trip_headsign we may also
-   * set the headsigns array to null to save space. Field is private to force use of the getter
-   * method which does the necessary fallbacks.
-   */
   private I18NString[] headsigns;
   /**
-   * Contains a list of via names for each stop. This field provides info about intermediate stops
-   * between current stop and final trip destination. This is 2D array since there can be more than
-   * one via name/stop per each record in stop sequence). This is mapped from NeTEx
-   * DestinationDisplay.vias. No GTFS mapping at the moment. Outer array may be null if there are no
+   * Implementation notes: This is 2D array since there can be more than
+   * one via name/stop per each record in stop sequence). Outer array may be null if there are no
    * vias in stop sequence. Inner array may be null if there are no vias for particular stop. This
-   * is done in order to save space. Field is private to force use of the getter method which does
-   * the necessary fallbacks.
+   * is done in order to save space.
    */
   private final String[][] headsignVias;
-  /**
-   * The time in seconds after midnight at which the vehicle should arrive at each stop according to
-   * the original schedule.
-   */
   private final int[] scheduledArrivalTimes;
-  /**
-   * The time in seconds after midnight at which the vehicle should leave each stop according to the
-   * original schedule.
-   */
   private final int[] scheduledDepartureTimes;
   private final List<BookingInfo> dropOffBookingInfos;
   private final List<BookingInfo> pickupBookingInfos;
-  /**
-   * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits the
-   * stops. Despite the face that the StopPattern or TripPattern enclosing this TripTimes provides
-   * an ordered list of Stops, the original stop sequence numbers may still be needed for matching
-   * with GTFS-RT update messages. Unfortunately, each individual trip can have totally different
-   * sequence numbers for the same stops, so we need to store them at the individual trip level. An
-   * effort is made to re-use the sequence number arrays when they are the same across different
-   * trips in the same pattern.
-   */
   private final int[] originalGtfsStopSequence;
-  /** A Set of stop indexes that are marked as timepoints in the GTFS input. */
   private final BitSet timepoints;
   /**
-   * This allows re-using the same scheduled arrival and departure time arrays for many different
+   * This allows re-using the same scheduled arrival and departure time arrays for many
    * TripTimes. It is also used in materializing frequency-based TripTimes.
    */
   private int timeShift;
-  // not final because these are set later, after TripTimes construction.
+
+  /** Implementation notes: not final because these are set later, after TripTimes construction. */
   private int serviceCode = -1;
-  /**
-   * The time in seconds after midnight at which the vehicle arrives at each stop, accounting for
-   * any real-time updates. Non-final to allow updates.
-   */
+  /** Implementation notes: Non-final to allow updates. */
   private int[] arrivalTimes;
-  /**
-   * The time in seconds after midnight at which the vehicle leaves each stop, accounting for any
-   * real-time updates. Non-final to allow updates.
-   */
+  /** Implementation notes: Non-final to allow updates. */
   private int[] departureTimes;
 
   /**
-   * States of the stops in the trip. If the state is DEFAULT for a stop, {@link #realTimeState}
-   * should determine the realtime state of the stop.
+   * States of the stops in the trip. If the state is DEFAULT for a stop,
+   * {@link #realTimeState} should determine the realtime state of the stop.
    * <p>
    * This is only for API-purposes (does not affect routing). Non-final to allow updates.
    */
   private StopRealTimeState[] stopRealTimeStates;
 
   /**
-   * This is only for API-purposes (does not affect routing). Non-final to allow updates.
+   *  Implementation notes: Non-final to allow updates.
    */
   private OccupancyStatus[] occupancyStatus;
 
-  /**
-   * The real-time state of this TripTimes.
-   */
   private RealTimeState realTimeState = RealTimeState.SCHEDULED;
 
   private Accessibility wheelchairAccessibility;
@@ -187,7 +150,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   /**
-   * Trips may also have null headsigns, in which case we should fall back on a Timetable or
+   * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS fields.
+   * A trip may not have a headsign, in which case we should fall back on a Timetable or
    * Pattern-level headsign. Such a string will be available when we give TripPatterns or
    * StopPatterns unique human readable route variant names, but a TripTimes currently does not have
    * a pointer to its enclosing timetable or pattern.
@@ -224,12 +188,18 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     return trip.getHeadsign();
   }
 
-  /** @return the time in seconds after midnight that the vehicle arrives at the stop. */
+  /**
+   * The time in seconds after midnight at which the vehicle should arrive at the given stop
+   * according to the original schedule.
+   */
   public int getScheduledArrivalTime(final int stop) {
     return scheduledArrivalTimes[stop] + timeShift;
   }
 
-  /** @return the amount of time in seconds that the vehicle waits at the stop. */
+  /**
+   * The time in seconds after midnight at which the vehicle should leave the given stop according
+   * to the original schedule.
+   */
   public int getScheduledDepartureTime(final int stop) {
     return scheduledDepartureTimes[stop] + timeShift;
   }
@@ -244,14 +214,20 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     return getDepartureTime(0);
   }
 
-  /** @return the time in seconds after midnight that the vehicle arrives at the stop. */
+  /**
+   * The time in seconds after midnight at which the vehicle arrives at each stop, accounting for
+   * any real-time updates.
+   */
   public int getArrivalTime(final int stop) {
     if (arrivalTimes == null) {
       return getScheduledArrivalTime(stop);
     } else return arrivalTimes[stop]; // updated times are not time shifted.
   }
 
-  /** @return the amount of time in seconds that the vehicle waits at the stop. */
+  /**
+   * The time in seconds after midnight at which the vehicle leaves each stop, accounting for any
+   * real-time updates.
+   */
   public int getDepartureTime(final int stop) {
     if (departureTimes == null) {
       return getScheduledDepartureTime(stop);
@@ -288,6 +264,12 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     stopRealTimeStates[stop] = StopRealTimeState.INACCURATE_PREDICTIONS;
   }
 
+  /**
+   * The real-time states for a given stops. If the state is DEFAULT for a stop,
+   * the {@link #getRealTimeState()} should determine the realtime state of the stop.
+   * <p>
+   * This is only for API-purposes (does not affect routing).
+   */
   public boolean isCancelledStop(int stop) {
     if (stopRealTimeStates == null) {
       return false;
@@ -295,7 +277,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     return stopRealTimeStates[stop] == StopRealTimeState.CANCELLED;
   }
 
-  // TODO OTP2 - Unused, but will be used by Transmodel API
   public boolean isRecordedStop(int stop) {
     if (stopRealTimeStates == null) {
       return false;
@@ -322,6 +303,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     this.occupancyStatus[stop] = occupancyStatus;
   }
 
+  /**
+   * This is only for API-purposes (does not affect routing).
+   */
   public OccupancyStatus getOccupancyStatus(int stop) {
     if (this.occupancyStatus == null) {
       return OccupancyStatus.NO_DATA_AVAILABLE;
@@ -554,7 +538,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   /**
-   * Returns the GTFS sequence number of the given 0-based stop index.
+   * Returns the GTFS sequence number of the given 0-based stop position.
+   *
+   * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits the
+   * stops. Despite the face that the StopPattern or TripPattern enclosing this TripTimes provides
+   * an ordered list of Stops, the original stop sequence numbers may still be needed for matching
+   * with GTFS-RT update messages. Unfortunately, each individual trip can have totally different
+   * sequence numbers for the same stops, so we need to store them at the individual trip level. An
+   * effort is made to re-use the sequence number arrays when they are the same across different
+   * trips in the same pattern.
    */
   public int gtfsSequenceOfStopIndex(final int stop) {
     return originalGtfsStopSequence[stop];
@@ -576,7 +568,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     return OptionalInt.empty();
   }
 
-  /** @return whether or not stopIndex is considered a timepoint in this TripTimes. */
+  /**
+   * Whether or not stopIndex is considered a GTFS timepoint.
+   */
   public boolean isTimepoint(final int stopIndex) {
     return timepoints.get(stopIndex);
   }
