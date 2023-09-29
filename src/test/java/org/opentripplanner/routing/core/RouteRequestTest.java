@@ -18,9 +18,8 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 
 class RouteRequestTest {
 
-  private static final Duration DURATION_24_HOURS_AND_ONE_MINUTE = Duration
-    .ofHours(24)
-    .plusMinutes(1);
+  private static final Duration DURATION_24_HOURS = Duration.ofHours(24);
+  private static final Duration DURATION_24_HOURS_AND_ONE_MINUTE = DURATION_24_HOURS.plusMinutes(1);
   private static final Duration DURATION_ZERO = Duration.ofMinutes(0);
   private static final Duration DURATION_ONE_MINUTE = Duration.ofMinutes(1);
   private static final Duration DURATION_MINUS_ONE_MINUTE = DURATION_ONE_MINUTE.negated();
@@ -134,6 +133,7 @@ class RouteRequestTest {
   @Test
   void testTooLongSearchWindow() {
     RouteRequest request = new RouteRequest();
+    request.setMaxSearchWindow(DURATION_24_HOURS);
     assertThrows(
       IllegalArgumentException.class,
       () -> request.setSearchWindow(DURATION_24_HOURS_AND_ONE_MINUTE)

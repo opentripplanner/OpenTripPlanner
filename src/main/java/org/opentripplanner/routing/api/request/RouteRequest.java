@@ -56,6 +56,8 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private Instant dateTime = Instant.now();
 
+  private Duration maxSearchWindow = Duration.ZERO;
+
   private Duration searchWindow;
 
   private PageCursor pageCursor;
@@ -321,14 +323,22 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public void setSearchWindow(Duration searchWindow) {
     if (searchWindow != null) {
-      if (searchWindow.toSeconds() > TimeUtils.ONE_DAY_SECONDS) {
-        throw new IllegalArgumentException("The search window cannot exceed 24 hours");
+      if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
+        throw new IllegalArgumentException("The search window cannot exceed " + maxSearchWindow);
       }
       if (searchWindow.isNegative()) {
         throw new IllegalArgumentException("The search window must be a positive duration");
       }
     }
     this.searchWindow = searchWindow;
+  }
+
+  private boolean hasMaxSearchWindow() {
+    return !Duration.ZERO.equals(maxSearchWindow);
+  }
+
+  public void setMaxSearchWindow(Duration maxSearchWindow) {
+    this.maxSearchWindow = maxSearchWindow;
   }
 
   public Locale locale() {
