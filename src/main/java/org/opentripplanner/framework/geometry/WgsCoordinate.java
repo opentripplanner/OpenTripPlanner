@@ -146,6 +146,12 @@ public final class WgsCoordinate implements Serializable {
     return new WgsCoordinate(lat, lng);
   }
 
+  public WgsCoordinate roundToApproximate100m() {
+    var lat = DoubleUtils.roundTo3Decimals(latitude);
+    var lng = DoubleUtils.roundTo3Decimals(longitude);
+    return new WgsCoordinate(lat, lng);
+  }
+
   /**
    * Return a string on the form: {@code "(60.12345, 11.12345)"}. Up to 5 digits are used after the
    * period(.), even if the coordinate is specified with a higher precision.
