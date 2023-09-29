@@ -52,15 +52,15 @@ public class RealtimeVehicle {
       .ofNullable(builder.stop())
       .map(s -> new StopRelationship(s, builder.stopStatus()))
       .orElse(null);
-    vehicleId = builder.vehicleId();
-    label = builder().label();
-    coordinates = builder.coordinates();
-    speed = builder().speed();
-    heading = builder().heading();
-    time = builder.time();
-    stop = stopRelationship;
-    trip = builder.trip();
-    occupancyStatus = builder.occupancyStatus();
+    this.vehicleId = builder.vehicleId();
+    this.label = builder.label();
+    this.coordinates = builder.coordinates();
+    this.speed = builder.speed();
+    this.heading = builder.heading();
+    this.time = builder.time();
+    this.stop = stopRelationship;
+    this.trip = builder.trip();
+    this.occupancyStatus = builder.occupancyStatus();
   }
 
   public Optional<FeedScopedId> vehicleId() {
