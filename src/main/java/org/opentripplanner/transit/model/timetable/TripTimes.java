@@ -3,23 +3,20 @@ package org.opentripplanner.transit.model.timetable;
 import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
-import jakarta.annotation.Nullable;
 import java.io.Serializable;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.IntUnaryOperator;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A TripTimes represents the arrival and departure times for a single trip in an Timetable. It is
@@ -27,48 +24,16 @@ import org.slf4j.LoggerFactory;
  * when realtime updates have been applied. All times are expressed as seconds since midnight (as in
  * GTFS).
  */
-public class TripTimes implements Serializable, Comparable<TripTimes> {
+public final class TripTimes implements Serializable, Comparable<TripTimes> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
-  private static final String[] EMPTY_STRING_ARRAY = new String[0];
-  private final Trip trip;
-  private I18NString[] headsigns;
-  /**
-   * Implementation notes: This is 2D array since there can be more than
-   * one via name/stop per each record in stop sequence). Outer array may be null if there are no
-   * vias in stop sequence. Inner array may be null if there are no vias for particular stop. This
-   * is done in order to save space.
-   */
-  private final String[][] headsignVias;
-  private final int[] scheduledArrivalTimes;
-  private final int[] scheduledDepartureTimes;
-  private final List<BookingInfo> dropOffBookingInfos;
-  private final List<BookingInfo> pickupBookingInfos;
-  private final int[] originalGtfsStopSequence;
-  private final BitSet timepoints;
-  /**
-   * This allows re-using the same scheduled arrival and departure time arrays for many
-   * TripTimes. It is also used in materializing frequency-based TripTimes.
-   */
-  private int timeShift;
+  private final ScheduledTripTimes scheduledTripTimes;
 
-  /** Implementation notes: not final because these are set after construction. */
-  private int serviceCode = -1;
-  /** Implementation notes: Non-final to allow updates. */
   private int[] arrivalTimes;
-  /** Implementation notes: Non-final to allow updates. */
   private int[] departureTimes;
-
-  /** Implementation notes:  Non-final to allow updates. */
+  private RealTimeState realTimeState;
   private StopRealTimeState[] stopRealTimeStates;
-
-  /**
-   *  Implementation notes: Non-final to allow updates.
-   */
+  private I18NString[] headsigns;
   private OccupancyStatus[] occupancyStatus;
-
-  private RealTimeState realTimeState = RealTimeState.SCHEDULED;
-
   private Accessibility wheelchairAccessibility;
 
   /**
@@ -81,67 +46,41 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     final Collection<StopTime> stopTimes,
     final Deduplicator deduplicator
   ) {
-    this.trip = trip;
-    final int nStops = stopTimes.size();
-    final int[] departures = new int[nStops];
-    final int[] arrivals = new int[nStops];
-    final int[] sequences = new int[nStops];
-    final BitSet timepoints = new BitSet(nStops);
-    // Times are always shifted to zero. This is essential for frequencies and deduplication.
-    this.timeShift = stopTimes.iterator().next().getArrivalTime();
-    final List<BookingInfo> dropOffBookingInfos = new ArrayList<>();
-    final List<BookingInfo> pickupBookingInfos = new ArrayList<>();
-    int s = 0;
-    for (final StopTime st : stopTimes) {
-      departures[s] = st.getDepartureTime() - timeShift;
-      arrivals[s] = st.getArrivalTime() - timeShift;
-      sequences[s] = st.getStopSequence();
-      timepoints.set(s, st.getTimepoint() == 1);
-
-      dropOffBookingInfos.add(st.getDropOffBookingInfo());
-      pickupBookingInfos.add(st.getPickupBookingInfo());
-      s++;
-    }
-    this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
-    this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
-    this.originalGtfsStopSequence = deduplicator.deduplicateIntArray(sequences);
-    this.headsigns =
-      deduplicator.deduplicateObjectArray(I18NString.class, makeHeadsignsArray(stopTimes));
-    this.headsignVias = deduplicator.deduplicateString2DArray(makeHeadsignViasArray(stopTimes));
-
-    this.dropOffBookingInfos =
-      deduplicator.deduplicateImmutableList(BookingInfo.class, dropOffBookingInfos);
-    this.pickupBookingInfos =
-      deduplicator.deduplicateImmutableList(BookingInfo.class, pickupBookingInfos);
+    this.scheduledTripTimes = new ScheduledTripTimes(trip, stopTimes, deduplicator);
     // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
-    // We cannot point to the scheduled times because they are shifted, and updated times are not.
+    // We cannot point to the scheduled times because we do not want to make an unnecessary copy.
     this.arrivalTimes = null;
     this.departureTimes = null;
+    this.realTimeState = scheduledTripTimes.getRealTimeState();
     this.stopRealTimeStates = null;
-    this.timepoints = deduplicator.deduplicateBitSet(timepoints);
-    this.wheelchairAccessibility = trip.getWheelchairBoarding();
-    LOG.trace("trip {} has timepoint at indexes {}", trip, timepoints);
+    this.headsigns = null;
+    this.occupancyStatus = null;
+    this.wheelchairAccessibility = scheduledTripTimes.getWheelchairAccessibility();
   }
 
-  /** This copy constructor does not copy the actual times, only the scheduled times. */
+  /**
+   * This copy constructor does not copy the actual times, only the scheduled times.
+   */
   public TripTimes(final TripTimes object) {
-    this.timeShift = object.timeShift;
-    this.trip = object.trip;
-    this.serviceCode = object.serviceCode;
-    this.headsigns = object.headsigns;
-    this.headsignVias = object.headsignVias;
-    this.scheduledArrivalTimes = object.scheduledArrivalTimes;
-    this.scheduledDepartureTimes = object.scheduledDepartureTimes;
+    this.scheduledTripTimes = object.scheduledTripTimes;
     this.arrivalTimes = null;
     this.departureTimes = null;
-    this.stopRealTimeStates = object.stopRealTimeStates;
-    this.pickupBookingInfos = object.pickupBookingInfos;
-    this.dropOffBookingInfos = object.dropOffBookingInfos;
-    this.originalGtfsStopSequence = object.originalGtfsStopSequence;
     this.realTimeState = object.realTimeState;
-    this.timepoints = object.timepoints;
-    this.wheelchairAccessibility = object.wheelchairAccessibility;
+    this.stopRealTimeStates = object.stopRealTimeStates;
+    this.headsigns = object.headsigns;
     this.occupancyStatus = object.occupancyStatus;
+    this.wheelchairAccessibility = object.wheelchairAccessibility;
+  }
+
+  public TripTimes(final TripTimes object, int timeShiftDelta) {
+    this.scheduledTripTimes = new ScheduledTripTimes(object.scheduledTripTimes, timeShiftDelta);
+    this.arrivalTimes = null;
+    this.departureTimes = null;
+    this.realTimeState = object.realTimeState;
+    this.stopRealTimeStates = object.stopRealTimeStates;
+    this.headsigns = object.headsigns;
+    this.occupancyStatus = object.occupancyStatus;
+    this.wheelchairAccessibility = object.wheelchairAccessibility;
   }
 
   /**
@@ -153,13 +92,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    */
   @Nullable
   public I18NString getHeadsign(final int stop) {
-    I18NString tripHeadsign = getTrip().getHeadsign();
-    if (headsigns == null) {
-      return tripHeadsign;
-    } else {
-      I18NString stopHeadsign = headsigns[stop];
-      return stopHeadsign != null ? stopHeadsign : tripHeadsign;
-    }
+    return (headsigns != null && headsigns[stop] != null)
+      ? headsigns[stop]
+      : scheduledTripTimes.getHeadsign(stop);
   }
 
   /**
@@ -170,17 +105,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * @return Empty list if there are no vias registered for a stop.
    */
   public List<String> getHeadsignVias(final int stop) {
-    if (headsignVias == null || headsignVias[stop] == null) {
-      return List.of();
-    }
-    return List.of(headsignVias[stop]);
+    return scheduledTripTimes.getHeadsignVias(stop);
   }
 
   /**
    * @return the whole trip's headsign. Individual stops can have different headsigns.
    */
   public I18NString getTripHeadsign() {
-    return trip.getHeadsign();
+    return scheduledTripTimes.getTripHeadsign();
   }
 
   /**
@@ -188,7 +120,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * according to the original schedule.
    */
   public int getScheduledArrivalTime(final int stop) {
-    return scheduledArrivalTimes[stop] + timeShift;
+    return scheduledTripTimes.getScheduledArrivalTime(stop);
   }
 
   /**
@@ -196,7 +128,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * to the original schedule.
    */
   public int getScheduledDepartureTime(final int stop) {
-    return scheduledDepartureTimes[stop] + timeShift;
+    return scheduledTripTimes.getScheduledDepartureTime(stop);
   }
 
   /**
@@ -214,9 +146,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * any real-time updates.
    */
   public int getArrivalTime(final int stop) {
-    if (arrivalTimes == null) {
-      return getScheduledArrivalTime(stop);
-    } else return arrivalTimes[stop]; // updated times are not time shifted.
+    return getOrElse(stop, arrivalTimes, scheduledTripTimes::getScheduledArrivalTime);
   }
 
   /**
@@ -224,19 +154,17 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * real-time updates.
    */
   public int getDepartureTime(final int stop) {
-    if (departureTimes == null) {
-      return getScheduledDepartureTime(stop);
-    } else return departureTimes[stop]; // updated times are not time shifted.
+    return getOrElse(stop, departureTimes, scheduledTripTimes::getScheduledDepartureTime);
   }
 
   /** @return the difference between the scheduled and actual arrival times at this stop. */
   public int getArrivalDelay(final int stop) {
-    return getArrivalTime(stop) - (scheduledArrivalTimes[stop] + timeShift);
+    return getArrivalTime(stop) - scheduledTripTimes.getScheduledArrivalTime(stop);
   }
 
   /** @return the difference between the scheduled and actual departure times at this stop. */
   public int getDepartureDelay(final int stop) {
-    return getDepartureTime(stop) - (scheduledDepartureTimes[stop] + timeShift);
+    return getDepartureTime(stop) - scheduledTripTimes.getScheduledDepartureTime(stop);
   }
 
   public void setRecorded(int stop) {
@@ -287,11 +215,11 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   public BookingInfo getDropOffBookingInfo(int stop) {
-    return dropOffBookingInfos.get(stop);
+    return scheduledTripTimes.getDropOffBookingInfo(stop);
   }
 
   public BookingInfo getPickupBookingInfo(int stop) {
-    return pickupBookingInfos.get(stop);
+    return scheduledTripTimes.getPickupBookingInfo(stop);
   }
 
   /**
@@ -342,7 +270,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
   public Optional<ValidationError> validateNonIncreasingTimes() {
-    final int nStops = scheduledArrivalTimes.length;
+    final int nStops = arrivalTimes.length;
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
       final int arr = getArrivalTime(s);
@@ -453,7 +381,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
 
   public void updateDepartureDelay(final int stop, final int delay) {
     prepareForRealTimeUpdates();
-    departureTimes[stop] = scheduledDepartureTimes[stop] + timeShift + delay;
+    departureTimes[stop] = scheduledTripTimes.getScheduledDepartureTime(stop) + delay;
   }
 
   public void updateArrivalTime(final int stop, final int time) {
@@ -463,10 +391,12 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
 
   public void updateArrivalDelay(final int stop, final int delay) {
     prepareForRealTimeUpdates();
-    arrivalTimes[stop] = scheduledArrivalTimes[stop] + timeShift + delay;
+    arrivalTimes[stop] = scheduledTripTimes.getScheduledArrivalTime(stop) + delay;
   }
 
+  @Nullable
   public Accessibility getWheelchairAccessibility() {
+    // No need to fall back to scheduled state, since it is copied over in the constructor
     return wheelchairAccessibility;
   }
 
@@ -475,7 +405,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   public int getNumStops() {
-    return scheduledArrivalTimes.length;
+    return scheduledTripTimes.getNumStops();
   }
 
   /** Sort trips based on first departure time. */
@@ -494,17 +424,17 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     if (arrivalTimes != null || departureTimes != null) {
       return null;
     }
-    final TripTimes shifted = new TripTimes(this);
     // Adjust 0-based times to match desired stoptime.
     final int shift = time - (depart ? getDepartureTime(stop) : getArrivalTime(stop));
-    // existing shift should usually (always?) be 0 on freqs
-    shifted.timeShift = shifted.timeShift + shift;
-    return shifted;
+
+    return new TripTimes(this, shift);
   }
 
-  // Time-shift all times on this trip. This is used when updating the time zone for the trip.
-  public void timeShift(Duration duration) {
-    timeShift += duration.toSeconds();
+  /**
+   * Time-shift all times on this trip. This is used when updating the time zone for the trip.
+   */
+  public TripTimes adjustTimesToGraphTimeZone(Duration duration) {
+    return new TripTimes(this, (int) duration.toSeconds());
   }
 
   /**
@@ -519,44 +449,35 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    * trips in the same pattern.
    */
   public int gtfsSequenceOfStopIndex(final int stop) {
-    return originalGtfsStopSequence[stop];
+    return scheduledTripTimes.gtfsSequenceOfStopIndex(stop);
   }
 
   /**
    * Returns the 0-based stop index of the given GTFS sequence number.
    */
   public OptionalInt stopIndexOfGtfsSequence(int stopSequence) {
-    if (originalGtfsStopSequence == null) {
-      return OptionalInt.empty();
-    }
-    for (int i = 0; i < originalGtfsStopSequence.length; i++) {
-      var sequence = originalGtfsStopSequence[i];
-      if (sequence == stopSequence) {
-        return OptionalInt.of(i);
-      }
-    }
-    return OptionalInt.empty();
+    return scheduledTripTimes.stopIndexOfGtfsSequence(stopSequence);
   }
 
   /**
    * Whether or not stopIndex is considered a GTFS timepoint.
    */
   public boolean isTimepoint(final int stopIndex) {
-    return timepoints.get(stopIndex);
+    return scheduledTripTimes.isTimepoint(stopIndex);
   }
 
   /** The code for the service on which this trip runs. For departure search optimizations. */
   public int getServiceCode() {
-    return serviceCode;
+    return scheduledTripTimes.getServiceCode();
   }
 
   public void setServiceCode(int serviceCode) {
-    this.serviceCode = serviceCode;
+    scheduledTripTimes.setServiceCode(serviceCode);
   }
 
   /** The trips whose arrivals and departures are represented by this class */
   public Trip getTrip() {
-    return trip;
+    return scheduledTripTimes.getTrip();
   }
 
   /**
@@ -638,48 +559,12 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     return stopRealTimeStates != null && stopRealTimeStates[stop] == state;
   }
 
-  /**
-   * @return either an array of headsigns (one for each stop on this trip) or null if the headsign
-   * is the same at all stops (including null) and can be found in the Trip object.
-   */
-  private I18NString[] makeHeadsignsArray(final Collection<StopTime> stopTimes) {
-    final I18NString tripHeadsign = trip.getHeadsign();
-    boolean useStopHeadsigns = false;
-    if (tripHeadsign == null) {
-      useStopHeadsigns = true;
-    } else {
-      for (final StopTime st : stopTimes) {
-        if (!(tripHeadsign.equals(st.getStopHeadsign()))) {
-          useStopHeadsigns = true;
-          break;
-        }
-      }
-    }
-    if (!useStopHeadsigns) {
-      return null; //defer to trip_headsign
-    }
-    boolean allNull = true;
-    int i = 0;
-    final I18NString[] hs = new I18NString[stopTimes.size()];
-    for (final StopTime st : stopTimes) {
-      final I18NString headsign = st.getStopHeadsign();
-      hs[i++] = headsign;
-      if (headsign != null) allNull = false;
-    }
-    if (allNull) {
-      return null;
-    } else {
-      return hs;
-    }
-  }
-
   public void setHeadsign(int index, I18NString headsign) {
     if (headsigns == null) {
-      if (headsign.equals(trip.getHeadsign())) {
+      if (headsign.equals(getTrip().getHeadsign())) {
         return;
       }
-
-      this.headsigns = new I18NString[scheduledArrivalTimes.length];
+      this.headsigns = scheduledTripTimes.copyHeadsigns(() -> new I18NString[getNumStops()]);
       this.headsigns[index] = headsign;
       return;
     }
@@ -688,35 +573,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     headsigns[index] = headsign;
   }
 
-  /**
-   * Create 2D String array for via names for each stop in sequence.
-   *
-   * @return May be null if no vias are present in stop sequence.
-   */
-  private String[][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
-    if (
-      stopTimes
-        .stream()
-        .allMatch(st -> st.getHeadsignVias() == null || st.getHeadsignVias().isEmpty())
-    ) {
-      return null;
-    }
-
-    String[][] vias = new String[stopTimes.size()][];
-
-    int i = 0;
-    for (final StopTime st : stopTimes) {
-      if (st.getHeadsignVias() == null) {
-        vias[i] = EMPTY_STRING_ARRAY;
-        i++;
-        continue;
-      }
-
-      vias[i] = st.getHeadsignVias().toArray(EMPTY_STRING_ARRAY);
-      i++;
-    }
-
-    return vias;
+  private static int getOrElse(int index, int[] array, IntUnaryOperator defaultValue) {
+    return array != null ? array[index] : defaultValue.applyAsInt(index);
   }
 
   /**
@@ -727,23 +585,16 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
    */
   private void prepareForRealTimeUpdates() {
     if (arrivalTimes == null) {
-      this.arrivalTimes = Arrays.copyOf(scheduledArrivalTimes, scheduledArrivalTimes.length);
-      this.departureTimes = Arrays.copyOf(scheduledDepartureTimes, scheduledDepartureTimes.length);
-      this.stopRealTimeStates = new StopRealTimeState[arrivalTimes.length];
-      this.occupancyStatus = new OccupancyStatus[arrivalTimes.length];
-      if (headsigns != null) {
-        headsigns = Arrays.copyOf(headsigns, headsigns.length);
-      }
-
-      for (int i = 0; i < arrivalTimes.length; i++) {
-        arrivalTimes[i] += timeShift;
-        departureTimes[i] += timeShift;
-        stopRealTimeStates[i] = StopRealTimeState.DEFAULT;
-        occupancyStatus[i] = OccupancyStatus.NO_DATA_AVAILABLE;
-      }
-
+      this.arrivalTimes = scheduledTripTimes.copyArrivalTimes();
+      this.departureTimes = scheduledTripTimes.copyDepartureTimes();
       // Update the real-time state
-      realTimeState = RealTimeState.UPDATED;
+      this.realTimeState = RealTimeState.UPDATED;
+      this.stopRealTimeStates = new StopRealTimeState[arrivalTimes.length];
+      Arrays.fill(stopRealTimeStates, StopRealTimeState.DEFAULT);
+      this.headsigns = scheduledTripTimes.copyHeadsigns(() -> null);
+      this.occupancyStatus = new OccupancyStatus[arrivalTimes.length];
+      Arrays.fill(occupancyStatus, OccupancyStatus.NO_DATA_AVAILABLE);
+      // skip immutable types: scheduledTripTimes & wheelchairAccessibility
     }
   }
 }
