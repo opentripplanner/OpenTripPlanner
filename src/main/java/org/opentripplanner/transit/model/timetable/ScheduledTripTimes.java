@@ -19,8 +19,6 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 
 final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTripTimes> {
 
-  private final int[] scheduledArrivalTimes;
-  private final int[] scheduledDepartureTimes;
   /**
    * Implementation notes: This allows re-using the same scheduled arrival and departure time
    * arrays for many ScheduledTripTimes. It is also used in materializing frequency-based
@@ -28,19 +26,21 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
    */
   private final int timeShift;
   private final int serviceCode;
+  private final int[] arrivalTimes;
+  private final int[] departureTimes;
   private final BitSet timepoints;
+  private final Trip trip;
   private final List<BookingInfo> dropOffBookingInfos;
   private final List<BookingInfo> pickupBookingInfos;
-  private final Trip trip;
 
   @Nullable
   private final I18NString[] headsigns;
 
   /**
-   * Implementation notes: This is 2D array since there can be more than
-   * one via name/stop per each record in stop sequence). Outer array may be null if there are no
-   * vias in stop sequence. Inner array may be null if there are no vias for particular stop. This
-   * is done in order to save space.
+   * Implementation notes: This is 2D array since there can be more than one via name/stop per each
+   * record in stop sequence). Outer array may be null if there are no vias in stop sequence. Inner
+   * array may be null if there are no vias for particular stop. This is done in order to save
+   * space.
    */
   @Nullable
   private final String[][] headsignVias;
@@ -49,16 +49,16 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
 
   ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
     this.timeShift = builder.timeShift;
-    this.trip = builder.trip;
     this.serviceCode = builder.serviceCode;
-    this.headsigns = builder.headsigns;
-    this.headsignVias = builder.headsignVias;
-    this.scheduledArrivalTimes = builder.arrivalTimes;
-    this.scheduledDepartureTimes = builder.departureTimes;
+    this.arrivalTimes = builder.arrivalTimes;
+    this.departureTimes = builder.departureTimes;
+    this.timepoints = builder.timepoints;
+    this.trip = builder.trip;
     this.pickupBookingInfos = builder.pickupBookingInfos;
     this.dropOffBookingInfos = builder.dropOffBookingInfos;
+    this.headsigns = builder.headsigns;
+    this.headsignVias = builder.headsignVias;
     this.originalGtfsStopSequence = builder.originalGtfsStopSequence;
-    this.timepoints = builder.timepoints;
   }
 
   public static ScheduledTripTimesBuilder of(@Nullable Deduplicator deduplicator) {
@@ -74,14 +74,14 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
    */
   public ScheduledTripTimesBuilder copyOf(@Nullable Deduplicator deduplicator) {
     return new ScheduledTripTimesBuilder(
-      scheduledArrivalTimes,
-      scheduledDepartureTimes,
       timeShift,
       serviceCode,
+      arrivalTimes,
+      departureTimes,
       timepoints,
+      trip,
       dropOffBookingInfos,
       pickupBookingInfos,
-      trip,
       headsigns,
       headsignVias,
       originalGtfsStopSequence,
@@ -96,39 +96,9 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
     return copyOf(null);
   }
 
-  /**
-   * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS fields.
-   * A trip may not have a headsign, in which case we should fall back on a Timetable or
-   * Pattern-level headsign. Such a string will be available when we give TripPatterns or
-   * StopPatterns unique human-readable route variant names, but a ScheduledTripTimes currently
-   * does not have a pointer to its enclosing timetable or pattern.
-   */
-  @Nullable
-  public I18NString getHeadsign(final int stop) {
-    return (headsigns != null && headsigns[stop] != null)
-      ? headsigns[stop]
-      : getTrip().getHeadsign();
-  }
-
-  /**
-   * Return list of via names per particular stop. This field provides info about intermediate stops
-   * between current stop and final trip destination. Mapped from NeTEx DestinationDisplay.vias. No
-   * GTFS mapping at the moment.
-   *
-   * @return Empty list if there are no vias registered for a stop.
-   */
-  public List<String> getHeadsignVias(final int stop) {
-    if (headsignVias == null || headsignVias[stop] == null) {
-      return List.of();
-    }
-    return List.of(headsignVias[stop]);
-  }
-
-  /**
-   * @return the whole trip's headsign. Individual stops can have different headsigns.
-   */
-  public I18NString getTripHeadsign() {
-    return trip.getHeadsign();
+  /** The code for the service on which this trip runs. For departure search optimizations. */
+  public int getServiceCode() {
+    return serviceCode;
   }
 
   /**
@@ -136,25 +106,7 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
    * according to the original schedule.
    */
   public int getScheduledArrivalTime(final int stop) {
-    return scheduledArrivalTimes[stop] + timeShift;
-  }
-
-  /**
-   * The time in seconds after midnight at which the vehicle should leave the given stop according
-   * to the original schedule.
-   */
-  public int getScheduledDepartureTime(final int stop) {
-    return scheduledDepartureTimes[stop] + timeShift;
-  }
-
-  /**
-   * Return an integer which can be used to sort TripTimes in order of departure/arrivals.
-   * <p>
-   * This sorted trip times is used to search for trips. OTP assume one trip do NOT pass another
-   * trip down the line.
-   */
-  public int sortIndex() {
-    return getDepartureTime(0);
+    return arrivalTimes[stop] + timeShift;
   }
 
   /**
@@ -165,6 +117,19 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
     return getScheduledArrivalTime(stop);
   }
 
+  /** @return the difference between the scheduled and actual arrival times at this stop. */
+  public int getArrivalDelay(final int stop) {
+    return getArrivalTime(stop) - (arrivalTimes[stop] + timeShift);
+  }
+
+  /**
+   * The time in seconds after midnight at which the vehicle should leave the given stop according
+   * to the original schedule.
+   */
+  public int getScheduledDepartureTime(final int stop) {
+    return departureTimes[stop] + timeShift;
+  }
+
   /**
    * The time in seconds after midnight at which the vehicle leaves each stop, accounting for any
    * real-time updates.
@@ -173,21 +138,31 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
     return getScheduledDepartureTime(stop);
   }
 
-  /** @return the difference between the scheduled and actual arrival times at this stop. */
-  public int getArrivalDelay(final int stop) {
-    return getArrivalTime(stop) - (scheduledArrivalTimes[stop] + timeShift);
-  }
-
   /** @return the difference between the scheduled and actual departure times at this stop. */
   public int getDepartureDelay(final int stop) {
-    return getDepartureTime(stop) - (scheduledDepartureTimes[stop] + timeShift);
+    return getDepartureTime(stop) - (departureTimes[stop] + timeShift);
   }
 
   /**
-   * This is only for API-purposes (does not affect routing).
+   * Whether or not stopIndex is considered a GTFS timepoint.
    */
-  public OccupancyStatus getOccupancyStatus(int stop) {
-    return OccupancyStatus.NO_DATA_AVAILABLE;
+  public boolean isTimepoint(final int stopIndex) {
+    return timepoints.get(stopIndex);
+  }
+
+  /** The trips whose arrivals and departures are represented by this class */
+  public Trip getTrip() {
+    return trip;
+  }
+
+  /**
+   * Return an integer which can be used to sort TripTimes in order of departure/arrivals.
+   * <p>
+   * This sorted trip times is used to search for trips. OTP assume one trip do NOT pass another
+   * trip down the line.
+   */
+  public int sortIndex() {
+    return getDepartureTime(0);
   }
 
   public BookingInfo getDropOffBookingInfo(int stop) {
@@ -234,6 +209,56 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
   }
 
   /**
+   * @return the whole trip's headsign. Individual stops can have different headsigns.
+   */
+  public I18NString getTripHeadsign() {
+    return trip.getHeadsign();
+  }
+
+  /**
+   * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS fields.
+   * A trip may not have a headsign, in which case we should fall back on a Timetable or
+   * Pattern-level headsign. Such a string will be available when we give TripPatterns or
+   * StopPatterns unique human-readable route variant names, but a ScheduledTripTimes currently
+   * does not have a pointer to its enclosing timetable or pattern.
+   */
+  @Nullable
+  public I18NString getHeadsign(final int stop) {
+    return (headsigns != null && headsigns[stop] != null)
+      ? headsigns[stop]
+      : getTrip().getHeadsign();
+  }
+
+  /**
+   * Return list of via names per particular stop. This field provides info about intermediate stops
+   * between current stop and final trip destination. Mapped from NeTEx DestinationDisplay.vias. No
+   * GTFS mapping at the moment.
+   *
+   * @return Empty list if there are no vias registered for a stop.
+   */
+  public List<String> getHeadsignVias(final int stop) {
+    if (headsignVias == null || headsignVias[stop] == null) {
+      return List.of();
+    }
+    return List.of(headsignVias[stop]);
+  }
+
+  public int getNumStops() {
+    return arrivalTimes.length;
+  }
+
+  public Accessibility getWheelchairAccessibility() {
+    return trip.getWheelchairBoarding();
+  }
+
+  /**
+   * This is only for API-purposes (does not affect routing).
+   */
+  public OccupancyStatus getOccupancyStatus(int stop) {
+    return OccupancyStatus.NO_DATA_AVAILABLE;
+  }
+
+  /**
    * When creating ScheduledTripTimes or wrapping it in updates, we could potentially imply
    * negative running or dwell times. We really don't want those being used in routing. This method
    * checks that all times are increasing.
@@ -241,7 +266,7 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
   public Optional<ValidationError> validateNonIncreasingTimes() {
-    final int nStops = scheduledArrivalTimes.length;
+    final int nStops = arrivalTimes.length;
     int prevDep = -9_999_999;
     for (int s = 0; s < nStops; s++) {
       final int arr = getArrivalTime(s);
@@ -256,14 +281,6 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
       prevDep = dep;
     }
     return Optional.empty();
-  }
-
-  public Accessibility getWheelchairAccessibility() {
-    return trip.getWheelchairBoarding();
-  }
-
-  public int getNumStops() {
-    return scheduledArrivalTimes.length;
   }
 
   /** Sort trips based on first departure time. */
@@ -303,18 +320,6 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
     return OptionalInt.empty();
   }
 
-  /**
-   * Whether or not stopIndex is considered a GTFS timepoint.
-   */
-  public boolean isTimepoint(final int stopIndex) {
-    return timepoints.get(stopIndex);
-  }
-
-  /** The code for the service on which this trip runs. For departure search optimizations. */
-  public int getServiceCode() {
-    return serviceCode;
-  }
-
   @Override
   public boolean equals(Object o) {
     throw new UnsupportedOperationException("Not implemented, implement if needed!");
@@ -325,19 +330,14 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
     throw new UnsupportedOperationException("Not implemented, implement if needed!");
   }
 
-  /** The trips whose arrivals and departures are represented by this class */
-  public Trip getTrip() {
-    return trip;
-  }
-
   /* package local - only visible to timetable classes */
 
   int[] copyArrivalTimes() {
-    return IntUtils.shiftArray(timeShift, scheduledArrivalTimes);
+    return IntUtils.shiftArray(timeShift, arrivalTimes);
   }
 
   int[] copyDepartureTimes() {
-    return IntUtils.shiftArray(timeShift, scheduledDepartureTimes);
+    return IntUtils.shiftArray(timeShift, departureTimes);
   }
 
   I18NString[] copyHeadsigns(Supplier<I18NString[]> defaultValue) {

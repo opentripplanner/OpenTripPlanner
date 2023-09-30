@@ -12,18 +12,17 @@ public class ScheduledTripTimesBuilder {
 
   private final int NOT_SET = -1;
 
-  int[] arrivalTimes;
-  int[] departureTimes;
   int timeShift;
   int serviceCode = NOT_SET;
+  int[] arrivalTimes;
+  int[] departureTimes;
   BitSet timepoints;
+  Trip trip;
   List<BookingInfo> dropOffBookingInfos;
   List<BookingInfo> pickupBookingInfos;
-  Trip trip;
   I18NString[] headsigns;
   String[][] headsignVias;
   int[] originalGtfsStopSequence;
-
   private final DeduplicatorService deduplicator;
 
   ScheduledTripTimesBuilder(@Nullable DeduplicatorService deduplicator) {
@@ -31,41 +30,31 @@ public class ScheduledTripTimesBuilder {
   }
 
   ScheduledTripTimesBuilder(
-    int[] arrivalTimes,
-    int[] departureTimes,
     int timeShift,
     int serviceCode,
+    int[] arrivalTimes,
+    int[] departureTimes,
     BitSet timepoints,
+    Trip trip,
     List<BookingInfo> dropOffBookingInfos,
     List<BookingInfo> pickupBookingInfos,
-    Trip trip,
     I18NString[] headsigns,
     String[][] headsignVias,
     int[] originalGtfsStopSequence,
     Deduplicator deduplicator
   ) {
     this(deduplicator);
-    this.arrivalTimes = arrivalTimes;
-    this.departureTimes = departureTimes;
     this.timeShift = timeShift;
     this.serviceCode = serviceCode;
+    this.arrivalTimes = arrivalTimes;
+    this.departureTimes = departureTimes;
     this.timepoints = timepoints;
+    this.trip = trip;
     this.dropOffBookingInfos = dropOffBookingInfos;
     this.pickupBookingInfos = pickupBookingInfos;
-    this.trip = trip;
     this.headsigns = headsigns;
     this.headsignVias = headsignVias;
     this.originalGtfsStopSequence = originalGtfsStopSequence;
-  }
-
-  public ScheduledTripTimesBuilder withArrivalTimes(int[] arrivalTimes) {
-    this.arrivalTimes = deduplicator.deduplicateIntArray(arrivalTimes);
-    return this;
-  }
-
-  public ScheduledTripTimesBuilder withDepartureTimes(int[] departureTimes) {
-    this.departureTimes = deduplicator.deduplicateIntArray(departureTimes);
-    return this;
   }
 
   public ScheduledTripTimesBuilder withTimeShift(int timeShift) {
@@ -87,8 +76,23 @@ public class ScheduledTripTimesBuilder {
     return this;
   }
 
+  public ScheduledTripTimesBuilder withArrivalTimes(int[] arrivalTimes) {
+    this.arrivalTimes = deduplicator.deduplicateIntArray(arrivalTimes);
+    return this;
+  }
+
+  public ScheduledTripTimesBuilder withDepartureTimes(int[] departureTimes) {
+    this.departureTimes = deduplicator.deduplicateIntArray(departureTimes);
+    return this;
+  }
+
   public ScheduledTripTimesBuilder withTimepoints(BitSet timepoints) {
     this.timepoints = deduplicator.deduplicateBitSet(timepoints);
+    return this;
+  }
+
+  public ScheduledTripTimesBuilder withTrip(Trip trip) {
+    this.trip = trip;
     return this;
   }
 
@@ -101,11 +105,6 @@ public class ScheduledTripTimesBuilder {
   public ScheduledTripTimesBuilder withPickupBookingInfos(List<BookingInfo> pickupBookingInfos) {
     this.pickupBookingInfos =
       deduplicator.deduplicateImmutableList(BookingInfo.class, pickupBookingInfos);
-    return this;
-  }
-
-  public ScheduledTripTimesBuilder withTrip(Trip trip) {
-    this.trip = trip;
     return this;
   }
 
