@@ -46,7 +46,7 @@ public final class TripTimes implements Serializable, Comparable<TripTimes> {
     final Collection<StopTime> stopTimes,
     final Deduplicator deduplicator
   ) {
-    this.scheduledTripTimes = new ScheduledTripTimes(trip, stopTimes, deduplicator);
+    this.scheduledTripTimes = StopTimeToScheduledTripTimesMapper.map(trip, stopTimes, deduplicator);
     // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
     // We cannot point to the scheduled times because we do not want to make an unnecessary copy.
     this.arrivalTimes = null;

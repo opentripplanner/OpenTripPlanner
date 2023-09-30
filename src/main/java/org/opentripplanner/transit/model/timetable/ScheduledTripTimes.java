@@ -4,10 +4,8 @@ import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorC
 import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -16,13 +14,11 @@ import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTripTimes> {
 
-  private static final String[] EMPTY_STRING_ARRAY = new String[0];
   private static final int NOT_SET = -1;
 
   private final int[] scheduledArrivalTimes;
@@ -34,7 +30,7 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
   private final int timeShift;
 
   /** Implementation notes: not final because these are set after construction. */
-  private int serviceCode = NOT_SET;
+  private int serviceCode;
   private final BitSet timepoints;
   private final List<BookingInfo> dropOffBookingInfos;
   private final List<BookingInfo> pickupBookingInfos;
@@ -55,66 +51,6 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
   private final int[] originalGtfsStopSequence;
 
   /**
-   * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing. The
-   * non-interpolated stoptimes should already be marked at timepoints by a previous filtering
-   * step.
-   */
-  public ScheduledTripTimes(
-    final Trip trip,
-    final Collection<StopTime> stopTimes,
-    final Deduplicator deduplicator
-  ) {
-    this.trip = trip;
-    final int nStops = stopTimes.size();
-    final int[] departures = new int[nStops];
-    final int[] arrivals = new int[nStops];
-    final int[] sequences = new int[nStops];
-    final BitSet timepoints = new BitSet(nStops);
-    // Times are always shifted to zero. This is essential for frequencies and deduplication.
-    this.timeShift = stopTimes.iterator().next().getArrivalTime();
-    final List<BookingInfo> dropOffBookingInfos = new ArrayList<>();
-    final List<BookingInfo> pickupBookingInfos = new ArrayList<>();
-    int s = 0;
-    for (final StopTime st : stopTimes) {
-      departures[s] = st.getDepartureTime() - timeShift;
-      arrivals[s] = st.getArrivalTime() - timeShift;
-      sequences[s] = st.getStopSequence();
-      timepoints.set(s, st.getTimepoint() == 1);
-
-      dropOffBookingInfos.add(st.getDropOffBookingInfo());
-      pickupBookingInfos.add(st.getPickupBookingInfo());
-      s++;
-    }
-    this.scheduledDepartureTimes = deduplicator.deduplicateIntArray(departures);
-    this.scheduledArrivalTimes = deduplicator.deduplicateIntArray(arrivals);
-    this.originalGtfsStopSequence = deduplicator.deduplicateIntArray(sequences);
-    this.headsigns =
-      deduplicator.deduplicateObjectArray(I18NString.class, makeHeadsignsArray(stopTimes));
-    this.headsignVias = deduplicator.deduplicateString2DArray(makeHeadsignViasArray(stopTimes));
-
-    this.dropOffBookingInfos =
-      deduplicator.deduplicateImmutableList(BookingInfo.class, dropOffBookingInfos);
-    this.pickupBookingInfos =
-      deduplicator.deduplicateImmutableList(BookingInfo.class, pickupBookingInfos);
-    this.timepoints = deduplicator.deduplicateBitSet(timepoints);
-  }
-
-  /** This copy constructor does not copy the actual times, only the scheduled times. */
-  public ScheduledTripTimes(final ScheduledTripTimes object) {
-    this.timeShift = object.timeShift;
-    this.trip = object.trip;
-    this.serviceCode = object.serviceCode;
-    this.headsigns = object.headsigns;
-    this.headsignVias = object.headsignVias;
-    this.scheduledArrivalTimes = object.scheduledArrivalTimes;
-    this.scheduledDepartureTimes = object.scheduledDepartureTimes;
-    this.pickupBookingInfos = object.pickupBookingInfos;
-    this.dropOffBookingInfos = object.dropOffBookingInfos;
-    this.originalGtfsStopSequence = object.originalGtfsStopSequence;
-    this.timepoints = object.timepoints;
-  }
-
-  /**
    * This is a temporary constructor to allow timeShifting.
    * TODO TT - It should be replaced by a builder.
    */
@@ -130,6 +66,41 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
     this.dropOffBookingInfos = object.dropOffBookingInfos;
     this.originalGtfsStopSequence = object.originalGtfsStopSequence;
     this.timepoints = object.timepoints;
+  }
+
+  ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
+    this.timeShift = builder.timeShift;
+    this.trip = builder.trip;
+    this.serviceCode = builder.serviceCode;
+    this.headsigns = builder.headsigns;
+    this.headsignVias = builder.headsignVias;
+    this.scheduledArrivalTimes = builder.arrivalTimes;
+    this.scheduledDepartureTimes = builder.departureTimes;
+    this.pickupBookingInfos = builder.pickupBookingInfos;
+    this.dropOffBookingInfos = builder.dropOffBookingInfos;
+    this.originalGtfsStopSequence = builder.originalGtfsStopSequence;
+    this.timepoints = builder.timepoints;
+  }
+
+  public static ScheduledTripTimesBuilder of(Deduplicator deduplicator) {
+    return new ScheduledTripTimesBuilder(deduplicator);
+  }
+
+  public ScheduledTripTimesBuilder copyOf(Deduplicator deduplicator) {
+    return new ScheduledTripTimesBuilder(
+      scheduledArrivalTimes,
+      scheduledDepartureTimes,
+      timeShift,
+      serviceCode,
+      timepoints,
+      dropOffBookingInfos,
+      pickupBookingInfos,
+      trip,
+      headsigns,
+      headsignVias,
+      originalGtfsStopSequence,
+      deduplicator
+    );
   }
 
   /**
@@ -372,73 +343,5 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
 
   I18NString[] copyHeadsigns(Supplier<I18NString[]> defaultValue) {
     return headsigns == null ? defaultValue.get() : Arrays.copyOf(headsigns, headsigns.length);
-  }
-
-  /* private member methods */
-
-  /**
-   * @return either an array of headsigns (one for each stop on this trip) or null if the headsign
-   * is the same at all stops (including null) and can be found in the Trip object.
-   */
-  private I18NString[] makeHeadsignsArray(final Collection<StopTime> stopTimes) {
-    final I18NString tripHeadsign = trip.getHeadsign();
-    boolean useStopHeadsigns = false;
-    if (tripHeadsign == null) {
-      useStopHeadsigns = true;
-    } else {
-      for (final StopTime st : stopTimes) {
-        if (!(tripHeadsign.equals(st.getStopHeadsign()))) {
-          useStopHeadsigns = true;
-          break;
-        }
-      }
-    }
-    if (!useStopHeadsigns) {
-      return null; //defer to trip_headsign
-    }
-    boolean allNull = true;
-    int i = 0;
-    final I18NString[] hs = new I18NString[stopTimes.size()];
-    for (final StopTime st : stopTimes) {
-      final I18NString headsign = st.getStopHeadsign();
-      hs[i++] = headsign;
-      if (headsign != null) allNull = false;
-    }
-    if (allNull) {
-      return null;
-    } else {
-      return hs;
-    }
-  }
-
-  /**
-   * Create 2D String array for via names for each stop in sequence.
-   *
-   * @return May be null if no vias are present in stop sequence.
-   */
-  private String[][] makeHeadsignViasArray(final Collection<StopTime> stopTimes) {
-    if (
-      stopTimes
-        .stream()
-        .allMatch(st -> st.getHeadsignVias() == null || st.getHeadsignVias().isEmpty())
-    ) {
-      return null;
-    }
-
-    String[][] vias = new String[stopTimes.size()][];
-
-    int i = 0;
-    for (final StopTime st : stopTimes) {
-      if (st.getHeadsignVias() == null) {
-        vias[i] = EMPTY_STRING_ARRAY;
-        i++;
-        continue;
-      }
-
-      vias[i] = st.getHeadsignVias().toArray(EMPTY_STRING_ARRAY);
-      i++;
-    }
-
-    return vias;
   }
 }
