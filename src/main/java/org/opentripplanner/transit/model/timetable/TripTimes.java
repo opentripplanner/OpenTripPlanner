@@ -6,7 +6,6 @@ import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorC
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -14,9 +13,7 @@ import java.util.function.IntUnaryOperator;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 
 /**
  * A TripTimes represents the arrival and departure times for a single trip in an Timetable. It is
@@ -36,51 +33,62 @@ public final class TripTimes implements Serializable, Comparable<TripTimes> {
   private OccupancyStatus[] occupancyStatus;
   private Accessibility wheelchairAccessibility;
 
-  /**
-   * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing. The
-   * non-interpolated stoptimes should already be marked at timepoints by a previous filtering
-   * step.
-   */
-  public TripTimes(
-    final Trip trip,
-    final Collection<StopTime> stopTimes,
-    final Deduplicator deduplicator
+  private TripTimes(final TripTimes original, int timeShiftDelta) {
+    this(original, new ScheduledTripTimes(original.scheduledTripTimes, timeShiftDelta));
+  }
+
+  TripTimes(ScheduledTripTimes scheduledTripTimes) {
+    this(
+      scheduledTripTimes,
+      scheduledTripTimes.getRealTimeState(),
+      null,
+      null,
+      null,
+      scheduledTripTimes.getWheelchairAccessibility()
+    );
+  }
+
+  private TripTimes(TripTimes original, ScheduledTripTimes scheduledTripTimes) {
+    this(
+      scheduledTripTimes,
+      original.realTimeState,
+      original.stopRealTimeStates,
+      original.headsigns,
+      original.occupancyStatus,
+      original.wheelchairAccessibility
+    );
+  }
+
+  private TripTimes(
+    ScheduledTripTimes scheduledTripTimes,
+    RealTimeState realTimeState,
+    StopRealTimeState[] stopRealTimeStates,
+    I18NString[] headsigns,
+    OccupancyStatus[] occupancyStatus,
+    Accessibility wheelchairAccessibility
   ) {
-    this.scheduledTripTimes = StopTimeToScheduledTripTimesMapper.map(trip, stopTimes, deduplicator);
+    this.scheduledTripTimes = scheduledTripTimes;
+    this.realTimeState = realTimeState;
+    this.stopRealTimeStates = stopRealTimeStates;
+    this.headsigns = headsigns;
+    this.occupancyStatus = occupancyStatus;
+    this.wheelchairAccessibility = wheelchairAccessibility;
+
     // We set these to null to indicate that this is a non-updated/scheduled TripTimes.
     // We cannot point to the scheduled times because we do not want to make an unnecessary copy.
     this.arrivalTimes = null;
     this.departureTimes = null;
-    this.realTimeState = scheduledTripTimes.getRealTimeState();
-    this.stopRealTimeStates = null;
-    this.headsigns = null;
-    this.occupancyStatus = null;
-    this.wheelchairAccessibility = scheduledTripTimes.getWheelchairAccessibility();
+  }
+
+  public static TripTimes of(ScheduledTripTimes scheduledTripTimes) {
+    return new TripTimes(scheduledTripTimes);
   }
 
   /**
-   * This copy constructor does not copy the actual times, only the scheduled times.
+   * Copy scheduled times, but not the actual times.
    */
-  public TripTimes(final TripTimes object) {
-    this.scheduledTripTimes = object.scheduledTripTimes;
-    this.arrivalTimes = null;
-    this.departureTimes = null;
-    this.realTimeState = object.realTimeState;
-    this.stopRealTimeStates = object.stopRealTimeStates;
-    this.headsigns = object.headsigns;
-    this.occupancyStatus = object.occupancyStatus;
-    this.wheelchairAccessibility = object.wheelchairAccessibility;
-  }
-
-  public TripTimes(final TripTimes object, int timeShiftDelta) {
-    this.scheduledTripTimes = new ScheduledTripTimes(object.scheduledTripTimes, timeShiftDelta);
-    this.arrivalTimes = null;
-    this.departureTimes = null;
-    this.realTimeState = object.realTimeState;
-    this.stopRealTimeStates = object.stopRealTimeStates;
-    this.headsigns = object.headsigns;
-    this.occupancyStatus = object.occupancyStatus;
-    this.wheelchairAccessibility = object.wheelchairAccessibility;
+  public TripTimes copyOfScheduledTimes() {
+    return new TripTimes(this, scheduledTripTimes);
   }
 
   /**

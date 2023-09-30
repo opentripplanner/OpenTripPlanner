@@ -25,8 +25,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 /**
  * This test will create a Transit service builder and then limit the service period. The services
@@ -193,7 +193,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
       .build();
 
     for (Trip trip : trips) {
-      p.add(new TripTimes(trip, STOP_TIMES, DEDUPLICATOR));
+      p.add(TripTimesFactory.tripTimes(trip, STOP_TIMES, DEDUPLICATOR));
     }
     return p;
   }

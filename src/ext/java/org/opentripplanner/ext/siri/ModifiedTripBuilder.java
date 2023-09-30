@@ -94,7 +94,7 @@ public class ModifiedTripBuilder {
    * in form the SIRI-ET update.
    */
   public Result<TripUpdate, UpdateError> build() {
-    TripTimes newTimes = new TripTimes(existingTripTimes);
+    TripTimes newTimes = existingTripTimes.copyOfScheduledTimes();
 
     StopPattern stopPattern = createStopPattern(pattern, calls, entityResolver);
 
