@@ -315,6 +315,16 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
     return serviceCode;
   }
 
+  @Override
+  public boolean equals(Object o) {
+    throw new UnsupportedOperationException("Not implemented, implement if needed!");
+  }
+
+  @Override
+  public int hashCode() {
+    throw new UnsupportedOperationException("Not implemented, implement if needed!");
+  }
+
   /** The trips whose arrivals and departures are represented by this class */
   public Trip getTrip() {
     return trip;
