@@ -19,18 +19,15 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 
 final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTripTimes> {
 
-  private static final int NOT_SET = -1;
-
   private final int[] scheduledArrivalTimes;
   private final int[] scheduledDepartureTimes;
   /**
-   * This allows re-using the same scheduled arrival and departure time arrays for many
-   * ScheduledTripTimes. It is also used in materializing frequency-based ScheduledTripTimes.
+   * Implementation notes: This allows re-using the same scheduled arrival and departure time
+   * arrays for many ScheduledTripTimes. It is also used in materializing frequency-based
+   * ScheduledTripTimes.
    */
   private final int timeShift;
-
-  /** Implementation notes: not final because these are set after construction. */
-  private int serviceCode;
+  private final int serviceCode;
   private final BitSet timepoints;
   private final List<BookingInfo> dropOffBookingInfos;
   private final List<BookingInfo> pickupBookingInfos;
@@ -50,24 +47,6 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
 
   private final int[] originalGtfsStopSequence;
 
-  /**
-   * This is a temporary constructor to allow timeShifting.
-   * TODO TT - It should be replaced by a builder.
-   */
-  ScheduledTripTimes(final ScheduledTripTimes object, int timeShiftDelta) {
-    this.timeShift = object.timeShift + timeShiftDelta;
-    this.trip = object.trip;
-    this.serviceCode = object.serviceCode;
-    this.headsigns = object.headsigns;
-    this.headsignVias = object.headsignVias;
-    this.scheduledArrivalTimes = object.scheduledArrivalTimes;
-    this.scheduledDepartureTimes = object.scheduledDepartureTimes;
-    this.pickupBookingInfos = object.pickupBookingInfos;
-    this.dropOffBookingInfos = object.dropOffBookingInfos;
-    this.originalGtfsStopSequence = object.originalGtfsStopSequence;
-    this.timepoints = object.timepoints;
-  }
-
   ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
     this.timeShift = builder.timeShift;
     this.trip = builder.trip;
@@ -82,11 +61,18 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
     this.timepoints = builder.timepoints;
   }
 
-  public static ScheduledTripTimesBuilder of(Deduplicator deduplicator) {
+  public static ScheduledTripTimesBuilder of(@Nullable Deduplicator deduplicator) {
     return new ScheduledTripTimesBuilder(deduplicator);
   }
 
-  public ScheduledTripTimesBuilder copyOf(Deduplicator deduplicator) {
+  /**
+   * Create a builder with or without deduplication.
+   * <p>
+   * Always provide a deduplicator when building the graph. No deduplication is ok when changing
+   * simple fields like {@code timeShift} and {@code serviceCode} or even the prefered way in a
+   * unittest.
+   */
+  public ScheduledTripTimesBuilder copyOf(@Nullable Deduplicator deduplicator) {
     return new ScheduledTripTimesBuilder(
       scheduledArrivalTimes,
       scheduledDepartureTimes,
@@ -104,10 +90,17 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
   }
 
   /**
+   * @see #copyOf(Deduplicator) copyOf(null)
+   */
+  public ScheduledTripTimesBuilder copyOfNoDuplication() {
+    return copyOf(null);
+  }
+
+  /**
    * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS fields.
    * A trip may not have a headsign, in which case we should fall back on a Timetable or
    * Pattern-level headsign. Such a string will be available when we give TripPatterns or
-   * StopPatterns unique human readable route variant names, but a ScheduledTripTimes currently
+   * StopPatterns unique human-readable route variant names, but a ScheduledTripTimes currently
    * does not have a pointer to its enclosing timetable or pattern.
    */
   @Nullable
@@ -320,10 +313,6 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
   /** The code for the service on which this trip runs. For departure search optimizations. */
   public int getServiceCode() {
     return serviceCode;
-  }
-
-  public void setServiceCode(int serviceCode) {
-    this.serviceCode = serviceCode;
   }
 
   /** The trips whose arrivals and departures are represented by this class */

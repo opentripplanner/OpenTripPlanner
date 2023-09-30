@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
  */
 public final class TripTimes implements Serializable, Comparable<TripTimes> {
 
-  private final ScheduledTripTimes scheduledTripTimes;
+  private ScheduledTripTimes scheduledTripTimes;
 
   private int[] arrivalTimes;
   private int[] departureTimes;
@@ -34,7 +34,10 @@ public final class TripTimes implements Serializable, Comparable<TripTimes> {
   private Accessibility wheelchairAccessibility;
 
   private TripTimes(final TripTimes original, int timeShiftDelta) {
-    this(original, new ScheduledTripTimes(original.scheduledTripTimes, timeShiftDelta));
+    this(
+      original,
+      original.scheduledTripTimes.copyOfNoDuplication().plusTimeShift(timeShiftDelta).build()
+    );
   }
 
   TripTimes(ScheduledTripTimes scheduledTripTimes) {
@@ -435,14 +438,20 @@ public final class TripTimes implements Serializable, Comparable<TripTimes> {
     // Adjust 0-based times to match desired stoptime.
     final int shift = time - (depart ? getDepartureTime(stop) : getArrivalTime(stop));
 
-    return new TripTimes(this, shift);
+    return new TripTimes(
+      this,
+      scheduledTripTimes.copyOfNoDuplication().plusTimeShift(shift).build()
+    );
   }
 
   /**
    * Time-shift all times on this trip. This is used when updating the time zone for the trip.
    */
-  public TripTimes adjustTimesToGraphTimeZone(Duration duration) {
-    return new TripTimes(this, (int) duration.toSeconds());
+  public TripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
+    return new TripTimes(
+      this,
+      scheduledTripTimes.copyOfNoDuplication().plusTimeShift((int) shiftDelta.toSeconds()).build()
+    );
   }
 
   /**
@@ -480,7 +489,8 @@ public final class TripTimes implements Serializable, Comparable<TripTimes> {
   }
 
   public void setServiceCode(int serviceCode) {
-    scheduledTripTimes.setServiceCode(serviceCode);
+    this.scheduledTripTimes =
+      scheduledTripTimes.copyOfNoDuplication().withServiceCode(serviceCode).build();
   }
 
   /** The trips whose arrivals and departures are represented by this class */
