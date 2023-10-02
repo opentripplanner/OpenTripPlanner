@@ -55,8 +55,9 @@ export function ItineraryHeaderContent({
         })}
       </div>
 
-      {tripPattern.legs.map((leg) => (
+      {tripPattern.legs.map((leg, i) => (
         <ItineraryHeaderLegContent
+          key={leg.id || `leg_${i}`}
           leg={leg}
           earliestStartTime={earliestStartTime}
           startPx={startPx}

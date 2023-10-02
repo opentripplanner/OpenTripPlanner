@@ -23,7 +23,7 @@ export function NavigationMarkers({
           }}
           anchor="bottom-right"
         >
-          <img alt="" src="/img/marker-flag-start-shadowed.png" height={48} width={49} />
+          <img alt="" src="/debug-client-preview/img/marker-flag-start-shadowed.png" height={48} width={49} />
         </Marker>
       )}
       {tripQueryVariables.to.coordinates && (
@@ -39,7 +39,7 @@ export function NavigationMarkers({
           }}
           anchor="bottom-right"
         >
-          <img alt="" src="/img/marker-flag-end-shadowed.png" height={48} width={49} />
+          <img alt="" src="/debug-client-preview/img/marker-flag-end-shadowed.png" height={48} width={49} />
         </Marker>
       )}
     </>

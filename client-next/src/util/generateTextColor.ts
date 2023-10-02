@@ -32,9 +32,9 @@ function hex2rgb(hex: string) {
 }
 
 function fullHex(hex: string) {
-  let r = hex.slice(1, 2);
-  let g = hex.slice(2, 3);
-  let b = hex.slice(3, 4);
+  const r = hex.slice(1, 2);
+  const g = hex.slice(2, 3);
+  const b = hex.slice(3, 4);
 
   return [parseInt(r + r, 16), parseInt(g + g, 16), parseInt(b + b, 16)];
 }

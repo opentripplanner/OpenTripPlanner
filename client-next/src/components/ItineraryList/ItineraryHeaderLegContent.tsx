@@ -56,9 +56,9 @@ export function ItineraryHeaderLegContent({
       <div
         style={{
           background: legTextColor,
-          maskImage: `url(/img/mode/${leg.mode.toLowerCase()}.png)`,
+          maskImage: `url(/debug-client-preview/img/mode/${leg.mode.toLowerCase()}.png)`,
           maskRepeat: 'no-repeat',
-          WebkitMaskImage: `url(/img/mode/${leg.mode.toLowerCase()}.png)`,
+          WebkitMaskImage: `url(/debug-client-preview/img/mode/${leg.mode.toLowerCase()}.png)`,
           WebkitMaskRepeat: 'no-repeat',
           width: '17px',
           height: '17px',
