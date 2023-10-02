@@ -2649,6 +2649,16 @@ type QueryType {
         maxArrivalTime: Int
     ): [Stoptime]
 
+    """Get cancelled Trips"""
+    cancelledTrips(
+        """Feed feedIds (e.g. ["HSL"])."""
+        feeds: [String]
+        before: String
+        after: String
+        first: Int
+        last: Int
+    ): DatedTripConnection
+
     """Get all patterns"""
     patterns: [Pattern]
 
@@ -3972,6 +3982,27 @@ type Trip implements Node {
         """
         types: [TripAlertType]
     ): [Alert]
+}
+
+"""
+Trip on a specific date
+"""
+type DatedTrip implements Node {
+    id: ID!
+    trip: Trip!
+    date: String!
+}
+
+"""An edge for DatedTrip connection"""
+type DatedTripEdge {
+    node: DatedTrip
+    cursor: String!
+}
+
+"""A connection to a list of dated trips"""
+type DatedTripConnection {
+    edges: [DatedTripEdge]
+    pageInfo: PageInfo!
 }
 
 """Entities, which are relevant for a trip and can contain alerts"""

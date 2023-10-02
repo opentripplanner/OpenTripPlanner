@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
+import org.opentripplanner.transit.model.timetable.DatedTrip;
+import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -245,6 +248,35 @@ public class DefaultTransitService implements TransitEditorService {
   @Override
   public Trip getTripForId(FeedScopedId id) {
     return this.transitModelIndex.getTripForId().get(id);
+  }
+
+  @Override
+  public Collection<DatedTrip> getCancelledTrips() {
+    OTPRequestTimeoutException.checkForTimeout();
+    List<DatedTrip> cancelledTrips = new ArrayList<>();
+    var timetableSnapshot = lazyGetTimeTableSnapShot();
+    if (timetableSnapshot == null) {
+      return cancelledTrips;
+    }
+    var calendarService = getCalendarService();
+    var patternMap = transitModelIndex.getPatternForTrip();
+
+    transitModelIndex
+      .getTripForId()
+      .values()
+      .forEach(trip -> {
+        Set<LocalDate> serviceDates = calendarService.getServiceDatesForServiceId(
+          trip.getServiceId()
+        );
+        var pattern = patternMap.get(trip);
+        for (LocalDate date : serviceDates) {
+          var tt = timetableSnapshot.resolve(pattern, date);
+          if (tt.getTripTimes(trip).getRealTimeState() == RealTimeState.CANCELED) {
+            cancelledTrips.add(new DatedTrip(trip, date));
+          }
+        }
+      });
+    return cancelledTrips;
   }
 
   @Override

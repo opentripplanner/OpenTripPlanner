@@ -63,6 +63,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -422,6 +423,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
 
             return new PlaceAtDistance(place, Double.parseDouble(parts[0]));
           }
+        case "DatedTrip":
+          return null; // ????
         case "Route":
           return transitService.getRouteForId(FeedScopedId.parse(id));
         case "Stop":
@@ -784,6 +787,23 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
       }
 
       return tripStream.collect(Collectors.toList());
+    };
+  }
+
+  @Override
+  public DataFetcher<Connection<DatedTrip>> cancelledTrips() {
+    return environment -> {
+      // var args = new GraphQLTypes.GraphQLQueryTypeGetTripsArgs(environment.getArguments());
+
+      Stream<DatedTrip> tripStream = getTransitService(environment).getCancelledTrips().stream();
+
+      /* if (args.getGraphQLFeeds() != null) {
+        List<String> feeds = args.getGraphQLFeeds();
+        tripStream = tripStream.filter(datedTrip -> feeds.contains(datedTrip.getTrip().getId().getFeedId()));
+	}*/
+
+      var datedTrips = tripStream.collect(Collectors.toList());
+      return new SimpleListConnection<>(datedTrips).get(environment);
     };
   }
 

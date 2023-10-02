@@ -47,6 +47,9 @@ config:
     ContactInfo: org.opentripplanner.transit.model.organization.ContactInfo
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
+    DatedTrip: org.opentripplanner.transit.model.timetable.DatedTrip#DatedTrip
+    DatedTripConnection: graphql.relay.Connection#Connection<DatedTrip>
+    DatedTripEdge: graphql.relay.Edge#Edge<DatedTrip>
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
     elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step

@@ -2,10 +2,15 @@
 package org.opentripplanner.apis.gtfs.generated;
 
 import graphql.relay.Connection;
+import graphql.relay.Connection;
+import graphql.relay.Connection;
+import graphql.relay.Edge;
+import graphql.relay.Edge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
 import java.util.Currency;
+import java.util.Map;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -20,7 +25,11 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirec
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
+import org.opentripplanner.apis.gtfs.model.RouteTypeModel;
+import org.opentripplanner.apis.gtfs.model.StopOnRouteModel;
+import org.opentripplanner.apis.gtfs.model.StopOnTripModel;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
+import org.opentripplanner.apis.gtfs.model.UnknownModel;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -42,6 +51,8 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
+import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
@@ -50,11 +61,13 @@ import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.timetable.DatedTrip;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class GraphQLDataFetchers {
@@ -291,6 +304,29 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> code();
 
     public DataFetcher<Integer> digits();
+  }
+
+  /** Trip on a specific date */
+  public interface GraphQLDatedTrip {
+    public DataFetcher<String> date();
+
+    public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
+
+    public DataFetcher<Trip> trip();
+  }
+
+  /** A connection to a list of dated trips */
+  public interface GraphQLDatedTripConnection {
+    public DataFetcher<Iterable<Edge<DatedTrip>>> edges();
+
+    public DataFetcher<Object> pageInfo();
+  }
+
+  /** An edge for DatedTrip connection */
+  public interface GraphQLDatedTripEdge {
+    public DataFetcher<String> cursor();
+
+    public DataFetcher<DatedTrip> node();
   }
 
   /**
@@ -664,6 +700,8 @@ public class GraphQLDataFetchers {
     public DataFetcher<Iterable<VehicleRentalPlace>> bikeRentalStations();
 
     public DataFetcher<Iterable<TripTimeOnDate>> cancelledTripTimes();
+
+    public DataFetcher<Connection<DatedTrip>> cancelledTrips();
 
     public DataFetcher<VehicleParking> carPark();
 
