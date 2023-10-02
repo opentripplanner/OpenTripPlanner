@@ -40,16 +40,13 @@ class StopTimeToScheduledTripTimesMapper {
     final int[] arrivals = new int[nStops];
     final int[] sequences = new int[nStops];
     final BitSet timepoints = new BitSet(nStops);
-    // Times are always shifted to zero. This is essential for frequencies and deduplication.
-    int timeShift = stopTimes.iterator().next().getArrivalTime();
-    builder.withTimeShift(timeShift);
 
     final List<BookingInfo> dropOffBookingInfos = new ArrayList<>();
     final List<BookingInfo> pickupBookingInfos = new ArrayList<>();
     int s = 0;
     for (final StopTime st : stopTimes) {
-      departures[s] = st.getDepartureTime() - timeShift;
-      arrivals[s] = st.getArrivalTime() - timeShift;
+      departures[s] = st.getDepartureTime();
+      arrivals[s] = st.getArrivalTime();
       sequences[s] = st.getStopSequence();
       timepoints.set(s, st.getTimepoint() == 1);
 

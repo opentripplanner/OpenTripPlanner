@@ -69,22 +69,20 @@ public final class ScheduledTripTimes implements Serializable, Comparable<Schedu
     validate();
   }
 
+  /**
+   * Always provide a deduplicator when building the graph. No deduplication is ok when changing
+   * simple fields like {@code timeShift} and {@code serviceCode} or even the prefered way in an
+   * unittest.
+   */
   public static ScheduledTripTimesBuilder of() {
     return new ScheduledTripTimesBuilder(null);
   }
 
-  public static ScheduledTripTimesBuilder of(@Nullable Deduplicator deduplicator) {
+  public static ScheduledTripTimesBuilder of(Deduplicator deduplicator) {
     return new ScheduledTripTimesBuilder(deduplicator);
   }
 
-  /**
-   * Create a builder with or without deduplication.
-   * <p>
-   * Always provide a deduplicator when building the graph. No deduplication is ok when changing
-   * simple fields like {@code timeShift} and {@code serviceCode} or even the prefered way in a
-   * unittest.
-   */
-  public ScheduledTripTimesBuilder copyOf(@Nullable Deduplicator deduplicator) {
+  public ScheduledTripTimesBuilder copyOf(Deduplicator deduplicator) {
     return new ScheduledTripTimesBuilder(
       timeShift,
       serviceCode,
