@@ -63,9 +63,9 @@ public class VehicleRentalServiceDirectoryFetcherConfig {
       )
       .description(
         """
-        If no default network exist only the listed networks are used. Configure the a network with
+        If no default network exists only the listed networks are used. Configure a network with
         name "{{default-network}}" to include all unlisted networks. If not present, all unlisted
-        networks is dropped. Note! The values in the "{{default-network}}" are not used to set
+        networks are dropped. Note! The values in the "{{default-network}}" are not used to set
         missing field values in networks listed.
         """.replace(
             "{{default-network}}",
