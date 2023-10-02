@@ -337,6 +337,10 @@ public class RouteRequest implements Cloneable, Serializable {
     return !Duration.ZERO.equals(maxSearchWindow);
   }
 
+  public Duration maxSearchWindow() {
+    return maxSearchWindow;
+  }
+
   public void setMaxSearchWindow(Duration maxSearchWindow) {
     this.maxSearchWindow = maxSearchWindow;
   }
