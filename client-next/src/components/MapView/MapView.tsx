@@ -1,6 +1,6 @@
 import { Map, NavigationControl } from 'react-map-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
+import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
 import { LegLines } from './LegLines.tsx';
 import { useMapDoubleClick } from './useMapDoubleClick.ts';
@@ -17,10 +17,12 @@ export function MapView({
   tripQueryVariables,
   setTripQueryVariables,
   tripQueryResult,
+  selectedTripPatternIndex,
 }: {
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (variables: TripQueryVariables) => void;
   tripQueryResult: TripQuery | null;
+  selectedTripPatternIndex: number;
 }) {
   const onMapDoubleClick = useMapDoubleClick({ tripQueryVariables, setTripQueryVariables });
 
@@ -36,7 +38,9 @@ export function MapView({
     >
       <NavigationControl position="top-left" />
       <NavigationMarkers tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
-      <LegLines tripQueryResult={tripQueryResult} />
+      {tripQueryResult?.trip.tripPatterns.length && (
+        <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
+      )}
     </Map>
   );
 }

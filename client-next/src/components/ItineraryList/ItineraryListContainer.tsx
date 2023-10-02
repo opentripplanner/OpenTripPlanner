@@ -5,13 +5,24 @@ import { ItineraryHeaderContent } from './ItineraryHeaderContent.tsx';
 import { useEarliestAndLatestTimes } from './useEarliestAndLatestTimes.ts';
 
 // TODO itinerary (accordion) selection should propagate to map view
-export function ItineraryListContainer({ tripQueryResult }: { tripQueryResult: QueryType | null }) {
+export function ItineraryListContainer({
+  tripQueryResult,
+  selectedTripPatternIndex,
+  setSelectedTripPatternIndex,
+}: {
+  tripQueryResult: QueryType | null;
+  selectedTripPatternIndex: number;
+  setSelectedTripPatternIndex: (selectedTripPatterIndex: number) => void;
+}) {
   const [earliestStartTime, latestEndTime] = useEarliestAndLatestTimes(tripQueryResult);
   const { containerRef, containerWidth } = useContainerWidth();
 
   return (
     <section className="itinerary-list-container" ref={containerRef}>
-      <Accordion>
+      <Accordion
+        activeKey={`${selectedTripPatternIndex}`}
+        onSelect={(eventKey) => setSelectedTripPatternIndex(parseInt(eventKey as string))}
+      >
         {tripQueryResult &&
           tripQueryResult.trip.tripPatterns.map((tripPattern, itineraryIndex) => (
             <Accordion.Item eventKey={`${itineraryIndex}`} key={`${itineraryIndex}`}>

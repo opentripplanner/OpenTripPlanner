@@ -16,7 +16,7 @@ const INITIAL_VARIABLES: TripQueryVariables = {
 export function App() {
   const [tripQueryVariables, setTripQueryVariables] = useState<TripQueryVariables>(INITIAL_VARIABLES);
   const [tripQueryResult, callback] = useTripQuery(tripQueryVariables);
-  //const [selectedTripPatternIndex, setSelectedTripPatternIndex] = useState<number>(0);
+  const [selectedTripPatternIndex, setSelectedTripPatternIndex] = useState<number>(0);
 
   return (
     <div className="app">
@@ -29,14 +29,14 @@ export function App() {
       <Stack direction="horizontal" gap={0}>
         <ItineraryListContainer
           tripQueryResult={tripQueryResult}
-          //selectedTripPatternIndex={selectedTripPatternIndex}
-          //setSelectedTripPatternIndex={setSelectedTripPatternIndex()}
+          selectedTripPatternIndex={selectedTripPatternIndex}
+          setSelectedTripPatternIndex={setSelectedTripPatternIndex}
         />
         <MapView
           tripQueryResult={tripQueryResult}
           tripQueryVariables={tripQueryVariables}
           setTripQueryVariables={setTripQueryVariables}
-          //selectedTripPatternIndex={selectedTripPatternIndex}
+          selectedTripPatternIndex={selectedTripPatternIndex}
         />
       </Stack>
       <DetailsViewContainer />
