@@ -13,12 +13,7 @@ export function SearchBar({
   setTripQueryVariables: (tripQueryVariables: TripQueryVariables) => void;
 }) {
   return (
-    <section
-      style={{
-        height: '5rem',
-        paddingLeft: '1rem',
-      }}
-    >
+    <section className="search-bar-container">
       <Stack direction="horizontal" gap={2}>
         <LocationInputField location={tripQueryVariables.from} label="From" id="fromInputField" />
         <LocationInputField location={tripQueryVariables.to} label="To" id="toInputField" />

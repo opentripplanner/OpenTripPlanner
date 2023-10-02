@@ -22,8 +22,8 @@ export function DepartureArrivalSelect({
         onChange={(e) => (e.target.value === 'arrival' ? onChange(true) : onChange(false))}
         value={tripQueryVariables.arriveBy ? 'arrival' : 'departure'}
       >
-        <option value="arrival">Arrival</option>
-        <option value="departure">Departure</option>
+        <option value="arrival">Arrive before</option>
+        <option value="departure">Depart after</option>
       </Form.Select>
     </Form.Group>
   );

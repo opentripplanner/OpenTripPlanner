@@ -10,8 +10,65 @@
   color: #4078bc;
 }
 
+.search-bar-container {
+  height: 5rem;
+  padding-left: 1rem;
+}
+
 .itinerary-list-container {
   width: 36rem;
   height: calc(100vh - 200px);
   overflow-y: auto;
+}
+
+.itinerary-header-wrapper {
+  position: relative;
+}
+
+.itinerary-header-itinerary-number {
+  position: absolute;
+}
+
+.itinerary-header-itinerary-line {
+  position: absolute;
+  height: 2px;
+  top: 9px;
+  background: #000;
+}
+
+.itinerary-header-itinerary-time {
+  position: absolute;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  width: 38px;
+  height: 15px;
+  text-align: center;
+  top: 2px;
+  padding: 1px;
+}
+
+.itinerary-header-leg-wrapper {
+  position: absolute;
+  height: 22px;
+  font-weight: bold;
+  text-shadow: none;
+  margin-top: -1px;
+  padding-top: 3px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.itinerary-header-leg-icon {
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  width: 17px;
+  height: 17px;
+  display: inline-block;
+}
+
+.itinerary-header-leg-public-code {
+  vertical-align: top;
+  font-size: 14px;
+  padding-left: 2px;
 }

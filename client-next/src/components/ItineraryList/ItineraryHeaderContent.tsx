@@ -1,6 +1,7 @@
 import { TripPattern } from '../../gql/graphql.ts';
 import { TIME_BOX_WIDTH, useHeaderContentStyleCalculations } from './useHeaderContentStyleCalculations.ts';
 import { ItineraryHeaderLegContent } from './ItineraryHeaderLegContent.tsx';
+import { useMemo } from 'react';
 
 export function ItineraryHeaderContent({
   tripPattern,
@@ -22,37 +23,41 @@ export function ItineraryHeaderContent({
     latestEndTime,
   );
 
+  const formattedStartTime = useMemo(
+    () =>
+      new Date(tripPattern.expectedStartTime).toLocaleTimeString('en-US', {
+        timeStyle: 'short',
+        hourCycle: 'h24',
+      }),
+    [tripPattern.expectedStartTime],
+  );
+
+  const formattedEndTime = useMemo(
+    () =>
+      new Date(tripPattern.expectedEndTime).toLocaleTimeString('en-US', {
+        timeStyle: 'short',
+        hourCycle: 'h24',
+      }),
+    [tripPattern.expectedEndTime],
+  );
+
   return (
-    <div style={{ position: 'relative' }}>
-      <div style={{ position: 'absolute' }}>{itineraryIndex + 1}.</div>
+    <div className="itinerary-header-wrapper">
+      <div className="itinerary-header-itinerary-number">{itineraryIndex + 1}.</div>
       <div
+        className="itinerary-header-itinerary-line"
         style={{
-          position: 'absolute',
           width: `${widthPx + 5}px`,
-          height: '2px',
           left: `${leftPx - 2}px`,
-          top: '9px',
-          background: 'black',
         }}
       />
       <div
+        className="itinerary-header-itinerary-time"
         style={{
-          position: 'absolute',
           left: `${leftPx - TIME_BOX_WIDTH}px`,
-          background: 'black',
-          color: 'white',
-          fontSize: '12px',
-          width: '38px',
-          height: '15px',
-          textAlign: 'center',
-          top: 2,
-          padding: 1,
         }}
       >
-        {new Date(tripPattern.expectedStartTime).toLocaleTimeString('en-US', {
-          timeStyle: 'short',
-          hourCycle: 'h24',
-        })}
+        {formattedStartTime}
       </div>
 
       {tripPattern.legs.map((leg, i) => (
@@ -67,23 +72,12 @@ export function ItineraryHeaderContent({
       ))}
 
       <div
+        className="itinerary-header-itinerary-time"
         style={{
-          position: 'absolute',
           left: `${leftPx + widthPx + 2}px`,
-          background: 'black',
-          color: 'white',
-          fontSize: '12px',
-          width: '38px',
-          height: '15px',
-          textAlign: 'center',
-          top: 2,
-          padding: 1,
         }}
       >
-        {new Date(tripPattern.expectedEndTime).toLocaleTimeString('en-US', {
-          timeStyle: 'short',
-          hourCycle: 'h24',
-        })}
+        {formattedEndTime}
       </div>
     </div>
   );
