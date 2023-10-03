@@ -11,6 +11,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 import static org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile.ofDebugEnabled;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -162,7 +164,9 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   void testRoutingErrorsOriginDestinationTooCloseTest() {
     ItineraryListFilterChain chain = createBuilder(false, false, 20)
       .withRemoveWalkAllTheWayResults(true)
-      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
+      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+        CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
+      )
       .build();
 
     Itinerary walk = newItinerary(A, T11_06).walk(D10m, E).build();
@@ -243,7 +247,9 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     var sortOrder = arriveBy ? STREET_AND_DEPARTURE_TIME : STREET_AND_ARRIVAL_TIME;
     return new ItineraryListFilterChainBuilder(sortOrder)
       .withMaxNumberOfItineraries(numOfItineraries)
-      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
+      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+        CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
+      )
       .withDebugEnabled(ofDebugEnabled(debug));
   }
 
@@ -297,9 +303,10 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
 
     @Test
     public void removeTransitWithHigherCostThanBestOnStreetOnlyDisabled() {
-      // Disable filter and allow none optimal bus itinerary pass through
+      // Allow non-optimal bus itinerary pass through
       ItineraryListFilterChain chain = builder
-        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(false)
+        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(null)
+        .withRemoveTransitIfWalkingIsBetter(false)
         .build();
       assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
     }
@@ -308,7 +315,9 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     public void removeTransitWithHigherCostThanBestOnStreetOnlyEnabled() {
       // Enable filter and remove bus itinerary
       ItineraryListFilterChain chain = builder
-        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
+        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+          CostLinearFunction.of(Duration.ofSeconds(0), 1.0)
+        )
         .build();
       assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
     }

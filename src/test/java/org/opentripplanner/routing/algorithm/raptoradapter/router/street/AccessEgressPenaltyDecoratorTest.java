@@ -44,7 +44,7 @@ class AccessEgressPenaltyDecoratorTest {
   static void verifyTestSetup() {
     assertEquals("Walk 15m38s $238035 w/penalty(13m23s $1606) ~ 1", EXP_WALK_W_PENALTY.toString());
     assertEquals(
-      "Walk 11m53s $237886 w/penalty(11m8s $1336) ~ 1",
+      "Walk 11m53s $237887 w/penalty(11m8s $1336) ~ 1",
       EXP_CAR_RENTAL_W_PENALTY.toString()
     );
   }
@@ -114,7 +114,7 @@ class AccessEgressPenaltyDecoratorTest {
   private static DefaultAccessEgress ofCarRental(int duration) {
     return ofAccessEgress(
       duration,
-      TestStateBuilder.ofCarRental().streetEdge().pickUpCar().build()
+      TestStateBuilder.ofCarRental().streetEdge().pickUpCarFromStation().build()
     );
   }
 

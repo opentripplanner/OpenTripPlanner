@@ -141,9 +141,9 @@ jobs:
           
           if [ ${{ github.ref }} = 'refs/heads/master' ]; 
           then
-            mike deploy --branch $LOCAL_BRANCH --prefix en --title=$MASTER_BRANCH_VERSION --update-aliases v$MASTER_BRANCH_VERSION latest
+            mike deploy --branch $LOCAL_BRANCH --deploy-prefix en --title=$MASTER_BRANCH_VERSION --update-aliases v$MASTER_BRANCH_VERSION latest
           else
-            mike deploy --branch $LOCAL_BRANCH --prefix en dev-2.x
+            mike deploy --branch $LOCAL_BRANCH --deploy-prefix en dev-2.x
           fi
           
           # commit and push the GraphQL documentation if the schema file is newer than the 
@@ -152,7 +152,7 @@ jobs:
           # schema hasn't changed.
           # example commit: https://github.com/opentripplanner/docs/commit/45e6ddf8e4a4
           
-          SCHEMA_FILE_MODIFIED=`git log -n 1 --pretty=format:%ct src/ext/resources/gtfsgraphqlapi/schema.graphqls`
+          SCHEMA_FILE_MODIFIED=`git log -n 1 --pretty=format:%ct src/main/resources/org/opentripplanner/apis/gtfs/schema.graphqls`
           echo "schema modified at ${SCHEMA_FILE_MODIFIED}"
           git checkout $LOCAL_BRANCH
           DOCS_MODIFIED=`git log -n 1 --pretty=format:%ct api/dev-2.x/graphql-gtfs/introduction.html`
@@ -179,7 +179,7 @@ jobs:
         with:
           node-version: 16
       - name: Run code generator
-        working-directory: src/ext/java/org/opentripplanner/ext/gtfsgraphqlapi/generated
+        working-directory: src/main/java/org/opentripplanner/apis/gtfs/generated
         run: |
           yarn install
           yarn generate
@@ -193,7 +193,7 @@ jobs:
         run: mvn --batch-mode compile -DskipTests -P prettierSkip
 
   container-image:
-    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
+    if: github.repository_owner == 'opentripplanner' && github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x' || github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     needs:
       - build-windows
@@ -220,7 +220,14 @@ jobs:
           
           version_with_snapshot=`mvn -q help:evaluate -Dexpression=project.version -q -DforceStdout`
           version=${version_with_snapshot/-SNAPSHOT/}
-          image_date=`date +%Y-%m-%dT%H-%M`
-          image_version="${version}_${image_date}"
+          
+          image_version=${version}
+          
+          ## if the Maven version contains SNAPSHOT, then add date to tag
+          if [[ $version_with_snapshot == *"SNAPSHOT"* ]]; then
+            image_date=`date +%Y-%m-%dT%H-%M`
+            image_version="${version}_${image_date}"
+            echo "Maven version ${version_with_snapshot} contains SNAPSHOT, adding date to container image tag"
+          fi
           
           mvn --batch-mode -P prettierSkip compile com.google.cloud.tools:jib-maven-plugin:build -Djib.to.tags=latest,$image_version

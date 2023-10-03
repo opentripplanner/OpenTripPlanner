@@ -327,7 +327,7 @@ public class CommandLineParameters {
 
     @Override
     public void validate(String name, String value) throws ParameterException {
-      Integer i = Integer.parseInt(value);
+      int i = Integer.parseInt(value);
       if (i <= 0) {
         String msg = String.format("%s must be a positive integer.", name);
         throw new ParameterException(msg);

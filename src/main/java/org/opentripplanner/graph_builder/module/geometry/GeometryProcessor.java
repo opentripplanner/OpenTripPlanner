@@ -80,7 +80,7 @@ public class GeometryProcessor {
     if (
       trip.getShapeId() == null ||
       trip.getShapeId().getId() == null ||
-      trip.getShapeId().getId().equals("")
+      trip.getShapeId().getId().isEmpty()
     ) {
       return null;
     }
@@ -123,7 +123,7 @@ public class GeometryProcessor {
       // this trip has a shape_id, but no such shape exists, and no shape_dist in stop_times
       // create straight line segments between stops for each hop
       issueStore.add(new MissingShapeGeometry(stopTimes.get(0).getTrip().getId(), shapeId));
-      return createStraightLineHopeGeometries(stopTimes, shapeId);
+      return createStraightLineHopGeometries(stopTimes);
     }
 
     List<LinearLocation> locations = getLinearLocations(stopTimes, shapeLineString);
@@ -132,7 +132,7 @@ public class GeometryProcessor {
       // their stop sequence. So we'll fall back to trivial stop-to-stop
       // linking, even though theoretically we could do better.
       issueStore.add(new ShapeGeometryTooFar(stopTimes.get(0).getTrip().getId(), shapeId));
-      return createStraightLineHopeGeometries(stopTimes, shapeId);
+      return createStraightLineHopGeometries(stopTimes);
     }
 
     return getGeometriesByShape(stopTimes, shapeId, shapeLineString, locations);
@@ -267,10 +267,7 @@ public class GeometryProcessor {
     return getStopLocations(possibleSegmentsForStop, stopTimes, 0, -1);
   }
 
-  private LineString[] createStraightLineHopeGeometries(
-    List<StopTime> stopTimes,
-    FeedScopedId shapeId
-  ) {
+  private LineString[] createStraightLineHopGeometries(List<StopTime> stopTimes) {
     LineString[] geoms = new LineString[stopTimes.size() - 1];
     StopTime st0;
     for (int i = 0; i < stopTimes.size() - 1; ++i) {

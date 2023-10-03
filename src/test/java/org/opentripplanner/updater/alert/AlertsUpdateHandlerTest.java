@@ -14,6 +14,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.TranslatedString;
@@ -83,7 +84,7 @@ public class AlertsUpdateHandlerTest {
       .addInformedEntity(GtfsRealtime.EntitySelector.newBuilder().setAgencyId("1"))
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertNull(transitAlert.url());
+    assertEquals(Optional.empty(), transitAlert.url());
   }
 
   @Test
@@ -102,7 +103,7 @@ public class AlertsUpdateHandlerTest {
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals("https://www.opentripplanner.org/", transitAlert.url().toString());
+    assertEquals("https://www.opentripplanner.org/", transitAlert.url().get().toString());
   }
 
   @Test
@@ -135,7 +136,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
 
     List<Entry<String, String>> translations =
-      ((TranslatedString) transitAlert.url()).getTranslations();
+      ((TranslatedString) transitAlert.url().get()).getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("https://www.opentripplanner.org/", translations.get(0).getValue());
@@ -156,7 +157,7 @@ public class AlertsUpdateHandlerTest {
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals("Title", transitAlert.headerText().toString());
+    assertEquals("Title", transitAlert.headerText().get().toString());
   }
 
   @Test
@@ -175,7 +176,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
 
     List<Entry<String, String>> translations =
-      ((TranslatedString) transitAlert.headerText()).getTranslations();
+      ((TranslatedString) transitAlert.headerText().get()).getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("Title", translations.get(0).getValue());
@@ -196,7 +197,7 @@ public class AlertsUpdateHandlerTest {
       )
       .build();
     TransitAlert transitAlert = processOneAlert(alert);
-    assertEquals("Description", transitAlert.descriptionText().toString());
+    assertEquals("Description", transitAlert.descriptionText().get().toString());
   }
 
   @Test
@@ -221,7 +222,7 @@ public class AlertsUpdateHandlerTest {
     TransitAlert transitAlert = processOneAlert(alert);
 
     List<Entry<String, String>> translations =
-      ((TranslatedString) transitAlert.descriptionText()).getTranslations();
+      ((TranslatedString) transitAlert.descriptionText().get()).getTranslations();
     assertEquals(2, translations.size());
     assertEquals("en", translations.get(0).getKey());
     assertEquals("Description", translations.get(0).getValue());

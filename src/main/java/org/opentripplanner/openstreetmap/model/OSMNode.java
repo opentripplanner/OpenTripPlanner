@@ -1,8 +1,12 @@
 package org.opentripplanner.openstreetmap.model;
 
+import java.util.Set;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.street.model.StreetTraversalPermission;
 
 public class OSMNode extends OSMWithTags {
+
+  static final Set<String> MOTOR_VEHICLE_BARRIERS = Set.of("bollard", "bar", "chain");
 
   public double lat;
   public double lon;
@@ -16,18 +20,6 @@ public class OSMNode extends OSMWithTags {
   }
 
   /**
-   * Returns the capacity of this node if defined, or 0.
-   */
-  public int getCapacity() throws NumberFormatException {
-    String capacity = getTag("capacity");
-    if (capacity == null) {
-      return 0;
-    }
-
-    return Integer.parseInt(getTag("capacity"));
-  }
-
-  /**
    * Is this a multi-level node that should be decomposed to multiple coincident nodes? Currently
    * returns true only for elevators.
    *
@@ -35,7 +27,7 @@ public class OSMNode extends OSMWithTags {
    * @author mattwigway
    */
   public boolean isMultiLevel() {
-    return hasTag("highway") && "elevator".equals(getTag("highway"));
+    return isElevator();
   }
 
   public boolean hasHighwayTrafficLight() {
@@ -46,13 +38,12 @@ public class OSMNode extends OSMWithTags {
     return hasTag("crossing") && "traffic_signals".equals(getTag("crossing"));
   }
 
-  /**
-   * Checks if this node is bollard
+  /* Checks if this node is a barrier which prevents motor vehicle traffic
    *
    * @return true if it is
    */
-  public boolean isBollard() {
-    return isTag("barrier", "bollard");
+  public boolean isMotorVehicleBarrier() {
+    return isOneOfTags("barrier", MOTOR_VEHICLE_BARRIERS);
   }
 
   /**
@@ -62,7 +53,7 @@ public class OSMNode extends OSMWithTags {
    */
   public boolean isBarrier() {
     return (
-      isBollard() ||
+      isMotorVehicleBarrier() ||
       isPedestrianExplicitlyDenied() ||
       isBicycleExplicitlyDenied() ||
       isMotorcarExplicitlyDenied() ||
@@ -71,8 +62,20 @@ public class OSMNode extends OSMWithTags {
     );
   }
 
+  /**
+   * Consider barrier tag in  permissions. Leave the rest for the super class.
+   */
   @Override
-  public String getOpenStreetMapLink() {
+  public StreetTraversalPermission overridePermissions(StreetTraversalPermission def) {
+    StreetTraversalPermission permission = def;
+    if (isMotorVehicleBarrier()) {
+      permission = permission.remove(StreetTraversalPermission.CAR);
+    }
+    return super.overridePermissions(permission);
+  }
+
+  @Override
+  public String url() {
     return String.format("https://www.openstreetmap.org/node/%d", getId());
   }
 }

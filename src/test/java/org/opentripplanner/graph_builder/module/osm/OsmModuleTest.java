@@ -37,6 +37,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.street.model.vertex.BarrierVertex;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -168,7 +169,6 @@ public class OsmModuleTest {
     OSMWithTags way = new OSMWay();
     way.addTag("highway", "footway");
     way.addTag("cycleway", "lane");
-    way.addTag("access", "no");
     way.addTag("surface", "gravel");
 
     WayPropertySet wayPropertySet = new WayPropertySet();
@@ -176,10 +176,10 @@ public class OsmModuleTest {
     // where there are no way specifiers, the default is used
     WayProperties wayData = wayPropertySet.getDataForWay(way);
     assertEquals(wayData.getPermission(), ALL);
-    assertEquals(wayData.getWalkSafetyFeatures().forward(), 1.0);
-    assertEquals(wayData.getWalkSafetyFeatures().back(), 1.0);
-    assertEquals(wayData.getBicycleSafetyFeatures().forward(), 1.0);
-    assertEquals(wayData.getBicycleSafetyFeatures().back(), 1.0);
+    assertEquals(wayData.walkSafety().forward(), 1.0);
+    assertEquals(wayData.walkSafety().back(), 1.0);
+    assertEquals(wayData.bicycleSafety().forward(), 1.0);
+    assertEquals(wayData.bicycleSafety().back(), 1.0);
 
     // add two equal matches: lane only...
     OsmSpecifier lane_only = new BestMatchSpecifier("cycleway=lane");
@@ -217,7 +217,7 @@ public class OsmModuleTest {
     wayPropertySet.setMixinProperties(gravel, gravel_is_dangerous);
 
     dataForWay = wayPropertySet.getDataForWay(way);
-    assertEquals(dataForWay.getBicycleSafetyFeatures().forward(), 1.5);
+    assertEquals(dataForWay.bicycleSafety().forward(), 1.5);
 
     // test a left-right distinction
     way = new OSMWay();
@@ -234,9 +234,9 @@ public class OsmModuleTest {
     wayPropertySet.addProperties(track_only, track_is_safest);
     dataForWay = wayPropertySet.getDataForWay(way);
     // right (with traffic) comes from track
-    assertEquals(0.25, dataForWay.getBicycleSafetyFeatures().forward());
+    assertEquals(0.25, dataForWay.bicycleSafety().forward());
     // left comes from lane
-    assertEquals(0.75, dataForWay.getBicycleSafetyFeatures().back());
+    assertEquals(0.75, dataForWay.bicycleSafety().back());
 
     way = new OSMWay();
     way.addTag("highway", "footway");
@@ -302,6 +302,36 @@ public class OsmModuleTest {
         assertFalse(v.getOutgoing().isEmpty());
         assertFalse(v.getIncoming().isEmpty());
       });
+  }
+
+  /**
+   * Test that a barrier vertex at ending street will get no access limit
+   */
+  @Test
+  void testBarrierAtEnd() {
+    var deduplicator = new Deduplicator();
+    var graph = new Graph(deduplicator);
+
+    File file = new File(
+      URLDecoder.decode(
+        getClass().getResource("accessno-at-end.pbf").getFile(),
+        StandardCharsets.UTF_8
+      )
+    );
+    OsmProvider provider = new OsmProvider(file, false);
+    OsmModule loader = OsmModule.of(provider, graph).build();
+    loader.buildGraph();
+
+    Vertex start = graph.getVertex(VertexLabel.osm(1));
+    Vertex end = graph.getVertex(VertexLabel.osm(3));
+
+    assertNotNull(start);
+    assertNotNull(end);
+    assertEquals(end.getClass(), BarrierVertex.class);
+    var barrier = (BarrierVertex) end;
+
+    // assert that pruning removed traversal restrictions
+    assertEquals(barrier.getBarrierPermissions(), ALL);
   }
 
   @Nonnull

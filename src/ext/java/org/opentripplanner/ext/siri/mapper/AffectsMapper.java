@@ -378,25 +378,6 @@ public class AffectsMapper {
     return null;
   }
 
-  private static FeedScopedId getTripId(
-    String vehicleJourney,
-    String feedId,
-    TransitService transitService
-  ) {
-    Trip trip = transitService.getTripForId(new FeedScopedId(feedId, vehicleJourney));
-    if (trip != null) {
-      return trip.getId();
-    }
-    //Attempt to find trip using datedServiceJourneys
-    TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateById(
-      new FeedScopedId(feedId, vehicleJourney)
-    );
-    if (tripOnServiceDate != null) {
-      return tripOnServiceDate.getTrip().getId();
-    }
-    return null;
-  }
-
   private static Set<StopCondition> resolveStopConditions(
     List<RoutePointTypeEnumeration> stopConditions
   ) {

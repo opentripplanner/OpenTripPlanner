@@ -5,16 +5,16 @@ the actions taken by the Maven release plugin. Based on past experience, the Mav
 can fail at various points in the process leaving the repo in a confusing state. Taking each action
 manually is more tedious, but keeps eyes on each step and is less prone to failure.
 
-* Make sure the documentation is up to date
-  * Check all links and references to the release and update to the target release version. Search
-    all files for with a regular expression: `2\.[012]\.0` and replace if appropriate with the new 
-    version.
 * Check that your local copy of the dev branch is up to date with no uncommitted changes
     * `git status`
     * `git checkout dev-2.x`
     * `git clean -df`
     * `git pull`
-* Verify that all dependencies in the POM are non-SNAPSHOT versions (e.g. with `grep`)
+* Make sure the documentation is up to date
+    * Check all links and references to the release and update to the target release version. Search
+      all files for with a regular expression: `2\.[012]\.0` and replace if appropriate with the new
+      version.
+    * In `docs/index.md` replace what is the latest version and add a new line for the previous one
 * Update `docs/Changelog.md`
     * Lines should have been added or updated as each pull request was merged
     * If you suspect any changes are not reflected in the Changelog, review the commit log and add
@@ -27,8 +27,8 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * This tells the GH Action that pushes the documentation on master what the name of the 
       current version is. 
       For version 2.3.0 Leonard has already done it: [Example commit](https://github.com/opentripplanner/OpenTripPlanner/commit/3cb061ab1e4253c3977a5d08fa5abab1b0baefd7)
-* Check [on GH Actions](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/) that
-  the build is currently passing
+* Verify that all dependencies in the POM are non-SNAPSHOT versions (e.g. with `grep`)
+* Check [on GH Actions](https://github.com/opentripplanner/OpenTripPlanner/actions/workflows/) that the build is currently passing
 * Switch to the HEAD of master branch, and ensure it's up to date with no uncommitted changes
     * `git checkout master`
     * `git status`
@@ -48,18 +48,6 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * You can also use the `package` goal instead of the `install` goal to avoid signing if you
       don't have the GPG certificate installed.
     * All tests should pass
-    * Run `MAVEN_OPTS="--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED" mvn com.webcohesion.enunciate:enunciate-maven-plugin:docs`
-    * This build will also create Enunciate API docs and Javadoc with the correct non-snapshot
-      version number
-* Deploy the documentation to AWS S3
-    * You have to do this right after the test release build to ensure the right version number in
-      the docs
-    * You will need AWSCLI tools (`sudo pip install -U awscli`)
-    * You will need AWS credentials with write access to the bucket `s3://dev.opentripplanner.org`
-    * `aws s3 cp --recursive target/site/apidocs s3://dev.opentripplanner.org/javadoc/x.y.z --acl public-read`
-    * `aws s3 cp --recursive target/site/enunciate/apidocs s3://dev.opentripplanner.org/apidoc/x.y.z --acl public-read`
-    * Check that docs are readable and show the correct version via
-      the [development documentation landing page](http://dev.opentripplanner.org).
 * Finally, if everything looks good, tag and push this release to make it official
     * `git tag -a vX.Y.Z -m "release X.Y.Z"`
     * `git push origin vX.Y.Z`
@@ -99,6 +87,20 @@ manually is more tedious, but keeps eyes on each step and is less prone to failu
     * Mention the new version number.
     * Provide links to the new developer documentation.
     * Provide links to the artifacts directory on Maven Central.
+* Prepare for the next release in GitHub by renaming the released milestone and creating a new
+  milestone for the next release. Then make sure all issues and PRs are tagged with the correct
+  milestone.
+    * Close open PRs older than 2 years, make sure the milestone is set to `Rejected`.
+    * Rename the old milestone from `x.y (Next Release)` to `x.y`. All issues and PRs assigned to 
+      this milestone are automatically updated.
+    * Create a new milestone: `x.y+1 (Next Release)`
+    * All PullRequests SHOULD have a milestone (except some very old ones) 
+        * Assign all *open* PRs to this new milestone `x.y+1 (Next Release)`.
+        * Assign all *closed* PRs without a milestone in the release to the released milestone 
+          `x.y`. Make sure NOT to include very old PRs or PRs merged after the release(if any).
+    * Some issues have a milestone, but not all.
+        * Move all open issues with the released milestone `x.y` to the next release 
+          `x.y+1 (Next Release)`. 
 
 ## Artifact Signing
 

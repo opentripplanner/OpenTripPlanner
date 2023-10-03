@@ -13,10 +13,6 @@ strict: true
 plugins:
     - "no-sitemap"
     - search
-    # remove this after OTP 2.4.0 has been released
-    - redirects:
-        redirect_maps:
-          'sandbox/LegacyGraphQLApi.md': 'sandbox/GtfsGraphQlApi.md'
 
 theme:
     name: material
@@ -68,8 +64,9 @@ nav:
     - Troubleshooting: 'Troubleshooting-Routing.md'
     - Comparing OTP2 to OTP1: 'Version-Comparison.md'
 - APIs:
-    - Introduction: 'Apis.md'
-    - GraphQL Tutorial: 'GraphQL-Tutorial.md'
+    - Introduction: 'apis/Apis.md'
+    - GraphQL Tutorial: 'apis/GraphQL-Tutorial.md'
+    - GTFS GraphQL API: 'apis/GTFS-GraphQL-API.md'
 - Configuration:
     - Introduction: 'Configuration.md'
     - Build: 'BuildConfiguration.md'
@@ -96,7 +93,6 @@ nav:
     - Actuator API: 'sandbox/ActuatorAPI.md'
     - Direct Transfer Analyzer: 'sandbox/transferanalyzer.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
-    - GTFS GraphQL API: 'sandbox/GtfsGraphQlApi.md'
     - Transmodel(NeTEx) GraphQL API: 'sandbox/TransmodelApi.md'
     - SIRI Updaters: 'sandbox/SiriUpdater.md'
     - SIRI Updater (Azure): 'sandbox/SiriAzureUpdater.md'

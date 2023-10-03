@@ -13,8 +13,6 @@
     "islandWithoutStopsMaxSize": 5,
     "islandWithStopsMaxSize": 5
   },
-  "banDiscouragedWalking": false,
-  "banDiscouragedBiking": false,
   "maxTransferDuration": "30m",
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,

@@ -92,7 +92,9 @@ public class RaptorSearchWindowCalculator {
 
   int roundUpToNearestMinute(int minTravelTimeInSeconds) {
     if (minTravelTimeInSeconds < 0) {
-      throw new IllegalArgumentException("This operation is not defined for negative numbers.");
+      throw new IllegalArgumentException(
+        "This operation is not defined for negative numbers: " + minTravelTimeInSeconds
+      );
     }
     // See the UnitTest for verification of this:
     // We want: 0 -> 0, 1 -> 60, 59 -> 60 ...

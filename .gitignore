@@ -44,3 +44,5 @@ src/ext/resources/reportapi/report.csv
 
 streetGraph.obj
 graph.obj
+# IntelliJ creates these pid files when you attach the debugger to tests
+.attach_pid*

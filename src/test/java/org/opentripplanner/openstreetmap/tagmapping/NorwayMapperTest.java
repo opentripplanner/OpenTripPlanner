@@ -93,7 +93,7 @@ public class NorwayMapperTest {
   @ParameterizedTest(name = "{0} should have a score of {1}")
   @MethodSource("createExpectedBicycleSafetyForMaxspeedCases")
   public void testBicycleSafetyForMaxspeed(OSMWithTags way, Double expected) {
-    var result = wps.getDataForWay(way).getBicycleSafetyFeatures();
+    var result = wps.getDataForWay(way).bicycleSafety();
     var expectedSafetyFeatures = new SafetyFeatures(expected, expected);
     assertEquals(expectedSafetyFeatures, result);
   }
@@ -101,7 +101,7 @@ public class NorwayMapperTest {
   @ParameterizedTest
   @MethodSource("createBicycleSafetyWithoutExplicitMaxspeed")
   public void testBicycleSafetyWithoutMaxspeed(OSMWithTags way, Double expected) {
-    var result = wps.getDataForWay(way).getBicycleSafetyFeatures();
+    var result = wps.getDataForWay(way).bicycleSafety();
     var expectedSafetyFeatures = new SafetyFeatures(expected, expected);
     assertEquals(expectedSafetyFeatures, result);
   }
@@ -109,8 +109,8 @@ public class NorwayMapperTest {
   @ParameterizedTest
   @MethodSource("createLinkRoadLikeMainCases")
   public void testBicycleSafetyLikeLinkRoad(OSMWithTags mainRoad, OSMWithTags linkRoad) {
-    var resultMain = wps.getDataForWay(mainRoad).getBicycleSafetyFeatures();
-    var resultLink = wps.getDataForWay(linkRoad).getBicycleSafetyFeatures();
+    var resultMain = wps.getDataForWay(mainRoad).bicycleSafety();
+    var resultLink = wps.getDataForWay(linkRoad).bicycleSafety();
 
     assertEquals(resultMain, resultLink);
   }

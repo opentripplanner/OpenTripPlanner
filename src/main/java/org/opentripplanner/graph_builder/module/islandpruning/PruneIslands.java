@@ -119,9 +119,7 @@ public class PruneIslands implements GraphBuilderModule {
       areas.add(ae.getArea());
     }
     for (AreaEdgeList a : areas) {
-      for (Vertex v : a.visibilityVertices()) {
-        visibilityVertices.add(v);
-      }
+      visibilityVertices.addAll(a.visibilityVertices());
     }
 
     int removed = 0;

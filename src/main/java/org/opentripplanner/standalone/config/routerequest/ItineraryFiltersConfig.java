@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
@@ -152,6 +153,26 @@ all non-transit itineraries with a cost larger than `1800 + 2 * 5000 = 11 800` a
 """
           )
           .asCostLinearFunction(dft.nonTransitGeneralizedCostLimit())
+      )
+      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+        c
+          .of("removeTransitWithHigherCostThanBestOnStreetOnly")
+          .since(V2_4)
+          .summary(
+            "Limit function for generalized-cost computed from street-only itineries applied to transit itineraries."
+          )
+          .description(
+            """
+The max-limit is applied to itineraries with transit *legs*, and only itineraries
+without transit legs are considered when calculating the minimum cost. The smallest
+generalized-cost value is used as input to the function. The function is used to calculate a
+*max-limit*. The max-limit is then used to filter *transit* itineraries by
+*generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
+set. Walking is handled with a different logic: if a transit itinerary has higher cost than
+a plain walk itinerary, it will be removed even if the cost limit function would keep it.
+"""
+          )
+          .asCostLinearFunction(dft.removeTransitWithHigherCostThanBestOnStreetOnly())
       )
       .withBikeRentalDistanceRatio(
         c
