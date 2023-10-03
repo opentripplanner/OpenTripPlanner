@@ -66,7 +66,7 @@ public class TimetableSnapshotSourceTest {
 
   @BeforeEach
   public void setUp() {
-    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     transitModel = model.transitModel();
 
     feedId = transitModel.getFeedIds().stream().findFirst().get();

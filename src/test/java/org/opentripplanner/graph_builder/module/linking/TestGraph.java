@@ -1,15 +1,6 @@
-package org.opentripplanner.graph_builder.module;
+package org.opentripplanner.graph_builder.module.linking;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
-import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.graph_builder.module.osm.OsmModule;
-import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
-import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
-import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.linking.VertexLinker;
@@ -19,46 +10,14 @@ import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
  * Get graphs of Columbus Ohio with real OSM streets and a synthetic transit system for use in
  * testing.
  */
-public class FakeGraph {
-
-  /** Build a graph in Columbus, OH with no transit */
-  public static TestOtpModel buildGraphNoTransit() throws URISyntaxException {
-    var deduplicator = new Deduplicator();
-    var stopModel = new StopModel();
-    var gg = new Graph(deduplicator);
-    var transitModel = new TransitModel(stopModel, deduplicator);
-
-    File file = getFileForResource("columbus.osm.pbf");
-    OsmProvider provider = new OsmProvider(file, false);
-
-    OsmModule osmModule = OsmModule.of(provider, gg).build();
-
-    osmModule.buildGraph();
-    return new TestOtpModel(gg, transitModel);
-  }
-
-  public static File getFileForResource(String resource) throws URISyntaxException {
-    URL resourceUrl = FakeGraph.class.getResource(resource);
-    return new File(resourceUrl.toURI());
-  }
-
-  /**
-   * This introduces a 1MB test resource but is only used by TestIntermediatePlaces.
-   */
-  public static void addPerpendicularRoutes(Graph graph, TransitModel transitModel)
-    throws URISyntaxException {
-    var input = List.of(new GtfsBundle(getFileForResource("addPerpendicularRoutes.gtfs.zip")));
-    new GtfsModule(input, transitModel, graph, ServiceDateInterval.unbounded()).buildGraph();
-  }
+class TestGraph {
 
   /** Add a regular grid of stops to the graph */
   public static void addRegularStopGrid(Graph graph) {

@@ -3,15 +3,13 @@ package org.opentripplanner.graph_builder.module.osm;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class PlatformLinkerTest {
@@ -27,12 +25,7 @@ public class PlatformLinkerTest {
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
 
-    File file = new File(
-      URLDecoder.decode(
-        FakeGraph.class.getResource("osm/skoyen.osm.pbf").getFile(),
-        StandardCharsets.UTF_8
-      )
-    );
+    File file = ResourceLoader.of(this).file("skoyen.osm.pbf");
 
     OsmProvider provider = new OsmProvider(file, false);
 
