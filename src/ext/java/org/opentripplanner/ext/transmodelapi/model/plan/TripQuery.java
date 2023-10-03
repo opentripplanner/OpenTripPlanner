@@ -58,8 +58,7 @@ public class TripQuery {
           .newArgument()
           .name("searchWindow")
           .description(
-            "The length of the search-window in minutes. This parameter is optional. " +
-            "The maximum value is 1440 minutes (24 hours)." +
+            "The length of the search-window in minutes. This parameter is optional." +
             "\n\n" +
             "The search-window is defined as the duration between the earliest-departure-time(EDT) and " +
             "the latest-departure-time(LDT). OTP will search for all itineraries in this departure " +
