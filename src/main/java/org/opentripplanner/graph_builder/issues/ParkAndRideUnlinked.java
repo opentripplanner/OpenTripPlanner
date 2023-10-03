@@ -16,6 +16,6 @@ public record ParkAndRideUnlinked(String name, OSMWithTags entity) implements Da
 
   @Override
   public String getHTMLMessage() {
-    return String.format(HTMLFMT, entity.getOpenStreetMapLink(), name, entity);
+    return String.format(HTMLFMT, entity.url(), name, entity);
   }
 }

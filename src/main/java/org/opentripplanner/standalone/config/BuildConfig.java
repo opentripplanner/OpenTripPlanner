@@ -149,8 +149,6 @@ public class BuildConfig implements OtpDataStoreConfig {
   /** See {@link IslandPruningConfig}. */
   public final IslandPruningConfig islandPruning;
 
-  public final boolean banDiscouragedWalking;
-  public final boolean banDiscouragedBiking;
   public final Duration maxTransferDuration;
   public final NetexFeedParameters netexDefaults;
   public final GtfsFeedParameters gtfsDefaults;
@@ -212,18 +210,6 @@ public class BuildConfig implements OtpDataStoreConfig {
             shortest way rather than around the edge of it. (These calculations can be time consuming).
             """
         )
-        .asBoolean(false);
-    banDiscouragedWalking =
-      root
-        .of("banDiscouragedWalking")
-        .since(V2_0)
-        .summary("Should walking be allowed on OSM ways tagged with `foot=discouraged`")
-        .asBoolean(false);
-    banDiscouragedBiking =
-      root
-        .of("banDiscouragedBiking")
-        .since(V2_0)
-        .summary("Should biking be allowed on OSM ways tagged with `bicycle=discouraged`")
         .asBoolean(false);
     configVersion =
       root

@@ -36,7 +36,7 @@ public class TimetableSnapshotTest {
 
   @BeforeAll
   public static void setUp() throws Exception {
-    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitModel transitModel = model.transitModel();
 
     feedId = transitModel.getFeedIds().iterator().next();

@@ -98,4 +98,15 @@ public class TransitIdMapper {
     );
     return fixedFeedId;
   }
+
+  /**
+   * Clear the globally configured feed id.
+   * <p>
+   * For use from tests only.
+   *
+   * @see #setupFixedFeedId(Collection)
+   */
+  public static void clearFixedFeedId() {
+    fixedFeedId = null;
+  }
 }

@@ -1,11 +1,17 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.OTHER_AGENCY;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.OTHER_FEED_AGENCY;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 
@@ -13,6 +19,10 @@ public class FareModelForTest {
 
   public static final FareZone AIRPORT_ZONE = FareZone.of(id("airport-zone")).build();
   public static final FareZone CITY_CENTER_ZONE = FareZone.of(id("city-center")).build();
+
+  public static final FareZone OTHER_FEED_ZONE = FareZone
+    .of(FeedScopedId.ofNullable("F2", "other-feed-zone"))
+    .build();
 
   static RegularStop AIRPORT_STOP = RegularStop
     .of(id("airport"))
@@ -39,15 +49,32 @@ public class FareModelForTest {
     .withName(new NonLocalizedString("Suburb"))
     .build();
 
+  static RegularStop OTHER_FEED_STOP = RegularStop
+    .of(FeedScopedId.ofNullable("F2", "other-feed-stop"))
+    .withCoordinate(new WgsCoordinate(1, 5))
+    .withName(new NonLocalizedString("Other feed stop"))
+    .addFareZones(OTHER_FEED_ZONE)
+    .build();
   static FareAttribute TEN_DOLLARS = FareAttribute
     .of(id("airport-to-city-center"))
     .setCurrencyType("USD")
     .setPrice(10)
     .setTransfers(0)
     .build();
+
+  static FareAttribute OTHER_FEED_ATTRIBUTE = FareAttribute
+    .of(FeedScopedId.ofNullable("F2", "other-feed-attribute"))
+    .setCurrencyType("USD")
+    .setPrice(10)
+    .setTransfers(1)
+    .setAgency(OTHER_FEED_AGENCY.getId())
+    .build();
+
   // Fare rule sets
   static FareRuleSet AIRPORT_TO_CITY_CENTER_SET = new FareRuleSet(TEN_DOLLARS);
   static FareRuleSet INSIDE_CITY_CENTER_SET = new FareRuleSet(TEN_DOLLARS);
+
+  static FareRuleSet OTHER_FEED_SET = new FareRuleSet(OTHER_FEED_ATTRIBUTE);
 
   static {
     AIRPORT_TO_CITY_CENTER_SET.addOriginDestination(
@@ -58,5 +85,16 @@ public class FareModelForTest {
       CITY_CENTER_ZONE.getId().getId(),
       CITY_CENTER_ZONE.getId().getId()
     );
+    OTHER_FEED_SET.addOriginDestination(
+      OTHER_FEED_ZONE.getId().getId(),
+      OTHER_FEED_ZONE.getId().getId()
+    );
   }
+
+  static Route OTHER_FEED_ROUTE = Route
+    .of(new FeedScopedId("F2", "other-feed-route"))
+    .withAgency(OTHER_FEED_AGENCY)
+    .withLongName(new NonLocalizedString("other-feed-route"))
+    .withMode(TransitMode.BUS)
+    .build();
 }

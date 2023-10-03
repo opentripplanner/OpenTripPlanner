@@ -1,0 +1,160 @@
+{
+  "data" : {
+    "routes" : [
+      {
+        "longName" : "Long name for CARPOOL",
+        "shortName" : "RCARPOOL",
+        "gtfsId" : "F:CARPOOL",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "CARPOOL",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for SUBWAY",
+        "shortName" : "RSUBWAY",
+        "gtfsId" : "F:SUBWAY",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "SUBWAY",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for BUS",
+        "shortName" : "RBUS",
+        "gtfsId" : "F:BUS",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "BUS",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for FERRY",
+        "shortName" : "RFERRY",
+        "gtfsId" : "F:FERRY",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "FERRY",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for COACH",
+        "shortName" : "RCOACH",
+        "gtfsId" : "F:COACH",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "COACH",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for TRAM",
+        "shortName" : "RTRAM",
+        "gtfsId" : "F:TRAM",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "TRAM",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for CABLE_CAR",
+        "shortName" : "RCABLE_CAR",
+        "gtfsId" : "F:CABLE_CAR",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "CABLE_CAR",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for FUNICULAR",
+        "shortName" : "RFUNICULAR",
+        "gtfsId" : "F:FUNICULAR",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "FUNICULAR",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for RAIL",
+        "shortName" : "RRAIL",
+        "gtfsId" : "F:RAIL",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "RAIL",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for MONORAIL",
+        "shortName" : "RMONORAIL",
+        "gtfsId" : "F:MONORAIL",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "MONORAIL",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for GONDOLA",
+        "shortName" : "RGONDOLA",
+        "gtfsId" : "F:GONDOLA",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "GONDOLA",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for TROLLEYBUS",
+        "shortName" : "RTROLLEYBUS",
+        "gtfsId" : "F:TROLLEYBUS",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "TROLLEYBUS",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for AIRPLANE",
+        "shortName" : "RAIRPLANE",
+        "gtfsId" : "F:AIRPLANE",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "AIRPLANE",
+        "bikesAllowed" : "NO_INFORMATION"
+      },
+      {
+        "longName" : "Long name for TAXI",
+        "shortName" : "RTAXI",
+        "gtfsId" : "F:TAXI",
+        "agency" : {
+          "gtfsId" : "F:A1",
+          "name" : "Agency Test"
+        },
+        "mode" : "TAXI",
+        "bikesAllowed" : "NO_INFORMATION"
+      }
+    ]
+  }
+}

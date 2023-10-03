@@ -246,12 +246,7 @@ public class OsmDatabase {
 
     /* filter out ways that are not relevant for routing */
     if (
-      !(
-        OsmFilter.isWayRoutable(way) ||
-        way.isParkAndRide() ||
-        way.isBikeParking() ||
-        way.isBoardingLocation()
-      )
+      !(way.isRoutable() || way.isParkAndRide() || way.isBikeParking() || way.isBoardingLocation())
     ) {
       return;
     }
@@ -296,9 +291,7 @@ public class OsmDatabase {
       // without reference to the ways that compose them. Accordingly, we will merely
       // mark the ways for preservation here, and deal with the details once we have
       // the ways loaded.
-      if (
-        !OsmFilter.isWayRoutable(relation) && !relation.isParkAndRide() && !relation.isBikeParking()
-      ) {
+      if (!relation.isRoutable() && !relation.isParkAndRide() && !relation.isBikeParking()) {
         return;
       }
       for (OSMRelationMember member : relation.getMembers()) {
@@ -796,8 +789,7 @@ public class OsmDatabase {
    * Handler for a new Area (single way area or multipolygon relations)
    */
   private void newArea(Area area) {
-    StreetTraversalPermission permissions = OsmFilter.getPermissionsForEntity(
-      area.parent,
+    StreetTraversalPermission permissions = area.parent.overridePermissions(
       StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE
     );
     if (area.parent.isRoutable() && permissions != StreetTraversalPermission.NONE) {

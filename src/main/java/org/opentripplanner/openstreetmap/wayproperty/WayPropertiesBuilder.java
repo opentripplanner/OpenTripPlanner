@@ -1,5 +1,6 @@
 package org.opentripplanner.openstreetmap.wayproperty;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 
 /**
@@ -8,7 +9,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
  */
 public class WayPropertiesBuilder {
 
-  private final StreetTraversalPermission permission;
+  private StreetTraversalPermission permission;
   private SafetyFeatures bicycleSafetyFeatures = null;
   private SafetyFeatures walkSafetyFeatures = null;
 
@@ -16,10 +17,10 @@ public class WayPropertiesBuilder {
     this.permission = permission;
   }
 
-  public WayPropertiesBuilder(WayProperties defaultProperties) {
+  WayPropertiesBuilder(WayProperties defaultProperties) {
     this.permission = defaultProperties.getPermission();
-    this.bicycleSafetyFeatures = defaultProperties.getBicycleSafetyFeatures();
-    this.walkSafetyFeatures = defaultProperties.getWalkSafetyFeatures();
+    this.bicycleSafetyFeatures = defaultProperties.bicycleSafety();
+    this.walkSafetyFeatures = defaultProperties.walkSafety();
   }
 
   /**
@@ -62,15 +63,22 @@ public class WayPropertiesBuilder {
     return this;
   }
 
+  public WayPropertiesBuilder withPermission(StreetTraversalPermission permission) {
+    this.permission = permission;
+    return this;
+  }
+
   public StreetTraversalPermission getPermission() {
     return permission;
   }
 
-  public SafetyFeatures getBicycleSafetyFeatures() {
+  @Nullable
+  protected SafetyFeatures bicycleSafety() {
     return bicycleSafetyFeatures;
   }
 
-  public SafetyFeatures getWalkSafetyFeatures() {
+  @Nullable
+  protected SafetyFeatures walkSafety() {
     return walkSafetyFeatures;
   }
 

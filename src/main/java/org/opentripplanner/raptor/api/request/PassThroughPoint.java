@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Objects;
 import java.util.stream.IntStream;
+import javax.annotation.Nullable;
 
 /**
  * A collection of stop indexes used to define a pass through-point.
@@ -11,13 +12,15 @@ import java.util.stream.IntStream;
 public class PassThroughPoint {
 
   private final int[] stops;
+  private final String name;
 
-  public PassThroughPoint(int[] stops) {
+  public PassThroughPoint(int[] stops, @Nullable String name) {
     Objects.requireNonNull(stops);
     if (stops.length == 0) {
       throw new IllegalArgumentException("At least one stop is required");
     }
     this.stops = Arrays.copyOf(stops, stops.length);
+    this.name = name;
   }
 
   /**
@@ -43,6 +46,8 @@ public class PassThroughPoint {
 
   @Override
   public String toString() {
-    return "(stops: " + Arrays.toString(stops) + ")";
+    return (
+      (name == null ? "(" : "(name: '" + name + "', ") + "stops: " + Arrays.toString(stops) + ")"
+    );
   }
 }

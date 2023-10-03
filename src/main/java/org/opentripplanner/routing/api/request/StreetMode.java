@@ -137,7 +137,7 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
   private static String GBFS_PREREQ =
     """
     
-    _Prerequisite:_ Vehicle or station location need to be added to OTP from dynamic data feeds.
+    _Prerequisite:_ Vehicle or station locations need to be added to OTP from dynamic data feeds.
     See [Configuring GBFS](UpdaterConfig.md#gbfs-vehicle-rental-systems) on how to add one.
     """;
 
@@ -148,8 +148,9 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
       case WALK -> "Walking some or all of the way of the route.";
       case BIKE -> "Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.";
       case BIKE_TO_PARK -> """
-        Leaving the bicycle at the departure station and walking from the arrival station to the destination. 
-        This mode needs to be combined with at least one transit mode otherwise it behaves like an ordinary bicycle journey. 
+        Leaving the bicycle at the departure station and walking from the arrival station to the destination.
+        This mode needs to be combined with at least one transit mode otherwise it behaves like an ordinary bicycle journey.
+        
         _Prerequisite:_ Bicycle parking stations present in the OSM file and visible to OTP by enabling the property `staticBikeParkAndRide` during graph build.
         """;
       case BIKE_RENTAL -> """
@@ -182,7 +183,7 @@ public enum StreetMode implements DocumentedEnum<StreetMode> {
         
         See [the sandbox documentation](sandbox/RideHailing.md) on how to configure it.
         """;
-      case FLEXIBLE -> "Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTex Flexible Stop Places.";
+      case FLEXIBLE -> "Encompasses all types of on-demand and flexible transportation for example GTFS Flex or NeTEx Flexible Stop Places.";
     };
   }
 }

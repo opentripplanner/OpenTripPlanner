@@ -47,7 +47,7 @@ public class NoThruTrafficEdgeRenderer implements EdgeVertexRenderer {
         label += " car";
         colorIndex += 4;
       }
-      if (!label.equals("")) {
+      if (!label.isEmpty()) {
         label = "No" + label + " thru traffic";
       }
 

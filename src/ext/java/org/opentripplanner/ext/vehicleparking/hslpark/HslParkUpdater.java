@@ -60,7 +60,7 @@ public class HslParkUpdater implements DataSource<VehicleParking> {
         parameters.utilizationsUrl(),
         "",
         parkPatchMapper::parseUtilization,
-        null
+        Map.of()
       );
     this.facilitiesFrequencySec = parameters.facilitiesFrequencySec();
   }
