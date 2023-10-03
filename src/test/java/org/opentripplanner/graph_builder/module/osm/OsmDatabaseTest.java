@@ -27,8 +27,8 @@ public class OsmDatabaseTest {
     var way = osmdb.getWay(13876983L);
     assertNotNull(way);
 
-    assertEquals(way.getTag("lcn"), "yes");
-    assertEquals(way.getTag("name"), "Gärtringer Weg");
+    assertEquals("yes", way.getTag("lcn"));
+    assertEquals("Gärtringer Weg", way.getTag("name"));
   }
 
   /**
@@ -46,6 +46,6 @@ public class OsmDatabaseTest {
 
     var way = osmdb.getWay(302732658L);
     assertNotNull(way);
-    assertEquals(way.getTag("public_transport"), "platform");
+    assertEquals("platform", way.getTag("public_transport"));
   }
 }
