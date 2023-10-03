@@ -11,6 +11,7 @@ import { useTripQuery } from '../hooks/useTripQuery.ts';
 const INITIAL_VARIABLES: TripQueryVariables = {
   from: {},
   to: {},
+  dateTime: new Date().toISOString(),
 };
 
 export function App() {
