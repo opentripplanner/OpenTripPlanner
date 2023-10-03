@@ -13,7 +13,7 @@ public class DigitransitEmissionsConfig {
   public DigitransitEmissionsConfig(String parameterName, NodeAdapter root) {
     var c = root
       .of(parameterName)
-      .summary("Configure properties for emissions file.")
+      .summary("Digitransit emissions configuration.")
       .description(
         """
         By specifying a URL to fetch emissions data, the program gains access to carbon dioxide (CO2)

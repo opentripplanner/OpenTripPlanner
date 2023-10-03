@@ -51,7 +51,7 @@ class EmissionsServiceTest {
   }
 
   @Test
-  void getEmissionsForItinerary() {
+  void testGetEmissionsForItinerary() {
     var route = TransitModelForTest.route(id("2")).withAgency(subject).build();
     List<Leg> legs = new ArrayList<>();
     var pattern = TransitModelForTest
@@ -86,7 +86,7 @@ class EmissionsServiceTest {
   }
 
   @Test
-  void getEmissionsForCarRoute() {
+  void testGetEmissionsForCarRoute() {
     var route = TransitModelForTest.route(id("2")).withAgency(subject).build();
     List<Leg> legs = new ArrayList<>();
     var pattern = TransitModelForTest

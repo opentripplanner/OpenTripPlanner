@@ -6,9 +6,9 @@
 
 ## Documentation
 
-CO2 Emissions and ability to show them via plan queries in itinerary by Digitransit team.
-This implementation enables OTP to retrieve CO2 information, which is then utilized during 
-itinerary queries. The emissions are represented in grams per kilometer (g/Km) unit
+Graph build import of CO2 Emissions from GTFS data sets (through custom emissions.txt extension)
+and the ability to attach them to itineraries by Digitransit team.
+The emissions are represented in grams per kilometer (g/Km) unit.
 
 Emissions data is located in an emissions.txt file within a gtfs package and has the following properties:
 
@@ -29,7 +29,7 @@ Emissions data is loaded from the gtfs package and embedded into the graph durin
 
 
 ### Configuration
-To enable this functionality, you need to add the "Co2Emissions"  feature in the
+To enable this functionality, you need to enable the "Co2Emissions"  feature in the
 `otp-config.json` file. 
 
 ```json
