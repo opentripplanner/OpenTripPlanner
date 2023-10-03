@@ -4,6 +4,7 @@ import { LocationInputField } from './LocationInputField.tsx';
 import { DepartureArrivalSelect } from './DepartureArrivalSelect.tsx';
 import { TimeInputField } from './TimeInputField.tsx';
 import { DateInputField } from './DateInputField.tsx';
+import { SearchWindowInput } from './SearchWindowInput.tsx';
 
 export function SearchBar({
   onRoute,
@@ -22,6 +23,7 @@ export function SearchBar({
         <DepartureArrivalSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <TimeInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <DateInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+        <SearchWindowInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <Button variant="primary" onClick={onRoute}>
           Route
         </Button>
