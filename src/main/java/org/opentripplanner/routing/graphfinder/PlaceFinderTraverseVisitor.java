@@ -188,7 +188,6 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
         seenStops.add(stop.getParentStation().getId());
         placesFound.add(new PlaceAtDistance(stop.getParentStation(), distance));
       } else {
-
         // Do not accumulate the same station many times
         if (
           stop.getParentStation() != null && seenStops.contains(stop.getParentStation().getId())
