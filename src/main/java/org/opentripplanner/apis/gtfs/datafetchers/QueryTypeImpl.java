@@ -13,6 +13,7 @@ import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -424,7 +425,11 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
             return new PlaceAtDistance(place, Double.parseDouble(parts[0]));
           }
         case "DatedTrip":
-          return null; // ????
+          {
+            String[] parts = id.split(";");
+            var trip = transitService.getTripForId(FeedScopedId.parse(parts[0]));
+            return new DatedTrip(trip, LocalDate.parse(parts[1]));
+          }
         case "Route":
           return transitService.getRouteForId(FeedScopedId.parse(id));
         case "Stop":
