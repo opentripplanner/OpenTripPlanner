@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -52,6 +53,8 @@ public class RouteRequest implements Cloneable, Serializable {
   private GenericLocation from;
 
   private GenericLocation to;
+
+  private List<PassThroughPoint> passThroughPoints = Collections.emptyList();
 
   private Instant dateTime = Instant.now();
 
@@ -293,6 +296,14 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public void setTo(GenericLocation to) {
     this.to = to;
+  }
+
+  public List<PassThroughPoint> getPassThroughPoints() {
+    return passThroughPoints;
+  }
+
+  public void setPassThroughPoints(final List<PassThroughPoint> passThroughPoints) {
+    this.passThroughPoints = passThroughPoints;
   }
 
   /**
