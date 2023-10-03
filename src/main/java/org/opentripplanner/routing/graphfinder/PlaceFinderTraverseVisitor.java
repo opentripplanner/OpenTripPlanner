@@ -40,6 +40,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final boolean includeVehicleRentals;
   private final boolean includeCarParking;
   private final boolean includeBikeParking;
+  private final boolean includeStopsAndStations;
   private final int maxResults;
   private final double radiusMeters;
 
@@ -80,6 +81,8 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     includeVehicleRentals = shouldInclude(filterByPlaceTypes, PlaceType.VEHICLE_RENT);
     includeCarParking = shouldInclude(filterByPlaceTypes, PlaceType.CAR_PARK);
     includeBikeParking = shouldInclude(filterByPlaceTypes, PlaceType.BIKE_PARK);
+    includeStopsAndStations = shouldInclude(filterByPlaceTypes, PlaceType.STOP_OR_STATION);
+
     this.maxResults = maxResults;
     this.radiusMeters = radiusMeters;
   }
@@ -176,8 +179,23 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
       !seenStops.contains(stop.getId()) &&
       (filterByModes == null || stopHasPatternsWithMode(stop, filterByModes))
     ) {
-      placesFound.add(new PlaceAtDistance(stop, distance));
-      seenStops.add(stop.getId());
+      if (
+        includeStopsAndStations &&
+        stop.getParentStation() != null &&
+        !seenStops.contains(stop.getParentStation().getId()) &&
+        !seenStops.contains(stop.getId())
+      ) {
+        seenStops.add(stop.getParentStation().getId());
+        placesFound.add(new PlaceAtDistance(stop.getParentStation(), distance));
+      } else {
+
+        // Do not accumulate the same station many times
+        if (
+          stop.getParentStation() != null && seenStops.contains(stop.getParentStation().getId())
+        ) return;
+        seenStops.add(stop.getId());
+        placesFound.add(new PlaceAtDistance(stop, distance));
+      }
     }
   }
 

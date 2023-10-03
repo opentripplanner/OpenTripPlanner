@@ -9,4 +9,5 @@ public enum PlaceType {
   VEHICLE_RENT,
   BIKE_PARK,
   CAR_PARK,
+  STOP_OR_STATION,
 }
