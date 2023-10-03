@@ -23,7 +23,7 @@ public class DigitransitEmissionsConfig {
       )
       .asObject();
 
-    this.carAvgCo2 = c.of("carAvgCo2").summary("The average CO2 emissions of a car.").asInt(170);
+    this.carAvgCo2 = c.of("carAvgCo2").summary("The average CO2 emissions of a car in grams per kilometer.").asInt(170);
 
     this.carAvgOccupancy =
       c.of("carAvgOccupancy").summary("The average number of passengers in a car.").asDouble(1.3);

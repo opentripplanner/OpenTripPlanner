@@ -46,13 +46,72 @@ class EmissionsServiceTest {
   @BeforeEach
   void SetUp() {
     Map<String, DigitransitEmissions> digitransitEmissions = new HashMap<>();
-    digitransitEmissions.put("F:2", new DigitransitEmissions(120, 12));
+    digitransitEmissions.put("F:1", new DigitransitEmissions(120, 12));
+    digitransitEmissions.put("F:2", new DigitransitEmissions(0, 0));
     this.eService = new DigitransitEmissionsService(digitransitEmissions, 131);
   }
 
   @Test
   void testGetEmissionsForItinerary() {
-    var route = TransitModelForTest.route(id("2")).withAgency(subject).build();
+    var stopOne = TransitModelForTest.stopForTest("1:stop1", 60, 25);
+    var stopTwo = TransitModelForTest.stopForTest("1:stop1", 61, 25);
+    var stopThree = TransitModelForTest.stopForTest("1:stop1", 62, 25);
+    var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
+    var route = TransitModelForTest.route(id("1")).build();
+    List<Leg> legs = new ArrayList<>();
+    var pattern = TransitModelForTest
+      .tripPattern("1", route)
+      .withStopPattern(stopPattern)
+      .build();
+    var stoptime = new StopTime();
+    var stoptimes = new ArrayList<StopTime>();
+    stoptimes.add(stoptime);
+    var trip = Trip
+      .of(FeedScopedId.parse("FOO:BAR"))
+      .withMode(TransitMode.BUS)
+      .withRoute(route)
+      .build();
+    var leg = new ScheduledTransitLeg(
+      new TripTimes(trip, stoptimes, new Deduplicator()),
+      pattern,
+      0,
+      2,
+      TIME,
+      TIME.plusMinutes(10),
+      TIME.toLocalDate(),
+      ZoneIds.BERLIN,
+      null,
+      null,
+      100,
+      null
+    );
+    legs.add(leg);
+    Itinerary i = new Itinerary(legs);
+    assertEquals(2223.902F, eService.getEmissionsForItinerary(i));
+  }
+
+  @Test
+  void testGetEmissionsForCarRoute() {
+    List<Leg> legs = new ArrayList<>();
+    var leg = StreetLeg
+      .create()
+      .withMode(TraverseMode.CAR)
+      .withDistanceMeters(214.4)
+      .withStartTime(TIME)
+      .withEndTime(TIME.plus(1, ChronoUnit.HOURS))
+      .build();
+    legs.add(leg);
+    Itinerary i = new Itinerary(legs);
+    assertEquals(28.0864F, eService.getEmissionsForItinerary(i));
+  }
+
+  @Test
+  void testNoEmissionsForFeedWithoutEmissionsConfigured() {
+    Map<String, DigitransitEmissions> digitransitEmissions = new HashMap<>();
+    digitransitEmissions.put("G:1", new DigitransitEmissions(120, 12));
+    this.eService = new DigitransitEmissionsService(digitransitEmissions, 131);
+  
+    var route = TransitModelForTest.route(id("1")).withAgency(subject).build();
     List<Leg> legs = new ArrayList<>();
     var pattern = TransitModelForTest
       .tripPattern("1", route)
@@ -82,34 +141,45 @@ class EmissionsServiceTest {
     );
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(0, eService.getEmissionsForItinerary(i));
+    assertEquals(-1, eService.getEmissionsForItinerary(i));
   }
 
   @Test
-  void testGetEmissionsForCarRoute() {
-    var route = TransitModelForTest.route(id("2")).withAgency(subject).build();
+  void testZeroEmissionsForItineraryWithZeroEmissions() {
+    var stopOne = TransitModelForTest.stopForTest("1:stop1", 60, 25);
+    var stopTwo = TransitModelForTest.stopForTest("1:stop1", 61, 25);
+    var stopThree = TransitModelForTest.stopForTest("1:stop1", 62, 25);
+    var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
+    var route = TransitModelForTest.route(id("2")).build();
     List<Leg> legs = new ArrayList<>();
     var pattern = TransitModelForTest
       .tripPattern("1", route)
-      .withStopPattern(TransitModelForTest.stopPattern(3))
+      .withStopPattern(stopPattern)
       .build();
     var stoptime = new StopTime();
     var stoptimes = new ArrayList<StopTime>();
     stoptimes.add(stoptime);
     var trip = Trip
-      .of(FeedScopedId.parse("F:A"))
+      .of(FeedScopedId.parse("FOO:BAR"))
       .withMode(TransitMode.BUS)
       .withRoute(route)
       .build();
-    var leg = StreetLeg
-      .create()
-      .withMode(TraverseMode.CAR)
-      .withDistanceMeters(214.4)
-      .withStartTime(TIME)
-      .withEndTime(TIME.plus(1, ChronoUnit.HOURS))
-      .build();
+    var leg = new ScheduledTransitLeg(
+      new TripTimes(trip, stoptimes, new Deduplicator()),
+      pattern,
+      0,
+      2,
+      TIME,
+      TIME.plusMinutes(10),
+      TIME.toLocalDate(),
+      ZoneIds.BERLIN,
+      null,
+      null,
+      100,
+      null
+    );
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(28.0864F, eService.getEmissionsForItinerary(i));
+    assertEquals(0, eService.getEmissionsForItinerary(i));
   }
 }
