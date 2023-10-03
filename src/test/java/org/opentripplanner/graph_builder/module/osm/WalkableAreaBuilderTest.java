@@ -25,6 +25,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.model.vertex.VertexLabel.OsmNodeOnLevelLabel;
+import org.opentripplanner.test.support.ResourceLoader;
 
 public class WalkableAreaBuilderTest {
 
@@ -39,7 +40,7 @@ public class WalkableAreaBuilderTest {
     final Set<String> boardingAreaRefTags = Set.of();
     final OsmDatabase osmdb = new OsmDatabase(DataImportIssueStore.NOOP);
 
-    final File file = new File(testInfo.getTestClass().get().getResource(osmFile).getFile());
+    final File file = ResourceLoader.of(WalkableAreaBuilderTest.class).file(osmFile);
     assertTrue(file.exists());
     new OsmProvider(file, false).readOSM(osmdb);
     osmdb.postLoad();

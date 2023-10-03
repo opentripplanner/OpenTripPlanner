@@ -37,11 +37,11 @@ public class GtfsContextBuilder {
     this.transitBuilder = transitBuilder;
   }
 
-  public static GtfsContextBuilder contextBuilder(String path) throws IOException {
-    return contextBuilder(null, path);
+  public static GtfsContextBuilder contextBuilder(File file) throws IOException {
+    return contextBuilder(null, file);
   }
 
-  public static GtfsContextBuilder contextBuilder(@Nullable String defaultFeedId, String path)
+  public static GtfsContextBuilder contextBuilder(@Nullable String defaultFeedId, File path)
     throws IOException {
     GtfsImport gtfsImport = gtfsImport(defaultFeedId, path);
     GtfsFeedId feedId = gtfsImport.getFeedId();
@@ -123,8 +123,8 @@ public class GtfsContextBuilder {
 
   /* private stuff */
 
-  private static GtfsImport gtfsImport(String defaultFeedId, String path) throws IOException {
-    return new GtfsImport(defaultFeedId, new File(path));
+  private static GtfsImport gtfsImport(String defaultFeedId, File file) throws IOException {
+    return new GtfsImport(defaultFeedId, file);
   }
 
   private void repairStopTimesForEachTrip() {
