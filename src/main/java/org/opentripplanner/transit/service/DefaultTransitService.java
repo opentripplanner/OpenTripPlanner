@@ -252,7 +252,7 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
-  public Collection<DatedTrip> getCancelledTrips() {
+  public Collection<DatedTrip> getCancelledTrips(List<String> feeds) {
     OTPRequestTimeoutException.checkForTimeout();
     List<DatedTrip> cancelledTrips = new ArrayList<>();
     Map<Trip, Integer> departures = new HashMap<>();
@@ -267,6 +267,9 @@ public class DefaultTransitService implements TransitEditorService {
 
     for (Map.Entry<FeedScopedId, Trip> entry : trips.entrySet()) {
       var trip = entry.getValue();
+      if (feeds != null && !feeds.contains(trip.getId().getFeedId())) {
+        continue;
+      }
       Set<LocalDate> serviceDates = calendarService.getServiceDatesForServiceId(
         trip.getServiceId()
       );
@@ -276,7 +279,7 @@ public class DefaultTransitService implements TransitEditorService {
         var tripTimes = timetable.getTripTimes(trip);
         if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) { // use UPDATED for faked testing
           cancelledTrips.add(new DatedTrip(trip, date));
-	  // store departure time from first stop
+          // store departure time from first stop
           departures.put(trip, tripTimes.sortIndex());
         }
       }
@@ -294,7 +297,7 @@ public class DefaultTransitService implements TransitEditorService {
       } else if (departure1 > departure2) {
         return 1;
       } else {
-	// identical departure day and time, so sort by unique feedscope id
+        // identical departure day and time, so sort by unique feedscope id
         return t1.trip().getId().compareTo(t2.trip().getId());
       }
     });

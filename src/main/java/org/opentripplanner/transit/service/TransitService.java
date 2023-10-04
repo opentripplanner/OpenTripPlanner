@@ -109,7 +109,7 @@ public interface TransitService {
 
   Collection<Trip> getAllTrips();
 
-  Collection<DatedTrip> getCancelledTrips();
+  Collection<DatedTrip> getCancelledTrips(List<String> feeds);
 
   Collection<Route> getAllRoutes();
 
