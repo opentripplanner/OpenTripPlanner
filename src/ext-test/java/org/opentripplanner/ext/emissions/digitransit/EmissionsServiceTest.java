@@ -46,10 +46,16 @@ class EmissionsServiceTest {
 
   @BeforeEach
   void SetUp() {
-    Map<String, DigitransitEmissions> digitransitEmissions = new HashMap<>();
-    digitransitEmissions.put("F:1", new DigitransitEmissions(120, 12));
-    digitransitEmissions.put("F:2", new DigitransitEmissions(0, 0));
-    this.eService = new DigitransitEmissionsService(digitransitEmissions, 131);
+    Map<FeedScopedId, DigitransitEmissions> digitransitEmissions = new HashMap<>();
+    digitransitEmissions.put(
+      new FeedScopedId("F", "1"),
+      DigitransitEmissions.newDigitransitEmissions(0.12, 12)
+    );
+    digitransitEmissions.put(
+      new FeedScopedId("F", "2"),
+      DigitransitEmissions.newDigitransitEmissions(0, 0)
+    );
+    this.eService = new DigitransitEmissionsService(digitransitEmissions, 0.131);
   }
 
   @Test
@@ -105,9 +111,12 @@ class EmissionsServiceTest {
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
-    Map<String, DigitransitEmissions> digitransitEmissions = new HashMap<>();
-    digitransitEmissions.put("G:1", new DigitransitEmissions(120, 12));
-    this.eService = new DigitransitEmissionsService(digitransitEmissions, 131);
+    Map<FeedScopedId, DigitransitEmissions> digitransitEmissions = new HashMap<>();
+    digitransitEmissions.put(
+      new FeedScopedId("G", "1"),
+      DigitransitEmissions.newDigitransitEmissions(0.12, 12)
+    );
+    this.eService = new DigitransitEmissionsService(digitransitEmissions, 0.131);
 
     var route = TransitModelForTest.route(id("1")).withAgency(subject).build();
     List<Leg> legs = new ArrayList<>();

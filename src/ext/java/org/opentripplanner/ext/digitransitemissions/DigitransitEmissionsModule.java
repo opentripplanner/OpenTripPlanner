@@ -16,6 +16,7 @@ import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
   private BuildConfig config;
   private EmissionsServiceRepository emissionsServiceRepository;
   private GraphBuilderDataSources dataSources;
-  private Map<String, DigitransitEmissions> emissionsData = new HashMap<>();
+  private Map<FeedScopedId, DigitransitEmissions> emissionsData = new HashMap<>();
 
   @Inject
   public DigitransitEmissionsModule(
@@ -43,9 +44,9 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
     if (config.digitransitEmissions != null) {
       LOG.info("Start emissions building!");
 
-      int carAvgCo2 = config.digitransitEmissions.getCarAvgCo2();
+      int carAvgCo2PerKm = config.digitransitEmissions.getCarAvgCo2();
       double carAvgOccupancy = config.digitransitEmissions.getCarAvgOccupancy();
-      double carAvgEmissions = carAvgCo2 / carAvgOccupancy;
+      double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
 
       for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
         if (gtfsData.dataSource().name().contains(".zip")) {
@@ -56,7 +57,7 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
       }
 
       this.emissionsServiceRepository.saveEmissionsService(
-          new DigitransitEmissionsService(this.emissionsData, carAvgEmissions)
+          new DigitransitEmissionsService(this.emissionsData, carAvgEmissionsPerMeter)
         );
     }
   }
@@ -92,11 +93,12 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
     reader.readHeaders();
     while (reader.readRecord()) {
       String routeId = reader.get("route_id");
-      Double avgCo2PerVehiclePerKm = Double.parseDouble(reader.get("avg_co2_per_vehicle_per_km"));
+      Double avgCo2PerVehiclePerMeter =
+        Double.parseDouble(reader.get("avg_co2_per_vehicle_per_km")) / 1000;
       int avgPassengerCount = Integer.parseInt(reader.get("avg_passenger_count"));
       this.emissionsData.put(
-          feedId + ":" + routeId,
-          new DigitransitEmissions(avgCo2PerVehiclePerKm, avgPassengerCount)
+          new FeedScopedId(feedId, routeId),
+          DigitransitEmissions.newDigitransitEmissions(avgCo2PerVehiclePerMeter, avgPassengerCount)
         );
     }
   }

@@ -18,15 +18,15 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 @Sandbox
 public class DigitransitEmissionsService implements Serializable, EmissionsService {
 
-  private Map<String, DigitransitEmissions> emissions;
+  private Map<FeedScopedId, DigitransitEmissions> emissions;
   private double carAvgEmissions;
 
   public DigitransitEmissionsService(
-    Map<String, DigitransitEmissions> emissions,
-    double carAvgEmissions
+    Map<FeedScopedId, DigitransitEmissions> emissions,
+    double carAvgEmissionsPerMeter
   ) {
     this.emissions = emissions;
-    this.carAvgEmissions = carAvgEmissions;
+    this.carAvgEmissions = carAvgEmissionsPerMeter;
   }
 
   @Override
@@ -61,11 +61,15 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
     DoubleStream emissionsStream = transitLegs
       .stream()
       .mapToDouble(leg -> {
-        double legDistanceInKm = leg.getDistanceMeters() / 1000;
-        String feedScopedRouteId =
-          leg.getAgency().getId().getFeedId() + ":" + leg.getRoute().getId().getId();
+        double legDistanceInMeters = leg.getDistanceMeters();
+        FeedScopedId feedScopedRouteId = new FeedScopedId(
+          leg.getAgency().getId().getFeedId(),
+          leg.getRoute().getId().getId()
+        );
         if (feedScopedRouteId != null && this.emissions.containsKey(feedScopedRouteId)) {
-          return this.emissions.get(feedScopedRouteId).getEmissionsPerPassenger() * legDistanceInKm;
+          return (
+            this.emissions.get(feedScopedRouteId).getEmissionsPerPassenger() * legDistanceInMeters
+          );
         }
         // Emissions value for the leg is missing
         return -1;
@@ -83,8 +87,8 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
     return carLegs
       .stream()
       .mapToDouble(leg -> {
-        double carLegDistanceInKm = leg.getDistanceMeters() / 1000;
-        return (this.carAvgEmissions * carLegDistanceInKm);
+        double carLegDistanceInMeters = leg.getDistanceMeters();
+        return (this.carAvgEmissions * carLegDistanceInMeters);
       })
       .sum();
   }
