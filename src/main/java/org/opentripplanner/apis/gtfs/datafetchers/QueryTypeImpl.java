@@ -798,14 +798,15 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   @Override
   public DataFetcher<Connection<DatedTrip>> cancelledTrips() {
     return environment -> {
-      // var args = new GraphQLTypes.GraphQLQueryTypeGetTripsArgs(environment.getArguments());
+      var args = new GraphQLTypes.GraphQLQueryTypeCancelledTripsArgs(environment.getArguments());
 
       Stream<DatedTrip> tripStream = getTransitService(environment).getCancelledTrips().stream();
 
-      /* if (args.getGraphQLFeeds() != null) {
-        List<String> feeds = args.getGraphQLFeeds();
-        tripStream = tripStream.filter(datedTrip -> feeds.contains(datedTrip.getTrip().getId().getFeedId()));
-	}*/
+      List<String> feeds = args.getGraphQLFeeds();
+      if (feeds != null) {
+        tripStream =
+          tripStream.filter(datedTrip -> feeds.contains(datedTrip.trip().getId().getFeedId()));
+      }
 
       var datedTrips = tripStream.collect(Collectors.toList());
       return new SimpleListConnection<>(datedTrips).get(environment);
