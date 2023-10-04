@@ -1180,7 +1180,7 @@ case where this is not the case.
     }
   ],
   "digitransitEmissions" : {
-    "carAvgCo2" : 170,
+    "carAvgCo2PerKm" : 170,
     "carAvgOccupancy" : 1.3
   }
 }

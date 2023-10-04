@@ -10,7 +10,7 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
     for (Itinerary i : itineraries) {
-      Float emissions = emissionsService.getEmissionsForItinerary(i);
+      Double emissions = emissionsService.getEmissionsForItinerary(i);
       if (emissions != null) {
         i.setEmissions(emissions);
       }

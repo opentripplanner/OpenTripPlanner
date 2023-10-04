@@ -30,7 +30,7 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
   }
 
   @Override
-  public Float getEmissionsForItinerary(Itinerary itinerary) {
+  public Double getEmissionsForItinerary(Itinerary itinerary) {
     List<TransitLeg> transitLegs = itinerary
       .getLegs()
       .stream()
@@ -39,8 +39,7 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
       .toList();
 
     if (!transitLegs.isEmpty()) {
-      Double emissions = getEmissionsForTransitItinerary(transitLegs);
-      return emissions != null ? emissions.floatValue() : null;
+      return getEmissionsForTransitItinerary(transitLegs);
     }
 
     List<StreetLeg> carLegs = itinerary
@@ -52,7 +51,7 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
       .toList();
 
     if (!carLegs.isEmpty()) {
-      return (float) getEmissionsForCarItinerary(carLegs);
+      return getEmissionsForCarItinerary(carLegs);
     }
     return null;
   }

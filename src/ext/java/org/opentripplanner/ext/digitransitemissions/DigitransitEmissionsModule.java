@@ -44,7 +44,7 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
     if (config.digitransitEmissions != null) {
       LOG.info("Start emissions building!");
 
-      int carAvgCo2PerKm = config.digitransitEmissions.getCarAvgCo2();
+      int carAvgCo2PerKm = config.digitransitEmissions.getCarAvgCo2PerKm();
       double carAvgOccupancy = config.digitransitEmissions.getCarAvgOccupancy();
       double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
 

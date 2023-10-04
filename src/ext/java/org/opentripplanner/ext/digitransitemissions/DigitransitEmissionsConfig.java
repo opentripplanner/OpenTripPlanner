@@ -7,7 +7,7 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
  */
 public class DigitransitEmissionsConfig {
 
-  private int carAvgCo2;
+  private int carAvgCo2PerKm;
   private double carAvgOccupancy;
 
   public DigitransitEmissionsConfig(String parameterName, NodeAdapter root) {
@@ -23,9 +23,9 @@ public class DigitransitEmissionsConfig {
       )
       .asObject();
 
-    this.carAvgCo2 =
+    this.carAvgCo2PerKm =
       c
-        .of("carAvgCo2")
+        .of("carAvgCo2PerKm")
         .summary("The average CO2 emissions of a car in grams per kilometer.")
         .asInt(170);
 
@@ -33,8 +33,8 @@ public class DigitransitEmissionsConfig {
       c.of("carAvgOccupancy").summary("The average number of passengers in a car.").asDouble(1.3);
   }
 
-  public int getCarAvgCo2() {
-    return carAvgCo2;
+  public int getCarAvgCo2PerKm() {
+    return carAvgCo2PerKm;
   }
 
   public double getCarAvgOccupancy() {

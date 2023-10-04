@@ -15,7 +15,7 @@ public class DefaultEmissionsService implements Serializable, EmissionsService {
   }
 
   @Override
-  public Float getEmissionsForItinerary(Itinerary itinerary) {
+  public Double getEmissionsForItinerary(Itinerary itinerary) {
     Optional<DigitransitEmissionsService> service = repository.retrieveEmissionsService();
     if (service.isPresent()) {
       return service.get().getEmissionsForItinerary(itinerary);

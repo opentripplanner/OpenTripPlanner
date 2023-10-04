@@ -40,14 +40,14 @@ To enable this functionality, you need to enable the "Co2Emissions"  feature in 
 ```
 Include the `digitransitEmissions` object in the
 `build-config.json` file. The `digitransitEmissions` object should contain parameters called
-`carAvgCo2` and `carAvgOccupancy`. The `carAvgCo2` provides the average emissions value for a car and
+`carAvgCo2PerKm` and `carAvgOccupancy`. The `carAvgCo2PerKm` provides the average emissions value for a car and
 the `carAvgOccupancy` provides the average number of passengers in a car.
 
 ```json
 //build-config.json
 {
   "digitransitEmissions": {
-    "carAvgCo2": 170,
+    "carAvgCo2PerKm": 170,
     "carAvgOccupancy": 1.3
   }
 }

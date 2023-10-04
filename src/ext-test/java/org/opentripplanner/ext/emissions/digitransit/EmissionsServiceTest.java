@@ -91,7 +91,7 @@ class EmissionsServiceTest {
     );
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(2223.902F, eService.getEmissionsForItinerary(i));
+    assertEquals(2223.902, eService.getEmissionsForItinerary(i));
   }
 
   @Test
@@ -106,7 +106,7 @@ class EmissionsServiceTest {
       .build();
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(28.0864F, eService.getEmissionsForItinerary(i));
+    assertEquals(28.0864, eService.getEmissionsForItinerary(i));
   }
 
   @Test

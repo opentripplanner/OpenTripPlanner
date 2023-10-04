@@ -83,7 +83,7 @@ public class ApiItinerary {
   /**
    * CO2 emissions of this trip
    */
-  public Float emissions;
+  public Double emissions;
   /**
    * A list of Legs. Each Leg is either a walking (cycling, car) portion of the trip, or a transit
    * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6,

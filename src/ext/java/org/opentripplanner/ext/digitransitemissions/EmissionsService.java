@@ -5,5 +5,5 @@ import org.opentripplanner.model.plan.Itinerary;
 
 @Sandbox
 public interface EmissionsService {
-  Float getEmissionsForItinerary(Itinerary itinerary);
+  Double getEmissionsForItinerary(Itinerary itinerary);
 }

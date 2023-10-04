@@ -412,7 +412,7 @@ public interface Leg {
   }
 
   @Nullable
-  default Float emissions() {
+  default Double emissions() {
     return null;
   }
 
