@@ -260,22 +260,21 @@ public class DefaultTransitService implements TransitEditorService {
     }
     var calendarService = getCalendarService();
     var patternMap = transitModelIndex.getPatternForTrip();
+    var trips = transitModelIndex.getTripForId();
 
-    transitModelIndex
-      .getTripForId()
-      .values()
-      .forEach(trip -> {
-        Set<LocalDate> serviceDates = calendarService.getServiceDatesForServiceId(
-          trip.getServiceId()
-        );
-        var pattern = patternMap.get(trip);
-        for (LocalDate date : serviceDates) {
-          var tt = timetableSnapshot.resolve(pattern, date);
-          if (tt.getTripTimes(trip).getRealTimeState() == RealTimeState.CANCELED) {
-            cancelledTrips.add(new DatedTrip(trip, date));
-          }
+    for (Map.Entry<FeedScopedId, Trip> entry : trips.entrySet()) {
+      var trip = entry.getValue();
+      Set<LocalDate> serviceDates = calendarService.getServiceDatesForServiceId(
+        trip.getServiceId()
+      );
+      var pattern = patternMap.get(trip);
+      for (LocalDate date : serviceDates) {
+        var tt = timetableSnapshot.resolve(pattern, date);
+        if (tt.getTripTimes(trip).getRealTimeState() == RealTimeState.CANCELED) {
+          cancelledTrips.add(new DatedTrip(trip, date));
         }
-      });
+      }
+    }
     return cancelledTrips;
   }
 
