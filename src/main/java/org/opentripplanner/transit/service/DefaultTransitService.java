@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -254,6 +255,8 @@ public class DefaultTransitService implements TransitEditorService {
   public Collection<DatedTrip> getCancelledTrips() {
     OTPRequestTimeoutException.checkForTimeout();
     List<DatedTrip> cancelledTrips = new ArrayList<>();
+    Map<Trip, Integer> departures = new HashMap<>();
+
     var timetableSnapshot = lazyGetTimeTableSnapShot();
     if (timetableSnapshot == null) {
       return cancelledTrips;
@@ -269,12 +272,32 @@ public class DefaultTransitService implements TransitEditorService {
       );
       var pattern = patternMap.get(trip);
       for (LocalDate date : serviceDates) {
-        var tt = timetableSnapshot.resolve(pattern, date);
-        if (tt.getTripTimes(trip).getRealTimeState() == RealTimeState.CANCELED) {
+        var timetable = timetableSnapshot.resolve(pattern, date);
+        var tripTimes = timetable.getTripTimes(trip);
+        if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) { // use UPDATED for faked testing
           cancelledTrips.add(new DatedTrip(trip, date));
+	  // store departure time from first stop
+          departures.put(trip, tripTimes.sortIndex());
         }
       }
     }
+    cancelledTrips.sort((t1, t2) -> {
+      if (t1.serviceDate().isBefore(t2.serviceDate())) {
+        return -1;
+      } else if (t2.serviceDate().isBefore(t1.serviceDate())) {
+        return 1;
+      }
+      var departure1 = departures.get(t1.trip());
+      var departure2 = departures.get(t2.trip());
+      if (departure1 < departure2) {
+        return -1;
+      } else if (departure1 > departure2) {
+        return 1;
+      } else {
+	// identical departure day and time, so sort by unique feedscope id
+        return t1.trip().getId().compareTo(t2.trip().getId());
+      }
+    });
     return cancelledTrips;
   }
 
