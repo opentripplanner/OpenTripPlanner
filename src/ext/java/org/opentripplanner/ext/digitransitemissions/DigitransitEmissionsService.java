@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.DoubleStream;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.lang.Sandbox;
@@ -38,7 +39,8 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
       .toList();
 
     if (!transitLegs.isEmpty()) {
-      return (float) getEmissionsForTransitItinerary(transitLegs);
+      Double emissions = getEmissionsForTransitItinerary(transitLegs);
+      return emissions != null ? emissions.floatValue() : null;
     }
 
     List<StreetLeg> carLegs = itinerary
@@ -55,7 +57,7 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
     return null;
   }
 
-  private double getEmissionsForTransitItinerary(List<TransitLeg> transitLegs) {
+  private Double getEmissionsForTransitItinerary(List<TransitLeg> transitLegs) {
     DoubleStream emissionsStream = transitLegs
       .stream()
       .mapToDouble(leg -> {
@@ -65,12 +67,14 @@ public class DigitransitEmissionsService implements Serializable, EmissionsServi
         if (feedScopedRouteId != null && this.emissions.containsKey(feedScopedRouteId)) {
           return this.emissions.get(feedScopedRouteId).getEmissionsPerPassenger() * legDistanceInKm;
         }
+        // Emissions value for the leg is missing
         return -1;
       });
     DoubleSummaryStatistics stats = emissionsStream.summaryStatistics();
     Double sum = stats.getSum();
+    // Check that no emissions value is invalid and the result is a number.
     if (stats.getMin() < 0 || Double.isNaN(sum)) {
-      return -1;
+      return null;
     }
     return sum;
   }

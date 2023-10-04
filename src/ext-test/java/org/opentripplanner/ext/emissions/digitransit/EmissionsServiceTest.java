@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.emissions.digitransit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.time.OffsetDateTime;
@@ -59,10 +60,7 @@ class EmissionsServiceTest {
     var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
     var route = TransitModelForTest.route(id("1")).build();
     List<Leg> legs = new ArrayList<>();
-    var pattern = TransitModelForTest
-      .tripPattern("1", route)
-      .withStopPattern(stopPattern)
-      .build();
+    var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();
     var stoptime = new StopTime();
     var stoptimes = new ArrayList<StopTime>();
     stoptimes.add(stoptime);
@@ -110,7 +108,7 @@ class EmissionsServiceTest {
     Map<String, DigitransitEmissions> digitransitEmissions = new HashMap<>();
     digitransitEmissions.put("G:1", new DigitransitEmissions(120, 12));
     this.eService = new DigitransitEmissionsService(digitransitEmissions, 131);
-  
+
     var route = TransitModelForTest.route(id("1")).withAgency(subject).build();
     List<Leg> legs = new ArrayList<>();
     var pattern = TransitModelForTest
@@ -141,7 +139,7 @@ class EmissionsServiceTest {
     );
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(-1, eService.getEmissionsForItinerary(i));
+    assertNull(eService.getEmissionsForItinerary(i));
   }
 
   @Test
@@ -152,10 +150,7 @@ class EmissionsServiceTest {
     var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
     var route = TransitModelForTest.route(id("2")).build();
     List<Leg> legs = new ArrayList<>();
-    var pattern = TransitModelForTest
-      .tripPattern("1", route)
-      .withStopPattern(stopPattern)
-      .build();
+    var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();
     var stoptime = new StopTime();
     var stoptimes = new ArrayList<StopTime>();
     stoptimes.add(stoptime);
