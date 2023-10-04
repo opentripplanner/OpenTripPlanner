@@ -374,6 +374,12 @@ public class AtlantaFareService extends DefaultFareService {
     addFareRules(FareType.electronicSenior, regularFareRules);
   }
 
+  @Nullable
+  @Override
+  protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
+    return fareRulesPerType.get(fareType);
+  }
+
   @Override
   public boolean populateFare(
     ItineraryFares fare,

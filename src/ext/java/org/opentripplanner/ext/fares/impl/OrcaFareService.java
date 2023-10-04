@@ -10,6 +10,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareMedium;
@@ -545,6 +546,12 @@ public class OrcaFareService extends DefaultFareService {
       );
       itineraryFares.addFareProduct(leg, transferFareProduct);
     }
+  }
+
+  @Nullable
+  @Override
+  protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
+    return fareRulesPerType.get(fareType);
   }
 
   /**

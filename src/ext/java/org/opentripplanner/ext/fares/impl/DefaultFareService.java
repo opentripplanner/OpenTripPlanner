@@ -107,34 +107,20 @@ public class DefaultFareService implements FareService {
     var fareLegsByFeed = fareLegs
       .stream()
       .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
-    var fareRulesByTypeAndFeed = fareRulesPerType
-      .entrySet()
-      .stream()
-      .collect(
-        Collectors.toMap(
-          Map.Entry::getKey,
-          rules ->
-            rules
-              .getValue()
-              .stream()
-              .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
-        )
-      );
 
     ItineraryFares fare = ItineraryFares.empty();
     boolean hasFare = false;
     for (FareType fareType : fareRulesPerType.keySet()) {
       List<FareComponent> components = new ArrayList<>();
       List<Money> fares = new ArrayList<>();
-      ItineraryFares currentFare = ItineraryFares.empty();
       boolean legWithoutRulesFound = false;
       boolean legsWithoutMatchingRulesFound = false;
-      boolean fareTypeHasFare = false;
       for (String feedId : fareLegsByFeed.keySet()) {
-        var fareRules = fareRulesByTypeAndFeed.get(fareType).get(feedId);
+        ItineraryFares currentFare = ItineraryFares.empty();
+        var fareRules = fareRulesForFeed(fareType, feedId);
 
         // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
-        if (fareRules != null && fareRules.size() > 0) {
+        if (fareRules != null && !fareRules.isEmpty()) {
           Currency currency = Currency.getInstance(
             fareRules.iterator().next().getFareAttribute().getCurrencyType()
           );
@@ -153,7 +139,13 @@ public class DefaultFareService implements FareService {
 
           components.addAll(currentFare.getComponents(fareType));
           fare.addFare(fareType, currentFare.getFare(fareType));
+
+          currentFare.getLegProducts().entries().forEach(entry ->{
+            fare.addFareProduct(entry.getKey(), entry.getValue().product());
+          });
+
           fares.add(currentFare.getFare(fareType));
+
 
           // If all the legs are from one feed, consider itinerary products
           if (fareLegs.equals(fareLegsByFeed.get(feedId))) {
@@ -190,6 +182,24 @@ public class DefaultFareService implements FareService {
       }
     }
     return hasFare ? fare : null;
+  }
+
+  @Nullable
+  protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
+    var fareRulesByTypeAndFeed = fareRulesPerType
+      .entrySet()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          Map.Entry::getKey,
+          rules ->
+            rules
+              .getValue()
+              .stream()
+              .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
+        )
+      );
+    return fareRulesByTypeAndFeed.get(fareType).get(feedId);
   }
 
   /**
