@@ -24,9 +24,11 @@ export function SearchBar({
         <TimeInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <DateInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <SearchWindowInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
-        <Button variant="primary" onClick={onRoute}>
-          Route
-        </Button>
+        <div className="search-bar-route-button-wrapper">
+          <Button variant="primary" onClick={onRoute}>
+            Route
+          </Button>
+        </div>
       </Stack>
     </section>
   );

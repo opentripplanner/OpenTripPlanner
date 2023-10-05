@@ -30,7 +30,9 @@ export function TimeInputField({
 
   return (
     <Form.Group>
-      <Form.Label htmlFor="timePicker">Time</Form.Label>
+      <Form.Label column="sm" htmlFor="timePicker">
+        Time
+      </Form.Label>
       <Form.Control type="time" id="timePicker" size="sm" onChange={onChange} value={current} />
     </Form.Group>
   );

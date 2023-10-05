@@ -31,7 +31,9 @@ export function DateInputField({
 
   return (
     <Form.Group>
-      <Form.Label htmlFor="datePicker">Date</Form.Label>
+      <Form.Label column="sm" htmlFor="datePicker">
+        Date
+      </Form.Label>
       <Form.Control type="date" id="datePicker" size="sm" onChange={onChange} value={current} />
     </Form.Group>
   );

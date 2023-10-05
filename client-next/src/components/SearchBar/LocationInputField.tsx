@@ -5,7 +5,9 @@ import { Location } from '../../gql/graphql.ts';
 export function LocationInputField({ location, id, label }: { location: Location; id: string; label: string }) {
   return (
     <Form.Group>
-      <Form.Label htmlFor={id}>{label}</Form.Label>
+      <Form.Label column="sm" htmlFor={id}>
+        {label}
+      </Form.Label>
       <Form.Control
         type="text"
         id={id}

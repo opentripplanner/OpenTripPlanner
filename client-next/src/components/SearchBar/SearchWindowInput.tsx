@@ -10,13 +10,17 @@ export function SearchWindowInput({
 }) {
   return (
     <Form.Group>
-      <Form.Label htmlFor="searchWindowInput">Search window (seconds)</Form.Label>
+      <Form.Label column="sm" htmlFor="searchWindowInput">
+        Search window
+      </Form.Label>
       <Form.Control
         type="number"
         id="searchWindowInput"
         size="sm"
         placeholder="3600"
-        value={tripQueryVariables.searchWindow || undefined}
+        prefix="seconds"
+        min={0}
+        value={tripQueryVariables.searchWindow || ''}
         onChange={(event) =>
           setTripQueryVariables({
             ...tripQueryVariables,

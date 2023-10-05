@@ -15,6 +15,11 @@
   padding-left: 1rem;
 }
 
+.search-bar-route-button-wrapper {
+  height: 5rem;
+  padding-top: 2rem;
+}
+
 .itinerary-list-container {
   width: 36rem;
   height: calc(100vh - 200px);
