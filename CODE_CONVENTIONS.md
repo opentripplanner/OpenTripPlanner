@@ -89,7 +89,7 @@ stop = stop.copyOf().withPrivateCode("TEX").build();
 ## Records, POJOs and Builders
 
 We prefer immutable typesafe types over flexibility and "short" class definitions. This make
-the code more robust and less error-prune. References to other entities might need to be mutable, 
+the code more robust and less error-prone. References to other entities might need to be mutable, 
 if so try to init them once, and throw an exception if set again. Example:
 
 ```java

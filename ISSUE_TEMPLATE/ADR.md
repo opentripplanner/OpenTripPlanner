@@ -1,7 +1,7 @@
 
 
 ### Description
-*One or two sentences witch goes into the [Architectural Decision Records](../ADRs.md) document
+*One or two sentences which goes into the [Architectural Decision Records](../ADRs.md) document
 later*
 
 ### Context and Problem Statement

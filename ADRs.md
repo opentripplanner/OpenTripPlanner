@@ -53,7 +53,7 @@ OTP uses prettier to format code. For more information on code style see the
 
 ### ADR-4 OOP
 Respect Object-Oriented principals
-  - Honer encapsulation & Single-responsibility principle
+  - Honor encapsulation & Single-responsibility principle
   - Abstraction - Use interfaces when a module need "someone" to play a role
   - Inheritance - Inheritances expresses “is-a” and/or “has-a” relationship, do not use it "just"
     to share data/functionality. 
