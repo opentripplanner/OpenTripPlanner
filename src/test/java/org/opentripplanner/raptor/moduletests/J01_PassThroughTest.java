@@ -91,7 +91,7 @@ public class J01_PassThroughTest {
       .withMultiCriteria(mc ->
         mc.withPassThroughPoints(
           // Include desired pass-through point in the request
-          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_D })))
+          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_D }, "PT1")))
         )
       )
       .searchParams()
@@ -127,7 +127,7 @@ public class J01_PassThroughTest {
       .withMultiCriteria(mc ->
         // Include desired pass-through point in the request
         mc.withPassThroughPoints(
-          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_A })))
+          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_A }, "PT1")))
         )
       )
       .searchParams()
@@ -164,7 +164,7 @@ public class J01_PassThroughTest {
       .withMultiCriteria(mc ->
         // Include desired pass-through point in the request
         mc.withPassThroughPoints(
-          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_C })))
+          new PassThroughPoints(List.of(new PassThroughPoint(new int[] { STOP_C }, "PT1")))
         )
       )
       .searchParams()
@@ -203,8 +203,8 @@ public class J01_PassThroughTest {
           // Include desired pass-through point in the request
           new PassThroughPoints(
             List.of(
-              new PassThroughPoint(new int[] { STOP_B }),
-              new PassThroughPoint(new int[] { STOP_D })
+              new PassThroughPoint(new int[] { STOP_B }, "PT1"),
+              new PassThroughPoint(new int[] { STOP_D }, "PT2")
             )
           )
         )
@@ -243,8 +243,8 @@ public class J01_PassThroughTest {
           // Include desired pass-through point in the request
           new PassThroughPoints(
             List.of(
-              new PassThroughPoint(new int[] { STOP_B }),
-              new PassThroughPoint(new int[] { STOP_C })
+              new PassThroughPoint(new int[] { STOP_B }, "PT1"),
+              new PassThroughPoint(new int[] { STOP_C }, "PT2")
             )
           )
         )
@@ -282,7 +282,7 @@ public class J01_PassThroughTest {
           // Include desired pass-through point in the request
           new PassThroughPoints(
             // Both STOP_B and STOP_C is a valid pass-through point
-            List.of(new PassThroughPoint(new int[] { STOP_B, STOP_C }))
+            List.of(new PassThroughPoint(new int[] { STOP_B, STOP_C }, "PT1"))
           )
         )
       )

@@ -3,10 +3,8 @@ package org.opentripplanner.graph_builder.module;
 import static graphql.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,6 +15,7 @@ import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -27,7 +26,7 @@ class GtfsModuleTest {
   public void addShapesForFrequencyTrips() {
     var model = buildTestModel();
 
-    var bundle = new GtfsBundle(new File(ConstantsForTests.FAKE_GTFS));
+    var bundle = new GtfsBundle(ConstantsForTests.SIMPLE_GTFS);
     var module = new GtfsModule(
       List.of(bundle),
       model.transitModel,
@@ -68,7 +67,7 @@ class GtfsModuleTest {
   class Interlining {
 
     static GtfsBundle bundle(String feedId) {
-      var b = new GtfsBundle(new File("src/test/resources/gtfs/interlining"));
+      var b = new GtfsBundle(ResourceLoader.of(GtfsModuleTest.class).file("/gtfs/interlining"));
       b.setFeedId(new GtfsFeedId.Builder().id(feedId).build());
       return b;
     }

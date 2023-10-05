@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -23,6 +22,7 @@ import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexFactory;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -37,7 +37,9 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 class OsmBoardingLocationsModuleTest {
 
-  File file = new File(ConstantsForTests.HERRENBERG_OSM);
+  File file = ResourceLoader
+    .of(OsmBoardingLocationsModuleTest.class)
+    .file("herrenberg-minimal.osm.pbf");
   RegularStop platform = TransitModelForTest
     .stop("de:08115:4512:4:101")
     .withCoordinate(48.59328, 8.86128)

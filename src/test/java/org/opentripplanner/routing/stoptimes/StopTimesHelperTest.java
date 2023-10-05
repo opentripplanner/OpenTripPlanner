@@ -28,7 +28,7 @@ class StopTimesHelperTest {
 
   @BeforeAll
   public static void setUp() throws Exception {
-    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitModel transitModel = model.transitModel();
     transitService = new DefaultTransitService(transitModel);
     feedId = transitModel.getFeedIds().iterator().next();

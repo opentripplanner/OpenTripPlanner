@@ -12,17 +12,17 @@ import org.junit.jupiter.api.Test;
 
 class PassThroughPointsTest {
 
-  private static final int[] STOPS_POINT_1 = { 2, 7, 13 };
-  private static final int[] STOPS_POINT_2 = { 12 };
+  private static final int[] STOPS_1 = { 2, 7, 13 };
+  private static final int[] STOPS_2 = { 12 };
 
   private final PassThroughPoints subject = new PassThroughPoints(
-    List.of(new PassThroughPoint(STOPS_POINT_1), new PassThroughPoint(STOPS_POINT_2))
+    List.of(new PassThroughPoint(STOPS_1, "PT1"), new PassThroughPoint(STOPS_2, "PT2"))
   );
 
   @Test
   void stream() {
     assertEquals(
-      "(stops: [2, 7, 13]), (stops: [12])",
+      "(name: 'PT1', stops: [2, 7, 13]), (name: 'PT2', stops: [12])",
       subject.stream().map(Objects::toString).collect(Collectors.joining(", "))
     );
   }
@@ -36,10 +36,10 @@ class PassThroughPointsTest {
   @Test
   void testEqualsAndHashCode() {
     var same = new PassThroughPoints(
-      List.of(new PassThroughPoint(STOPS_POINT_1), new PassThroughPoint(STOPS_POINT_2))
+      List.of(new PassThroughPoint(STOPS_1, "PT1"), new PassThroughPoint(STOPS_2, "PT2"))
     );
     var other = new PassThroughPoints(
-      List.of(new PassThroughPoint(STOPS_POINT_1), new PassThroughPoint(STOPS_POINT_1))
+      List.of(new PassThroughPoint(STOPS_1, "PT1"), new PassThroughPoint(STOPS_1, "PT2"))
     );
     assertEquals(same, subject);
     assertNotEquals(other, subject);
@@ -51,7 +51,7 @@ class PassThroughPointsTest {
   @Test
   void testToString() {
     assertEquals(
-      "PassThroughPoints{points: [(stops: [2, 7, 13]), (stops: [12])]}",
+      "PassThroughPoints{points: [(name: 'PT1', stops: [2, 7, 13]), (name: 'PT2', stops: [12])]}",
       subject.toString()
     );
   }

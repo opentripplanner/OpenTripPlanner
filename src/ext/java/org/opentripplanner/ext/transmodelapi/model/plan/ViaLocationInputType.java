@@ -26,7 +26,7 @@ public class ViaLocationInputType {
           .name("name")
           .description(
             "The name of the location. This is pass-through information" +
-            "and is not used in routing."
+            " and is not used in routing."
           )
           .type(Scalars.GraphQLString)
           .build()

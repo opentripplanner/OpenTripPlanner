@@ -232,6 +232,11 @@ public class DefaultTransitService implements TransitEditorService {
   }
 
   @Override
+  public Collection<StopLocation> getStopOrChildStops(FeedScopedId id) {
+    return transitModel.getStopModel().findStopOrChildStops(id);
+  }
+
+  @Override
   public Collection<StopLocationsGroup> listStopLocationGroups() {
     OTPRequestTimeoutException.checkForTimeout();
     return transitModel.getStopModel().listStopLocationGroups();

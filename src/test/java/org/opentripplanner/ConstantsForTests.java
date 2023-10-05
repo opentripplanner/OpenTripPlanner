@@ -39,6 +39,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfigLoader;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.street.search.TraverseModeSet;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.service.StopModel;
@@ -46,63 +47,33 @@ import org.opentripplanner.transit.service.TransitModel;
 
 public class ConstantsForTests {
 
-  public static final String CALTRAIN_GTFS = "src/test/resources/gtfs/caltrain_gtfs.zip";
+  private static final ResourceLoader RES = ResourceLoader.of(ConstantsForTests.class);
 
-  public static final String NETEX_MINIMAL = "src/test/resources/netex/netex_minimal.zip";
+  public static final File CALTRAIN_GTFS = RES.file("/gtfs/caltrain_gtfs.zip");
 
-  private static final String PORTLAND_GTFS = "src/test/resources/portland/portland.gtfs.zip";
+  private static final File PORTLAND_GTFS = RES.file("/portland/portland.gtfs.zip");
 
-  public static final String PORTLAND_CENTRAL_OSM =
-    "src/test/resources/portland/portland-central-filtered.osm.pbf";
+  private static final File PORTLAND_CENTRAL_OSM = RES.file(
+    "/portland/portland-central-filtered.osm.pbf"
+  );
 
   private static final String PORTLAND_BIKE_SHARE_CSV =
     "src/test/resources/portland/portland-vehicle-rental.csv";
 
-  private static final String PORTLAND_NED = "src/test/resources/portland/portland-ned.tif";
-
   private static final String PORTLAND_NED_WITH_NODATA =
     "src/test/resources/portland/portland-ned-nodata.tif";
 
-  private static final String OSLO_EAST_OSM = "src/test/resources/oslo-east-filtered.osm.pbf";
+  private static final File OSLO_EAST_OSM = RES.file("oslo-east-filtered.osm.pbf");
 
-  public static final String KCM_GTFS = "src/test/resources/gtfs/kcm_gtfs.zip";
+  public static final File SIMPLE_GTFS = RES.file("/gtfs/simple/");
 
-  public static final String FAKE_GTFS = "src/test/resources/testagency";
-
-  public static final String FARE_COMPONENT_GTFS =
-    "src/test/resources/gtfs/farecomponents.gtfs.zip";
-
-  public static final String SHAPE_DIST_GTFS = "src/test/resources/gtfs/shape_dist_traveled/";
+  public static final File SHAPE_DIST_GTFS = RES.file("/gtfs/shape_dist_traveled/");
 
   private static final String NETEX_NORDIC_DIR = "src/test/resources/netex/nordic";
 
   private static final String NETEX_NORDIC_FILENAME = "netex_minimal.zip";
   private static final String NETEX_EPIP_DIR = "src/test/resources/netex/epip/";
   private static final String NETEX_EPIP_DATA_DIR = NETEX_EPIP_DIR + "netex_epip_minimal/";
-  /* Stuttgart area, Germany */
-  public static final String DEUFRINGEN_OSM =
-    "src/test/resources/germany/deufringen-minimal.osm.pbf";
-  public static final String BOEBLINGEN_OSM =
-    "src/test/resources/germany/boeblingen-minimal.osm.pbf";
-  public static final String VVS_BUS_764_ONLY =
-    "src/test/resources/germany/vvs-bus-764-only.gtfs.zip";
-  public static final String VVS_BUS_751_ONLY =
-    "src/test/resources/germany/vvs-bus-751-only.gtfs.zip";
-  public static final String HERRENBERG_HINDENBURG_STR_UNDER_CONSTRUCTION_OSM =
-    "src/test/resources/germany/herrenberg-hindenburgstr-under-construction.osm.pbf";
-  public static final String HERRENBERG_BARRIER_GATES_OSM =
-    "src/test/resources/germany/herrenberg-barrier-gates.osm.pbf";
-  public static final String HERRENBERG_OSM =
-    "src/test/resources/germany/herrenberg-minimal.osm.pbf";
-  public static final String ISLAND_PRUNE_OSM =
-    "src/test/resources/germany/herrenberg-island-prune-nothru.osm.pbf";
-  public static final String ADAPTIVE_PRUNE_OSM = "src/test/resources/isoiiluoto.pbf";
-
-  /* filenames encoded with cp437 and utf8 */
-  public static final String UMLAUT_CP437_ZIP = "src/test/resources/umlaut-cp437.zip";
-  public static final String UMLAUT_TXT = "ümläüt.txt";
-  public static final String UMLAUT_UTF8_ZIP = "src/test/resources/umlaut-utf8.zip";
-  public static final String UMLAUT_UTF8_ZIP_NO_EFS = "src/test/resources/umlaut-utf8-no-efs.zip";
 
   private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
     new File(NETEX_NORDIC_DIR, NETEX_NORDIC_FILENAME),
@@ -151,8 +122,7 @@ public class ConstantsForTests {
       var transitModel = new TransitModel(new StopModel(), deduplicator);
       // Add street data from OSM
       {
-        File osmFile = new File(PORTLAND_CENTRAL_OSM);
-        OsmProvider osmProvider = new OsmProvider(osmFile, false);
+        OsmProvider osmProvider = new OsmProvider(PORTLAND_CENTRAL_OSM, false);
         OsmModule osmModule = OsmModule
           .of(osmProvider, graph)
           .withStaticParkAndRide(true)
@@ -189,14 +159,13 @@ public class ConstantsForTests {
     }
   }
 
-  public static TestOtpModel buildOsmGraph(String osmPath) {
+  public static TestOtpModel buildOsmGraph(File osmFile) {
     try {
       var deduplicator = new Deduplicator();
       var stopModel = new StopModel();
       var graph = new Graph(deduplicator);
       var transitModel = new TransitModel(stopModel, deduplicator);
       // Add street data from OSM
-      File osmFile = new File(osmPath);
       OsmProvider osmProvider = new OsmProvider(osmFile, true);
       OsmModule osmModule = OsmModule.of(osmProvider, graph).build();
       osmModule.buildGraph();
@@ -206,7 +175,7 @@ public class ConstantsForTests {
     }
   }
 
-  public static TestOtpModel buildOsmAndGtfsGraph(String osmPath, String gtfsPath) {
+  public static TestOtpModel buildOsmAndGtfsGraph(File osmPath, File gtfsPath) {
     var otpModel = buildOsmGraph(osmPath);
 
     addGtfsToGraph(
@@ -223,19 +192,16 @@ public class ConstantsForTests {
     return otpModel;
   }
 
-  public static TestOtpModel buildGtfsGraph(String gtfsPath) {
+  public static TestOtpModel buildGtfsGraph(File gtfsPath) {
     return buildGtfsGraph(gtfsPath, new DefaultFareServiceFactory());
   }
 
-  public static TestOtpModel buildGtfsGraph(
-    String gtfsPath,
-    FareServiceFactory fareServiceFactory
-  ) {
+  public static TestOtpModel buildGtfsGraph(File gtfsFile, FareServiceFactory fareServiceFactory) {
     var deduplicator = new Deduplicator();
     var stopModel = new StopModel();
     var graph = new Graph(deduplicator);
     var transitModel = new TransitModel(stopModel, deduplicator);
-    addGtfsToGraph(graph, transitModel, gtfsPath, fareServiceFactory, null);
+    addGtfsToGraph(graph, transitModel, gtfsFile, fareServiceFactory, null);
     return new TestOtpModel(graph, transitModel);
   }
 
@@ -247,9 +213,7 @@ public class ConstantsForTests {
       var transitModel = new TransitModel(stopModel, deduplicator);
       // Add street data from OSM
       {
-        File osmFile = new File(OSLO_EAST_OSM);
-
-        OsmProvider osmProvider = new OsmProvider(osmFile, false);
+        OsmProvider osmProvider = new OsmProvider(OSLO_EAST_OSM, false);
         OsmModule osmModule = OsmModule.of(osmProvider, graph).build();
         osmModule.buildGraph();
       }
@@ -298,11 +262,11 @@ public class ConstantsForTests {
   public static void addGtfsToGraph(
     Graph graph,
     TransitModel transitModel,
-    String file,
+    File file,
     FareServiceFactory fareServiceFactory,
     @Nullable String feedId
   ) {
-    var bundle = new GtfsBundle(new File(file));
+    var bundle = new GtfsBundle(file);
     bundle.setFeedId(new GtfsFeedId.Builder().id(feedId).build());
 
     var module = new GtfsModule(

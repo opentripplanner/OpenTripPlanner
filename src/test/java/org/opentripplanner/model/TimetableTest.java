@@ -50,7 +50,7 @@ public class TimetableTest {
 
   @BeforeAll
   public static void setUp() throws Exception {
-    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.FAKE_GTFS);
+    TestOtpModel model = ConstantsForTests.buildGtfsGraph(ConstantsForTests.SIMPLE_GTFS);
     TransitModel transitModel = model.transitModel();
 
     feedId = transitModel.getFeedIds().stream().findFirst().get();
