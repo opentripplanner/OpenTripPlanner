@@ -188,6 +188,12 @@ public class ItineraryFares {
     fareProduct.forEach(fp -> addFareProduct(leg, fp));
   }
 
+  /**
+   * Convert the fare received via the deprecated {@link FareComponent} to leg products. This
+   * inverts the relationship:
+   *   - fare component has several legs
+   *   - leg product is a mapping from leg to a list of fare products
+   */
   @Nonnull
   public Multimap<Leg, FareProductUse> legProductsFromComponents() {
     Multimap<Leg, FareProductUse> legProductsFromComponents = HashMultimap.create();

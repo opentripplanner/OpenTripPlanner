@@ -193,6 +193,9 @@ public class DefaultFareService implements FareService {
     return hasFare ? fare : null;
   }
 
+  /**
+   * For a given fareType and feedId return the applicable fare rule sets.
+   */
   @Nullable
   protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
     var fareRulesByTypeAndFeed = fareRulesPerType
