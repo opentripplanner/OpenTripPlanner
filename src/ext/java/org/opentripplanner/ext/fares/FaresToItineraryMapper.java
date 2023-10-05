@@ -1,9 +1,11 @@
 package org.opentripplanner.ext.fares;
 
+import com.google.common.collect.Multimap;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 
 /**
@@ -21,13 +23,17 @@ public class FaresToItineraryMapper {
       })
       .toList();
 
+    final Multimap<Leg, FareProductUse> legProductsFromComponents = fares.legProductsFromComponents();
+
     i
       .getLegs()
       .stream()
       .filter(ScheduledTransitLeg.class::isInstance)
       .forEach(l -> {
         var legInstances = fares.getLegProducts().get(l);
-        l.setFareProducts(ListUtils.combine(itineraryInstances, legInstances));
+        l.setFareProducts(
+          ListUtils.combine(itineraryInstances, legInstances, legProductsFromComponents.get(l))
+        );
       });
   }
 }
