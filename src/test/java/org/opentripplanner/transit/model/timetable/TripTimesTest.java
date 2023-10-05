@@ -221,7 +221,8 @@ class TripTimesTest {
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
    * Test case: 5 at 400, 6 cancelled (with internal representation 460, since delays are propagated
    * to later stops without arrival or departure), 7 at 420.
-   * Result: Expect error before interpolation. Expect no errors, after interpolation.
+   * Result: Expect error before interpolation since 6 is now larger than 5. Expect no errors after
+   * interpolation.
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsLate() {
@@ -247,7 +248,7 @@ class TripTimesTest {
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
    * Test case: 5 at 300, 6 cancelled(with internal representation 360, since delays are propagated
    * to later stops without arrival or departure), 7 at 320.
-   * Result: Expect errors, but no errors after interpolation.
+   * Result: Expect errors, since 7 is now less than 6 scheduled, but no errors after interpolation.
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsEarly() {
