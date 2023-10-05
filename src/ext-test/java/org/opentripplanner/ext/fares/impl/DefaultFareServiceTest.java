@@ -56,6 +56,14 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var fp = fare.getItineraryProducts().get(0);
     assertEquals(TEN_DOLLARS, fp.price());
     assertEquals("F:regular", fp.id().toString());
+
+    var lp = fare.legProductsFromComponents();
+    assertEquals(1, lp.size());
+    var product = lp.values().iterator().next().product();
+    assertEquals(TEN_DOLLARS, product.price());
+
+    // the leg products from the components and the "true" leg products are different collections
+    assertTrue(fare.getLegProducts().isEmpty());
   }
 
   @Test
