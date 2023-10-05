@@ -6,12 +6,12 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.edge.StreetEdge;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -22,7 +22,12 @@ public class PruneNoThruIslandsTest {
 
   @BeforeAll
   static void setup() {
-    graph = buildOsmGraph(ConstantsForTests.ISLAND_PRUNE_OSM);
+    graph =
+      buildOsmGraph(
+        ResourceLoader
+          .of(PruneNoThruIslandsTest.class)
+          .file("herrenberg-island-prune-nothru.osm.pbf")
+      );
   }
 
   @Test
@@ -63,13 +68,12 @@ public class PruneNoThruIslandsTest {
     );
   }
 
-  private static Graph buildOsmGraph(String osmPath) {
+  private static Graph buildOsmGraph(File osmFile) {
     try {
       var deduplicator = new Deduplicator();
       var graph = new Graph(deduplicator);
       var transitModel = new TransitModel(new StopModel(), deduplicator);
       // Add street data from OSM
-      File osmFile = new File(osmPath);
       OsmProvider osmProvider = new OsmProvider(osmFile, true);
       OsmModule osmModule = OsmModule.of(osmProvider, graph).withEdgeNamer(new TestNamer()).build();
 

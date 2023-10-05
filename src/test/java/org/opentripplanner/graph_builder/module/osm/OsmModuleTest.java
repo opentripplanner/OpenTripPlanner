@@ -10,8 +10,6 @@ import static org.opentripplanner.street.model.StreetTraversalPermission.ALL;
 import static org.opentripplanner.street.model.StreetTraversalPermission.PEDESTRIAN;
 
 import java.io.File;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -43,18 +41,19 @@ import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
 public class OsmModuleTest {
+
+  private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(OsmModuleTest.class);
 
   @Test
   public void testGraphBuilder() {
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
 
-    File file = new File(
-      URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), StandardCharsets.UTF_8)
-    );
+    File file = RESOURCE_LOADER.file("map.osm.pbf");
 
     OsmProvider provider = new OsmProvider(file, true);
 
@@ -112,12 +111,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var gg = new Graph(deduplicator);
 
-    File file = new File(
-      URLDecoder.decode(
-        getClass().getResource("NYC_small.osm.pbf").getFile(),
-        StandardCharsets.UTF_8
-      )
-    );
+    File file = RESOURCE_LOADER.file("NYC_small.osm.pbf");
     OsmProvider provider = new OsmProvider(file, true);
     OsmModule osmModule = OsmModule.of(provider, gg).withAreaVisibility(true).build();
 
@@ -312,12 +306,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
 
-    File file = new File(
-      URLDecoder.decode(
-        getClass().getResource("accessno-at-end.pbf").getFile(),
-        StandardCharsets.UTF_8
-      )
-    );
+    File file = RESOURCE_LOADER.file("accessno-at-end.pbf");
     OsmProvider provider = new OsmProvider(file, false);
     OsmModule loader = OsmModule.of(provider, graph).build();
     loader.buildGraph();
@@ -339,7 +328,7 @@ public class OsmModuleTest {
     var graph = new Graph();
     var providers = Stream
       .of("B+R.osm.pbf", "P+R.osm.pbf")
-      .map(f -> new File(getClass().getResource(f).getFile()))
+      .map(RESOURCE_LOADER::file)
       .map(f -> new OsmProvider(f, false))
       .toList();
     var module = OsmModule
@@ -364,12 +353,7 @@ public class OsmModuleTest {
     var deduplicator = new Deduplicator();
     var graph = new Graph(deduplicator);
 
-    File file = new File(
-      URLDecoder.decode(
-        getClass().getResource("usf_area.osm.pbf").getFile(),
-        StandardCharsets.UTF_8
-      )
-    );
+    File file = RESOURCE_LOADER.file("usf_area.osm.pbf");
     OsmProvider provider = new OsmProvider(file, false);
 
     OsmModule loader = OsmModule.of(provider, graph).withAreaVisibility(!skipVisibility).build();

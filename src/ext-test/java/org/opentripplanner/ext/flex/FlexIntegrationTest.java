@@ -3,13 +3,11 @@ package org.opentripplanner.ext.flex;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.graph_builder.module.FakeGraph.getFileForResource;
 import static org.opentripplanner.routing.api.request.StreetMode.FLEXIBLE;
 import static org.opentripplanner.street.search.TraverseMode.WALK;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -36,6 +34,7 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -58,16 +57,15 @@ public class FlexIntegrationTest {
   @BeforeAll
   static void setup() {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    var osmPath = getAbsolutePath(FlexTest.COBB_OSM);
-    var cobblincGtfsPath = getAbsolutePath(FlexTest.COBB_BUS_30_GTFS);
-    var martaGtfsPath = getAbsolutePath(FlexTest.MARTA_BUS_856_GTFS);
-    var flexGtfsPath = getAbsolutePath(FlexTest.COBB_FLEX_GTFS);
-
-    TestOtpModel model = ConstantsForTests.buildOsmGraph(osmPath);
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(FlexTest.COBB_OSM);
     graph = model.graph();
     transitModel = model.transitModel();
 
-    addGtfsToGraph(graph, transitModel, List.of(cobblincGtfsPath, martaGtfsPath, flexGtfsPath));
+    addGtfsToGraph(
+      graph,
+      transitModel,
+      List.of(FlexTest.COBB_BUS_30_GTFS, FlexTest.MARTA_BUS_856_GTFS, FlexTest.COBB_FLEX_GTFS)
+    );
     service = TestServerContext.createServerContext(graph, transitModel).routingService();
   }
 
@@ -176,21 +174,9 @@ public class FlexIntegrationTest {
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }
 
-  private static String getAbsolutePath(String cobbOsm) {
-    try {
-      return getFileForResource(cobbOsm).getAbsolutePath();
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  private static void addGtfsToGraph(
-    Graph graph,
-    TransitModel transitModel,
-    List<String> gtfsFiles
-  ) {
+  private static void addGtfsToGraph(Graph graph, TransitModel transitModel, List<File> gtfsFiles) {
     // GTFS
-    var gtfsBundles = gtfsFiles.stream().map(f -> new GtfsBundle(new File(f))).toList();
+    var gtfsBundles = gtfsFiles.stream().map(GtfsBundle::new).toList();
     GtfsModule gtfsModule = new GtfsModule(
       gtfsBundles,
       transitModel,
