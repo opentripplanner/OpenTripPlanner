@@ -382,10 +382,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
   /**
    * When creating a scheduled TripTimes or wrapping it in updates, we could potentially imply
    * negative running or dwell times. We really don't want those being used in routing. This method
-   * checks that all times are increasing for stops that are not CANCELLED or NO_DATA, since they
-   * may not have real-time arrival or departure times associated with them. Note! The
-   * `includeRealtimeCancellations` flag include canceled trips in the trip search, not individual
-   * canceled stops - so having none increasing times in this case SHOULD work.
+   * checks that all internal times are increasing. Thus, this check should be used at the end of
+   * updating trip times, after any propagating or interpolating delay operations.
    *
    * @return empty if times were found to be increasing, stop index of the first error otherwise
    */
@@ -395,17 +393,14 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     for (int s = 0; s < nStops; s++) {
       final int arr = getArrivalTime(s);
       final int dep = getDepartureTime(s);
-      final boolean isCancelled = isCancelledStop(s);
 
-      if (!isCancelled) {
-        if (dep < arr) {
-          return Optional.of(new ValidationError(NEGATIVE_DWELL_TIME, s));
-        }
-        if (prevDep > arr) {
-          return Optional.of(new ValidationError(NEGATIVE_HOP_TIME, s));
-        }
-        prevDep = dep;
+      if (dep < arr) {
+        return Optional.of(new ValidationError(NEGATIVE_DWELL_TIME, s));
       }
+      if (prevDep > arr) {
+        return Optional.of(new ValidationError(NEGATIVE_HOP_TIME, s));
+      }
+      prevDep = dep;
     }
     return Optional.empty();
   }
@@ -545,6 +540,76 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
       updateArrivalDelay(i, delay);
     }
     return hasAdjustedTimes;
+  }
+
+  /**
+   * Interpolate the times for CANCELLED stops in between regular stops to ensure internal time
+   * representations are increasing for these stops. This will not interpolate terminal
+   * cancellations, as those can be handled by backward and forward propagations. Note: This is
+   * currently for GTFS-RT only, since SIRI requires times for all stops.
+   *
+   * @return true if there is interpolated times, false if there is no interpolation.
+   */
+  public boolean interpolateMissingTimes() {
+    boolean hasInterpolatedTimes = false;
+    final int nStops = scheduledArrivalTimes.length;
+    boolean startInterpolate = false, hasPrevTimes = false;
+    int prevDeparture = 0, prevScheduledDeparture = 0, prevStopIndex = -1;
+
+    // Loop through all stops
+    for (int s = 0; s < nStops; s++) {
+      final boolean isCancelledStop = isCancelledStop(s);
+      final int scheduledArrival = getScheduledArrivalTime(s);
+      final int scheduledDeparture = getScheduledDepartureTime(s);
+      final int arrival = getArrivalTime(s);
+      final int departure = getDepartureTime(s);
+
+      if (!isCancelledStop && !startInterpolate) {
+        // Regular stop, could be used for interpolation for future cancellation, keep track.
+        prevDeparture = departure;
+        prevScheduledDeparture = scheduledDeparture;
+        prevStopIndex = s;
+        hasPrevTimes = true;
+      } else if (isCancelledStop && !startInterpolate && hasPrevTimes) {
+        // First cancelled stop, keep track.
+        startInterpolate = true;
+      } else if (!isCancelledStop && startInterpolate && hasPrevTimes) {
+        // First regular stop after cancelled stops, interpolate.
+        // Calculate necessary info for interpolation.
+        int numCancelledStops = s - prevStopIndex - 1;
+        int scheduledTravelTime = scheduledArrival - prevScheduledDeparture;
+        int realTimeTravelTime = arrival - prevDeparture;
+        double travelTimeRatio = (double) realTimeTravelTime / scheduledTravelTime;
+
+        // Fill out interpolated time for cancelled stops, using the calculated ratio.
+        for (int cancelledIndex = prevStopIndex + 1; cancelledIndex < s; cancelledIndex++) {
+          final int scheduledArrivalCancelled = getScheduledArrivalTime(cancelledIndex);
+          final int scheduledDepartureCancelled = getScheduledDepartureTime(cancelledIndex);
+
+          // Interpolate
+          int scheduledArrivalDiff = scheduledArrivalCancelled - prevScheduledDeparture;
+          double interpolatedArrival = prevDeparture + travelTimeRatio * scheduledArrivalDiff;
+          int scheduledDepartureDiff = scheduledDepartureCancelled - prevScheduledDeparture;
+          double interpolatedDeparture = prevDeparture + travelTimeRatio * scheduledDepartureDiff;
+
+          // Set Interpolated Times
+          updateArrivalTime(cancelledIndex, (int) interpolatedArrival);
+          updateDepartureTime(cancelledIndex, (int) interpolatedDeparture);
+        }
+
+        // Set tracking variables
+        prevDeparture = departure;
+        prevScheduledDeparture = scheduledDeparture;
+        prevStopIndex = s;
+        startInterpolate = false;
+        hasPrevTimes = true;
+
+        // Set return variable
+        hasInterpolatedTimes = true;
+      }
+    }
+
+    return hasInterpolatedTimes;
   }
 
   /**

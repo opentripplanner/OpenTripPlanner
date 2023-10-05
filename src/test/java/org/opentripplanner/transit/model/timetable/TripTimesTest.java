@@ -193,21 +193,26 @@ class TripTimesTest {
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
    * Test case: 5 at 421, 6 cancelled (with internal representation 481, since delays are propagated
    * to later stops without arrival or departure), 7 at 420
-   * Result: Error to be present at stop 7, due to negative hop time
+   * Result: Error to be present at stop 7, due to negative hop time. Error should stay after
+   * interpolation, since 6 would be then less than 5 due to interpolation.
    */
   @Test
   public void testNegativeHopTimeWithStopCancellations() {
-    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimes = new TripTimes(createInitialTripTimes());
 
-    updatedTripTimesB.updateDepartureTime(5, 421);
-    updatedTripTimesB.updateArrivalTime(6, 481);
-    updatedTripTimesB.updateDepartureTime(6, 481);
-    updatedTripTimesB.setCancelled(6);
-    updatedTripTimesB.updateArrivalTime(7, 420);
+    updatedTripTimes.updateDepartureTime(5, 421);
+    updatedTripTimes.updateArrivalTime(6, 481);
+    updatedTripTimes.updateDepartureTime(6, 481);
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.updateArrivalTime(7, 420);
 
-    var error = updatedTripTimesB.validateNonIncreasingTimes();
+    var error = updatedTripTimes.validateNonIncreasingTimes();
     assertTrue(error.isPresent());
-    assertEquals(7, error.get().stopIndex());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
     assertEquals(NEGATIVE_HOP_TIME, error.get().code());
   }
 
@@ -216,19 +221,24 @@ class TripTimesTest {
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
    * Test case: 5 at 400, 6 cancelled (with internal representation 460, since delays are propagated
    * to later stops without arrival or departure), 7 at 420.
-   * Result: Expect no errors, since 6 is cancelled, and 5 is earlier than 7.
+   * Result: Expect error before interpolation. Expect no errors, after interpolation.
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsLate() {
-    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimes = new TripTimes(createInitialTripTimes());
 
-    updatedTripTimesB.updateDepartureTime(5, 400);
-    updatedTripTimesB.updateArrivalTime(6, 460);
-    updatedTripTimesB.updateDepartureTime(6, 460);
-    updatedTripTimesB.setCancelled(6);
-    updatedTripTimesB.updateArrivalTime(7, 420);
+    updatedTripTimes.updateDepartureTime(5, 400);
+    updatedTripTimes.updateArrivalTime(6, 460);
+    updatedTripTimes.updateDepartureTime(6, 460);
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.updateArrivalTime(7, 420);
 
-    var error = updatedTripTimesB.validateNonIncreasingTimes();
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
     assertFalse(error.isPresent());
   }
 
@@ -237,17 +247,22 @@ class TripTimesTest {
    * Scheduled: 5 at 300, 6 at 360, 7 at 420
    * Test case: 5 at 300, 6 cancelled(with internal representation 360, since delays are propagated
    * to later stops without arrival or departure), 7 at 320.
-   * Result: Expect no errors, since 6 is cancelled, and 5 is still earlier than 7.
+   * Result: Expect errors, but no errors after interpolation.
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsEarly() {
-    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimes = new TripTimes(createInitialTripTimes());
 
-    updatedTripTimesB.updateDepartureTime(5, 300);
-    updatedTripTimesB.setCancelled(6);
-    updatedTripTimesB.updateArrivalTime(7, 320);
+    updatedTripTimes.updateDepartureTime(5, 300);
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.updateArrivalTime(7, 320);
 
-    var error = updatedTripTimesB.validateNonIncreasingTimes();
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
     assertFalse(error.isPresent());
   }
 
@@ -255,18 +270,104 @@ class TripTimesTest {
    * Test positive hop time with stop cancellations at the beginning of the trip.
    * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
    * Test case: 0 and 1 cancelled, start trip at stop 2 at time 0.
-   * Result: Expect no errors, since 0 and 1 is cancelled, and 2 is still earlier than the others.
+   * Result: Expect errors, since 0 and 1 is cancelled and not backward propagated. Expect no
+   * interpolation, since there is no times to interpolate before 0. Expect same error after
+   * interpolation.
    */
   @Test
   public void testPositiveHopTimeWithTerminalCancellation() {
-    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimes = new TripTimes(createInitialTripTimes());
 
-    updatedTripTimesB.setCancelled(0);
-    updatedTripTimesB.setCancelled(1);
-    updatedTripTimesB.updateArrivalTime(2, 0);
-    updatedTripTimesB.updateDepartureTime(2, 10);
+    updatedTripTimes.setCancelled(0);
+    updatedTripTimes.setCancelled(1);
+    updatedTripTimes.updateArrivalTime(2, 0);
+    updatedTripTimes.updateDepartureTime(2, 10);
 
-    var error = updatedTripTimesB.validateNonIncreasingTimes();
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertFalse(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+  }
+
+  /**
+   * Test positive hop time with stop cancellations at the beginning of the trip.
+   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
+   * Test case: 6 and 7 are cancelled.
+   * Result: Expect no errors and no interpolations, since there is no time to interpolate at the
+   * end terminal.
+   */
+  @Test
+  public void testInterpolationWithTerminalCancellation() {
+    TripTimes updatedTripTimes = new TripTimes(createInitialTripTimes());
+
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.setCancelled(7);
+
+    assertFalse(updatedTripTimes.interpolateMissingTimes());
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
+  /**
+   * Test interpolation with multiple cancelled stops together.
+   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
+   * Test case: 0 at 0, 1 to 6 are cancelled, 7 at time 350.
+   * Result: Expect errors, since 7 is less than the scheduled time at 6. Expect no errors after
+   * interpolation.
+   */
+  @Test
+  public void testInterpolationWithMultipleStopCancellations() {
+    TripTimes updatedTripTimes = new TripTimes(createInitialTripTimes());
+
+    updatedTripTimes.setCancelled(1);
+    updatedTripTimes.setCancelled(2);
+    updatedTripTimes.setCancelled(3);
+    updatedTripTimes.setCancelled(4);
+    updatedTripTimes.setCancelled(5);
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.updateArrivalTime(7, 350);
+    updatedTripTimes.updateDepartureTime(7, 350);
+
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
+  /**
+   * Test interpolation with multiple cancelled stops together.
+   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
+   * Test case: 0 at 0, 1 2 cancelled, 3 at 90, 4 5 6 cancelled, 7 at time 250.
+   * Result: Expect errors, since 3 is less than scheduled time at 2, and 7 is less than the
+   * scheduled time at 6. Expect no errors after interpolation.
+   */
+  @Test
+  public void testInterpolationWithMultipleStopCancellations2() {
+    TripTimes updatedTripTimes = new TripTimes(createInitialTripTimes());
+
+    updatedTripTimes.setCancelled(1);
+    updatedTripTimes.setCancelled(2);
+    updatedTripTimes.updateArrivalTime(3, 90);
+    updatedTripTimes.updateDepartureTime(3, 90);
+    updatedTripTimes.setCancelled(4);
+    updatedTripTimes.setCancelled(5);
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.updateArrivalTime(7, 250);
+    updatedTripTimes.updateDepartureTime(7, 250);
+
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
     assertFalse(error.isPresent());
   }
 

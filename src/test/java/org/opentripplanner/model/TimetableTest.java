@@ -591,6 +591,61 @@ public class TimetableTest {
     });
   }
 
+  @Test
+  public void testUpdateWithCancellation() {
+    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
+    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+    // Stop 1
+    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+    stopTimeUpdateBuilder.setStopSequence(1);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(0);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+    stopTimeEventBuilder.setDelay(0);
+
+    // Stop 2
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(1);
+    stopTimeUpdateBuilder.setStopSequence(2);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
+
+    // Stop 3
+    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(2);
+    stopTimeUpdateBuilder.setStopSequence(3);
+    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+    stopTimeEventBuilder.setDelay(-800);
+    stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+    stopTimeEventBuilder.setDelay(-800);
+
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertTrue(patch.isSuccess());
+
+    patch.ifSuccess(p -> {
+      var updatedTripTimes = p.getTripTimes();
+      assertNotNull(updatedTripTimes);
+      assertEquals(0, updatedTripTimes.getArrivalDelay(0));
+      assertEquals(0, updatedTripTimes.getDepartureDelay(0));
+      assertEquals(-800, updatedTripTimes.getArrivalDelay(2));
+      assertEquals(-800, updatedTripTimes.getDepartureDelay(2));
+      assertFalse(updatedTripTimes.isCancelledStop(0));
+      assertTrue(updatedTripTimes.isCancelledStop(1));
+      assertFalse(updatedTripTimes.isCancelledStop(2));
+      assertTrue(updatedTripTimes.getDepartureTime(0) < updatedTripTimes.getArrivalTime(1));
+      assertTrue(updatedTripTimes.getDepartureTime(1) < updatedTripTimes.getArrivalTime(2));
+    });
+  }
+
   @Nested
   class InvalidStopEvent {
 

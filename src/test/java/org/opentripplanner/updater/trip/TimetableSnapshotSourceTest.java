@@ -841,8 +841,8 @@ public class TimetableSnapshotSourceTest {
 
         assertEquals(0, newTripTimes.getArrivalDelay(0));
         assertEquals(0, newTripTimes.getDepartureDelay(0));
-        assertEquals(0, newTripTimes.getArrivalDelay(1));
-        assertEquals(0, newTripTimes.getDepartureDelay(1));
+        assertEquals(45, newTripTimes.getArrivalDelay(1));
+        assertEquals(45, newTripTimes.getDepartureDelay(1));
         assertEquals(90, newTripTimes.getArrivalDelay(2));
         assertEquals(90, newTripTimes.getDepartureDelay(2));
         assertFalse(newTripTimes.isCancelledStop(0));
