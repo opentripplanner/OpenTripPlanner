@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostPathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 
-public class PassThroughPathTailFilter<T> implements PathTailFilter<T> {
+class PassThroughPathTailFilter<T> implements PathTailFilter<T> {
 
   private final MinCostPathTailFilter<T> filterChain;
   private final Function<T, Integer> getC2;
