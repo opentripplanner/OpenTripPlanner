@@ -108,17 +108,15 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   }
 
   private PathTailFilterFactory<T> createFilterFactory() {
+    PathTailFilterFactory<T> costFilter = new TransferOptimizedFilterFactory<>(
+      config.optimizeTransferPriority(),
+      config.optimizeTransferWaitTime()
+    );
+
     if (multiCriteriaRequest.hasPassThroughPoints()) {
-      return new PassThroughFilterFactory<>(
-        config.optimizeTransferPriority(),
-        config.optimizeTransferWaitTime(),
-        multiCriteriaRequest.passThroughPoints()
-      );
+      return new PassThroughFilterFactory<>(multiCriteriaRequest.passThroughPoints(), costFilter);
     } else {
-      return new TransferOptimizedFilterFactory<>(
-        config.optimizeTransferPriority(),
-        config.optimizeTransferWaitTime()
-      );
+      return costFilter;
     }
   }
 

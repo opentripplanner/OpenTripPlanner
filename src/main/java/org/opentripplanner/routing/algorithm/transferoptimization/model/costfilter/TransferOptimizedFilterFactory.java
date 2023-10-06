@@ -40,4 +40,14 @@ public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule>
 
     return new MinCostPathTailFilter<>(filters);
   }
+
+  /**
+   * This factory method is used for unit testing. It allows you to pass in a simple cost function
+   * instead of the more complicated functions used in the main version of this.
+   */
+  public static <T extends RaptorTripSchedule> PathTailFilter<OptimizedPathTail<T>> ofCostFunction(
+    ToIntFunction<OptimizedPathTail<T>> costFunction
+  ) {
+    return new MinCostPathTailFilter<>(List.of(costFunction));
+  }
 }

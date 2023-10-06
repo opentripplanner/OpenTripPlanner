@@ -18,11 +18,11 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTail
  *
  * @param <T> The element type of the cost-functions and the filtered list
  */
-public class MinCostPathTailFilter<T> implements PathTailFilter<T> {
+class MinCostPathTailFilter<T> implements PathTailFilter<T> {
 
   private final List<ToIntFunction<T>> costFunctions;
 
-  public MinCostPathTailFilter(List<ToIntFunction<T>> costFunctions) {
+  MinCostPathTailFilter(List<ToIntFunction<T>> costFunctions) {
     this.costFunctions = costFunctions;
   }
 
