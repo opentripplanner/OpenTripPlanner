@@ -19,6 +19,13 @@
       "sourceType": "gbfs",
       "url": "https://mds.bird.co/gbfs/v2/public/portland/gbfs.json",
       "geofencingZones": "true"
+    },
+    {
+      "type": "vehicle-rental",
+      "frequency": "90s",
+      "sourceType": "gbfs",
+      "url": "https://gbfs.spin.pm/api/gbfs/v2_3/portland/gbfs",
+      "geofencingZones": "true"
     }
   ]
 }
