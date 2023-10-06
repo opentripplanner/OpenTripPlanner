@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.transferoptimization.model;
+package org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostPathTailFilter;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 
 public class PassThroughPathTailFilter<T> implements PathTailFilter<T> {
 
