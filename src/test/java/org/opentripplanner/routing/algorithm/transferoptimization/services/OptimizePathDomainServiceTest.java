@@ -8,7 +8,6 @@ import static org.opentripplanner.routing.algorithm.transferoptimization.service
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
@@ -20,6 +19,7 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.TransferOptimizedFilterFactory;
 
 public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
