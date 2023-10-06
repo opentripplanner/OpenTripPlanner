@@ -5,6 +5,7 @@ import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.path.PathBuilderLeg;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.FilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizeTransfersCostAndC2FilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizeTransfersFilterChain;
