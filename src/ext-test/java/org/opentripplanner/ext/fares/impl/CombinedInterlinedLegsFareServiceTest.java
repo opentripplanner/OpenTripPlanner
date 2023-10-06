@@ -13,6 +13,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.ext.fares.impl.CombinedInterlinedLegsFareService.CombinationMode;
@@ -54,7 +55,7 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     name = "Itinerary with {3} and combination mode {0} should lead to a fare of {2}"
   )
   @VariableSource("testCases")
-  void modeAlways(CombinationMode mode, Itinerary itinerary, Money totalPrice, String hint) {
+  void modes(CombinationMode mode, Itinerary itinerary, Money totalPrice, String hint) {
     var service = new CombinedInterlinedLegsFareService(mode);
     service.addFareRules(
       FareType.regular,
@@ -71,10 +72,37 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     var uses = List.copyOf(fare.legProductsFromComponents().get(firstLeg));
     assertEquals(1, uses.size());
 
-    var firstProduct = uses.get(0).product();
+    var secondLeg = itinerary.getTransitLeg(1);
+    uses = List.copyOf(fare.legProductsFromComponents().get(secondLeg));
+    assertEquals(1, uses.size());
+  }
+
+  @Test
+  void legFares() {
+    var itinerary = interlinedWithSameRoute;
+    var service = new CombinedInterlinedLegsFareService(ALWAYS);
+    service.addFareRules(
+      FareType.regular,
+      List.of(AIRPORT_TO_CITY_CENTER_SET, INSIDE_CITY_CENTER_SET)
+    );
+
+    var fare = service.calculateFares(itinerary);
+
+    var firstLeg = itinerary.getTransitLeg(0);
+    var uses = List.copyOf(fare.legProductsFromComponents().get(firstLeg));
+    assertEquals(1, uses.size());
+
+    var firstLegUse = uses.get(0);
+    assertEquals(tenDollars, firstLegUse.product().price());
 
     var secondLeg = itinerary.getTransitLeg(1);
     uses = List.copyOf(fare.legProductsFromComponents().get(secondLeg));
     assertEquals(1, uses.size());
+
+    var secondLegUse = uses.get(0);
+    assertEquals(tenDollars, secondLegUse.product().price());
+
+    // the same far product is used for both legs as you only need to buy one
+    assertEquals(secondLegUse, firstLegUse);
   }
 }
