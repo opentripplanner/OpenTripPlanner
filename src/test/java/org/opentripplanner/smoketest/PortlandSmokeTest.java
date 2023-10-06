@@ -32,7 +32,7 @@ public class PortlandSmokeTest {
       List.of("WALK", "TRAM", "WALK")
     );
 
-    SmokeTest.assertThatAllTransitLegsHaveFares(plan);
+    SmokeTest.assertThatAllTransitLegsHaveFareProducts(plan);
   }
 
   /**
