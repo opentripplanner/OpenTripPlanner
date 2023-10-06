@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,8 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilter;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.TransferOptimizedFilterFactory;
 
 public class TransitPathLegSelectorTest implements RaptorTestConstants {
 
@@ -39,8 +39,8 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     null
   );
 
-  public static final MinCostPathTailFilter<OptimizedPathTail<TestTripSchedule>> FILTER_CHAIN = new MinCostPathTailFilter<>(
-    List.of(OptimizedPathTail::generalizedCost)
+  public static final PathTailFilter<OptimizedPathTail<TestTripSchedule>> FILTER_CHAIN = TransferOptimizedFilterFactory.ofCostFunction(
+    OptimizedPathTail::generalizedCost
   );
 
   private final int T10_00 = TimeUtils.time("10:00");

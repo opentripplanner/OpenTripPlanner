@@ -9,24 +9,19 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Optimize
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilter;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.TransferOptimizedFilterFactory;
 
 public class PassThroughFilterFactory<T extends RaptorTripSchedule>
   implements PathTailFilterFactory<T> {
 
-  private final boolean transferPriority;
-  private final boolean optimizeWaitTime;
   private final List<PassThroughPoint> passThroughPoints;
+  private final PathTailFilterFactory<T> delegate;
 
   public PassThroughFilterFactory(
-    boolean transferPriority,
-    boolean optimizeWaitTime,
-    List<PassThroughPoint> passThroughPoints
+    List<PassThroughPoint> passThroughPoints,
+    PathTailFilterFactory<T> delegate
   ) {
-    this.transferPriority = transferPriority;
-    this.optimizeWaitTime = optimizeWaitTime;
     this.passThroughPoints = passThroughPoints;
+    this.delegate = delegate;
   }
 
   /**
@@ -60,12 +55,8 @@ public class PassThroughFilterFactory<T extends RaptorTripSchedule>
   public PathTailFilter<OptimizedPathTail<T>> createFilter(
     List<List<TripToTripTransfer<T>>> possibleTransfers
   ) {
-    return new PassThroughPathTailFilter<>(
-      (MinCostPathTailFilter<OptimizedPathTail<T>>) new TransferOptimizedFilterFactory<T>(
-        transferPriority,
-        optimizeWaitTime
-      )
-        .createFilter(possibleTransfers),
+    return new PassThroughPathTailFilter<OptimizedPathTail<T>>(
+      delegate.createFilter(possibleTransfers),
       tail -> this.calculateC2(tail, possibleTransfers, passThroughPoints)
     );
   }
