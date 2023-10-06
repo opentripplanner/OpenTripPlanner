@@ -1,9 +1,12 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
 import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
+import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.opentripplanner.framework.time.TimeUtils.time;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
@@ -11,17 +14,26 @@ import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
 import io.micrometer.core.instrument.Metrics;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.routing.api.request.PassThroughPoint;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
@@ -35,7 +47,14 @@ import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeSe
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.network.Route;
+import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class TripRequestMapperTest implements PlanTestConstants {
@@ -43,12 +62,43 @@ public class TripRequestMapperTest implements PlanTestConstants {
   static final TransmodelRequestContext context;
   private static final Duration MAX_FLEXIBLE = Duration.ofMinutes(20);
 
+  private static final Function<StopLocation, String> STOP_TO_ID = s -> s.getId().toString();
+
+  private static final Route route1 = TransitModelForTest.route("route1").build();
+  private static final Route route2 = TransitModelForTest.route("route2").build();
+
+  private static final RegularStop stop1 = TransitModelForTest.stopForTest("ST:stop1", 1, 1);
+  private static final RegularStop stop2 = TransitModelForTest.stopForTest("ST:stop2", 2, 1);
+  private static final RegularStop stop3 = TransitModelForTest.stopForTest("ST:stop3", 3, 1);
+
   static {
     var graph = new Graph();
-    var transitModel = new TransitModel();
-    transitModel.initTimeZone(ZoneIds.STOCKHOLM);
-    final var transitService = new DefaultTransitService(transitModel);
+    var itinerary = newItinerary(Place.forStop(stop1), time("11:00"))
+      .bus(route1, 1, time("11:05"), time("11:20"), Place.forStop(stop2))
+      .bus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3))
+      .build();
+    var patterns = itineraryPatterns(itinerary);
+    var stopModel = StopModel
+      .of()
+      .withRegularStop(stop1)
+      .withRegularStop(stop2)
+      .withRegularStop(stop3)
+      .build();
 
+    var transitModel = new TransitModel(stopModel, new Deduplicator());
+    transitModel.initTimeZone(ZoneIds.STOCKHOLM);
+    var calendarServiceData = new CalendarServiceData();
+    LocalDate serviceDate = itinerary.startTime().toLocalDate();
+    patterns.forEach(pattern -> {
+      transitModel.addTripPattern(pattern.getId(), pattern);
+      final int serviceCode = pattern.getScheduledTimetable().getTripTimes(0).getServiceCode();
+      transitModel.getServiceCodes().put(pattern.getId(), serviceCode);
+      calendarServiceData.putServiceDatesForServiceId(pattern.getId(), List.of(serviceDate));
+    });
+
+    transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
+    transitModel.index();
+    final var transitService = new DefaultTransitService(transitModel);
     var defaultRequest = new RouteRequest();
 
     // Change defaults for FLEXIBLE to a lower value than the default 45m. This should restrict the
@@ -242,6 +292,42 @@ public class TripRequestMapperTest implements PlanTestConstants {
     assertEquals(TimeSlopeSafetyTriangle.DEFAULT, req1.preferences().bike().optimizeTriangle());
   }
 
+  @Test
+  void testPassThroughPoints() {
+    TransitIdMapper.clearFixedFeedId();
+
+    final List<String> PTP1 = List.of(stop1, stop2, stop3).stream().map(STOP_TO_ID).toList();
+    final List<String> PTP2 = List.of(stop2, stop3, stop1).stream().map(STOP_TO_ID).toList();
+    final Map<String, Object> arguments = Map.of(
+      "passThroughPoints",
+      List.of(Map.of("name", "PTP1", "placeIds", PTP1), Map.of("placeIds", PTP2, "name", "PTP2"))
+    );
+
+    final List<PassThroughPoint> points = TripRequestMapper
+      .createRequest(executionContext(arguments))
+      .getPassThroughPoints();
+    assertEquals(PTP1, points.get(0).stopLocations().stream().map(STOP_TO_ID).toList());
+    assertEquals("PTP1", points.get(0).name());
+    assertEquals(PTP2, points.get(1).stopLocations().stream().map(STOP_TO_ID).toList());
+    assertEquals("PTP2", points.get(1).name());
+  }
+
+  @Test
+  void testPassThroughPointsNoMatch() {
+    TransitIdMapper.clearFixedFeedId();
+
+    final Map<String, Object> arguments = Map.of(
+      "passThroughPoints",
+      List.of(Map.of("placeIds", List.of("F:XX:NonExisting")))
+    );
+
+    final RuntimeException ex = assertThrows(
+      RuntimeException.class,
+      () -> TripRequestMapper.createRequest(executionContext(arguments))
+    );
+    assertEquals("No match for F:XX:NonExisting.", ex.getMessage());
+  }
+
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
     ExecutionInput executionInput = ExecutionInput
       .newExecutionInput()
@@ -263,5 +349,15 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .build();
 
     return env;
+  }
+
+  private static List<TripPattern> itineraryPatterns(final Itinerary itinerary) {
+    return itinerary
+      .getLegs()
+      .stream()
+      .filter(Leg::isScheduledTransitLeg)
+      .map(Leg::asScheduledTransitLeg)
+      .map(ScheduledTransitLeg::getTripPattern)
+      .collect(toList());
   }
 }

@@ -71,9 +71,9 @@ Most people want to get routing results out of OTP, so lets see the query for th
 ```graphql
 {
     plan(
-        # these coordinate are in Portland, change this to YOUR origin
+        # these coordinates are in Portland, change this to YOUR origin
         from: { lat: 45.5552, lon: -122.6534 }
-        # these coordinate are in Portland, change this to YOUR destination
+        # these coordinates are in Portland, change this to YOUR destination
         to: { lat: 45.4908, lon: -122.5519 }
         # use the correct date and time of your request
         date: "2023-02-15",

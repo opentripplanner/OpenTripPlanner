@@ -3,11 +3,11 @@ package org.opentripplanner.openstreetmap.model;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import java.io.File;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.osm.OsmDatabase;
 import org.opentripplanner.openstreetmap.OsmProvider;
+import org.opentripplanner.test.support.ResourceLoader;
 
 public class BicycleNetworkRelationsTest {
 
@@ -19,10 +19,7 @@ public class BicycleNetworkRelationsTest {
   public void testBicycleRouteRelations() {
     var issueStore = DataImportIssueStore.NOOP;
     var osmdb = new OsmDatabase(issueStore);
-    var provider = new OsmProvider(
-      new File("src/test/resources/germany/ehningen-minimal.osm.pbf"),
-      true
-    );
+    var provider = new OsmProvider(ResourceLoader.of(this).file("ehningen-minimal.osm.pbf"), true);
     provider.readOSM(osmdb);
     osmdb.postLoad();
 
