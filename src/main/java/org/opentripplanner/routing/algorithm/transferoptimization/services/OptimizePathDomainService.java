@@ -107,17 +107,20 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     List<TransitPathLeg<T>> transitLegs = originalPath.transitLegs().collect(Collectors.toList());
     var filter = filterFactory.createFilter(possibleTransfers);
 
-    return filter
-      .finalizeFilter(findBestTransferOption(originalPath, transitLegs, possibleTransfers, filter))
-      .stream()
-      .map(OptimizedPathTail::build)
-      .collect(toSet());
+    // Combine transit legs and transfers
+    var tails = findBestTransferOption(originalPath, transitLegs, possibleTransfers, filter);
+
+    var filteredTails = filter.finalizeFilter(tails);
+
+    return filteredTails.stream().map(OptimizedPathTail::build).collect(toSet());
   }
 
+  /**
+   * Find all possible transfers between each pair of transit legs, and sort on arrival time.
+   */
   private List<List<TripToTripTransfer<T>>> findPossibleTransfers(RaptorPath<T> originalPath) {
     List<TransitPathLeg<T>> transitLegs = originalPath.transitLegs().collect(Collectors.toList());
 
-    // Find all possible transfers between each pair of transit legs, and sort on arrival time
     return sortTransfersOnArrivalTimeInDecOrder(
       transferGenerator.findAllPossibleTransfers(transitLegs)
     );
@@ -131,7 +134,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     RaptorPath<T> originalPath,
     List<TransitPathLeg<T>> originalTransitLegs,
     List<List<TripToTripTransfer<T>>> possibleTransfers,
-    OptimizeTransfersFilterChain<OptimizedPathTail<T>> filterChain
+    OptimizeTransfersFilterChain<OptimizedPathTail<T>> filter
   ) {
     final int iterationDepartureTime = originalPath.rangeRaptorIterationDepartureTime();
     // Create a set of tails with the last transit leg in it (one element)
@@ -168,7 +171,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
       // create a tailSelector for the tails produced in the last round and use it to filter them
       // based on the transfer-arrival-time and given filter
-      var tailSelector = new TransitPathLegSelector<>(filterChain, tails);
+      var tailSelector = new TransitPathLegSelector<>(filter, tails);
 
       // Reset the result set to an empty set
       tails = new HashSet<>();
@@ -192,8 +195,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     }
 
     // Filter tails one final time
-    tails =
-      new TransitPathLegSelector<>(filterChain, tails).next(originalPath.accessLeg().toTime());
+    tails = new TransitPathLegSelector<>(filter, tails).next(originalPath.accessLeg().toTime());
 
     // Insert the access leg and the following transfer
     insertAccess(originalPath, tails);

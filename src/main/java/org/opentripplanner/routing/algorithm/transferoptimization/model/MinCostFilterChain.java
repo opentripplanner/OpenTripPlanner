@@ -27,7 +27,7 @@ public class MinCostFilterChain<T> implements OptimizeTransfersFilterChain<T> {
 
   @Override
   public Set<T> filter(Set<T> elements) {
-    for (ToIntFunction<T> costFunction : costFunctions) {
+    for (var costFunction : costFunctions) {
       elements = filter(elements, costFunction);
     }
     return elements;
