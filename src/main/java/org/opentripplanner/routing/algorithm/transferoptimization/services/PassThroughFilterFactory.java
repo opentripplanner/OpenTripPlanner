@@ -12,14 +12,14 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTail
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
-public class OptimizeTransfersCostAndC2FilterFactory<T extends RaptorTripSchedule>
+public class PassThroughFilterFactory<T extends RaptorTripSchedule>
   implements PathTailFilterFactory<T> {
 
   private final boolean transferPriority;
   private final boolean optimizeWaitTime;
   private final List<PassThroughPoint> passThroughPoints;
 
-  public OptimizeTransfersCostAndC2FilterFactory(
+  public PassThroughFilterFactory(
     boolean transferPriority,
     boolean optimizeWaitTime,
     List<PassThroughPoint> passThroughPoints
