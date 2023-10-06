@@ -3,6 +3,7 @@ package org.opentripplanner.ext.siri;
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.siri.mapper.SiriTransportModeMapper.mapTransitMainMode;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -144,6 +145,10 @@ class AddedTripBuilder {
   }
 
   Result<TripUpdate, UpdateError> build() {
+    if (calls.isEmpty()) {
+      return UpdateError.result(tripId, TOO_FEW_STOPS);
+    }
+
     if (serviceDate == null) {
       return UpdateError.result(tripId, NO_START_DATE);
     }
