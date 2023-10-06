@@ -9,8 +9,9 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTail
 
 /**
  * This class takes a list of transit legs and returns the best leg based on the {@link
- * TransferOptimizedFilterFactory} and the earliest-boarding-time. The filter is used to pick the
- * best leg from the legs which can be boarded after the earliest-boarding-time.
+ * org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter} and
+ * the earliest-boarding-time. The filter is used to pick the best leg from the legs which can be
+ * boarded after the earliest-boarding-time.
  * <p>
  * HOW IT WORKS
  * <p>
