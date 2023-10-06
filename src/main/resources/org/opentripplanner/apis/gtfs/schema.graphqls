@@ -3413,6 +3413,7 @@ enum OccupancyStatus {
   determined at the discretion of the producer. There isn't a big difference between this and
   EMPTY so it's possible to handle them as the same value, if one wants to limit the number of
   different values.
+  SIRI nordic profile: more than ~50% of seats available.
   """
   MANY_SEATS_AVAILABLE
 
@@ -3420,10 +3421,14 @@ enum OccupancyStatus {
   The vehicle or carriage has a small number of seats available. The amount of free seats out of
   the total seats available to be considered small enough to fall into this category is
   determined at the discretion of the producer.
+  SIRI nordic profile: less than ~50% of seats available.
   """
   FEW_SEATS_AVAILABLE
 
-  """The vehicle or carriage can currently accommodate only standing passengers."""
+  """
+  The vehicle or carriage can currently accommodate only standing passengers.
+  SIRI nordic profile: less than ~10% of seats available.
+  """
   STANDING_ROOM_ONLY
 
   """
@@ -3441,6 +3446,8 @@ enum OccupancyStatus {
 
   """
   The vehicle or carriage is not accepting passengers.
+  SIRI nordic profile: if vehicle/carriage is not in use / unavailable, or passengers are only allowed
+  to alight due to e.g. crowding.
   """
   NOT_ACCEPTING_PASSENGERS
 }

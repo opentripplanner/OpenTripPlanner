@@ -9,7 +9,7 @@ package org.opentripplanner.transit.model.timetable;
  */
 public enum OccupancyStatus {
   /**
-   * Default. There is no occupancy-data on this departure
+   * Default. There is no occupancy-data on this departure,
    */
   NO_DATA_AVAILABLE,
   /**
@@ -27,15 +27,18 @@ public enum OccupancyStatus {
    * The vehicle or carriage has a small number of seats available. The amount of free seats out of
    * the total seats available to be considered small enough to fall into this category is
    * determined at the discretion of the producer.
+   * SIRI nordic profile: more than ~50% of seats available.
    */
   FEW_SEATS_AVAILABLE,
   /**
    * The vehicle or carriage can currently accommodate only standing passengers.
+   * SIRI nordic profile: less than ~50% of seats available.
    */
   STANDING_ROOM_ONLY,
   /**
    * The vehicle or carriage can currently accommodate only standing passengers and has limited
    * space for them.
+   * SIRI nordic profile: less than ~10% of seats available.
    */
   CRUSHED_STANDING_ROOM_ONLY,
   /**
@@ -45,6 +48,8 @@ public enum OccupancyStatus {
   FULL,
   /**
    * The vehicle or carriage is not accepting passengers.
+   * SIRI nordic profile: if vehicle/carriage is not in use / unavailable, or passengers are only
+   * allowed to alight due to e.g. crowding.
    */
   NOT_ACCEPTING_PASSENGERS,
 }

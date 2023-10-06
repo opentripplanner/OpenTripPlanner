@@ -211,17 +211,26 @@ public class EnumTypes {
     .value(
       "manySeatsAvailable",
       OccupancyStatus.MANY_SEATS_AVAILABLE,
-      "The vehicle or carriage has a large number of seats available."
+      """
+      The vehicle or carriage has a large number of seats available.
+      SIRI nordic profile: more than ~50% of seats available.
+      """
     )
     .value(
       "fewSeatsAvailable",
       OccupancyStatus.FEW_SEATS_AVAILABLE,
-      "The vehicle or carriage has a few seats available."
+      """
+      The vehicle or carriage has a few seats available.
+      SIRI nordic profile: less than ~50% of seats available.
+      """
     )
     .value(
       "standingRoomOnly",
       OccupancyStatus.STANDING_ROOM_ONLY,
-      "The vehicle or carriage only has standing room available."
+      """
+      The vehicle or carriage only has standing room available.
+      SIRI nordic profile: less than ~10% of seats available.
+      """
     )
     .value(
       "crushedStandingRoomOnly",
@@ -240,7 +249,11 @@ public class EnumTypes {
     .value(
       "notAcceptingPassengers",
       OccupancyStatus.NOT_ACCEPTING_PASSENGERS,
-      "The vehicle or carriage has no seats or standing room available."
+      """
+      The vehicle or carriage has no seats or standing room available.
+      SIRI nordic profile: if vehicle/carriage is not in use / unavailable, or passengers are only allowed
+      to alight due to e.g. crowding.
+      """
     )
     .build();
 
