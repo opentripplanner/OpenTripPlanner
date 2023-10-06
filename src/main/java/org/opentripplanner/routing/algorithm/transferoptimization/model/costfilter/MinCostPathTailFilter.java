@@ -1,9 +1,10 @@
-package org.opentripplanner.routing.algorithm.transferoptimization.model;
+package org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.ToIntFunction;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 
 /**
  * This class takes a list of "cost functions" and creates a filter chain for them. The precedence

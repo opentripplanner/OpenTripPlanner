@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilter;
 
 class MinCostPathTailFilterTest {
 

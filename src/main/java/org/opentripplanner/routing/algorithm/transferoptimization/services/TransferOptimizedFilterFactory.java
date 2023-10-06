@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostPathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilter;
 
 public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule>
   implements PathTailFilterFactory<T> {
