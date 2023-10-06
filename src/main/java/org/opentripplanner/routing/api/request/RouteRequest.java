@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DateUtils;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
@@ -56,7 +56,8 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private Instant dateTime = Instant.now();
 
-  private Duration maxSearchWindow = Duration.ZERO;
+  @Nullable
+  private Duration maxSearchWindow;
 
   private Duration searchWindow;
 
@@ -334,14 +335,14 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   private boolean hasMaxSearchWindow() {
-    return !Duration.ZERO.equals(maxSearchWindow);
+    return maxSearchWindow != null;
   }
 
   public Duration maxSearchWindow() {
     return maxSearchWindow;
   }
 
-  public void setMaxSearchWindow(Duration maxSearchWindow) {
+  public void setMaxSearchWindow(@Nullable Duration maxSearchWindow) {
     this.maxSearchWindow = maxSearchWindow;
   }
 

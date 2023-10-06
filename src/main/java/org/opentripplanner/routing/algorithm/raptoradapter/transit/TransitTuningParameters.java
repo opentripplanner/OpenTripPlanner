@@ -82,6 +82,12 @@ public interface TransitTuningParameters {
    */
   int transferCacheMaxSize();
 
+  /**
+   * The maximum search window that can be set through the searchWindow API parameter. Due to the
+   * way timetable data are collected before a Raptor trip search, using a search window larger than
+   * 24 hours may lead to inconsistent search results. Limiting the search window prevents also
+   * potential performance issues. The recommended maximum value is 24 hours.
+   */
   Duration maxSearchWindow();
 
   /**
