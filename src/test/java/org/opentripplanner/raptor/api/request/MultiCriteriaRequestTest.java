@@ -61,7 +61,7 @@ class MultiCriteriaRequestTest {
 
   @Test
   void passThroughPoints() {
-    assertEquals(PASS_THROUGH_POINTS, subject.passThroughPoints().orElseThrow());
+    assertEquals(PASS_THROUGH_POINTS, subject.passThroughPoints());
   }
 
   @Test

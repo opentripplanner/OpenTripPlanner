@@ -21,7 +21,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   @Nullable
   private final RaptorTransitPriorityGroupCalculator transitPriorityCalculator;
 
-  @Nullable
   private final List<PassThroughPoint> passThroughPoints;
 
   @Nullable
@@ -30,7 +29,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   private MultiCriteriaRequest() {
     this.relaxC1 = RelaxFunction.NORMAL;
     this.transitPriorityCalculator = null;
-    this.passThroughPoints = null;
+    this.passThroughPoints = List.of();
     this.relaxCostAtDestination = null;
   }
 
@@ -77,8 +76,12 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return Optional.ofNullable(transitPriorityCalculator);
   }
 
-  public Optional<List<PassThroughPoint>> passThroughPoints() {
-    return Optional.ofNullable(passThroughPoints);
+  public boolean hasPassThroughPoints() {
+    return !passThroughPoints.isEmpty();
+  }
+
+  public List<PassThroughPoint> passThroughPoints() {
+    return passThroughPoints;
   }
 
   /**
@@ -138,7 +141,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   }
 
   public boolean includeC2() {
-    return passThroughPoints != null || transitPriorityCalculator != null;
+    return hasPassThroughPoints() || transitPriorityCalculator != null;
   }
 
   public static class Builder<T extends RaptorTripSchedule> {
@@ -177,7 +180,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
       return this;
     }
 
-    @Nullable
     public List<PassThroughPoint> passThroughPoints() {
       return passThroughPoints;
     }
@@ -185,7 +187,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     @Nullable
     public Builder<T> withPassThroughPoints(List<PassThroughPoint> points) {
       // Prevent setting this to an empty list - here we use null to represent NOT_SET
-      passThroughPoints = (points == null || points.isEmpty()) ? null : points;
+      passThroughPoints = (points == null || points.isEmpty()) ? List.of() : points;
       return this;
     }
 
