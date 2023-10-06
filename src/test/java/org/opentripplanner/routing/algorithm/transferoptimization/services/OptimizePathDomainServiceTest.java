@@ -19,7 +19,7 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.TransferOptimizedFilterFactory;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
 
 public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
@@ -295,7 +295,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       waitTimeCalculator,
       null,
       0.0,
-      new TransferOptimizedFilterFactory<>(true, waitTimeCalculator != null),
+      new MinCostPathTailFilterFactory<>(true, waitTimeCalculator != null),
       (new RaptorTestConstants() {})::stopIndexToName
     );
   }

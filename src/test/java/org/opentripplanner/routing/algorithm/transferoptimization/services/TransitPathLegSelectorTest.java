@@ -21,7 +21,7 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.TransferOptimizedFilterFactory;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
 
 public class TransitPathLegSelectorTest implements RaptorTestConstants {
 
@@ -39,7 +39,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     null
   );
 
-  public static final PathTailFilter<OptimizedPathTail<TestTripSchedule>> FILTER_CHAIN = TransferOptimizedFilterFactory.ofCostFunction(
+  public static final PathTailFilter<OptimizedPathTail<TestTripSchedule>> FILTER_CHAIN = MinCostPathTailFilterFactory.ofCostFunction(
     OptimizedPathTail::generalizedCost
   );
 

@@ -12,7 +12,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOp
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.TransferOptimizedFilterFactory;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.PassThroughFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
@@ -108,7 +108,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   }
 
   private PathTailFilterFactory<T> createFilterFactory() {
-    PathTailFilterFactory<T> costFilter = new TransferOptimizedFilterFactory<>(
+    PathTailFilterFactory<T> costFilter = new MinCostPathTailFilterFactory<>(
       config.optimizeTransferPriority(),
       config.optimizeTransferWaitTime()
     );
