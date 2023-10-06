@@ -3,6 +3,7 @@ package org.opentripplanner.ext.siri;
 import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.siri.mapper.SiriTransportModeMapper.mapTransitMainMode;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_VALID_STOPS;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TOO_FEW_STOPS;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
@@ -145,7 +147,7 @@ class AddedTripBuilder {
   }
 
   Result<TripUpdate, UpdateError> build() {
-    if (calls.isEmpty()) {
+    if (calls.size() < 2) {
       return UpdateError.result(tripId, TOO_FEW_STOPS);
     }
 
@@ -180,6 +182,11 @@ class AddedTripBuilder {
         stopSequence == 0,
         stopSequence == (calls.size() - 1)
       );
+
+      // Drop this update if the call refers to an unknown stop (not present in the stop model).
+      if (stopTime == null) {
+        return UpdateError.result(tripId, NO_VALID_STOPS);
+      }
 
       aimedStopTimes.add(stopTime);
     }
@@ -284,6 +291,9 @@ class AddedTripBuilder {
     return tripBuilder.build();
   }
 
+  /**
+   * Map the call to a StopTime or return null if the stop cannot be found in the stop model.
+   */
   private StopTime createStopTime(
     Trip trip,
     ZonedDateTime departureDate,
@@ -292,10 +302,15 @@ class AddedTripBuilder {
     boolean isFirstStop,
     boolean isLastStop
   ) {
+    RegularStop stop = entityResolver.resolveQuay(call.getStopPointRef());
+    if (stop == null) {
+      return null;
+    }
+
     StopTime stopTime = new StopTime();
     stopTime.setStopSequence(stopSequence);
     stopTime.setTrip(trip);
-    stopTime.setStop(entityResolver.resolveQuay(call.getStopPointRef()));
+    stopTime.setStop(stop);
 
     // Fallback to other time, if one doesn't exist
     var aimedArrivalTime = call.getAimedArrivalTime() != null

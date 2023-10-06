@@ -455,7 +455,14 @@ class AddedTripBuilderTest {
 
   @Test
   void testAddedTripFailOnTooFewCalls() {
-    List<CallWrapper> calls = List.of();
+    List<CallWrapper> calls = List.of(
+      TestCall
+        .of()
+        .withStopPointRef(STOP_A.getId().getId())
+        .withAimedDepartureTime(zonedDateTime(10, 20))
+        .withExpectedDepartureTime(zonedDateTime(10, 20))
+        .build()
+    );
     var addedTrip = new AddedTripBuilder(
       TRANSIT_MODEL,
       ENTITY_RESOLVER,
@@ -480,7 +487,53 @@ class AddedTripBuilderTest {
     assertEquals(
       UpdateError.UpdateErrorType.TOO_FEW_STOPS,
       addedTrip.failureValue().errorType(),
-      "Trip creation should fail with too few stops"
+      "Trip creation should fail with too few calls"
+    );
+  }
+
+  @Test
+  void testAddedTripFailOnUnknownStop() {
+    List<CallWrapper> calls = List.of(
+      TestCall
+        .of()
+        .withStopPointRef("UNKNOWN_STOP_REF")
+        .withAimedDepartureTime(zonedDateTime(10, 20))
+        .withExpectedDepartureTime(zonedDateTime(10, 20))
+        .build(),
+      TestCall
+        .of()
+        .withStopPointRef(STOP_B.getId().getId())
+        .withAimedArrivalTime(zonedDateTime(10, 30))
+        .withExpectedArrivalTime(zonedDateTime(10, 31))
+        .withAimedDepartureTime(zonedDateTime(10, 30))
+        .withExpectedDepartureTime(zonedDateTime(10, 29))
+        .build()
+    );
+    var addedTrip = new AddedTripBuilder(
+      TRANSIT_MODEL,
+      ENTITY_RESOLVER,
+      AbstractTransitEntity::getId,
+      TRIP_ID,
+      OPERATOR,
+      LINE_REF,
+      REPLACED_ROUTE,
+      SERVICE_DATE,
+      TRANSIT_MODE,
+      SUB_MODE,
+      calls,
+      false,
+      null,
+      false,
+      SHORT_NAME,
+      HEADSIGN
+    )
+      .build();
+
+    assertTrue(addedTrip.isFailure(), "Trip creation should fail");
+    assertEquals(
+      UpdateError.UpdateErrorType.NO_VALID_STOPS,
+      addedTrip.failureValue().errorType(),
+      "Trip creation should fail with call referring to unknown stop"
     );
   }
 
