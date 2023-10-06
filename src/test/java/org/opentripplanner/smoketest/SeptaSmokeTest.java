@@ -49,7 +49,10 @@ public class SeptaSmokeTest {
 
     assertFalse(products.isEmpty());
 
-    var prices = products.stream().map(p -> p.price().amount().doubleValue()).collect(Collectors.toSet());
+    var prices = products
+      .stream()
+      .map(p -> p.price().amount().doubleValue())
+      .collect(Collectors.toSet());
 
     LOG.info("Received fare products {}", products);
 
