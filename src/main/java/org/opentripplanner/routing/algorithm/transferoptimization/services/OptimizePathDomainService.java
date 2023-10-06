@@ -17,8 +17,8 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.FilterFactory;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizeTransfersFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
@@ -135,7 +135,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     RaptorPath<T> originalPath,
     List<TransitPathLeg<T>> originalTransitLegs,
     List<List<TripToTripTransfer<T>>> possibleTransfers,
-    OptimizeTransfersFilterChain<OptimizedPathTail<T>> filter
+    PathTailFilter<OptimizedPathTail<T>> filter
   ) {
     final int iterationDepartureTime = originalPath.rangeRaptorIterationDepartureTime();
     // Create a set of tails with the last transit leg in it (one element)

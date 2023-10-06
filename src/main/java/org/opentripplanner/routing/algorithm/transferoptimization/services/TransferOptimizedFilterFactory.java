@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.function.ToIntFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.FilterFactory;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizeTransfersFilterChain;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostPathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
 public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule>
@@ -22,7 +22,7 @@ public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule>
   }
 
   @Override
-  public OptimizeTransfersFilterChain<OptimizedPathTail<T>> createFilter(
+  public PathTailFilter<OptimizedPathTail<T>> createFilter(
     List<List<TripToTripTransfer<T>>> possibleTransfers
   ) {
     List<ToIntFunction<OptimizedPathTail<T>>> filters = new ArrayList<>(3);
@@ -39,6 +39,6 @@ public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule>
 
     filters.add(OptimizedPathTail::breakTieCost);
 
-    return new MinCostFilterChain<>(filters);
+    return new MinCostPathTailFilter<>(filters);
   }
 }

@@ -6,10 +6,10 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.path.PathBuilderLeg;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.FilterFactory;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizeTransfersCostAndC2FilterChain;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizeTransfersFilterChain;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostPathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PassThroughPathTailFilter;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
 public class OptimizeTransfersCostAndC2FilterFactory<T extends RaptorTripSchedule>
@@ -57,11 +57,11 @@ public class OptimizeTransfersCostAndC2FilterFactory<T extends RaptorTripSchedul
    *  Then we're going to use minCostFilterChain to determine which of those 2 possibilities is better
    */
   @Override
-  public OptimizeTransfersFilterChain<OptimizedPathTail<T>> createFilter(
+  public PathTailFilter<OptimizedPathTail<T>> createFilter(
     List<List<TripToTripTransfer<T>>> possibleTransfers
   ) {
-    return new OptimizeTransfersCostAndC2FilterChain<>(
-      (MinCostFilterChain<OptimizedPathTail<T>>) new TransferOptimizedFilterFactory<T>(
+    return new PassThroughPathTailFilter<>(
+      (MinCostPathTailFilter<OptimizedPathTail<T>>) new TransferOptimizedFilterFactory<T>(
         transferPriority,
         optimizeWaitTime
       )

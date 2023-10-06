@@ -17,11 +17,11 @@ import java.util.function.ToIntFunction;
  *
  * @param <T> The element type of the cost-functions and the filtered list
  */
-public class MinCostFilterChain<T> implements OptimizeTransfersFilterChain<T> {
+public class MinCostPathTailFilter<T> implements PathTailFilter<T> {
 
   private final List<ToIntFunction<T>> costFunctions;
 
-  public MinCostFilterChain(List<ToIntFunction<T>> costFunctions) {
+  public MinCostPathTailFilter(List<ToIntFunction<T>> costFunctions) {
     this.costFunctions = costFunctions;
   }
 
