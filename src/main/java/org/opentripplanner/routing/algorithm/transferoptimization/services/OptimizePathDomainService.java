@@ -16,9 +16,9 @@ import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.FilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
@@ -72,7 +72,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   private final TransferGenerator<T> transferGenerator;
   private final RaptorCostCalculator<T> costCalculator;
   private final RaptorSlackProvider slackProvider;
-  private final FilterFactory<T> filterFactory;
+  private final PathTailFilterFactory<T> filterFactory;
   private final RaptorStopNameResolver stopNameTranslator;
 
   @Nullable
@@ -90,7 +90,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
     int[] stopBoardAlightCosts,
     double extraStopBoardAlightCostsFactor,
-    FilterFactory<T> filterFactory,
+    PathTailFilterFactory<T> filterFactory,
     RaptorStopNameResolver stopNameTranslator
   ) {
     this.transferGenerator = transferGenerator;
