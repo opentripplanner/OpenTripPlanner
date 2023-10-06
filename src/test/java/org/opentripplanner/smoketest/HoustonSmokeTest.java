@@ -1,5 +1,6 @@
 package org.opentripplanner.smoketest;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.client.model.RequestMode.BICYCLE;
 import static org.opentripplanner.client.model.RequestMode.BUS;
 import static org.opentripplanner.client.model.RequestMode.TRANSIT;
@@ -27,10 +28,12 @@ public class HoustonSmokeTest {
   @Test
   public void routeFromSouthToNorth() {
     var modes = Set.of(TRANSIT, WALK);
-    SmokeTest.basicRouteTest(
+    var plan = SmokeTest.basicRouteTest(
       new SmokeTestRequest(galvestonRoad, northLindale, modes),
       List.of("WALK", "BUS", "BUS", "WALK", "TRAM", "WALK")
     );
+
+    SmokeTest.assertThatAllTransitLegsHaveFares(plan);
   }
 
   @Test

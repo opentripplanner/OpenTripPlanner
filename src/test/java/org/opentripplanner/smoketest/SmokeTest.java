@@ -135,6 +135,11 @@ public class SmokeTest {
     }
   }
 
+  static void assertThatAllTransitLegsHaveFares(TripPlan plan) {
+    var transitLegs = plan.transitItineraries().stream().flatMap(i-> i.transitLegs().stream());
+    transitLegs.forEach(leg -> assertFalse(leg.fareProducts().isEmpty()));
+  }
+
   /**
    * The Fare class is a little hard to deserialize, so we have a custom deserializer as we don't
    * run any assertions against the fares. (That is done during unit tests.)

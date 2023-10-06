@@ -27,10 +27,12 @@ public class PortlandSmokeTest {
   public void railTrip() {
     // this used to be across the city by since the train is interrupted in April '23 this is a
     // much shorter trip
-    SmokeTest.basicRouteTest(
+    var plan = SmokeTest.basicRouteTest(
       new SmokeTestRequest(cennentenial, hazelwood, Set.of(TRAM, WALK)),
       List.of("WALK", "TRAM", "WALK")
     );
+
+    SmokeTest.assertThatAllTransitLegsHaveFares(plan);
   }
 
   /**
