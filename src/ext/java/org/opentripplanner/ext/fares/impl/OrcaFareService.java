@@ -548,6 +548,10 @@ public class OrcaFareService extends DefaultFareService {
     }
   }
 
+  /**
+   * In the base class only the rules for a specific feed are selected and then passed to the
+   * fare engine, however here we want to explicitly compute fares across feed boundaries.
+   */
   @Nullable
   @Override
   protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {

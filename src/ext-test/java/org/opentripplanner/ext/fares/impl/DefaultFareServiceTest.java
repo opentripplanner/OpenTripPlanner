@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -105,7 +104,6 @@ class DefaultFareServiceTest implements PlanTestConstants {
     products = List.copyOf(legProductsFromComponents.get(secondLeg));
     assertEquals(TEN_DOLLARS, products.get(0).product().price());
 
-    assertFalse(fare.getItineraryProducts().isEmpty());
     assertEquals(1, fare.getItineraryProducts().size());
     assertEquals(TWENTY_DOLLARS, fare.getItineraryProducts().get(0).price());
   }
