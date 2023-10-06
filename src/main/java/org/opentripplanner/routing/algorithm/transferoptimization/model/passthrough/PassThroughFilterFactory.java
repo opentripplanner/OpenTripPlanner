@@ -10,7 +10,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTail
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilter;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferOptimizedFilterFactory;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.TransferOptimizedFilterFactory;
 
 public class PassThroughFilterFactory<T extends RaptorTripSchedule>
   implements PathTailFilterFactory<T> {

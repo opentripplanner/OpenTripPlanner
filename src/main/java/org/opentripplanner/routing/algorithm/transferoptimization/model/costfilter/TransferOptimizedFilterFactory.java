@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.transferoptimization.services;
+package org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +8,6 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Optimize
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilter;
 
 public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule>
   implements PathTailFilterFactory<T> {

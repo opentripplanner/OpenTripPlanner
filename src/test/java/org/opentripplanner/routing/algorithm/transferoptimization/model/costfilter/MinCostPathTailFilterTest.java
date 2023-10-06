@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.transferoptimization.model;
+package org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -7,7 +7,6 @@ import java.util.Objects;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilter;
 
 class MinCostPathTailFilterTest {
 
