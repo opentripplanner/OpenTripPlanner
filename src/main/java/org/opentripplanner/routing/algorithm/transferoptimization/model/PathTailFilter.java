@@ -5,7 +5,7 @@ import java.util.Set;
 /**
  * TODO PT - This need JavaDoc
  */
-public interface OptimizeTransfersFilterChain<T> {
+public interface PathTailFilter<T> {
   /**
    * TODO PT - This need JavaDoc
    */

@@ -4,9 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizeTransfersFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 
 /**
  * This class takes a list of transit legs and returns the best leg based on the {@link
@@ -29,14 +28,14 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Optimize
  */
 class TransitPathLegSelector<T extends RaptorTripSchedule> {
 
-  private final OptimizeTransfersFilterChain<OptimizedPathTail<T>> filter;
+  private final PathTailFilter<OptimizedPathTail<T>> filter;
   private Set<OptimizedPathTail<T>> remindingLegs;
   private Set<OptimizedPathTail<T>> selectedLegs;
 
   private int lastLimit = Integer.MAX_VALUE;
 
   TransitPathLegSelector(
-    final OptimizeTransfersFilterChain<OptimizedPathTail<T>> filter,
+    final PathTailFilter<OptimizedPathTail<T>> filter,
     final Set<OptimizedPathTail<T>> legs
   ) {
     this.filter = filter;

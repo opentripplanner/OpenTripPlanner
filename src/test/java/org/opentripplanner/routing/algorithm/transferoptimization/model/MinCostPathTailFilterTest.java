@@ -8,7 +8,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 
-class MinCostFilterChainTest {
+class MinCostPathTailFilterTest {
 
   private final A v01 = new A("A", 0, 1);
   private final A v10 = new A("B", 1, 0);
@@ -22,7 +22,7 @@ class MinCostFilterChainTest {
   @Test
   void filterEmptySet() {
     // filter empty set
-    assertEquals(Set.of(), new MinCostFilterChain<A>(List.of(it -> it.x)).filter(Set.of()));
+    assertEquals(Set.of(), new MinCostPathTailFilter<A>(List.of(it -> it.x)).filter(Set.of()));
   }
 
   @Test
@@ -51,7 +51,7 @@ class MinCostFilterChainTest {
   }
 
   private Set<A> filter(A... as) {
-    return new MinCostFilterChain<A>(List.of(it -> it.x, it -> it.y)).filter(setOf(as));
+    return new MinCostPathTailFilter<A>(List.of(it -> it.x, it -> it.y)).filter(setOf(as));
   }
 
   static class A {

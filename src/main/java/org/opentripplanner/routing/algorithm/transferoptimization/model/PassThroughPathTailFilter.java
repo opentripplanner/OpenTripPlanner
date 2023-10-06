@@ -8,13 +8,13 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class OptimizeTransfersCostAndC2FilterChain<T> implements OptimizeTransfersFilterChain<T> {
+public class PassThroughPathTailFilter<T> implements PathTailFilter<T> {
 
-  private final MinCostFilterChain<T> filterChain;
+  private final MinCostPathTailFilter<T> filterChain;
   private final Function<T, Integer> getC2;
 
-  public OptimizeTransfersCostAndC2FilterChain(
-    MinCostFilterChain<T> filterChain,
+  public PassThroughPathTailFilter(
+    MinCostPathTailFilter<T> filterChain,
     Function<T, Integer> getC2
   ) {
     this.filterChain = filterChain;
