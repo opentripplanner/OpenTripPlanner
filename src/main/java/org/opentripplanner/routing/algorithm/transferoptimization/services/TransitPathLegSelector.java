@@ -75,7 +75,7 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
 
     // Set state
     remindingLegs = rest;
-    selectedLegs = filter.filter(candidates);
+    selectedLegs = filter.filterIntermediateResult(candidates);
 
     return selectedLegs;
   }

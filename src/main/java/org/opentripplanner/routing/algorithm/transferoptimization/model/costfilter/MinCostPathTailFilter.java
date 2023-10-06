@@ -27,7 +27,7 @@ class MinCostPathTailFilter<T> implements PathTailFilter<T> {
   }
 
   @Override
-  public Set<T> filter(Set<T> elements) {
+  public Set<T> filterIntermediateResult(Set<T> elements) {
     for (var costFunction : costFunctions) {
       elements = filter(elements, costFunction);
     }
@@ -53,7 +53,7 @@ class MinCostPathTailFilter<T> implements PathTailFilter<T> {
   }
 
   @Override
-  public Set<T> finalizeFilter(Set<T> elements) {
+  public Set<T> filterFinalResult(Set<T> elements) {
     return elements;
   }
 }
