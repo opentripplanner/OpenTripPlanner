@@ -348,9 +348,12 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
    * Include transfer leg in itinerary if the path is a "physical" path-leg between two stops, like
    * walk or bicycle. Do NOT include it if it represents a stay-seated transfer. See more details in
    * https://github.com/opentripplanner/OpenTripPlanner/issues/5086.
+   * TODO: the logic should be revisited when adding support for transfer between on-board flex
+   * access and transit.
    */
   private boolean includeTransferInItinerary(Leg transitLegBeforeTransfer) {
     return (
+      transitLegBeforeTransfer == null ||
       transitLegBeforeTransfer.getTransferToNextLeg() == null ||
       !transitLegBeforeTransfer.getTransferToNextLeg().getTransferConstraint().isStaySeated()
     );
