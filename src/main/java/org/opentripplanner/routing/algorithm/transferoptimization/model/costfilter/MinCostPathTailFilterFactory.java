@@ -9,13 +9,13 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTail
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
-public class TransferOptimizedFilterFactory<T extends RaptorTripSchedule>
+public class MinCostPathTailFilterFactory<T extends RaptorTripSchedule>
   implements PathTailFilterFactory<T> {
 
   private final boolean transferPriority;
   private final boolean optimizeWaitTime;
 
-  public TransferOptimizedFilterFactory(boolean transferPriority, boolean optimizeWaitTime) {
+  public MinCostPathTailFilterFactory(boolean transferPriority, boolean optimizeWaitTime) {
     this.transferPriority = transferPriority;
     this.optimizeWaitTime = optimizeWaitTime;
   }
