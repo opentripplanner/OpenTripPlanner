@@ -111,7 +111,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     // Combine transit legs and transfers
     var tails = findBestTransferOption(originalPath, transitLegs, possibleTransfers, filter);
 
-    var filteredTails = filter.finalizeFilter(tails);
+    var filteredTails = filter.filterFinalResult(tails);
 
     return filteredTails.stream().map(OptimizedPathTail::build).collect(toSet());
   }

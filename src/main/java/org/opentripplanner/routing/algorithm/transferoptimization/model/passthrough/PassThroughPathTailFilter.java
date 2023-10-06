@@ -20,19 +20,19 @@ class PassThroughPathTailFilter<T> implements PathTailFilter<T> {
   }
 
   @Override
-  public Set<T> filter(Set<T> elements) {
+  public Set<T> filterIntermediateResult(Set<T> elements) {
     Map<Integer, Set<T>> elementsByC2Value = elements
       .stream()
       .collect(Collectors.groupingBy(getC2, toSet()));
     Set<T> result = new HashSet<>();
     for (Integer c2 : elementsByC2Value.keySet()) {
-      result.addAll(filterChain.filter(elementsByC2Value.get(c2)));
+      result.addAll(filterChain.filterIntermediateResult(elementsByC2Value.get(c2)));
     }
     return result;
   }
 
   @Override
-  public Set<T> finalizeFilter(Set<T> elements) {
+  public Set<T> filterFinalResult(Set<T> elements) {
     return elements.stream().filter(tail -> getC2.apply(tail) == 0).collect(toSet());
   }
 }

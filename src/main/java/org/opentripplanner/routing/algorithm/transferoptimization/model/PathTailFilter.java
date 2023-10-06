@@ -9,9 +9,9 @@ public interface PathTailFilter<T> {
   /**
    * TODO PT - This need JavaDoc
    */
-  Set<T> filter(Set<T> elements);
+  Set<T> filterIntermediateResult(Set<T> elements);
   /**
    * TODO PT - This need JavaDoc
    */
-  Set<T> finalizeFilter(Set<T> elements);
+  Set<T> filterFinalResult(Set<T> elements);
 }

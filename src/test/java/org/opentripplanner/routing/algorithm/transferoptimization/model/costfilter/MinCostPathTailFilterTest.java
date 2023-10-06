@@ -22,7 +22,10 @@ class MinCostPathTailFilterTest {
   @Test
   void filterEmptySet() {
     // filter empty set
-    assertEquals(Set.of(), new MinCostPathTailFilter<A>(List.of(it -> it.x)).filter(Set.of()));
+    assertEquals(
+      Set.of(),
+      new MinCostPathTailFilter<A>(List.of(it -> it.x)).filterIntermediateResult(Set.of())
+    );
   }
 
   @Test
@@ -51,7 +54,8 @@ class MinCostPathTailFilterTest {
   }
 
   private Set<A> filter(A... as) {
-    return new MinCostPathTailFilter<A>(List.of(it -> it.x, it -> it.y)).filter(setOf(as));
+    return new MinCostPathTailFilter<A>(List.of(it -> it.x, it -> it.y))
+      .filterIntermediateResult(setOf(as));
   }
 
   static class A {
