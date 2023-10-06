@@ -5,15 +5,15 @@ import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.path.PathBuilderLeg;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.FilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostPathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PassThroughPathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
 public class OptimizeTransfersCostAndC2FilterFactory<T extends RaptorTripSchedule>
-  implements FilterFactory<T> {
+  implements PathTailFilterFactory<T> {
 
   private final boolean transferPriority;
   private final boolean optimizeWaitTime;

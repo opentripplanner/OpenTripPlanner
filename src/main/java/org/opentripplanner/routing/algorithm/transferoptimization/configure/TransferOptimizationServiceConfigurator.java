@@ -9,8 +9,8 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.FilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizeTransfersCostAndC2FilterFactory;
@@ -107,7 +107,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     }
   }
 
-  private FilterFactory<T> createFilterFactory() {
+  private PathTailFilterFactory<T> createFilterFactory() {
     if (multiCriteriaRequest.hasPassThroughPoints()) {
       return new OptimizeTransfersCostAndC2FilterFactory<>(
         config.optimizeTransferPriority(),
@@ -124,7 +124,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
 
   private OptimizePathDomainService<T> createOptimizePathService(
     TransferGenerator<T> transferGenerator,
-    FilterFactory<T> filterFactory,
+    PathTailFilterFactory<T> filterFactory,
     TransferWaitTimeCostCalculator transferWaitTimeCostCalculator,
     RaptorCostCalculator<T> costCalculator
   ) {
