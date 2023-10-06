@@ -259,7 +259,12 @@ public class DefaultFareService implements FareService {
 
       var componentLegs = new ArrayList<Leg>();
       for (int i = start; i <= via; ++i) {
-        componentLegs.add(legs.get(i));
+        final Leg e = legs.get(i);
+        if(e instanceof CombinedInterlinedTransitLeg transitLeg) {
+          componentLegs.addAll(transitLeg.originalLegs());
+        } else {
+          componentLegs.add(e);
+        }
       }
       components.add(
         new FareComponent(fareId, Money.ofFractionalAmount(currency, cost), componentLegs)

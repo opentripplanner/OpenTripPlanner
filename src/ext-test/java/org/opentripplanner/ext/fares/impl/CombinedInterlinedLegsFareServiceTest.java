@@ -54,7 +54,7 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     name = "Itinerary with {3} and combination mode {0} should lead to a fare of {2}"
   )
   @VariableSource("testCases")
-  void modeAlways(CombinationMode mode, Itinerary itinerary, Money expectedPrice, String hint) {
+  void modeAlways(CombinationMode mode, Itinerary itinerary, Money totalPrice, String hint) {
     var service = new CombinedInterlinedLegsFareService(mode);
     service.addFareRules(
       FareType.regular,
@@ -65,7 +65,16 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     assertNotNull(fare);
 
     var price = fare.getFare(FareType.regular);
+    assertEquals(totalPrice, price);
 
-    assertEquals(expectedPrice, price);
+    var firstLeg = itinerary.getTransitLeg(0);
+    var uses = List.copyOf(fare.legProductsFromComponents().get(firstLeg));
+    assertEquals(1, uses.size());
+
+    var firstProduct = uses.get(0).product();
+
+    var secondLeg = itinerary.getTransitLeg(1);
+    uses = List.copyOf(fare.legProductsFromComponents().get(secondLeg));
+    assertEquals(1, uses.size());
   }
 }
