@@ -27,8 +27,8 @@ public class FaresToItineraryMapper {
     i.transformTransitLegs(leg -> {
       var legInstances = fares.getLegProducts().get(leg);
       leg.setFareProducts(
-          ListUtils.combine(itineraryFareUses, legProductsFromComponents.get(l), legInstances)
-        );
+        ListUtils.combine(itineraryFareUses, legProductsFromComponents.get(leg), legInstances)
+      );
       return leg;
     });
   }
