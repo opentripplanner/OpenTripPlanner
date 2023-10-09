@@ -112,6 +112,8 @@ public class SmokeTest {
 
   static void assertThatAllTransitLegsHaveFareProducts(TripPlan plan) {
     var transitLegs = plan.transitItineraries().stream().flatMap(i -> i.transitLegs().stream());
-    transitLegs.forEach(leg -> assertFalse(leg.fareProducts().isEmpty()));
+    transitLegs.forEach(leg ->
+      assertFalse(leg.fareProducts().isEmpty(), "Leg %s should have fare products".formatted(leg))
+    );
   }
 }
