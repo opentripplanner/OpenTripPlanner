@@ -1,5 +1,6 @@
 package org.opentripplanner.model.fare;
 
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
@@ -102,24 +104,6 @@ public class ItineraryFares {
   @Deprecated
   public void addFareComponent(FareType fareType, List<FareComponent> components) {
     this.components.replaceValues(fareType, components);
-
-    for (var c : components) {
-      var firstLegStartTime = c.legs().get(0).getStartTime();
-      for (var leg : c.legs()) {
-        final FareProduct fareProduct = new FareProduct(
-          c.fareId(),
-          fareType.name(),
-          c.price(),
-          null,
-          null,
-          null
-        );
-        legProducts.put(
-          leg,
-          new FareProductUse(fareProduct.uniqueInstanceId(firstLegStartTime), fareProduct)
-        );
-      }
-    }
   }
 
   /**
@@ -202,5 +186,34 @@ public class ItineraryFares {
    */
   public void addFareProduct(Leg leg, Collection<FareProduct> fareProduct) {
     fareProduct.forEach(fp -> addFareProduct(leg, fp));
+  }
+
+  /**
+   * Convert the fare received via the deprecated {@link FareComponent} to leg products. This
+   * inverts the relationship:
+   *   - fare component has several legs
+   *   - leg product is a mapping from leg to a list of fare products
+   */
+  @Nonnull
+  public Multimap<Leg, FareProductUse> legProductsFromComponents() {
+    Multimap<Leg, FareProductUse> legProductsFromComponents = HashMultimap.create();
+    for (var type : getFareTypes()) {
+      var components = getComponents(type);
+
+      for (var c : components) {
+        var firstLegStartTime = c.legs().get(0).getStartTime();
+        for (var leg : c.legs()) {
+          final FareProduct fareProduct = FareProduct
+            .of(c.fareId(), type.name(), c.price())
+            .build();
+
+          legProductsFromComponents.put(
+            leg,
+            new FareProductUse(fareProduct.uniqueInstanceId(firstLegStartTime), fareProduct)
+          );
+        }
+      }
+    }
+    return legProductsFromComponents;
   }
 }
