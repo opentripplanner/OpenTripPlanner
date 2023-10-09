@@ -183,9 +183,10 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Classify the ride type based on the route information provided. In most cases the agency name is sufficient. In
-   * some cases the route description and short name are needed to define inner agency ride types. For Kitsap, the
-   * route data is enough to define the agency, but addition trip id checks are needed to define the fast ferry direction.
+   * Classify the ride type based on the route information provided. In most cases the agency name
+   * is sufficient. In some cases the route description and short name are needed to define inner
+   * agency ride types. For Kitsap, the route data is enough to define the agency, but addition trip
+   * id checks are needed to define the fast ferry direction.
    */
   private static RideType classify(Route route, String tripId) {
     var rideType = getRideType(route.getAgency().getId().getId(), route);
@@ -217,8 +218,8 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Define which discount fare should be applied based on the fare type. If the ride type is unknown the discount
-   * fare can not be applied, use the default fare.
+   * Define which discount fare should be applied based on the fare type. If the ride type is
+   * unknown the discount fare can not be applied, use the default fare.
    */
   private Money getLegFare(FareType fareType, RideType rideType, Money defaultFare, Leg leg) {
     if (rideType == null) {
@@ -265,7 +266,7 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   *  Calculate the correct Link fare from a "ride" including start and end stations.
+   * Calculate the correct Link fare from a "ride" including start and end stations.
    */
   private Money getSoundTransitFare(
     Leg leg,
@@ -403,8 +404,9 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Get the ride price for a single leg. If testing, this class is being called directly so the required agency cash
-   * values are not available therefore the default test price is used instead.
+   * Get the ride price for a single leg. If testing, this class is being called directly so the
+   * required agency cash values are not available therefore the default test price is used
+   * instead.
    */
   protected Optional<Money> getRidePrice(
     Leg leg,
@@ -415,12 +417,14 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Calculate the cost of a journey. Where free transfers are not permitted the cash price is used. If free transfers
-   * are applicable, the most expensive discount fare across all legs is added to the final cumulative price.
-   *
-   * The computed fare for Orca card users takes into account realtime trip updates where available, so that, for
-   * instance, when a leg on a long itinerary is delayed to begin after the initial two hour window has expired,
-   * the calculated fare for that trip will be two one-way fares instead of one.
+   * Calculate the cost of a journey. Where free transfers are not permitted the cash price is used.
+   * If free transfers are applicable, the most expensive discount fare across all legs is added to
+   * the final cumulative price.
+   * <p>
+   * The computed fare for Orca card users takes into account realtime trip updates where available,
+   * so that, for instance, when a leg on a long itinerary is delayed to begin after the initial two
+   * hour window has expired, the calculated fare for that trip will be two one-way fares instead of
+   * one.
    */
   @Override
   public boolean populateFare(
@@ -509,10 +513,11 @@ public class OrcaFareService extends DefaultFareService {
 
   /**
    * Adds a leg fare product to the given itinerary fares object
-   * @param leg The leg to create a fareproduct for
-   * @param itineraryFares The itinerary fares to store the fare product in
-   * @param fareType Fare type (split into container and rider category)
-   * @param totalFare Total fare paid after transfer
+   *
+   * @param leg              The leg to create a fareproduct for
+   * @param itineraryFares   The itinerary fares to store the fare product in
+   * @param fareType         Fare type (split into container and rider category)
+   * @param totalFare        Total fare paid after transfer
    * @param transferDiscount Transfer discount applied
    */
   private static void addLegFareProduct(
@@ -556,8 +561,6 @@ public class OrcaFareService extends DefaultFareService {
 
   /**
    * Check if trip falls within the transfer time window.
-   * @param freeTransferStartTime
-   * @param currentLegStartTime
    */
   private boolean inFreeTransferWindow(
     ZonedDateTime freeTransferStartTime,
