@@ -16,6 +16,8 @@ import org.opentripplanner.client.model.TripPlan;
 import org.opentripplanner.client.model.VehicleRentalStation;
 import org.opentripplanner.client.parameters.TripPlanParameters;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is both a utility class and a category to select or deselect smoke tests during test
@@ -26,6 +28,8 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
  * If you want run them, use `mvn test -Djunit.tags.included="atlanta" -Djunit.tags.excluded=""`.
  */
 public class SmokeTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(SmokeTest.class);
 
   public static final OtpApiClient API_CLIENT = new OtpApiClient(
     ZoneId.of("America/New_York"),
@@ -112,8 +116,16 @@ public class SmokeTest {
 
   static void assertThatAllTransitLegsHaveFareProducts(TripPlan plan) {
     var transitLegs = plan.transitItineraries().stream().flatMap(i -> i.transitLegs().stream());
-    transitLegs.forEach(leg ->
-      assertFalse(leg.fareProducts().isEmpty(), "Leg %s should have fare products".formatted(leg))
-    );
+    transitLegs.forEach(leg -> {
+      assertFalse(leg.fareProducts().isEmpty(), "Leg %s should have fare products".formatted(leg));
+
+      LOG.info(
+        "Leg with mode {} from {} to {} has {} fare products.",
+        leg.mode(),
+        leg.from(),
+        leg.to(),
+        leg.fareProducts().size()
+      );
+    });
   }
 }
