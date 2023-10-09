@@ -3,14 +3,6 @@ package org.opentripplanner.smoketest;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -18,14 +10,11 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
-import org.opentripplanner.api.json.JSONObjectMapperProvider;
-import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.client.OtpApiClient;
 import org.opentripplanner.client.model.TripPlan;
 import org.opentripplanner.client.model.TripPlan.Itinerary;
 import org.opentripplanner.client.model.VehicleRentalStation;
 import org.opentripplanner.client.parameters.TripPlanParameters;
-import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 /**
@@ -38,24 +27,10 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
  */
 public class SmokeTest {
 
-  public static final ObjectMapper mapper;
   public static final OtpApiClient API_CLIENT = new OtpApiClient(
     ZoneId.of("America/New_York"),
     "http://localhost:8080"
   );
-
-  static {
-    var provider = new JSONObjectMapperProvider();
-
-    SimpleModule module = new SimpleModule("SmokeTests");
-    module.addDeserializer(ItineraryFares.class, new FareDeserializer());
-    module.addDeserializer(DebugOutput.class, new DebugOutputDeserializer());
-
-    mapper = provider.getContext(null);
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    mapper.registerModule(new ParameterNamesModule(JsonCreator.Mode.PROPERTIES));
-    mapper.registerModule(module);
-  }
 
   /**
    * In order to have somewhat predictable results we get the route for the next Monday.
@@ -135,29 +110,8 @@ public class SmokeTest {
     }
   }
 
-  /**
-   * The Fare class is a little hard to deserialize, so we have a custom deserializer as we don't
-   * run any assertions against the fares. (That is done during unit tests.)
-   */
-  static class FareDeserializer extends JsonDeserializer<ItineraryFares> {
-
-    @Override
-    public ItineraryFares deserialize(
-      JsonParser jsonParser,
-      DeserializationContext deserializationContext
-    ) {
-      return null;
-    }
-  }
-
-  static class DebugOutputDeserializer extends JsonDeserializer<DebugOutput> {
-
-    @Override
-    public DebugOutput deserialize(
-      JsonParser jsonParser,
-      DeserializationContext deserializationContext
-    ) {
-      return null;
-    }
+  static void assertThatAllTransitLegsHaveFareProducts(TripPlan plan) {
+    var transitLegs = plan.transitItineraries().stream().flatMap(i -> i.transitLegs().stream());
+    transitLegs.forEach(leg -> assertFalse(leg.fareProducts().isEmpty()));
   }
 }

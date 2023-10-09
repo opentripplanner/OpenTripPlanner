@@ -3,22 +3,28 @@
   "updaters": [
     {
       "type": "real-time-alerts",
-      "frequencySec": 60,
       "earlyStartSec": 864000,
       "url": "https://trimet.org/transweb/ws/V1/FeedSpecAlerts/includeFuture/true/suppressSystemWideAlerts/true/",
       "feedId": "TriMet"
     },
     {
       "type": "stop-time-updater",
-      "frequencySec": 30,
+      "frequency": "30s",
       "url": "https://trimet.org/transweb/ws/V1/TripUpdate",
       "feedId": "TriMet"
     },
     {
       "type": "vehicle-rental",
-      "frequencySec": 90,
+      "frequency": "90s",
       "sourceType": "gbfs",
       "url": "https://mds.bird.co/gbfs/v2/public/portland/gbfs.json",
+      "geofencingZones": "true"
+    },
+    {
+      "type": "vehicle-rental",
+      "frequency": "90s",
+      "sourceType": "gbfs",
+      "url": "https://gbfs.spin.pm/api/gbfs/v2_3/portland/gbfs",
       "geofencingZones": "true"
     }
   ]
