@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.test.support.ResourceLoader;
 
 /*
  * When bus stops are added to graph they split an existing edge in two parts so that an artificial
@@ -45,12 +46,15 @@ public class SplitEdgeTurnRestrictionsTest {
   static final GenericLocation parkStrasse = new GenericLocation(48.68358, 9.00826);
   static final GenericLocation herrenbergerStrasse = new GenericLocation(48.68497, 9.00909);
   static final GenericLocation steinbeissWeg = new GenericLocation(48.68172, 9.00599);
+  private static final ResourceLoader RESOURCE_LOADER = ResourceLoader.of(
+    SplitEdgeTurnRestrictionsTest.class
+  );
 
   @Test
   void shouldTakeDeufringenTurnRestrictionsIntoAccount() {
     TestOtpModel model = ConstantsForTests.buildOsmAndGtfsGraph(
-      ConstantsForTests.DEUFRINGEN_OSM,
-      ConstantsForTests.VVS_BUS_764_ONLY
+      RESOURCE_LOADER.file("deufringen-minimal.osm.pbf"),
+      RESOURCE_LOADER.file("vvs-bus-764-only.gtfs.zip")
     );
     Graph graph = model.graph();
     // https://www.openstreetmap.org/relation/10264251 has a turn restriction so when leaving Hardtheimer Weg
@@ -89,8 +93,8 @@ public class SplitEdgeTurnRestrictionsTest {
     // this tests that the following turn restriction is transferred correctly to the split edges
     // https://www.openstreetmap.org/relation/299171
     TestOtpModel model = ConstantsForTests.buildOsmAndGtfsGraph(
-      ConstantsForTests.BOEBLINGEN_OSM,
-      ConstantsForTests.VVS_BUS_751_ONLY
+      RESOURCE_LOADER.file("boeblingen-minimal.osm.pbf"),
+      RESOURCE_LOADER.file("vvs-bus-751-only.gtfs.zip")
     );
     var graph = model.graph();
 

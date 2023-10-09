@@ -336,7 +336,7 @@ public class WayPropertySet {
     }
 
     String units = m.group(2);
-    if (units == null || units.equals("")) units = "kmh";
+    if (units == null || units.isEmpty()) units = "kmh";
 
     // we'll be doing quite a few string comparisons here
     units = units.intern();
