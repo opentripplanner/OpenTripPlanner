@@ -299,19 +299,22 @@ public class OrcaFareService extends DefaultFareService {
       case COMM_TRANS_COMMUTER_EXPRESS -> usDollars(2f);
       case KC_WATER_TAXI_VASHON_ISLAND -> usDollars(4.5f);
       case KC_WATER_TAXI_WEST_SEATTLE -> usDollars(3.75f);
-      case KITSAP_TRANSIT -> usDollars(1f);
       case KC_METRO,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
         SOUND_TRANSIT_SOUNDER,
+        KITSAP_TRANSIT,
         EVERETT_TRANSIT,
-        SEATTLE_STREET_CAR -> usDollars(1.5f);
+        PIERCE_COUNTY_TRANSIT,
+        SEATTLE_STREET_CAR -> usDollars(1.00f);
       case WASHINGTON_STATE_FERRIES -> getWashingtonStateFerriesFare(
         route.getLongName(),
         FareType.electronicSpecial,
         defaultFare
       );
+      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> usDollars((1f));
+      case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> usDollars((5f));
       default -> defaultFare;
     };
   }
@@ -329,21 +332,19 @@ public class OrcaFareService extends DefaultFareService {
       case COMM_TRANS_LOCAL_SWIFT -> usDollars(1.25f);
       case COMM_TRANS_COMMUTER_EXPRESS -> usDollars(2f);
       case EVERETT_TRANSIT, SKAGIT_TRANSIT -> usDollars(0.5f);
-      case PIERCE_COUNTY_TRANSIT, SEATTLE_STREET_CAR, KITSAP_TRANSIT -> fareType.equals( // Pierce, Seattle Streetcar, and Kitsap only provide discounted senior fare for orca.
-          FareType.electronicSenior
-        )
-        ? usDollars(1f)
-        : defaultFare;
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> fareType.equals(FareType.electronicSenior) // Kitsap only provide discounted senior fare for orca.
         ? usDollars(1f)
         : usDollars(2f);
       case KC_WATER_TAXI_VASHON_ISLAND -> usDollars(3f);
       case KC_WATER_TAXI_WEST_SEATTLE -> usDollars(2.5f);
-      case KC_METRO,
-        SOUND_TRANSIT,
+      case SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
-        SOUND_TRANSIT_SOUNDER -> usDollars(1f);
+        SOUND_TRANSIT_SOUNDER,
+        KC_METRO,
+        PIERCE_COUNTY_TRANSIT,
+        SEATTLE_STREET_CAR,
+        KITSAP_TRANSIT -> fareType.equals(FareType.electronicSenior) ? usDollars(1f) : defaultFare;
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> fareType.equals(FareType.electronicSenior)
         ? usDollars(5f)
         : usDollars(10f);
@@ -358,16 +359,15 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Apply youth discount fares based on the ride type.
-   * Youth ride free in Washington.
+   * Apply youth discount fares based on the ride type. Youth ride free in Washington.
    */
   private Money getYouthFare() {
     return Money.ZERO_USD;
   }
 
   /**
-   * Get the washington state ferries fare matching the route long name and fare type. If no match is found, return
-   * the default fare.
+   * Get the washington state ferries fare matching the route long name and fare type. If no match
+   * is found, return the default fare.
    */
   private Money getWashingtonStateFerriesFare(
     I18NString routeLongName,
