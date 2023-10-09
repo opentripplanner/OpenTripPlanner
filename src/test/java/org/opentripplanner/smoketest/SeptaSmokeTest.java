@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.client.model.Coordinate;
-import org.opentripplanner.client.model.TripPlan.FareProductUse;
+import org.opentripplanner.client.model.FareProductUse;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
