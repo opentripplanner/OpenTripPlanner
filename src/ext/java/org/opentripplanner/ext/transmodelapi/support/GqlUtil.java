@@ -89,12 +89,36 @@ public class GqlUtil {
       .build();
   }
 
-  public static GraphQLInputObjectField newIdListInputField(String name, String description) {
+  /**
+   * Specify a list of ID input fields that may contain null values.
+   */
+  public static GraphQLInputObjectField newNullableIdListInputField(
+    String name,
+    String description
+  ) {
+    return newIdListInputField(name, description, true);
+  }
+
+  /**
+   * Specify a list of ID input fields that may not contain null values.
+   */
+  public static GraphQLInputObjectField newNonNullIdListInputField(
+    String name,
+    String description
+  ) {
+    return newIdListInputField(name, description, false);
+  }
+
+  private static GraphQLInputObjectField newIdListInputField(
+    String name,
+    String description,
+    boolean nullable
+  ) {
     return GraphQLInputObjectField
       .newInputObjectField()
       .name(name)
       .description(description)
-      .type(new GraphQLList(Scalars.GraphQLID))
+      .type(new GraphQLList(nullable ? Scalars.GraphQLID : new GraphQLNonNull(Scalars.GraphQLID)))
       .defaultValue(List.of())
       .build();
   }

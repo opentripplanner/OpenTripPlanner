@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
-import static org.opentripplanner.ext.transmodelapi.support.GqlUtil.newIdListInputField;
+import static org.opentripplanner.ext.transmodelapi.support.GqlUtil.newNonNullIdListInputField;
 
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLInputObjectType;
@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -27,10 +26,12 @@ public class JourneyWhiteListed {
       "for each line to be used. If a line is both banned and whitelisted, it will " +
       "be counted as banned."
     )
-    .field(newIdListInputField("lines", "Set of ids for lines that should be used"))
-    .field(newIdListInputField("authorities", "Set of ids for authorities that should be used"))
+    .field(newNonNullIdListInputField("lines", "Set of ids for lines that should be used"))
     .field(
-      GqlUtil.newIdListInputField(
+      newNonNullIdListInputField("authorities", "Set of ids for authorities that should be used")
+    )
+    .field(
+      newNonNullIdListInputField(
         "rentalNetworks",
         "Set of ids of rental networks that should be used for renting vehicles."
       )
