@@ -1,8 +1,8 @@
 {
   "data" : {
     "vehicleRentalStation" : {
-      "stationId": "F:abc",
-      "name" : "abc",
+      "stationId": "Network-1:FooStation",
+      "name" : "FooStation",
       "lat" : 20.0,
       "lon" : 10.0,
       "spacesAvailable" : 2,

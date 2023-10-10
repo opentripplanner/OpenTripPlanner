@@ -1,5 +1,5 @@
 {
-    vehicleRentalStation(id:"F:abc") {
+    vehicleRentalStation(id:"Network-1:FooStation") {
         stationId
         name
         lat

@@ -70,6 +70,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
@@ -218,7 +219,7 @@ class GraphQLIntegrationTest {
     transitService.getTransitAlertService().setAlerts(alerts);
 
     var rentalService = new DefaultVehicleRentalService();
-    rentalService.addVehicleRentalStation(vehicleRentalStation("abc"));
+    rentalService.addVehicleRentalStation(vehicleRentalStation());
 
     context =
       new GraphQLRequestContext(
@@ -309,15 +310,14 @@ class GraphQLIntegrationTest {
   }
 
   @Nonnull
-  private static VehicleRentalStation vehicleRentalStation(String name) {
-    var station = new VehicleRentalStation();
-    station.id = id(name);
-    station.name = I18NString.of(name);
-    station.longitude = 10;
-    station.latitude = 20;
-    station.vehiclesAvailable = 3;
-    station.spacesAvailable = 2;
-    return station;
+  private static VehicleRentalStation vehicleRentalStation() {
+    return TestVehicleRentalStationBuilder
+      .of()
+      .withLongitude(10)
+      .withLatitude(20)
+      .withVehicles(3)
+      .withSpaces(2)
+      .build();
   }
 
   /**

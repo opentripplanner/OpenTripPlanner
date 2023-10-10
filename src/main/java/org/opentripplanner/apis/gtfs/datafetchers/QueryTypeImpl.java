@@ -850,8 +850,8 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         .stream()
         .filter(vehicleRentalStation ->
           OTPFeature.GtfsGraphQlApiRentalStationFuzzyMatching.isOn()
-            ? isFuzzyMatchRentalStationIds(vehicleRentalStation, id)
-            : isMatchRentalStationIds(vehicleRentalStation, id)
+            ? stationIdFuzzyMatches(vehicleRentalStation, id)
+            : stationIdMatches(vehicleRentalStation, id)
         )
         .findAny()
         .orElse(null);
@@ -899,7 +899,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   /**
    * This matches station's feedScopedId to the given string.
    */
-  private boolean isMatchRentalStationIds(VehicleRentalStation station, String feedScopedId) {
+  private boolean stationIdMatches(VehicleRentalStation station, String feedScopedId) {
     return station.getId().toString().equals(feedScopedId);
   }
 
@@ -911,9 +911,9 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
    * <p>
    * TODO this can be potentially removed after a while, only used by Digitransit as of now.
    */
-  private boolean isFuzzyMatchRentalStationIds(VehicleRentalStation station, String idWithoutFeed) {
+  private boolean stationIdFuzzyMatches(VehicleRentalStation station, String idWithoutFeed) {
     if (idWithoutFeed != null && idWithoutFeed.contains(":")) {
-      return isMatchRentalStationIds(station, idWithoutFeed);
+      return stationIdMatches(station, idWithoutFeed);
     }
     return station.getId().getId().equals(idWithoutFeed);
   }
