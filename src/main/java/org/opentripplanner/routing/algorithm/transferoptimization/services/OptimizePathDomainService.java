@@ -34,7 +34,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTr
  * M : number of possible transfer location for a given pair of trips
  *
  * Without any pruning the permutations have an order of O(N^M), but by filtering during the path
- * construction we get close to O(N*M) - which is acceptable.
+ * construction we get close to o(N*M) - which is acceptable.
  *
  * Example with 3 lines(trips), where the `+` indicate stop places:
  *

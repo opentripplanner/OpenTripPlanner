@@ -23,8 +23,8 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
- * This is the leg implementation for the {@link PathBuilder}. It is a private inner class which
- * helps to cache and calculate values before constructing a path.
+ * This is the leg implementation for the {@link PathBuilder}. It helps to cache and calculate
+ * values before constructing a path.
  */
 public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
@@ -45,9 +45,9 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   private PathBuilderLeg<T> prev = null;
   private PathBuilderLeg<T> next = null;
 
-  // TODO: 2023-09-01 We need some storage space to keep track of c2 value per stop
-  //  when we are filtering out possible transfers.
-  //  I choose to include it here because it is practical but maybe we should have it somewhere else?
+  // TODO PT: 2023-09-01 We need some storage space to keep track of c2 value per stop
+  //          when we are filtering out possible transfers.
+  //          I choose to include it here because it is practical but maybe we should have it somewhere else?
   private final int[] c2PerStopPosition;
 
   /**
@@ -121,18 +121,19 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * Get c2 value associate with given stop position in a pattern.
    *  This works only for transit legs and if c2 is already set
    */
+  @Deprecated
   public int c2ForStopPosition(int pos) {
     var c2 = c2PerStopPosition[pos];
     if (c2 == NOT_SET) {
       throw new IllegalArgumentException("C2 for stop position " + pos + " not set");
     }
-
     return c2;
   }
 
   /**
    * Set c2 value on a given stop position in a transit leg
    */
+  @Deprecated
   public void setC2OnStopPosition(int pos, int c2) {
     c2PerStopPosition[pos] = c2;
   }
