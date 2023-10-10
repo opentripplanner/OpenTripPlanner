@@ -35,6 +35,7 @@ public class OrcaFareService extends DefaultFareService {
   public static final String COMM_TRANS_AGENCY_ID = "29";
   public static final String KC_METRO_AGENCY_ID = "1";
   public static final String SOUND_TRANSIT_AGENCY_ID = "40";
+  public static final String T_LINK_AGENCY_ID = "F1";
   public static final String EVERETT_TRANSIT_AGENCY_ID = "97";
   public static final String PIERCE_COUNTY_TRANSIT_AGENCY_ID = "3";
   public static final String SKAGIT_TRANSIT_AGENCY_ID = "e0e4541a-2714-487b-b30c-f5c6cb4a310f";
@@ -69,6 +70,7 @@ public class OrcaFareService extends DefaultFareService {
     SOUND_TRANSIT,
     SOUND_TRANSIT_BUS,
     SOUND_TRANSIT_SOUNDER,
+    SOUND_TRANSIT_T_LINK,
     SOUND_TRANSIT_LINK,
     WASHINGTON_STATE_FERRIES,
     WHATCOM_LOCAL,
@@ -145,6 +147,7 @@ public class OrcaFareService extends DefaultFareService {
       }
       case SEATTLE_STREET_CAR_AGENCY_ID -> RideType.SEATTLE_STREET_CAR;
       case WASHINGTON_STATE_FERRIES_AGENCY_ID -> RideType.WASHINGTON_STATE_FERRIES;
+      case T_LINK_AGENCY_ID -> RideType.SOUND_TRANSIT_T_LINK;
       case KITSAP_TRANSIT_AGENCY_ID -> RideType.KITSAP_TRANSIT;
       case WHATCOM_AGENCY_ID -> {
         try {
@@ -343,6 +346,7 @@ public class OrcaFareService extends DefaultFareService {
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
         SOUND_TRANSIT_SOUNDER,
+        SOUND_TRANSIT_T_LINK,
         KITSAP_TRANSIT,
         EVERETT_TRANSIT,
         PIERCE_COUNTY_TRANSIT,
@@ -381,6 +385,7 @@ public class OrcaFareService extends DefaultFareService {
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
         SOUND_TRANSIT_SOUNDER,
+        SOUND_TRANSIT_T_LINK,
         KC_METRO,
         PIERCE_COUNTY_TRANSIT,
         SEATTLE_STREET_CAR,
