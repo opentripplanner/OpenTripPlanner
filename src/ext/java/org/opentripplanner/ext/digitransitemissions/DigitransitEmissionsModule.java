@@ -95,7 +95,7 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
       String routeId = reader.get("route_id");
       Double avgCo2PerVehiclePerMeter =
         Double.parseDouble(reader.get("avg_co2_per_vehicle_per_km")) / 1000;
-      int avgPassengerCount = Integer.parseInt(reader.get("avg_passenger_count"));
+      Double avgPassengerCount = Double.parseDouble(reader.get("avg_passenger_count"));
       this.emissionsData.put(
           new FeedScopedId(feedId, routeId),
           DigitransitEmissions.newDigitransitEmissions(avgCo2PerVehiclePerMeter, avgPassengerCount)

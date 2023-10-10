@@ -4,7 +4,7 @@ import java.util.Objects;
 
 public record DigitransitEmissions(
   double avgCo2PerVehiclePerMeter,
-  int avgPassengerCount,
+  double avgPassengerCount,
   double emissionsPerPassengerPerMeter
 ) {
   public DigitransitEmissions {
@@ -15,7 +15,7 @@ public record DigitransitEmissions(
 
   public static DigitransitEmissions newDigitransitEmissions(
     double avgCo2PerVehiclePerMeter,
-    int avgPassengerCount
+    double avgPassengerCount
   ) {
     return new DigitransitEmissions(
       avgCo2PerVehiclePerMeter,
@@ -26,7 +26,7 @@ public record DigitransitEmissions(
 
   private static double calculateEmissionsPerPassengerPerMeter(
     double avgCo2PerVehiclePerMeter,
-    int avgPassengerCount
+    double avgPassengerCount
   ) {
     if (avgPassengerCount <= 1) {
       return avgCo2PerVehiclePerMeter;
