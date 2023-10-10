@@ -2,27 +2,38 @@ package org.opentripplanner.ext.stopconsolidation;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import java.io.Serializable;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
+import javax.annotation.Nonnull;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationParser.StopGroup;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Singleton
-public class StopConsolidationModel {
+public class StopConsolidationModel implements Serializable {
 
-  private static final IdPair TO_REPLACE = new IdPair(
-    FeedScopedId.parse("kcm:280"),
-    FeedScopedId.parse("commtrans:1079")
-  );
+  private static final Logger LOG = LoggerFactory.getLogger(StopConsolidationModel.class);
   private final TransitModel transitModel;
+  private final List<StopGroup> groups;
+
+  // lazily initialized because the stop model is not loaded at construction time
+  private List<StopReplacement> replacements;
 
   @Inject
   public StopConsolidationModel(TransitModel transitModel) {
-    this.transitModel = transitModel;
+    try {
+      groups = StopConsolidationParser.parseGroups();
+
+      LOG.info("Parsed {} consolidated stop groups", groups.size());
+    } finally {
+      this.transitModel = transitModel;
+    }
   }
 
   public List<FeedScopedId> stopIdsToReplace() {
@@ -30,33 +41,45 @@ public class StopConsolidationModel {
   }
 
   public List<StopReplacement> replacements() {
-    return Stream
-      .of(TO_REPLACE)
-      .map(r -> {
-        var primaryStop = transitModel.getStopModel().getRegularStop(r.primary());
-        Objects.requireNonNull(primaryStop, "No stop with id %s".formatted(r.secondary()));
-        return new StopReplacement(primaryStop, r.secondary());
-      })
-      .toList();
+    return lazilyGetReplacements();
   }
 
-  public boolean isConsolidatedStop(StopLocation stop) {
-    return TO_REPLACE.secondary.equals(stop.getId());
-  }
+  @Nonnull
+  private synchronized List<StopReplacement> lazilyGetReplacements() {
+    if (replacements == null) {
 
-  public I18NString agencySpecificName(Agency agency, StopLocation stop) {
-    if (TO_REPLACE.secondary().equals(stop.getId())) {
-      return I18NString.of("CONSOLIDATED STOP for agency %s".formatted(agency.getName()));
-    } else {
-      return stop.getName();
+      replacements = groups
+        .stream()
+        .flatMap(group -> {
+          var primaryStop = transitModel.getStopModel().getRegularStop(group.primary());
+          if (primaryStop == null) {
+            LOG.error("Could not find primary stop with id {}. Ignoring stop group {}.", group.primary(), group);
+            return Stream.empty();
+          } else {
+            return group.secondaries().stream().map(r -> new StopReplacement(primaryStop, r));
+          }
+        })
+        .toList();
     }
+    return replacements;
   }
 
-  public record IdPair(FeedScopedId primary, FeedScopedId secondary) {
-    public IdPair {
-      Objects.requireNonNull(primary);
-      Objects.requireNonNull(secondary);
-    }
+  public boolean isSecondaryStop(StopLocation stop) {
+    return groups.stream().anyMatch(r -> r.secondaries().contains(stop.getId()));
+  }
+
+  private Optional<I18NString> primaryName(FeedScopedId secondary) {
+    return groups
+      .stream()
+      .filter(r -> r.secondaries().contains(secondary))
+      .findAny()
+      .map(StopGroup::primary)
+      .map(p -> transitModel.getStopModel().getStopLocation(p))
+      .map(StopLocation::getName);
+  }
+
+  public I18NString agencySpecificName(StopLocation stop) {
+    return primaryName(stop.getId()).orElse(stop.getName());
   }
 
   public record StopReplacement(StopLocation primary, FeedScopedId child) {}

@@ -23,14 +23,15 @@ public class StopConsolidationModule implements GraphBuilderModule {
   @Override
   public void buildGraph() {
     var stopsToReplace = model.stopIdsToReplace();
+    var replacements = model.replacements();
 
     transitModel
       .getAllTripPatterns()
       .stream()
       .filter(pattern -> pattern.containsAnyStopId(stopsToReplace))
       .forEach(pattern -> {
-        LOG.debug("Replacing stop(s) in pattern {}", pattern);
-        var modifiedPattern = modifyStopsInPattern(pattern, model.replacements());
+        LOG.info("Replacing stop(s) in pattern {}", pattern);
+        var modifiedPattern = modifyStopsInPattern(pattern, replacements);
         transitModel.addTripPattern(modifiedPattern.getId(), modifiedPattern);
       });
   }

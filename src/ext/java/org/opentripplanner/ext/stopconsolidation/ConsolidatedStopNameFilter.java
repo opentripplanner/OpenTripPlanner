@@ -25,8 +25,8 @@ public class ConsolidatedStopNameFilter implements ItineraryListFilter {
 
         return new ConsolidatedStopLeg(
           stl,
-          model.agencySpecificName(agency, stl.getFrom().stop),
-          model.agencySpecificName(agency, stl.getTo().stop)
+          model.agencySpecificName(stl.getFrom().stop),
+          model.agencySpecificName(stl.getTo().stop)
         );
       } else {
         return leg;
@@ -36,7 +36,7 @@ public class ConsolidatedStopNameFilter implements ItineraryListFilter {
 
   private boolean needsToRenameStops(ScheduledTransitLeg stl) {
     return (
-      model.isConsolidatedStop(stl.getFrom().stop) || model.isConsolidatedStop(stl.getTo().stop)
+      model.isSecondaryStop(stl.getFrom().stop) || model.isSecondaryStop(stl.getTo().stop)
     );
   }
 }
