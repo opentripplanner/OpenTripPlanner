@@ -2,9 +2,8 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.TimeUtils.time;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.txConstrained;
+import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.tx;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.tx;
 
 import java.util.Collection;
 import java.util.List;
@@ -113,7 +112,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       .times("10:12 10:22 10:50")
       .build();
 
-    var transfers = dummyTransferGenerator(List.of(tx(trip1, STOP_C, D30s, STOP_F, trip2)));
+    var transfers = dummyTransferGenerator(
+      List.of(tx(trip1, STOP_C, trip2, STOP_F).walk(D30s).build())
+    );
 
     // Path:  Access ~ B ~ T1 ~ C ~ Walk 30s ~ D ~ T2 ~ E ~ Egress
     var original = pathBuilder()
@@ -169,11 +170,11 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     var transfers = dummyTransferGenerator(
       List.of(
-        tx(trip1, STOP_B, trip2),
-        tx(trip1, STOP_B, D30s, STOP_C, trip2),
-        tx(trip1, STOP_D, trip2)
+        tx(trip1, STOP_B, trip2).build(),
+        tx(trip1, STOP_B, trip2, STOP_C).walk(D30s).build(),
+        tx(trip1, STOP_D, trip2).build()
       ),
-      List.of(tx(trip2, STOP_D, D30s, STOP_E, trip3), tx(trip2, STOP_F, trip3))
+      List.of(tx(trip2, STOP_D, trip3, STOP_E).walk(D30s).build(), tx(trip2, STOP_F, trip3).build())
     );
 
     var original = pathBuilder()
@@ -244,8 +245,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     var transfers = dummyTransferGenerator(
       List.of(
-        tx(trip1, STOP_B, trip2),
-        tx(txConstrained(trip1, STOP_C, trip2, STOP_C).guaranteed())
+        tx(trip1, STOP_B, trip2).build(),
+        tx(trip1, STOP_C, trip2, STOP_C).guaranteed().build()
       )
     );
 
