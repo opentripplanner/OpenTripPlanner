@@ -1,0 +1,10 @@
+{
+    vehicleRentalStation(id:"F:abc") {
+        stationId
+        name
+        lat
+        lon
+        spacesAvailable
+        vehiclesAvailable
+    }
+}

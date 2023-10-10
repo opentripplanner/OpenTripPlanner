@@ -70,6 +70,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -216,13 +217,16 @@ class GraphQLIntegrationTest {
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);
 
+    var rentalService = new DefaultVehicleRentalService();
+    rentalService.addVehicleRentalStation(vehicleRentalStation("abc"));
+
     context =
       new GraphQLRequestContext(
         new TestRoutingService(List.of(i1)),
         transitService,
         new DefaultFareService(),
         graph.getVehicleParkingService(),
-        new DefaultVehicleRentalService(),
+        rentalService,
         new DefaultVehiclePositionService(),
         GraphFinder.getInstance(graph, transitService::findRegularStop),
         new RouteRequest()
@@ -302,6 +306,18 @@ class GraphQLIntegrationTest {
       new RiderCategory(id("senior-citizens"), "Senior citizens", null),
       new FareMedium(id("oyster"), "TfL Oyster Card")
     );
+  }
+
+  @Nonnull
+  private static VehicleRentalStation vehicleRentalStation(String name) {
+    var station = new VehicleRentalStation();
+    station.id = id(name);
+    station.name = I18NString.of(name);
+    station.longitude = 10;
+    station.latitude = 20;
+    station.vehiclesAvailable = 3;
+    station.spacesAvailable = 2;
+    return station;
   }
 
   /**

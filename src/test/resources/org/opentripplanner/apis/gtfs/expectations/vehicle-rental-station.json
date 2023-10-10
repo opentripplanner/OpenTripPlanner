@@ -1,0 +1,12 @@
+{
+  "data" : {
+    "vehicleRentalStation" : {
+      "stationId": "F:abc",
+      "name" : "abc",
+      "lat" : 20.0,
+      "lon" : 10.0,
+      "spacesAvailable" : 2,
+      "vehiclesAvailable" : 3
+    }
+  }
+}
