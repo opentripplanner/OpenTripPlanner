@@ -87,6 +87,8 @@ public interface TransitTuningParameters {
    * way timetable data are collected before a Raptor trip search, using a search window larger than
    * 24 hours may lead to inconsistent search results. Limiting the search window prevents also
    * potential performance issues. The recommended maximum value is 24 hours.
+   * This parameter does not restrict the maximum duration of a dynamic search window (use
+   * the parameter transit.dynamicSearchWindow.maxWindow to specify such a restriction).
    */
   Duration maxSearchWindow();
 
