@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -140,16 +141,24 @@ public class DefaultFareService implements FareService {
           components.addAll(currentFare.getComponents(fareType));
           fare.addFare(fareType, currentFare.getFare(fareType));
 
-          currentFare.getLegProducts().entries().forEach(entry ->{
-            fare.addFareProduct(entry.getKey(), entry.getValue().product());
-          });
+          currentFare
+            .getLegProducts()
+            .entries()
+            .forEach(entry -> fare.addFareProduct(entry.getKey(), entry.getValue().product()));
 
           fares.add(currentFare.getFare(fareType));
 
-
           // If all the legs are from one feed, consider itinerary products
           if (fareLegs.equals(fareLegsByFeed.get(feedId))) {
-            fare.addItineraryProducts(currentFare.getItineraryProducts());
+            currentFare
+              .getFareTypes()
+              .forEach(type -> {
+                var money = currentFare.getFare(type);
+                var fareProduct = FareProduct
+                  .of(new FeedScopedId(feedId, type.name()), type.name(), money)
+                  .build();
+                fare.addItineraryProducts(List.of(fareProduct));
+              });
           }
         } else {
           legWithoutRulesFound = true;
@@ -184,6 +193,9 @@ public class DefaultFareService implements FareService {
     return hasFare ? fare : null;
   }
 
+  /**
+   * For a given fareType and feedId return the applicable fare rule sets.
+   */
   @Nullable
   protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
     var fareRulesByTypeAndFeed = fareRulesPerType

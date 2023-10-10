@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_A_STOP;
@@ -25,6 +26,9 @@ import org.opentripplanner.transit.model.basic.Money;
 
 class DefaultFareServiceTest implements PlanTestConstants {
 
+  private static final Money TEN_DOLLARS = Money.usDollars(10);
+  private static final Money TWENTY_DOLLARS = Money.usDollars(20);
+
   @Test
   void noRules() {
     var service = new DefaultFareService();
@@ -46,7 +50,19 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var price = fare.getFare(FareType.regular);
 
-    assertEquals(Money.usDollars(10), price);
+    assertEquals(TEN_DOLLARS, price);
+
+    var fp = fare.getItineraryProducts().get(0);
+    assertEquals(TEN_DOLLARS, fp.price());
+    assertEquals("F:regular", fp.id().toString());
+
+    var lp = fare.legProductsFromComponents();
+    assertEquals(1, lp.size());
+    var product = lp.values().iterator().next().product();
+    assertEquals(TEN_DOLLARS, product.price());
+
+    // the leg products from the components and the "true" leg products are different collections
+    assertTrue(fare.getLegProducts().isEmpty());
   }
 
   @Test
@@ -73,7 +89,23 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var price = fare.getFare(FareType.regular);
 
-    assertEquals(Money.usDollars(20), price);
+    assertEquals(TWENTY_DOLLARS, price);
+
+    assertTrue(fare.getLegProducts().isEmpty());
+
+    var legProductsFromComponents = fare.legProductsFromComponents();
+
+    var firstLeg = itin.getLegs().get(0);
+    var products = List.copyOf(legProductsFromComponents.get(firstLeg));
+
+    assertEquals(TEN_DOLLARS, products.get(0).product().price());
+
+    var secondLeg = itin.getLegs().get(1);
+    products = List.copyOf(legProductsFromComponents.get(secondLeg));
+    assertEquals(TEN_DOLLARS, products.get(0).product().price());
+
+    assertEquals(1, fare.getItineraryProducts().size());
+    assertEquals(TWENTY_DOLLARS, fare.getItineraryProducts().get(0).price());
   }
 
   @Test
@@ -97,10 +129,13 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var component = components.get(0);
     assertEquals(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), component.fareId());
-    assertEquals(Money.usDollars(10), component.price());
+    assertEquals(TEN_DOLLARS, component.price());
 
     var firstBusLeg = itin.firstTransitLeg().get();
     assertEquals(List.of(firstBusLeg), component.legs());
+
+    var legProductsFromComponent = fare.legProductsFromComponents();
+    assertEquals(1, legProductsFromComponent.size());
   }
 
   @Test
@@ -127,7 +162,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       resultComponents
     );
 
-    assertEquals(Money.usDollars(20), resultPrice);
+    assertEquals(TWENTY_DOLLARS, resultPrice);
   }
 
   @Test
@@ -155,7 +190,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       resultComponents
     );
 
-    assertEquals(Money.usDollars(20), resultPrice);
+    assertEquals(TWENTY_DOLLARS, resultPrice);
   }
 
   @Test

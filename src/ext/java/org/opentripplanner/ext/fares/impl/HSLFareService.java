@@ -3,9 +3,7 @@ package org.opentripplanner.ext.fares.impl;
 import com.google.common.collect.Sets;
 import java.time.Duration;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Currency;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -14,11 +12,8 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.fares.model.RouteOriginDestination;
-import org.opentripplanner.model.fare.ItineraryFares;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.slf4j.Logger;
@@ -28,9 +23,9 @@ import org.slf4j.LoggerFactory;
  * This fare service module handles single feed HSL ticket pricing logic.
  */
 
-public class HSLFareServiceImpl extends DefaultFareService {
+public class HSLFareService extends DefaultFareService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HSLFareService.class);
   // this is not Float.MAX_VALUE to avoid overflow which would then make debugging harder
   public static final Money MAX_PRICE = Money.euros(999999f);
 
