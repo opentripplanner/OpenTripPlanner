@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan.legreference;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -16,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A reference which can be used to rebuild an exact copy of a {@link ScheduledTransitLeg} using the
- * {@Link RoutingService}
+ * {@link org.opentripplanner.routing.api.RoutingService}
  */
 public record ScheduledTransitLegReference(
   FeedScopedId tripId,
@@ -36,6 +37,7 @@ public record ScheduledTransitLegReference(
    * In this case the method returns null.
    */
   @Override
+  @Nullable
   public ScheduledTransitLeg getLeg(TransitService transitService) {
     Trip trip = transitService.getTripForId(tripId);
     if (trip == null) {

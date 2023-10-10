@@ -29,7 +29,7 @@ class ScheduledTransitLegReferenceTest {
 
   private static final int SERVICE_CODE = 555;
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 1, 1);
-  public static final int NUMBER_OF_STOPS = 3;
+  private static final int NUMBER_OF_STOPS = 3;
   private static TransitService transitService;
   private static FeedScopedId tripId;
 
