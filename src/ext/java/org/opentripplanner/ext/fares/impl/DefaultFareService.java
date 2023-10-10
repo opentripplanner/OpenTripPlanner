@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
+import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -107,34 +108,20 @@ public class DefaultFareService implements FareService {
     var fareLegsByFeed = fareLegs
       .stream()
       .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
-    var fareRulesByTypeAndFeed = fareRulesPerType
-      .entrySet()
-      .stream()
-      .collect(
-        Collectors.toMap(
-          Map.Entry::getKey,
-          rules ->
-            rules
-              .getValue()
-              .stream()
-              .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
-        )
-      );
 
     ItineraryFares fare = ItineraryFares.empty();
     boolean hasFare = false;
     for (FareType fareType : fareRulesPerType.keySet()) {
       List<FareComponent> components = new ArrayList<>();
       List<Money> fares = new ArrayList<>();
-      ItineraryFares currentFare = ItineraryFares.empty();
       boolean legWithoutRulesFound = false;
       boolean legsWithoutMatchingRulesFound = false;
-      boolean fareTypeHasFare = false;
       for (String feedId : fareLegsByFeed.keySet()) {
-        var fareRules = fareRulesByTypeAndFeed.get(fareType).get(feedId);
+        ItineraryFares currentFare = ItineraryFares.empty();
+        var fareRules = fareRulesForFeed(fareType, feedId);
 
         // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
-        if (fareRules != null && fareRules.size() > 0) {
+        if (fareRules != null && !fareRules.isEmpty()) {
           Currency currency = Currency.getInstance(
             fareRules.iterator().next().getFareAttribute().getCurrencyType()
           );
@@ -153,11 +140,25 @@ public class DefaultFareService implements FareService {
 
           components.addAll(currentFare.getComponents(fareType));
           fare.addFare(fareType, currentFare.getFare(fareType));
+
+          currentFare
+            .getLegProducts()
+            .entries()
+            .forEach(entry -> fare.addFareProduct(entry.getKey(), entry.getValue().product()));
+
           fares.add(currentFare.getFare(fareType));
 
           // If all the legs are from one feed, consider itinerary products
           if (fareLegs.equals(fareLegsByFeed.get(feedId))) {
-            fare.addItineraryProducts(currentFare.getItineraryProducts());
+            currentFare
+              .getFareTypes()
+              .forEach(type -> {
+                var money = currentFare.getFare(type);
+                var fareProduct = FareProduct
+                  .of(new FeedScopedId(feedId, type.name()), type.name(), money)
+                  .build();
+                fare.addItineraryProducts(List.of(fareProduct));
+              });
           }
         } else {
           legWithoutRulesFound = true;
@@ -190,6 +191,27 @@ public class DefaultFareService implements FareService {
       }
     }
     return hasFare ? fare : null;
+  }
+
+  /**
+   * For a given fareType and feedId return the applicable fare rule sets.
+   */
+  @Nullable
+  protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
+    var fareRulesByTypeAndFeed = fareRulesPerType
+      .entrySet()
+      .stream()
+      .collect(
+        Collectors.toMap(
+          Map.Entry::getKey,
+          rules ->
+            rules
+              .getValue()
+              .stream()
+              .collect(Collectors.groupingBy(rule -> rule.getFareAttribute().getId().getFeedId()))
+        )
+      );
+    return fareRulesByTypeAndFeed.get(fareType).get(feedId);
   }
 
   /**

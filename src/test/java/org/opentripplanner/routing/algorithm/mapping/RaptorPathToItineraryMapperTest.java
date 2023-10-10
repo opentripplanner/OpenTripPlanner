@@ -8,9 +8,12 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.HashMap;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
@@ -20,12 +23,28 @@ import org.opentripplanner.raptor._data.transit.TestRoute;
 import org.opentripplanner.raptor._data.transit.TestTransitData;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.path.AccessPathLeg;
+import org.opentripplanner.raptor.api.path.EgressPathLeg;
+import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
+import org.opentripplanner.raptor.api.path.TransferPathLeg;
+import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultRaptorTransfer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.Transfer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.street.search.state.TestStateBuilder;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -34,6 +53,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class RaptorPathToItineraryMapperTest {
@@ -56,6 +76,10 @@ public class RaptorPathToItineraryMapperTest {
     TRANSIT_RELUCTANCE,
     STOP_COSTS
   );
+
+  private static final RegularStop S1 = TransitModelForTest.stopForTest("STOP1", 0.0, 0.0);
+
+  private static final RegularStop S2 = TransitModelForTest.stopForTest("STOP2", 1.0, 1.0);
 
   @ParameterizedTest
   @ValueSource(strings = { "0", "3000", "-3000" })
@@ -82,8 +106,41 @@ public class RaptorPathToItineraryMapperTest {
     );
   }
 
+  /**
+   * Create a minimalist path FlexAccess-->Transfer-->Egress (without transit) and check that the 3 legs
+   * are properly mapped in the itinerary.
+   */
+  @Test
+  public void createItineraryWithOnBoardFlexAccess() {
+    RaptorPathToItineraryMapper<TestTripSchedule> mapper = getRaptorPathToItineraryMapper();
+
+    State state = TestStateBuilder.ofWalking().streetEdge().streetEdge().build();
+    FlexAccessEgress flexAccessEgress = new FlexAccessEgress(S1, null, 0, 1, null, state, true);
+    RaptorAccessEgress access = new FlexAccessEgressAdapter(flexAccessEgress, false);
+    Transfer transfer = new Transfer(S2.getIndex(), 0);
+    RaptorTransfer raptorTransfer = new DefaultRaptorTransfer(S1.getIndex(), 0, 0, transfer);
+    RaptorAccessEgress egress = new DefaultAccessEgress(S2.getIndex(), state);
+    PathLeg<RaptorTripSchedule> egressLeg = new EgressPathLeg<>(egress, 0, 0, 0);
+    PathLeg<RaptorTripSchedule> transferLeg = new TransferPathLeg<>(
+      S1.getIndex(),
+      0,
+      0,
+      0,
+      raptorTransfer,
+      egressLeg
+    );
+    AccessPathLeg<TestTripSchedule> accessLeg = new AccessPathLeg(access, 0, 0, 0, transferLeg);
+    RaptorPath<TestTripSchedule> path = new Path<>(0, accessLeg, 0);
+    // Act
+    var itinerary = mapper.createItinerary(path);
+
+    // Assert
+    assertNotNull(itinerary);
+    assertEquals(3, itinerary.getLegs().size(), "The wrong number of legs was returned");
+  }
+
   private TripPattern getOriginalPattern(TestTripPattern pattern) {
-    ArrayList<StopTime> stopTimes = new ArrayList<StopTime>();
+    ArrayList<StopTime> stopTimes = new ArrayList<>();
 
     for (int i = 0; i < pattern.numberOfStopsInPattern(); i++) {
       var stop = RegularStop
@@ -114,12 +171,28 @@ public class RaptorPathToItineraryMapperTest {
       .of(2022, Month.OCTOBER, 10, 12, 0, 0)
       .atZone(ZoneIds.STOCKHOLM)
       .toInstant();
-    return new RaptorPathToItineraryMapper<TestTripSchedule>(
+    TransitModel transitModel = new TransitModel();
+    transitModel.initTimeZone(ZoneIds.CET);
+    return new RaptorPathToItineraryMapper<>(
       new Graph(),
-      new DefaultTransitService(new TransitModel()),
-      null,
+      new DefaultTransitService(transitModel),
+      getTransitLayer(),
       dateTime.atZone(ZoneIds.CET),
       new RouteRequest()
+    );
+  }
+
+  private static TransitLayer getTransitLayer() {
+    return new TransitLayer(
+      new HashMap<>(),
+      null,
+      null,
+      StopModel.of().withRegularStop(S1).withRegularStop(S2).build(),
+      null,
+      null,
+      null,
+      null,
+      null
     );
   }
 

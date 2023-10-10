@@ -201,4 +201,4 @@ You can run the OTP .jar file with the `--help` option for a full list of comman
 
 ## Exploring the API
 
-If you want to learn how to use OTP's API's, check out the [GraphQL tutorial](GraphQL-Tutorial.md).
+If you want to learn how to use OTP's API's, check out the [GraphQL tutorial](apis/GraphQL-Tutorial.md).

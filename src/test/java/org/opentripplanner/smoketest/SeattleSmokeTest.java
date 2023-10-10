@@ -32,10 +32,12 @@ public class SeattleSmokeTest {
   @Test
   public void acrossTheCity() {
     var modes = Set.of(TRANSIT, WALK);
-    SmokeTest.basicRouteTest(
+    var plan = SmokeTest.basicRouteTest(
       new SmokeTestRequest(sodo, clydeHill, modes),
       List.of("WALK", "BUS", "WALK", "BUS", "WALK")
     );
+
+    SmokeTest.assertThatAllTransitLegsHaveFareProducts(plan);
   }
 
   @Test

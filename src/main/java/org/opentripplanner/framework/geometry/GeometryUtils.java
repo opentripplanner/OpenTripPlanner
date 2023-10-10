@@ -249,7 +249,7 @@ public class GeometryUtils {
       int i = 0;
       for (List<LngLatAlt> geoJsonPath : geoJsonMultiLineString.getCoordinates()) {
         org.geojson.LineString geoJsonLineString = new org.geojson.LineString(
-          geoJsonPath.toArray(new LngLatAlt[geoJsonPath.size()])
+          geoJsonPath.toArray(new LngLatAlt[0])
         );
         jtsLineStrings[i++] = (LineString) convertGeoJsonToJtsGeometry(geoJsonLineString);
       }

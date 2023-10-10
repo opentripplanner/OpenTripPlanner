@@ -32,7 +32,9 @@ class BitSetPassThroughPointsServiceTest {
   private static final int STOP_31 = 6;
 
   private static final PassThroughPointsService SUBJECT = BitSetPassThroughPointsService.of(
-    new PassThroughPoints(List.of(new PassThroughPoint(STOPS_1), new PassThroughPoint(STOPS_2)))
+    new PassThroughPoints(
+      List.of(new PassThroughPoint(STOPS_1, "PT1"), new PassThroughPoint(STOPS_2, "PT2"))
+    )
   );
   /**
    * We expect the c2 value at the destination to be the same as the number of pass-through
