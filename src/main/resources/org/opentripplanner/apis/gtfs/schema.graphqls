@@ -1467,7 +1467,7 @@ type Itinerary {
     """How far the user has to walk, in meters."""
     walkDistance: Float
 
-    """CO2 emissions of the trip on this itinerary, in grams per person."""
+    """CO₂ emissions of the trip on this itinerary, in grams per person."""
     emissions: Float
     
     """

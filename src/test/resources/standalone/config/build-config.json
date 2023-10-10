@@ -75,7 +75,7 @@
     }
   ],
   "digitransitEmissions": {
-    "carAvgCo2": 170,
+    "carAvgCo2PerKm": 170,
     "carAvgOccupancy": 1.3
   }
 }

@@ -1,4 +1,4 @@
-# Digitransit CO2 Emissions calculation
+# Digitransit CO₂ Emissions calculation
 
 ## Contact Info
 
@@ -6,7 +6,7 @@
 
 ## Documentation
 
-Graph build import of CO2 Emissions from GTFS data sets (through custom emissions.txt extension)
+Graph build import of CO₂ Emissions from GTFS data sets (through custom emissions.txt extension)
 and the ability to attach them to itineraries by Digitransit team.
 The emissions are represented in grams per kilometer (g/Km) unit.
 
@@ -23,6 +23,7 @@ For example:
 route_id,avg_co2_per_vehicle_per_km,avg_passenger_count
 1234,123,20
 2345,0,0
+3456,12.3,20.0
 ```
 
 Emissions data is loaded from the gtfs package and embedded into the graph during the build process.

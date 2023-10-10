@@ -590,7 +590,7 @@ public class Itinerary {
   }
 
   /**
-   * The co2 emissions of this itinerary.
+   * The CO₂ emissions of this itinerary.
    */
   public void setEmissions(Double emissions) {
     this.emissions = emissions;

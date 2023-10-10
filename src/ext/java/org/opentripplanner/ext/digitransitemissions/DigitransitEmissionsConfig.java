@@ -16,7 +16,7 @@ public class DigitransitEmissionsConfig {
       .summary("Digitransit emissions configuration.")
       .description(
         """
-        By specifying a URL to fetch emissions data, the program gains access to carbon dioxide (CO2)
+        By specifying a URL to fetch emissions data, the program gains access to carbon dioxide (CO₂)
         emissions associated with transportation modes. This data is then used
         to perform emission calculations for public transport modes and car travel.
         """
@@ -26,7 +26,7 @@ public class DigitransitEmissionsConfig {
     this.carAvgCo2PerKm =
       c
         .of("carAvgCo2PerKm")
-        .summary("The average CO2 emissions of a car in grams per kilometer.")
+        .summary("The average CO₂ emissions of a car in grams per kilometer.")
         .asInt(170);
 
     this.carAvgOccupancy =
