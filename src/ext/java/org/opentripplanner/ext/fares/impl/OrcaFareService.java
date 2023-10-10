@@ -489,7 +489,7 @@ public class OrcaFareService extends DefaultFareService {
         // The start of a free transfer must be with a transit agency that permits it!
         freeTransferStartTime = leg.getStartTime();
       }
-      Optional<Money> singleLegPrice = getRidePrice(leg, fareType, fareRules);
+      Optional<Money> singleLegPrice = getRidePrice(leg, FareType.regular, fareRules);
       Optional<Money> optionalLegFare = singleLegPrice.flatMap(slp ->
         getLegFare(fareType, rideType, slp, leg)
       );
