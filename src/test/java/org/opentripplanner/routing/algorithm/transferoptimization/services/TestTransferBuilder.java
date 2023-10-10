@@ -1,11 +1,16 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
+import java.util.Objects;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferConstraint;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.model.transfer.TripTransferPoint;
+import org.opentripplanner.raptor._data.transit.TestTransfer;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TripStopTime;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.timetable.Trip;
 
@@ -16,17 +21,37 @@ import org.opentripplanner.transit.model.timetable.Trip;
 @SuppressWarnings("UnusedReturnValue")
 public class TestTransferBuilder<T extends RaptorTripSchedule> {
 
-  private final T fromTrip;
-  private final int fromStopIndex;
-  private final T toTrip;
-  private final int toStopIndex;
-  private final TransferConstraint.Builder constraint = TransferConstraint.of();
+  private T fromTrip;
+  private int fromStopIndex = RaptorConstants.NOT_SET;
+  private T toTrip;
+  private int toStopIndex = RaptorConstants.NOT_SET;
 
-  private TestTransferBuilder(T fromTrip, int fromStopIndex, T toTrip, int toStopIndex) {
-    this.fromTrip = fromTrip;
-    this.fromStopIndex = fromStopIndex;
-    this.toTrip = toTrip;
-    this.toStopIndex = toStopIndex;
+  // We set the default walk time to zero - it is not relevant for many tests and zero is easy
+  private int walkDurationSec = 0;
+  private TransferConstraint.Builder constraint = null;
+
+  public static <T extends RaptorTripSchedule> TestTransferBuilder<T> tx(T fromTrip, T toTrip) {
+    return new TestTransferBuilder<T>().fromTrip(fromTrip).toTrip(toTrip);
+  }
+
+  /**
+   * Set all required parameter for a transfer. The walk duration is set to zero.
+   */
+  public static <T extends RaptorTripSchedule> TestTransferBuilder<T> tx(
+    T fromTrip,
+    int fromStopIndex,
+    T toTrip,
+    int toStopIndex
+  ) {
+    return tx(fromTrip, toTrip).fromStopIndex(fromStopIndex).toStopIndex(toStopIndex);
+  }
+
+  public static <T extends RaptorTripSchedule> TestTransferBuilder<T> tx(
+    T fromTrip,
+    int sameStopIndex,
+    T toTrip
+  ) {
+    return tx(fromTrip, sameStopIndex, toTrip, sameStopIndex);
   }
 
   public static <T extends RaptorTripSchedule> TestTransferBuilder<T> txConstrained(
@@ -35,53 +60,109 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
     T toTrip,
     int toStopIndex
   ) {
-    return new TestTransferBuilder<>(fromTrip, fromStopIndex, toTrip, toStopIndex);
+    var builder = tx(fromTrip, fromStopIndex, toTrip, toStopIndex);
+    // Make sure the constraint is initialized; hence an object generated in the build step.
+    // If none of the constraints are set this still generates a constraint instance, witch
+    // should behave like a regular transfer, but is not the same structure.
+    builder.constraint();
+    return builder;
   }
 
-  public T getFromTrip() {
+  public T fromTrip() {
     return fromTrip;
   }
 
-  public int getFromStopIndex() {
+  public TestTransferBuilder<T> fromTrip(T fromTrip) {
+    this.fromTrip = fromTrip;
+    return this;
+  }
+
+  public int fromStopIndex() {
     return fromStopIndex;
   }
 
-  public T getToTrip() {
+  public TestTransferBuilder<T> fromStopIndex(int fromStopIndex) {
+    this.fromStopIndex = fromStopIndex;
+    return this;
+  }
+
+  public T toTrip() {
     return toTrip;
   }
 
-  public int getToStopIndex() {
+  public TestTransferBuilder<T> toTrip(T toTrip) {
+    this.toTrip = toTrip;
+    return this;
+  }
+
+  public int toStopIndex() {
     return toStopIndex;
   }
 
+  public TestTransferBuilder<T> toStopIndex(int toStopIndex) {
+    this.toStopIndex = toStopIndex;
+    return this;
+  }
+
+  /**
+   * Walk duration in seconds
+   */
+  public int walk() {
+    return walkDurationSec;
+  }
+
+  public TestTransferBuilder<T> walk(int walkDurationSec) {
+    this.walkDurationSec = walkDurationSec;
+    return this;
+  }
+
   public TestTransferBuilder<T> staySeated() {
-    this.constraint.staySeated();
+    this.constraint().staySeated();
     return this;
   }
 
   public TestTransferBuilder<T> guaranteed() {
-    this.constraint.guaranteed();
+    this.constraint().guaranteed();
     return this;
   }
 
   public TestTransferBuilder<T> maxWaitTime(int maxWaitTime) {
-    this.constraint.maxWaitTime(maxWaitTime);
+    this.constraint().maxWaitTime(maxWaitTime);
     return this;
   }
 
   public TestTransferBuilder<T> priority(TransferPriority priority) {
-    this.constraint.priority(priority);
+    this.constraint().priority(priority);
     return this;
   }
 
-  public ConstrainedTransfer build() {
-    if (fromTrip == null) {
-      throw new NullPointerException();
-    }
-    if (toTrip == null) {
-      throw new NullPointerException();
-    }
+  public TripToTripTransfer<T> build() {
+    validateFromTo();
+    validateWalkDurationSec();
 
+    var pathTransfer = fromStopIndex == toStopIndex
+      ? null
+      : TestTransfer.transfer(toStopIndex, walkDurationSec);
+
+    return new TripToTripTransfer<>(
+      departure(fromTrip, fromStopIndex),
+      arrival(toTrip, toStopIndex),
+      pathTransfer,
+      buildConstrainedTransfer()
+    );
+  }
+
+  private static <T extends RaptorTripSchedule> Trip createDummyTrip(T trip) {
+    // Set an uniq id: pattern + the first stop departure time
+    return TransitModelForTest
+      .trip(trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0)))
+      .build();
+  }
+
+  private ConstrainedTransfer buildConstrainedTransfer() {
+    if (constraint == null) {
+      return null;
+    }
     int fromStopPos = fromTrip.pattern().findStopPositionAfter(0, fromStopIndex);
     int toStopPos = toTrip.pattern().findStopPositionAfter(0, toStopIndex);
 
@@ -93,10 +174,35 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
     );
   }
 
-  private static <T extends RaptorTripSchedule> Trip createDummyTrip(T trip) {
-    // Set a uniq id: pattern + the first stop departure time
-    return TransitModelForTest
-      .trip(trip.pattern().debugInfo() + ":" + TimeUtils.timeToStrCompact(trip.departure(0)))
-      .build();
+  private static <T extends RaptorTripSchedule> TripStopTime<T> departure(T trip, int stopIndex) {
+    return TripStopTime.departure(trip, trip.pattern().findStopPositionAfter(0, stopIndex));
+  }
+
+  private static <T extends RaptorTripSchedule> TripStopTime<T> arrival(T trip, int stopIndex) {
+    return TripStopTime.arrival(trip, trip.pattern().findStopPositionAfter(0, stopIndex));
+  }
+
+  private void validateFromTo() {
+    Objects.requireNonNull(fromTrip);
+    Objects.requireNonNull(toTrip);
+    if (fromStopIndex < 0) {
+      throw new IllegalStateException();
+    }
+    if (toStopIndex < 0) {
+      throw new IllegalStateException();
+    }
+  }
+
+  private void validateWalkDurationSec() {
+    if (walkDurationSec < 0) {
+      throw new IllegalStateException();
+    }
+  }
+
+  private TransferConstraint.Builder constraint() {
+    if (constraint == null) {
+      constraint = TransferConstraint.of();
+    }
+    return constraint;
   }
 }

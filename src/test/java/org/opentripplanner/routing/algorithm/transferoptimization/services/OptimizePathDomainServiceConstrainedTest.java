@@ -7,9 +7,7 @@ import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 import static org.opentripplanner.model.transfer.TransferPriority.NOT_ALLOWED;
 import static org.opentripplanner.model.transfer.TransferPriority.PREFERRED;
 import static org.opentripplanner.model.transfer.TransferPriority.RECOMMENDED;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.txConstrained;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.tx;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -65,15 +63,15 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
 
   TransferGenerator<TestTripSchedule> transfers = dummyTransferGenerator(
     List.of(
-      tx(txConstrained(trip1, STOP_B, trip2, STOP_C).priority(ALLOWED), D1m),
-      tx(txConstrained(trip1, STOP_C, trip2, STOP_D).priority(RECOMMENDED), D2m),
-      tx(txConstrained(trip1, STOP_D, trip2, STOP_E).priority(PREFERRED), D3m),
-      tx(txConstrained(trip1, STOP_E, trip2, STOP_F).guaranteed(), D4m),
-      tx(txConstrained(trip1, STOP_F, trip2, STOP_G).staySeated(), D5m),
-      tx(txConstrained(trip1, STOP_C, trip2, STOP_C).priority(NOT_ALLOWED)),
-      tx(txConstrained(trip1, STOP_D, trip2, STOP_D).priority(NOT_ALLOWED)),
-      tx(txConstrained(trip1, STOP_E, trip2, STOP_E).priority(NOT_ALLOWED)),
-      tx(txConstrained(trip1, STOP_F, trip2, STOP_F).priority(NOT_ALLOWED))
+      TestTransferBuilder.tx(trip1, STOP_B, trip2, STOP_C).priority(ALLOWED).walk(D1m).build(),
+      TestTransferBuilder.tx(trip1, STOP_C, trip2, STOP_D).priority(RECOMMENDED).walk(D2m).build(),
+      TestTransferBuilder.tx(trip1, STOP_D, trip2, STOP_E).priority(PREFERRED).walk(D3m).build(),
+      TestTransferBuilder.tx(trip1, STOP_E, trip2, STOP_F).guaranteed().walk(D4m).build(),
+      TestTransferBuilder.tx(trip1, STOP_F, trip2, STOP_G).staySeated().walk(D5m).build(),
+      TestTransferBuilder.tx(trip1, STOP_C, trip2, STOP_C).priority(NOT_ALLOWED).build(),
+      TestTransferBuilder.tx(trip1, STOP_D, trip2, STOP_D).priority(NOT_ALLOWED).build(),
+      TestTransferBuilder.tx(trip1, STOP_E, trip2, STOP_E).priority(NOT_ALLOWED).build(),
+      TestTransferBuilder.tx(trip1, STOP_F, trip2, STOP_F).priority(NOT_ALLOWED).build()
     )
   );
 
