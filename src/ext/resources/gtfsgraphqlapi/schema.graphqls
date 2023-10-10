@@ -3554,10 +3554,6 @@ input InputRentalPreferences {
     keepingVehicleAtDestinationCost: Cost
     allowedNetworks: [String!]
     bannedNetworks: [String!]
-    pickupTime: Duration
-    pickupCost: Cost
-    dropOffTime: Duration
-    dropOffCost: Cost
 }
 
 """
@@ -4244,8 +4240,6 @@ input InputTransitModePreferences {
 input InputTransitPreferences {
     """TODO should we reuse this or make a new design"""
     unpreferred: InputUnpreferred
-    """TODO should we reuse this or make a new design"""
-    banned: InputBanned
     board: InputBoardPreferences
     alight: InputAlightPreferences
     transfer: InputTransferPreferences
