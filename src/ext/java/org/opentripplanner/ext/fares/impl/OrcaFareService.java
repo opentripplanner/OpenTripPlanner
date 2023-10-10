@@ -269,7 +269,7 @@ public class OrcaFareService extends DefaultFareService {
         fareType,
         rideType,
         defaultFare,
-        leg.getRoute()
+        leg
       );
       case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
       default -> Optional.of(defaultFare);
@@ -299,7 +299,7 @@ public class OrcaFareService extends DefaultFareService {
         getWashingtonStateFerriesFare(route.getLongName(), fareType, defaultFare)
       );
       case SOUND_TRANSIT_LINK, SOUND_TRANSIT_SOUNDER -> Optional.of(
-        getSoundTransitFare(leg, fareType, defaultFare, rideType)
+        getSoundTransitFare(leg, defaultFare, rideType)
       );
       case SOUND_TRANSIT_BUS -> optionalUSD(3.25f);
       default -> Optional.of(defaultFare);
@@ -311,7 +311,6 @@ public class OrcaFareService extends DefaultFareService {
    */
   private Money getSoundTransitFare(
     Leg leg,
-    FareType fareType,
     Money defaultFare,
     RideType rideType
   ) {
@@ -329,7 +328,7 @@ public class OrcaFareService extends DefaultFareService {
       .ofNullable(fareModel.get(lookupKey))
       .orElseGet(() -> fareModel.get(reverseLookupKey));
 
-    return (fare != null) ? fare.get(fareType) : defaultFare;
+    return (fare != null) ? fare.get(FareType.regular) : defaultFare;
   }
 
   /**
@@ -367,8 +366,9 @@ public class OrcaFareService extends DefaultFareService {
     FareType fareType,
     RideType rideType,
     Money defaultFare,
-    Route route
+    Leg leg
   ) {
+    var route = leg.getRoute();
     return switch (rideType) {
       case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
       case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
@@ -391,7 +391,7 @@ public class OrcaFareService extends DefaultFareService {
         SEATTLE_STREET_CAR,
         KITSAP_TRANSIT -> fareType.equals(FareType.electronicSenior)
         ? optionalUSD(1f)
-        : Optional.of(defaultFare);
+        : getRegularFare(fareType, rideType, defaultFare, leg);
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> fareType.equals(FareType.electronicSenior)
         ? optionalUSD(5f)
         : optionalUSD(10f);
