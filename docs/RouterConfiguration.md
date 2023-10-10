@@ -218,7 +218,7 @@ using a search window larger than 24 hours may lead to inconsistent search resul
 Limiting the search window prevents also potential performance issues.
 The recommended maximum value is 24 hours.
 This parameter does not restrict the maximum duration of a dynamic search window (use
-the parameter transit.dynamicSearchWindow.maxWindow to specify such a restriction).
+the parameter `transit.dynamicSearchWindow.maxWindow` to specify such a restriction).
 
 
 <h3 id="transit_scheduledTripBinarySearchThreshold">scheduledTripBinarySearchThreshold</h3>
