@@ -42,6 +42,25 @@ class StopTimesHelperTest {
   }
 
   /**
+   * Case 0, requested number of departure = 0
+   */
+  @Test
+  void stopTimesForStop_zeroRequestedNumberOfDeparture() {
+    // Case 1, should find first departure for each pattern
+    var result = StopTimesHelper.stopTimesForStop(
+      transitService,
+      transitService.getRegularStop(stopId),
+      serviceDate.atStartOfDay(transitService.getTimeZone()).toInstant(),
+      Duration.ofHours(24),
+      0,
+      ArrivalDeparture.BOTH,
+      true
+    );
+
+    assertTrue(result.isEmpty());
+  }
+
+  /**
    * Case 1, should find first departure for each pattern when numberOfDepartures is one
    */
   @Test
