@@ -14,6 +14,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Apply correct traversal permissions to barrier vertex [#5369](https://github.com/opentripplanner/OpenTripPlanner/pull/5369)
 - Move GTFS GraphQL API out of the sandbox [#5339](https://github.com/opentripplanner/OpenTripPlanner/pull/5339)
 - Transmodel GraphQL API for pass-through searches [#5320](https://github.com/opentripplanner/OpenTripPlanner/pull/5320)
+- Fix check for OSM relation members not being present in the extract [#5379](https://github.com/opentripplanner/OpenTripPlanner/pull/5379)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
