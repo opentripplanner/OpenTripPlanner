@@ -265,12 +265,7 @@ public class OrcaFareService extends DefaultFareService {
     return switch (fareType) {
       case youth, electronicYouth -> Optional.of(getYouthFare());
       case electronicSpecial -> getLiftFare(rideType, defaultFare, leg.getRoute());
-      case electronicSenior, senior -> getSeniorFare(
-        fareType,
-        rideType,
-        defaultFare,
-        leg
-      );
+      case electronicSenior, senior -> getSeniorFare(fareType, rideType, defaultFare, leg);
       case regular, electronicRegular -> getRegularFare(fareType, rideType, defaultFare, leg);
       default -> Optional.of(defaultFare);
     };
@@ -309,11 +304,7 @@ public class OrcaFareService extends DefaultFareService {
   /**
    * Calculate the correct Link fare from a "ride" including start and end stations.
    */
-  private Money getSoundTransitFare(
-    Leg leg,
-    Money defaultFare,
-    RideType rideType
-  ) {
+  private Money getSoundTransitFare(Leg leg, Money defaultFare, RideType rideType) {
     String start = cleanStationName(leg.getFrom().name.toString());
     String end = cleanStationName(leg.getTo().name.toString());
     // Fares are the same no matter the order of the stations
@@ -372,10 +363,7 @@ public class OrcaFareService extends DefaultFareService {
     return switch (rideType) {
       case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
       case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
-      case EVERETT_TRANSIT,
-        SKAGIT_TRANSIT,
-        WHATCOM_LOCAL,
-        SKAGIT_LOCAL -> optionalUSD(0.5f);
+      case EVERETT_TRANSIT, SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> fareType.equals(FareType.electronicSenior) // Kitsap only provide discounted senior fare for orca.
         ? optionalUSD(1f)
         : optionalUSD(2f);
