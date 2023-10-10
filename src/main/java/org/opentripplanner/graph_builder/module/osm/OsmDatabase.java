@@ -1062,7 +1062,7 @@ public class OsmDatabase {
           }
         }
         case WAY -> {
-          if (member.hasRolePlatform() && areaWayIds.contains(member.getRef())) {
+          if (member.hasRolePlatform() && areaWaysById.containsKey(member.getRef())) {
             platformAreas.add(areaWaysById.get(member.getRef()));
           }
         }
@@ -1075,6 +1075,14 @@ public class OsmDatabase {
     }
 
     for (OSMWithTags area : platformAreas) {
+      if (area == null) {
+        throw new RuntimeException(
+          "Could not process public transport relation '%s' (%s)".formatted(
+              relation,
+              relation.url()
+            )
+        );
+      }
       // single platform area presumably contains only one level in most cases
       // a node inside it may specify several levels if it is an elevator
       // make sure each node has access to the current platform level
