@@ -317,7 +317,7 @@ public class QuayType {
             );
             Integer timeRangeInput = environment.getArgument("timeRange");
             Duration timeRange = Duration.ofSeconds(timeRangeInput.longValue());
-            RegularStop stop = environment.getSource();
+            StopLocation stop = environment.getSource();
 
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
