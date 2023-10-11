@@ -29,10 +29,14 @@ import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * This type of FlexTrip is used when a taxi-type service is modeled, which operates in one or
- * between two areas/groups of stops without a set schedule. The travel times are calculated based
+ * This type of FlexTrip is used when a taxi-type service is modeled, which operates in any number
+ * od areas/groups of stops without a set schedule. The travel times are calculated based
  * on the driving time between the stops, with the schedule times being used just for deciding if a
  * trip is possible.
+ * <p>
+ * An unscheduled flex trip may visit/drive from one flex stops(areas/group of stop locations) to
+ * any other stop in the pattern without driving through the stops in between. Only the times in the
+ * two stops used need to match the path.
  */
 public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBuilder> {
 
