@@ -145,7 +145,7 @@
                 <version>3.11.0</version>
                 <configuration>
                     <!-- Target Java version -->
-                    <release>17</release>
+                    <release>21</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>com.google.dagger</groupId>
