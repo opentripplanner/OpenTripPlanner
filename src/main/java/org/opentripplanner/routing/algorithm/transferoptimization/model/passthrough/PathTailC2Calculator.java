@@ -101,6 +101,9 @@ class PathTailC2Calculator<T extends RaptorTripSchedule> {
     int c2,
     int stopIndex
   ) {
+    if (c2 == 0) {
+      return false;
+    }
     var point = passThroughPoints.get(c2 - 1);
     return point != null && point.asBitSet().get(stopIndex);
   }
