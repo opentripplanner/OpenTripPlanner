@@ -6,8 +6,7 @@ import jakarta.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
-import org.opentripplanner.ext.digitransitemissions.EmissionsServiceRepository;
-import org.opentripplanner.ext.digitransitemissions.EmissionsServiceRepositoryModule;
+import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -27,7 +26,6 @@ import org.opentripplanner.transit.service.TransitModel;
     DataStoreModule.class,
     GsDataSourceModule.class,
     WorldEnvelopeRepositoryModule.class,
-    EmissionsServiceRepositoryModule.class,
   }
 )
 public interface LoadApplicationFactory {
@@ -48,7 +46,7 @@ public interface LoadApplicationFactory {
   GraphBuilderDataSources graphBuilderDataSources();
 
   @Singleton
-  EmissionsServiceRepository emptyEmissionsServiceRepository();
+  EmissionsDataModel emptyEmissionsDataModel();
 
   @Component.Builder
   interface Builder {

@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.configure;
 import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.digitransitemissions.EmissionsServiceRepository;
+import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.LogMDCSupport;
@@ -72,7 +72,7 @@ public class ConstructApplication {
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
-    EmissionsServiceRepository emissionsServiceRepository
+    EmissionsDataModel emissionsDataModel
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -89,7 +89,7 @@ public class ConstructApplication {
         .transitModel(transitModel)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
-        .emissionsServiceRepository(emissionsServiceRepository)
+        .emissionsDataModel(emissionsDataModel)
         .dataImportIssueSummary(issueSummary)
         .build();
   }
@@ -121,7 +121,7 @@ public class ConstructApplication {
       graph(),
       transitModel(),
       factory.worldEnvelopeRepository(),
-      factory.emissionsServiceRepository(),
+      factory.emissionsDataModel(),
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );
@@ -293,7 +293,7 @@ public class ConstructApplication {
     factory.metricsLogging();
   }
 
-  public EmissionsServiceRepository emissionsServiceRepository() {
-    return factory.emissionsServiceRepository();
+  public EmissionsDataModel emissionsDataModel() {
+    return factory.emissionsDataModel();
   }
 }

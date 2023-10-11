@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.digitransitemissions.DigitransitEmissions;
 import org.opentripplanner.ext.digitransitemissions.DigitransitEmissionsService;
+import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -55,7 +56,10 @@ class EmissionsServiceTest {
       new FeedScopedId("F", "2"),
       DigitransitEmissions.newDigitransitEmissions(0, 0)
     );
-    this.eService = new DigitransitEmissionsService(digitransitEmissions, 0.131);
+    EmissionsDataModel emissionsDataModel = new EmissionsDataModel();
+    emissionsDataModel.setDigitransitEmissions(digitransitEmissions);
+    emissionsDataModel.setCarAvgCo2EmissionsPerMeter(0.131);
+    this.eService = new DigitransitEmissionsService(emissionsDataModel);
   }
 
   @Test
@@ -116,7 +120,11 @@ class EmissionsServiceTest {
       new FeedScopedId("G", "1"),
       DigitransitEmissions.newDigitransitEmissions(0.12, 12)
     );
-    this.eService = new DigitransitEmissionsService(digitransitEmissions, 0.131);
+    EmissionsDataModel emissionsDataModel = new EmissionsDataModel();
+    emissionsDataModel.setDigitransitEmissions(digitransitEmissions);
+    emissionsDataModel.setCarAvgCo2EmissionsPerMeter(0.131);
+
+    this.eService = new DigitransitEmissionsService(emissionsDataModel);
 
     var route = TransitModelForTest.route(id("1")).withAgency(subject).build();
     List<Leg> legs = new ArrayList<>();

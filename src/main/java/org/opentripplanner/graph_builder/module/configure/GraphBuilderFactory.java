@@ -8,7 +8,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.digitransitemissions.DigitransitEmissionsModule;
-import org.opentripplanner.ext.digitransitemissions.EmissionsServiceRepository;
+import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.GraphBuilder;
@@ -79,6 +79,6 @@ public interface GraphBuilderFactory {
     GraphBuilderFactory build();
 
     @BindsInstance
-    Builder emissionsServiceRepository(EmissionsServiceRepository emissionsServiceRepository);
+    Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
   }
 }

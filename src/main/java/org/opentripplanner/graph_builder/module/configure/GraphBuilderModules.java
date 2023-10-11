@@ -12,7 +12,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.digitransitemissions.DigitransitEmissionsModule;
-import org.opentripplanner.ext.digitransitemissions.EmissionsServiceRepository;
+import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -113,9 +113,9 @@ public class GraphBuilderModules {
   static DigitransitEmissionsModule provideEmissionsModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
-    EmissionsServiceRepository emissionsServiceRepository
+    EmissionsDataModel emissionsDataModel
   ) {
-    return new DigitransitEmissionsModule(dataSources, config, emissionsServiceRepository);
+    return new DigitransitEmissionsModule(dataSources, config, emissionsDataModel);
   }
 
   @Provides

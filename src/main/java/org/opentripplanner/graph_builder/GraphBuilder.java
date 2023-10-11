@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
-import org.opentripplanner.ext.digitransitemissions.EmissionsServiceRepository;
+import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
@@ -61,7 +61,7 @@ public class GraphBuilder implements Runnable {
     Graph graph,
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
-    EmissionsServiceRepository emissionsServiceRepository,
+    EmissionsDataModel emissionsDataModel,
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
@@ -81,7 +81,7 @@ public class GraphBuilder implements Runnable {
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .dataSources(dataSources)
       .timeZoneId(transitModel.getTimeZone())
-      .emissionsServiceRepository(emissionsServiceRepository)
+      .emissionsDataModel(emissionsDataModel)
       .build();
 
     var graphBuilder = factory.graphBuilder();

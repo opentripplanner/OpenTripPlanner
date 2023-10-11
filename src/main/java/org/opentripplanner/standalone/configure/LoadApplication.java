@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.digitransitemissions.EmissionsServiceRepository;
+import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.graph.Graph;
@@ -54,7 +54,7 @@ public class LoadApplication {
       obj.transitModel,
       obj.worldEnvelopeRepository,
       obj.issueSummary,
-      obj.emissionsServiceRepository
+      obj.emissionsDataModel
     );
   }
 
@@ -65,7 +65,7 @@ public class LoadApplication {
       factory.emptyTransitModel(),
       factory.emptyWorldEnvelopeRepository(),
       DataImportIssueSummary.empty(),
-      factory.emptyEmissionsServiceRepository()
+      factory.emptyEmissionsDataModel()
     );
   }
 
@@ -85,7 +85,7 @@ public class LoadApplication {
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
     DataImportIssueSummary issueSummary,
-    EmissionsServiceRepository emissionsServiceRepository
+    EmissionsDataModel emissionsDataModel
   ) {
     return new ConstructApplication(
       cli,
@@ -95,7 +95,7 @@ public class LoadApplication {
       config(),
       graphBuilderDataSources(),
       issueSummary,
-      emissionsServiceRepository
+      emissionsDataModel
     );
   }
 }

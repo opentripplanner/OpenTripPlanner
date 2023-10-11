@@ -25,26 +25,26 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(DigitransitEmissionsModule.class);
   private BuildConfig config;
-  private EmissionsServiceRepository emissionsServiceRepository;
+  private EmissionsDataModel emissionsDataModel;
   private GraphBuilderDataSources dataSources;
-  private Map<FeedScopedId, DigitransitEmissions> emissionsData = new HashMap<>();
+  private Map<FeedScopedId, Emissions> emissionsData = new HashMap<>();
 
   @Inject
   public DigitransitEmissionsModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
-    EmissionsServiceRepository emissionsServiceRepository
+    EmissionsDataModel emissionsDataModel
   ) {
     this.dataSources = dataSources;
     this.config = config;
-    this.emissionsServiceRepository = emissionsServiceRepository;
+    this.emissionsDataModel = emissionsDataModel;
   }
 
   public void buildGraph() {
     if (config.digitransitEmissions != null) {
       LOG.info("Start emissions building!");
 
-      int carAvgCo2PerKm = config.digitransitEmissions.getCarAvgCo2PerKm();
+      double carAvgCo2PerKm = config.digitransitEmissions.getCarAvgCo2PerKm();
       double carAvgOccupancy = config.digitransitEmissions.getCarAvgOccupancy();
       double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
 
@@ -55,10 +55,8 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
           readGtfs(gtfsData.dataSource().path());
         }
       }
-
-      this.emissionsServiceRepository.saveEmissionsService(
-          new DigitransitEmissionsService(this.emissionsData, carAvgEmissionsPerMeter)
-        );
+      this.emissionsDataModel.setEmissions(this.emissionsData);
+      this.emissionsDataModel.setCarAvgCo2EmissionsPerMeter(carAvgEmissionsPerMeter);
     }
   }
 

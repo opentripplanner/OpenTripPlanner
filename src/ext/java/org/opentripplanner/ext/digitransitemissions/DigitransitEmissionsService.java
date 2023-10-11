@@ -1,10 +1,9 @@
 package org.opentripplanner.ext.digitransitemissions;
 
-import java.io.Serializable;
+import jakarta.inject.Inject;
 import java.util.DoubleSummaryStatistics;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.DoubleStream;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.lang.Sandbox;
@@ -16,17 +15,17 @@ import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 @Sandbox
-public class DigitransitEmissionsService implements Serializable, EmissionsService {
+public class DigitransitEmissionsService implements EmissionsService {
 
-  private Map<FeedScopedId, DigitransitEmissions> emissions;
+  private Map<FeedScopedId, Emissions> emissions;
   private double carAvgEmissions;
 
-  public DigitransitEmissionsService(
-    Map<FeedScopedId, DigitransitEmissions> emissions,
-    double carAvgEmissionsPerMeter
-  ) {
-    this.emissions = emissions;
-    this.carAvgEmissions = carAvgEmissionsPerMeter;
+  public DigitransitEmissionsService() {}
+
+  @Inject
+  public DigitransitEmissionsService(EmissionsDataModel emissionsDataModel) {
+    this.emissions = emissionsDataModel.getEmissions().get();
+    this.carAvgEmissions = emissionsDataModel.getCarAvgCo2EmissionsPerMeter().get();
   }
 
   @Override

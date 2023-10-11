@@ -6,7 +6,8 @@ public record DigitransitEmissions(
   double avgCo2PerVehiclePerMeter,
   double avgPassengerCount,
   double emissionsPerPassengerPerMeter
-) {
+)
+  implements Emissions {
   public DigitransitEmissions {
     Objects.requireNonNull(avgCo2PerVehiclePerMeter);
     Objects.requireNonNull(avgPassengerCount);
