@@ -637,7 +637,6 @@ public class OrcaFareService extends DefaultFareService {
     );
   }
 
-
   /**
    * Define Orca fare types.
    */
