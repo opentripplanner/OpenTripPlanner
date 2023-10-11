@@ -10,6 +10,7 @@ import java.util.Currency;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.ridehailing.model.Ride;
@@ -77,7 +78,24 @@ public class OrcaFareService extends DefaultFareService {
     WHATCOM_CROSS_COUNTY,
     SKAGIT_LOCAL,
     SKAGIT_CROSS_COUNTY,
-    UNKNOWN,
+    UNKNOWN;
+
+    /**
+     * All transit agencies permit free transfers, apart from these.
+     */
+    public boolean permitsFreeTransfers() {
+      return switch (this) {
+        case WASHINGTON_STATE_FERRIES, SKAGIT_TRANSIT -> false;
+        default -> true;
+      };
+    }
+
+    public boolean agencyAcceptsOrca() {
+      return switch (this) {
+        case WHATCOM_LOCAL, WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY, SKAGIT_LOCAL -> false;
+        default -> true;
+      };
+    }
   }
 
   static RideType getRideType(String agencyId, Route route) {
@@ -135,30 +153,16 @@ public class OrcaFareService extends DefaultFareService {
       }
       case SOUND_TRANSIT_AGENCY_ID -> RideType.SOUND_TRANSIT;
       case EVERETT_TRANSIT_AGENCY_ID -> RideType.EVERETT_TRANSIT;
-      case SKAGIT_TRANSIT_AGENCY_ID -> {
-        try {
-          yield route.getShortName().equals("80X") || route.getShortName().equals("90X")
-            ? RideType.SKAGIT_CROSS_COUNTY
-            : RideType.SKAGIT_LOCAL;
-        } catch (NumberFormatException e) {
-          LOG.warn("Unable to determine skagit route id from {}.", route.getShortName(), e);
-          yield RideType.SKAGIT_LOCAL;
-        }
-      }
+      case SKAGIT_TRANSIT_AGENCY_ID -> Set.of("80X", "90X").contains(route.getShortName())
+        ? RideType.SKAGIT_CROSS_COUNTY
+        : RideType.SKAGIT_LOCAL;
       case SEATTLE_STREET_CAR_AGENCY_ID -> RideType.SEATTLE_STREET_CAR;
       case WASHINGTON_STATE_FERRIES_AGENCY_ID -> RideType.WASHINGTON_STATE_FERRIES;
       case T_LINK_AGENCY_ID -> RideType.SOUND_TRANSIT_T_LINK;
       case KITSAP_TRANSIT_AGENCY_ID -> RideType.KITSAP_TRANSIT;
-      case WHATCOM_AGENCY_ID -> {
-        try {
-          yield route.getShortName().equals("80X")
-            ? RideType.WHATCOM_CROSS_COUNTY
-            : RideType.WHATCOM_LOCAL;
-        } catch (NumberFormatException e) {
-          LOG.warn("Unable to determine whatcom route id from {}.", route.getShortName(), e);
-          yield RideType.WHATCOM_LOCAL;
-        }
-      }
+      case WHATCOM_AGENCY_ID -> "80X".equals(route.getShortName())
+        ? RideType.WHATCOM_CROSS_COUNTY
+        : RideType.WHATCOM_LOCAL;
       default -> RideType.UNKNOWN;
     };
   }
@@ -259,7 +263,7 @@ public class OrcaFareService extends DefaultFareService {
       return Optional.of(defaultFare);
     }
     // Filter out agencies that don't accept ORCA from the electronic fare type
-    if (usesOrca(fareType) && !agencyAcceptsOrca(rideType)) {
+    if (usesOrca(fareType) && !rideType.agencyAcceptsOrca()) {
       return Optional.empty();
     }
     return switch (fareType) {
@@ -297,6 +301,12 @@ public class OrcaFareService extends DefaultFareService {
         getSoundTransitFare(leg, defaultFare, rideType)
       );
       case SOUND_TRANSIT_BUS -> optionalUSD(3.25f);
+      case WHATCOM_LOCAL,
+        WHATCOM_CROSS_COUNTY,
+        SKAGIT_LOCAL,
+        SKAGIT_CROSS_COUNTY -> fareType.equals(FareType.electronicRegular)
+        ? Optional.empty()
+        : Optional.of(defaultFare);
       default -> Optional.of(defaultFare);
     };
   }
@@ -472,7 +482,8 @@ public class OrcaFareService extends DefaultFareService {
     Money orcaFareDiscount = Money.ZERO_USD;
     for (Leg leg : legs) {
       RideType rideType = classify(leg.getRoute(), leg.getTrip().getId().getId());
-      boolean ridePermitsFreeTransfers = permitsFreeTransfers(rideType);
+      assert rideType != null;
+      boolean ridePermitsFreeTransfers = rideType.permitsFreeTransfers();
       if (freeTransferStartTime == null && ridePermitsFreeTransfers) {
         // The start of a free transfer must be with a transit agency that permits it!
         freeTransferStartTime = leg.getStartTime();
@@ -621,27 +632,11 @@ public class OrcaFareService extends DefaultFareService {
   private boolean hasFreeTransfers(FareType fareType, RideType rideType) {
     // King County Metro allows transfers on cash fare
     return (
-      (permitsFreeTransfers(rideType) && usesOrca(fareType)) ||
+      (rideType.permitsFreeTransfers() && usesOrca(fareType)) ||
       (rideType == RideType.KC_METRO && !usesOrca(fareType))
     );
   }
 
-  /**
-   * All transit agencies permit free transfers, apart from these.
-   */
-  private boolean permitsFreeTransfers(RideType rideType) {
-    return switch (rideType) {
-      case WASHINGTON_STATE_FERRIES, SKAGIT_TRANSIT -> false;
-      default -> true;
-    };
-  }
-
-  private static boolean agencyAcceptsOrca(RideType rideType) {
-    return switch (rideType) {
-      case WHATCOM_LOCAL, WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY, SKAGIT_LOCAL -> false;
-      default -> true;
-    };
-  }
 
   /**
    * Define Orca fare types.
