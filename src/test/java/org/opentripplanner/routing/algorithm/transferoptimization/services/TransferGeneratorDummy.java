@@ -13,7 +13,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTr
 public class TransferGeneratorDummy {
 
   @SafeVarargs
-  static TransferGenerator<TestTripSchedule> dummyTransferGenerator(
+  public static TransferGenerator<TestTripSchedule> dummyTransferGenerator(
     final List<TripToTripTransfer<TestTripSchedule>>... transfers
   ) {
     return new TransferGenerator<>(null, new TestTransitData()) {
