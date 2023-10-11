@@ -1,0 +1,17 @@
+{
+  "vehicleRentalServiceDirectory": {
+    "url": "https://example.com",
+    "sourcesName": "systems",
+    "updaterUrlName": "url",
+    "updaterNetworkName": "id",
+    "headers": {
+      "ET-Client-Name": "otp"
+    },
+    "networks": [
+      {
+        "network" : "oslo-by-sykkel",
+        "geofencingZones" : true
+      }
+    ]
+  }
+}

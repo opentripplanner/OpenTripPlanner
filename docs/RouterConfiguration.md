@@ -67,13 +67,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                           | *Optional* |               |   na  |
 | [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                            | *Optional* |               |  1.5  |
 | [vectorTileLayers](sandbox/MapboxVectorTilesApi.md)                                       |       `object[]`      | Configuration of the individual layers for the Mapbox vector tiles.                                   | *Optional* |               |  2.0  |
-| vehicleRentalServiceDirectory                                                             |        `object`       | Configuration for the vehicle rental service directory.                                               | *Optional* |               |  2.0  |
-|    language                                                                               |        `string`       | Language code.                                                                                        | *Optional* |               |   na  |
-|    sourcesName                                                                            |        `string`       | Json tag name for updater sources.                                                                    | *Optional* | `"systems"`   |   na  |
-|    updaterNetworkName                                                                     |        `string`       | Json tag name for the network name for each source.                                                   | *Optional* | `"id"`        |   na  |
-|    updaterUrlName                                                                         |        `string`       | Json tag name for endpoint urls for each source.                                                      | *Optional* | `"url"`       |   na  |
-|    url                                                                                    |         `uri`         | Endpoint for the VehicleRentalServiceDirectory                                                        | *Required* |               |   na  |
-|    [headers](#vehicleRentalServiceDirectory_headers)                                      |    `map of string`    | HTTP headers to add to the request. Any header key, value can be inserted.                            | *Optional* |               |   na  |
+| [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory.                                               | *Optional* |               |  2.0  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -414,13 +408,6 @@ Only turn this feature on if you have unique ids across all feeds, without the f
 **Path:** /transmodelApi 
 
 Used to group requests when monitoring OTP.
-
-<h3 id="vehicleRentalServiceDirectory_headers">headers</h3>
-
-**Since version:** `na` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
-**Path:** /vehicleRentalServiceDirectory 
-
-HTTP headers to add to the request. Any header key, value can be inserted.
 
 
 <!-- PARAMETERS-DETAILS END -->
