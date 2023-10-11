@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.basic;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -13,7 +14,7 @@ import org.opentripplanner.framework.lang.IntUtils;
 /**
  * Represents an amount of money.
  */
-public class Money implements Comparable<Money> {
+public class Money implements Comparable<Money>, Serializable {
 
   public static final Currency USD = Currency.getInstance("USD");
   public static final Money ZERO_USD = Money.usDollars(0);
