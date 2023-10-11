@@ -53,8 +53,7 @@ public class LoadApplication {
       obj.graph,
       obj.transitModel,
       obj.worldEnvelopeRepository,
-      obj.issueSummary,
-      obj.stopConsolidationModel
+      obj.issueSummary
     );
   }
 
@@ -64,8 +63,7 @@ public class LoadApplication {
       factory.emptyGraph(),
       factory.emptyTransitModel(),
       factory.emptyWorldEnvelopeRepository(),
-      DataImportIssueSummary.empty(),
-      new StopConsolidationModel(factory.emptyTransitModel())
+      DataImportIssueSummary.empty()
     );
   }
 
@@ -84,8 +82,7 @@ public class LoadApplication {
     Graph graph,
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
-    DataImportIssueSummary issueSummary,
-    StopConsolidationModel stopConsolidationModel
+    DataImportIssueSummary issueSummary
   ) {
     return new ConstructApplication(
       cli,
@@ -95,7 +92,7 @@ public class LoadApplication {
       config(),
       graphBuilderDataSources(),
       issueSummary,
-      stopConsolidationModel
+      new StopConsolidationModel(transitModel)
     );
   }
 }

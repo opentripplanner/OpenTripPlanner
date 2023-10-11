@@ -10,6 +10,7 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationParser.StopGroup;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class StopConsolidationModel implements Serializable {
   }
 
   public List<FeedScopedId> stopIdsToReplace() {
-    return replacements().stream().map(StopReplacement::child).toList();
+    return replacements().stream().map(StopReplacement::secondary).toList();
   }
 
   public List<StopReplacement> replacements() {
@@ -68,19 +69,19 @@ public class StopConsolidationModel implements Serializable {
     return groups.stream().anyMatch(r -> r.secondaries().contains(stop.getId()));
   }
 
-  private Optional<I18NString> primaryName(FeedScopedId secondary) {
+  private Optional<I18NString> primaryName(StopLocation secondary) {
     return groups
       .stream()
-      .filter(r -> r.secondaries().contains(secondary))
+      .filter(r -> r.secondaries().contains(secondary.getId()))
       .findAny()
       .map(StopGroup::primary)
-      .map(p -> transitModel.getStopModel().getStopLocation(p))
-      .map(StopLocation::getName);
+      .map(id -> transitModel.getStopModel().getRegularStop(id))
+      .map(RegularStop::getName);
   }
 
   public I18NString agencySpecificName(StopLocation stop) {
-    return primaryName(stop.getId()).orElse(stop.getName());
+    return primaryName(stop).orElse(stop.getName());
   }
 
-  public record StopReplacement(StopLocation primary, FeedScopedId child) {}
+  public record StopReplacement(StopLocation primary, FeedScopedId secondary) {}
 }

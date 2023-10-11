@@ -4,7 +4,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 
-public class ConsolidatedStopLeg extends ScheduledTransitLeg {
+class ConsolidatedStopLeg extends ScheduledTransitLeg {
 
   private final I18NString fromName;
   private final I18NString toName;

@@ -21,8 +21,6 @@ public class ConsolidatedStopNameFilter implements ItineraryListFilter {
   private Itinerary changeNames(Itinerary i) {
     return i.transformTransitLegs(leg -> {
       if (leg instanceof ScheduledTransitLeg stl && needsToRenameStops(stl)) {
-        var agency = stl.getAgency();
-
         return new ConsolidatedStopLeg(
           stl,
           model.agencySpecificName(stl.getFrom().stop),

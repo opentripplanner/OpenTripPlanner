@@ -2,6 +2,8 @@ package org.opentripplanner.ext.stopconsolidation;
 
 import com.csvreader.CsvReader;
 import com.google.common.collect.ImmutableListMultimap;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -11,16 +13,23 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class StopConsolidationParser {
+class StopConsolidationParser {
 
-  private record StopGroupEntry(String groupId, FeedScopedId stopId, boolean isPrimary) {}
   record StopGroup(FeedScopedId primary, Collection<FeedScopedId> secondaries) {}
 
+  private static final Logger LOG = LoggerFactory.getLogger(StopConsolidationParser.class);
+  private record StopGroupEntry(String groupId, FeedScopedId stopId, boolean isPrimary) {}
+
   public static List<StopGroup> parseGroups() {
-    var url = StopConsolidationParser.class.getResource("/consolidated-stops.csv");
     try {
-      var stream = url.openStream();
+      var file = new File("seattle/consolidated-stops.csv");
+
+      LOG.info("Reading stop consolidation data from {}", file.getAbsolutePath());
+
+      var stream = new FileInputStream(file);
       var reader = new CsvReader(stream, StandardCharsets.UTF_8);
       reader.setDelimiter(',');
 

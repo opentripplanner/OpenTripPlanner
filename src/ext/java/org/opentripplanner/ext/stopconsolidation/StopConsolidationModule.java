@@ -42,7 +42,7 @@ public class StopConsolidationModule implements GraphBuilderModule {
     List<StopConsolidationModel.StopReplacement> replacements
   ) {
     var updatedStopPattern = pattern.getStopPattern().mutate();
-    replacements.forEach(r -> updatedStopPattern.replaceStop(r.child(), r.primary()));
+    replacements.forEach(r -> updatedStopPattern.replaceStop(r.secondary(), r.primary()));
     return pattern.copy().withStopPattern(updatedStopPattern.build()).build();
   }
 }
