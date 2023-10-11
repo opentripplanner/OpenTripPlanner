@@ -100,11 +100,11 @@ public class RouteRequestToFilterChainMapper {
       );
     }
 
-    context
-      .stopConsolidationModel()
-      .ifPresent(scm -> {
-        builder.withStopConsolidationFilter(new ConsolidatedStopNameFilter(scm));
-      });
+    if (context.stopConsolidationService().isActive()) {
+      builder.withStopConsolidationFilter(
+        new ConsolidatedStopNameFilter(context.stopConsolidationService())
+      );
+    }
 
     return builder.build();
   }

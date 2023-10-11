@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -53,7 +54,7 @@ public interface GraphBuilderFactory {
   EdgeUpdaterModule dataOverlayFactory();
   DataImportIssueReporter dataImportIssueReporter();
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
-  StopConsolidationModule stopConsolidator();
+  StopConsolidationModule stopConsolidationModule();
 
   @Component.Builder
   interface Builder {
@@ -68,6 +69,9 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
+
+    @BindsInstance
+    Builder stopConsolidationRepository(StopConsolidationRepository stopConsolidationRepository);
 
     @BindsInstance
     Builder dataSources(GraphBuilderDataSources graphBuilderDataSources);

@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.function.Predicate;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
+import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -117,7 +119,7 @@ public class SpeedTest {
         TestServerContext.createVehicleRentalService(),
         config.flexConfig,
         List.of(),
-        null,
+        new DefaultStopConsolidationService(new DefaultStopConsolidationRepository(), transitModel),
         null
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now

@@ -4,6 +4,8 @@ import static org.opentripplanner.standalone.configure.ConstructApplication.crea
 
 import io.micrometer.core.instrument.Metrics;
 import java.util.List;
+import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
+import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -45,7 +47,7 @@ public class TestServerContext {
       createVehicleRentalService(),
       routerConfig.flexConfig(),
       List.of(),
-      null,
+      new DefaultStopConsolidationService(new DefaultStopConsolidationRepository(), transitModel),
       null
     );
     creatTransitLayerForRaptor(transitModel, routerConfig.transitTuningConfig());

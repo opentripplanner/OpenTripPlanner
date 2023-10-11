@@ -12,6 +12,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -266,8 +267,11 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static StopConsolidationModule providesStopConsolidator(TransitModel transitModel) {
-    return new StopConsolidationModule(transitModel);
+  static StopConsolidationModule providesStopConsolidationModule(
+    TransitModel transitModel,
+    StopConsolidationRepository repo
+  ) {
+    return new StopConsolidationModule(transitModel, repo);
   }
 
   /* private methods */

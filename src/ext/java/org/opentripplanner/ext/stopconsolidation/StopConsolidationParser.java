@@ -7,23 +7,22 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.BooleanUtils;
+import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 class StopConsolidationParser {
 
-  record StopGroup(FeedScopedId primary, Collection<FeedScopedId> secondaries) {}
-
   private static final Logger LOG = LoggerFactory.getLogger(StopConsolidationParser.class);
+
   private record StopGroupEntry(String groupId, FeedScopedId stopId, boolean isPrimary) {}
 
-  public static List<StopGroup> parseGroups() {
+  public static List<ConsolidatedStopGroup> parseGroups() {
     try {
       var file = new File("seattle/consolidated-stops.csv");
 
@@ -54,27 +53,25 @@ class StopConsolidationParser {
           )
         );
 
-        return groups
-          .keys()
-          .stream()
-          .map(key -> {
-            var ge = groups.get(key);
+      return groups
+        .keys()
+        .stream()
+        .map(key -> {
+          var ge = groups.get(key);
 
-            var primaryId = ge.stream().filter(e -> e.isPrimary).findAny().orElseThrow().stopId;
-            var secondaries = ge
-              .stream()
-              .filter(e -> !e.isPrimary)
-              .map(e -> e.stopId)
-              .collect(Collectors.toSet());
+          var primaryId = ge.stream().filter(e -> e.isPrimary).findAny().orElseThrow().stopId;
+          var secondaries = ge
+            .stream()
+            .filter(e -> !e.isPrimary)
+            .map(e -> e.stopId)
+            .collect(Collectors.toSet());
 
-            return new StopGroup(primaryId, secondaries);
-          })
-          .distinct()
-          .toList();
+          return new ConsolidatedStopGroup(primaryId, secondaries);
+        })
+        .distinct()
+        .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-
   }
-
 }

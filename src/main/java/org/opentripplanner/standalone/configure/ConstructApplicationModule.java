@@ -7,7 +7,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
-import org.opentripplanner.ext.stopconsolidation.StopConsolidationModel;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
@@ -33,7 +33,7 @@ public class ConstructApplicationModule {
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     List<RideHailingService> rideHailingServices,
-    @Nullable StopConsolidationModel stopConsolidationModel,
+    @Nullable StopConsolidationService stopConsolidationService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor
   ) {
     return DefaultServerRequestContext.create(
@@ -49,7 +49,7 @@ public class ConstructApplicationModule {
       vehicleRentalService,
       routerConfig.flexConfig(),
       rideHailingServices,
-      stopConsolidationModel,
+      stopConsolidationService,
       traverseVisitor
     );
   }

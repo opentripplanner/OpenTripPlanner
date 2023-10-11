@@ -4,7 +4,7 @@ import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
-import org.opentripplanner.ext.stopconsolidation.StopConsolidationModel;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -72,7 +72,7 @@ public class ConstructApplication {
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
-    StopConsolidationModel stopConsolidationModel
+    StopConsolidationRepository stopConsolidationModel
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -90,7 +90,7 @@ public class ConstructApplication {
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
         .dataImportIssueSummary(issueSummary)
-        .stopConsolidationModel(stopConsolidationModel)
+        .stopConsolidationRepository(stopConsolidationModel)
         .build();
   }
 
@@ -121,6 +121,7 @@ public class ConstructApplication {
       graph(),
       transitModel(),
       factory.worldEnvelopeRepository(),
+      factory.stopConsolidationRepository(),
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );
@@ -242,8 +243,8 @@ public class ConstructApplication {
     return factory.dataImportIssueSummary();
   }
 
-  public StopConsolidationModel stopConsolidationModel() {
-    return factory.stopConsolidationModel();
+  public StopConsolidationRepository stopConsolidationRepository() {
+    return factory.stopConsolidationRepository();
   }
 
   public RealtimeVehicleRepository realtimeVehicleRepository() {

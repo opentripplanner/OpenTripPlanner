@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
@@ -60,10 +61,10 @@ public class GraphBuilder implements Runnable {
     Graph graph,
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
+    StopConsolidationRepository stopConsolidationRepository,
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
-    //DaggerGraphBuilderFactory appFactory = GraphBuilderFactoryDa
     boolean hasOsm = dataSources.has(OSM);
     boolean hasGtfs = dataSources.has(GTFS);
     boolean hasNetex = dataSources.has(NETEX);
@@ -77,6 +78,7 @@ public class GraphBuilder implements Runnable {
       .graph(graph)
       .transitModel(transitModel)
       .worldEnvelopeRepository(worldEnvelopeRepository)
+      .stopConsolidationRepository(stopConsolidationRepository)
       .dataSources(dataSources)
       .timeZoneId(transitModel.getTimeZone())
       .build();
@@ -160,7 +162,7 @@ public class GraphBuilder implements Runnable {
 
     // don't consolidate stops if there are none
     if (hasTransitData) {
-      graphBuilder.addModule(factory.stopConsolidator());
+      graphBuilder.addModule(factory.stopConsolidationModule());
     }
 
     return graphBuilder;

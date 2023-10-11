@@ -152,7 +152,7 @@ public class OTPMain {
         config.buildConfig(),
         config.routerConfig(),
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),
-        app.stopConsolidationModel()
+        app.stopConsolidationRepository()
       )
         .save(app.graphOutputDataSource());
       // Log size info for the deduplicator

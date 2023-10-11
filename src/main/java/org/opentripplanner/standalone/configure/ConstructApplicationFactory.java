@@ -5,7 +5,9 @@ import dagger.Component;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
-import org.opentripplanner.ext.stopconsolidation.StopConsolidationModel;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
+import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -45,6 +47,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     VehicleRentalRepositoryModule.class,
     ConstructApplicationModule.class,
     RideHailingServicesModule.class,
+    StopConsolidationServiceModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -68,8 +71,8 @@ public interface ConstructApplicationFactory {
 
   MetricsLogging metricsLogging();
 
-  @Nullable
-  StopConsolidationModel stopConsolidationModel();
+  StopConsolidationRepository stopConsolidationRepository();
+  StopConsolidationService stopConsolidationService();
 
   @Component.Builder
   interface Builder {
@@ -89,10 +92,10 @@ public interface ConstructApplicationFactory {
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
 
     @BindsInstance
-    Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);
+    Builder stopConsolidationRepository(StopConsolidationRepository stopConsolidationRepository);
 
     @BindsInstance
-    Builder stopConsolidationModel(@Nullable StopConsolidationModel model);
+    Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);
 
     ConstructApplicationFactory build();
   }
