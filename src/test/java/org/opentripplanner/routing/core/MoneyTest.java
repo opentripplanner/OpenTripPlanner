@@ -2,11 +2,12 @@ package org.opentripplanner.routing.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.transit.model.basic.Locales.NORWEGIAN_BOKMAL;
-import static org.opentripplanner.transit.model.basic.Locales.NORWEGIAN_NYNORSK;
 
+import java.io.Serializable;
 import java.util.Currency;
 import java.util.Locale;
 import java.util.stream.Stream;
@@ -85,5 +86,10 @@ class MoneyTest {
     assertTrue(twoDollars.greaterThan(oneDollar));
     assertFalse(oneDollar.greaterThan(oneDollar));
     assertFalse(oneDollar.greaterThan(twoDollars));
+  }
+
+  @Test
+  void serializable() {
+    assertInstanceOf(Serializable.class, oneDollar);
   }
 }
