@@ -2,13 +2,10 @@
 package org.opentripplanner.apis.gtfs.generated;
 
 import graphql.relay.Connection;
-import graphql.relay.Connection;
-import graphql.relay.Edge;
 import graphql.relay.Edge;
 import graphql.schema.DataFetcher;
 import graphql.schema.TypeResolver;
 import java.util.Currency;
-import java.util.Map;
 import java.util.Map;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -23,11 +20,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirec
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
-import org.opentripplanner.apis.gtfs.model.RouteTypeModel;
-import org.opentripplanner.apis.gtfs.model.StopOnRouteModel;
-import org.opentripplanner.apis.gtfs.model.StopOnTripModel;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
-import org.opentripplanner.apis.gtfs.model.UnknownModel;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -49,8 +42,6 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
@@ -58,7 +49,6 @@ import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePositio
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 import org.opentripplanner.transit.model.basic.Money;
