@@ -18,7 +18,6 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -175,7 +174,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     if (
       filterByStops != null &&
       !filterByStops.contains(stop.getId()) ||
-      seenStops.contains(stop.getStationOrStopId()) || //&&
+      seenStops.contains(stop.getStationOrStopId()) ||
       !(filterByModes == null || stopHasPatternsWithMode(stop, filterByModes))
     ) {
       return;
