@@ -75,9 +75,9 @@ public class OrcaFareServiceTest {
    * types.
    */
   private static void calculateFare(List<Leg> legs, FareType fareType, Money expectedPrice) {
-    ItineraryFares fare = new ItineraryFares();
-    orcaFareService.populateFare(fare, USD, fareType, legs, null);
-    assertEquals(expectedPrice, fare.getFare(fareType));
+    var itinerary = new Itinerary(legs);
+    var itineraryFares = orcaFareService.calculateFares(itinerary);
+    assertEquals(expectedPrice, itineraryFares.getFare(fareType));
   }
 
   private static void assertLegFareEquals(
@@ -642,25 +642,27 @@ public class OrcaFareServiceTest {
     String firstStopName,
     String lastStopName
   ) {
+    // Use the agency ID as feed ID to make sure that we have a new feed ID for each different agency
+    // This tests to make sure we are calculating transfers across feeds correctly.
     Agency agency = Agency
-      .of(new FeedScopedId(FEED_ID, agencyId))
+      .of(new FeedScopedId(agencyId, agencyId))
       .withName(agencyId)
       .withTimezone(ZoneIds.NEW_YORK.getId())
       .build();
 
     // Set up stops
     RegularStop firstStop = RegularStop
-      .of(new FeedScopedId(FEED_ID, "1"))
+      .of(new FeedScopedId(agencyId, "1"))
       .withCoordinate(new WgsCoordinate(1, 1))
       .withName(new NonLocalizedString(firstStopName))
       .build();
     RegularStop lastStop = RegularStop
-      .of(new FeedScopedId(FEED_ID, "2"))
+      .of(new FeedScopedId(agencyId, "2"))
       .withCoordinate(new WgsCoordinate(1, 2))
       .withName(new NonLocalizedString(lastStopName))
       .build();
 
-    FeedScopedId routeFeedScopeId = new FeedScopedId(FEED_ID, routeId);
+    FeedScopedId routeFeedScopeId = new FeedScopedId(agencyId, routeId);
     NonLocalizedString longName = null;
     if (routeLongName != null) {
       longName = new NonLocalizedString(routeLongName);
