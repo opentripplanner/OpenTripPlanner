@@ -38,10 +38,12 @@ public class HoustonSmokeTest {
   @Test
   public void selectOnlyBusses() {
     var modes = Set.of(BUS, WALK);
-    SmokeTest.basicRouteTest(
+    var plan = SmokeTest.basicRouteTest(
       new SmokeTestRequest(galvestonRoad, northLindale, modes),
       List.of("WALK", "BUS", "WALK", "BUS", "WALK", "BUS", "WALK")
     );
+
+    SmokeTest.assertThatAllTransitLegsHaveFareProducts(plan);
   }
 
   @Test

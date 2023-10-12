@@ -11,6 +11,7 @@ import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import org.opentripplanner.client.OtpApiClient;
+import org.opentripplanner.client.model.FareProductUse;
 import org.opentripplanner.client.model.Itinerary;
 import org.opentripplanner.client.model.TripPlan;
 import org.opentripplanner.client.model.VehicleRentalStation;
@@ -115,7 +116,11 @@ public class SmokeTest {
   }
 
   static void assertThatAllTransitLegsHaveFareProducts(TripPlan plan) {
-    var transitLegs = plan.transitItineraries().stream().flatMap(i -> i.transitLegs().stream());
+    var transitLegs = plan
+      .transitItineraries()
+      .stream()
+      .flatMap(i -> i.transitLegs().stream())
+      .toList();
     transitLegs.forEach(leg -> {
       assertFalse(leg.fareProducts().isEmpty(), "Leg %s should have fare products".formatted(leg));
 
@@ -127,5 +132,13 @@ public class SmokeTest {
         leg.fareProducts().size()
       );
     });
+
+    var fareProducts = transitLegs
+      .stream()
+      .flatMap(l -> l.fareProducts().stream().map(FareProductUse::product));
+    assertTrue(
+      fareProducts.anyMatch(fp -> fp.price().amount().floatValue() > 0),
+      "There were no fare product with a price higher than 0."
+    );
   }
 }

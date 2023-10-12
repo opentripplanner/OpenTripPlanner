@@ -1,7 +1,5 @@
 package org.opentripplanner.netex.loader.parser;
 
-import static org.opentripplanner.framework.logging.MaxCountLogger.maxCount;
-
 import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,7 +35,7 @@ import org.slf4j.LoggerFactory;
 class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
   private static final Logger LOG = LoggerFactory.getLogger(ServiceFrameParser.class);
-  private static final MaxCountLogger PASSENGER_STOP_ASSIGNMENT_LOGGER = maxCount(LOG);
+  private static final MaxCountLogger PASSENGER_STOP_ASSIGNMENT_LOGGER = MaxCountLogger.of(LOG);
 
   private final ReadOnlyHierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById;
 
