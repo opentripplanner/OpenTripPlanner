@@ -34,7 +34,6 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final Set<String> filterByVehicleRental;
   private final Set<String> seenPatternAtStops = new HashSet<>();
   private final Set<FeedScopedId> seenStops = new HashSet<>();
-  private final Set<FeedScopedId> seenStations = new HashSet<>();
   private final Set<FeedScopedId> seenVehicleRentalPlaces = new HashSet<>();
   private final Set<FeedScopedId> seenParkingLots = new HashSet<>();
   private final boolean includeStops;
