@@ -6,6 +6,10 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
+/**
+ * A decorating filter that checks if a transit legs contains any primary stops and if it does,
+ * then
+ */
 public class ConsolidatedStopNameFilter implements ItineraryListFilter {
 
   private final StopConsolidationService service;
@@ -22,10 +26,11 @@ public class ConsolidatedStopNameFilter implements ItineraryListFilter {
   private Itinerary changeNames(Itinerary i) {
     return i.transformTransitLegs(leg -> {
       if (leg instanceof ScheduledTransitLeg stl && needsToRenameStops(stl)) {
+        var agency = leg.getAgency();
         return new ConsolidatedStopLeg(
           stl,
-          service.agencySpecificName(stl.getFrom().stop),
-          service.agencySpecificName(stl.getTo().stop)
+          service.agencySpecificName(stl.getFrom().stop, agency),
+          service.agencySpecificName(stl.getTo().stop, agency)
         );
       } else {
         return leg;
@@ -34,8 +39,6 @@ public class ConsolidatedStopNameFilter implements ItineraryListFilter {
   }
 
   private boolean needsToRenameStops(ScheduledTransitLeg stl) {
-    return (
-      service.isSecondaryStop(stl.getFrom().stop) || service.isSecondaryStop(stl.getTo().stop)
-    );
+    return (service.isPrimaryStop(stl.getFrom().stop) || service.isPrimaryStop(stl.getTo().stop));
   }
 }

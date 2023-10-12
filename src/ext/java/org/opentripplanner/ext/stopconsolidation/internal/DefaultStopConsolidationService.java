@@ -3,15 +3,13 @@ package org.opentripplanner.ext.stopconsolidation.internal;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
@@ -26,9 +24,6 @@ public class DefaultStopConsolidationService implements StopConsolidationService
   private final StopConsolidationRepository model;
   private final TransitModel transitModel;
 
-  // lazily initialized because the stop model is not loaded at construction time
-  private List<StopReplacement> replacements;
-
   @Inject
   public DefaultStopConsolidationService(
     StopConsolidationRepository model,
@@ -40,17 +35,33 @@ public class DefaultStopConsolidationService implements StopConsolidationService
 
   @Override
   public List<StopReplacement> replacements() {
-    return lazilyGetReplacements();
+    return model
+      .groups()
+      .stream()
+      .flatMap(group -> {
+        var primaryStop = transitModel.getStopModel().getRegularStop(group.primary());
+        if (primaryStop == null) {
+          LOG.error(
+            "Could not find primary stop with id {}. Ignoring stop group {}.",
+            group.primary(),
+            group
+          );
+          return Stream.empty();
+        } else {
+          return group.secondaries().stream().map(r -> new StopReplacement(primaryStop, r));
+        }
+      })
+      .toList();
   }
 
   @Override
-  public List<FeedScopedId> stopIdsToReplace() {
+  public List<FeedScopedId> secondaryStops() {
     return replacements().stream().map(StopReplacement::secondary).toList();
   }
 
   @Override
-  public boolean isSecondaryStop(StopLocation stop) {
-    return model.groups().stream().anyMatch(r -> r.secondaries().contains(stop.getId()));
+  public boolean isPrimaryStop(StopLocation stop) {
+    return model.groups().stream().anyMatch(r -> r.primary().equals(stop.getId()));
   }
 
   @Override
@@ -58,44 +69,21 @@ public class DefaultStopConsolidationService implements StopConsolidationService
     return !model.groups().isEmpty();
   }
 
-  @Nonnull
-  private synchronized List<StopReplacement> lazilyGetReplacements() {
-    if (replacements == null) {
-      replacements =
-        model
-          .groups()
-          .stream()
-          .flatMap(group -> {
-            var primaryStop = transitModel.getStopModel().getRegularStop(group.primary());
-            if (primaryStop == null) {
-              LOG.error(
-                "Could not find primary stop with id {}. Ignoring stop group {}.",
-                group.primary(),
-                group
-              );
-              return Stream.empty();
-            } else {
-              return group.secondaries().stream().map(r -> new StopReplacement(primaryStop, r));
-            }
-          })
-          .toList();
-    }
-    return replacements;
-  }
-
-  private Optional<I18NString> primaryName(StopLocation secondary) {
-    return model
-      .groups()
-      .stream()
-      .filter(r -> r.secondaries().contains(secondary.getId()))
-      .findAny()
-      .map(ConsolidatedStopGroup::primary)
-      .map(id -> transitModel.getStopModel().getRegularStop(id))
-      .map(RegularStop::getName);
-  }
-
   @Override
-  public I18NString agencySpecificName(StopLocation stop) {
-    return primaryName(stop).orElse(stop.getName());
+  public I18NString agencySpecificName(StopLocation stop, Agency agency) {
+    if (agency.getId().getFeedId().equals(stop.getId().getFeedId())) {
+      return stop.getName();
+    } else {
+      return model
+        .groups()
+        .stream()
+        .filter(r -> r.primary().equals(stop.getId()))
+        .flatMap(g -> g.secondaries().stream())
+        .filter(secondary -> secondary.getFeedId().equals(agency.getId().getFeedId()))
+        .findAny()
+        .map(id -> transitModel.getStopModel().getRegularStop(id))
+        .map(RegularStop::getName)
+        .orElseGet(stop::getName);
+    }
   }
 }

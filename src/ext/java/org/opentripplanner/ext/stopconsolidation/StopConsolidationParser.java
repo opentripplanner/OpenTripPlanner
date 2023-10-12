@@ -16,16 +16,14 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class StopConsolidationParser {
+public class StopConsolidationParser {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopConsolidationParser.class);
 
   private record StopGroupEntry(String groupId, FeedScopedId stopId, boolean isPrimary) {}
 
-  public static List<ConsolidatedStopGroup> parseGroups() {
+  public static List<ConsolidatedStopGroup> parseGroups(File file) {
     try {
-      var file = new File("seattle/consolidated-stops.csv");
-
       LOG.info("Reading stop consolidation data from {}", file.getAbsolutePath());
 
       var stream = new FileInputStream(file);

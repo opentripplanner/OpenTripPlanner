@@ -12,6 +12,7 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationParser;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
@@ -271,7 +272,9 @@ public class GraphBuilderModules {
     TransitModel transitModel,
     StopConsolidationRepository repo
   ) {
-    return new StopConsolidationModule(transitModel, repo);
+    var file = new File("seattle/consolidated-stops.csv");
+    var groups = StopConsolidationParser.parseGroups(file);
+    return new StopConsolidationModule(transitModel, repo, groups);
   }
 
   /* private methods */

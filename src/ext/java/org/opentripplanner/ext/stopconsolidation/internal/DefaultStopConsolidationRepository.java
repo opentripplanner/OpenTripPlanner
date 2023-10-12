@@ -23,6 +23,6 @@ public class DefaultStopConsolidationRepository
   }
 
   public List<ConsolidatedStopGroup> groups() {
-    return groups;
+    return List.copyOf(groups);
   }
 }

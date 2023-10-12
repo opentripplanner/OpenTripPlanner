@@ -1,9 +1,11 @@
 package org.opentripplanner.ext.stopconsolidation;
 
 import jakarta.inject.Inject;
+import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nonnull;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
+import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -11,30 +13,41 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A graph build module that takes a list of "consolidated" stops (stops from several feeds
+ * that represent the same stop place) and swaps the "secondary" stops in patterns with their
+ * "primary" equivalent.
+ * <p>
+ * NOTE: This will make realtime trip updates for a modified pattern a lot harder. For IBI's initial
+ * implementation this is acceptable and will serve as encouragement for the data producers to
+ * produce a consolidated transit feed rather than relying on this feature.
+ */
 public class StopConsolidationModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
   private final StopConsolidationRepository repository;
   private final TransitModel transitModel;
+  private final Collection<ConsolidatedStopGroup> groups;
 
   @Inject
   public StopConsolidationModule(
     TransitModel transitModel,
-    StopConsolidationRepository repository
+    StopConsolidationRepository repository,
+    Collection<ConsolidatedStopGroup> groups
   ) {
     this.transitModel = transitModel;
     this.repository = repository;
+    this.groups = groups;
   }
 
   @Override
   public void buildGraph() {
-    var groups = StopConsolidationParser.parseGroups();
     repository.addGroups(groups);
 
     var service = new DefaultStopConsolidationService(repository, transitModel);
 
-    var stopsToReplace = service.stopIdsToReplace();
+    var stopsToReplace = service.secondaryStops();
     var replacements = service.replacements();
 
     transitModel
