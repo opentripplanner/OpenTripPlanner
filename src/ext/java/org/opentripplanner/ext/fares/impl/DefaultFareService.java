@@ -259,7 +259,17 @@ public class DefaultFareService implements FareService {
 
       var componentLegs = new ArrayList<Leg>();
       for (int i = start; i <= via; ++i) {
-        componentLegs.add(legs.get(i));
+        final var leg = legs.get(i);
+        // if we have a leg that is combined for the purpose of fare calculation we need to
+        // retrieve the original legs so that the fare products are assigned back to the original
+        // legs that the combined one originally consisted of.
+        // (remember that the combined leg only exists during fare calculation and is thrown away
+        // afterwards to associating fare products with it will result in the API not showing any.)
+        if (leg instanceof CombinedInterlinedTransitLeg combinedLeg) {
+          componentLegs.addAll(combinedLeg.originalLegs());
+        } else {
+          componentLegs.add(leg);
+        }
       }
       components.add(
         new FareComponent(fareId, Money.ofFractionalAmount(currency, cost), componentLegs)
@@ -374,12 +384,13 @@ public class DefaultFareService implements FareService {
 
   /**
    * Returns true if two interlined legs (those with a stay-seated transfer between them) should be
-   * treated as a single leg.
+   * treated as a single leg for the purposes of fare calculation.
    * <p>
    * By default it's disabled since this is unspecified in the GTFS fares spec.
    *
    * @see DefaultFareService#combineInterlinedLegs(List)
    * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
+   * @see HSLFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
    */
   protected boolean shouldCombineInterlinedLegs(
     ScheduledTransitLeg previousLeg,
