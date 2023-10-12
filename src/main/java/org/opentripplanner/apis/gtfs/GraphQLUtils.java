@@ -91,7 +91,7 @@ public class GraphQLUtils {
       case CAR_PARK -> PlaceType.CAR_PARK;
       case DEPARTURE_ROW -> PlaceType.PATTERN_AT_STOP;
       case STOP -> PlaceType.STOP;
-      case STOP_OR_STATION -> PlaceType.STOP_OR_STATION;
+      case STATION -> PlaceType.STATION;
     };
   }
 

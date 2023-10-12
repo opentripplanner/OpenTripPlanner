@@ -46,11 +46,7 @@ public class PlaceInterfaceTypeResolver implements TypeResolver {
     if (o instanceof PatternAtStop) {
       return schema.getObjectType("DepartureRow");
     }
-    if (o instanceof RegularStop) {
-      return schema.getObjectType("Stop");
-    }
-
-    if (o instanceof Station) {
+    if (o instanceof RegularStop || o instanceof Station) {
       return schema.getObjectType("Stop");
     }
 

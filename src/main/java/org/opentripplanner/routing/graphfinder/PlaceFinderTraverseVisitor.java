@@ -18,6 +18,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
@@ -33,6 +34,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final Set<String> filterByVehicleRental;
   private final Set<String> seenPatternAtStops = new HashSet<>();
   private final Set<FeedScopedId> seenStops = new HashSet<>();
+  private final Set<FeedScopedId> seenStations = new HashSet<>();
   private final Set<FeedScopedId> seenVehicleRentalPlaces = new HashSet<>();
   private final Set<FeedScopedId> seenParkingLots = new HashSet<>();
   private final boolean includeStops;
@@ -40,7 +42,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final boolean includeVehicleRentals;
   private final boolean includeCarParking;
   private final boolean includeBikeParking;
-  private final boolean includeStopsAndStations;
+  private final boolean includeStations;
   private final int maxResults;
   private final double radiusMeters;
 
@@ -81,7 +83,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     includeVehicleRentals = shouldInclude(filterByPlaceTypes, PlaceType.VEHICLE_RENT);
     includeCarParking = shouldInclude(filterByPlaceTypes, PlaceType.CAR_PARK);
     includeBikeParking = shouldInclude(filterByPlaceTypes, PlaceType.BIKE_PARK);
-    includeStopsAndStations = shouldInclude(filterByPlaceTypes, PlaceType.STOP_OR_STATION);
+    includeStations = shouldInclude(filterByPlaceTypes, PlaceType.STATION);
 
     this.maxResults = maxResults;
     this.radiusMeters = radiusMeters;
@@ -171,30 +173,32 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   }
 
   private void handleStop(RegularStop stop, double distance) {
-    if (filterByStops != null && !filterByStops.contains(stop.getId())) {
+    if (
+      filterByStops != null &&
+      !filterByStops.contains(stop.getId()) ||
+      seenStops.contains(stop.getStationOrStopId()) || //&&
+      !(filterByModes == null || stopHasPatternsWithMode(stop, filterByModes))
+    ) {
       return;
     }
-    if (
-      includeStops &&
-      !seenStops.contains(stop.getId()) &&
-      (filterByModes == null || stopHasPatternsWithMode(stop, filterByModes))
-    ) {
-      if (
-        includeStopsAndStations &&
-        stop.getParentStation() != null &&
-        !seenStops.contains(stop.getParentStation().getId()) &&
-        !seenStops.contains(stop.getId())
-      ) {
+    if (includeStops && includeStations) {
+      if (stop.getParentStation() != null && !seenStops.contains(stop.getParentStation().getId())) {
         seenStops.add(stop.getParentStation().getId());
         placesFound.add(new PlaceAtDistance(stop.getParentStation(), distance));
       } else {
-        // Do not accumulate the same station many times
-        if (
-          stop.getParentStation() != null && seenStops.contains(stop.getParentStation().getId())
-        ) return;
         seenStops.add(stop.getId());
         placesFound.add(new PlaceAtDistance(stop, distance));
       }
+    } else if (
+      includeStations &&
+      stop.getParentStation() != null &&
+      !seenStops.contains(stop.getParentStation().getId())
+    ) {
+      seenStops.add(stop.getParentStation().getId());
+      placesFound.add(new PlaceAtDistance(stop.getParentStation(), distance));
+    } else if (includeStops && !seenStops.contains(stop.getId())) {
+      seenStops.add(stop.getId());
+      placesFound.add(new PlaceAtDistance(stop, distance));
     }
   }
 

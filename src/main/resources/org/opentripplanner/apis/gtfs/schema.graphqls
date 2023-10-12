@@ -969,7 +969,10 @@ enum FeedAlertType {
 }
 
 enum FilterPlaceType {
-    """Stops"""
+    """
+    Stops.
+    NOTE: if this is selected at the same time as STATION, stops that have a parent station will not be returned but their parent stations will be returned instead.
+    """
     STOP
 
     """Departure rows"""
@@ -988,8 +991,11 @@ enum FilterPlaceType {
     CAR_PARK
 
 
-    """Stops or stations"""
-    STOP_OR_STATION
+    """
+    Stations.
+    NOTE: if this is selected at the same time as STOP, stops that have a parent station will not be returned but their parent stations will be returned instead.
+    """
+    STATION
 }
 
 type Geometry {

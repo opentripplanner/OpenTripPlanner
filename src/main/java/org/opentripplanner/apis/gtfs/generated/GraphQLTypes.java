@@ -238,8 +238,8 @@ public class GraphQLTypes {
     BIKE_PARK,
     CAR_PARK,
     DEPARTURE_ROW,
+    STATION,
     STOP,
-    STOP_OR_STATION,
     VEHICLE_RENT,
   }
 
