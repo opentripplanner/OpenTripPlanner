@@ -971,7 +971,7 @@ enum FeedAlertType {
 enum FilterPlaceType {
     """
     Stops.
-    NOTE: if this is selected at the same time as STATION, stops that have a parent station will not be returned but their parent stations will be returned instead.
+    NOTE: if this is selected at the same time as `STATION`, stops that have a parent station will not be returned but their parent stations will be returned instead.
     """
     STOP
 
@@ -993,7 +993,7 @@ enum FilterPlaceType {
 
     """
     Stations.
-    NOTE: if this is selected at the same time as STOP, stops that have a parent station will not be returned but their parent stations will be returned instead.
+    NOTE: if this is selected at the same time as `STOP`, stops that have a parent station will not be returned but their parent stations will be returned instead.
     """
     STATION
 }
