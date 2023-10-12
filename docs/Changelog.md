@@ -16,6 +16,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Transmodel GraphQL API for pass-through searches [#5320](https://github.com/opentripplanner/OpenTripPlanner/pull/5320)
 - Fix check for OSM relation members not being present in the extract [#5379](https://github.com/opentripplanner/OpenTripPlanner/pull/5379)
 - Add a configurable limit for the search window [#5293](https://github.com/opentripplanner/OpenTripPlanner/pull/5293)
+- Fix fare calculation for combined interlined legs [#5408](https://github.com/opentripplanner/OpenTripPlanner/pull/5408)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
