@@ -2,7 +2,6 @@ package org.opentripplanner.ext.stopconsolidation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_A;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_C;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_D;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_05;
@@ -14,6 +13,7 @@ import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidati
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 
 class ConsolidatedStopNameFilterTest {
@@ -32,7 +32,8 @@ class ConsolidatedStopNameFilterTest {
     var itinerary = TestItineraryBuilder
       .newItinerary(Place.forStop(STOP_C))
       .bus(TestStopConsolidationModel.ROUTE, 1, T11_05, T11_12, Place.forStop(STOP_C))
-      .bus(1, T11_05, T11_12, Place.forStop(STOP_A))
+      .bus(1, T11_05, T11_12, PlanTestConstants.E)
+      .bus(1, T11_05, T11_12, PlanTestConstants.F)
       .build();
 
     var filtered = filter.filter(List.of(itinerary));
