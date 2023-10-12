@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DateUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
@@ -57,6 +58,9 @@ public class RouteRequest implements Cloneable, Serializable {
   private List<PassThroughPoint> passThroughPoints = Collections.emptyList();
 
   private Instant dateTime = Instant.now();
+
+  @Nullable
+  private Duration maxSearchWindow;
 
   private Duration searchWindow;
 
@@ -330,7 +334,27 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   public void setSearchWindow(Duration searchWindow) {
+    if (searchWindow != null) {
+      if (hasMaxSearchWindow() && searchWindow.toSeconds() > maxSearchWindow.toSeconds()) {
+        throw new IllegalArgumentException("The search window cannot exceed " + maxSearchWindow);
+      }
+      if (searchWindow.isNegative()) {
+        throw new IllegalArgumentException("The search window must be a positive duration");
+      }
+    }
     this.searchWindow = searchWindow;
+  }
+
+  private boolean hasMaxSearchWindow() {
+    return maxSearchWindow != null;
+  }
+
+  public Duration maxSearchWindow() {
+    return maxSearchWindow;
+  }
+
+  public void setMaxSearchWindow(@Nullable Duration maxSearchWindow) {
+    this.maxSearchWindow = maxSearchWindow;
   }
 
   public Locale locale() {
