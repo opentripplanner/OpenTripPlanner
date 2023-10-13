@@ -206,6 +206,7 @@ public class EnumTypes {
       still accepting passengers. There isn't a big difference between this and `manySeatsAvailable`
       so it's possible to handle them as the same value, if one wants to limit the number of different
       values.
+      SIRI nordic profile: merge these into `manySeatsAvailable`.
       """
     )
     .value(
@@ -239,6 +240,7 @@ public class EnumTypes {
         The vehicle or carriage can currently accommodate only standing passengers and has limited
         space for them. There isn't a big difference between this and `full` so it's possible to handle
         them as the same value, if one wants to limit the number of different values.
+        SIRI nordic profile: merge into `standingRoomOnly`.
         """
     )
     .value(
