@@ -1887,11 +1887,11 @@ input InputPlaceIds {
 "Filter trips by only allowing lines involving certain elements. If both lines and authorities are specified, only one must be valid for each line to be used. If a line is both banned and whitelisted, it will be counted as banned."
 input InputWhiteListed {
   "Set of ids for authorities that should be used"
-  authorities: [ID!] = []
+  authorities: [ID] = []
   "Set of ids for lines that should be used"
-  lines: [ID!] = []
+  lines: [ID] = []
   "Set of ids of rental networks that should be used for renting vehicles."
-  rentalNetworks: [ID!] = []
+  rentalNetworks: [ID] = []
 }
 
 "Parameters for the OTP Itinerary Filter Chain. These parameters SHOULD be configured on the server side and should not be used by the client. They are made available here to be able to experiment and tune the server."

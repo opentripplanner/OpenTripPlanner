@@ -13,37 +13,35 @@ public class BannedInputType {
       "authorities are specified, only one must be valid for each line to be banned. If a " +
       "line is both banned and whitelisted, it will be counted as banned."
     )
+    .field(GqlUtil.newIdListInputField("lines", "Set of ids for lines that should not be used"))
     .field(
-      GqlUtil.newNullableIdListInputField("lines", "Set of ids for lines that should not be used")
-    )
-    .field(
-      GqlUtil.newNullableIdListInputField(
+      GqlUtil.newIdListInputField(
         "authorities",
         "Set of ids for authorities that should not be used"
       )
     )
     .field(
-      GqlUtil.newNullableIdListInputField(
+      GqlUtil.newIdListInputField(
         "quays",
         "NOT IMPLEMENTED. Set of ids of quays that should not be allowed for boarding or alighting. Trip patterns " +
         "that travel through the quay will still be permitted."
       )
     )
     .field(
-      GqlUtil.newNullableIdListInputField(
+      GqlUtil.newIdListInputField(
         "quaysHard",
         "NOT IMPLEMENTED. Set of ids of quays that should not be allowed for boarding, alighting or traveling " +
         "thorugh."
       )
     )
     .field(
-      GqlUtil.newNullableIdListInputField(
+      GqlUtil.newIdListInputField(
         "serviceJourneys",
         "Set of ids of service journeys that should not be used."
       )
     )
     .field(
-      GqlUtil.newNullableIdListInputField(
+      GqlUtil.newIdListInputField(
         "rentalNetworks",
         "Set of ids of rental networks that should not be allowed for renting vehicles."
       )

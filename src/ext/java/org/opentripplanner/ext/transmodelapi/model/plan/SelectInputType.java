@@ -1,10 +1,13 @@
 package org.opentripplanner.ext.transmodelapi.model.plan;
 
+import static org.opentripplanner.ext.transmodelapi.support.GqlUtil.newIdListInputField;
+
 import graphql.Scalars;
 import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
+import java.util.List;
 
 public class SelectInputType {
 
