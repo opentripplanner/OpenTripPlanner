@@ -32,7 +32,6 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -87,34 +86,38 @@ public class UnscheduledTripTest {
       CONTINUOUS_DROP_OFF_STOP.setTrip(trip);
     }
 
-    static final List<List<StopTime>> notUnscheduled = List.of(
-      List.of(),
-      List.of(SCHEDULED_STOP),
-      List.of(SCHEDULED_STOP, SCHEDULED_STOP),
-      List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP),
-      List.of(UNSCHEDULED_STOP, SCHEDULED_STOP, UNSCHEDULED_STOP),
-      List.of(UNSCHEDULED_STOP, CONTINUOUS_PICKUP_STOP),
-      List.of(UNSCHEDULED_STOP, CONTINUOUS_DROP_OFF_STOP),
-      List.of(CONTINUOUS_PICKUP_STOP, CONTINUOUS_DROP_OFF_STOP)
-    );
+    static List<List<StopTime>> notUnscheduled() {
+      return List.of(
+        List.of(),
+        List.of(SCHEDULED_STOP),
+        List.of(SCHEDULED_STOP, SCHEDULED_STOP),
+        List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, SCHEDULED_STOP, UNSCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, CONTINUOUS_PICKUP_STOP),
+        List.of(UNSCHEDULED_STOP, CONTINUOUS_DROP_OFF_STOP),
+        List.of(CONTINUOUS_PICKUP_STOP, CONTINUOUS_DROP_OFF_STOP)
+      );
+    }
 
     @ParameterizedTest
-    @VariableSource("notUnscheduled")
+    @MethodSource("notUnscheduled")
     void isNotUnscheduled(List<StopTime> stopTimes) {
       assertFalse(isUnscheduledTrip(stopTimes));
     }
 
-    static final List<List<StopTime>> unscheduled = List.of(
-      List.of(UNSCHEDULED_STOP),
-      List.of(UNSCHEDULED_STOP, SCHEDULED_STOP),
-      List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
-      List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP),
-      List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP, UNSCHEDULED_STOP),
-      Collections.nCopies(10, UNSCHEDULED_STOP)
-    );
+    static List<List<StopTime>> unscheduled() {
+      return List.of(
+        List.of(UNSCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, SCHEDULED_STOP),
+        List.of(SCHEDULED_STOP, UNSCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP),
+        List.of(UNSCHEDULED_STOP, UNSCHEDULED_STOP, UNSCHEDULED_STOP),
+        Collections.nCopies(10, UNSCHEDULED_STOP)
+      );
+    }
 
     @ParameterizedTest
-    @VariableSource("unscheduled")
+    @MethodSource("unscheduled")
     void isUnscheduled(List<StopTime> stopTimes) {
       assertTrue(isUnscheduledTrip(stopTimes));
     }

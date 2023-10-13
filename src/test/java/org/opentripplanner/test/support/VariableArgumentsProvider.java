@@ -1,10 +1,7 @@
 package org.opentripplanner.test.support;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.function.Function;
 import java.util.stream.Stream;
-import javax.annotation.Nonnull;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ArgumentsProvider;
@@ -53,27 +50,6 @@ class VariableArgumentsProvider implements ArgumentsProvider, AnnotationConsumer
 
     field.setAccessible(accessible);
 
-    if (value == null) {
-      return null;
-    } else if (value instanceof Collection<?> collection) {
-      return collection.stream().map(toArguments());
-    } else if (value instanceof Stream stream) {
-      return stream.map(toArguments());
-    } else {
-      throw new IllegalArgumentException(
-        "Cannot convert %s to stream.".formatted(value.getClass())
-      );
-    }
-  }
-
-  @Nonnull
-  private static Function<Object, Arguments> toArguments() {
-    return val -> {
-      if (val instanceof Arguments arguments) {
-        return arguments;
-      } else {
-        return Arguments.of(val);
-      }
-    };
+    return value == null ? null : (Stream<Arguments>) value;
   }
 }

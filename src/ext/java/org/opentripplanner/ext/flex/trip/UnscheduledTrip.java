@@ -30,7 +30,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
  * This type of FlexTrip is used when a taxi-type service is modeled, which operates in any number
- * od areas/groups of stops without a set schedule. The travel times are calculated based
+ * of areas/groups of stops without a set schedule. The travel times are calculated based
  * on the driving time between the stops, with the schedule times being used just for deciding if a
  * trip is possible.
  * <p>
