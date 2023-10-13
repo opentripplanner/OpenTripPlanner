@@ -3,7 +3,7 @@ package org.opentripplanner.model;
 
 import java.util.List;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.StopTimeKey;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -295,14 +295,19 @@ public final class StopTime implements Comparable<StopTime> {
 
   @Override
   public String toString() {
-    return ToStringBuilder
-      .of(this.getClass())
-      .addNum("seq", stopSequence)
-      .addObj("stop", stop)
-      .addObj("trip", trip)
-      .addServiceTime("arrival", arrivalTime)
-      .addServiceTime("departure", departureTime)
-      .toString();
+    return (
+      "StopTime(seq=" +
+      getStopSequence() +
+      " stop=" +
+      getStop().getId() +
+      " trip=" +
+      getTrip().getId() +
+      " times=" +
+      TimeUtils.timeToStrLong(getArrivalTime()) +
+      "-" +
+      TimeUtils.timeToStrLong(getDepartureTime()) +
+      ")"
+    );
   }
 
   private static int getAvailableTime(int... times) {

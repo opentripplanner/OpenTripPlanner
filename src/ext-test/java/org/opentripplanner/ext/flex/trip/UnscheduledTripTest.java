@@ -59,20 +59,43 @@ public class UnscheduledTripTest {
 
     private static final StopTime SCHEDULED_STOP = new StopTime();
     private static final StopTime UNSCHEDULED_STOP = new StopTime();
+    private static final StopTime CONTINUOUS_PICKUP_STOP = new StopTime();
+    private static final StopTime CONTINUOUS_DROP_OFF_STOP = new StopTime();
 
     static {
+      var trip = TransitModelForTest.trip("flex").build();
       SCHEDULED_STOP.setArrivalTime(30);
       SCHEDULED_STOP.setDepartureTime(60);
+      SCHEDULED_STOP.setStop(AREA_STOP);
+      SCHEDULED_STOP.setTrip(trip);
 
       UNSCHEDULED_STOP.setFlexWindowStart(30);
       UNSCHEDULED_STOP.setFlexWindowEnd(300);
+      UNSCHEDULED_STOP.setStop(AREA_STOP);
+      UNSCHEDULED_STOP.setTrip(trip);
+
+      CONTINUOUS_PICKUP_STOP.setFlexContinuousPickup(PickDrop.COORDINATE_WITH_DRIVER);
+      CONTINUOUS_PICKUP_STOP.setFlexWindowStart(30);
+      CONTINUOUS_PICKUP_STOP.setFlexWindowEnd(300);
+      CONTINUOUS_PICKUP_STOP.setStop(AREA_STOP);
+      CONTINUOUS_PICKUP_STOP.setTrip(trip);
+
+      CONTINUOUS_DROP_OFF_STOP.setFlexContinuousDropOff(PickDrop.COORDINATE_WITH_DRIVER);
+      CONTINUOUS_DROP_OFF_STOP.setFlexWindowStart(100);
+      CONTINUOUS_DROP_OFF_STOP.setFlexWindowEnd(200);
+      CONTINUOUS_DROP_OFF_STOP.setStop(AREA_STOP);
+      CONTINUOUS_DROP_OFF_STOP.setTrip(trip);
     }
 
     static final List<List<StopTime>> notUnscheduled = List.of(
       List.of(),
       List.of(SCHEDULED_STOP),
       List.of(SCHEDULED_STOP, SCHEDULED_STOP),
-      List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP)
+      List.of(SCHEDULED_STOP, SCHEDULED_STOP, SCHEDULED_STOP),
+      List.of(UNSCHEDULED_STOP, SCHEDULED_STOP, UNSCHEDULED_STOP),
+      List.of(UNSCHEDULED_STOP, CONTINUOUS_PICKUP_STOP),
+      List.of(UNSCHEDULED_STOP, CONTINUOUS_DROP_OFF_STOP),
+      List.of(CONTINUOUS_PICKUP_STOP, CONTINUOUS_DROP_OFF_STOP)
     );
 
     @ParameterizedTest

@@ -37,6 +37,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
  * An unscheduled flex trip may visit/drive from one flex stops(areas/group of stop locations) to
  * any other stop in the pattern without driving through the stops in between. Only the times in the
  * two stops used need to match the path.
+ * <p>
+ * For a discussion of this behaviour see https://github.com/MobilityData/gtfs-flex/issues/76
  */
 public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBuilder> {
 
@@ -81,19 +83,16 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
     Predicate<StopTime> hasFlexWindow = st ->
       st.getFlexWindowStart() != MISSING_VALUE || st.getFlexWindowEnd() != MISSING_VALUE;
-    Predicate<StopTime> notContinuousStop = stopTime ->
-      stopTime.getFlexContinuousDropOff() == NONE && stopTime.getFlexContinuousPickup() == NONE;
-    boolean noContinuousStops = stopTimes.stream().allMatch(notContinuousStop);
+    Predicate<StopTime> hasContinuousStops = stopTime ->
+      stopTime.getFlexContinuousDropOff() != NONE || stopTime.getFlexContinuousPickup() != NONE;
     if (stopTimes.isEmpty()) {
       return false;
+    } else if (stopTimes.stream().anyMatch(hasContinuousStops)) {
+      return false;
     } else if (N_STOPS.contains(stopTimes.size())) {
-      return (
-        N_STOPS.contains(stopTimes.size()) &&
-        stopTimes.stream().anyMatch(hasFlexWindow) &&
-        noContinuousStops
-      );
+      return stopTimes.stream().anyMatch(hasFlexWindow);
     } else {
-      return stopTimes.stream().allMatch(hasFlexWindow) && noContinuousStops;
+      return stopTimes.stream().allMatch(hasFlexWindow);
     }
   }
 
