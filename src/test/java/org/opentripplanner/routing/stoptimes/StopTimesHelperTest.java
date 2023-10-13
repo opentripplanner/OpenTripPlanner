@@ -46,7 +46,6 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForStop_zeroRequestedNumberOfDeparture() {
-    // Case 1, should find first departure for each pattern
     var result = StopTimesHelper.stopTimesForStop(
       transitService,
       transitService.getRegularStop(stopId),
@@ -65,7 +64,6 @@ class StopTimesHelperTest {
    */
   @Test
   void stopTimesForStop_oneDeparture() {
-    // Case 1, should find first departure for each pattern
     var result = StopTimesHelper.stopTimesForStop(
       transitService,
       transitService.getRegularStop(stopId),
