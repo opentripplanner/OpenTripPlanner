@@ -90,6 +90,15 @@ public class DefaultFareService implements FareService {
     return fareRulesPerType;
   }
 
+  /**
+   * Takes a legs and returns a map of their agency's feed id and all corresponding legs.
+   */
+  protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {
+    return fareLegs
+      .stream()
+      .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
+  }
+
   @Override
   public ItineraryFares calculateFares(Itinerary itinerary) {
     var fareLegs = itinerary
@@ -105,9 +114,7 @@ public class DefaultFareService implements FareService {
     if (fareLegs.isEmpty()) {
       return null;
     }
-    var fareLegsByFeed = fareLegs
-      .stream()
-      .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
+    var fareLegsByFeed = fareLegsByFeed(fareLegs);
 
     ItineraryFares fare = ItineraryFares.empty();
     boolean hasFare = false;
