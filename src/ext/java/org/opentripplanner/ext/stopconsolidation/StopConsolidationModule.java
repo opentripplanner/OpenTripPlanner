@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.stopconsolidation;
 
-import jakarta.inject.Inject;
+import java.io.File;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -30,7 +30,6 @@ public class StopConsolidationModule implements GraphBuilderModule {
   private final TransitModel transitModel;
   private final Collection<ConsolidatedStopGroup> groups;
 
-  @Inject
   public StopConsolidationModule(
     TransitModel transitModel,
     StopConsolidationRepository repository,
@@ -69,5 +68,15 @@ public class StopConsolidationModule implements GraphBuilderModule {
     var updatedStopPattern = pattern.getStopPattern().mutate();
     replacements.forEach(r -> updatedStopPattern.replaceStop(r.secondary(), r.primary()));
     return pattern.copy().withStopPattern(updatedStopPattern.build()).build();
+  }
+
+  public static StopConsolidationModule of(
+    TransitModel transitModel,
+    StopConsolidationRepository repo,
+    File file
+  ) {
+    LOG.info("Reading stop consolidation information from '{}'", file.getAbsolutePath());
+    var groups = StopConsolidationParser.parseGroups(file);
+    return new StopConsolidationModule(transitModel, repo, groups);
   }
 }

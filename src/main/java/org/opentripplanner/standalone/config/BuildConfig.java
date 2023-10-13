@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -180,6 +181,8 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final LocalDate transitServiceEnd;
   public final ZoneId transitModelTimeZone;
+
+  public final String stopConsolidationFile;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -606,6 +609,15 @@ Netex data is also often supplied in a ZIP file.
       """
         )
         .asUri(null);
+
+    stopConsolidationFile =
+      root
+        .of("stopConsolidationFile")
+        .since(V2_5)
+        .summary(
+          "Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation."
+        )
+        .asString(null);
 
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);

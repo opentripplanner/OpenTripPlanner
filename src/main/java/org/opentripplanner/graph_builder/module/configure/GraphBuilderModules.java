@@ -12,7 +12,6 @@ import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
-import org.opentripplanner.ext.stopconsolidation.StopConsolidationParser;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
@@ -40,7 +39,6 @@ import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -272,11 +270,19 @@ public class GraphBuilderModules {
   static StopConsolidationModule providesStopConsolidationModule(
     TransitModel transitModel,
     StopConsolidationRepository repo,
-    BuildConfig configModel
+    GraphBuilderDataSources dataSources,
+    BuildConfig buildConfig
   ) {
-    var file = new File("seattle/consolidated-stops.csv");
-    var groups = StopConsolidationParser.parseGroups(file);
-    return new StopConsolidationModule(transitModel, repo, groups);
+    if (buildConfig.stopConsolidationFile == null) {
+      return new StopConsolidationModule(transitModel, repo, List.of());
+    } else {
+      var file = dataSources
+        .baseDirectory()
+        .toPath()
+        .resolve(buildConfig.stopConsolidationFile)
+        .toFile();
+      return StopConsolidationModule.of(transitModel, repo, file);
+    }
   }
 
   /* private methods */

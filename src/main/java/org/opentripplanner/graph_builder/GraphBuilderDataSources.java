@@ -182,6 +182,10 @@ public class GraphBuilderDataSources {
       .orElse(buildConfig.netexDefaults.copyOf().withSource(dataSource.uri()).build());
   }
 
+  public File baseDirectory() {
+    return baseDirectory;
+  }
+
   /**
    * Match the URI provided in the configuration with the URI of a datasource,
    * either by comparing directly the two URIs or by first prepending the OTP base directory

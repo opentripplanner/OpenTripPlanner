@@ -24,7 +24,7 @@ public class StopConsolidationParser {
 
   public static List<ConsolidatedStopGroup> parseGroups(File file) {
     try {
-      LOG.info("Reading stop consolidation data from {}", file.getAbsolutePath());
+      LOG.debug("Reading stop consolidation data from {}", file.getAbsolutePath());
 
       var stream = new FileInputStream(file);
       var reader = new CsvReader(stream, StandardCharsets.UTF_8);
