@@ -46,8 +46,9 @@ public class JourneyWhiteListed {
       this.authorityIds = Set.of();
       this.lineIds = Set.of();
     } else {
-      this.authorityIds = Set.copyOf(TransitIdMapper.mapIDsToDomain(whiteList.get("authorities")));
-      this.lineIds = Set.copyOf(TransitIdMapper.mapIDsToDomain(whiteList.get("lines")));
+      this.authorityIds =
+        Set.copyOf(TransitIdMapper.mapIDsToDomainNullSafe(whiteList.get("authorities")));
+      this.lineIds = Set.copyOf(TransitIdMapper.mapIDsToDomainNullSafe(whiteList.get("lines")));
     }
   }
 
