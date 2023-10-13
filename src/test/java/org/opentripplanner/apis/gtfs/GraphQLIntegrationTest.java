@@ -116,6 +116,8 @@ class GraphQLIntegrationTest {
         List.of()
       );
 
+    // unfortunately this is necessary to prevent a race condition when all tests run
+    StopLocation.initIndexCounter(0);
     var stopModel = StopModel.of();
     PlanTestConstants.listStops().forEach(sl -> stopModel.withRegularStop((RegularStop) sl));
     var model = stopModel.build();
