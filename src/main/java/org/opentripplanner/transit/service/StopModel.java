@@ -248,6 +248,9 @@ public class StopModel implements Serializable {
   @Nullable
   @SafeVarargs
   private static <V> V getById(FeedScopedId id, Map<FeedScopedId, ? extends V>... maps) {
+    if (id == null) {
+      return null;
+    }
     for (Map<FeedScopedId, ? extends V> map : maps) {
       V v = map.get(id);
       if (v != null) {
