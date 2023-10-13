@@ -22,8 +22,8 @@ public final class IntUtils {
   }
 
   /**
-   * Convert an integer to a String, if the value equals the {@code notSetValue} parameter an empty
-   * string is returned.
+   * Convert an integer array to a string of comma separated numbers. If the array is empty, then
+   * an empty string is returned.
    */
   public static String intArrayToString(int... values) {
     var buf = new StringBuilder();
