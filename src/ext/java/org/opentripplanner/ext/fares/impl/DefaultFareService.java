@@ -90,6 +90,9 @@ public class DefaultFareService implements FareService {
     return fareRulesPerType;
   }
 
+  /**
+   * Takes a legs and returns a map of their agency's feed id and all corresponding legs.
+   */
   protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {
     return fareLegs
       .stream()
