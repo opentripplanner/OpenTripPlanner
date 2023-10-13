@@ -40,6 +40,7 @@ import org.opentripplanner.openstreetmap.OsmProvider;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.ConfigModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -270,7 +271,8 @@ public class GraphBuilderModules {
   @Singleton
   static StopConsolidationModule providesStopConsolidationModule(
     TransitModel transitModel,
-    StopConsolidationRepository repo
+    StopConsolidationRepository repo,
+    BuildConfig configModel
   ) {
     var file = new File("seattle/consolidated-stops.csv");
     var groups = StopConsolidationParser.parseGroups(file);

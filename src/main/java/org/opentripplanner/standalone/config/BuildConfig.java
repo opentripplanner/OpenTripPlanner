@@ -165,21 +165,21 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
   public final TransitFeeds transitFeeds;
-  public boolean staticParkAndRide;
-  public boolean staticBikeParkAndRide;
-  public double distanceBetweenElevationSamples;
-  public double maxElevationPropagationMeters;
-  public boolean readCachedElevations;
-  public boolean writeCachedElevations;
+  public final boolean staticParkAndRide;
+  public final boolean staticBikeParkAndRide;
+  public final double distanceBetweenElevationSamples;
+  public final double maxElevationPropagationMeters;
+  public final boolean readCachedElevations;
+  public final boolean writeCachedElevations;
 
-  public boolean includeEllipsoidToGeoidDifference;
+  public final boolean includeEllipsoidToGeoidDifference;
 
-  public boolean multiThreadElevationCalculations;
+  public final boolean multiThreadElevationCalculations;
 
-  public LocalDate transitServiceStart;
+  public final LocalDate transitServiceStart;
 
-  public LocalDate transitServiceEnd;
-  public ZoneId transitModelTimeZone;
+  public final LocalDate transitServiceEnd;
+  public final ZoneId transitModelTimeZone;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
