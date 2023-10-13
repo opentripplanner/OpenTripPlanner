@@ -32,10 +32,12 @@ public class BitSetPassThroughPointsService implements PassThroughPointsService 
   }
 
   public static PassThroughPointsService of(List<PassThroughPoint> points) {
-    return points
-      .stream()
-      .map(PassThroughPoint::asBitSet)
-      .collect(collectingAndThen(toList(), BitSetPassThroughPointsService::new));
+    return points == null || points.isEmpty()
+      ? NOOP
+      : points
+        .stream()
+        .map(PassThroughPoint::asBitSet)
+        .collect(collectingAndThen(toList(), BitSetPassThroughPointsService::new));
   }
 
   @Override

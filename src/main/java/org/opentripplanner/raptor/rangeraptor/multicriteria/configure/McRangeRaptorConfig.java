@@ -63,9 +63,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   public static PassThroughPointsService passThroughPointsService(
     MultiCriteriaRequest<?> multiCriteriaRequest
   ) {
-    return multiCriteriaRequest.hasPassThroughPoints()
-      ? BitSetPassThroughPointsService.of(multiCriteriaRequest.passThroughPoints())
-      : PassThroughPointsService.NOOP;
+    return BitSetPassThroughPointsService.of(multiCriteriaRequest.passThroughPoints());
   }
 
   /**
