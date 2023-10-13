@@ -917,8 +917,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * Additional qualifier for a transport mode. Note that qualifiers can only be used with certain
-   * transport modes.
+   * Additional qualifier for a transport mode.
+   * Note that qualifiers can only be used with certain transport modes.
    */
   public enum GraphQLQualifier {
     ACCESS,
@@ -3373,8 +3373,8 @@ public class GraphQLTypes {
   }
 
   /**
-   * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that
-   * they may be represented differently to the user.
+   * The state of the vehicle parking. TEMPORARILY_CLOSED and CLOSED are distinct states so that they
+   * may be represented differently to the user.
    */
   public enum GraphQLVehicleParkingState {
     CLOSED,
