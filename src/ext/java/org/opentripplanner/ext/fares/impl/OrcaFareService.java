@@ -614,6 +614,15 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
+   * Disables functionality grouping legs by their feed.
+   * This ensures we can calculate transfers between agencies/feeds.
+   */
+  @Override
+  protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {
+    return Map.of(FEED_ID, fareLegs);
+  }
+
+  /**
    * Check if trip falls within the transfer time window.
    */
   private boolean inFreeTransferWindow(
