@@ -3,7 +3,6 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model.passthr
 import java.util.List;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
@@ -58,9 +57,7 @@ public class PassThroughFilterFactory<T extends RaptorTripSchedule>
   }
 
   @Override
-  public PathTailFilter<OptimizedPathTail<T>> createFilter(
-    List<List<TripToTripTransfer<T>>> possibleTransfers
-  ) {
+  public PathTailFilter<T> createFilter(List<List<TripToTripTransfer<T>>> possibleTransfers) {
     var calculator = new PathTailC2Calculator<>(possibleTransfers, passThroughPoints);
     return new PassThroughPathTailFilter<>(
       delegate.createFilter(possibleTransfers),

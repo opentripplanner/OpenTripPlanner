@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.ToIntFunction;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 
 /**
@@ -18,24 +20,27 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTail
  *
  * @param <T> The element type of the cost-functions and the filtered list
  */
-class MinCostPathTailFilter<T> implements PathTailFilter<T> {
+class MinCostPathTailFilter<T extends RaptorTripSchedule> implements PathTailFilter<T> {
 
-  private final List<ToIntFunction<T>> costFunctions;
+  private final List<ToIntFunction<OptimizedPathTail<T>>> costFunctions;
 
-  MinCostPathTailFilter(List<ToIntFunction<T>> costFunctions) {
+  MinCostPathTailFilter(List<ToIntFunction<OptimizedPathTail<T>>> costFunctions) {
     this.costFunctions = costFunctions;
   }
 
   @Override
-  public Set<T> filterIntermediateResult(Set<T> elements) {
+  public Set<OptimizedPathTail<T>> filterIntermediateResult(Set<OptimizedPathTail<T>> elements) {
     for (var costFunction : costFunctions) {
       elements = filter(elements, costFunction);
     }
     return elements;
   }
 
-  private Set<T> filter(Set<T> elements, ToIntFunction<T> costFunction) {
-    var result = new HashSet<T>();
+  private Set<OptimizedPathTail<T>> filter(
+    Set<OptimizedPathTail<T>> elements,
+    ToIntFunction<OptimizedPathTail<T>> costFunction
+  ) {
+    var result = new HashSet<OptimizedPathTail<T>>();
     int minCost = Integer.MAX_VALUE;
 
     for (var it : elements) {
@@ -53,7 +58,7 @@ class MinCostPathTailFilter<T> implements PathTailFilter<T> {
   }
 
   @Override
-  public Set<T> filterFinalResult(Set<T> elements) {
+  public Set<OptimizedPathTail<T>> filterFinalResult(Set<OptimizedPathTail<T>> elements) {
     return elements;
   }
 }

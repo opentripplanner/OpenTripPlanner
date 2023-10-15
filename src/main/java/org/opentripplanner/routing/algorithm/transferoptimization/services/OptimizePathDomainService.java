@@ -135,7 +135,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     RaptorPath<T> originalPath,
     List<TransitPathLeg<T>> originalTransitLegs,
     List<List<TripToTripTransfer<T>>> possibleTransfers,
-    PathTailFilter<OptimizedPathTail<T>> filter
+    PathTailFilter<T> filter
   ) {
     final int iterationDepartureTime = originalPath.rangeRaptorIterationDepartureTime();
     // Create a set of tails with the last transit leg in it (one element)

@@ -39,7 +39,7 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     null
   );
 
-  public static final PathTailFilter<OptimizedPathTail<TestTripSchedule>> FILTER_CHAIN = MinCostPathTailFilterFactory.ofCostFunction(
+  public static final PathTailFilter<TestTripSchedule> FILTER_CHAIN = MinCostPathTailFilterFactory.ofCostFunction(
     OptimizedPathTail::generalizedCost
   );
 

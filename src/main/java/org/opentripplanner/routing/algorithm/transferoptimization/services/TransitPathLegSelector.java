@@ -29,16 +29,13 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTail
  */
 class TransitPathLegSelector<T extends RaptorTripSchedule> {
 
-  private final PathTailFilter<OptimizedPathTail<T>> filter;
+  private final PathTailFilter<T> filter;
   private Set<OptimizedPathTail<T>> remindingLegs;
   private Set<OptimizedPathTail<T>> selectedLegs;
 
   private int lastLimit = Integer.MAX_VALUE;
 
-  TransitPathLegSelector(
-    final PathTailFilter<OptimizedPathTail<T>> filter,
-    final Set<OptimizedPathTail<T>> legs
-  ) {
+  TransitPathLegSelector(final PathTailFilter<T> filter, final Set<OptimizedPathTail<T>> legs) {
     this.filter = filter;
     this.remindingLegs = Set.copyOf(legs);
     this.selectedLegs = new HashSet<>();

@@ -21,9 +21,7 @@ public class MinCostPathTailFilterFactory<T extends RaptorTripSchedule>
   }
 
   @Override
-  public PathTailFilter<OptimizedPathTail<T>> createFilter(
-    List<List<TripToTripTransfer<T>>> possibleTransfers
-  ) {
+  public PathTailFilter<T> createFilter(List<List<TripToTripTransfer<T>>> possibleTransfers) {
     List<ToIntFunction<OptimizedPathTail<T>>> filters = new ArrayList<>(3);
 
     if (transferPriority) {
@@ -45,7 +43,7 @@ public class MinCostPathTailFilterFactory<T extends RaptorTripSchedule>
    * This factory method is used for unit testing. It allows you to pass in a simple cost function
    * instead of the more complicated functions used in the main version of this.
    */
-  public static <T extends RaptorTripSchedule> PathTailFilter<OptimizedPathTail<T>> ofCostFunction(
+  public static <T extends RaptorTripSchedule> PathTailFilter<T> ofCostFunction(
     ToIntFunction<OptimizedPathTail<T>> costFunction
   ) {
     return new MinCostPathTailFilter<>(List.of(costFunction));

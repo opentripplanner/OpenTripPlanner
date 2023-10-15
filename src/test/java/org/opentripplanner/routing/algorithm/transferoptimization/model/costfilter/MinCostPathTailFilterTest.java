@@ -1,64 +1,74 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
+import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 
-class MinCostPathTailFilterTest {
+class MinCostPathTailFilterTest implements RaptorTestConstants {
 
-  private final A v01 = new A("A", 0, 1);
-  private final A v10 = new A("B", 1, 0);
-  private final A v02 = new A("C", 0, 2);
-  private final A w01 = new A("A'", 0, 1);
+  private static final TransferWaitTimeCostCalculator WAIT_TIME_CALC = new TransferWaitTimeCostCalculator(
+    1.0,
+    5.0
+  );
 
-  static Set<A> setOf(A... as) {
-    return Set.of(as);
-  }
+  private final A v01 = new A("A", 0, 11);
+  private final A v10 = new A("B", 1, 10);
+  private final A v02 = new A("C", 0, 12);
+  private final A w01 = new A("A'", 0, 11);
 
   @Test
   void filterEmptySet() {
     // filter empty set
     assertEquals(
       Set.of(),
-      new MinCostPathTailFilter<A>(List.of(it -> it.x)).filterIntermediateResult(Set.of())
+      new MinCostPathTailFilter<TestTripSchedule>(List.of(it -> ((A) it).x))
+        .filterIntermediateResult(Set.of())
     );
   }
 
   @Test
   void filterOneElement() {
-    assertEquals(setOf(v01), filter(v01));
+    assertEquals(Set.of(v01), filter(v01));
   }
 
   @Test
   void filterTwoDistinctEntries() {
-    assertEquals(setOf(v01), filter(v01, v10));
+    assertEquals(Set.of(v01), filter(v01, v10));
     // swap order, should not matter
-    assertEquals(setOf(v01), filter(v10, v01));
+    assertEquals(Set.of(v01), filter(v10, v01));
   }
 
   @Test
   void filterTwoDistinctEntriesWithTheSameFirstValueX() {
     // Keep best y (x is same)
-    assertEquals(setOf(v01), filter(v01, v02));
-    assertEquals(setOf(v01), filter(v02, v01));
+    assertEquals(Set.of(v01), filter(v01, v02));
+    assertEquals(Set.of(v01), filter(v02, v01));
   }
 
   @Test
   void filterTwoEqualVectors() {
-    assertEquals(setOf(v01, w01), filter(v01, w01));
-    assertEquals(setOf(v01, w01), filter(w01, v01));
+    assertEquals(Set.of(v01, w01), filter(v01, w01));
+    assertEquals(Set.of(v01, w01), filter(w01, v01));
   }
 
   private Set<A> filter(A... as) {
-    return new MinCostPathTailFilter<A>(List.of(it -> it.x, it -> it.y))
-      .filterIntermediateResult(setOf(as));
+    return new MinCostPathTailFilter<TestTripSchedule>(List.of(it -> ((A) it).x, it -> ((A) it).y))
+      .filterIntermediateResult(Set.of(as))
+      .stream()
+      .map(it -> (A) it)
+      .collect(Collectors.toSet());
   }
 
-  static class A {
+  static class A extends OptimizedPathTail<TestTripSchedule> {
 
     /** Name is included in eq/hc to be able to add the "same" [x,y] vector to a set. */
     public final String name;
@@ -66,6 +76,7 @@ class MinCostPathTailFilterTest {
     public final int y;
 
     private A(String name, int x, int y) {
+      super(SLACK_PROVIDER, COST_CALCULATOR, T00_00, WAIT_TIME_CALC, null, 0.0, null);
       this.name = name;
       this.x = x;
       this.y = y;
@@ -81,24 +92,15 @@ class MinCostPathTailFilterTest {
       if (this == o) {
         return true;
       }
-      if (!(o instanceof A)) {
-        return false;
+      if (o instanceof A a) {
+        return name.equals(a.name) && x == a.x && y == a.y;
       }
-      final A a = (A) o;
-      return name.equals(a.name) && x == a.x && y == a.y;
+      return false;
     }
 
     @Override
     public String toString() {
-      return ValueObjectToStringBuilder
-        .of()
-        .addText(name)
-        .addText("(")
-        .addNum(x)
-        .addText(", ")
-        .addNum(y)
-        .addText(")")
-        .toString();
+      return name + "(" + x + ", " + y + ")";
     }
   }
 }
