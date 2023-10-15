@@ -20,7 +20,7 @@ public class TransitPreferencesMapper {
       callWith.argument("boardSlackDefault", builder::withDefaultSec);
       callWith.argument(
         "boardSlackList",
-        (Integer v) -> TransportModeSlack.mapIntoDomain(builder, v)
+        (Object v) -> TransportModeSlack.mapIntoDomain(builder, v)
       );
     });
     transit.withAlightSlack(builder -> {

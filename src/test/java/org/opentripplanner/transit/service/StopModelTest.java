@@ -2,6 +2,7 @@ package org.opentripplanner.transit.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -131,5 +132,11 @@ class StopModelTest {
     assertEquals(EXP_GROUP_OF_STATION, m.listStopLocationGroups().toString());
     assertEquals(COOR_B, m.getCoordinateById(ID));
     assertFalse(m.hasAreaStops());
+  }
+
+  @Test
+  void testNullStopLocationId() {
+    var m = StopModel.of().build();
+    assertNull(m.getStopLocation(null));
   }
 }
