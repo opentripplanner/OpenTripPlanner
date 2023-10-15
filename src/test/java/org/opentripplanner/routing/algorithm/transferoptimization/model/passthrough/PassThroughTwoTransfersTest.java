@@ -112,28 +112,26 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
       testCase().points(STOP_C).points(STOP_J).expectTransfersFrom(STOP_C, STOP_J),
       testCase().points(STOP_C).points(STOP_K).expectTransfersFrom(STOP_C, STOP_H),
       testCase().points(STOP_C).points(STOP_L).expectTransfersFrom(STOP_C, STOP_H),
-      testCase().points(STOP_D).points(STOP_E).expectTransfersFrom(STOP_E, STOP_J),
-      testCase().points(STOP_D).points(STOP_G).expectTransfersFrom(STOP_E, STOP_J),
-      testCase().points(STOP_D).points(STOP_H).expectTransfersFrom(STOP_E, STOP_J),
-      testCase().points(STOP_D).points(STOP_I).expectTransfersFrom(STOP_E, STOP_J),
-      testCase().points(STOP_D).points(STOP_J).expectTransfersFrom(STOP_E, STOP_J),
-      testCase().points(STOP_D).points(STOP_K).expectTransfersFrom(STOP_E, STOP_J),
+      testCase().points(STOP_D).points(STOP_E, STOP_K).expectTransfersFrom(STOP_E, STOP_J),
+      testCase().points(STOP_D).points(STOP_I, STOP_H).expectTransfersFrom(STOP_E, STOP_J),
+      testCase().points(STOP_D).points(STOP_J, STOP_K).expectTransfersFrom(STOP_E, STOP_J),
       testCase().points(STOP_D).points(STOP_L).expectTransfersFrom(STOP_E, STOP_J),
-      testCase().points(STOP_E).points(STOP_G).expectTransfersFrom(STOP_E, STOP_J),
-      testCase().points(STOP_E).points(STOP_H).expectTransfersFrom(STOP_E, STOP_J),
+      testCase().points(STOP_D).points(STOP_M).expectTransfersFrom(STOP_E, STOP_J),
       testCase().points(STOP_E).points(STOP_I).expectTransfersFrom(STOP_E, STOP_J),
       testCase().points(STOP_E).points(STOP_J).expectTransfersFrom(STOP_E, STOP_J),
-      testCase().points(STOP_E).points(STOP_K).expectTransfersFrom(STOP_E, STOP_J),
       testCase().points(STOP_E).points(STOP_L).expectTransfersFrom(STOP_E, STOP_J),
+      testCase().points(STOP_E).points(STOP_M).expectTransfersFrom(STOP_E, STOP_J),
       testCase().points(STOP_G).points(STOP_H).expectTransfersFrom(STOP_C, STOP_H),
       testCase().points(STOP_G).points(STOP_I).expectTransfersFrom(STOP_C, STOP_J),
       testCase().points(STOP_G).points(STOP_J).expectTransfersFrom(STOP_C, STOP_J),
       testCase().points(STOP_G).points(STOP_K).expectTransfersFrom(STOP_C, STOP_H),
       testCase().points(STOP_G).points(STOP_L).expectTransfersFrom(STOP_C, STOP_H),
+      testCase().points(STOP_G).points(STOP_M).expectTransfersFrom(STOP_C, STOP_H),
       testCase().points(STOP_H).points(STOP_I).expectTransfersFrom(STOP_C, STOP_J),
       testCase().points(STOP_H).points(STOP_J).expectTransfersFrom(STOP_C, STOP_J),
       testCase().points(STOP_H).points(STOP_K).expectTransfersFrom(STOP_C, STOP_H),
       testCase().points(STOP_H).points(STOP_L).expectTransfersFrom(STOP_C, STOP_H),
+      testCase().points(STOP_H).points(STOP_M).expectTransfersFrom(STOP_C, STOP_H),
       testCase().points(STOP_I).points(STOP_J).expectTransfersFrom(STOP_C, STOP_J),
       testCase().points(STOP_I).points(STOP_L).expectTransfersFrom(STOP_C, STOP_J),
       testCase().points(STOP_I).points(STOP_M).expectTransfersFrom(STOP_C, STOP_J),
@@ -224,6 +222,8 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
     var subject = subject(tc.points(), firstTransfers, secondTransfers);
 
     // When
+    System.out.println(pathFocus(expectedPath.toString(this::stopIndexToName)));
+
     var result = subject.findBestTransitPath(originalPath);
 
     // Then expect a set containing the expected path only

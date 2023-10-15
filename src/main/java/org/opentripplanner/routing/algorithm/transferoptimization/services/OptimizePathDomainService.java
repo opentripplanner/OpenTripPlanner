@@ -104,9 +104,15 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   }
 
   public Set<OptimizedPath<T>> findBestTransitPath(RaptorPath<T> originalPath) {
-    var possibleTransfers = findPossibleTransfers(originalPath);
     List<TransitPathLeg<T>> transitLegs = originalPath.transitLegs().collect(Collectors.toList());
-    var filter = filterFactory.createFilter(possibleTransfers);
+
+    // Find all possible transfers between each pair of transit legs, and sort on arrival time
+    var possibleTransfers = sortTransfersOnArrivalTimeInDecOrder(
+      transferGenerator.findAllPossibleTransfers(transitLegs)
+    );
+
+    // TODO : Is the factory needed?
+    var filter = filterFactory.createFilter();
 
     // Combine transit legs and transfers
     var tails = findBestTransferOption(originalPath, transitLegs, possibleTransfers, filter);
@@ -114,17 +120,6 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     var filteredTails = filter.filterFinalResult(tails);
 
     return filteredTails.stream().map(OptimizedPathTail::build).collect(toSet());
-  }
-
-  /**
-   * Find all possible transfers between each pair of transit legs, and sort on arrival time.
-   */
-  private List<List<TripToTripTransfer<T>>> findPossibleTransfers(RaptorPath<T> originalPath) {
-    List<TransitPathLeg<T>> transitLegs = originalPath.transitLegs().collect(Collectors.toList());
-
-    return sortTransfersOnArrivalTimeInDecOrder(
-      transferGenerator.findAllPossibleTransfers(transitLegs)
-    );
   }
 
   private static <T> T last(List<T> list) {
@@ -178,13 +173,13 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
       tails = new HashSet<>();
 
       for (TripToTripTransfer<T> tx : transfers) {
-        // Skip transfers happening before earliest possible board time
+        // Skip transfers happening before the earliest possible board time
         if (tx.from().time() <= earliestDepartureTimeFromLeg) {
           continue;
         }
 
         // Find the best tails that are safe to board with respect to the arrival
-        var candidateTails = tailSelector.next(tx.to().time());
+        var candidateTails = tailSelector.next(tx.to().stopPosition());
 
         for (OptimizedPathTail<T> tail : candidateTails) {
           // Tail can be used with current transfer
@@ -196,7 +191,9 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     }
 
     // Filter tails one final time
-    tails = new TransitPathLegSelector<>(filter, tails).next(originalPath.accessLeg().toTime());
+    tails =
+      new TransitPathLegSelector<>(filter, tails)
+        .next(originalPath.accessLeg().nextTransitLeg().getFromStopPosition());
 
     // Insert the access leg and the following transfer
     insertAccess(originalPath, tails);

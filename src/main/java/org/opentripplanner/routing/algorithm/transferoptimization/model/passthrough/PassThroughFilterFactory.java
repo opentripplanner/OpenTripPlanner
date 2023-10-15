@@ -5,7 +5,6 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
 /**
  * Create a filter chain function and find the best combination of transfers for the journey
@@ -57,11 +56,7 @@ public class PassThroughFilterFactory<T extends RaptorTripSchedule>
   }
 
   @Override
-  public PathTailFilter<T> createFilter(List<List<TripToTripTransfer<T>>> possibleTransfers) {
-    var calculator = new PathTailC2Calculator<>(possibleTransfers, passThroughPoints);
-    return new PassThroughPathTailFilter<>(
-      delegate.createFilter(possibleTransfers),
-      calculator::calculateC2
-    );
+  public PathTailFilter<T> createFilter() {
+    return new PassThroughPathTailFilter<>(delegate.createFilter(), passThroughPoints);
   }
 }

@@ -29,11 +29,19 @@ class MinCostPathTailFilter<T extends RaptorTripSchedule> implements PathTailFil
   }
 
   @Override
-  public Set<OptimizedPathTail<T>> filterIntermediateResult(Set<OptimizedPathTail<T>> elements) {
+  public Set<OptimizedPathTail<T>> filterIntermediateResult(
+    Set<OptimizedPathTail<T>> elements,
+    int boardStopPosition
+  ) {
     for (var costFunction : costFunctions) {
       elements = filter(elements, costFunction);
     }
     return elements;
+  }
+
+  @Override
+  public Set<OptimizedPathTail<T>> filterFinalResult(Set<OptimizedPathTail<T>> elements) {
+    return filterIntermediateResult(elements, 0);
   }
 
   private Set<OptimizedPathTail<T>> filter(
@@ -55,10 +63,5 @@ class MinCostPathTailFilter<T extends RaptorTripSchedule> implements PathTailFil
       }
     }
     return result;
-  }
-
-  @Override
-  public Set<OptimizedPathTail<T>> filterFinalResult(Set<OptimizedPathTail<T>> elements) {
-    return elements;
   }
 }

@@ -7,7 +7,6 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
 public class MinCostPathTailFilterFactory<T extends RaptorTripSchedule>
   implements PathTailFilterFactory<T> {
@@ -21,7 +20,7 @@ public class MinCostPathTailFilterFactory<T extends RaptorTripSchedule>
   }
 
   @Override
-  public PathTailFilter<T> createFilter(List<List<TripToTripTransfer<T>>> possibleTransfers) {
+  public PathTailFilter<T> createFilter() {
     List<ToIntFunction<OptimizedPathTail<T>>> filters = new ArrayList<>(3);
 
     if (transferPriority) {

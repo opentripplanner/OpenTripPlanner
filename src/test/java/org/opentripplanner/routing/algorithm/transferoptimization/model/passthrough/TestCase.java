@@ -42,7 +42,7 @@ record TestCase(
         buf.append("at (");
         appendPoint(buf, 0);
         for (int i = 1; i < points.size(); ++i) {
-          buf.append(") or (");
+          buf.append(") and (");
           appendPoint(buf, i);
         }
         buf.append(")");
@@ -61,7 +61,7 @@ record TestCase(
   }
 
   private void appendPoint(StringBuilder buf, int passThroughPointIndex) {
-    points.get(passThroughPointIndex).appendStops(buf, " and ", this::stopIndexToName);
+    points.get(passThroughPointIndex).appendStops(buf, " or ", this::stopIndexToName);
   }
 
   boolean contains(int stopIndex) {

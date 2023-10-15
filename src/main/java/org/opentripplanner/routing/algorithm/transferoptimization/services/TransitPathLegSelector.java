@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
@@ -33,7 +32,7 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
   private Set<OptimizedPathTail<T>> remindingLegs;
   private Set<OptimizedPathTail<T>> selectedLegs;
 
-  private int lastLimit = Integer.MAX_VALUE;
+  private int prevStopPosition = Integer.MAX_VALUE;
 
   TransitPathLegSelector(final PathTailFilter<T> filter, final Set<OptimizedPathTail<T>> legs) {
     this.filter = filter;
@@ -41,23 +40,23 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
     this.selectedLegs = new HashSet<>();
   }
 
-  Set<OptimizedPathTail<T>> next(final int earliestBoardingTime) {
-    if (earliestBoardingTime > lastLimit) {
+  Set<OptimizedPathTail<T>> next(final int fromStopPosition) {
+    if (fromStopPosition > prevStopPosition) {
       throw new IllegalStateException(
         "The next method must be called with decreasing time limits. " +
-        "minTimeLimit=" +
-        TimeUtils.timeToStrLong(earliestBoardingTime) +
-        ", lastLimit=" +
-        TimeUtils.timeToStrLong(lastLimit)
+        "fromStopPosition=" +
+        fromStopPosition +
+        ", previousStopPosition=" +
+        prevStopPosition
       );
     }
-    lastLimit = earliestBoardingTime;
+    prevStopPosition = fromStopPosition;
 
     Set<OptimizedPathTail<T>> candidates = new HashSet<>();
     Set<OptimizedPathTail<T>> rest = new HashSet<>();
 
     for (OptimizedPathTail<T> it : remindingLegs) {
-      if (earliestBoardingTime < it.latestPossibleBoardingTime()) {
+      if (fromStopPosition < it.head().toStopPos()) {
         candidates.add(it);
       } else {
         rest.add(it);
@@ -72,7 +71,7 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
 
     // Set state
     remindingLegs = rest;
-    selectedLegs = filter.filterIntermediateResult(candidates);
+    selectedLegs = filter.filterIntermediateResult(candidates, fromStopPosition);
 
     return selectedLegs;
   }

@@ -30,8 +30,8 @@ class MinCostPathTailFilterTest implements RaptorTestConstants {
     // filter empty set
     assertEquals(
       Set.of(),
-      new MinCostPathTailFilter<TestTripSchedule>(List.of(it -> ((A) it).x))
-        .filterIntermediateResult(Set.of())
+      new MinCostPathTailFilter<TestTripSchedule>(List.of(OptimizedPathTail::generalizedCost))
+        .filterIntermediateResult(Set.of(), 0)
     );
   }
 
@@ -62,10 +62,14 @@ class MinCostPathTailFilterTest implements RaptorTestConstants {
 
   private Set<A> filter(A... as) {
     return new MinCostPathTailFilter<TestTripSchedule>(List.of(it -> ((A) it).x, it -> ((A) it).y))
-      .filterIntermediateResult(Set.of(as))
+      .filterIntermediateResult(Set.of(as), 0)
       .stream()
       .map(it -> (A) it)
       .collect(Collectors.toSet());
+  }
+
+  A toA(OptimizedPathTail<TestTripSchedule> e) {
+    return (A) e;
   }
 
   static class A extends OptimizedPathTail<TestTripSchedule> {

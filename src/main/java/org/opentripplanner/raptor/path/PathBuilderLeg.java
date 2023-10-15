@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.path;
 
-import java.util.Arrays;
 import java.util.function.Predicate;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -41,14 +40,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private int fromTime = NOT_SET;
   private int toTime = NOT_SET;
+  private int c2 = RaptorConstants.NOT_SET;
 
   private PathBuilderLeg<T> prev = null;
   private PathBuilderLeg<T> next = null;
-
-  // TODO PT: 2023-09-01 We need some storage space to keep track of c2 value per stop
-  //          when we are filtering out possible transfers.
-  //          I choose to include it here because it is practical but maybe we should have it somewhere else?
-  private final int[] c2PerStopPosition;
 
   /**
    * Copy-constructor - do a deep copy with the exception of immutable types. Always start with the
@@ -60,9 +55,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     this.fromTime = other.fromTime;
     this.toTime = other.toTime;
     this.leg = other.leg;
-    // TODO: 2023-09-01 We have to copy over values here so that they are present
-    //  in the next filter loop cycle
-    this.c2PerStopPosition = other.c2PerStopPosition.clone();
+    this.c2 = other.c2;
 
     // Mutable fields
     if (other.next != null) {
@@ -78,14 +71,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
       var transit = (MyTransitLeg<T>) leg;
       this.fromTime = transit.fromTime();
       this.toTime = transit.toTime();
-      c2PerStopPosition = new int[transit.trip.pattern().numberOfStopsInPattern()];
-      Arrays.fill(c2PerStopPosition, NOT_SET);
-    } else {
-      c2PerStopPosition = new int[0];
     }
   }
 
-  /* factory methods */
+  /* accessors */
 
   public int fromTime() {
     return fromTime;
@@ -107,8 +96,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return leg.toStop();
   }
 
-  /* accessors */
-
   public int toStopPos() {
     return asTransitLeg().toStopPos();
   }
@@ -117,25 +104,16 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return toTime - fromTime;
   }
 
-  /**
-   * Get c2 value associate with given stop position in a pattern.
-   *  This works only for transit legs and if c2 is already set
-   */
-  @Deprecated
-  public int c2ForStopPosition(int pos) {
-    var c2 = c2PerStopPosition[pos];
-    if (c2 == NOT_SET) {
-      throw new IllegalArgumentException("C2 for stop position " + pos + " not set");
-    }
+  public int c2() {
     return c2;
   }
 
-  /**
-   * Set c2 value on a given stop position in a transit leg
-   */
-  @Deprecated
-  public void setC2OnStopPosition(int pos, int c2) {
-    c2PerStopPosition[pos] = c2;
+  public void c2(int c2) {
+    this.c2 = c2;
+  }
+
+  public boolean isC2Set() {
+    return c2 != RaptorConstants.NOT_SET;
   }
 
   @Nullable
@@ -178,6 +156,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   public T trip() {
     return asTransitLeg().trip;
+  }
+
+  public PathBuilderLeg<T> prev() {
+    return prev;
   }
 
   public PathBuilderLeg<T> next() {
@@ -326,10 +308,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   static <T extends RaptorTripSchedule> PathBuilderLeg<T> egress(RaptorAccessEgress egress) {
     return new PathBuilderLeg<>(new MyEgressLeg(egress));
-  }
-
-  PathBuilderLeg<T> prev() {
-    return prev;
   }
 
   void setPrev(PathBuilderLeg<T> prev) {
