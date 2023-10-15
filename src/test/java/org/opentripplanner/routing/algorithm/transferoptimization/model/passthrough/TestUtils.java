@@ -58,7 +58,8 @@ class TestUtils implements RaptorTestConstants {
     List<PassThroughPoint> passThroughPoints,
     final List<TripToTripTransfer<TestTripSchedule>>... transfers
   ) {
-    var filterFactory = new MinCostPathTailFilterFactory<TestTripSchedule>(false, false);
+    var filter = new MinCostPathTailFilterFactory<TestTripSchedule>(false, false).createFilter();
+    filter = new PassThroughPathTailFilter<>(filter, passThroughPoints);
     var generator = dummyTransferGenerator(transfers);
 
     return new OptimizePathDomainService<>(
@@ -68,7 +69,7 @@ class TestUtils implements RaptorTestConstants {
       null,
       null,
       0.0,
-      new PassThroughFilterFactory<>(passThroughPoints, filterFactory),
+      filter,
       (new RaptorTestConstants() {})::stopIndexToName
     );
   }

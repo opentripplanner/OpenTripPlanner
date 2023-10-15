@@ -6,10 +6,8 @@ import java.util.function.ToIntFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 
-public class MinCostPathTailFilterFactory<T extends RaptorTripSchedule>
-  implements PathTailFilterFactory<T> {
+public class MinCostPathTailFilterFactory<T extends RaptorTripSchedule> {
 
   private final boolean transferPriority;
   private final boolean optimizeWaitTime;
@@ -19,7 +17,6 @@ public class MinCostPathTailFilterFactory<T extends RaptorTripSchedule>
     this.optimizeWaitTime = optimizeWaitTime;
   }
 
-  @Override
   public PathTailFilter<T> createFilter() {
     List<ToIntFunction<OptimizedPathTail<T>>> filters = new ArrayList<>(3);
 

@@ -10,10 +10,10 @@ import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.PassThroughFilterFactory;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.PassThroughPathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
@@ -79,14 +79,11 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   private OptimizeTransferService<T> createOptimizeTransferService() {
     var pathTransferGenerator = createTransferGenerator(config.optimizeTransferPriority());
 
-    var filterFactory = createFilterFactory();
-
     if (config.optimizeTransferWaitTime()) {
       var transferWaitTimeCalculator = createTransferWaitTimeCalculator();
 
       var transfersPermutationService = createOptimizePathService(
         pathTransferGenerator,
-        filterFactory,
         transferWaitTimeCalculator,
         transitDataProvider.multiCriteriaCostCalculator()
       );
@@ -99,7 +96,6 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     } else {
       var transfersPermutationService = createOptimizePathService(
         pathTransferGenerator,
-        filterFactory,
         null,
         transitDataProvider.multiCriteriaCostCalculator()
       );
@@ -107,22 +103,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     }
   }
 
-  private PathTailFilterFactory<T> createFilterFactory() {
-    PathTailFilterFactory<T> costFilter = new MinCostPathTailFilterFactory<>(
-      config.optimizeTransferPriority(),
-      config.optimizeTransferWaitTime()
-    );
-
-    if (multiCriteriaRequest.hasPassThroughPoints()) {
-      return new PassThroughFilterFactory<>(multiCriteriaRequest.passThroughPoints(), costFilter);
-    } else {
-      return costFilter;
-    }
-  }
-
   private OptimizePathDomainService<T> createOptimizePathService(
     TransferGenerator<T> transferGenerator,
-    PathTailFilterFactory<T> filterFactory,
     TransferWaitTimeCostCalculator transferWaitTimeCostCalculator,
     RaptorCostCalculator<T> costCalculator
   ) {
@@ -133,7 +115,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       transferWaitTimeCostCalculator,
       stopBoardAlightCosts,
       config.extraStopBoardAlightCostsFactor(),
-      filterFactory,
+      createFilter(),
       stopNameResolver
     );
   }
@@ -155,5 +137,18 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       config.backTravelWaitTimeFactor(),
       config.minSafeWaitTimeFactor()
     );
+  }
+
+  private PathTailFilter<T> createFilter() {
+    var filter = new MinCostPathTailFilterFactory<T>(
+      config.optimizeTransferPriority(),
+      config.optimizeTransferWaitTime()
+    )
+      .createFilter();
+
+    if (multiCriteriaRequest.hasPassThroughPoints()) {
+      filter = new PassThroughPathTailFilter<>(filter, multiCriteriaRequest.passThroughPoints());
+    }
+    return filter;
   }
 }

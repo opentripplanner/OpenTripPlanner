@@ -18,7 +18,6 @@ import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
@@ -72,7 +71,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   private final TransferGenerator<T> transferGenerator;
   private final RaptorCostCalculator<T> costCalculator;
   private final RaptorSlackProvider slackProvider;
-  private final PathTailFilterFactory<T> filterFactory;
+  private final PathTailFilter<T> filter;
   private final RaptorStopNameResolver stopNameTranslator;
 
   @Nullable
@@ -90,7 +89,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
     int[] stopBoardAlightCosts,
     double extraStopBoardAlightCostsFactor,
-    PathTailFilterFactory<T> filterFactory,
+    PathTailFilter<T> filter,
     RaptorStopNameResolver stopNameTranslator
   ) {
     this.transferGenerator = transferGenerator;
@@ -99,7 +98,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     this.waitTimeCostCalculator = waitTimeCostCalculator;
     this.stopBoardAlightCosts = stopBoardAlightCosts;
     this.extraStopBoardAlightCostsFactor = extraStopBoardAlightCostsFactor;
-    this.filterFactory = filterFactory;
+    this.filter = filter;
     this.stopNameTranslator = stopNameTranslator;
   }
 
@@ -110,9 +109,6 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     var possibleTransfers = sortTransfersOnArrivalTimeInDecOrder(
       transferGenerator.findAllPossibleTransfers(transitLegs)
     );
-
-    // TODO : Is the factory needed?
-    var filter = filterFactory.createFilter();
 
     // Combine transit legs and transfers
     var tails = findBestTransferOption(originalPath, transitLegs, possibleTransfers, filter);

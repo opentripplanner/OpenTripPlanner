@@ -289,6 +289,11 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     TransferGenerator<TestTripSchedule> generator,
     @Nullable TransferWaitTimeCostCalculator waitTimeCalculator
   ) {
+    var filter = new MinCostPathTailFilterFactory<TestTripSchedule>(
+      true,
+      waitTimeCalculator != null
+    )
+      .createFilter();
     return new OptimizePathDomainService<>(
       generator,
       COST_CALCULATOR,
@@ -296,7 +301,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       waitTimeCalculator,
       null,
       0.0,
-      new MinCostPathTailFilterFactory<>(true, waitTimeCalculator != null),
+      filter,
       (new RaptorTestConstants() {})::stopIndexToName
     );
   }
