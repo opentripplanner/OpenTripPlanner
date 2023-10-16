@@ -19,6 +19,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix fare calculation for combined interlined legs [#5408](https://github.com/opentripplanner/OpenTripPlanner/pull/5408)
 - Fix board slack list mapping in Transmodel API [#5420](https://github.com/opentripplanner/OpenTripPlanner/pull/5420)
 - Fix flexible quay querying in Transmodel API [#5417](https://github.com/opentripplanner/OpenTripPlanner/pull/5417)
+- Add validation for missing calls in SIRI update [#5403](https://github.com/opentripplanner/OpenTripPlanner/pull/5403)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
