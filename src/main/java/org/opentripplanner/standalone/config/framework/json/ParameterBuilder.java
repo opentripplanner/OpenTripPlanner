@@ -234,7 +234,8 @@ public class ParameterBuilder {
       it -> parseOptionalEnum(it.asText(), enumClass)
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
-    return result.isEmpty() ? EnumSet.noneOf(enumClass) : EnumSet.copyOf(result);
+    // Set is immutable
+    return result.isEmpty() ? Set.of() : Set.copyOf(result);
   }
 
   public <T extends Enum<T>> Set<T> asEnumSet(Class<T> enumClass, Collection<T> defaultValues) {
@@ -247,7 +248,8 @@ public class ParameterBuilder {
       it -> parseOptionalEnum(it.asText(), enumClass)
     );
     List<T> result = optionalList.stream().filter(Optional::isPresent).map(Optional::get).toList();
-    return result.isEmpty() ?  EnumSet.noneOf(enumClass) : EnumSet.copyOf(result);
+    // Set is immutable
+    return result.isEmpty() ? Set.copyOf(dft) : Set.copyOf(result);
   }
 
   /**
