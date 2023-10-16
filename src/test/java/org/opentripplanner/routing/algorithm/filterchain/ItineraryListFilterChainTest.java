@@ -61,14 +61,12 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   }
 
   @Test
-  public void testFilterChainWithLateDepartureFilterSet() {
-    // Given a "default" chain
+  public void testFilterChainWithSearchWindowFilterSet() {
     ItineraryListFilterChain chain = createBuilder(false, false, 10)
-      // with latest-departure-time-limit set
-      .withLatestDepartureTimeLimit(TestItineraryBuilder.newTime(T11_32).toInstant())
+      .withSearchWindow(TestItineraryBuilder.newTime(T11_00).toInstant(), Duration.ofMinutes(10))
       .build();
-
-    assertEquals(toStr(List.of(i1)), toStr(chain.filter(List.of(i1, i2, i3))));
+    var result = chain.filter(List.of(i1, i2, i3));
+    assertEquals(toStr(List.of(i1)), toStr(result));
   }
 
   @Test
@@ -91,7 +89,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   public void testDebugFilterChain() {
     // Given a filter-chain with debugging enabled
     ItineraryListFilterChain chain = createBuilder(false, true, 3)
-      .withLatestDepartureTimeLimit(newTime(I3_LATE_START_TIME - 1).toInstant())
+      .withSearchWindow(newTime(T11_00).toInstant(), Duration.ofMinutes(6))
       .build();
 
     // Walk first, then transit sorted on arrival-time
@@ -183,7 +181,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   void routingErrorsOutsideWindowTest() {
     var chain = createBuilder(false, false, 20)
       .withRemoveWalkAllTheWayResults(true)
-      .withLatestDepartureTimeLimit(Instant.from(newTime(T11_00)))
+      .withSearchWindow(Instant.from(newTime(T11_00)), Duration.ofMinutes(5))
       .build();
 
     Itinerary bus = newItinerary(A).bus(21, T11_06, T11_23, E).build();
