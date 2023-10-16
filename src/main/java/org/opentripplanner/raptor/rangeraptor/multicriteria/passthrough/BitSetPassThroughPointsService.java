@@ -10,7 +10,6 @@ import java.util.function.IntPredicate;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
-import org.opentripplanner.raptor.api.request.PassThroughPoints;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 
 /**
@@ -32,11 +31,13 @@ public class BitSetPassThroughPointsService implements PassThroughPointsService 
     this.expectedC2ValueAtDestination = passThroughPoints.size();
   }
 
-  public static PassThroughPointsService of(PassThroughPoints points) {
-    return points
-      .stream()
-      .map(PassThroughPoint::asBitSet)
-      .collect(collectingAndThen(toList(), BitSetPassThroughPointsService::new));
+  public static PassThroughPointsService of(List<PassThroughPoint> points) {
+    return points == null || points.isEmpty()
+      ? NOOP
+      : points
+        .stream()
+        .map(PassThroughPoint::asBitSet)
+        .collect(collectingAndThen(toList(), BitSetPassThroughPointsService::new));
   }
 
   @Override
