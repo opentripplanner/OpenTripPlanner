@@ -145,7 +145,7 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
 
   /**
    * In this test we will test a path with *three* transit legs and 2 transfers. For each transfer
-   * there is two options, an in total three possible paths:
+   * there is two options, and in total three possible paths:
    * <ol>
    *   <li>Origin ~ B ~ C ~ G ~ H ~ K ~ M ~ Destination</li>
    *   <li>Origin ~ B ~ C ~ G ~ J ~ L ~ M ~ Destination</li>
@@ -222,7 +222,6 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
     var subject = subject(tc.points(), firstTransfers, secondTransfers);
 
     // When
-    System.out.println(pathFocus(expectedPath.toString(this::stopIndexToName)));
 
     var result = subject.findBestTransitPath(originalPath);
 

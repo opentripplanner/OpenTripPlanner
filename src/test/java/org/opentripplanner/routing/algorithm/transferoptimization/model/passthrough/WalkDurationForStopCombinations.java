@@ -8,10 +8,10 @@ import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
 
 /**
- * This class is used to adjust the walk time - giving each path a unique generalized-cost. We want
- * the paths witch do NOT visit the pass-through points to have a lower generalized-cost than the
+ * This class is used to adjust the walk time - giving each path an unique generalized-cost. We want
+ * the paths which do NOT visit the pass-through points to have a lower generalized-cost than the
  * "correct" paths. We do this by adding a small increasing cost to each paths ordered by the number
- * of stops visited. Then we add a bigger cost for each stop in the transfer witch is a
+ * of stops visited. Then we add a bigger cost for each stop in the transfer which is a
  * pass-through-point.
  */
 class WalkDurationForStopCombinations {

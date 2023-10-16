@@ -21,7 +21,7 @@ class PassThroughPointsIterator {
   }
 
   /**
-   * Iterate from the given {@code c2} value (pass-through-pint number minus one) towards the
+   * Iterate from the given {@code c2} value (pass-through-point number minus one) towards the
    * beginning.
    */
   static PassThroughPointsIterator tailIterator(List<PassThroughPoint> passThroughPoints, int c2) {
@@ -30,7 +30,7 @@ class PassThroughPointsIterator {
 
   /**
    * Iterate over the pass-though-points starting at the end/destination and towards the beginning
-   * or the points, until the origin is reached.
+   * of the points, until the origin is reached.
    */
   static PassThroughPointsIterator tailIterator(List<PassThroughPoint> passThroughPoints) {
     return new PassThroughPointsIterator(passThroughPoints, passThroughPoints.size());

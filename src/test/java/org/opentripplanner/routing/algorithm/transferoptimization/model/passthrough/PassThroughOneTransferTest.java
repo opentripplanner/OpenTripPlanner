@@ -17,7 +17,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 
 /**
  * This test focus on the PASS-THROUGH functionality with two transit legs and one transfer in the
- * path. But between trip 1 and trip 2, there will be may transfer options to choose from.
+ * path. But between trip 1 and trip 2, there may be many transfer options to choose from.
  *
  * <p>
  * FEATURE UNDER TESTED
@@ -102,7 +102,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
   }
 
   /**
-   * In this test we will use trip 1 and 2. We will have one test for each  possible pass-though-
+   * In this test we will use trip 1 and 2. We will have one test for each  possible pass-through-
    * point. We will add 4 transfers between the trips, [from]-[to]: {@code C-G, C-H, D-G, D-H}. We
    * will also add transfers between B-F and E-I, these transfers can not be used with the access
    * and egress, because we are not allowed to have two walking legs in a row. We include this
@@ -155,7 +155,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
       .egress(D1s);
 
     // These are illegal transfer for the given path, we add them here to make sure they
-    // do not interfere with the result. For simpler debugging problems try comment out these
+    // do not interfere with the result. For simpler debugging problems try commenting out these
     // lines, just do not forget to comment them back in when the problem is fixed.
     var subject = subject(
       tc.points(),

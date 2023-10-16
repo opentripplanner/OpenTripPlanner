@@ -62,7 +62,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
   ) {
     var builder = tx(fromTrip, fromStopIndex, toTrip, toStopIndex);
     // Make sure the constraint is initialized; hence an object generated in the build step.
-    // If none of the constraints are set this still generates a constraint instance, witch
+    // If none of the constraints are set this still generates a constraint instance, which
     // should behave like a regular transfer, but is not the same structure.
     builder.constraint();
     return builder;

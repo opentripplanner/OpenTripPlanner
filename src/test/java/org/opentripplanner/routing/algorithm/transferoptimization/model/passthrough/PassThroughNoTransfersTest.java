@@ -63,7 +63,7 @@ public class PassThroughNoTransfersTest implements RaptorTestConstants {
 
   /**
    * The pass-though point used can be the board-, intermediate-, and/or alight-stop. We will also
-   * test all combinations of these to make sure a pass-though point is only accounted for once.
+   * test all combinations of these to make sure a pass-through point is only accounted for once.
    * <p>
    * The trip1 used:
    * <pre>
