@@ -1164,7 +1164,8 @@ case where this is not the case.
         "enabled" : true
       }
     }
-  ]
+  ],
+  "stopConsolidationFile" : "consolidated-stops.csv"
 }
 ```
 
