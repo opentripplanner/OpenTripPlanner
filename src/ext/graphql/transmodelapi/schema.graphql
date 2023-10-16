@@ -1528,8 +1528,8 @@ enum MultiModalMode {
 enum OccupancyStatus {
   """
   The vehicle or carriage can currently accommodate only standing passengers and has limited
-  space for them. There isn't a big difference between this and `full` so it's possible to handle
-  them as the same value, if one wants to limit the number of different values.
+  space for them. There isn't a big difference between this and `full` so it's possible to
+  handle them as the same value, if one wants to limit the number of different values.
   SIRI nordic profile: merge into `standingRoomOnly`.
   """
   crushedStandingRoomOnly
@@ -1546,7 +1546,10 @@ enum OccupancyStatus {
   SIRI nordic profile: less than ~50% of seats available.
   """
   fewSeatsAvailable
-  "The vehicle or carriage is considered full by most measures, but may still be allowing passengers to board."
+  """
+  The vehicle or carriage is considered full by most measures, but may still be allowing
+  passengers to board.
+  """
   full
   """
   The vehicle or carriage has a large number of seats available.
@@ -1557,8 +1560,8 @@ enum OccupancyStatus {
   noData
   """
   The vehicle or carriage has no seats or standing room available.
-  SIRI nordic profile: if vehicle/carriage is not in use / unavailable, or passengers are only allowed
-  to alight due to e.g. crowding.
+  SIRI nordic profile: if vehicle/carriage is not in use / unavailable, or passengers are only
+  allowed to alight due to e.g. crowding.
   """
   notAcceptingPassengers
   """
