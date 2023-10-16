@@ -318,7 +318,7 @@ public class QuayType {
             JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
             Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
-            Integer startTimeInput = environment.getArgument("startTime");
+            Long startTimeInput = environment.getArgument("startTime");
             Instant startTime = startTimeInput != null
               ? Instant.ofEpochMilli(startTimeInput)
               : Instant.now();
