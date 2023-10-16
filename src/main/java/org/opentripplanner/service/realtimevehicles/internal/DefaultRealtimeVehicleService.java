@@ -67,8 +67,7 @@ public class DefaultRealtimeVehicleService
       .stream()
       .filter(vehicle -> tripId.equals(vehicle.trip().getId()))
       .max(Comparator.comparing(vehicle -> vehicle.time().orElse(Instant.MIN)))
-      .map(RealtimeVehicle::occupancyStatus)
-      .orElse(Optional.empty())
+      .flatMap(RealtimeVehicle::occupancyStatus)
       .orElse(NO_DATA_AVAILABLE);
   }
 }
