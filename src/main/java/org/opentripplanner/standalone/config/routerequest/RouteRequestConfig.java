@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
@@ -480,7 +481,12 @@ ferries, where the check-in process needs to be done in good time before ride.
                       .asEnumMap()
                       .entrySet()
                       .stream()
-                      .map(s -> "- %s = %s".formatted(s.getKey(), s.getValue()))
+                      .map(s ->
+                        "- `%s` = %s".formatted(
+                            StringUtils.kebabCase(s.getKey().toString()),
+                            s.getValue()
+                          )
+                      )
                       .collect(Collectors.joining("\n"))
                   )
               )

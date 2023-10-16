@@ -408,9 +408,9 @@ performance will be better.
 
 The default values are
 
-- CAR_TO_PARK = (timePenalty: 30m + 2.0 t, costFactor: 2.0)
-- CAR_RENTAL = (timePenalty: 30m + 2.0 t, costFactor: 2.0)
-- CAR_HAILING = (timePenalty: 30m + 2.0 t, costFactor: 2.0)
+- `car-to-park` = (timePenalty: 30m + 2.0 t, costFactor: 2.0)
+- `car-rental` = (timePenalty: 30m + 2.0 t, costFactor: 2.0)
+- `car-hailing` = (timePenalty: 30m + 2.0 t, costFactor: 2.0)
 
 Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 

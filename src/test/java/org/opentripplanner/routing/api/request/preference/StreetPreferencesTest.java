@@ -109,10 +109,9 @@ class StreetPreferencesTest {
       "routingTimeout: 3s, " +
       "elevator: ElevatorPreferences{boardTime: 2m}, " +
       "intersectionTraversalModel: CONSTANT, " +
-      "accessEgress: AccessEgressPreferences{" +
-      "penalty: TimeAndCostPenaltyForEnum{CAR_TO_PARK: " +
+      "accessEgress: AccessEgressPreferences{penalty: TimeAndCostPenaltyForEnum{CAR_TO_PARK: " +
       CAR_PENALTY +
-      "}, " +
+      ", CAR_RENTAL: (timePenalty: 30m + 2.0 t, costFactor: 2.0), CAR_HAILING: (timePenalty: 30m + 2.0 t, costFactor: 2.0)}, " +
       "maxDuration: DurationForStreetMode{default:5m}" +
       "}, " +
       "maxDirectDuration: DurationForStreetMode{default:10m}" +
