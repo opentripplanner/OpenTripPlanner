@@ -22,8 +22,8 @@ import org.opentripplanner.routing.api.request.framework.TimePenalty;
 public final class AccessEgressPreferences implements Serializable {
 
   private static final TimeAndCostPenalty DEFAULT_PENALTY = TimeAndCostPenalty.of(
-    TimePenalty.of(ofMinutes(10), 1.5f),
-    2.5
+    TimePenalty.of(ofMinutes(30), 2f),
+    2
   );
   private static final TimeAndCostPenaltyForEnum<StreetMode> DEFAULT_TIME_AND_COST = TimeAndCostPenaltyForEnum
     .of(StreetMode.class)

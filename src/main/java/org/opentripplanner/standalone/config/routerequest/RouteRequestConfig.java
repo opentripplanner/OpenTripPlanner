@@ -15,6 +15,8 @@ import static org.opentripplanner.standalone.config.routerequest.VehicleWalkingC
 import static org.opentripplanner.standalone.config.routerequest.WheelchairConfig.mapWheelchairPreferences;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -455,7 +457,9 @@ ferries, where the check-in process needs to be done in good time before ride.
             the access legs used. In other cases where the access(CAR) is faster than transit the
             performance will be better.
 
-            The default is no penalty, if not configured.
+            The default values are
+            
+            %s
 
             Example: `"car-to-park" : { "timePenalty": "10m + 1.5t", "costFactor": 2.5 }`
 
@@ -470,7 +474,15 @@ ferries, where the check-in process needs to be done in good time before ride.
             The `costFactor` is used to add an additional cost to the leg´s  generalized-cost. The
             time-penalty is multiplied with the cost-factor. A cost-factor of zero, gives no
             extra cost, while 1.0 will add the same amount to both time and cost.
-            """
+            """.formatted(
+                    dftAccessEgress
+                      .penalty()
+                      .asEnumMap()
+                      .entrySet()
+                      .stream()
+                      .map(s -> "- %s = %s".formatted(s.getKey(), s.getValue()))
+                      .collect(Collectors.joining("\n"))
+                  )
               )
               .asEnumMap(
                 StreetMode.class,
