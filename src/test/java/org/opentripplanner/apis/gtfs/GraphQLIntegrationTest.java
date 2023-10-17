@@ -255,7 +255,7 @@ class GraphQLIntegrationTest {
         graph.getVehicleParkingService(),
         new DefaultVehicleRentalService(),
         realtimeVehicleService,
-       finder,
+        finder,
         new RouteRequest()
       );
   }
@@ -356,7 +356,7 @@ class GraphQLIntegrationTest {
     return null;
   }
 
-  private static GraphFinder finder = new GraphFinder() {
+  private static final GraphFinder finder = new GraphFinder() {
     @Override
     public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
       return null;
