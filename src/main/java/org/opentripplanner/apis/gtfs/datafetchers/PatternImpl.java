@@ -22,8 +22,8 @@ import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.services.TransitAlertService;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -227,9 +227,9 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   }
 
   @Override
-  public DataFetcher<Iterable<RealtimeVehiclePosition>> vehiclePositions() {
+  public DataFetcher<Iterable<RealtimeVehicle>> vehiclePositions() {
     return environment ->
-      getVehiclePositionsService(environment).getVehiclePositions(this.getSource(environment));
+      getRealtimeVehiclesService(environment).getRealtimeVehicles(this.getSource(environment));
   }
 
   private Agency getAgency(DataFetchingEnvironment environment) {
@@ -252,8 +252,8 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
     return getSource(environment).scheduledTripsAsStream().collect(Collectors.toList());
   }
 
-  private VehiclePositionService getVehiclePositionsService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().vehiclePositionService();
+  private RealtimeVehicleService getRealtimeVehiclesService(DataFetchingEnvironment environment) {
+    return environment.<GraphQLRequestContext>getContext().realtimeVehicleService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

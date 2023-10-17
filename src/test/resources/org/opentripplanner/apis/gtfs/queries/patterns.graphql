@@ -17,6 +17,27 @@
                 pickupType
                 dropoffType
             }
+            occupancy {
+                occupancyStatus
+            }
+        }
+        vehiclePositions {
+            vehicleId
+            label
+            lat
+            lon
+            stopRelationship {
+                status
+                stop {
+                    gtfsId
+                }
+            }
+            speed
+            heading
+            lastUpdated
+            trip {
+                gtfsId
+            }
         }
     }
 }

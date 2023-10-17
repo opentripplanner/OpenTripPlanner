@@ -20,7 +20,7 @@ import org.opentripplanner.transit.model.basic.Money;
 public class FaresFilterTest implements PlanTestConstants {
 
   @Test
-  public void shouldAddFare() {
+  void shouldAddFare() {
     final int ID = 1;
 
     Itinerary i1 = newItinerary(A, 0)

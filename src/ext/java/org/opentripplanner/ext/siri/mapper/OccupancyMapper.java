@@ -10,7 +10,7 @@ public class OccupancyMapper {
 
   public static OccupancyStatus mapOccupancyStatus(OccupancyEnumeration occupancy) {
     if (occupancy == null) {
-      return OccupancyStatus.NO_DATA;
+      return OccupancyStatus.NO_DATA_AVAILABLE;
     }
     return switch (occupancy) {
       case SEATS_AVAILABLE -> OccupancyStatus.MANY_SEATS_AVAILABLE;

@@ -92,7 +92,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
     float ABCD_PRICE = 5.70f;
     float D_PRICE = 2.80f;
 
-    HSLFareServiceImpl hslFareService = new HSLFareServiceImpl();
+    HSLFareService hslFareService = new HSLFareService();
     int fiveMinutes = 60 * 5;
 
     // Fare attributes
@@ -446,7 +446,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
     FareRuleSet ruleSetAB = new FareRuleSet(fareAttributeAB);
 
-    var service = new HSLFareServiceImpl();
+    var service = new HSLFareService();
     service.addFareRules(FareType.regular, List.of(ruleSetAB));
 
     // outside HSL's fare zones, should return null

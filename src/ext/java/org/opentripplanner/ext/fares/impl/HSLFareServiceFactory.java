@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 public class HSLFareServiceFactory extends DefaultFareServiceFactory {
 
-  private static final Logger LOG = LoggerFactory.getLogger(HSLFareServiceImpl.class);
+  private static final Logger LOG = LoggerFactory.getLogger(HSLFareService.class);
 
   @Override
   protected void fillFareRules(
@@ -76,7 +76,7 @@ public class HSLFareServiceFactory extends DefaultFareServiceFactory {
   }
 
   public FareService makeFareService() {
-    HSLFareServiceImpl fareService = new HSLFareServiceImpl();
+    HSLFareService fareService = new HSLFareService();
     fareService.addFareRules(FareType.regular, regularFareRules.values());
     if (LOG.isDebugEnabled()) {
       for (FareRuleSet ruleSet : regularFareRules.values()) {
