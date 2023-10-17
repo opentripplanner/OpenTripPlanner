@@ -22,7 +22,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
  */
-public class Itinerary {
+public class Itinerary implements ItinerarySortKey {
 
   public static final int UNKNOWN = -1;
 
