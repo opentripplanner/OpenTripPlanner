@@ -110,8 +110,8 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     assertTrue(i1.getSystemNotices().isEmpty());
     assertFalse(i2.getSystemNotices().isEmpty());
     assertFalse(i3.getSystemNotices().isEmpty());
-    assertEquals("transit-vs-street-filter", i2.getSystemNotices().get(0).tag);
-    assertEquals("outside-search-window", i3.getSystemNotices().get(0).tag);
+    assertEquals("transit-vs-street-filter", i2.getSystemNotices().get(0).tag());
+    assertEquals("outside-search-window", i3.getSystemNotices().get(0).tag());
   }
 
   @Test

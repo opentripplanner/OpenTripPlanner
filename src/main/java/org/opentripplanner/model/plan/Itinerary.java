@@ -202,7 +202,7 @@ public class Itinerary implements ItinerarySortKey {
    * given {@code tag}.
    */
   public boolean hasSystemNoticeTag(String tag) {
-    return systemNotices.stream().map(n -> n.tag).anyMatch(tag::equals);
+    return systemNotices.stream().map(SystemNotice::tag).anyMatch(tag::equals);
   }
 
   public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
