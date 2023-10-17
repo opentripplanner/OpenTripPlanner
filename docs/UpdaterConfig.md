@@ -223,16 +223,26 @@ The information is downloaded in a single HTTP request and polled regularly.
 <!-- vehicle-positions BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Config Parameter           |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
-|----------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| type = "vehicle-positions" |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
-| feedId                     |     `string`    | Feed ID to which the update should be applied.                             | *Required* |               |  2.2  |
-| frequency                  |    `duration`   | How often the positions should be updated.                                 | *Optional* | `"PT1M"`      |  2.2  |
-| url                        |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from.  | *Required* |               |  2.2  |
-| [headers](#u__6__headers)  | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
+| Config Parameter            |       Type      | Summary                                                                    |  Req./Opt. | Default Value | Since |
+|-----------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| type = "vehicle-positions"  |      `enum`     | The type of the updater.                                                   | *Required* |               |  1.5  |
+| feedId                      |     `string`    | Feed ID to which the update should be applied.                             | *Required* |               |  2.2  |
+| frequency                   |    `duration`   | How often the positions should be updated.                                 | *Optional* | `"PT1M"`      |  2.2  |
+| fuzzyTripMatching           |    `boolean`    | Whether to match trips fuzzily.                                            | *Optional* | `false`       |  2.5  |
+| url                         |      `uri`      | The URL of GTFS-RT protobuf HTTP resource to download the positions from.  | *Required* |               |  2.2  |
+| [features](#u__6__features) |    `enum set`   | Which features of GTFS RT vehicle positions should be loaded into OTP.     | *Optional* |               |  2.5  |
+| [headers](#u__6__headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted. | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
+
+<h4 id="u__6__features">features</h4>
+
+**Since version:** `2.5` ∙ **Type:** `enum set` ∙ **Cardinality:** `Optional`   
+**Path:** /updaters/[6]   
+**Enum values:** `position` | `stop-position` | `occupancy`
+
+Which features of GTFS RT vehicle positions should be loaded into OTP.
 
 <h4 id="u__6__headers">headers</h4>
 
@@ -256,7 +266,11 @@ HTTP headers to add to the request. Any header key, value can be inserted.
       "frequency" : "1m",
       "headers" : {
         "Header-Name" : "Header-Value"
-      }
+      },
+      "fuzzyTripMatching" : false,
+      "features" : [
+        "position"
+      ]
     }
   ]
 }

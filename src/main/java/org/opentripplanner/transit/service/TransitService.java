@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Stream;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.FeedInfo;
@@ -98,6 +97,8 @@ public interface TransitService {
   Collection<RegularStop> listRegularStops();
 
   StopLocation getStopLocation(FeedScopedId parseId);
+
+  Collection<StopLocation> getStopOrChildStops(FeedScopedId id);
 
   Collection<StopLocationsGroup> listStopLocationGroups();
 

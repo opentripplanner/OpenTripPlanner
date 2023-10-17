@@ -818,6 +818,8 @@ type QueryType {
     numTripPatterns: Int = 50,
     "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from the last response and keep the original request as is. This will enable you to search for itineraries in the next or previous time-window."
     pageCursor: String,
+    "The list of points the journey is required to pass through."
+    passThroughPoints: [PassThroughPoint!],
     """
     Whether non-optimal transit paths at the destination should be returned. Let c be the
     existing minimum pareto optimal generalized-cost to beat. Then a trip with cost c' is
@@ -1522,18 +1524,50 @@ enum MultiModalMode {
   parent
 }
 
+"OccupancyStatus to be exposed in the API. The values are based on GTFS-RT"
 enum OccupancyStatus {
-  "The vehicle or carriage has a few seats available."
+  """
+  The vehicle or carriage can currently accommodate only standing passengers and has limited
+  space for them. There isn't a big difference between this and `full` so it's possible to
+  handle them as the same value, if one wants to limit the number of different values.
+  SIRI nordic profile: merge into `standingRoomOnly`.
+  """
+  crushedStandingRoomOnly
+  """
+  The vehicle is considered empty by most measures, and has few or no passengers onboard, but is
+  still accepting passengers. There isn't a big difference between this and `manySeatsAvailable`
+  so it's possible to handle them as the same value, if one wants to limit the number of different
+  values.
+  SIRI nordic profile: merge these into `manySeatsAvailable`.
+  """
+  empty
+  """
+  The vehicle or carriage has a few seats available.
+  SIRI nordic profile: less than ~50% of seats available.
+  """
   fewSeatsAvailable
-  "The vehicle or carriage is considered full by most measures, but may still be allowing passengers to board."
+  """
+  The vehicle or carriage is considered full by most measures, but may still be allowing
+  passengers to board.
+  """
   full
-  "The vehicle or carriage has a large number of seats available."
+  """
+  The vehicle or carriage has a large number of seats available.
+  SIRI nordic profile: more than ~50% of seats available.
+  """
   manySeatsAvailable
   "The vehicle or carriage doesn't have any occupancy data available."
   noData
-  "The vehicle or carriage has no seats or standing room available."
+  """
+  The vehicle or carriage has no seats or standing room available.
+  SIRI nordic profile: if vehicle/carriage is not in use / unavailable, or passengers are only
+  allowed to alight due to e.g. crowding.
+  """
   notAcceptingPassengers
-  "The vehicle or carriage only has standing room available."
+  """
+  The vehicle or carriage only has standing room available.
+  SIRI nordic profile: less than ~10% of seats available.
+  """
   standingRoomOnly
 }
 
@@ -1935,6 +1969,18 @@ input Modes {
   transportModes: [TransportModes]
 }
 
+"Defines one point which the journey must pass through."
+input PassThroughPoint {
+  "Optional name of the pass-through point for debugging and logging. It is not used in routing."
+  name: String
+  """
+  The list of *stop location ids* which define the pass-through point. At least one id is required.
+  Quay, StopPlace, multimodal StopPlace, and GroupOfStopPlaces are supported location types.
+  The journey must pass through at least one of these entities - not all of them.
+  """
+  placeIds: [String!]
+}
+
 "A combination of street mode and penalty for time and cost."
 input PenaltyForStreetMode {
   """
@@ -2028,7 +2074,7 @@ input ViaLocationInput {
   maxSlack: Duration = "PT1H"
   "The minimum time the user wants to stay in the via location before continuing his journey"
   minSlack: Duration = "PT5M"
-  "The name of the location. This is pass-through informationand is not used in routing."
+  "The name of the location. This is pass-through information and is not used in routing."
   name: String
   "The id of an element in the OTP model. Currently supports Quay, StopPlace, multimodal StopPlace, and GroupOfStopPlaces."
   place: String

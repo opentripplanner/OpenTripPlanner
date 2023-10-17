@@ -7,16 +7,19 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.List;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.request.Optimization;
+import org.opentripplanner.raptor.api.request.PassThroughPoint;
 import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.rangeraptor.SystemErrDebugLogger;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.performance.PerformanceTimersForRaptor;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.api.request.RouteRequest;
+import org.opentripplanner.transit.model.site.StopLocation;
 
 public class RaptorRequestMapper {
 
@@ -105,12 +108,14 @@ public class RaptorRequestMapper {
     if (preferences.transfer().maxAdditionalTransfers() != null) {
       searchParams.numberOfAdditionalTransfers(preferences.transfer().maxAdditionalTransfers());
     }
+
     builder.withMultiCriteria(mcBuilder -> {
       preferences
         .transit()
         .raptor()
         .relaxGeneralizedCostAtDestination()
         .ifPresent(mcBuilder::withRelaxCostAtDestination);
+      mcBuilder.withPassThroughPoints(mapPassThroughPoints());
     });
 
     for (Optimization optimization : preferences.transit().raptor().optimizations()) {
@@ -167,6 +172,17 @@ public class RaptorRequestMapper {
     );
 
     return builder.build();
+  }
+
+  private List<PassThroughPoint> mapPassThroughPoints() {
+    return request
+      .getPassThroughPoints()
+      .stream()
+      .map(p -> {
+        final int[] stops = p.stopLocations().stream().mapToInt(StopLocation::getIndex).toArray();
+        return new PassThroughPoint(p.name(), stops);
+      })
+      .toList();
   }
 
   private int relativeTime(Instant time) {

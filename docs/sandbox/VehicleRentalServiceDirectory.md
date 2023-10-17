@@ -1,24 +1,102 @@
 # Vehicle Rental Service Directory API support.
 
+This adds support for the GBFS service directory endpoint component located at 
+https://github.com/entur/lamassu. OTP uses the service directory to lookup and connect to all GBFS
+endpoints registered in the directory. This simplifies the management of the GBFS endpoints, since
+multiple services/components like OTP can connect to the directory and get the necessary
+configuration from it.
+
+
 ## Contact Info
 
-- Gard Mellemstrand, Entur, Norway
+- Entur, Norway
+
 
 ## Changelog
 
 - Initial implementation of bike share updater API support
-- Make json tag names
-  configurable [#3447](https://github.com/opentripplanner/OpenTripPlanner/pull/3447)
+- Make json tag names configurable [#3447](https://github.com/opentripplanner/OpenTripPlanner/pull/3447)
+- Enable GBFS geofencing with VehicleRentalServiceDirectory [#5324](https://github.com/opentripplanner/OpenTripPlanner/pull/5324)
 
-## Documentation
 
-This adds support for the GBFS service directory endpoint component located
-at https://github.com/entur/lahmu. OTP use the service directory to lookup and connect to all GBFS
-endpoints registered in the directory. This simplify the management of the GBFS endpoints, since
-multiple services/components like OTP can connect to the directory and get the necessary
-configuration from it.
-
-### Configuration
+## Configuration
 
 To enable this you need to specify a url for the `vehicleRentalServiceDirectory` in
 the `router-config.json`
+
+### Parameter Summary
+
+<!-- PARAMETERS-TABLE BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+| Config Parameter                                    |       Type      | Summary                                                                         |  Req./Opt. | Default Value | Since |
+|-----------------------------------------------------|:---------------:|---------------------------------------------------------------------------------|:----------:|---------------|:-----:|
+| language                                            |     `string`    | Language code.                                                                  | *Optional* |               |  2.1  |
+| sourcesName                                         |     `string`    | Json tag name for updater sources.                                              | *Optional* | `"systems"`   |  2.1  |
+| updaterNetworkName                                  |     `string`    | Json tag name for the network name for each source.                             | *Optional* | `"id"`        |  2.1  |
+| updaterUrlName                                      |     `string`    | Json tag name for endpoint urls for each source.                                | *Optional* | `"url"`       |  2.1  |
+| url                                                 |      `uri`      | Endpoint for the VehicleRentalServiceDirectory                                  | *Required* |               |  2.1  |
+| [headers](#vehicleRentalServiceDirectory_headers)   | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.      | *Optional* |               |  2.1  |
+| [networks](#vehicleRentalServiceDirectory_networks) |    `object[]`   | List all networks to include. Use "network": "default-network" to set defaults. | *Optional* |               |  2.4  |
+|       geofencingZones                               |    `boolean`    | Enables geofencingZones for the given network                                   | *Optional* | `false`       |  2.4  |
+|       network                                       |     `string`    | The network name                                                                | *Required* |               |  2.4  |
+
+<!-- PARAMETERS-TABLE END -->
+
+
+### Parameter Details
+
+<!-- PARAMETERS-DETAILS BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+<h4 id="vehicleRentalServiceDirectory_headers">headers</h4>
+
+**Since version:** `2.1` ∙ **Type:** `map of string` ∙ **Cardinality:** `Optional`   
+**Path:** /vehicleRentalServiceDirectory 
+
+HTTP headers to add to the request. Any header key, value can be inserted.
+
+<h4 id="vehicleRentalServiceDirectory_networks">networks</h4>
+
+**Since version:** `2.4` ∙ **Type:** `object[]` ∙ **Cardinality:** `Optional`   
+**Path:** /vehicleRentalServiceDirectory 
+
+List all networks to include. Use "network": "default-network" to set defaults.
+
+If no default network exists only the listed networks are used. Configure a network with
+name "default-network" to include all unlisted networks. If not present, all unlisted
+networks are dropped. Note! The values in the "default-network" are not used to set
+missing field values in networks listed.
+
+
+
+<!-- PARAMETERS-DETAILS END -->
+
+
+### Example
+
+<!-- JSON-EXAMPLE BEGIN -->
+<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
+
+```JSON
+// router-config.json
+{
+  "vehicleRentalServiceDirectory" : {
+    "url" : "https://example.com",
+    "sourcesName" : "systems",
+    "updaterUrlName" : "url",
+    "updaterNetworkName" : "id",
+    "headers" : {
+      "ET-Client-Name" : "otp"
+    },
+    "networks" : [
+      {
+        "network" : "oslo-by-sykkel",
+        "geofencingZones" : true
+      }
+    ]
+  }
+}
+```
+
+<!-- JSON-EXAMPLE END -->

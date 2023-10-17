@@ -38,7 +38,7 @@ public class OtpTransitServiceImplTest {
 
   @BeforeAll
   public static void setup() throws IOException {
-    GtfsContextBuilder contextBuilder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS);
+    GtfsContextBuilder contextBuilder = contextBuilder(FEED_ID, ConstantsForTests.SIMPLE_GTFS);
     OtpTransitServiceBuilder builder = contextBuilder.getTransitBuilder();
 
     // Supplement test data with at least one entity in all collections

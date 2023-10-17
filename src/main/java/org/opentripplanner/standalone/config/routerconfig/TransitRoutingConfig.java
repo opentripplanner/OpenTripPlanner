@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
 
 import java.time.Duration;
 import java.util.List;
@@ -31,6 +32,7 @@ public final class TransitRoutingConfig implements RaptorTuningParameters, Trans
   private final List<Duration> pagingSearchWindowAdjustments;
 
   private final Map<StopTransferPriority, Integer> stopTransferCost;
+  private final Duration maxSearchWindow;
   private final DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients;
 
   public TransitRoutingConfig(
@@ -200,6 +202,24 @@ for more info."
         )
         .asDurations(PAGING_SEARCH_WINDOW_ADJUSTMENTS);
 
+    this.maxSearchWindow =
+      c
+        .of("maxSearchWindow")
+        .since(V2_4)
+        .summary("Upper limit of the request parameter searchWindow.")
+        .description(
+          """
+            Maximum search window that can be set through the searchWindow API parameter.
+            Due to the way timetable data are collected before a Raptor trip search,
+            using a search window larger than 24 hours may lead to inconsistent search results.
+            Limiting the search window prevents also potential performance issues.
+            The recommended maximum value is 24 hours.
+            This parameter does not restrict the maximum duration of a dynamic search window (use
+            the parameter `transit.dynamicSearchWindow.maxWindow` to specify such a restriction).
+            """
+        )
+        .asDuration(Duration.ofHours(24));
+
     this.dynamicSearchWindowCoefficients = new DynamicSearchWindowConfig("dynamicSearchWindow", c);
   }
 
@@ -246,6 +266,11 @@ for more info."
   @Override
   public List<RouteRequest> transferCacheRequests() {
     return transferCacheRequests;
+  }
+
+  @Override
+  public Duration maxSearchWindow() {
+    return maxSearchWindow;
   }
 
   @Override
