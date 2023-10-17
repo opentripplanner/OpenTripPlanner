@@ -219,7 +219,7 @@ public class RoutingWorker {
 
   /**
    * Calculate the earliest-departure-time used in the transit search.
-   * This method return {@code null} if no transit search is performed.
+   * This method returns {@code null} if no transit search is performed.
    */
   @Nullable
   private Instant earliestDepartureTimeUsed() {
@@ -236,7 +236,7 @@ public class RoutingWorker {
 
   /**
    * Calculate the search-window earliest-departure-time used in the transit search.
-   * This method return {@code null} if no transit search is performed.
+   * This method returns {@code null} if no transit search is performed.
    */
   @Nullable
   private Duration searchWindowUsed() {
