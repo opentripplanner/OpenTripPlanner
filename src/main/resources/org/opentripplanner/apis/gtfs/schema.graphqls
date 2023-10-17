@@ -558,7 +558,7 @@ type VehicleRentalStation implements Node & PlaceInterface {
     Number of vehicles currently available on the rental station.
     See field `allowPickupNow` to know if is currently possible to pick up a vehicle.
     """
-    vehiclesAvailable: Int
+    vehiclesAvailable: Int @deprecated(reason: "Use availableVehicles instead, which also contains vehicle types")
 
     """
     Number of free spaces currently available on the rental station.
@@ -567,7 +567,17 @@ type VehicleRentalStation implements Node & PlaceInterface {
     the rental station, even if the vehicle racks don't have any spaces available.
     See field `allowDropoffNow` to know if is currently possible to return a vehicle.
     """
-    spacesAvailable: Int
+    spacesAvailable: Int @deprecated(reason: "Use availableSpaces instead, which also contains the space vehicle types")
+
+    """
+    Number of vehicles currently available on the rental station, grouped by vehicle type.
+    """
+    availableVehicles: RentalVehicleEntityCounts!
+
+    """
+    Number of free spaces currently available on the rental station, grouped by vehicle type.
+    """
+    availableSpaces: RentalVehicleEntityCounts!
 
     """
     If true, values of `vehiclesAvailable` and `spacesAvailable` are updated from a
@@ -615,6 +625,22 @@ type VehicleRentalStation implements Node & PlaceInterface {
     If true, station is on and in service.
     """
     operative: Boolean
+}
+
+type RentalVehicleEntityCounts {
+    """The total number of entities (e.g. vehicles, spaces)."""
+    total: Int!
+
+    """The number of entities by type"""
+    byType: [RentalVehicleTypeCount!]!
+}
+
+type RentalVehicleTypeCount {
+    """The type of the rental vehicle (scooter, bicycle, car...)"""
+    vehicleType: RentalVehicleType!
+
+    """The number of vehicles of this type"""
+    count: Int!
 }
 
 """
