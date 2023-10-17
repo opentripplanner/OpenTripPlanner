@@ -1,0 +1,80 @@
+{
+  "data" : {
+    "nearest" : {
+      "edges" : [
+        {
+          "node" : {
+            "place" : {
+              "id" : "U3RvcDpGOkE",
+              "gtfsId" : "F:A",
+              "parentStation" : null
+            }
+          }
+        },
+        {
+          "node" : {
+            "place" : {
+              "id" : "U3RvcDpGOkI",
+              "gtfsId" : "F:B",
+              "parentStation" : null
+            }
+          }
+        },
+        {
+          "node" : {
+            "place" : {
+              "id" : "U3RvcDpGOkM",
+              "gtfsId" : "F:C",
+              "parentStation" : null
+            }
+          }
+        },
+        {
+          "node" : {
+            "place" : {
+              "id" : "U3RvcDpGOkQ",
+              "gtfsId" : "F:D",
+              "parentStation" : null
+            }
+          }
+        },
+        {
+          "node" : {
+            "place" : {
+              "id" : "U3RvcDpGOkU",
+              "gtfsId" : "F:E",
+              "parentStation" : null
+            }
+          }
+        },
+        {
+          "node" : {
+            "place" : {
+              "id" : "U3RvcDpGOkY",
+              "gtfsId" : "F:F",
+              "parentStation" : null
+            }
+          }
+        },
+        {
+          "node" : {
+            "place" : {
+              "id" : "U3RvcDpGOkc",
+              "gtfsId" : "F:G",
+              "parentStation" : null
+            }
+          }
+        },
+        {
+          "node" : {
+            "place" : {
+              "id" : "U3RvcDpGOkg",
+              "gtfsId" : "F:H",
+              "parentStation" : null
+            }
+          }
+        }
+      ]
+    }
+  }
+}

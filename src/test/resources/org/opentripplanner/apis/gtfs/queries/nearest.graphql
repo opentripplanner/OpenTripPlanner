@@ -1,0 +1,17 @@
+{
+  nearest(lat: 60.19915, lon: 24.94089, maxDistance: 500) {
+    edges {
+      node {
+        place {
+          ...on Stop {
+              id
+              gtfsId
+              parentStation {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  }
