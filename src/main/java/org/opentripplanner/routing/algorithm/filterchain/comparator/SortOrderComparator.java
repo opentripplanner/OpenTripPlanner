@@ -27,13 +27,12 @@ public class SortOrderComparator extends CompositeComparator<ItinerarySortKey> {
 
   /** Sort latest arrival-time first */
   static final Comparator<ItinerarySortKey> ARRIVAL_TIME_COMP = comparing(
-    ItinerarySortKey::endTime
+    ItinerarySortKey::endTimeAsInstant
   );
 
   static final Comparator<ItinerarySortKey> DEPARTURE_TIME_COMP = comparing(
-    ItinerarySortKey::startTime
-  )
-    .reversed();
+    ItinerarySortKey::startTimeAsInstant
+  ).reversed();
 
   static final Comparator<ItinerarySortKey> GENERALIZED_COST_COMP = comparingInt(
     ItinerarySortKey::getGeneralizedCost
