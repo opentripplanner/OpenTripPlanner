@@ -1,3 +1,12 @@
+---
+name: Bug report
+about: ''
+title: ''
+labels: Bug
+assignees: ''
+
+---
+
 **NOTE:** this issue system is intended for reporting bugs and tracking progress in software
 development. For all other usage and software development questions or discussion, please write to
 the user mailing list(https://groups.google.com/forum/#!forum/opentripplanner-users) or post a
