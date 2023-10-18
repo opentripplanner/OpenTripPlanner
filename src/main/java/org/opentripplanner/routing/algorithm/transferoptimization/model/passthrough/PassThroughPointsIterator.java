@@ -5,8 +5,8 @@ import java.util.List;
 import org.opentripplanner.raptor.api.request.PassThroughPoint;
 
 /**
- * Iterate over the pass-though-points. Note! this class iterate backwards starting at the last
- * pass-through-point and forward.
+ * Iterate over the pass-through points. Note! This implementation iterates backwards starting at the last
+ * pass-through point.
  */
 class PassThroughPointsIterator {
 

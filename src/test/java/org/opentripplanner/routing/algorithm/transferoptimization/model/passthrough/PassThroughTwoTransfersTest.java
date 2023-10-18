@@ -20,7 +20,7 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
  *  This test focus on the PASS-THROUGH functionality with three transit legs and two transfer in
  *  the path.
  *  <p>
- *  FEATURE UNDER TESTED
+ *  FEATURE UNDER TEST
  *  <p>
  *  We want the path with the lowest generalized-cost that visit the pass-through points in the
  *  correct order.
@@ -31,7 +31,7 @@ import org.opentripplanner.raptor.api.path.RaptorPath;
  *  plenty of slack to do the transfers for all possible stops combinations. There is two
  *  transfers to choose from between trip 1 and trip 2, and between trip 2 and trip 3. We will set
  *  the transfer durations to get different generalized-costs for each possible path. We will set
- *  the cost so the transfers witch do not contain any transfer-points have the lowest cost - is
+ *  the cost so the transfers which do not contain any transfer-points have the lowest cost - is
  *  optimal on generalized-cost. We do this to make sure the subject-under-test is using the
  *  pass-through-points, and not the generalized cost to choose the correct path.
  */

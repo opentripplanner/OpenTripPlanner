@@ -17,9 +17,9 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
  * This test focus on the PASS-THROUGH functionality with a very simple scenario - one transit leg
  * and no transfers.
  * <p>
- * FEATURE UNDER TESTED
+ * FEATURE UNDER TEST
  * <p>
- * We want the path with the lowest generalized-cost that visit the pass-through points in the
+ * We want the path with the lowest generalized-cost that visits the pass-through points in the
  * correct order.
  * <p>
  * TEST SETUP
@@ -88,7 +88,6 @@ public class PassThroughNoTransfersTest implements RaptorTestConstants {
     assertEquals(1, result.size());
 
     // Then expect a set containing the original path
-    System.out.println(first(result).toString(this::stopIndexToName));
     assertEquals(
       originalPath.toString(this::stopIndexToName),
       first(result).toString(this::stopIndexToName)

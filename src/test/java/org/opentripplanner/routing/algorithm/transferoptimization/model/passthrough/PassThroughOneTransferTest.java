@@ -20,7 +20,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
  * path. But between trip 1 and trip 2, there may be many transfer options to choose from.
  *
  * <p>
- * FEATURE UNDER TESTED
+ * FEATURE UNDER TEST
  * <p>
  * We want the path with the lowest generalized-cost that visit the pass-through points in the
  * correct order.
@@ -30,7 +30,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
  * We will use 2 trips with a fixed set of transfers for each test. Each trip has 5 stops and
  * plenty of slack to do the transfers for all possible stops combinations. We will set the
  * transfer durations to get different generalized-costs for each possible path. We will set the
- * cost so the transfers witch do not contain any transfer-points have the lowest cost - is optimal
+ * cost so the transfers which do not contain any transfer-points have the lowest cost - is optimal
  * on generalized-cost. We do this to make sure the subject-under-test is using the pass-through-
  * points, and not the generalized cost to choose the correct path.
  */
@@ -139,7 +139,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
       // This transfer do not visit G
       .addTxCost(STOP_D, STOP_H, 2);
 
-    // We need *a* path - the transfer her can be any
+    // We need *a* path - the transfer here can be any.
     var originalPath = pathBuilder()
       .access(ITERATION_START_TIME, STOP_B, D1s)
       .bus(trip1, STOP_D)
@@ -154,7 +154,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
       .bus(trip2, STOP_I)
       .egress(D1s);
 
-    // These are illegal transfer for the given path, we add them here to make sure they
+    // These are illegal transfers for the given path, we add them here to make sure they
     // do not interfere with the result. For simpler debugging problems try commenting out these
     // lines, just do not forget to comment them back in when the problem is fixed.
     var subject = subject(
@@ -164,7 +164,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
         tx(trip1, STOP_C, trip2, STOP_H, txCost),
         tx(trip1, STOP_D, trip2, STOP_G, txCost),
         tx(trip1, STOP_D, trip2, STOP_H, txCost),
-        // These are illegal transfer for the given path, we add them here to make sure they
+        // These are illegal transfers for the given path, we add them here to make sure they
         // do not interfere with the result. For simpler debugging problems try comment out these
         // lines, just do not forget to comment them back in when the problem is fixed.
         tx(trip1, STOP_B, trip2, STOP_F, txCost),
