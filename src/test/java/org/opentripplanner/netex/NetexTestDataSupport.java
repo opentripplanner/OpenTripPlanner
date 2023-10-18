@@ -13,6 +13,7 @@ import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DayTypeRefStructure;
 import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 import org.rutebanken.netex.model.JourneyRefStructure;
+import org.rutebanken.netex.model.ObjectFactory;
 import org.rutebanken.netex.model.OperatingDay;
 import org.rutebanken.netex.model.OperatingDayRefStructure;
 import org.rutebanken.netex.model.OperatingPeriod;
@@ -89,7 +90,10 @@ public final class NetexTestDataSupport {
     Boolean isAvailable
   ) {
     return createDayTypeAssignment(dayTypeId, isAvailable)
-      .withOperatingPeriodRef(new OperatingPeriodRefStructure().withRef(opPeriodId));
+      .withOperatingPeriodRef(
+        new ObjectFactory()
+          .createOperatingPeriodRef(new OperatingPeriodRefStructure().withRef(opPeriodId))
+      );
   }
 
   public static DayTypeAssignment createDayTypeAssignmentWithOpDay(

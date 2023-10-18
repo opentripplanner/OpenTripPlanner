@@ -25,19 +25,21 @@ import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.AccessibilityAssessment;
 import org.rutebanken.netex.model.AccessibilityLimitation;
 import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
+import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.MultilingualString;
+import org.rutebanken.netex.model.ObjectFactory;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 public class StopAndStationMapperTest {
 
   public static final ZoneId DEFAULT_TIME_ZONE = ZoneIds.OSLO;
+  private final ObjectFactory objectFactory = new ObjectFactory();
 
   @Test
   public void testWheelChairBoarding() {
@@ -47,7 +49,7 @@ public class StopAndStationMapperTest {
       "1",
       55.707005,
       13.186816,
-      VehicleModeEnumeration.BUS
+      AllVehicleModesOfTransportEnumeration.BUS
     );
 
     // Create on quay with access, one without, and one with NULL
@@ -68,9 +70,9 @@ public class StopAndStationMapperTest {
 
     stopPlace.setQuays(
       new Quays_RelStructure()
-        .withQuayRefOrQuay(quay1)
-        .withQuayRefOrQuay(quay2)
-        .withQuayRefOrQuay(quay3)
+        .withQuayRefOrQuay(objectFactory.createQuay(quay1))
+        .withQuayRefOrQuay(objectFactory.createQuay(quay2))
+        .withQuayRefOrQuay(objectFactory.createQuay(quay3))
     );
 
     var stopPlaceById = new HierarchicalVersionMapById<StopPlace>();
@@ -94,7 +96,7 @@ public class StopAndStationMapperTest {
     );
 
     // Add quay with no AccessibilityAssessment, then it should take default from stopPlace
-    stopPlace.getQuays().withQuayRefOrQuay(quay4);
+    stopPlace.getQuays().withQuayRefOrQuay(objectFactory.createQuay(quay4));
 
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
 
@@ -112,7 +114,7 @@ public class StopAndStationMapperTest {
       "2",
       59.909584,
       10.755165,
-      VehicleModeEnumeration.TRAM
+      AllVehicleModesOfTransportEnumeration.TRAM
     );
 
     StopPlace stopPlaceOld = createStopPlace(
@@ -121,7 +123,7 @@ public class StopAndStationMapperTest {
       "1",
       59.909584,
       10.755165,
-      VehicleModeEnumeration.TRAM
+      AllVehicleModesOfTransportEnumeration.TRAM
     );
 
     stopPlaces.add(stopPlaceNew);
@@ -136,11 +138,15 @@ public class StopAndStationMapperTest {
     Quay quay3 = createQuay("NSR:Quay:3", "", "1", 59.909911, 10.753008, "C");
 
     stopPlaceNew.setQuays(
-      new Quays_RelStructure().withQuayRefOrQuay(quay1b).withQuayRefOrQuay(quay2)
+      new Quays_RelStructure()
+        .withQuayRefOrQuay(objectFactory.createQuay(quay1b))
+        .withQuayRefOrQuay(objectFactory.createQuay(quay2))
     );
 
     stopPlaceOld.setQuays(
-      new Quays_RelStructure().withQuayRefOrQuay(quay1a).withQuayRefOrQuay(quay3)
+      new Quays_RelStructure()
+        .withQuayRefOrQuay(objectFactory.createQuay(quay1a))
+        .withQuayRefOrQuay(objectFactory.createQuay(quay3))
     );
 
     HierarchicalVersionMapById<Quay> quaysById = new HierarchicalVersionMapById<>();
@@ -213,7 +219,7 @@ public class StopAndStationMapperTest {
         "1",
         59.909584,
         10.755165,
-        VehicleModeEnumeration.TRAM
+        AllVehicleModesOfTransportEnumeration.TRAM
       );
 
     stopPlace.withLimitedUse(LimitedUseTypeEnumeration.ISOLATED);
@@ -249,13 +255,13 @@ public class StopAndStationMapperTest {
       "1",
       55.707005,
       13.186816,
-      VehicleModeEnumeration.BUS
+      AllVehicleModesOfTransportEnumeration.BUS
     );
 
     // Create on quay with access, one without, and one with NULL
     var quay1 = createQuay("ST:Quay:1", "Quay1", "1", 55.706063, 13.186708, "a");
 
-    stopPlace.setQuays(new Quays_RelStructure().withQuayRefOrQuay(quay1));
+    stopPlace.setQuays(new Quays_RelStructure().withQuayRefOrQuay(objectFactory.createQuay(quay1)));
 
     StopModelBuilder stopModelBuilder = StopModel.of();
 
@@ -297,7 +303,7 @@ public class StopAndStationMapperTest {
     String version,
     Double lat,
     Double lon,
-    VehicleModeEnumeration transportMode
+    AllVehicleModesOfTransportEnumeration transportMode
   ) {
     return new StopPlace()
       .withName(createMLString(name))

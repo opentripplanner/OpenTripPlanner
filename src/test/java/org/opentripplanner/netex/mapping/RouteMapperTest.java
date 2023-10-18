@@ -31,6 +31,7 @@ import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.OrganisationRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
+import org.rutebanken.netex.model.TransportOrganisationRefStructure;
 
 public class RouteMapperTest {
 
@@ -81,7 +82,7 @@ public class RouteMapperTest {
     Network network = new Network()
       .withId(NETWORK_ID)
       .withTransportOrganisationRef(
-        createJaxbElement(new OrganisationRefStructure().withRef(AUTHORITY_ID))
+        createJaxbElement(new TransportOrganisationRefStructure().withRef(AUTHORITY_ID))
       );
 
     netexIndex.networkById.add(network);

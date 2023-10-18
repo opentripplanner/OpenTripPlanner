@@ -39,7 +39,7 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
 
     // Keep list sorted alphabetically
     warnOnMissingMapping(LOG, frame.getBookingTimes());
-    warnOnMissingMapping(LOG, frame.getVehicleTypeRef());
+    warnOnMissingMapping(LOG, frame.getVehicleTypes());
     warnOnMissingMapping(LOG, frame.getCoupledJourneys());
     warnOnMissingMapping(LOG, frame.getDefaultInterchanges());
     warnOnMissingMapping(LOG, frame.getFlexibleServiceProperties());
@@ -58,7 +58,7 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     warnOnMissingMapping(LOG, frame.getTrainNumbers());
     warnOnMissingMapping(LOG, frame.getTypesOfService());
     warnOnMissingMapping(LOG, frame.getVehicleTypes());
-    warnOnMissingMapping(LOG, frame.getVehicleTypeRef());
+    warnOnMissingMapping(LOG, frame.getVehicleTypes());
 
     verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
   }

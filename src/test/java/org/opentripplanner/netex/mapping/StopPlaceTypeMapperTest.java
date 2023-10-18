@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.rutebanken.netex.model.StopPlace;
-import org.rutebanken.netex.model.VehicleModeEnumeration;
 
 public class StopPlaceTypeMapperTest {
 
@@ -24,7 +24,7 @@ public class StopPlaceTypeMapperTest {
   @Test
   public void mapWithTransportModeOnly() {
     var transitMode = stopPlaceTypeMapper.map(
-      new StopPlace().withTransportMode(VehicleModeEnumeration.RAIL)
+      new StopPlace().withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
     );
     assertEquals(TransitMode.RAIL, transitMode.mainMode());
     assertNull(transitMode.subMode());
@@ -34,7 +34,7 @@ public class StopPlaceTypeMapperTest {
   public void mapWithSubMode() {
     var transitMode = stopPlaceTypeMapper.map(
       new StopPlace()
-        .withTransportMode(VehicleModeEnumeration.RAIL)
+        .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
         .withRailSubmode(RailSubmodeEnumeration.REGIONAL_RAIL)
     );
     assertEquals(TransitMode.RAIL, transitMode.mainMode());
@@ -54,7 +54,7 @@ public class StopPlaceTypeMapperTest {
   public void checkSubModePrecedensOverMainMode() {
     var transitMode = stopPlaceTypeMapper.map(
       new StopPlace()
-        .withTransportMode(VehicleModeEnumeration.RAIL)
+        .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
         .withBusSubmode(BusSubmodeEnumeration.SIGHTSEEING_BUS)
     );
     assertEquals(TransitMode.BUS, transitMode.mainMode());

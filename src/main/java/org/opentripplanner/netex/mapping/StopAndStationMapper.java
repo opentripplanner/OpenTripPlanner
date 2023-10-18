@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import jakarta.xml.bind.JAXBElement;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -129,9 +130,9 @@ class StopAndStationMapper {
 
     return stopPlace
       .getTariffZones()
-      .getTariffZoneRef()
+      .getTariffZoneRef_()
       .stream()
-      .map(ref -> findTariffZone(stopPlace, ref))
+      .map(ref -> findTariffZone(stopPlace, (TariffZoneRef) ref.getValue()))
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
   }
@@ -209,9 +210,9 @@ class StopAndStationMapper {
 
     List<Quay> result = new ArrayList<>();
 
-    for (Object it : quays.getQuayRefOrQuay()) {
-      if (it instanceof Quay) {
-        result.add((Quay) it);
+    for (JAXBElement<?> it : quays.getQuayRefOrQuay()) {
+      if (it.getValue() instanceof Quay quay) {
+        result.add(quay);
       } else {
         issueStore.add(
           Issue.issue(

@@ -149,7 +149,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
             assignment.getId()
           );
         } else {
-          String quayRef = assignment.getQuayRef().getRef();
+          String quayRef = assignment.getQuayRef().getValue().getRef();
           String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
           quayIdByStopPointRef.put(stopPointRef, quayRef);
         }
