@@ -1,23 +1,23 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
+name: Roadmap Epic
+about: Suggest an idea for the Roadmap
 title: ''
-labels: new feature
+labels: Roadmap
 assignees: ''
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+### Describe expected behavior:
+- What: <!-- Clearly state what the desired changes or new features could look like. -->
+- Why: <!-- Clearly state the effect/outcome of this change. -->
+- When: <!-- Provide a timeline or timeframe for when these changes should be implemented, preferably on a quarterly basis (e.g., Y24 Q3). -->
 
-**Why is this a problem?**
-Describe the context, the goal or use-case this is part of.
+### Linked issue(s)
+<!-- Add a checkbox by typing “- [] ”. Then, link to an issue by typing “#” and searching for the issue by text or issue number.  -->
 
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
+### OTP PO Discussion meeting details:
+- Date: <!-- Specify the date when the discussion meeting took place. -->
+- Link(s): <!-- Provide a link or location where the discussion notes or details can be found. This could be a meeting link or another document. -->
 
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
+### Extra Comments (Optional) 
 
-**Additional context**
-Add any other context or screenshots about the feature request here.
