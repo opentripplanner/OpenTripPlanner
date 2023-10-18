@@ -1,8 +1,8 @@
 ---
 name: Bug report
-about: 'Report a bug or issue'
+about: Report a bug or issue
 title: ''
-labels: Bug
+labels: ''
 assignees: ''
 
 ---
@@ -26,4 +26,3 @@ question in the developer chat: https://gitter.im/opentripplanner/OpenTripPlanne
 ## Router config and graph build config JSON
 
 ## Steps to reproduce the problem
-

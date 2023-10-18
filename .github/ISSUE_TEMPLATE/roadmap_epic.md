@@ -19,5 +19,4 @@ assignees: ''
 - Date: <!-- Specify the date when the discussion meeting took place. -->
 - Link(s): <!-- Provide a link or location where the discussion notes or details can be found. This could be a meeting link or another document. -->
 
-### Extra Comments (Optional) 
-
+### Extra Comments (Optional)
