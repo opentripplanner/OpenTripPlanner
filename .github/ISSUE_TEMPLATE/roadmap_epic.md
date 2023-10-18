@@ -13,7 +13,7 @@ assignees: ''
 - When: <!-- Provide a timeline or timeframe for when these changes should be implemented, preferably on a quarterly basis (e.g., Y24 Q3). -->
 
 ### Linked issue(s)
-<!-- Add a checkbox by typing “- [] ”. Then, link to an issue by typing “#” and searching for the issue by text or issue number.  -->
+<!-- Add a checkbox by typing “- [] ”. Then, link to an issue by typing “#” and searching for the issue by text or issue number, or create a new issue.  -->
 
 ### OTP PO Discussion meeting details:
 - Date: <!-- Specify the date when the discussion meeting took place. -->
