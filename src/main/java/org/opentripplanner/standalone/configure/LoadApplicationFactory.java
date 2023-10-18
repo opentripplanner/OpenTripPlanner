@@ -6,7 +6,7 @@ import jakarta.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
-import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;

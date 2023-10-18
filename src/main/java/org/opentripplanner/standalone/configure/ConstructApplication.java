@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.configure;
 import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.LogMDCSupport;

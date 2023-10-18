@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.digitransitemissions;
+package org.opentripplanner.ext.emissions;
 
 import com.csvreader.CsvReader;
 import dagger.Module;
@@ -21,16 +21,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Module
-public class DigitransitEmissionsModule implements GraphBuilderModule {
+public class EmissionsModule implements GraphBuilderModule {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DigitransitEmissionsModule.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EmissionsModule.class);
   private BuildConfig config;
   private EmissionsDataModel emissionsDataModel;
   private GraphBuilderDataSources dataSources;
-  private Map<FeedScopedId, Emissions> emissionsData = new HashMap<>();
+  private Map<FeedScopedId, Double> emissionsData = new HashMap<>();
 
   @Inject
-  public DigitransitEmissionsModule(
+  public EmissionsModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     EmissionsDataModel emissionsDataModel
@@ -41,11 +41,11 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
   }
 
   public void buildGraph() {
-    if (config.digitransitEmissions != null) {
+    if (config.emissions != null) {
       LOG.info("Start emissions building!");
 
-      double carAvgCo2PerKm = config.digitransitEmissions.getCarAvgCo2PerKm();
-      double carAvgOccupancy = config.digitransitEmissions.getCarAvgOccupancy();
+      double carAvgCo2PerKm = config.emissions.getCarAvgCo2PerKm();
+      double carAvgOccupancy = config.emissions.getCarAvgOccupancy();
       double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
 
       for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
@@ -55,8 +55,8 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
           readGtfs(gtfsData.dataSource().path());
         }
       }
-      this.emissionsDataModel.setEmissions(this.emissionsData);
-      this.emissionsDataModel.setCarAvgCo2EmissionsPerMeter(carAvgEmissionsPerMeter);
+      this.emissionsDataModel.setCo2Emissions(this.emissionsData);
+      this.emissionsDataModel.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
     }
   }
 
@@ -96,7 +96,7 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
       Double avgPassengerCount = Double.parseDouble(reader.get("avg_passenger_count"));
       this.emissionsData.put(
           new FeedScopedId(feedId, routeId),
-          DigitransitEmissions.newDigitransitEmissions(avgCo2PerVehiclePerMeter, avgPassengerCount)
+          calculateEmissionsPerPassengerPerMeter(avgCo2PerVehiclePerMeter, avgPassengerCount)
         );
     }
   }
@@ -111,5 +111,15 @@ public class DigitransitEmissionsModule implements GraphBuilderModule {
       LOG.error("Reading feed id for emissions failed.", e);
       throw new RuntimeException(e);
     }
+  }
+
+  private static double calculateEmissionsPerPassengerPerMeter(
+    double avgCo2PerVehiclePerMeter,
+    double avgPassengerCount
+  ) {
+    if (avgPassengerCount <= 1) {
+      return avgCo2PerVehiclePerMeter;
+    }
+    return avgCo2PerVehiclePerMeter / avgPassengerCount;
   }
 }

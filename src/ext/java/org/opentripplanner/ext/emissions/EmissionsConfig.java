@@ -1,19 +1,19 @@
-package org.opentripplanner.ext.digitransitemissions;
+package org.opentripplanner.ext.emissions;
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
- * This class is responsible for mapping Digitransit emissions configuration into Digitransit emissions parameters.
+ * This class is responsible for mapping emissions configuration into emissions parameters.
  */
-public class DigitransitEmissionsConfig {
+public class EmissionsConfig {
 
   private int carAvgCo2PerKm;
   private double carAvgOccupancy;
 
-  public DigitransitEmissionsConfig(String parameterName, NodeAdapter root) {
+  public EmissionsConfig(String parameterName, NodeAdapter root) {
     var c = root
       .of(parameterName)
-      .summary("Digitransit emissions configuration.")
+      .summary("Emissions configuration.")
       .description(
         """
         By specifying a URL to fetch emissions data, the program gains access to carbon dioxide (CO₂)

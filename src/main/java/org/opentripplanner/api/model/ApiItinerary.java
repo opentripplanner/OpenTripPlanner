@@ -81,9 +81,9 @@ public class ApiItinerary {
   public ApiItineraryFares fare = new ApiItineraryFares(Map.of(), Map.of(), null, null);
 
   /**
-   * CO₂ emissions of this trip
+   * The emissions of this trip.
    */
-  public Double emissions;
+  public ApiEmissions emissions;
   /**
    * A list of Legs. Each Leg is either a walking (cycling, car) portion of the trip, or a transit
    * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6,

@@ -12,10 +12,12 @@ public class ItineraryMapper {
 
   private final LegMapper legMapper;
   private final FareMapper fareMapper;
+  private final EmissionsMapper emissionsMapper;
 
   public ItineraryMapper(Locale locale, boolean addIntermediateStops) {
     this.legMapper = new LegMapper(locale, addIntermediateStops);
     this.fareMapper = new FareMapper(locale);
+    this.emissionsMapper = new EmissionsMapper();
   }
 
   public List<ApiItinerary> mapItineraries(Collection<Itinerary> domain) {
@@ -45,7 +47,7 @@ public class ItineraryMapper {
     api.tooSloped = domain.isTooSloped();
     api.arrivedAtDestinationWithRentedBicycle = domain.isArrivedAtDestinationWithRentedVehicle();
     api.fare = fareMapper.mapFare(domain);
-    api.emissions = domain.getEmissions();
+    api.emissions = emissionsMapper.mapEmissions(domain.getEmissions());
     api.legs = legMapper.mapLegs(domain.getLegs());
     api.systemNotices = SystemNoticeMapper.mapSystemNotices(domain.getSystemNotices());
     api.accessibilityScore = domain.getAccessibilityScore();

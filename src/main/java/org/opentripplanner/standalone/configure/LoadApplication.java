@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
 import org.opentripplanner.datastore.api.DataSource;
-import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.graph.Graph;

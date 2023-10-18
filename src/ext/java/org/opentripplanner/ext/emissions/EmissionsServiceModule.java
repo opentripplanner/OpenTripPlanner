@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.digitransitemissions;
+package org.opentripplanner.ext.emissions;
 
 import dagger.Module;
 import dagger.Provides;
@@ -14,6 +14,6 @@ public class EmissionsServiceModule {
   @Provides
   @Singleton
   public EmissionsService provideEmissionsService(EmissionsDataModel emissionsDataModel) {
-    return new DigitransitEmissionsService(emissionsDataModel);
+    return new EmissionsDataService(emissionsDataModel);
   }
 }

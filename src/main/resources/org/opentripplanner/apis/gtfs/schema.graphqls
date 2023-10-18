@@ -900,6 +900,13 @@ type elevationProfileComponent {
     elevation: Float
 }
 
+type Emissions {
+    """
+    CO₂ emissions of the trip on this itinerary, in grams per person.
+    """
+    co2grams: Float
+}
+
 type fare {
     type: String @deprecated
 
@@ -1467,8 +1474,8 @@ type Itinerary {
     """How far the user has to walk, in meters."""
     walkDistance: Float
 
-    """CO₂ emissions of the trip on this itinerary, in grams per person."""
-    emissions: Float
+    """Emissions of the trip on this itinerary."""
+    emissions: Emissions
     
     """
     A list of Legs. Each Leg is either a walking (cycling, car) portion of the

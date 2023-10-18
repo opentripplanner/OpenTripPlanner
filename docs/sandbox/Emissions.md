@@ -1,4 +1,4 @@
-# Digitransit CO₂ Emissions calculation
+# CO₂ Emissions calculation
 
 ## Contact Info
 
@@ -10,7 +10,7 @@ Graph build import of CO₂ Emissions from GTFS data sets (through custom emissi
 and the ability to attach them to itineraries by Digitransit team.
 The emissions are represented in grams per kilometer (g/Km) unit.
 
-Emissions data is located in an emissions.txt file within a gtfs package and has the following properties:
+Emissions data is located in an emissions.txt file within a gtfs package and has the following columns:
 
 `route_id`: route id
 
@@ -39,15 +39,15 @@ To enable this functionality, you need to enable the "Co2Emissions"  feature in 
   "Co2Emissions": true
 }
 ```
-Include the `digitransitEmissions` object in the
-`build-config.json` file. The `digitransitEmissions` object should contain parameters called
-`carAvgCo2PerKm` and `carAvgOccupancy`. The `carAvgCo2PerKm` provides the average emissions value for a car and
+Include the `emissions` object in the
+`build-config.json` file. The `emissions` object should contain parameters called
+`carAvgCo2PerKm` and `carAvgOccupancy`. The `carAvgCo2PerKm` provides the average emissions value for a car in g/km and
 the `carAvgOccupancy` provides the average number of passengers in a car.
 
 ```json
 //build-config.json
 {
-  "digitransitEmissions": {
+  "emissions": {
     "carAvgCo2PerKm": 170,
     "carAvgOccupancy": 1.3
   }

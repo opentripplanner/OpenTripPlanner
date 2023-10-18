@@ -11,8 +11,8 @@ import java.util.List;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
-import org.opentripplanner.ext.digitransitemissions.DigitransitEmissionsModule;
-import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsModule;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -110,12 +110,12 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
-  static DigitransitEmissionsModule provideEmissionsModule(
+  static EmissionsModule provideEmissionsModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
     EmissionsDataModel emissionsDataModel
   ) {
-    return new DigitransitEmissionsModule(dataSources, config, emissionsDataModel);
+    return new EmissionsModule(dataSources, config, emissionsDataModel);
   }
 
   @Provides

@@ -390,7 +390,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> elevationLost();
 
-    public DataFetcher<Double> emissions();
+    public DataFetcher<Map<String, Double>> emissions();
 
     public DataFetcher<Long> endTime();
 

@@ -1,8 +1,8 @@
-package org.opentripplanner.ext.emissions.digitransit;
+package org.opentripplanner.ext.emissions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
+import static shadow.org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
@@ -14,9 +14,6 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.digitransitemissions.DigitransitEmissions;
-import org.opentripplanner.ext.digitransitemissions.DigitransitEmissionsService;
-import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -31,9 +28,10 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-class EmissionsServiceTest {
+class EmissionsTest {
 
-  private DigitransitEmissionsService eService;
+  private EmissionsDataService eService;
+  private EmissionsFilter emissionsFilter;
 
   static final ZonedDateTime TIME = OffsetDateTime
     .parse("2023-07-20T17:49:06+03:00")
@@ -47,19 +45,14 @@ class EmissionsServiceTest {
 
   @BeforeEach
   void SetUp() {
-    Map<FeedScopedId, DigitransitEmissions> digitransitEmissions = new HashMap<>();
-    digitransitEmissions.put(
-      new FeedScopedId("F", "1"),
-      DigitransitEmissions.newDigitransitEmissions(0.12, 12)
-    );
-    digitransitEmissions.put(
-      new FeedScopedId("F", "2"),
-      DigitransitEmissions.newDigitransitEmissions(0, 0)
-    );
+    Map<FeedScopedId, Double> emissions = new HashMap<>();
+    emissions.put(new FeedScopedId("F", "1"), (0.12 / 12));
+    emissions.put(new FeedScopedId("F", "2"), 0.0);
     EmissionsDataModel emissionsDataModel = new EmissionsDataModel();
-    emissionsDataModel.setDigitransitEmissions(digitransitEmissions);
-    emissionsDataModel.setCarAvgCo2EmissionsPerMeter(0.131);
-    this.eService = new DigitransitEmissionsService(emissionsDataModel);
+    emissionsDataModel.setCo2Emissions(emissions);
+    emissionsDataModel.setCarAvgCo2PerMeter(0.131);
+    this.eService = new EmissionsDataService(emissionsDataModel);
+    this.emissionsFilter = new EmissionsFilter(eService);
   }
 
   @Test
@@ -95,7 +88,7 @@ class EmissionsServiceTest {
     );
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(2223.902, eService.getEmissionsForItinerary(i));
+    assertEquals(2223.902, emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2).get());
   }
 
   @Test
@@ -110,21 +103,19 @@ class EmissionsServiceTest {
       .build();
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(28.0864, eService.getEmissionsForItinerary(i));
+    assertEquals(28.0864, emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2).get());
   }
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
-    Map<FeedScopedId, DigitransitEmissions> digitransitEmissions = new HashMap<>();
-    digitransitEmissions.put(
-      new FeedScopedId("G", "1"),
-      DigitransitEmissions.newDigitransitEmissions(0.12, 12)
-    );
+    Map<FeedScopedId, Double> emissions = new HashMap<>();
+    emissions.put(new FeedScopedId("G", "1"), (0.12 / 12));
     EmissionsDataModel emissionsDataModel = new EmissionsDataModel();
-    emissionsDataModel.setDigitransitEmissions(digitransitEmissions);
-    emissionsDataModel.setCarAvgCo2EmissionsPerMeter(0.131);
+    emissionsDataModel.setCo2Emissions(emissions);
+    emissionsDataModel.setCarAvgCo2PerMeter(0.131);
 
-    this.eService = new DigitransitEmissionsService(emissionsDataModel);
+    this.eService = new EmissionsDataService(emissionsDataModel);
+    this.emissionsFilter = new EmissionsFilter(this.eService);
 
     var route = TransitModelForTest.route(id("1")).withAgency(subject).build();
     List<Leg> legs = new ArrayList<>();
@@ -156,7 +147,7 @@ class EmissionsServiceTest {
     );
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertNull(eService.getEmissionsForItinerary(i));
+    assertThat(emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2)).isEmpty();
   }
 
   @Test
@@ -192,6 +183,6 @@ class EmissionsServiceTest {
     );
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertEquals(0, eService.getEmissionsForItinerary(i));
+    assertEquals(0, emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2).get());
   }
 }

@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.digitransitemissions.EmissionsFilter;
+import org.opentripplanner.ext.emissions.EmissionsFilter;
 import org.opentripplanner.ext.ridehailing.RideHailingFilter;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.Itinerary;

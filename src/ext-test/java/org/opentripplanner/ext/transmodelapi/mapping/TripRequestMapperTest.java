@@ -24,8 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.digitransitemissions.DigitransitEmissionsService;
-import org.opentripplanner.ext.digitransitemissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsDataService;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -127,7 +126,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository()),
           new DefaultVehiclePositionService(),
           new DefaultVehicleRentalService(),
-          new DigitransitEmissionsService(),
+          new EmissionsDataService(),
           RouterConfig.DEFAULT.flexConfig(),
           List.of(),
           null
