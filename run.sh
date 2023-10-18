@@ -18,7 +18,7 @@ function build_graph {
   DIR="graphs"
   rm -rf $DIR || true
   mkdir -p $DIR
-  unzip -o -d $DIR $FILE
+  unzip -o -d $DIR $FILE && rm $FILE
   mv $DIR/router-$GRAPHNAME $DIR/$GRAPHNAME
   java $JAVA_OPTS -jar $JAR --build --save ./$DIR/$GRAPHNAME
 }
@@ -34,24 +34,26 @@ function download_graph {
 
     if [ "$HTTP_STATUS" -eq 404 ]; then
         rm  $GRAPH_FILE > /dev/null
-        echo "Graph not found";
-       return 1;
+        echo "Graph not found"
+        return 1
     fi
 
-    if [ "$HTTP_STATUS" -eq 200 ]; then break;
-    fi;
+    if [ "$HTTP_STATUS" -eq 200 ]; then break
+    fi
 
     rm  $GRAPH_FILE > /dev/null
-    sleep $SLEEP_TIME;
+    sleep $SLEEP_TIME
 
   done
 
   if [ -f graph-$NAME.zip ]; then
     # if the graph already exists then overwrite it, otherwise we need to build a new one on every start
     unzip -o $GRAPH_FILE  -d ./graphs
-    return $?;
+    SUCCESS=$?
+    rm $GRAPH_FILE
+    return $SUCCESS
   else
-    return 1;
+    return 1
   fi
 }
 
