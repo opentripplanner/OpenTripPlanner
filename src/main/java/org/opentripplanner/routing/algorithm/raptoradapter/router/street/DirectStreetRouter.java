@@ -61,7 +61,12 @@ public class DirectStreetRouter {
         directRequest.wheelchair(),
         directRequest.preferences().wheelchair()
       );
-      return response;
+
+      var decorator = new DirectItineraryPenaltyDecorator(
+        request.journey().modes().directMode,
+        request.preferences().street().accessEgress().penalty()
+      );
+      return decorator.applyPenalty(response);
     } catch (PathNotFoundException e) {
       return Collections.emptyList();
     }

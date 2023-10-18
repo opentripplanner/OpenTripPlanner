@@ -22,14 +22,15 @@ import org.opentripplanner.routing.api.request.framework.TimePenalty;
 public final class AccessEgressPreferences implements Serializable {
 
   private static final TimeAndCostPenalty DEFAULT_PENALTY = TimeAndCostPenalty.of(
-    TimePenalty.of(ofMinutes(30), 2f),
-    2
+    TimePenalty.of(ofMinutes(20), 2f),
+    1.5
   );
   private static final TimeAndCostPenaltyForEnum<StreetMode> DEFAULT_TIME_AND_COST = TimeAndCostPenaltyForEnum
     .of(StreetMode.class)
     .with(StreetMode.CAR_TO_PARK, DEFAULT_PENALTY)
     .with(StreetMode.CAR_HAILING, DEFAULT_PENALTY)
     .with(StreetMode.CAR_RENTAL, DEFAULT_PENALTY)
+    .with(StreetMode.FLEXIBLE, DEFAULT_PENALTY)
     .build();
 
   public static final AccessEgressPreferences DEFAULT = new AccessEgressPreferences();

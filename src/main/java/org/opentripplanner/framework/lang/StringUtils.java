@@ -112,7 +112,7 @@ public class StringUtils {
   }
 
   /**
-   * Convert "HELLO_WORLD" or "Hello_World" to "hello-world".
+   * Convert "HELLO_WORLD" or "HellO_WorlD" to "hello-world".
    * <p>
    * https://developer.mozilla.org/en-US/docs/Glossary/Kebab_case
    */
