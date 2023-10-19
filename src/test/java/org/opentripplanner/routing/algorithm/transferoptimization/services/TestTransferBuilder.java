@@ -35,7 +35,7 @@ public class TestTransferBuilder<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Set all required parameter for a transfer. The walk duration is set to zero.
+   * Set all required parameters for a transfer. The walk duration is set to zero.
    */
   public static <T extends RaptorTripSchedule> TestTransferBuilder<T> tx(
     T fromTrip,
