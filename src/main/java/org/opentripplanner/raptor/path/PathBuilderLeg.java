@@ -22,8 +22,8 @@ import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 
 /**
- * This is the leg implementation for the {@link PathBuilder}. It is a private inner class which
- * helps to cache and calculate values before constructing a path.
+ * This is the leg implementation for the {@link PathBuilder}. It helps to cache and calculate
+ * values before constructing a path.
  */
 public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
@@ -40,6 +40,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   private int fromTime = NOT_SET;
   private int toTime = NOT_SET;
+  private int c2 = RaptorConstants.NOT_SET;
 
   private PathBuilderLeg<T> prev = null;
   private PathBuilderLeg<T> next = null;
@@ -54,6 +55,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     this.fromTime = other.fromTime;
     this.toTime = other.toTime;
     this.leg = other.leg;
+    this.c2 = other.c2;
 
     // Mutable fields
     if (other.next != null) {
@@ -72,7 +74,7 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     }
   }
 
-  /* factory methods */
+  /* accessors */
 
   public int fromTime() {
     return fromTime;
@@ -94,14 +96,24 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
     return leg.toStop();
   }
 
-  /* accessors */
-
   public int toStopPos() {
     return asTransitLeg().toStopPos();
   }
 
   public int durationInSec() {
     return toTime - fromTime;
+  }
+
+  public int c2() {
+    return c2;
+  }
+
+  public void c2(int c2) {
+    this.c2 = c2;
+  }
+
+  public boolean isC2Set() {
+    return c2 != RaptorConstants.NOT_SET;
   }
 
   @Nullable
@@ -144,6 +156,10 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   public T trip() {
     return asTransitLeg().trip;
+  }
+
+  public PathBuilderLeg<T> prev() {
+    return prev;
   }
 
   public PathBuilderLeg<T> next() {
@@ -292,10 +308,6 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
 
   static <T extends RaptorTripSchedule> PathBuilderLeg<T> egress(RaptorAccessEgress egress) {
     return new PathBuilderLeg<>(new MyEgressLeg(egress));
-  }
-
-  PathBuilderLeg<T> prev() {
-    return prev;
   }
 
   void setPrev(PathBuilderLeg<T> prev) {

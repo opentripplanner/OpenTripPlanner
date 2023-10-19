@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -14,8 +16,8 @@ import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.OptimizedPath;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTripTransfer;
 
@@ -31,7 +33,7 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.TripToTr
  * M : number of possible transfer location for a given pair of trips
  *
  * Without any pruning the permutations have an order of O(N^M), but by filtering during the path
- * construction we get close to O(N*M) - which is acceptable.
+ * construction we get close to o(N*M) - which is acceptable.
  *
  * Example with 3 lines(trips), where the `+` indicate stop places:
  *
@@ -69,7 +71,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   private final TransferGenerator<T> transferGenerator;
   private final RaptorCostCalculator<T> costCalculator;
   private final RaptorSlackProvider slackProvider;
-  private final MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain;
+  private final PathTailFilter<T> filter;
   private final RaptorStopNameResolver stopNameTranslator;
 
   @Nullable
@@ -87,7 +89,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     @Nullable TransferWaitTimeCostCalculator waitTimeCostCalculator,
     int[] stopBoardAlightCosts,
     double extraStopBoardAlightCostsFactor,
-    MinCostFilterChain<OptimizedPathTail<T>> minCostFilterChain,
+    PathTailFilter<T> filter,
     RaptorStopNameResolver stopNameTranslator
   ) {
     this.transferGenerator = transferGenerator;
@@ -96,7 +98,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     this.waitTimeCostCalculator = waitTimeCostCalculator;
     this.stopBoardAlightCosts = stopBoardAlightCosts;
     this.extraStopBoardAlightCostsFactor = extraStopBoardAlightCostsFactor;
-    this.minCostFilterChain = minCostFilterChain;
+    this.filter = filter;
     this.stopNameTranslator = stopNameTranslator;
   }
 
@@ -109,9 +111,11 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     );
 
     // Combine transit legs and transfers
-    var tails = findBestTransferOption(originalPath, transitLegs, possibleTransfers);
+    var tails = findBestTransferOption(originalPath, transitLegs, possibleTransfers, filter);
 
-    return tails.stream().map(OptimizedPathTail::build).collect(Collectors.toSet());
+    var filteredTails = filter.filterFinalResult(tails);
+
+    return filteredTails.stream().map(OptimizedPathTail::build).collect(toSet());
   }
 
   private static <T> T last(List<T> list) {
@@ -121,7 +125,8 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
   private Set<OptimizedPathTail<T>> findBestTransferOption(
     RaptorPath<T> originalPath,
     List<TransitPathLeg<T>> originalTransitLegs,
-    List<List<TripToTripTransfer<T>>> possibleTransfers
+    List<List<TripToTripTransfer<T>>> possibleTransfers,
+    PathTailFilter<T> filter
   ) {
     final int iterationDepartureTime = originalPath.rangeRaptorIterationDepartureTime();
     // Create a set of tails with the last transit leg in it (one element)
@@ -158,19 +163,19 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
       // create a tailSelector for the tails produced in the last round and use it to filter them
       // based on the transfer-arrival-time and given filter
-      var tailSelector = new TransitPathLegSelector<>(minCostFilterChain, tails);
+      var tailSelector = new TransitPathLegSelector<>(filter, tails);
 
       // Reset the result set to an empty set
       tails = new HashSet<>();
 
       for (TripToTripTransfer<T> tx : transfers) {
-        // Skip transfers happening before earliest possible board time
+        // Skip transfers happening before the earliest possible board time
         if (tx.from().time() <= earliestDepartureTimeFromLeg) {
           continue;
         }
 
         // Find the best tails that are safe to board with respect to the arrival
-        var candidateTails = tailSelector.next(tx.to().time());
+        var candidateTails = tailSelector.next(tx.to().stopPosition());
 
         for (OptimizedPathTail<T> tail : candidateTails) {
           // Tail can be used with current transfer
@@ -183,8 +188,8 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
 
     // Filter tails one final time
     tails =
-      new TransitPathLegSelector<>(minCostFilterChain, tails)
-        .next(originalPath.accessLeg().toTime());
+      new TransitPathLegSelector<>(filter, tails)
+        .next(originalPath.accessLeg().nextTransitLeg().getFromStopPosition());
 
     // Insert the access leg and the following transfer
     insertAccess(originalPath, tails);
