@@ -31,6 +31,7 @@ import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.RiderCategory;
+import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
@@ -390,7 +391,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> elevationLost();
 
-    public DataFetcher<Map<String, Double>> emissions();
+    public DataFetcher<Emissions> emissionsPerPerson();
 
     public DataFetcher<Long> endTime();
 

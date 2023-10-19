@@ -7,5 +7,5 @@ public record ApiEmissions(
   /**
    * The carbon dioxide emissions of the itinerary in grams.
    */
-  Double co2grams
+  Double co2Grams
 ) {}

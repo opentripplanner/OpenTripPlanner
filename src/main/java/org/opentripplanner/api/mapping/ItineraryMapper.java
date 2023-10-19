@@ -47,7 +47,7 @@ public class ItineraryMapper {
     api.tooSloped = domain.isTooSloped();
     api.arrivedAtDestinationWithRentedBicycle = domain.isArrivedAtDestinationWithRentedVehicle();
     api.fare = fareMapper.mapFare(domain);
-    api.emissions = emissionsMapper.mapEmissions(domain.getEmissions());
+    api.emissionsPerPerson = emissionsMapper.mapEmissions(domain.getEmissionsPerPerson());
     api.legs = legMapper.mapLegs(domain.getLegs());
     api.systemNotices = SystemNoticeMapper.mapSystemNotices(domain.getSystemNotices());
     api.accessibilityScore = domain.getAccessibilityScore();

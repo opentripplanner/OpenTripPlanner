@@ -411,11 +411,6 @@ public interface Leg {
     return null;
   }
 
-  @Nullable
-  default Double emissions() {
-    return null;
-  }
-
   default Boolean getRentedVehicle() {
     return null;
   }

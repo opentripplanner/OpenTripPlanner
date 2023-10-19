@@ -51,7 +51,7 @@ public class Itinerary {
   /* Sandbox experimental properties */
   private Float accessibilityScore;
 
-  private Emissions emissions;
+  private Emissions emissionsPerPerson;
 
   /* other properties */
 
@@ -251,7 +251,7 @@ public class Itinerary {
       .addNum("elevationGained", elevationGained, 0.0)
       .addCol("legs", legs)
       .addObj("fare", fare)
-      .addObj("emissions", emissions)
+      .addObj("emissions", emissionsPerPerson)
       .toString();
   }
 
@@ -592,12 +592,12 @@ public class Itinerary {
   /**
    * The emissions of this itinerary.
    */
-  public void setEmissions(Emissions emissions) {
-    this.emissions = emissions;
+  public void setEmissionsPerPerson(Emissions emissionsPerPerson) {
+    this.emissionsPerPerson = emissionsPerPerson;
   }
 
   @Nullable
-  public Emissions getEmissions() {
-    return this.emissions;
+  public Emissions getEmissionsPerPerson() {
+    return this.emissionsPerPerson;
   }
 }

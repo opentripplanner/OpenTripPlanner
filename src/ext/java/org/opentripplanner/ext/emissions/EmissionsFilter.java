@@ -22,10 +22,10 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
 
       Optional<Double> carbonDioxide = this.getEmissionsForItinerary(i, EmissionType.CO2);
       if (carbonDioxide.isPresent()) {
-        emissions.setCo2grams(carbonDioxide.get());
+        emissions.setCo2Grams(carbonDioxide.get());
       }
 
-      i.setEmissions(emissions);
+      i.setEmissionsPerPerson(emissions);
     }
     return itineraries;
   }

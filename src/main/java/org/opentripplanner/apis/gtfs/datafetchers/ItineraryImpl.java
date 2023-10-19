@@ -102,17 +102,8 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   }
 
   @Override
-  public DataFetcher<Map<String, Double>> emissions() {
-    return environment -> {
-      Emissions emissions = getSource(environment).getEmissions();
-      if (emissions == null) {
-        return null;
-      }
-
-      Map<String, Double> result = new HashMap<>();
-      result.put("co2grams", emissions.getCo2grams());
-      return result;
-    };
+  public DataFetcher<Emissions> emissionsPerPerson() {
+    return environment -> getSource(environment).getEmissionsPerPerson();
   }
 
   private Itinerary getSource(DataFetchingEnvironment environment) {

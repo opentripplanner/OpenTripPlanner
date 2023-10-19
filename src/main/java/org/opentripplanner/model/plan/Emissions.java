@@ -5,13 +5,13 @@ import org.opentripplanner.framework.lang.Sandbox;
 @Sandbox
 public class Emissions {
 
-  private Double co2grams;
+  private Double co2Grams;
 
-  public Double getCo2grams() {
-    return co2grams;
+  public Double getCo2Grams() {
+    return co2Grams;
   }
 
-  public void setCo2grams(Double co2grams) {
-    this.co2grams = co2grams;
+  public void setCo2Grams(Double co2Grams) {
+    this.co2Grams = co2Grams;
   }
 }

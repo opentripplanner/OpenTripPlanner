@@ -904,7 +904,7 @@ type Emissions {
     """
     CO₂ emissions in grams.
     """
-    co2grams: Float
+    co2Grams: Float
 }
 
 type fare {
@@ -1474,8 +1474,8 @@ type Itinerary {
     """How far the user has to walk, in meters."""
     walkDistance: Float
 
-    """Emissions of the trip on this itinerary."""
-    emissions: Emissions
+    """Emissions of this itinerary per traveler."""
+    emissionsPerPerson: Emissions
     
     """
     A list of Legs. Each Leg is either a walking (cycling, car) portion of the
