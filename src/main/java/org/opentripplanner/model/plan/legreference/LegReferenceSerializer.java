@@ -26,19 +26,6 @@ public class LegReferenceSerializer {
 
   private static final Logger LOG = LoggerFactory.getLogger(LegReferenceSerializer.class);
 
-  // TODO: This is for backwards compatibility. Change to use ISO_LOCAL_DATE after OTP v2.2 is released
-  private static final DateTimeFormatter LENIENT_ISO_LOCAL_DATE = new DateTimeFormatterBuilder()
-    .appendValue(YEAR, 4)
-    .optionalStart()
-    .appendLiteral('-')
-    .optionalEnd()
-    .appendValue(MONTH_OF_YEAR, 2)
-    .optionalStart()
-    .appendLiteral('-')
-    .optionalEnd()
-    .appendValue(DAY_OF_MONTH, 2)
-    .toFormatter();
-
   /** private constructor to prevent instantiating this utility class */
   private LegReferenceSerializer() {}
 
@@ -93,18 +80,28 @@ public class LegReferenceSerializer {
       out.writeUTF(s.serviceDate().toString());
       out.writeInt(s.fromStopPositionInPattern());
       out.writeInt(s.toStopPositionInPattern());
+      out.writeUTF(s.fromStopId().toString());
+      out.writeUTF(s.toStopId().toString());
     } else {
       throw new IllegalArgumentException("Invalid LegReference type");
     }
   }
 
+  /**
+   * Deserialize a leg reference.
+   * To remain backward-compatible, additional fields (stopId) are read optionally.
+   * TODO: Remove backward-compatible logic after OTP release 2.6
+   *
+   */
   static LegReference readScheduledTransitLeg(ObjectInputStream objectInputStream)
     throws IOException {
     return new ScheduledTransitLegReference(
       FeedScopedId.parse(objectInputStream.readUTF()),
-      LocalDate.parse(objectInputStream.readUTF(), LENIENT_ISO_LOCAL_DATE),
+      LocalDate.parse(objectInputStream.readUTF(), DateTimeFormatter.ISO_LOCAL_DATE),
       objectInputStream.readInt(),
-      objectInputStream.readInt()
+      objectInputStream.readInt(),
+      objectInputStream.available() > 0 ? FeedScopedId.parse(objectInputStream.readUTF()) : null,
+      objectInputStream.available() > 0 ? FeedScopedId.parse(objectInputStream.readUTF()) : null
     );
   }
 
