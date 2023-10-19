@@ -8,13 +8,25 @@ This is only worth it when the execution is long running, i.e. more than ~50 mil
 """
 directive @async on FIELD_DEFINITION
 
+"""
+Only one of the fields on an input type should be defined.
+
+This is used when input type parameter fields are alternatives and not meant to be combined together.
+"""
 directive @oneOf on FIELD_DEFINITION
 
 schema {
     query: QueryType
 }
 
+"""
+Plan accessibilty preferences. This can be expanded to contain preferences for various accessibility use cases
+in the future. Currently only generic wheelchair preferences are available.
+"""
 input InputAccessibilityPreferences {
+    """
+    Wheelchair related preferences. Note, currently this is the only accessibility mode that is available.
+    """
     wheelchair: InputWheelchairPreferences
 }
 
@@ -279,7 +291,14 @@ enum AlertSeverityLevelType {
     SEVERE
 }
 
+"""
+Preferences related to alighting from a transit vehicle.
+"""
 input InputAlightPreferences {
+    """
+    What is the required minimum time alighting from a vehicle.
+    Invariant: `board slack + alight slack <= transfer minimum total slack`
+    """
     slack: Duration
 }
 
@@ -768,16 +787,54 @@ enum BikesAllowed {
     NOT_ALLOWED
 }
 
+"""
+Preferences related to travel with a bicycle.
+"""
 input InputBicyclePreferences {
+    """
+    A multiplier for how bad cycling is compared to being in transit for equal lengths of time.
+    """
     reluctance: Reluctance
-    bikeWalking: InputVehicleWalkPreferences
+
+    """
+    Walking preferences when walking a bicycle.
+    """
+    bicycleWalking: InputVehicleWalkPreferences
+
+    """
+    Maximum speed on flat ground while riding a scooter. Note, this speed is higher than
+    the average speed will be in itineraries as this is the maximum speed but there are
+    factors that slow down cycling such as crossings, intersections and elevation changes.
+    """
     speed: Speed
+
+    """
+    What criteria should be used when optimizing a cycling route.
+    """
     optimize: InputCyclingOptimizationCriteria
+
+    """
+    Cost of boarding a vehicle with a bicycle.
+    """
     boardCost: Cost
 }
 
+"""
+Preferences related to boarding a transit vehicle. Note, board costs for each street mode
+can be found under the street mode preferences.
+"""
 input InputBoardPreferences {
+    """
+    A multiplier for how bad waiting at a stop is compared to being in transit for equal lengths of time.
+    """
     waitReluctance: Reluctance
+
+    """
+    What is the required minimum waiting time at a stop. Setting this value as `0s`, for example, can lead
+    to passenger missing a connection when the vehicle leaves ahead of time or the passenger arrives to the
+    stop later than expected.
+    Invariant: `board slack + alight slack <= transfer minimum total slack`
+    """
     slack: Duration
 }
 
@@ -825,7 +882,13 @@ type CarPark implements Node & PlaceInterface {
     openingHours: OpeningHours
 }
 
+"""
+Preferences related to traveling on a car (excluding car travel on transit services such as taxi).
+"""
 input InputCarPreferences {
+    """
+    A multiplier for how bad travelling on car is compared to being in transit for equal lengths of time.
+    """
     reluctance: Reluctance
 }
 
@@ -856,10 +919,23 @@ type Cluster implements Node {
     stops: [Stop!]
 }
 
+"""
+A static cost that is applied to a certain event or entity. Cost is a positive integer,
+for example `450`. One cost unit should roughly match a one second travel on transit.
+"""
 scalar Cost
 
+"""
+A cost function that is applied to a certain event. String must be of the format:
+`A + B x`, where A is fixed cost and B is a multiplier of time x. For example: `600 + 2.0 x`.
+Positive numbers should be used. One cost unit should roughly match a one second travel
+on transit. Either `A` or `B x` can be omitted.
+"""
 scalar CostFunction
 
+"""
+Either a latitude or a longitude coordinate as a WGS 84 format number.
+"""
 scalar Coordinate
 
 type Coordinates {
@@ -870,19 +946,73 @@ type Coordinates {
     lon: Float
 }
 
+"""
+Plan date time options. Only one of the values should be defined.
+"""
 input InputPlanDateTime @oneOf {
+    """
+    Earliest departure date time. The returned itineraries should not
+    depart before this instant unless one is using paging to find earlier
+    itineraries. Note, it is not currently possible to define both
+    `earliestDeparture` and `latestArrival`.
+    """
     earliestDeparture: DateTimeWithOffset
+
+    """
+    Latest arrival time date time. The returned itineraries should not
+    arrive to the destination after this instant unless one is using
+    paging to find later itineraries. Note, it is not currently possible
+    to define both  `earliestDeparture` and `latestArrival`.
+    """
     latestArrival: DateTimeWithOffset
 }
 
+"""
+Search window for the plan search.
+"""
 input InputSearchWindow {
+    """
+    Duration of the search window. This either starts at the defined earliest departure
+    time or ends at the latest arrival time. If this is not provided, a reasonable
+    search window is automatically generated. When search for earlier or later itineraries
+    with paging, this search window is no longer used and the new window will be based
+    on how many suggestions were returned in the previous search. The new search window can be
+    shorter or longer than the original search window. Note, itineraries are returned faster
+    with a smaller search window.
+    """
     duration: Duration
+
+    """
+    Maximum number of itineraries that will be returned. It's possible that no itineraries are
+    found, paging for earlier or later itineraries can yield to results in that case. The returned
+    itineraries are either closest to the defined earliest departure time or to the latest arrival
+    time.
+    """
     numberOfItineraries: Int
-    gracePeriod: InputSearchWindowGracePeriod
+
+    """
+    Defines a grace period outside of the normal search window (either before the defined earliest
+    departure time or after the defined latest arrival time) for some which some itineraries can
+    be returned.
+    """
+    gracePeriod: InputSearchWindowGracePeriod @deprecated(reason: "Not yet implemented.")
 }
 
+"""
+Defines a grace period outside of the normal search window (either before the defined earliest
+departure time or after the defined latest arrival time) for some which some itineraries can
+be returned.
+"""
 input InputSearchWindowGracePeriod {
+    """
+    Duration of the grace period. Either ending when the normal search window starts if earliest
+    departure time is defined, or after the latest arrival time.
+    """
     duration: Duration
+
+    """
+    Number of itineraries that returned within the grace period.
+    """
     numberOfItineraries: Int
 }
 
@@ -1064,8 +1194,17 @@ type StopGeometries {
     googleEncoded: [Geometry]
 }
 
+"""
+A coordinate pair used for a location in a plan query.
+"""
 input InputPlanCoordinates {
+    """
+    Latitude as a WGS 84 format number.
+    """
     latitude: Coordinate!
+    """
+    Longitude as a WGS 84 format number.
+    """
     longitude: Coordinate!
 }
 
@@ -1192,6 +1331,9 @@ input InputPreferred {
     otherThanPreferredRoutesPenalty: Int
 }
 
+"""
+TODO add documentation.
+"""
 scalar Locale
 
 """
@@ -1254,40 +1396,132 @@ input ParkingFilter {
     select: [ParkingFilterOperation!]
 }
 
+"""
+Settings related to debugging why certain itineraries are returned.
+"""
 input InputPlanDebugSettings {
+    """
+    Itinerary filter debug profile used to control the behaviour of itinerary filters.
+    """
     itineraryFilterDebugProfile: ItineraryFilterDebugProfile = OFF
 }
 
+"""
+Plan location settings. Either coordinates or a stop should be defined. Label is optional
+and can be used together with the other fields.
+"""
 input InputPlanLocation {
-    coordinate: InputPlanCoordinates
+    """
+    Coordinates of the location. Note, either coordinates or a stop should be defined.
+    """
+    coordinates: InputPlanCoordinates
+
+    """
+    Stop that should be used as a location for the search. The expected value is the stop's
+    feedscoped GTFS ID, for example `feedId:stopId`. Note, either coordinates or a stop should
+    be defined.
+    """
     stop: FeedScopedId
+
+    """
+    A label that can be attached to the location. This label is then returned with the location
+    in the itineraries.
+    """
     label: String
 }
 
+"""
+Wrapper type for different types of preferences related to plan query.
+"""
 input InputPlanPreferences {
+    """
+    Street routing preferences used for ingress, egress and transfers. These do not directly affect
+    the transit legs but can change how preferable walking or cycling, for example, is compared to
+    transit.
+    """
     street: InputPlanStreetPreferences
+
+    """
+    Transit routing preferences used for transit legs.
+    """
     transit: InputTransitPreferences
+
+    """
+    Accessibility preferences that affect both the street and transit routing.
+    """
     accessibility: InputAccessibilityPreferences
 }
 
+"""
+Street mode options for different phases of an itinerary.
+"""
 input InputPlanStreetModes {
-    """Selection of only one allowed for now."""
+    """
+    Street mode that is used when searching for itineraries that don't use any transit.
+    Selection of only one allowed for now.
+    """
     direct: [PlanDirectMode!]
-    """Selection of only one allowed for now."""
+
+    """
+    Street mode that is used when searching for access to transit network from origin.
+    Selection of only one allowed for now.
+    """
     access: [PlanAccessEgressMode!]
-    """Selection of only one allowed for now."""
+
+    """
+    Street mode that is used when searching for egress to destination from transit network.
+    Selection of only one allowed for now.
+    """
     egress: [PlanAccessEgressMode!]
-    """Selection of only one allowed for now."""
+
+    """
+    Street mode that is used when searching for transfers.
+    Selection of only one allowed for now.
+    """
     transfer: [PlanTransferMode!]
 }
 
+"""
+Street routing preferences used for ingress, egress and transfers. These do not directly affect
+the transit legs but can change how preferable walking or cycling, for example, is compared to
+transit.
+"""
 input InputPlanStreetPreferences {
+    """
+    Which modes of travel can be used for street routing at different stages.
+    """
     modes: InputPlanStreetModes
+
+    """
+    Cycling related preferences.
+    """
     bicycle: InputBicyclePreferences
+
+    """
+    Scooter (kick or electrical) related preferences.
+    """
     scooter: InputScooterPreferences
+
+    """
+    Car related preferences. These are not used for car travel as part of transit, such as
+    taxi travel.
+    """
     car: InputCarPreferences
+
+    """
+    Walk related preferences. These are not used when walking a bicycle or a scooter as they
+    have their own preferences.
+    """
     walk: InputWalkPreferences
+
+    """
+    Rental related preferences.
+    """
     rental: InputRentalPreferences
+
+    """
+    Parking related preferences.
+    """
     parking: VehicleParkingInput
 }
 
@@ -1695,6 +1929,10 @@ String representation of a duration in seconds. Examples of the format: `300s`, 
 """
 scalar DurationInSeconds
 
+"""
+Feedscoped ID. These follow the format of `feed:entityId`, The feedId should be unique system or a data set identifier
+and the entityId should be unique within that system or data set.
+"""
 scalar FeedScopedId
 
 type RideHailingProvider {
@@ -2001,35 +2239,45 @@ enum Mode {
     MONORAIL
 }
 
+"""
+Transit modes include modes that are used within organized transportation networks
+run by public transportation authorities, taxi companies etc.
+Equivalent to GTFS route_type or to NeTEx TransportMode.
+"""
 enum TransitMode {
-    """AIRPLANE"""
     AIRPLANE
 
-    """BUS"""
+    """
+    Most busses or coaches use this mode but sometimes the other bus-like modes such
+    `COACH` or `TROLLEYBUS` are used.
+    """
     BUS
 
-    """CABLE_CAR"""
     CABLE_CAR
 
-    """COACH"""
+    """
+    Sometimes coaches use this mode but sometimes they are modelled to use `BUS` mode
+    instead.
+    """
     COACH
 
-    """FERRY"""
     FERRY
 
-    """FUNICULAR"""
     FUNICULAR
 
-    """GONDOLA"""
     GONDOLA
 
-    """RAIL"""
+    """
+    This includes long or short distance trains. Tram, subway, monorail and funicular have
+    their own modes but it's possible that sometimes they use this mode instead.
+    """
     RAIL
 
-    """SUBWAY"""
+    """
+    Subway or metro, depending on the local terminology.
+    """
     SUBWAY
 
-    """TRAM"""
     TRAM
 
     """Private car trips shared with others."""
@@ -2088,59 +2336,174 @@ type PageInfo {
     endCursor: String
 }
 
+"""
+Street modes that can be used for access to transit network or for
+egress from transit network to destination.
+"""
 enum PlanAccessEgressMode {
+    """
+    Cycling to or from a stop and boarding a vehicle with the bicycle.
+    Note, this can include walking when it's needed to walk the bicycle.
+    Access and egress can use cycling only if the mode used for transfers
+    is also cycling.
+    """
     BICYCLE
 
+    """
+    Bicycle rental can use either station based systems or "floating"
+    vehicles which are not linked to a rental station. Note, this
+    can include walking before picking up or after dropping off the
+    bicycle or when it's needed to walk the bicycle.
+    """
     BICYCLE_RENTAL
 
+    """
+    Starting the itinerary with a bicycle and parking the bicycle to
+    a parking location. Note, this can include walking after parking
+    the bicycle or when it's needed to walk the bicycle.
+    """
     BICYCLE_PARKING
 
-    CAR
-
+    """
+    Car rental can use either station based systems or "floating"
+    vehicles which are not linked to a rental station. Note, this
+    can include walking before picking up or after dropping off the
+    car.
+    """
     CAR_RENTAL
 
+    """
+    Starting the itinerary with a car and parking the car to a parking location.
+    Note, this can include walking after parking the car.
+    """
     CAR_PARKING
 
+    """
+    Getting picked up by a car from a location that is accessible with a car.
+    Note, this can include walking before the pickup.
+    """
     CAR_PICKUP
 
+    """
+    Getting dropped off by a car to a location that is accessible with a car.
+    Note, this can include walking after the drop-off.
+    """
     CAR_DROPOFF
 
+    """
+    Flexible transit. This can include different forms of flexible transit that
+    can be defined in GTFS-Flex or in Netex. Note, this can include walking before
+    or after the flexible transit leg.
+    """
     FLEX
 
+    """
+    Riding a scooter to or from a stop and boarding a vehicle with the scooter.
+    Note, this can include walking when it's needed to walk the scooter.
+    """
     SCOOTER
 
+    """
+    Scooter rental can use either station based systems or "floating"
+    vehicles which are not linked to a rental station. Note, this
+    can include walking before picking up or after dropping off the
+    scooter or when it's needed to walk the scooter.
+    """
     SCOOTER_RENTAL
 
+    """
+    Walking to or from a stop.
+    """
     WALK
 }
 
 enum PlanDirectMode {
+    """
+    Cycling from the origin to the destination. Note, this can include walking
+    when it's needed to walk the bicycle.
+    """
     BICYCLE
 
+    """
+    Bicycle rental can use either station based systems or "floating"
+    vehicles which are not linked to a rental station. Note, this
+    can include walking before picking up or after dropping off the
+    bicycle or when it's needed to walk the bicycle.
+    """
     BICYCLE_RENTAL
 
+    """
+    Starting the itinerary with a bicycle and parking the bicycle to
+    a parking location. Note, this can include walking after parking
+    the bicycle or when it's needed to walk the bicycle.
+    """
     BICYCLE_PARKING
 
+    """
+    Driving a car from the origin to the destination.
+    """
     CAR
 
+    """
+    Car rental can use either station based systems or "floating"
+    vehicles which are not linked to a rental station. Note, this
+    can include walking before picking up or after dropping off the
+    car.
+    """
     CAR_RENTAL
 
+    """
+    Starting the itinerary with a car and parking the car to a parking location.
+    Note, this can include walking after parking the car.
+    """
     CAR_PARKING
 
+    """
+    Flexible transit. This can include different forms of flexible transit that
+    can be defined in GTFS-Flex or in Netex. Note, this can include walking before
+    or after the flexible transit leg.
+    """
     FLEX
 
+    """
+    Riding a scooter from the origin to the destination. Note, this can include walking
+    when it's needed to walk the scooter.
+    """
     SCOOTER
 
+    """
+    Scooter rental can use either station based systems or "floating"
+    vehicles which are not linked to a rental station. Note, this
+    can include walking before picking up or after dropping off the
+    scooter or when it's needed to walk the scooter.
+    """
     SCOOTER_RENTAL
 
+    """
+    Walking from the origin to the destination. Note, this can include walking
+    when it's needed to walk the bicycle.
+    """
     WALK
 }
 
 enum PlanTransferMode {
+    """
+    Cycling between transit vehicles (typically between stops). Note, this can
+    include walking when it's needed to walk the bicycle. Transfers can only use
+    cycling if the mode used for access and egress is also `BICYCLE`.
+    """
     BICYCLE
 
+    """
+    Riding a scooter between transit vehicles (typically between stops). Note, this can
+    include walking when it's needed to walk the scooter. Transfers can only use
+    scooter if the mode used for access and egress is also `SCOOTER`.
+    """
     SCOOTER
 
+    """
+    Walking between transit vehicles (typically between stops).
+    """
     WALK
 }
 
@@ -2357,8 +2720,18 @@ type BookingInfo {
     dropOffMessage: String
 }
 
+"""
+What criteria should be used when optimizing a cycling route.
+"""
 input InputCyclingOptimizationCriteria @oneOf {
+    """
+    Use one of the predefined optimization types.
+    """
     type: CyclingOptimizationType
+
+    """
+    Define optimization by weighing three criteria.
+    """
     triangle: InputTriangleCyclingFactors
 }
 
@@ -2396,8 +2769,18 @@ enum CyclingOptimizationType {
     SAFEST_STREETS
 }
 
+"""
+What criteria should be used when optimizing a scooter route.
+"""
 input InputScooterOptimizationCriteria @oneOf {
+    """
+    Use one of the predefined optimization types.
+    """
     type: ScooterOptimizationType
+
+    """
+    Define optimization by weighing three criteria.
+    """
     triangle: InputTriangleScooterFactors
 }
 
@@ -2439,6 +2822,9 @@ enum ScooterOptimizationType {
     SAFEST_STREETS
 }
 
+"""
+Speed in meters per seconds. Values are positive floating point numbers (for example, 2.34).
+"""
 scalar Speed
 
 "The board/alight position in between two stops of the pattern of a trip with continuous pickup/drop off."
@@ -2627,33 +3013,94 @@ type Plan {
     debugOutput: debugOutput!
 }
 
+"""
+Plan (result of an itinerary search) that follows
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
 type PlanConnection {
+    """
+    What was the starting point for the itinerary search.
+    """
     searchDateTime: DateTimeWithOffset
 
+    """
+    Origin and destination of the search.
+    """
     locations: PlanPlaces
 
+    """
+    Errors faced during the routing search.
+    """
     routingErrors: [RoutingError!]!
 
+    """
+    Debug information about the search.
+    """
     debugInformation: PlanDebugInformation!
 
+    """
+    Edges which contain the itineraries. Part of the
+    [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+    """
     edges: [PlanEdge]
 
+    """
+    Contains cursors to continue the search and the information if there are more itineraries available.
+    Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+    """
     pageInfo: PageInfo!
 }
 
+"""
+Debug information about an itinerary search.
+"""
 type PlanDebugInformation {
+    """
+    Total time taken for the route request.
+    """
     totalTime: DurationInSeconds
+
+    """
+    Time taken in the transit router (including access/egress street router).
+    """
     pathCalculationTime: DurationInSeconds
+
+    """
+    The search window that was used for the search.
+    """
     searchWindowUsed: Duration
 }
 
+"""
+Edge outputted by a plan search. Part of the
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
 type PlanEdge {
+    """
+    An itinerary suggestion. Part of the
+    [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+    """
     node: Itinerary
+
+    """
+    The cursor of the edge. Part of the
+    [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+    """
     cursor: String!
 }
 
+"""
+Origin and destination of an itinerary search.
+"""
 type PlanPlaces {
+    """
+    Origin of the itinerary search.
+    """
     from: Place!
+
+    """
+    Destination of the itinerary search.
+    """
     to: Place!
 }
 
@@ -3507,17 +3954,82 @@ type QueryType {
         startTransitTripId: String @deprecated(reason: "Not implemented in OTP2")
     ): Plan @async
 
+    """
+    Plan (itinerary) search that follows
+    [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+    """
     planConnection(
+        """
+        Datetime of the search. It's possible to either define the earliest departure time
+        or the latest arrival time.
+        """
         dateTime: InputPlanDateTime
+
+        """
+        The search window(s) of the search. It also allows to limit how many itineraries are returned.
+        """
         searchWindow: InputSearchWindow
+
+        """
+        The origin where the search starts. Usually coordinates but can also a be a stop.
+        """
         origin: InputPlanLocation
+
+        """
+        The destination where the search ends. Usually coordinates but can also a be a stop.
+        """
         destination: InputPlanLocation
+
+        """
+        Preferences that affect what itineraries are returned. Preferences are split into categories.
+        """
         preferences: InputPlanPreferences
+
+        """
+        Settings meant for debugging purposes that control the search and the returned itineraries.
+        """
         debugSettings: InputPlanDebugSettings
+
+        """
+        Locale used for translations. Note, there might not necessarily be translations available.
+        It's possible and recommended to use the ´accept-language´ header instead of this parameter.
+        """
         locale: Locale
-        before: String
+
+        """
+        Takes in cursor from a previous search. Used for forward pagination. If earliest departure time
+        is used in the original query, the new search then returns itineraries that depart after
+        the start time of the last itinerary that was returned, or at the same time if there are multiple
+        itinerary options that can depart at that moment in time.
+        If latest arrival time is defined, the new search returns itineraries that arrive before the end
+        time of the last itinerary that was returned in the previous search, or at the same time if there
+        are multiple itinerary options that can arrive at that moment in time. This parameter is part of
+        the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm) and
+        should be used together with the `first` parameter.
+        """
         after: String
+
+        """
+        How many new itineraries should at maximum be returned in forward pagination. This parameter is
+        part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+        and should be used together with the `after` parameter.
+        """
         first: Int
+
+        """
+        Takes in cursor from a previous search. Used for backwards pagination. If earliest departure time
+        is used in the original query, the new search then returns itineraries that depart before that time.
+        If latest arrival time is defined, the new search returns itineraries that arrive after that time.
+        This parameter is part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+        and should be used together with the `last` parameter.
+        """
+        before: String
+
+        """
+        How many new itineraries should at maximum be returned in backwards pagination. This parameter is
+        part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
+        and should be used together with the `before` parameter.
+        """
         last: Int
     ): PlanConnection @async
 }
@@ -3548,12 +4060,37 @@ enum RealtimeState {
     MODIFIED
 }
 
+"""
+A cost multiplier for how bad something is compared to being in transit for equal lengths of time.
+Value should be a float and bigger than equal to 1.0.
+"""
 scalar Reluctance
 
+"""
+Preferences related to rental (station based or floating vehicle rental).
+"""
 input InputRentalPreferences {
+    """
+    Is it possible to arrive to the destination without dropping off the rental
+    vehicle first.
+    """
     allowKeepingVehicleAtDestination: Boolean
+
+    """
+    Cost associated with arriving to the destination with a rented vehicle.
+    No cost is applied if arriving to the destination after dropping off the rented
+    vehicle.
+    """
     keepingVehicleAtDestinationCost: Cost
+
+    """
+    Rental networks which can be potentially used as part of an itinerary.
+    """
     allowedNetworks: [String!]
+
+    """
+    Rental networks which cannot be used as part of an itinerary.
+    """
     bannedNetworks: [String!]
 }
 
@@ -3730,11 +4267,36 @@ enum AbsoluteDirection {
   NORTHWEST
 }
 
+"""
+Preferences related to travel with a scooter (kick or e-scooter).
+"""
 input InputScooterPreferences {
+    """
+    A multiplier for how bad riding a scooter is compared to being in transit
+    for equal lengths of time.
+    """
     reluctance: Reluctance
+
+    """
+    Walking preferences when walking a scooter.
+    """
     scooterWalking: InputVehicleWalkPreferences
+
+    """
+    Maximum speed on flat ground while riding a scooter. Note, this speed is higher than
+    the average speed will be in itineraries as this is the maximum speed but there are
+    factors that slow down the travel such as crossings, intersections and elevation changes.
+    """
     speed: Speed
+
+    """
+    What criteria should be used when optimizing a scooter route.
+    """
     optimize: InputScooterOptimizationCriteria
+
+    """
+    Cost of boarding a vehicle with a scooter.
+    """
     boardCost: Cost
 }
 
@@ -4226,26 +4788,90 @@ input InputTimetablePreferences {
     includeRealtimeCancellations: Boolean = false
 }
 
+"""
+Preferences related to transfers between transit vehicles (typically between stops).
+"""
 input InputTransferPreferences {
+    """
+    A static cost that is added for each transfer on top of other costs.
+    """
     costPenalty: Cost
-    minimumWaitingTime: Duration
-    maximumAdditionalTransfers: Int = 5
-    maximumTransfers: Int = 12
+
+    """
+    A global minimum transfer time (in seconds) that specifies the minimum amount of time
+    that must pass between exiting one transit vehicle and boarding another. This time is
+    in addition to time it might take to walk between transit stops. Setting this value
+    as `0s`, for example, can lead to passenger missing a connection when the vehicle leaves
+    ahead of time or the passenger arrives to the stop later than expected.
+    Invariant: `board slack + alight slack <= transfer minimum total slack`
+    """
+    minimumTotalSlack: Duration
+
+    """
+    How many additional transfers there can be at maximum compared to the itinerary with the
+    least number of transfers.
+    """
+    maximumAdditionalTransfers: Int
+
+    """
+    How many transfers there can be at maximum in an itinerary.
+    """
+    maximumTransfers: Int
 }
 
+"""
+Transit mode and a reluctance associated with it.
+"""
 input InputTransitModePreferences {
+    """
+    Transit mode that could be (but doesn't have to be) used in an itinerary.
+    """
     mode: TransitMode!
+
+    """
+    Reluctance in a format of a cost function of this transit mode compared to an ideal transit
+    mode. String must be of the format: `A + B x`, where A is fixed cost and B is a multiplier
+    of time x. For example `30 + 2.0 x`, where 30 cost units would be added per leg that
+    uses this transit mode and the cost of travel for each second would be multiplied by 2.
+    Either `A` or `B x` can be omitted.
+    """
     reluctance: CostFunction
 }
 
+"""
+Transit routing preferences used for transit legs.
+"""
 input InputTransitPreferences {
     """TODO should we reuse this or make a new design"""
     unpreferred: InputUnpreferred
+
+    """
+    Preferences related to boarding a transit vehicle. Note, board costs for each street mode
+    can be found under the street mode preferences.
+    """
     board: InputBoardPreferences
+
+    """
+    Preferences related to alighting from a transit vehicle.
+    """
     alight: InputAlightPreferences
+
+    """
+    Preferences related to transfers between transit vehicles (typically between stops).
+    """
     transfer: InputTransferPreferences
+
+    """
+    Preferences related to cancellations and realtime.
+    """
     timetable: InputTimetablePreferences
-    modes: [InputTransitModePreference!]
+
+    """
+    Transit modes and reluctancies associated with them. Each defined mode can be used in
+    an itinerary but doesn't have to be. If a direct mode is set under street preferences,
+    an itinerary without any transit modes can be returned.
+    """
+    modes: [InputTransitModePreference!]!
 }
 
 """Text with language"""
@@ -4458,12 +5084,19 @@ enum VertexType {
     PARKANDRIDE
 }
 
+"""
+Preferences for walking a vehicle (scooter or bicycle).
+"""
 input InputVehicleWalkPreferences {
-    """Speed when walking a vehicle."""
+    """
+    Maximum walk speed on flat ground. Note, this speed is higher than the average speed
+    will be in itineraries as this is the maximum speed but there are
+    factors that slow down walking such as crossings, intersections and elevation changes.
+    """
     speed: Speed
 
     """
-    Reluctance in a format of `30s + 2.0 x` where the static cost is applied
+    Reluctance in a format of `30 + 2.0 x` where the static cost is applied
     both when getting off the vehicle and when getting on the vehicle again.
     However, these static costs are not applied when getting on a rented vehicle
     for the first time or off the vehicle when returning the vehicle. The multiplier
@@ -4480,10 +5113,31 @@ input InputVehicleWalkPreferences {
     hopOnOrOffTimeSeconds: Int
 }
 
+"""
+Preferences related to walking (excluding walking a bicycle or a scooter).
+"""
 input InputWalkPreferences {
+    """
+    Maximum walk speed on flat ground. Note, this speed is higher than the average speed
+    will be in itineraries as this is the maximum speed but there are
+    factors that slow down walking such as crossings, intersections and elevation changes.
+    """
     speed: Speed
+
+    """
+    A multiplier for how bad walking is compared to being in transit for equal lengths of time.
+    """
     reluctance: Reluctance
+
+    """
+    Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
+    If the value is set to be 0, safety is ignored.
+    """
     walkSafetyFactor: WeightingFactor
+
+    """
+    The cost of boarding a vehicle while walking.
+    """
     boardCost: Cost
 }
 
@@ -4503,6 +5157,14 @@ enum WheelchairBoarding {
     NOT_POSSIBLE
 }
 
+"""
+Wheelchair related preferences. Note, this is the only from of accessibilty available
+currently and is sometimes is used for other accessibility needs as well.
+"""
 input InputWheelchairPreferences {
+    """
+    Is wheelchair accessibility considered in routing. Note, this does not guarantee
+    that the itineraries are wheelchair accessible as there can be data issues.
+    """
     enabled: Boolean
 }
