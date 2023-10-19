@@ -142,7 +142,7 @@ local machine. It can be informative to watch the HTTP requests and responses be
 the developer tools in your web browser. OTP's built-in web server will run by default on ports 8080
 and 8081 for HTTP and HTTPS respectively. If by any chance some other software is already using one
 or both of those port numbers, you can specify different port numbers with switches
-like `--port 8801 --securePort 8802`.
+like `--port 8801`.
 
 ## Saving a Graph
 
