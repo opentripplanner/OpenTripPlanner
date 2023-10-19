@@ -5,7 +5,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 /**
  * Filter path tails for a given stopPosition during the optimization process. The algorithm only
- * feed in paths which can be compared. If the head is alighted at a position which gives it an
+ * feeds in paths which can be compared. If the head is alighted at a position which gives it an
  * advantage over another path (accept boarding at more stops), then the paths are split into
  * different sets and the filter is called for each set.
  */
