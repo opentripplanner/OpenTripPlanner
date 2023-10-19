@@ -902,7 +902,7 @@ type elevationProfileComponent {
 
 type Emissions {
     """
-    CO₂ emissions of the trip on this itinerary, in grams per person.
+    CO₂ emissions in grams.
     """
     co2grams: Float
 }
