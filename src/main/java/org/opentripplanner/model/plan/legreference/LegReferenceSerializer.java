@@ -90,7 +90,7 @@ public class LegReferenceSerializer {
   /**
    * Deserialize a leg reference.
    * To remain backward-compatible, additional fields (stopId) are read optionally.
-   * TODO: Remove backward-compatible logic after OTP release 2.6
+   * TODO: Remove backward-compatible logic after OTP release 2.5
    *
    */
   static LegReference readScheduledTransitLeg(ObjectInputStream objectInputStream)

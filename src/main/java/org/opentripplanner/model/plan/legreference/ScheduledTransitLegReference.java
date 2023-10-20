@@ -159,7 +159,7 @@ public record ScheduledTransitLegReference(
   ) {
     if (stopId == null) {
       // this is a legacy reference, skip validation
-      // TODO: remove backward-compatible logic after OTP release 2.6
+      // TODO: remove backward-compatible logic after OTP release 2.5
       return true;
     }
 

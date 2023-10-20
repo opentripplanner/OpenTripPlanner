@@ -17,9 +17,16 @@ class LegReferenceSerializerTest {
   private static final FeedScopedId FROM_STOP_ID = TransitModelForTest.id("Boarding Stop");
   private static final int TO_STOP_POS = 3;
   private static final FeedScopedId TO_STOP_ID = TransitModelForTest.id("Alighting Stop");
+
+  /**
+   * Token based on the latest format, including stop ids.
+   */
   private static final String ENCODED_TOKEN =
     "rO0ABXdZABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjEABkY6VHJpcAAKMjAyMi0wMS0zMQAAAAEAAAADAA9GOkJvYXJkaW5nIFN0b3AAEEY6QWxpZ2h0aW5nIFN0b3A=";
 
+  /**
+   * Token based on the previous format, without stop ids.
+   */
   private static final String ENCODED_LEGACY_TOKEN =
     "rO0ABXc2ABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjEABkY6VHJpcAAKMjAyMi0wMS0zMQAAAAEAAAAD";
 
