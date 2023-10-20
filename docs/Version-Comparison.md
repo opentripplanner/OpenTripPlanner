@@ -52,7 +52,8 @@ the EU profile, and generalization to the EU profile should be feasible once it 
 | SIRI Realtime                                     | no                                                                                                          | yes                                                                                             |
 | Elevation data                                    | TIFF and NED                                                                                                | TIFF and NED                                                                                    |
 | One-to-many routing,<br> isochrones and scripting | yes                                                                                                         | no                                                                                              |
-| Java version                                      | 8+                                                                                                          | 11+                                                                                             |
+| Isochrones                                        | yes                                                                                                         | yes                                                                                             |
+| Java version                                      | 8+                                                                                                          | 17+                                                                                             |
 | Multiple regions per server                       | yes                                                                                                         | no                                                                                              |
 | Hot reloading of graphs                           | yes                                                                                                         | no                                                                                              |
 | Street (OSM) routing algorithm                    | Generalized cost A*                                                                                         | Generalized cost A*                                                                             |
@@ -125,7 +126,7 @@ OTP2 to simplify the code base and make it easier to reason about security.
 Less parameters are available on the OTP2 REST API than in OTP1. Often there is no practical loss of
 functionality, just a different way of expressing things due to the new routing algorithms. A
 summary of parameters that have been removed and their replacements can be found in the [migration
-guide](Version-Comparison.md#Migration guide)
+guide](Version-Comparison.md#migration-guide)
 
 ## OTP Trip planning and Transit index APIs
 
@@ -136,7 +137,7 @@ GraphQL API, the only supported way of sending requests to the OTP routing engin
 Details of those two APIs are available at the following pages:
 
 
-- [GTFS GraphQL API](sandbox/GtfsGraphQlApi.md) - HSL's GraphQL API used by the Digitransit
+- [GTFS GraphQL API](apis/GTFS-GraphQL-API.md) - HSL's GraphQL API used by the Digitransit
   project.
 - [Transmodel API](sandbox/TransmodelApi.md) - Entur´s Transmodel API
 

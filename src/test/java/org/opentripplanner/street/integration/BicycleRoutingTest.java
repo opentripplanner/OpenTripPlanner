@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.TraverseMode;
+import org.opentripplanner.test.support.ResourceLoader;
 
 public class BicycleRoutingTest {
 
@@ -28,7 +29,9 @@ public class BicycleRoutingTest {
   private final Graph herrenbergGraph;
 
   {
-    TestOtpModel model = ConstantsForTests.buildOsmGraph(ConstantsForTests.HERRENBERG_OSM);
+    TestOtpModel model = ConstantsForTests.buildOsmGraph(
+      ResourceLoader.of(BicycleRoutingTest.class).file("herrenberg-minimal.osm.pbf")
+    );
     herrenbergGraph = model.graph();
 
     model.transitModel().index();

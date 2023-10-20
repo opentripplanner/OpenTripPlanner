@@ -115,7 +115,7 @@ public class Ring {
         lrholelist.add(ring);
       }
     }
-    LinearRing[] lrholes = lrholelist.toArray(new LinearRing[lrholelist.size()]);
+    LinearRing[] lrholes = lrholelist.toArray(new LinearRing[0]);
     return factory.createPolygon(shell, lrholes);
   }
 

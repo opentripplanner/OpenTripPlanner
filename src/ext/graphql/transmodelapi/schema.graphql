@@ -14,6 +14,9 @@ directive @include(
     if: Boolean!
   ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
 
+"Indicates an Input Object is a OneOf Input Object."
+directive @oneOf on INPUT_OBJECT
+
 "Directs the executor to skip this field or fragment when the `if` argument is true."
 directive @skip(
     "Skipped when true."
@@ -256,10 +259,10 @@ type GroupOfLines {
 }
 
 type Interchange {
-  FromLine: Line @deprecated
-  FromServiceJourney: ServiceJourney @deprecated
-  ToLine: Line @deprecated
-  ToServiceJourney: ServiceJourney @deprecated
+  FromLine: Line @deprecated(reason : "This is the same as using the `fromServiceJourney { line }` field.")
+  FromServiceJourney: ServiceJourney @deprecated(reason : "Use fromServiceJourney instead")
+  ToLine: Line @deprecated(reason : "This is the same as using the `toServiceJourney { line }` field.")
+  ToServiceJourney: ServiceJourney @deprecated(reason : "Use toServiceJourney instead")
   fromServiceJourney: ServiceJourney
   guaranteed: Boolean
   "Maximum time after scheduled departure time the connecting transport is guaranteed to wait for the delayed trip. [NOT RESPECTED DURING ROUTING, JUST PASSED THROUGH]"
@@ -383,7 +386,7 @@ type Line {
   authority: Authority
   bikesAllowed: BikesAllowed
   "Booking arrangements for flexible line."
-  bookingArrangements: BookingArrangement @deprecated
+  bookingArrangements: BookingArrangement @deprecated(reason : "BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
   branding: Branding
   description: String
   "Type of flexible line, or null if line is not flexible."
@@ -493,7 +496,7 @@ type Place {
 
 type PlaceAtDistance {
   distance: Float
-  id: ID! @deprecated
+  id: ID! @deprecated(reason : "Id is not referable or meaningful and will be removed")
   place: PlaceInterface
 }
 
@@ -518,7 +521,7 @@ type PtSituationElement {
   "Get all affected entities for the situation"
   affects: [Affects!]!
   "Get affected authority for this situation element"
-  authority: Authority @deprecated
+  authority: Authority @deprecated(reason : "Use affects instead")
   "Timestamp for when the situation was created."
   creationTime: DateTime
   "Description of situation in all different translations available"
@@ -526,22 +529,22 @@ type PtSituationElement {
   id: ID!
   "Optional links to more information."
   infoLinks: [infoLink!]
-  lines: [Line]! @deprecated
+  lines: [Line]! @deprecated(reason : "Use affects instead")
   "Codespace of the data source."
   participant: String
   "Priority of this situation "
   priority: Int
-  quays: [Quay!]! @deprecated
+  quays: [Quay!]! @deprecated(reason : "Use affects instead")
   "Authority that reported this situation. Always returns the first agency in the codespace"
-  reportAuthority: Authority @deprecated
+  reportAuthority: Authority @deprecated(reason : "Not yet officially supported. May be removed or renamed.")
   "ReportType of this situation"
   reportType: ReportType
-  serviceJourneys: [ServiceJourney]! @deprecated
+  serviceJourneys: [ServiceJourney]! @deprecated(reason : "Use affects instead")
   "Severity of this situation "
   severity: Severity
   "Operator's internal id for this situation"
   situationNumber: String
-  stopPlaces: [StopPlace!]! @deprecated
+  stopPlaces: [StopPlace!]! @deprecated(reason : "Use affects instead")
   "Summary of situation in all different translations available"
   summary: [MultilingualString!]!
   "Period this situation is in effect"
@@ -563,7 +566,7 @@ type Quay implements PlaceInterface {
     numberOfDepartures: Int = 5,
     "Limit the number of departures per line and destination display returned. The parameter is only applied when the value is between 1 and 'numberOfDepartures'."
     numberOfDeparturesPerLineAndDestinationDisplay: Int,
-    omitNonBoarding: Boolean = false,
+    omitNonBoarding: Boolean = false @deprecated(reason : "Non-functional. Use arrivalDeparture instead."),
     "DateTime for when to fetch estimated calls from. Default value is current time"
     startTime: DateTime,
     timeRange: Int = 86400,
@@ -585,7 +588,7 @@ type Quay implements PlaceInterface {
   longitude: Float
   name(
     "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned."
-    lang: String,
+    lang: String @deprecated(reason : "Use 'language' instead"),
     "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exits, the default name is returned."
     language: String
   ): String!
@@ -744,7 +747,7 @@ type QueryType {
   "Get all active situations."
   situations(
     "Filter by reporting authorities."
-    authorities: [String],
+    authorities: [String] @deprecated(reason : "Use codespaces instead. This only uses the codespace of the given authority."),
     "Filter by reporting source."
     codespaces: [String],
     "Filter by severity."
@@ -818,6 +821,8 @@ type QueryType {
     numTripPatterns: Int = 50,
     "Use the cursor to go to the next \"page\" of itineraries. Copy the cursor from the last response and keep the original request as is. This will enable you to search for itineraries in the next or previous time-window."
     pageCursor: String,
+    "The list of points the journey is required to pass through."
+    passThroughPoints: [PassThroughPoint!],
     """
     Whether non-optimal transit paths at the destination should be returned. Let c be the
     existing minimum pareto optimal generalized-cost to beat. Then a trip with cost c' is
@@ -945,7 +950,7 @@ type RoutingParameters {
   alightSlackDefault: Int
   "List of alightSlack for a given set of modes."
   alightSlackList: [TransportModeSlackType]
-  allowBikeRental: Boolean @deprecated
+  allowBikeRental: Boolean @deprecated(reason : "Rental is specified by modes")
   "Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot."
   bikeBoardCost: Int
   "Cost to park a bike."
@@ -974,10 +979,10 @@ type RoutingParameters {
   carDropOffTime: Int
   "Max car speed along streets, in meters per second"
   carSpeed: Float
-  compactLegsByReversedSearch: Boolean @deprecated
-  debugItineraryFilter: Boolean @deprecated
+  compactLegsByReversedSearch: Boolean @deprecated(reason : "NOT IN USE IN OTP2.")
+  debugItineraryFilter: Boolean @deprecated(reason : "Use `itineraryFilter.debug` instead.")
   "Option to disable the default filtering of GTFS-RT alerts by time."
-  disableAlertFiltering: Boolean @deprecated
+  disableAlertFiltering: Boolean @deprecated(reason : "This is not supported!")
   "If true, the remaining weight heuristic is disabled."
   disableRemainingWeightHeuristic: Boolean
   "What is the cost of boarding a elevator?"
@@ -994,7 +999,7 @@ type RoutingParameters {
   ignoreRealTimeUpdates: Boolean
   "When true, service journeys cancelled in scheduled route data will be included during this search."
   includedPlannedCancellations: Boolean
-  kissAndRide: Boolean @deprecated
+  kissAndRide: Boolean @deprecated(reason : "Parking is specified by modes")
   "Maximum number of transfers allowed in addition to the result with least number of transfers"
   maxAdditionalTransfers: Int
   "This is the maximum duration in seconds for a direct street search. This is a performance limit and should therefore be set high. Use filters to limit what is presented to the client."
@@ -1006,13 +1011,13 @@ type RoutingParameters {
   "The maximum number of itineraries to return."
   numItineraries: Int
   "Accept only paths that use transit (no street-only paths)."
-  onlyTransitTrips: Boolean @deprecated
+  onlyTransitTrips: Boolean @deprecated(reason : "This is replaced by modes input object")
   "Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing to wait for preferred route."
   otherThanPreferredRoutesPenalty: Int
-  parkAndRide: Boolean @deprecated
-  reverseOptimizeOnTheFly: Boolean @deprecated
+  parkAndRide: Boolean @deprecated(reason : "Parking is specified by modes")
+  reverseOptimizeOnTheFly: Boolean @deprecated(reason : "NOT IN USE IN OTP2.")
   "Whether the planner should return intermediate stops lists for transit legs."
-  showIntermediateStops: Boolean @deprecated
+  showIntermediateStops: Boolean @deprecated(reason : "This parameter is always enabled")
   "Used instead of walkReluctance for stairs."
   stairsReluctance: Float
   "An extra penalty added on transfers (i.e. all boardings except the first one)."
@@ -1057,7 +1062,7 @@ type ServiceJourney {
   "Whether bikes are allowed on service journey."
   bikesAllowed: BikesAllowed
   "Booking arrangements for flexible services."
-  bookingArrangements: BookingArrangement @deprecated
+  bookingArrangements: BookingArrangement @deprecated(reason : "BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
   directionType: DirectionType
   "Returns scheduled passingTimes for this ServiceJourney for a given date, updated with realtime-updates (if available). NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is known when creating the request. For fetching estimatedCalls for a given trip.leg, use leg.serviceJourneyEstimatedCalls instead."
   estimatedCalls(
@@ -1085,7 +1090,7 @@ type ServiceJourney {
     "Only fetch the last n quays on the service journey"
     last: Int
   ): [Quay!]!
-  serviceAlteration: ServiceAlteration @deprecated
+  serviceAlteration: ServiceAlteration @deprecated(reason : "The service journey alteration will be moved out of SJ and grouped together with the SJ and date. In Netex this new type is called DatedServiceJourney. We will create artificial DSJs for the old SJs.")
   "Get all situations active for the service journey."
   situations: [PtSituationElement!]!
   transportMode: TransportMode
@@ -1119,7 +1124,7 @@ type StopPlace implements PlaceInterface {
   longitude: Float
   name(
     "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exist, the default name is returned."
-    lang: String,
+    lang: String @deprecated(reason : "Use 'language' instead"),
     "Fetch the name in the language given. The language should be represented as a ISO-639 language code. If the translation does not exist, the default name is returned."
     language: String
   ): String!
@@ -1221,9 +1226,9 @@ type Trip {
   "The origin"
   fromPlace: Place!
   "A list of possible error messages as enum"
-  messageEnums: [String]! @deprecated
+  messageEnums: [String]! @deprecated(reason : "Use routingErrors instead")
   "A list of possible error messages in cleartext"
-  messageStrings(language: String): [String]! @deprecated
+  messageStrings(language: String): [String]! @deprecated(reason : "Use routingErrors instead")
   "The trip request metadata."
   metadata: TripSearchData
   """
@@ -1257,7 +1262,7 @@ type TripPattern {
   "Duration of the trip, in seconds."
   duration: Long
   "Time that the trip arrives."
-  endTime: DateTime @deprecated
+  endTime: DateTime @deprecated(reason : "Replaced with expectedEndTime")
   "The expected, realtime adjusted date and time the trip ends."
   expectedEndTime: DateTime!
   "The expected, realtime adjusted date and time the trip starts."
@@ -1267,7 +1272,7 @@ type TripPattern {
   "A list of legs. Each leg is either a walking (cycling, car) portion of the trip, or a ride leg on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6, then walks to their destination, has four legs."
   legs: [Leg!]!
   "Time that the trip departs."
-  startTime: DateTime @deprecated
+  startTime: DateTime @deprecated(reason : "Replaced with expectedStartTime")
   "How far the user has to walk, bike and/or drive in meters. It includes all street(none transit) modes."
   streetDistance: Float
   "Get all system notices."
@@ -1278,7 +1283,7 @@ type TripPattern {
   waitTimeOptimizedCost: Int
   "How much time is spent waiting for transit to arrive, in seconds."
   waitingTime: Long
-  walkDistance: Float @deprecated
+  walkDistance: Float @deprecated(reason : "Replaced by `streetDistance`.")
   "How much time is spent walking, in seconds."
   walkTime: Long
 }
@@ -1286,9 +1291,9 @@ type TripPattern {
 "Trips search metadata."
 type TripSearchData {
   "This is the suggested search time for the \"next page\" or time window. Insert it together with the 'searchWindowUsed' in the request to get a new set of trips following in the time-window AFTER the current search."
-  nextDateTime: DateTime @deprecated
+  nextDateTime: DateTime @deprecated(reason : "Use pageCursor instead")
   "This is the suggested search time for the \"previous page\" or time-window. Insert it together with the 'searchWindowUsed' in the request to get a new set of trips preceding in the time-window BEFORE the current search."
-  prevDateTime: DateTime @deprecated
+  prevDateTime: DateTime @deprecated(reason : "Use pageCursor instead")
   "This is the time window used by the raptor search. The input searchWindow is an optional parameter and is dynamically assigned if not set. OTP might override the value if it is too small or too large. When paging OTP adjusts it to the appropriate size, depending on the number of itineraries found in the current search window. The scaling of the search window ensures faster paging and limits resource usage. The unit is seconds."
   searchWindowUsed: Int!
 }
@@ -1522,18 +1527,50 @@ enum MultiModalMode {
   parent
 }
 
+"OccupancyStatus to be exposed in the API. The values are based on GTFS-RT"
 enum OccupancyStatus {
-  "The vehicle or carriage has a few seats available."
+  """
+  The vehicle or carriage can currently accommodate only standing passengers and has limited
+  space for them. There isn't a big difference between this and `full` so it's possible to
+  handle them as the same value, if one wants to limit the number of different values.
+  SIRI nordic profile: merge into `standingRoomOnly`.
+  """
+  crushedStandingRoomOnly
+  """
+  The vehicle is considered empty by most measures, and has few or no passengers onboard, but is
+  still accepting passengers. There isn't a big difference between this and `manySeatsAvailable`
+  so it's possible to handle them as the same value, if one wants to limit the number of different
+  values.
+  SIRI nordic profile: merge these into `manySeatsAvailable`.
+  """
+  empty
+  """
+  The vehicle or carriage has a few seats available.
+  SIRI nordic profile: less than ~50% of seats available.
+  """
   fewSeatsAvailable
-  "The vehicle or carriage is considered full by most measures, but may still be allowing passengers to board."
+  """
+  The vehicle or carriage is considered full by most measures, but may still be allowing
+  passengers to board.
+  """
   full
-  "The vehicle or carriage has a large number of seats available."
+  """
+  The vehicle or carriage has a large number of seats available.
+  SIRI nordic profile: more than ~50% of seats available.
+  """
   manySeatsAvailable
   "The vehicle or carriage doesn't have any occupancy data available."
   noData
-  "The vehicle or carriage has no seats or standing room available."
+  """
+  The vehicle or carriage has no seats or standing room available.
+  SIRI nordic profile: if vehicle/carriage is not in use / unavailable, or passengers are only
+  allowed to alight due to e.g. crowding.
+  """
   notAcceptingPassengers
-  "The vehicle or carriage only has standing room available."
+  """
+  The vehicle or carriage only has standing room available.
+  SIRI nordic profile: less than ~10% of seats available.
+  """
   standingRoomOnly
 }
 
@@ -1900,7 +1937,7 @@ input ItineraryFilters {
   itineraries are returned with a system notice, and not deleted.
   """
   debug: ItineraryFilterDebugProfile = off
-  groupSimilarityKeepNumOfItineraries: Float = 0.68 @deprecated
+  groupSimilarityKeepNumOfItineraries: Float = 0.68 @deprecated(reason : "Use groupSimilarityKeepThree instead.")
   "Pick ONE itinerary from each group after putting itineraries that is 85% similar together."
   groupSimilarityKeepOne: Float = 0.85
   "Reduce the number of itineraries in each group to to maximum 3 itineraries. The itineraries are grouped by similar legs (on board same journey). So, if  68% of the distance is traveled by similar legs, then two itineraries are in the same group. Default value is 68%, must be at least 50%."
@@ -1908,7 +1945,7 @@ input ItineraryFilters {
   "Of the itineraries grouped to maximum of three itineraries, how much worse can the non-grouped legs be compared to the lowest cost. 2.0 means that they can be double the cost, and any itineraries having a higher cost will be filtered. Default value is 2.0, use a value lower than 1.0 to turn off"
   groupedOtherThanSameLegsMaxCostMultiplier: Float = 2.0
   "Add an additional cost for short transfers on long transit itineraries. See javaDoc on `AddMinSafeTransferCostFilter` details."
-  minSafeTransferTimeFactor: Float @deprecated
+  minSafeTransferTimeFactor: Float @deprecated(reason : "This filter is removed, it has undesired side-effects")
   "Set a relative limit for all transit itineraries. The limit is calculated based on the transit itinerary generalized-cost and the time between itineraries Itineraries without transit legs are excluded from this filter. Example: costLimitFunction(x) = 3600 + 2.0 x and intervalRelaxFactor = 0.5. If the lowest cost returned is 10 000, then the limit is set to: 3 600 + 2 * 10 000 = 26 600 plus half of the time between either departure or arrival times of the itinerary. Default: {\"costLimitFunction\": 15m + 1.50 t, \"intervalRelaxFactor\": 0.4}"
   transitGeneralizedCostLimit: TransitGeneralizedCostFilterParams
 }
@@ -1933,6 +1970,18 @@ input Modes {
   egressMode: StreetMode
   "The allowed modes for the transit part of the trip. Use an empty list to disallow transit for this search. If the element is not present or null, it will default to all transport modes."
   transportModes: [TransportModes]
+}
+
+"Defines one point which the journey must pass through."
+input PassThroughPoint {
+  "Optional name of the pass-through point for debugging and logging. It is not used in routing."
+  name: String
+  """
+  The list of *stop location ids* which define the pass-through point. At least one id is required.
+  Quay, StopPlace, multimodal StopPlace, and GroupOfStopPlaces are supported location types.
+  The journey must pass through at least one of these entities - not all of them.
+  """
+  placeIds: [String!]
 }
 
 "A combination of street mode and penalty for time and cost."
@@ -2028,7 +2077,7 @@ input ViaLocationInput {
   maxSlack: Duration = "PT1H"
   "The minimum time the user wants to stay in the via location before continuing his journey"
   minSlack: Duration = "PT5M"
-  "The name of the location. This is pass-through informationand is not used in routing."
+  "The name of the location. This is pass-through information and is not used in routing."
   name: String
   "The id of an element in the OTP model. Currently supports Quay, StopPlace, multimodal StopPlace, and GroupOfStopPlaces."
   place: String

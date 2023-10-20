@@ -47,7 +47,9 @@
         "@graphql-codegen/cli",
         "@graphql-codegen/java",
         "@graphql-codegen/java-resolvers",
-        "graphql"
+        "graphql",
+        "io.micrometer:micrometer-registry-prometheus",
+        "io.micrometer:micrometer-registry-influx"
       ],
       // we don't use the 'monthly' preset because that only fires on the first day of the month
       // when there might already other PRs open
@@ -87,7 +89,9 @@
         "org.apache.maven.plugins:maven-gpg-plugin",
         "org.apache.maven.plugins:maven-source-plugin",
         "io.github.git-commit-id:git-commit-id-maven-plugin",
-        "com.hubspot.maven.plugins:prettier-maven-plugin"
+        "com.hubspot.maven.plugins:prettier-maven-plugin",
+        "com.google.cloud.tools:jib-maven-plugin",
+        "org.apache.maven.plugins:maven-shade-plugin"
       ],
       "matchPackagePrefixes": [
         "org.junit.jupiter:",

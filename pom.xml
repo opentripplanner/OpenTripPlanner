@@ -56,17 +56,17 @@
 
 
     <properties>
-        <otp.serialization.version.id>120</otp.serialization.version.id>
+        <otp.serialization.version.id>121</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>29.2</geotools.version>
-        <google.dagger.version>2.48</google.dagger.version>
-        <jackson.version>2.15.2</jackson.version>
+        <google.dagger.version>2.48.1</google.dagger.version>
+        <jackson.version>2.15.3</jackson.version>
         <jersey.version>3.1.3</jersey.version>
         <junit.version>5.10.0</junit.version>
-        <micrometer.version>1.11.4</micrometer.version>
+        <micrometer.version>1.11.5</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <logback.version>1.4.11</logback.version>
-        <lucene.version>9.7.0</lucene.version>
+        <lucene.version>9.8.0</lucene.version>
         <slf4j.version>2.0.9</slf4j.version>
         <netex-java-model.version>2.0.14</netex-java-model.version>
         <siri-java-model.version>1.22</siri-java-model.version>
@@ -313,7 +313,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.10</version>
+                <version>0.8.11</version>
             </plugin>
             <plugin>
                 <!-- Get current Git commit information for use in MavenVersion class.
@@ -364,7 +364,7 @@
                   properly if some input files are missing a terminating newline) -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.0</version>
+                <version>3.5.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -445,7 +445,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>3.4.0</version>
                 <configuration>
                     <container>
                         <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
@@ -572,7 +572,7 @@
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.22.0</version>
+                <version>26.24.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -714,7 +714,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.9</version>
         </dependency>
 
         <!-- TESTING -->
@@ -739,7 +739,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.5.0</version>
+            <version>5.6.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -899,7 +899,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>21.1</version>
+            <version>21.2</version>
         </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
@@ -940,22 +940,17 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.36.0</version>
+            <version>1.43.0</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.13.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.microsoft.azure</groupId>
-            <artifactId>azure-servicebus</artifactId>
-            <version>3.6.7</version>
+            <version>7.14.4</version>
         </dependency>
         <dependency>
             <groupId>com.azure.resourcemanager</groupId>
             <artifactId>azure-resourcemanager-servicebus</artifactId>
-            <version>2.24.0</version>
+            <version>2.30.0</version>
         </dependency>
         <dependency>
             <groupId>ch.poole</groupId>

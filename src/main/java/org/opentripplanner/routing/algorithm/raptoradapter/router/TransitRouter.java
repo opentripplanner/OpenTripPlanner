@@ -142,17 +142,16 @@ public class TransitRouter {
     Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
 
     if (OTPFeature.OptimizeTransfers.isOn() && !transitResponse.containsUnknownPaths()) {
-      paths =
-        TransferOptimizationServiceConfigurator
-          .createOptimizeTransferService(
-            transitLayer::getStopByIndex,
-            requestTransitDataProvider.stopNameResolver(),
-            serverContext.transitService().getTransferService(),
-            requestTransitDataProvider,
-            transitLayer.getStopBoardAlightCosts(),
-            request.preferences().transfer().optimization()
-          )
-          .optimize(transitResponse.paths());
+      var service = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
+        transitLayer::getStopByIndex,
+        requestTransitDataProvider.stopNameResolver(),
+        serverContext.transitService().getTransferService(),
+        requestTransitDataProvider,
+        transitLayer.getStopBoardAlightCosts(),
+        request.preferences().transfer().optimization(),
+        raptorRequest.multiCriteria()
+      );
+      paths = service.optimize(transitResponse.paths());
     }
 
     // Create itineraries

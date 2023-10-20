@@ -17,6 +17,6 @@ public record InvalidVehicleParkingCapacity(OSMWithTags entity, String capacityV
 
   @Override
   public String getHTMLMessage() {
-    return String.format(HTMLFMT, entity.getOpenStreetMapLink(), entity.getId(), capacityValue);
+    return String.format(HTMLFMT, entity.url(), entity.getId(), capacityValue);
   }
 }

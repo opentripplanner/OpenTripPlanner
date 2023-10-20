@@ -106,7 +106,7 @@ Used for street-level cable cars where the cable runs beneath the car.
 
 Private car trips shared with others.
 
-This is currently not specified in GTFS so we use the mode type values 1500-1560 which are in the range of private taxis.
+This is currently not specified in GTFS so we use the mode type values 1550-1560 which are in the range of private taxis.
 
 
 <h4 id="COACH">COACH</h4>

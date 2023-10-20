@@ -1,0 +1,43 @@
+{
+    patterns {
+        code
+        headsign
+        trips {
+            gtfsId
+            stoptimes {
+                stop {
+                    gtfsId
+                    name
+                }
+                headsign
+                scheduledArrival
+                scheduledDeparture
+                stopPosition
+                realtimeState
+                pickupType
+                dropoffType
+            }
+            occupancy {
+                occupancyStatus
+            }
+        }
+        vehiclePositions {
+            vehicleId
+            label
+            lat
+            lon
+            stopRelationship {
+                status
+                stop {
+                    gtfsId
+                }
+            }
+            speed
+            heading
+            lastUpdated
+            trip {
+                gtfsId
+            }
+        }
+    }
+}

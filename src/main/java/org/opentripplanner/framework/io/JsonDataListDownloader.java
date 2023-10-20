@@ -9,7 +9,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
+import javax.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,26 +25,26 @@ public class JsonDataListDownloader<T> {
   private final OtpHttpClient otpHttpClient;
 
   public JsonDataListDownloader(
-    String url,
-    String jsonParsePath,
-    Function<JsonNode, T> elementParser,
-    Map<String, String> headers
+    @Nonnull String url,
+    @Nonnull String jsonParsePath,
+    @Nonnull Function<JsonNode, T> elementParser,
+    @Nonnull Map<String, String> headers
   ) {
     this(url, jsonParsePath, elementParser, headers, new OtpHttpClient());
   }
 
   public JsonDataListDownloader(
-    String url,
-    String jsonParsePath,
-    Function<JsonNode, T> elementParser,
-    Map<String, String> headers,
-    OtpHttpClient OtpHttpClient
+    @Nonnull String url,
+    @Nonnull String jsonParsePath,
+    @Nonnull Function<JsonNode, T> elementParser,
+    @Nonnull Map<String, String> headers,
+    @Nonnull OtpHttpClient OtpHttpClient
   ) {
-    this.url = url;
-    this.jsonParsePath = jsonParsePath;
-    this.headers = headers;
-    this.elementParser = elementParser;
-    this.otpHttpClient = OtpHttpClient;
+    this.url = Objects.requireNonNull(url);
+    this.jsonParsePath = Objects.requireNonNull(jsonParsePath);
+    this.headers = Objects.requireNonNull(headers);
+    this.elementParser = Objects.requireNonNull(elementParser);
+    this.otpHttpClient = Objects.requireNonNull(OtpHttpClient);
   }
 
   public List<T> download() {
@@ -87,7 +89,7 @@ public class JsonDataListDownloader<T> {
     ObjectMapper mapper = new ObjectMapper();
     JsonNode rootNode = mapper.readTree(rentalString);
 
-    if (!jsonParsePath.equals("")) {
+    if (!jsonParsePath.isEmpty()) {
       String delimiter = "/";
       String[] parseElement = jsonParsePath.split(delimiter);
       for (String s : parseElement) {

@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.framework.logging.ThrottleLogger;
+import org.opentripplanner.framework.logging.Throttle;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.routing.algorithm.raptoradapter.path.PathDiff;
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 public class OptimizeTransferService<T extends RaptorTripSchedule> {
 
   private static final Logger LOG = LoggerFactory.getLogger(OptimizeTransferService.class);
-  private static final Logger OPTIMIZATION_FAILED_LOG = ThrottleLogger.throttle(LOG);
+  private static final Throttle THROTTLE_OPTIMIZATION_FAILED = Throttle.ofOneSecond();
 
   private final OptimizePathDomainService<T> optimizePathDomainService;
   private final MinSafeTransferTimeCalculator<T> minSafeTransferTimeCalculator;
@@ -84,11 +84,14 @@ public class OptimizeTransferService<T extends RaptorTripSchedule> {
     try {
       return optimizePathDomainService.findBestTransitPath(path);
     } catch (RuntimeException e) {
-      OPTIMIZATION_FAILED_LOG.warn(
-        "Unable to optimize transfers in path. Details: {}, path: {}",
-        e.getMessage(),
-        path,
-        e
+      THROTTLE_OPTIMIZATION_FAILED.throttle(() ->
+        LOG.warn(
+          "Unable to optimize transfers in path. Details: {}, path: {}  {}",
+          e.getMessage(),
+          path,
+          THROTTLE_OPTIMIZATION_FAILED.setupInfo(),
+          e
+        )
       );
       return List.of(new OptimizedPath<>(path));
     }
