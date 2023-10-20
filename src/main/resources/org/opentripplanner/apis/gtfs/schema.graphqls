@@ -5032,7 +5032,7 @@ input InputTransferPreferences {
 """
 Transit mode and a reluctance associated with it.
 """
-input InputTransitModePreferences {
+input InputTransitModePreference {
     """
     Transit mode that could be (but doesn't have to be) used in an itinerary.
     """
