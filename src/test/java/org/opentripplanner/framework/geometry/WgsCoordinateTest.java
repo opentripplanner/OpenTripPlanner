@@ -9,25 +9,26 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner._support.geometry.Coordinates;
 
 public class WgsCoordinateTest {
 
   @Test
-  public void normalize() {
+  void normalize() {
     WgsCoordinate c = new WgsCoordinate(1.123456789, 2.987654321);
     assertEquals(1.1234568, c.latitude());
     assertEquals(2.9876543, c.longitude());
   }
 
   @Test
-  public void testToString() {
+  void testToString() {
     WgsCoordinate c = new WgsCoordinate(1.123456789, 2.987654321);
     assertEquals("(1.12346, 2.98765)", c.toString());
     assertEquals("(1.123, 2.9)", new WgsCoordinate(1.123, 2.9).toString());
   }
 
   @Test
-  public void testCoordinateEquals() {
+  void testCoordinateEquals() {
     WgsCoordinate a = new WgsCoordinate(5.000_000_3, 3.0);
 
     // Test latitude
@@ -50,7 +51,7 @@ public class WgsCoordinateTest {
   }
 
   @Test
-  public void asJtsCoordinate() {
+  void asJtsCoordinate() {
     // Given a well known location in Oslo
     double latitude = 59.9110583;
     double longitude = 10.7502691;
@@ -65,7 +66,7 @@ public class WgsCoordinateTest {
   }
 
   @Test
-  public void mean() {
+  void mean() {
     var c1 = new WgsCoordinate(10.0, 5.0);
     var c2 = new WgsCoordinate(20.0, -5.0);
 
@@ -79,7 +80,7 @@ public class WgsCoordinateTest {
   }
 
   @Test
-  public void validCoordinates() {
+  void validCoordinates() {
     // Edge cases should NOT throw exceptions
     new WgsCoordinate(90d, 1d);
     new WgsCoordinate(-90d, 1d);
@@ -94,13 +95,29 @@ public class WgsCoordinateTest {
   }
 
   @Test
-  public void add() {
+  void add() {
     assertEquals(new WgsCoordinate(12d, 5d), new WgsCoordinate(9d, 1d).add(3d, 4d));
   }
 
   @Test
-  public void testGreenwich() {
+  void testGreenwich() {
     assertEquals(51.48d, WgsCoordinate.GREENWICH.latitude());
     assertEquals(0d, WgsCoordinate.GREENWICH.longitude());
+  }
+
+  @Test
+  void roundingTo10m() {
+    var hamburg = new WgsCoordinate(Coordinates.HAMBURG);
+    var rounded = hamburg.roundToApproximate10m();
+    assertEquals(10.0003, rounded.latitude());
+    assertEquals(53.5566, rounded.longitude());
+  }
+
+  @Test
+  void roundingTo100m() {
+    var hamburg = new WgsCoordinate(Coordinates.HAMBURG);
+    var rounded = hamburg.roundToApproximate100m();
+    assertEquals(10, rounded.latitude());
+    assertEquals(53.557, rounded.longitude());
   }
 }

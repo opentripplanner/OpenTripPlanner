@@ -734,7 +734,11 @@ Used to group requests when monitoring OTP.
       "frequency" : "1m",
       "headers" : {
         "Header-Name" : "Header-Value"
-      }
+      },
+      "fuzzyTripMatching" : false,
+      "features" : [
+        "position"
+      ]
     },
     {
       "type" : "websocket-gtfs-rt-updater"

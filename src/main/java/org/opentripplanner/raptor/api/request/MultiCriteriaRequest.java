@@ -1,5 +1,6 @@
 package org.opentripplanner.raptor.api.request;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
@@ -20,8 +21,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   @Nullable
   private final RaptorTransitPriorityGroupCalculator transitPriorityCalculator;
 
-  @Nullable
-  private final PassThroughPoints passThroughPoints;
+  private final List<PassThroughPoint> passThroughPoints;
 
   @Nullable
   private final Double relaxCostAtDestination;
@@ -29,7 +29,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   private MultiCriteriaRequest() {
     this.relaxC1 = RelaxFunction.NORMAL;
     this.transitPriorityCalculator = null;
-    this.passThroughPoints = null;
+    this.passThroughPoints = List.of();
     this.relaxCostAtDestination = null;
   }
 
@@ -76,8 +76,12 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return Optional.ofNullable(transitPriorityCalculator);
   }
 
-  public Optional<PassThroughPoints> passThroughPoints() {
-    return Optional.ofNullable(passThroughPoints);
+  public boolean hasPassThroughPoints() {
+    return !passThroughPoints.isEmpty();
+  }
+
+  public List<PassThroughPoint> passThroughPoints() {
+    return passThroughPoints;
   }
 
   /**
@@ -137,20 +141,23 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   }
 
   public boolean includeC2() {
-    return passThroughPoints != null || transitPriorityCalculator != null;
+    return hasPassThroughPoints() || transitPriorityCalculator != null;
   }
 
   public static class Builder<T extends RaptorTripSchedule> {
 
     private final MultiCriteriaRequest<T> original;
     private RelaxFunction relaxC1;
-    private RaptorTransitPriorityGroupCalculator transitPriorityCalculator = null;
-    private PassThroughPoints passThroughPoints = null;
-    private Double relaxCostAtDestination = null;
+    private RaptorTransitPriorityGroupCalculator transitPriorityCalculator;
+    private List<PassThroughPoint> passThroughPoints;
+    private Double relaxCostAtDestination;
 
     public Builder(MultiCriteriaRequest<T> original) {
       this.original = original;
       this.relaxC1 = original.relaxC1;
+      this.passThroughPoints = original.passThroughPoints;
+      this.transitPriorityCalculator = original.transitPriorityCalculator;
+      this.relaxCostAtDestination = original.relaxCostAtDestination;
     }
 
     @Nullable
@@ -173,14 +180,14 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
       return this;
     }
 
-    @Nullable
-    public PassThroughPoints passThroughPoints() {
+    public List<PassThroughPoint> passThroughPoints() {
       return passThroughPoints;
     }
 
     @Nullable
-    public Builder<T> withPassThroughPoints(PassThroughPoints value) {
-      passThroughPoints = value;
+    public Builder<T> withPassThroughPoints(List<PassThroughPoint> points) {
+      // Prevent setting this to an empty list - here we use null to represent NOT_SET
+      passThroughPoints = (points == null || points.isEmpty()) ? List.of() : points;
       return this;
     }
 

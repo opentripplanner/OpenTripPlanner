@@ -747,6 +747,18 @@ public class GraphQLTypes {
     WALK,
   }
 
+  /** Occupancy status of a vehicle. */
+  public enum GraphQLOccupancyStatus {
+    CRUSHED_STANDING_ROOM_ONLY,
+    EMPTY,
+    FEW_SEATS_AVAILABLE,
+    FULL,
+    MANY_SEATS_AVAILABLE,
+    NOT_ACCEPTING_PASSENGERS,
+    NO_DATA_AVAILABLE,
+    STANDING_ROOM_ONLY,
+  }
+
   public static class GraphQLOpeningHoursDatesArgs {
 
     private List<String> dates;

@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.txConstrained;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,7 @@ import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder;
 
 class OptimizedPathTailTest implements RaptorTestConstants {
 
@@ -27,17 +26,16 @@ class OptimizedPathTailTest implements RaptorTestConstants {
   private final TransitPathLeg<TestTripSchedule> t3 = t2.nextTransitLeg();
 
   @SuppressWarnings("ConstantConditions")
-  private final TripToTripTransfer<TestTripSchedule> tx23 = TransferGeneratorDummy.tx(
-    txConstrained(t2.trip(), STOP_D, t3.trip(), STOP_D).staySeated()
-  );
+  private final TripToTripTransfer<TestTripSchedule> tx23 = TestTransferBuilder
+    .tx(t2.trip(), STOP_D, t3.trip(), STOP_D)
+    .staySeated()
+    .build();
 
-  private final TripToTripTransfer<TestTripSchedule> tx12 = TransferGeneratorDummy.tx(
-    t1.trip(),
-    STOP_B,
-    D2m,
-    STOP_C,
-    t2.trip()
-  );
+  private final TripToTripTransfer<TestTripSchedule> tx12 = TestTransferBuilder
+    .tx(t1.trip(), STOP_B, t2.trip(), STOP_C)
+    .walk(D2m)
+    .build();
+
   private final TransferWaitTimeCostCalculator waitTimeCalc = new TransferWaitTimeCostCalculator(
     1.0,
     5.0

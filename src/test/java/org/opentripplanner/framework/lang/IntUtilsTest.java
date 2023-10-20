@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.framework.lang.IntUtils.concat;
 import static org.opentripplanner.framework.lang.IntUtils.intArray;
+import static org.opentripplanner.framework.lang.IntUtils.intArrayToString;
 import static org.opentripplanner.framework.lang.IntUtils.intToString;
 import static org.opentripplanner.framework.lang.IntUtils.requireInRange;
 import static org.opentripplanner.framework.lang.IntUtils.requireNotNegative;
@@ -20,6 +21,13 @@ class IntUtilsTest {
   void testIntToString() {
     assertEquals("7", intToString(7, -1));
     assertEquals("", intToString(-1, -1));
+  }
+
+  @SuppressWarnings("RedundantArrayCreation")
+  @Test
+  void testIntToString2() {
+    assertEquals("7, -1", intArrayToString(7, -1));
+    assertEquals("", intArrayToString(new int[0]));
   }
 
   @Test

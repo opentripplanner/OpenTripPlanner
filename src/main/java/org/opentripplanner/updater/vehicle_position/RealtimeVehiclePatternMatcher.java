@@ -1,5 +1,8 @@
 package org.opentripplanner.updater.vehicle_position;
 
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY;
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION;
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.INVALID_INPUT_STRUCTURE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_SERVICE_ON_DATE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
@@ -30,15 +33,18 @@ import javax.annotation.Nonnull;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopStatus;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus;
+import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -50,27 +56,31 @@ import org.slf4j.LoggerFactory;
  * Responsible for converting vehicle positions in memory to exportable ones, and associating each
  * position with a pattern.
  */
-public class VehiclePositionPatternMatcher {
+public class RealtimeVehiclePatternMatcher {
 
-  private static final Logger LOG = LoggerFactory.getLogger(VehiclePositionPatternMatcher.class);
+  private static final Logger LOG = LoggerFactory.getLogger(RealtimeVehiclePatternMatcher.class);
 
   private final String feedId;
-  private final VehiclePositionRepository repository;
+  private final RealtimeVehicleRepository repository;
   private final ZoneId timeZoneId;
 
   private final Function<FeedScopedId, Trip> getTripForId;
   private final Function<Trip, TripPattern> getStaticPattern;
   private final BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern;
+  private final GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
+  private final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures;
 
   private Set<TripPattern> patternsInPreviousUpdate = Set.of();
 
-  public VehiclePositionPatternMatcher(
+  public RealtimeVehiclePatternMatcher(
     String feedId,
     Function<FeedScopedId, Trip> getTripForId,
     Function<Trip, TripPattern> getStaticPattern,
     BiFunction<Trip, LocalDate, TripPattern> getRealtimePattern,
-    VehiclePositionRepository repository,
-    ZoneId timeZoneId
+    RealtimeVehicleRepository repository,
+    ZoneId timeZoneId,
+    GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher,
+    Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> vehiclePositionFeatures
   ) {
     this.feedId = feedId;
     this.getTripForId = getTripForId;
@@ -78,28 +88,30 @@ public class VehiclePositionPatternMatcher {
     this.getRealtimePattern = getRealtimePattern;
     this.repository = repository;
     this.timeZoneId = timeZoneId;
+    this.fuzzyTripMatcher = fuzzyTripMatcher;
+    this.vehiclePositionFeatures = vehiclePositionFeatures;
   }
 
   /**
-   * Attempts to match each vehicle position to a pattern, then adds each to a pattern
+   * Attempts to match each vehicle to a pattern, then adds each to a pattern
    *
    * @param vehiclePositions List of vehicle positions to match to patterns
    */
-  public UpdateResult applyVehiclePositionUpdates(List<VehiclePosition> vehiclePositions) {
+  public UpdateResult applyRealtimeVehicleUpdates(List<VehiclePosition> vehiclePositions) {
     var matchResults = vehiclePositions
       .stream()
-      .map(vehiclePosition -> toRealtimeVehiclePosition(feedId, vehiclePosition))
+      .map(vehiclePosition -> toRealtimeVehicle(feedId, vehiclePosition))
       .toList();
 
-    // we take the list of positions and out of them create a Map<TripPattern, List<VehiclePosition>>
-    // that map makes it very easy to update the positions in the service
-    // it also enables the bookkeeping about which pattern previously had positions but no longer do
+    // we take the list of vehicles and out of them create a Map<TripPattern, List<RealtimeVehicle>>
+    // that map makes it very easy to update the vehicles in the service
+    // it also enables the bookkeeping about which pattern previously had vehicles but no longer do
     // these need to be removed from the service as we assume that the vehicle has stopped
-    var positions = matchResults
+    var vehicles = matchResults
       .stream()
       .filter(Result::isSuccess)
       .map(Result::successValue)
-      .collect(Collectors.groupingBy(PatternAndVehiclePosition::pattern))
+      .collect(Collectors.groupingBy(PatternAndRealtimeVehicle::pattern))
       .entrySet()
       .stream()
       .collect(
@@ -109,18 +121,18 @@ public class VehiclePositionPatternMatcher {
             e
               .getValue()
               .stream()
-              .map(PatternAndVehiclePosition::position)
+              .map(PatternAndRealtimeVehicle::vehicle)
               .collect(Collectors.toList())
         )
       );
 
-    positions.forEach(repository::setVehiclePositions);
-    Set<TripPattern> patternsInCurrentUpdate = positions.keySet();
+    vehicles.forEach(repository::setRealtimeVehicles);
+    Set<TripPattern> patternsInCurrentUpdate = vehicles.keySet();
 
-    // if there was a position in the previous update but not in the current one, we assume
-    // that the pattern has no more vehicle positions.
+    // if there was a vehicle in the previous update but not in the current one, we assume
+    // that the pattern has no more vehicles.
     var toDelete = Sets.difference(patternsInPreviousUpdate, patternsInCurrentUpdate);
-    toDelete.forEach(repository::clearVehiclePositions);
+    toDelete.forEach(repository::clearRealtimeVehicles);
     patternsInPreviousUpdate = patternsInCurrentUpdate;
 
     if (!vehiclePositions.isEmpty() && patternsInCurrentUpdate.isEmpty()) {
@@ -185,81 +197,87 @@ public class VehiclePositionPatternMatcher {
   }
 
   /**
-   * Converts GtfsRealtime vehicle position to the OTP RealtimeVehiclePosition which can be used by
+   * Converts GtfsRealtime vehicle position to the OTP RealtimeVehicle which can be used by
    * the API.
    *
    * @param stopIndexOfGtfsSequence A function that takes a GTFS stop_sequence and returns the index
    *                                of the stop in the trip.
    */
-  private RealtimeVehiclePosition mapVehiclePosition(
+  private RealtimeVehicle mapRealtimeVehicle(
     VehiclePosition vehiclePosition,
     List<StopLocation> stopsOnVehicleTrip,
     @Nonnull Trip trip,
     @Nonnull Function<Integer, OptionalInt> stopIndexOfGtfsSequence
   ) {
-    var newPosition = RealtimeVehiclePosition.builder();
+    var newVehicle = RealtimeVehicle.builder();
 
-    if (vehiclePosition.hasPosition()) {
+    if (vehiclePositionFeatures.contains(POSITION) && vehiclePosition.hasPosition()) {
       var position = vehiclePosition.getPosition();
-      newPosition.setCoordinates(
+      newVehicle.withCoordinates(
         new WgsCoordinate(position.getLatitude(), position.getLongitude())
       );
 
       if (position.hasSpeed()) {
-        newPosition.setSpeed(position.getSpeed());
+        newVehicle.withSpeed(position.getSpeed());
       }
       if (position.hasBearing()) {
-        newPosition.setHeading(position.getBearing());
+        newVehicle.withHeading(position.getBearing());
       }
     }
 
     if (vehiclePosition.hasVehicle()) {
       var vehicle = vehiclePosition.getVehicle();
       var id = new FeedScopedId(feedId, vehicle.getId());
-      newPosition
-        .setVehicleId(id)
-        .setLabel(Optional.ofNullable(vehicle.getLabel()).orElse(vehicle.getLicensePlate()));
+      newVehicle
+        .withVehicleId(id)
+        .withLabel(Optional.ofNullable(vehicle.getLabel()).orElse(vehicle.getLicensePlate()));
     }
 
     if (vehiclePosition.hasTimestamp()) {
-      newPosition.setTime(Instant.ofEpochSecond(vehiclePosition.getTimestamp()));
+      newVehicle.withTime(Instant.ofEpochSecond(vehiclePosition.getTimestamp()));
     }
 
-    if (vehiclePosition.hasCurrentStatus()) {
-      newPosition.setStopStatus(toModel(vehiclePosition.getCurrentStatus()));
-    }
+    if (vehiclePositionFeatures.contains(STOP_POSITION)) {
+      if (vehiclePosition.hasCurrentStatus()) {
+        newVehicle.withStopStatus(stopStatusToModel(vehiclePosition.getCurrentStatus()));
+      }
 
-    // we prefer the to get the current stop from the stop_id
-    if (vehiclePosition.hasStopId()) {
-      var matchedStops = stopsOnVehicleTrip
-        .stream()
-        .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
-        .toList();
-      if (matchedStops.size() == 1) {
-        newPosition.setStop(matchedStops.get(0));
-      } else {
-        LOG.warn(
-          "Stop ID {} is not in trip {}. Not setting stopRelationship.",
-          vehiclePosition.getStopId(),
-          trip.getId()
-        );
+      // we prefer the to get the current stop from the stop_id
+      if (vehiclePosition.hasStopId()) {
+        var matchedStops = stopsOnVehicleTrip
+          .stream()
+          .filter(stop -> stop.getId().getId().equals(vehiclePosition.getStopId()))
+          .toList();
+        if (matchedStops.size() == 1) {
+          newVehicle.withStop(matchedStops.get(0));
+        } else {
+          LOG.warn(
+            "Stop ID {} is not in trip {}. Not setting stopRelationship.",
+            vehiclePosition.getStopId(),
+            trip.getId()
+          );
+        }
+      }
+      // but if stop_id isn't there we try current_stop_sequence
+      else if (vehiclePosition.hasCurrentStopSequence()) {
+        stopIndexOfGtfsSequence
+          .apply(vehiclePosition.getCurrentStopSequence())
+          .ifPresent(stopIndex -> {
+            if (validStopIndex(stopIndex, stopsOnVehicleTrip)) {
+              var stop = stopsOnVehicleTrip.get(stopIndex);
+              newVehicle.withStop(stop);
+            }
+          });
       }
     }
-    // but if stop_id isn't there we try current_stop_sequence
-    else if (vehiclePosition.hasCurrentStopSequence()) {
-      stopIndexOfGtfsSequence
-        .apply(vehiclePosition.getCurrentStopSequence())
-        .ifPresent(stopIndex -> {
-          if (validStopIndex(stopIndex, stopsOnVehicleTrip)) {
-            var stop = stopsOnVehicleTrip.get(stopIndex);
-            newPosition.setStop(stop);
-          }
-        });
+
+    newVehicle.withTrip(trip);
+
+    if (vehiclePositionFeatures.contains(OCCUPANCY) && vehiclePosition.hasOccupancyStatus()) {
+      newVehicle.withOccupancyStatus(occupancyStatusToModel(vehiclePosition.getOccupancyStatus()));
     }
 
-    newPosition.setTrip(trip);
-
-    return newPosition.build();
+    return newVehicle.build();
   }
 
   /**
@@ -271,11 +289,27 @@ public class VehiclePositionPatternMatcher {
 
   private record TemporalDistance(LocalDate date, long distance) {}
 
-  private static StopStatus toModel(VehicleStopStatus currentStatus) {
+  private static StopStatus stopStatusToModel(VehicleStopStatus currentStatus) {
     return switch (currentStatus) {
       case IN_TRANSIT_TO -> StopStatus.IN_TRANSIT_TO;
       case INCOMING_AT -> StopStatus.INCOMING_AT;
       case STOPPED_AT -> StopStatus.STOPPED_AT;
+    };
+  }
+
+  private static OccupancyStatus occupancyStatusToModel(
+    VehiclePosition.OccupancyStatus occupancyStatus
+  ) {
+    return switch (occupancyStatus) {
+      case NO_DATA_AVAILABLE -> OccupancyStatus.NO_DATA_AVAILABLE;
+      case EMPTY -> OccupancyStatus.EMPTY;
+      case MANY_SEATS_AVAILABLE -> OccupancyStatus.MANY_SEATS_AVAILABLE;
+      case FEW_SEATS_AVAILABLE -> OccupancyStatus.FEW_SEATS_AVAILABLE;
+      case STANDING_ROOM_ONLY -> OccupancyStatus.STANDING_ROOM_ONLY;
+      case CRUSHED_STANDING_ROOM_ONLY -> OccupancyStatus.CRUSHED_STANDING_ROOM_ONLY;
+      case FULL -> OccupancyStatus.FULL;
+      case NOT_ACCEPTING_PASSENGERS -> OccupancyStatus.NOT_ACCEPTING_PASSENGERS;
+      case NOT_BOARDABLE -> OccupancyStatus.NOT_ACCEPTING_PASSENGERS;
     };
   }
 
@@ -287,7 +321,12 @@ public class VehiclePositionPatternMatcher {
     }
   }
 
-  private Result<PatternAndVehiclePosition, UpdateError> toRealtimeVehiclePosition(
+  private VehiclePosition fuzzilySetTrip(VehiclePosition vehiclePosition) {
+    var trip = fuzzyTripMatcher.match(feedId, vehiclePosition.getTrip());
+    return vehiclePosition.toBuilder().setTrip(trip).build();
+  }
+
+  private Result<PatternAndRealtimeVehicle, UpdateError> toRealtimeVehicle(
     String feedId,
     VehiclePosition vehiclePosition
   ) {
@@ -299,7 +338,11 @@ public class VehiclePositionPatternMatcher {
       return Result.failure(UpdateError.noTripId(INVALID_INPUT_STRUCTURE));
     }
 
-    var tripId = vehiclePosition.getTrip().getTripId();
+    var vehiclePositionWithTripId = fuzzyTripMatcher == null
+      ? vehiclePosition
+      : fuzzilySetTrip(vehiclePosition);
+
+    var tripId = vehiclePositionWithTripId.getTrip().getTripId();
 
     if (StringUtils.hasNoValue(tripId)) {
       return Result.failure(UpdateError.noTripId(UpdateError.UpdateErrorType.NO_TRIP_ID));
@@ -317,7 +360,7 @@ public class VehiclePositionPatternMatcher {
     }
 
     var serviceDate = Optional
-      .of(vehiclePosition.getTrip().getStartDate())
+      .of(vehiclePositionWithTripId.getTrip().getStartDate())
       .map(Strings::emptyToNull)
       .flatMap(ServiceDateUtils::parseStringToOptional)
       .orElseGet(() -> inferServiceDate(trip));
@@ -337,15 +380,15 @@ public class VehiclePositionPatternMatcher {
     }
 
     // Add position to pattern
-    var newPosition = mapVehiclePosition(
-      vehiclePosition,
+    var newVehicle = mapRealtimeVehicle(
+      vehiclePositionWithTripId,
       pattern.getStops(),
       trip,
       staticTripTimes::stopIndexOfGtfsSequence
     );
 
-    return Result.success(new PatternAndVehiclePosition(pattern, newPosition));
+    return Result.success(new PatternAndRealtimeVehicle(pattern, newVehicle));
   }
 
-  record PatternAndVehiclePosition(TripPattern pattern, RealtimeVehiclePosition position) {}
+  record PatternAndRealtimeVehicle(TripPattern pattern, RealtimeVehicle vehicle) {}
 }

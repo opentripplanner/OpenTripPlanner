@@ -38,7 +38,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.UpdateError;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
-public class AddedTripBuilderTest {
+class AddedTripBuilderTest {
 
   private static final Agency AGENCY = TransitModelForTest.AGENCY;
   private static final ZoneId TIME_ZONE = AGENCY.getTimezone();
@@ -105,7 +105,7 @@ public class AddedTripBuilderTest {
   }
 
   @Test
-  public void testAddedTrip() {
+  void testAddedTrip() {
     var addedTrip = new AddedTripBuilder(
       TRANSIT_MODEL,
       ENTITY_RESOLVER,
@@ -370,7 +370,7 @@ public class AddedTripBuilderTest {
   }
 
   @Test
-  public void testAddedTripFailOnMissingServiceId() {
+  void testAddedTripFailOnMissingServiceId() {
     var addedTrip = new AddedTripBuilder(
       TRANSIT_MODEL,
       ENTITY_RESOLVER,
@@ -382,7 +382,7 @@ public class AddedTripBuilderTest {
       null,
       TRANSIT_MODE,
       SUB_MODE,
-      List.of(),
+      getCalls(0),
       false,
       null,
       false,
@@ -400,7 +400,7 @@ public class AddedTripBuilderTest {
   }
 
   @Test
-  public void testAddedTripFailOnNonIncreasingDwellTime() {
+  void testAddedTripFailOnNonIncreasingDwellTime() {
     List<CallWrapper> calls = List.of(
       TestCall
         .of()
@@ -453,6 +453,90 @@ public class AddedTripBuilderTest {
     );
   }
 
+  @Test
+  void testAddedTripFailOnTooFewCalls() {
+    List<CallWrapper> calls = List.of(
+      TestCall
+        .of()
+        .withStopPointRef(STOP_A.getId().getId())
+        .withAimedDepartureTime(zonedDateTime(10, 20))
+        .withExpectedDepartureTime(zonedDateTime(10, 20))
+        .build()
+    );
+    var addedTrip = new AddedTripBuilder(
+      TRANSIT_MODEL,
+      ENTITY_RESOLVER,
+      AbstractTransitEntity::getId,
+      TRIP_ID,
+      OPERATOR,
+      LINE_REF,
+      REPLACED_ROUTE,
+      SERVICE_DATE,
+      TRANSIT_MODE,
+      SUB_MODE,
+      calls,
+      false,
+      null,
+      false,
+      SHORT_NAME,
+      HEADSIGN
+    )
+      .build();
+
+    assertTrue(addedTrip.isFailure(), "Trip creation should fail");
+    assertEquals(
+      UpdateError.UpdateErrorType.TOO_FEW_STOPS,
+      addedTrip.failureValue().errorType(),
+      "Trip creation should fail with too few calls"
+    );
+  }
+
+  @Test
+  void testAddedTripFailOnUnknownStop() {
+    List<CallWrapper> calls = List.of(
+      TestCall
+        .of()
+        .withStopPointRef("UNKNOWN_STOP_REF")
+        .withAimedDepartureTime(zonedDateTime(10, 20))
+        .withExpectedDepartureTime(zonedDateTime(10, 20))
+        .build(),
+      TestCall
+        .of()
+        .withStopPointRef(STOP_B.getId().getId())
+        .withAimedArrivalTime(zonedDateTime(10, 30))
+        .withExpectedArrivalTime(zonedDateTime(10, 31))
+        .withAimedDepartureTime(zonedDateTime(10, 30))
+        .withExpectedDepartureTime(zonedDateTime(10, 29))
+        .build()
+    );
+    var addedTrip = new AddedTripBuilder(
+      TRANSIT_MODEL,
+      ENTITY_RESOLVER,
+      AbstractTransitEntity::getId,
+      TRIP_ID,
+      OPERATOR,
+      LINE_REF,
+      REPLACED_ROUTE,
+      SERVICE_DATE,
+      TRANSIT_MODE,
+      SUB_MODE,
+      calls,
+      false,
+      null,
+      false,
+      SHORT_NAME,
+      HEADSIGN
+    )
+      .build();
+
+    assertTrue(addedTrip.isFailure(), "Trip creation should fail");
+    assertEquals(
+      UpdateError.UpdateErrorType.NO_VALID_STOPS,
+      addedTrip.failureValue().errorType(),
+      "Trip creation should fail with call referring to unknown stop"
+    );
+  }
+
   @ParameterizedTest
   @CsvSource(
     {
@@ -462,7 +546,7 @@ public class AddedTripBuilderTest {
       "ferry,FERRY,RAIL,",
     }
   )
-  public void testGetTransportMode(
+  void testGetTransportMode(
     String siriMode,
     String internalMode,
     String replacedRouteMode,
