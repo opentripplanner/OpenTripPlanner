@@ -3,6 +3,11 @@ package org.opentripplanner.graph_builder.module.ned;
 import java.util.ArrayList;
 import java.util.List;
 import javax.media.jai.InterpolationBilinear;
+import org.geotools.api.coverage.CannotEvaluateException;
+import org.geotools.api.coverage.Coverage;
+import org.geotools.api.coverage.PointOutsideCoverageException;
+import org.geotools.api.coverage.SampleDimension;
+import org.geotools.api.geometry.Position;
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
@@ -11,11 +16,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.index.strtree.STRtree;
-import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.coverage.Coverage;
-import org.opengis.coverage.PointOutsideCoverageException;
-import org.opengis.coverage.SampleDimension;
-import org.opengis.geometry.DirectPosition;
 
 /**
  * Stitches together multiple elevation maps into a single elevation map, hackily.  This is
@@ -75,8 +75,8 @@ public class UnifiedGridCoverage extends AbstractCoverage {
   }
 
   @Override
-  public Object evaluate(DirectPosition point) throws CannotEvaluateException {
-    /* we don't use this function, we use evaluate(DirectPosition point, double[] values) */
+  public Object evaluate(Position point) throws CannotEvaluateException {
+    /* we don't use this function, we use evaluate(Position point, double[] values) */
     return null;
   }
 
@@ -93,7 +93,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
   /**
    * Calculate the elevation at a given point
    */
-  public double[] evaluate(DirectPosition point, double[] values) throws CannotEvaluateException {
+  public double[] evaluate(Position point, double[] values) throws CannotEvaluateException {
     double x = point.getOrdinate(0);
     double y = point.getOrdinate(1);
     Coordinate pointCoordinate = new Coordinate(x, y);

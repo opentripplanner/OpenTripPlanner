@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.geotools.geometry.DirectPosition2D;
+import org.geotools.api.coverage.Coverage;
+import org.geotools.api.coverage.PointOutsideCoverageException;
+import org.geotools.api.referencing.operation.TransformException;
+import org.geotools.geometry.Position2D;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.impl.PackedCoordinateSequence;
-import org.opengis.coverage.Coverage;
-import org.opengis.coverage.PointOutsideCoverageException;
-import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.SphericalDistanceLibrary;
@@ -564,7 +564,7 @@ public class ElevationModule implements GraphBuilderModule {
       // GeoTIFFs in various projections. Note that GeoTools defaults to strict EPSG axis ordering of (lat, long)
       // for DefaultGeographicCRS.WGS84, but OTP is using (long, lat) throughout and assumes unprojected DEM
       // rasters to also use (long, lat).
-      coverage.evaluate(new DirectPosition2D(GeometryUtils.WGS84_XY, x, y), values);
+      coverage.evaluate(new Position2D(GeometryUtils.WGS84_XY, x, y), values);
     } catch (PointOutsideCoverageException e) {
       nPointsOutsideDEM.incrementAndGet();
       throw e;
