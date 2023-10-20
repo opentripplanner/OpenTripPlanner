@@ -2313,6 +2313,66 @@ enum TransitMode {
     MONORAIL
 }
 
+"""
+Transit modes include modes that are used within organized transportation networks
+run by public transportation authorities, taxi companies etc.
+Equivalent to GTFS route_type or to NeTEx TransportMode with an addition of `ANY`
+mode that enables all modes.
+"""
+enum PlanTransitMode {
+    AIRPLANE
+
+    """
+    Selecting this enables all modes to usable in routing.
+    """
+    ANY
+
+    """
+    Most busses or coaches use this mode but sometimes the other bus-like modes such
+    `COACH` or `TROLLEYBUS` are used.
+    """
+    BUS
+
+    CABLE_CAR
+
+    """
+    Sometimes coaches use this mode but sometimes they are modelled to use `BUS` mode
+    instead.
+    """
+    COACH
+
+    FERRY
+
+    FUNICULAR
+
+    GONDOLA
+
+    """
+    This includes long or short distance trains. Tram, subway, monorail and funicular have
+    their own modes but it's possible that sometimes they use this mode instead.
+    """
+    RAIL
+
+    """
+    Subway or metro, depending on the local terminology.
+    """
+    SUBWAY
+
+    TRAM
+
+    """Private car trips shared with others."""
+    CARPOOL
+
+    """A taxi, possibly operated by a public transport agency."""
+    TAXI
+
+    "Electric buses that draw power from overhead wires using poles."
+    TROLLEYBUS
+
+    "Railway in which the track consists of a single rail or a beam."
+    MONORAIL
+}
+
 """An object with an ID"""
 interface Node {
     """The ID of an object"""
@@ -4906,7 +4966,7 @@ input InputTransitModePreferences {
     """
     Transit mode that could be (but doesn't have to be) used in an itinerary.
     """
-    mode: TransitMode!
+    mode: PlanTransitMode!
 
     """
     Reluctance in a format of a cost function of this transit mode compared to an ideal transit
