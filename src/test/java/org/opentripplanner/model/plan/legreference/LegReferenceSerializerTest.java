@@ -21,13 +21,13 @@ class LegReferenceSerializerTest {
   /**
    * Token based on the latest format, including stop ids.
    */
-  private static final String ENCODED_TOKEN =
-    "rO0ABXdZABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjEABkY6VHJpcAAKMjAyMi0wMS0zMQAAAAEAAAADAA9GOkJvYXJkaW5nIFN0b3AAEEY6QWxpZ2h0aW5nIFN0b3A=";
+  private static final String ENCODED_TOKEN_V2 =
+    "rO0ABXdZABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjIABkY6VHJpcAAKMjAyMi0wMS0zMQAAAAEAAAADAA9GOkJvYXJkaW5nIFN0b3AAEEY6QWxpZ2h0aW5nIFN0b3A=";
 
   /**
    * Token based on the previous format, without stop ids.
    */
-  private static final String ENCODED_LEGACY_TOKEN =
+  private static final String ENCODED_TOKEN_V1 =
     "rO0ABXc2ABhTQ0hFRFVMRURfVFJBTlNJVF9MRUdfVjEABkY6VHJpcAAKMjAyMi0wMS0zMQAAAAEAAAAD";
 
   @Test
@@ -43,7 +43,7 @@ class LegReferenceSerializerTest {
 
     var out = LegReferenceSerializer.encode(ref);
 
-    assertEquals(ENCODED_TOKEN, out);
+    assertEquals(ENCODED_TOKEN_V2, out);
 
     var ref2 = LegReferenceSerializer.decode(out);
 
@@ -52,7 +52,7 @@ class LegReferenceSerializerTest {
 
   @Test
   void testScheduledTransitLegReferenceDeserialize() {
-    var ref = (ScheduledTransitLegReference) LegReferenceSerializer.decode(ENCODED_TOKEN);
+    var ref = (ScheduledTransitLegReference) LegReferenceSerializer.decode(ENCODED_TOKEN_V2);
     assertNotNull(ref);
     assertEquals(TRIP_ID, ref.tripId());
     assertEquals(SERVICE_DATE, ref.serviceDate());
@@ -62,8 +62,8 @@ class LegReferenceSerializerTest {
 
   @Test
   void testScheduledTransitLegReferenceLegacyDeserialize() {
-    var ref = (ScheduledTransitLegReference) LegReferenceSerializer.decode(ENCODED_LEGACY_TOKEN);
-
+    var ref = (ScheduledTransitLegReference) LegReferenceSerializer.decode(ENCODED_TOKEN_V1);
+    assertNotNull(ref);
     assertEquals(TRIP_ID, ref.tripId());
     assertEquals(SERVICE_DATE, ref.serviceDate());
     assertEquals(FROM_STOP_POS, ref.fromStopPositionInPattern());

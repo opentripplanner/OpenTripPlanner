@@ -1,18 +1,12 @@
 package org.opentripplanner.model.plan.legreference;
 
-import static java.time.temporal.ChronoField.DAY_OF_MONTH;
-import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
-import static java.time.temporal.ChronoField.YEAR;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.Base64;
 import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -67,13 +61,25 @@ public class LegReferenceSerializer {
 
       var type = readEnum(in, LegReferenceType.class);
       return type.getDeserializer().read(in);
-    } catch (IOException | ParseException e) {
+    } catch (IOException e) {
       LOG.error("Unable to decode leg reference: '" + legReference + "'", e);
       return null;
     }
   }
 
-  static void writeScheduledTransitLeg(LegReference ref, ObjectOutputStream out)
+  static void writeScheduledTransitLegV1(LegReference ref, ObjectOutputStream out)
+    throws IOException {
+    if (ref instanceof ScheduledTransitLegReference s) {
+      out.writeUTF(s.tripId().toString());
+      out.writeUTF(s.serviceDate().toString());
+      out.writeInt(s.fromStopPositionInPattern());
+      out.writeInt(s.toStopPositionInPattern());
+    } else {
+      throw new IllegalArgumentException("Invalid LegReference type");
+    }
+  }
+
+  static void writeScheduledTransitLegV2(LegReference ref, ObjectOutputStream out)
     throws IOException {
     if (ref instanceof ScheduledTransitLegReference s) {
       out.writeUTF(s.tripId().toString());
@@ -87,21 +93,27 @@ public class LegReferenceSerializer {
     }
   }
 
-  /**
-   * Deserialize a leg reference.
-   * To remain backward-compatible, additional fields (stopId) are read optionally.
-   * TODO: Remove backward-compatible logic after OTP release 2.5
-   *
-   */
-  static LegReference readScheduledTransitLeg(ObjectInputStream objectInputStream)
+  static LegReference readScheduledTransitLegV1(ObjectInputStream objectInputStream)
     throws IOException {
     return new ScheduledTransitLegReference(
       FeedScopedId.parse(objectInputStream.readUTF()),
       LocalDate.parse(objectInputStream.readUTF(), DateTimeFormatter.ISO_LOCAL_DATE),
       objectInputStream.readInt(),
       objectInputStream.readInt(),
-      objectInputStream.available() > 0 ? FeedScopedId.parse(objectInputStream.readUTF()) : null,
-      objectInputStream.available() > 0 ? FeedScopedId.parse(objectInputStream.readUTF()) : null
+      null,
+      null
+    );
+  }
+
+  static LegReference readScheduledTransitLegV2(ObjectInputStream objectInputStream)
+    throws IOException {
+    return new ScheduledTransitLegReference(
+      FeedScopedId.parse(objectInputStream.readUTF()),
+      LocalDate.parse(objectInputStream.readUTF(), DateTimeFormatter.ISO_LOCAL_DATE),
+      objectInputStream.readInt(),
+      objectInputStream.readInt(),
+      FeedScopedId.parse(objectInputStream.readUTF()),
+      FeedScopedId.parse(objectInputStream.readUTF())
     );
   }
 
