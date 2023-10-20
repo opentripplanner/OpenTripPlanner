@@ -1466,13 +1466,13 @@ input InputPlanStreetModes {
     Street mode that is used when searching for access to transit network from origin.
     Selection of only one allowed for now.
     """
-    access: [PlanAccessEgressMode!]
+    access: [PlanAccessMode!]
 
     """
     Street mode that is used when searching for egress to destination from transit network.
     Selection of only one allowed for now.
     """
-    egress: [PlanAccessEgressMode!]
+    egress: [PlanEgressMode!]
 
     """
     Street mode that is used when searching for transfers.
@@ -2417,21 +2417,21 @@ type PageInfo {
 }
 
 """
-Street modes that can be used for access to transit network or for
-egress from transit network to destination.
+Street modes that can be used for access to transit network from origin.
 """
-enum PlanAccessEgressMode {
+enum PlanAccessMode {
     """
-    Cycling to or from a stop and boarding a vehicle with the bicycle.
+    Cycling to a stop and boarding a vehicle with the bicycle.
     Note, this can include walking when it's needed to walk the bicycle.
-    Access and egress can use cycling only if the mode used for transfers
-    is also cycling.
+    Access can use cycling only if the mode used for transfers
+    and egress is also `BICYCLE`.
     """
     BICYCLE
 
     """
     Bicycle rental can use either station based systems or "floating"
-    vehicles which are not linked to a rental station. Note, this
+    vehicles which are not linked to a rental station. Note, if there are no
+    rental options available, access will include only walking. Also, this
     can include walking before picking up or after dropping off the
     bicycle or when it's needed to walk the bicycle.
     """
@@ -2446,7 +2446,8 @@ enum PlanAccessEgressMode {
 
     """
     Car rental can use either station based systems or "floating"
-    vehicles which are not linked to a rental station. Note, this
+    vehicles which are not linked to a rental station. Note, if there are no
+    rental options available, access will include only walking. Also, this
     can include walking before picking up or after dropping off the
     car.
     """
@@ -2457,12 +2458,6 @@ enum PlanAccessEgressMode {
     Note, this can include walking after parking the car.
     """
     CAR_PARKING
-
-    """
-    Getting picked up by a car from a location that is accessible with a car.
-    Note, this can include walking before the pickup.
-    """
-    CAR_PICKUP
 
     """
     Getting dropped off by a car to a location that is accessible with a car.
@@ -2478,25 +2473,30 @@ enum PlanAccessEgressMode {
     FLEX
 
     """
-    Riding a scooter to or from a stop and boarding a vehicle with the scooter.
-    Note, this can include walking when it's needed to walk the scooter.
+    Riding a scooter to a stop and boarding a vehicle with the scooter.
+    Note, this can include walking when it's needed to walk the scooter. Access
+    can use scooter only if the mode used for transfers and egress is also `SCOOTER`.
     """
     SCOOTER
 
     """
     Scooter rental can use either station based systems or "floating"
-    vehicles which are not linked to a rental station. Note, this
+    vehicles which are not linked to a rental station. Note, if there are no
+    rental options available, access will include only walking. Also, this
     can include walking before picking up or after dropping off the
     scooter or when it's needed to walk the scooter.
     """
     SCOOTER_RENTAL
 
     """
-    Walking to or from a stop.
+    Walking to a stop.
     """
     WALK
 }
 
+"""
+Street mode that is used when searching for itineraries that don't use any transit.
+"""
 enum PlanDirectMode {
     """
     Cycling from the origin to the destination. Note, this can include walking
@@ -2506,8 +2506,9 @@ enum PlanDirectMode {
 
     """
     Bicycle rental can use either station based systems or "floating"
-    vehicles which are not linked to a rental station. Note, this
-    can include walking before picking up or after dropping off the
+    vehicles which are not linked to a rental station. Note, if there are no
+    rental options available, itinerary will include only walking.
+    Also, it can include walking before picking up or after dropping off the
     bicycle or when it's needed to walk the bicycle.
     """
     BICYCLE_RENTAL
@@ -2526,7 +2527,8 @@ enum PlanDirectMode {
 
     """
     Car rental can use either station based systems or "floating"
-    vehicles which are not linked to a rental station. Note, this
+    vehicles which are not linked to a rental station. Note, if there are no
+    rental options available, itinerary will include only walking. Also, this
     can include walking before picking up or after dropping off the
     car.
     """
@@ -2553,7 +2555,8 @@ enum PlanDirectMode {
 
     """
     Scooter rental can use either station based systems or "floating"
-    vehicles which are not linked to a rental station. Note, this
+    vehicles which are not linked to a rental station. Note, if there are no
+    rental options available, itinerary will include only walking. Also, this
     can include walking before picking up or after dropping off the
     scooter or when it's needed to walk the scooter.
     """
@@ -2562,6 +2565,70 @@ enum PlanDirectMode {
     """
     Walking from the origin to the destination. Note, this can include walking
     when it's needed to walk the bicycle.
+    """
+    WALK
+}
+
+"""
+Street modes that can be used for egress from transit network to destination.
+"""
+enum PlanEgressMode {
+    """
+    Cycling from a stop to the destination. Note, this can include walking when
+    it's needed to walk the bicycle. Egress can use cycling only if the mode used
+    for access and transfers is also `BICYCLE`.
+    """
+    BICYCLE
+
+    """
+    Bicycle rental can use either station based systems or "floating"
+    vehicles which are not linked to a rental station. Note, if there are no
+    rental options available, egress will include only walking. Also, this
+    can include walking before picking up or after dropping off the
+    bicycle or when it's needed to walk the bicycle.
+    """
+    BICYCLE_RENTAL
+
+    """
+    Car rental can use either station based systems or "floating"
+    vehicles which are not linked to a rental station. Note, if there are no
+    rental options available, egress will include only walking. Also, this
+    can include walking before picking up or after dropping off the
+    car.
+    """
+    CAR_RENTAL
+
+    """
+    Getting picked up by a car from a location that is accessible with a car.
+    Note, this can include walking before the pickup.
+    """
+    CAR_PICKUP
+
+    """
+    Flexible transit. This can include different forms of flexible transit that
+    can be defined in GTFS-Flex or in Netex. Note, this can include walking before
+    or after the flexible transit leg.
+    """
+    FLEX
+
+    """
+    Riding a scooter from a stop to the destination. Note, this can include walking
+    when it's needed to walk the scooter. Egress can use scooter only if the mode
+    used for transfers and egress is also `SCOOTER`.
+    """
+    SCOOTER
+
+    """
+    Scooter rental can use either station based systems or "floating"
+    vehicles which are not linked to a rental station. Note, if there are no
+    rental options available, egress will include only walking. Also, this
+    can include walking before picking up or after dropping off the
+    scooter or when it's needed to walk the scooter.
+    """
+    SCOOTER_RENTAL
+
+    """
+    Walking from a stop to the destination.
     """
     WALK
 }
