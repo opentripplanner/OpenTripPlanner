@@ -1407,10 +1407,26 @@ input InputPlanDebugSettings {
 }
 
 """
-Plan location settings. Either coordinates or a stop should be defined. Label is optional
-and can be used together with the other fields.
+Plan location settings. Location must be set. Label is optional
+and used for naming the location.
 """
-input InputPlanLocation {
+input InputPlanLabeledLocation {
+    """
+    A location that has to be used in an itinerary.
+    """
+    location: InputPlanLocation!
+
+    """
+    A label that can be attached to the location. This label is then returned with the location
+    in the itineraries.
+    """
+    label: String
+}
+
+"""
+Plan location. Either coordinates or a stop should be defined.
+"""
+input InputPlanLocation @oneOf {
     """
     Coordinates of the location. Note, either coordinates or a stop should be defined.
     """
@@ -1422,12 +1438,6 @@ input InputPlanLocation {
     be defined.
     """
     stop: FeedScopedId
-
-    """
-    A label that can be attached to the location. This label is then returned with the location
-    in the itineraries.
-    """
-    label: String
 }
 
 """
@@ -4120,12 +4130,12 @@ type QueryType {
         """
         The origin where the search starts. Usually coordinates but can also a be a stop.
         """
-        origin: InputPlanLocation
+        origin: InputPlanLabeledLocation
 
         """
         The destination where the search ends. Usually coordinates but can also a be a stop.
         """
-        destination: InputPlanLocation
+        destination: InputPlanLabeledLocation
 
         """
         Preferences that affect what itineraries are returned. Preferences are split into categories.
