@@ -1603,6 +1603,26 @@ input InputUnpreferred {
     useUnpreferredRoutesPenalty: Int @deprecated(reason: "Use unpreferredCost instead")
 }
 
+"""
+Unpreferred entities and an extra cost attached to using them in routing.
+"""
+input InputPlanUnpreferred {
+    """List of feedscoped route IDs unpreferred by the user."""
+    routes: [FeedScopedId!]
+
+    """List of feedscoped agency IDs unpreferred by the user."""
+    agencies: [FeedScopedId!]
+
+    """
+    An cost function used to calculate penalty for an unpreferred route/agency. Function should return
+    number of seconds that we are willing to wait for unpreferred route/agency.
+    String must be of the format:
+    `A + B x`, where A is fixed penalty and B is a multiplier of transit leg travel time x.
+    For example: `600 + 2.0 x`
+    """
+    unpreferredCost: CostFunction
+}
+
 enum RoutingErrorCode {
     """
     No transit connection was found between the origin and destination within the operating day or
@@ -4902,8 +4922,10 @@ input InputTransitModePreferences {
 Transit routing preferences used for transit legs.
 """
 input InputTransitPreferences {
-    """TODO should we reuse this or make a new design"""
-    unpreferred: InputUnpreferred
+    """
+    Unprefer routes or agencies by giving them extra cost.
+    """
+    unpreferred: InputPlanUnpreferred
 
     """
     Preferences related to boarding a transit vehicle. Note, board costs for each street mode
