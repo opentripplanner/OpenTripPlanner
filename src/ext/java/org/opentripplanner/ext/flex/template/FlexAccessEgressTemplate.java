@@ -27,6 +27,12 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
+/**
+ * A container for a few pieces of information that can be used to calculate flex accesses, egresses,
+ * direct flex itineraries or polylines.
+ * <p>
+ * Please also see Flex.svg for an illustration of how the flex concepts relate to each other.
+ */
 public abstract class FlexAccessEgressTemplate {
 
   /**
