@@ -1332,7 +1332,7 @@ input InputPreferred {
 }
 
 """
-TODO add documentation.
+Locale in string format. For example, `en` or `en-US`.
 """
 scalar Locale
 
