@@ -7,6 +7,7 @@ import static org.opentripplanner.routing.algorithm.transferoptimization.service
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
@@ -273,6 +274,61 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     assertEquals(
       "ConstrainedTransfer{from: TripTP{F:BUS T1:10:02, stopPos 2}, to: TripTP{F:BUS T2:10:13, stopPos 1}, constraint: {guaranteed}}",
       it.accessLeg().nextLeg().asTransitLeg().getConstrainedTransferAfterLeg().toString()
+    );
+  }
+
+  /**
+   * <pre>
+   * DEPARTURE TIMES
+   * Stop        A      B      C      D
+   * Trip 1    10:10  10:10  10:15
+   * Trip 2           10:13  10:13  10:30
+   * </pre>
+   * Case: A trip may have the exact same times for more than one stop. This is a regression test
+   *       see https://github.com/opentripplanner/OpenTripPlanner/issues/5444.
+   *       The following transfers are exist: A-B, A-C, B-B, B-C, C-B and C-C.
+   * Expect: Transfer B-B, the earliest transfer with the lowest transfer time and cost.
+   */
+  @Test
+  public void testSameStopTimesInPattern() {
+    // Given
+    var trip1 = TestTripSchedule
+      .schedule()
+      .pattern("T1", STOP_A, STOP_B, STOP_C)
+      .times("10:10 10:10 10:15")
+      .build();
+
+    var trip2 = TestTripSchedule
+      .schedule()
+      .pattern("T2", STOP_B, STOP_C, STOP_D)
+      .times("10:13 10:13 10:30")
+      .build();
+
+    var transfers = dummyTransferGenerator(
+      List.of(
+        tx(trip1, STOP_A, trip2, STOP_B).walk(D10s).build(),
+        tx(trip1, STOP_A, trip2, STOP_C).walk(D10s).build(),
+        tx(trip1, STOP_B, trip2).build(),
+        tx(trip1, STOP_B, trip2, STOP_C).walk(D10s).build(),
+        tx(trip1, STOP_C, trip2, STOP_B).walk(D10s).build(),
+        tx(trip1, STOP_C, trip2).build()
+      )
+    );
+
+    var original = pathBuilder()
+      .access(ITERATION_START_TIME, STOP_A)
+      .bus(trip1, STOP_B)
+      .bus(trip2, STOP_D)
+      .egress(D0s);
+
+    var subject = subject(transfers, null);
+
+    // Find the path with the lowest cost
+    var result = subject.findBestTransitPath(original);
+
+    assertEquals(
+      "A ~ BUS T1 10:10 10:10 ~ B ~ BUS T2 10:13 10:30 ~ D [10:09:20 10:30:20 21m 1tx $1300 $33pri]",
+      result.stream().map(it -> it.toString(this::stopIndexToName)).collect(Collectors.joining())
     );
   }
 

@@ -106,7 +106,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     List<TransitPathLeg<T>> transitLegs = originalPath.transitLegs().collect(Collectors.toList());
 
     // Find all possible transfers between each pair of transit legs, and sort on arrival time
-    var possibleTransfers = sortTransfersOnArrivalTimeInDecOrder(
+    var possibleTransfers = sortTransfersOnArrivalStopPosInDecOrder(
       transferGenerator.findAllPossibleTransfers(transitLegs)
     );
 
@@ -242,7 +242,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
     return tail.mutate().addTransitAndTransferLeg(originalLeg, tx);
   }
 
-  private List<List<TripToTripTransfer<T>>> sortTransfersOnArrivalTimeInDecOrder(
+  private List<List<TripToTripTransfer<T>>> sortTransfersOnArrivalStopPosInDecOrder(
     List<List<TripToTripTransfer<T>>> transfers
   ) {
     return transfers
@@ -250,7 +250,7 @@ public class OptimizePathDomainService<T extends RaptorTripSchedule> {
       .map(it ->
         it
           .stream()
-          .sorted(Comparator.comparingInt(l -> -l.to().time()))
+          .sorted(Comparator.comparingInt(l -> -l.to().stopPosition()))
           .collect(Collectors.toList())
       )
       .collect(Collectors.toList());
