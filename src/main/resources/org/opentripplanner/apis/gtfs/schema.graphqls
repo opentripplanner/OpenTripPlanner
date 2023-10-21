@@ -16,11 +16,11 @@ schema {
 Plan accessibilty preferences. This can be expanded to contain preferences for various accessibility use cases
 in the future. Currently only generic wheelchair preferences are available.
 """
-input InputAccessibilityPreferences {
+input AccessibilityPreferencesInput {
     """
     Wheelchair related preferences. Note, currently this is the only accessibility mode that is available.
     """
-    wheelchair: InputWheelchairPreferences
+    wheelchair: WheelchairPreferencesInput
 }
 
 """A public transport agency"""
@@ -287,7 +287,7 @@ enum AlertSeverityLevelType {
 """
 Preferences related to alighting from a transit vehicle.
 """
-input InputAlightPreferences {
+input AlightPreferencesInput {
     """
     What is the required minimum time alighting from a vehicle.
     Invariant: `board slack + alight slack <= transfer minimum total slack`
@@ -783,7 +783,7 @@ enum BikesAllowed {
 """
 Preferences related to travel with a bicycle.
 """
-input InputBicyclePreferences {
+input BicyclePreferencesInput {
     """
     A multiplier for how bad cycling is compared to being in transit for equal lengths of time.
     """
@@ -792,7 +792,7 @@ input InputBicyclePreferences {
     """
     Walking preferences when walking a bicycle.
     """
-    bicycleWalking: InputVehicleWalkPreferences
+    bicycleWalking: VehicleWalkPreferencesInput
 
     """
     Maximum speed on flat ground while riding a scooter. Note, this speed is higher than
@@ -804,7 +804,7 @@ input InputBicyclePreferences {
     """
     What criteria should be used when optimizing a cycling route.
     """
-    optimize: InputCyclingOptimizationCriteria
+    optimize: CyclingOptimizationCriteriaInput
 
     """
     Cost of boarding a vehicle with a bicycle.
@@ -816,7 +816,7 @@ input InputBicyclePreferences {
 Preferences related to boarding a transit vehicle. Note, board costs for each street mode
 can be found under the street mode preferences.
 """
-input InputBoardPreferences {
+input BoardPreferencesInput {
     """
     A multiplier for how bad waiting at a stop is compared to being in transit for equal lengths of time.
     """
@@ -878,7 +878,7 @@ type CarPark implements Node & PlaceInterface {
 """
 Preferences related to traveling on a car (excluding car travel on transit services such as taxi).
 """
-input InputCarPreferences {
+input CarPreferencesInput {
     """
     A multiplier for how bad travelling on car is compared to being in transit for equal lengths of time.
     """
@@ -942,7 +942,7 @@ type Coordinates {
 """
 Plan date time options. Only one of the values should be defined.
 """
-input InputPlanDateTime @oneOf {
+input PlanDateTimeInput @oneOf {
     """
     Earliest departure date time. The returned itineraries should not
     depart before this instant unless one is using paging to find earlier
@@ -963,7 +963,7 @@ input InputPlanDateTime @oneOf {
 """
 Search window for the plan search.
 """
-input InputSearchWindow {
+input SearchWindowInput {
     """
     Duration of the search window. This either starts at the defined earliest departure
     time or ends at the latest arrival time. If this is not provided, a reasonable
@@ -988,7 +988,7 @@ input InputSearchWindow {
     departure time or after the defined latest arrival time) for some which some itineraries can
     be returned.
     """
-    gracePeriod: InputSearchWindowGracePeriod @deprecated(reason: "Not yet implemented.")
+    gracePeriod: SearchWindowGracePeriodInput @deprecated(reason: "Not yet implemented.")
 }
 
 """
@@ -996,7 +996,7 @@ Defines a grace period outside of the normal search window (either before the de
 departure time or after the defined latest arrival time) for some which some itineraries can
 be returned.
 """
-input InputSearchWindowGracePeriod {
+input SearchWindowGracePeriodInput {
     """
     Duration of the grace period. Either ending when the normal search window starts if earliest
     departure time is defined, or after the latest arrival time.
@@ -1190,7 +1190,7 @@ type StopGeometries {
 """
 A coordinate pair used for a location in a plan query.
 """
-input InputPlanCoordinates {
+input PlanCoordinatesInput {
     """
     Latitude as a WGS 84 format number.
     """
@@ -1392,7 +1392,7 @@ input ParkingFilter {
 """
 Settings related to debugging why certain itineraries are returned.
 """
-input InputPlanDebugSettings {
+input PlanDebugSettingsInput {
     """
     Itinerary filter debug profile used to control the behaviour of itinerary filters.
     """
@@ -1403,11 +1403,11 @@ input InputPlanDebugSettings {
 Plan location settings. Location must be set. Label is optional
 and used for naming the location.
 """
-input InputPlanLabeledLocation {
+input PlanLabeledLocationInput {
     """
     A location that has to be used in an itinerary.
     """
-    location: InputPlanLocation!
+    location: PlanLocationInput!
 
     """
     A label that can be attached to the location. This label is then returned with the location
@@ -1419,11 +1419,11 @@ input InputPlanLabeledLocation {
 """
 Plan location. Either coordinates or a stop should be defined.
 """
-input InputPlanLocation @oneOf {
+input PlanLocationInput @oneOf {
     """
     Coordinates of the location. Note, either coordinates or a stop should be defined.
     """
-    coordinates: InputPlanCoordinates
+    coordinates: PlanCoordinatesInput
 
     """
     Stop that should be used as a location for the search. The expected value is the stop's
@@ -1436,29 +1436,29 @@ input InputPlanLocation @oneOf {
 """
 Wrapper type for different types of preferences related to plan query.
 """
-input InputPlanPreferences {
+input PlanPreferencesInput {
     """
     Street routing preferences used for ingress, egress and transfers. These do not directly affect
     the transit legs but can change how preferable walking or cycling, for example, is compared to
     transit.
     """
-    street: InputPlanStreetPreferences
+    street: PlanStreetPreferencesInput
 
     """
     Transit routing preferences used for transit legs.
     """
-    transit: InputTransitPreferences
+    transit: TransitPreferencesInput
 
     """
     Accessibility preferences that affect both the street and transit routing.
     """
-    accessibility: InputAccessibilityPreferences
+    accessibility: AccessibilityPreferencesInput
 }
 
 """
 Street mode options for different phases of an itinerary.
 """
-input InputPlanStreetModes {
+input PlanStreetModesInput {
     """
     Street mode that is used when searching for itineraries that don't use any transit.
     Selection of only one allowed for now.
@@ -1489,38 +1489,38 @@ Street routing preferences used for ingress, egress and transfers. These do not 
 the transit legs but can change how preferable walking or cycling, for example, is compared to
 transit.
 """
-input InputPlanStreetPreferences {
+input PlanStreetPreferencesInput {
     """
     Which modes of travel can be used for street routing at different stages.
     """
-    modes: InputPlanStreetModes
+    modes: PlanStreetModesInput
 
     """
     Cycling related preferences.
     """
-    bicycle: InputBicyclePreferences
+    bicycle: BicyclePreferencesInput
 
     """
     Scooter (kick or electrical) related preferences.
     """
-    scooter: InputScooterPreferences
+    scooter: ScooterPreferencesInput
 
     """
     Car related preferences. These are not used for car travel as part of transit, such as
     taxi travel.
     """
-    car: InputCarPreferences
+    car: CarPreferencesInput
 
     """
     Walk related preferences. These are not used when walking a bicycle or a scooter as they
     have their own preferences.
     """
-    walk: InputWalkPreferences
+    walk: WalkPreferencesInput
 
     """
     Rental related preferences.
     """
-    rental: InputRentalPreferences
+    rental: RentalPreferencesInput
 
     """
     Parking related preferences.
@@ -1547,7 +1547,7 @@ input InputTriangle {
 Relative importances of optimization factors. Only effective for bicycling legs.
 Invariant: `cyclingSafety + flatness + time == 1`
 """
-input InputTriangleCyclingFactors {
+input TriangleCyclingFactorsInput {
     """
     Relative importance of cycling safety, but this factor can also include other
     concerns such as convenience and general cyclist preferences by taking into account
@@ -1566,7 +1566,7 @@ input InputTriangleCyclingFactors {
 Relative importances of optimization factors. Only effective for scooter legs.
 Invariant: `scooterSafety + flatness + time == 1`
 """
-input InputTriangleScooterFactors {
+input TriangleScooterFactorsInput {
     """
     Relative importance of scooter safety, but this factor can also include other
     concerns such as convenience and general scooter preferences by taking into account
@@ -1609,7 +1609,7 @@ input InputUnpreferred {
 """
 Unpreferred entities and an extra cost attached to using them in routing.
 """
-input InputPlanUnpreferred {
+input PlanUnpreferredInput {
     """List of feedscoped route IDs unpreferred by the user."""
     routes: [FeedScopedId!]
 
@@ -2873,7 +2873,7 @@ type BookingInfo {
 """
 What criteria should be used when optimizing a cycling route.
 """
-input InputCyclingOptimizationCriteria @oneOf {
+input CyclingOptimizationCriteriaInput @oneOf {
     """
     Use one of the predefined optimization types.
     """
@@ -2882,7 +2882,7 @@ input InputCyclingOptimizationCriteria @oneOf {
     """
     Define optimization by weighing three criteria.
     """
-    triangle: InputTriangleCyclingFactors
+    triangle: TriangleCyclingFactorsInput
 }
 
 """
@@ -2922,7 +2922,7 @@ enum CyclingOptimizationType {
 """
 What criteria should be used when optimizing a scooter route.
 """
-input InputScooterOptimizationCriteria @oneOf {
+input ScooterOptimizationCriteriaInput @oneOf {
     """
     Use one of the predefined optimization types.
     """
@@ -2931,7 +2931,7 @@ input InputScooterOptimizationCriteria @oneOf {
     """
     Define optimization by weighing three criteria.
     """
-    triangle: InputTriangleScooterFactors
+    triangle: TriangleScooterFactorsInput
 }
 
 """
@@ -4113,32 +4113,32 @@ type QueryType {
         Datetime of the search. It's possible to either define the earliest departure time
         or the latest arrival time.
         """
-        dateTime: InputPlanDateTime
+        dateTime: PlanDateTimeInput
 
         """
         The search window(s) of the search. It also allows to limit how many itineraries are returned.
         """
-        searchWindow: InputSearchWindow
+        searchWindow: SearchWindowInput
 
         """
         The origin where the search starts. Usually coordinates but can also a be a stop.
         """
-        origin: InputPlanLabeledLocation
+        origin: PlanLabeledLocationInput
 
         """
         The destination where the search ends. Usually coordinates but can also a be a stop.
         """
-        destination: InputPlanLabeledLocation
+        destination: PlanLabeledLocationInput
 
         """
         Preferences that affect what itineraries are returned. Preferences are split into categories.
         """
-        preferences: InputPlanPreferences
+        preferences: PlanPreferencesInput
 
         """
         Settings meant for debugging purposes that control the search and the returned itineraries.
         """
-        debugSettings: InputPlanDebugSettings
+        debugSettings: PlanDebugSettingsInput
 
         """
         Locale used for translations. Note, there might not necessarily be translations available.
@@ -4219,7 +4219,7 @@ scalar Reluctance
 """
 Preferences related to rental (station based or floating vehicle rental).
 """
-input InputRentalPreferences {
+input RentalPreferencesInput {
     """
     Is it possible to arrive to the destination without dropping off the rental
     vehicle first.
@@ -4480,7 +4480,7 @@ enum OccupancyStatus {
 """
 Preferences related to travel with a scooter (kick or e-scooter).
 """
-input InputScooterPreferences {
+input ScooterPreferencesInput {
     """
     A multiplier for how bad riding a scooter is compared to being in transit
     for equal lengths of time.
@@ -4490,7 +4490,7 @@ input InputScooterPreferences {
     """
     Walking preferences when walking a scooter.
     """
-    scooterWalking: InputVehicleWalkPreferences
+    scooterWalking: VehicleWalkPreferencesInput
 
     """
     Maximum speed on flat ground while riding a scooter. Note, this speed is higher than
@@ -4502,7 +4502,7 @@ input InputScooterPreferences {
     """
     What criteria should be used when optimizing a scooter route.
     """
-    optimize: InputScooterOptimizationCriteria
+    optimize: ScooterOptimizationCriteriaInput
 
     """
     Cost of boarding a vehicle with a scooter.
@@ -4970,7 +4970,7 @@ type TicketType implements Node {
     zones: [String!]
 }
 
-input InputTimetablePreferences {
+input TimetablePreferencesInput {
     """
     When true, realtime updates are considered during the routing.
     In practice, when this option is set as false, some of the suggestions might not be
@@ -5001,7 +5001,7 @@ input InputTimetablePreferences {
 """
 Preferences related to transfers between transit vehicles (typically between stops).
 """
-input InputTransferPreferences {
+input TransferPreferencesInput {
     """
     A static cost that is added for each transfer on top of other costs.
     """
@@ -5032,7 +5032,7 @@ input InputTransferPreferences {
 """
 Transit mode and a reluctance associated with it.
 """
-input InputTransitModePreference {
+input TransitModePreferenceInput {
     """
     Transit mode that could be (but doesn't have to be) used in an itinerary.
     """
@@ -5051,39 +5051,39 @@ input InputTransitModePreference {
 """
 Transit routing preferences used for transit legs.
 """
-input InputTransitPreferences {
+input TransitPreferencesInput {
     """
     Unprefer routes or agencies by giving them extra cost.
     """
-    unpreferred: InputPlanUnpreferred
+    unpreferred: PlanUnpreferredInput
 
     """
     Preferences related to boarding a transit vehicle. Note, board costs for each street mode
     can be found under the street mode preferences.
     """
-    board: InputBoardPreferences
+    board: BoardPreferencesInput
 
     """
     Preferences related to alighting from a transit vehicle.
     """
-    alight: InputAlightPreferences
+    alight: AlightPreferencesInput
 
     """
     Preferences related to transfers between transit vehicles (typically between stops).
     """
-    transfer: InputTransferPreferences
+    transfer: TransferPreferencesInput
 
     """
     Preferences related to cancellations and realtime.
     """
-    timetable: InputTimetablePreferences
+    timetable: TimetablePreferencesInput
 
     """
     Transit modes and reluctancies associated with them. Each defined mode can be used in
     an itinerary but doesn't have to be. If a direct mode is set under street preferences,
     an itinerary without any transit modes can be returned.
     """
-    modes: [InputTransitModePreference!]!
+    modes: [TransitModePreferenceInput!]!
 }
 
 """Text with language"""
@@ -5316,7 +5316,7 @@ enum VertexType {
 """
 Preferences for walking a vehicle (scooter or bicycle).
 """
-input InputVehicleWalkPreferences {
+input VehicleWalkPreferencesInput {
     """
     Maximum walk speed on flat ground. Note, this speed is higher than the average speed
     will be in itineraries as this is the maximum speed but there are
@@ -5345,7 +5345,7 @@ input InputVehicleWalkPreferences {
 """
 Preferences related to walking (excluding walking a bicycle or a scooter).
 """
-input InputWalkPreferences {
+input WalkPreferencesInput {
     """
     Maximum walk speed on flat ground. Note, this speed is higher than the average speed
     will be in itineraries as this is the maximum speed but there are
@@ -5390,7 +5390,7 @@ enum WheelchairBoarding {
 Wheelchair related preferences. Note, this is the only from of accessibilty available
 currently and is sometimes is used for other accessibility needs as well.
 """
-input InputWheelchairPreferences {
+input WheelchairPreferencesInput {
     """
     Is wheelchair accessibility considered in routing. Note, this does not guarantee
     that the itineraries are wheelchair accessible as there can be data issues.
