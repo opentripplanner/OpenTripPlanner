@@ -3176,7 +3176,7 @@ type PlanConnection {
     """
     Origin and destination of the search.
     """
-    locations: PlanPlaces
+    locations: PlanPlaces!
 
     """
     Errors faced during the routing search.
