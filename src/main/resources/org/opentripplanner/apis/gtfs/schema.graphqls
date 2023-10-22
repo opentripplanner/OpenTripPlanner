@@ -823,7 +823,7 @@ input BoardPreferencesInput {
     waitReluctance: Reluctance
 
     """
-    What is the required minimum waiting time at a stop. Setting this value as `0s`, for example, can lead
+    What is the required minimum waiting time at a stop. Setting this value as `PT0S`, for example, can lead
     to passenger missing a connection when the vehicle leaves ahead of time or the passenger arrives to the
     stop later than expected.
     Invariant: `board slack + alight slack <= transfer minimum total slack`
@@ -5011,7 +5011,7 @@ input TransferPreferencesInput {
     A global minimum transfer time (in seconds) that specifies the minimum amount of time
     that must pass between exiting one transit vehicle and boarding another. This time is
     in addition to time it might take to walk between transit stops. Setting this value
-    as `0s`, for example, can lead to passenger missing a connection when the vehicle leaves
+    as `PT0S`, for example, can lead to passenger missing a connection when the vehicle leaves
     ahead of time or the passenger arrives to the stop later than expected.
     Invariant: `board slack + alight slack <= transfer minimum total slack`
     """
