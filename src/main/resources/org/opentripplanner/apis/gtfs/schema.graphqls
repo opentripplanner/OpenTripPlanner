@@ -927,7 +927,7 @@ on transit. Either `A` or `B x` can be omitted.
 scalar CostFunction
 
 """
-Either a latitude or a longitude coordinate as a WGS 84 format number.
+Either a latitude or a longitude coordinate as a WGS 84 format floating point number.
 """
 scalar Coordinate
 
@@ -961,17 +961,26 @@ input PlanDateTimeInput @oneOf {
 }
 
 """
-Search window for the plan search.
+Search window for the plan search. Search window duration limitation is done mainly for
+performance reasons. It can make sense to search for more itineraries that what is immediately
+needed if there is a possibility that more itineraries are used later on (limiting the number
+of returned itineraries does not affect the performance by a lot but can affect the network
+bandwidth usage).
 """
 input SearchWindowInput {
     """
     Duration of the search window. This either starts at the defined earliest departure
     time or ends at the latest arrival time. If this is not provided, a reasonable
-    search window is automatically generated. When search for earlier or later itineraries
+    search window is automatically generated. When searching for earlier or later itineraries
     with paging, this search window is no longer used and the new window will be based
     on how many suggestions were returned in the previous search. The new search window can be
     shorter or longer than the original search window. Note, itineraries are returned faster
     with a smaller search window.
+
+    Setting this parameter makes especially sense if the transportation network is as sparse or dense
+    in the whole area that can be searched for itineraries. Otherwise, letting the system decide what
+    is the search window is in combination of using paging can lead to better performance and to
+    getting a more consistent number of itineraries in each search.
     """
     duration: Duration
 
@@ -4111,7 +4120,7 @@ type QueryType {
     planConnection(
         """
         Datetime of the search. It's possible to either define the earliest departure time
-        or the latest arrival time.
+        or the latest arrival time. By default, earliest departure time is set as now.
         """
         dateTime: PlanDateTimeInput
 
