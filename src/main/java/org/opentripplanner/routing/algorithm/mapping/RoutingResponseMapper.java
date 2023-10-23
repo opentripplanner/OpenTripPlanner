@@ -111,12 +111,11 @@ public class RoutingResponseMapper {
       return factory;
     }
 
-    long t0 = transitSearchTimeZero.toEpochSecond();
-    var edt = Instant.ofEpochSecond(t0 + searchParams.earliestDepartureTime());
-    var lat = searchParams.isLatestArrivalTimeSet()
-      ? Instant.ofEpochSecond(t0 + searchParams.latestArrivalTime())
+    Instant edt = transitSearchTimeZero.plusSeconds(searchParams.earliestDepartureTime()).toInstant();
+    Instant lat = searchParams.isLatestArrivalTimeSet()
+      ? transitSearchTimeZero.plusSeconds(searchParams.latestArrivalTime()).toInstant()
       : null;
-    var searchWindow = Duration.ofSeconds(searchParams.searchWindowInSeconds());
+    Duration searchWindow = Duration.ofSeconds(searchParams.searchWindowInSeconds());
     factory = factory.withOriginalSearch(currentPageType, edt, lat, searchWindow);
 
     if (numItinerariesFilterResults != null) {
