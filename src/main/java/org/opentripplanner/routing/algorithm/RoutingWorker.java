@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -20,6 +19,7 @@ import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
@@ -65,7 +65,7 @@ public class RoutingWorker {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private SearchParams raptorSearchParamsUsed = null;
-  private Itinerary firstRemovedItinerary = null;
+  private NumItinerariesFilterResults numItinerariesFilterResults = null;
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
     request.applyPageCursor();
@@ -103,7 +103,7 @@ public class RoutingWorker {
     var routingErrors = Collections.synchronizedSet(new HashSet<RoutingError>());
 
     if (OTPFeature.ParallelRouting.isOn()) {
-      // TODO: This is not using {@link OtpRequestThreadFactory} witch mean we do not get
+      // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
       //       log-trace-parameters-propagation and graceful timeout handling here.
       try {
         CompletableFuture
@@ -139,7 +139,7 @@ public class RoutingWorker {
       filterOnLatestDepartureTime(),
       emptyDirectModeHandler.removeWalkAllTheWayResults() ||
       removeWalkAllTheWayResultsFromDirectFlex,
-      it -> firstRemovedItinerary = it
+      res -> numItinerariesFilterResults = res
     );
 
     List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
@@ -167,7 +167,7 @@ public class RoutingWorker {
       transitSearchTimeZero,
       raptorSearchParamsUsed,
       searchWindowNextSearch,
-      firstRemovedItinerary,
+      numItinerariesFilterResults,
       filteredItineraries,
       routingErrors,
       debugTimingAggregator,
@@ -276,11 +276,11 @@ public class RoutingWorker {
     var sw = Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
 
     // SearchWindow cropped -> decrease search-window
-    if (firstRemovedItinerary != null) {
+    if (numItinerariesFilterResults != null) {
       Instant swStartTime = searchStartTime()
         .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime());
       boolean cropSWHead = request.doCropSearchWindowAtTail();
-      Instant rmItineraryStartTime = firstRemovedItinerary.startTime().toInstant();
+      Instant rmItineraryStartTime = numItinerariesFilterResults.firstRemovedDepartureTime;
 
       return pagingSearchWindowAdjuster.decreaseSearchWindow(
         sw,

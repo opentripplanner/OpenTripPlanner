@@ -9,6 +9,7 @@ import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 
 public class PageCursorFactory {
 
@@ -18,8 +19,7 @@ public class PageCursorFactory {
   private SearchTime current = null;
   private Duration currentSearchWindow = null;
   private boolean wholeSwUsed = true;
-  private Instant removedItineraryStartTime = null;
-  private Instant removedItineraryEndTime = null;
+  private NumItinerariesFilterResults numItinerariesFilterResults = null;
 
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;
@@ -48,27 +48,18 @@ public class PageCursorFactory {
   }
 
   /**
-   * Set the start and end time for removed itineraries. The current implementation uses the FIRST
-   * removed itinerary, but this can in some cases lead to missed itineraries in the next search.
-   * So, we will document here what should be done.
-   * <p>
-   * For case {@code depart-after-crop-sw} and {@code arrive-by-crop-sw-reversed-filter} the {@code
-   * startTime} should be the EARLIEST departure time for all removed itineraries.
-   * <p>
-   * For case {@code depart-after-crop-sw-reversed-filter} and {@code arrive-by-crop-sw} the {@code
-   * startTime} should be the LATEST departure time for all removed itineraries.
-   * <p>
-   * The {@code endTime} should be replaced by removing duplicates between the to pages. This can
-   * for example be done by including a hash for each potential itinerary in the token, and make a
-   * filter to remove those in the following page response.
+   * If there were itineraries removed in the current search because the numItineraries parameter
+   * was used, then we want to allow the caller to move within some of the itineraries that were
+   * removed in the next and previous pages. This means we will use information from when we cropped
+   * the list of itineraries to create the new search encoded in the page cursors.
    *
-   * @param startTime is rounded down to the closest minute.
-   * @param endTime   is round up to the closest minute.
+   * @param numItinerariesFilterResults the result from the {@code NumItinerariesFilter}
    */
-  public PageCursorFactory withRemovedItineraries(Instant startTime, Instant endTime) {
+  public PageCursorFactory withRemovedItineraries(
+    NumItinerariesFilterResults numItinerariesFilterResults
+  ) {
     this.wholeSwUsed = false;
-    this.removedItineraryStartTime = startTime.truncatedTo(ChronoUnit.MINUTES);
-    this.removedItineraryEndTime = endTime.plusSeconds(59).truncatedTo(ChronoUnit.MINUTES);
+    this.numItinerariesFilterResults = numItinerariesFilterResults;
     return this;
   }
 
@@ -94,8 +85,7 @@ public class PageCursorFactory {
       .addDuration("currentSearchWindow", currentSearchWindow)
       .addDuration("newSearchWindow", newSearchWindow)
       .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
-      .addDateTime("removedItineraryStartTime", removedItineraryStartTime)
-      .addDateTime("removedItineraryEndTime", removedItineraryEndTime)
+      .addObj("numItinerariesFilterResults", numItinerariesFilterResults)
       .addObj("nextCursor", nextCursor)
       .addObj("prevCursor", prevCursor)
       .toString();
@@ -107,7 +97,7 @@ public class PageCursorFactory {
    * equivalent when creating new cursors.
    */
   private static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
-    return sortOrder.isSortedByArrivalTimeAcceding() ? NEXT_PAGE : PREVIOUS_PAGE;
+    return sortOrder.isSortedByArrivalTimeAscending() ? NEXT_PAGE : PREVIOUS_PAGE;
   }
 
   /** Create page cursor pair (next and previous) */
@@ -119,64 +109,41 @@ public class PageCursorFactory {
     SearchTime prev = new SearchTime(null, null);
     SearchTime next = new SearchTime(null, null);
 
-    // Depart after, sort on arrival time with the earliest first
-    if (sortOrder.isSortedByArrivalTimeAcceding()) {
-      if (currentPageType == NEXT_PAGE) {
-        prev.edt = calcPrevSwStartRelativeToUsedSw();
-        next.edt = wholeSwUsed ? calcNextSwStartRelativeToUsedSw() : removedItineraryStartTime;
-      }
-      // current page type == PREV_PAGE
-      else {
-        if (wholeSwUsed) {
-          prev.edt = calcPrevSwStartRelativeToUsedSw();
-        } else {
-          //TODO: The start time for the removed itinerary is not the best thing to use
-          //      here. We should take the LATEST start time of all removed itineraries
-          //      instead.
-          prev.edt = calcPrevSwStartRelativeToRmItinerary();
-          prev.lat = removedItineraryEndTime;
-        }
-        next.edt = calcNextSwStartRelativeToUsedSw();
-      }
-    }
-    // Arrive-by, sort on departure time with the latest first
-    else {
-      if (currentPageType == PREVIOUS_PAGE) {
-        if (wholeSwUsed) {
-          prev.edt = calcPrevSwStartRelativeToUsedSw();
-          prev.lat = current.lat;
-        } else {
-          prev.edt = calcPrevSwStartRelativeToRmItinerary();
-          // TODO: Replace this by hashing removed itineraries
-          prev.lat = removedItineraryEndTime;
-        }
-        next.edt = calcNextSwStartRelativeToUsedSw();
-      }
-      // Use normal sort and removal in ItineraryFilterChain
-      else {
-        prev.edt = calcPrevSwStartRelativeToUsedSw();
+    if (wholeSwUsed) {
+      prev.edt = edtBeforeNewSw();
+      next.edt = edtAfterUsedSw();
+      if (!sortOrder.isSortedByArrivalTimeAscending()) {
         prev.lat = current.lat;
-        next.edt = wholeSwUsed ? calcNextSwStartRelativeToUsedSw() : removedItineraryStartTime;
+      }
+    } else { // If the whole search window was not used (i.e. if there were removed itineraries)
+      if (currentPageType == NEXT_PAGE) {
+        prev.edt = edtBeforeNewSw();
+        next.edt = numItinerariesFilterResults.earliestRemovedDeparture;
+        if (sortOrder.isSortedByArrivalTimeAscending()) {
+          prev.lat =
+            numItinerariesFilterResults.earliestKeptArrival.truncatedTo(ChronoUnit.MINUTES);
+        } else {
+          prev.lat = current.lat;
+        }
+      } else {
+        // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
+        // search-window from the last time included in the search window we need to include one extra
+        // minute at the end.
+        prev.edt =
+          numItinerariesFilterResults.latestRemovedDeparture.minus(newSearchWindow).plusSeconds(60);
+        next.edt = edtAfterUsedSw();
+        prev.lat = numItinerariesFilterResults.latestRemovedArrival;
       }
     }
     prevCursor = new PageCursor(PREVIOUS_PAGE, sortOrder, prev.edt, prev.lat, newSearchWindow);
     nextCursor = new PageCursor(NEXT_PAGE, sortOrder, next.edt, next.lat, newSearchWindow);
   }
 
-  /**
-   * The search-window start and end is [inclusive, exclusive], so to calculate the start of the
-   * search-window from the last time included in the search window we need to include one extra
-   * minute at the end.
-   */
-  private Instant calcPrevSwStartRelativeToRmItinerary() {
-    return removedItineraryStartTime.minus(newSearchWindow).plusSeconds(60);
-  }
-
-  private Instant calcPrevSwStartRelativeToUsedSw() {
+  private Instant edtBeforeNewSw() {
     return current.edt.minus(newSearchWindow);
   }
 
-  private Instant calcNextSwStartRelativeToUsedSw() {
+  private Instant edtAfterUsedSw() {
     return current.edt.plus(currentSearchWindow);
   }
 
