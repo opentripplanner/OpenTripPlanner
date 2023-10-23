@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan.legreference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.time.LocalDate;
@@ -21,6 +22,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
@@ -32,6 +34,7 @@ class ScheduledTransitLegReferenceTest {
   private static final int SERVICE_CODE = 555;
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 1, 1);
   private static final int NUMBER_OF_STOPS = 3;
+  private static final FeedScopedId TRIP_ON_SERVICE_DATE_ID = id("TRIP_ON_SERVICE_DATE_ID");
   public static FeedScopedId stopIdAtPosition0;
   public static FeedScopedId stopIdAtPosition1;
 
@@ -82,6 +85,18 @@ class ScheduledTransitLegReferenceTest {
     CalendarServiceData calendarServiceData = new CalendarServiceData();
     calendarServiceData.putServiceDatesForServiceId(tripPattern.getId(), List.of(SERVICE_DATE));
     transitModel.updateCalendarServiceData(true, calendarServiceData, DataImportIssueStore.NOOP);
+
+    transitModel
+      .getTripOnServiceDates()
+      .put(
+        TRIP_ON_SERVICE_DATE_ID,
+        TripOnServiceDate
+          .of(TRIP_ON_SERVICE_DATE_ID)
+          .withTrip(trip)
+          .withServiceDate(SERVICE_DATE)
+          .build()
+      );
+
     transitModel.index();
 
     // build transit service
@@ -98,7 +113,8 @@ class ScheduledTransitLegReferenceTest {
       boardAtStopPos,
       alightAtStopPos,
       stopIdAtPosition0,
-      stopIdAtPosition1
+      stopIdAtPosition1,
+      null
     );
     ScheduledTransitLeg leg = scheduledTransitLegReference.getLeg(transitService);
     assertNotNull(leg);
@@ -116,7 +132,8 @@ class ScheduledTransitLegReferenceTest {
       0,
       1,
       stopIdAtPosition0,
-      stopIdAtPosition1
+      stopIdAtPosition1,
+      null
     );
     assertNull(scheduledTransitLegReference.getLeg(transitService));
   }
@@ -129,7 +146,8 @@ class ScheduledTransitLegReferenceTest {
       0,
       1,
       stopIdAtPosition0,
-      stopIdAtPosition1
+      stopIdAtPosition1,
+      null
     );
     assertNull(scheduledTransitLegReference.getLeg(transitService));
   }
@@ -142,7 +160,8 @@ class ScheduledTransitLegReferenceTest {
       NUMBER_OF_STOPS,
       1,
       stopIdAtPosition0,
-      stopIdAtPosition1
+      stopIdAtPosition1,
+      null
     );
     assertNull(scheduledTransitLegReference.getLeg(transitService));
   }
@@ -155,7 +174,8 @@ class ScheduledTransitLegReferenceTest {
       0,
       1,
       TransitModelForTest.id("invalid stop id"),
-      stopIdAtPosition1
+      stopIdAtPosition1,
+      null
     );
     assertNull(scheduledTransitLegReference.getLeg(transitService));
   }
@@ -170,7 +190,8 @@ class ScheduledTransitLegReferenceTest {
       0,
       2,
       stopIdAtPosition0,
-      stop4.getId()
+      stop4.getId(),
+      null
     );
     assertNotNull(scheduledTransitLegReference.getLeg(transitService));
   }
@@ -183,8 +204,71 @@ class ScheduledTransitLegReferenceTest {
       0,
       NUMBER_OF_STOPS,
       stopIdAtPosition0,
-      stopIdAtPosition1
+      stopIdAtPosition1,
+      null
     );
     assertNull(scheduledTransitLegReference.getLeg(transitService));
+  }
+
+  @Test
+  void legReferenceCannotReferToBothTripAndTripOnServiceDate() {
+    assertThrows(
+      IllegalArgumentException.class,
+      () ->
+        new ScheduledTransitLegReference(
+          tripId,
+          SERVICE_DATE,
+          0,
+          NUMBER_OF_STOPS,
+          stopIdAtPosition0,
+          stopIdAtPosition1,
+          TransitModelForTest.id("trip on date id")
+        )
+    );
+  }
+
+  @Test
+  void legReferenceCannotReferToInconsistentServiceDateAndTripOnServiceDate() {
+    ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
+      null,
+      SERVICE_DATE.plusDays(1),
+      0,
+      1,
+      stopIdAtPosition0,
+      stopIdAtPosition1,
+      TRIP_ON_SERVICE_DATE_ID
+    );
+    assertNull(scheduledTransitLegReference.getLeg(transitService));
+  }
+
+  @Test
+  void getLegFromReferenceWithUnknownTripOnDate() {
+    ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
+      null,
+      SERVICE_DATE,
+      0,
+      NUMBER_OF_STOPS,
+      stopIdAtPosition0,
+      stopIdAtPosition1,
+      TransitModelForTest.id("unknown trip on date id")
+    );
+    assertNull(scheduledTransitLegReference.getLeg(transitService));
+  }
+
+  @Test
+  void getLegFromReferenceWithValidTripOnDate() {
+    ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
+      null,
+      SERVICE_DATE,
+      0,
+      1,
+      stopIdAtPosition0,
+      stopIdAtPosition1,
+      TRIP_ON_SERVICE_DATE_ID
+    );
+    ScheduledTransitLeg leg = scheduledTransitLegReference.getLeg(transitService);
+    assertNotNull(leg);
+    assertEquals(tripId, leg.getTrip().getId());
+    assertEquals(SERVICE_DATE, leg.getServiceDate());
   }
 }
