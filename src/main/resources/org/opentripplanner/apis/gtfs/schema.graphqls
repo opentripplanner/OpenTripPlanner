@@ -1587,11 +1587,11 @@ input InputUnpreferred {
 Unpreferred entities and an extra cost attached to using them in routing.
 """
 input PlanUnpreferredInput {
-    """List of feedscoped route IDs unpreferred by the user."""
-    routes: [FeedScopedId!]
+    """List of feedscoped route IDs (format is `FeedId:RouteId`) unpreferred by the user."""
+    routes: [String!]
 
-    """List of feedscoped agency IDs unpreferred by the user."""
-    agencies: [FeedScopedId!]
+    """List of feedscoped agency IDs (format is `FeedId:AgencyId`) unpreferred by the user."""
+    agencies: [String!]
 
     """
     An cost function used to calculate penalty for an unpreferred route/agency. Function should return
@@ -1928,12 +1928,6 @@ scalar Duration
 String representation of a duration in seconds. Examples of the format: `300s`, `1s`, `2.5s`, `3.14s` or `15.233s`.
 """
 scalar DurationInSeconds
-
-"""
-Feedscoped ID. These follow the format of `feed:entityId`, The feedId should be unique system or a data set identifier
-and the entityId should be unique within that system or data set.
-"""
-scalar FeedScopedId
 
 type RideHailingProvider {
     "The ID of the ride hailing provider."
