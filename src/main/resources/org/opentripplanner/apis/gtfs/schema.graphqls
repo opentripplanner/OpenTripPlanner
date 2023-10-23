@@ -1368,20 +1368,24 @@ input PlanLabeledLocationInput {
 }
 
 """
-Plan location. Either coordinates or a stop should be defined.
+Plan location. Either coordinates or a stop location should be defined.
 """
 input PlanLocationInput @oneOf {
     """
-    Coordinates of the location. Note, either coordinates or a stop should be defined.
+    Coordinates of the location. Note, either coordinates or a stop location should be defined.
     """
     coordinates: PlanCoordinatesInput
 
     """
-    Stop that should be used as a location for the search. The expected value is the stop's
-    feedscoped GTFS ID, for example `feedId:stopId`. Note, either coordinates or a stop should
-    be defined.
+    Stop, station, a group of stop places or multimodal stop place that should be used as
+    a location for the search. The stop place can be used in two ways:
+    1. As a location where one should depart from or arrive to on transit depending on if
+       its used as an origin or a destination
+    2. As coordinates where the search can start or end but it's not required to use this stop
+       place for a direct transit connnection.
+    Note, either coordinates or a stop location should be defined.
     """
-    stop: FeedScopedId
+    stopLocation: PlanStopLocationInput
 }
 
 """
@@ -1404,6 +1408,28 @@ input PlanPreferencesInput {
     Accessibility preferences that affect both the street and transit routing.
     """
     accessibility: AccessibilityPreferencesInput
+}
+
+"""
+Stop, station, a group of stop places or multimodal stop place that should be used as
+a location for the search. The stop place can be used in two ways:
+1. As a location where one should depart from or arrive to on transit depending on if
+    its used as an origin or a destination
+2. As coordinates where the search can start or end but it's not required to use this stop
+    place for a direct transit connnection.
+"""
+input PlanStopLocationInput {
+    """
+    ID of the stop, station, a group of stop places or multimodal stop place. Format
+    should be `FeedId:StopLocationId`.
+    """
+    stopLocationId: String
+
+    """
+    If set as true, one must either board or alight from this stop location. Otherwise,
+    it's optional and alternatively one can just walk to or from this location.
+    """
+    transitConnectionRequired: Boolean
 }
 
 """
@@ -4093,12 +4119,12 @@ type QueryType {
         numberOfItineraries: Int
 
         """
-        The origin where the search starts. Usually coordinates but can also a be a stop.
+        The origin where the search starts. Usually coordinates but can also be a stop location.
         """
         origin: PlanLabeledLocationInput
 
         """
-        The destination where the search ends. Usually coordinates but can also a be a stop.
+        The destination where the search ends. Usually coordinates but can also be a stop location.
         """
         destination: PlanLabeledLocationInput
 
