@@ -949,7 +949,7 @@ input PlanDateTimeInput @oneOf {
     itineraries. Note, it is not currently possible to define both
     `earliestDeparture` and `latestArrival`.
     """
-    earliestDeparture: DateTimeWithOffset
+    earliestDeparture: OffsetDateTime
 
     """
     Latest arrival time date time. The returned itineraries should not
@@ -957,7 +957,7 @@ input PlanDateTimeInput @oneOf {
     paging to find later itineraries. Note, it is not currently possible
     to define both  `earliestDeparture` and `latestArrival`.
     """
-    latestArrival: DateTimeWithOffset
+    latestArrival: OffsetDateTime
 }
 
 """
@@ -1940,7 +1940,7 @@ type Money {
 """
 An ISO-8601-formatted datetime with offset, i.e. `2023-06-13T14:30+03:00` for 2:30pm on June 13th 2023 at Helsinki's offset from UTC at that time.
 """
-scalar DateTimeWithOffset
+scalar OffsetDateTime
 
 """
 An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
@@ -3171,7 +3171,7 @@ type PlanConnection {
     """
     What was the starting point for the itinerary search.
     """
-    searchDateTime: DateTimeWithOffset
+    searchDateTime: OffsetDateTime
 
     """
     Origin and destination of the search.
