@@ -55,7 +55,7 @@ public class GrizzlyServer {
    */
   public void run() {
     LOG.info(
-      "Starting OTP Grizzly server on ports {} of interface {}",
+      "Starting OTP Grizzly server on port {} of interface {}",
       params.port,
       params.bindAddress
     );
