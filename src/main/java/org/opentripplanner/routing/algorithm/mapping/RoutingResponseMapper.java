@@ -111,7 +111,9 @@ public class RoutingResponseMapper {
       return factory;
     }
 
-    Instant edt = transitSearchTimeZero.plusSeconds(searchParams.earliestDepartureTime()).toInstant();
+    Instant edt = transitSearchTimeZero
+      .plusSeconds(searchParams.earliestDepartureTime())
+      .toInstant();
     Instant lat = searchParams.isLatestArrivalTimeSet()
       ? transitSearchTimeZero.plusSeconds(searchParams.latestArrivalTime()).toInstant()
       : null;
