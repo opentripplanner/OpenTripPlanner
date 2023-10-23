@@ -137,7 +137,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
 
   private static <T> Set<T> toSet(List<T> list) {
     if (list == null) {
-      return null;
+      return Set.of();
     }
     return Set.copyOf(list);
   }
@@ -172,10 +172,9 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
 
   private void handleStop(RegularStop stop, double distance) {
     if (
-      filterByStops != null &&
-      !filterByStops.contains(stop.getId()) ||
+      (!filterByStops.isEmpty() && !filterByStops.contains(stop.getId())) ||
       seenStops.contains(stop.getStationOrStopId()) ||
-      !(filterByModes == null || stopHasPatternsWithMode(stop, filterByModes))
+      !(filterByModes.isEmpty() || stopHasPatternsWithMode(stop, filterByModes))
     ) {
       return;
     }
@@ -205,9 +204,9 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
       List<TripPattern> patterns = transitService
         .getPatternsForStop(stop)
         .stream()
-        .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.getMode()))
+        .filter(pattern -> filterByModes.isEmpty() || filterByModes.contains(pattern.getMode()))
         .filter(pattern ->
-          filterByRoutes == null || filterByRoutes.contains(pattern.getRoute().getId())
+          filterByRoutes.isEmpty() || filterByRoutes.contains(pattern.getRoute().getId())
         )
         .filter(pattern -> pattern.canBoard(stop))
         .toList();
@@ -228,7 +227,9 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     if (!includeVehicleRentals) {
       return;
     }
-    if (filterByVehicleRental != null && !filterByVehicleRental.contains(station.getStationId())) {
+    if (
+      !filterByVehicleRental.isEmpty() && !filterByVehicleRental.contains(station.getStationId())
+    ) {
       return;
     }
     if (seenVehicleRentalPlaces.contains(station.getId())) {
