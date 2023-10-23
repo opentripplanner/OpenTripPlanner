@@ -960,64 +960,6 @@ input PlanDateTimeInput @oneOf {
     latestArrival: OffsetDateTime
 }
 
-"""
-Search window for the plan search. Search window duration limitation is done mainly for
-performance reasons. It can make sense to search for more itineraries that what is immediately
-needed if there is a possibility that more itineraries are used later on (limiting the number
-of returned itineraries does not affect the performance by a lot but can affect the network
-bandwidth usage).
-"""
-input SearchWindowInput {
-    """
-    Duration of the search window. This either starts at the defined earliest departure
-    time or ends at the latest arrival time. If this is not provided, a reasonable
-    search window is automatically generated. When searching for earlier or later itineraries
-    with paging, this search window is no longer used and the new window will be based
-    on how many suggestions were returned in the previous search. The new search window can be
-    shorter or longer than the original search window. Note, itineraries are returned faster
-    with a smaller search window.
-
-    Setting this parameter makes especially sense if the transportation network is as sparse or dense
-    in the whole area that can be searched for itineraries. Otherwise, letting the system decide what
-    is the search window is in combination of using paging can lead to better performance and to
-    getting a more consistent number of itineraries in each search.
-    """
-    duration: Duration
-
-    """
-    Maximum number of itineraries that will be returned. It's possible that no itineraries are
-    found, paging for earlier or later itineraries can yield to results in that case. The returned
-    itineraries are either closest to the defined earliest departure time or to the latest arrival
-    time.
-    """
-    numberOfItineraries: Int
-
-    """
-    Defines a grace period outside of the normal search window (either before the defined earliest
-    departure time or after the defined latest arrival time) for some which some itineraries can
-    be returned.
-    """
-    gracePeriod: SearchWindowGracePeriodInput @deprecated(reason: "Not yet implemented.")
-}
-
-"""
-Defines a grace period outside of the normal search window (either before the defined earliest
-departure time or after the defined latest arrival time) for some which some itineraries can
-be returned.
-"""
-input SearchWindowGracePeriodInput {
-    """
-    Duration of the grace period. Either ending when the normal search window starts if earliest
-    departure time is defined, or after the latest arrival time.
-    """
-    duration: Duration
-
-    """
-    Number of itineraries that returned within the grace period.
-    """
-    numberOfItineraries: Int
-}
-
 type debugOutput {
     totalTime: Long
     pathCalculationTime: Long
@@ -4125,9 +4067,30 @@ type QueryType {
         dateTime: PlanDateTimeInput
 
         """
-        The search window(s) of the search. It also allows to limit how many itineraries are returned.
+        Duration of the search window. This either starts at the defined earliest departure
+        time or ends at the latest arrival time. If this is not provided, a reasonable
+        search window is automatically generated. When searching for earlier or later itineraries
+        with paging, this search window is no longer used and the new window will be based
+        on how many suggestions were returned in the previous search. The new search window can be
+        shorter or longer than the original search window. Note, itineraries are returned faster
+        with a smaller search window and search window limitation is done mainly for performance reasons.
+
+        Setting this parameter makes especially sense if the transportation network is as sparse or dense
+        in the whole itinerary search area. Otherwise, letting the system decide what is the search window
+        is in combination of using paging can lead to better performance and to getting a more consistent
+        number of itineraries in each search.
         """
-        searchWindow: SearchWindowInput
+        searchWindow: Duration
+
+        """
+        Maximum number of itineraries that will be returned. It's possible that no itineraries are
+        found, paging for earlier or later itineraries can yield to results in that case. The returned
+        itineraries are either closest to the defined earliest departure time or to the latest arrival
+        time. It can make sense to search for more itineraries that what is immediately needed if there
+        is a possibility that more itineraries are used later on (limiting the number of returned itineraries
+        does not affect the performance by a lot but can affect the network bandwidth usage).
+        """
+        numberOfItineraries: Int
 
         """
         The origin where the search starts. Usually coordinates but can also a be a stop.
