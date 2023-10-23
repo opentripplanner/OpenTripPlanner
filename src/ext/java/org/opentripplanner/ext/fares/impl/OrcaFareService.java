@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
-import org.opentripplanner.ext.ridehailing.model.Ride;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -203,18 +202,6 @@ public class OrcaFareService extends DefaultFareService {
   }
 
   /**
-   * Cleans a station name by removing spaces and special phrases.
-   */
-  private static String cleanStationName(String s) {
-    return s
-      .replaceAll(" ", "")
-      .replaceAll("(Northbound)", "")
-      .replaceAll("(Southbound)", "")
-      .replaceAll("Station", "")
-      .toLowerCase();
-  }
-
-  /**
    * Classify the ride type based on the route information provided. In most cases the agency name
    * is sufficient. In some cases the route description and short name are needed to define inner
    * agency ride types. For Kitsap, the route data is enough to define the agency, but addition trip
@@ -297,9 +284,6 @@ public class OrcaFareService extends DefaultFareService {
       case WASHINGTON_STATE_FERRIES -> Optional.of(
         getWashingtonStateFerriesFare(route.getLongName(), fareType, defaultFare)
       );
-      case SOUND_TRANSIT_LINK, SOUND_TRANSIT_SOUNDER -> Optional.of(
-        getSoundTransitFare(leg, defaultFare, rideType)
-      );
       case SOUND_TRANSIT_BUS -> optionalUSD(3.25f);
       case WHATCOM_LOCAL,
         WHATCOM_CROSS_COUNTY,
@@ -309,27 +293,6 @@ public class OrcaFareService extends DefaultFareService {
         : Optional.of(defaultFare);
       default -> Optional.of(defaultFare);
     };
-  }
-
-  /**
-   * Calculate the correct Link fare from a "ride" including start and end stations.
-   */
-  private Money getSoundTransitFare(Leg leg, Money defaultFare, RideType rideType) {
-    String start = cleanStationName(leg.getFrom().name.toString());
-    String end = cleanStationName(leg.getTo().name.toString());
-    // Fares are the same no matter the order of the stations
-    // Therefore, the fares DB only contains each station pair once
-    // If no match is found, try the reversed order
-    String lookupKey = String.format("%s-%s", start, end);
-    String reverseLookupKey = String.format("%s-%s", end, start);
-    Map<String, Map<FareType, Money>> fareModel = (rideType == RideType.SOUND_TRANSIT_LINK)
-      ? OrcaFaresData.linkFares
-      : OrcaFaresData.sounderFares;
-    Map<FareType, Money> fare = Optional
-      .ofNullable(fareModel.get(lookupKey))
-      .orElseGet(() -> fareModel.get(reverseLookupKey));
-
-    return (fare != null) ? fare.get(FareType.regular) : defaultFare;
   }
 
   /**
