@@ -118,7 +118,7 @@ class NetexEpipBundleSmokeTest {
     assertEquals(9.93422080466927, quay.getLon(), 0.000001);
     assertEquals("HH:DE::StopPlace:80026_Master::", quay.getParentStation().getId().toString());
     // Assert that quay duplicates are not overriding existing values
-    assertEquals(0, quay.getIndex());
+    assertEquals(2, quay.getIndex());
     assertNull(quay.getPlatformCode());
     assertEquals(31, stops.size());
   }

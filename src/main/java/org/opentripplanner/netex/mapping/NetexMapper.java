@@ -4,7 +4,9 @@ import com.google.common.collect.Multimap;
 import jakarta.xml.bind.JAXBElement;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -308,7 +310,11 @@ public class NetexMapper {
       issueStore,
       noTransfersOnIsolatedStops
     );
-    for (String stopPlaceId : currentNetexIndex.getStopPlaceById().localKeys()) {
+    ArrayList<String> sortedStopPlaceIds = new ArrayList<String>(
+      currentNetexIndex.getStopPlaceById().localKeys()
+    );
+    Collections.sort(sortedStopPlaceIds);
+    for (String stopPlaceId : sortedStopPlaceIds) {
       Collection<StopPlace> stopPlaceAllVersions = currentNetexIndex
         .getStopPlaceById()
         .lookup(stopPlaceId);

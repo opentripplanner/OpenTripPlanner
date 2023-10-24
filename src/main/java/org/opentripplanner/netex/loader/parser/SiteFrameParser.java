@@ -116,6 +116,11 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     }
   }
 
+  /*
+   * If it is a multimodal StopPlace with subordinate StopPlaces
+   *
+   * FIXME DELFI dataset does not have this Tag!
+   */
   private boolean isMultiModalStopPlace(StopPlace stopPlace) {
     return (
       stopPlace.getKeyList() != null &&
@@ -128,5 +133,12 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
           keyValueStructure.getValue().equals("true")
         )
     );
+  }
+
+  /*
+   * Is subordinate to a multi modal StopPlace
+   */
+  private boolean hasParentSiteRef(StopPlace stopPlace) {
+    return (stopPlace.getParentSiteRef() != null);
   }
 }
