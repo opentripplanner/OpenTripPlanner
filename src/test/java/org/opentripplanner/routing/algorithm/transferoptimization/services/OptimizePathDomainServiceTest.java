@@ -286,7 +286,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
    * </pre>
    * Case: A trip may have the exact same times for more than one stop. This is a regression test
    *       see https://github.com/opentripplanner/OpenTripPlanner/issues/5444.
-   *       The following transfers are exist: A-B, A-C, B-B, B-C, C-B and C-C.
+   *       The following transfers exist: A-B, A-C, B-B, B-C, C-B and C-C.
    * Expect: Transfer B-B, the earliest transfer with the lowest transfer time and cost.
    */
   @Test
