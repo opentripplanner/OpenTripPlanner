@@ -13,7 +13,7 @@ public interface OtpArchitectureModules {
   Package GOOGLE_COLLECTIONS = Package.of("com.google.common.collect");
   Package JACKSON_ANNOTATIONS = Package.of("com.fasterxml.jackson.annotation");
   Package JTS_GEOM = Package.of("org.locationtech.jts.(*)..");
-  Package OPEN_GIS = Package.of("org.opengis..");
+  Package OPEN_GIS = Package.of("org.geotools.api..");
 
   /* OTP Modules */
 

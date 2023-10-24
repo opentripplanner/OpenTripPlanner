@@ -40,7 +40,7 @@ import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
@@ -123,7 +123,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           Metrics.globalRegistry,
           RouterConfig.DEFAULT.vectorTileLayers(),
           new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository()),
-          new DefaultVehiclePositionService(),
+          new DefaultRealtimeVehicleService(transitService),
           new DefaultVehicleRentalService(),
           RouterConfig.DEFAULT.flexConfig(),
           List.of(),

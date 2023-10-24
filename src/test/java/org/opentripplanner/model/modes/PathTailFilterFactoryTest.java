@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
-class FilterFactoryTest {
+class PathTailFilterFactoryTest {
 
   private static final SubMode LOCAL_BUS = SubMode.getOrBuildAndCacheForever("localBus");
   private static final SubMode EXPRESS_BUS = SubMode.getOrBuildAndCacheForever("expressBus");

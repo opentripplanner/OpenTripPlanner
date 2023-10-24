@@ -291,7 +291,9 @@
       "frequency": "1m",
       "headers": {
         "Header-Name": "Header-Value"
-      }
+      },
+      "fuzzyTripMatching": false,
+      "features": ["position"]
     },
     // Streaming differential GTFS-RT TripUpdates over websockets
     {

@@ -2,6 +2,9 @@ package org.opentripplanner.updater.vehicle_position;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY;
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION;
+import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.stopTime;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
@@ -24,7 +27,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
@@ -32,20 +36,36 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
-public class VehiclePositionsMatcherTest {
+public class RealtimeVehicleMatcherTest {
 
-  public static final Route ROUTE = TransitModelForTest.route("1").build();
+  private static final Route ROUTE = TransitModelForTest.route("1").build();
+  private static final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> FEATURES = Set.of(
+    POSITION,
+    STOP_POSITION,
+    OCCUPANCY
+  );
   ZoneId zoneId = ZoneIds.BERLIN;
   String tripId = "trip1";
   FeedScopedId scopedTripId = TransitModelForTest.id(tripId);
 
   @Test
-  public void matchRealtimePositionsToTrip() {
+  public void matchRealtimeVehiclesToTrip() {
     var pos = vehiclePosition(tripId);
     testVehiclePositions(pos);
+  }
+
+  @Test
+  public void testOccupancy() {
+    var pos = vehiclePosition(tripId);
+    var posWithOccupancy = pos
+      .toBuilder()
+      .setOccupancyStatus(VehiclePosition.OccupancyStatus.FEW_SEATS_AVAILABLE)
+      .build();
+    testVehiclePositionOccupancy(posWithOccupancy);
   }
 
   @Test
@@ -64,7 +84,7 @@ public class VehiclePositionsMatcherTest {
 
   @Test
   public void tripNotFoundInPattern() {
-    var service = new DefaultVehiclePositionService();
+    var service = new DefaultRealtimeVehicleService(null);
 
     final String secondTripId = "trip2";
 
@@ -75,17 +95,19 @@ public class VehiclePositionsMatcherTest {
     var pattern = tripPattern(trip1, stopTimes);
 
     // Map positions to trips in feed
-    VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
+    RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
       TransitModelForTest.FEED_ID,
       ignored -> trip2,
       ignored -> pattern,
       (id, time) -> pattern,
       service,
-      zoneId
+      zoneId,
+      null,
+      FEATURES
     );
 
     var positions = List.of(vehiclePosition(secondTripId));
-    var result = matcher.applyVehiclePositionUpdates(positions);
+    var result = matcher.applyRealtimeVehicleUpdates(positions);
 
     assertEquals(1, result.failed());
     assertEquals(Set.of(TRIP_NOT_FOUND_IN_PATTERN), result.failures().keySet());
@@ -93,7 +115,7 @@ public class VehiclePositionsMatcherTest {
 
   @Test
   public void sequenceId() {
-    var service = new DefaultVehiclePositionService();
+    var service = new DefaultRealtimeVehicleService(null);
 
     var tripId = "trip1";
     var scopedTripId = TransitModelForTest.id(tripId);
@@ -106,13 +128,15 @@ public class VehiclePositionsMatcherTest {
     var patternForTrip = Map.of(trip1, pattern1);
 
     // Map positions to trips in feed
-    VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
+    RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
       TransitModelForTest.FEED_ID,
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
       service,
-      zoneId
+      zoneId,
+      null,
+      FEATURES
     );
 
     var pos = VehiclePosition
@@ -124,12 +148,12 @@ public class VehiclePositionsMatcherTest {
     var positions = List.of(pos);
 
     // Execute the same match-to-pattern step as the runner
-    matcher.applyVehiclePositionUpdates(positions);
+    matcher.applyRealtimeVehicleUpdates(positions);
 
     // ensure that gtfs-rt was matched to an OTP pattern correctly
-    assertEquals(1, service.getVehiclePositions(pattern1).size());
-    var nextStop = service.getVehiclePositions(pattern1).get(0).stop().stop();
-    assertEquals("F:stop-20", nextStop.getId().toString());
+    assertEquals(1, service.getRealtimeVehicles(pattern1).size());
+    var nextStop = service.getRealtimeVehicles(pattern1).get(0).stop();
+    assertEquals("F:stop-20", nextStop.get().stop().getId().toString());
   }
 
   @Test
@@ -146,7 +170,7 @@ public class VehiclePositionsMatcherTest {
   }
 
   private void testVehiclePositions(VehiclePosition pos) {
-    var service = new DefaultVehiclePositionService();
+    var service = new DefaultRealtimeVehicleService(null);
     var trip = TransitModelForTest.trip(tripId).build();
     var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
 
@@ -156,40 +180,77 @@ public class VehiclePositionsMatcherTest {
     var patternForTrip = Map.of(trip, pattern);
 
     // an untouched pattern has no vehicle positions
-    assertEquals(0, service.getVehiclePositions(pattern).size());
+    assertEquals(0, service.getRealtimeVehicles(pattern).size());
 
     // Map positions to trips in feed
-    VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
+    var matcher = new RealtimeVehiclePatternMatcher(
       TransitModelForTest.FEED_ID,
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
       service,
-      zoneId
+      zoneId,
+      null,
+      FEATURES
     );
 
     var positions = List.of(pos);
 
     // Execute the same match-to-pattern step as the runner
-    matcher.applyVehiclePositionUpdates(positions);
+    matcher.applyRealtimeVehicleUpdates(positions);
 
     // ensure that gtfs-rt was matched to an OTP pattern correctly
-    var vehiclePositions = service.getVehiclePositions(pattern);
-    assertEquals(1, vehiclePositions.size());
+    var realtimeVehicles = service.getRealtimeVehicles(pattern);
+    assertEquals(1, realtimeVehicles.size());
 
-    var parsedPos = vehiclePositions.get(0);
-    assertEquals(tripId, parsedPos.trip().getId().getId());
-    assertEquals(new WgsCoordinate(1, 1), parsedPos.coordinates());
-    assertEquals(30, parsedPos.heading());
+    var parsedVehicle = realtimeVehicles.get(0);
+    assertEquals(tripId, parsedVehicle.trip().getId().getId());
+    assertEquals(new WgsCoordinate(1, 1), parsedVehicle.coordinates().get());
+    assertEquals(30, parsedVehicle.heading().get());
 
     // if we have an empty list of updates then clear the positions from the previous update
-    matcher.applyVehiclePositionUpdates(List.of());
-    assertEquals(0, service.getVehiclePositions(pattern).size());
+    matcher.applyRealtimeVehicleUpdates(List.of());
+    assertEquals(0, service.getRealtimeVehicles(pattern).size());
+  }
+
+  private void testVehiclePositionOccupancy(VehiclePosition pos) {
+    var service = new DefaultRealtimeVehicleService(null);
+    var trip = TransitModelForTest.trip(tripId).build();
+    var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
+
+    TripPattern pattern = tripPattern(trip, stopTimes);
+
+    var tripForId = Map.of(scopedTripId, trip);
+    var patternForTrip = Map.of(trip, pattern);
+
+    // an untouched pattern has no vehicle positions
+    assertEquals(0, service.getRealtimeVehicles(pattern).size());
+
+    // Map positions to trips in feed
+    RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
+      TransitModelForTest.FEED_ID,
+      tripForId::get,
+      patternForTrip::get,
+      (id, time) -> patternForTrip.get(id),
+      service,
+      zoneId,
+      null,
+      FEATURES
+    );
+
+    var positions = List.of(pos);
+
+    // Execute the same match-to-pattern step as the runner
+    matcher.applyRealtimeVehicleUpdates(positions);
+
+    // Check that occupancy for the trip is as set in original position
+    var occupancy = service.getOccupancyStatus(trip.getId(), pattern);
+    assertEquals(OccupancyStatus.FEW_SEATS_AVAILABLE, occupancy);
   }
 
   @Test
   public void clearOldTrips() {
-    var service = new DefaultVehiclePositionService();
+    var service = new DefaultRealtimeVehicleService(null);
 
     var tripId1 = "trip1";
     var tripId2 = "trip2";
@@ -210,17 +271,19 @@ public class VehiclePositionsMatcherTest {
 
     var patternForTrip = Map.of(trip1, pattern1, trip2, pattern2);
 
-    // an untouched pattern has no vehicle positions
-    assertEquals(0, service.getVehiclePositions(pattern1).size());
+    // an untouched pattern has no vehicles
+    assertEquals(0, service.getRealtimeVehicles(pattern1).size());
 
     // Map positions to trips in feed
-    VehiclePositionPatternMatcher matcher = new VehiclePositionPatternMatcher(
+    RealtimeVehiclePatternMatcher matcher = new RealtimeVehiclePatternMatcher(
       TransitModelForTest.FEED_ID,
       tripForId::get,
       patternForTrip::get,
       (id, time) -> patternForTrip.get(id),
       service,
-      zoneId
+      zoneId,
+      null,
+      FEATURES
     );
 
     var pos1 = vehiclePosition(tripId1);
@@ -230,16 +293,16 @@ public class VehiclePositionsMatcherTest {
     var positions = List.of(pos1, pos2);
 
     // Execute the same match-to-pattern step as the runner
-    matcher.applyVehiclePositionUpdates(positions);
+    matcher.applyRealtimeVehicleUpdates(positions);
 
     // ensure that gtfs-rt was matched to an OTP pattern correctly
-    assertEquals(1, service.getVehiclePositions(pattern1).size());
-    assertEquals(1, service.getVehiclePositions(pattern2).size());
+    assertEquals(1, service.getRealtimeVehicles(pattern1).size());
+    assertEquals(1, service.getRealtimeVehicles(pattern2).size());
 
-    matcher.applyVehiclePositionUpdates(List.of(pos1));
-    assertEquals(1, service.getVehiclePositions(pattern1).size());
+    matcher.applyRealtimeVehicleUpdates(List.of(pos1));
+    assertEquals(1, service.getRealtimeVehicles(pattern1).size());
     // because there are no more updates for pattern2 we remove all positions
-    assertEquals(0, service.getVehiclePositions(pattern2).size());
+    assertEquals(0, service.getRealtimeVehicles(pattern2).size());
   }
 
   static Stream<Arguments> inferenceTestCases = Stream.of(
@@ -261,7 +324,7 @@ public class VehiclePositionsMatcherTest {
     var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 
     var instant = OffsetDateTime.parse(time).toInstant();
-    var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, instant);
+    var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, instant);
 
     assertEquals(LocalDate.parse(expectedDate), inferredDate);
   }
@@ -280,7 +343,7 @@ public class VehiclePositionsMatcherTest {
 
     // because the trip "crosses" midnight and we are already on the next day, we infer the service date to be
     // yesterday
-    var inferredDate = VehiclePositionPatternMatcher.inferServiceDate(tripTimes, zoneId, time);
+    var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, time);
 
     assertEquals(LocalDate.parse("2022-04-04"), inferredDate);
   }

@@ -5,7 +5,7 @@ import static java.util.Comparator.comparingInt;
 
 import java.util.Comparator;
 import org.opentripplanner.framework.collection.CompositeComparator;
-import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 
 /**
@@ -15,25 +15,32 @@ import org.opentripplanner.model.plan.SortOrder;
  * <p>
  * THIS CLASS IS THREAD-SAFE
  */
-public class SortOrderComparator extends CompositeComparator<Itinerary> {
+public class SortOrderComparator extends CompositeComparator<ItinerarySortKey> {
 
   /**
    * This comparator will sort all itineraries with STREET ONLY first. So, if there is an itinerary
    * with walking/bicycle/car from origin all the way to the destination, than it will be sorted
    * before any itineraries with one or more transit legs.
    */
-  static final Comparator<Itinerary> STREET_ONLY_FIRST_COMP = (a, b) ->
+  static final Comparator<ItinerarySortKey> STREET_ONLY_FIRST_COMP = (a, b) ->
     Boolean.compare(b.isOnStreetAllTheWay(), a.isOnStreetAllTheWay());
 
   /** Sort latest arrival-time first */
-  static final Comparator<Itinerary> ARRIVAL_TIME_COMP = comparing(Itinerary::endTime);
-  static final Comparator<Itinerary> DEPARTURE_TIME_COMP = comparing(Itinerary::startTime)
-    .reversed();
-  static final Comparator<Itinerary> GENERALIZED_COST_COMP = comparingInt(
-    Itinerary::getGeneralizedCost
+  static final Comparator<ItinerarySortKey> ARRIVAL_TIME_COMP = comparing(
+    ItinerarySortKey::endTimeAsInstant
   );
-  static final Comparator<Itinerary> NUM_OF_TRANSFERS_COMP = comparingInt(
-    Itinerary::getNumberOfTransfers
+
+  static final Comparator<ItinerarySortKey> DEPARTURE_TIME_COMP = comparing(
+    ItinerarySortKey::startTimeAsInstant
+  )
+    .reversed();
+
+  static final Comparator<ItinerarySortKey> GENERALIZED_COST_COMP = comparingInt(
+    ItinerarySortKey::getGeneralizedCost
+  );
+
+  static final Comparator<ItinerarySortKey> NUM_OF_TRANSFERS_COMP = comparingInt(
+    ItinerarySortKey::getNumberOfTransfers
   );
 
   private static final SortOrderComparator STREET_AND_ARRIVAL_TIME = new SortOrderComparator(
@@ -63,7 +70,7 @@ public class SortOrderComparator extends CompositeComparator<Itinerary> {
   );
 
   @SafeVarargs
-  private SortOrderComparator(Comparator<Itinerary>... compareVector) {
+  private SortOrderComparator(Comparator<ItinerarySortKey>... compareVector) {
     super(compareVector);
   }
 
