@@ -791,11 +791,12 @@ input BicyclePreferencesInput {
 
     """
     Walking preferences when walking a bicycle.
+    TODO: review with @t2gran
     """
     bicycleWalking: VehicleWalkPreferencesInput
 
     """
-    Maximum speed on flat ground while riding a scooter. Note, this speed is higher than
+    Maximum speed on flat ground while riding a bicycle. Note, this speed is higher than
     the average speed will be in itineraries as this is the maximum speed but there are
     factors that slow down cycling such as crossings, intersections and elevation changes.
     """
@@ -804,7 +805,7 @@ input BicyclePreferencesInput {
     """
     What criteria should be used when optimizing a cycling route.
     """
-    optimize: CyclingOptimizationCriteriaInput
+    optimization: CyclingOptimizationCriteriaInput
 
     """
     Cost of boarding a vehicle with a bicycle.
@@ -1521,8 +1522,8 @@ input InputTriangle {
 }
 
 """
-Relative importances of optimization factors. Only effective for bicycling legs.
-Invariant: `cyclingSafety + flatness + time == 1`
+Relative importance of optimization factors. Only effective for bicycling legs.
+Invariant: `safety + flatness + time == 1`
 """
 input TriangleCyclingFactorsInput {
     """
@@ -1530,7 +1531,7 @@ input TriangleCyclingFactorsInput {
     concerns such as convenience and general cyclist preferences by taking into account
     road surface etc.
     """
-    cyclingSafety: WeightingFactor
+    safety: WeightingFactor
 
     """Relative importance of flat terrain"""
     flatness: WeightingFactor
@@ -1540,8 +1541,8 @@ input TriangleCyclingFactorsInput {
 }
 
 """
-Relative importances of optimization factors. Only effective for scooter legs.
-Invariant: `scooterSafety + flatness + time == 1`
+Relative importance of optimization factors. Only effective for scooter legs.
+Invariant: `safety + flatness + time == 1`
 """
 input TriangleScooterFactorsInput {
     """
@@ -1549,7 +1550,7 @@ input TriangleScooterFactorsInput {
     concerns such as convenience and general scooter preferences by taking into account
     road surface etc.
     """
-    scooterSafety: WeightingFactor
+    safety: WeightingFactor
 
     """Relative importance of flat terrain"""
     flatness: WeightingFactor
@@ -2872,7 +2873,7 @@ enum CyclingOptimizationType {
     """
     Emphasize flatness over safety or duration of the route. This option was previously called `FLAT`.
     """
-    FLATTEST_STREETS
+    FLAT_STREETS
 
     """
     Emphasize cycling safety over flatness or duration of the route. Safety can also include other
@@ -2922,7 +2923,7 @@ enum ScooterOptimizationType {
     """
     Emphasize flatness over safety or duration of the route. This option was previously called `FLAT`.
     """
-    FLATTEST_STREETS
+    FLAT_STREETS
 
     """
     Emphasize scooter safety over flatness or duration of the route. Safety can also include other
@@ -4494,7 +4495,7 @@ input ScooterPreferencesInput {
     """
     What criteria should be used when optimizing a scooter route.
     """
-    optimize: ScooterOptimizationCriteriaInput
+    optimization: ScooterOptimizationCriteriaInput
 
     """
     Cost of boarding a vehicle with a scooter.
@@ -5331,7 +5332,7 @@ input VehicleWalkPreferencesInput {
     or when getting on the vehicle again. However, this is not applied when getting
     on a rented vehicle for the first time or off the vehicle when returning the vehicle.
     """
-    hopOnOrOffTimeSeconds: Int
+    hopOnOrOffTime: Duration
 }
 
 """
