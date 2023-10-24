@@ -30,9 +30,10 @@ This has the following consequences
 
     However, this feature has also severe downsides:
 
-    - It makes trip updates which reference a stop id will not work. You can only reference a stop by its sequence, 
-      which only works in GTFS-RT, not Siri.
-    - Fare calculations and transfers are unlikely to work as expected 
+    - It makes realtime trip updates referencing a stop id much more complicated and in many cases 
+      impossible to resolve. 
+      You can only reference a stop by its sequence, which only works in GTFS-RT, not Siri.
+    - Fare calculation and transfers are unlikely to work as expected.
 
 
 ## Configuration
@@ -41,8 +42,6 @@ To enable this feature you need to add a file to OTP's working directory and con
 its name like this:
 
 <!-- INSERT: config -->
-
-## Consolidation file
 
 The additional config file must look like the following:
 
