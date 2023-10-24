@@ -45,32 +45,7 @@ Include the `emissions` object in the
 `carAvgCo2PerKm` and `carAvgOccupancy`. The `carAvgCo2PerKm` provides the average emissions value for a car in g/km and
 the `carAvgOccupancy` provides the average number of passengers in a car.
 
-<!-- config BEGIN -->
-<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
-### Example configuration
-
-```JSON
-// build-config.json
-{
-  "emissions" : {
-    "carAvgCo2PerKm" : 170,
-    "carAvgOccupancy" : 1.3
-  }
-}
-```
-### Overview
-
-| Config Parameter |    Type   | Summary                                                    |  Req./Opt. | Default Value | Since |
-|------------------|:---------:|------------------------------------------------------------|:----------:|---------------|:-----:|
-| carAvgCo2PerKm   | `integer` | The average CO₂ emissions of a car in grams per kilometer. | *Optional* | `170`         |   na  |
-| carAvgOccupancy  |  `double` | The average number of passengers in a car.                 | *Optional* | `1.3`         |   na  |
-
-
-### Details
-
-
-<!-- config END -->
+<!-- INSERT: config -->
 
 ## Changelog
 

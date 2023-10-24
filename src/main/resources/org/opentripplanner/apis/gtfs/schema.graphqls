@@ -904,7 +904,7 @@ type Emissions {
     """
     CO₂ emissions in grams.
     """
-    co2Grams: Float
+    co2: Grams
 }
 
 type fare {
@@ -1007,6 +1007,8 @@ type Geometry {
 }
 
 scalar GeoJson
+
+scalar Grams
 
 type StopGeometries {
     """Representation of the stop geometries as GeoJSON (https://geojson.org/)"""

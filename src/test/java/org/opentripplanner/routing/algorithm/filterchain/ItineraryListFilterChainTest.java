@@ -18,6 +18,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.opentripplanner.ext.emissions.EmissionType;
+import org.opentripplanner.ext.emissions.EmissionsFilter;
+import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
@@ -38,6 +41,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   private Itinerary i1;
   private Itinerary i2;
   private Itinerary i3;
+  private Itinerary i4;
 
   @BeforeEach
   public void setUpItineraries() {
@@ -50,6 +54,9 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
 
     // Not optimal, departure is very late
     i3 = newItinerary(A).bus(20, I3_LATE_START_TIME, I3_LATE_START_TIME + D1m, E).build();
+
+    // car itinerary for emissions test
+    i4 = newItinerary(A).drive(T11_30, PlanTestConstants.T11_50, B).build();
   }
 
   @Test
@@ -320,6 +327,37 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
         )
         .build();
       assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
+    }
+  }
+
+  @Nested
+  class AddEmissionsToItineraryTest {
+
+    Itinerary bus;
+    Itinerary car;
+    ItineraryListFilterChainBuilder builder = createBuilder(true, false, 2);
+
+    @BeforeEach
+    public void setUpItineraries() {
+      bus = newItinerary(A).bus(21, T11_06, T11_09, B).build();
+      car = newItinerary(A).drive(T11_30, T11_50, B).build();
+    }
+
+    @Test
+    public void emissionsTest() {
+      var emissionsService = Mockito.mock(EmissionsService.class);
+
+      ItineraryListFilterChain chain = builder
+        .withEmissions(new EmissionsFilter(emissionsService))
+        .build();
+      chain.filter(List.of(bus, car));
+
+      Mockito
+        .verify(emissionsService, Mockito.atLeastOnce())
+        .getEmissionsPerMeterForRoute(bus.getTransitLeg(0).getRoute().getId(), EmissionType.CO2);
+      Mockito
+        .verify(emissionsService, Mockito.atLeastOnce())
+        .getEmissionsPerMeterForCar(EmissionType.CO2);
     }
   }
 }

@@ -9,6 +9,6 @@ public class EmissionsMapper {
     if (emissions == null) {
       return null;
     }
-    return new ApiEmissions(emissions.getCo2Grams());
+    return new ApiEmissions(emissions.getCo2());
   }
 }

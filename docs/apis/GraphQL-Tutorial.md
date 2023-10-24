@@ -90,6 +90,9 @@ Most people want to get routing results out of OTP, so lets see the query for th
         itineraries {
             startTime
             endTime
+            emissionsPerPerson {
+                co2
+            }
             legs {
                 mode
                 startTime

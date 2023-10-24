@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.framework.lang.Sandbox;
+import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -22,7 +23,7 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
 
       Optional<Double> carbonDioxide = this.getEmissionsForItinerary(i, EmissionType.CO2);
       if (carbonDioxide.isPresent()) {
-        emissions.setCo2Grams(carbonDioxide.get());
+        emissions.setCo2(new Grams(carbonDioxide.get()));
       }
 
       i.setEmissionsPerPerson(emissions);
@@ -84,7 +85,7 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
     List<StreetLeg> carLegs,
     EmissionType emissionType
   ) {
-    Optional<Double> emissionsForCar = emissionsService.getCarEmissionsPerMeter(emissionType);
+    Optional<Double> emissionsForCar = emissionsService.getEmissionsPerMeterForCar(emissionType);
     if (emissionsForCar.isPresent()) {
       return Optional.of(
         carLegs.stream().mapToDouble(leg -> emissionsForCar.get() * leg.getDistanceMeters()).sum()

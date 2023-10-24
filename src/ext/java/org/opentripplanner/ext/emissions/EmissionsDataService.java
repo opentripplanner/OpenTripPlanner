@@ -31,7 +31,7 @@ public class EmissionsDataService implements EmissionsService {
   }
 
   @Override
-  public Optional<Double> getCarEmissionsPerMeter(EmissionType emissionType) {
+  public Optional<Double> getEmissionsPerMeterForCar(EmissionType emissionType) {
     switch (emissionType) {
       case CO2:
         return Optional.ofNullable(this.emissionsDataModel.getCarAvgCo2PerMeter());

@@ -5,6 +5,9 @@
         {
           "startTime" : 1580641200000,
           "endTime" : 1580644800000,
+          "emissionsPerPerson" : {
+            "co2": 123.0
+          },
           "legs" : [
             {
               "mode" : "WALK",
