@@ -558,7 +558,7 @@ type VehicleRentalStation implements Node & PlaceInterface {
     Number of vehicles currently available on the rental station.
     See field `allowPickupNow` to know if is currently possible to pick up a vehicle.
     """
-    vehiclesAvailable: Int @deprecated(reason: "Use availableVehicles instead, which also contains vehicle types")
+    vehiclesAvailable: Int @deprecated(reason: "Use `availableVehicles` instead, which also contains vehicle types")
 
     """
     Number of free spaces currently available on the rental station.
@@ -567,7 +567,7 @@ type VehicleRentalStation implements Node & PlaceInterface {
     the rental station, even if the vehicle racks don't have any spaces available.
     See field `allowDropoffNow` to know if is currently possible to return a vehicle.
     """
-    spacesAvailable: Int @deprecated(reason: "Use availableSpaces instead, which also contains the space vehicle types")
+    spacesAvailable: Int @deprecated(reason: "Use `availableSpaces` instead, which also contains the space vehicle types")
 
     """
     Number of vehicles currently available on the rental station, grouped by vehicle type.
