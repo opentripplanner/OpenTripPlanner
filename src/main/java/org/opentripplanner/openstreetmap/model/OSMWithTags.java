@@ -438,7 +438,7 @@ public class OSMWithTags {
   }
 
   /**
-   * Is this a public transport boarding location where passengers wait for transti and that can be
+   * Is this a public transport boarding location where passengers wait for transit and that can be
    * linked to a transit stop vertex later on.
    * <p>
    * This intentionally excludes railway=stop and public_transport=stop because these are supposed

@@ -21,6 +21,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix flexible quay querying in Transmodel API [#5417](https://github.com/opentripplanner/OpenTripPlanner/pull/5417)
 - Add validation for missing calls in SIRI update [#5403](https://github.com/opentripplanner/OpenTripPlanner/pull/5403)
 - Import Occupancy Status from GTFS-RT Vehicle Positions [#5372](https://github.com/opentripplanner/OpenTripPlanner/pull/5372)
+- Add Roadmap epic template [#5413](https://github.com/opentripplanner/OpenTripPlanner/pull/5413)
+- Allow multiple zones in an unscheduled flex trip [#5376](https://github.com/opentripplanner/OpenTripPlanner/pull/5376)
+- Filter out null, empty and blank elements when mapping feed-scoped ids [#5428](https://github.com/opentripplanner/OpenTripPlanner/pull/5428)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
