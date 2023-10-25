@@ -9,6 +9,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -61,7 +62,7 @@ public class GraphBuilder implements Runnable {
     Graph graph,
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
-    StopConsolidationRepository stopConsolidationRepository,
+    @Nullable StopConsolidationRepository stopConsolidationRepository,
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
@@ -161,7 +162,7 @@ public class GraphBuilder implements Runnable {
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
 
     // don't consolidate stops if there are none
-    if (hasTransitData) {
+    if (hasTransitData && factory.stopConsolidationModule() != null) {
       graphBuilder.addModule(factory.stopConsolidationModule());
     }
 

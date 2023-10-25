@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.stopconsolidation;
 
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
@@ -15,7 +16,7 @@ public class ConsolidatedStopNameFilter implements ItineraryListFilter {
   private final StopConsolidationService service;
 
   public ConsolidatedStopNameFilter(StopConsolidationService service) {
-    this.service = service;
+    this.service = Objects.requireNonNull(service);
   }
 
   @Override

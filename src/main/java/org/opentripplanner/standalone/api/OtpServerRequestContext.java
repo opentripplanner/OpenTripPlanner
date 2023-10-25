@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.api;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Locale;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
@@ -92,6 +93,8 @@ public interface OtpServerRequestContext {
   RaptorTuningParameters raptorTuningParameters();
 
   List<RideHailingService> rideHailingServices();
+
+  @Nullable
   StopConsolidationService stopConsolidationService();
 
   MeterRegistry meterRegistry();

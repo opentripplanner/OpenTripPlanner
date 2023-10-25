@@ -119,7 +119,7 @@ public class SpeedTest {
         TestServerContext.createVehicleRentalService(),
         config.flexConfig,
         List.of(),
-        new DefaultStopConsolidationService(new DefaultStopConsolidationRepository(), transitModel),
+        null,
         null
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now

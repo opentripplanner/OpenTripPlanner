@@ -72,7 +72,7 @@ public class ConstructApplication {
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
     DataImportIssueSummary issueSummary,
-    StopConsolidationRepository stopConsolidationModel
+    @Nullable StopConsolidationRepository stopConsolidationRepository
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -90,7 +90,7 @@ public class ConstructApplication {
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
         .dataImportIssueSummary(issueSummary)
-        .stopConsolidationRepository(stopConsolidationModel)
+        .stopConsolidationRepository(stopConsolidationRepository)
         .build();
   }
 

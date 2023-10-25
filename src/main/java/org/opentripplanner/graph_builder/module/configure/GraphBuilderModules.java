@@ -8,6 +8,7 @@ import jakarta.inject.Singleton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
@@ -267,14 +268,15 @@ public class GraphBuilderModules {
 
   @Provides
   @Singleton
+  @Nullable
   static StopConsolidationModule providesStopConsolidationModule(
     TransitModel transitModel,
-    StopConsolidationRepository repo,
+    @Nullable StopConsolidationRepository repo,
     GraphBuilderDataSources dataSources,
     BuildConfig buildConfig
   ) {
     if (buildConfig.stopConsolidationFile == null) {
-      return new StopConsolidationModule(transitModel, repo, List.of());
+      return null;
     } else {
       var file = dataSources
         .baseDirectory()

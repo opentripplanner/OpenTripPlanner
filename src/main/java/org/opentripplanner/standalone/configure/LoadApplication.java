@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.configure;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -85,7 +86,7 @@ public class LoadApplication {
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
     DataImportIssueSummary issueSummary,
-    StopConsolidationRepository stopConsolidationRepository
+    @Nullable StopConsolidationRepository stopConsolidationRepository
   ) {
     return new ConstructApplication(
       cli,

@@ -1,8 +1,7 @@
 package org.opentripplanner.ext.stopconsolidation.internal;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
@@ -16,26 +15,24 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Singleton
 public class DefaultStopConsolidationService implements StopConsolidationService {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultStopConsolidationService.class);
 
-  private final StopConsolidationRepository model;
+  private final StopConsolidationRepository repo;
   private final TransitModel transitModel;
 
-  @Inject
   public DefaultStopConsolidationService(
-    StopConsolidationRepository model,
+    StopConsolidationRepository repo,
     TransitModel transitModel
   ) {
-    this.model = model;
-    this.transitModel = transitModel;
+    this.repo = Objects.requireNonNull(repo);
+    this.transitModel = Objects.requireNonNull(transitModel);
   }
 
   @Override
   public List<StopReplacement> replacements() {
-    return model
+    return repo
       .groups()
       .stream()
       .flatMap(group -> {
@@ -61,12 +58,12 @@ public class DefaultStopConsolidationService implements StopConsolidationService
 
   @Override
   public boolean isPrimaryStop(StopLocation stop) {
-    return model.groups().stream().anyMatch(r -> r.primary().equals(stop.getId()));
+    return repo.groups().stream().anyMatch(r -> r.primary().equals(stop.getId()));
   }
 
   @Override
   public boolean isActive() {
-    return !model.groups().isEmpty();
+    return !repo.groups().isEmpty();
   }
 
   @Override
@@ -74,7 +71,7 @@ public class DefaultStopConsolidationService implements StopConsolidationService
     if (agency.getId().getFeedId().equals(stop.getId().getFeedId())) {
       return stop.getName();
     } else {
-      return model
+      return repo
         .groups()
         .stream()
         .filter(r -> r.primary().equals(stop.getId()))

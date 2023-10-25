@@ -54,7 +54,12 @@ public interface GraphBuilderFactory {
   EdgeUpdaterModule dataOverlayFactory();
   DataImportIssueReporter dataImportIssueReporter();
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
+
+  @Nullable
   StopConsolidationModule stopConsolidationModule();
+
+  @Nullable
+  StopConsolidationRepository stopConsolidationRepository();
 
   @Component.Builder
   interface Builder {
@@ -71,7 +76,9 @@ public interface GraphBuilderFactory {
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
 
     @BindsInstance
-    Builder stopConsolidationRepository(StopConsolidationRepository stopConsolidationRepository);
+    Builder stopConsolidationRepository(
+      @Nullable StopConsolidationRepository stopConsolidationRepository
+    );
 
     @BindsInstance
     Builder dataSources(GraphBuilderDataSources graphBuilderDataSources);

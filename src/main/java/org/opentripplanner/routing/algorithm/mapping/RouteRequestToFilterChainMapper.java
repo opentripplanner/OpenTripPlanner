@@ -100,7 +100,7 @@ public class RouteRequestToFilterChainMapper {
       );
     }
 
-    if (context.stopConsolidationService().isActive()) {
+    if (context.stopConsolidationService() != null) {
       builder.withStopConsolidationFilter(
         new ConsolidatedStopNameFilter(context.stopConsolidationService())
       );

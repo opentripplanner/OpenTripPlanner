@@ -99,7 +99,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     VehicleRentalService vehicleRentalService,
     FlexConfig flexConfig,
     List<RideHailingService> rideHailingServices,
-    StopConsolidationService stopConsolidationService,
+    @Nullable StopConsolidationService stopConsolidationService,
     @Nullable TraverseVisitor traverseVisitor
   ) {
     return new DefaultServerRequestContext(
