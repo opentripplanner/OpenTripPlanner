@@ -13,6 +13,7 @@ import org.opentripplanner.transit.model.basic.Money;
  * but a refactor is unneeded given the proximity of GTFS Fares V2 which will render this redundant.
  */
 class OrcaFaresData {
+
   // Spaces have been removed from the route name because of inconsistencies in the WSF GTFS route dataset.
   public static Map<String, Map<FareType, Money>> washingtonStateFerriesFares = Map.ofEntries(
     sEntry("Seattle-BainbridgeIsland", 9.85f, 4.90f),

@@ -415,9 +415,9 @@ public class OrcaFareServiceTest {
   @Test
   void calculateTransferExtension() {
     List<Leg> rides = List.of(
-      getLeg(KITSAP_TRANSIT_AGENCY_ID, 0, 4,"Kitsap Fast Ferry", "east"), // 2.00
+      getLeg(KITSAP_TRANSIT_AGENCY_ID, 0, 4, "Kitsap Fast Ferry", "east"), // 2.00
       getLeg(KC_METRO_AGENCY_ID, 100), // Default ride price, extends transfer
-      getLeg(KITSAP_TRANSIT_AGENCY_ID, 150, 4,"Kitsap Fast Ferry", "west") // 10.00
+      getLeg(KITSAP_TRANSIT_AGENCY_ID, 150, 4, "Kitsap Fast Ferry", "west") // 10.00
     );
     var regularFare = usDollars(2.00f).plus(DEFAULT_TEST_RIDE_PRICE).plus(usDollars(10f));
     calculateFare(rides, regular, regularFare);
