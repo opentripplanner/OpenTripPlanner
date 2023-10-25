@@ -1,7 +1,11 @@
 package org.opentripplanner.ext.stopconsolidation;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.PATTERN;
+import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_A;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_B;
+import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_C;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_D;
 
 import java.util.List;
@@ -20,5 +24,18 @@ class StopConsolidationModuleTest {
     var repo = new DefaultStopConsolidationRepository();
     var module = new StopConsolidationModule(transitModel, repo, groups);
     module.buildGraph();
+
+    var modifiedPattern = transitModel.getTripPatternForId(PATTERN.getId());
+    assertFalse(modifiedPattern.getRoutingTripPattern().getPattern().sameAs(PATTERN));
+    assertFalse(modifiedPattern.sameAs(PATTERN));
+
+    var modifiedStop = modifiedPattern.getRoutingTripPattern().getPattern().getStopPattern().getStop(1);
+    assertEquals(modifiedStop, STOP_D);
+
+    var patterns = List.copyOf(transitModel.getAllTripPatterns());
+    assertEquals(1, patterns.size());
+
+    var p = patterns.get(0);
+    assertEquals(List.of(STOP_A, STOP_D, STOP_C), p.getStops());
   }
 }
