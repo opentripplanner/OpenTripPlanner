@@ -18,6 +18,8 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -30,19 +32,34 @@ class ScheduledTransitLegReferenceTest {
   private static final int SERVICE_CODE = 555;
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 1, 1);
   private static final int NUMBER_OF_STOPS = 3;
+  public static FeedScopedId stopIdAtPosition0;
+  public static FeedScopedId stopIdAtPosition1;
+
+  public static FeedScopedId stopIdAtPosition2;
   private static TransitService transitService;
   private static FeedScopedId tripId;
+  private static RegularStop stop4;
 
   @BeforeAll
   static void buildTransitService() {
+    Station parentStation = TransitModelForTest.station("PARENT_STATION").build();
+
+    RegularStop stop1 = TransitModelForTest.stopForTest("STOP1", 0, 0);
+    RegularStop stop2 = TransitModelForTest.stopForTest("STOP2", 0, 0);
+    RegularStop stop3 = TransitModelForTest.stopForTest("STOP3", 0, 0, parentStation);
+    stop4 = TransitModelForTest.stopForTest("STOP4", 0, 0, parentStation);
+
     // build transit data
     TripPattern tripPattern = TransitModelForTest
       .tripPattern("1", TransitModelForTest.route(id("1")).build())
-      .withStopPattern(TransitModelForTest.stopPattern(NUMBER_OF_STOPS))
+      .withStopPattern(TransitModelForTest.stopPattern(stop1, stop2, stop3))
       .build();
     Timetable timetable = tripPattern.getScheduledTimetable();
     Trip trip = TransitModelForTest.trip("1").build();
     tripId = trip.getId();
+    stopIdAtPosition0 = tripPattern.getStop(0).getId();
+    stopIdAtPosition1 = tripPattern.getStop(1).getId();
+    stopIdAtPosition2 = tripPattern.getStop(2).getId();
     TripTimes tripTimes = new TripTimes(
       trip,
       TransitModelForTest.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),
@@ -52,7 +69,14 @@ class ScheduledTransitLegReferenceTest {
     timetable.addTripTimes(tripTimes);
 
     // build transit model
-    TransitModel transitModel = new TransitModel(StopModel.of().build(), new Deduplicator());
+    StopModel stopModel = StopModel
+      .of()
+      .withRegularStop(stop1)
+      .withRegularStop(stop2)
+      .withRegularStop(stop3)
+      .withRegularStop(stop4)
+      .build();
+    TransitModel transitModel = new TransitModel(stopModel, new Deduplicator());
     transitModel.addTripPattern(tripPattern.getId(), tripPattern);
     transitModel.getServiceCodes().put(tripPattern.getId(), SERVICE_CODE);
     CalendarServiceData calendarServiceData = new CalendarServiceData();
@@ -66,20 +90,22 @@ class ScheduledTransitLegReferenceTest {
 
   @Test
   void getLegFromReference() {
-    int boardAtStop = 0;
-    int alightAtStop = 1;
+    int boardAtStopPos = 0;
+    int alightAtStopPos = 1;
     ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
       tripId,
       SERVICE_DATE,
-      boardAtStop,
-      alightAtStop
+      boardAtStopPos,
+      alightAtStopPos,
+      stopIdAtPosition0,
+      stopIdAtPosition1
     );
     ScheduledTransitLeg leg = scheduledTransitLegReference.getLeg(transitService);
     assertNotNull(leg);
     assertEquals(tripId, leg.getTrip().getId());
     assertEquals(SERVICE_DATE, leg.getServiceDate());
-    assertEquals(boardAtStop, leg.getBoardStopPosInPattern());
-    assertEquals(alightAtStop, leg.getAlightStopPosInPattern());
+    assertEquals(boardAtStopPos, leg.getBoardStopPosInPattern());
+    assertEquals(alightAtStopPos, leg.getAlightStopPosInPattern());
   }
 
   @Test
@@ -88,7 +114,9 @@ class ScheduledTransitLegReferenceTest {
       FeedScopedId.ofNullable("XXX", "YYY"),
       SERVICE_DATE,
       0,
-      1
+      1,
+      stopIdAtPosition0,
+      stopIdAtPosition1
     );
     assertNull(scheduledTransitLegReference.getLeg(transitService));
   }
@@ -99,29 +127,63 @@ class ScheduledTransitLegReferenceTest {
       tripId,
       LocalDate.EPOCH,
       0,
-      1
+      1,
+      stopIdAtPosition0,
+      stopIdAtPosition1
     );
     assertNull(scheduledTransitLegReference.getLeg(transitService));
   }
 
   @Test
-  void getLegFromReferenceInvalidBoardingStop() {
+  void getLegFromReferenceOutOfRangeBoardingStop() {
     ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
       tripId,
       SERVICE_DATE,
       NUMBER_OF_STOPS,
-      1
+      1,
+      stopIdAtPosition0,
+      stopIdAtPosition1
     );
     assertNull(scheduledTransitLegReference.getLeg(transitService));
   }
 
   @Test
-  void getLegFromReferenceInvalidAlightingStop() {
+  void getLegFromReferenceMismatchOnBoardingStop() {
     ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
       tripId,
       SERVICE_DATE,
       0,
-      NUMBER_OF_STOPS
+      1,
+      TransitModelForTest.id("invalid stop id"),
+      stopIdAtPosition1
+    );
+    assertNull(scheduledTransitLegReference.getLeg(transitService));
+  }
+
+  @Test
+  void getLegFromReferenceMismatchOnAlightingStopSameParentStation() {
+    // this tests substitutes the actual alighting stop (stop3) by another stop (stop4) that
+    // belongs to the same parent station
+    ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
+      tripId,
+      SERVICE_DATE,
+      0,
+      2,
+      stopIdAtPosition0,
+      stop4.getId()
+    );
+    assertNotNull(scheduledTransitLegReference.getLeg(transitService));
+  }
+
+  @Test
+  void getLegFromReferenceOutOfRangeAlightingStop() {
+    ScheduledTransitLegReference scheduledTransitLegReference = new ScheduledTransitLegReference(
+      tripId,
+      SERVICE_DATE,
+      0,
+      NUMBER_OF_STOPS,
+      stopIdAtPosition0,
+      stopIdAtPosition1
     );
     assertNull(scheduledTransitLegReference.getLeg(transitService));
   }
