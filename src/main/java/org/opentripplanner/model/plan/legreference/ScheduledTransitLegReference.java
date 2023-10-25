@@ -9,6 +9,7 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
@@ -23,7 +24,10 @@ public record ScheduledTransitLegReference(
   FeedScopedId tripId,
   LocalDate serviceDate,
   int fromStopPositionInPattern,
-  int toStopPositionInPattern
+  int toStopPositionInPattern,
+  FeedScopedId fromStopId,
+
+  FeedScopedId toStopId
 )
   implements LegReference {
   private static final Logger LOG = LoggerFactory.getLogger(ScheduledTransitLegReference.class);
@@ -35,6 +39,10 @@ public record ScheduledTransitLegReference(
    * rolled out, or because a realtime update has modified a trip),
    * it may not be possible to reconstruct the leg.
    * In this case the method returns null.
+   * The method checks that the referenced stop positions still refer to the same stop ids.
+   * As an exception, the reference is still considered valid if the referenced stop is different
+   * but belongs to the same parent station: this covers for example the case of a last-minute
+   * platform change in a train station that typically does not affect the validity of the leg.
    */
   @Override
   @Nullable
@@ -66,6 +74,18 @@ public record ScheduledTransitLegReference(
         serviceDate,
         numStops
       );
+      return null;
+    }
+
+    if (
+      !matchReferencedStopInPattern(
+        tripPattern,
+        fromStopPositionInPattern,
+        fromStopId,
+        transitService
+      ) ||
+      !matchReferencedStopInPattern(tripPattern, toStopPositionInPattern, toStopId, transitService)
+    ) {
       return null;
     }
 
@@ -122,5 +142,61 @@ public record ScheduledTransitLegReference(
       .addTransitAlertsToLeg(leg, false);
 
     return leg;
+  }
+
+  /**
+   * Return false if the stop id in the reference does not match the actual stop id in the trip
+   * pattern.
+   * Return true in the specific case where the stop ids differ, but belong to the same parent
+   * station.
+   *
+   */
+  private boolean matchReferencedStopInPattern(
+    TripPattern tripPattern,
+    int stopPosition,
+    FeedScopedId stopId,
+    TransitService transitService
+  ) {
+    if (stopId == null) {
+      // this is a legacy reference, skip validation
+      // TODO: remove backward-compatible logic after OTP release 2.5
+      return true;
+    }
+
+    StopLocation stopLocationInPattern = tripPattern.getStops().get(stopPosition);
+    if (stopId.equals(stopLocationInPattern.getId())) {
+      return true;
+    }
+    StopLocation stopLocationInLegReference = transitService.getStopLocation(stopId);
+    if (
+      stopLocationInLegReference == null ||
+      stopLocationInPattern.getParentStation() == null ||
+      !stopLocationInPattern
+        .getParentStation()
+        .equals(stopLocationInLegReference.getParentStation())
+    ) {
+      LOG.info(
+        "Invalid transit leg reference:" +
+        " The referenced stop at position {} with id '{}' does not match" +
+        " the stop id '{}' in trip {} and service date {}",
+        stopPosition,
+        stopId,
+        stopLocationInPattern.getId(),
+        tripId,
+        serviceDate
+      );
+      return false;
+    }
+    LOG.info(
+      "Transit leg reference with modified stop id within the same station: " +
+      "The referenced stop at position {} with id '{}' does not match\" +\n" +
+      "        \" the stop id '{}' in trip {} and service date {}",
+      stopPosition,
+      stopId,
+      stopLocationInPattern.getId(),
+      tripId,
+      serviceDate
+    );
+    return true;
   }
 }
