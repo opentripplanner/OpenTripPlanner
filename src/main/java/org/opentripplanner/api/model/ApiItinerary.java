@@ -81,7 +81,7 @@ public class ApiItinerary {
   public ApiItineraryFares fare = new ApiItineraryFares(Map.of(), Map.of(), null, null);
 
   /**
-   * The emissions of this trip.
+   * The emissions of this itinerary.
    */
   public ApiEmissions emissionsPerPerson;
   /**
