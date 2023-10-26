@@ -4,7 +4,8 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
 
 public class VehicleRentalStationImpl implements GraphQLDataFetchers.GraphQLVehicleRentalStation {
@@ -96,7 +97,17 @@ public class VehicleRentalStationImpl implements GraphQLDataFetchers.GraphQLVehi
     return environment -> getSource(environment).getVehiclesAvailable();
   }
 
-  private VehicleRentalPlace getSource(DataFetchingEnvironment environment) {
+  @Override
+  public DataFetcher<RentalVehicleEntityCounts> availableVehicles() {
+    return environment -> getSource(environment).getVehicleTypeCounts();
+  }
+
+  @Override
+  public DataFetcher<RentalVehicleEntityCounts> availableSpaces() {
+    return environment -> getSource(environment).getVehicleSpaceCounts();
+  }
+
+  private VehicleRentalStation getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }
