@@ -100,6 +100,11 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.netexModule());
     }
 
+    // don't consolidate stops if there are none
+    if (hasTransitData && factory.stopConsolidationModule() != null) {
+      graphBuilder.addModule(factory.stopConsolidationModule());
+    }
+
     if (hasTransitData) {
       graphBuilder.addModule(factory.tripPatternNamer());
     }
@@ -160,11 +165,6 @@ public class GraphBuilder implements Runnable {
     }
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
-
-    // don't consolidate stops if there are none
-    if (hasTransitData && factory.stopConsolidationModule() != null) {
-      graphBuilder.addModule(factory.stopConsolidationModule());
-    }
 
     return graphBuilder;
   }

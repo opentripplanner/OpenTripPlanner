@@ -29,7 +29,11 @@ class StopConsolidationModuleTest {
     assertFalse(modifiedPattern.getRoutingTripPattern().getPattern().sameAs(PATTERN));
     assertFalse(modifiedPattern.sameAs(PATTERN));
 
-    var modifiedStop = modifiedPattern.getRoutingTripPattern().getPattern().getStopPattern().getStop(1);
+    var modifiedStop = modifiedPattern
+      .getRoutingTripPattern()
+      .getPattern()
+      .getStopPattern()
+      .getStop(1);
     assertEquals(modifiedStop, STOP_D);
 
     var patterns = List.copyOf(transitModel.getAllTripPatterns());
