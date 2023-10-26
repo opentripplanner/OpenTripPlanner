@@ -93,7 +93,6 @@ class EmissionsTest {
 
   @Test
   void testGetEmissionsForCarRoute() {
-    List<Leg> legs = new ArrayList<>();
     var leg = StreetLeg
       .create()
       .withMode(TraverseMode.CAR)
@@ -101,8 +100,7 @@ class EmissionsTest {
       .withStartTime(TIME)
       .withEndTime(TIME.plus(1, ChronoUnit.HOURS))
       .build();
-    legs.add(leg);
-    Itinerary i = new Itinerary(legs);
+    Itinerary i = new Itinerary(List.of(legs));
     assertEquals(28.0864, emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2).get());
   }
 
