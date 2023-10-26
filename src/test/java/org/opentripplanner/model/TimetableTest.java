@@ -33,6 +33,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.ValidationError;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
@@ -43,6 +44,7 @@ public class TimetableTest {
   private static final ZoneId TIME_ZONE = ZoneIds.NEW_YORK;
   private static final LocalDate SERVICE_DATE = LocalDate.of(2009, 8, 7);
   private static final String TRIP_ID = "1.1";
+  private static final String TRIP_ID_WITH_MORE_STOPS = "19.1";
   private static Map<FeedScopedId, TripPattern> patternIndex;
   private static Timetable timetable;
   private static String feedId;
@@ -591,34 +593,24 @@ public class TimetableTest {
     });
   }
 
+  /**
+   * Test TripUpdate with 1 stop cancellation and the regular stop times after the cancelled stop is
+   * earlier than the scheduled time at the cancelled stop.
+   * Scheduled: 0, 600, 1200
+   * Test case: 0, cancelled, 400
+   * Expect no errors and applied stop times should be increasing.
+   */
   @Test
-  public void testUpdateWithCancellation() {
-    var tripDescriptorBuilder = tripDescriptorBuilder(TRIP_ID);
-    TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
-    tripUpdateBuilder.setTrip(tripDescriptorBuilder);
-
-    // Stop 1
-    StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
-    stopTimeUpdateBuilder.setStopSequence(1);
-    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
-    StopTimeEvent.Builder stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-    stopTimeEventBuilder.setDelay(0);
-    stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-    stopTimeEventBuilder.setDelay(0);
-
-    // Stop 2
-    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(1);
-    stopTimeUpdateBuilder.setStopSequence(2);
-    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SKIPPED);
-
-    // Stop 3
-    stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(2);
-    stopTimeUpdateBuilder.setStopSequence(3);
-    stopTimeUpdateBuilder.setScheduleRelationship(StopTimeUpdate.ScheduleRelationship.SCHEDULED);
-    stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
-    stopTimeEventBuilder.setDelay(-800);
-    stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
-    stopTimeEventBuilder.setDelay(-800);
+  public void testUpdateWithCancellationAndEarlierThanCancelled() {
+    TripUpdateBuilder tripUpdateBuilder = new TripUpdateBuilder(
+      TRIP_ID,
+      SERVICE_DATE,
+      SCHEDULED,
+      TIME_ZONE
+    )
+      .addDelayedStopTime(1, 0)
+      .addSkippedStop(2)
+      .addDelayedStopTime(3, -800, -800);
 
     TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -641,8 +633,303 @@ public class TimetableTest {
       assertFalse(updatedTripTimes.isCancelledStop(0));
       assertTrue(updatedTripTimes.isCancelledStop(1));
       assertFalse(updatedTripTimes.isCancelledStop(2));
-      assertTrue(updatedTripTimes.getDepartureTime(0) < updatedTripTimes.getArrivalTime(1));
-      assertTrue(updatedTripTimes.getDepartureTime(1) < updatedTripTimes.getArrivalTime(2));
+      assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
+      assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
+    });
+  }
+
+  /**
+   * Test TripUpdate with 1 stop cancellation and the regular stop times before the cancelled stop is
+   * later than the scheduled time at the cancelled stop.
+   * Scheduled: 0, 600, 1200
+   * Test case: 1000, cancelled, 1200
+   * Expect no errors and applied stop times should be increasing.
+   */
+  @Test
+  public void testUpdateWithCancellationAndLaterThanCancelled() {
+    TripUpdateBuilder tripUpdateBuilder = new TripUpdateBuilder(
+      TRIP_ID,
+      SERVICE_DATE,
+      SCHEDULED,
+      TIME_ZONE
+    )
+      .addDelayedStopTime(1, 1000, 1000)
+      .addSkippedStop(2)
+      .addDelayedStopTime(3, 0, 0);
+
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertTrue(patch.isSuccess());
+
+    patch.ifSuccess(p -> {
+      var updatedTripTimes = p.getTripTimes();
+      assertNotNull(updatedTripTimes);
+      assertEquals(1000, updatedTripTimes.getArrivalDelay(0));
+      assertEquals(1000, updatedTripTimes.getDepartureDelay(0));
+      assertEquals(0, updatedTripTimes.getArrivalDelay(2));
+      assertEquals(0, updatedTripTimes.getDepartureDelay(2));
+      assertFalse(updatedTripTimes.isCancelledStop(0));
+      assertTrue(updatedTripTimes.isCancelledStop(1));
+      assertFalse(updatedTripTimes.isCancelledStop(2));
+      assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
+      assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
+    });
+  }
+
+  /**
+   * Test TripUpdate with 1 stop cancellation and the regular stop times are non-increasing.
+   * Scheduled: 0, 600, 1200
+   * Test case: 1000, cancelled, 800
+   * Expect errors, since the stop times are not increasing.
+   */
+  @Test
+  public void testUpdateWithCancellationAndNonIncreasingTimes() {
+    TripUpdateBuilder tripUpdateBuilder = new TripUpdateBuilder(
+      TRIP_ID,
+      SERVICE_DATE,
+      SCHEDULED,
+      TIME_ZONE
+    )
+      .addDelayedStopTime(1, 1000, 1000)
+      .addSkippedStop(2)
+      .addDelayedStopTime(3, -400, -400);
+
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertTrue(patch.isFailure());
+
+    patch.ifFailure(p -> {
+      assertEquals(UpdateError.UpdateErrorType.NEGATIVE_HOP_TIME, p.errorType());
+    });
+  }
+
+  /**
+   * Test TripUpdate with 1 stop cancellation at the beginning of the route and running early.
+   * Scheduled: 0, 600, 1200
+   * Test case: cancelled, -100, 1200
+   * Expect no errors and the stop times are increasing.
+   */
+  @Test
+  public void testUpdateWithStartTerminalCancellationAndEarly() {
+    TripUpdateBuilder tripUpdateBuilder = new TripUpdateBuilder(
+      TRIP_ID,
+      SERVICE_DATE,
+      SCHEDULED,
+      TIME_ZONE
+    )
+      .addSkippedStop(1)
+      .addDelayedStopTime(2, -700, -700)
+      .addDelayedStopTime(3, 0, 0);
+
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertTrue(patch.isSuccess());
+
+    patch.ifSuccess(p -> {
+      var updatedTripTimes = p.getTripTimes();
+      assertNotNull(updatedTripTimes);
+      assertEquals(-700, updatedTripTimes.getArrivalDelay(1));
+      assertEquals(-700, updatedTripTimes.getDepartureDelay(1));
+      assertEquals(0, updatedTripTimes.getArrivalDelay(2));
+      assertEquals(0, updatedTripTimes.getDepartureDelay(2));
+      assertTrue(updatedTripTimes.isCancelledStop(0));
+      assertFalse(updatedTripTimes.isCancelledStop(1));
+      assertFalse(updatedTripTimes.isCancelledStop(2));
+      assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
+      assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
+    });
+  }
+
+  /**
+   * Test TripUpdate with 1 stop cancellation at the end of the route and running late.
+   * Scheduled: 0, 600, 1200
+   * Test case: 0, 1300, cancelled
+   * Expect no errors and the stop times are increasing.
+   */
+  @Test
+  public void testUpdateWithEndTerminalCancellationAndLate() {
+    TripUpdateBuilder tripUpdateBuilder = new TripUpdateBuilder(
+      TRIP_ID,
+      SERVICE_DATE,
+      SCHEDULED,
+      TIME_ZONE
+    )
+      .addDelayedStopTime(1, 0, 0)
+      .addDelayedStopTime(2, 700, 700)
+      .addSkippedStop(3);
+
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var patch = timetable.createUpdatedTripTimes(
+      tripUpdate,
+      TIME_ZONE,
+      SERVICE_DATE,
+      BackwardsDelayPropagationType.REQUIRED_NO_DATA
+    );
+
+    assertTrue(patch.isSuccess());
+
+    patch.ifSuccess(p -> {
+      var updatedTripTimes = p.getTripTimes();
+      assertNotNull(updatedTripTimes);
+      assertEquals(0, updatedTripTimes.getArrivalDelay(0));
+      assertEquals(0, updatedTripTimes.getDepartureDelay(0));
+      assertEquals(700, updatedTripTimes.getArrivalDelay(1));
+      assertEquals(700, updatedTripTimes.getDepartureDelay(1));
+      assertFalse(updatedTripTimes.isCancelledStop(0));
+      assertFalse(updatedTripTimes.isCancelledStop(1));
+      assertTrue(updatedTripTimes.isCancelledStop(2));
+      assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
+      assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
+    });
+  }
+
+  /**
+   * Test TripUpdate with multiple stop cancelled together.
+   * Scheduled: 0, 0, 600, 1200, 1800, 2400, 3000, 3600
+   * Test case: 600, cancelled, cancelled, cancelled, cancelled, cancelled, cancelled, 2400
+   * Expect no errors and the stop times are increasing.
+   */
+  @Test
+  public void testUpdateWithMultipleCancellationsTogether() {
+    TripUpdateBuilder tripUpdateBuilder = new TripUpdateBuilder(
+      TRIP_ID_WITH_MORE_STOPS,
+      SERVICE_DATE,
+      SCHEDULED,
+      TIME_ZONE
+    )
+      .addDelayedStopTime(1, 600, 600)
+      .addSkippedStop(2)
+      .addSkippedStop(3)
+      .addSkippedStop(4)
+      .addSkippedStop(5)
+      .addSkippedStop(6)
+      .addSkippedStop(7)
+      .addDelayedStopTime(8, -1200, -1200);
+
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var patch = patternIndex
+      .get(new FeedScopedId(feedId, TRIP_ID_WITH_MORE_STOPS))
+      .getScheduledTimetable()
+      .createUpdatedTripTimes(
+        tripUpdate,
+        TIME_ZONE,
+        SERVICE_DATE,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
+
+    assertTrue(patch.isSuccess());
+
+    patch.ifSuccess(p -> {
+      var updatedTripTimes = p.getTripTimes();
+      assertNotNull(updatedTripTimes);
+      assertEquals(600, updatedTripTimes.getArrivalDelay(0));
+      assertEquals(600, updatedTripTimes.getDepartureDelay(0));
+      assertEquals(-1200, updatedTripTimes.getArrivalDelay(7));
+      assertEquals(-1200, updatedTripTimes.getDepartureDelay(7));
+      assertFalse(updatedTripTimes.isCancelledStop(0));
+      assertTrue(updatedTripTimes.isCancelledStop(1));
+      assertTrue(updatedTripTimes.isCancelledStop(2));
+      assertTrue(updatedTripTimes.isCancelledStop(3));
+      assertTrue(updatedTripTimes.isCancelledStop(4));
+      assertTrue(updatedTripTimes.isCancelledStop(5));
+      assertTrue(updatedTripTimes.isCancelledStop(6));
+      assertFalse(updatedTripTimes.isCancelledStop(7));
+      assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
+      assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
+      assertTrue(updatedTripTimes.getDepartureTime(2) <= updatedTripTimes.getArrivalTime(3));
+      assertTrue(updatedTripTimes.getDepartureTime(3) <= updatedTripTimes.getArrivalTime(4));
+      assertTrue(updatedTripTimes.getDepartureTime(4) <= updatedTripTimes.getArrivalTime(5));
+      assertTrue(updatedTripTimes.getDepartureTime(5) <= updatedTripTimes.getArrivalTime(6));
+      assertTrue(updatedTripTimes.getDepartureTime(6) <= updatedTripTimes.getArrivalTime(7));
+    });
+  }
+
+  /**
+   * Test TripUpdate with multiple separate stop cancellations.
+   * Scheduled: 0, 0, 600, 1200, 1800, 2400, 3000, 3600
+   * Test case: 600, cancelled, cancelled, 700, 2300, cancelled, cancelled, 2400
+   * Expect no errors and the stop times are increasing.
+   */
+  @Test
+  public void testUpdateWithMultipleSeparateCancellations() {
+    TripUpdateBuilder tripUpdateBuilder = new TripUpdateBuilder(
+      TRIP_ID_WITH_MORE_STOPS,
+      SERVICE_DATE,
+      SCHEDULED,
+      TIME_ZONE
+    )
+      .addDelayedStopTime(1, 600, 600)
+      .addSkippedStop(2)
+      .addSkippedStop(3)
+      .addDelayedStopTime(4, -500, -500)
+      .addDelayedStopTime(5, 500, 500)
+      .addSkippedStop(6)
+      .addSkippedStop(7)
+      .addDelayedStopTime(8, -1200, -1200);
+
+    TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+    var patch = patternIndex
+      .get(new FeedScopedId(feedId, TRIP_ID_WITH_MORE_STOPS))
+      .getScheduledTimetable()
+      .createUpdatedTripTimes(
+        tripUpdate,
+        TIME_ZONE,
+        SERVICE_DATE,
+        BackwardsDelayPropagationType.REQUIRED_NO_DATA
+      );
+
+    assertTrue(patch.isSuccess());
+
+    patch.ifSuccess(p -> {
+      var updatedTripTimes = p.getTripTimes();
+      assertNotNull(updatedTripTimes);
+      assertEquals(600, updatedTripTimes.getArrivalDelay(0));
+      assertEquals(600, updatedTripTimes.getDepartureDelay(0));
+      assertEquals(-500, updatedTripTimes.getArrivalDelay(3));
+      assertEquals(-500, updatedTripTimes.getDepartureDelay(3));
+      assertEquals(500, updatedTripTimes.getArrivalDelay(4));
+      assertEquals(500, updatedTripTimes.getDepartureDelay(4));
+      assertEquals(-1200, updatedTripTimes.getArrivalDelay(7));
+      assertEquals(-1200, updatedTripTimes.getDepartureDelay(7));
+      assertFalse(updatedTripTimes.isCancelledStop(0));
+      assertTrue(updatedTripTimes.isCancelledStop(1));
+      assertTrue(updatedTripTimes.isCancelledStop(2));
+      assertFalse(updatedTripTimes.isCancelledStop(3));
+      assertFalse(updatedTripTimes.isCancelledStop(4));
+      assertTrue(updatedTripTimes.isCancelledStop(5));
+      assertTrue(updatedTripTimes.isCancelledStop(6));
+      assertFalse(updatedTripTimes.isCancelledStop(7));
+      assertTrue(updatedTripTimes.getDepartureTime(0) <= updatedTripTimes.getArrivalTime(1));
+      assertTrue(updatedTripTimes.getDepartureTime(1) <= updatedTripTimes.getArrivalTime(2));
+      assertTrue(updatedTripTimes.getDepartureTime(2) <= updatedTripTimes.getArrivalTime(3));
+      assertTrue(updatedTripTimes.getDepartureTime(3) <= updatedTripTimes.getArrivalTime(4));
+      assertTrue(updatedTripTimes.getDepartureTime(4) <= updatedTripTimes.getArrivalTime(5));
+      assertTrue(updatedTripTimes.getDepartureTime(5) <= updatedTripTimes.getArrivalTime(6));
+      assertTrue(updatedTripTimes.getDepartureTime(6) <= updatedTripTimes.getArrivalTime(7));
     });
   }
 

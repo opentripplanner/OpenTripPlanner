@@ -353,7 +353,7 @@ public class Timetable implements Serializable {
     }
 
     // Interpolate missing times from CANCELLED stops. Note: Currently for GTFS-RT ONLY.
-    if (newTimes.interpolateMissingTimes()) {
+    if (interpolateMissingTimes(newTimes)) {
       LOG.debug("Interpolated delays for cancelled stops on trip {}.", tripId);
     }
 
@@ -471,5 +471,79 @@ public class Timetable implements Serializable {
       // Pattern is created only for real-time updates
       return null;
     }
+  }
+
+  /**
+   * Interpolate the times for CANCELLED stops in between regular stops to ensure internal time
+   * representations are increasing for these stops. This will not interpolate terminal
+   * cancellations, as those can be handled by backward and forward propagations.
+   *
+   * @return true if there is interpolated times, false if there is no interpolation.
+   */
+  private boolean interpolateMissingTimes(TripTimes newTimes) {
+    boolean hasInterpolatedTimes = false;
+    final int numStops = newTimes.getNumStops();
+    boolean startInterpolate = false;
+    boolean hasPrevTimes = false;
+    int prevDeparture = 0;
+    int prevScheduledDeparture = 0;
+    int prevStopIndex = -1;
+
+    // Loop through all stops
+    for (int s = 0; s < numStops; s++) {
+      final boolean isCancelledStop = newTimes.isCancelledStop(s);
+      final int scheduledArrival = newTimes.getScheduledArrivalTime(s);
+      final int scheduledDeparture = newTimes.getScheduledDepartureTime(s);
+      final int arrival = newTimes.getArrivalTime(s);
+      final int departure = newTimes.getDepartureTime(s);
+
+      if (!isCancelledStop && !startInterpolate) {
+        // Regular stop, could be used for interpolation for future cancellation, keep track.
+        prevDeparture = departure;
+        prevScheduledDeparture = scheduledDeparture;
+        prevStopIndex = s;
+        hasPrevTimes = true;
+      } else if (isCancelledStop && !startInterpolate && hasPrevTimes) {
+        // First cancelled stop, keep track.
+        startInterpolate = true;
+      } else if (!isCancelledStop && startInterpolate && hasPrevTimes) {
+        // First regular stop after cancelled stops, interpolate.
+        // Calculate necessary info for interpolation.
+        int numCancelledStops = s - prevStopIndex - 1;
+        int scheduledTravelTime = scheduledArrival - prevScheduledDeparture;
+        int realTimeTravelTime = arrival - prevDeparture;
+        double travelTimeRatio = (double) realTimeTravelTime / scheduledTravelTime;
+
+        // Fill out interpolated time for cancelled stops, using the calculated ratio.
+        for (int cancelledIndex = prevStopIndex + 1; cancelledIndex < s; cancelledIndex++) {
+          final int scheduledArrivalCancelled = newTimes.getScheduledArrivalTime(cancelledIndex);
+          final int scheduledDepartureCancelled = newTimes.getScheduledDepartureTime(
+            cancelledIndex
+          );
+
+          // Interpolate
+          int scheduledArrivalDiff = scheduledArrivalCancelled - prevScheduledDeparture;
+          double interpolatedArrival = prevDeparture + travelTimeRatio * scheduledArrivalDiff;
+          int scheduledDepartureDiff = scheduledDepartureCancelled - prevScheduledDeparture;
+          double interpolatedDeparture = prevDeparture + travelTimeRatio * scheduledDepartureDiff;
+
+          // Set Interpolated Times
+          newTimes.updateArrivalTime(cancelledIndex, (int) interpolatedArrival);
+          newTimes.updateDepartureTime(cancelledIndex, (int) interpolatedDeparture);
+        }
+
+        // Set tracking variables
+        prevDeparture = departure;
+        prevScheduledDeparture = scheduledDeparture;
+        prevStopIndex = s;
+        startInterpolate = false;
+        hasPrevTimes = true;
+
+        // Set return variable
+        hasInterpolatedTimes = true;
+      }
+    }
+
+    return hasInterpolatedTimes;
   }
 }

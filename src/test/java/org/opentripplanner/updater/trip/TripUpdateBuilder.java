@@ -89,6 +89,21 @@ public class TripUpdateBuilder {
   }
 
   /**
+   * Add a skipped stop to the TripUpdate.
+   */
+  public TripUpdateBuilder addSkippedStop(int stopSequence) {
+    return addStopTime(
+      null,
+      NO_VALUE,
+      stopSequence,
+      NO_DELAY,
+      NO_DELAY,
+      StopTimeUpdate.ScheduleRelationship.SKIPPED,
+      null
+    );
+  }
+
+  /**
    * As opposed to the other convenience methods, this one takes a raw {@link StopTimeUpdate} and
    * adds it to the trip. This is useful if you want to test invalid ones.
    */
