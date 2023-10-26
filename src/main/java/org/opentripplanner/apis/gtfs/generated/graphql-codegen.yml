@@ -38,6 +38,8 @@ config:
     BikeRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace#VehicleRentalPlace
     BikeRentalStationUris: org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris#VehicleRentalStationUris
     VehicleRentalStation: org.opentripplanner.service.vehiclerental.model.VehicleRentalStation#VehicleRentalStation
+    RentalVehicleEntityCounts: org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts#RentalVehicleEntityCounts
+    RentalVehicleTypeCount: org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount#RentalVehicleTypeCount
     RentalVehicle: org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle#VehicleRentalVehicle
     VehicleRentalUris: org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris#VehicleRentalStationUris
     BikesAllowed: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed#GraphQLBikesAllowed
@@ -58,6 +60,7 @@ config:
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
     Mode: String
+    OccupancyStatus: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus#GraphQLOccupancyStatus
     TransitMode: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode#GraphQLTransitMode
     PageInfo: Object
     Pattern: org.opentripplanner.transit.model.network.TripPattern#TripPattern
@@ -85,14 +88,15 @@ config:
     TicketType: org.opentripplanner.ext.fares.model.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
     Trip: org.opentripplanner.transit.model.timetable.Trip#Trip
+    TripOccupancy: org.opentripplanner.apis.gtfs.model.TripOccupancy#TripOccupancy
     Unknown: org.opentripplanner.apis.gtfs.model.UnknownModel#UnknownModel
     VehicleParking: org.opentripplanner.routing.vehicle_parking.VehicleParking#VehicleParking
     VehicleParkingSpaces: org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces#VehicleParkingSpaces
     VehicleParkingState: org.opentripplanner.routing.vehicle_parking.VehicleParkingState#VehicleParkingState
     VertexType: String
     SystemNotice: org.opentripplanner.model.SystemNotice#SystemNotice
-    VehiclePosition: org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition#RealtimeVehiclePosition
-    StopRelationship: org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship#StopRelationship
+    VehiclePosition: org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle#RealtimeVehicle
+    StopRelationship: org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship#StopRelationship
     WheelchairBoarding: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding
     FormFactor: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor
     PropulsionType: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPropulsionType

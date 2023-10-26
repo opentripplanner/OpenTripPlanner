@@ -14,10 +14,12 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_15;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_30;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_50;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
+import static org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopStatus.IN_TRANSIT_TO;
 import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
+import static org.opentripplanner.transit.model.timetable.OccupancyStatus.FEW_SEATS_AVAILABLE;
 
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
@@ -68,7 +70,8 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
-import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
@@ -218,8 +221,36 @@ class GraphQLIntegrationTest {
     var alerts = ListUtils.combine(List.of(alert), getTransitAlert(entitySelector));
     transitService.getTransitAlertService().setAlerts(alerts);
 
-    var rentalService = new DefaultVehicleRentalService();
-    rentalService.addVehicleRentalStation(vehicleRentalStation());
+    var realtimeVehicleService = new DefaultRealtimeVehicleService(transitService);
+    var occypancyVehicle = RealtimeVehicle
+      .builder()
+      .withTrip(trip)
+      .withTime(Instant.MAX)
+      .withVehicleId(id("vehicle-1"))
+      .withOccupancyStatus(FEW_SEATS_AVAILABLE)
+      .build();
+    var positionVehicle = RealtimeVehicle
+      .builder()
+      .withTrip(trip)
+      .withTime(Instant.MIN)
+      .withVehicleId(id("vehicle-2"))
+      .withLabel("vehicle2")
+      .withCoordinates(new WgsCoordinate(60.0, 80.0))
+      .withHeading(80.0)
+      .withSpeed(10.2)
+      .withStop(pattern.getStop(0))
+      .withStopStatus(IN_TRANSIT_TO)
+      .build();
+    realtimeVehicleService.setRealtimeVehicles(pattern, List.of(occypancyVehicle, positionVehicle));
+
+    DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
+    VehicleRentalStation vehicleRentalStation = new TestVehicleRentalStationBuilder()
+      .withVehicles(10)
+      .withSpaces(10)
+      .withVehicleTypeBicycle(5, 7)
+      .withVehicleTypeElectricBicycle(5, 3)
+      .build();
+    defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalStation);
 
     context =
       new GraphQLRequestContext(
@@ -227,8 +258,8 @@ class GraphQLIntegrationTest {
         transitService,
         new DefaultFareService(),
         graph.getVehicleParkingService(),
-        rentalService,
-        new DefaultVehiclePositionService(),
+        defaultVehicleRentalService,
+        realtimeVehicleService,
         GraphFinder.getInstance(graph, transitService::findRegularStop),
         new RouteRequest()
       );
@@ -307,17 +338,6 @@ class GraphQLIntegrationTest {
       new RiderCategory(id("senior-citizens"), "Senior citizens", null),
       new FareMedium(id("oyster"), "TfL Oyster Card")
     );
-  }
-
-  @Nonnull
-  private static VehicleRentalStation vehicleRentalStation() {
-    return TestVehicleRentalStationBuilder
-      .of()
-      .withLongitude(10)
-      .withLatitude(20)
-      .withVehicles(3)
-      .withSpaces(2)
-      .build();
   }
 
   /**

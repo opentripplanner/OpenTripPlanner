@@ -90,6 +90,15 @@ public class DefaultFareService implements FareService {
     return fareRulesPerType;
   }
 
+  /**
+   * Takes a legs and returns a map of their agency's feed id and all corresponding legs.
+   */
+  protected Map<String, List<Leg>> fareLegsByFeed(List<Leg> fareLegs) {
+    return fareLegs
+      .stream()
+      .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
+  }
+
   @Override
   public ItineraryFares calculateFares(Itinerary itinerary) {
     var fareLegs = itinerary
@@ -105,9 +114,7 @@ public class DefaultFareService implements FareService {
     if (fareLegs.isEmpty()) {
       return null;
     }
-    var fareLegsByFeed = fareLegs
-      .stream()
-      .collect(Collectors.groupingBy(leg -> leg.getAgency().getId().getFeedId()));
+    var fareLegsByFeed = fareLegsByFeed(fareLegs);
 
     ItineraryFares fare = ItineraryFares.empty();
     boolean hasFare = false;
@@ -122,9 +129,7 @@ public class DefaultFareService implements FareService {
 
         // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
         if (fareRules != null && !fareRules.isEmpty()) {
-          Currency currency = Currency.getInstance(
-            fareRules.iterator().next().getFareAttribute().getCurrencyType()
-          );
+          Currency currency = fareRules.iterator().next().getFareAttribute().getPrice().currency();
           boolean feedHasFare = populateFare(
             currentFare,
             currency,
@@ -259,7 +264,17 @@ public class DefaultFareService implements FareService {
 
       var componentLegs = new ArrayList<Leg>();
       for (int i = start; i <= via; ++i) {
-        componentLegs.add(legs.get(i));
+        final var leg = legs.get(i);
+        // if we have a leg that is combined for the purpose of fare calculation we need to
+        // retrieve the original legs so that the fare products are assigned back to the original
+        // legs that the combined one originally consisted of.
+        // (remember that the combined leg only exists during fare calculation and is thrown away
+        // afterwards to associating fare products with it will result in the API not showing any.)
+        if (leg instanceof CombinedInterlinedTransitLeg combinedLeg) {
+          componentLegs.addAll(combinedLeg.originalLegs());
+        } else {
+          componentLegs.add(leg);
+        }
       }
       components.add(
         new FareComponent(fareId, Money.ofFractionalAmount(currency, cost), componentLegs)
@@ -342,7 +357,7 @@ public class DefaultFareService implements FareService {
           journeyTime
         )
       ) {
-        Money newFare = getFarePrice(attribute, fareType);
+        Money newFare = attribute.getPrice();
         if (bestFare == null || newFare.lessThan(bestFare)) {
           bestAttribute = attribute;
           bestFare = newFare;
@@ -356,30 +371,15 @@ public class DefaultFareService implements FareService {
       .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
   }
 
-  protected Money getFarePrice(FareAttribute fare, FareType type) {
-    var currency = Currency.getInstance(fare.getCurrencyType());
-    return switch (type) {
-      case senior:
-        if (fare.getSeniorPrice() >= 0) {
-          yield Money.ofFractionalAmount(currency, fare.getSeniorPrice());
-        }
-      case youth:
-        if (fare.getYouthPrice() >= 0) {
-          yield Money.ofFractionalAmount(currency, fare.getYouthPrice());
-        }
-      default:
-        yield Money.ofFractionalAmount(currency, fare.getPrice());
-    };
-  }
-
   /**
    * Returns true if two interlined legs (those with a stay-seated transfer between them) should be
-   * treated as a single leg.
+   * treated as a single leg for the purposes of fare calculation.
    * <p>
    * By default it's disabled since this is unspecified in the GTFS fares spec.
    *
    * @see DefaultFareService#combineInterlinedLegs(List)
    * @see HighestFareInFreeTransferWindowFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
+   * @see HSLFareService#shouldCombineInterlinedLegs(ScheduledTransitLeg, ScheduledTransitLeg)
    */
   protected boolean shouldCombineInterlinedLegs(
     ScheduledTransitLeg previousLeg,

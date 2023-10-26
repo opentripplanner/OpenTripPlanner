@@ -169,6 +169,35 @@ public class TimeUtils {
   }
 
   /**
+   * Convert system time in milliseconds to a sting:
+   * <pre>
+   * -1100 -> -1.1s
+   *     0 -> 0s
+   *  1000 -> 1s
+   *  1001 -> 1.001s
+   *  1010 -> 1.01s
+   *  1100 -> 1.1s
+   * 23456 -> 23.456s
+   * </pre>
+   */
+  public static String msToString(long milliseconds) {
+    long seconds = milliseconds / 1000L;
+    int decimals = Math.abs((int) (milliseconds % 1000));
+    if (decimals == 0) {
+      return seconds + "s";
+    }
+    if (decimals % 10 == 0) {
+      decimals = decimals / 10;
+      if (decimals % 10 == 0) {
+        decimals = decimals / 10;
+        return seconds + "." + decimals + "s";
+      }
+      return seconds + "." + String.format("%02d", decimals) + "s";
+    }
+    return seconds + "." + String.format("%03d", decimals) + "s";
+  }
+
+  /**
    * Wait (compute) until the given {@code waitMs} is past. The returned long is a very random
    * number. If this method is called twice a grace period of 5 times the wait-time is set. All
    * calls within the grace period will return immediately. This ensures only ONE wait is applied

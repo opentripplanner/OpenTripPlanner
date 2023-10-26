@@ -36,7 +36,6 @@ It supports the following URL parameters:
 | `autocomplete` | Whether we should use the query string to do a prefix match      |
 | `stops`        | Search for stops, either by name or stop code                    |
 | `clusters`     | Search for clusters by their name                                |
-| `corners`      | Search for street corners using at least one of the street names |
 
 #### Stop clusters
 

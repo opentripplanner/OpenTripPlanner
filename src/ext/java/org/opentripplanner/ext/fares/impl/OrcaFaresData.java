@@ -236,20 +236,20 @@ class OrcaFaresData {
 
   // Spaces have been removed from the route name because of inconsistencies in the WSF GTFS route dataset.
   public static Map<String, Map<FareType, Money>> washingtonStateFerriesFares = Map.ofEntries(
-    sEntry("Seattle-BainbridgeIsland", 9.25f, 4.60f),
-    sEntry("Seattle-Bremerton", 9.25f, 4.60f),
-    sEntry("Mukilteo-Clinton", 5.65f, 2.80f),
-    sEntry("Fauntleroy-VashonIsland", 6.10f, 3.05f),
-    sEntry("Fauntleroy-Southworth", 7.20f, 3.60f),
-    sEntry("Edmonds-Kingston", 9.25f, 4.60f),
-    sEntry("PointDefiance-Tahlequah", 6.10f, 3.05f),
-    sEntry("Anacortes-FridayHarbor", 14.85f, 7.40f),
-    sEntry("Anacortes-LopezIsland", 14.85f, 7.40f),
-    sEntry("Anacortes-OrcasIsland", 14.85f, 7.40f),
-    sEntry("Anacortes-ShawIsland", 14.85f, 7.40f),
-    sEntry("Coupeville-PortTownsend", 3.85f, 1.90f),
-    sEntry("PortTownsend-Coupeville", 3.85f, 1.90f),
-    sEntry("Southworth-VashonIsland", 6.10f, 3.05f)
+    sEntry("Seattle-BainbridgeIsland", 9.85f, 4.90f),
+    sEntry("Seattle-Bremerton", 9.85f, 4.90f),
+    sEntry("Mukilteo-Clinton", 6f, 3f),
+    sEntry("Fauntleroy-VashonIsland", 6.50f, 3.25f),
+    sEntry("Fauntleroy-Southworth", 7.70f, 3.85f),
+    sEntry("Edmonds-Kingston", 9.85f, 4.90f),
+    sEntry("PointDefiance-Tahlequah", 6.50f, 3.25f),
+    sEntry("Anacortes-FridayHarbor", 15.85f, 7.90f),
+    sEntry("Anacortes-LopezIsland", 15.85f, 7.90f),
+    sEntry("Anacortes-OrcasIsland", 15.85f, 7.90f),
+    sEntry("Anacortes-ShawIsland", 15.85f, 7.90f),
+    sEntry("Coupeville-PortTownsend", 4.10f, 2.05f),
+    sEntry("PortTownsend-Coupeville", 4.10f, 2.05f),
+    sEntry("Southworth-VashonIsland", 6.50f, 3.25f)
   );
 
   private static Map.Entry<String, Map<FareType, Money>> entry(

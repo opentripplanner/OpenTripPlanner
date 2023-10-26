@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
-import org.opentripplanner.framework.logging.ThrottleLogger;
+import org.opentripplanner.framework.logging.Throttle;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
   private static final Logger LOG = LoggerFactory.getLogger(DestinationArrivalPaths.class);
-  private static final Logger LOG_MISS_MATCH = ThrottleLogger.throttle(LOG);
+  private static final Throttle THROTTLE_MISS_MATCH = Throttle.ofOneSecond();
 
   private final ParetoSet<RaptorPath<T>> paths;
   private final RaptorTransitCalculator<T> transitCalculator;
@@ -207,11 +207,14 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
   ) {
     if (path.c1() != destArrival.c1()) {
       // TODO - Bug: Cost mismatch stop-arrivals and paths #3623
-      LOG_MISS_MATCH.warn(
-        "Cost mismatch - Mapper: {}, stop-arrivals: {}, path: {}",
-        OtpNumberFormat.formatCostCenti(path.c1()),
-        raptorCostsAsString(destArrival),
-        path.toStringDetailed(stopNameResolver)
+      THROTTLE_MISS_MATCH.throttle(() ->
+        LOG.warn(
+          "Cost mismatch - Mapper: {}, stop-arrivals: {}, path: {}  {}",
+          OtpNumberFormat.formatCostCenti(path.c1()),
+          raptorCostsAsString(destArrival),
+          path.toStringDetailed(stopNameResolver),
+          THROTTLE_MISS_MATCH.setupInfo()
+        )
       );
     }
   }
