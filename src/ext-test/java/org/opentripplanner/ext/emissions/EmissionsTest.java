@@ -147,7 +147,7 @@ class EmissionsTest {
     );
     legs.add(leg);
     Itinerary i = new Itinerary(legs);
-    assertThat(emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2)).isEmpty();
+    assertTrue(emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2).isEmpty());
   }
 
   @Test
