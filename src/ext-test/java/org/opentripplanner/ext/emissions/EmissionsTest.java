@@ -86,8 +86,7 @@ class EmissionsTest {
       100,
       null
     );
-    legs.add(leg);
-    Itinerary i = new Itinerary(legs);
+    Itinerary i = new Itinerary(List.of(legs));
     assertEquals(2223.902, emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2).get());
   }
 
