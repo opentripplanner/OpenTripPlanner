@@ -226,7 +226,7 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * Set the search window for the current request. This is used to filter-out itineraries outside
+   * Set the search window for the current request. This is used to filter out itineraries outside
    * the search window. The filter uses the itinerary-departure-time. The filter is ignored if
    * both arguments are {@code null}, the searchWindow is required if the earliestDepartureTime is
    * set.
