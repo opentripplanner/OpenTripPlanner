@@ -572,12 +572,12 @@ type VehicleRentalStation implements Node & PlaceInterface {
     """
     Number of vehicles currently available on the rental station, grouped by vehicle type.
     """
-    availableVehicles: RentalVehicleEntityCounts!
+    availableVehicles: RentalVehicleEntityCounts
 
     """
     Number of free spaces currently available on the rental station, grouped by vehicle type.
     """
-    availableSpaces: RentalVehicleEntityCounts!
+    availableSpaces: RentalVehicleEntityCounts
 
     """
     If true, values of `vehiclesAvailable` and `spacesAvailable` are updated from a
