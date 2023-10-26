@@ -8,7 +8,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 @Sandbox
 public class EmissionsDataService implements EmissionsService {
 
-  private EmissionsDataModel emissionsDataModel;
+  private final EmissionsDataModel emissionsDataModel;
 
   public EmissionsDataService() {}
 
