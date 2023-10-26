@@ -8,8 +8,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class EmissionsDataModel implements Serializable {
 
-  private Map<FeedScopedId, Double> co2Emissions;
-  private double carAvgCo2PerMeter;
+  private final Map<FeedScopedId, Double> co2Emissions;
+  private final double carAvgCo2PerMeter;
 
   @Inject
   public EmissionsDataModel() {}
