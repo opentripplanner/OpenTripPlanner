@@ -166,7 +166,7 @@ public class PlaceFinderTraverseVisitorTest {
     // One trip pattern should also be found on default settings
     var pattern = new PatternAtStop(STOP1, a.getAllTripPatterns().stream().findFirst().get());
 
-    assertEquals(List.of(STATION, pattern, STOP2), res);
+    assertEquals(List.of(STOP1, pattern, STOP2), res);
 
     visitor.visitVertex(state1);
   }

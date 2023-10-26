@@ -81,7 +81,10 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     includeVehicleRentals = shouldInclude(filterByPlaceTypes, PlaceType.VEHICLE_RENT);
     includeCarParking = shouldInclude(filterByPlaceTypes, PlaceType.CAR_PARK);
     includeBikeParking = shouldInclude(filterByPlaceTypes, PlaceType.BIKE_PARK);
-    includeStations = shouldInclude(filterByPlaceTypes, PlaceType.STATION);
+    includeStations =
+      shouldInclude(filterByPlaceTypes, PlaceType.STATION) &&
+      filterByPlaceTypes != null &&
+      !filterByPlaceTypes.isEmpty();
 
     this.maxResults = maxResults;
     this.radiusMeters = radiusMeters;
