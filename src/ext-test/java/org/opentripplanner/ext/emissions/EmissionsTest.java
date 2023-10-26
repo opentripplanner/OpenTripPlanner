@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.emissions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
-import static shadow.org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
