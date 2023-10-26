@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public final class Grams implements Serializable, Comparable<Grams> {
 
-  private final Double value;
+  private final double value;
 
   public Grams(double value) {
     this.value = value;
