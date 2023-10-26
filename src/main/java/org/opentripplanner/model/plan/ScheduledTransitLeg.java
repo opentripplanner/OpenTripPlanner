@@ -350,7 +350,9 @@ public class ScheduledTransitLeg implements TransitLeg {
       tripTimes.getTrip().getId(),
       serviceDate,
       boardStopPosInPattern,
-      alightStopPosInPattern
+      alightStopPosInPattern,
+      tripPattern.getStops().get(boardStopPosInPattern).getId(),
+      tripPattern.getStops().get(alightStopPosInPattern).getId()
     );
   }
 

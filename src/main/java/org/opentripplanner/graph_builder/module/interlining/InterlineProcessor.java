@@ -53,13 +53,19 @@ public class InterlineProcessor {
     this.staySeatedNotAllowed = staySeatedNotAllowed;
     this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     this.issueStore = issueStore;
-    this.transitServiceStart = calendarServiceData.getFirstDate();
+    this.transitServiceStart = calendarServiceData.getFirstDate().orElse(null);
     this.daysInTransitService =
-      (int) ChronoUnit.DAYS.between(transitServiceStart, calendarServiceData.getLastDate()) + 1;
+      calendarServiceData
+        .getLastDate()
+        .map(lastDate -> (int) ChronoUnit.DAYS.between(transitServiceStart, lastDate) + 1)
+        .orElse(0);
     this.calendarServiceData = calendarServiceData;
   }
 
   public List<ConstrainedTransfer> run(Collection<TripPattern> tripPatterns) {
+    if (daysInTransitService == 0) {
+      return List.of();
+    }
     var interlinedTrips = this.getInterlinedTrips(tripPatterns);
     var transfers = interlinedTrips
       .entries()

@@ -18,7 +18,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -149,7 +149,7 @@ public class ConstructApplication {
     /* Create updater modules from JSON config. */
     UpdaterConfigurator.configure(
       graph(),
-      vehiclePositionRepository(),
+      realtimeVehicleRepository(),
       vehicleRentalRepository(),
       transitModel(),
       routerConfig().updaterConfig()
@@ -239,8 +239,8 @@ public class ConstructApplication {
     return factory.dataImportIssueSummary();
   }
 
-  public VehiclePositionRepository vehiclePositionRepository() {
-    return factory.vehiclePositionRepository();
+  public RealtimeVehicleRepository realtimeVehicleRepository() {
+    return factory.realtimeVehicleRepository();
   }
 
   public VehicleRentalRepository vehicleRentalRepository() {

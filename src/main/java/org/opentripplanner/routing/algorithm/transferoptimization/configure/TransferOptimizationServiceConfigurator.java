@@ -4,17 +4,18 @@ import java.util.function.IntFunction;
 import org.opentripplanner.model.transfer.TransferService;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
+import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorTransitDataProvider;
 import org.opentripplanner.routing.algorithm.transferoptimization.OptimizeTransferService;
 import org.opentripplanner.routing.algorithm.transferoptimization.api.TransferOptimizationParameters;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.MinSafeTransferTimeCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.TransferWaitTimeCostCalculator;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.PassThroughPathTailFilter;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.OptimizePathDomainService;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGenerator;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferOptimizedFilterFactory;
 import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferServiceAdaptor;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -29,6 +30,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
   private final RaptorTransitDataProvider<T> transitDataProvider;
   private final int[] stopBoardAlightCosts;
   private final TransferOptimizationParameters config;
+  private final MultiCriteriaRequest<T> multiCriteriaRequest;
 
   private TransferOptimizationServiceConfigurator(
     IntFunction<StopLocation> stopLookup,
@@ -36,7 +38,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     TransferService transferService,
     RaptorTransitDataProvider<T> transitDataProvider,
     int[] stopBoardAlightCosts,
-    TransferOptimizationParameters config
+    TransferOptimizationParameters config,
+    MultiCriteriaRequest<T> multiCriteriaRequest
   ) {
     this.stopLookup = stopLookup;
     this.stopNameResolver = stopNameResolver;
@@ -44,6 +47,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     this.transitDataProvider = transitDataProvider;
     this.stopBoardAlightCosts = stopBoardAlightCosts;
     this.config = config;
+    this.multiCriteriaRequest = multiCriteriaRequest;
   }
 
   /**
@@ -57,7 +61,8 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     TransferService transferService,
     RaptorTransitDataProvider<T> transitDataProvider,
     int[] stopBoardAlightCosts,
-    TransferOptimizationParameters config
+    TransferOptimizationParameters config,
+    MultiCriteriaRequest<T> multiCriteriaRequest
   ) {
     return new TransferOptimizationServiceConfigurator<T>(
       stopLookup,
@@ -65,24 +70,20 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       transferService,
       transitDataProvider,
       stopBoardAlightCosts,
-      config
+      config,
+      multiCriteriaRequest
     )
       .createOptimizeTransferService();
   }
 
   private OptimizeTransferService<T> createOptimizeTransferService() {
     var pathTransferGenerator = createTransferGenerator(config.optimizeTransferPriority());
-    var filter = createTransferOptimizedFilter(
-      config.optimizeTransferPriority(),
-      config.optimizeTransferWaitTime()
-    );
 
     if (config.optimizeTransferWaitTime()) {
       var transferWaitTimeCalculator = createTransferWaitTimeCalculator();
 
       var transfersPermutationService = createOptimizePathService(
         pathTransferGenerator,
-        filter,
         transferWaitTimeCalculator,
         transitDataProvider.multiCriteriaCostCalculator()
       );
@@ -95,7 +96,6 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     } else {
       var transfersPermutationService = createOptimizePathService(
         pathTransferGenerator,
-        filter,
         null,
         transitDataProvider.multiCriteriaCostCalculator()
       );
@@ -105,7 +105,6 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
 
   private OptimizePathDomainService<T> createOptimizePathService(
     TransferGenerator<T> transferGenerator,
-    MinCostFilterChain<OptimizedPathTail<T>> transferPointFilter,
     TransferWaitTimeCostCalculator transferWaitTimeCostCalculator,
     RaptorCostCalculator<T> costCalculator
   ) {
@@ -116,7 +115,7 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
       transferWaitTimeCostCalculator,
       stopBoardAlightCosts,
       config.extraStopBoardAlightCostsFactor(),
-      transferPointFilter,
+      createFilter(),
       stopNameResolver
     );
   }
@@ -140,10 +139,16 @@ public class TransferOptimizationServiceConfigurator<T extends RaptorTripSchedul
     );
   }
 
-  private MinCostFilterChain<OptimizedPathTail<T>> createTransferOptimizedFilter(
-    boolean transferPriority,
-    boolean optimizeWaitTime
-  ) {
-    return TransferOptimizedFilterFactory.filter(transferPriority, optimizeWaitTime);
+  private PathTailFilter<T> createFilter() {
+    var filter = new MinCostPathTailFilterFactory<T>(
+      config.optimizeTransferPriority(),
+      config.optimizeTransferWaitTime()
+    )
+      .createFilter();
+
+    if (multiCriteriaRequest.hasPassThroughPoints()) {
+      filter = new PassThroughPathTailFilter<>(filter, multiCriteriaRequest.passThroughPoints());
+    }
+    return filter;
   }
 }

@@ -374,6 +374,16 @@ public class AtlantaFareService extends DefaultFareService {
     addFareRules(FareType.electronicSenior, regularFareRules);
   }
 
+  /**
+   * In the base class only the rules for a specific feed are selected and then passed to the
+   * fare engine, however here we want to explicitly compute fares across feed boundaries.
+   */
+  @Nullable
+  @Override
+  protected Collection<FareRuleSet> fareRulesForFeed(FareType fareType, String feedId) {
+    return fareRulesPerType.get(fareType);
+  }
+
   @Override
   public boolean populateFare(
     ItineraryFares fare,

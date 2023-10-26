@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 /**
@@ -12,13 +13,13 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
  */
 public final class SortingFilter implements ItineraryListFilter {
 
-  private final Comparator<Itinerary> comparator;
+  private final Comparator<ItinerarySortKey> comparator;
 
-  public SortingFilter(Comparator<Itinerary> comparator) {
+  public SortingFilter(Comparator<ItinerarySortKey> comparator) {
     this.comparator = comparator;
   }
 
-  public Comparator<Itinerary> comparator() {
+  public Comparator<ItinerarySortKey> comparator() {
     return comparator;
   }
 
@@ -27,7 +28,7 @@ public final class SortingFilter implements ItineraryListFilter {
     if (itineraries.size() < 2) {
       return itineraries;
     }
-    // Sort acceding by qualifier and map to list of itineraries
+    // Sort ascending by qualifier and map to list of itineraries
     return itineraries.stream().sorted(comparator()).collect(Collectors.toList());
   }
 }

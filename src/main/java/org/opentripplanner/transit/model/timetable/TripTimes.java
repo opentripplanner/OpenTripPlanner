@@ -324,7 +324,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
 
   public OccupancyStatus getOccupancyStatus(int stop) {
     if (this.occupancyStatus == null) {
-      return OccupancyStatus.NO_DATA;
+      return OccupancyStatus.NO_DATA_AVAILABLE;
     }
     return this.occupancyStatus[stop];
   }
@@ -681,7 +681,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         arrivalTimes[i] += timeShift;
         departureTimes[i] += timeShift;
         stopRealTimeStates[i] = StopRealTimeState.DEFAULT;
-        occupancyStatus[i] = OccupancyStatus.NO_DATA;
+        occupancyStatus[i] = OccupancyStatus.NO_DATA_AVAILABLE;
       }
 
       // Update the real-time state
