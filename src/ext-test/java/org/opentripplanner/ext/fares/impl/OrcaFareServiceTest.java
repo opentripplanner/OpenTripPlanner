@@ -296,17 +296,26 @@ public class OrcaFareServiceTest {
   }
 
   /**
-   * Single trip with Kitsap transit fast ferry east to confirm correct non Orca fares are applied.
+   * Single trip with Kitsap transit fast ferry to confirm correct non Orca fares are applied.
    */
   @Test
-  void calculateFareForKitsapFastFerryEastAgency() {
-    List<Leg> rides = List.of(getLeg(KITSAP_TRANSIT_AGENCY_ID, 0, 4, "Kitsap Fast Ferry", "east"));
+  void calculateFareForKitsapFastFerry() {
+    List<Leg> rides = List.of(getLeg(KITSAP_TRANSIT_AGENCY_ID, 0, 4, "404", "east"));
     calculateFare(rides, regular, TWO_DOLLARS);
     calculateFare(rides, FareType.senior, TWO_DOLLARS);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, ONE_DOLLAR);
     calculateFare(rides, FareType.electronicRegular, TWO_DOLLARS);
     calculateFare(rides, FareType.electronicSenior, ONE_DOLLAR);
+    calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
+
+    rides = List.of(getLeg(KITSAP_TRANSIT_AGENCY_ID, 0, 4, "404", "west"));
+    calculateFare(rides, regular, usDollars(10f));
+    calculateFare(rides, FareType.senior, usDollars(10f));
+    calculateFare(rides, FareType.youth, Money.ZERO_USD);
+    calculateFare(rides, FareType.electronicSpecial, usDollars(5f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(10f));
+    calculateFare(rides, FareType.electronicSenior, usDollars(5f));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
   }
 
