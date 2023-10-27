@@ -17,8 +17,7 @@ class DefaultVehicleRentalServiceTest {
     DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
 
     VehicleRentalStation vehicleRentalStation = new TestVehicleRentalStationBuilder()
-      .withLatitude(1)
-      .withLongitude(1)
+      .withCoordinates(1, 1)
       .build();
     defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalStation);
 
