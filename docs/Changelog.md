@@ -26,6 +26,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Filter out null, empty and blank elements when mapping feed-scoped ids [#5428](https://github.com/opentripplanner/OpenTripPlanner/pull/5428)
 - Validate stop id in Transit leg reference [#5440](https://github.com/opentripplanner/OpenTripPlanner/pull/5440)
 - Add available types and spaces to `VehicleRentalStation` [#5425](https://github.com/opentripplanner/OpenTripPlanner/pull/5425)
+- Make vehicleRentalStation query optionally accept id without feed [#5411](https://github.com/opentripplanner/OpenTripPlanner/pull/5411)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
