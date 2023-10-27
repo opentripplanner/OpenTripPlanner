@@ -37,11 +37,26 @@ To enable the SIRI updater you need to add it to the updaters section of the `ro
 | previewInterval                |    `duration`   | TODO                                                                                                   | *Optional* |               |  2.0  |
 | requestorRef                   |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
 | timeout                        |    `duration`   | The HTTP timeout to download the updates.                                                              | *Optional* | `"PT15S"`     |  2.0  |
-| url                            |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
+| [url](#u__8__url)              |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
 | [headers](#u__8__headers)      | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
 
 
 ##### Parameter details
+
+<h4 id="u__8__url">url</h4>
+
+**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[8] 
+
+The URL to send the HTTP requests to.
+
+Use the file protocol to set a directory for reading updates from a directory. The file
+loader will look for xml files: '*.xml' in the configured directory. The files are
+renamed by the loader when possessed:
+
+&nbsp;&nbsp;&nbsp; _a.xml_ &nbsp; ➞ &nbsp; _a.xml.inProgress_ &nbsp; ➞ &nbsp; _a.xml.ok_ &nbsp; or &nbsp; _a.xml.failed_
+
+
 
 <h4 id="u__8__headers">headers</h4>
 
@@ -87,7 +102,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 | frequency                       |    `duration`   | How often the updates should be retrieved.                                                             | *Optional* | `"PT1M"`      |  2.0  |
 | requestorRef                    |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
 | timeout                         |    `duration`   | The HTTP timeout to download the updates.                                                              | *Optional* | `"PT15S"`     |  2.0  |
-| url                             |     `string`    | The URL to send the HTTP requests to.                                                                  | *Required* |               |  2.0  |
+| [url](#u__9__url)               |     `string`    | The URL to send the HTTP requests to. Support http/https and file protocol.                            | *Required* |               |  2.0  |
 | [headers](#u__9__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
 
 
@@ -103,6 +118,22 @@ This value is subtracted from the actual validity defined in the message.
 Normally the planned departure time is used, so setting this to 10s will cause the
 SX-message to be included in trip-results 10 seconds before the the planned departure
 time.
+
+<h4 id="u__9__url">url</h4>
+
+**Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
+**Path:** /updaters/[9] 
+
+The URL to send the HTTP requests to. Support http/https and file protocol.
+
+
+Use the file protocol to set a directory for reading updates from a directory. The file
+loader will look for xml files: '*.xml' in the configured directory. The files are
+renamed by the loader when possessed:
+
+&nbsp;&nbsp;&nbsp; _a.xml_ &nbsp; ➞ &nbsp; _a.xml.inProgress_ &nbsp; ➞ &nbsp; _a.xml.ok_ &nbsp; or &nbsp; _a.xml.failed_
+
+
 
 <h4 id="u__9__headers">headers</h4>
 

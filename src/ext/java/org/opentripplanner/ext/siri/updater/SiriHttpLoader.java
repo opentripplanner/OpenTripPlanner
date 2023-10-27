@@ -2,6 +2,7 @@ package org.opentripplanner.ext.siri.updater;
 
 import jakarta.xml.bind.JAXBException;
 import java.time.Duration;
+import java.util.Optional;
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.updater.spi.HttpHeaders;
 import org.slf4j.Logger;
@@ -11,7 +12,7 @@ import uk.org.siri.siri20.Siri;
 /**
  * Load real-time updates from SIRI-SX and SIRI-ET feeds over HTTP.
  */
-public class SiriHttpLoader {
+public class SiriHttpLoader implements SiriLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(SiriHttpLoader.class);
   private final HttpHeaders requestHeaders;
@@ -40,7 +41,8 @@ public class SiriHttpLoader {
   /**
    * Send a SIRI-SX service request and unmarshal the response as JAXB.
    */
-  public Siri fetchSXFeed(String requestorRef) throws JAXBException {
+  @Override
+  public Optional<Siri> fetchSXFeed(String requestorRef) throws JAXBException {
     RequestTimer requestTimer = new RequestTimer("SX");
     requestTimer.init();
     String sxServiceRequest = SiriHelper.createSXServiceRequestAsXml(requestorRef);
@@ -51,7 +53,8 @@ public class SiriHttpLoader {
   /**
    * Send a SIRI-ET service request and unmarshal the response as JAXB.
    */
-  public Siri fetchETFeed(String requestorRef) throws JAXBException {
+  @Override
+  public Optional<Siri> fetchETFeed(String requestorRef) throws JAXBException {
     RequestTimer requestTimer = new RequestTimer("ET");
     requestTimer.init();
     String etServiceRequest = SiriHelper.createETServiceRequestAsXml(requestorRef, previewInterval);
@@ -59,7 +62,11 @@ public class SiriHttpLoader {
     return fetchFeed(etServiceRequest, requestTimer, requestorRef);
   }
 
-  private Siri fetchFeed(String serviceRequest, RequestTimer requestTimer, String requestorRef) {
+  private Optional<Siri> fetchFeed(
+    String serviceRequest,
+    RequestTimer requestTimer,
+    String requestorRef
+  ) {
     try {
       return otpHttpClient.postXmlAndMap(
         url,
@@ -70,7 +77,7 @@ public class SiriHttpLoader {
           requestTimer.responseFetched();
           Siri siri = SiriHelper.unmarshal(is);
           requestTimer.responseUnmarshalled();
-          return siri;
+          return Optional.of(siri);
         }
       );
     } finally {

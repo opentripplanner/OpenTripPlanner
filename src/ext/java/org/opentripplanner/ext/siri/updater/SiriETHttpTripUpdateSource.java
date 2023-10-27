@@ -2,6 +2,7 @@ package org.opentripplanner.ext.siri.updater;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.io.OtpHttpClientException;
@@ -21,7 +22,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   private final String url;
 
-  private final SiriHttpLoader siriHttpLoader;
+  private final SiriLoader siriLoader;
   private final String requestorRef;
 
   /**
@@ -35,31 +36,29 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
     this.feedId = parameters.feedId();
     this.url = parameters.url();
 
-    requestorRef =
+    this.requestorRef =
       parameters.requestorRef() == null || parameters.requestorRef().isEmpty()
         ? "otp-" + UUID.randomUUID()
         : parameters.requestorRef();
 
-    siriHttpLoader =
-      new SiriHttpLoader(
-        url,
-        parameters.timeout(),
-        parameters.httpRequestHeaders(),
-        parameters.previewInterval()
-      );
+    this.siriLoader = createLoader(url, parameters);
   }
 
   @Override
-  public Siri getUpdates() {
+  public Optional<Siri> getUpdates() {
     long t1 = System.currentTimeMillis();
     try {
-      Siri siri = siriHttpLoader.fetchETFeed(requestorRef);
-
-      if (siri.getServiceDelivery().getResponseTimestamp().isBefore(lastTimestamp)) {
-        LOG.info("Newer data has already been processed");
-        return null;
+      var siri = siriLoader.fetchETFeed(requestorRef);
+      if (siri.isEmpty()) {
+        return Optional.empty();
       }
-      lastTimestamp = siri.getServiceDelivery().getResponseTimestamp();
+
+      var serviceDelivery = siri.get().getServiceDelivery();
+      if (serviceDelivery.getResponseTimestamp().isBefore(lastTimestamp)) {
+        LOG.info("Newer data has already been processed");
+        return Optional.empty();
+      }
+      lastTimestamp = serviceDelivery.getResponseTimestamp();
 
       //All subsequent requests will return changes since last request
       fullDataset = false;
@@ -71,7 +70,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
       LOG.info("Failed after {} ms", (System.currentTimeMillis() - t1));
       LOG.warn("Failed to parse SIRI-ET feed from {}", url, e);
     }
-    return null;
+    return Optional.empty();
   }
 
   @Override
@@ -86,6 +85,22 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
   public String toString() {
     return "SiriETHttpTripUpdateSource(" + url + ")";
+  }
+
+  private static SiriLoader createLoader(String url, Parameters parameters) {
+    // Load realtime updates from a file.
+    if (SiriFileLoader.matchesUrl(url)) {
+      return new SiriFileLoader(url);
+    }
+    // Fallback to default loader
+    else {
+      return new SiriHttpLoader(
+        url,
+        parameters.timeout(),
+        parameters.httpRequestHeaders(),
+        parameters.previewInterval()
+      );
+    }
   }
 
   public interface Parameters {
