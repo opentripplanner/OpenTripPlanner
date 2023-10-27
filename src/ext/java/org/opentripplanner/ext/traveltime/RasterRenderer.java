@@ -5,6 +5,8 @@ import static javax.imageio.ImageWriteParam.MODE_EXPLICIT;
 import jakarta.ws.rs.core.StreamingOutput;
 import java.awt.image.DataBuffer;
 import javax.media.jai.RasterFactory;
+import org.geotools.api.parameter.GeneralParameterValue;
+import org.geotools.api.parameter.ParameterValueGroup;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.GridEnvelope2D;
@@ -13,12 +15,10 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffWriteParams;
 import org.geotools.gce.geotiff.GeoTiffWriter;
-import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.referencing.operation.transform.AffineTransform2D;
 import org.locationtech.jts.geom.Coordinate;
-import org.opengis.parameter.GeneralParameterValue;
-import org.opengis.parameter.ParameterValueGroup;
 import org.opentripplanner.ext.traveltime.geometry.ZSampleGrid;
 
 public class RasterRenderer {
@@ -49,7 +49,7 @@ public class RasterRenderer {
       raster.setSample(s.getX() - minX, maxY - s.getY(), 0, z.wTime / z.w);
     }
 
-    Envelope2D geom = new GridGeometry2D(
+    ReferencedEnvelope geom = new GridGeometry2D(
       new GridEnvelope2D(0, 0, width, height),
       new AffineTransform2D(resX, 0, 0, resY, center.x + resX * minX, center.y + resY * minY),
       DefaultGeographicCRS.WGS84

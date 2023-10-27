@@ -40,11 +40,10 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     String testCaseName, // used to create parameterized test name
     FareService fareService,
     Itinerary i,
-    float expectedFare
+    Money expectedFare
   ) {
     var fares = fareService.calculateFares(i);
-    final Money expected = Money.usDollars(expectedFare);
-    assertEquals(expected, fares.getFare(FareType.regular));
+    assertEquals(expectedFare, fares.getFare(FareType.regular));
 
     for (var type : fares.getFareTypes()) {
       assertTrue(fares.getComponents(type).isEmpty());
@@ -55,7 +54,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
         .filter(fp -> fp.name().equals(type.name()))
         .map(FareProduct::price)
         .toList();
-      assertEquals(List.of(expected), prices);
+      assertEquals(List.of(expectedFare), prices);
     }
   }
 
@@ -71,10 +70,9 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     List<FareRuleSet> defaultFareRules = new LinkedList<>();
 
     // $1 fares
-    float oneDollar = 1.0f;
+    var oneDollar = Money.usDollars(1.0f);
     FareAttribute oneDollarFareAttribute = FareAttribute
       .of(new FeedScopedId(FEED_ID, "oneDollarAttribute"))
-      .setCurrencyType("USD")
       .setPrice(oneDollar)
       .build();
     FareRuleSet oneDollarRouteBasedFares = new FareRuleSet(oneDollarFareAttribute);
@@ -83,10 +81,9 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
     defaultFareRules.add(oneDollarRouteBasedFares);
 
     // $2 fares
-    float twoDollars = 2.0f;
+    var twoDollars = Money.usDollars(2.0f);
     FareAttribute twoDollarFareAttribute = FareAttribute
       .of(new FeedScopedId(FEED_ID, "twoDollarAttribute"))
-      .setCurrencyType("USD")
       .setPrice(twoDollars)
       .build();
 
@@ -166,7 +163,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
         "Two transit legs, second leg starts outside free transfer window",
         defaultFareService,
         twoTransitLegSecondRouteHappensAfterFreeTransferWindowPath,
-        oneDollar + oneDollar
+        oneDollar.plus(oneDollar)
       )
     );
 
@@ -182,7 +179,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
         "Three transit legs, second leg starts outside free transfer window, third leg within second free transfer window",
         defaultFareService,
         threeTransitLegSecondRouteHappensAfterFreeTransferWindowPath,
-        oneDollar + oneDollar
+        oneDollar.plus(oneDollar)
       )
     );
 
@@ -198,7 +195,7 @@ class HighestFareInFreeTransferWindowFareServiceTest implements PlanTestConstant
         "Three transit legs, all starting outside free transfer window",
         defaultFareService,
         threeTransitLegAllOutsideFreeTransferWindowPath,
-        oneDollar + oneDollar + oneDollar
+        oneDollar.plus(oneDollar).plus(oneDollar)
       )
     );
 

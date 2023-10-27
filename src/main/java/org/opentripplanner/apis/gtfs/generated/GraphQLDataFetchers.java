@@ -48,7 +48,9 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
@@ -1181,6 +1183,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> stationId();
 
     public DataFetcher<Integer> vehiclesAvailable();
+
+    public DataFetcher<RentalVehicleEntityCounts> availableVehicles();
+
+    public DataFetcher<RentalVehicleEntityCounts> availableSpaces();
   }
 
   public interface GraphQLVehicleRentalUris {

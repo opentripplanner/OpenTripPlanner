@@ -6,18 +6,18 @@ import java.awt.image.renderable.RenderableImage;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import org.geotools.api.coverage.CannotEvaluateException;
+import org.geotools.api.coverage.PointOutsideCoverageException;
+import org.geotools.api.coverage.SampleDimension;
+import org.geotools.api.coverage.grid.GridCoverage;
+import org.geotools.api.coverage.grid.GridGeometry;
+import org.geotools.api.geometry.Bounds;
+import org.geotools.api.geometry.Position;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
+import org.geotools.api.util.Record;
+import org.geotools.api.util.RecordType;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.util.CoverageUtilities;
-import org.opengis.coverage.CannotEvaluateException;
-import org.opengis.coverage.PointOutsideCoverageException;
-import org.opengis.coverage.SampleDimension;
-import org.opengis.coverage.grid.GridCoverage;
-import org.opengis.coverage.grid.GridGeometry;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.Envelope;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.util.Record;
-import org.opengis.util.RecordType;
 
 public class NoDataGridCoverage implements GridCoverage {
 
@@ -75,7 +75,7 @@ public class NoDataGridCoverage implements GridCoverage {
   }
 
   @Override
-  public Envelope getEnvelope() {
+  public Bounds getEnvelope() {
     return gridCoverage.getEnvelope();
   }
 
@@ -86,44 +86,43 @@ public class NoDataGridCoverage implements GridCoverage {
 
   // Override the evaluate methods, so that a PointOutsideCoverageException is thrown for NO_DATE values
   @Override
-  public Set<Record> evaluate(DirectPosition directPosition, Collection<String> collection)
-    throws PointOutsideCoverageException, CannotEvaluateException {
+  public Set<Record> evaluate(Position directPosition, Collection<String> collection)
+    throws CannotEvaluateException {
     throw new UnsupportedOperationException("This methods is unsupported");
   }
 
   @Override
-  public Object evaluate(DirectPosition directPosition)
-    throws PointOutsideCoverageException, CannotEvaluateException {
+  public Object evaluate(Position directPosition) throws CannotEvaluateException {
     throw new UnsupportedOperationException("This methods is unsupported");
   }
 
   @Override
-  public boolean[] evaluate(DirectPosition directPosition, boolean[] booleans)
-    throws PointOutsideCoverageException, CannotEvaluateException, ArrayIndexOutOfBoundsException {
+  public boolean[] evaluate(Position directPosition, boolean[] booleans)
+    throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
     throw new UnsupportedOperationException("This methods is unsupported");
   }
 
   @Override
-  public byte[] evaluate(DirectPosition directPosition, byte[] bytes)
-    throws PointOutsideCoverageException, CannotEvaluateException, ArrayIndexOutOfBoundsException {
+  public byte[] evaluate(Position directPosition, byte[] bytes)
+    throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
     throw new UnsupportedOperationException("This methods is unsupported");
   }
 
   @Override
-  public int[] evaluate(DirectPosition directPosition, int[] ints)
-    throws PointOutsideCoverageException, CannotEvaluateException, ArrayIndexOutOfBoundsException {
+  public int[] evaluate(Position directPosition, int[] ints)
+    throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
     throw new UnsupportedOperationException("This methods is unsupported");
   }
 
   @Override
-  public float[] evaluate(DirectPosition directPosition, float[] floats)
-    throws PointOutsideCoverageException, CannotEvaluateException, ArrayIndexOutOfBoundsException {
+  public float[] evaluate(Position directPosition, float[] floats)
+    throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
     throw new UnsupportedOperationException("This methods is unsupported");
   }
 
   @Override
-  public double[] evaluate(DirectPosition directPosition, double[] dest)
-    throws PointOutsideCoverageException, CannotEvaluateException, ArrayIndexOutOfBoundsException {
+  public double[] evaluate(Position directPosition, double[] dest)
+    throws CannotEvaluateException, ArrayIndexOutOfBoundsException {
     gridCoverage.evaluate(directPosition, dest);
     if (this.noData != null && this.noData.getAsSingleValue() == dest[0]) {
       throw new PointOutsideCoverageException("Value is NO_DATA.");

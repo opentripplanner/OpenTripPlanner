@@ -3,9 +3,9 @@ package org.opentripplanner.raptor.api.request;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Objects;
+import java.util.function.IntFunction;
 import java.util.stream.IntStream;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.lang.StringUtils;
 
 /**
@@ -55,8 +55,28 @@ public class PassThroughPoint {
    */
   @Override
   public String toString() {
-    return (
-      "(" + (name == null ? "" : name + ", ") + "stops: " + IntUtils.intArrayToString(stops) + ")"
-    );
+    return toString(Integer::toString);
+  }
+
+  public String toString(IntFunction<String> nameResolver) {
+    StringBuilder buf = new StringBuilder("(");
+    if (name != null) {
+      buf.append(name).append(", ");
+    }
+    buf.append("stops: ");
+    appendStops(buf, ", ", nameResolver);
+    return buf.append(")").toString();
+  }
+
+  public void appendStops(StringBuilder buf, String sep, IntFunction<String> nameResolver) {
+    boolean skipFirst = true;
+    for (int stop : stops) {
+      if (skipFirst) {
+        skipFirst = false;
+      } else {
+        buf.append(sep);
+      }
+      buf.append(nameResolver.apply(stop));
+    }
   }
 }
