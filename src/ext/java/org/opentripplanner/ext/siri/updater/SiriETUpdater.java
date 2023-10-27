@@ -110,7 +110,9 @@ public class SiriETUpdater extends PollingGraphUpdater {
             );
             ResultLogger.logUpdateResult(feedId, "siri-et", result);
             recordMetrics.accept(result);
-            if (markPrimed) primed = true;
+            if (markPrimed) {
+              primed = true;
+            }
           });
         }
       }
