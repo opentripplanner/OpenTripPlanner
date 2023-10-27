@@ -168,10 +168,7 @@ public class OrcaFareService extends DefaultFareService {
       case WASHINGTON_STATE_FERRIES_AGENCY_ID -> RideType.WASHINGTON_STATE_FERRIES;
       case T_LINK_AGENCY_ID -> RideType.SOUND_TRANSIT_T_LINK;
       case KITSAP_TRANSIT_AGENCY_ID -> {
-        if (
-          route.getId().getId().equalsIgnoreCase("Kitsap Fast Ferry") &&
-          route.getGtfsType() == ROUTE_TYPE_FERRY
-        ) {
+        if (route.getGtfsType() == ROUTE_TYPE_FERRY) {
           // Additional trip id checks are required to distinguish Kitsap fast ferry routes.
           if (tripId.contains("east")) {
             yield RideType.KITSAP_TRANSIT_FAST_FERRY_EASTBOUND;
