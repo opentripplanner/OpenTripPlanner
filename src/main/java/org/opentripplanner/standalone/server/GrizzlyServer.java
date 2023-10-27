@@ -83,7 +83,7 @@ public class GrizzlyServer {
     );
     httpListener.setSecure(false);
 
-    // For both HTTP and HTTPS listeners: enable gzip compression, set thread pool, add listener to httpServer.
+    // For the HTTP listeners: enable gzip compression, set thread pool, add listener to httpServer.
     CompressionConfig cc = httpListener.getCompressionConfig();
     cc.setCompressionMode(CompressionConfig.CompressionMode.ON);
     cc.setCompressionMinSize(50000); // the min number of bytes to compress
