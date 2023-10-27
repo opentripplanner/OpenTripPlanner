@@ -118,6 +118,7 @@ public class MainView {
 
   private final DataSourcesView dataSourcesView;
   private final OptionsView optionsView;
+  private final StartOtpButtonView startOtpButtonView;
   private final Runnable otpStarter;
   private final Model model;
 
@@ -139,7 +140,7 @@ public class MainView {
     );
     this.dataSourcesView = new DataSourcesView(model);
     this.optionsView = new OptionsView(model);
-    StartOtpButtonView startOtpButtonView = new StartOtpButtonView();
+    this.startOtpButtonView = new StartOtpButtonView();
 
     innerPanel.add(sourceDirectoryView.panel(), CONFIG_SOURCE_DIR_PANEL_CONSTRAINTS);
     innerPanel.add(dataSourcesView.panel(), CONFIG_DIRS_PANEL_CONSTRAINTS);
@@ -176,6 +177,8 @@ public class MainView {
     mainFrame.pack();
     mainFrame.setLocationRelativeTo(null);
     mainFrame.setVisible(true);
+
+    startOtpButtonView.grabFocus();
   }
 
   private void startOtp() {
