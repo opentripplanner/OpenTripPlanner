@@ -139,7 +139,6 @@ with your local OpenTripPlanner instance.
 
 This map-based user interface is in fact sending HTTP GET requests to the OTP server running on your
 local machine. It can be informative to watch the HTTP requests and responses being generated using
-```suggestion
 the developer tools in your web browser. OTP's built-in web server will run by default on port 8080.
 If by any chance some other software is already using that port number, you can specify a different
 port number with a switch
