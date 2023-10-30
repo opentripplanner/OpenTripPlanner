@@ -1,7 +1,7 @@
 import { Form } from 'react-bootstrap';
 import { StreetMode, TripQueryVariables } from '../../gql/graphql.ts';
 
-export function EgressSelect({
+export function DirectModeSelect({
   tripQueryVariables,
   setTripQueryVariables,
 }: {
@@ -10,11 +10,11 @@ export function EgressSelect({
 }) {
   return (
     <Form.Group>
-      <Form.Label column="sm" htmlFor="egressSelect">
-        Egress
+      <Form.Label column="sm" htmlFor="directModeSelect">
+        Direct mode
       </Form.Label>
       <Form.Select
-        id="egressSelect"
+        id="directModeSelect"
         size="sm"
         onChange={(e) => {
           if (e.target.value !== 'not_selected') {
@@ -22,25 +22,25 @@ export function EgressSelect({
               ...tripQueryVariables,
               modes: {
                 ...tripQueryVariables.modes,
-                accessMode: tripQueryVariables.modes?.accessMode || (e.target.value as StreetMode),
-                egressMode: e.target.value as StreetMode,
+                directMode: e.target.value as StreetMode,
               },
             });
           } else {
             setTripQueryVariables({
               ...tripQueryVariables,
               modes:
-                tripQueryVariables.modes?.directMode || tripQueryVariables.modes?.transportModes
+                tripQueryVariables.modes?.accessMode ||
+                tripQueryVariables.modes?.egressMode ||
+                tripQueryVariables.modes?.transportModes
                   ? {
                       ...tripQueryVariables.modes,
-                      accessMode: undefined,
-                      egressMode: undefined,
+                      directMode: undefined,
                     }
                   : undefined,
             });
           }
         }}
-        value={tripQueryVariables.modes?.egressMode || 'not_selected'}
+        value={tripQueryVariables.modes?.directMode || 'not_selected'}
       >
         <option value="not_selected">Not selected</option>
         {Object.values(StreetMode).map((mode) => (

@@ -7,6 +7,8 @@ import { DateInputField } from './DateInputField.tsx';
 import { SearchWindowInput } from './SearchWindowInput.tsx';
 import { AccessSelect } from './AccessSelect.tsx';
 import { EgressSelect } from './EgressSelect.tsx';
+import { DirectModeSelect } from './DirectModeSelect.tsx';
+import { TransitModeSelect } from './TransitModeSelect.tsx';
 
 export function SearchBar({
   onRoute,
@@ -27,7 +29,9 @@ export function SearchBar({
         <DateInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <SearchWindowInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <AccessSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+        <TransitModeSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <EgressSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+        <DirectModeSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <div className="search-bar-route-button-wrapper">
           <Button variant="primary" onClick={onRoute}>
             Route

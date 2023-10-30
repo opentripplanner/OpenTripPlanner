@@ -14,6 +14,7 @@ export function AccessSelect({
         Access
       </Form.Label>
       <Form.Select
+        id="accessSelect"
         size="sm"
         onChange={(e) => {
           if (e.target.value !== 'not_selected') {
