@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.astar.spi.SkipEdgeStrategy;
 import org.opentripplanner.astar.spi.TraverseVisitor;
-import org.opentripplanner.framework.lang.PredicateUtils;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -42,7 +42,7 @@ public class StopFinderTraverseVisitor implements TraverseVisitor<State, Edge> {
    * @return A de-duplicated list of nearby stops found by this visitor.
    */
   public List<NearbyStop> stopsFound() {
-    return stopsFound.stream().filter(PredicateUtils.distinctByKey(ns -> ns.stop)).toList();
+    return ListUtils.distinctByKey(stopsFound, ns -> ns.stop);
   }
 
   /**
