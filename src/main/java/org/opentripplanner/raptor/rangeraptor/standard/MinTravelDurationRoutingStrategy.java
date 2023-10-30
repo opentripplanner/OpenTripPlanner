@@ -4,7 +4,6 @@ import static org.opentripplanner.raptor.spi.RaptorTripScheduleSearch.UNBOUNDED_
 
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.model.TransitArrival;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoutingStrategy;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.support.TimeBasedBoardingSupport;
@@ -12,6 +11,8 @@ import org.opentripplanner.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.raptor.spi.RaptorBoardOrAlightEvent;
 import org.opentripplanner.raptor.spi.RaptorConstrainedBoardingSearch;
 import org.opentripplanner.raptor.spi.RaptorRoute;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The purpose of this class is to implement a routing strategy for finding the best minimum travel
@@ -29,12 +30,15 @@ import org.opentripplanner.raptor.spi.RaptorRoute;
 public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule>
   implements RoutingStrategy<T> {
 
+  private static final Logger LOG = LoggerFactory.getLogger(MinTravelDurationRoutingStrategy.class);
+
   private static final int NOT_SET = -1;
 
   private final StdWorkerState<T> state;
   private final TimeBasedBoardingSupport<T> boardingSupport;
   private final TransitCalculator<T> calculator;
 
+  private int logCount = 0;
   private int onTripIndex;
   private int onTripBoardTime;
   private int onTripBoardStop;
@@ -113,10 +117,16 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
 
       // Remove the wait time from the arrival-time. We don´t need to use the transit
       // calculator because of the way we compute the time-shift. It is positive in the case
-      // of a forward-search and negative int he case of a reverse-search.
+      // of a forward-search and negative in the case of a reverse-search.
       final int stopArrivalTime = stopArrivalTime0 - onTripTimeShift;
 
-      state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);
+      // TODO: Make sure that the TimeTables can not have negative trip times, then
+      //       this check can be removed.
+      if (calculator.isBefore(stopArrivalTime, onTripBoardTime)) {
+        logInvalidAlightTime(stopPos, stopArrivalTime);
+      } else {
+        state.transitToStop(stopIndex, stopArrivalTime, onTripBoardStop, onTripBoardTime, onTrip);
+      }
     }
   }
 
@@ -168,7 +178,16 @@ public final class MinTravelDurationRoutingStrategy<T extends RaptorTripSchedule
     return state.bestTimePreviousRound(stopIndex);
   }
 
-  private TransitArrival<T> previousTransitArrival(int boardStopIndex) {
-    return state.previousTransit(boardStopIndex);
+  private void logInvalidAlightTime(int stopPos, int stopArrivalTime) {
+    if (logCount < 3) {
+      ++logCount;
+      LOG.error(
+        "Traveling back in time is not allowed. Board stop pos: {}, alight stop pos: {}, stop arrival time: {}, trip: {}.",
+        onTrip.findDepartureStopPosition(onTripBoardTime, onTripBoardStop),
+        stopPos,
+        stopArrivalTime,
+        onTrip
+      );
+    }
   }
 }
