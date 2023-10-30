@@ -10,9 +10,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 @Sandbox
 public class DefaultEmissionsService implements EmissionsService {
 
-  private EmissionsDataModel emissionsDataModel;
-
-  public DefaultEmissionsService() {}
+  private final EmissionsDataModel emissionsDataModel;
 
   @Inject
   public DefaultEmissionsService(EmissionsDataModel emissionsDataModel) {
