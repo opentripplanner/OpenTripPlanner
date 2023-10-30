@@ -13,7 +13,7 @@ type MultiSelectDropdownProps<T> = {
   onChange: (value: T[]) => void;
 };
 
-const MultiSelectDropdown = <T extends unknown>({ label, options, values, onChange }: MultiSelectDropdownProps<T>) => {
+const MultiSelectDropdown = <T = unknown,>({ label, options, values, onChange }: MultiSelectDropdownProps<T>) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
