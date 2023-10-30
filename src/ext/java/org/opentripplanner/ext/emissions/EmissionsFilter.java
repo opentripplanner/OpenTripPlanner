@@ -30,11 +30,10 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
         .map(TransitLeg.class::cast)
         .toList();
 
-      if (!transitLegs.isEmpty()) {
-        Optional<Grams> co2Emissions = calculateCo2EmissionsForTransit(transitLegs);
-        Grams co2 = co2Emissions.isPresent() ? co2Emissions.get() : null;
-        itinerary.setEmissionsPerPerson(new Emissions(co2));
-      }
+      calculateCo2EmissionsForTransit(transitLegs)
+        .ifPresent(co2 -> {
+          itinerary.setEmissionsPerPerson(new Emissions(co2));
+        });
 
       List<StreetLeg> carLegs = itinerary
         .getLegs()
@@ -44,11 +43,10 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
         .filter(leg -> leg.getMode() == TraverseMode.CAR)
         .toList();
 
-      if (!carLegs.isEmpty()) {
-        Optional<Grams> carCo2Emissions = calculateCo2EmissionsForCar(carLegs);
-        Grams co2 = carCo2Emissions.isPresent() ? carCo2Emissions.get() : null;
-        itinerary.setEmissionsPerPerson(new Emissions(co2));
-      }
+      calculateCo2EmissionsForCar(carLegs)
+        .ifPresent(co2 -> {
+          itinerary.setEmissionsPerPerson(new Emissions(co2));
+        });
     }
     return itineraries;
   }
@@ -75,15 +73,15 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
   }
 
   private Optional<Grams> calculateCo2EmissionsForCar(List<StreetLeg> carLegs) {
-    return emissionsService.getEmissionsPerMeterForCar().map( emissions -> {
-        return new Grams(
+    return emissionsService
+      .getEmissionsPerMeterForCar()
+      .map(emissions ->
+        new Grams(
           carLegs
             .stream()
-            .mapToDouble(leg ->
-              emissionsForCar.get().getCo2().multiply(leg.getDistanceMeters()).asDouble()
-            )
+            .mapToDouble(leg -> emissions.getCo2().multiply(leg.getDistanceMeters()).asDouble())
             .sum()
-        );
-    });
+        )
+      );
   }
 }
