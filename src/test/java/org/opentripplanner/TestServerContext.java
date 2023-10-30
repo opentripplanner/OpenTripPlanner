@@ -9,8 +9,8 @@ import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
-import org.opentripplanner.service.vehiclepositions.internal.DefaultVehiclePositionService;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
@@ -21,6 +21,7 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 public class TestServerContext {
 
@@ -33,6 +34,7 @@ public class TestServerContext {
   ) {
     transitModel.index();
     final RouterConfig routerConfig = RouterConfig.DEFAULT;
+    var transitService = new DefaultTransitService(transitModel);
     DefaultServerRequestContext context = DefaultServerRequestContext.create(
       routerConfig.transitTuningConfig(),
       routerConfig.routingRequestDefaults(),
@@ -42,7 +44,7 @@ public class TestServerContext {
       Metrics.globalRegistry,
       routerConfig.vectorTileLayers(),
       createWorldEnvelopeService(),
-      createVehiclePositionService(),
+      createRealtimeVehicleService(transitService),
       createVehicleRentalService(),
       createEmissionsService(),
       routerConfig.flexConfig(),
@@ -58,8 +60,8 @@ public class TestServerContext {
     return new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository());
   }
 
-  public static VehiclePositionService createVehiclePositionService() {
-    return new DefaultVehiclePositionService();
+  public static RealtimeVehicleService createRealtimeVehicleService(TransitService transitService) {
+    return new DefaultRealtimeVehicleService(transitService);
   }
 
   public static VehicleRentalService createVehicleRentalService() {

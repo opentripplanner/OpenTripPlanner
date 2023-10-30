@@ -42,7 +42,7 @@ class StopClusterMapper {
       // if they are very close to each other and have the same name, only one is chosen (at random)
       .filter(
         PredicateUtils.distinctByKey(sl ->
-          new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate10m())
+          new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate100m())
         )
       )
       .flatMap(sl -> this.map(sl).stream());

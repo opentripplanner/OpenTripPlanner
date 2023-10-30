@@ -482,37 +482,33 @@ public class TestItineraryBuilder implements PlanTestConstants {
 
     if (headwaySecs != null) {
       leg =
-        new FrequencyTransitLeg(
-          tripTimes,
-          tripPattern,
-          fromStopIndex,
-          toStopIndex,
-          newTime(start),
-          newTime(end),
-          serviceDate != null ? serviceDate : SERVICE_DAY,
-          UTC,
-          transferFromPreviousLeg,
-          null,
-          legCost,
-          headwaySecs,
-          null
-        );
+        new FrequencyTransitLegBuilder()
+          .withTripTimes(tripTimes)
+          .withTripPattern(tripPattern)
+          .withBoardStopIndexInPattern(fromStopIndex)
+          .withAlightStopIndexInPattern(toStopIndex)
+          .withStartTime(newTime(start))
+          .withEndTime(newTime(end))
+          .withServiceDate(serviceDate != null ? serviceDate : SERVICE_DAY)
+          .withZoneId(UTC)
+          .withTransferFromPreviousLeg(transferFromPreviousLeg)
+          .withGeneralizedCost(legCost)
+          .withFrequencyHeadwayInSeconds(headwaySecs)
+          .build();
     } else {
       leg =
-        new ScheduledTransitLeg(
-          tripTimes,
-          tripPattern,
-          fromStopIndex,
-          toStopIndex,
-          newTime(start),
-          newTime(end),
-          serviceDate != null ? serviceDate : SERVICE_DAY,
-          UTC,
-          transferFromPreviousLeg,
-          null,
-          legCost,
-          null
-        );
+        new ScheduledTransitLegBuilder()
+          .withTripTimes(tripTimes)
+          .withTripPattern(tripPattern)
+          .withBoardStopIndexInPattern(fromStopIndex)
+          .withAlightStopIndexInPattern(toStopIndex)
+          .withStartTime(newTime(start))
+          .withEndTime(newTime(end))
+          .withServiceDate(serviceDate != null ? serviceDate : SERVICE_DAY)
+          .withZoneId(UTC)
+          .withTransferFromPreviousLeg(transferFromPreviousLeg)
+          .withGeneralizedCost(legCost)
+          .build();
     }
 
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));

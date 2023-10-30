@@ -16,11 +16,13 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertEffectTy
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAlertSeverityLevelType;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLBikesAllowed;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLInputField;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLOccupancyStatus;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRelativeDirection;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLRoutingErrorCode;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLTransitMode;
 import org.opentripplanner.apis.gtfs.model.RideHailingProvider;
 import org.opentripplanner.apis.gtfs.model.StopPosition;
+import org.opentripplanner.apis.gtfs.model.TripOccupancy;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.ridehailing.model.RideEstimate;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -45,9 +47,11 @@ import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingState;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
@@ -563,7 +567,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<Trip>> tripsForDate();
 
-    public DataFetcher<Iterable<RealtimeVehiclePosition>> vehiclePositions();
+    public DataFetcher<Iterable<RealtimeVehicle>> vehiclePositions();
   }
 
   public interface GraphQLPlace {
@@ -1036,6 +1040,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
 
+    public DataFetcher<TripOccupancy> occupancy();
+
     public DataFetcher<TripPattern> pattern();
 
     public DataFetcher<Route> route();
@@ -1061,6 +1067,14 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> tripShortName();
 
     public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLWheelchairBoarding> wheelchairAccessible();
+  }
+
+  /**
+   * Occupancy of a vehicle on a trip. This should include the most recent occupancy information
+   * available for a trip. Historic data might not be available.
+   */
+  public interface GraphQLTripOccupancy {
+    public DataFetcher<GraphQLOccupancyStatus> occupancyStatus();
   }
 
   /** This is used for alert entities that we don't explicitly handle or they are missing. */
@@ -1172,6 +1186,10 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> stationId();
 
     public DataFetcher<Integer> vehiclesAvailable();
+
+    public DataFetcher<RentalVehicleEntityCounts> availableVehicles();
+
+    public DataFetcher<RentalVehicleEntityCounts> availableSpaces();
   }
 
   public interface GraphQLVehicleRentalUris {

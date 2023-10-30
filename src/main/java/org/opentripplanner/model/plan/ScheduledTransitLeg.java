@@ -35,6 +35,7 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 /**
@@ -57,47 +58,37 @@ public class ScheduledTransitLeg implements TransitLeg {
   private final int generalizedCost;
   protected final LocalDate serviceDate;
   protected final ZoneId zoneId;
+  private final TripOnServiceDate tripOnServiceDate;
   private double distanceMeters;
   private final double directDistanceMeters;
   private final Float accessibilityScore;
   private List<FareProductUse> fareProducts = List.of();
 
-  public ScheduledTransitLeg(
-    TripTimes tripTimes,
-    TripPattern tripPattern,
-    int boardStopIndexInPattern,
-    int alightStopIndexInPattern,
-    ZonedDateTime startTime,
-    ZonedDateTime endTime,
-    LocalDate serviceDate,
-    ZoneId zoneId,
-    ConstrainedTransfer transferFromPreviousLeg,
-    ConstrainedTransfer transferToNextLeg,
-    int generalizedCost,
-    @Nullable Float accessibilityScore
-  ) {
-    this.tripTimes = tripTimes;
-    this.tripPattern = tripPattern;
+  ScheduledTransitLeg(ScheduledTransitLegBuilder<?> builder) {
+    this.tripTimes = builder.tripTimes();
+    this.tripPattern = builder.tripPattern();
 
-    this.boardStopPosInPattern = boardStopIndexInPattern;
-    this.alightStopPosInPattern = alightStopIndexInPattern;
+    this.boardStopPosInPattern = builder.boardStopIndexInPattern();
+    this.alightStopPosInPattern = builder.alightStopIndexInPattern();
 
-    this.startTime = startTime;
-    this.endTime = endTime;
+    this.startTime = builder.startTime();
+    this.endTime = builder.endTime();
 
-    this.serviceDate = serviceDate;
-    this.zoneId = zoneId;
+    this.serviceDate = builder.serviceDate();
+    this.zoneId = builder.zoneId();
 
-    this.transferFromPrevLeg = transferFromPreviousLeg;
-    this.transferToNextLeg = transferToNextLeg;
+    this.tripOnServiceDate = builder.tripOnServiceDate();
 
-    this.generalizedCost = generalizedCost;
+    this.transferFromPrevLeg = builder.transferFromPreviousLeg();
+    this.transferToNextLeg = builder.transferToNextLeg();
 
-    this.accessibilityScore = accessibilityScore;
+    this.generalizedCost = builder.generalizedCost();
+
+    this.accessibilityScore = builder.accessibilityScore();
     List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(
       tripPattern,
-      boardStopIndexInPattern,
-      alightStopIndexInPattern
+      builder.boardStopIndexInPattern(),
+      builder.alightStopIndexInPattern()
     );
     this.legGeometry = GeometryUtils.makeLineString(transitLegCoordinates);
 
@@ -127,10 +118,12 @@ public class ScheduledTransitLeg implements TransitLeg {
     return ServiceDateUtils.asStartOfService(serviceDate, zoneId).toInstant();
   }
 
+  @Override
   public boolean isScheduledTransitLeg() {
     return true;
   }
 
+  @Override
   public ScheduledTransitLeg asScheduledTransitLeg() {
     return this;
   }
@@ -245,6 +238,12 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   @Override
+  @Nullable
+  public TripOnServiceDate getTripOnServiceDate() {
+    return tripOnServiceDate;
+  }
+
+  @Override
   public Place getFrom() {
     return Place.forStop(tripPattern.getStop(boardStopPosInPattern));
   }
@@ -344,16 +343,25 @@ public class ScheduledTransitLeg implements TransitLeg {
     return generalizedCost;
   }
 
+  /**
+   * Construct a leg reference from this leg.
+   * If the trip is based on a TripOnServiceDate, the leg reference will contain the
+   * TripOnServiceDate id instead of the Trip id.
+   */
   @Override
   public LegReference getLegReference() {
     return new ScheduledTransitLegReference(
-      tripTimes.getTrip().getId(),
+      tripOnServiceDate == null ? tripTimes.getTrip().getId() : null,
       serviceDate,
       boardStopPosInPattern,
-      alightStopPosInPattern
+      alightStopPosInPattern,
+      tripPattern.getStops().get(boardStopPosInPattern).getId(),
+      tripPattern.getStops().get(alightStopPosInPattern).getId(),
+      tripOnServiceDate == null ? null : tripOnServiceDate.getId()
     );
   }
 
+  @Override
   public void addAlert(TransitAlert alert) {
     transitAlerts.add(alert);
   }
@@ -375,20 +383,7 @@ public class ScheduledTransitLeg implements TransitLeg {
   }
 
   public ScheduledTransitLeg withAccessibilityScore(Float score) {
-    return new ScheduledTransitLeg(
-      tripTimes,
-      tripPattern,
-      boardStopPosInPattern,
-      alightStopPosInPattern,
-      startTime,
-      endTime,
-      serviceDate,
-      zoneId,
-      transferFromPrevLeg,
-      transferToNextLeg,
-      generalizedCost,
-      score
-    );
+    return new ScheduledTransitLegBuilder<>(this).withAccessibilityScore(score).build();
   }
 
   /**

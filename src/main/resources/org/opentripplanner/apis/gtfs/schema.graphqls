@@ -558,7 +558,7 @@ type VehicleRentalStation implements Node & PlaceInterface {
     Number of vehicles currently available on the rental station.
     See field `allowPickupNow` to know if is currently possible to pick up a vehicle.
     """
-    vehiclesAvailable: Int
+    vehiclesAvailable: Int @deprecated(reason: "Use `availableVehicles` instead, which also contains vehicle types")
 
     """
     Number of free spaces currently available on the rental station.
@@ -567,7 +567,17 @@ type VehicleRentalStation implements Node & PlaceInterface {
     the rental station, even if the vehicle racks don't have any spaces available.
     See field `allowDropoffNow` to know if is currently possible to return a vehicle.
     """
-    spacesAvailable: Int
+    spacesAvailable: Int @deprecated(reason: "Use `availableSpaces` instead, which also contains the space vehicle types")
+
+    """
+    Number of vehicles currently available on the rental station, grouped by vehicle type.
+    """
+    availableVehicles: RentalVehicleEntityCounts
+
+    """
+    Number of free spaces currently available on the rental station, grouped by vehicle type.
+    """
+    availableSpaces: RentalVehicleEntityCounts
 
     """
     If true, values of `vehiclesAvailable` and `spacesAvailable` are updated from a
@@ -615,6 +625,22 @@ type VehicleRentalStation implements Node & PlaceInterface {
     If true, station is on and in service.
     """
     operative: Boolean
+}
+
+type RentalVehicleEntityCounts {
+    """The total number of entities (e.g. vehicles, spaces)."""
+    total: Int!
+
+    """The number of entities by type"""
+    byType: [RentalVehicleTypeCount!]!
+}
+
+type RentalVehicleTypeCount {
+    """The type of the rental vehicle (scooter, bicycle, car...)"""
+    vehicleType: RentalVehicleType!
+
+    """The number of vehicles of this type"""
+    count: Int!
 }
 
 """
@@ -3406,6 +3432,66 @@ enum AbsoluteDirection {
   NORTHWEST
 }
 
+"""Occupancy status of a vehicle."""
+enum OccupancyStatus {
+  """Default. There is no occupancy-data on this departure."""
+  NO_DATA_AVAILABLE
+
+  """
+  The vehicle is considered empty by most measures, and has few or no passengers onboard, but is
+  still accepting passengers. There isn't a big difference between this and MANY_SEATS_AVAILABLE
+  so it's possible to handle them as the same value, if one wants to limit the number of different
+  values.
+  SIRI nordic profile: merge these into `MANY_SEATS_AVAILABLE`.
+  """
+  EMPTY
+
+  """
+  The vehicle or carriage has a large number of seats available. The amount of free seats out of
+  the total seats available to be considered large enough to fall into this category is
+  determined at the discretion of the producer. There isn't a big difference between this and
+  EMPTY so it's possible to handle them as the same value, if one wants to limit the number of
+  different values.
+  SIRI nordic profile: more than ~50% of seats available.
+  """
+  MANY_SEATS_AVAILABLE
+
+  """
+  The vehicle or carriage has a small number of seats available. The amount of free seats out of
+  the total seats available to be considered small enough to fall into this category is
+  determined at the discretion of the producer.
+  SIRI nordic profile: less than ~50% of seats available.
+  """
+  FEW_SEATS_AVAILABLE
+
+  """
+  The vehicle or carriage can currently accommodate only standing passengers.
+  SIRI nordic profile: less than ~10% of seats available.
+  """
+  STANDING_ROOM_ONLY
+
+  """
+  The vehicle or carriage can currently accommodate only standing passengers and has limited
+  space for them. There isn't a big difference between this and FULL so it's possible to handle
+  them as the same value, if one wants to limit the number of different values.
+  SIRI nordic profile: merge into `STANDING_ROOM_ONLY`.
+  """
+  CRUSHED_STANDING_ROOM_ONLY
+
+  """
+  The vehicle is considered full by most measures, but may still be allowing passengers to
+  board.
+  """
+  FULL
+
+  """
+  The vehicle or carriage is not accepting passengers.
+  SIRI nordic profile: if vehicle/carriage is not in use / unavailable, or passengers are only allowed
+  to alight due to e.g. crowding.
+  """
+  NOT_ACCEPTING_PASSENGERS
+}
+
 type step {
     """The distance in meters that this step takes."""
     distance: Float
@@ -3984,6 +4070,12 @@ type Trip implements Node {
         """
         types: [TripAlertType]
     ): [Alert]
+
+    """
+    The latest realtime occupancy information for the latest occurance of this
+    trip.
+    """
+    occupancy: TripOccupancy
 }
 
 """Entities, which are relevant for a trip and can contain alerts"""
@@ -4008,6 +4100,17 @@ enum TripAlertType {
     Some of the alerts can only affect the trip or its route on the stop.
     """
     STOPS_ON_TRIP
+}
+
+"""
+Occupancy of a vehicle on a trip. This should include the most recent occupancy information
+available for a trip. Historic data might not be available.
+"""
+type TripOccupancy {
+    """
+    Occupancy information mapped to a limited set of descriptive states.
+    """
+    occupancyStatus: OccupancyStatus
 }
 
 """

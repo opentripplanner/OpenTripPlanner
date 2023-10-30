@@ -13,7 +13,7 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalSe
 import org.opentripplanner.framework.io.OtpHttpClient;
 import org.opentripplanner.model.calendar.openinghours.OpeningHoursCalendarService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -46,20 +46,20 @@ public class UpdaterConfigurator {
   private final Graph graph;
   private final TransitModel transitModel;
   private final UpdatersParameters updatersParameters;
-  private final VehiclePositionRepository vehiclePositionRepository;
+  private final RealtimeVehicleRepository realtimeVehicleRepository;
   private final VehicleRentalRepository vehicleRentalRepository;
   private SiriTimetableSnapshotSource siriTimetableSnapshotSource = null;
   private TimetableSnapshotSource gtfsTimetableSnapshotSource = null;
 
   private UpdaterConfigurator(
     Graph graph,
-    VehiclePositionRepository vehiclePositionRepository,
+    RealtimeVehicleRepository realtimeVehicleRepository,
     VehicleRentalRepository vehicleRentalRepository,
     TransitModel transitModel,
     UpdatersParameters updatersParameters
   ) {
     this.graph = graph;
-    this.vehiclePositionRepository = vehiclePositionRepository;
+    this.realtimeVehicleRepository = realtimeVehicleRepository;
     this.vehicleRentalRepository = vehicleRentalRepository;
     this.transitModel = transitModel;
     this.updatersParameters = updatersParameters;
@@ -67,15 +67,15 @@ public class UpdaterConfigurator {
 
   public static void configure(
     Graph graph,
-    VehiclePositionRepository vehiclePositionService,
-    VehicleRentalRepository vehicleRentalService,
+    RealtimeVehicleRepository realtimeVehicleRepository,
+    VehicleRentalRepository vehicleRentalRepository,
     TransitModel transitModel,
     UpdatersParameters updatersParameters
   ) {
     new UpdaterConfigurator(
       graph,
-      vehiclePositionService,
-      vehicleRentalService,
+      realtimeVehicleRepository,
+      vehicleRentalRepository,
       transitModel,
       updatersParameters
     )
@@ -163,7 +163,7 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getVehiclePositionsUpdaterParameters()) {
       updaters.add(
-        new PollingVehiclePositionUpdater(configItem, vehiclePositionRepository, transitModel)
+        new PollingVehiclePositionUpdater(configItem, realtimeVehicleRepository, transitModel)
       );
     }
     for (var configItem : updatersParameters.getSiriETUpdaterParameters()) {

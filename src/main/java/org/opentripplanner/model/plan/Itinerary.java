@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
  */
-public class Itinerary {
+public class Itinerary implements ItinerarySortKey {
 
   public static final int UNKNOWN = -1;
 
@@ -85,10 +86,24 @@ public class Itinerary {
   }
 
   /**
+   * Time that the trip departs as a Java Instant type.
+   */
+  public Instant startTimeAsInstant() {
+    return firstLeg().getStartTime().toInstant();
+  }
+
+  /**
    * Time that the trip arrives.
    */
   public ZonedDateTime endTime() {
     return lastLeg().getEndTime();
+  }
+
+  /**
+   * Time that the trip arrives as a Java Instant type.
+   */
+  public Instant endTimeAsInstant() {
+    return lastLeg().getEndTime().toInstant();
   }
 
   /**

@@ -29,7 +29,6 @@ public class CommandLineParameters {
 
   private static final String TIP = " Use --help to see available options.";
   private static final int DEFAULT_PORT = 8080;
-  private static final int DEFAULT_SECURE_PORT = 8081;
   private static final String DEFAULT_CACHE_PATH = "/var/otp/cache";
   private static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
 
@@ -127,13 +126,6 @@ public class CommandLineParameters {
     description = "Server port for plain HTTP."
   )
   public Integer port = DEFAULT_PORT;
-
-  @Parameter(
-    names = { "--securePort" },
-    validateWith = PositiveInteger.class,
-    description = "Server port for HTTPS."
-  )
-  public Integer securePort = DEFAULT_SECURE_PORT;
 
   @Parameter(
     names = { "--visualize" },
@@ -240,7 +232,6 @@ public class CommandLineParameters {
   private void validatePortsAvailable() {
     if (doServe()) {
       checkPortAvailable(port);
-      checkPortAvailable(securePort);
     }
   }
 

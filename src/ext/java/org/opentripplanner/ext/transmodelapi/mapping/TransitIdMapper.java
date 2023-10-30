@@ -1,10 +1,12 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -32,19 +34,17 @@ public class TransitIdMapper {
     return id.toString();
   }
 
-  public static List<FeedScopedId> mapIDsToDomainNullSafe(Collection<String> ids) {
-    return (ids == null) ? List.of() : mapIDsToDomain(ids);
-  }
-
-  public static List<FeedScopedId> mapIDsToDomain(Collection<String> ids) {
+  /**
+   * Maps ids to feed-scoped ids.
+   * Return an empty collection if the collection of ids is null.
+   * If the collection of ids contains null or blank elements, they are ignored.
+   */
+  @Nonnull
+  public static List<FeedScopedId> mapIDsToDomainNullSafe(@Nullable Collection<String> ids) {
     if (ids == null) {
-      return null;
+      return List.of();
     }
-    List<FeedScopedId> list = new ArrayList<>();
-    for (String id : ids) {
-      list.add(mapIDToDomain(id));
-    }
-    return list;
+    return ids.stream().filter(StringUtils::hasValue).map(TransitIdMapper::mapIDToDomain).toList();
   }
 
   public static FeedScopedId mapIDToDomain(String id) {

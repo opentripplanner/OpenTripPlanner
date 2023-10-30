@@ -19,12 +19,12 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.street.model.note.StreetNote;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -185,6 +185,14 @@ public interface Leg {
    * For transit legs, the trip. For non-transit legs, null.
    */
   default Trip getTrip() {
+    return null;
+  }
+
+  /**
+   * For transit legs, the trip on service date, if it exists. For non-transit legs, null.
+   */
+  @Nullable
+  default TripOnServiceDate getTripOnServiceDate() {
     return null;
   }
 

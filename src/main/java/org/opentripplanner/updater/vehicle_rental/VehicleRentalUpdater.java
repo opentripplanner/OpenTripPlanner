@@ -10,6 +10,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.opentripplanner.framework.lang.ObjectUtils;
+import org.opentripplanner.framework.logging.Throttle;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -45,13 +48,18 @@ import org.slf4j.LoggerFactory;
 public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleRentalUpdater.class);
+
+  private final Throttle unlinkedPlaceThrottle;
+
   private final VehicleRentalDatasource source;
+  private final String nameForLogging;
+
   private WriteToGraphCallback saveResultOnGraph;
 
   private Map<StreetEdge, RentalRestrictionExtension> latestModifiedEdges = Map.of();
   private Set<GeofencingZone> latestAppliedGeofencingZones = Set.of();
-  Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
-  Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
+  private final Map<FeedScopedId, VehicleRentalPlaceVertex> verticesByStation = new HashMap<>();
+  private final Map<FeedScopedId, DisposableEdgeCollection> tempEdgesByStation = new HashMap<>();
   private final VertexLinker linker;
 
   private final VehicleRentalRepository service;
@@ -64,9 +72,15 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
   ) throws IllegalArgumentException {
     super(parameters);
     // Configure updater
-    LOG.info("Setting up vehicle rental updater.");
+    LOG.info("Setting up vehicle rental updater for {}.", source);
 
     this.source = source;
+    this.nameForLogging =
+      ObjectUtils.ifNotNull(
+        parameters.sourceParameters().network(),
+        parameters.sourceParameters().url()
+      );
+    this.unlinkedPlaceThrottle = Throttle.ofOneSecond();
 
     // Creation of network linker library will not modify the graph
     this.linker = vertexLinker;
@@ -78,16 +92,19 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       // Do any setup if needed
       source.setup();
     } catch (UpdaterConstructionException e) {
-      LOG.warn("Unable to setup updater: {}", this, e);
+      LOG.warn("Unable to setup updater: {}", nameForLogging, e);
     }
 
     if (runOnlyOnce()) {
-      LOG.info("Creating vehicle-rental updater running once only (non-polling): {}", source);
+      LOG.info(
+        "Creating vehicle-rental updater running once only (non-polling): {}",
+        nameForLogging
+      );
     } else {
       LOG.info(
-        "Creating vehicle-rental updater running every {} seconds: {}",
-        pollingPeriod(),
-        source
+        "Creating vehicle-rental updater running every {}: {}",
+        DurationUtils.durationToStr(pollingPeriod()),
+        nameForLogging
       );
     }
   }
@@ -109,9 +126,9 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
 
   @Override
   protected void runPolling() {
-    LOG.debug("Updating vehicle rental stations from {}", source);
+    LOG.debug("Updating vehicle rental stations from {}", nameForLogging);
     if (!source.update()) {
-      LOG.debug("No updates");
+      LOG.debug("No updates from {}", nameForLogging);
       return;
     }
     List<VehicleRentalPlace> stations = source.getUpdates();
@@ -149,6 +166,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         service.addVehicleRentalStation(station);
         stationSet.add(station.getId());
         VehicleRentalPlaceVertex vehicleRentalVertex = verticesByStation.get(station.getId());
+
         if (vehicleRentalVertex == null) {
           vehicleRentalVertex = vertexFactory.vehicleRentalPlace(station);
           DisposableEdgeCollection tempEdges = linker.linkVertexForRealTime(
@@ -168,8 +186,17 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
               )
           );
           if (vehicleRentalVertex.getOutgoing().isEmpty()) {
-            // the toString includes the text "Bike rental station"
-            LOG.info("VehicleRentalPlace {} is unlinked", vehicleRentalVertex);
+            // Copy reference to pass into lambda
+            var vrv = vehicleRentalVertex;
+            unlinkedPlaceThrottle.throttle(() ->
+              // the toString includes the text "Bike rental station"
+              LOG.warn(
+                "VehicleRentalPlace is unlinked for {}: {}  {}",
+                nameForLogging,
+                vrv,
+                unlinkedPlaceThrottle.setupInfo()
+              )
+            );
           }
           Set<RentalFormFactor> formFactors = Stream
             .concat(
@@ -188,6 +215,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
           vehicleRentalVertex.setStation(station);
         }
       }
+
       /* remove existing stations that were not present in the update */
       List<FeedScopedId> toRemove = new ArrayList<>();
       for (Entry<FeedScopedId, VehicleRentalPlaceVertex> entry : verticesByStation.entrySet()) {
@@ -206,7 +234,7 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
       // this check relies on the generated equals for the record which also recursively checks that
       // the JTS geometries are equal
       if (!geofencingZones.isEmpty() && !geofencingZones.equals(latestAppliedGeofencingZones)) {
-        LOG.info("Computing geofencing zones");
+        LOG.info("Computing geofencing zones for {}", nameForLogging);
         var start = System.currentTimeMillis();
 
         latestModifiedEdges.forEach(StreetEdge::removeRentalExtension);
@@ -218,9 +246,10 @@ public class VehicleRentalUpdater extends PollingGraphUpdater {
         var end = System.currentTimeMillis();
         var millis = Duration.ofMillis(end - start);
         LOG.info(
-          "Geofencing zones computation took {}. Added extension to {} edges.",
+          "Geofencing zones computation took {}. Added extension to {} edges. For {}",
           TimeUtils.durationToStrCompact(millis),
-          latestModifiedEdges.size()
+          latestModifiedEdges.size(),
+          nameForLogging
         );
       }
     }

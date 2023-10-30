@@ -17,6 +17,7 @@ import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -68,20 +69,16 @@ class EmissionsTest {
       .withMode(TransitMode.BUS)
       .withRoute(route)
       .build();
-    var leg = new ScheduledTransitLeg(
-      new TripTimes(trip, stoptimes, new Deduplicator()),
-      pattern,
-      0,
-      2,
-      TIME,
-      TIME.plusMinutes(10),
-      TIME.toLocalDate(),
-      ZoneIds.BERLIN,
-      null,
-      null,
-      100,
-      null
-    );
+    var leg = new ScheduledTransitLegBuilder<>()
+      .withTripTimes(new TripTimes(trip, stoptimes, new Deduplicator()))
+      .withTripPattern(pattern)
+      .withBoardStopIndexInPattern(0)
+      .withAlightStopIndexInPattern(2)
+      .withStartTime(TIME)
+      .withEndTime(TIME.plusMinutes(10))
+      .withServiceDate(TIME.toLocalDate())
+      .withZoneId(ZoneIds.BERLIN)
+      .build();
     Itinerary i = new Itinerary(List.of(leg));
     assertEquals(
       new Grams(2223.902),
@@ -127,20 +124,16 @@ class EmissionsTest {
       .withMode(TransitMode.BUS)
       .withRoute(route)
       .build();
-    var leg = new ScheduledTransitLeg(
-      new TripTimes(trip, stoptimes, new Deduplicator()),
-      pattern,
-      0,
-      2,
-      TIME,
-      TIME.plusMinutes(10),
-      TIME.toLocalDate(),
-      ZoneIds.BERLIN,
-      null,
-      null,
-      100,
-      null
-    );
+    var leg = new ScheduledTransitLegBuilder<>()
+      .withTripTimes(new TripTimes(trip, stoptimes, new Deduplicator()))
+      .withTripPattern(pattern)
+      .withBoardStopIndexInPattern(0)
+      .withAlightStopIndexInPattern(2)
+      .withStartTime(TIME)
+      .withEndTime(TIME.plusMinutes(10))
+      .withServiceDate(TIME.toLocalDate())
+      .withZoneId(ZoneIds.BERLIN)
+      .build();
     Itinerary i = new Itinerary(List.of(leg));
     assertEquals(null, emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2());
   }
@@ -161,20 +154,16 @@ class EmissionsTest {
       .withMode(TransitMode.BUS)
       .withRoute(route)
       .build();
-    var leg = new ScheduledTransitLeg(
-      new TripTimes(trip, stoptimes, new Deduplicator()),
-      pattern,
-      0,
-      2,
-      TIME,
-      TIME.plusMinutes(10),
-      TIME.toLocalDate(),
-      ZoneIds.BERLIN,
-      null,
-      null,
-      100,
-      null
-    );
+    var leg = new ScheduledTransitLegBuilder<>()
+      .withTripTimes(new TripTimes(trip, stoptimes, new Deduplicator()))
+      .withTripPattern(pattern)
+      .withBoardStopIndexInPattern(0)
+      .withAlightStopIndexInPattern(2)
+      .withStartTime(TIME)
+      .withEndTime(TIME.plusMinutes(10))
+      .withServiceDate(TIME.toLocalDate())
+      .withZoneId(ZoneIds.BERLIN)
+      .build();
     Itinerary i = new Itinerary(List.of(leg));
     assertEquals(
       new Grams(0.0),

@@ -48,6 +48,11 @@ public interface TransitTuningParameters {
     }
 
     @Override
+    public Duration maxSearchWindow() {
+      return Duration.ofHours(24);
+    }
+
+    @Override
     public List<Duration> pagingSearchWindowAdjustments() {
       return PAGING_SEARCH_WINDOW_ADJUSTMENTS;
     }
@@ -76,6 +81,16 @@ public interface TransitTuningParameters {
    * too large, more memory may be used than needed.
    */
   int transferCacheMaxSize();
+
+  /**
+   * The maximum search window that can be set through the searchWindow API parameter. Due to the
+   * way timetable data are collected before a Raptor trip search, using a search window larger than
+   * 24 hours may lead to inconsistent search results. Limiting the search window prevents also
+   * potential performance issues. The recommended maximum value is 24 hours.
+   * This parameter does not restrict the maximum duration of a dynamic search window (use
+   * the parameter transit.dynamicSearchWindow.maxWindow to specify such a restriction).
+   */
+  Duration maxSearchWindow();
 
   /**
    * This parameter is used to reduce the number of pages a client have to step through for a

@@ -136,10 +136,6 @@ public final class StopTime implements Comparable<StopTime> {
     this.arrivalTime = arrivalTime;
   }
 
-  public void clearArrivalTime() {
-    this.arrivalTime = MISSING_VALUE;
-  }
-
   public boolean isDepartureTimeSet() {
     return departureTime != MISSING_VALUE;
   }
@@ -155,10 +151,6 @@ public final class StopTime implements Comparable<StopTime> {
     this.departureTime = departureTime;
   }
 
-  public void clearDepartureTime() {
-    this.departureTime = MISSING_VALUE;
-  }
-
   public boolean isTimepointSet() {
     return timepoint != MISSING_VALUE;
   }
@@ -172,10 +164,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   public void setTimepoint(int timepoint) {
     this.timepoint = timepoint;
-  }
-
-  public void clearTimepoint() {
-    this.timepoint = MISSING_VALUE;
   }
 
   public I18NString getStopHeadsign() {
@@ -220,10 +208,6 @@ public final class StopTime implements Comparable<StopTime> {
 
   public void setShapeDistTraveled(double shapeDistTraveled) {
     this.shapeDistTraveled = shapeDistTraveled;
-  }
-
-  public void clearShapeDistTraveled() {
-    this.shapeDistTraveled = MISSING_VALUE;
   }
 
   public String getFarePeriodId() {
@@ -307,14 +291,6 @@ public final class StopTime implements Comparable<StopTime> {
   public void cancel() {
     pickupType = PickDrop.CANCELLED;
     dropOffType = PickDrop.CANCELLED;
-  }
-
-  public void cancelDropOff() {
-    dropOffType = PickDrop.CANCELLED;
-  }
-
-  public void cancelPickup() {
-    pickupType = PickDrop.CANCELLED;
   }
 
   @Override

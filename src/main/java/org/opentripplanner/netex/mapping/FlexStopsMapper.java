@@ -19,12 +19,9 @@ import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.KeyListStructure;
 import org.rutebanken.netex.model.KeyValueStructure;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 class FlexStopsMapper {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FlexStopsMapper.class);
   /**
    * Key-value pair used until proper NeTEx support is added
    */

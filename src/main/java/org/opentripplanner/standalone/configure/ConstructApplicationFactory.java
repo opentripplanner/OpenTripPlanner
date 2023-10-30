@@ -11,10 +11,10 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionRepository;
-import org.opentripplanner.service.vehiclepositions.VehiclePositionService;
-import org.opentripplanner.service.vehiclepositions.configure.VehiclePositionsRepositoryModule;
-import org.opentripplanner.service.vehiclepositions.configure.VehiclePositionsServiceModule;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
+import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
+import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleRepositoryModule;
+import org.opentripplanner.service.realtimevehicles.configure.RealtimeVehicleServiceModule;
 import org.opentripplanner.service.vehiclerental.VehicleRentalRepository;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.vehiclerental.configure.VehicleRentalRepositoryModule;
@@ -40,8 +40,8 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     ConfigModule.class,
     TransitModule.class,
     WorldEnvelopeServiceModule.class,
-    VehiclePositionsServiceModule.class,
-    VehiclePositionsRepositoryModule.class,
+    RealtimeVehicleServiceModule.class,
+    RealtimeVehicleRepositoryModule.class,
     VehicleRentalServiceModule.class,
     VehicleRentalRepositoryModule.class,
     ConstructApplicationModule.class,
@@ -56,8 +56,8 @@ public interface ConstructApplicationFactory {
   TransitModel transitModel();
   WorldEnvelopeRepository worldEnvelopeRepository();
   WorldEnvelopeService worldEnvelopeService();
-  VehiclePositionRepository vehiclePositionRepository();
-  VehiclePositionService vehiclePositionService();
+  RealtimeVehicleRepository realtimeVehicleRepository();
+  RealtimeVehicleService realtimeVehicleService();
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
   DataImportIssueSummary dataImportIssueSummary();

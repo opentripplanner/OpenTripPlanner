@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -28,8 +27,6 @@ import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 class LuceneIndexTest {
-
-  static Graph graph = new Graph();
 
   // Berlin
   static Station BERLIN_HAUPTBAHNHOF_STATION = station("Hauptbahnhof")
@@ -113,7 +110,7 @@ class LuceneIndexTest {
         }
       }
     };
-    index = new LuceneIndex(graph, transitService);
+    index = new LuceneIndex(transitService);
     mapper = new StopClusterMapper(transitService);
   }
 
@@ -145,9 +142,29 @@ class LuceneIndexTest {
   @Nested
   class StopClusters {
 
-    @Test
-    void stopClusters() {
-      var result1 = index.queryStopClusters("alex").toList();
+    @ParameterizedTest
+    @ValueSource(
+      strings = {
+        "Alexanderplatz",
+        "Alexa",
+        "alex",
+        "aleyanderplazt",
+        "alexnderplazt",
+        "Alexnderplatz",
+        "Alexnaderplatz",
+        "xande",
+        "xanderpla",
+        "alexnaderplaz",
+        "Alexanderplat",
+        "alexanderplat",
+        "alexand",
+        "alexander platz",
+        "alexander-platz",
+        "alexander",
+      }
+    )
+    void stopClustersWithTypos(String searchTerm) {
+      var result1 = index.queryStopClusters(searchTerm).toList();
       assertEquals(List.of(mapper.map(ALEXANDERPLATZ_STATION)), result1);
     }
 
@@ -167,7 +184,29 @@ class LuceneIndexTest {
     @ParameterizedTest
     @ValueSource(
       strings = {
-        "five", "five ", "five p", "five po", "five poi", "five poin", "five point", "five points",
+        "five",
+        "five ",
+        "five p",
+        "five po",
+        "five poi",
+        "five poin",
+        "five point",
+        "five points",
+        "fife point",
+        "five poits",
+        "fife",
+        "points",
+        "ife points",
+        "the five points",
+        "five @ points",
+        "five @ the points",
+        "five@points",
+        "five at points",
+        "five&points",
+        "five & points",
+        "five and the points",
+        "points five",
+        "points fife",
       }
     )
     void stopClustersWithSpace(String query) {
@@ -175,9 +214,10 @@ class LuceneIndexTest {
       assertEquals(List.of(mapper.map(FIVE_POINTS_STATION)), result);
     }
 
-    @Test
-    void stopCode() {
-      var result = index.queryStopClusters(ARTS_CENTER.getCode()).toList();
+    @ParameterizedTest
+    @ValueSource(strings = { "4456", "445" })
+    void fuzzyStopCode(String query) {
+      var result = index.queryStopClusters(query).toList();
       assertEquals(1, result.size());
       assertEquals(ARTS_CENTER.getName().toString(), result.get(0).name());
     }

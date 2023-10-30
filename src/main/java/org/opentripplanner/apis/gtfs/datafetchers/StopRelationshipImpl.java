@@ -4,7 +4,7 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
-import org.opentripplanner.service.vehiclepositions.model.RealtimeVehiclePosition.StopRelationship;
+import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 
 public class StopRelationshipImpl implements GraphQLDataFetchers.GraphQLStopRelationship {
 
@@ -23,7 +23,7 @@ public class StopRelationshipImpl implements GraphQLDataFetchers.GraphQLStopRela
     return env -> getSource(env).stop();
   }
 
-  private StopRelationship getSource(DataFetchingEnvironment environment) {
+  private RealtimeVehicle.StopRelationship getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }
