@@ -47,7 +47,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     RealtimeVehicleRepositoryModule.class,
     VehicleRentalServiceModule.class,
     VehicleRentalRepositoryModule.class,
-    ConstructApplicationModule.class,
+    OtpServerModule.class,
     RideHailingServicesModule.class,
     EmissionsServiceModule.class,
     StopConsolidationServiceModule.class,

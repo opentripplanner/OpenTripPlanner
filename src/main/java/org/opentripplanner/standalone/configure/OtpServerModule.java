@@ -23,7 +23,7 @@ import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.visualizer.GraphVisualizer;
 
 @Module
-public class ConstructApplicationModule {
+public class OtpServerModule {
 
   @Provides
   OtpServerRequestContext providesServerContext(
