@@ -17,6 +17,7 @@ import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.apis.APIEndpoints;
+import org.opentripplanner.ext.reportapi.configure.ReportFactory;
 import org.opentripplanner.ext.restapi.serialization.JSONObjectMapperProvider;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
@@ -138,6 +139,7 @@ public class OTPWebApplication extends Application {
       protected void configure() {
         bindFactory(factory::createServerContext).to(OtpServerRequestContext.class);
         bindFactory(factory::transitService).to(TransitService.class);
+        bindFactory(() -> factory.reportFactoryBuilder().build()).to(ReportFactory.class);
       }
     };
   }

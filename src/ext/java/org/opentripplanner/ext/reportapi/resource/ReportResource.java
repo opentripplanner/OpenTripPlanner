@@ -12,6 +12,8 @@ import jakarta.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.Objects;
+import org.opentripplanner.ext.reportapi.configure.ReportFactory;
 import org.opentripplanner.ext.reportapi.model.BicycleSafetyReport;
 import org.opentripplanner.ext.reportapi.model.CachedValue;
 import org.opentripplanner.ext.reportapi.model.GraphReportBuilder;
@@ -28,7 +30,7 @@ import org.opentripplanner.transit.service.TransitService;
 @Produces(MediaType.TEXT_PLAIN)
 public class ReportResource {
 
-  /** Since the computation is pretty expensive only allow it every 5 minutes */
+  /** Since the computation is pretty expensive, only allow it every 5 minutes */
   private static final CachedValue<GraphStats> cachedStats = new CachedValue<>(
     Duration.ofMinutes(5)
   );
@@ -38,13 +40,16 @@ public class ReportResource {
   private final RouteRequest defaultRequest;
 
   @SuppressWarnings("unused")
-  public ReportResource(
-    @Context OtpServerRequestContext requestContext,
-    @Context TransitService transitService
-  ) {
-    this.transferService = transitService.getTransferService();
-    this.transitService = transitService;
-    this.defaultRequest = requestContext.defaultRouteRequest();
+  public ReportResource(@Context ReportFactory reportFactory) {
+    var rs1 = reportFactory.reportService();
+    var rs2 = reportFactory.reportService();
+
+    System.err.println("ts.re: " + Objects.hashCode(rs1));
+    System.err.println("ts.re: " + Objects.hashCode(rs2));
+
+    this.transitService = rs1.getTransitService();
+    this.transferService = rs2.getTransferService();
+    this.defaultRequest = rs1.getDefaultRequest();
   }
 
   @GET

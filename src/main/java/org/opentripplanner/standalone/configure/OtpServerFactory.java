@@ -7,12 +7,14 @@ import javax.annotation.Nullable;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsServiceModule;
 import org.opentripplanner.ext.interactivelauncher.configuration.InteractiveLauncherModule;
+import org.opentripplanner.ext.reportapi.configure.ReportFactory;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
+import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleRepository;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
@@ -75,6 +77,10 @@ public interface OtpServerFactory {
 
   TransitService transitService();
   OtpServerRequestContext createServerContext();
+
+  RouteRequest defaultRequest();
+
+  ReportFactory.Builder reportFactoryBuilder();
 
   MetricsLogging metricsLogging();
 
