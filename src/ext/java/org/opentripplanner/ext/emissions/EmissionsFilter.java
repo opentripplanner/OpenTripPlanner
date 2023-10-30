@@ -52,6 +52,9 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
   }
 
   private Optional<Grams> calculateCo2EmissionsForTransit(List<TransitLeg> transitLegs) {
+    if (transitLegs.isEmpty()) {
+      return Optional.empty();
+    }
     Grams co2Emissions = new Grams(0.0);
     for (TransitLeg leg : transitLegs) {
       FeedScopedId feedScopedRouteId = new FeedScopedId(
@@ -69,10 +72,13 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
         return Optional.empty();
       }
     }
-    return Optional.of(co2Emissions);
+    return Optional.ofNullable(co2Emissions);
   }
 
   private Optional<Grams> calculateCo2EmissionsForCar(List<StreetLeg> carLegs) {
+    if (carLegs.isEmpty()) {
+      return Optional.empty();
+    }
     return emissionsService
       .getEmissionsPerMeterForCar()
       .map(emissions ->

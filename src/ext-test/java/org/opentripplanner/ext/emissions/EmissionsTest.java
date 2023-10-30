@@ -135,7 +135,7 @@ class EmissionsTest {
       .withZoneId(ZoneIds.BERLIN)
       .build();
     Itinerary i = new Itinerary(List.of(leg));
-    assertEquals(null, emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2());
+    assertEquals(null, emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson());
   }
 
   @Test

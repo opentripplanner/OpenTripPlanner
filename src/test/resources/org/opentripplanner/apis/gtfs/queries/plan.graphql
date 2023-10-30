@@ -19,9 +19,6 @@
         itineraries {
             startTime
             endTime
-            emissionsPerPerson {
-                co2
-            }
             legs {
                 mode
                 startTime
