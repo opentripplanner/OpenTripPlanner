@@ -43,7 +43,7 @@ export function TransitModeSelect({
         });
       }
     },
-    [tripQueryVariables.modes, setTripQueryVariables],
+    [tripQueryVariables, setTripQueryVariables],
   );
 
   return (
