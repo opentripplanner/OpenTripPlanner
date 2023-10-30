@@ -75,19 +75,15 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
   }
 
   private Optional<Grams> calculateCo2EmissionsForCar(List<StreetLeg> carLegs) {
-    Optional<Emissions> emissionsForCar = emissionsService.getEmissionsPerMeterForCar();
-    if (emissionsForCar.isPresent()) {
-      return Optional.of(
-        new Grams(
+    return emissionsService.getEmissionsPerMeterForCar().map( emissions -> {
+        return new Grams(
           carLegs
             .stream()
             .mapToDouble(leg ->
               emissionsForCar.get().getCo2().multiply(leg.getDistanceMeters()).asDouble()
             )
             .sum()
-        )
-      );
-    }
-    return Optional.empty();
+        );
+    });
   }
 }
