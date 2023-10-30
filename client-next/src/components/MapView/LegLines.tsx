@@ -3,10 +3,10 @@ import { Layer, Source } from 'react-map-gl';
 import { decode } from '@googlemaps/polyline-codec';
 import { getColorForMode } from '../../util/getColorForMode.ts';
 
-export function LegLines({ tripPattern }: { tripPattern: TripPattern }) {
+export function LegLines({ tripPattern }: { tripPattern?: TripPattern }) {
   return (
     <>
-      {tripPattern.legs.map(
+      {tripPattern?.legs.map(
         (leg, i) =>
           leg.pointsOnLink && (
             <Source
