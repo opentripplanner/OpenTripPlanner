@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.glassfish.jersey.internal.inject.Binder;
@@ -35,9 +34,6 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
  */
 public class OTPWebApplication extends Application {
 
-  /* This object groups together all the modules for a single running OTP server. */
-  private final Supplier<OtpServerRequestContext> contextProvider;
-
   private final OtpServerFactory factory;
 
   private final List<Class<? extends ContainerResponseFilter>> customFilters;
@@ -50,12 +46,7 @@ public class OTPWebApplication extends Application {
     SLF4JBridgeHandler.install();
   }
 
-  public OTPWebApplication(
-    OTPWebApplicationParameters parameters,
-    Supplier<OtpServerRequestContext> contextProvider,
-    OtpServerFactory factory
-  ) {
-    this.contextProvider = contextProvider;
+  public OTPWebApplication(OTPWebApplicationParameters parameters, OtpServerFactory factory) {
     this.factory = factory;
     this.customFilters = createCustomFilters(parameters.traceParameters());
   }
@@ -109,20 +100,14 @@ public class OTPWebApplication extends Application {
         // Serialize POJOs (unannotated) JSON using Jackson
         new JSONObjectMapperProvider(),
         // Allow injecting the OTP server object into Jersey resource classes
-        makeBinder(contextProvider),
-        new AbstractBinder() {
-          @Override
-          protected void configure() {
-            bindFactory(factory::transitService).to(TransitService.class);
-          }
-        },
+        bindRequestScopedInstances(),
         // Add performance instrumentation of Jersey requests to micrometer
-        getMetricsApplicationEventListener()
+        createMetricsApplicationEventListener()
       )
     );
 
     if (OTPFeature.ActuatorAPI.isOn()) {
-      singletons.add(getBoundPrometheusRegistry());
+      singletons.add(createPrometheusRegistryBinder());
     }
 
     return singletons;
@@ -138,51 +123,32 @@ public class OTPWebApplication extends Application {
   }
 
   /**
-   * Return an HK2 Binder that injects this specific OtpServerContext instance into Jersey web
-   * resources. This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS) as
-   * a singleton. Jersey forces us to use injection to get application context into HTTP method
+   * Return an HK2 Binder that injects this specific implementation instance into Jersey web
+   * resources. This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS)
+   * as a singleton. Jersey forces us to use injection to get application context into HTTP method
    * handlers, but in OTP we always just inject this OTP server context and grab anything else we
    * need (graph and other application components) from this single object.
    * <p>
    * More on custom injection in Jersey 2:
    * http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
    */
-  private Binder makeBinder(Supplier<OtpServerRequestContext> contextProvider) {
+  private Binder bindRequestScopedInstances() {
     return new AbstractBinder() {
       @Override
       protected void configure() {
-        bindFactory(contextProvider).to(OtpServerRequestContext.class);
+        bindFactory(factory::createServerContext).to(OtpServerRequestContext.class);
+        bindFactory(factory::transitService).to(TransitService.class);
       }
     };
   }
 
-  private MetricsApplicationEventListener getMetricsApplicationEventListener() {
+  private MetricsApplicationEventListener createMetricsApplicationEventListener() {
     return new MetricsApplicationEventListener(
       Metrics.globalRegistry,
       new DefaultJerseyTagsProvider(),
       "http.server.requests",
       true
     );
-  }
-
-  /**
-   * Instantiate and add the prometheus micrometer registry to the global composite registry.
-   *
-   * @return A AbstractBinder, which can be used to inject the registry into the Actuator API calls
-   */
-  private Binder getBoundPrometheusRegistry() {
-    PrometheusMeterRegistry prometheusRegistry = new PrometheusMeterRegistry(
-      PrometheusConfig.DEFAULT
-    );
-
-    Metrics.globalRegistry.add(prometheusRegistry);
-
-    return new AbstractBinder() {
-      @Override
-      protected void configure() {
-        bind(prometheusRegistry).to(PrometheusMeterRegistry.class);
-      }
-    };
   }
 
   private List<Class<? extends ContainerResponseFilter>> createCustomFilters(
@@ -194,5 +160,26 @@ public class OTPWebApplication extends Application {
     RequestTraceFilter.init(traceParameters);
 
     return List.of(RequestTraceFilter.class);
+  }
+
+  /**
+   * Instantiate and add the prometheus micrometer registry to the global composite registry.
+   *
+   * @return A AbstractBinder, which can be used to inject the registry into the Actuator API calls
+   */
+  private Binder createPrometheusRegistryBinder() {
+    return new AbstractBinder() {
+      @Override
+      protected void configure() {
+        bind(createPrometheusRegistry()).to(PrometheusMeterRegistry.class);
+      }
+    };
+  }
+
+  private PrometheusMeterRegistry createPrometheusRegistry() {
+    var prometheusRegistry = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+
+    Metrics.globalRegistry.add(prometheusRegistry);
+    return prometheusRegistry;
   }
 }
