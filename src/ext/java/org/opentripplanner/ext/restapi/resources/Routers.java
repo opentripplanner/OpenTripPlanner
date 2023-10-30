@@ -7,6 +7,7 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import java.util.Objects;
 import org.opentripplanner.ext.restapi.model.ApiRouterInfo;
 import org.opentripplanner.ext.restapi.model.ApiRouterList;
 import org.opentripplanner.routing.error.GraphNotFoundException;
@@ -36,8 +37,8 @@ public class Routers {
     @Context OtpServerRequestContext serverContext,
     @Context TransitService transitService
   ) {
-    this.serverContext = serverContext;
-    this.transitService = transitService;
+    this.serverContext = Objects.requireNonNull(serverContext);
+    this.transitService = Objects.requireNonNull(transitService);
   }
 
   /**

@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
@@ -702,8 +703,8 @@ public abstract class RoutingResource {
     @Context OtpServerRequestContext serverContext,
     @Context TransitService transitService
   ) {
-    this.serverContext = serverContext;
-    this.transitService = transitService;
+    this.serverContext = Objects.requireNonNull(serverContext);
+    this.transitService = Objects.requireNonNull(transitService);
   }
 
   /**
