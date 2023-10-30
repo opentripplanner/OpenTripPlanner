@@ -21,7 +21,7 @@ import org.opentripplanner.apis.APIEndpoints;
 import org.opentripplanner.ext.restapi.serialization.JSONObjectMapperProvider;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.standalone.configure.ConstructApplicationFactory;
+import org.opentripplanner.standalone.configure.OtpServerFactory;
 import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -38,7 +38,7 @@ public class OTPWebApplication extends Application {
   /* This object groups together all the modules for a single running OTP server. */
   private final Supplier<OtpServerRequestContext> contextProvider;
 
-  private final ConstructApplicationFactory factory;
+  private final OtpServerFactory factory;
 
   private final List<Class<? extends ContainerResponseFilter>> customFilters;
 
@@ -53,7 +53,7 @@ public class OTPWebApplication extends Application {
   public OTPWebApplication(
     OTPWebApplicationParameters parameters,
     Supplier<OtpServerRequestContext> contextProvider,
-    ConstructApplicationFactory factory
+    OtpServerFactory factory
   ) {
     this.contextProvider = contextProvider;
     this.factory = factory;

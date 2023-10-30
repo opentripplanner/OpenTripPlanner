@@ -54,7 +54,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     InteractiveLauncherModule.class,
   }
 )
-public interface ConstructApplicationFactory {
+public interface OtpServerFactory {
   ConfigModel config();
   RaptorConfig<TripSchedule> raptorConfig();
   Graph graph();
@@ -109,6 +109,6 @@ public interface ConstructApplicationFactory {
     @BindsInstance
     Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
 
-    ConstructApplicationFactory build();
+    OtpServerFactory build();
   }
 }

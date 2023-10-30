@@ -2,14 +2,14 @@ package org.opentripplanner.standalone.server;
 
 import org.glassfish.jersey.internal.inject.AbstractBinder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.configure.ConstructApplicationFactory;
+import org.opentripplanner.standalone.configure.OtpServerFactory;
 import org.opentripplanner.transit.service.TransitService;
 
 public class JerseyToDaggerBridge extends AbstractBinder {
 
-  private final ConstructApplicationFactory factory;
+  private final OtpServerFactory factory;
 
-  public JerseyToDaggerBridge(ConstructApplicationFactory factory) {
+  public JerseyToDaggerBridge(OtpServerFactory factory) {
     this.factory = factory;
   }
 
