@@ -127,7 +127,7 @@ public class GraphQLScalars {
         public Double serialize(Object dataFetcherResult) throws CoercingSerializeException {
           if (dataFetcherResult instanceof Grams) {
             var grams = (Grams) dataFetcherResult;
-            return grams.asDouble();
+            return Double.valueOf(grams.asDouble());
           }
           return null;
         }

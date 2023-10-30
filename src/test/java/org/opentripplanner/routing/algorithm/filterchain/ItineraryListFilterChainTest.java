@@ -13,12 +13,15 @@ import static org.opentripplanner.routing.api.request.preference.ItineraryFilter
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.opentripplanner.ext.emissions.EmissionType;
+import org.opentripplanner.ext.emissions.DefaultEmissionsService;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsFilter;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.model.plan.Itinerary;
@@ -29,6 +32,7 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
  * This class test the whole filter chain with a few test cases. Each filter should be tested with a
@@ -336,28 +340,22 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     Itinerary bus;
     Itinerary car;
     ItineraryListFilterChainBuilder builder = createBuilder(true, false, 2);
+    EmissionsService eService;
 
     @BeforeEach
     public void setUpItineraries() {
       bus = newItinerary(A).bus(21, T11_06, T11_09, B).build();
       car = newItinerary(A).drive(T11_30, T11_50, B).build();
+      Map<FeedScopedId, Double> emissions = new HashMap<>();
+      emissions.put(new FeedScopedId("F", "1"), 1.0);
+      eService = new DefaultEmissionsService(new EmissionsDataModel(emissions, 1.0));
     }
 
     @Test
     public void emissionsTest() {
-      var emissionsService = Mockito.mock(EmissionsService.class);
-
-      ItineraryListFilterChain chain = builder
-        .withEmissions(new EmissionsFilter(emissionsService))
-        .build();
-      chain.filter(List.of(bus, car));
-
-      Mockito
-        .verify(emissionsService, Mockito.atLeastOnce())
-        .getEmissionsPerMeterForRoute(bus.getTransitLeg(0).getRoute().getId(), EmissionType.CO2);
-      Mockito
-        .verify(emissionsService, Mockito.atLeastOnce())
-        .getEmissionsPerMeterForCar(EmissionType.CO2);
+      ItineraryListFilterChain chain = builder.withEmissions(new EmissionsFilter(eService)).build();
+      List<Itinerary> itineraries = chain.filter(List.of(bus, car));
+      assertFalse(itineraries.stream().anyMatch(i -> i.getEmissionsPerPerson().getCo2() == null));
     }
   }
 }

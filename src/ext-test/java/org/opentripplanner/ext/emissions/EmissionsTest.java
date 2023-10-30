@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.emissions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.time.OffsetDateTime;
@@ -14,9 +13,9 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
@@ -30,7 +29,7 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class EmissionsTest {
 
-  private EmissionsDataService eService;
+  private DefaultEmissionsService eService;
   private EmissionsFilter emissionsFilter;
 
   static final ZonedDateTime TIME = OffsetDateTime
@@ -48,10 +47,8 @@ class EmissionsTest {
     Map<FeedScopedId, Double> emissions = new HashMap<>();
     emissions.put(new FeedScopedId("F", "1"), (0.12 / 12));
     emissions.put(new FeedScopedId("F", "2"), 0.0);
-    EmissionsDataModel emissionsDataModel = new EmissionsDataModel();
-    emissionsDataModel.setCo2Emissions(emissions);
-    emissionsDataModel.setCarAvgCo2PerMeter(0.131);
-    this.eService = new EmissionsDataService(emissionsDataModel);
+    EmissionsDataModel emissionsDataModel = new EmissionsDataModel(emissions, 0.131);
+    this.eService = new DefaultEmissionsService(emissionsDataModel);
     this.emissionsFilter = new EmissionsFilter(eService);
   }
 
@@ -62,7 +59,6 @@ class EmissionsTest {
     var stopThree = TransitModelForTest.stopForTest("1:stop1", 62, 25);
     var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
     var route = TransitModelForTest.route(id("1")).build();
-    List<Leg> legs = new ArrayList<>();
     var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();
     var stoptime = new StopTime();
     var stoptimes = new ArrayList<StopTime>();
@@ -86,8 +82,11 @@ class EmissionsTest {
       100,
       null
     );
-    Itinerary i = new Itinerary(List.of(legs));
-    assertEquals(2223.902, emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2).get());
+    Itinerary i = new Itinerary(List.of(leg));
+    assertEquals(
+      new Grams(2223.902),
+      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
+    );
   }
 
   @Test
@@ -99,23 +98,23 @@ class EmissionsTest {
       .withStartTime(TIME)
       .withEndTime(TIME.plus(1, ChronoUnit.HOURS))
       .build();
-    Itinerary i = new Itinerary(List.of(legs));
-    assertEquals(28.0864, emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2).get());
+    Itinerary i = new Itinerary(List.of(leg));
+    assertEquals(
+      new Grams(28.0864),
+      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
+    );
   }
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
     Map<FeedScopedId, Double> emissions = new HashMap<>();
     emissions.put(new FeedScopedId("G", "1"), (0.12 / 12));
-    EmissionsDataModel emissionsDataModel = new EmissionsDataModel();
-    emissionsDataModel.setCo2Emissions(emissions);
-    emissionsDataModel.setCarAvgCo2PerMeter(0.131);
+    EmissionsDataModel emissionsDataModel = new EmissionsDataModel(emissions, 0.131);
 
-    this.eService = new EmissionsDataService(emissionsDataModel);
+    this.eService = new DefaultEmissionsService(emissionsDataModel);
     this.emissionsFilter = new EmissionsFilter(this.eService);
 
     var route = TransitModelForTest.route(id("1")).withAgency(subject).build();
-    List<Leg> legs = new ArrayList<>();
     var pattern = TransitModelForTest
       .tripPattern("1", route)
       .withStopPattern(TransitModelForTest.stopPattern(3))
@@ -142,8 +141,8 @@ class EmissionsTest {
       100,
       null
     );
-    Itinerary i = new Itinerary(List.of(legs));
-    assertTrue(emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2).isEmpty());
+    Itinerary i = new Itinerary(List.of(leg));
+    assertEquals(null, emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2());
   }
 
   @Test
@@ -153,7 +152,6 @@ class EmissionsTest {
     var stopThree = TransitModelForTest.stopForTest("1:stop1", 62, 25);
     var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
     var route = TransitModelForTest.route(id("2")).build();
-    List<Leg> legs = new ArrayList<>();
     var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();
     var stoptime = new StopTime();
     var stoptimes = new ArrayList<StopTime>();
@@ -177,8 +175,10 @@ class EmissionsTest {
       100,
       null
     );
-    legs.add(leg);
-    Itinerary i = new Itinerary(List.of(legs));
-    assertEquals(0, emissionsFilter.getEmissionsForItinerary(i, EmissionType.CO2).get());
+    Itinerary i = new Itinerary(List.of(leg));
+    assertEquals(
+      new Grams(0.0),
+      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
+    );
   }
 }

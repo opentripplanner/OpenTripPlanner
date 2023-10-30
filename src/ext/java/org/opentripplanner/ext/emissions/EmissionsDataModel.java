@@ -6,10 +6,13 @@ import java.util.Map;
 import java.util.Optional;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
+/**
+ * Container for emissions data.
+ */
 public class EmissionsDataModel implements Serializable {
 
-  private final Map<FeedScopedId, Double> co2Emissions;
-  private final double carAvgCo2PerMeter;
+  private Map<FeedScopedId, Double> co2Emissions;
+  private Double carAvgCo2PerMeter;
 
   @Inject
   public EmissionsDataModel() {}
@@ -27,8 +30,8 @@ public class EmissionsDataModel implements Serializable {
     this.carAvgCo2PerMeter = carAvgCo2PerMeter;
   }
 
-  public Double getCarAvgCo2PerMeter() {
-    return this.carAvgCo2PerMeter;
+  public Optional<Double> getCarAvgCo2PerMeter() {
+    return Optional.ofNullable(this.carAvgCo2PerMeter);
   }
 
   public Optional<Double> getCO2EmissionsById(FeedScopedId feedScopedRouteId) {

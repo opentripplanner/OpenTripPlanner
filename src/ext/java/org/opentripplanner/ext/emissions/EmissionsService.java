@@ -2,6 +2,7 @@ package org.opentripplanner.ext.emissions;
 
 import java.util.Optional;
 import org.opentripplanner.framework.lang.Sandbox;
+import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -10,20 +11,16 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 @Sandbox
 public interface EmissionsService {
   /**
-   * Get specific type of emissions per meter for a specific route.
-   * @param feedScopedRouteId
-   * @param emissionType
+   * Get all emissions per meter for a specific route.
+   *
    * @return Emissions per meter
    */
-  Optional<Double> getEmissionsPerMeterForRoute(
-    FeedScopedId feedScopedRouteId,
-    EmissionType emissionType
-  );
+  Optional<Emissions> getEmissionsPerMeterForRoute(FeedScopedId feedScopedRouteId);
 
   /**
-   * Get specific type of emissions for a car journey.
-   * @param emissionType
+   * Get all emissions per meter for a car.
+   *
    * @return Emissions per meter
    */
-  Optional<Double> getEmissionsPerMeterForCar(EmissionType emissionType);
+  Optional<Emissions> getEmissionsPerMeterForCar();
 }

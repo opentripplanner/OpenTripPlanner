@@ -201,8 +201,7 @@ class GraphQLIntegrationTest {
 
     railLeg.addAlert(alert);
 
-    var emissions = new Emissions();
-    emissions.setCo2(new Grams(123.0));
+    var emissions = new Emissions(new Grams(123.0));
     i1.setEmissionsPerPerson(emissions);
 
     var transitService = new DefaultTransitService(transitModel) {

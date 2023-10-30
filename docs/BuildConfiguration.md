@@ -733,9 +733,9 @@ to specify your NED tile cache location.
 
 Emissions configuration.
 
-By specifying a URL to fetch emissions data, the program gains access to carbon dioxide (CO₂)
-emissions associated with transportation modes. This data is then used
-to perform emission calculations for public transport modes and car travel.
+By specifying the average CO₂ emissions of a car in grams per kilometer as well as
+the average number of passengers in a car the program is able to to perform emission
+calculations for car travel.
 
 
 <h3 id="gd_discardMinTransferTimes">discardMinTransferTimes</h3>

@@ -113,9 +113,10 @@ public class GraphBuilderModules {
   static EmissionsModule provideEmissionsModule(
     GraphBuilderDataSources dataSources,
     BuildConfig config,
-    EmissionsDataModel emissionsDataModel
+    EmissionsDataModel emissionsDataModel,
+    DataImportIssueStore issueStore
   ) {
-    return new EmissionsModule(dataSources, config, emissionsDataModel);
+    return new EmissionsModule(dataSources, config, emissionsDataModel, issueStore);
   }
 
   @Provides

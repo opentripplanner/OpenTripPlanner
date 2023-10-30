@@ -14,6 +14,6 @@ public class EmissionsServiceModule {
   @Provides
   @Singleton
   public EmissionsService provideEmissionsService(EmissionsDataModel emissionsDataModel) {
-    return new EmissionsDataService(emissionsDataModel);
+    return new DefaultEmissionsService(emissionsDataModel);
   }
 }
