@@ -22,9 +22,12 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.TransitService;
 
@@ -206,7 +209,16 @@ public class AlternativeLegs {
 
     while (!pq.isEmpty()) {
       TripTimeOnDate tripTimeOnDate = pq.poll();
-      res.add(mapToLeg(timeZone, pattern, boardingPosition, alightingPosition, tripTimeOnDate));
+      res.add(
+        mapToLeg(
+          timeZone,
+          pattern,
+          boardingPosition,
+          alightingPosition,
+          tripTimeOnDate,
+          transitService
+        )
+      );
     }
 
     return res.stream();
@@ -218,7 +230,8 @@ public class AlternativeLegs {
     TripPattern pattern,
     int boardingPosition,
     int alightingPosition,
-    TripTimeOnDate tripTimeOnDate
+    TripTimeOnDate tripTimeOnDate,
+    TransitService transitService
   ) {
     LocalDate serviceDay = tripTimeOnDate.getServiceDay();
     TripTimes tripTimes = tripTimeOnDate.getTripTimes();
@@ -234,20 +247,21 @@ public class AlternativeLegs {
       tripTimes.getArrivalTime(alightingPosition)
     );
 
-    return new ScheduledTransitLeg(
-      tripTimes,
-      pattern,
-      boardingPosition,
-      alightingPosition,
-      boardingTime,
-      alightingTime,
-      serviceDay,
-      timeZone,
-      null,
-      null,
-      ZERO_COST,
-      null
+    TripOnServiceDate tripOnServiceDate = transitService.getTripOnServiceDateForTripAndDay(
+      new TripIdAndServiceDate(tripTimeOnDate.getTrip().getId(), tripTimeOnDate.getServiceDay())
     );
+
+    return new ScheduledTransitLegBuilder<>()
+      .withTripTimes(tripTimes)
+      .withTripPattern(pattern)
+      .withBoardStopIndexInPattern(boardingPosition)
+      .withAlightStopIndexInPattern(alightingPosition)
+      .withStartTime(boardingTime)
+      .withEndTime(alightingTime)
+      .withServiceDate(serviceDay)
+      .withZoneId(timeZone)
+      .withTripOnServiceDate(tripOnServiceDate)
+      .build();
   }
 
   @Nonnull
