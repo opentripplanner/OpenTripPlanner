@@ -14,6 +14,11 @@
     },
     {
       "type" : "gtfs",
+      "feedId" : "ccsww-nw",
+      "source" : "https://data.trilliumtransit.com/gtfs/catholiccommunity-wa-us/catholiccommunity-wa-us-northwest--flex-v2.zip"
+    },
+    {
+      "type" : "gtfs",
       "feedId" : "payyourpal",
       "source" : "https://data.trilliumtransit.com/gtfs/homage-wa-us/homage-wa-us-payyourpal--flex-v2.zip"
     },

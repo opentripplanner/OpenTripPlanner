@@ -19,7 +19,7 @@ portland/osm.pbf:
 	${CURL} http://osm.ibi-transit.com/vex/45.424388,-122.885443,45.684746,-122.44084.pbf -o $@
 
 seattle/osm.pbf:
-	${CURL} http://osm.ibi-transit.com/vex/47.481002,-122.459681,47.734124,-122.224433.pbf -o $@
+	${CURL} http://osm.ibi-transit.com/vex/47.50925,-122.47458,47.786105,-122.224433.pbf -o $@
 
 build-%: otp.jar %/osm.pbf
 	java -Xmx6G -jar otp.jar --build --save $*
