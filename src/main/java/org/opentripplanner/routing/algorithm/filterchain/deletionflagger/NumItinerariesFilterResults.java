@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.time.Instant;
 import java.util.List;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.pagecursor.PageCursorFactoryParameters;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
@@ -49,7 +50,7 @@ public class NumItinerariesFilterResults implements PageCursorFactoryParameters 
         .stream()
         .map(it -> it.endTime().toInstant())
         .min(Instant::compareTo)
-        .orElse(null);
+        .orElseThrow();
 
     Itinerary firstRemovedItinerary;
     if (cropSection == ListSection.HEAD) {
@@ -68,30 +69,19 @@ public class NumItinerariesFilterResults implements PageCursorFactoryParameters 
 
   @Override
   public String toString() {
-    return (
-      "NumItinerariesFilterResults{" +
-      "earliestRemovedDeparture=" +
-      earliestRemovedDeparture +
-      ", latestRemovedDeparture=" +
-      latestRemovedDeparture +
-      ", earliestRemovedArrival=" +
-      earliestRemovedArrival +
-      ", latestRemovedArrival=" +
-      latestRemovedArrival +
-      ", earliestKeptArrival=" +
-      earliestKeptArrival +
-      ", firstRemovedArrivalTime=" +
-      firstRemovedArrivalTime +
-      ", firstRemovedGeneralizedCost=" +
-      firstRemovedGeneralizedCost +
-      ", firstRemovedNumOfTransfers=" +
-      firstRemovedNumOfTransfers +
-      ", firstRemovedDepartureTime=" +
-      firstRemovedDepartureTime +
-      ", cropSection=" +
-      cropSection +
-      '}'
-    );
+    return ToStringBuilder
+      .of(NumItinerariesFilterResults.class)
+      .addDateTime("earliestRemovedDeparture", earliestRemovedDeparture)
+      .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
+      .addDateTime("earliestRemovedArrival", earliestRemovedArrival)
+      .addDateTime("latestRemovedArrival", latestRemovedArrival)
+      .addDateTime("earliestKeptArrival", earliestKeptArrival)
+      .addDateTime("firstRemovedArrivalTime", firstRemovedArrivalTime)
+      .addNum("firstRemovedGeneralizedCost", firstRemovedGeneralizedCost)
+      .addNum("firstRemovedNumOfTransfers", firstRemovedNumOfTransfers)
+      .addDateTime("firstRemovedDepartureTime", firstRemovedDepartureTime)
+      .addEnum("cropSection", cropSection)
+      .toString();
   }
 
   @Override
