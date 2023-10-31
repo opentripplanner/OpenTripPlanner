@@ -113,7 +113,7 @@ public class RoutingResponseMapperTest {
       "currentSearchWindow: 1h, " +
       "newSearchWindow: 1h30m, " +
       "searchWindowCropped, " +
-      "numItinerariesFilterResults: " +
+      "pageCursorFactoryParams: " +
       new NumItinerariesFilterResults(
         List.of(KEPT_ITINERARY),
         List.of(REMOVED_ITINERARY),

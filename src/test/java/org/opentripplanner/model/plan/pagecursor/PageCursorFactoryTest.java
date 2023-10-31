@@ -3,18 +3,14 @@ package org.opentripplanner.model.plan.pagecursor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
 import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.ListSection;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 
 @SuppressWarnings("ConstantConditions")
 class PageCursorFactoryTest implements PlanTestConstants {
@@ -37,33 +33,23 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(null, T12_00, null, D1H);
 
     var nextPage = factory.nextPageCursor();
-    assetPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
 
     var prevPage = factory.previousPageCursor();
-    assetPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE);
+    assertPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE);
   }
 
   @Test
   public void sortArrivalAscendingCropSearchWindow() {
     var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
       .withOriginalSearch(NEXT_PAGE, T12_00, null, D1H)
-      .withRemovedItineraries(
-        new NumItinerariesFilterResults(
-          List.of(
-            newItinerary(A).bus(22, TimeUtils.time("12:00"), TimeUtils.time("13:00"), B).build()
-          ),
-          List.of(
-            newItinerary(A).bus(21, TimeUtils.time("12:30"), TimeUtils.time("13:30"), B).build()
-          ),
-          ListSection.TAIL
-        )
-      );
+      .withRemovedItineraries(new PageCursorFactoryParametersImpl(T12_00, T12_30, T12_30, T13_30));
 
     var nextPage = factory.nextPageCursor();
-    assetPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE);
+    assertPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE);
 
     var prevPage = factory.previousPageCursor();
-    assetPageCursor(prevPage, T10_30, T13_00, D90M, PREVIOUS_PAGE);
+    assertPageCursor(prevPage, T10_30, T12_00, D90M, PREVIOUS_PAGE);
   }
 
   @Test
@@ -72,33 +58,23 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(PREVIOUS_PAGE, T12_00, null, D1H);
 
     var nextPage = factory.nextPageCursor();
-    assetPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
 
     var prevPage = factory.previousPageCursor();
-    assetPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE);
+    assertPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE);
   }
 
   @Test
   public void sortArrivalAscendingCropSearchWindowPreviousPage() {
     var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
       .withOriginalSearch(PREVIOUS_PAGE, T12_00, null, D1H)
-      .withRemovedItineraries(
-        new NumItinerariesFilterResults(
-          List.of(
-            newItinerary(A).bus(22, TimeUtils.time("12:00"), TimeUtils.time("13:00"), B).build()
-          ),
-          List.of(
-            newItinerary(A).bus(21, TimeUtils.time("12:30"), TimeUtils.time("13:30"), B).build()
-          ),
-          ListSection.HEAD
-        )
-      );
+      .withRemovedItineraries(new PageCursorFactoryParametersImpl(T12_00, T12_30, T12_30, T13_30));
 
     var nextPage = factory.nextPageCursor();
-    assetPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
 
     var prevPage = factory.previousPageCursor();
-    assetPageCursor(prevPage, T11_01, T13_30, D90M, PREVIOUS_PAGE);
+    assertPageCursor(prevPage, T11_01, T13_30, D90M, PREVIOUS_PAGE);
   }
 
   @Test
@@ -107,33 +83,23 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(null, T12_00, T13_30, D1H);
 
     var nextPage = factory.nextPageCursor();
-    assetPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
 
     var prevPage = factory.previousPageCursor();
-    assetPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE);
+    assertPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE);
   }
 
   @Test
   public void sortDepartureDescendingCropSearchWindow() {
     var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
       .withOriginalSearch(PREVIOUS_PAGE, T12_00, T13_30, D1H)
-      .withRemovedItineraries(
-        new NumItinerariesFilterResults(
-          List.of(
-            newItinerary(A).bus(21, TimeUtils.time("12:30"), TimeUtils.time("13:30"), B).build()
-          ),
-          List.of(
-            newItinerary(A).bus(22, TimeUtils.time("12:30"), TimeUtils.time("13:00"), B).build()
-          ),
-          ListSection.TAIL
-        )
-      );
+      .withRemovedItineraries(new PageCursorFactoryParametersImpl(T12_30, T12_30, T12_30, T13_00));
 
     var nextPage = factory.nextPageCursor();
-    assetPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
 
     var prevPage = factory.previousPageCursor();
-    assetPageCursor(prevPage, T11_01, T13_00, D90M, PREVIOUS_PAGE);
+    assertPageCursor(prevPage, T11_01, T13_00, D90M, PREVIOUS_PAGE);
   }
 
   @Test
@@ -142,40 +108,30 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H);
 
     var nextPage = factory.nextPageCursor();
-    assetPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
+    assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE);
 
     var prevPage = factory.previousPageCursor();
-    assetPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE);
+    assertPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE);
   }
 
   @Test
   public void sortDepartureDescendingCropSearchWindowNextPage() {
     var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
       .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H)
-      .withRemovedItineraries(
-        new NumItinerariesFilterResults(
-          List.of(
-            newItinerary(A).bus(22, TimeUtils.time("12:00"), TimeUtils.time("13:00"), B).build()
-          ),
-          List.of(
-            newItinerary(A).bus(21, TimeUtils.time("12:30"), TimeUtils.time("13:30"), B).build()
-          ),
-          ListSection.HEAD
-        )
-      );
+      .withRemovedItineraries(new PageCursorFactoryParametersImpl(T12_00, T12_30, T12_30, T13_30));
 
     var nextPage = factory.nextPageCursor();
-    assetPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE);
+    assertPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE);
 
     var prevPage = factory.previousPageCursor();
-    assetPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE);
+    assertPageCursor(prevPage, T10_30, T13_30, D90M, PREVIOUS_PAGE);
   }
 
   private static Instant time(String input) {
     return TIME_ZERO.plusSeconds(TimeUtils.time(input));
   }
 
-  private void assetPageCursor(
+  private void assertPageCursor(
     PageCursor pageCursor,
     Instant expEdt,
     Instant expLat,
@@ -187,4 +143,12 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assertEquals(expSearchWindow, pageCursor.searchWindow);
     assertEquals(expPageType, pageCursor.type);
   }
+
+  private record PageCursorFactoryParametersImpl(
+    Instant earliestKeptArrival,
+    Instant earliestRemovedDeparture,
+    Instant latestRemovedDeparture,
+    Instant latestRemovedArrival
+  )
+    implements PageCursorFactoryParameters {}
 }

@@ -3,9 +3,10 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.pagecursor.PageCursorFactoryParameters;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 
-public class NumItinerariesFilterResults {
+public class NumItinerariesFilterResults implements PageCursorFactoryParameters {
 
   public final Instant earliestRemovedDeparture;
   public final Instant latestRemovedDeparture;
@@ -91,5 +92,25 @@ public class NumItinerariesFilterResults {
       cropSection +
       '}'
     );
+  }
+
+  @Override
+  public Instant earliestRemovedDeparture() {
+    return earliestRemovedDeparture;
+  }
+
+  @Override
+  public Instant earliestKeptArrival() {
+    return earliestKeptArrival;
+  }
+
+  @Override
+  public Instant latestRemovedDeparture() {
+    return latestRemovedDeparture;
+  }
+
+  @Override
+  public Instant latestRemovedArrival() {
+    return latestRemovedArrival;
   }
 }

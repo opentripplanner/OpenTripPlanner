@@ -9,7 +9,6 @@ import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 
 public class PageCursorFactory {
 
@@ -19,7 +18,7 @@ public class PageCursorFactory {
   private SearchTime current = null;
   private Duration currentSearchWindow = null;
   private boolean wholeSwUsed = true;
-  private NumItinerariesFilterResults numItinerariesFilterResults = null;
+  private PageCursorFactoryParameters pageCursorFactoryParams = null;
 
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;
@@ -53,13 +52,13 @@ public class PageCursorFactory {
    * removed in the next and previous pages. This means we will use information from when we cropped
    * the list of itineraries to create the new search encoded in the page cursors.
    *
-   * @param numItinerariesFilterResults the result from the {@code NumItinerariesFilter}
+   * @param pageCursorFactoryParams the result from the {@code NumItinerariesFilter}
    */
   public PageCursorFactory withRemovedItineraries(
-    NumItinerariesFilterResults numItinerariesFilterResults
+    PageCursorFactoryParameters pageCursorFactoryParams
   ) {
     this.wholeSwUsed = false;
-    this.numItinerariesFilterResults = numItinerariesFilterResults;
+    this.pageCursorFactoryParams = pageCursorFactoryParams;
     return this;
   }
 
@@ -85,7 +84,7 @@ public class PageCursorFactory {
       .addDuration("currentSearchWindow", currentSearchWindow)
       .addDuration("newSearchWindow", newSearchWindow)
       .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
-      .addObj("numItinerariesFilterResults", numItinerariesFilterResults)
+      .addObj("pageCursorFactoryParams", pageCursorFactoryParams)
       .addObj("nextCursor", nextCursor)
       .addObj("prevCursor", prevCursor)
       .toString();
@@ -118,10 +117,9 @@ public class PageCursorFactory {
     } else { // If the whole search window was not used (i.e. if there were removed itineraries)
       if (currentPageType == NEXT_PAGE) {
         prev.edt = edtBeforeNewSw();
-        next.edt = numItinerariesFilterResults.earliestRemovedDeparture;
+        next.edt = pageCursorFactoryParams.earliestRemovedDeparture();
         if (sortOrder.isSortedByArrivalTimeAscending()) {
-          prev.lat =
-            numItinerariesFilterResults.earliestKeptArrival.truncatedTo(ChronoUnit.MINUTES);
+          prev.lat = pageCursorFactoryParams.earliestKeptArrival().truncatedTo(ChronoUnit.MINUTES);
         } else {
           prev.lat = current.lat;
         }
@@ -130,9 +128,9 @@ public class PageCursorFactory {
         // search-window from the last time included in the search window we need to include one extra
         // minute at the end.
         prev.edt =
-          numItinerariesFilterResults.latestRemovedDeparture.minus(newSearchWindow).plusSeconds(60);
+          pageCursorFactoryParams.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
         next.edt = edtAfterUsedSw();
-        prev.lat = numItinerariesFilterResults.latestRemovedArrival;
+        prev.lat = pageCursorFactoryParams.latestRemovedArrival();
       }
     }
     prevCursor = new PageCursor(PREVIOUS_PAGE, sortOrder, prev.edt, prev.lat, newSearchWindow);
