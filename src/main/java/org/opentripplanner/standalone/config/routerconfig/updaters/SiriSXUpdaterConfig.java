@@ -13,7 +13,7 @@ public class SiriSXUpdaterConfig {
     """
     Use the file protocol to set a directory for reading updates from a directory. The file
     loader will look for xml files: '*.xml' in the configured directory. The files are
-    renamed by the loader when possessed:
+    renamed by the loader when processed:
     
     &nbsp;&nbsp;&nbsp; _a.xml_ &nbsp; ➞ &nbsp; _a.xml.inProgress_ &nbsp; ➞ &nbsp; _a.xml.ok_ &nbsp; or &nbsp; _a.xml.failed_
     
@@ -28,7 +28,7 @@ public class SiriSXUpdaterConfig {
         .since(V2_0)
         .summary(
           """
-          The URL to send the HTTP requests to. Support http/https and file protocol.
+          The URL to send the HTTP requests to. Supports http/https and file protocol.
           """
         )
         .description(URL_DESCRIPTION)

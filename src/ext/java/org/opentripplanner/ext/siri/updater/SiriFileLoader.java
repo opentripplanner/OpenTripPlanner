@@ -15,9 +15,9 @@ import uk.org.siri.siri20.Siri;
  * <pre>
  * update.xml  ➞  update.xml.inProgress  ➞  ( update.xml.ok | update.xml.failed )
  * </pre>
- * The renaming of the file guarantee that the file is not processed twice. A {@code .ok} file
+ * The renaming of the file guarantees that the file is not processed twice. A {@code .ok} file
  * indicate that the file is processed and the content parsed ok. The status of the update
- * might be different - se logs for update errors.
+ * might be different - see logs for update errors.
  * <p>
  * The file updater will pick up any file matching {@code *.xml} in the configured directory.
  */

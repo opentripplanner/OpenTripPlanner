@@ -48,7 +48,7 @@ public class CountdownTimer {
   }
 
   /**
-   * Return {@code true} if time is up, and then imitatively start the timer again.
+   * Return {@code true} if time is up, and then immediately start the timer again.
    */
   public boolean nextLap() {
     long time = now();
