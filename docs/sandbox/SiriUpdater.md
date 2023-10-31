@@ -52,7 +52,7 @@ The URL to send the HTTP requests to.
 
 Use the file protocol to set a directory for reading updates from a directory. The file
 loader will look for xml files: '*.xml' in the configured directory. The files are
-renamed by the loader when possessed:
+renamed by the loader when processed:
 
 &nbsp;&nbsp;&nbsp; _a.xml_ &nbsp; ➞ &nbsp; _a.xml.inProgress_ &nbsp; ➞ &nbsp; _a.xml.ok_ &nbsp; or &nbsp; _a.xml.failed_
 
@@ -102,7 +102,7 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 | frequency                       |    `duration`   | How often the updates should be retrieved.                                                             | *Optional* | `"PT1M"`      |  2.0  |
 | requestorRef                    |     `string`    | The requester reference.                                                                               | *Optional* |               |  2.0  |
 | timeout                         |    `duration`   | The HTTP timeout to download the updates.                                                              | *Optional* | `"PT15S"`     |  2.0  |
-| [url](#u__9__url)               |     `string`    | The URL to send the HTTP requests to. Support http/https and file protocol.                            | *Required* |               |  2.0  |
+| [url](#u__9__url)               |     `string`    | The URL to send the HTTP requests to. Supports http/https and file protocol.                           | *Required* |               |  2.0  |
 | [headers](#u__9__headers)       | `map of string` | HTTP headers to add to the request. Any header key, value can be inserted.                             | *Optional* |               |  2.3  |
 
 
@@ -124,12 +124,12 @@ time.
 **Since version:** `2.0` ∙ **Type:** `string` ∙ **Cardinality:** `Required`   
 **Path:** /updaters/[9] 
 
-The URL to send the HTTP requests to. Support http/https and file protocol.
+The URL to send the HTTP requests to. Supports http/https and file protocol.
 
 
 Use the file protocol to set a directory for reading updates from a directory. The file
 loader will look for xml files: '*.xml' in the configured directory. The files are
-renamed by the loader when possessed:
+renamed by the loader when processed:
 
 &nbsp;&nbsp;&nbsp; _a.xml_ &nbsp; ➞ &nbsp; _a.xml.inProgress_ &nbsp; ➞ &nbsp; _a.xml.ok_ &nbsp; or &nbsp; _a.xml.failed_
 
