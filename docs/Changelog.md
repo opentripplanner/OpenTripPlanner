@@ -30,6 +30,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add stricter validation for flex areas [#5457](https://github.com/opentripplanner/OpenTripPlanner/pull/5457)
 - Remove HTTPS handling and its documentation [#5439](https://github.com/opentripplanner/OpenTripPlanner/pull/5439)
 - Add support for DSJ in transit leg reference [#5455](https://github.com/opentripplanner/OpenTripPlanner/pull/5455)
+- Ignore negative travel-times in Raptor [#5443](https://github.com/opentripplanner/OpenTripPlanner/pull/5443)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
