@@ -7,6 +7,7 @@ import static org.opentripplanner.ext.fares.impl.OrcaFareService.COMM_TRANS_AGEN
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.KC_METRO_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.KITSAP_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.PIERCE_COUNTY_TRANSIT_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.ROUTE_TYPE_FERRY;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.SKAGIT_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.SOUND_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.WASHINGTON_STATE_FERRIES_AGENCY_ID;
@@ -340,12 +341,13 @@ public class OrcaFareServiceTest {
    * Single trip with Link Light Rail to ensure distance fare is calculated correctly.
    */
   @Test
-  void calculateFareForLightRailLeg() {
+  void calculateFareForSTRail() {
     List<Leg> rides = List.of(
-      getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Roosevelt Station", "Int'l Dist/Chinatown")
+      getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Roosevelt Station", "Int'l Dist/Chinatown"),
+      getLeg(SOUND_TRANSIT_AGENCY_ID, "S Line", 100, "King Street Station", "Auburn Station")
     );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE);
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2));
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(2));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, ORCA_SPECIAL_FARE);
     calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE);
@@ -353,17 +355,31 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
   }
 
+  /**
+   * Test King County Water Taxis
+   */
   @Test
-  void calculateFareForSounderLeg() {
+  void calculateWaterTaxiFares() {
     List<Leg> rides = List.of(
-      getLeg(SOUND_TRANSIT_AGENCY_ID, "S Line", 0, "King Street Station", "Auburn Station")
+      getLeg(KC_METRO_AGENCY_ID, "973", 1)
     );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE);
+    calculateFare(rides, regular, usDollars(5.75f));
+    calculateFare(rides, FareType.senior, usDollars(5.75f));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, ORCA_SPECIAL_FARE);
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.electronicSenior, ONE_DOLLAR);
+    calculateFare(rides, FareType.electronicSpecial, usDollars(3.75f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(5f));
+    calculateFare(rides, FareType.electronicSenior, usDollars(2.50f));
+    calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
+
+    rides = List.of(
+      getLeg(KC_METRO_AGENCY_ID, "973", 1)
+    );
+    calculateFare(rides, regular, usDollars(5.75f));
+    calculateFare(rides, FareType.senior, usDollars(5.75f));
+    calculateFare(rides, FareType.youth, Money.ZERO_USD);
+    calculateFare(rides, FareType.electronicSpecial, usDollars(3.75f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(5f));
+    calculateFare(rides, FareType.electronicSenior, usDollars(2.50f));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
   }
 

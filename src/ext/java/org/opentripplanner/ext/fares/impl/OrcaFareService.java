@@ -134,13 +134,11 @@ public class OrcaFareService extends DefaultFareService {
         }
 
         if (
-          route.getGtfsType() == ROUTE_TYPE_FERRY &&
-          routeLongNameFallBack(route).contains("Water Taxi: West Seattle")
+          "973".equals(route.getShortName())
         ) {
           yield RideType.KC_WATER_TAXI_WEST_SEATTLE;
         } else if (
-          route.getGtfsType() == ROUTE_TYPE_FERRY &&
-          route.getDescription().contains("Water Taxi: Vashon Island")
+          "975".equals(route.getShortName())
         ) {
           yield RideType.KC_WATER_TAXI_VASHON_ISLAND;
         }
@@ -245,8 +243,8 @@ public class OrcaFareService extends DefaultFareService {
   ) {
     Route route = leg.getRoute();
     return switch (rideType) {
-      case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(5.75f);
-      case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(5f);
+      case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType) ? optionalUSD(5.75f) : optionalUSD(6.75f);
+      case KC_WATER_TAXI_WEST_SEATTLE ->  usesOrca(fareType) ? optionalUSD(5f) : optionalUSD(5.75f);
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> optionalUSD(2f);
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> optionalUSD(10f);
       case WASHINGTON_STATE_FERRIES -> Optional.of(
@@ -308,8 +306,8 @@ public class OrcaFareService extends DefaultFareService {
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> fareType.equals(FareType.electronicSenior) // Kitsap only provide discounted senior fare for orca.
         ? optionalUSD(1f)
         : optionalUSD(2f);
-      case KC_WATER_TAXI_VASHON_ISLAND -> optionalUSD(3f);
-      case KC_WATER_TAXI_WEST_SEATTLE -> optionalUSD(2.5f);
+      case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType) ? optionalUSD(3f) : optionalUSD(6.75f);
+      case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType) ? optionalUSD(2.5f) : optionalUSD(5.75f);
       case SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
