@@ -16,10 +16,19 @@ const query = graphql(`
     $to: Location!
     $arriveBy: Boolean
     $dateTime: DateTime
+    $numTripPatterns: Int
     $searchWindow: Int
     $modes: Modes
   ) {
-    trip(from: $from, to: $to, arriveBy: $arriveBy, dateTime: $dateTime, searchWindow: $searchWindow, modes: $modes) {
+    trip(
+      from: $from
+      to: $to
+      arriveBy: $arriveBy
+      dateTime: $dateTime
+      numTripPatterns: $numTripPatterns
+      searchWindow: $searchWindow
+      modes: $modes
+    ) {
       tripPatterns {
         aimedStartTime
         aimedEndTime

@@ -9,6 +9,7 @@ import { AccessSelect } from './AccessSelect.tsx';
 import { EgressSelect } from './EgressSelect.tsx';
 import { DirectModeSelect } from './DirectModeSelect.tsx';
 import { TransitModeSelect } from './TransitModeSelect.tsx';
+import { NumTripPatternsInput } from './NumTripPatternsInput.tsx';
 
 export function SearchBar({
   onRoute,
@@ -27,6 +28,7 @@ export function SearchBar({
         <DepartureArrivalSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <TimeInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <DateInputField tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+        <NumTripPatternsInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <SearchWindowInput tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <AccessSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <TransitModeSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
