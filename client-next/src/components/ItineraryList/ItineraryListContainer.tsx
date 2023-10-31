@@ -4,7 +4,6 @@ import { useContainerWidth } from './useContainerWidth.ts';
 import { ItineraryHeaderContent } from './ItineraryHeaderContent.tsx';
 import { useEarliestAndLatestTimes } from './useEarliestAndLatestTimes.ts';
 
-// TODO itinerary (accordion) selection should propagate to map view
 export function ItineraryListContainer({
   tripQueryResult,
   selectedTripPatternIndex,
