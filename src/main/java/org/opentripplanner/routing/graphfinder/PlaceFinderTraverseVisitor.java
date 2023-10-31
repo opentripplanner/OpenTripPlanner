@@ -70,23 +70,24 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     int maxResults,
     double radiusMeters
   ) {
+    if (filterByPlaceTypes == null || filterByPlaceTypes.isEmpty()) {
+      throw new IllegalArgumentException("No place type filter was included in request");
+    }
     this.transitService = transitService;
+
     this.filterByModes = toSet(filterByModes);
     this.filterByStops = toSet(filterByStops);
     this.filterByRoutes = toSet(filterByRoutes);
     this.filterByVehicleRental = toSet(filterByBikeRentalStations);
-
     includeStops = shouldInclude(filterByPlaceTypes, PlaceType.STOP);
+
     includePatternAtStops = shouldInclude(filterByPlaceTypes, PlaceType.PATTERN_AT_STOP);
     includeVehicleRentals = shouldInclude(filterByPlaceTypes, PlaceType.VEHICLE_RENT);
     includeCarParking = shouldInclude(filterByPlaceTypes, PlaceType.CAR_PARK);
     includeBikeParking = shouldInclude(filterByPlaceTypes, PlaceType.BIKE_PARK);
-    includeStations =
-      shouldInclude(filterByPlaceTypes, PlaceType.STATION) &&
-      filterByPlaceTypes != null &&
-      !filterByPlaceTypes.isEmpty();
-
+    includeStations = shouldInclude(filterByPlaceTypes, PlaceType.STATION);
     this.maxResults = maxResults;
+
     this.radiusMeters = radiusMeters;
   }
 
@@ -162,7 +163,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   }
 
   private boolean shouldInclude(List<PlaceType> filterByPlaceTypes, PlaceType type) {
-    return filterByPlaceTypes == null || filterByPlaceTypes.contains(type);
+    return filterByPlaceTypes.contains(type);
   }
 
   private boolean stopHasPatternsWithMode(RegularStop stop, Set<TransitMode> modes) {

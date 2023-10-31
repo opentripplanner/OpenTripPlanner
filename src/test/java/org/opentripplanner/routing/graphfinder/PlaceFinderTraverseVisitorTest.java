@@ -137,37 +137,4 @@ public class PlaceFinderTraverseVisitorTest {
 
     visitor.visitVertex(state1);
   }
-
-  @Test
-  void noStationsByDefault() {
-    var visitor = new PlaceFinderTraverseVisitor(
-      transitService,
-      List.of(TransitMode.BUS),
-      null,
-      null,
-      null,
-      null,
-      1,
-      500
-    );
-
-    assertEquals(List.of(), visitor.placesFound);
-    var state1 = TestStateBuilder.ofWalking().streetEdge().stop(STOP1).build();
-
-    visitor.visitVertex(state1);
-
-    var state2 = TestStateBuilder.ofWalking().streetEdge().streetEdge().stop(STOP2).build();
-    visitor.visitVertex(state2);
-
-    // Revisited stop should not be added to found places
-    visitor.visitVertex(state1);
-    var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
-
-    // One trip pattern should also be found on default settings
-    var pattern = new PatternAtStop(STOP1, a.getAllTripPatterns().stream().findFirst().get());
-
-    assertEquals(List.of(STOP1, pattern, STOP2), res);
-
-    visitor.visitVertex(state1);
-  }
 }
