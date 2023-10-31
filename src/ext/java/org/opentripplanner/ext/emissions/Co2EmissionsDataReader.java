@@ -29,18 +29,18 @@ public class Co2EmissionsDataReader {
 
   /**
    * Read files in a GTFS directory.
-   * @param filePath
+   * @param directory
    * @return emissions data
    */
-  public Map<FeedScopedId, Double> readGtfs(String filePath) {
+  public Map<FeedScopedId, Double> readGtfs(File directory) {
     String feedId = "";
     Map<FeedScopedId, Double> emissionsData = new HashMap<>();
-    try (InputStream feedInfoStream = new FileInputStream(filePath + "/feed_info.txt")) {
+    try (InputStream feedInfoStream = new FileInputStream(directory + "/feed_info.txt")) {
       feedId = readFeedId(feedInfoStream);
     } catch (IOException e) {
       issueStore.add("InvalidData", "Reading feed_info.txt failed.");
     }
-    try (InputStream stream = new FileInputStream(filePath + "/emissions.txt")) {
+    try (InputStream stream = new FileInputStream(directory + "/emissions.txt")) {
       emissionsData = readEmissions(stream, feedId);
     } catch (IOException e) {
       issueStore.add("InvalidData", "Reading emissions.txt failed.");
@@ -50,12 +50,12 @@ public class Co2EmissionsDataReader {
 
   /**
    * Read files in a GTFS zip file.
-   * @param filePath
+   * @param file
    * @return emissions data
    */
-  public Map<FeedScopedId, Double> readGtfsZip(String filePath) {
+  public Map<FeedScopedId, Double> readGtfsZip(File file) {
     try {
-      ZipFile zipFile = new ZipFile(new File(filePath), ZipFile.OPEN_READ);
+      ZipFile zipFile = new ZipFile(file, ZipFile.OPEN_READ);
       String feedId = readFeedId(zipFile.getInputStream(zipFile.getEntry("feed_info.txt")));
       InputStream stream = zipFile.getInputStream(zipFile.getEntry("emissions.txt"));
       Map<FeedScopedId, Double> emissionsData = readEmissions(stream, feedId);

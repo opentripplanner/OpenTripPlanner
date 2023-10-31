@@ -2,6 +2,7 @@ package org.opentripplanner.ext.emissions;
 
 import dagger.Module;
 import jakarta.inject.Inject;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
@@ -50,9 +51,9 @@ public class EmissionsModule implements GraphBuilderModule {
 
       for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
         if (gtfsData.dataSource().name().contains(".zip")) {
-          emissionsData = co2EmissionsDataReader.readGtfsZip(gtfsData.dataSource().path());
+          emissionsData = co2EmissionsDataReader.readGtfsZip(new File(gtfsData.dataSource().uri()));
         } else {
-          emissionsData = co2EmissionsDataReader.readGtfs(gtfsData.dataSource().path());
+          emissionsData = co2EmissionsDataReader.readGtfs(new File(gtfsData.dataSource().uri()));
         }
       }
       this.emissionsDataModel.setCo2Emissions(this.emissionsData);
