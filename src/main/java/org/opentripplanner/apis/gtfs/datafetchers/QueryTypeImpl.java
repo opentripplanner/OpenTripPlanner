@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -325,7 +326,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         : null;
       List<PlaceType> filterByPlaceTypes = args.getGraphQLFilterByPlaceTypes() != null
         ? args.getGraphQLFilterByPlaceTypes().stream().map(GraphQLUtils::toModel).toList()
-        : null;
+        : EnumSet.complementOf(EnumSet.of(PlaceType.STATION)).stream().toList();
 
       List<PlaceAtDistance> places;
       try {
