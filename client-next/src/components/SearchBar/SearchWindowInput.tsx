@@ -19,12 +19,12 @@ export function SearchWindowInput({
         size="sm"
         placeholder="3600"
         prefix="seconds"
-        min={0}
+        min={1}
         value={tripQueryVariables.searchWindow || ''}
         onChange={(event) =>
           setTripQueryVariables({
             ...tripQueryVariables,
-            searchWindow: Number(event.target.value),
+            searchWindow: Number(event.target.value) > 0 ? Number(event.target.value) : undefined,
           })
         }
       />
