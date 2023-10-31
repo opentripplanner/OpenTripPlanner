@@ -40,7 +40,7 @@ const MultiSelectDropdown = <T = unknown,>({ label, options, values, onChange }:
         type="text"
         id="multiSelectDropdown"
         size="sm"
-        value={values.join(', ')}
+        value={values.length > 0 ? values.join(', ') : 'Not selected'}
         onClick={toggleDropdown}
         onChange={() => {}}
       />

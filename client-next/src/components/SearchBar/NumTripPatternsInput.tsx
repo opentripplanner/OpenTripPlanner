@@ -10,12 +10,12 @@ export function NumTripPatternsInput({
 }) {
   return (
     <Form.Group>
-      <Form.Label column="sm" htmlFor="searchWindowInput">
+      <Form.Label column="sm" htmlFor="numTripPatternsInput">
         Number of trip patterns
       </Form.Label>
       <Form.Control
         type="number"
-        id="searchWindowInput"
+        id="numTripPatternsInput"
         size="sm"
         placeholder="12"
         min={1}
