@@ -1,7 +1,7 @@
 import { Form } from 'react-bootstrap';
-import { StreetMode, TripQueryVariables } from '../../gql/graphql.ts';
+import { ItineraryFilterDebugProfile, TripQueryVariables } from '../../gql/graphql.ts';
 
-export function ItineraryDebugSelect({
+export function ItineraryFilterDebugSelect({
   tripQueryVariables,
   setTripQueryVariables,
 }: {
@@ -10,42 +10,24 @@ export function ItineraryDebugSelect({
 }) {
   return (
     <Form.Group>
-      <Form.Label column="sm" htmlFor="egressSelect">
-        Egress
+      <Form.Label column="sm" htmlFor="itineraryDebugFilterSelect">
+        Itinerary filter debug
       </Form.Label>
       <Form.Select
-        id="egressSelect"
+        id="itineraryDebugFilterSelect"
         size="sm"
         onChange={(e) => {
-          if (e.target.value !== 'not_selected') {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              modes: {
-                ...tripQueryVariables.modes,
-                accessMode: tripQueryVariables.modes?.accessMode || (e.target.value as StreetMode),
-                egressMode: e.target.value as StreetMode,
-              },
-            });
-          } else {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              modes:
-                tripQueryVariables.modes?.directMode || tripQueryVariables.modes?.transportModes
-                  ? {
-                      ...tripQueryVariables.modes,
-                      accessMode: undefined,
-                      egressMode: undefined,
-                    }
-                  : undefined,
-            });
-          }
+          setTripQueryVariables({
+            ...tripQueryVariables,
+            itineraryFiltersDebug: e.target.value as ItineraryFilterDebugProfile,
+          });
         }}
-        value={tripQueryVariables.modes?.egressMode || 'not_selected'}
+        value={tripQueryVariables.itineraryFiltersDebug || 'not_selected'}
       >
         <option value="not_selected">Not selected</option>
-        {Object.values(StreetMode).map((mode) => (
-          <option key={mode} value={mode}>
-            {mode}
+        {Object.values(ItineraryFilterDebugProfile).map((debugProfile) => (
+          <option key={debugProfile} value={debugProfile}>
+            {debugProfile}
           </option>
         ))}
       </Form.Select>

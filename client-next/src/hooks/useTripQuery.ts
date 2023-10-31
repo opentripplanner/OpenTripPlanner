@@ -19,6 +19,7 @@ const query = graphql(`
     $numTripPatterns: Int
     $searchWindow: Int
     $modes: Modes
+    $itineraryFiltersDebug: ItineraryFilterDebugProfile
   ) {
     trip(
       from: $from
@@ -28,6 +29,7 @@ const query = graphql(`
       numTripPatterns: $numTripPatterns
       searchWindow: $searchWindow
       modes: $modes
+      itineraryFilters: { debug: $itineraryFiltersDebug }
     ) {
       tripPatterns {
         aimedStartTime

@@ -10,6 +10,7 @@ import { EgressSelect } from './EgressSelect.tsx';
 import { DirectModeSelect } from './DirectModeSelect.tsx';
 import { TransitModeSelect } from './TransitModeSelect.tsx';
 import { NumTripPatternsInput } from './NumTripPatternsInput.tsx';
+import { ItineraryFilterDebugSelect } from './ItineraryFilterDebugSelect.tsx';
 
 export function SearchBar({
   onRoute,
@@ -34,6 +35,10 @@ export function SearchBar({
         <TransitModeSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <EgressSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
         <DirectModeSelect tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+        <ItineraryFilterDebugSelect
+          tripQueryVariables={tripQueryVariables}
+          setTripQueryVariables={setTripQueryVariables}
+        />
         <div className="search-bar-route-button-wrapper">
           <Button variant="primary" onClick={onRoute}>
             Route
