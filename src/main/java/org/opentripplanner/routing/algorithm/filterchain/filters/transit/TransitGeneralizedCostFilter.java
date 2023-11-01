@@ -11,6 +11,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
+ * This filter removes all transit results which have a generalized-cost higher than the max-limit
  * This filter removes all transit results that have a generalized-cost higher than the max-limit
  * computed by the {@link #costLimitFunction} plus the wait cost given by
  * {@link TransitGeneralizedCostFilter#getWaitTimeCost}.

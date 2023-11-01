@@ -38,7 +38,7 @@ public class RemoveTransitIfWalkingIsBetter implements RemoveItineraryFlagger {
 
     return itineraries
       .stream()
-      .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCost() >= limit)
+      .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCostIncludingPenalty() >= limit)
       .collect(Collectors.toList());
   }
 

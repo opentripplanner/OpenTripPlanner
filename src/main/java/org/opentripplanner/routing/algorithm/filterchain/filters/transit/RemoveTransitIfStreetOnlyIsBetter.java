@@ -38,7 +38,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     OptionalInt minStreetCost = itineraries
       .stream()
       .filter(Itinerary::isOnStreetAllTheWay)
-      .mapToInt(Itinerary::getGeneralizedCost)
+      .mapToInt(Itinerary::getGeneralizedCostIncludingPenalty)
       .min();
 
     if (minStreetCost.isEmpty()) {
@@ -52,7 +52,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     // Filter away itineraries that have higher cost than limit cost computed above
     return itineraries
       .stream()
-      .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCost() >= limit)
+      .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCostIncludingPenalty() >= limit)
       .collect(Collectors.toList());
   }
 

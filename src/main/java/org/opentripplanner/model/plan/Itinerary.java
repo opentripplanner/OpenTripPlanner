@@ -489,13 +489,17 @@ public class Itinerary implements ItinerarySortKey {
 
   /**
    * If a generalized cost is used in the routing algorithm, this should be the total cost computed
-   * by the algorithm. This is relevant for anyone who want to debug an search and tuning the
+   * by the algorithm. This is relevant for anyone who want to debug a search and tuning the
    * system. The unit should be equivalent to the cost of "one second of transit".
    * <p>
    * -1 indicate that the cost is not set/computed.
    */
   public int getGeneralizedCost() {
     return generalizedCost;
+  }
+
+  public int getGeneralizedCostIncludingPenalty() {
+    return generalizedCost - penaltyCost(accessPenalty) - penaltyCost(egressPenalty);
   }
 
   public void setGeneralizedCost(int generalizedCost) {
@@ -662,5 +666,13 @@ public class Itinerary implements ItinerarySortKey {
   @Nullable
   public Emissions getEmissionsPerPerson() {
     return this.emissionsPerPerson;
+  }
+
+  private static int penaltyCost(TimeAndCost penalty) {
+    if (penalty == null) {
+      return 0;
+    } else {
+      return penalty.cost().toSeconds();
+    }
   }
 }
