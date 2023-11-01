@@ -285,6 +285,7 @@ public class OrcaFareService extends DefaultFareService {
       );
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> optionalUSD((1f));
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> optionalUSD((5f));
+      case SKAGIT_LOCAL, SKAGIT_CROSS_COUNTY, WHATCOM_CROSS_COUNTY, WHATCOM_LOCAL -> Optional.empty();
       default -> Optional.of(defaultFare);
     };
   }
@@ -326,7 +327,7 @@ public class OrcaFareService extends DefaultFareService {
       case WASHINGTON_STATE_FERRIES -> Optional.of(
         getWashingtonStateFerriesFare(route.getLongName(), fareType, defaultFare)
       );
-      case WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY -> optionalUSD(1f);
+      case WHATCOM_CROSS_COUNTY, SKAGIT_CROSS_COUNTY -> Optional.of(defaultFare.half());
       default -> Optional.of(defaultFare);
     };
   }

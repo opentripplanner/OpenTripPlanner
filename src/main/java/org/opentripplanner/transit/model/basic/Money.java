@@ -141,6 +141,11 @@ public class Money implements Comparable<Money>, Serializable {
   }
 
   /**
+   * Returns half this instance's amount
+   */
+  public Money half() { return new Money(currency, amount / 2); }
+
+  /**
    * Multiplies the amount with the multiplicator.
    */
   public Money times(int multiplicator) {

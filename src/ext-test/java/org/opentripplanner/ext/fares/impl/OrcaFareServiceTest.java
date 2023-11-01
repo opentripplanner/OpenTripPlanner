@@ -10,6 +10,7 @@ import static org.opentripplanner.ext.fares.impl.OrcaFareService.PIERCE_COUNTY_T
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.SKAGIT_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.SOUND_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.WASHINGTON_STATE_FERRIES_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.WHATCOM_AGENCY_ID;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
@@ -451,6 +452,24 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicRegular, usDollars(10f)); // transfer extended on second leg
     calculateFare(rides, FareType.electronicSenior, usDollars(6f));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
+  }
+
+  /**
+   * Tests fares from non ORCA accepting agencies
+   */
+  @Test
+  void testNonOrcaAgencies() {
+    List<Leg> rides = List.of(
+      getLeg(SKAGIT_TRANSIT_AGENCY_ID, 0, "80X"),
+      getLeg(WHATCOM_AGENCY_ID, 0, "80X")
+    );
+
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2));
+    calculateFare(rides, FareType.senior, usDollars(0.50f).times(2));
+    // TODO: Check that these are undefined, not zero
+    calculateFare(rides, FareType.youth, ZERO_USD);
+    calculateFare(rides, FareType.electronicSpecial, ZERO_USD);
+    calculateFare(rides, FareType.electronicRegular, ZERO_USD);
   }
 
   static Stream<Arguments> allTypes() {
