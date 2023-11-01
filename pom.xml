@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>122</otp.serialization.version.id>
+        <otp.serialization.version.id>123</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>30.0</geotools.version>
         <google.dagger.version>2.48.1</google.dagger.version>
@@ -714,7 +714,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>3.0.10</version>
+            <version>3.0.11</version>
         </dependency>
 
         <!-- TESTING -->

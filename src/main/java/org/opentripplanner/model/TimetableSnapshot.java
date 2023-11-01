@@ -202,7 +202,9 @@ public class TimetableSnapshot {
         temp.addAll(sortedTimetables);
         sortedTimetables = temp;
       }
-      if (old.getServiceDate() != null) sortedTimetables.remove(old);
+      if (old.getServiceDate() != null) {
+        sortedTimetables.remove(old);
+      }
       sortedTimetables.add(tt);
       timetables.put(pattern, sortedTimetables);
       dirtyTimetables.add(tt);

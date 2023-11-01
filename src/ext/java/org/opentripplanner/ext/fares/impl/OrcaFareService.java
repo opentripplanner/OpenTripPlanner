@@ -13,7 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
-import org.opentripplanner.ext.ridehailing.model.Ride;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
@@ -98,7 +97,16 @@ public class OrcaFareService extends DefaultFareService {
     }
   }
 
-  static RideType getRideType(String agencyId, Route route) {
+  /**
+   * Categorizes a leg based on various parameters.
+   * The classifications determine the various rules and fares applied to the leg.
+   * @param leg Leg to be classified.
+   * @return RideType classification
+   */
+  static RideType getRideType(Leg leg) {
+    var agencyId = leg.getAgency().getId().getId();
+    var route = leg.getRoute();
+    var tripId = leg.getTrip().getId().getId();
     return switch (agencyId) {
       case COMM_TRANS_AGENCY_ID -> {
         try {
@@ -159,7 +167,17 @@ public class OrcaFareService extends DefaultFareService {
       case SEATTLE_STREET_CAR_AGENCY_ID -> RideType.SEATTLE_STREET_CAR;
       case WASHINGTON_STATE_FERRIES_AGENCY_ID -> RideType.WASHINGTON_STATE_FERRIES;
       case T_LINK_AGENCY_ID -> RideType.SOUND_TRANSIT_T_LINK;
-      case KITSAP_TRANSIT_AGENCY_ID -> RideType.KITSAP_TRANSIT;
+      case KITSAP_TRANSIT_AGENCY_ID -> {
+        if (route.getGtfsType() == ROUTE_TYPE_FERRY) {
+          // Additional trip id checks are required to distinguish Kitsap fast ferry routes.
+          if (tripId.contains("east")) {
+            yield RideType.KITSAP_TRANSIT_FAST_FERRY_EASTBOUND;
+          } else if (tripId.contains("west")) {
+            yield RideType.KITSAP_TRANSIT_FAST_FERRY_WESTBOUND;
+          }
+        }
+        yield RideType.KITSAP_TRANSIT;
+      }
       case WHATCOM_AGENCY_ID -> "80X".equals(route.getShortName())
         ? RideType.WHATCOM_CROSS_COUNTY
         : RideType.WHATCOM_LOCAL;
@@ -184,69 +202,6 @@ public class OrcaFareService extends DefaultFareService {
     addFareRules(FareType.electronicYouth, regularFareRules);
     addFareRules(FareType.electronicSpecial, regularFareRules);
     addFareRules(FareType.electronicSenior, regularFareRules);
-  }
-
-  /**
-   * Checks a routeShortName against a given string after removing spaces
-   */
-  private static boolean checkShortName(Route route, String compareString) {
-    String cleanCompareString = compareString.replaceAll("-", "").replaceAll(" ", "");
-    if (route.getShortName() != null) {
-      return route
-        .getShortName()
-        .replaceAll("-", "")
-        .replaceAll(" ", "")
-        .equalsIgnoreCase(cleanCompareString);
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Cleans a station name by removing spaces and special phrases.
-   */
-  private static String cleanStationName(String s) {
-    return s
-      .replaceAll(" ", "")
-      .replaceAll("(Northbound)", "")
-      .replaceAll("(Southbound)", "")
-      .replaceAll("Station", "")
-      .toLowerCase();
-  }
-
-  /**
-   * Classify the ride type based on the route information provided. In most cases the agency name
-   * is sufficient. In some cases the route description and short name are needed to define inner
-   * agency ride types. For Kitsap, the route data is enough to define the agency, but addition trip
-   * id checks are needed to define the fast ferry direction.
-   */
-  private static RideType classify(Route route, String tripId) {
-    var rideType = getRideType(route.getAgency().getId().getId(), route);
-    if (rideType == null) {
-      return null;
-    }
-    if (
-      rideType == RideType.KITSAP_TRANSIT &&
-      route.getId().getId().equalsIgnoreCase("Kitsap Fast Ferry") &&
-      route.getGtfsType() == ROUTE_TYPE_FERRY
-    ) {
-      // Additional trip id checks are required to distinguish Kitsap fast ferry routes.
-      if (tripId.contains("east")) {
-        rideType = RideType.KITSAP_TRANSIT_FAST_FERRY_EASTBOUND;
-      } else if (tripId.contains("west")) {
-        rideType = RideType.KITSAP_TRANSIT_FAST_FERRY_WESTBOUND;
-      }
-    } else if (rideType == RideType.SOUND_TRANSIT && checkShortName(route, "1 Line")) {
-      rideType = RideType.SOUND_TRANSIT_LINK;
-    } else if (
-      rideType == RideType.SOUND_TRANSIT &&
-      (checkShortName(route, "S Line") || checkShortName(route, "N Line"))
-    ) {
-      rideType = RideType.SOUND_TRANSIT_SOUNDER;
-    } else if (rideType == RideType.SOUND_TRANSIT) { //if it isn't Link or Sounder, then...
-      rideType = RideType.SOUND_TRANSIT_BUS;
-    }
-    return rideType;
   }
 
   /**
@@ -297,9 +252,6 @@ public class OrcaFareService extends DefaultFareService {
       case WASHINGTON_STATE_FERRIES -> Optional.of(
         getWashingtonStateFerriesFare(route.getLongName(), fareType, defaultFare)
       );
-      case SOUND_TRANSIT_LINK, SOUND_TRANSIT_SOUNDER -> Optional.of(
-        getSoundTransitFare(leg, defaultFare, rideType)
-      );
       case SOUND_TRANSIT_BUS -> optionalUSD(3.25f);
       case WHATCOM_LOCAL,
         WHATCOM_CROSS_COUNTY,
@@ -309,27 +261,6 @@ public class OrcaFareService extends DefaultFareService {
         : Optional.of(defaultFare);
       default -> Optional.of(defaultFare);
     };
-  }
-
-  /**
-   * Calculate the correct Link fare from a "ride" including start and end stations.
-   */
-  private Money getSoundTransitFare(Leg leg, Money defaultFare, RideType rideType) {
-    String start = cleanStationName(leg.getFrom().name.toString());
-    String end = cleanStationName(leg.getTo().name.toString());
-    // Fares are the same no matter the order of the stations
-    // Therefore, the fares DB only contains each station pair once
-    // If no match is found, try the reversed order
-    String lookupKey = String.format("%s-%s", start, end);
-    String reverseLookupKey = String.format("%s-%s", end, start);
-    Map<String, Map<FareType, Money>> fareModel = (rideType == RideType.SOUND_TRANSIT_LINK)
-      ? OrcaFaresData.linkFares
-      : OrcaFaresData.sounderFares;
-    Map<FareType, Money> fare = Optional
-      .ofNullable(fareModel.get(lookupKey))
-      .orElseGet(() -> fareModel.get(reverseLookupKey));
-
-    return (fare != null) ? fare.get(FareType.regular) : defaultFare;
   }
 
   /**
@@ -481,7 +412,7 @@ public class OrcaFareService extends DefaultFareService {
     Money cost = Money.ZERO_USD;
     Money orcaFareDiscount = Money.ZERO_USD;
     for (Leg leg : legs) {
-      RideType rideType = classify(leg.getRoute(), leg.getTrip().getId().getId());
+      RideType rideType = getRideType(leg);
       assert rideType != null;
       boolean ridePermitsFreeTransfers = rideType.permitsFreeTransfers();
       if (freeTransferStartTime == null && ridePermitsFreeTransfers) {

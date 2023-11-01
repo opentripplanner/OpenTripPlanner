@@ -4,12 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 
 public class MaxLimitFilterTest implements PlanTestConstants {
 
@@ -49,37 +47,5 @@ public class MaxLimitFilterTest implements PlanTestConstants {
     List<Itinerary> itineraries = List.of(i1, i2, i3);
     var result = DeletionFlaggerTestHelper.process(itineraries, subject);
     assertEquals(toStr(List.of()), toStr(result));
-  }
-
-  @Test
-  public void testCropHead() {
-    MaxLimitFilter subject = new MaxLimitFilter("Test", 1, ListSection.HEAD, null);
-    List<Itinerary> itineraries = List.of(i1, i2, i3);
-    var result = DeletionFlaggerTestHelper.process(itineraries, subject);
-    assertEquals(toStr(List.of(i3)), toStr(result));
-  }
-
-  @Test
-  public void testCropTailAndSubscribe() {
-    var subscribeResult = new ArrayList<Itinerary>();
-    var subject = new MaxLimitFilter("Test", 2, ListSection.TAIL, subscribeResult::add);
-    var itineraries = List.of(i1, i2, i3);
-
-    var processedList = DeletionFlaggerTestHelper.process(itineraries, subject);
-
-    assertEquals(toStr(List.of(i3)), toStr(subscribeResult));
-    assertEquals(toStr(List.of(i1, i2)), toStr(processedList));
-  }
-
-  @Test
-  public void testCropHeadAndSubscribe() {
-    var subscribeResult = new ArrayList<Itinerary>();
-    var subject = new MaxLimitFilter("Test", 1, ListSection.HEAD, subscribeResult::add);
-    var itineraries = List.of(i1, i2, i3);
-
-    var processedList = DeletionFlaggerTestHelper.process(itineraries, subject);
-
-    assertEquals(toStr(List.of(i2)), toStr(subscribeResult));
-    assertEquals(toStr(List.of(i3)), toStr(processedList));
   }
 }

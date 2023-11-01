@@ -73,6 +73,8 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.standalone.config.framework.json.JsonSupport;
 import org.opentripplanner.test.support.FilePatternSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -241,13 +243,22 @@ class GraphQLIntegrationTest {
       .build();
     realtimeVehicleService.setRealtimeVehicles(pattern, List.of(occypancyVehicle, positionVehicle));
 
+    DefaultVehicleRentalService defaultVehicleRentalService = new DefaultVehicleRentalService();
+    VehicleRentalStation vehicleRentalStation = new TestVehicleRentalStationBuilder()
+      .withVehicles(10)
+      .withSpaces(10)
+      .withVehicleTypeBicycle(5, 7)
+      .withVehicleTypeElectricBicycle(5, 3)
+      .build();
+    defaultVehicleRentalService.addVehicleRentalStation(vehicleRentalStation);
+
     context =
       new GraphQLRequestContext(
         new TestRoutingService(List.of(i1)),
         transitService,
         new DefaultFareService(),
         graph.getVehicleParkingService(),
-        new DefaultVehicleRentalService(),
+        defaultVehicleRentalService,
         realtimeVehicleService,
         GraphFinder.getInstance(graph, transitService::findRegularStop),
         new RouteRequest()

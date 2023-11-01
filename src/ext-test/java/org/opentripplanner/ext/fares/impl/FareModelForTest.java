@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.fares.impl;
 
-import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.OTHER_AGENCY;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.OTHER_FEED_AGENCY;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
@@ -9,6 +7,7 @@ import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -57,15 +56,13 @@ public class FareModelForTest {
     .build();
   static FareAttribute TEN_DOLLARS = FareAttribute
     .of(id("airport-to-city-center"))
-    .setCurrencyType("USD")
-    .setPrice(10)
+    .setPrice(Money.usDollars(10))
     .setTransfers(0)
     .build();
 
   static FareAttribute OTHER_FEED_ATTRIBUTE = FareAttribute
     .of(FeedScopedId.ofNullable("F2", "other-feed-attribute"))
-    .setCurrencyType("USD")
-    .setPrice(10)
+    .setPrice(Money.usDollars(10))
     .setTransfers(1)
     .setAgency(OTHER_FEED_AGENCY.getId())
     .build();

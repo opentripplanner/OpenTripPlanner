@@ -251,7 +251,10 @@ public class ToStringBuilderTest {
       LocalDateTime.of(2012, 1, 28, 23, 45, 12),
       TIME_ZONE_ID_PARIS
     );
-    assertEquals("ToStringBuilderTest{t: 23:45:12}", subject().addTime("t", c).toString());
+    assertEquals(
+      "ToStringBuilderTest{t: 2012-01-28T23:45:12}",
+      subject().addTime("t", c).toString()
+    );
   }
 
   @Test
