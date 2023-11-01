@@ -38,12 +38,12 @@ public class Co2EmissionsDataReader {
     try (InputStream feedInfoStream = new FileInputStream(directory + "/feed_info.txt")) {
       feedId = readFeedId(feedInfoStream);
     } catch (IOException e) {
-      issueStore.add("InvalidData", "Reading feed_info.txt failed.");
+      issueStore.add("InvalidEmissionData", "Reading feed_info.txt failed.");
     }
     try (InputStream stream = new FileInputStream(directory + "/emissions.txt")) {
       emissionsData = readEmissions(stream, feedId);
     } catch (IOException e) {
-      issueStore.add("InvalidData", "Reading emissions.txt failed.");
+      issueStore.add("InvalidEmissionData", "Reading emissions.txt failed.");
     }
     return emissionsData;
   }
@@ -62,7 +62,7 @@ public class Co2EmissionsDataReader {
       zipFile.close();
       return emissionsData;
     } catch (IOException e) {
-      issueStore.add("InvalidData", "Reading emissions data failed.");
+      issueStore.add("InvalidEmissionData", "Reading emissions data failed.");
     }
     return null;
   }
@@ -80,14 +80,14 @@ public class Co2EmissionsDataReader {
 
       if (avgCo2PerVehiclePerKmString.isEmpty()) {
         issueStore.add(
-          "InvalidData",
+          "InvalidEmissionData",
           "Value for avg_co2_per_vehicle_per_km is missing in the Emissions.txt for route %s",
           routeId
         );
       }
       if (avgPassengerCountString.isEmpty()) {
         issueStore.add(
-          "InvalidData",
+          "InvalidEmissionData",
           "Value for avg_passenger_count is missing in the Emissions.txt for route %s",
           routeId
         );
@@ -114,7 +114,7 @@ public class Co2EmissionsDataReader {
       reader.readRecord();
       return reader.get("feed_id");
     } catch (IOException e) {
-      issueStore.add("InvalidData", "Reading emissions data failed.");
+      issueStore.add("InvalidEmissionData", "Reading emissions data failed.");
       throw new RuntimeException(e);
     }
   }
@@ -130,7 +130,7 @@ public class Co2EmissionsDataReader {
     }
     if (avgPassengerCount <= 0 || avgCo2PerVehiclePerMeter < 0) {
       issueStore.add(
-        "InvalidData",
+        "InvalidEmissionData",
         "avgPassengerCount is 0 or less, but avgCo2PerVehiclePerMeter is nonzero or avgCo2PerVehiclePerMeter is negative for route %s",
         routeId
       );
