@@ -9,11 +9,30 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class SiriSXUpdaterConfig {
 
+  static final String URL_DESCRIPTION =
+    """
+    Use the file protocol to set a directory for reading updates from a directory. The file
+    loader will look for xml files: '*.xml' in the configured directory. The files are
+    renamed by the loader when processed:
+    
+    &nbsp;&nbsp;&nbsp; _a.xml_ &nbsp; ➞ &nbsp; _a.xml.inProgress_ &nbsp; ➞ &nbsp; _a.xml.ok_ &nbsp; or &nbsp; _a.xml.failed_
+    
+    """;
+
   public static SiriSXUpdaterParameters create(String configRef, NodeAdapter c) {
     return new SiriSXUpdaterParameters(
       configRef,
       c.of("feedId").since(V2_0).summary("The ID of the feed to apply the updates to.").asString(),
-      c.of("url").since(V2_0).summary("The URL to send the HTTP requests to.").asString(),
+      c
+        .of("url")
+        .since(V2_0)
+        .summary(
+          """
+          The URL to send the HTTP requests to. Supports http/https and file protocol.
+          """
+        )
+        .description(URL_DESCRIPTION)
+        .asString(),
       c.of("requestorRef").since(V2_0).summary("The requester reference.").asString(null),
       c
         .of("frequency")

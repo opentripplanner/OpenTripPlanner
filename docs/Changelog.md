@@ -29,6 +29,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Make vehicleRentalStation query optionally accept id without feed [#5411](https://github.com/opentripplanner/OpenTripPlanner/pull/5411)
 - Add stricter validation for flex areas [#5457](https://github.com/opentripplanner/OpenTripPlanner/pull/5457)
 - Remove HTTPS handling and its documentation [#5439](https://github.com/opentripplanner/OpenTripPlanner/pull/5439)
+- Add support for DSJ in transit leg reference [#5455](https://github.com/opentripplanner/OpenTripPlanner/pull/5455)
+- Ignore negative travel-times in Raptor [#5443](https://github.com/opentripplanner/OpenTripPlanner/pull/5443)
+- Fix sort order bug in optimized transfers [#5446](https://github.com/opentripplanner/OpenTripPlanner/pull/5446)
+- Siri file loader [#5460](https://github.com/opentripplanner/OpenTripPlanner/pull/5460)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
