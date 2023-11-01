@@ -230,7 +230,7 @@ class StopAndStationMapper {
   /**
    * Get WheelChairBoarding from Quay and parent Station.
    *
-   * @param quay      NeTEx quay could contain information about accessability
+   * @param quay      NeTEx quay could contain information about accessibility
    * @param stopPlace Parent StopPlace for given Quay
    * @return not null value with default NO_INFORMATION if nothing defined in quay or parentStation.
    */

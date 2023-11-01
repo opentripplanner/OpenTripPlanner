@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(NetexParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiteFrameParser.class);
 
   private final Collection<FlexibleStopPlace> flexibleStopPlaces = new ArrayList<>();
 

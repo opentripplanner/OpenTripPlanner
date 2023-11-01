@@ -10,19 +10,19 @@ import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
 import org.rutebanken.netex.model.StopPlace;
 
-public class StopPlaceTypeMapperTest {
+class StopPlaceTypeMapperTest {
 
   private final StopPlaceTypeMapper stopPlaceTypeMapper = new StopPlaceTypeMapper();
 
   @Test
-  public void mapWithoutTransportMode() {
+  void mapWithoutTransportMode() {
     var transitMode = stopPlaceTypeMapper.map(new StopPlace());
     assertNull(transitMode.mainMode());
     assertNull(transitMode.subMode());
   }
 
   @Test
-  public void mapWithTransportModeOnly() {
+  void mapWithTransportModeOnly() {
     var transitMode = stopPlaceTypeMapper.map(
       new StopPlace().withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
     );
@@ -31,7 +31,7 @@ public class StopPlaceTypeMapperTest {
   }
 
   @Test
-  public void mapWithSubMode() {
+  void mapWithSubMode() {
     var transitMode = stopPlaceTypeMapper.map(
       new StopPlace()
         .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)
@@ -42,7 +42,7 @@ public class StopPlaceTypeMapperTest {
   }
 
   @Test
-  public void mapWithSubModeOnly() {
+  void mapWithSubModeOnly() {
     var transitMode = stopPlaceTypeMapper.map(
       new StopPlace().withRailSubmode(RailSubmodeEnumeration.REGIONAL_RAIL)
     );
@@ -51,7 +51,7 @@ public class StopPlaceTypeMapperTest {
   }
 
   @Test
-  public void checkSubModePrecedensOverMainMode() {
+  void checkSubModePrecedenceOverMainMode() {
     var transitMode = stopPlaceTypeMapper.map(
       new StopPlace()
         .withTransportMode(AllVehicleModesOfTransportEnumeration.RAIL)

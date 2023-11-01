@@ -36,13 +36,13 @@ import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 import org.rutebanken.netex.model.StopPlace;
 
-public class StopAndStationMapperTest {
+class StopAndStationMapperTest {
 
   public static final ZoneId DEFAULT_TIME_ZONE = ZoneIds.OSLO;
   private final ObjectFactory objectFactory = new ObjectFactory();
 
   @Test
-  public void testWheelChairBoarding() {
+  void testWheelChairBoarding() {
     var stopPlace = createStopPlace(
       "ST:StopPlace:1",
       "Lunce C",
@@ -105,7 +105,7 @@ public class StopAndStationMapperTest {
   }
 
   @Test
-  public void mapStopPlaceAndQuays() {
+  void mapStopPlaceAndQuays() {
     Collection<StopPlace> stopPlaces = new ArrayList<>();
 
     StopPlace stopPlaceNew = createStopPlace(
@@ -209,7 +209,7 @@ public class StopAndStationMapperTest {
 
   @ParameterizedTest
   @CsvSource(value = { "true", "false" })
-  public void testMapIsolatedStopPlace(boolean isolated) {
+  void testMapIsolatedStopPlace(boolean isolated) {
     Collection<StopPlace> stopPlaces = new ArrayList<>();
     StopPlace stopPlace;
     stopPlace =
@@ -247,7 +247,7 @@ public class StopAndStationMapperTest {
   }
 
   @Test
-  public void testDuplicateStopIndices() {
+  void testDuplicateStopIndices() {
     StopLocation.initIndexCounter(0);
     var stopPlace = createStopPlace(
       "ST:StopPlace:1",
