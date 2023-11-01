@@ -30,6 +30,7 @@ import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryIm
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
+import org.opentripplanner.graph_builder.module.osm.parameters.OsmExtractParameters;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
@@ -56,18 +57,17 @@ public class GraphBuilderModules {
     Graph graph,
     DataImportIssueStore issueStore
   ) {
-    var providers = dataSources
-      .getOsmConfiguredDatasource()
-      .stream()
-      .map(source ->
+    List<OsmProvider> providers = new ArrayList<>();
+    for (ConfiguredDataSource<OsmExtractParameters> osmConfiguredDataSource : dataSources.getOsmConfiguredDatasource()) {
+      providers.add(
         new OsmProvider(
-          source.dataSource(),
-          source.config().osmTagMapper(),
-          source.config().timeZone(),
+          osmConfiguredDataSource.dataSource(),
+          osmConfiguredDataSource.config().osmTagMapper(),
+          osmConfiguredDataSource.config().timeZone(),
           config.osmCacheDataInMem
         )
-      )
-      .toList();
+      );
+    }
 
     return OsmModule
       .of(providers, graph)

@@ -11,7 +11,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.io.File;
 import java.net.URI;
-import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 import org.opentripplanner.datastore.OtpDataStore;
@@ -107,7 +106,7 @@ public class GraphBuilderDataSources {
     return inputData.get(type);
   }
 
-  public Collection<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDatasource() {
+  public Iterable<ConfiguredDataSource<OsmExtractParameters>> getOsmConfiguredDatasource() {
     return inputData
       .get(OSM)
       .stream()
