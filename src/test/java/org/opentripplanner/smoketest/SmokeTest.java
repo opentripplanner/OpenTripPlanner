@@ -55,7 +55,7 @@ public class SmokeTest {
     try {
       List<VehicleRentalStation> stations = API_CLIENT.vehicleRentalStations();
       assertFalse(stations.isEmpty(), "Found no vehicle rental stations.");
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -96,7 +96,7 @@ public class SmokeTest {
 
       assertThatItineraryHasModes(itineraries, expectedModes);
       return plan;
-    } catch (InterruptedException | IOException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
@@ -110,7 +110,7 @@ public class SmokeTest {
         vehiclePositions.isEmpty(),
         "Found no patterns that have realtime vehicle positions."
       );
-    } catch (IOException | InterruptedException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }

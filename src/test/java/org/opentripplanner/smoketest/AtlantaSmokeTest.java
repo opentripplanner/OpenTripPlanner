@@ -61,7 +61,7 @@ public class AtlantaSmokeTest {
 
     var usesZone1Route = transitLegs
       .stream()
-      .map(l -> l.route().shortName())
+      .map(l -> l.route().name())
       .anyMatch(name -> name.equals("Zone 1"));
 
     assertTrue(usesZone1Route);

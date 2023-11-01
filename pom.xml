@@ -982,7 +982,7 @@
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>otp-client</artifactId>
-            <version>0.0.16</version>
+            <version>0.0.20</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
