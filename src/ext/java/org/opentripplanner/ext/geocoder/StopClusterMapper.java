@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.geocoder;
 
+import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.Optional;
 import org.opentripplanner.framework.collection.ListUtils;
@@ -28,7 +29,7 @@ class StopClusterMapper {
    * - of "identical" stops which are very close to each other and have an identical name, only one
    *   is chosen (at random)
    */
-  Collection<StopCluster> generateStopClusters(
+  Iterable<StopCluster> generateStopClusters(
     Collection<StopLocation> stopLocations,
     Collection<StopLocationsGroup> stopLocationsGroups
   ) {
@@ -51,7 +52,7 @@ class StopClusterMapper {
       .toList();
     var stations = stopLocationsGroups.stream().map(this::map).toList();
 
-    return ListUtils.combine(deduplicatedStops, stations);
+    return Iterables.concat(deduplicatedStops, stations);
   }
 
   StopCluster map(StopLocationsGroup g) {

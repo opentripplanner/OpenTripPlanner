@@ -39,6 +39,6 @@ public class ListUtils {
       }
     });
 
-    return List.copyOf(ret);
+    return ret;
   }
 }
