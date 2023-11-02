@@ -266,7 +266,7 @@ public class Itinerary implements ItinerarySortKey {
       .addNum("elevationGained", elevationGained, 0.0)
       .addCol("legs", legs)
       .addObj("fare", fare)
-      .addObj("emissions", emissionsPerPerson)
+      .addObj("emissionsPerPerson", emissionsPerPerson)
       .toString();
   }
 
