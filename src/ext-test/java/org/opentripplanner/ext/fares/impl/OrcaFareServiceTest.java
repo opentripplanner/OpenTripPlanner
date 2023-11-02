@@ -56,6 +56,8 @@ public class OrcaFareServiceTest {
   private static final Money FERRY_FARE = usDollars(6.50f);
   private static final Money HALF_FERRY_FARE = usDollars(3.25f);
   private static final Money ORCA_SPECIAL_FARE = usDollars(1.00f);
+  public static final Money VASHON_WATER_TAXI_CASH_FARE = usDollars(6.75f);
+  public static final Money WEST_SEATTLE_WATER_TAXI_CASH_FARE = usDollars(5.75f);
   private static final String FEED_ID = "A";
   private static TestOrcaFareService orcaFareService;
   public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
@@ -360,26 +362,23 @@ public class OrcaFareServiceTest {
    */
   @Test
   void calculateWaterTaxiFares() {
-    List<Leg> rides = List.of(
-      getLeg(KC_METRO_AGENCY_ID, "973", 1)
-    );
-    calculateFare(rides, regular, usDollars(5.75f));
-    calculateFare(rides, FareType.senior, usDollars(5.75f));
+    List<Leg> rides = List.of(getLeg(KC_METRO_AGENCY_ID, "973", 1));
+    calculateFare(rides, regular, WEST_SEATTLE_WATER_TAXI_CASH_FARE);
+    calculateFare(rides, FareType.senior, WEST_SEATTLE_WATER_TAXI_CASH_FARE);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, usDollars(3.75f));
     calculateFare(rides, FareType.electronicRegular, usDollars(5f));
     calculateFare(rides, FareType.electronicSenior, usDollars(2.50f));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
 
-    rides = List.of(
-      getLeg(KC_METRO_AGENCY_ID, "973", 1)
-    );
-    calculateFare(rides, regular, usDollars(5.75f));
-    calculateFare(rides, FareType.senior, usDollars(5.75f));
+    rides = List.of(getLeg(KC_METRO_AGENCY_ID, "975", 1));
+
+    calculateFare(rides, regular, VASHON_WATER_TAXI_CASH_FARE);
+    calculateFare(rides, FareType.senior, VASHON_WATER_TAXI_CASH_FARE);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, usDollars(3.75f));
-    calculateFare(rides, FareType.electronicRegular, usDollars(5f));
-    calculateFare(rides, FareType.electronicSenior, usDollars(2.50f));
+    calculateFare(rides, FareType.electronicSpecial, usDollars(4.50f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(5.75f));
+    calculateFare(rides, FareType.electronicSenior, usDollars(3f));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
   }
 
