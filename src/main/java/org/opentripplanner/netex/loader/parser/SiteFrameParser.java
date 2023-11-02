@@ -111,11 +111,13 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
   private void parseQuays(Quays_RelStructure quayRefOrQuay) {
     if (quayRefOrQuay == null) return;
 
-    for (JAXBElement<?> quayObject : quayRefOrQuay.getQuayRefOrQuay()) {
-      if (quayObject.getValue() instanceof Quay quay) {
-        quays.add(quay);
-      }
-    }
+    quayRefOrQuay
+      .getQuayRefOrQuay()
+      .stream()
+      .map(JAXBElement::getValue)
+      .filter(Quay.class::isInstance)
+      .map(Quay.class::cast)
+      .forEach(quays::add);
   }
 
   private boolean isMultiModalStopPlace(StopPlace stopPlace) {

@@ -6,6 +6,7 @@ import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
@@ -100,9 +101,12 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
       return;
     }
 
-    for (Object p : operatingPeriods.getOperatingPeriodRefOrOperatingPeriodOrUicOperatingPeriod()) {
-      parseOperatingPeriod(p);
-    }
+    operatingPeriods
+      .getOperatingPeriodRefOrOperatingPeriodOrUicOperatingPeriod()
+      .stream()
+      .filter(Objects::nonNull)
+      .map(JAXBElement::getValue)
+      .forEach(this::parseOperatingPeriod);
   }
 
   private void parseOperatingPeriod(Object operatingPeriod) {

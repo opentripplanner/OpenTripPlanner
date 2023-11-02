@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import jakarta.xml.bind.JAXBElement;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -131,8 +132,8 @@ class StationMapper {
         stopPlace.getId() + " " + stopPlace.getName()
       );
       List<WgsCoordinate> coordinates = new ArrayList<>();
-      for (Object it : stopPlace.getQuays().getQuayRefOrQuay()) {
-        if (it instanceof Quay quay && quay.getCentroid() != null) {
+      for (JAXBElement<?> it : stopPlace.getQuays().getQuayRefOrQuay()) {
+        if (it.getValue() instanceof Quay quay && quay.getCentroid() != null) {
           coordinates.add(WgsCoordinateMapper.mapToDomain(quay.getCentroid()));
         }
       }
