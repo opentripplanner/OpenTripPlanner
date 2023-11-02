@@ -3,10 +3,10 @@ package org.opentripplanner.netex.mapping;
 import jakarta.xml.bind.JAXBElement;
 import java.time.DateTimeException;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -22,6 +22,7 @@ import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.NameTypeEnumeration;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.Zone_VersionStructure;
 
 class StationMapper {
 
@@ -131,12 +132,18 @@ class StationMapper {
         "Station %s does not contain any coordinates.",
         stopPlace.getId() + " " + stopPlace.getName()
       );
-      List<WgsCoordinate> coordinates = new ArrayList<>();
-      for (JAXBElement<?> it : stopPlace.getQuays().getQuayRefOrQuay()) {
-        if (it.getValue() instanceof Quay quay && quay.getCentroid() != null) {
-          coordinates.add(WgsCoordinateMapper.mapToDomain(quay.getCentroid()));
-        }
-      }
+      List<WgsCoordinate> coordinates = stopPlace
+        .getQuays()
+        .getQuayRefOrQuay()
+        .stream()
+        .map(JAXBElement::getValue)
+        .filter(Objects::nonNull)
+        .filter(Quay.class::isInstance)
+        .map(Quay.class::cast)
+        .map(Zone_VersionStructure::getCentroid)
+        .filter(Objects::nonNull)
+        .map(WgsCoordinateMapper::mapToDomain)
+        .toList();
       if (coordinates.isEmpty()) {
         throw new IllegalArgumentException(
           "Station w/quays without coordinates. Station id: " + stopPlace.getId()

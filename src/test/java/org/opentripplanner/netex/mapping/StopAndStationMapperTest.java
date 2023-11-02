@@ -4,8 +4,9 @@ import static graphql.Assert.assertFalse;
 import static graphql.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.opentripplanner.netex.NetexTestDataSupport.createQuay;
+import static org.opentripplanner.netex.NetexTestDataSupport.createStopPlace;
 
-import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,12 +29,9 @@ import org.rutebanken.netex.model.AccessibilityLimitations_RelStructure;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.LimitationStatusEnumeration;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
-import org.rutebanken.netex.model.LocationStructure;
-import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.ObjectFactory;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
-import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 import org.rutebanken.netex.model.StopPlace;
 
 class StopAndStationMapperTest {
@@ -295,49 +293,6 @@ class StopAndStationMapperTest {
       DataImportIssueStore.NOOP,
       false
     );
-  }
-
-  private static StopPlace createStopPlace(
-    String id,
-    String name,
-    String version,
-    Double lat,
-    Double lon,
-    AllVehicleModesOfTransportEnumeration transportMode
-  ) {
-    return new StopPlace()
-      .withName(createMLString(name))
-      .withVersion(version)
-      .withId(id)
-      .withCentroid(createSimplePoint(lat, lon))
-      .withTransportMode(transportMode);
-  }
-
-  private static Quay createQuay(
-    String id,
-    String name,
-    String version,
-    Double lat,
-    Double lon,
-    String platformCode
-  ) {
-    return new Quay()
-      .withName(createMLString(name))
-      .withId(id)
-      .withVersion(version)
-      .withPublicCode(platformCode)
-      .withCentroid(createSimplePoint(lat, lon));
-  }
-
-  private static MultilingualString createMLString(String name) {
-    return new MultilingualString().withValue(name);
-  }
-
-  private static SimplePoint_VersionStructure createSimplePoint(Double lat, Double lon) {
-    return new SimplePoint_VersionStructure()
-      .withLocation(
-        new LocationStructure().withLatitude(new BigDecimal(lat)).withLongitude(new BigDecimal(lon))
-      );
   }
 
   /**
