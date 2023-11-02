@@ -4993,7 +4993,7 @@ input TransferPreferencesInput {
     """
     A static cost that is added for each transfer on top of other costs.
     """
-    costPenalty: Cost
+    cost: Cost
 
     """
     A global minimum transfer time (in seconds) that specifies the minimum amount of time
