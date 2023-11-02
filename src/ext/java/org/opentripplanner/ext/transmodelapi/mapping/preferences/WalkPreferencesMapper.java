@@ -9,7 +9,8 @@ public class WalkPreferencesMapper {
     WalkPreferences.Builder walk,
     DataFetcherDecorator callWith
   ) {
-    callWith.argument("walkBoardCost", walk::withBoardCost);
+    // This is not part of API
+    // callWith.argument("walkBoardCost", walk::withBoardCost);
     callWith.argument("walkSpeed", walk::withSpeed);
     callWith.argument("walkReluctance", walk::withReluctance);
   }

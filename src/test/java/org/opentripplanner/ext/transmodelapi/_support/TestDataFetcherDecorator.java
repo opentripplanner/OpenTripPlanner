@@ -8,9 +8,13 @@ public class TestDataFetcherDecorator extends DataFetcherDecorator {
 
   private final Map<String, ?> data;
 
-  public TestDataFetcherDecorator(Map<String, ?> data) {
+  private TestDataFetcherDecorator(Map<String, ?> data) {
     super(null);
     this.data = data;
+  }
+
+  public static TestDataFetcherDecorator of(String fieldName, Object value) {
+    return new TestDataFetcherDecorator(Map.of(fieldName, value));
   }
 
   @SuppressWarnings("unchecked")
