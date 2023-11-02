@@ -2,6 +2,7 @@ package org.opentripplanner.ext.siri.updater;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
@@ -103,9 +104,9 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   private void updateSiri() {
     boolean moreData = false;
     do {
-      Siri updates = getUpdates();
-      if (updates != null) {
-        ServiceDelivery serviceDelivery = updates.getServiceDelivery();
+      var updates = getUpdates();
+      if (updates.isPresent()) {
+        ServiceDelivery serviceDelivery = updates.get().getServiceDelivery();
         moreData = Boolean.TRUE.equals(serviceDelivery.isMoreData());
         // Mark this updater as primed after last page of updates. Copy moreData into a final
         // primitive, because the object moreData persists across iterations.
@@ -122,12 +123,15 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     } while (moreData);
   }
 
-  private Siri getUpdates() {
+  private Optional<Siri> getUpdates() {
     long t1 = System.currentTimeMillis();
     try {
-      Siri siri = siriHttpLoader.fetchSXFeed(requestorRef);
+      Optional<Siri> siri = siriHttpLoader.fetchSXFeed(requestorRef);
+      if (siri.isEmpty()) {
+        return Optional.empty();
+      }
 
-      ServiceDelivery serviceDelivery = siri.getServiceDelivery();
+      ServiceDelivery serviceDelivery = siri.get().getServiceDelivery();
       if (serviceDelivery == null) {
         throw new RuntimeException("Failed to get serviceDelivery " + url);
       }
@@ -135,7 +139,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
       ZonedDateTime responseTimestamp = serviceDelivery.getResponseTimestamp();
       if (responseTimestamp.isBefore(lastTimestamp)) {
         LOG.info("Ignoring feed with an old timestamp.");
-        return null;
+        return Optional.empty();
       }
 
       lastTimestamp = responseTimestamp;
@@ -154,7 +158,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         (System.currentTimeMillis() - t1)
       );
     }
-    return null;
+    return Optional.empty();
   }
 
   /**

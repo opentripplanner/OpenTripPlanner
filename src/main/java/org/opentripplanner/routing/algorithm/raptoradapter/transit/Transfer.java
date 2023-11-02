@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
@@ -85,5 +86,14 @@ public class Transfer {
         this
       )
     );
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(Transfer.class)
+      .addNum("toStop", toStop)
+      .addNum("distance", distanceMeters, "m")
+      .toString();
   }
 }

@@ -195,7 +195,7 @@ public class RouteRequest implements Cloneable, Serializable {
     }
 
     var previousPage = pageCursor.type == PageType.PREVIOUS_PAGE;
-    return pageCursor.originalSortOrder.isSortedByArrivalTimeAcceding() == previousPage;
+    return pageCursor.originalSortOrder.isSortedByArrivalTimeAscending() == previousPage;
   }
 
   /**
@@ -207,7 +207,7 @@ public class RouteRequest implements Cloneable, Serializable {
    */
   public boolean doCropSearchWindowAtTail() {
     if (pageCursor == null) {
-      return itinerariesSortOrder().isSortedByArrivalTimeAcceding();
+      return itinerariesSortOrder().isSortedByArrivalTimeAscending();
     }
     return pageCursor.type == PageType.NEXT_PAGE;
   }

@@ -29,4 +29,8 @@ class StartOtpButtonView {
   Box panel() {
     return panel;
   }
+
+  void grabFocus() {
+    startOtpBtn.grabFocus();
+  }
 }

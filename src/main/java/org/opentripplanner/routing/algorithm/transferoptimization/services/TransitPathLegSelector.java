@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
@@ -74,5 +75,16 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
     selectedLegs = filter.filterIntermediateResult(candidates, fromStopPosition);
 
     return selectedLegs;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TransitPathLegSelector.class)
+      .addObj("filter", filter)
+      .addCol("remindingLegs", remindingLegs)
+      .addCol("selectedLegs", selectedLegs)
+      .addNum("prevStopPosition", prevStopPosition)
+      .toString();
   }
 }

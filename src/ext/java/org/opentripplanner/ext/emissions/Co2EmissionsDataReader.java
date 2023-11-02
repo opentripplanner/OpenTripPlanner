@@ -13,6 +13,8 @@ import java.util.zip.ZipFile;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class handles reading the CO₂ emissions data from the files in the GTFS package
@@ -20,6 +22,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 @Sandbox
 public class Co2EmissionsDataReader {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Co2EmissionsDataReader.class);
 
   private final DataImportIssueStore issueStore;
 
@@ -39,11 +43,13 @@ public class Co2EmissionsDataReader {
       feedId = readFeedId(feedInfoStream);
     } catch (IOException e) {
       issueStore.add("InvalidEmissionData", "Reading feed_info.txt failed.");
+      LOG.error("InvalidEmissionData: reading feed_info.txt failed.", e);
     }
     try (InputStream stream = new FileInputStream(directory + "/emissions.txt")) {
       emissionsData = readEmissions(stream, feedId);
     } catch (IOException e) {
       issueStore.add("InvalidEmissionData", "Reading emissions.txt failed.");
+      LOG.error("InvalidEmissionData: reading emissions.txt failed.", e);
     }
     return emissionsData;
   }
@@ -63,6 +69,7 @@ public class Co2EmissionsDataReader {
       return emissionsData;
     } catch (IOException e) {
       issueStore.add("InvalidEmissionData", "Reading emissions data failed.");
+      LOG.error("InvalidEmissionData: Reading emissions data failed.", e);
     }
     return null;
   }
@@ -114,7 +121,8 @@ public class Co2EmissionsDataReader {
       reader.readRecord();
       return reader.get("feed_id");
     } catch (IOException e) {
-      issueStore.add("InvalidEmissionData", "Reading emissions data failed.");
+      issueStore.add("InvalidEmissionData", "Reading feed_info.txt failed.");
+      LOG.error("InvalidEmissionData: reading feed_info.txt failed.", e);
       throw new RuntimeException(e);
     }
   }
