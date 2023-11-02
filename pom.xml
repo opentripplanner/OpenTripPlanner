@@ -70,7 +70,8 @@
         <slf4j.version>2.0.9</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <siri-java-model.version>1.25</siri-java-model.version>
-        <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
+        <jakarta.xml.bind-api.version>4.0.1</jakarta.xml.bind-api.version>
+        <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -560,12 +561,12 @@
                 The jaxb-api provides annotations like XmlElement indicating how classes should be (de)serialized.
                 The jaxb-runtime pulls in the jaxb-api of the same version transitively. But we specify both api and
                 runtime dependencies anyway here at the top level to prevent transitive dependencies from pulling in
-                mismatched versions. This is overriding an older version of jaxb-api pulled in by the netex-java-model.
+                mismatched versions.
             -->
             <dependency>
                 <groupId>jakarta.xml.bind</groupId>
                 <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>3.0.1</version>
+                <version>${jakarta.xml.bind-api.version}</version>
             </dependency>
 
             <dependency>
