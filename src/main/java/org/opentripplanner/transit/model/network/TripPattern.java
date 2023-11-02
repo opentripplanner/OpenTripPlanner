@@ -139,7 +139,8 @@ public final class TripPattern
   }
 
   public LineString getHopGeometry(int stopPosInPattern) {
-    if (hopGeometries != null) {
+    //Only uncompact the line string if the hop geometry and stop pattern have the same size.
+    if (hopGeometries != null && hopGeometries.length == stopPattern.getSize() - 1) {
       return CompactLineStringUtils.uncompactLineString(hopGeometries[stopPosInPattern], false);
     } else {
       return GeometryUtils
