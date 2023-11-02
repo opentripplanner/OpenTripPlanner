@@ -1925,11 +1925,6 @@ An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 """
 scalar Duration
 
-"""
-String representation of a duration in seconds. Examples of the format: `300s`, `1s`, `2.5s`, `3.14s` or `15.233s`.
-"""
-scalar DurationInSeconds
-
 type RideHailingProvider {
     "The ID of the ride hailing provider."
     id: String!
@@ -3180,12 +3175,12 @@ type PlanDebugInformation {
     """
     Total time taken for the route request.
     """
-    totalTime: DurationInSeconds
+    totalTime: Duration
 
     """
     Time taken in the transit router (including access/egress street router).
     """
-    pathCalculationTime: DurationInSeconds
+    pathCalculationTime: Duration
 
     """
     The search window that was used for the search.
@@ -4205,7 +4200,7 @@ enum RealtimeState {
 
 """
 A cost multiplier for how bad something is compared to being in transit for equal lengths of time.
-Value should be a float and bigger than equal to 1.0.
+The value should be over 0.
 """
 scalar Reluctance
 
