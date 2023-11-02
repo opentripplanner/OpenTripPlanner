@@ -60,7 +60,6 @@ nav:
     - System Requirements and Suggestions: 'System-Requirements.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
     - Netex and SIRI: 'Netex-Norway.md'
-    - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
     - Comparing OTP2 to OTP1: 'Version-Comparison.md'
 - APIs:

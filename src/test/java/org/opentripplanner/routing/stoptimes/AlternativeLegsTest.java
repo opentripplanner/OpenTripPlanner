@@ -21,6 +21,12 @@ import org.opentripplanner.transit.service.DefaultTransitService;
  */
 class AlternativeLegsTest extends GtfsTest {
 
+  private static final String FEED_ID = "FEED";
+  private static final FeedScopedId STOP_ID_B = new FeedScopedId(FEED_ID, "B");
+  private static final FeedScopedId STOP_ID_C = new FeedScopedId(FEED_ID, "C");
+  private static final FeedScopedId STOP_ID_X = new FeedScopedId(FEED_ID, "X");
+  private static final FeedScopedId STOP_ID_Y = new FeedScopedId(FEED_ID, "Y");
+
   @Override
   public String getFeedName() {
     return "gtfs/simple";
@@ -34,7 +40,10 @@ class AlternativeLegsTest extends GtfsTest {
       new FeedScopedId(this.feedId.getId(), "1.2"),
       LocalDate.parse("2022-04-02"),
       1,
-      2
+      2,
+      STOP_ID_B,
+      STOP_ID_C,
+      null
     )
       .getLeg(transitService);
 
@@ -70,7 +79,10 @@ class AlternativeLegsTest extends GtfsTest {
       new FeedScopedId(this.feedId.getId(), "2.2"),
       LocalDate.parse("2022-04-02"),
       0,
-      1
+      1,
+      STOP_ID_B,
+      STOP_ID_C,
+      null
     )
       .getLeg(transitService);
 
@@ -106,7 +118,10 @@ class AlternativeLegsTest extends GtfsTest {
       new FeedScopedId(this.feedId.getId(), "19.1"),
       LocalDate.parse("2022-04-02"),
       1,
-      2
+      2,
+      STOP_ID_X,
+      STOP_ID_Y,
+      null
     )
       .getLeg(transitService);
 
@@ -137,7 +152,10 @@ class AlternativeLegsTest extends GtfsTest {
       new FeedScopedId(this.feedId.getId(), "19.1"),
       LocalDate.parse("2022-04-02"),
       1,
-      7
+      7,
+      STOP_ID_X,
+      STOP_ID_B,
+      null
     )
       .getLeg(transitService);
 

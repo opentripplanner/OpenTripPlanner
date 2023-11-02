@@ -21,36 +21,9 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
 
   private final int frequencyHeadwayInSeconds;
 
-  public FrequencyTransitLeg(
-    TripTimes tripTimes,
-    TripPattern tripPattern,
-    int boardStopIndexInPattern,
-    int alightStopIndexInPattern,
-    ZonedDateTime startTime,
-    ZonedDateTime endTime,
-    LocalDate serviceDate,
-    ZoneId zoneId,
-    ConstrainedTransfer transferFromPreviousLeg,
-    ConstrainedTransfer transferToNextLeg,
-    int generalizedCost,
-    int frequencyHeadwayInSeconds,
-    @Nullable Float accessibilityScore
-  ) {
-    super(
-      tripTimes,
-      tripPattern,
-      boardStopIndexInPattern,
-      alightStopIndexInPattern,
-      startTime,
-      endTime,
-      serviceDate,
-      zoneId,
-      transferFromPreviousLeg,
-      transferToNextLeg,
-      generalizedCost,
-      accessibilityScore
-    );
-    this.frequencyHeadwayInSeconds = frequencyHeadwayInSeconds;
+  FrequencyTransitLeg(FrequencyTransitLegBuilder builder) {
+    super(builder);
+    this.frequencyHeadwayInSeconds = builder.frequencyHeadwayInSeconds();
   }
 
   @Override
@@ -101,20 +74,6 @@ public class FrequencyTransitLeg extends ScheduledTransitLeg {
 
   @Override
   public ScheduledTransitLeg withAccessibilityScore(Float score) {
-    return new FrequencyTransitLeg(
-      tripTimes,
-      tripPattern,
-      boardStopPosInPattern,
-      alightStopPosInPattern,
-      getStartTime(),
-      getEndTime(),
-      serviceDate,
-      zoneId,
-      getTransferFromPrevLeg(),
-      getTransferToNextLeg(),
-      getGeneralizedCost(),
-      frequencyHeadwayInSeconds,
-      score
-    );
+    return new FrequencyTransitLegBuilder(this).withAccessibilityScore(score).build();
   }
 }

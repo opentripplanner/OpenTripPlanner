@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.ToIntFunction;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
@@ -63,5 +64,13 @@ class MinCostPathTailFilter<T extends RaptorTripSchedule> implements PathTailFil
       }
     }
     return result;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(MinCostPathTailFilter.class)
+      .addCol("costFunctions", costFunctions)
+      .toString();
   }
 }
