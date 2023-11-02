@@ -237,7 +237,7 @@ public class ToStringBuilder {
    * DATE is not printed. {@code null} value is ignored.
    */
   public ToStringBuilder addTime(String name, ZonedDateTime time) {
-    return addIfNotNull(name, time, DateTimeFormatter.ISO_LOCAL_TIME::format);
+    return addIfNotNull(name, time, DateTimeFormatter.ISO_LOCAL_DATE_TIME::format);
   }
 
   /**

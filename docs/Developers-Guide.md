@@ -134,11 +134,11 @@ how OTP is used or configured should include changes to the documentation alongs
 modifications.
 
 The documentation files are in Markdown format and are in the `/docs` directory under the root of
-the project. On every push to the master branch the documentation will be rebuilt and deployed as
-static pages to our subdomain of [ReadTheDocs](http://opentripplanner.readthedocs.org/). MkDocs is a
-Python program and should run on any major platform. See http://www.mkdocs.org/ for information on
-how to install it and how to generate a live local preview of the documentation while you're working
-on writing it.
+the project. On every push to the `dev-2.x` branch the documentation will be rebuilt and deployed as
+static pages to our subdomain of [Github Pages](https://github.com/opentripplanner/docs). 
+MkDocs is a Python program and should run on any major platform. 
+See [http://www.mkdocs.org/](http://www.mkdocs.org/) for information on how to install it and 
+how to generate a live local preview of the documentation while you're writing it.
 
 In short:
 
@@ -149,11 +149,11 @@ $ mkdocs serve
 
 The OTP GTFS GraphQL API documentation is available online at 
 
-https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/
+[https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/](https://docs.opentripplanner.org/api/dev-2.x/graphql-gtfs/)
 
 You can also use the interactive GraphQL API client that is built into every instance at
 
-http://localhost:8080/graphiql
+[http://localhost:8080/graphiql](http://localhost:8080/graphiql)
 
 ### Debug layers
 

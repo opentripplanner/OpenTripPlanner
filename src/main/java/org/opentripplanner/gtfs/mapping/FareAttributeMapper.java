@@ -3,11 +3,13 @@ package org.opentripplanner.gtfs.mapping;
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 import java.util.Collection;
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareAttributeBuilder;
 import org.opentripplanner.framework.collection.MapUtils;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /** Responsible for mapping GTFS FareAttribute into the OTP model. */
@@ -25,13 +27,14 @@ class FareAttributeMapper {
   }
 
   private FareAttribute doMap(org.onebusaway.gtfs.model.FareAttribute rhs) {
+    var price = Money.ofFractionalAmount(
+      Currency.getInstance(rhs.getCurrencyType()),
+      rhs.getPrice()
+    );
     FareAttributeBuilder builder = FareAttribute
       .of(mapAgencyAndId(rhs.getId()))
-      .setPrice(rhs.getPrice())
-      .setCurrencyType(rhs.getCurrencyType())
-      .setPaymentMethod(rhs.getPaymentMethod())
-      .setYouthPrice(rhs.getYouthPrice())
-      .setSeniorPrice(rhs.getSeniorPrice());
+      .setPrice(price)
+      .setPaymentMethod(rhs.getPaymentMethod());
 
     if (rhs.getId().getAgencyId() != null && rhs.getAgencyId() != null) {
       builder.setAgency(new FeedScopedId(rhs.getId().getAgencyId(), rhs.getAgencyId()));

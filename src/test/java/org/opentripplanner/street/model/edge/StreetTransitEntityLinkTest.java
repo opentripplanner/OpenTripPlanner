@@ -7,12 +7,13 @@ import static org.opentripplanner.transit.model.basic.Accessibility.NOT_POSSIBLE
 import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
 import static org.opentripplanner.transit.model.basic.Accessibility.POSSIBLE;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
@@ -22,7 +23,6 @@ import org.opentripplanner.street.model.vertex.TransitStopVertexBuilder;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
-import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -119,38 +119,42 @@ class StreetTransitEntityLinkTest {
   @Nested
   class Rental {
 
-    static Stream<Arguments> allowedStates = Stream
-      .of(
-        TestStateBuilder.ofScooterRental().pickUpFreeFloatingScooter(),
-        TestStateBuilder.ofBikeRental().pickUpFreeFloatingBike(),
-        // allowing cars into stations is a bit questionable but the alternatives would be quite
-        // computationally expensive
-        TestStateBuilder.ofCarRental().pickUpFreeFloatingCar(),
-        TestStateBuilder.ofWalking(),
-        TestStateBuilder.ofCycling()
-      )
-      .map(TestStateBuilder::build)
-      .map(Arguments::of);
+    static List<State> allowedStates() {
+      return Stream
+        .of(
+          TestStateBuilder.ofScooterRental().pickUpFreeFloatingScooter(),
+          TestStateBuilder.ofBikeRental().pickUpFreeFloatingBike(),
+          // allowing cars into stations is a bit questionable but the alternatives would be quite
+          // computationally expensive
+          TestStateBuilder.ofCarRental().pickUpFreeFloatingCar(),
+          TestStateBuilder.ofWalking(),
+          TestStateBuilder.ofCycling()
+        )
+        .map(TestStateBuilder::build)
+        .toList();
+    }
 
     @ParameterizedTest
-    @VariableSource("allowedStates")
+    @MethodSource("allowedStates")
     void freeFloatingVehiclesAreAllowedIntoStops(State state) {
       testTraversalWithState(state, true);
     }
 
-    static Stream<Arguments> notAllowedStates = Stream
-      .of(
-        TestStateBuilder.ofBikeRental().pickUpBikeFromStation(),
-        TestStateBuilder.ofCarRental().pickUpCarFromStation(),
-        // for bike and ride you need to drop the bike at a parking facility first
-        TestStateBuilder.ofBikeAndRide().streetEdge(),
-        TestStateBuilder.parkAndRide().streetEdge()
-      )
-      .map(TestStateBuilder::build)
-      .map(Arguments::of);
+    static List<State> notAllowedStates() {
+      return Stream
+        .of(
+          TestStateBuilder.ofBikeRental().pickUpBikeFromStation(),
+          TestStateBuilder.ofCarRental().pickUpCarFromStation(),
+          // for bike and ride you need to drop the bike at a parking facility first
+          TestStateBuilder.ofBikeAndRide().streetEdge(),
+          TestStateBuilder.parkAndRide().streetEdge()
+        )
+        .map(TestStateBuilder::build)
+        .toList();
+    }
 
     @ParameterizedTest
-    @VariableSource("notAllowedStates")
+    @MethodSource("notAllowedStates")
     void stationBasedVehiclesAreNotAllowedIntoStops(State state) {
       testTraversalWithState(state, false);
     }
