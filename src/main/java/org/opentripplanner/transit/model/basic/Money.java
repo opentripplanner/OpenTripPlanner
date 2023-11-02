@@ -144,7 +144,9 @@ public class Money implements Comparable<Money>, Serializable {
    * Returns half this instance's amount
    * Amounts in minor currency unit is rounded to nearest integer, so $0.99/2 becomes $0.50
    */
-  public Money half() { return new Money(currency, IntUtils.round(amount / 2f)); }
+  public Money half() {
+    return new Money(currency, IntUtils.round(amount / 2f));
+  }
 
   /**
    * Multiplies the amount with the multiplicator.
