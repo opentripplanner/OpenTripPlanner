@@ -920,14 +920,6 @@ for example `450`. One cost unit should roughly match a one second travel on tra
 scalar Cost
 
 """
-A cost function that is applied to a certain event. String must be of the format:
-`A + B x`, where A is fixed cost and B is a multiplier of time x. For example: `600 + 2.0 x`.
-Positive numbers should be used. One cost unit should roughly match a one second travel
-on transit. Either `A` or `B x` can be omitted.
-"""
-scalar CostFunction
-
-"""
 Either a latitude or a longitude coordinate as a WGS 84 format floating point number.
 """
 scalar Coordinate
@@ -1595,13 +1587,24 @@ input PlanUnpreferredInput {
     agencies: [String!]
 
     """
-    An cost function used to calculate penalty for an unpreferred route/agency. Function should return
-    number of seconds that we are willing to wait for unpreferred route/agency.
-    String must be of the format:
-    `A + B x`, where A is fixed penalty and B is a multiplier of transit leg travel time x.
-    For example: `600 + 2.0 x`
+    Costs related to using unpreferred entities.
     """
-    unpreferredCost: CostFunction
+    cost: PlanUnpreferredCostInput
+}
+
+"""
+Costs related to using unpreferred entities.
+"""
+input PlanUnpreferredCostInput {
+    """
+    A static cost that is added each time something that is unpreferred is used.
+    """
+    cost: Cost
+
+    """
+    A cost multiplier of transit leg travel time.
+    """
+    reluctance: Reluctance
 }
 
 enum RoutingErrorCode {
@@ -5027,13 +5030,24 @@ input TransitModePreferenceInput {
     mode: PlanTransitMode!
 
     """
-    Reluctance in a format of a cost function of this transit mode compared to an ideal transit
-    mode. String must be of the format: `A + B x`, where A is fixed cost and B is a multiplier
-    of time x. For example `30 + 2.0 x`, where 30 cost units would be added per leg that
-    uses this transit mode and the cost of travel for each second would be multiplied by 2.
-    Either `A` or `B x` can be omitted.
+    Costs related to using a transit mode.
     """
-    reluctance: CostFunction
+    cost: TransitModePreferenceCostInput
+}
+
+"""
+Costs related to using a transit mode.
+"""
+input TransitModePreferenceCostInput {
+    """
+    A static cost that is added each time a transit mode is used.
+    """
+    cost: Cost
+
+    """
+    A cost multiplier of transit leg travel time.
+    """
+    reluctance: Reluctance
 }
 
 """
@@ -5313,14 +5327,9 @@ input VehicleWalkPreferencesInput {
     speed: Speed
 
     """
-    Reluctance in a format of `30 + 2.0 x` where the static cost is applied
-    both when getting off the vehicle and when getting on the vehicle again.
-    However, these static costs are not applied when getting on a rented vehicle
-    for the first time or off the vehicle when returning the vehicle. The multiplier
-    is for how bad walking the vehicle is compared to being in transit for equal
-    lengths of time.
+    Costs related to walking a vehicle.
     """
-    reluctance: CostFunction
+    cost: VehicleWalkPreferencesCostInput
 
     """"
     How long it takes to hop on or off a vehicle when switching to walking the vehicle
@@ -5328,6 +5337,24 @@ input VehicleWalkPreferencesInput {
     on a rented vehicle for the first time or off the vehicle when returning the vehicle.
     """
     hopOnOrOffTime: Duration
+}
+
+"""
+Costs related to walking a vehicle.
+"""
+input VehicleWalkPreferencesCostInput {
+    """
+    A static cost that is added each time hopping on or off a vehicle to start or end
+    vehicle walking. However, this cost is not applied when getting on a rented vehicle
+    for the first time or when getting off the vehicle when returning the vehicle.
+    """
+    hopOnOrOffCost: Cost
+
+    """
+    A cost multiplier of vehicle walking travel time. The multiplier is for how bad
+    walking the vehicle is compared to being in transit for equal lengths of time.
+    """
+    reluctance: Reluctance
 }
 
 """
