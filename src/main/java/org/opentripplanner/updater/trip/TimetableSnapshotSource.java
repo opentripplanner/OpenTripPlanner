@@ -435,7 +435,12 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     // Get new TripTimes based on scheduled timetable
     var result = pattern
       .getScheduledTimetable()
-      .createUpdatedTripTimes(tripUpdate, timeZone, serviceDate, backwardsDelayPropagationType);
+      .createUpdatedTripTimesFromGTFSRT(
+        tripUpdate,
+        timeZone,
+        serviceDate,
+        backwardsDelayPropagationType
+      );
 
     if (result.isFailure()) {
       // necessary so the success type is correct

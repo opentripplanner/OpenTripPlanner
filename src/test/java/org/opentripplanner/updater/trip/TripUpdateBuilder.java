@@ -81,11 +81,19 @@ public class TripUpdateBuilder {
     );
   }
 
-  public TripUpdateBuilder addStopTime(
-    int stopSequence,
-    StopTimeUpdate.ScheduleRelationship scheduleRelationship
-  ) {
-    return addStopTime(null, -1, stopSequence, NO_VALUE, NO_VALUE, scheduleRelationship, null);
+  /**
+   * Add a NO_DATA stop to the TripUpdate.
+   */
+  public TripUpdateBuilder addNoDataStop(int stopSequence) {
+    return addStopTime(
+      null,
+      NO_VALUE,
+      stopSequence,
+      NO_DELAY,
+      NO_DELAY,
+      StopTimeUpdate.ScheduleRelationship.NO_DATA,
+      null
+    );
   }
 
   /**

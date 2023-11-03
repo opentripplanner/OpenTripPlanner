@@ -630,9 +630,9 @@ public class TimetableSnapshotSourceTest {
         SCHEDULED,
         transitModel.getTimeZone()
       )
-        .addStopTime(1, NO_DATA)
-        .addStopTime(2, SKIPPED)
-        .addStopTime(3, NO_DATA);
+        .addNoDataStop(1)
+        .addSkippedStop(2)
+        .addNoDataStop(3);
 
       var tripUpdate = builder.build();
 
@@ -762,7 +762,7 @@ public class TimetableSnapshotSourceTest {
         transitModel.getTimeZone()
       )
         .addDelayedStopTime(1, 0)
-        .addStopTime(2, SKIPPED)
+        .addSkippedStop(2)
         .addDelayedStopTime(3, 90);
 
       var tripUpdate = builder.build();
