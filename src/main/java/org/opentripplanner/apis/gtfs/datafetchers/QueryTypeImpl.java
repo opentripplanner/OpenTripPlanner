@@ -21,6 +21,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.locationtech.jts.geom.Coordinate;
@@ -73,6 +74,10 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   // TODO: figure out a runtime solution
   private static final DirectionMapper DIRECTION_MAPPER = new DirectionMapper(
     DataImportIssueStore.NOOP
+  );
+
+  private final List<PlaceType> DEFAULT_PLACE_TYPES = List.copyOf(
+    EnumSet.complementOf(EnumSet.of(PlaceType.STATION))
   );
 
   @Override
@@ -326,7 +331,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
         : null;
       List<PlaceType> filterByPlaceTypes = args.getGraphQLFilterByPlaceTypes() != null
         ? args.getGraphQLFilterByPlaceTypes().stream().map(GraphQLUtils::toModel).toList()
-        : EnumSet.complementOf(EnumSet.of(PlaceType.STATION)).stream().toList();
+        : DEFAULT_PLACE_TYPES;
 
       List<PlaceAtDistance> places;
       try {
