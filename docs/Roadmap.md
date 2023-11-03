@@ -21,7 +21,7 @@ Any individual or organization can create an Issue on the OTP Roadmap using the 
 7. Fill in the necessary fields, and then click `Create`.
 <br>
 ![create](images/roadmap-6.png)
-<be>
+<br>
 
 
 A roadmap issue should follow these principles:
