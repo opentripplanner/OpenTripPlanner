@@ -2,7 +2,6 @@ package org.opentripplanner.api.common;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.function.Consumer;
-import org.opentripplanner.api.mapping.RelaxMapper;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
@@ -90,7 +89,7 @@ class RequestToPreferencesMapper {
 
       if (req.relaxTransitPriorityGroup != null) {
         tr.withTransitGroupPriorityGeneralizedCostSlack(
-          RelaxMapper.mapRelax(req.relaxTransitPriorityGroup)
+          CostLinearFunction.of(req.relaxTransitPriorityGroup)
         );
       } else {
         setIfNotNull(

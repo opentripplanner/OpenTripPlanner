@@ -17,6 +17,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
@@ -334,14 +335,34 @@ ferries, where the check-in process needs to be done in good time before ride.
             """
           )
           .asCostLinearFunction(dft.unpreferredCost())
+      );
+
+    String relaxTransitPriorityGroupValue = c
+      .of("relaxTransitPriorityGroup")
+      .since(V2_3)
+      .summary("The relax function for transit-priority-groups")
+      .description(
+        """
+        A path is considered optimal if it the generalized-cost is smaller than an other the 
+        generalized-cost of another path. If this parameter is set, the comparison is relaxed
+        further if they belong to different transit-priority-groups.
+        """
       )
-      .withRaptor(it ->
-        c
-          .of("relaxTransitSearchGeneralizedCostAtDestination")
-          .since(V2_3)
-          .summary("Whether non-optimal transit paths at the destination should be returned")
-          .description(
-            """
+      .asString(dft.relaxTransitPriorityGroup().toString());
+
+    if (relaxTransitPriorityGroupValue != null) {
+      builder.withTransitGroupPriorityGeneralizedCostSlack(
+        CostLinearFunction.of(relaxTransitPriorityGroupValue)
+      );
+    }
+
+    builder.withRaptor(it ->
+      c
+        .of("relaxTransitSearchGeneralizedCostAtDestination")
+        .since(V2_3)
+        .summary("Whether non-optimal transit paths at the destination should be returned")
+        .description(
+          """
                 Let c be the existing minimum pareto optimal generalized cost to beat. Then a trip
                 with cost c' is accepted if the following is true:
                 `c' < Math.round(c * relaxRaptorCostCriteria)`.
@@ -351,10 +372,10 @@ ferries, where the check-in process needs to be done in good time before ride.
                 Values equals or less than zero is not allowed. Values greater than 2.0 are not
                 supported, due to performance reasons.
                 """
-          )
-          .asDoubleOptional()
-          .ifPresent(it::withRelaxGeneralizedCostAtDestination)
-      );
+        )
+        .asDoubleOptional()
+        .ifPresent(it::withRelaxGeneralizedCostAtDestination)
+    );
   }
 
   private static void mapBikePreferences(NodeAdapter c, BikePreferences.Builder builder) {

@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model.plan;
 import static org.opentripplanner.ext.transmodelapi.model.framework.StreetModeDurationInputType.mapDurationForStreetModeGraphQLValue;
 
 import graphql.Scalars;
+import graphql.language.NullValue;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLEnumType;
 import graphql.schema.GraphQLFieldDefinition;
@@ -17,7 +18,6 @@ import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
 import org.opentripplanner.ext.transmodelapi.model.framework.PassThroughPointInputType;
 import org.opentripplanner.ext.transmodelapi.model.framework.PenaltyForStreetModeType;
-import org.opentripplanner.ext.transmodelapi.model.scalars.RelaxScalarFactory;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -287,14 +287,21 @@ public class TripQuery {
             
             This relax the comparison inside the routing engine for each stop-arrival. If two
             paths have a different set of transit-priority-groups, then the generalized-cost
-            comparison is relaxed. The final set of paths are filtered through the normal 
+            comparison is relaxed. The final set of paths are filtered through the normal
             itinerary-filters.
             
             - The `ratio` must be greater or equal to 1.0 and less then 1.2.
             - The `slack` must be greater or equal to 0 and less then 3600.
+            
+            THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!
             """.stripIndent()
           )
-          .type(RelaxScalarFactory.createRelaxFunctionScalar(1.2, 3600))
+          .type(RelaxCostType.INPUT_TYPE)
+          .defaultValueLiteral(
+            preferences.transit().relaxTransitPriorityGroup().isNormal()
+              ? NullValue.of()
+              : RelaxCostType.valueOf(preferences.transit().relaxTransitPriorityGroup())
+          )
           .build()
       )
       .argument(

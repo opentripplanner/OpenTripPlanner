@@ -3,7 +3,6 @@ package org.opentripplanner.routing.api.request.preference;
 import static java.util.Objects.requireNonNull;
 
 import java.io.Serializable;
-import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -27,7 +26,7 @@ public final class TransitPreferences implements Serializable {
   private final Map<TransitMode, Double> reluctanceForMode;
   private final Cost otherThanPreferredRoutesPenalty;
   private final CostLinearFunction unpreferredCost;
-  private final Relax relaxTransitPriorityGroup;
+  private final CostLinearFunction relaxTransitPriorityGroup;
   private final boolean ignoreRealtimeUpdates;
   private final boolean includePlannedCancellations;
   private final boolean includeRealtimeCancellations;
@@ -37,8 +36,8 @@ public final class TransitPreferences implements Serializable {
     this.boardSlack = this.alightSlack = DurationForEnum.of(TransitMode.class).build();
     this.reluctanceForMode = Map.of();
     this.otherThanPreferredRoutesPenalty = Cost.costOfMinutes(5);
-    this.unpreferredCost = CostLinearFunction.of(Duration.ZERO, 1.0);
-    this.relaxTransitPriorityGroup = Relax.NORMAL;
+    this.unpreferredCost = CostLinearFunction.NORMAL;
+    this.relaxTransitPriorityGroup = CostLinearFunction.NORMAL;
     this.ignoreRealtimeUpdates = false;
     this.includePlannedCancellations = false;
     this.includeRealtimeCancellations = false;
@@ -128,7 +127,13 @@ public final class TransitPreferences implements Serializable {
     return unpreferredCost;
   }
 
-  public Relax relaxTransitPriorityGroup() {
+  /**
+   * This is used to relax the cost when comparing transit-priority-groups. The default is the
+   * NORMAL function({@code f(x) = x}. This is the same as not using priority-groups. The
+   * coefficient must be in range {@code [1.0 to 4.0]} and the constant must be in range
+   * {@code [$0 to $1440(4h)]}.
+   */
+  public CostLinearFunction relaxTransitPriorityGroup() {
     return relaxTransitPriorityGroup;
   }
 
@@ -208,7 +213,7 @@ public final class TransitPreferences implements Serializable {
         DEFAULT.otherThanPreferredRoutesPenalty
       )
       .addObj("unpreferredCost", unpreferredCost, DEFAULT.unpreferredCost)
-      .addObj("relaxTransitPriorityGroup", relaxTransitPriorityGroup, Relax.NORMAL)
+      .addObj("relaxTransitPriorityGroup", relaxTransitPriorityGroup, CostLinearFunction.NORMAL)
       .addBoolIfTrue(
         "ignoreRealtimeUpdates",
         ignoreRealtimeUpdates != DEFAULT.ignoreRealtimeUpdates
@@ -235,7 +240,7 @@ public final class TransitPreferences implements Serializable {
     private Map<TransitMode, Double> reluctanceForMode;
     private Cost otherThanPreferredRoutesPenalty;
     private CostLinearFunction unpreferredCost;
-    private Relax relaxTransitPriorityGroup;
+    private CostLinearFunction relaxTransitPriorityGroup;
     private boolean ignoreRealtimeUpdates;
     private boolean includePlannedCancellations;
     private boolean includeRealtimeCancellations;
@@ -297,7 +302,7 @@ public final class TransitPreferences implements Serializable {
       return setUnpreferredCost(CostLinearFunction.of(constFunction));
     }
 
-    public Builder withTransitGroupPriorityGeneralizedCostSlack(Relax value) {
+    public Builder withTransitGroupPriorityGeneralizedCostSlack(CostLinearFunction value) {
       this.relaxTransitPriorityGroup = value;
       return this;
     }

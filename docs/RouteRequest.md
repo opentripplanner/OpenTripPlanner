@@ -57,6 +57,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | numItineraries                                                                                               |        `integer`       | The maximum number of itineraries to return.                                                                                                   | *Optional* | `50`             |  2.0  |
 | [optimize](#rd_optimize)                                                                                     |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                                | *Optional* | `"safe"`         |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                                       |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                                  | *Optional* | `300`            |  2.0  |
+| [relaxTransitPriorityGroup](#rd_relaxTransitPriorityGroup)                                                   |        `string`        | The relax function for transit-priority-groups                                                                                                 | *Optional* | `"0s + 1.00 t"`  |  2.3  |
 | [relaxTransitSearchGeneralizedCostAtDestination](#rd_relaxTransitSearchGeneralizedCostAtDestination)         |        `double`        | Whether non-optimal transit paths at the destination should be returned                                                                        | *Optional* |                  |  2.3  |
 | [searchWindow](#rd_searchWindow)                                                                             |       `duration`       | The duration of the search-window.                                                                                                             | *Optional* |                  |  2.0  |
 | stairsReluctance                                                                                             |        `double`        | Used instead of walkReluctance for stairs.                                                                                                     | *Optional* | `2.0`            |  2.0  |
@@ -245,6 +246,18 @@ The set of characteristics that the user wants to optimize for.
 Penalty added for using every route that is not preferred if user set any route as preferred.
 
 We return number of seconds that we are willing to wait for preferred route.
+
+<h3 id="rd_relaxTransitPriorityGroup">relaxTransitPriorityGroup</h3>
+
+**Since version:** `2.3` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"0s + 1.00 t"`   
+**Path:** /routingDefaults 
+
+The relax function for transit-priority-groups
+
+A path is considered optimal if it the generalized-cost is smaller than an other the
+generalized-cost of another path. If this parameter is set, the comparison is relaxed
+further if they belong to different transit-priority-groups.
+
 
 <h3 id="rd_relaxTransitSearchGeneralizedCostAtDestination">relaxTransitSearchGeneralizedCostAtDestination</h3>
 

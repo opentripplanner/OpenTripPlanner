@@ -2,6 +2,7 @@ package org.opentripplanner.api.mapping;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import org.opentripplanner.routing.api.request.preference.Relax;
@@ -49,6 +50,10 @@ public class RelaxMapper {
           (errors.isEmpty() ? "" : " Details: " + errors)
         )
       );
+  }
+
+  public static String mapRelaxToString(Relax domain) {
+    return String.format(Locale.ROOT, "%.2f * x + %d", domain.ratio(), domain.slack());
   }
 
   private static Optional<Relax> parse(

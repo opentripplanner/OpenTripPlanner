@@ -23,7 +23,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitPriorityGroup32n;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.Relax;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class RaptorRequestMapper {
@@ -117,7 +117,7 @@ public class RaptorRequestMapper {
     builder.withMultiCriteria(mcBuilder -> {
       var pt = preferences.transit();
       var r = pt.raptor();
-      if (pt.relaxTransitPriorityGroup().hasEffect()) {
+      if (!pt.relaxTransitPriorityGroup().isNormal()) {
         mcBuilder.withTransitPriorityCalculator(TransitPriorityGroup32n.priorityCalculator());
         mcBuilder.withRelaxC1(mapRelaxCost(pt.relaxTransitPriorityGroup()));
       } else {
@@ -193,13 +193,13 @@ public class RaptorRequestMapper {
       .toList();
   }
 
-  static RelaxFunction mapRelaxCost(Relax relax) {
+  static RelaxFunction mapRelaxCost(CostLinearFunction relax) {
     if (relax == null) {
       return null;
     }
     return GeneralizedCostRelaxFunction.of(
-      relax.ratio(),
-      RaptorCostConverter.toRaptorCost(relax.slack())
+      relax.coefficient(),
+      RaptorCostConverter.toRaptorCost(relax.constant().toSeconds())
     );
   }
 
