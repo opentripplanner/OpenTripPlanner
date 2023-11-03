@@ -18,22 +18,20 @@ Any individual or organization can create an Issue on the OTP Roadmap using the 
 6. Pick the `Roadmap Epic` type by clicking `Choose`.
 <br>
 ![choose-issue-type](images/roadmap-5.png)
-7. Fill in the necessary fields, and then click `Create`.
+7. Fill in the necessary fields 
+<br>
+  - What: Clearly state what the desired changes or new features could look like. <br>
+  - Why: Clearly state the effect/outcome of this change.<br>
+  - When: Provide a timeline or timeframe for when these changes should be implemented. <br>
+  - Link issue(s) that which belongs to or is part of this.<br>
+  - Description could include a solution.<br>
+  - Use `Labels` to indicate which organizations who has interests in this Roadmap issue. <br>
+Then click `Create`.
 <br>
 ![create](images/roadmap-6.png)
-<br>
-
-
-A roadmap issue should follow these principles:
-
-Encourage discussions in the thread, [Gitter](https://app.gitter.im/#/room/#opentripplanner_OpenTripPlanner:gitter.im), PO- or developer meetings. Discussions should be concluded, and the roadmap description should be updated accordingly.
- - The description must be easy to understand and always updated to the latest conclusion. Click the “Edit” button. 
- - Description should at least consist of 
-   - What’s the problem we want to solve
-   - Why we want to, or the effect it makes
-   - Linked issues
- - Description could include a solution
- - Use LABELS
-Twice a year, POs and developers will sort, time frame, and clean up the issues.
-
-<img width="1152" alt="roadmap-principles" src="https://github.com/opentripplanner/OpenTripPlanner/assets/27970417/2d19a0fc-6170-4dc9-aa6d-4c26c6f4bfd8">
+<br><br>
+Discussions about the Issue within the corresponding [Gitter](https://app.gitter.im/#/room/#opentripplanner_OpenTripPlanner:gitter.im) chat are encouraged along with participation in the product owner (PO) or developer meetings. Should these discussions reach a conclusion, the Roadmap Issue can be updated accordingly.
+<br><br>
+Twice a year, product owners (POs) and developers will review and clean up the issues at the PO meetings.
+<br><br>
+Products owner (PO) meetings are open to everyone interst in OTP. Meetings are held on the first Tuesday at 7AM US Pacific / 10AM US Eastern / 4PM CET. To join the video meeting, click on this [meeting link](https://meet.google.com/tmf-rcxa-vbd).
