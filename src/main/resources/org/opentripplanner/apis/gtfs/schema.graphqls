@@ -355,6 +355,25 @@ type BikePark implements Node & PlaceInterface {
     openingHours: OpeningHours
 }
 
+"""
+Is it possible to arrive to the destination with a rented vehicle and does it
+come with an extra cost.
+"""
+input DestinationVehiclePolicyInput {
+    """
+    Is it possible to arrive to the destination without dropping off the rental
+    vehicle first.
+    """
+    allowKeepingVehicleAtDestination: Boolean
+
+    """
+    Cost associated with arriving to the destination with a rented vehicle.
+    No cost is applied if arriving to the destination after dropping off the rented
+    vehicle.
+    """
+    keepingVehicleAtDestinationCost: Cost
+}
+
 """Vehicle parking represents a location where bicycles or cars can be parked."""
 type VehicleParking implements Node & PlaceInterface {
     """
@@ -4212,17 +4231,10 @@ Preferences related to rental (station based or floating vehicle rental).
 """
 input RentalPreferencesInput {
     """
-    Is it possible to arrive to the destination without dropping off the rental
-    vehicle first.
+    Is it possible to arrive to the destination with a rented vehicle and does it
+    come with an extra cost.
     """
-    allowKeepingVehicleAtDestination: Boolean
-
-    """
-    Cost associated with arriving to the destination with a rented vehicle.
-    No cost is applied if arriving to the destination after dropping off the rented
-    vehicle.
-    """
-    keepingVehicleAtDestinationCost: Cost
+    destinationVehiclePolicy: DestinationVehiclePolicyInput
 
     """
     Rental networks which can be potentially used as part of an itinerary.
