@@ -21,3 +21,19 @@ Any individual or organization can create an Issue on the OTP Roadmap using the 
 7. Fill in the necessary fields, and then click `Create`.
 <br>
 ![create](images/roadmap-6.png)
+<be>
+
+
+A roadmap issue should follow these principles:
+
+Encourage discussions in the thread, [Gitter](https://app.gitter.im/#/room/#opentripplanner_OpenTripPlanner:gitter.im), PO- or developer meetings. Discussions should be concluded, and the roadmap description should be updated accordingly.
+ - The description must be easy to understand and always updated to the latest conclusion. Click the “Edit” button. 
+ - Description should at least consist of 
+   - What’s the problem we want to solve
+   - Why we want to, or the effect it makes
+   - Linked issues
+ - Description could include a solution
+ - Use LABELS
+Twice a year, POs and developers will sort, time frame, and clean up the issues.
+
+<img width="1152" alt="roadmap-principles" src="https://github.com/opentripplanner/OpenTripPlanner/assets/27970417/2d19a0fc-6170-4dc9-aa6d-4c26c6f4bfd8">
