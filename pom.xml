@@ -714,7 +714,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>3.0.10</version>
+            <version>3.0.11</version>
         </dependency>
 
         <!-- TESTING -->
@@ -739,7 +739,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.6.0</version>
+            <version>5.7.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

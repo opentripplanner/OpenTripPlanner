@@ -8,6 +8,7 @@ import static org.opentripplanner.model.plan.PlanTestConstants.B;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.Itinerary;
@@ -17,6 +18,8 @@ import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.routing.algorithm.filterchain.ListSection;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 
 public class RoutingResponseMapperTest {
 
@@ -40,6 +43,11 @@ public class RoutingResponseMapperTest {
   private static final Itinerary REMOVED_ITINERARY = TestItineraryBuilder
     .newItinerary(A, T12_30)
     .bus(1, T12_30, T13_00, B)
+    .build();
+
+  private static final Itinerary KEPT_ITINERARY = TestItineraryBuilder
+    .newItinerary(A, T12_00)
+    .bus(1, T12_00, T12_30, B)
     .build();
 
   @Test
@@ -88,7 +96,11 @@ public class RoutingResponseMapperTest {
       TRANSIT_TIME_ZERO,
       SEARCH_PARAMS,
       D90M,
-      REMOVED_ITINERARY,
+      new NumItinerariesFilterResults(
+        List.of(KEPT_ITINERARY),
+        List.of(REMOVED_ITINERARY),
+        ListSection.TAIL
+      ),
       PageType.NEXT_PAGE
     );
 
@@ -101,8 +113,12 @@ public class RoutingResponseMapperTest {
       "currentSearchWindow: 1h, " +
       "newSearchWindow: 1h30m, " +
       "searchWindowCropped, " +
-      "removedItineraryStartTime: 2020-02-02T12:30:00Z, " +
-      "removedItineraryEndTime: 2020-02-02T13:00:00Z" +
+      "pageCursorFactoryParams: " +
+      new NumItinerariesFilterResults(
+        List.of(KEPT_ITINERARY),
+        List.of(REMOVED_ITINERARY),
+        ListSection.TAIL
+      ) +
       "}",
       factory.toString()
     );

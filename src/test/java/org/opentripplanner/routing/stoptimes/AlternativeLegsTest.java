@@ -42,7 +42,8 @@ class AlternativeLegsTest extends GtfsTest {
       1,
       2,
       STOP_ID_B,
-      STOP_ID_C
+      STOP_ID_C,
+      null
     )
       .getLeg(transitService);
 
@@ -80,7 +81,8 @@ class AlternativeLegsTest extends GtfsTest {
       0,
       1,
       STOP_ID_B,
-      STOP_ID_C
+      STOP_ID_C,
+      null
     )
       .getLeg(transitService);
 
@@ -118,7 +120,8 @@ class AlternativeLegsTest extends GtfsTest {
       1,
       2,
       STOP_ID_X,
-      STOP_ID_Y
+      STOP_ID_Y,
+      null
     )
       .getLeg(transitService);
 
@@ -151,7 +154,8 @@ class AlternativeLegsTest extends GtfsTest {
       1,
       7,
       STOP_ID_X,
-      STOP_ID_B
+      STOP_ID_B,
+      null
     )
       .getLeg(transitService);
 

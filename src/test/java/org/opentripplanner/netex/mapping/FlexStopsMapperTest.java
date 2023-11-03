@@ -85,13 +85,36 @@ class FlexStopsMapperTest {
     6.3023991052849
   );
 
-  static final Collection<Double> INVALID_AREA_POS_LIST = List.of(
+  static final Collection<Double> INVALID_NON_CLOSED_POLYGON = List.of(
     59.62575084033623,
     6.3023991052849,
     59.62883380609349,
     6.289718020117876,
     59.6346950024935,
     6.293494451572027
+  );
+
+  static final Collection<Double> INVALID_SELF_INTERSECTING_POLYGON = List.of(
+    63.596915083462335,
+    10.878374152208456,
+    63.65365163120023,
+    10.885927252794394,
+    63.66835971343224,
+    10.878885368213025,
+    63.64886239899589,
+    10.847544187841429,
+    63.64938508072749,
+    10.785677008653767,
+    63.56025960429534,
+    10.535758055643848,
+    63.52844559758193,
+    10.668967284159471,
+    63.59753465537067,
+    10.879080809550098,
+    63.617069269781574,
+    10.88251403708916,
+    63.596915083462335,
+    10.878374152208456
   );
 
   @Test
@@ -122,17 +145,14 @@ class FlexStopsMapperTest {
   }
 
   @Test
-  void testMapInvalidAreaStop() {
-    FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
-      ID_FACTORY,
-      List.of(),
-      DataImportIssueStore.NOOP
-    );
+  void testMapInvalidNonClosedAreaStop() {
+    AreaStop areaStop = createAreaStop(INVALID_NON_CLOSED_POLYGON);
+    assertNull(areaStop);
+  }
 
-    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(INVALID_AREA_POS_LIST);
-
-    AreaStop areaStop = (AreaStop) flexStopsMapper.map(flexibleStopPlace);
-
+  @Test
+  void testMapInvalidSelfIntersectingAreaStop() {
+    AreaStop areaStop = createAreaStop(INVALID_SELF_INTERSECTING_POLYGON);
     assertNull(areaStop);
   }
 
@@ -268,5 +288,15 @@ class FlexStopsMapperTest {
               )
           )
       );
+  }
+
+  private AreaStop createAreaStop(Collection<Double> polygonCoordinates) {
+    FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
+      ID_FACTORY,
+      List.of(),
+      DataImportIssueStore.NOOP
+    );
+    FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(polygonCoordinates);
+    return (AreaStop) flexStopsMapper.map(flexibleStopPlace);
   }
 }

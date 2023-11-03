@@ -1,5 +1,6 @@
 package org.opentripplanner.service.vehiclerental.model;
 
+import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -18,18 +19,15 @@ public class TestVehicleRentalStationBuilder {
   private int spaces = 10;
   private boolean overloadingAllowed = false;
   private boolean stationOn = false;
-  private RentalVehicleType vehicleType = RentalVehicleType.getDefaultType(NETWORK_1);
+  private final Map<RentalVehicleType, Integer> vehicleTypesAvailable = new HashMap<>();
+  private final Map<RentalVehicleType, Integer> vehicleSpacesAvailable = new HashMap<>();
 
   public static TestVehicleRentalStationBuilder of() {
     return new TestVehicleRentalStationBuilder();
   }
 
-  public TestVehicleRentalStationBuilder withLatitude(double latitude) {
+  public TestVehicleRentalStationBuilder withCoordinates(double latitude, double longitude) {
     this.latitude = latitude;
-    return this;
-  }
-
-  public TestVehicleRentalStationBuilder withLongitude(double longitude) {
     this.longitude = longitude;
     return this;
   }
@@ -54,24 +52,55 @@ public class TestVehicleRentalStationBuilder {
     return this;
   }
 
-  public TestVehicleRentalStationBuilder withVehicleTypeBicycle() {
-    return buildVehicleType(RentalFormFactor.BICYCLE);
+  public TestVehicleRentalStationBuilder withVehicleTypeBicycle(int numAvailable, int numSpaces) {
+    return buildVehicleType(
+      RentalFormFactor.BICYCLE,
+      RentalVehicleType.PropulsionType.HUMAN,
+      numAvailable,
+      numSpaces
+    );
   }
 
-  public TestVehicleRentalStationBuilder withVehicleTypeCar() {
-    return buildVehicleType(RentalFormFactor.CAR);
+  public TestVehicleRentalStationBuilder withVehicleTypeElectricBicycle(
+    int numAvailable,
+    int numSpaces
+  ) {
+    return buildVehicleType(
+      RentalFormFactor.BICYCLE,
+      RentalVehicleType.PropulsionType.ELECTRIC,
+      numAvailable,
+      numSpaces
+    );
+  }
+
+  public TestVehicleRentalStationBuilder withVehicleTypeCar(int numAvailable, int numSpaces) {
+    return buildVehicleType(
+      RentalFormFactor.CAR,
+      RentalVehicleType.PropulsionType.ELECTRIC,
+      numAvailable,
+      numSpaces
+    );
   }
 
   @Nonnull
-  private TestVehicleRentalStationBuilder buildVehicleType(RentalFormFactor rentalFormFactor) {
-    this.vehicleType =
-      new RentalVehicleType(
-        new FeedScopedId(TestVehicleRentalStationBuilder.NETWORK_1, rentalFormFactor.name()),
-        rentalFormFactor.name(),
-        rentalFormFactor,
-        RentalVehicleType.PropulsionType.ELECTRIC,
-        100000d
-      );
+  private TestVehicleRentalStationBuilder buildVehicleType(
+    RentalFormFactor rentalFormFactor,
+    RentalVehicleType.PropulsionType propulsionType,
+    int numAvailable,
+    int numSpaces
+  ) {
+    RentalVehicleType vehicleType = new RentalVehicleType(
+      new FeedScopedId(
+        TestVehicleRentalStationBuilder.NETWORK_1,
+        String.format("%s-%s", rentalFormFactor.name(), propulsionType.name())
+      ),
+      rentalFormFactor.name(),
+      rentalFormFactor,
+      propulsionType,
+      100000d
+    );
+    this.vehicleTypesAvailable.put(vehicleType, numAvailable);
+    this.vehicleSpacesAvailable.put(vehicleType, numSpaces);
     return this;
   }
 
@@ -84,8 +113,16 @@ public class TestVehicleRentalStationBuilder {
     station.longitude = longitude;
     station.vehiclesAvailable = vehicles;
     station.spacesAvailable = spaces;
-    station.vehicleTypesAvailable = Map.of(vehicleType, vehicles);
-    station.vehicleSpacesAvailable = Map.of(vehicleType, spaces);
+
+    // If no vehicle types are specified, use the default type
+    if (vehicleTypesAvailable.isEmpty() || vehicleSpacesAvailable.isEmpty()) {
+      station.vehicleTypesAvailable = Map.of(RentalVehicleType.getDefaultType(NETWORK_1), vehicles);
+      station.vehicleSpacesAvailable = Map.of(RentalVehicleType.getDefaultType(NETWORK_1), spaces);
+    } else {
+      station.vehicleTypesAvailable = vehicleTypesAvailable;
+      station.vehicleSpacesAvailable = vehicleSpacesAvailable;
+    }
+
     station.overloadingAllowed = overloadingAllowed;
     station.isRenting = stationOn;
     station.isReturning = stationOn;

@@ -22,6 +22,13 @@ enum LegReferenceType {
     ScheduledTransitLegReference.class,
     LegReferenceSerializer::writeScheduledTransitLegV2,
     LegReferenceSerializer::readScheduledTransitLegV2
+  ),
+
+  SCHEDULED_TRANSIT_LEG_V3(
+    3,
+    ScheduledTransitLegReference.class,
+    LegReferenceSerializer::writeScheduledTransitLegV3,
+    LegReferenceSerializer::readScheduledTransitLegV3
   );
 
   private final int version;
@@ -45,8 +52,8 @@ enum LegReferenceType {
   /**
    * Return the latest LegReferenceType version for a given leg reference class.
    */
-  static LegReferenceType forClass(Class<? extends LegReference> legReferenceClass) {
-    Optional<LegReferenceType> latestVersion = Arrays
+  static Optional<LegReferenceType> forClass(Class<? extends LegReference> legReferenceClass) {
+    return Arrays
       .stream(LegReferenceType.values())
       .filter(legReferenceType -> legReferenceType.legReferenceClass.equals(legReferenceClass))
       .reduce((legReferenceType, other) -> {
@@ -55,8 +62,6 @@ enum LegReferenceType {
         }
         return other;
       });
-
-    return latestVersion.orElse(null);
   }
 
   Writer<LegReference> getSerializer() {

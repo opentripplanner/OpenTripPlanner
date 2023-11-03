@@ -117,7 +117,7 @@ public class TestStateBuilder {
   public TestStateBuilder pickUpCarFromStation() {
     return pickUpRentalVehicle(
       RentalFormFactor.CAR,
-      TestVehicleRentalStationBuilder.of().withVehicleTypeCar().build()
+      TestVehicleRentalStationBuilder.of().withVehicleTypeCar(10, 10).build()
     );
   }
 
@@ -138,7 +138,7 @@ public class TestStateBuilder {
   public TestStateBuilder pickUpBikeFromStation() {
     return pickUpRentalVehicle(
       RentalFormFactor.BICYCLE,
-      TestVehicleRentalStationBuilder.of().withVehicleTypeBicycle().build()
+      TestVehicleRentalStationBuilder.of().withVehicleTypeElectricBicycle(10, 10).build()
     );
   }
 
