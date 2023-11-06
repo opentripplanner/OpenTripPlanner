@@ -34,9 +34,14 @@ class StopModelIndex {
     Collection<GroupStop> groupStops,
     Collection<MultiModalStation> multiModalStations
   ) {
-    stopsByIndex = new StopLocation[StopLocation.indexCounter()];
-
     var allStops = new CollectionsView<StopLocation>(stops, flexStops, groupStops);
+    // StopLocation#indexCounter is prone to race conditions during tests, that's why we
+    // iterate over all stops to find the maximum index
+    // TODO: this change can be reverted once https://github.com/opentripplanner/OpenTripPlanner/issues/5480
+    // is fixed
+    var indexSize = allStops.stream().mapToInt(StopLocation::getIndex).max().orElse(0) + 1;
+    stopsByIndex = new StopLocation[indexSize];
+
     for (StopLocation it : allStops) {
       if (it instanceof RegularStop regularStop) {
         var envelope = new Envelope(it.getCoordinate().asJtsCoordinate());
