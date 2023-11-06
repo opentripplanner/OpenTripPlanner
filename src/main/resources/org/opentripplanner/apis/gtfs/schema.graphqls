@@ -1645,7 +1645,7 @@ type RideHailingEstimate {
 
 scalar DateTime
 
-type LegTime {
+type LegTimes {
     scheduled: DateTime
     actual: DateTime
     delay: Duration
@@ -1653,22 +1653,8 @@ type LegTime {
 
 type Leg {
 
-    start: LegTime
-    end: LegTime
-
-    """
-    For transit leg, the offset from the scheduled departure time of the boarding
-    stop in this leg, i.e. scheduled time of departure at boarding stop =
-    `startTime - departureDelay`
-    """
-    departureDelay: Int
-
-    """
-    For transit leg, the offset from the scheduled arrival time of the alighting
-    stop in this leg, i.e. scheduled time of arrival at alighting stop = `endTime
-    - arrivalDelay`
-    """
-    arrivalDelay: Int
+    start: LegTimes
+    end: LegTimes
 
     """The mode (e.g. `WALK`) used when traversing this leg."""
     mode: Mode
@@ -1840,6 +1826,20 @@ type Leg {
     The date and time when this leg ends. Format: Unix timestamp in milliseconds.
     """
     endTime: Long @deprecated(reason: "Use `end.actual` instead which contains timezone information.")
+
+    """
+    For transit leg, the offset from the scheduled departure time of the boarding
+    stop in this leg, i.e. scheduled time of departure at boarding stop =
+    `startTime - departureDelay`
+    """
+    departureDelay: Int @deprecated(reason: "Use `end.delay` instead.")
+
+    """
+    For transit leg, the offset from the scheduled arrival time of the alighting
+    stop in this leg, i.e. scheduled time of arrival at alighting stop = `endTime
+    - arrivalDelay`
+    """
+    arrivalDelay: Int @deprecated(reason: "Use `start.delay` instead.")
 
 }
 
