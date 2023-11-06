@@ -200,8 +200,8 @@ public interface Leg {
     return null;
   }
 
-  LegTime start();
-  LegTime end();
+  LegTimes start();
+  LegTimes end();
 
   /**
    * The date and time this leg begins.

@@ -36,7 +36,7 @@ import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.LegTime;
+import org.opentripplanner.model.plan.LegTimes;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -51,7 +51,6 @@ import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
-import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
@@ -443,7 +442,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> duration();
 
-    public DataFetcher<LegTime> end();
+    public DataFetcher<LegTimes> end();
 
     public DataFetcher<Long> endTime();
 
@@ -485,7 +484,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<String> serviceDate();
 
-    public DataFetcher<LegTime> start();
+    public DataFetcher<LegTimes> start();
 
     public DataFetcher<Long> startTime();
 
@@ -980,11 +979,11 @@ public class GraphQLDataFetchers {
 
   /** Stoptime represents the time when a specific trip arrives to or departs from a specific stop. */
   public interface GraphQLStoptime {
-    public DataFetcher<LegTime> arrival();
+    public DataFetcher<LegTimes> arrival();
 
     public DataFetcher<Integer> arrivalDelay();
 
-    public DataFetcher<LegTime> departure();
+    public DataFetcher<LegTimes> departure();
 
     public DataFetcher<Integer> departureDelay();
 

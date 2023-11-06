@@ -8,14 +8,14 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.plan.LegTime;
+import org.opentripplanner.model.plan.LegTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
-  public DataFetcher<LegTime> arrival() {
+  public DataFetcher<LegTimes> arrival() {
     return environment -> {
       var tripTime = getSource(environment);
       return tripTime.arrival(getZoneId(environment));
@@ -28,7 +28,7 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
   }
 
   @Override
-  public DataFetcher<LegTime> departure() {
+  public DataFetcher<LegTimes> departure() {
     return environment -> {
       var tripTime = getSource(environment);
       return tripTime.departure(getZoneId(environment));
