@@ -79,6 +79,6 @@ public interface GraphBuilderFactory {
     GraphBuilderFactory build();
 
     @BindsInstance
-    Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
+    Builder emissionsDataModel(@Nullable EmissionsDataModel emissionsDataModel);
   }
 }

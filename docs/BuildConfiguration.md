@@ -55,9 +55,7 @@ Sections follow that describe particular settings in more depth.
 | demDefaults                                                              |   `object`  | Default properties for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.3  |
 |    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)       |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                                                         | *Optional* | `1.0`                             |  2.3  |
 | [elevationBucket](#elevationBucket)                                      |   `object`  | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
-| [emissions](#emissions)                                                  |   `object`  | Emissions configuration.                                                                                                                                       | *Optional* |                                   |   na  |
-|    carAvgCo2PerKm                                                        |  `integer`  | The average CO₂ emissions of a car in grams per kilometer.                                                                                                     | *Optional* | `170`                             |   na  |
-|    carAvgOccupancy                                                       |   `double`  | The average number of passengers in a car.                                                                                                                     | *Optional* | `1.3`                             |   na  |
+| [emissions](sandbox/Emissions.md)                                        |   `object`  | Emissions configuration.                                                                                                                                       | *Optional* |                                   |   na  |
 | [fares](sandbox/Fares.md)                                                |   `object`  | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
 | gtfsDefaults                                                             |   `object`  | The gtfsDefaults section allows you to specify default properties for GTFS files.                                                                              | *Optional* |                                   |  2.3  |
 |    blockBasedInterlining                                                 |  `boolean`  | Whether to create stay-seated transfers in between two trips with the same block id.                                                                           | *Optional* | `true`                            |  2.3  |
@@ -724,18 +722,6 @@ billed to your AWS account.
 Once the tiles are downloaded for a particular geographic area, OTP will keep them in local cache
 for the next graph build operation. You should add the `--cache <directory>` command line parameter
 to specify your NED tile cache location.
-
-
-<h3 id="emissions">emissions</h3>
-
-**Since version:** `na` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
-**Path:** / 
-
-Emissions configuration.
-
-By specifying the average CO₂ emissions of a car in grams per kilometer as well as
-the average number of passengers in a car the program is able to to perform emission
-calculations for car travel.
 
 
 <h3 id="gd_discardMinTransferTimes">discardMinTransferTimes</h3>

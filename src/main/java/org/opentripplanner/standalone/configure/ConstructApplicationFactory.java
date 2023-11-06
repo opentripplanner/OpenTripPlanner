@@ -61,6 +61,8 @@ public interface ConstructApplicationFactory {
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
   DataImportIssueSummary dataImportIssueSummary();
+
+  @Nullable
   EmissionsDataModel emissionsDataModel();
 
   @Nullable
