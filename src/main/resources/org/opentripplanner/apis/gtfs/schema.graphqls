@@ -1575,7 +1575,7 @@ type Money {
     amount: Float!
 }
 
-""""
+"""
 An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
 """
 scalar Duration
@@ -1865,7 +1865,7 @@ enum Mode {
     """TRAM"""
     TRAM
 
-    """"Private car trips shared with others."""
+    """Private car trips shared with others."""
     CARPOOL
 
     """A taxi, possibly operated by a public transport agency."""
@@ -1915,7 +1915,7 @@ enum TransitMode {
     """TRAM"""
     TRAM
 
-    """"Private car trips shared with others."""
+    """Private car trips shared with others."""
     CARPOOL
 
     """A taxi, possibly operated by a public transport agency."""
