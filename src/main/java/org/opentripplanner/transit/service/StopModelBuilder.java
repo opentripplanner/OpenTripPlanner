@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.service;
 
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupOfStations;
@@ -10,12 +11,12 @@ import org.opentripplanner.transit.model.site.Station;
 
 public class StopModelBuilder {
 
-  private final EntityById<RegularStop> regularStopById = new EntityById<>();
-  private final EntityById<AreaStop> areaStopById = new EntityById<>();
-  private final EntityById<GroupStop> groupStopById = new EntityById<>();
-  private final EntityById<Station> stationById = new EntityById<>();
-  private final EntityById<MultiModalStation> multiModalStationById = new EntityById<>();
-  private final EntityById<GroupOfStations> groupOfStationById = new EntityById<>();
+  private final EntityById<RegularStop> regularStopById = new DefaultEntityById<>();
+  private final EntityById<AreaStop> areaStopById = new DefaultEntityById<>();
+  private final EntityById<GroupStop> groupStopById = new DefaultEntityById<>();
+  private final EntityById<Station> stationById = new DefaultEntityById<>();
+  private final EntityById<MultiModalStation> multiModalStationById = new DefaultEntityById<>();
+  private final EntityById<GroupOfStations> groupOfStationById = new DefaultEntityById<>();
 
   StopModelBuilder() {}
 

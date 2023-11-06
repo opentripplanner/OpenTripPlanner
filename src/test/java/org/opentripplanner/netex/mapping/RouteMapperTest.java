@@ -16,7 +16,7 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.index.NetexEntityIndex;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.network.BikeAccess;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
@@ -54,11 +54,11 @@ public class RouteMapperTest {
     RouteMapper routeMapper = new RouteMapper(
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
-      new EntityById<>(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       ArrayListMultimap.create(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -120,11 +120,11 @@ public class RouteMapperTest {
     RouteMapper routeMapper = new RouteMapper(
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
-      new EntityById<>(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       ArrayListMultimap.create(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -145,11 +145,11 @@ public class RouteMapperTest {
     RouteMapper routeMapper = new RouteMapper(
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
-      new EntityById<>(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       ArrayListMultimap.create(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
       Set.of(FERRY_WITHOUT_BICYCLES_ID)
@@ -170,11 +170,11 @@ public class RouteMapperTest {
     RouteMapper routeMapper = new RouteMapper(
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
-      new EntityById<>(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       ArrayListMultimap.create(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       netexEntityIndex.readOnlyView(),
       ZoneId.systemDefault().getId(),
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS
@@ -205,7 +205,7 @@ public class RouteMapperTest {
       transitBuilder.getOperatorsById(),
       transitBuilder.getBrandingsById(),
       ArrayListMultimap.create(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       netexIndex.readOnlyView(),
       TransitModelForTest.TIME_ZONE_ID,
       EMPTY_FERRY_WITHOUT_BICYCLE_IDS

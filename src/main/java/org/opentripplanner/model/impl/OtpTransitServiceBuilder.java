@@ -24,6 +24,7 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
@@ -60,7 +61,7 @@ public class OtpTransitServiceBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(OtpTransitServiceBuilder.class);
 
-  private final EntityById<Agency> agenciesById = new EntityById<>();
+  private final EntityById<Agency> agenciesById = new DefaultEntityById<>();
 
   private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
 
@@ -74,41 +75,41 @@ public class OtpTransitServiceBuilder {
 
   private final Multimap<AbstractTransitEntity, Notice> noticeAssignments = ArrayListMultimap.create();
 
-  private final EntityById<Operator> operatorsById = new EntityById<>();
+  private final EntityById<Operator> operatorsById = new DefaultEntityById<>();
 
   private final List<Pathway> pathways = new ArrayList<>();
 
-  private final EntityById<Route> routesById = new EntityById<>();
+  private final EntityById<Route> routesById = new DefaultEntityById<>();
 
   private final Multimap<FeedScopedId, ShapePoint> shapePoints = ArrayListMultimap.create();
 
-  private final EntityById<Entrance> entrancesById = new EntityById<>();
+  private final EntityById<Entrance> entrancesById = new DefaultEntityById<>();
 
-  private final EntityById<PathwayNode> pathwayNodesById = new EntityById<>();
+  private final EntityById<PathwayNode> pathwayNodesById = new DefaultEntityById<>();
 
-  private final EntityById<BoardingArea> boardingAreasById = new EntityById<>();
+  private final EntityById<BoardingArea> boardingAreasById = new DefaultEntityById<>();
 
   private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
-  private final EntityById<FareZone> fareZonesById = new EntityById<>();
+  private final EntityById<FareZone> fareZonesById = new DefaultEntityById<>();
 
   private final List<ConstrainedTransfer> transfers = new ArrayList<>();
 
   private final List<StaySeatedNotAllowed> staySeatedNotAllowed = new ArrayList<>();
 
-  private final EntityById<Trip> tripsById = new EntityById<>();
+  private final EntityById<Trip> tripsById = new DefaultEntityById<>();
 
   private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
-  private final EntityById<FlexTrip<?, ?>> flexTripsById = new EntityById<>();
+  private final EntityById<FlexTrip<?, ?>> flexTripsById = new DefaultEntityById<>();
 
-  private final EntityById<Branding> brandingsById = new EntityById<>();
+  private final EntityById<Branding> brandingsById = new DefaultEntityById<>();
 
   private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId = ArrayListMultimap.create();
 
-  private final EntityById<TripOnServiceDate> tripOnServiceDates = new EntityById<>();
+  private final EntityById<TripOnServiceDate> tripOnServiceDates = new DefaultEntityById<>();
 
-  private final EntityById<GroupOfRoutes> groupOfRouteById = new EntityById<>();
+  private final EntityById<GroupOfRoutes> groupOfRouteById = new DefaultEntityById<>();
 
   private final DataImportIssueStore issueStore;
 

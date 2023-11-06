@@ -20,6 +20,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -102,7 +103,7 @@ class ServiceLinkMapperTest {
     quayIdByStopPointRef.add("RUT:StopPoint:2", "NSR:Quay:2");
     quayIdByStopPointRef.add("RUT:StopPoint:3", "NSR:Quay:3");
 
-    EntityById<RegularStop> stopsById = new EntityById<>();
+    EntityById<RegularStop> stopsById = new DefaultEntityById<>();
     issueStore = new DefaultDataImportIssueStore();
 
     QuayMapper quayMapper = new QuayMapper(ID_FACTORY, issueStore, stopsById);
