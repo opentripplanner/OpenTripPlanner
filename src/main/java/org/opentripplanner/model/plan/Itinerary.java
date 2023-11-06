@@ -498,6 +498,18 @@ public class Itinerary implements ItinerarySortKey {
     return generalizedCost;
   }
 
+  /**
+   * If a generalized cost is used in the routing algorithm, this should be the cost computed minus
+   * the artificial penalty added for car access/egresses. This is useful so that itineraries
+   * using only on-street legs don't have an unfair advantage over those combining access/egress with
+   * transit and using a penalty when being processed by the itinerary filter chain.
+   *
+   * @see Itinerary#getGeneralizedCost()
+   * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
+   * @see org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter
+   * @see org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter
+   * @see org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfWalkingIsBetterFilter
+   */
   public int getGeneralizedCostIncludingPenalty() {
     return generalizedCost - penaltyCost(accessPenalty) - penaltyCost(egressPenalty);
   }
