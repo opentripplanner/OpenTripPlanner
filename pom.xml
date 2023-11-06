@@ -70,7 +70,6 @@
         <slf4j.version>2.0.9</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <siri-java-model.version>1.25</siri-java-model.version>
-        <jakarta.xml.bind-api.version>4.0.1</jakarta.xml.bind-api.version>
         <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -542,33 +541,6 @@
 
     <dependencyManagement>
         <dependencies>
-
-
-            <!-- Jakarta EE-->
-            <dependency>
-                <groupId>jakarta.annotation</groupId>
-                <artifactId>jakarta.annotation-api</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.ws.rs</groupId>
-                <artifactId>jakarta.ws.rs-api</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.validation</groupId>
-                <artifactId>jakarta.validation-api</artifactId>
-            </dependency>
-            <!--
-                The jaxb-api provides annotations like XmlElement indicating how classes should be (de)serialized.
-                The jaxb-runtime pulls in the jaxb-api of the same version transitively. But we specify both api and
-                runtime dependencies anyway here at the top level to prevent transitive dependencies from pulling in
-                mismatched versions.
-            -->
-            <dependency>
-                <groupId>jakarta.xml.bind</groupId>
-                <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>${jakarta.xml.bind-api.version}</version>
-            </dependency>
-
             <dependency>
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
