@@ -27,24 +27,30 @@ public class ResultLogger {
         DoubleUtils.roundTo2Decimals((double) updateResult.successful() / totalUpdates * 100)
       );
 
-      var errorIndex = updateResult.failures();
-
-      errorIndex
-        .keySet()
-        .forEach(key -> {
-          var value = errorIndex.get(key);
-          var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
-          LOG.warn(
-            "[{} {}] {} failures of {}: {}",
-            keyValue("feedId", feedId),
-            keyValue("type", type),
-            value.size(),
-            keyValue("errorType", key),
-            tripIds
-          );
-        });
+      logUpdateResultErrors(feedId, type, updateResult);
     } else {
       LOG.info("[feedId={}, type={}] Feed did not contain any updates", feedId, type);
     }
+  }
+
+  public static void logUpdateResultErrors(String feedId, String type, UpdateResult updateResult) {
+    if (updateResult.failed() == 0) {
+      return;
+    }
+    var errorIndex = updateResult.failures();
+    errorIndex
+      .keySet()
+      .forEach(key -> {
+        var value = errorIndex.get(key);
+        var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
+        LOG.warn(
+          "[{} {}] {} failures of {}: {}",
+          keyValue("feedId", feedId),
+          keyValue("type", type),
+          value.size(),
+          keyValue("errorType", key),
+          tripIds
+        );
+      });
   }
 }
