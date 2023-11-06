@@ -52,6 +52,8 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
     // Filter away itineraries that have higher cost than limit cost computed above
     return itineraries
       .stream()
+      // we use the cost including the access/egress penalty since we don't want to give
+      // searches that are only on the street network an unfair advantage
       .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCostIncludingPenalty() >= limit)
       .collect(Collectors.toList());
   }
