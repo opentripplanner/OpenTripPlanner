@@ -16,6 +16,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public final class RegularStopBuilder
   extends StationElementBuilder<RegularStop, RegularStopBuilder> {
 
+  private int index;
+
   private String platformCode;
 
   private I18NString url;
