@@ -119,7 +119,15 @@ class GraphQLIntegrationTest {
       );
 
     var stopModel = StopModel.of();
-    PlanTestConstants.listStops().forEach(sl -> stopModel.withRegularStop((RegularStop) sl));
+    PlanTestConstants
+      .listStops()
+      .forEach(sl -> {
+        // because of https://github.com/opentripplanner/OpenTripPlanner/issues/5480
+        // we make copies of the stops so that they will have an index that is more likely to
+        // exist during indexing of the stop model
+        var stop = (RegularStop) sl;
+        stopModel.withRegularStop(stop.copy().build());
+      });
     var model = stopModel.build();
     var transitModel = new TransitModel(model, DEDUPLICATOR);
 
