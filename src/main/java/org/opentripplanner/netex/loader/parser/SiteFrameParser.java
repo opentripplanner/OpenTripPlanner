@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.netex.index.NetexEntityIndex;
+import org.opentripplanner.netex.support.JAXBUtils;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.Quay;
@@ -109,15 +110,10 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
   }
 
   private void parseQuays(Quays_RelStructure quayRefOrQuay) {
-    if (quayRefOrQuay == null) return;
-
-    quayRefOrQuay
-      .getQuayRefOrQuay()
-      .stream()
-      .map(JAXBElement::getValue)
-      .filter(Quay.class::isInstance)
-      .map(Quay.class::cast)
-      .forEach(quays::add);
+    if (quayRefOrQuay == null) {
+      return;
+    }
+    JAXBUtils.forEachJAXBElementValue(Quay.class, quayRefOrQuay.getQuayRefOrQuay(), quays::add);
   }
 
   private boolean isMultiModalStopPlace(StopPlace stopPlace) {

@@ -1,6 +1,5 @@
 package org.opentripplanner.netex.mapping;
 
-import jakarta.xml.bind.JAXBElement;
 import java.time.DateTimeException;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -14,6 +13,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.support.JAXBUtils;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
@@ -132,14 +132,8 @@ class StationMapper {
         "Station %s does not contain any coordinates.",
         stopPlace.getId() + " " + stopPlace.getName()
       );
-      List<WgsCoordinate> coordinates = stopPlace
-        .getQuays()
-        .getQuayRefOrQuay()
-        .stream()
-        .map(JAXBElement::getValue)
-        .filter(Objects::nonNull)
-        .filter(Quay.class::isInstance)
-        .map(Quay.class::cast)
+      List<WgsCoordinate> coordinates = JAXBUtils
+        .streamJAXBElementValue(Quay.class, stopPlace.getQuays().getQuayRefOrQuay())
         .map(Zone_VersionStructure::getCentroid)
         .filter(Objects::nonNull)
         .map(WgsCoordinateMapper::mapToDomain)
