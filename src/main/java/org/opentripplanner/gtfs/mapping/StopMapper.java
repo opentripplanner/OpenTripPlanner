@@ -36,16 +36,7 @@ class StopMapper {
   }
 
   private RegularStop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
-    if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
-      throw new IllegalArgumentException(
-        "Expected location_type %s, but got %s for stops.txt entry %s".formatted(
-            Stop.LOCATION_TYPE_STOP,
-            gtfsStop.getLocationType(),
-            gtfsStop
-          )
-      );
-    }
-
+    assertLocationTypeIsStop(gtfsStop);
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
     RegularStopBuilder builder = RegularStop
       .of(base.getId())
@@ -98,5 +89,17 @@ class StopMapper {
     }
 
     return builder.build();
+  }
+
+  private void assertLocationTypeIsStop(Stop gtfsStop) {
+    if (gtfsStop.getLocationType() != Stop.LOCATION_TYPE_STOP) {
+      throw new IllegalArgumentException(
+        "Expected location_type %s, but got %s for stops.txt entry %s".formatted(
+            Stop.LOCATION_TYPE_STOP,
+            gtfsStop.getLocationType(),
+            gtfsStop
+          )
+      );
+    }
   }
 }

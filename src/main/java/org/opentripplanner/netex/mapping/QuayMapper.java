@@ -10,6 +10,7 @@ import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
@@ -23,14 +24,6 @@ class QuayMapper {
   private final FeedScopedIdFactory idFactory;
 
   private final EntityById<RegularStop> regularStopIndex;
-
-  private record MappingParameters(
-    Quay quay,
-    Station parentStation,
-    Collection<FareZone> fareZones,
-    NetexMainAndSubMode transitMode,
-    Accessibility wheelchair
-  ) {}
 
   QuayMapper(
     FeedScopedIdFactory idFactory,
@@ -53,48 +46,45 @@ class QuayMapper {
     NetexMainAndSubMode transitMode,
     Accessibility wheelchair
   ) {
-    MappingParameters parameters = new MappingParameters(
-      quay,
-      parentStation,
-      fareZones,
-      transitMode,
-      wheelchair
-    );
+    FeedScopedId id = idFactory.createId(quay.getId());
     return regularStopIndex.computeIfAbsent(
-      idFactory.createId(quay.getId()),
-      ignored -> map(parameters)
+      id,
+      ignore -> map(quay, parentStation, fareZones, transitMode, wheelchair)
     );
   }
 
-  private RegularStop map(MappingParameters parameters) {
-    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(parameters.quay.getCentroid());
+  private RegularStop map(
+    @Nonnull Quay quay,
+    Station parentStation,
+    Collection<FareZone> fareZones,
+    NetexMainAndSubMode transitMode,
+    Accessibility wheelchair
+  ) {
+    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
     if (coordinate == null) {
       issueStore.add(
         "QuayWithoutCoordinates",
         "Quay %s does not contain any coordinates.",
-        parameters.quay.getId()
+        quay.getId()
       );
       return null;
     }
 
     var builder = RegularStop
-      .of(idFactory.createId(parameters.quay.getId()))
-      .withParentStation(parameters.parentStation)
-      .withName(parameters.parentStation.getName())
-      .withPlatformCode(parameters.quay.getPublicCode())
+      .of(idFactory.createId(quay.getId()))
+      .withParentStation(parentStation)
+      .withName(parentStation.getName())
+      .withPlatformCode(quay.getPublicCode())
       .withDescription(
-        NonLocalizedString.ofNullable(
-          parameters.quay.getDescription(),
-          MultilingualString::getValue
-        )
+        NonLocalizedString.ofNullable(quay.getDescription(), MultilingualString::getValue)
       )
-      .withCoordinate(WgsCoordinateMapper.mapToDomain(parameters.quay.getCentroid()))
-      .withWheelchairAccessibility(parameters.wheelchair)
-      .withVehicleType(parameters.transitMode.mainMode())
-      .withNetexVehicleSubmode(parameters.transitMode.subMode());
+      .withCoordinate(WgsCoordinateMapper.mapToDomain(quay.getCentroid()))
+      .withWheelchairAccessibility(wheelchair)
+      .withVehicleType(transitMode.mainMode())
+      .withNetexVehicleSubmode(transitMode.subMode());
 
-    builder.fareZones().addAll(parameters.fareZones);
+    builder.fareZones().addAll(fareZones);
 
     return builder.build();
   }
