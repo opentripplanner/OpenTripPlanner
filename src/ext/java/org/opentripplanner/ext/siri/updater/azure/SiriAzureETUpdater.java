@@ -22,6 +22,7 @@ import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
@@ -117,7 +118,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
           false,
           updates
         );
-        logErrors(result);
+        ResultLogger.logUpdateResultErrors(feedId, "siri-et", result);
         recordMetrics.accept(result);
       });
     } catch (JAXBException | XMLStreamException e) {
@@ -144,7 +145,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
             false,
             updates
           );
-          logErrors(result);
+          ResultLogger.logUpdateResultErrors(feedId, "siri-et", result);
           recordMetrics.accept(result);
 
           setPrimed(true);
@@ -180,26 +181,5 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
     }
 
     return siri.getServiceDelivery().getEstimatedTimetableDeliveries();
-  }
-
-  private void logErrors(UpdateResult updateResult) {
-    if (updateResult.failed() == 0) {
-      return;
-    }
-    var errorIndex = updateResult.failures();
-    errorIndex
-      .keySet()
-      .forEach(key -> {
-        var value = errorIndex.get(key);
-        var tripIds = value.stream().map(UpdateError::debugId).collect(Collectors.toSet());
-        LOG.warn(
-          "[{} {}] {} failures of {}: {}",
-          keyValue("feedId", feedId),
-          keyValue("type", "siri-et"),
-          value.size(),
-          keyValue("errorType", key),
-          tripIds
-        );
-      });
   }
 }
