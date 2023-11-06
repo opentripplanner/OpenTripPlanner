@@ -576,6 +576,21 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!--
+                this is necessary because async-http-client uses an old netty version that can crash the
+                Java 21 JVM: https://github.com/netty/netty/pull/13640
+
+                when ACH has been upgraded to the (as of now unreleased) version 3, this can be removed again.
+            -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.1.100.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
