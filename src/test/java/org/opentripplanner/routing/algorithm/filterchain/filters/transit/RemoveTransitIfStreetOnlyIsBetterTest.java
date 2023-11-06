@@ -7,6 +7,8 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
+import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
@@ -15,7 +17,7 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants {
 
   @Test
-  public void filterAwayNothingIfNoWalking() {
+  void filterAwayNothingIfNoWalking() {
     // Given:
     Itinerary i1 = newItinerary(A).bus(21, 6, 7, E).build();
     Itinerary i2 = newItinerary(A).rail(110, 6, 9, E).build();
@@ -31,7 +33,7 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
   }
 
   @Test
-  public void filterAwayLongTravelTimeWithoutWaitTime() {
+  void filterAwayLongTravelTimeWithoutWaitTime() {
     // Given: a walk itinerary with high cost - do not have any effect on filtering
     Itinerary walk = newItinerary(A, 6).walk(1, E).build();
     walk.setGeneralizedCost(300);
@@ -56,5 +58,26 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
 
     // Then:
     assertEquals(toStr(List.of(bicycle, walk, i1)), toStr(result));
+  }
+
+  @Test
+  void considerPenalties() {
+    Itinerary walk = newItinerary(A, 6).walk(1, E).build();
+    walk.setGeneralizedCost(300);
+
+    // Transit has a much higher cost than walking; However, it also has a high penalty which is
+    // subtracted when comparing the itineraries
+    Itinerary busWithPenalty = newItinerary(A).bus(21, 6, 8, E).build();
+    busWithPenalty.setGeneralizedCost(600);
+    busWithPenalty.setAccessPenalty(new TimeAndCost(Duration.ZERO, Cost.costOfSeconds(400)));
+
+    var itineraries = List.of(walk, busWithPenalty);
+    var subject = new RemoveTransitIfStreetOnlyIsBetter(CostLinearFunction.of(Duration.ZERO, 1.0));
+
+    // When:
+    var result = subject.flagForRemoval(itineraries);
+
+    // Then:
+    assertEquals(List.of(), result);
   }
 }
