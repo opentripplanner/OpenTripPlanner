@@ -4222,7 +4222,7 @@ enum RealtimeState {
 
 """
 A cost multiplier for how bad something is compared to being in transit for equal lengths of time.
-The value should be over 0.
+The value should be greater than 0.
 """
 scalar Reluctance
 
