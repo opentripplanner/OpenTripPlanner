@@ -22,10 +22,16 @@ public class ConsolidatedStopNameFilter implements ItineraryListFilter {
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
-    return itineraries.stream().map(this::changeNames).toList();
+    return itineraries.stream().map(this::replacePrimaryNamesWithSecondary).toList();
   }
 
-  private Itinerary changeNames(Itinerary i) {
+  /**
+   * If the itinerary has a from/to that is the primary stop of a {@link org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup}
+   * then we replace its name with the secondary name of the agency that is
+   * operating the route, so that the name in the result matches the name in the in-vehicle
+   * display.
+   */
+  private Itinerary replacePrimaryNamesWithSecondary(Itinerary i) {
     return i.transformTransitLegs(leg -> {
       if (leg instanceof ScheduledTransitLeg stl && needsToRenameStops(stl)) {
         var agency = leg.getAgency();
