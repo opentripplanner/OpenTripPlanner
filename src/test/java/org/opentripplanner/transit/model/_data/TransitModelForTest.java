@@ -105,6 +105,14 @@ public class TransitModelForTest {
     return Trip.of(FeedScopedId.ofNullable(feedId, tripId)).withRoute(route("R" + tripId).build());
   }
 
+  public static RegularStopBuilder stop(String idAndName) {
+    return RegularStop
+      .of(id(idAndName))
+      .withName(new NonLocalizedString(idAndName))
+      .withCode(idAndName)
+      .withCoordinate(new WgsCoordinate(60.0, 10.0));
+  }
+
   public static RegularStop stopForTest(
     String idAndName,
     Accessibility wheelchair,
@@ -112,14 +120,6 @@ public class TransitModelForTest {
     double lon
   ) {
     return stopForTest(idAndName, null, lat, lon, null, wheelchair);
-  }
-
-  public static RegularStopBuilder stop(String idAndName) {
-    return RegularStop
-      .of(id(idAndName))
-      .withName(new NonLocalizedString(idAndName))
-      .withCode(idAndName)
-      .withCoordinate(new WgsCoordinate(60.0, 10.0));
   }
 
   public static RegularStop stopForTest(String idAndName, double lat, double lon) {
@@ -144,7 +144,7 @@ public class TransitModelForTest {
     return stopForTest(idAndName, desc, lat, lon, parent, null);
   }
 
-  public static RegularStop stopForTest(
+  private static RegularStop stopForTest(
     String idAndName,
     String desc,
     double lat,
@@ -152,10 +152,7 @@ public class TransitModelForTest {
     Station parent,
     Accessibility wheelchair
   ) {
-    return RegularStop
-      .of(id(idAndName))
-      .withName(new NonLocalizedString(idAndName))
-      .withCode(idAndName)
+    return stop(idAndName)
       .withDescription(NonLocalizedString.ofNullable(desc))
       .withCoordinate(new WgsCoordinate(lat, lon))
       .withWheelchairAccessibility(wheelchair)

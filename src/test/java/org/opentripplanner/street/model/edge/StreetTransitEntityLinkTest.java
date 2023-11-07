@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
@@ -24,12 +26,14 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 
 class StreetTransitEntityLinkTest {
 
-  static final RegularStop accessibleStop = TransitModelForTest.stopForTest(
+  static final RegularStop accessibleStop = stopForTest(
     "A:accessible",
     "wheelchair accessible stop",
     10.001,
@@ -41,7 +45,7 @@ class StreetTransitEntityLinkTest {
   @Nested
   class WheelchairAccessibility {
 
-    static final RegularStop inaccessibleStop = TransitModelForTest.stopForTest(
+    static final RegularStop inaccessibleStop = stopForTest(
       "A:inaccessible",
       "wheelchair inaccessible stop",
       10.001,
@@ -50,7 +54,7 @@ class StreetTransitEntityLinkTest {
       NOT_POSSIBLE
     );
 
-    static final RegularStop unknownStop = TransitModelForTest.stopForTest(
+    static final RegularStop unknownStop = stopForTest(
       "A:unknown",
       "unknown",
       10.001,
@@ -168,5 +172,22 @@ class StreetTransitEntityLinkTest {
       var result = edge.traverse(state);
       assertEquals(canTraverse, result.length > 0);
     }
+  }
+
+  private static RegularStop stopForTest(
+    String idAndName,
+    String desc,
+    double lat,
+    double lon,
+    Station parent,
+    Accessibility wheelchair
+  ) {
+    return TransitModelForTest
+      .stop(idAndName)
+      .withDescription(NonLocalizedString.ofNullable(desc))
+      .withCoordinate(new WgsCoordinate(lat, lon))
+      .withWheelchairAccessibility(wheelchair)
+      .withParentStation(parent)
+      .build();
   }
 }
