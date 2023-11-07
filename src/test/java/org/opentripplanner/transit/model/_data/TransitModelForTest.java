@@ -34,6 +34,12 @@ import org.opentripplanner.transit.model.timetable.TripBuilder;
 
 /**
  * Test utility class to help construct valid transit model objects.
+ * <p>
+ * TODO: This need cleanup - it has static factory methods. This is not safe, since
+ *       all objects created will be created in the same context. All stops are created
+ *       withing the context of a StopModel, mixing more than on model in a test would break the
+ *       assumptions the design is build on. For now, it is just the stop index - but we want to
+ *       use this to encapsulate the StopModel completely.
  */
 public class TransitModelForTest {
 

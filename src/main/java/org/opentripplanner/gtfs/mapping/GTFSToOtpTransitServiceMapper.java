@@ -86,6 +86,7 @@ public class GTFSToOtpTransitServiceMapper {
   private final boolean discardMinTransferTimes;
 
   public GTFSToOtpTransitServiceMapper(
+    OtpTransitServiceBuilder builder,
     String feedId,
     DataImportIssueStore issueStore,
     boolean discardMinTransferTimes,
@@ -93,7 +94,7 @@ public class GTFSToOtpTransitServiceMapper {
     StopTransferPriority stationTransferPreference
   ) {
     this.issueStore = issueStore;
-    builder = new OtpTransitServiceBuilder(this.issueStore);
+    this.builder = builder;
     // Create callbacks for mappers to retrieve stop and stations
     Function<FeedScopedId, Station> stationLookup = id -> builder.getStations().get(id);
     Function<FeedScopedId, RegularStop> stopLookup = id -> builder.getStops().get(id);
@@ -104,7 +105,7 @@ public class GTFSToOtpTransitServiceMapper {
     feedInfoMapper = new FeedInfoMapper(feedId);
     agencyMapper = new AgencyMapper(feedId);
     stationMapper = new StationMapper(translationHelper, stationTransferPreference);
-    stopMapper = new StopMapper(translationHelper, stationLookup);
+    stopMapper = new StopMapper(translationHelper, stationLookup, builder.stopModelBuilder());
     entranceMapper = new EntranceMapper(translationHelper, stationLookup);
     pathwayNodeMapper = new PathwayNodeMapper(translationHelper, stationLookup);
     boardingAreaMapper = new BoardingAreaMapper(translationHelper, stopLookup);

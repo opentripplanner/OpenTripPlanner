@@ -2,11 +2,13 @@ package org.opentripplanner.transit.service;
 
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
 
 public class StopModelBuilder {
@@ -26,6 +28,10 @@ public class StopModelBuilder {
 
   public EntityById<RegularStop> regularStopsById() {
     return regularStopById;
+  }
+
+  public RegularStopBuilder regularStop(FeedScopedId id) {
+    return RegularStop.of(id);
   }
 
   public StopModelBuilder withRegularStop(RegularStop stop) {

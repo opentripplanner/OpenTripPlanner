@@ -12,18 +12,24 @@ import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.service.StopModelBuilder;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
 
   private final Map<org.onebusaway.gtfs.model.Stop, RegularStop> mappedStops = new HashMap<>();
-
+  private final StopModelBuilder stopModelBuilder;
   private final TranslationHelper translationHelper;
   private final Function<FeedScopedId, Station> stationLookUp;
 
-  StopMapper(TranslationHelper translationHelper, Function<FeedScopedId, Station> stationLookUp) {
+  StopMapper(
+    TranslationHelper translationHelper,
+    Function<FeedScopedId, Station> stationLookUp,
+    StopModelBuilder stopModelBuilder
+  ) {
     this.translationHelper = translationHelper;
     this.stationLookUp = stationLookUp;
+    this.stopModelBuilder = stopModelBuilder;
   }
 
   Collection<RegularStop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
@@ -31,15 +37,15 @@ class StopMapper {
   }
 
   /** Map from GTFS to OTP model, {@code null} safe. */
-  RegularStop map(org.onebusaway.gtfs.model.Stop orginal) {
-    return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
+  RegularStop map(org.onebusaway.gtfs.model.Stop original) {
+    return original == null ? null : mappedStops.computeIfAbsent(original, this::doMap);
   }
 
   private RegularStop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
     assertLocationTypeIsStop(gtfsStop);
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
-    RegularStopBuilder builder = RegularStop
-      .of(base.getId())
+    RegularStopBuilder builder = stopModelBuilder
+      .regularStop(base.getId())
       .withCode(base.getCode())
       .withCoordinate(base.getCoordinate())
       .withWheelchairAccessibility(base.getWheelchairAccessibility())

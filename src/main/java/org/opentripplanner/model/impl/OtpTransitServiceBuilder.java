@@ -113,8 +113,8 @@ public class OtpTransitServiceBuilder {
 
   private final DataImportIssueStore issueStore;
 
-  public OtpTransitServiceBuilder(DataImportIssueStore issueStore) {
-    this.stopModelBuilder = StopModel.of();
+  public OtpTransitServiceBuilder(StopModel stopModel, DataImportIssueStore issueStore) {
+    this.stopModelBuilder = stopModel.withContext();
     this.issueStore = issueStore;
   }
 

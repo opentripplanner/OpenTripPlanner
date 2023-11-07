@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Branding;
+import org.opentripplanner.transit.service.StopModel;
 import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.BrandingRefStructure;
@@ -75,6 +76,7 @@ public class RouteMapperTest {
   public void mapRouteWithAgencySpecified() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      new StopModel(),
       DataImportIssueStore.NOOP
     );
 
@@ -189,6 +191,7 @@ public class RouteMapperTest {
   public void mapRouteWithBranding() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      new StopModel(),
       DataImportIssueStore.NOOP
     );
 
@@ -222,6 +225,7 @@ public class RouteMapperTest {
   public void mapRouteWithGroupOfRoutes() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
+      new StopModel(),
       DataImportIssueStore.NOOP
     );
 

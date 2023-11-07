@@ -222,12 +222,7 @@ public abstract class GraphRoutingTest {
         .build();
     }
 
-    public RegularStop stopEntity(
-      String id,
-      double latitude,
-      double longitude,
-      boolean noTransfers
-    ) {
+    RegularStop stopEntity(String id, double latitude, double longitude, boolean noTransfers) {
       var stopBuilder = TransitModelForTest.stop(id).withCoordinate(latitude, longitude);
       if (noTransfers) {
         stopBuilder.withParentStation(

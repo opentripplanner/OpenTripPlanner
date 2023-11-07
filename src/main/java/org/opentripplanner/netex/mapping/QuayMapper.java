@@ -3,17 +3,16 @@ package org.opentripplanner.netex.mapping;
 import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.mapping.support.NetexMainAndSubMode;
 import org.opentripplanner.transit.model.basic.Accessibility;
-import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.FareZone;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Quay;
 
@@ -23,16 +22,16 @@ class QuayMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  private final EntityById<RegularStop> regularStopIndex;
+  private final StopModelBuilder stopModelBuilder;
 
   QuayMapper(
     FeedScopedIdFactory idFactory,
     DataImportIssueStore issueStore,
-    EntityById<RegularStop> regularStopIndex
+    StopModelBuilder stopModelBuilder
   ) {
     this.idFactory = idFactory;
     this.issueStore = issueStore;
-    this.regularStopIndex = regularStopIndex;
+    this.stopModelBuilder = stopModelBuilder;
   }
 
   /**
@@ -46,21 +45,22 @@ class QuayMapper {
     NetexMainAndSubMode transitMode,
     Accessibility wheelchair
   ) {
-    FeedScopedId id = idFactory.createId(quay.getId());
-    return regularStopIndex.computeIfAbsent(
-      id,
-      ignore -> map(quay, parentStation, fareZones, transitMode, wheelchair)
-    );
+    var id = idFactory.createId(quay.getId());
+
+    return stopModelBuilder
+      .regularStopsById()
+      .computeIfAbsent(id, it -> map(it, quay, parentStation, fareZones, transitMode, wheelchair));
   }
 
   private RegularStop map(
+    FeedScopedId id,
     @Nonnull Quay quay,
     Station parentStation,
     Collection<FareZone> fareZones,
     NetexMainAndSubMode transitMode,
     Accessibility wheelchair
   ) {
-    WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
+    var coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
     if (coordinate == null) {
       issueStore.add(
@@ -72,7 +72,7 @@ class QuayMapper {
     }
 
     var builder = RegularStop
-      .of(idFactory.createId(quay.getId()))
+      .of(id)
       .withParentStation(parentStation)
       .withName(parentStation.getName())
       .withPlatformCode(quay.getPublicCode())

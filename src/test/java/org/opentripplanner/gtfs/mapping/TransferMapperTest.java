@@ -19,6 +19,7 @@ import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPriority;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
+import org.opentripplanner.transit.service.StopModel;
 
 public class TransferMapperTest {
 
@@ -37,7 +38,8 @@ public class TransferMapperTest {
 
   private static final StopMapper STOP_MAPPER = new StopMapper(
     TRANSLATION_HELPER,
-    stationId -> null
+    stationId -> null,
+    new StopModel().withContext()
   );
   private static final BookingRuleMapper BOOKING_RULE_MAPPER = new BookingRuleMapper();
 

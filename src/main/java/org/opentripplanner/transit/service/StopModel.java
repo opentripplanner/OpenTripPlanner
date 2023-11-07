@@ -47,7 +47,7 @@ public class StopModel implements Serializable {
     this.index = new StopModelIndex(List.of(), List.of(), List.of(), List.of());
   }
 
-  public StopModel(StopModelBuilder builder) {
+  StopModel(StopModelBuilder builder) {
     this.regularStopById = builder.regularStopsById().asImmutableMap();
     this.stationById = builder.stationById().asImmutableMap();
     this.multiModalStationById = builder.multiModalStationById().asImmutableMap();
@@ -58,6 +58,10 @@ public class StopModel implements Serializable {
   }
 
   public static StopModelBuilder of() {
+    return new StopModelBuilder();
+  }
+
+  public StopModelBuilder withContext() {
     return new StopModelBuilder();
   }
 
