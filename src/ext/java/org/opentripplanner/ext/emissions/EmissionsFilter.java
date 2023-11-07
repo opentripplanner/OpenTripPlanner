@@ -45,7 +45,17 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
 
       calculateCo2EmissionsForCar(carLegs)
         .ifPresent(co2 -> {
-          itinerary.setEmissionsPerPerson(new Emissions(co2));
+          if (transitLegs.isEmpty()) {
+            itinerary.setEmissionsPerPerson(new Emissions(co2));
+          } else if (
+            itinerary.getEmissionsPerPerson() != null &&
+            itinerary.getEmissionsPerPerson().getCo2() != null
+          ) {
+            // Calculate park and ride emissions.
+            itinerary.setEmissionsPerPerson(
+              new Emissions(itinerary.getEmissionsPerPerson().getCo2().plus(co2))
+            );
+          }
         });
     }
     return itineraries;

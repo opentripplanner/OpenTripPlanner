@@ -170,4 +170,91 @@ class EmissionsTest {
       emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
     );
   }
+
+  @Test
+  void testGetEmissionsForCombinedRoute() {
+    var stopOne = TransitModelForTest.stopForTest("1:stop1", 60, 25);
+    var stopTwo = TransitModelForTest.stopForTest("1:stop1", 61, 25);
+    var stopThree = TransitModelForTest.stopForTest("1:stop1", 62, 25);
+    var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
+    var route = TransitModelForTest.route(id("1")).build();
+    var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();
+    var stoptime = new StopTime();
+    var stoptimes = new ArrayList<StopTime>();
+    stoptimes.add(stoptime);
+    var trip = Trip
+      .of(FeedScopedId.parse("FOO:BAR"))
+      .withMode(TransitMode.BUS)
+      .withRoute(route)
+      .build();
+    var transitLeg = new ScheduledTransitLegBuilder<>()
+      .withTripTimes(new TripTimes(trip, stoptimes, new Deduplicator()))
+      .withTripPattern(pattern)
+      .withBoardStopIndexInPattern(0)
+      .withAlightStopIndexInPattern(2)
+      .withStartTime(TIME)
+      .withEndTime(TIME.plusMinutes(10))
+      .withServiceDate(TIME.toLocalDate())
+      .withZoneId(ZoneIds.BERLIN)
+      .build();
+
+    var streetLeg = StreetLeg
+      .create()
+      .withMode(TraverseMode.CAR)
+      .withDistanceMeters(214.4)
+      .withStartTime(TIME)
+      .withEndTime(TIME.plus(1, ChronoUnit.HOURS))
+      .build();
+    Itinerary i = new Itinerary(List.of(transitLeg, streetLeg));
+    assertEquals(
+      new Grams(2251.9884),
+      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
+    );
+  }
+
+  @Test
+  void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
+    Map<FeedScopedId, Double> emissions = new HashMap<>();
+    emissions.put(new FeedScopedId("G", "1"), (0.12 / 12));
+    EmissionsDataModel emissionsDataModel = new EmissionsDataModel(emissions, 0.131);
+
+    this.eService = new DefaultEmissionsService(emissionsDataModel);
+    this.emissionsFilter = new EmissionsFilter(this.eService);
+
+    var route = TransitModelForTest.route(id("1")).withAgency(subject).build();
+    var pattern = TransitModelForTest
+      .tripPattern("1", route)
+      .withStopPattern(TransitModelForTest.stopPattern(3))
+      .build();
+    var stoptime = new StopTime();
+    var stoptimes = new ArrayList<StopTime>();
+    stoptimes.add(stoptime);
+    var trip = Trip
+      .of(FeedScopedId.parse("FOO:BAR"))
+      .withMode(TransitMode.BUS)
+      .withRoute(route)
+      .build();
+    var transitLeg = new ScheduledTransitLegBuilder<>()
+      .withTripTimes(new TripTimes(trip, stoptimes, new Deduplicator()))
+      .withTripPattern(pattern)
+      .withBoardStopIndexInPattern(0)
+      .withAlightStopIndexInPattern(2)
+      .withStartTime(TIME)
+      .withEndTime(TIME.plusMinutes(10))
+      .withServiceDate(TIME.toLocalDate())
+      .withZoneId(ZoneIds.BERLIN)
+      .build();
+    var streetLeg = StreetLeg
+      .create()
+      .withMode(TraverseMode.CAR)
+      .withDistanceMeters(214.4)
+      .withStartTime(TIME)
+      .withEndTime(TIME.plus(1, ChronoUnit.HOURS))
+      .build();
+    Itinerary i = new Itinerary(List.of(transitLeg, streetLeg));
+    var emissionsResult = emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson() != null
+      ? emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
+      : null;
+    assertEquals(null, emissionsResult);
+  }
 }
