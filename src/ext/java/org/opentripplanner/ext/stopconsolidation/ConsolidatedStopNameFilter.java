@@ -8,8 +8,9 @@ import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 
 /**
- * A decorating filter that checks if a transit legs contains any primary stops and if it does,
- * then
+ * A decorating filter that checks if a transit leg contains any primary stops and if it does,
+ * then replaces it with the secondary, agency-specific stop name. This is so that the in-vehicle
+ * display matches what OTP returns as a board/alight stop name.
  */
 public class ConsolidatedStopNameFilter implements ItineraryListFilter {
 

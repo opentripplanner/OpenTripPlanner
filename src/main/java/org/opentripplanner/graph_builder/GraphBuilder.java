@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.Nullable;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -108,7 +107,7 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.netexModule());
     }
 
-    // don't consolidate stops if there are none
+    // Consolidate stops only if a stop consolidation repo has been provided
     if (hasTransitData && factory.stopConsolidationModule() != null) {
       graphBuilder.addModule(factory.stopConsolidationModule());
     }

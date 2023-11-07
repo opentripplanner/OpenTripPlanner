@@ -444,7 +444,7 @@ public class OSMWithTags {
    * This intentionally excludes railway=stop and public_transport=stop because these are supposed
    * to be placed on the tracks not on the platform.
    *
-   * @return whether the boarding location where passengers wait for public transport.
+   * @return whether the node is a place used to board a public transport vehicle
    */
   public boolean isBoardingLocation() {
     return (

@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
  * that represent the same stop place) and swaps the "secondary" stops in patterns with their
  * "primary" equivalent.
  * <p>
- * NOTE: This will make realtime trip updates for a modified pattern a lot harder. For IBI's initial
- * implementation this is acceptable and will serve as encouragement for the data producers to
+ * NOTE: This will make realtime trip updates for a modified pattern a lot harder. For Arcadis'
+ * initial implementation this is acceptable and will serve as encouragement for the data producers to
  * produce a consolidated transit feed rather than relying on this feature.
  */
 public class StopConsolidationModule implements GraphBuilderModule {

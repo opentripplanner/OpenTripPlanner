@@ -55,10 +55,10 @@ public class StopConsolidationParser {
         .keys()
         .stream()
         .map(key -> {
-          var ge = groups.get(key);
+          var group = groups.get(key);
 
-          var primaryId = ge.stream().filter(e -> e.isPrimary).findAny().orElseThrow().stopId;
-          var secondaries = ge
+          var primaryId = group.stream().filter(e -> e.isPrimary).findAny().orElseThrow().stopId;
+          var secondaries = group
             .stream()
             .filter(e -> !e.isPrimary)
             .map(e -> e.stopId)

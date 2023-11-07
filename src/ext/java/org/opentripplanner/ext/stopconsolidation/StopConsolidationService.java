@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 public interface StopConsolidationService {
   /**
-   * A flat list of
+   * A flat list of pairs of stops that should be replaced.
    */
   List<StopReplacement> replacements();
 
