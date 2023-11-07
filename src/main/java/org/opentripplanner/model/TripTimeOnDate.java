@@ -1,16 +1,11 @@
 package org.opentripplanner.model;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.model.plan.LegTimes;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
@@ -272,32 +267,5 @@ public class TripTimeOnDate {
 
   public BookingInfo getDropOffBookingInfo() {
     return tripTimes.getDropOffBookingInfo(stopIndex);
-  }
-
-  public LegTimes arrival(ZoneId zoneId) {
-    var delay = getArrivalDelay();
-    var scheduled = getScheduledArrival();
-    var actual = getActualDeparture();
-    return buildLegTime(zoneId, scheduled, actual, delay);
-  }
-
-  public LegTimes departure(ZoneId zoneId) {
-    var delay = getDepartureDelay();
-    var scheduled = getScheduledDeparture();
-    var actual = getActualDeparture();
-    return buildLegTime(zoneId, scheduled, actual, delay);
-  }
-
-  @Nonnull
-  private LegTimes buildLegTime(ZoneId zoneId, int scheduled, int actual, int delay) {
-    var midnight = serviceDate.atStartOfDay(zoneId);
-    var scheduledTime = midnight.plusSeconds(scheduled);
-    ZonedDateTime actualTime;
-    if (actual == UNDEFINED) {
-      actualTime = null;
-    } else {
-      actualTime = midnight.plusSeconds(actual);
-    }
-    return new LegTimes(scheduledTime, actualTime, Duration.ofSeconds(delay));
   }
 }

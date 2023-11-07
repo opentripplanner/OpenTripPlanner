@@ -2,37 +2,18 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import java.time.ZoneId;
-import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripTimeOnDate;
-import org.opentripplanner.model.plan.LegTimes;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   @Override
-  public DataFetcher<LegTimes> arrival() {
-    return environment -> {
-      var tripTime = getSource(environment);
-      return tripTime.arrival(getZoneId(environment));
-    };
-  }
-
-  @Override
   public DataFetcher<Integer> arrivalDelay() {
     return environment -> missingValueToNull(getSource(environment).getArrivalDelay());
-  }
-
-  @Override
-  public DataFetcher<LegTimes> departure() {
-    return environment -> {
-      var tripTime = getSource(environment);
-      return tripTime.departure(getZoneId(environment));
-    };
   }
 
   @Override
@@ -130,10 +111,6 @@ public class StoptimeImpl implements GraphQLDataFetchers.GraphQLStoptime {
 
   private TripTimeOnDate getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
-  }
-
-  private ZoneId getZoneId(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().transitService().getTimeZone();
   }
 
   /**
