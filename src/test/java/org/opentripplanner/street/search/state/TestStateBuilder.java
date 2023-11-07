@@ -194,7 +194,7 @@ public class TestStateBuilder {
    */
   public TestStateBuilder stop() {
     count++;
-    return arriveAtStop(TransitModelForTest.stopForTest("stop", count, count));
+    return arriveAtStop(TransitModelForTest.stop("stop", count, count).build());
   }
 
   public TestStateBuilder enterStation(String id) {

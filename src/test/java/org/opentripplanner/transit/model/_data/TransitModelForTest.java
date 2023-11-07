@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.model._data;
 
-import static org.opentripplanner.transit.model.basic.Accessibility.NO_INFORMATION;
-
 import java.util.List;
 import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Geometry;
@@ -10,7 +8,6 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
@@ -45,8 +42,9 @@ public class TransitModelForTest {
 
   public static final String FEED_ID = "F";
   public static final String TIME_ZONE_ID = "Europe/Paris";
-
   public static final String OTHER_TIME_ZONE_ID = "America/Los_Angeles";
+  public static final WgsCoordinate ANY_COORDINATE = new WgsCoordinate(60.0, 10.0);
+
   public static final Agency AGENCY = Agency
     .of(id("A1"))
     .withName("Agency Test")
@@ -105,59 +103,19 @@ public class TransitModelForTest {
     return Trip.of(FeedScopedId.ofNullable(feedId, tripId)).withRoute(route("R" + tripId).build());
   }
 
+  /**
+   * Create a stop with all required fields set.
+   */
   public static RegularStopBuilder stop(String idAndName) {
     return RegularStop
       .of(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
       .withCode(idAndName)
-      .withCoordinate(new WgsCoordinate(60.0, 10.0));
+      .withCoordinate(ANY_COORDINATE);
   }
 
-  public static RegularStop stopForTest(
-    String idAndName,
-    Accessibility wheelchair,
-    double lat,
-    double lon
-  ) {
-    return stopForTest(idAndName, null, lat, lon, null, wheelchair);
-  }
-
-  public static RegularStop stopForTest(String idAndName, double lat, double lon) {
-    return stopForTest(idAndName, null, lat, lon, null, NO_INFORMATION);
-  }
-
-  public static RegularStop stopForTest(String idAndName, String desc, double lat, double lon) {
-    return stopForTest(idAndName, desc, lat, lon, null, NO_INFORMATION);
-  }
-
-  public static RegularStop stopForTest(String idAndName, double lat, double lon, Station parent) {
-    return stopForTest(idAndName, null, lat, lon, parent, NO_INFORMATION);
-  }
-
-  public static RegularStop stopForTest(
-    String idAndName,
-    String desc,
-    double lat,
-    double lon,
-    Station parent
-  ) {
-    return stopForTest(idAndName, desc, lat, lon, parent, null);
-  }
-
-  private static RegularStop stopForTest(
-    String idAndName,
-    String desc,
-    double lat,
-    double lon,
-    Station parent,
-    Accessibility wheelchair
-  ) {
-    return stop(idAndName)
-      .withDescription(NonLocalizedString.ofNullable(desc))
-      .withCoordinate(new WgsCoordinate(lat, lon))
-      .withWheelchairAccessibility(wheelchair)
-      .withParentStation(parent)
-      .build();
+  public static RegularStopBuilder stop(String idAndName, double lat, double lon) {
+    return stop(idAndName).withCoordinate(lat, lon);
   }
 
   public static StationBuilder station(String idAndName) {
@@ -191,7 +149,7 @@ public class TransitModelForTest {
     stopTime.setTrip(trip);
     stopTime.setStopSequence(seq);
 
-    var stop = TransitModelForTest.stopForTest("stop-" + seq, 0, 0);
+    var stop = stop("stop-" + seq, 0, 0).build();
     stopTime.setStop(stop);
 
     return stopTime;

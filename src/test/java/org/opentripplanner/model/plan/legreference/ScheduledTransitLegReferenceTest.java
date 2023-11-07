@@ -47,10 +47,13 @@ class ScheduledTransitLegReferenceTest {
   static void buildTransitService() {
     Station parentStation = TransitModelForTest.station("PARENT_STATION").build();
 
-    RegularStop stop1 = TransitModelForTest.stopForTest("STOP1", 0, 0);
-    RegularStop stop2 = TransitModelForTest.stopForTest("STOP2", 0, 0);
-    RegularStop stop3 = TransitModelForTest.stopForTest("STOP3", 0, 0, parentStation);
-    stop4 = TransitModelForTest.stopForTest("STOP4", 0, 0, parentStation);
+    RegularStop stop1 = TransitModelForTest.stop("STOP1", 0, 0).build();
+    RegularStop stop2 = TransitModelForTest.stop("STOP2", 0, 0).build();
+    RegularStop stop3 = TransitModelForTest
+      .stop("STOP3", 0, 0)
+      .withParentStation(parentStation)
+      .build();
+    stop4 = TransitModelForTest.stop("STOP4", 0, 0).withParentStation(parentStation).build();
 
     // build transit data
     TripPattern tripPattern = TransitModelForTest

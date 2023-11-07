@@ -24,7 +24,7 @@ public class FaresFilterTest implements PlanTestConstants {
     final int ID = 1;
 
     Itinerary i1 = newItinerary(A, 0)
-      .walk(20, Place.forStop(TransitModelForTest.stopForTest("1:stop", 1d, 1d)))
+      .walk(20, Place.forStop(TransitModelForTest.stop("1:stop", 1d, 1d).build()))
       .bus(ID, 0, 50, B)
       .bus(ID, 52, 100, C)
       .build();

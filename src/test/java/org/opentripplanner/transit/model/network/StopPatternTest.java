@@ -15,10 +15,10 @@ class StopPatternTest {
   @Test
   void boardingAlightingConditions() {
     // We have different types of stops, of which only regular stops should allow boarding/alighting
-    var s1 = TransitModelForTest.stopForTest("1", 60.0, 11.0);
-    var s2 = TransitModelForTest.stopForTest("2", 61.0, 11.0);
-    var s3 = TransitModelForTest.stopForTest("3", 62.0, 11.0);
-    var s4 = TransitModelForTest.stopForTest("4", 62.1, 11.0);
+    var s1 = TransitModelForTest.stop("1", 60.0, 11.0).build();
+    var s2 = TransitModelForTest.stop("2", 61.0, 11.0).build();
+    var s3 = TransitModelForTest.stop("3", 62.0, 11.0).build();
+    var s4 = TransitModelForTest.stop("4", 62.1, 11.0).build();
 
     var s34 = TransitModelForTest.groupStopForTest("3_4", List.of(s3, s4));
 

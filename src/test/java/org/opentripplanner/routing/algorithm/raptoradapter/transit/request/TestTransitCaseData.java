@@ -16,20 +16,16 @@ public final class TestTransitCaseData {
     .withCoordinate(61.0, 11.5)
     .build();
 
-  public static final RegularStop STOP_A = TransitModelForTest.stopForTest(
-    "A",
-    60.0,
-    11.0,
-    STATION_A
-  );
-  public static final RegularStop STOP_B = TransitModelForTest.stopForTest(
-    "B",
-    60.0,
-    11.2,
-    STATION_B
-  );
-  public static final RegularStop STOP_C = TransitModelForTest.stopForTest("C", 61.0, 11.4);
-  public static final RegularStop STOP_D = TransitModelForTest.stopForTest("D", 61.0, 11.6);
+  public static final RegularStop STOP_A = TransitModelForTest
+    .stop("A", 60.0, 11.0)
+    .withParentStation(STATION_A)
+    .build();
+  public static final RegularStop STOP_B = TransitModelForTest
+    .stop("B", 60.0, 11.2)
+    .withParentStation(STATION_B)
+    .build();
+  public static final RegularStop STOP_C = TransitModelForTest.stop("C", 61.0, 11.4).build();
+  public static final RegularStop STOP_D = TransitModelForTest.stop("D", 61.0, 11.6).build();
 
   public static final LocalDate DATE = LocalDate.of(2021, 12, 24);
 

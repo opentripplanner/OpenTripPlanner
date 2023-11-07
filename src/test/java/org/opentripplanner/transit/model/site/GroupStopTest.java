@@ -16,11 +16,9 @@ class GroupStopTest {
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
 
-  private static final StopLocation STOP_LOCATION = TransitModelForTest.stopForTest(
-    "1:stop",
-    1d,
-    1d
-  );
+  private static final StopLocation STOP_LOCATION = TransitModelForTest
+    .stop("1:stop", 1d, 1d)
+    .build();
   private static final GroupStop subject = GroupStop
     .of(TransitModelForTest.id(ID))
     .withName(NAME)
@@ -55,7 +53,7 @@ class GroupStopTest {
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       subject.sameAs(
-        subject.copy().addLocation(TransitModelForTest.stopForTest("2:stop", 1d, 2d)).build()
+        subject.copy().addLocation(TransitModelForTest.stop("2:stop", 1d, 2d).build()).build()
       )
     );
   }

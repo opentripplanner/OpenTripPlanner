@@ -44,12 +44,10 @@ class OsmBoardingLocationsModuleTest {
     .stop("de:08115:4512:4:101")
     .withCoordinate(48.59328, 8.86128)
     .build();
-  RegularStop busStop = TransitModelForTest.stopForTest("de:08115:4512:5:C", 48.59434, 8.86452);
-  RegularStop floatingBusStop = TransitModelForTest.stopForTest(
-    "floating-bus-stop",
-    48.59417,
-    8.86464
-  );
+  RegularStop busStop = TransitModelForTest.stop("de:08115:4512:5:C", 48.59434, 8.86452).build();
+  RegularStop floatingBusStop = TransitModelForTest
+    .stop("floating-bus-stop", 48.59417, 8.86464)
+    .build();
 
   static Stream<Arguments> testCases = Stream.of(
     Arguments.of(

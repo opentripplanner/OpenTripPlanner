@@ -158,8 +158,8 @@ public class TestHalfEdges {
         .withBack(true)
         .buildAndConnect();
 
-    var s1 = TransitModelForTest.stopForTest("fleem station", 40.0099999, -74.005);
-    var s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
+    var s1 = TransitModelForTest.stop("fleem station", 40.0099999, -74.005).build();
+    var s2 = TransitModelForTest.stop("morx station", 40.0099999, -74.002).build();
 
     transitModel.mergeStopModels(StopModel.of().withRegularStop(s1).withRegularStop(s2).build());
 

@@ -77,9 +77,9 @@ public class RaptorPathToItineraryMapperTest {
     STOP_COSTS
   );
 
-  private static final RegularStop S1 = TransitModelForTest.stopForTest("STOP1", 0.0, 0.0);
+  private static final RegularStop S1 = TransitModelForTest.stop("STOP1", 0.0, 0.0).build();
 
-  private static final RegularStop S2 = TransitModelForTest.stopForTest("STOP2", 1.0, 1.0);
+  private static final RegularStop S2 = TransitModelForTest.stop("STOP2", 1.0, 1.0).build();
 
   @ParameterizedTest
   @ValueSource(strings = { "0", "3000", "-3000" })

@@ -182,7 +182,7 @@ public class NetexTestDataSample {
     // Setup stops
     for (int i = 0; i < NUM_OF_STOPS; i++) {
       String stopId = "NSR:Quay:" + (i + 1);
-      stopsById.add(TransitModelForTest.stopForTest(stopId, 60.0, 10.0));
+      stopsById.add(TransitModelForTest.stop(stopId, 60.0, 10.0).build());
       quayIdByStopPointRef.add(pointsInLink.get(i).getId(), stopId);
     }
   }

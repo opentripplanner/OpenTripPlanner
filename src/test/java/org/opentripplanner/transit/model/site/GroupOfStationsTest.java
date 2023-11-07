@@ -18,12 +18,10 @@ class GroupOfStationsTest {
 
   private static final Station STATION = TransitModelForTest.station("1:station").build();
 
-  private static final StopLocation STOP_LOCATION = TransitModelForTest.stopForTest(
-    "1:stop",
-    1d,
-    1d,
-    STATION
-  );
+  private static final StopLocation STOP_LOCATION = TransitModelForTest
+    .stop("1:stop", 1d, 1d)
+    .withParentStation(STATION)
+    .build();
 
   private static final GroupOfStations subject = GroupOfStations
     .of(TransitModelForTest.id(ID))

@@ -16,17 +16,19 @@ public class TransferTestData {
   static final int ANY_POS = 999;
 
   static final RegularStop STOP_A = TransitModelForTest
-    .stopForTest("A", 60.0, 11.0)
+    .stop("A", 60.0, 11.0)
+    .build()
     .copy()
     .withParentStation(STATION)
     .build();
-  static final RegularStop STOP_B = TransitModelForTest.stopForTest("B", 60.0, 11.0);
+  static final RegularStop STOP_B = TransitModelForTest.stop("B", 60.0, 11.0).build();
   static final RegularStop STOP_S = TransitModelForTest
-    .stopForTest("S", 60.0, 11.0)
+    .stop("S", 60.0, 11.0)
+    .build()
     .copy()
     .withParentStation(STATION)
     .build();
-  static final RegularStop ANY_STOP = TransitModelForTest.stopForTest("any", 60.0, 11.0);
+  static final RegularStop ANY_STOP = TransitModelForTest.stop("any", 60.0, 11.0).build();
 
   static final Route ROUTE_1 = TransitModelForTest.route("1").build();
   static final Route ROUTE_2 = TransitModelForTest.route("2").build();

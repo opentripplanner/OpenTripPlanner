@@ -44,7 +44,7 @@ class TripTimesTest {
     for (int i = 0; i < stops.size(); ++i) {
       StopTime stopTime = new StopTime();
 
-      RegularStop stop = TransitModelForTest.stopForTest(stops.get(i).getId(), 0.0, 0.0);
+      RegularStop stop = TransitModelForTest.stop(stops.get(i).getId(), 0.0, 0.0).build();
       stopTime.setStop(stop);
       stopTime.setArrivalTime(i * 60);
       stopTime.setDepartureTime(i * 60);
@@ -257,9 +257,9 @@ class TripTimesTest {
     StopTime stopTime1 = new StopTime();
     StopTime stopTime2 = new StopTime();
 
-    RegularStop stop0 = TransitModelForTest.stopForTest(stops.get(0).getId(), 0.0, 0.0);
-    RegularStop stop1 = TransitModelForTest.stopForTest(stops.get(1).getId(), 0.0, 0.0);
-    RegularStop stop2 = TransitModelForTest.stopForTest(stops.get(2).getId(), 0.0, 0.0);
+    RegularStop stop0 = TransitModelForTest.stop(stops.get(0).getId(), 0.0, 0.0).build();
+    RegularStop stop1 = TransitModelForTest.stop(stops.get(1).getId(), 0.0, 0.0).build();
+    RegularStop stop2 = TransitModelForTest.stop(stops.get(2).getId(), 0.0, 0.0).build();
 
     stopTime0.setStop(stop0);
     stopTime0.setDepartureTime(0);

@@ -67,9 +67,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
   private static final Route route1 = TransitModelForTest.route("route1").build();
   private static final Route route2 = TransitModelForTest.route("route2").build();
 
-  private static final RegularStop stop1 = TransitModelForTest.stopForTest("ST:stop1", 1, 1);
-  private static final RegularStop stop2 = TransitModelForTest.stopForTest("ST:stop2", 2, 1);
-  private static final RegularStop stop3 = TransitModelForTest.stopForTest("ST:stop3", 3, 1);
+  private static final RegularStop stop1 = TransitModelForTest.stop("ST:stop1", 1, 1).build();
+  private static final RegularStop stop2 = TransitModelForTest.stop("ST:stop2", 2, 1).build();
+  private static final RegularStop stop3 = TransitModelForTest.stop("ST:stop3", 3, 1).build();
 
   static {
     var graph = new Graph();

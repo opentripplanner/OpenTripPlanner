@@ -115,7 +115,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
    */
   private static StopTime createStopTime() {
     var st = new StopTime();
-    st.setStop(TransitModelForTest.stopForTest("Stop:1", 0.0, 0.0));
+    st.setStop(TransitModelForTest.stop("Stop:1", 0.0, 0.0).build());
     return st;
   }
 
