@@ -6,11 +6,13 @@ import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.netex.index.NetexEntityIndex;
+import org.opentripplanner.netex.support.JAXBUtils;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.Site_VersionFrameStructure;
+import org.rutebanken.netex.model.Site_VersionStructure;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone;
 import org.rutebanken.netex.model.TariffZone_VersionStructure;
@@ -20,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(NetexParser.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiteFrameParser.class);
 
   private final Collection<FlexibleStopPlace> flexibleStopPlaces = new ArrayList<>();
 
@@ -37,7 +39,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
   @Override
   public void parse(Site_VersionFrameStructure frame) {
     if (frame.getStopPlaces() != null) {
-      parseStopPlaces(frame.getStopPlaces().getStopPlace());
+      parseStopPlaces(frame.getStopPlaces().getStopPlace_());
     }
     if (frame.getGroupsOfStopPlaces() != null) {
       parseGroupsOfStopPlaces(frame.getGroupsOfStopPlaces().getGroupOfStopPlaces());
@@ -87,8 +89,9 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     groupsOfStopPlaces.addAll(groupsOfStopPlacesList);
   }
 
-  private void parseStopPlaces(Collection<StopPlace> stopPlaceList) {
-    for (StopPlace stopPlace : stopPlaceList) {
+  private void parseStopPlaces(List<JAXBElement<? extends Site_VersionStructure>> stopPlaceList) {
+    for (JAXBElement<? extends Site_VersionStructure> jaxBStopPlace : stopPlaceList) {
+      StopPlace stopPlace = (StopPlace) jaxBStopPlace.getValue();
       if (isMultiModalStopPlace(stopPlace)) {
         multiModalStopPlaces.add(stopPlace);
       } else {
@@ -107,13 +110,10 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
   }
 
   private void parseQuays(Quays_RelStructure quayRefOrQuay) {
-    if (quayRefOrQuay == null) return;
-
-    for (Object quayObject : quayRefOrQuay.getQuayRefOrQuay()) {
-      if (quayObject instanceof Quay) {
-        quays.add((Quay) quayObject);
-      }
+    if (quayRefOrQuay == null) {
+      return;
     }
+    JAXBUtils.forEachJAXBElementValue(Quay.class, quayRefOrQuay.getQuayRefOrQuay(), quays::add);
   }
 
   private boolean isMultiModalStopPlace(StopPlace stopPlace) {
