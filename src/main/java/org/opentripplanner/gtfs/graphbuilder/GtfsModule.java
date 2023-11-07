@@ -402,7 +402,8 @@ public class GtfsModule implements GraphBuilderModule {
     double luminance = Math.sqrt(newRed + newGreen + newBlue);
 
     //For brighter colors use black text color and reverse for darker
-    if (luminance > 0.5) {
+    //the threshold is based on W3C guideline, see https://stackoverflow.com/a/3943023/272733
+    if (luminance > 0.179) {
       textColor = "000000";
     } else {
       textColor = "FFFFFF";
