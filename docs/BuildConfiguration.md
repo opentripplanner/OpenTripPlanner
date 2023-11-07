@@ -1166,12 +1166,11 @@ case where this is not the case.
       }
     }
   ],
+  "stopConsolidationFile" : "consolidated-stops.csv",
   "emissions" : {
     "carAvgCo2PerKm" : 170,
     "carAvgOccupancy" : 1.3
   }
-  ],
-  "stopConsolidationFile" : "consolidated-stops.csv"
 }
 ```
 
