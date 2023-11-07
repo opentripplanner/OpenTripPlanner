@@ -755,10 +755,22 @@ public class GraphQLDataFetchers {
     public DataFetcher<RentalVehicleType> vehicleType();
   }
 
+  public interface GraphQLRentalVehicleEntityCounts {
+    public DataFetcher<Iterable<RentalVehicleTypeCount>> byType();
+
+    public DataFetcher<Integer> total();
+  }
+
   public interface GraphQLRentalVehicleType {
     public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLFormFactor> formFactor();
 
     public DataFetcher<org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLPropulsionType> propulsionType();
+  }
+
+  public interface GraphQLRentalVehicleTypeCount {
+    public DataFetcher<Integer> count();
+
+    public DataFetcher<RentalVehicleType> vehicleType();
   }
 
   /** An estimate for a ride on a hailed vehicle, like an Uber car. */
@@ -1160,6 +1172,10 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Boolean> allowPickupNow();
 
+    public DataFetcher<RentalVehicleEntityCounts> availableSpaces();
+
+    public DataFetcher<RentalVehicleEntityCounts> availableVehicles();
+
     public DataFetcher<Integer> capacity();
 
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
@@ -1183,10 +1199,6 @@ public class GraphQLDataFetchers {
     public DataFetcher<String> stationId();
 
     public DataFetcher<Integer> vehiclesAvailable();
-
-    public DataFetcher<RentalVehicleEntityCounts> availableVehicles();
-
-    public DataFetcher<RentalVehicleEntityCounts> availableSpaces();
   }
 
   public interface GraphQLVehicleRentalUris {
