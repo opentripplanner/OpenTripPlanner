@@ -65,10 +65,10 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
     Itinerary walk = newItinerary(A, 6).walk(1, E).build();
     walk.setGeneralizedCost(300);
 
-    // Transit has a much higher cost than walking; However, it also has a high penalty which is
-    // subtracted when comparing the itineraries
+    // Transit have slightly lower cost; However, it also has a high penalty which is not taken
+    // into account when comparing the itineraries.
     Itinerary busWithPenalty = newItinerary(A).bus(21, 6, 8, E).build();
-    busWithPenalty.setGeneralizedCost(600);
+    busWithPenalty.setGeneralizedCost(299);
     busWithPenalty.setAccessPenalty(new TimeAndCost(Duration.ZERO, Cost.costOfSeconds(400)));
 
     var itineraries = List.of(walk, busWithPenalty);

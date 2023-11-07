@@ -9,6 +9,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.R
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
@@ -32,6 +33,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   private final Integer opening;
   private final Integer closing;
   private final boolean closed;
+  private final TimeAndCost penalty;
 
   private TestAccessEgress(Builder builder) {
     this.stop = builder.stop;
@@ -43,6 +45,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     this.opening = builder.opening;
     this.closing = builder.closing;
     this.closed = builder.closed;
+    this.penalty = builder.penalty;
 
     if (free) {
       assertEquals(0, durationInSeconds);
@@ -117,6 +120,14 @@ public class TestAccessEgress implements RaptorAccessEgress {
   /** Create a flex access arriving at given stop by walking with 1 ride/extra transfer. */
   public static TestAccessEgress flexAndWalk(int stop, int durationInSeconds, int nRides) {
     return flexAndWalk(stop, durationInSeconds, nRides, walkCost(durationInSeconds));
+  }
+
+  public static TestAccessEgress car(int stop, int durationInSeconds, TimeAndCost penalty) {
+    return new Builder(stop, durationInSeconds)
+      .withFree()
+      .withCost(durationInSeconds)
+      .withPenalty(penalty)
+      .build();
   }
 
   /** Create a flex access arriving at given stop by walking. */
@@ -272,6 +283,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
     Integer closing = null;
     private boolean free = false;
     private boolean closed = false;
+    private TimeAndCost penalty;
 
     Builder(int stop, int durationInSeconds) {
       this.stop = stop;
@@ -289,6 +301,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
       this.opening = original.opening;
       this.closing = original.closing;
       this.closed = original.closed;
+      this.penalty = original.penalty;
     }
 
     Builder withFree() {
@@ -309,6 +322,11 @@ public class TestAccessEgress implements RaptorAccessEgress {
 
     Builder stopReachedOnBoard() {
       this.stopReachedOnBoard = STOP_REACHED_ON_BOARD;
+      return this;
+    }
+
+    Builder withPenalty(TimeAndCost penalty) {
+      this.penalty = penalty;
       return this;
     }
 
