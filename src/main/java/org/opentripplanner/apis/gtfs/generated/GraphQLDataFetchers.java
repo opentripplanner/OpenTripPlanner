@@ -51,6 +51,7 @@ import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle;
 import org.opentripplanner.service.realtimevehicles.model.RealtimeVehicle.StopRelationship;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleEntityCounts;
 import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleTypeCount;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStation;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalStationUris;
@@ -499,7 +500,7 @@ public class GraphQLDataFetchers {
     public DataFetcher<Boolean> walkingBike();
   }
 
-  public interface GraphQLLegTime {
+  public interface GraphQLLegTimes {
     public DataFetcher<java.time.OffsetDateTime> actual();
 
     public DataFetcher<java.time.Duration> delay();

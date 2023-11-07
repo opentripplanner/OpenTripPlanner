@@ -3897,8 +3897,8 @@ type Stoptime {
     stopPosition: Int
 
 
-    departure: LegTime
-    arrival: LegTime
+    departure: LegTimes
+    arrival: LegTimes
 
     """
     Scheduled arrival time. Format: seconds since midnight of the departure date
