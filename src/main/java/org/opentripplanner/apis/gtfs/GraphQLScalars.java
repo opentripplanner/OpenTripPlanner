@@ -54,9 +54,9 @@ public class GraphQLScalars {
     )
     .build();
 
-  public static GraphQLScalarType dateTimeScalar = GraphQLScalarType
+  public static GraphQLScalarType offsetDateTimeScalar = GraphQLScalarType
     .newScalar()
-    .name("DateTime")
+    .name("OffsetDateTime")
     .coercing(
       new Coercing<OffsetDateTime, String>() {
         @Override

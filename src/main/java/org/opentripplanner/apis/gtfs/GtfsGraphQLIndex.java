@@ -111,7 +111,7 @@ class GtfsGraphQLIndex {
         .scalar(GraphQLScalars.geoJsonScalar)
         .scalar(GraphQLScalars.graphQLIDScalar)
         .scalar(GraphQLScalars.gramsScalar)
-        .scalar(GraphQLScalars.dateTimeScalar)
+        .scalar(GraphQLScalars.offsetDateTimeScalar)
         .scalar(ExtendedScalars.GraphQLLong)
         .type("Node", type -> type.typeResolver(new NodeTypeResolver()))
         .type("PlaceInterface", type -> type.typeResolver(new PlaceInterfaceTypeResolver()))

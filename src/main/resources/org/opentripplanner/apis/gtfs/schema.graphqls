@@ -1507,8 +1507,8 @@ type Itinerary {
     """
     endTime: Long @deprecated(reason: "Use `end` instead which includes timezone information.")
 
-    start: DateTime
-    end: DateTime
+    start: OffsetDateTime
+    end: OffsetDateTime
 
     """Duration of the trip on this itinerary, in seconds."""
     duration: Long
@@ -1643,11 +1643,11 @@ type RideHailingEstimate {
     productName: String
 }
 
-scalar DateTime
+scalar OffsetDateTime
 
 type LegTimes {
-    scheduled: DateTime
-    actual: DateTime
+    scheduled: OffsetDateTime
+    actual: OffsetDateTime
     delay: Duration
 }
 
@@ -2276,10 +2276,10 @@ type Place {
     lon: Float!
 
     "The time the rider will arrive at the place."
-    arrival: DateTime
+    arrival: OffsetDateTime
 
     "The time the rider will depart the place."
-    departure: DateTime
+    departure: OffsetDateTime
 
     """The stop related to the place."""
     stop: Stop
