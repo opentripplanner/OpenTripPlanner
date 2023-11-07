@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
@@ -77,6 +78,7 @@ public class SerializedGraphObject implements Serializable {
   public final StopConsolidationRepository stopConsolidationRepository;
   private final int stopLocationCounter;
   private final int routingTripPatternCounter;
+  public final EmissionsDataModel emissionsDataModel;
 
   public SerializedGraphObject(
     Graph graph,
@@ -85,6 +87,7 @@ public class SerializedGraphObject implements Serializable {
     BuildConfig buildConfig,
     RouterConfig routerConfig,
     DataImportIssueSummary issueSummary,
+    EmissionsDataModel emissionsDataModel,
     StopConsolidationRepository stopConsolidationRepository
   ) {
     this.graph = graph;
@@ -94,6 +97,7 @@ public class SerializedGraphObject implements Serializable {
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
     this.issueSummary = issueSummary;
+    this.emissionsDataModel = emissionsDataModel;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
     this.stopLocationCounter = StopLocation.indexCounter();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();

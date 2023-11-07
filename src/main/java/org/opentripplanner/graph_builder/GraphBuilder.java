@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
@@ -62,6 +64,7 @@ public class GraphBuilder implements Runnable {
     Graph graph,
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
+    @Nullable EmissionsDataModel emissionsDataModel,
     @Nullable StopConsolidationRepository stopConsolidationRepository,
     boolean loadStreetGraph,
     boolean saveStreetGraph
@@ -73,7 +76,7 @@ public class GraphBuilder implements Runnable {
 
     transitModel.initTimeZone(config.transitModelTimeZone);
 
-    var factory = DaggerGraphBuilderFactory
+    var builder = DaggerGraphBuilderFactory
       .builder()
       .config(config)
       .graph(graph)
@@ -81,8 +84,13 @@ public class GraphBuilder implements Runnable {
       .worldEnvelopeRepository(worldEnvelopeRepository)
       .stopConsolidationRepository(stopConsolidationRepository)
       .dataSources(dataSources)
-      .timeZoneId(transitModel.getTimeZone())
-      .build();
+      .timeZoneId(transitModel.getTimeZone());
+
+    if (OTPFeature.Co2Emissions.isOn()) {
+      builder.emissionsDataModel(emissionsDataModel);
+    }
+
+    var factory = builder.build();
 
     var graphBuilder = factory.graphBuilder();
 
@@ -162,6 +170,10 @@ public class GraphBuilder implements Runnable {
 
     if (OTPFeature.DataOverlay.isOn()) {
       graphBuilder.addModuleOptional(factory.dataOverlayFactory());
+    }
+
+    if (OTPFeature.Co2Emissions.isOn()) {
+      graphBuilder.addModule(factory.emissionsModule());
     }
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());

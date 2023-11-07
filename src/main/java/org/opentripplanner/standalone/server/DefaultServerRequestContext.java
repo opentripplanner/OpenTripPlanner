@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
@@ -44,6 +45,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   private final WorldEnvelopeService worldEnvelopeService;
   private final RealtimeVehicleService realtimeVehicleService;
   private final VehicleRentalService vehicleRentalService;
+  private final EmissionsService emissionsService;
   private final StopConsolidationService stopConsolidationService;
 
   /**
@@ -61,6 +63,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
+    EmissionsService emissionsService,
     List<RideHailingService> rideHailingServices,
     StopConsolidationService stopConsolidationService,
     FlexConfig flexConfig,
@@ -80,6 +83,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     this.worldEnvelopeService = worldEnvelopeService;
     this.realtimeVehicleService = realtimeVehicleService;
     this.rideHailingServices = rideHailingServices;
+    this.emissionsService = emissionsService;
     this.stopConsolidationService = stopConsolidationService;
   }
 
@@ -97,6 +101,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
     WorldEnvelopeService worldEnvelopeService,
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
+    @Nullable EmissionsService emissionsService,
     FlexConfig flexConfig,
     List<RideHailingService> rideHailingServices,
     @Nullable StopConsolidationService stopConsolidationService,
@@ -114,6 +119,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
       worldEnvelopeService,
       realtimeVehicleService,
       vehicleRentalService,
+      emissionsService,
       rideHailingServices,
       stopConsolidationService,
       flexConfig,
@@ -216,5 +222,10 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   @Override
   public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
     return vectorTileLayers;
+  }
+
+  @Override
+  public EmissionsService emissionsService() {
+    return emissionsService;
   }
 }

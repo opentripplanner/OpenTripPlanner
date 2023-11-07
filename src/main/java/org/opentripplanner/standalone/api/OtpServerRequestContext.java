@@ -6,6 +6,7 @@ import java.util.Locale;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
@@ -98,6 +99,9 @@ public interface OtpServerRequestContext {
   StopConsolidationService stopConsolidationService();
 
   MeterRegistry meterRegistry();
+
+  @Nullable
+  EmissionsService emissionsService();
 
   /** Inspector/debug services */
   TileRendererManager tileRendererManager();

@@ -117,6 +117,7 @@ public class SpeedTest {
         TestServerContext.createWorldEnvelopeService(),
         TestServerContext.createRealtimeVehicleService(transitService),
         TestServerContext.createVehicleRentalService(),
+        TestServerContext.createEmissionsService(),
         config.flexConfig,
         List.of(),
         null,

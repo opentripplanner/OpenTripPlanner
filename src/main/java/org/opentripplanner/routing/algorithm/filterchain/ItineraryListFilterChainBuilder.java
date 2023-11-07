@@ -78,6 +78,10 @@ public class ItineraryListFilterChainBuilder {
   /**
    * Sandbox filters which decorate the itineraries with extra information.
    */
+
+  @Sandbox
+  private ItineraryListFilter emissionsFilter;
+
   @Sandbox
   private ItineraryListFilter faresFilter;
 
@@ -290,6 +294,11 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withEmissions(ItineraryListFilter emissionsFilter) {
+    this.emissionsFilter = emissionsFilter;
+    return this;
+  }
+
   public ItineraryListFilterChainBuilder withMinBikeParkingDistance(double distance) {
     this.minBikeParkingDistance = distance;
     return this;
@@ -337,6 +346,14 @@ public class ItineraryListFilterChainBuilder {
 
     if (accessibilityScore) {
       filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
+    }
+
+    if (faresFilter != null) {
+      filters.add(faresFilter);
+    }
+
+    if (this.emissionsFilter != null) {
+      filters.add(this.emissionsFilter);
     }
 
     if (transitAlertService != null) {

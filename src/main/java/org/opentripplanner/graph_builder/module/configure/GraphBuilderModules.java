@@ -12,6 +12,8 @@ import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
@@ -107,6 +109,17 @@ public class GraphBuilderModules {
       config.getTransitServicePeriod(),
       config.fareServiceFactory
     );
+  }
+
+  @Provides
+  @Singleton
+  static EmissionsModule provideEmissionsModule(
+    GraphBuilderDataSources dataSources,
+    BuildConfig config,
+    @Nullable EmissionsDataModel emissionsDataModel,
+    DataImportIssueStore issueStore
+  ) {
+    return new EmissionsModule(dataSources, config, emissionsDataModel, issueStore);
   }
 
   @Provides

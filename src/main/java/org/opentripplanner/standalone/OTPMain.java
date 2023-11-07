@@ -152,6 +152,7 @@ public class OTPMain {
         config.buildConfig(),
         config.routerConfig(),
         DataImportIssueSummary.combine(graphBuilder.issueSummary(), app.dataImportIssueSummary()),
+        app.emissionsDataModel(),
         app.stopConsolidationRepository()
       )
         .save(app.graphOutputDataSource());
