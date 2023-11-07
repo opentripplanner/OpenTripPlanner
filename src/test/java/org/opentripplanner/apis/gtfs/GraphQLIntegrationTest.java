@@ -92,7 +92,9 @@ import org.opentripplanner.transit.service.TransitModel;
 
 class GraphQLIntegrationTest {
 
-  static final Graph graph = new Graph();
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
+  static final Graph GRAPH = new Graph();
 
   static final Instant ALERT_START_TIME = OffsetDateTime
     .parse("2023-02-15T12:03:28+01:00")
@@ -105,7 +107,7 @@ class GraphQLIntegrationTest {
 
   @BeforeAll
   static void setup() {
-    graph
+    GRAPH
       .getVehicleParkingService()
       .updateVehicleParking(
         List.of(
@@ -123,9 +125,9 @@ class GraphQLIntegrationTest {
     var model = stopModel.build();
     var transitModel = new TransitModel(model, DEDUPLICATOR);
 
-    final TripPattern pattern = TransitModelForTest.pattern(BUS).build();
+    final TripPattern pattern = TEST_MODEL.pattern(BUS).build();
     var trip = TransitModelForTest.trip("123").withHeadsign(I18NString.of("Trip Headsign")).build();
-    var stopTimes = TransitModelForTest.stopTimesEvery5Minutes(3, trip, T11_00);
+    var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, T11_00);
     var tripTimes = new TripTimes(trip, stopTimes, DEDUPLICATOR);
     pattern.add(tripTimes);
 
@@ -257,10 +259,10 @@ class GraphQLIntegrationTest {
         new TestRoutingService(List.of(i1)),
         transitService,
         new DefaultFareService(),
-        graph.getVehicleParkingService(),
+        GRAPH.getVehicleParkingService(),
         defaultVehicleRentalService,
         realtimeVehicleService,
-        GraphFinder.getInstance(graph, transitService::findRegularStop),
+        GraphFinder.getInstance(GRAPH, transitService::findRegularStop),
         new RouteRequest()
       );
   }

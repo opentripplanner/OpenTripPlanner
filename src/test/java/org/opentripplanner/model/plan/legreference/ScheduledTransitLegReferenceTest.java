@@ -31,6 +31,7 @@ import org.opentripplanner.transit.service.TransitService;
 
 class ScheduledTransitLegReferenceTest {
 
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
   private static final int SERVICE_CODE = 555;
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 1, 1);
   private static final int NUMBER_OF_STOPS = 3;
@@ -45,15 +46,12 @@ class ScheduledTransitLegReferenceTest {
 
   @BeforeAll
   static void buildTransitService() {
-    Station parentStation = TransitModelForTest.station("PARENT_STATION").build();
+    Station parentStation = TEST_MODEL.station("PARENT_STATION").build();
 
-    RegularStop stop1 = TransitModelForTest.stop("STOP1", 0, 0).build();
-    RegularStop stop2 = TransitModelForTest.stop("STOP2", 0, 0).build();
-    RegularStop stop3 = TransitModelForTest
-      .stop("STOP3", 0, 0)
-      .withParentStation(parentStation)
-      .build();
-    stop4 = TransitModelForTest.stop("STOP4", 0, 0).withParentStation(parentStation).build();
+    RegularStop stop1 = TEST_MODEL.stop("STOP1", 0, 0).build();
+    RegularStop stop2 = TEST_MODEL.stop("STOP2", 0, 0).build();
+    RegularStop stop3 = TEST_MODEL.stop("STOP3", 0, 0).withParentStation(parentStation).build();
+    stop4 = TEST_MODEL.stop("STOP4", 0, 0).withParentStation(parentStation).build();
 
     // build transit data
     TripPattern tripPattern = TransitModelForTest
@@ -68,7 +66,7 @@ class ScheduledTransitLegReferenceTest {
     stopIdAtPosition2 = tripPattern.getStop(2).getId();
     TripTimes tripTimes = new TripTimes(
       trip,
-      TransitModelForTest.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),
+      TEST_MODEL.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),
       new Deduplicator()
     );
     tripTimes.setServiceCode(SERVICE_CODE);

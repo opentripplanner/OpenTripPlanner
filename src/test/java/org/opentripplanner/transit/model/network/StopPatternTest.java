@@ -12,17 +12,19 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 class StopPatternTest {
 
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
   @Test
   void boardingAlightingConditions() {
     // We have different types of stops, of which only regular stops should allow boarding/alighting
-    var s1 = TransitModelForTest.stop("1", 60.0, 11.0).build();
-    var s2 = TransitModelForTest.stop("2", 61.0, 11.0).build();
-    var s3 = TransitModelForTest.stop("3", 62.0, 11.0).build();
-    var s4 = TransitModelForTest.stop("4", 62.1, 11.0).build();
+    var s1 = testModel.stop("1", 60.0, 11.0).build();
+    var s2 = testModel.stop("2", 61.0, 11.0).build();
+    var s3 = testModel.stop("3", 62.0, 11.0).build();
+    var s4 = testModel.stop("4", 62.1, 11.0).build();
 
-    var s34 = TransitModelForTest.groupStopForTest("3_4", List.of(s3, s4));
+    var s34 = testModel.groupStopForTest("3_4", List.of(s3, s4));
 
-    var areaStop = TransitModelForTest.areaStopForTest(
+    var areaStop = testModel.areaStopForTest(
       "area",
       GeometryUtils
         .getGeometryFactory()
@@ -41,10 +43,10 @@ class StopPatternTest {
 
     StopPattern stopPattern = new StopPattern(
       List.of(
-        TransitModelForTest.stopTime(t, 0, s1),
-        TransitModelForTest.stopTime(t, 1, s2),
-        TransitModelForTest.stopTime(t, 2, s34),
-        TransitModelForTest.stopTime(t, 3, areaStop)
+        testModel.stopTime(t, 0, s1),
+        testModel.stopTime(t, 1, s2),
+        testModel.stopTime(t, 2, s34),
+        testModel.stopTime(t, 3, areaStop)
       )
     );
 

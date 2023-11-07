@@ -57,6 +57,8 @@ import org.opentripplanner.transit.service.TransitModel;
 
 public class TestHalfEdges {
 
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
   private Graph graph;
   private StreetEdge top, bottom, left, right, leftBack, rightBack;
   private IntersectionVertex br, tr, bl, tl;
@@ -68,7 +70,7 @@ public class TestHalfEdges {
   public void setUp() {
     var deduplicator = new Deduplicator();
     graph = new Graph(deduplicator);
-    transitModel = new TransitModel(new StopModel(), deduplicator);
+    transitModel = new TransitModel(testModel.stopModel(), deduplicator);
     var factory = new VertexFactory(graph);
     // a 0.1 degree x 0.1 degree square
     tl = factory.intersection("tl", -74.01, 40.01);
@@ -158,8 +160,8 @@ public class TestHalfEdges {
         .withBack(true)
         .buildAndConnect();
 
-    var s1 = TransitModelForTest.stop("fleem station", 40.0099999, -74.005).build();
-    var s2 = TransitModelForTest.stop("morx station", 40.0099999, -74.002).build();
+    var s1 = testModel.stop("fleem station", 40.0099999, -74.005).build();
+    var s2 = testModel.stop("morx station", 40.0099999, -74.002).build();
 
     transitModel.mergeStopModels(StopModel.of().withRegularStop(s1).withRegularStop(s2).build());
 

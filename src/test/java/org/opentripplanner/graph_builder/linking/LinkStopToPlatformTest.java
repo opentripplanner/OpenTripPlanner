@@ -44,6 +44,7 @@ public class LinkStopToPlatformTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(LinkStopToPlatformTest.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+  private final TransitModelForTest testModel = TransitModelForTest.of();
 
   private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var deduplicator = new Deduplicator();
@@ -105,8 +106,7 @@ public class LinkStopToPlatformTest {
     RegularStop[] transitStops = new RegularStop[stops.length];
     for (int i = 0; i < stops.length; i++) {
       Coordinate stop = stops[i];
-      transitStops[i] =
-        TransitModelForTest.stop("TestStop " + i).withCoordinate(stop.y, stop.x).build();
+      transitStops[i] = testModel.stop("TestStop " + i).withCoordinate(stop.y, stop.x).build();
     }
 
     transitModel.index();

@@ -28,6 +28,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
+import org.opentripplanner.transit.service.StopModel;
 
 /**
  * Test utility class to help construct valid transit model objects.
@@ -64,6 +65,16 @@ public class TransitModelForTest {
     .withTimezone(TIME_ZONE_ID)
     .withUrl("https:/www.otherfeedagency.com")
     .build();
+
+  private final StopModel stopModel;
+
+  public TransitModelForTest(StopModel stopModel) {
+    this.stopModel = stopModel;
+  }
+
+  public static TransitModelForTest of() {
+    return new TransitModelForTest(new StopModel());
+  }
 
   public static FeedScopedId id(String id) {
     return new FeedScopedId(FEED_ID, id);
@@ -103,10 +114,14 @@ public class TransitModelForTest {
     return Trip.of(FeedScopedId.ofNullable(feedId, tripId)).withRoute(route("R" + tripId).build());
   }
 
+  public StopModel stopModel() {
+    return stopModel;
+  }
+
   /**
    * Create a stop with all required fields set.
    */
-  public static RegularStopBuilder stop(String idAndName) {
+  public RegularStopBuilder stop(String idAndName) {
     return RegularStop
       .of(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
@@ -114,11 +129,11 @@ public class TransitModelForTest {
       .withCoordinate(ANY_COORDINATE);
   }
 
-  public static RegularStopBuilder stop(String idAndName, double lat, double lon) {
+  public RegularStopBuilder stop(String idAndName, double lat, double lon) {
     return stop(idAndName).withCoordinate(lat, lon);
   }
 
-  public static StationBuilder station(String idAndName) {
+  public StationBuilder station(String idAndName) {
     return Station
       .of(new FeedScopedId(FEED_ID, idAndName))
       .withName(new NonLocalizedString(idAndName))
@@ -128,7 +143,7 @@ public class TransitModelForTest {
       .withPriority(StopTransferPriority.ALLOWED);
   }
 
-  public static GroupStop groupStopForTest(String idAndName, List<RegularStop> stops) {
+  public GroupStop groupStopForTest(String idAndName, List<RegularStop> stops) {
     var builder = GroupStop.of(id(idAndName)).withName(new NonLocalizedString(idAndName));
 
     stops.forEach(builder::addLocation);
@@ -136,7 +151,7 @@ public class TransitModelForTest {
     return builder.build();
   }
 
-  public static AreaStop areaStopForTest(String idAndName, Geometry geometry) {
+  public AreaStop areaStopForTest(String idAndName, Geometry geometry) {
     return AreaStop
       .of(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
@@ -144,7 +159,7 @@ public class TransitModelForTest {
       .build();
   }
 
-  public static StopTime stopTime(Trip trip, int seq) {
+  public StopTime stopTime(Trip trip, int seq) {
     var stopTime = new StopTime();
     stopTime.setTrip(trip);
     stopTime.setStopSequence(seq);
@@ -155,7 +170,7 @@ public class TransitModelForTest {
     return stopTime;
   }
 
-  public static StopTime stopTime(Trip trip, int seq, StopLocation stop) {
+  public StopTime stopTime(Trip trip, int seq, StopLocation stop) {
     var stopTime = new StopTime();
     stopTime.setTrip(trip);
     stopTime.setStopSequence(seq);
@@ -164,8 +179,8 @@ public class TransitModelForTest {
     return stopTime;
   }
 
-  public static StopTime stopTime(Trip trip, int seq, int time) {
-    var stopTime = TransitModelForTest.stopTime(trip, seq);
+  public StopTime stopTime(Trip trip, int seq, int time) {
+    var stopTime = stopTime(trip, seq);
     stopTime.setArrivalTime(time);
     stopTime.setDepartureTime(time);
     stopTime.setStopHeadsign(I18NString.of("Stop headsign at stop %s".formatted(seq)));
@@ -178,17 +193,17 @@ public class TransitModelForTest {
    * <p>
    * The first stop has stop sequence 10, the following one has 20 and so on.
    */
-  public static List<StopTime> stopTimesEvery5Minutes(int count, Trip trip, int startTime) {
+  public List<StopTime> stopTimesEvery5Minutes(int count, Trip trip, int startTime) {
     return IntStream
       .range(0, count)
       .mapToObj(seq -> stopTime(trip, (seq + 1) * 10, startTime + (seq * 60 * 5)))
       .toList();
   }
 
-  public static StopPattern stopPattern(int numberOfStops) {
+  public StopPattern stopPattern(int numberOfStops) {
     var builder = StopPattern.create(numberOfStops);
     for (int i = 0; i < numberOfStops; i++) {
-      builder.stops[i] = TransitModelForTest.stop("Stop_" + i).build();
+      builder.stops[i] = stop("Stop_" + i).build();
       builder.pickups[i] = PickDrop.SCHEDULED;
       builder.dropoffs[i] = PickDrop.SCHEDULED;
     }
@@ -208,7 +223,7 @@ public class TransitModelForTest {
   /**
    * Create {@link TripPatternBuilder} fully set up with the given mode.
    */
-  public static TripPatternBuilder pattern(TransitMode mode) {
+  public TripPatternBuilder pattern(TransitMode mode) {
     return tripPattern(mode.name(), route(mode.name()).withMode(mode).build())
       .withStopPattern(stopPattern(3));
   }

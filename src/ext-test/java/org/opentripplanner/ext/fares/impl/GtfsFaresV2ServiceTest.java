@@ -29,6 +29,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
   FeedScopedId LEG_GROUP1 = id("leg-group1");
   FeedScopedId LEG_GROUP2 = id("leg-group2");
   FeedScopedId LEG_GROUP3 = id("leg-group3");
@@ -79,10 +81,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     .build();
 
   Place INNER_ZONE_STOP = Place.forStop(
-    TransitModelForTest.stop("inner city stop").withCoordinate(1, 1).build()
+    testModel.stop("inner city stop").withCoordinate(1, 1).build()
   );
   Place OUTER_ZONE_STOP = Place.forStop(
-    TransitModelForTest.stop("outer city stop").withCoordinate(2, 2).build()
+    testModel.stop("outer city stop").withCoordinate(2, 2).build()
   );
   String INNER_ZONE = "inner-zone";
   String OUTER_ZONE = "outer-zone";

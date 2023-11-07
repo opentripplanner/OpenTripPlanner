@@ -57,24 +57,41 @@ public interface PlanTestConstants {
   int T11_50 = time("11:50");
   int T11_55 = time("11:55");
 
-  // Stop/Places
+  // Stop/Places - Stops should not be created in a static context - they are indexed
+  //
+  @Deprecated
+  TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
+  @Deprecated
   Place A = place("A", 5.0, 8.0);
+
+  @Deprecated
   Place B = place("B", 6.0, 8.5);
+
+  @Deprecated
   Place C = place("C", 7.0, 9.0);
+
+  @Deprecated
   Place D = place("D", 8.0, 9.5);
+
+  @Deprecated
   Place E = place("E", 9.0, 10.0);
+
+  @Deprecated
   Place F = place("F", 9.0, 10.5);
+
+  @Deprecated
   Place G = place("G", 9.5, 11.0);
+
+  @Deprecated
   Place H = place("H", 10.0, 11.5);
 
   static Place place(String name, double lat, double lon) {
-    return Place.forStop(TransitModelForTest.stop(name).withCoordinate(lat, lon).build());
+    return Place.forStop(TEST_MODEL.stop(name).withCoordinate(lat, lon).build());
   }
 
   static Place place(String name, double lat, double lon, FareZone zone) {
-    return Place.forStop(
-      TransitModelForTest.stop(name).withCoordinate(lat, lon).addFareZones(zone).build()
-    );
+    return Place.forStop(TEST_MODEL.stop(name).withCoordinate(lat, lon).addFareZones(zone).build());
   }
 
   static List<StopLocation> listStops() {

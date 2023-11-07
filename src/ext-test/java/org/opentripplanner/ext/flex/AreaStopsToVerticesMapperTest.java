@@ -29,12 +29,15 @@ import org.opentripplanner.transit.service.TransitModel;
 
 class AreaStopsToVerticesMapperTest {
 
-  private static final AreaStop BERLIN_AREA_STOP = TransitModelForTest.areaStopForTest(
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
+  private static final AreaStop BERLIN_AREA_STOP = TEST_MODEL.areaStopForTest(
     "berlin",
     Polygons.BERLIN
   );
-  public static final StopModel STOP_MODEL = StopModel
-    .of()
+  public static final StopModel STOP_MODEL = TEST_MODEL
+    .stopModel()
+    .copy()
     .withAreaStop(AreaStopsToVerticesMapperTest.BERLIN_AREA_STOP)
     .build();
 

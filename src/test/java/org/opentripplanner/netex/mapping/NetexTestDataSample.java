@@ -60,6 +60,8 @@ public class NetexTestDataSample {
     .withName(new MultilingualString().withValue("everyday"));
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
   private final JourneyPattern journeyPattern;
   private final HierarchicalMapById<JourneyPattern_VersionStructure> journeyPatternById = new HierarchicalMapById<>();
   private final HierarchicalMapById<DestinationDisplay> destinationDisplayById = new HierarchicalMapById<>();
@@ -182,7 +184,7 @@ public class NetexTestDataSample {
     // Setup stops
     for (int i = 0; i < NUM_OF_STOPS; i++) {
       String stopId = "NSR:Quay:" + (i + 1);
-      stopsById.add(TransitModelForTest.stop(stopId, 60.0, 10.0).build());
+      stopsById.add(testModel.stop(stopId, 60.0, 10.0).build());
       quayIdByStopPointRef.add(pointsInLink.get(i).getId(), stopId);
     }
   }

@@ -47,9 +47,10 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
   private static final FeedScopedId SERVICE_D_IN = TransitModelForTest.id("CalSrvDIn");
   private static final FeedScopedId SERVICE_C_OUT = TransitModelForTest.id("CalSrvOut");
   private static final FeedScopedId SERVICE_D_OUT = TransitModelForTest.id("CalSrvDOut");
-  private static final RegularStop STOP_1 = TransitModelForTest.stop("Stop-1").build();
-  private static final RegularStop STOP_2 = TransitModelForTest.stop("Stop-2").build();
   private static final Deduplicator DEDUPLICATOR = new Deduplicator();
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final RegularStop STOP_1 = TEST_MODEL.stop("Stop-1").build();
+  private static final RegularStop STOP_2 = TEST_MODEL.stop("Stop-2").build();
   private static final List<StopTime> STOP_TIMES = List.of(
     createStopTime(STOP_1, 0),
     createStopTime(STOP_2, 300)

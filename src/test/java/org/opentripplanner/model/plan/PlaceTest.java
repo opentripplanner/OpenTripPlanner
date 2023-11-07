@@ -51,8 +51,9 @@ public class PlaceTest {
 
   @Test
   public void sameLocationBasedOnStopId() {
-    var s1 = TransitModelForTest.stop("1").withCoordinate(1.0, 1.0).build();
-    var s2 = TransitModelForTest.stop("2").withCoordinate(1.0, 2.0).build();
+    var testModel = TransitModelForTest.of();
+    var s1 = testModel.stop("1").withCoordinate(1.0, 1.0).build();
+    var s2 = testModel.stop("2").withCoordinate(1.0, 2.0).build();
 
     Place aPlace = place(s1);
     Place samePlace = place(s1);

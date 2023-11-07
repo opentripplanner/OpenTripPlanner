@@ -73,6 +73,8 @@ public abstract class GraphRoutingTest {
 
   public abstract static class Builder {
 
+    private final TransitModelForTest testModel = TransitModelForTest.of();
+
     private final Graph graph;
     private final TransitModel transitModel;
     private final VertexFactory vertexFactory;
@@ -223,7 +225,7 @@ public abstract class GraphRoutingTest {
     }
 
     RegularStop stopEntity(String id, double latitude, double longitude, boolean noTransfers) {
-      var stopBuilder = TransitModelForTest.stop(id).withCoordinate(latitude, longitude);
+      var stopBuilder = testModel.stop(id).withCoordinate(latitude, longitude);
       if (noTransfers) {
         stopBuilder.withParentStation(
           Station

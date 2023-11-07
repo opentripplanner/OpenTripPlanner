@@ -33,7 +33,9 @@ import org.opentripplanner.transit.model.site.Station;
 
 class StreetTransitEntityLinkTest {
 
-  static final RegularStop accessibleStop = stopForTest(
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
+  private static final RegularStop ACCESSIBLE_STOP = stopForTest(
     "A:accessible",
     "wheelchair accessible stop",
     10.001,
@@ -71,7 +73,7 @@ class StreetTransitEntityLinkTest {
 
     @Test
     void allowAccessibleStop() {
-      var afterTraversal = traverse(accessibleStop, true);
+      var afterTraversal = traverse(ACCESSIBLE_STOP, true);
 
       assertFalse(State.isEmpty(afterTraversal));
     }
@@ -164,7 +166,7 @@ class StreetTransitEntityLinkTest {
     }
 
     private void testTraversalWithState(State state, boolean canTraverse) {
-      var transitStopVertex = new TransitStopVertexBuilder().withStop(accessibleStop).build();
+      var transitStopVertex = new TransitStopVertexBuilder().withStop(ACCESSIBLE_STOP).build();
       var edge = StreetTransitStopLink.createStreetTransitStopLink(
         (StreetVertex) state.getVertex(),
         transitStopVertex
@@ -182,7 +184,7 @@ class StreetTransitEntityLinkTest {
     Station parent,
     Accessibility wheelchair
   ) {
-    return TransitModelForTest
+    return TEST_MODEL
       .stop(idAndName)
       .withDescription(NonLocalizedString.ofNullable(desc))
       .withCoordinate(new WgsCoordinate(lat, lon))

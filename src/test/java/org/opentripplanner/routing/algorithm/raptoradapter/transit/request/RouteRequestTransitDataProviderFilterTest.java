@@ -47,13 +47,13 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class RouteRequestTransitDataProviderFilterTest {
 
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
   private static final Route ROUTE = TransitModelForTest.route("1").build();
 
   private static final FeedScopedId TRIP_ID = TransitModelForTest.id("T1");
 
-  private static final RegularStop STOP_FOR_TEST = TransitModelForTest
-    .stop("TEST:STOP", 0, 0)
-    .build();
+  private static final RegularStop STOP_FOR_TEST = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
 
   private static final WheelchairPreferences DEFAULT_ACCESSIBILITY = WheelchairPreferences.DEFAULT;
 
@@ -905,7 +905,7 @@ class RouteRequestTransitDataProviderFilterTest {
     double lat,
     double lon
   ) {
-    return TransitModelForTest
+    return TEST_MODEL
       .stop(idAndName)
       .withCoordinate(new WgsCoordinate(lat, lon))
       .withWheelchairAccessibility(wheelchair)
@@ -914,7 +914,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
   private static StopTime getStopTime(String idAndName, PickDrop scheduled) {
     var stopTime1 = new StopTime();
-    stopTime1.setStop(TransitModelForTest.stop(idAndName, 0.0, 0.0).build());
+    stopTime1.setStop(TEST_MODEL.stop(idAndName, 0.0, 0.0).build());
     stopTime1.setDropOffType(scheduled);
     stopTime1.setPickupType(scheduled);
     return stopTime1;

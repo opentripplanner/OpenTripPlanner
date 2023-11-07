@@ -117,6 +117,8 @@ class FlexStopsMapperTest {
     10.878374152208456
   );
 
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
   @Test
   void testMapAreaStop() {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
@@ -158,8 +160,8 @@ class FlexStopsMapperTest {
 
   @Test
   void testMapGroupStop() {
-    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
+    RegularStop stop1 = testModel.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = testModel.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
     flexibleStopPlace.setKeyList(
@@ -187,8 +189,8 @@ class FlexStopsMapperTest {
 
   @Test
   void testMapGroupStopVariantWithKeyValueOnArea() {
-    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
+    RegularStop stop1 = testModel.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = testModel.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
 
@@ -240,8 +242,8 @@ class FlexStopsMapperTest {
 
   @Test
   void testMapFlexibleStopPlaceWithInvalidGeometryOnUnrestrictedPublicTransportAreas() {
-    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
+    RegularStop stop1 = testModel.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = testModel.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
     var invalidPolygon = List.of(1.0);
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(invalidPolygon);
