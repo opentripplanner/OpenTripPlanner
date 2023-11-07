@@ -52,6 +52,8 @@ public class Itinerary implements ItinerarySortKey {
   /* Sandbox experimental properties */
   private Float accessibilityScore;
 
+  private Emissions emissionsPerPerson;
+
   /* other properties */
 
   private final List<SystemNotice> systemNotices = new ArrayList<>();
@@ -264,6 +266,7 @@ public class Itinerary implements ItinerarySortKey {
       .addNum("elevationGained", elevationGained, 0.0)
       .addCol("legs", legs)
       .addObj("fare", fare)
+      .addObj("emissionsPerPerson", emissionsPerPerson)
       .toString();
   }
 
@@ -599,5 +602,17 @@ public class Itinerary implements ItinerarySortKey {
       .filter(ScheduledTransitLeg.class::isInstance)
       .map(ScheduledTransitLeg.class::cast)
       .toList();
+  }
+
+  /**
+   * The emissions of this itinerary.
+   */
+  public void setEmissionsPerPerson(Emissions emissionsPerPerson) {
+    this.emissionsPerPerson = emissionsPerPerson;
+  }
+
+  @Nullable
+  public Emissions getEmissionsPerPerson() {
+    return this.emissionsPerPerson;
   }
 }

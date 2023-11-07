@@ -13,6 +13,7 @@ import graphql.schema.GraphQLScalarType;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.graphql.scalar.DurationScalarFactory;
+import org.opentripplanner.framework.model.Grams;
 
 public class GraphQLScalars {
 
@@ -112,6 +113,41 @@ public class GraphQLScalars {
           throw new CoercingParseLiteralException(
             "Unexpected type " + input.getClass().getSimpleName()
           );
+        }
+      }
+    )
+    .build();
+
+  public static GraphQLScalarType gramsScalar = GraphQLScalarType
+    .newScalar()
+    .name("Grams")
+    .coercing(
+      new Coercing<Grams, Double>() {
+        @Override
+        public Double serialize(Object dataFetcherResult) throws CoercingSerializeException {
+          if (dataFetcherResult instanceof Grams) {
+            var grams = (Grams) dataFetcherResult;
+            return Double.valueOf(grams.asDouble());
+          }
+          return null;
+        }
+
+        @Override
+        public Grams parseValue(Object input) throws CoercingParseValueException {
+          if (input instanceof Double) {
+            var grams = (Double) input;
+            return new Grams(grams);
+          }
+          return null;
+        }
+
+        @Override
+        public Grams parseLiteral(Object input) throws CoercingParseLiteralException {
+          if (input instanceof Double) {
+            var grams = (Double) input;
+            return new Grams(grams);
+          }
+          return null;
         }
       }
     )

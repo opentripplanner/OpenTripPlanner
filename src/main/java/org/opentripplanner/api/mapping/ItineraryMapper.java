@@ -30,7 +30,6 @@ public class ItineraryMapper {
       return null;
     }
     ApiItinerary api = new ApiItinerary();
-
     api.duration = domain.getDuration().toSeconds();
     api.startTime = GregorianCalendar.from(domain.startTime());
     api.endTime = GregorianCalendar.from(domain.endTime());
