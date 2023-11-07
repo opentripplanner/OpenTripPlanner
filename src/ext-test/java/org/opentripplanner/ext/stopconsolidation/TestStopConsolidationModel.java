@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.stopconsolidation;
 
+import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_A;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_B;
+import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_C;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.List;
@@ -26,9 +29,6 @@ class TestStopConsolidationModel {
     .route(new FeedScopedId(SECONDARY_FEED_ID, "route-33"))
     .withAgency(AGENCY)
     .build();
-  static final RegularStop STOP_A = TransitModelForTest.stop("A").build();
-  static final RegularStop STOP_B = TransitModelForTest.stop("B").build();
-  static final RegularStop STOP_C = TransitModelForTest.stop("C").build();
   static final RegularStop STOP_D = TransitModelForTest
     .stop("D")
     .withId(new FeedScopedId(SECONDARY_FEED_ID, "secondary-stop-D"))

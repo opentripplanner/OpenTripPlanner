@@ -61,6 +61,24 @@ public class TransitModelForTest {
     .withUrl("https:/www.otherfeedagency.com")
     .build();
 
+  public static final RegularStop STOP_A = TransitModelForTest
+    .stop("A")
+    .withCoordinate(1, 1)
+    .build();
+  public static final RegularStop STOP_B = TransitModelForTest
+    .stop("B")
+    .withCoordinate(1.1, 1.1)
+    .build();
+  public static final RegularStop STOP_C = TransitModelForTest
+    .stop("C")
+    .withCoordinate(1.2, 1.2)
+    .build();
+  public static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(
+    STOP_A,
+    STOP_B,
+    STOP_C
+  );
+
   public static FeedScopedId id(String id) {
     return new FeedScopedId(FEED_ID, id);
   }
