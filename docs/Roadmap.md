@@ -1,6 +1,6 @@
 The OTP community uses a GitHub-hosted Roadmap to document all long-term feature requests for OpenTripPlanner. Unlike typical [OTP Issues](https://github.com/opentripplanner/OpenTripPlanner/issues), the Roadmap outlines quarterly and yearly product-focused goals the community intends to propose for OTP, rather than short-term bug fixes or feature requests.
 
-Twice a year, product owners (POs) and developers will review and clean up the issues at the PO meetings. Product owner (PO) meetings are open to everyone interested in OTP and are held on the first Tuesday of each month at 7 AM US Pacific / 10 AM  US Eastern / 4PM CET. To join, please ask members in the [Gitter](https://app.gitter.im/#/room/#opentripplanner_OpenTripPlanner:gitter.im) chat.
+Twice a year, product owners (POs) and developers will review and clean up the issues at the PO meetings. Product owner (PO) meetings are open to everyone interested in OTP and are held on the first Tuesday of each month at 7 AM US Pacific / 10 AM  US Eastern / 4PM CET. To join, please consult this [calender](https://calendar.google.com/calendar/u/0/embed?src=ormbltvsqb6adl80ejgudt0glc@group.calendar.google.com). For other questions, please contact members in the [Gitter](https://app.gitter.im/#/room/#opentripplanner_OpenTripPlanner:gitter.im) chat or the [user mailing list](https://groups.google.com/g/opentripplanner-users).
 
 To create an issue on the OTP Roadmap, follow these steps:
 
