@@ -8,7 +8,7 @@
 
 ## Contact Info
 
-- Jon Campbell, IBI, USA
+- [Jon Campbell](mailto:jon.campbell@arcadis.com), Arcadis, USA
 
 ## Feature explanation
 
@@ -74,5 +74,5 @@ The column names mean the following:
 - `stop_group_id`: id to group several rows in the file together
 - `feed_id`: feed id of the stop
 - `stop_id`: id of the stop
-- `is_primary`: whether the row represents a primary stop, `1` means yes and `0` mean no
+- `is_primary`: whether the row represents a primary stop, `1` means yes and `0` means no
 
