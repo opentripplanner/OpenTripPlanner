@@ -28,7 +28,9 @@ import org.slf4j.LoggerFactory;
 public class StopModel implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopModel.class);
+  private static final int NO_PARENT = -1;
 
+  private final int parentHash;
   private final Map<FeedScopedId, RegularStop> regularStopById;
   private final Map<FeedScopedId, Station> stationById;
   private final Map<FeedScopedId, MultiModalStation> multiModalStationById;
@@ -39,6 +41,7 @@ public class StopModel implements Serializable {
 
   @Inject
   public StopModel() {
+    this.parentHash = NO_PARENT;
     this.regularStopById = Map.of();
     this.stationById = Map.of();
     this.multiModalStationById = Map.of();
@@ -49,6 +52,7 @@ public class StopModel implements Serializable {
   }
 
   StopModel(StopModelBuilder builder) {
+    this.parentHash = builder.original().hashCode();
     this.regularStopById = builder.regularStopsById().asImmutableMap();
     this.stationById = builder.stationById().asImmutableMap();
     this.multiModalStationById = builder.multiModalStationById().asImmutableMap();
@@ -59,12 +63,18 @@ public class StopModel implements Serializable {
   }
 
   /**
-   * Merge child into main. If a duplicate key exist, then child value is kept. This allows
-   * updates - witch is not allowed for stop model, but it is enforced elsewhere.
+   * Merge child into main. The child model must be created using the {@code main.withContext()}
+   * method, if not this method will fail! If a duplicate key exist, then child value is kept -
+   * this feature is normally not allowed, but not enforced here.
    */
   private StopModel(StopModel main, StopModel child) {
-    // pass in main, then child so new values replaces old value. This allows updates - witch is
-    // not allowed for stop model, but it is enforced elsewhere.
+    if (main.hashCode() != child.parentHash) {
+      throw new IllegalArgumentException(
+        "A Stop model can only be merged with its parent, this is done to avoid duplicates/gaps " +
+        "in the stopIndex."
+      );
+    }
+    this.parentHash = NO_PARENT;
     this.areaStopById = MapUtils.combine(main.areaStopById, child.areaStopById);
     this.regularStopById = MapUtils.combine(main.regularStopById, child.regularStopById);
     this.groupOfStationsById =

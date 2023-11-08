@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.service;
 
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
@@ -18,6 +19,8 @@ import org.opentripplanner.transit.model.site.Station;
 
 public class StopModelBuilder {
 
+  private final StopModel original;
+
   private final EntityById<RegularStop> regularStopById = new DefaultEntityById<>();
   private final EntityById<AreaStop> areaStopById = new DefaultEntityById<>();
   private final EntityById<GroupStop> groupStopById = new DefaultEntityById<>();
@@ -25,10 +28,12 @@ public class StopModelBuilder {
   private final EntityById<MultiModalStation> multiModalStationById = new DefaultEntityById<>();
   private final EntityById<GroupOfStations> groupOfStationById = new DefaultEntityById<>();
 
-  StopModelBuilder() {}
+  StopModelBuilder(StopModel original) {
+    this.original = original;
+  }
 
-  StopModelBuilder(StopModel stopModel) {
-    addAll(stopModel);
+  public StopModel original() {
+    return original;
   }
 
   public ImmutableEntityById<RegularStop> regularStopsById() {
