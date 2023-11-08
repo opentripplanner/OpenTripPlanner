@@ -78,6 +78,9 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeTransitIfWalkingIsBetter = true;
 
   @Sandbox
+  private ItineraryListFilter emissionsFilter;
+
+  @Sandbox
   private ItineraryListFilter rideHailingFilter;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
@@ -283,6 +286,11 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  public ItineraryListFilterChainBuilder withEmissions(ItineraryListFilter emissionsFilter) {
+    this.emissionsFilter = emissionsFilter;
+    return this;
+  }
+
   public ItineraryListFilterChainBuilder withMinBikeParkingDistance(double distance) {
     this.minBikeParkingDistance = distance;
     return this;
@@ -327,6 +335,10 @@ public class ItineraryListFilterChainBuilder {
 
     if (faresService != null) {
       filters.add(new FaresFilter(faresService));
+    }
+
+    if (this.emissionsFilter != null) {
+      filters.add(this.emissionsFilter);
     }
 
     if (transitAlertService != null) {

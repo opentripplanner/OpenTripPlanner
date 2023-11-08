@@ -55,6 +55,7 @@ Sections follow that describe particular settings in more depth.
 | demDefaults                                                              |   `object`  | Default properties for DEM extracts.                                                                                                                           | *Optional* |                                   |  2.3  |
 |    [elevationUnitMultiplier](#demDefaults_elevationUnitMultiplier)       |   `double`  | Specify a multiplier to convert elevation units from source to meters.                                                                                         | *Optional* | `1.0`                             |  2.3  |
 | [elevationBucket](#elevationBucket)                                      |   `object`  | Used to download NED elevation tiles from the given AWS S3 bucket.                                                                                             | *Optional* |                                   |   na  |
+| [emissions](sandbox/Emissions.md)                                        |   `object`  | Emissions configuration.                                                                                                                                       | *Optional* |                                   |   na  |
 | [fares](sandbox/Fares.md)                                                |   `object`  | Fare configuration.                                                                                                                                            | *Optional* |                                   |  2.0  |
 | gtfsDefaults                                                             |   `object`  | The gtfsDefaults section allows you to specify default properties for GTFS files.                                                                              | *Optional* |                                   |  2.3  |
 |    blockBasedInterlining                                                 |  `boolean`  | Whether to create stay-seated transfers in between two trips with the same block id.                                                                           | *Optional* | `true`                            |  2.3  |
@@ -1163,7 +1164,11 @@ case where this is not the case.
         "enabled" : true
       }
     }
-  ]
+  ],
+  "emissions" : {
+    "carAvgCo2PerKm" : 170,
+    "carAvgOccupancy" : 1.3
+  }
 }
 ```
 
