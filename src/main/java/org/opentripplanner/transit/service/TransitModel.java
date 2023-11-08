@@ -458,7 +458,7 @@ public class TransitModel implements Serializable {
    */
   public void mergeStopModels(StopModel newStopModel) {
     invalidateIndex();
-    this.stopModel = this.stopModel.copy().addAll(newStopModel).build();
+    this.stopModel = this.stopModel.merge(newStopModel);
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {

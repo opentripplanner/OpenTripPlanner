@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.collection.CollectionsView;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -44,7 +45,7 @@ public class StopModel implements Serializable {
     this.groupOfStationsById = Map.of();
     this.areaStopById = Map.of();
     this.groupStopById = Map.of();
-    this.index = new StopModelIndex(List.of(), List.of(), List.of(), List.of());
+    this.index = createIndex();
   }
 
   StopModel(StopModelBuilder builder) {
@@ -57,12 +58,47 @@ public class StopModel implements Serializable {
     reindex();
   }
 
-  public static StopModelBuilder of() {
-    return new StopModelBuilder();
+  /**
+   * Merge child into main. If a duplicate key exist, then child value is kept. This allows
+   * updates - witch is not allowed for stop model, but it is enforced elsewhere.
+   */
+  private StopModel(StopModel main, StopModel child) {
+    // pass in main, then child so new values replaces old value. This allows updates - witch is
+    // not allowed for stop model, but it is enforced elsewhere.
+    this.areaStopById = MapUtils.combine(main.areaStopById, child.areaStopById);
+    this.regularStopById = MapUtils.combine(main.regularStopById, child.regularStopById);
+    this.groupOfStationsById =
+      MapUtils.combine(main.groupOfStationsById, child.groupOfStationsById);
+    this.groupStopById = MapUtils.combine(main.groupStopById, child.groupStopById);
+    this.multiModalStationById =
+      MapUtils.combine(main.multiModalStationById, child.multiModalStationById);
+    this.stationById = MapUtils.combine(main.stationById, child.stationById);
+    reindex();
   }
 
+  /**
+   * Create a new builder based on a empty model. This is useful in unit-tests, but should
+   * NOT be used in the main code.
+   * <p>
+   * In the application code the correct way is to retrieve a model instance and the n use the
+   * {@link #withContext()} method to create a builder.
+   */
+  public static StopModelBuilder of() {
+    return new StopModelBuilder(new StopModel());
+  }
+
+  /**
+   * Create a new builder attached to the existing model. Any changes will be added on top of the
+   * existing model. The StopModel does not allow updates to existing read-only entities - only
+   * updates to entities created in the same context. This prevents an input feed to erase
+   * information added by another feed. It is the first feed who wins.
+   * <p>
+   * USE THIS TO CREATE A SAFE BUILDER IN PRODUCTION CODE. You MAY use this method in unit-tests,
+   * the alternative is the {@link #of()} method. This method should be used if the test have a
+   * StopModel and the {@link #of()} method should be used if a stop-model in not needed.
+   */
   public StopModelBuilder withContext() {
-    return new StopModelBuilder();
+    return new StopModelBuilder(this);
   }
 
   public StopModelBuilder copy() {
@@ -237,16 +273,23 @@ public class StopModel implements Serializable {
     reindex();
   }
 
+  public StopModel merge(StopModel child) {
+    return new StopModel(this, child);
+  }
+
   private void reindex() {
     LOG.info("Index stop model...");
-    index =
-      new StopModelIndex(
-        regularStopById.values(),
-        areaStopById.values(),
-        groupStopById.values(),
-        multiModalStationById.values()
-      );
+    index = createIndex();
     LOG.info("Index stop model complete.");
+  }
+
+  private StopModelIndex createIndex() {
+    return new StopModelIndex(
+      regularStopById.values(),
+      areaStopById.values(),
+      groupStopById.values(),
+      multiModalStationById.values()
+    );
   }
 
   @Nullable
