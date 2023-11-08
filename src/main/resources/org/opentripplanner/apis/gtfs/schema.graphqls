@@ -1546,6 +1546,13 @@ type Itinerary {
     """
     accessibilityScore: Float
 
+    """
+    How many transfers are contained in this itinerary.
+
+    Note: Interlined/stay-seated transfers also increase the count.
+    """
+    numberOfTransfers: Int
+
     #
     # deprecated fields
     #

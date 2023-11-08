@@ -23,6 +23,7 @@
             emissionsPerPerson {
                 co2
             }
+            numberOfTransfers
             legs {
                 mode
                 from {

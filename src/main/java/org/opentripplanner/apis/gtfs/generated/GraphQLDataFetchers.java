@@ -409,6 +409,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<Leg>> legs();
 
+    public DataFetcher<Integer> numberOfTransfers();
+
     public DataFetcher<Long> startTime();
 
     public DataFetcher<Iterable<SystemNotice>> systemNotices();
