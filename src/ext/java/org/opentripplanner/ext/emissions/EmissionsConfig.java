@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.emissions;
 
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 
 /**
  * This class is responsible for mapping emissions configuration into emissions parameters.
@@ -13,6 +14,7 @@ public class EmissionsConfig {
   public EmissionsConfig(String parameterName, NodeAdapter root) {
     var c = root
       .of(parameterName)
+      .since(OtpVersion.V2_5)
       .summary("Emissions configuration.")
       .description(
         """
@@ -26,6 +28,7 @@ public class EmissionsConfig {
     this.carAvgCo2PerKm =
       c
         .of("carAvgCo2PerKm")
+        .since(OtpVersion.V2_5)
         .summary("The average CO₂ emissions of a car in grams per kilometer.")
         .asInt(170);
 
