@@ -64,7 +64,7 @@ the `carAvgOccupancy` provides the average number of passengers in a car.
 | Config Parameter |    Type   | Summary                                                    |  Req./Opt. | Default Value | Since |
 |------------------|:---------:|------------------------------------------------------------|:----------:|---------------|:-----:|
 | carAvgCo2PerKm   | `integer` | The average CO₂ emissions of a car in grams per kilometer. | *Optional* | `170`         |  2.5  |
-| carAvgOccupancy  |  `double` | The average number of passengers in a car.                 | *Optional* | `1.3`         |   na  |
+| carAvgOccupancy  |  `double` | The average number of passengers in a car.                 | *Optional* | `1.3`         |  2.5  |
 
 
 ### Details
