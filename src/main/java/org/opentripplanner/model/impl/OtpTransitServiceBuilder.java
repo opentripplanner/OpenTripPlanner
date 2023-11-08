@@ -27,6 +27,7 @@ import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -140,16 +141,16 @@ public class OtpTransitServiceBuilder {
     return frequencies;
   }
 
-  public StopModelBuilder stopModelBuilder() {
+  public StopModelBuilder stopModel() {
     return stopModelBuilder;
   }
 
-  public EntityById<GroupOfStations> getGroupsOfStationsById() {
-    return stopModelBuilder().groupOfStationById();
+  public ImmutableEntityById<GroupOfStations> getGroupsOfStationsById() {
+    return stopModelBuilder.groupOfStationById();
   }
 
-  public EntityById<MultiModalStation> getMultiModalStationsById() {
-    return stopModelBuilder().multiModalStationById();
+  public ImmutableEntityById<MultiModalStation> getMultiModalStationsById() {
+    return stopModelBuilder.multiModalStationById();
   }
 
   /**
@@ -176,12 +177,12 @@ public class OtpTransitServiceBuilder {
     return shapePoints;
   }
 
-  public EntityById<Station> getStations() {
-    return stopModelBuilder().stationById();
+  public ImmutableEntityById<Station> getStations() {
+    return stopModelBuilder.stationById();
   }
 
-  public EntityById<RegularStop> getStops() {
-    return stopModelBuilder().regularStopsById();
+  public ImmutableEntityById<RegularStop> getStops() {
+    return stopModelBuilder.regularStopsById();
   }
 
   public EntityById<Entrance> getEntrances() {
@@ -196,12 +197,12 @@ public class OtpTransitServiceBuilder {
     return boardingAreasById;
   }
 
-  public EntityById<AreaStop> getAreaStops() {
-    return stopModelBuilder().areaStopById();
+  public ImmutableEntityById<AreaStop> getAreaStops() {
+    return stopModelBuilder.areaStopById();
   }
 
-  public EntityById<GroupStop> getGroupStops() {
-    return stopModelBuilder().groupStopById();
+  public ImmutableEntityById<GroupStop> getGroupStops() {
+    return stopModelBuilder.groupStopById();
   }
 
   public TripStopTimes getStopTimesSortedByTrip() {

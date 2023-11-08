@@ -46,10 +46,10 @@ class QuayMapper {
     Accessibility wheelchair
   ) {
     var id = idFactory.createId(quay.getId());
-
-    return stopModelBuilder
-      .regularStopsById()
-      .computeIfAbsent(id, it -> map(it, quay, parentStation, fareZones, transitMode, wheelchair));
+    return stopModelBuilder.computeRegularStopIfAbsent(
+      id,
+      it -> map(it, quay, parentStation, fareZones, transitMode, wheelchair)
+    );
   }
 
   private RegularStop map(

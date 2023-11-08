@@ -83,8 +83,8 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     subject.getCalendarDates().add(new ServiceCalendarDate(SERVICE_D_OUT, D1, 1));
 
     // Add 2 stops
-    subject.getStops().add(STOP_1);
-    subject.getStops().add(STOP_2);
+    subject.stopModel().withRegularStop(STOP_1);
+    subject.stopModel().withRegularStop(STOP_2);
 
     // Add Route
     subject.getRoutes().add(route);

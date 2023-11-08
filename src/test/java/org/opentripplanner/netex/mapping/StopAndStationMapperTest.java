@@ -261,11 +261,11 @@ public class StopAndStationMapperTest {
 
     StopAndStationMapper stopAndStationMapper = createStopAndStationMapper(stopModelBuilder);
     stopAndStationMapper.mapParentAndChildStops(List.of(stopPlace));
-    stopModelBuilder.regularStopsById().addAll(stopAndStationMapper.resultStops);
+    stopModelBuilder.withRegularStops(stopAndStationMapper.resultStops);
 
     StopAndStationMapper stopAndStationMapper2 = createStopAndStationMapper(stopModelBuilder);
     stopAndStationMapper2.mapParentAndChildStops(List.of(stopPlace));
-    stopModelBuilder.regularStopsById().addAll(stopAndStationMapper2.resultStops);
+    stopModelBuilder.withRegularStops(stopAndStationMapper2.resultStops);
 
     assertEquals(1, stopModelBuilder.regularStopsById().size());
     assertEquals(

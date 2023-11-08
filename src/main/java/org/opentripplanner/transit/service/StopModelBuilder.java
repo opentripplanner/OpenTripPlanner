@@ -1,8 +1,11 @@
 package org.opentripplanner.transit.service;
 
+import java.util.Collection;
+import java.util.function.Function;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupStop;
@@ -26,7 +29,7 @@ public class StopModelBuilder {
     addAll(stopModel);
   }
 
-  public EntityById<RegularStop> regularStopsById() {
+  public ImmutableEntityById<RegularStop> regularStopsById() {
     return regularStopById;
   }
 
@@ -34,12 +37,24 @@ public class StopModelBuilder {
     return RegularStop.of(id);
   }
 
+  public RegularStop computeRegularStopIfAbsent(
+    FeedScopedId id,
+    Function<FeedScopedId, RegularStop> factory
+  ) {
+    return regularStopById.computeIfAbsent(id, factory);
+  }
+
   public StopModelBuilder withRegularStop(RegularStop stop) {
     regularStopById.add(stop);
     return this;
   }
 
-  public EntityById<Station> stationById() {
+  public StopModelBuilder withRegularStops(Collection<RegularStop> stops) {
+    regularStopById.addAll(stops);
+    return this;
+  }
+
+  public ImmutableEntityById<Station> stationById() {
     return stationById;
   }
 
@@ -48,7 +63,16 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<MultiModalStation> multiModalStationById() {
+  public Station computeStationIfAbsent(FeedScopedId id, Function<FeedScopedId, Station> body) {
+    return stationById.computeIfAbsent(id, body::apply);
+  }
+
+  public StopModelBuilder withStations(Collection<Station> stations) {
+    stationById.addAll(stations);
+    return this;
+  }
+
+  public ImmutableEntityById<MultiModalStation> multiModalStationById() {
     return multiModalStationById;
   }
 
@@ -57,7 +81,7 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<GroupOfStations> groupOfStationById() {
+  public ImmutableEntityById<GroupOfStations> groupOfStationById() {
     return groupOfStationById;
   }
 
@@ -66,7 +90,7 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<AreaStop> areaStopById() {
+  public ImmutableEntityById<AreaStop> areaStopById() {
     return areaStopById;
   }
 
@@ -75,12 +99,22 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<GroupStop> groupStopById() {
+  public StopModelBuilder withAreaStops(Collection<AreaStop> stops) {
+    areaStopById.addAll(stops);
+    return this;
+  }
+
+  public ImmutableEntityById<GroupStop> groupStopById() {
     return groupStopById;
   }
 
   public StopModelBuilder withGroupStop(GroupStop group) {
     groupStopById.add(group);
+    return this;
+  }
+
+  public StopModelBuilder withGroupStops(Collection<GroupStop> groups) {
+    groupStopById.addAll(groups);
     return this;
   }
 

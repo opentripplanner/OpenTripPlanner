@@ -7,8 +7,8 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
-import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupOfStationsBuilder;
 import org.opentripplanner.transit.model.site.MultiModalStation;
@@ -24,15 +24,15 @@ class GroupOfStationsMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  private final EntityById<MultiModalStation> multiModalStations;
+  private final ImmutableEntityById<MultiModalStation> multiModalStations;
 
-  private final EntityById<Station> stations;
+  private final ImmutableEntityById<Station> stations;
 
   GroupOfStationsMapper(
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
-    EntityById<MultiModalStation> multiModalStations,
-    EntityById<Station> stations
+    ImmutableEntityById<MultiModalStation> multiModalStations,
+    ImmutableEntityById<Station> stations
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
