@@ -141,11 +141,12 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private TripPattern getOriginalPattern(TestTripPattern pattern) {
+    var stopModelBuilder = StopModel.of();
     ArrayList<StopTime> stopTimes = new ArrayList<>();
 
     for (int i = 0; i < pattern.numberOfStopsInPattern(); i++) {
-      var stop = RegularStop
-        .of(new FeedScopedId("TestFeed", i + ""))
+      var stop = stopModelBuilder
+        .regularStop(new FeedScopedId("TestFeed", i + ""))
         .withCoordinate(0.0, 0.0)
         .build();
       var stopTime = new StopTime();

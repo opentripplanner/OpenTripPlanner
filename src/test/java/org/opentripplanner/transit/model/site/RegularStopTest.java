@@ -15,6 +15,7 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.service.StopModel;
 
 class RegularStopTest {
 
@@ -34,8 +35,9 @@ class RegularStopTest {
   public static final ZoneId TIME_ZONE = ZoneId.of(TransitModelForTest.TIME_ZONE_ID);
   private static final String PLATFORM_CODE = "platformCode";
 
-  private static final RegularStop subject = RegularStop
-    .of(TransitModelForTest.id(ID))
+  private static final RegularStop subject = StopModel
+    .of()
+    .regularStop(TransitModelForTest.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)
     .withCode(CODE)

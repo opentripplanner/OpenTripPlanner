@@ -36,8 +36,9 @@ class StopModelTest {
     .build();
   private static final String EXP_STATIONS = List.of(STATION).toString();
 
-  private static final RegularStop STOP = RegularStop
-    .of(ID)
+  private static final RegularStop STOP = StopModel
+    .of()
+    .regularStop(ID)
     .withCoordinate(COOR_A)
     .withName(NAME)
     .withParentStation(STATION)

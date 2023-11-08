@@ -71,8 +71,8 @@ class QuayMapper {
       return null;
     }
 
-    var builder = RegularStop
-      .of(id)
+    var builder = stopModelBuilder
+      .regularStop(id)
       .withParentStation(parentStation)
       .withName(parentStation.getName())
       .withPlatformCode(quay.getPublicCode())

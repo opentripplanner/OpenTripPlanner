@@ -122,8 +122,9 @@ public class TransitModelForTest {
    * Create a stop with all required fields set.
    */
   public RegularStopBuilder stop(String idAndName) {
-    return RegularStop
-      .of(id(idAndName))
+    return stopModel
+      .withContext()
+      .regularStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
       .withCode(idAndName)
       .withCoordinate(ANY_COORDINATE);
