@@ -22,7 +22,6 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 class LuceneIndexTest {
@@ -90,7 +89,7 @@ class LuceneIndexTest {
 
   @BeforeAll
   static void setup() {
-    var stopModel = StopModel.of();
+    var stopModel = TEST_MODEL.stopModelBuilder();
     List
       .of(
         ALEXANDERPLATZ_BUS,

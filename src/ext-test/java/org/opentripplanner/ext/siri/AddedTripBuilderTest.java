@@ -66,8 +66,8 @@ class AddedTripBuilderTest {
   private static final RegularStop STOP_B = MODEL_TEST.stop("B").build();
   private static final RegularStop STOP_C = MODEL_TEST.stop("C").build();
   private static final RegularStop STOP_D = MODEL_TEST.stop("D").build();
-  private final StopModel STOP_MODEL = StopModel
-    .of()
+  private final StopModel STOP_MODEL = MODEL_TEST
+    .stopModelBuilder()
     .withRegularStop(STOP_A)
     .withRegularStop(STOP_B)
     .withRegularStop(STOP_C)

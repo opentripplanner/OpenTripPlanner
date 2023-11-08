@@ -73,8 +73,8 @@ class ScheduledTransitLegReferenceTest {
     timetable.addTripTimes(tripTimes);
 
     // build transit model
-    StopModel stopModel = StopModel
-      .of()
+    StopModel stopModel = TEST_MODEL
+      .stopModelBuilder()
       .withRegularStop(stop1)
       .withRegularStop(stop2)
       .withRegularStop(stop3)

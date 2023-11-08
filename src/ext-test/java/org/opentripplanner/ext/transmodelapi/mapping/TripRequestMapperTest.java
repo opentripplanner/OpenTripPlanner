@@ -54,7 +54,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class TripRequestMapperTest implements PlanTestConstants {
@@ -80,8 +79,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .bus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3))
       .build();
     var patterns = itineraryPatterns(itinerary);
-    var stopModel = StopModel
-      .of()
+    var stopModel = TEST_MODEL
+      .stopModelBuilder()
       .withRegularStop(stop1)
       .withRegularStop(stop2)
       .withRegularStop(stop3)

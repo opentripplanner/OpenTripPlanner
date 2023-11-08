@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.plan.PlanTestConstants.place;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
@@ -359,7 +358,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     @Test
     void directDistance() {
-      Place dest = place(
+      Place dest = testModel.place(
         "Destination",
         A.coordinate.latitude(),
         A.coordinate.longitude() + SphericalDistanceLibrary.metersToDegrees(5_000)

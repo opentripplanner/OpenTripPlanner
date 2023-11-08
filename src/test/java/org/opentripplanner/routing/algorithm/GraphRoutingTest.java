@@ -73,8 +73,6 @@ public abstract class GraphRoutingTest {
 
   public abstract static class Builder {
 
-    private final TransitModelForTest testModel = TransitModelForTest.of();
-
     private final Graph graph;
     private final TransitModel transitModel;
     private final VertexFactory vertexFactory;
@@ -82,9 +80,8 @@ public abstract class GraphRoutingTest {
 
     protected Builder() {
       var deduplicator = new Deduplicator();
-      var stopModel = new StopModel();
       graph = new Graph(deduplicator);
-      transitModel = new TransitModel(stopModel, deduplicator);
+      transitModel = new TransitModel(new StopModel(), deduplicator);
       vertexFactory = new VertexFactory(graph);
       vehicleParkingHelper = new VehicleParkingHelper(graph);
     }
@@ -225,6 +222,9 @@ public abstract class GraphRoutingTest {
     }
 
     RegularStop stopEntity(String id, double latitude, double longitude, boolean noTransfers) {
+      var stopModelBuilder = transitModel.getStopModel().withContext();
+      var testModel = new TransitModelForTest(stopModelBuilder);
+
       var stopBuilder = testModel.stop(id).withCoordinate(latitude, longitude);
       if (noTransfers) {
         stopBuilder.withParentStation(
@@ -238,7 +238,7 @@ public abstract class GraphRoutingTest {
       }
 
       var stop = stopBuilder.build();
-      transitModel.mergeStopModels(StopModel.of().withRegularStop(stop).build());
+      transitModel.mergeStopModels(stopModelBuilder.withRegularStop(stop).build());
       return stop;
     }
 

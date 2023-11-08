@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model._data;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -8,6 +9,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
@@ -69,12 +71,12 @@ public class TransitModelForTest {
 
   private final StopModelBuilder stopModelBuilder;
 
-  public TransitModelForTest(StopModel stopModel) {
-    this.stopModelBuilder = stopModel.withContext();
+  public TransitModelForTest(StopModelBuilder stopModelBuilder) {
+    this.stopModelBuilder = stopModelBuilder;
   }
 
   public static TransitModelForTest of() {
-    return new TransitModelForTest(new StopModel());
+    return new TransitModelForTest(StopModel.of());
   }
 
   public static FeedScopedId id(String id) {
@@ -188,6 +190,16 @@ public class TransitModelForTest {
     stopTime.setDepartureTime(time);
     stopTime.setStopHeadsign(I18NString.of("Stop headsign at stop %s".formatted(seq)));
     return stopTime;
+  }
+
+  public Place place(String name, Consumer<RegularStopBuilder> stopBuilder) {
+    var stop = stop(name);
+    stopBuilder.accept(stop);
+    return Place.forStop(stop.build());
+  }
+
+  public Place place(String name, double lat, double lon) {
+    return place(name, b -> b.withCoordinate(lat, lon));
   }
 
   /**

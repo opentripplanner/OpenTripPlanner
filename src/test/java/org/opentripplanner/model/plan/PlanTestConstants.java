@@ -2,12 +2,8 @@ package org.opentripplanner.model.plan;
 
 import static org.opentripplanner.framework.time.TimeUtils.time;
 
-import java.util.List;
-import java.util.stream.Stream;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.site.FareZone;
-import org.opentripplanner.transit.model.site.StopLocation;
 
 public interface PlanTestConstants {
   int NOT_SET = -999_999;
@@ -67,71 +63,47 @@ public interface PlanTestConstants {
    * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
    */
   @Deprecated
-  Place A = place("A", 5.0, 8.0);
+  Place A = Place.forStop(TEST_MODEL.stop("A").withCoordinate(5.0, 8.0).build());
 
   /**
    * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
    */
   @Deprecated
-  Place B = place("B", 6.0, 8.5);
+  Place B = Place.forStop(TEST_MODEL.stop("B").withCoordinate(6.0, 8.5).build());
 
   /**
    * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
    */
   @Deprecated
-  Place C = place("C", 7.0, 9.0);
+  Place C = Place.forStop(TEST_MODEL.stop("C").withCoordinate(7.0, 9.0).build());
 
   /**
    * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
    */
   @Deprecated
-  Place D = place("D", 8.0, 9.5);
+  Place D = Place.forStop(TEST_MODEL.stop("D").withCoordinate(8.0, 9.5).build());
 
   /**
    * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
    */
   @Deprecated
-  Place E = place("E", 9.0, 10.0);
+  Place E = Place.forStop(TEST_MODEL.stop("E").withCoordinate(9.0, 10.0).build());
 
   /**
    * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
    */
   @Deprecated
-  Place F = place("F", 9.0, 10.5);
+  Place F = Place.forStop(TEST_MODEL.stop("F").withCoordinate(9.0, 10.5).build());
 
   /**
    * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
    */
   @Deprecated
-  Place G = place("G", 9.5, 11.0);
+  Place G = Place.forStop(TEST_MODEL.stop("G").withCoordinate(9.5, 11.0).build());
 
   /**
    * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
    */
   @Deprecated
-  Place H = place("H", 10.0, 11.5);
-
-  /**
-   * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
-   */
-  @Deprecated
-  static Place place(String name, double lat, double lon) {
-    return Place.forStop(TEST_MODEL.stop(name).withCoordinate(lat, lon).build());
-  }
-
-  /**
-   * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
-   */
-  @Deprecated
-  static Place place(String name, double lat, double lon, FareZone zone) {
-    return Place.forStop(TEST_MODEL.stop(name).withCoordinate(lat, lon).addFareZones(zone).build());
-  }
-
-  /**
-   * @deprecated Depend on TransitModelForTest. Create per test, do not share between tests - it has state
-   */
-  @Deprecated
-  static List<StopLocation> listStops() {
-    return Stream.of(A, B, C, D, E, F, G, H).map(p -> p.stop).toList();
-  }
+  Place H = Place.forStop(TEST_MODEL.stop("H").withCoordinate(10.0, 11.5).build());
 }

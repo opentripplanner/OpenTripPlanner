@@ -53,7 +53,6 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class RaptorPathToItineraryMapperTest {
@@ -141,7 +140,7 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private TripPattern getOriginalPattern(TestTripPattern pattern) {
-    var stopModelBuilder = StopModel.of();
+    var stopModelBuilder = TEST_MODEL.stopModelBuilder();
     ArrayList<StopTime> stopTimes = new ArrayList<>();
 
     for (int i = 0; i < pattern.numberOfStopsInPattern(); i++) {
@@ -189,7 +188,7 @@ public class RaptorPathToItineraryMapperTest {
       new HashMap<>(),
       null,
       null,
-      StopModel.of().withRegularStop(S1).withRegularStop(S2).build(),
+      TEST_MODEL.stopModelBuilder().withRegularStop(S1).withRegularStop(S2).build(),
       null,
       null,
       null,

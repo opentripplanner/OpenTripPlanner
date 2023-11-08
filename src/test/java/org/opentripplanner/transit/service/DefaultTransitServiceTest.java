@@ -35,8 +35,8 @@ class DefaultTransitServiceTest {
 
   @BeforeAll
   static void setup() {
-    var stopModel = StopModel
-      .of()
+    var stopModel = TEST_MODEL
+      .stopModelBuilder()
       .withRegularStop(STOP_A)
       .withRegularStop(STOP_B)
       .withStation(STATION)

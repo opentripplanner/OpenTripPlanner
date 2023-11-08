@@ -2,12 +2,7 @@ package org.opentripplanner.apis.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
-import static org.opentripplanner.model.plan.PlanTestConstants.A;
-import static org.opentripplanner.model.plan.PlanTestConstants.B;
-import static org.opentripplanner.model.plan.PlanTestConstants.C;
-import static org.opentripplanner.model.plan.PlanTestConstants.D;
 import static org.opentripplanner.model.plan.PlanTestConstants.D10m;
-import static org.opentripplanner.model.plan.PlanTestConstants.E;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_01;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_15;
@@ -51,7 +46,7 @@ import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.WalkStep;
@@ -87,12 +82,25 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 class GraphQLIntegrationTest {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
+  private static final Place A = TEST_MODEL.place("A", 5.0, 8.0);
+  private static final Place B = TEST_MODEL.place("B", 6.0, 8.5);
+  private static final Place C = TEST_MODEL.place("C", 7.0, 9.0);
+  private static final Place D = TEST_MODEL.place("D", 8.0, 9.5);
+  private static final Place E = TEST_MODEL.place("E", 9.0, 10.0);
+  private static final Place F = TEST_MODEL.place("F", 9.0, 10.5);
+  private static final Place G = TEST_MODEL.place("G", 9.5, 11.0);
+  private static final Place H = TEST_MODEL.place("H", 10.0, 11.5);
+
+  private static final List<RegularStop> STOP_LOCATIONS = Stream
+    .of(A, B, C, D, E, F, G, H)
+    .map(p -> (RegularStop) p.stop)
+    .toList();
 
   static final Graph GRAPH = new Graph();
 
@@ -120,8 +128,8 @@ class GraphQLIntegrationTest {
         List.of()
       );
 
-    var stopModel = StopModel.of();
-    PlanTestConstants.listStops().forEach(sl -> stopModel.withRegularStop((RegularStop) sl));
+    var stopModel = TEST_MODEL.stopModelBuilder();
+    STOP_LOCATIONS.forEach(stopModel::withRegularStop);
     var model = stopModel.build();
     var transitModel = new TransitModel(model, DEDUPLICATOR);
 

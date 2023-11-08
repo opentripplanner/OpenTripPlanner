@@ -118,8 +118,8 @@ class ModifiedTripBuilderTest {
   );
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 2, 17);
-  private final StopModel stopModel = StopModel
-    .of()
+  private final StopModel stopModel = TEST_MODEL
+    .stopModelBuilder()
     .withRegularStop(STOP_A_1)
     .withRegularStop(STOP_A_2)
     .withRegularStop(STOP_B_1)
