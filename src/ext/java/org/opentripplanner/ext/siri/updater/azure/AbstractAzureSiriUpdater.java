@@ -163,7 +163,7 @@ public abstract class AbstractAzureSiriUpdater implements GraphUpdater {
 
   @Override
   public void teardown() {
-    eventProcessor.stop();
+    eventProcessor.close();
     serviceBusAdmin.deleteSubscription(topicName, subscriptionName).block();
     LOG.info("Subscription {} deleted on topic {}", subscriptionName, topicName);
   }
