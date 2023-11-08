@@ -29,14 +29,15 @@ import org.opentripplanner.transit.model.site.StopTransferPriority;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
 import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.StopModelBuilder;
 
 /**
  * Test utility class to help construct valid transit model objects.
  * <p>
  * TODO: This need cleanup - it has static factory methods. This is not safe, since
  *       all objects created will be created in the same context. All stops are created
- *       withing the context of a StopModel, mixing more than on model in a test would break the
- *       assumptions the design is build on. For now, it is just the stop index - but we want to
+ *       withing the context of a StopModel, mixing more than one model in a test is sharing
+ *       state between tests. For now, it is just the stop index - but we want to
  *       use this to encapsulate the StopModel completely.
  */
 public class TransitModelForTest {
@@ -66,10 +67,10 @@ public class TransitModelForTest {
     .withUrl("https:/www.otherfeedagency.com")
     .build();
 
-  private final StopModel stopModel;
+  private final StopModelBuilder stopModelBuilder;
 
   public TransitModelForTest(StopModel stopModel) {
-    this.stopModel = stopModel;
+    this.stopModelBuilder = stopModel.withContext();
   }
 
   public static TransitModelForTest of() {
@@ -114,16 +115,15 @@ public class TransitModelForTest {
     return Trip.of(FeedScopedId.ofNullable(feedId, tripId)).withRoute(route("R" + tripId).build());
   }
 
-  public StopModel stopModel() {
-    return stopModel;
+  public StopModelBuilder stopModelBuilder() {
+    return stopModelBuilder;
   }
 
   /**
    * Create a stop with all required fields set.
    */
   public RegularStopBuilder stop(String idAndName) {
-    return stopModel
-      .withContext()
+    return stopModelBuilder
       .regularStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
       .withCode(idAndName)
@@ -145,7 +145,9 @@ public class TransitModelForTest {
   }
 
   public GroupStop groupStopForTest(String idAndName, List<RegularStop> stops) {
-    var builder = GroupStop.of(id(idAndName)).withName(new NonLocalizedString(idAndName));
+    var builder = stopModelBuilder
+      .groupStop(id(idAndName))
+      .withName(new NonLocalizedString(idAndName));
 
     stops.forEach(builder::addLocation);
 
@@ -153,8 +155,8 @@ public class TransitModelForTest {
   }
 
   public AreaStop areaStopForTest(String idAndName, Geometry geometry) {
-    return AreaStop
-      .of(id(idAndName))
+    return stopModelBuilder
+      .areaStop(id(idAndName))
       .withName(new NonLocalizedString(idAndName))
       .withGeometry(geometry)
       .build();

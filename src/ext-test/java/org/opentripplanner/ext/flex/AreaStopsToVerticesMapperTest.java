@@ -36,8 +36,7 @@ class AreaStopsToVerticesMapperTest {
     Polygons.BERLIN
   );
   public static final StopModel STOP_MODEL = TEST_MODEL
-    .stopModel()
-    .copy()
+    .stopModelBuilder()
     .withAreaStop(AreaStopsToVerticesMapperTest.BERLIN_AREA_STOP)
     .build();
 

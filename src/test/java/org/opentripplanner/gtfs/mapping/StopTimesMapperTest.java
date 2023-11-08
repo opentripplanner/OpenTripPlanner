@@ -17,6 +17,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.StopModelBuilder;
 
 public class StopTimesMapperTest {
 
@@ -56,16 +57,19 @@ public class StopTimesMapperTest {
 
   public static final DataImportIssueStore ISSUE_STORE = DataImportIssueStore.NOOP;
 
+  private final StopModelBuilder stopModelBuilder = StopModel.of();
+
   private final StopMapper stopMapper = new StopMapper(
     new TranslationHelper(),
     stationId -> null,
-    new StopModel().withContext()
+    stopModelBuilder
   );
   private final BookingRuleMapper bookingRuleMapper = new BookingRuleMapper();
-  private final LocationMapper locationMapper = new LocationMapper();
+  private final LocationMapper locationMapper = new LocationMapper(stopModelBuilder);
   private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
     stopMapper,
-    locationMapper
+    locationMapper,
+    stopModelBuilder
   );
   private final TranslationHelper translationHelper = new TranslationHelper();
   private final StopTimeMapper subject = new StopTimeMapper(

@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
@@ -118,12 +119,14 @@ class FlexStopsMapperTest {
   );
 
   private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final StopModelBuilder stopModelBuilder = testModel.stopModelBuilder();
 
   @Test
   void testMapAreaStop() {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -176,6 +179,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper subject = new FlexStopsMapper(
       ID_FACTORY,
       List.of(stop1, stop2),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -210,6 +214,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper subject = new FlexStopsMapper(
       ID_FACTORY,
       List.of(stop1, stop2),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -233,7 +238,12 @@ class FlexStopsMapperTest {
         )
     );
 
-    FlexStopsMapper subject = new FlexStopsMapper(ID_FACTORY, List.of(), DataImportIssueStore.NOOP);
+    FlexStopsMapper subject = new FlexStopsMapper(
+      ID_FACTORY,
+      List.of(),
+      stopModelBuilder,
+      DataImportIssueStore.NOOP
+    );
 
     GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
 
@@ -259,6 +269,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper subject = new FlexStopsMapper(
       ID_FACTORY,
       List.of(stop1, stop2),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -296,6 +307,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(polygonCoordinates);

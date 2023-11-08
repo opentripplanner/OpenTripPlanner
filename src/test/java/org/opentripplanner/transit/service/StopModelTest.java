@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.site.Station;
 
 class StopModelTest {
 
+  private static final StopModelBuilder STOP_MODEL_BUILDER = StopModel.of();
   private static final WgsCoordinate COOR_A = new WgsCoordinate(60.0, 11.0);
   private static final WgsCoordinate COOR_B = new WgsCoordinate(62.0, 12.0);
   private static final Geometry GEOMETRY = GeometryUtils
@@ -36,20 +37,22 @@ class StopModelTest {
     .build();
   private static final String EXP_STATIONS = List.of(STATION).toString();
 
-  private static final RegularStop STOP = StopModel
-    .of()
+  private static final RegularStop STOP = STOP_MODEL_BUILDER
     .regularStop(ID)
     .withCoordinate(COOR_A)
     .withName(NAME)
     .withParentStation(STATION)
     .build();
   private static final String EXP_STOPS = List.of(STOP).toString();
-  private static final AreaStop STOP_AREA = AreaStop
-    .of(ID)
+  private static final AreaStop STOP_AREA = STOP_MODEL_BUILDER
+    .areaStop(ID)
     .withName(NAME)
     .withGeometry(GEOMETRY)
     .build();
-  private static final GroupStop STOP_GROUP = GroupStop.of(ID).addLocation(STOP).build();
+  private static final GroupStop STOP_GROUP = STOP_MODEL_BUILDER
+    .groupStop(ID)
+    .addLocation(STOP)
+    .build();
   private static final MultiModalStation MM_STATION = MultiModalStation
     .of(ID)
     .withName(NAME)

@@ -7,8 +7,10 @@ import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.AreaStopBuilder;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.GroupStopBuilder;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.RegularStopBuilder;
@@ -90,6 +92,10 @@ public class StopModelBuilder {
     return this;
   }
 
+  public AreaStopBuilder areaStop(FeedScopedId id) {
+    return AreaStop.of(id);
+  }
+
   public ImmutableEntityById<AreaStop> areaStopById() {
     return areaStopById;
   }
@@ -102,6 +108,10 @@ public class StopModelBuilder {
   public StopModelBuilder withAreaStops(Collection<AreaStop> stops) {
     areaStopById.addAll(stops);
     return this;
+  }
+
+  public GroupStopBuilder groupStop(FeedScopedId id) {
+    return GroupStop.of(id);
   }
 
   public ImmutableEntityById<GroupStop> groupStopById() {

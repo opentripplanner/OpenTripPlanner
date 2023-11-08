@@ -38,7 +38,7 @@ public class GTFSToOtpTransitServiceMapper {
 
   private final BoardingAreaMapper boardingAreaMapper;
 
-  private final LocationMapper locationMapper = new LocationMapper();
+  private final LocationMapper locationMapper;
 
   private final LocationGroupMapper locationGroupMapper;
 
@@ -109,7 +109,8 @@ public class GTFSToOtpTransitServiceMapper {
     entranceMapper = new EntranceMapper(translationHelper, stationLookup);
     pathwayNodeMapper = new PathwayNodeMapper(translationHelper, stationLookup);
     boardingAreaMapper = new BoardingAreaMapper(translationHelper, stopLookup);
-    locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper);
+    locationMapper = new LocationMapper(builder.stopModel());
+    locationGroupMapper = new LocationGroupMapper(stopMapper, locationMapper, builder.stopModel());
     pathwayMapper =
       new PathwayMapper(stopMapper, entranceMapper, pathwayNodeMapper, boardingAreaMapper);
     routeMapper = new RouteMapper(agencyMapper, issueStore, translationHelper);

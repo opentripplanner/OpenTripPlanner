@@ -12,22 +12,26 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
+import org.opentripplanner.transit.service.StopModel;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.opentripplanner.transit.service.TransitModel;
 
 class AreaStopLayerBuilderTest {
 
-  public static final Coordinate[] COORDINATES = {
+  private static final Coordinate[] COORDINATES = {
     new Coordinate(0, 0),
     new Coordinate(0, 1),
     new Coordinate(1, 1),
     new Coordinate(1, 0),
     new Coordinate(0, 0),
   };
-  public static final FeedScopedId ID = new FeedScopedId("FEED", "ID");
-  public static final I18NString NAME = new NonLocalizedString("Test stop");
+  private static final FeedScopedId ID = new FeedScopedId("FEED", "ID");
+  private static final I18NString NAME = new NonLocalizedString("Test stop");
 
-  public static final AreaStop AREA_STOP = AreaStop
-    .of(ID)
+  private final StopModelBuilder stopModelBuilder = StopModel.of();
+
+  private final AreaStop areaStop = stopModelBuilder
+    .areaStop(ID)
     .withName(NAME)
     .withGeometry(GeometryUtils.getGeometryFactory().createPolygon(COORDINATES))
     .build();
@@ -39,7 +43,7 @@ class AreaStopLayerBuilderTest {
       Locale.ENGLISH
     );
 
-    var properties = subject.map(AREA_STOP);
+    var properties = subject.map(areaStop);
 
     assertEquals(2, properties.size());
     assertTrue(properties.contains(new KeyValue("id", ID.toString())));

@@ -363,6 +363,7 @@ public class NetexMapper {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       idFactory,
       transitBuilder.getStops().values(),
+      transitBuilder.stopModel(),
       issueStore
     );
 

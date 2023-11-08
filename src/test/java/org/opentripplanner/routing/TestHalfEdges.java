@@ -70,7 +70,7 @@ public class TestHalfEdges {
   public void setUp() {
     var deduplicator = new Deduplicator();
     graph = new Graph(deduplicator);
-    transitModel = new TransitModel(testModel.stopModel(), deduplicator);
+    transitModel = new TransitModel(testModel.stopModelBuilder().build(), deduplicator);
     var factory = new VertexFactory(graph);
     // a 0.1 degree x 0.1 degree square
     tl = factory.intersection("tl", -74.01, 40.01);

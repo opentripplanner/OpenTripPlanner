@@ -101,8 +101,9 @@ public class StopModel implements Serializable {
     return new StopModelBuilder(this);
   }
 
+  @Deprecated
   public StopModelBuilder copy() {
-    return new StopModelBuilder(this);
+    return withContext().addAll(this);
   }
 
   /**
