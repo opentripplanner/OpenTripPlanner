@@ -20,6 +20,7 @@ import org.opentripplanner.transit.model.site.Station;
 public class StopModelBuilder {
 
   private final StopModel original;
+  private final AtomicInteger indexCounter;
 
   private final EntityById<RegularStop> regularStopById = new DefaultEntityById<>();
   private final EntityById<AreaStop> areaStopById = new DefaultEntityById<>();
@@ -30,10 +31,15 @@ public class StopModelBuilder {
 
   StopModelBuilder(StopModel original) {
     this.original = original;
+    this.indexCounter = new AtomicInteger(original.stopIndexSize());
   }
 
   public StopModel original() {
     return original;
+  }
+
+  int stopIndexSize() {
+    return indexCounter.get();
   }
 
   public ImmutableEntityById<RegularStop> regularStopsById() {
@@ -41,7 +47,7 @@ public class StopModelBuilder {
   }
 
   public RegularStopBuilder regularStop(FeedScopedId id) {
-    return RegularStop.of(id);
+    return RegularStop.of(id, indexCounter::getAndIncrement);
   }
 
   public RegularStop computeRegularStopIfAbsent(
@@ -98,7 +104,7 @@ public class StopModelBuilder {
   }
 
   public AreaStopBuilder areaStop(FeedScopedId id) {
-    return AreaStop.of(id);
+    return AreaStop.of(id, indexCounter::getAndIncrement);
   }
 
   public ImmutableEntityById<AreaStop> areaStopById() {
@@ -116,7 +122,7 @@ public class StopModelBuilder {
   }
 
   public GroupStopBuilder groupStop(FeedScopedId id) {
-    return GroupStop.of(id);
+    return GroupStop.of(id, indexCounter::getAndIncrement);
   }
 
   public ImmutableEntityById<GroupStop> groupStopById() {

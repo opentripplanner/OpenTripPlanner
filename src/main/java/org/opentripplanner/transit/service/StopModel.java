@@ -31,6 +31,7 @@ public class StopModel implements Serializable {
   private static final int NO_PARENT = -1;
 
   private final int parentHash;
+  private final int stopIndexSize;
   private final Map<FeedScopedId, RegularStop> regularStopById;
   private final Map<FeedScopedId, Station> stationById;
   private final Map<FeedScopedId, MultiModalStation> multiModalStationById;
@@ -42,6 +43,7 @@ public class StopModel implements Serializable {
   @Inject
   public StopModel() {
     this.parentHash = NO_PARENT;
+    this.stopIndexSize = 0;
     this.regularStopById = Map.of();
     this.stationById = Map.of();
     this.multiModalStationById = Map.of();
@@ -53,6 +55,7 @@ public class StopModel implements Serializable {
 
   StopModel(StopModelBuilder builder) {
     this.parentHash = builder.original().hashCode();
+    this.stopIndexSize = builder.stopIndexSize();
     this.regularStopById = builder.regularStopsById().asImmutableMap();
     this.stationById = builder.stationById().asImmutableMap();
     this.multiModalStationById = builder.multiModalStationById().asImmutableMap();
@@ -75,6 +78,7 @@ public class StopModel implements Serializable {
       );
     }
     this.parentHash = NO_PARENT;
+    this.stopIndexSize = child.stopIndexSize();
     this.areaStopById = MapUtils.combine(main.areaStopById, child.areaStopById);
     this.regularStopById = MapUtils.combine(main.regularStopById, child.regularStopById);
     this.groupOfStationsById =
@@ -98,10 +102,11 @@ public class StopModel implements Serializable {
   }
 
   /**
-   * Create a new builder attached to the existing model. Any changes will be added on top of the
-   * existing model. The StopModel does not allow updates to existing read-only entities - only
-   * updates to entities created in the same context. This prevents an input feed to erase
-   * information added by another feed. It is the first feed who wins.
+   * Create a new builder attached to the existing model. The entities of the existing model is
+   * NOT copied into the builder, but the builder have access to the model - allowing it to check
+   * for duplicates and injecting information from the model(indexing). The changes in the
+   * StopModelBuilder can then be merged into the original model - this is for now left to the
+   * caller.
    * <p>
    * USE THIS TO CREATE A SAFE BUILDER IN PRODUCTION CODE. You MAY use this method in unit-tests,
    * the alternative is the {@link #of()} method. This method should be used if the test have a
@@ -299,7 +304,8 @@ public class StopModel implements Serializable {
       regularStopById.values(),
       areaStopById.values(),
       groupStopById.values(),
-      multiModalStationById.values()
+      multiModalStationById.values(),
+      stopIndexSize
     );
   }
 
