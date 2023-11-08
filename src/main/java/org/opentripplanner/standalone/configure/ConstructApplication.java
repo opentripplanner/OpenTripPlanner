@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.configure;
 import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.LogMDCSupport;
@@ -70,7 +71,8 @@ public class ConstructApplication {
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
-    DataImportIssueSummary issueSummary
+    DataImportIssueSummary issueSummary,
+    EmissionsDataModel emissionsDataModel
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -87,6 +89,7 @@ public class ConstructApplication {
         .transitModel(transitModel)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
+        .emissionsDataModel(emissionsDataModel)
         .dataImportIssueSummary(issueSummary)
         .build();
   }
@@ -118,6 +121,7 @@ public class ConstructApplication {
       graph(),
       transitModel(),
       factory.worldEnvelopeRepository(),
+      factory.emissionsDataModel(),
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );
@@ -287,5 +291,9 @@ public class ConstructApplication {
 
   private void createMetricsLogging() {
     factory.metricsLogging();
+  }
+
+  public EmissionsDataModel emissionsDataModel() {
+    return factory.emissionsDataModel();
   }
 }

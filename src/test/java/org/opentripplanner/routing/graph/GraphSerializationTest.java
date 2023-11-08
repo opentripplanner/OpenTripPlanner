@@ -19,6 +19,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeRepository;
@@ -61,7 +62,8 @@ public class GraphSerializationTest {
   public void testRoundTripSerializationForGTFSGraph() throws Exception {
     TestOtpModel model = ConstantsForTests.buildNewPortlandGraph(true);
     var weRepo = new DefaultWorldEnvelopeRepository();
-    testRoundTrip(model.graph(), model.transitModel(), weRepo);
+    var emissionsDataModel = new EmissionsDataModel();
+    testRoundTrip(model.graph(), model.transitModel(), weRepo, emissionsDataModel);
   }
 
   /**
@@ -71,7 +73,8 @@ public class GraphSerializationTest {
   public void testRoundTripSerializationForNetexGraph() throws Exception {
     TestOtpModel model = ConstantsForTests.buildNewMinimalNetexGraph();
     var worldEnvelopeRepository = new DefaultWorldEnvelopeRepository();
-    testRoundTrip(model.graph(), model.transitModel(), worldEnvelopeRepository);
+    var emissionsDataModel = new EmissionsDataModel();
+    testRoundTrip(model.graph(), model.transitModel(), worldEnvelopeRepository, emissionsDataModel);
   }
 
   // Ideally we'd also test comparing two separate but identical complex graphs, built separately from the same inputs.
@@ -169,7 +172,8 @@ public class GraphSerializationTest {
   private void testRoundTrip(
     Graph originalGraph,
     TransitModel originalTransitModel,
-    WorldEnvelopeRepository worldEnvelopeRepository
+    WorldEnvelopeRepository worldEnvelopeRepository,
+    EmissionsDataModel emissionsDataModel
   ) throws Exception {
     // Now round-trip the graph through serialization.
     File tempFile = TempFile.createTempFile("graph", "pdx");
@@ -179,7 +183,8 @@ public class GraphSerializationTest {
       worldEnvelopeRepository,
       BuildConfig.DEFAULT,
       RouterConfig.DEFAULT,
-      DataImportIssueSummary.empty()
+      DataImportIssueSummary.empty(),
+      emissionsDataModel
     );
     serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
     SerializedGraphObject deserializedGraph = SerializedGraphObject.load(tempFile);
