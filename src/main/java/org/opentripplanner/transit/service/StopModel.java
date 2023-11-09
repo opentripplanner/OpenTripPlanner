@@ -102,8 +102,8 @@ public class StopModel implements Serializable {
   }
 
   /**
-   * Create a new builder attached to the existing model. The entities of the existing model is
-   * NOT copied into the builder, but the builder have access to the model - allowing it to check
+   * Create a new builder attached to the existing model. The entities of the existing model are
+   * NOT copied into the builder, but the builder has access to the model - allowing it to check
    * for duplicates and injecting information from the model(indexing). The changes in the
    * StopModelBuilder can then be merged into the original model - this is for now left to the
    * caller.

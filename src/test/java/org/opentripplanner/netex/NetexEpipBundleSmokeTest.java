@@ -48,7 +48,6 @@ class NetexEpipBundleSmokeTest {
     // Given
     OtpTransitServiceBuilder transitBuilder;
     try (NetexBundle netexBundle = ConstantsForTests.createMinimalNetexEpipBundle()) {
-      // Ensure that the smoke test runs independently
       // Run the check to make sure it does not throw an exception
       netexBundle.checkInputs();
 
