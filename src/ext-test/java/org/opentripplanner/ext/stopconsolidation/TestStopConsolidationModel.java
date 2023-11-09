@@ -1,8 +1,5 @@
 package org.opentripplanner.ext.stopconsolidation;
 
-import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_A;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_B;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_C;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.List;
@@ -14,11 +11,19 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 class TestStopConsolidationModel {
 
+  private static final TransitModelForTest testModel = TransitModelForTest.of();
+  public static final RegularStop STOP_A = testModel.stop("A").withCoordinate(1, 1).build();
+  public static final RegularStop STOP_B = testModel.stop("B").withCoordinate(1.1, 1.1).build();
+  public static final RegularStop STOP_C = testModel.stop("C").withCoordinate(1.2, 1.2).build();
+  public static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(
+    STOP_A,
+    STOP_B,
+    STOP_C
+  );
   static final String SECONDARY_FEED_ID = "secondary";
   static final Agency AGENCY = TransitModelForTest
     .agency("agency")
@@ -29,12 +34,10 @@ class TestStopConsolidationModel {
     .route(new FeedScopedId(SECONDARY_FEED_ID, "route-33"))
     .withAgency(AGENCY)
     .build();
-  static final RegularStop STOP_D = TransitModelForTest
+  static final RegularStop STOP_D = testModel
     .stop("D")
     .withId(new FeedScopedId(SECONDARY_FEED_ID, "secondary-stop-D"))
     .build();
-
-  static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(STOP_A, STOP_B, STOP_C);
 
   static final TripPattern PATTERN = TripPattern
     .of(id("123"))
@@ -43,7 +46,7 @@ class TestStopConsolidationModel {
     .build();
 
   static TransitModel buildTransitModel() {
-    var stopModelBuilder = StopModel.of();
+    var stopModelBuilder = testModel.stopModelBuilder();
     List.of(STOP_A, STOP_B, STOP_C, STOP_D).forEach(stopModelBuilder::withRegularStop);
     return new TransitModel(stopModelBuilder.build(), new Deduplicator());
   }

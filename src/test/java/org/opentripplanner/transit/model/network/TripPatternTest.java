@@ -6,10 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.framework.geometry.GeometryUtils.makeLineString;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_A;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_B;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_C;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_PATTERN;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.util.List;
@@ -24,10 +20,17 @@ class TripPatternTest {
 
   private static final String ID = "1";
   private static final String NAME = "short name";
-  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   private static final Route ROUTE = TransitModelForTest.route("routeId").build();
-  private static final StopPattern STOP_PATTERN = TEST_MODEL.stopPattern(10);
+  public static final RegularStop STOP_A = TEST_MODEL.stop("A").build();
+  public static final RegularStop STOP_B = TEST_MODEL.stop("B").build();
+  public static final RegularStop STOP_C = TEST_MODEL.stop("C").build();
+  private static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(
+    STOP_A,
+    STOP_B,
+    STOP_C
+  );
 
   private static final List<LineString> HOP_GEOMETRIES = List.of(
     makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()),

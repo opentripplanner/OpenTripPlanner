@@ -3,10 +3,10 @@ package org.opentripplanner.ext.stopconsolidation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.PATTERN;
+import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_A;
+import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_B;
+import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_C;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_D;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_A;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_B;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.STOP_C;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
