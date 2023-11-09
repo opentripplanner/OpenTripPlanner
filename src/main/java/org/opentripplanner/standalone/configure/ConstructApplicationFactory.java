@@ -4,6 +4,8 @@ import dagger.BindsInstance;
 import dagger.Component;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsServiceModule;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -44,6 +46,7 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     VehicleRentalRepositoryModule.class,
     ConstructApplicationModule.class,
     RideHailingServicesModule.class,
+    EmissionsServiceModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -58,6 +61,9 @@ public interface ConstructApplicationFactory {
   VehicleRentalRepository vehicleRentalRepository();
   VehicleRentalService vehicleRentalService();
   DataImportIssueSummary dataImportIssueSummary();
+
+  @Nullable
+  EmissionsDataModel emissionsDataModel();
 
   @Nullable
   GraphVisualizer graphVisualizer();
@@ -86,6 +92,9 @@ public interface ConstructApplicationFactory {
 
     @BindsInstance
     Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);
+
+    @BindsInstance
+    Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
 
     ConstructApplicationFactory build();
   }

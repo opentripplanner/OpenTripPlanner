@@ -23,7 +23,8 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class TripPatternForDateTest {
 
-  private static final RegularStop STOP = TransitModelForTest.stopForTest("TEST:STOP", 0, 0);
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final RegularStop STOP = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
   private static final Route ROUTE = TransitModelForTest.route("1").build();
   private static final TripTimes tripTimes = new TripTimes(
     TransitModelForTest.trip("1").withRoute(ROUTE).build(),

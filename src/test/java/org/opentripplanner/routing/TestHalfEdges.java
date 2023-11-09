@@ -52,10 +52,11 @@ import org.opentripplanner.street.search.strategy.EuclideanRemainingWeightHeuris
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class TestHalfEdges {
+
+  private final TransitModelForTest testModel = TransitModelForTest.of();
 
   private Graph graph;
   private StreetEdge top, bottom, left, right, leftBack, rightBack;
@@ -68,7 +69,7 @@ public class TestHalfEdges {
   public void setUp() {
     var deduplicator = new Deduplicator();
     graph = new Graph(deduplicator);
-    transitModel = new TransitModel(new StopModel(), deduplicator);
+    var stopModelBuilder = testModel.stopModelBuilder();
     var factory = new VertexFactory(graph);
     // a 0.1 degree x 0.1 degree square
     tl = factory.intersection("tl", -74.01, 40.01);
@@ -158,10 +159,11 @@ public class TestHalfEdges {
         .withBack(true)
         .buildAndConnect();
 
-    var s1 = TransitModelForTest.stopForTest("fleem station", 40.0099999, -74.005);
-    var s2 = TransitModelForTest.stopForTest("morx station", 40.0099999, -74.002);
+    var s1 = testModel.stop("fleem station", 40.0099999, -74.005).build();
+    var s2 = testModel.stop("morx station", 40.0099999, -74.002).build();
 
-    transitModel.mergeStopModels(StopModel.of().withRegularStop(s1).withRegularStop(s2).build());
+    stopModelBuilder.withRegularStop(s1).withRegularStop(s2);
+    transitModel = new TransitModel(stopModelBuilder.build(), deduplicator);
 
     station1 = factory.transitStop(new TransitStopVertexBuilder().withStop(s1));
     station2 = factory.transitStop(new TransitStopVertexBuilder().withStop(s2));

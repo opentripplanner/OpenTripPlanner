@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Metrics;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
+import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -32,7 +33,8 @@ public class ConstructApplicationModule {
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     List<RideHailingService> rideHailingServices,
-    @Nullable TraverseVisitor<?, ?> traverseVisitor
+    @Nullable TraverseVisitor<?, ?> traverseVisitor,
+    EmissionsService emissionsService
   ) {
     return DefaultServerRequestContext.create(
       routerConfig.transitTuningConfig(),
@@ -45,6 +47,7 @@ public class ConstructApplicationModule {
       worldEnvelopeService,
       realtimeVehicleService,
       vehicleRentalService,
+      emissionsService,
       routerConfig.flexConfig(),
       rideHailingServices,
       traverseVisitor

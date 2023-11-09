@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.Notice;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -16,7 +17,7 @@ class NoticeMapper {
 
   private final FeedScopedIdFactory idFactory;
 
-  private final EntityById<Notice> cache = new EntityById<>();
+  private final EntityById<Notice> cache = new DefaultEntityById<>();
 
   NoticeMapper(FeedScopedIdFactory idFactory) {
     this.idFactory = idFactory;

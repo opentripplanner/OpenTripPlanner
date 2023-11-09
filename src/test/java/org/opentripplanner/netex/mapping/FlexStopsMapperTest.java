@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
@@ -117,11 +118,15 @@ class FlexStopsMapperTest {
     10.878374152208456
   );
 
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final StopModelBuilder stopModelBuilder = testModel.stopModelBuilder();
+
   @Test
   void testMapAreaStop() {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -158,8 +163,8 @@ class FlexStopsMapperTest {
 
   @Test
   void testMapGroupStop() {
-    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
+    RegularStop stop1 = testModel.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = testModel.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
     flexibleStopPlace.setKeyList(
@@ -174,6 +179,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper subject = new FlexStopsMapper(
       ID_FACTORY,
       List.of(stop1, stop2),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -187,8 +193,8 @@ class FlexStopsMapperTest {
 
   @Test
   void testMapGroupStopVariantWithKeyValueOnArea() {
-    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
+    RegularStop stop1 = testModel.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = testModel.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
 
@@ -208,6 +214,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper subject = new FlexStopsMapper(
       ID_FACTORY,
       List.of(stop1, stop2),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -231,7 +238,12 @@ class FlexStopsMapperTest {
         )
     );
 
-    FlexStopsMapper subject = new FlexStopsMapper(ID_FACTORY, List.of(), DataImportIssueStore.NOOP);
+    FlexStopsMapper subject = new FlexStopsMapper(
+      ID_FACTORY,
+      List.of(),
+      stopModelBuilder,
+      DataImportIssueStore.NOOP
+    );
 
     GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
 
@@ -240,8 +252,8 @@ class FlexStopsMapperTest {
 
   @Test
   void testMapFlexibleStopPlaceWithInvalidGeometryOnUnrestrictedPublicTransportAreas() {
-    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
+    RegularStop stop1 = testModel.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = testModel.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
     var invalidPolygon = List.of(1.0);
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(invalidPolygon);
@@ -257,6 +269,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper subject = new FlexStopsMapper(
       ID_FACTORY,
       List.of(stop1, stop2),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -294,6 +307,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(polygonCoordinates);

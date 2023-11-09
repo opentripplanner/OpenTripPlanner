@@ -17,7 +17,7 @@ public class EntityByIdTest {
   private static final String LIST_OF_E_TO_STRING = String.format("[%s]", E_TO_STRING);
   private static final String MAP_OF_E_TO_STRING = String.format("{%s=%s}", ID, E_TO_STRING);
   private static final FeedScopedId FAKE_ID = TransitModelForTest.id("77");
-  private final EntityById<TestEntity> subject = new EntityById<>();
+  private final EntityById<TestEntity> subject = new DefaultEntityById<>();
 
   @Test
   public void add() {

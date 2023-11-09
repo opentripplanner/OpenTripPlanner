@@ -32,10 +32,10 @@ jobs:
           node-version: 18
 
       # Java setup step completes very fast, no need to run in a preconfigured docker container
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
           cache: maven
 
@@ -66,10 +66,10 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
           cache: maven
       # on windows there are frequent failures caused by page files being too small
@@ -183,10 +183,10 @@ jobs:
         run: |
           yarn install
           yarn generate
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
           cache: maven
       - name: Compile Java code
@@ -202,10 +202,10 @@ jobs:
       - uses: actions/checkout@v3.1.0
         with:
           fetch-depth: 0
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
           cache: maven
       - name: Build container image with Jib, push to Dockerhub
