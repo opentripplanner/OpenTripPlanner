@@ -183,6 +183,9 @@ public class GraphBuilderDataSources {
       .orElse(buildConfig.netexDefaults.copyOf().withSource(dataSource.uri()).build());
   }
 
+  /**
+   * Returns the optional data source for the stop consolidation configuration.
+   */
   public Optional<DataSource> stopConsolidationDataSource() {
     return Optional
       .ofNullable(buildConfig.stopConsolidationFile)
