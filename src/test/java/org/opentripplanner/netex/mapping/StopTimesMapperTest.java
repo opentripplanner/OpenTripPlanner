@@ -18,7 +18,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
-import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
@@ -47,8 +47,8 @@ public class StopTimesMapperTest {
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       sample.getStopsById(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       sample.getDestinationDisplayById(),
       sample.getQuayIdByStopPointRef(),
       new HierarchicalMap<>(),
@@ -137,8 +137,8 @@ public class StopTimesMapperTest {
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
       netexSample.getStopsById(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       netexSample.getDestinationDisplayById(),
       netexSample.getQuayIdByStopPointRef(),
       new HierarchicalMap<>(),

@@ -21,6 +21,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.service.StopModel;
 import uk.org.siri.siri20.OccupancyEnumeration;
 
 public class TimetableHelperTest {
@@ -55,8 +56,9 @@ public class TimetableHelperTest {
       .build();
 
     var stopTime = new StopTime();
-    RegularStop stop = RegularStop
-      .of(SCOPED_STOP_ID)
+    RegularStop stop = StopModel
+      .of()
+      .regularStop(SCOPED_STOP_ID)
       .withCoordinate(0.0, 0.0)
       .withParentStation(station)
       .build();

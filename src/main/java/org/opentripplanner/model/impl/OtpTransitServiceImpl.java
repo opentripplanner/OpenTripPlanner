@@ -77,7 +77,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
   OtpTransitServiceImpl(OtpTransitServiceBuilder builder) {
     this.agencies = immutableList(builder.getAgenciesById().values());
     this.feedInfos = immutableList(builder.getFeedInfos());
-    this.stopModel = builder.stopModelBuilder().build();
+    this.stopModel = builder.stopModel().build();
     this.noticeAssignments = ImmutableListMultimap.copyOf(builder.getNoticeAssignments());
     this.operators = immutableList(builder.getOperatorsById().values());
     this.pathways = immutableList(builder.getPathways());

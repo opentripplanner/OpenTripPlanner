@@ -1,30 +1,60 @@
 package org.opentripplanner.transit.service;
 
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.AreaStopBuilder;
 import org.opentripplanner.transit.model.site.GroupOfStations;
 import org.opentripplanner.transit.model.site.GroupStop;
+import org.opentripplanner.transit.model.site.GroupStopBuilder;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.RegularStopBuilder;
 import org.opentripplanner.transit.model.site.Station;
 
 public class StopModelBuilder {
 
-  private final EntityById<RegularStop> regularStopById = new EntityById<>();
-  private final EntityById<AreaStop> areaStopById = new EntityById<>();
-  private final EntityById<GroupStop> groupStopById = new EntityById<>();
-  private final EntityById<Station> stationById = new EntityById<>();
-  private final EntityById<MultiModalStation> multiModalStationById = new EntityById<>();
-  private final EntityById<GroupOfStations> groupOfStationById = new EntityById<>();
+  private final StopModel original;
+  private final AtomicInteger indexCounter;
 
-  StopModelBuilder() {}
+  private final EntityById<RegularStop> regularStopById = new DefaultEntityById<>();
+  private final EntityById<AreaStop> areaStopById = new DefaultEntityById<>();
+  private final EntityById<GroupStop> groupStopById = new DefaultEntityById<>();
+  private final EntityById<Station> stationById = new DefaultEntityById<>();
+  private final EntityById<MultiModalStation> multiModalStationById = new DefaultEntityById<>();
+  private final EntityById<GroupOfStations> groupOfStationById = new DefaultEntityById<>();
 
-  StopModelBuilder(StopModel stopModel) {
-    addAll(stopModel);
+  StopModelBuilder(StopModel original) {
+    this.original = original;
+    this.indexCounter = new AtomicInteger(original.stopIndexSize());
   }
 
-  public EntityById<RegularStop> regularStopsById() {
+  public StopModel original() {
+    return original;
+  }
+
+  int stopIndexSize() {
+    return indexCounter.get();
+  }
+
+  public ImmutableEntityById<RegularStop> regularStopsById() {
     return regularStopById;
+  }
+
+  public RegularStopBuilder regularStop(FeedScopedId id) {
+    return RegularStop.of(id, indexCounter::getAndIncrement);
+  }
+
+  public RegularStop computeRegularStopIfAbsent(
+    FeedScopedId id,
+    Function<FeedScopedId, RegularStop> factory
+  ) {
+    return regularStopById.computeIfAbsent(id, factory);
   }
 
   public StopModelBuilder withRegularStop(RegularStop stop) {
@@ -32,7 +62,12 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<Station> stationById() {
+  public StopModelBuilder withRegularStops(Collection<RegularStop> stops) {
+    regularStopById.addAll(stops);
+    return this;
+  }
+
+  public ImmutableEntityById<Station> stationById() {
     return stationById;
   }
 
@@ -41,7 +76,16 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<MultiModalStation> multiModalStationById() {
+  public Station computeStationIfAbsent(FeedScopedId id, Function<FeedScopedId, Station> body) {
+    return stationById.computeIfAbsent(id, body::apply);
+  }
+
+  public StopModelBuilder withStations(Collection<Station> stations) {
+    stationById.addAll(stations);
+    return this;
+  }
+
+  public ImmutableEntityById<MultiModalStation> multiModalStationById() {
     return multiModalStationById;
   }
 
@@ -50,7 +94,7 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<GroupOfStations> groupOfStationById() {
+  public ImmutableEntityById<GroupOfStations> groupOfStationById() {
     return groupOfStationById;
   }
 
@@ -59,7 +103,11 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<AreaStop> areaStopById() {
+  public AreaStopBuilder areaStop(FeedScopedId id) {
+    return AreaStop.of(id, indexCounter::getAndIncrement);
+  }
+
+  public ImmutableEntityById<AreaStop> areaStopById() {
     return areaStopById;
   }
 
@@ -68,12 +116,26 @@ public class StopModelBuilder {
     return this;
   }
 
-  public EntityById<GroupStop> groupStopById() {
+  public StopModelBuilder withAreaStops(Collection<AreaStop> stops) {
+    areaStopById.addAll(stops);
+    return this;
+  }
+
+  public GroupStopBuilder groupStop(FeedScopedId id) {
+    return GroupStop.of(id, indexCounter::getAndIncrement);
+  }
+
+  public ImmutableEntityById<GroupStop> groupStopById() {
     return groupStopById;
   }
 
   public StopModelBuilder withGroupStop(GroupStop group) {
     groupStopById.add(group);
+    return this;
+  }
+
+  public StopModelBuilder withGroupStops(Collection<GroupStop> groups) {
+    groupStopById.addAll(groups);
     return this;
   }
 

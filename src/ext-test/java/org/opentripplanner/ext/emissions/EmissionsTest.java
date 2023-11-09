@@ -5,7 +5,6 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
@@ -55,9 +53,10 @@ class EmissionsTest {
 
   @Test
   void testGetEmissionsForItinerary() {
-    var stopOne = TransitModelForTest.stopForTest("1:stop1", 60, 25);
-    var stopTwo = TransitModelForTest.stopForTest("1:stop1", 61, 25);
-    var stopThree = TransitModelForTest.stopForTest("1:stop1", 62, 25);
+    var testModel = TransitModelForTest.of();
+    var stopOne = testModel.stop("1:stop1", 60, 25).build();
+    var stopTwo = testModel.stop("1:stop1", 61, 25).build();
+    var stopThree = testModel.stop("1:stop1", 62, 25).build();
     var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
     var route = TransitModelForTest.route(id("1")).build();
     var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();
@@ -93,7 +92,7 @@ class EmissionsTest {
       .withMode(TraverseMode.CAR)
       .withDistanceMeters(214.4)
       .withStartTime(TIME)
-      .withEndTime(TIME.plus(1, ChronoUnit.HOURS))
+      .withEndTime(TIME.plusHours(1))
       .build();
     Itinerary i = new Itinerary(List.of(leg));
     assertEquals(
@@ -104,6 +103,7 @@ class EmissionsTest {
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
+    var testModel = TransitModelForTest.of();
     Map<FeedScopedId, Double> emissions = new HashMap<>();
     emissions.put(new FeedScopedId("G", "1"), (0.12 / 12));
     EmissionsDataModel emissionsDataModel = new EmissionsDataModel(emissions, 0.131);
@@ -114,7 +114,7 @@ class EmissionsTest {
     var route = TransitModelForTest.route(id("1")).withAgency(subject).build();
     var pattern = TransitModelForTest
       .tripPattern("1", route)
-      .withStopPattern(TransitModelForTest.stopPattern(3))
+      .withStopPattern(testModel.stopPattern(3))
       .build();
     var stoptime = new StopTime();
     var stoptimes = new ArrayList<StopTime>();
@@ -140,9 +140,10 @@ class EmissionsTest {
 
   @Test
   void testZeroEmissionsForItineraryWithZeroEmissions() {
-    var stopOne = TransitModelForTest.stopForTest("1:stop1", 60, 25);
-    var stopTwo = TransitModelForTest.stopForTest("1:stop1", 61, 25);
-    var stopThree = TransitModelForTest.stopForTest("1:stop1", 62, 25);
+    var testModel = TransitModelForTest.of();
+    var stopOne = testModel.stop("1:stop1", 60, 25).build();
+    var stopTwo = testModel.stop("1:stop1", 61, 25).build();
+    var stopThree = testModel.stop("1:stop1", 62, 25).build();
     var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
     var route = TransitModelForTest.route(id("2")).build();
     var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();

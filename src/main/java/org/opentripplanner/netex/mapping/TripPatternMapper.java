@@ -19,6 +19,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
@@ -86,9 +87,9 @@ class TripPatternMapper {
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
     EntityById<Operator> operatorById,
-    EntityById<RegularStop> stopById,
-    EntityById<AreaStop> areaStopById,
-    EntityById<GroupStop> groupStopById,
+    ImmutableEntityById<RegularStop> stopById,
+    ImmutableEntityById<AreaStop> areaStopById,
+    ImmutableEntityById<GroupStop> groupStopById,
     EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById,
     ReadOnlyHierarchicalMap<String, Route> routeById,
     ReadOnlyHierarchicalMap<String, JourneyPattern_VersionStructure> journeyPatternById,

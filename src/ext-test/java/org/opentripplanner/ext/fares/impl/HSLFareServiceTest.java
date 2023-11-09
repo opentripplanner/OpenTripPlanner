@@ -21,6 +21,7 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -74,17 +75,18 @@ public class HSLFareServiceTest implements PlanTestConstants {
     FareZone C = FareZone.of(new FeedScopedId(FEED_ID, "C")).build();
     FareZone D = FareZone.of(new FeedScopedId(FEED_ID, "D")).build();
 
-    Place A1 = PlanTestConstants.place("A1", 10.0, 12.0, A);
-    Place A2 = PlanTestConstants.place("A2", 10.0, 12.0, A);
+    var testModel = TransitModelForTest.of();
+    Place A1 = testModel.place("A1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(A));
+    Place A2 = testModel.place("A2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(A));
 
-    Place B1 = PlanTestConstants.place("B1", 10.0, 12.0, B);
-    Place B2 = PlanTestConstants.place("B2", 10.0, 12.0, B);
+    Place B1 = testModel.place("B1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(B));
+    Place B2 = testModel.place("B2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(B));
 
-    Place C1 = PlanTestConstants.place("C1", 10.0, 12.0, C);
-    Place C2 = PlanTestConstants.place("C2", 10.0, 12.0, C);
+    Place C1 = testModel.place("C1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(C));
+    Place C2 = testModel.place("C2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(C));
 
-    Place D1 = PlanTestConstants.place("D1", 10.0, 12.0, D);
-    Place D2 = PlanTestConstants.place("D2", 10.0, 12.0, D);
+    Place D1 = testModel.place("D1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(D));
+    Place D2 = testModel.place("D2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(D));
 
     var AB_PRICE = euros(2.80f);
     var BC_PRICE = euros(2.80f);

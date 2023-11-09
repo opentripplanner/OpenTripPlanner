@@ -60,12 +60,14 @@ class AddedTripBuilderTest {
   private static final String HEADSIGN = "TEST TRIP TOWARDS TEST ISLAND";
 
   /* Transit model */
-  private static final RegularStop STOP_A = TransitModelForTest.stop("A").build();
-  private static final RegularStop STOP_B = TransitModelForTest.stop("B").build();
-  private static final RegularStop STOP_C = TransitModelForTest.stop("C").build();
-  private static final RegularStop STOP_D = TransitModelForTest.stop("D").build();
-  private final StopModel STOP_MODEL = StopModel
-    .of()
+  private static final TransitModelForTest MODEL_TEST = TransitModelForTest.of();
+
+  private static final RegularStop STOP_A = MODEL_TEST.stop("A").build();
+  private static final RegularStop STOP_B = MODEL_TEST.stop("B").build();
+  private static final RegularStop STOP_C = MODEL_TEST.stop("C").build();
+  private static final RegularStop STOP_D = MODEL_TEST.stop("D").build();
+  private final StopModel STOP_MODEL = MODEL_TEST
+    .stopModelBuilder()
     .withRegularStop(STOP_A)
     .withRegularStop(STOP_B)
     .withRegularStop(STOP_C)

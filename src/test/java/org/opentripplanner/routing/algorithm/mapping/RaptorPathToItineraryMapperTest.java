@@ -53,11 +53,11 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class RaptorPathToItineraryMapperTest {
 
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
   private static final int BOARD_COST_SEC = 60;
   private static final int TRANSFER_COST_SEC = 120;
   private static final double[] TRANSIT_RELUCTANCE = new double[] { 1.0 };
@@ -77,9 +77,9 @@ public class RaptorPathToItineraryMapperTest {
     STOP_COSTS
   );
 
-  private static final RegularStop S1 = TransitModelForTest.stopForTest("STOP1", 0.0, 0.0);
+  private static final RegularStop S1 = TEST_MODEL.stop("STOP1", 0.0, 0.0).build();
 
-  private static final RegularStop S2 = TransitModelForTest.stopForTest("STOP2", 1.0, 1.0);
+  private static final RegularStop S2 = TEST_MODEL.stop("STOP2", 1.0, 1.0).build();
 
   @ParameterizedTest
   @ValueSource(strings = { "0", "3000", "-3000" })
@@ -140,11 +140,12 @@ public class RaptorPathToItineraryMapperTest {
   }
 
   private TripPattern getOriginalPattern(TestTripPattern pattern) {
+    var stopModelBuilder = TEST_MODEL.stopModelBuilder();
     ArrayList<StopTime> stopTimes = new ArrayList<>();
 
     for (int i = 0; i < pattern.numberOfStopsInPattern(); i++) {
-      var stop = RegularStop
-        .of(new FeedScopedId("TestFeed", i + ""))
+      var stop = stopModelBuilder
+        .regularStop(new FeedScopedId("TestFeed", i + ""))
         .withCoordinate(0.0, 0.0)
         .build();
       var stopTime = new StopTime();
@@ -187,7 +188,7 @@ public class RaptorPathToItineraryMapperTest {
       new HashMap<>(),
       null,
       null,
-      StopModel.of().withRegularStop(S1).withRegularStop(S2).build(),
+      TEST_MODEL.stopModelBuilder().withRegularStop(S1).withRegularStop(S2).build(),
       null,
       null,
       null,

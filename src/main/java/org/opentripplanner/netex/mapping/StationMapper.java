@@ -14,8 +14,9 @@ import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.netex.support.JAXBUtils;
-import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
 import org.rutebanken.netex.model.LocaleStructure;
 import org.rutebanken.netex.model.MultilingualString;
@@ -33,32 +34,30 @@ class StationMapper {
   private final ZoneId defaultTimeZone;
 
   private final boolean noTransfersOnIsolatedStops;
-  private final EntityById<Station> stationsById;
+  private final StopModelBuilder stopModelBuilder;
 
   StationMapper(
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
     ZoneId defaultTimeZone,
     boolean noTransfersOnIsolatedStops,
-    EntityById<Station> stationsById
+    StopModelBuilder stopModelBuilder
   ) {
     this.issueStore = issueStore;
     this.idFactory = idFactory;
     this.defaultTimeZone = defaultTimeZone;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
-    this.stationsById = stationsById;
+    this.stopModelBuilder = stopModelBuilder;
   }
 
   Station map(StopPlace stopPlace) {
-    return stationsById.computeIfAbsent(
-      idFactory.createId(stopPlace.getId()),
-      ignored -> mapStopPlaceToStation(stopPlace)
-    );
+    var id = idFactory.createId(stopPlace.getId());
+    return stopModelBuilder.computeStationIfAbsent(id, it -> mapStopPlaceToStation(it, stopPlace));
   }
 
-  Station mapStopPlaceToStation(StopPlace stopPlace) {
+  Station mapStopPlaceToStation(FeedScopedId id, StopPlace stopPlace) {
     var builder = Station
-      .of(idFactory.createId(stopPlace.getId()))
+      .of(id)
       .withName(resolveName(stopPlace))
       .withCoordinate(mapCoordinate(stopPlace))
       .withDescription(
