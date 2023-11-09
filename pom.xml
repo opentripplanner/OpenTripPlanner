@@ -461,6 +461,7 @@
                         </ports>
                     </container>
                     <from>
+                        <image>eclipse-temurin:21-jre</image>
                         <platforms>
                             <platform>
                                 <architecture>amd64</architecture>
