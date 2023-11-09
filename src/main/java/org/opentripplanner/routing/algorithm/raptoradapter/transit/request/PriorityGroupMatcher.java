@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
  * This class turn a {@link TransitPriorityGroupSelect} into a matcher.
  * <p>
  * Design: It uses the composite design pattern. A matcher is created for each
- * value in the "select", then the list of none empty matchers are merged into
+ * value in the "select", then the list of non-empty matchers is merged into
  * a `CompositeMatcher`. So, a new matcher is only created if the field in the
  * select is present.
  */

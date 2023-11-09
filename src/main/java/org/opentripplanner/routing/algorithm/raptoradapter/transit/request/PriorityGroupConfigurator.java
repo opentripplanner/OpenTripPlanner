@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 
 /**
- * This class dynamically build an index of transit-group-ids from the
+ * This class dynamically builds an index of transit-group-ids from the
  * provided {@link TransitPriorityGroupSelect}s while serving the caller with
  * group-ids for each requested pattern. It is made for optimal
  * performance, since it is used in request scope.

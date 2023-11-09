@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import org.opentripplanner.routing.api.request.preference.Relax;
 
 /**
- * Map a text to a Relax instance. The patter used is:
+ * Map a text to a Relax instance. The pattern used is:
  * <pre>
  *   NNN.NN '*' [variable-placeholder] '+' NNN
  * </pre>
@@ -23,11 +23,11 @@ public class RelaxMapper {
   private static final String SEP = "\\s*";
   private static final String NUM = "(\\d+(?:\\.\\d+)?+)";
   private static final String INT = "(\\d+)";
-  private static final String ALFA = "[a-zA-Z]+";
+  private static final String ALPHA = "[a-zA-Z]+";
   private static final String PLUS = SEP + Pattern.quote("+") + SEP;
   private static final String TIMES = Pattern.quote("*");
 
-  private static final String RATIO = NUM + SEP + TIMES + "?" + SEP + ALFA;
+  private static final String RATIO = NUM + SEP + TIMES + "?" + SEP + ALPHA;
   private static final String SLACK = INT;
 
   private static final Pattern RELAX_PATTERN_1 = Pattern.compile(RATIO + PLUS + SLACK);

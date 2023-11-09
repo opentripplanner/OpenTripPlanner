@@ -19,8 +19,8 @@ public class TransitPriorityGroupConfig {
       .summary("Transit priority groups configuration")
       .description(
         """
-        Use this to group transit patterns into groups. Each group will be given priority
-        over others groups in the trip search. Hence; To paths with a different different
+        Use this to separate transit patterns into groups. Each group will be given priority
+        over other groups in the trip search. Hence, two paths with a different different
         set of groups will BOTH be returned unless the cost is worse then the relaxation
         specified in the `` parameter . 
         
@@ -33,7 +33,7 @@ public class TransitPriorityGroupConfig {
         c,
         "base",
         "All groups in base get the same group-id(GROUP_ZERO). Normally you will put all " +
-        "local-traffic and other 'none-problematic' services here."
+        "local-traffic and other 'non-problematic' services here."
       )
     );
     transit.addPriorityGroupsByAgency(
@@ -74,14 +74,14 @@ public class TransitPriorityGroupConfig {
       .addModes(
         c
           .of("modes")
-          .since(V2_3)
+          .since(V2_5)
           .summary("List all modes to select for this group.")
           .asEnumSet(TransitMode.class)
       )
       .addSubModeRegexp(
         c
           .of("subModes")
-          .since(V2_3)
+          .since(V2_5)
           .summary("List a set of regular expressions for matching sub-modes.")
           .asStringList(List.of())
       )

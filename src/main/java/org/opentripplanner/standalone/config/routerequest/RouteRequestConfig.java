@@ -343,7 +343,7 @@ ferries, where the check-in process needs to be done in good time before ride.
       .summary("The relax function for transit-priority-groups")
       .description(
         """
-        A path is considered optimal if it the generalized-cost is smaller than an other the 
+        A path is considered optimal if it the generalized-cost is less than the 
         generalized-cost of another path. If this parameter is set, the comparison is relaxed
         further if they belong to different transit-priority-groups.
         """
