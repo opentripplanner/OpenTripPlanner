@@ -50,7 +50,9 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
         itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get().plus(co2ForCar.get())));
       } else if (co2ForTransit.isPresent()) {
         itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get()));
-      } else co2ForCar.ifPresent(grams -> itinerary.setEmissionsPerPerson(new Emissions(grams)));
+      } else if (co2ForCar.isPresent()) {
+        itinerary.setEmissionsPerPerson(new Emissions(co2ForCar.get()));
+      }
     }
     return itineraries;
   }
