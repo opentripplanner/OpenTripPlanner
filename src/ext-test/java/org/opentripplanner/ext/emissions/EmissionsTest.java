@@ -82,7 +82,7 @@ class EmissionsTest {
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
     Itinerary i = new Itinerary(List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED)));
-    assertEquals(null, emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson());
+    assertNull(emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson());
   }
 
   @Test
