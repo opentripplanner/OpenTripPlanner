@@ -4973,12 +4973,12 @@ type TicketType implements Node {
 
 input TimetablePreferencesInput {
     """
-    When true, realtime updates are considered during the routing.
-    In practice, when this option is set as false, some of the suggestions might not be
+    When false, realtime updates are considered during the routing.
+    In practice, when this option is set as true, some of the suggestions might not be
     realistic as the transfers could be invalid due to delays,
     trips can be cancelled or stops can be skipped.
     """
-    includeRealtimeUpdates: Boolean = true
+    excludeRealtimeUpdates: Boolean = false
 
     """
     When true, departures that have been cancelled ahead of time will be
