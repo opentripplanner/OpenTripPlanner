@@ -92,7 +92,7 @@ class EmissionsTest {
       .withMode(TraverseMode.CAR)
       .withDistanceMeters(214.4)
       .withStartTime(TIME)
-      .withEndTime(TIME.minusHours(1))
+      .withEndTime(TIME.plusHours(1))
       .build();
     Itinerary i = new Itinerary(List.of(leg));
     assertEquals(
