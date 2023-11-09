@@ -32,6 +32,10 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
 
       Optional<Grams> co2ForTransit = calculateCo2EmissionsForTransit(transitLegs);
 
+      if (!transitLegs.isEmpty() && co2ForTransit.isEmpty()) {
+        continue;
+      }
+
       List<StreetLeg> carLegs = itinerary
         .getLegs()
         .stream()
@@ -42,15 +46,11 @@ public record EmissionsFilter(EmissionsService emissionsService) implements Itin
 
       Optional<Grams> co2ForCar = calculateCo2EmissionsForCar(carLegs);
 
-      if (
-        co2ForTransit.isPresent() ||
-        co2ForCar.isPresent() &&
-        (transitLegs.isEmpty() || co2ForTransit.isPresent())
-      ) {
-        Grams co2 = co2ForTransit.isPresent() ? co2ForTransit.get() : new Grams(0);
-        co2 = co2ForCar.isPresent() ? co2.plus(co2ForCar.get()) : co2;
-        itinerary.setEmissionsPerPerson(new Emissions(co2));
-      }
+      if (co2ForTransit.isPresent() && co2ForCar.isPresent()) {
+        itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get().plus(co2ForCar.get())));
+      } else if (co2ForTransit.isPresent()) {
+        itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get()));
+      } else co2ForCar.ifPresent(grams -> itinerary.setEmissionsPerPerson(new Emissions(grams)));
     }
     return itineraries;
   }
