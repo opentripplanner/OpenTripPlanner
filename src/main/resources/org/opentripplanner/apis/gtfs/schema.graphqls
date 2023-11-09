@@ -1551,7 +1551,7 @@ type Itinerary {
 
     Note: Interlined/stay-seated transfers also increase the count.
     """
-    numberOfTransfers: Int
+    numberOfTransfers: Int!
 
     #
     # deprecated fields
