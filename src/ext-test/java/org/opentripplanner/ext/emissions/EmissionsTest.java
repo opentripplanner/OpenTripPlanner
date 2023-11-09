@@ -44,7 +44,7 @@ class EmissionsTest {
     .withMode(TraverseMode.CAR)
     .withDistanceMeters(214.4)
     .withStartTime(TIME)
-    .withEndTime(TIME.plus(1, ChronoUnit.HOURS))
+    .withEndTime(TIME.plusHours(1))
     .build();
 
   private static final Route ROUTE_WITH_EMISSIONS = TransitModelForTest.route(id("1")).build();
