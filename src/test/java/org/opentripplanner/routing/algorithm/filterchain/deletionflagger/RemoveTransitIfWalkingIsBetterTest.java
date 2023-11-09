@@ -7,8 +7,10 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import java.time.Duration;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 public class RemoveTransitIfWalkingIsBetterTest implements PlanTestConstants {
 
@@ -21,7 +23,7 @@ public class RemoveTransitIfWalkingIsBetterTest implements PlanTestConstants {
     // When:
     List<Itinerary> result = DeletionFlaggerTestHelper.process(
       List.of(i1, i2),
-      new RemoveTransitIfWalkingIsBetterFilter()
+      new RemoveTransitIfWalkingIsBetterFilter(CostLinearFunction.of(Cost.ZERO, 1.0))
     );
 
     // Then:
@@ -44,9 +46,10 @@ public class RemoveTransitIfWalkingIsBetterTest implements PlanTestConstants {
 
     List<Itinerary> result = DeletionFlaggerTestHelper.process(
       List.of(i1, i2, bicycle, walk),
-      new RemoveTransitIfWalkingIsBetterFilter()
+      new RemoveTransitIfWalkingIsBetterFilter(CostLinearFunction.of(Cost.ZERO, 1.0))
     );
 
     assertEquals(toStr(List.of(i2, bicycle, walk)), toStr(result));
   }
+  // TODO: 2023-11-09 Write tests for cases other than 0 + 1.0x
 }

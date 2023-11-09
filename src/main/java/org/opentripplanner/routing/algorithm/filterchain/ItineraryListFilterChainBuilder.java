@@ -11,6 +11,7 @@ import java.util.function.Function;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.framework.lang.Sandbox;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
@@ -60,6 +61,7 @@ public class ItineraryListFilterChainBuilder {
   private int maxNumberOfItineraries = NOT_SET;
   private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
   private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
+  private CostLinearFunction removeTransitWithHigherCostThanBestOnWalkOnly;
   private boolean removeWalkAllTheWayResults;
   private boolean sameFirstOrLastTripFilter;
   private TransitGeneralizedCostFilterParams transitGeneralizedCostFilterParams;
@@ -200,6 +202,27 @@ public class ItineraryListFilterChainBuilder {
    * exist.
    */
   public ItineraryListFilterChainBuilder withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+    CostLinearFunction value
+  ) {
+    this.removeTransitWithHigherCostThanBestOnStreetOnly = value;
+    return this;
+  }
+
+  /**
+   * The direct street search(walk) is not pruning the transit search, so in some
+   * cases we get "silly" transit itineraries that is marginally better on travel-duration compared
+   * with an on-street-all-the-way itinerary. Use this method to filter worse enough itineraries.
+   * <p>
+   * The filter removes all itineraries with a generalized-cost that is higher than the best
+   * on-street-all-the-way itinerary.
+   * <p>
+   * This filter only have an effect, if an on-street-all-the-way(WALK) itinerary
+   * exist.
+   *
+   * This have same effect as {@link ItineraryListFilterChainBuilder#withRemoveTransitWithHigherCostThanBestOnStreetOnly(CostLinearFunction)}
+   * but only for WALK itineraries
+   */
+  public ItineraryListFilterChainBuilder withRemoveTransitWithHigherCostThanBestOnWalkOnly(
     CostLinearFunction value
   ) {
     this.removeTransitWithHigherCostThanBestOnStreetOnly = value;
@@ -388,7 +411,15 @@ public class ItineraryListFilterChainBuilder {
       }
 
       if (removeTransitIfWalkingIsBetter) {
-        filters.add(new DeletionFlaggingFilter(new RemoveTransitIfWalkingIsBetterFilter()));
+        filters.add(
+          new DeletionFlaggingFilter(
+            new RemoveTransitIfWalkingIsBetterFilter(
+              removeTransitWithHigherCostThanBestOnWalkOnly != null
+                ? removeTransitWithHigherCostThanBestOnWalkOnly
+                : CostLinearFunction.of(Cost.ZERO, 1.0)
+            )
+          )
+        );
       }
 
       if (removeWalkAllTheWayResults) {

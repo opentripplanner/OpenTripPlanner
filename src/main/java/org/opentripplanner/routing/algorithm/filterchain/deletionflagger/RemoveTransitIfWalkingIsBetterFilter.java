@@ -15,6 +15,12 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
  */
 public class RemoveTransitIfWalkingIsBetterFilter implements ItineraryDeletionFlagger {
 
+  private final CostLinearFunction costLimitFunction;
+
+  public RemoveTransitIfWalkingIsBetterFilter(CostLinearFunction costLimitFunction) {
+    this.costLimitFunction = costLimitFunction;
+  }
+
   /**
    * Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
    * to know which filters removed
@@ -38,7 +44,7 @@ public class RemoveTransitIfWalkingIsBetterFilter implements ItineraryDeletionFl
       return List.of();
     }
 
-    var limit = minWalkCost.getAsInt();
+    var limit = costLimitFunction.calculate(Cost.costOfSeconds(minWalkCost.getAsInt())).toSeconds();
 
     return itineraries
       .stream()

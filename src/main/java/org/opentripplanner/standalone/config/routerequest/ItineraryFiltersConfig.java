@@ -174,6 +174,28 @@ a plain walk itinerary, it will be removed even if the cost limit function would
           )
           .asCostLinearFunction(dft.removeTransitWithHigherCostThanBestOnStreetOnly())
       )
+      .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
+        c
+          .of("removeTransitWithHigherCostThanBestOnWalkOnly")
+          .since(V2_4)
+          .summary(
+            "Limit function for generalized-cost computed from street-only itineraries applied to transit itineraries."
+          )
+          .description(
+            """
+The max-limit is applied to itineraries with transit *legs*, and only itineraries
+without transit legs are considered when calculating the minimum cost. The smallest
+generalized-cost value is used as input to the function. The function is used to calculate a
+*max-limit*. The max-limit is then used to filter *transit* itineraries by
+*generalized-cost*. Itineraries with a cost higher than the max-limit are dropped from the result
+set. Walking is handled with a different logic: if a transit itinerary has higher cost than
+a plain walk itinerary, it will be removed even if the cost limit function would keep it.
+This function works in the same way as removeTransitWithHigherCostThanBestOnStreetOnly but only for WALK legs.
+Default value is 0 + 1.0x.
+"""
+          )
+          .asCostLinearFunction(dft.removeTransitWithHigherCostThanBestOnWalkOnly())
+      )
       .withBikeRentalDistanceRatio(
         c
           .of("bikeRentalDistanceRatio")

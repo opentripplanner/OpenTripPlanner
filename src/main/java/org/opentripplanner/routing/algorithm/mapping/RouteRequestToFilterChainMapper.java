@@ -70,6 +70,9 @@ public class RouteRequestToFilterChainMapper {
       .withRemoveTransitWithHigherCostThanBestOnStreetOnly(
         params.removeTransitWithHigherCostThanBestOnStreetOnly()
       )
+      .withRemoveTransitWithHigherCostThanBestOnWalkOnly(
+        params.removeTransitWithHigherCostThanBestOnWalkOnly()
+      )
       .withSameFirstOrLastTripFilter(params.filterItinerariesWithSameFirstOrLastTrip())
       .withAccessibilityScore(
         params.useAccessibilityScore() && request.wheelchair(),
