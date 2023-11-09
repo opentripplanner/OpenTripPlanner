@@ -12,12 +12,14 @@ import jakarta.inject.Singleton;
 import java.io.File;
 import java.net.URI;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.OtpBaseDirectory;
+import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParameters;
 import org.opentripplanner.graph_builder.module.ned.parameter.DemExtractParametersBuilder;
@@ -181,8 +183,13 @@ public class GraphBuilderDataSources {
       .orElse(buildConfig.netexDefaults.copyOf().withSource(dataSource.uri()).build());
   }
 
-  public File baseDirectory() {
-    return baseDirectory;
+  public Optional<DataSource> stopConsolidationDataSource() {
+    return Optional
+      .ofNullable(buildConfig.stopConsolidationFile)
+      .map(fileName -> {
+        var f = baseDirectory.toPath().resolve(fileName).toFile();
+        return new FileDataSource(f, FileType.CONFIG);
+      });
   }
 
   /**

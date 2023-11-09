@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -82,6 +83,17 @@ public class ResourceLoader {
     var path = file(s).toPath();
     try {
       return Files.readAllLines(path, StandardCharsets.UTF_8).stream().limit(lines).toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   * Returns the specified resources as an input stream.
+   */
+  public InputStream inputStream(String path) {
+    try {
+      return url(path).openStream();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }

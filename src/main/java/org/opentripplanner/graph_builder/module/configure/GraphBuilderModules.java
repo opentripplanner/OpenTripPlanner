@@ -285,19 +285,12 @@ public class GraphBuilderModules {
   static StopConsolidationModule providesStopConsolidationModule(
     TransitModel transitModel,
     @Nullable StopConsolidationRepository repo,
-    GraphBuilderDataSources dataSources,
-    BuildConfig buildConfig
+    GraphBuilderDataSources dataSources
   ) {
-    if (buildConfig.stopConsolidationFile == null) {
-      return null;
-    } else {
-      var file = dataSources
-        .baseDirectory()
-        .toPath()
-        .resolve(buildConfig.stopConsolidationFile)
-        .toFile();
-      return StopConsolidationModule.of(transitModel, repo, file);
-    }
+    return dataSources
+      .stopConsolidationDataSource()
+      .map(ds -> StopConsolidationModule.of(transitModel, repo, ds))
+      .orElse(null);
   }
 
   /* private methods */

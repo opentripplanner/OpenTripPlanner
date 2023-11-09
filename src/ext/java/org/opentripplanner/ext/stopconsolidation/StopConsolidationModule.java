@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nonnull;
+import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationService;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.ext.stopconsolidation.model.StopReplacement;
@@ -74,10 +75,10 @@ public class StopConsolidationModule implements GraphBuilderModule {
   public static StopConsolidationModule of(
     TransitModel transitModel,
     StopConsolidationRepository repo,
-    File file
+    DataSource ds
   ) {
-    LOG.info("Reading stop consolidation information from '{}'", file.getAbsolutePath());
-    var groups = StopConsolidationParser.parseGroups(file);
+    LOG.info("Reading stop consolidation information from '{}'", ds);
+    var groups = StopConsolidationParser.parseGroups(ds.asInputStream());
     return new StopConsolidationModule(transitModel, repo, groups);
   }
 }

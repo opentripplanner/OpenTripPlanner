@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableListMultimap;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,16 +19,11 @@ import org.slf4j.LoggerFactory;
 
 public class StopConsolidationParser {
 
-  private static final Logger LOG = LoggerFactory.getLogger(StopConsolidationParser.class);
-
   private record StopGroupEntry(String groupId, FeedScopedId stopId, boolean isPrimary) {}
 
-  public static List<ConsolidatedStopGroup> parseGroups(File file) {
+  public static List<ConsolidatedStopGroup> parseGroups(InputStream is) {
     try {
-      LOG.debug("Reading stop consolidation data from {}", file.getAbsolutePath());
-
-      var stream = new FileInputStream(file);
-      var reader = new CsvReader(stream, StandardCharsets.UTF_8);
+      var reader = new CsvReader(is, StandardCharsets.UTF_8);
       reader.setDelimiter(',');
 
       reader.readHeaders();

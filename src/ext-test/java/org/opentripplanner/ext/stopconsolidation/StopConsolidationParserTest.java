@@ -11,7 +11,7 @@ class StopConsolidationParserTest {
 
   @Test
   void parse() {
-    var file = ResourceLoader.of(this).file("consolidated-stops.csv");
+    var file = ResourceLoader.of(this).inputStream("consolidated-stops.csv");
     var groups = StopConsolidationParser.parseGroups(file);
     assertEquals(20, groups.size());
 
