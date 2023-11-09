@@ -23,6 +23,16 @@ class CalculateWorldEnvelopeModuleTest {
   );
 
   @Test
+  void buildEmptyEnvelope() {
+    var subject = CalculateWorldEnvelopeModule.build(List.of(), List.of());
+
+    assertEquals(
+      "WorldEnvelope{lowerLeft: (-90.0, -180.0), upperRight: (90.0, 180.0), meanCenter: (0.0, 0.0), transitMedianCenter: (47.101, 9.611)}",
+      subject.toString()
+    );
+  }
+
+  @Test
   void buildVertexesOnly() {
     var subject = CalculateWorldEnvelopeModule.build(vertexes, List.of());
 
