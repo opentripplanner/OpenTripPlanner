@@ -49,7 +49,9 @@ class EmissionsTest {
 
   private static final Route ROUTE_WITH_EMISSIONS = TransitModelForTest.route(id("1")).build();
   private static final Route ROUTE_WITH_ZERO_EMISSIONS = TransitModelForTest.route(id("2")).build();
-  private static final Route ROUTE_WITHOUT_EMISSIONS_CONFIGURED = TransitModelForTest.route(id("3")).build();
+  private static final Route ROUTE_WITHOUT_EMISSIONS_CONFIGURED = TransitModelForTest
+    .route(id("3"))
+    .build();
 
   @BeforeAll
   static void SetUp() {
@@ -105,7 +107,9 @@ class EmissionsTest {
 
   @Test
   void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
-    Itinerary i = new Itinerary(List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG));
+    Itinerary i = new Itinerary(
+      List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG)
+    );
     var emissionsResult = emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson() != null
       ? emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
       : null;
