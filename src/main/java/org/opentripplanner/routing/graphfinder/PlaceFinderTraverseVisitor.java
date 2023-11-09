@@ -174,11 +174,23 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
       .anyMatch(modes::contains);
   }
 
+  private boolean stopIsIncludedByStopFilter(RegularStop stop) {
+    return filterByStops.isEmpty() || filterByStops.contains(stop.getId());
+  }
+
+  private boolean stopIsIncludedByModeFilter(RegularStop stop) {
+    return filterByModes.isEmpty() || stopHasPatternsWithMode(stop, filterByModes);
+  }
+
   private void handleStop(RegularStop stop, double distance) {
+    /*
+     Do not consider stop if it is not included in the stop or mode filter
+     or if it or its parent station has already been seen.
+     */
     if (
-      (!filterByStops.isEmpty() && !filterByStops.contains(stop.getId())) ||
+      !stopIsIncludedByStopFilter(stop) ||
       seenStops.contains(stop.getStationOrStopId()) ||
-      !(filterByModes.isEmpty() || stopHasPatternsWithMode(stop, filterByModes))
+      !stopIsIncludedByModeFilter(stop)
     ) {
       return;
     }
