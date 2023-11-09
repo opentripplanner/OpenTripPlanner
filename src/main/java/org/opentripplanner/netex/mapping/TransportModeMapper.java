@@ -63,6 +63,8 @@ class TransportModeMapper {
       return new NetexMainAndSubMode(TransitMode.TRAM, submode.getTramSubmode().value());
     } else if (submode.getWaterSubmode() != null) {
       return new NetexMainAndSubMode(TransitMode.FERRY, submode.getWaterSubmode().value());
+    } else if (submode.getTaxiSubmode() != null) {
+      return new NetexMainAndSubMode(TransitMode.TAXI, submode.getTaxiSubmode().value());
     }
     throw new IllegalArgumentException();
   }

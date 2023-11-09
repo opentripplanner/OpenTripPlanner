@@ -41,10 +41,12 @@ import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.fare.FareMedium;
 import org.opentripplanner.model.fare.FareProduct;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.fare.RiderCategory;
+import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
@@ -213,6 +215,9 @@ class GraphQLIntegrationTest {
       .build();
 
     railLeg.addAlert(alert);
+
+    var emissions = new Emissions(new Grams(123.0));
+    i1.setEmissionsPerPerson(emissions);
 
     var transitService = new DefaultTransitService(transitModel) {
       private final TransitAlertService alertService = new TransitAlertServiceImpl(transitModel);

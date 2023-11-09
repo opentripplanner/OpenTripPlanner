@@ -8,9 +8,12 @@ import jakarta.inject.Singleton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsModule;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -104,6 +107,17 @@ public class GraphBuilderModules {
       config.getTransitServicePeriod(),
       config.fareServiceFactory
     );
+  }
+
+  @Provides
+  @Singleton
+  static EmissionsModule provideEmissionsModule(
+    GraphBuilderDataSources dataSources,
+    BuildConfig config,
+    @Nullable EmissionsDataModel emissionsDataModel,
+    DataImportIssueStore issueStore
+  ) {
+    return new EmissionsModule(dataSources, config, emissionsDataModel, issueStore);
   }
 
   @Provides

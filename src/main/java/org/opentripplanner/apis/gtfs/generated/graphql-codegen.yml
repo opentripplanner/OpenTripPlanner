@@ -25,6 +25,7 @@ config:
     Long: Long
     Polyline: String
     GeoJson: org.locationtech.jts.geom.Geometry
+    Grams: org.opentripplanner.framework.model.Grams
     Duration: java.time.Duration
   mappers:
     AbsoluteDirection: org.opentripplanner.apis.gtfs.generated.GraphQLTypes.GraphQLAbsoluteDirection#GraphQLAbsoluteDirection
@@ -52,6 +53,7 @@ config:
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: org.opentripplanner.routing.graphfinder.PatternAtStop#PatternAtStop
     elevationProfileComponent: org.opentripplanner.model.plan.ElevationProfile.Step
+    Emissions: org.opentripplanner.model.plan.Emissions#Emissions
     fare: java.util.Map#Map<String, Object>
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
     Feed: String
@@ -111,3 +113,4 @@ config:
     FareMedium: org.opentripplanner.model.fare.FareMedium#FareMedium
     RiderCategory: org.opentripplanner.model.fare.RiderCategory#RiderCategory
     StopPosition: org.opentripplanner.apis.gtfs.model.StopPosition#StopPosition
+

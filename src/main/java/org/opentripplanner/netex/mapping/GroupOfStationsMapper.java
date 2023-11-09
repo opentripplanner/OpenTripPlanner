@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.mapping;
 
+import jakarta.xml.bind.JAXBElement;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -51,7 +52,11 @@ class GroupOfStationsMapper {
         "GroupOfStopPlaces {} does not contain a name.",
         groupOfStopPlaces.getId()
       );
-      StopPlaceRefStructure ref = groupOfStopPlaces.getMembers().getStopPlaceRef().get(0);
+      StopPlaceRefStructure ref = groupOfStopPlaces
+        .getMembers()
+        .getStopPlaceRef()
+        .get(0)
+        .getValue();
       name = stations.get(idFactory.createId(ref.getRef())).getName();
     }
     GroupOfStationsBuilder groupOfStations = GroupOfStations
@@ -83,9 +88,9 @@ class GroupOfStationsMapper {
   ) {
     StopPlaceRefs_RelStructure members = groupOfStopPlaces.getMembers();
     if (members != null) {
-      List<StopPlaceRefStructure> memberList = members.getStopPlaceRef();
-      for (StopPlaceRefStructure stopPlaceRefStructure : memberList) {
-        FeedScopedId stationId = idFactory.createId(stopPlaceRefStructure.getRef());
+      List<JAXBElement<? extends StopPlaceRefStructure>> memberList = members.getStopPlaceRef();
+      for (JAXBElement<? extends StopPlaceRefStructure> stopPlaceRefStructure : memberList) {
+        FeedScopedId stationId = idFactory.createId(stopPlaceRefStructure.getValue().getRef());
         StopLocationsGroup station = lookupStation(stationId);
         if (station != null) {
           groupOfStations.addChildStation(station);

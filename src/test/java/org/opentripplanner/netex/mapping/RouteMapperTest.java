@@ -30,10 +30,10 @@ import org.rutebanken.netex.model.GroupOfLinesRefStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.Network;
-import org.rutebanken.netex.model.OrganisationRefStructure;
 import org.rutebanken.netex.model.PresentationStructure;
+import org.rutebanken.netex.model.TransportOrganisationRefStructure;
 
-public class RouteMapperTest {
+class RouteMapperTest {
 
   private static final String NETWORK_ID = "RUT:Network:1";
   private static final String GOL_ID_1 = "RUT:GroupOfLines:1";
@@ -48,7 +48,7 @@ public class RouteMapperTest {
   private static final Set<String> EMPTY_FERRY_WITHOUT_BICYCLE_IDS = Collections.emptySet();
 
   @Test
-  public void mapRouteWithDefaultAgency() {
+  void mapRouteWithDefaultAgency() {
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     Line line = createExampleLine();
 
@@ -73,7 +73,7 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapRouteWithAgencySpecified() {
+  void mapRouteWithAgencySpecified() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
       new StopModel(),
@@ -83,7 +83,7 @@ public class RouteMapperTest {
     Network network = new Network()
       .withId(NETWORK_ID)
       .withTransportOrganisationRef(
-        createJaxbElement(new OrganisationRefStructure().withRef(AUTHORITY_ID))
+        createJaxbElement(new TransportOrganisationRefStructure().withRef(AUTHORITY_ID))
       );
 
     netexIndex.networkById.add(network);
@@ -112,7 +112,7 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapRouteWithColor() {
+  void mapRouteWithColor() {
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     Line line = createExampleLine();
     byte[] color = new byte[] { 127, 0, 0 };
@@ -134,12 +134,12 @@ public class RouteMapperTest {
 
     Route route = routeMapper.mapRoute(line);
 
-    assertEquals(route.getColor(), "7F0000");
-    assertEquals(route.getTextColor(), "007F00");
+    assertEquals("7F0000", route.getColor());
+    assertEquals("007F00", route.getTextColor());
   }
 
   @Test
-  public void allowBicyclesOnFerries() {
+  void allowBicyclesOnFerries() {
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     Line lineWithBicycles = createExampleFerry(LINE_ID);
     Line lineWithOutBicycles = createExampleFerry(FERRY_WITHOUT_BICYCLES_ID);
@@ -165,7 +165,7 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapRouteWithoutBranding() {
+  void mapRouteWithoutBranding() {
     NetexEntityIndex netexEntityIndex = new NetexEntityIndex();
     Line line = createExampleLine();
 
@@ -188,7 +188,7 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapRouteWithBranding() {
+  void mapRouteWithBranding() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
       new StopModel(),
@@ -222,7 +222,7 @@ public class RouteMapperTest {
   }
 
   @Test
-  public void mapRouteWithGroupOfRoutes() {
+  void mapRouteWithGroupOfRoutes() {
     NetexEntityIndex netexIndex = new NetexEntityIndex();
     OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(
       new StopModel(),
