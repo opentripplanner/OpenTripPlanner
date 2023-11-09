@@ -153,7 +153,7 @@ public class DayTypeAssignmentMapper {
   private void addOperatingPeriod(DayTypeAssignment dayTypeAssignment) {
     boolean isAvailable = isDayTypeAvailableForAssigment(dayTypeAssignment);
 
-    String ref = dayTypeAssignment.getOperatingPeriodRef().getRef();
+    String ref = dayTypeAssignment.getOperatingPeriodRef().getValue().getRef();
     OperatingPeriod_VersionStructure period = operatingPeriods.lookup(ref);
 
     if (period instanceof OperatingPeriod operatingPeriod) {
