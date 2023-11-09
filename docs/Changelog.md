@@ -34,6 +34,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix sort order bug in optimized transfers [#5446](https://github.com/opentripplanner/OpenTripPlanner/pull/5446)
 - Siri file loader [#5460](https://github.com/opentripplanner/OpenTripPlanner/pull/5460)
 - Calculate CO₂ emissions of itineraries [#5278](https://github.com/opentripplanner/OpenTripPlanner/pull/5278)
+- Update NeTEx Java Model 2.0.15 [#5466](https://github.com/opentripplanner/OpenTripPlanner/pull/5466)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)

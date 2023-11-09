@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.netex.index.NetexEntityIndex;
+import org.opentripplanner.netex.support.JAXBUtils;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DayTypeAssignmentsInFrame_RelStructure;
@@ -99,10 +100,11 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
     if (operatingPeriods == null) {
       return;
     }
-
-    for (Object p : operatingPeriods.getOperatingPeriodRefOrOperatingPeriodOrUicOperatingPeriod()) {
-      parseOperatingPeriod(p);
-    }
+    JAXBUtils.forEachJAXBElementValue(
+      Object.class,
+      operatingPeriods.getOperatingPeriodRefOrOperatingPeriodOrUicOperatingPeriod(),
+      this::parseOperatingPeriod
+    );
   }
 
   private void parseOperatingPeriod(Object operatingPeriod) {

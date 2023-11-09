@@ -2,10 +2,10 @@ package org.opentripplanner.netex.mapping;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -13,6 +13,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.i18n.TranslatedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.netex.support.JAXBUtils;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.Station;
 import org.rutebanken.netex.model.LimitedUseTypeEnumeration;
@@ -21,6 +22,7 @@ import org.rutebanken.netex.model.MultilingualString;
 import org.rutebanken.netex.model.NameTypeEnumeration;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.Zone_VersionStructure;
 
 class StationMapper {
 
@@ -130,12 +132,12 @@ class StationMapper {
         "Station %s does not contain any coordinates.",
         stopPlace.getId() + " " + stopPlace.getName()
       );
-      List<WgsCoordinate> coordinates = new ArrayList<>();
-      for (Object it : stopPlace.getQuays().getQuayRefOrQuay()) {
-        if (it instanceof Quay quay && quay.getCentroid() != null) {
-          coordinates.add(WgsCoordinateMapper.mapToDomain(quay.getCentroid()));
-        }
-      }
+      List<WgsCoordinate> coordinates = JAXBUtils
+        .streamJAXBElementValue(Quay.class, stopPlace.getQuays().getQuayRefOrQuay())
+        .map(Zone_VersionStructure::getCentroid)
+        .filter(Objects::nonNull)
+        .map(WgsCoordinateMapper::mapToDomain)
+        .toList();
       if (coordinates.isEmpty()) {
         throw new IllegalArgumentException(
           "Station w/quays without coordinates. Station id: " + stopPlace.getId()
