@@ -303,7 +303,7 @@ public class NetexMapper {
       idFactory,
       currentNetexIndex.getQuayById(),
       tariffZoneMapper,
-      transitBuilder.stopModelBuilder(),
+      transitBuilder.stopModel(),
       zoneId,
       issueStore,
       noTransfersOnIsolatedStops
@@ -314,8 +314,8 @@ public class NetexMapper {
         .lookup(stopPlaceId);
       stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
     }
-    transitBuilder.getStops().addAll(stopMapper.resultStops);
-    transitBuilder.getStations().addAll(stopMapper.resultStations);
+    transitBuilder.stopModel().withRegularStops(stopMapper.resultStops);
+    transitBuilder.stopModel().withStations(stopMapper.resultStations);
     currentMapperIndexes.addStationByMultiModalStationRfs(
       stopMapper.resultStationByMultiModalStationRfs
     );
@@ -332,7 +332,7 @@ public class NetexMapper {
         .get(multiModalStopPlace.getId());
       var multiModalStation = mapper.map(multiModalStopPlace, stations);
 
-      transitBuilder.getMultiModalStationsById().add(multiModalStation);
+      transitBuilder.stopModel().withMultiModalStation(multiModalStation);
     }
   }
 
@@ -346,7 +346,7 @@ public class NetexMapper {
     for (GroupOfStopPlaces groupOfStopPlaces : currentNetexIndex
       .getGroupOfStopPlacesById()
       .localValues()) {
-      transitBuilder.getGroupsOfStationsById().add(groupOfStationsMapper.map(groupOfStopPlaces));
+      transitBuilder.stopModel().withGroupOfStation(groupOfStationsMapper.map(groupOfStopPlaces));
     }
   }
 
@@ -363,18 +363,19 @@ public class NetexMapper {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       idFactory,
       transitBuilder.getStops().values(),
+      transitBuilder.stopModel(),
       issueStore
     );
 
     for (FlexibleStopPlace flexibleStopPlace : flexibleStopPlaces) {
       StopLocation stopLocation = flexStopsMapper.map(flexibleStopPlace);
       if (stopLocation instanceof AreaStop areaStop) {
-        transitBuilder.getAreaStops().add(areaStop);
+        transitBuilder.stopModel().withAreaStop(areaStop);
       } else if (stopLocation instanceof GroupStop groupStop) {
-        transitBuilder.getGroupStops().add(groupStop);
+        transitBuilder.stopModel().withGroupStop(groupStop);
         for (var child : groupStop.getLocations()) {
           if (child instanceof AreaStop areaStop) {
-            transitBuilder.getAreaStops().add(areaStop);
+            transitBuilder.stopModel().withAreaStop(areaStop);
           }
         }
       }
@@ -435,9 +436,9 @@ public class NetexMapper {
       issueStore,
       idFactory,
       transitBuilder.getOperatorsById(),
-      transitBuilder.getStops(),
-      transitBuilder.getAreaStops(),
-      transitBuilder.getGroupStops(),
+      transitBuilder.stopModel().regularStopsById(),
+      transitBuilder.stopModel().areaStopById(),
+      transitBuilder.stopModel().groupStopById(),
       transitBuilder.getRoutes(),
       currentNetexIndex.getRouteById(),
       currentNetexIndex.getJourneyPatternsById(),

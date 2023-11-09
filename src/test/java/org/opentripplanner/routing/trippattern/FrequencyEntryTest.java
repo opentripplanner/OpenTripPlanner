@@ -29,7 +29,7 @@ public class FrequencyEntryTest {
     for (int i = 0; i < STOP_NUM; ++i) {
       FeedScopedId id = TransitModelForTest.id(i + "");
 
-      RegularStop stop = TransitModelForTest.stopForTest(id.getId(), 0.0, 0.0);
+      RegularStop stop = TransitModelForTest.of().stop(id.getId(), 0.0, 0.0).build();
 
       StopTime stopTime = new StopTime();
       stopTime.setStop(stop);

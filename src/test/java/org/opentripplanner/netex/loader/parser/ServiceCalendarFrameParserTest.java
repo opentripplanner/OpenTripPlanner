@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.parser;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import jakarta.xml.bind.JAXBElement;
 import java.time.LocalDateTime;

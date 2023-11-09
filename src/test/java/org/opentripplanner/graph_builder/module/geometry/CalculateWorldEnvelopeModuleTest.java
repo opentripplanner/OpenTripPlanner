@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.module.geometry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.stop;
 
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -9,15 +8,18 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.model.vertex.VertexLabel;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 class CalculateWorldEnvelopeModuleTest {
 
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
   private final List<V> vertexes = List.of(new V(10d, 12d), new V(11d, 13d), new V(14d, 15d));
 
   private final List<RegularStop> stops = List.of(
-    stop("1").withCoordinate(20d, 22d).build(),
-    stop("1").withCoordinate(22d, 24d).build()
+    testModel.stop("1").withCoordinate(20d, 22d).build(),
+    testModel.stop("1").withCoordinate(22d, 24d).build()
   );
 
   @Test

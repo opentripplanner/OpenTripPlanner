@@ -14,9 +14,10 @@ class TripTimeOnDateTest implements PlanTestConstants {
 
   @Test
   void gtfsSequence() {
-    var pattern = TransitModelForTest.pattern(TransitMode.BUS).build();
+    var testModel = TransitModelForTest.of();
+    var pattern = testModel.pattern(TransitMode.BUS).build();
     var trip = TransitModelForTest.trip("123").build();
-    var stopTimes = TransitModelForTest.stopTimesEvery5Minutes(3, trip, T11_00);
+    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip, T11_00);
 
     var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
 

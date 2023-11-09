@@ -3,8 +3,6 @@ package org.opentripplanner.transit.model.network;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.stop;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.stopForTest;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -15,17 +13,19 @@ import org.opentripplanner.transit.model.timetable.Trip;
 
 class StopPatternTest {
 
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
   @Test
   void boardingAlightingConditions() {
     // We have different types of stops, of which only regular stops should allow boarding/alighting
-    var s1 = stopForTest("1", 60.0, 11.0);
-    var s2 = stopForTest("2", 61.0, 11.0);
-    var s3 = stopForTest("3", 62.0, 11.0);
-    var s4 = stopForTest("4", 62.1, 11.0);
+    var s1 = testModel.stop("1", 60.0, 11.0).build();
+    var s2 = testModel.stop("2", 61.0, 11.0).build();
+    var s3 = testModel.stop("3", 62.0, 11.0).build();
+    var s4 = testModel.stop("4", 62.1, 11.0).build();
 
-    var s34 = TransitModelForTest.groupStopForTest("3_4", List.of(s3, s4));
+    var s34 = testModel.groupStopForTest("3_4", List.of(s3, s4));
 
-    var areaStop = TransitModelForTest.areaStopForTest(
+    var areaStop = testModel.areaStopForTest(
       "area",
       GeometryUtils
         .getGeometryFactory()
@@ -44,10 +44,10 @@ class StopPatternTest {
 
     StopPattern stopPattern = new StopPattern(
       List.of(
-        TransitModelForTest.stopTime(t, 0, s1),
-        TransitModelForTest.stopTime(t, 1, s2),
-        TransitModelForTest.stopTime(t, 2, s34),
-        TransitModelForTest.stopTime(t, 3, areaStop)
+        testModel.stopTime(t, 0, s1),
+        testModel.stopTime(t, 1, s2),
+        testModel.stopTime(t, 2, s34),
+        testModel.stopTime(t, 3, areaStop)
       )
     );
 
@@ -64,10 +64,10 @@ class StopPatternTest {
 
   @Test
   void replaceStop() {
-    var s1 = stop("1").build();
-    var s2 = stop("2").build();
-    var s3 = stop("3").build();
-    var s4 = stop("4").build();
+    var s1 = testModel.stop("1").build();
+    var s2 = testModel.stop("2").build();
+    var s3 = testModel.stop("3").build();
+    var s4 = testModel.stop("4").build();
 
     var pattern = TransitModelForTest.stopPattern(s1, s2, s3);
 

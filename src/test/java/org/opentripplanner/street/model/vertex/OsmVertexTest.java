@@ -13,11 +13,13 @@ import org.opentripplanner.transit.model.site.AreaStop;
 
 class OsmVertexTest {
 
-  private static final AreaStop AREA_STOP1 = TransitModelForTest.areaStopForTest(
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
+  private static final AreaStop AREA_STOP1 = TEST_MODEL.areaStopForTest(
     "flex-zone-1",
     Polygons.BERLIN
   );
-  private static final AreaStop AREA_STOP2 = TransitModelForTest.areaStopForTest(
+  private static final AreaStop AREA_STOP2 = TEST_MODEL.areaStopForTest(
     "flex-zone-2",
     Polygons.BERLIN
   );

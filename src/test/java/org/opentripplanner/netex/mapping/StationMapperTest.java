@@ -12,6 +12,7 @@ import org.opentripplanner.netex.NetexTestDataSupport;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.site.Station;
+import org.opentripplanner.transit.service.StopModel;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.StopPlace;
 
@@ -21,14 +22,13 @@ class StationMapperTest {
 
   @BeforeEach
   void setUp() {
-    EntityById<Station> stationsById = new EntityById<>();
     stationMapper =
       new StationMapper(
         DataImportIssueStore.NOOP,
         new FeedScopedIdFactory("FEED_ID"),
         ZoneId.of("UTC"),
         false,
-        stationsById
+        StopModel.of()
       );
   }
 

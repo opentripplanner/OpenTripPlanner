@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
+import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.AccessibilityPreferences;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
@@ -24,12 +26,16 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.Station;
 
 class StreetTransitEntityLinkTest {
 
-  static final RegularStop accessibleStop = TransitModelForTest.stopForTest(
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
+  private static final RegularStop ACCESSIBLE_STOP = stopForTest(
     "A:accessible",
     "wheelchair accessible stop",
     10.001,
@@ -41,7 +47,7 @@ class StreetTransitEntityLinkTest {
   @Nested
   class WheelchairAccessibility {
 
-    static final RegularStop inaccessibleStop = TransitModelForTest.stopForTest(
+    static final RegularStop inaccessibleStop = stopForTest(
       "A:inaccessible",
       "wheelchair inaccessible stop",
       10.001,
@@ -50,7 +56,7 @@ class StreetTransitEntityLinkTest {
       NOT_POSSIBLE
     );
 
-    static final RegularStop unknownStop = TransitModelForTest.stopForTest(
+    static final RegularStop unknownStop = stopForTest(
       "A:unknown",
       "unknown",
       10.001,
@@ -67,7 +73,7 @@ class StreetTransitEntityLinkTest {
 
     @Test
     void allowAccessibleStop() {
-      var afterTraversal = traverse(accessibleStop, true);
+      var afterTraversal = traverse(ACCESSIBLE_STOP, true);
 
       assertFalse(State.isEmpty(afterTraversal));
     }
@@ -160,7 +166,7 @@ class StreetTransitEntityLinkTest {
     }
 
     private void testTraversalWithState(State state, boolean canTraverse) {
-      var transitStopVertex = new TransitStopVertexBuilder().withStop(accessibleStop).build();
+      var transitStopVertex = new TransitStopVertexBuilder().withStop(ACCESSIBLE_STOP).build();
       var edge = StreetTransitStopLink.createStreetTransitStopLink(
         (StreetVertex) state.getVertex(),
         transitStopVertex
@@ -168,5 +174,22 @@ class StreetTransitEntityLinkTest {
       var result = edge.traverse(state);
       assertEquals(canTraverse, result.length > 0);
     }
+  }
+
+  private static RegularStop stopForTest(
+    String idAndName,
+    String desc,
+    double lat,
+    double lon,
+    Station parent,
+    Accessibility wheelchair
+  ) {
+    return TEST_MODEL
+      .stop(idAndName)
+      .withDescription(NonLocalizedString.ofNullable(desc))
+      .withCoordinate(new WgsCoordinate(lat, lon))
+      .withWheelchairAccessibility(wheelchair)
+      .withParentStation(parent)
+      .build();
   }
 }

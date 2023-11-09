@@ -14,6 +14,10 @@ public abstract class AbstractBuilder<
     this.original = original;
   }
 
+  E original() {
+    return original;
+  }
+
   /**
    * Create a new instance, following the pattern (from the Agency class):
    * <pre>

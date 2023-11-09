@@ -24,8 +24,10 @@ class TripPatternTest {
 
   private static final String ID = "1";
   private static final String NAME = "short name";
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   private static final Route ROUTE = TransitModelForTest.route("routeId").build();
+  private static final StopPattern STOP_PATTERN = TEST_MODEL.stopPattern(10);
 
   private static final List<LineString> HOP_GEOMETRIES = List.of(
     makeLineString(STOP_A.getCoordinate(), STOP_B.getCoordinate()),
@@ -76,9 +78,7 @@ class TripPatternTest {
       )
     );
     assertFalse(subject.sameAs(subject.copy().withMode(TransitMode.RAIL).build()));
-    assertFalse(
-      subject.sameAs(subject.copy().withStopPattern(TransitModelForTest.stopPattern(11)).build())
-    );
+    assertFalse(subject.sameAs(subject.copy().withStopPattern(TEST_MODEL.stopPattern(11)).build()));
   }
 
   @Test

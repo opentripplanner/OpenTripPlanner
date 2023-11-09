@@ -78,9 +78,9 @@ class StopAndStationMapper {
         idFactory,
         defaultTimeZone,
         noTransfersOnIsolatedStops,
-        stopModelBuilder.stationById()
+        stopModelBuilder
       );
-    this.quayMapper = new QuayMapper(idFactory, issueStore, stopModelBuilder.regularStopsById());
+    this.quayMapper = new QuayMapper(idFactory, issueStore, stopModelBuilder);
     this.tariffZoneMapper = tariffZoneMapper;
     this.quayIndex = quayIndex;
     this.issueStore = issueStore;
