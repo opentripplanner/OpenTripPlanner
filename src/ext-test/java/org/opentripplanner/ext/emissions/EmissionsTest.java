@@ -113,7 +113,7 @@ class EmissionsTest {
     var emissionsResult = emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson() != null
       ? emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
       : null;
-    assertEquals(null, emissionsResult);
+    assertNull(emissionsResult);
   }
 
   private ScheduledTransitLeg createTransitLeg(Route route) {
