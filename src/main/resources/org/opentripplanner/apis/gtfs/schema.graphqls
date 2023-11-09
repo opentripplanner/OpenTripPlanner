@@ -290,7 +290,6 @@ Preferences related to alighting from a transit vehicle.
 input AlightPreferencesInput {
     """
     What is the required minimum time alighting from a vehicle.
-    Invariant: `board slack + alight slack <= transfer minimum total slack`
     """
     slack: Duration
 }
@@ -846,7 +845,6 @@ input BoardPreferencesInput {
     What is the required minimum waiting time at a stop. Setting this value as `PT0S`, for example, can lead
     to passenger missing a connection when the vehicle leaves ahead of time or the passenger arrives to the
     stop later than expected.
-    Invariant: `board slack + alight slack <= transfer minimum total slack`
     """
     slack: Duration
 }
@@ -5016,9 +5014,8 @@ input TransferPreferencesInput {
     in addition to time it might take to walk between transit stops. Setting this value
     as `PT0S`, for example, can lead to passenger missing a connection when the vehicle leaves
     ahead of time or the passenger arrives to the stop later than expected.
-    Invariant: `board slack + alight slack <= transfer minimum total slack`
     """
-    minimumTotalSlack: Duration
+    slack: Duration
 
     """
     How many additional transfers there can be at maximum compared to the itinerary with the
