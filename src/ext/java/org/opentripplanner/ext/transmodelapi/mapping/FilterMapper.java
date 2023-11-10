@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
-import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
 
 import graphql.schema.DataFetchingEnvironment;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ class FilterMapper {
     var bannedAgencies = new ArrayList<FeedScopedId>();
     callWith.argument(
       "banned.authorities",
-      (Collection<String> authorities) -> bannedAgencies.addAll(mapIDsToDomain(authorities))
+      (Collection<String> authorities) -> bannedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
     );
     if (!bannedAgencies.isEmpty()) {
       filterRequestBuilder.addNot(SelectRequest.of().withAgencies(bannedAgencies).build());
@@ -52,7 +52,7 @@ class FilterMapper {
     var bannedLines = new ArrayList<FeedScopedId>();
     callWith.argument(
       "banned.lines",
-      (List<String> lines) -> bannedLines.addAll(mapIDsToDomain(lines))
+      (List<String> lines) -> bannedLines.addAll(mapIDsToDomainNullSafe(lines))
     );
     if (!bannedLines.isEmpty()) {
       filterRequestBuilder.addNot(SelectRequest.of().withRoutes(bannedLines).build());
@@ -63,7 +63,8 @@ class FilterMapper {
     var whiteListedAgencies = new ArrayList<FeedScopedId>();
     callWith.argument(
       "whiteListed.authorities",
-      (Collection<String> authorities) -> whiteListedAgencies.addAll(mapIDsToDomain(authorities))
+      (Collection<String> authorities) ->
+        whiteListedAgencies.addAll(mapIDsToDomainNullSafe(authorities))
     );
     if (!whiteListedAgencies.isEmpty()) {
       selectors.add(SelectRequest.of().withAgencies(whiteListedAgencies));
@@ -72,7 +73,7 @@ class FilterMapper {
     var whiteListedLines = new ArrayList<FeedScopedId>();
     callWith.argument(
       "whiteListed.lines",
-      (List<String> lines) -> whiteListedLines.addAll(mapIDsToDomain(lines))
+      (List<String> lines) -> whiteListedLines.addAll(mapIDsToDomainNullSafe(lines))
     );
     if (!whiteListedLines.isEmpty()) {
       selectors.add(SelectRequest.of().withRoutes(whiteListedLines));

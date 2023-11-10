@@ -17,6 +17,8 @@ import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedC
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
@@ -65,7 +67,7 @@ public class ItineraryListFilterChainBuilder {
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
   private Instant latestDepartureTimeLimit = null;
-  private Consumer<Itinerary> maxLimitReachedSubscriber;
+  private Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsConsumer;
   private boolean accessibilityScore;
   private double wheelchairMaxSlope;
   private FareService faresService;
@@ -74,6 +76,9 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
+
+  @Sandbox
+  private ItineraryListFilter emissionsFilter;
 
   @Sandbox
   private ItineraryListFilter rideHailingFilter;
@@ -111,7 +116,7 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * Group itineraries by the main legs and keeping approximately the given total number of
-   * itineraries. The itineraries are grouped by the legs that account for more then 'p' % for the
+   * itineraries. The itineraries are grouped by the legs that account for more than 'p' % for the
    * total distance.
    *
    * @see GroupBySimilarity for more details.
@@ -186,7 +191,7 @@ public class ItineraryListFilterChainBuilder {
   /**
    * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
    * cases we get "silly" transit itineraries that is marginally better on travel-duration compared
-   * with a on-street-all-the-way itinerary. Use this method to filter worse enough itineraries.
+   * with an on-street-all-the-way itinerary. Use this method to filter worse enough itineraries.
    * <p>
    * The filter removes all itineraries with a generalized-cost that is higher than the best
    * on-street-all-the-way itinerary.
@@ -205,7 +210,7 @@ public class ItineraryListFilterChainBuilder {
    * A transit itinerary with higher generalized-cost than a walk-only itinerary is silly. This filter removes such
    * itineraries.
    * <p>
-   * This filter only have an effect, if an walk-all-the-way itinerary exist.
+   * This filter only have an effect, if a walk-all-the-way itinerary exist.
    */
   public ItineraryListFilterChainBuilder withRemoveTransitIfWalkingIsBetter(boolean value) {
     this.removeTransitIfWalkingIsBetter = value;
@@ -234,18 +239,17 @@ public class ItineraryListFilterChainBuilder {
 
   /**
    * If the maximum number of itineraries is exceeded, then the excess itineraries are removed. To
-   * get notified about this a subscriber can be added. The first itinerary removed by the {@code
-   * maxLimit} is returned. The 'maxLimit' check is the last thing happening in the filter-chain
-   * after the final sort. So, if another filter remove an itinerary, the itinerary is not
-   * considered with the respect to this the {@link #withMaxNumberOfItineraries(int)} limit.
+   * get notified about this a consumer can be added. The 'maxLimit' check is the last thing
+   * happening in the filter-chain after the final sort. So, if another filter removes an itinerary,
+   * the itinerary is not considered with respect to the {@link #withMaxNumberOfItineraries(int)}
+   * limit.
    *
-   * @param maxLimitReachedSubscriber the subscriber to notify in case any elements are removed.
-   *                                  Only the first element removed is passed to the subscriber.
+   * @param numItinerariesFilterResultsConsumer the consumer to notify when elements are removed.
    */
-  public ItineraryListFilterChainBuilder withMaxLimitReachedSubscriber(
-    Consumer<Itinerary> maxLimitReachedSubscriber
+  public ItineraryListFilterChainBuilder withNumItinerariesFilterResultsConsumer(
+    Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsConsumer
   ) {
-    this.maxLimitReachedSubscriber = maxLimitReachedSubscriber;
+    this.numItinerariesFilterResultsConsumer = numItinerariesFilterResultsConsumer;
     return this;
   }
 
@@ -279,6 +283,11 @@ public class ItineraryListFilterChainBuilder {
 
   public ItineraryListFilterChainBuilder withFares(FareService fareService) {
     this.faresService = fareService;
+    return this;
+  }
+
+  public ItineraryListFilterChainBuilder withEmissions(ItineraryListFilter emissionsFilter) {
+    this.emissionsFilter = emissionsFilter;
     return this;
   }
 
@@ -326,6 +335,10 @@ public class ItineraryListFilterChainBuilder {
 
     if (faresService != null) {
       filters.add(new FaresFilter(faresService));
+    }
+
+    if (this.emissionsFilter != null) {
+      filters.add(this.emissionsFilter);
     }
 
     if (transitAlertService != null) {
@@ -410,11 +423,10 @@ public class ItineraryListFilterChainBuilder {
       filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
       filters.add(
         new DeletionFlaggingFilter(
-          new MaxLimitFilter(
-            MAX_NUMBER_OF_ITINERARIES_TAG,
+          new NumItinerariesFilter(
             maxNumberOfItineraries,
             maxNumberOfItinerariesCrop,
-            maxLimitReachedSubscriber
+            numItinerariesFilterResultsConsumer
           )
         )
       );
@@ -465,7 +477,7 @@ public class ItineraryListFilterChainBuilder {
    * of the total travel distance.
    * <p>
    * Each group is filtered using generalized-cost, keeping only the itineraries with the lowest
-   * cost. If there is a tie, the filter look at the number-of-transfers as a tie breaker.
+   * cost. If there is a tie, the filter look at the number-of-transfers as a tiebreaker.
    * <p>
    * The filter name is dynamically created: similar-legs-filter-68p-1
    */

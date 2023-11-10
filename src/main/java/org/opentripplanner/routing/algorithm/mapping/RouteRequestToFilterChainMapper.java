@@ -3,12 +3,14 @@ package org.opentripplanner.routing.algorithm.mapping;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
+import org.opentripplanner.ext.emissions.EmissionsFilter;
 import org.opentripplanner.ext.ridehailing.RideHailingFilter;
-import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -27,7 +29,7 @@ public class RouteRequestToFilterChainMapper {
     OtpServerRequestContext context,
     Instant filterOnLatestDepartureTime,
     boolean removeWalkAllTheWayResults,
-    Consumer<Itinerary> maxLimitReachedSubscriber
+    Consumer<NumItinerariesFilterResults> maxLimitFilterResultsSubscriber
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
@@ -83,7 +85,7 @@ public class RouteRequestToFilterChainMapper {
         context.transitService()::getMultiModalStationForStation
       )
       .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
-      .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)
+      .withNumItinerariesFilterResultsConsumer(maxLimitFilterResultsSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
       .withRemoveTransitIfWalkingIsBetter(true)
       .withDebugEnabled(params.debug());
@@ -92,6 +94,10 @@ public class RouteRequestToFilterChainMapper {
       builder.withRideHailingFilter(
         new RideHailingFilter(context.rideHailingServices(), request.wheelchair())
       );
+    }
+
+    if (OTPFeature.Co2Emissions.isOn() && context.emissionsService() != null) {
+      builder.withEmissions(new EmissionsFilter(context.emissionsService()));
     }
 
     return builder.build();

@@ -1,0 +1,59 @@
+{
+  "data" : {
+    "vehicleRentalStation" : {
+      "stationId" : "Network-1:FooStation",
+      "name" : "FooStation",
+      "vehiclesAvailable" : 10,
+      "availableVehicles" : {
+        "byType" : [
+          {
+            "vehicleType" : {
+              "formFactor" : "BICYCLE",
+              "propulsionType" : "ELECTRIC"
+            },
+            "count" : 5
+          },
+          {
+            "vehicleType" : {
+              "formFactor" : "BICYCLE",
+              "propulsionType" : "HUMAN"
+            },
+            "count" : 5
+          }
+        ],
+        "total" : 10
+      },
+      "spacesAvailable" : 10,
+      "availableSpaces" : {
+        "byType" : [
+          {
+            "vehicleType" : {
+              "formFactor" : "BICYCLE",
+              "propulsionType" : "ELECTRIC"
+            },
+            "count" : 3
+          },
+          {
+            "vehicleType" : {
+              "formFactor" : "BICYCLE",
+              "propulsionType" : "HUMAN"
+            },
+            "count" : 7
+          }
+        ],
+        "total" : 10
+      },
+      "allowDropoff" : false,
+      "allowPickup" : false,
+      "allowDropoffNow" : false,
+      "allowPickupNow" : false,
+      "network" : "Network-1",
+      "lon" : 18.99,
+      "lat" : 47.51,
+      "capacity" : null,
+      "allowOverloading" : false,
+      "rentalUris" : null,
+      "operative" : false
+    }
+  }
+}

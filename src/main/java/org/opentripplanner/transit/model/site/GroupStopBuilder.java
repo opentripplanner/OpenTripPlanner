@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -14,6 +15,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStopBuilder> {
 
+  private final IntSupplier indexCounter;
+
   private I18NString name;
 
   private Set<StopLocation> stopLocations = new HashSet<>();
@@ -25,12 +28,14 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
 
   private WgsCoordinate centroid;
 
-  GroupStopBuilder(FeedScopedId id) {
+  GroupStopBuilder(FeedScopedId id, IntSupplier indexCounter) {
     super(id);
+    this.indexCounter = indexCounter;
   }
 
   GroupStopBuilder(@Nonnull GroupStop original) {
     super(original);
+    this.indexCounter = original::getIndex;
     // Optional fields
     this.name = original.getName();
     this.stopLocations = new HashSet<>(original.getLocations());
@@ -87,5 +92,9 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
 
   public WgsCoordinate centroid() {
     return centroid;
+  }
+
+  int createIndex() {
+    return indexCounter.getAsInt();
   }
 }

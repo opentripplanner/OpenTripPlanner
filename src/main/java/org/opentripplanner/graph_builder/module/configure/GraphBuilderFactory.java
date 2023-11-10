@@ -7,6 +7,8 @@ import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsModule;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.GraphBuilder;
@@ -37,6 +39,7 @@ public interface GraphBuilderFactory {
   GraphBuilder graphBuilder();
   OsmModule osmModule();
   GtfsModule gtfsModule();
+  EmissionsModule emissionsModule();
   NetexModule netexModule();
   TimeZoneAdjusterModule timeZoneAdjusterModule();
   TripPatternNamer tripPatternNamer();
@@ -74,5 +77,8 @@ public interface GraphBuilderFactory {
     Builder timeZoneId(@Nullable ZoneId zoneId);
 
     GraphBuilderFactory build();
+
+    @BindsInstance
+    Builder emissionsDataModel(@Nullable EmissionsDataModel emissionsDataModel);
   }
 }

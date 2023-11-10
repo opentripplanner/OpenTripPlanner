@@ -31,7 +31,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * A scheduled deviated trip is similar to a regular scheduled trip, except that is continues stop
+ * A scheduled deviated trip is similar to a regular scheduled trip, except that it contains stop
  * locations, which are not stops, but other types, such as groups of stops or location areas.
  */
 public class ScheduledDeviatedTrip
@@ -92,7 +92,7 @@ public class ScheduledDeviatedTrip
     ArrayList<FlexAccessTemplate> res = new ArrayList<>();
 
     for (int toIndex = fromIndex; toIndex < stopTimes.length; toIndex++) {
-      if (getDropOffType(toIndex).isNotRoutable()) {
+      if (getAlightRule(toIndex).isNotRoutable()) {
         continue;
       }
       for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
@@ -132,7 +132,7 @@ public class ScheduledDeviatedTrip
     ArrayList<FlexEgressTemplate> res = new ArrayList<>();
 
     for (int fromIndex = toIndex; fromIndex >= 0; fromIndex--) {
-      if (getPickupType(fromIndex).isNotRoutable()) {
+      if (getBoardRule(fromIndex).isNotRoutable()) {
         continue;
       }
       for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
@@ -230,14 +230,6 @@ public class ScheduledDeviatedTrip
     return getToIndex(stop) != -1;
   }
 
-  public PickDrop getPickupType(int i) {
-    return stopTimes[i].pickupType;
-  }
-
-  public PickDrop getDropOffType(int i) {
-    return stopTimes[i].dropOffType;
-  }
-
   @Override
   public boolean sameAs(@Nonnull ScheduledDeviatedTrip other) {
     return (
@@ -262,7 +254,7 @@ public class ScheduledDeviatedTrip
 
   private int getFromIndex(NearbyStop accessEgress) {
     for (int i = 0; i < stopTimes.length; i++) {
-      if (getPickupType(i).isNotRoutable()) {
+      if (getBoardRule(i).isNotRoutable()) {
         continue;
       }
       StopLocation stop = stopTimes[i].stop;
@@ -281,7 +273,7 @@ public class ScheduledDeviatedTrip
 
   private int getToIndex(NearbyStop accessEgress) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
-      if (getDropOffType(i).isNotRoutable()) {
+      if (getAlightRule(i).isNotRoutable()) {
         continue;
       }
       StopLocation stop = stopTimes[i].stop;

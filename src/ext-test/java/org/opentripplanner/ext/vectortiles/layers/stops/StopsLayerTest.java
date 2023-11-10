@@ -42,8 +42,9 @@ public class StopsLayerTest {
       false
     );
     stop =
-      RegularStop
-        .of(new FeedScopedId("F", "name"))
+      StopModel
+        .of()
+        .regularStop(new FeedScopedId("F", "name"))
         .withName(nameTranslations)
         .withDescription(descTranslations)
         .withCoordinate(50, 10)

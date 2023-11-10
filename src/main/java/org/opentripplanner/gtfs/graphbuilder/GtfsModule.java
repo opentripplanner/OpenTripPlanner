@@ -124,6 +124,7 @@ public class GtfsModule implements GraphBuilderModule {
       for (GtfsBundle gtfsBundle : gtfsBundles) {
         GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
         GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
+          new OtpTransitServiceBuilder(transitModel.getStopModel(), issueStore),
           gtfsBundle.getFeedId().getId(),
           issueStore,
           gtfsBundle.discardMinTransferTimes(),

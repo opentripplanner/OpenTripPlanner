@@ -11,6 +11,7 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.geometry.UnsupportedGeometryException;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,11 @@ public class LocationMapper {
   private static final Logger LOG = LoggerFactory.getLogger(LocationMapper.class);
 
   private final Map<org.onebusaway.gtfs.model.Location, AreaStop> mappedLocations = new HashMap<>();
+  private final StopModelBuilder stopModelBuilder;
+
+  public LocationMapper(StopModelBuilder stopModelBuilder) {
+    this.stopModelBuilder = stopModelBuilder;
+  }
 
   Collection<AreaStop> map(Collection<org.onebusaway.gtfs.model.Location> allLocations) {
     return MapUtils.mapToList(allLocations, this::map);
@@ -39,8 +45,8 @@ public class LocationMapper {
       LOG.error("Unsupported geometry type for {}", gtfsLocation.getId());
     }
 
-    return AreaStop
-      .of(mapAgencyAndId(gtfsLocation.getId()))
+    return stopModelBuilder
+      .areaStop(mapAgencyAndId(gtfsLocation.getId()))
       .withName(name)
       .withUrl(NonLocalizedString.ofNullable(gtfsLocation.getUrl()))
       .withDescription(NonLocalizedString.ofNullable(gtfsLocation.getDescription()))

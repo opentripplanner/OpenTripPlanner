@@ -20,6 +20,9 @@
             endTime
             generalizedCost
             accessibilityScore
+            emissionsPerPerson {
+                co2
+            }
             legs {
                 mode
                 from {

@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.services.ned;
 
+import org.geotools.api.coverage.Coverage;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.opengis.coverage.Coverage;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
