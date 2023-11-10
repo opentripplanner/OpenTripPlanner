@@ -18,6 +18,9 @@ jobs:
         run: |
           if [[ ${GITHUB_REF##*/} =~ ^202[0-9][0-1][0-9][0-3][0-9] ]]; then
               echo "match=true" >> $GITHUB_OUTPUT
+          else
+              echo invalid release tag
+              exit 1
           fi
       - name: Push latest image as v2-prod
         if: steps.check-tag.outputs.match == 'true'
