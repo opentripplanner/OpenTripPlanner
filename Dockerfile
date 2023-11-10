@@ -1,5 +1,5 @@
-FROM openjdk:17-slim
-MAINTAINER Reittiopas version: 0.1
+FROM eclipse-temurin:21-jre
+MAINTAINER Reittiopas version: 1.0
 
 VOLUME /opt/opentripplanner/graphs
 
