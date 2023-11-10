@@ -59,7 +59,8 @@
     {
       "description": "in order to keep review burden low, don't update these quite so frequently",
       "matchPackagePrefixes": [
-        "org.apache.lucene:"
+        "org.apache.lucene:",
+        "io.netty:"
       ],
       "extends": [
         "schedule:quarterly"
