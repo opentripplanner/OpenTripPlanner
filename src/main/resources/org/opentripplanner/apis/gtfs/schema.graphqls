@@ -2313,7 +2313,7 @@ enum PlanTransitMode {
     AIRPLANE
 
     """
-    Selecting this enables all modes to usable in routing.
+    Selecting this enables all modes to be usable in routing.
     """
     ANY
 
