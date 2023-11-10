@@ -27,7 +27,7 @@ public class VehicleParkingUpdaterConfig {
       .since(V2_2)
       .summary("The name of the data source.")
       .description("This will end up in the API responses as the feed id of of the parking lot.")
-      .asString(null);
+      .asString();
     return switch (sourceType) {
       case HSL_PARK -> new HslParkUpdaterParameters(
         updaterRef,

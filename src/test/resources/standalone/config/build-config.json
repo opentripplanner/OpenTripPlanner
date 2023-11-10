@@ -61,6 +61,11 @@
       "groupFilePattern" : "(\\w{3})_.*\\.xml",
       "ignoreFilePattern" : "(temp|tmp)"
       //"ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
+    },
+    {
+      "source": "https://data.itsfactory.fi/journeys/files/gtfs/latest/gtfs_tampere.zip",
+      "type": "gtfs",
+      "feedId": "tampere"
     }
   ],
   "transferRequests": [

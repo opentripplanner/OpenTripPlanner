@@ -111,6 +111,15 @@ Sections follow that describe particular settings in more depth.
 |       [sharedGroupFilePattern](#tf_1_sharedGroupFilePattern)             |   `regexp`  | Pattern for matching shared group NeTEx files in a NeTEx bundle.                                                                                               | *Optional* | `"(\w{3})-.*-shared\.xml"`        |  2.0  |
 |       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
 |       [ferryIdsNotAllowedForBicycle](#tf_1_ferryIdsNotAllowedForBicycle) |  `string[]` | List ferries which do not allow bikes.                                                                                                                         | *Optional* |                                   |  2.0  |
+|    { object }                                                            |   `object`  | Nested object in array. The object type is determined by the parameters.                                                                                       | *Optional* |                                   |  2.2  |
+|       type = "gtfs"                                                      |    `enum`   | The feed input format.                                                                                                                                         | *Required* |                                   |  2.2  |
+|       blockBasedInterlining                                              |  `boolean`  | Whether to create stay-seated transfers in between two trips with the same block id. Overrides the value specified in `gtfsDefaults`.                          | *Optional* | `true`                            |  2.3  |
+|       [discardMinTransferTimes](#tf__2__discardMinTransferTimes)         |  `boolean`  | Should minimum transfer times in GTFS files be discarded. Overrides the value specified in `gtfsDefaults`.                                                     | *Optional* | `false`                           |  2.3  |
+|       feedId                                                             |   `string`  | The unique ID for this feed. This overrides any feed ID defined within the feed itself.                                                                        | *Optional* |                                   |  2.2  |
+|       maxInterlineDistance                                               |  `integer`  | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle. Overrides the value specified in `gtfsDefaults`. | *Optional* | `200`                             |  2.3  |
+|       removeRepeatedStops                                                |  `boolean`  | Should consecutive identical stops be merged into one stop time entry. Overrides the value specified in `gtfsDefaults`.                                        | *Optional* | `true`                            |  2.3  |
+|       source                                                             |    `uri`    | The unique URI pointing to the data file.                                                                                                                      | *Required* |                                   |  2.2  |
+|       [stationTransferPreference](#tf__2__stationTransferPreference)     |    `enum`   | Should there be some preference or aversion for transfers at stops that are part of a station. Overrides the value specified in `gtfsDefaults`.                | *Optional* | `"allowed"`                       |  2.3  |
 
 <!-- PARAMETERS-TABLE END -->
 
@@ -1073,6 +1082,29 @@ For this reason we allow bicycles on ferries by default and allow to override th
 case where this is not the case.
 
 
+<h3 id="tf__2__discardMinTransferTimes">discardMinTransferTimes</h3>
+
+**Since version:** `2.3` ∙ **Type:** `boolean` ∙ **Cardinality:** `Optional` ∙ **Default value:** `false`   
+**Path:** /transitFeeds/[2] 
+
+Should minimum transfer times in GTFS files be discarded. Overrides the value specified in `gtfsDefaults`.
+
+This is useful eg. when the minimum transfer time is only set for ticketing purposes,
+but we want to calculate the transfers always from OSM data.
+
+
+<h3 id="tf__2__stationTransferPreference">stationTransferPreference</h3>
+
+**Since version:** `2.3` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"allowed"`   
+**Path:** /transitFeeds/[2]   
+**Enum values:** `discouraged` | `allowed` | `recommended` | `preferred`
+
+Should there be some preference or aversion for transfers at stops that are part of a station. Overrides the value specified in `gtfsDefaults`.
+
+This parameter sets the generic level of preference. What is the actual cost can be changed
+with the `stopTransferCost` parameter in the router configuration.
+
+
 
 <!-- PARAMETERS-DETAILS END -->
 
@@ -1152,6 +1184,11 @@ case where this is not the case.
       "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
       "groupFilePattern" : "(\\w{3})_.*\\.xml",
       "ignoreFilePattern" : "(temp|tmp)"
+    },
+    {
+      "source" : "https://data.itsfactory.fi/journeys/files/gtfs/latest/gtfs_tampere.zip",
+      "type" : "gtfs",
+      "feedId" : "tampere"
     }
   ],
   "transferRequests" : [

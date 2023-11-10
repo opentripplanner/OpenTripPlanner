@@ -297,7 +297,8 @@
     },
     // Streaming differential GTFS-RT TripUpdates over websockets
     {
-      "type": "websocket-gtfs-rt-updater"
+      "type": "websocket-gtfs-rt-updater",
+      "feedId": "ov"
     },
     // Siri-ET over HTTP
     {

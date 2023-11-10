@@ -11,7 +11,7 @@ public class WebsocketGtfsRealtimeUpdaterConfig {
   public static WebsocketGtfsRealtimeUpdaterParameters create(String configRef, NodeAdapter c) {
     return new WebsocketGtfsRealtimeUpdaterParameters(
       configRef,
-      c.of("feedId").since(V1_5).summary("TODO").asString(null),
+      c.of("feedId").since(V1_5).summary("TODO").asString(),
       c.of("url").since(V1_5).summary("TODO").asString(null),
       c.of("reconnectPeriodSec").since(V1_5).summary("TODO").asInt(60),
       c
