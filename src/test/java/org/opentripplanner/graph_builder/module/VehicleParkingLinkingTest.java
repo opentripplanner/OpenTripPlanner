@@ -12,7 +12,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestGraphData;
-import org.opentripplanner.routing.vehicle_parking.VehicleParkingTestUtil;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
@@ -96,9 +95,9 @@ public class VehicleParkingLinkingTest {
     graph.addVertex(C);
     graph.addVertex(D);
 
-    VehicleParkingTestUtil.createStreet(C, D, StreetTraversalPermission.CAR);
+    StreetModelForTest.streetEdge(C, D, StreetTraversalPermission.CAR);
 
-    VehicleParkingTestUtil.createStreet(A, C, StreetTraversalPermission.NONE);
+    StreetModelForTest.streetEdge(A, C, StreetTraversalPermission.NONE);
 
     var parking = VehicleParking
       .builder()

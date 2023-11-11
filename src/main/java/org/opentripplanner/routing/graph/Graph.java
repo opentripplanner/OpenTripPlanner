@@ -199,8 +199,9 @@ public class Graph implements Serializable {
       .collect(Collectors.toList());
   }
 
+  @Nullable
   public TransitStopVertex getStopVertexForStopId(FeedScopedId id) {
-    return streetIndex.findTransitStopVertices(id);
+    return streetIndex.getTransitStopVertex(id);
   }
 
   /**
