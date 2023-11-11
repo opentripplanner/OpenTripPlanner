@@ -33,12 +33,14 @@ import org.slf4j.LoggerFactory;
  * {@link GraphBuilderModule} plugin that links various
  * objects in the graph to the street network. It should be run after both the transit network and
  * street network are loaded. It links four things: transit stops, transit entrances, bike rental
- * stations, and bike parks. Therefore it should be run even when there's no GTFS data present to
+ * stations, and bike parks. Therefore, it should be run even when there's no GTFS data present to
  * make bike rental services and bike parks usable.
  */
 public class StreetLinkerModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetLinkerModule.class);
+  private static final TraverseModeSet CAR_ONLY = new TraverseModeSet(TraverseMode.CAR);
+  private static final TraverseModeSet WALK_ONLY = new TraverseModeSet(TraverseMode.WALK);
   private final Graph graph;
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
@@ -107,42 +109,47 @@ public class StreetLinkerModule implements GraphBuilderModule {
       if (tStop.hasPathways()) {
         continue;
       }
-      // check if stop is already linked, to allow multiple linking cycles
+      // check if stop is already linked, to allow multiple idempotent linking cycles
       if (tStop.getDegreeOut() + tStop.getDegreeIn() > 0) {
         continue;
       }
-      TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
+
+      // ordinarily stops only need to be accessible by foot
+      linkStopToStreetNetwork(tStop, WALK_ONLY);
 
       if (OTPFeature.FlexRouting.isOn()) {
-        // If regular stops are used for flex trips, they also need to be connected to car routable
-        // street edges.
+        // If regular stops or group stops are used for flex trips, they also need to be connected to car routable
+        // street edges. This does not apply to zones as street vertices store which zones they are part of.
         if (stopLocationsUsedForFlexTrips.contains(tStop.getStop())) {
-          modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR);
+          linkStopToStreetNetwork(tStop, CAR_ONLY);
         }
       }
 
-      graph
-        .getLinker()
-        .linkVertexPermanently(
-          tStop,
-          modes,
-          LinkingDirection.BOTH_WAYS,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetTransitStopLink.createStreetTransitStopLink(
-                (TransitStopVertex) vertex,
-                streetVertex
-              ),
-              StreetTransitStopLink.createStreetTransitStopLink(
-                streetVertex,
-                (TransitStopVertex) vertex
-              )
-            )
-        );
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
+  }
+
+  private void linkStopToStreetNetwork(TransitStopVertex tStop, TraverseModeSet modes) {
+    graph
+      .getLinker()
+      .linkVertexPermanently(
+        tStop,
+        modes,
+        LinkingDirection.BOTH_WAYS,
+        (vertex, streetVertex) ->
+          List.of(
+            StreetTransitStopLink.createStreetTransitStopLink(
+              (TransitStopVertex) vertex,
+              streetVertex
+            ),
+            StreetTransitStopLink.createStreetTransitStopLink(
+              streetVertex,
+              (TransitStopVertex) vertex
+            )
+          )
+      );
   }
 
   private static void linkVehicleParkingWithLinker(
@@ -274,7 +281,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   /**
-   * Removes vehicle parking entrace vertex from graph.
+   * Removes vehicle parking entrance vertex from graph.
    *
    * @return vehicle parking for removal if the removed entrance was its only entrance.
    */
