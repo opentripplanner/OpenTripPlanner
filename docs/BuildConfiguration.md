@@ -43,7 +43,7 @@ Sections follow that describe particular settings in more depth.
 | staticParkAndRide                                                        |  `boolean`  | Whether we should create car P+R stations from OSM data.                                                                                                       | *Optional* | `true`                            |  1.5  |
 | [streetGraph](#streetGraph)                                              |    `uri`    | URI to the street graph object file for reading and writing.                                                                                                   | *Optional* |                                   |  2.0  |
 | [subwayAccessTime](#subwayAccessTime)                                    |   `double`  | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                                                           | *Optional* | `2.0`                             |  1.5  |
-| [transitModelTimeZone](#transitModelTimeZone)                            | `time-zone` | Time zone for the graph.                                                                                                                                       | *Optional* |                                   |  2.2  |
+| [transitModelTimeZone](#transitModelTimeZone)                            | `time-zone` | Time zone for the graph.                                                                                                                                       | *Optional* | Detect from GTFS agency_timezone  |  2.2  |
 | [transitServiceEnd](#transitServiceEnd)                                  |  `duration` | Limit the import of transit services to the given end date.                                                                                                    | *Optional* | `"P3Y"`                           |  2.0  |
 | [transitServiceStart](#transitServiceStart)                              |  `duration` | Limit the import of transit services to the given START date.                                                                                                  | *Optional* | `"-P1Y"`                          |  2.0  |
 | [writeCachedElevations](#writeCachedElevations)                          |  `boolean`  | Reusing elevation data from previous builds                                                                                                                    | *Optional* | `false`                           |  2.0  |
@@ -585,7 +585,9 @@ to check in to a flight (2-3 hours for international flights) than to alight and
 
 Time zone for the graph.
 
-This is used to store the timetables in the transit model, and to interpret times in incoming requests.
+This is used to store the timetables in the transit model, and to interpret times in incoming requests. 
+OTP is currently designed to use a single time zone, which is set from agency_timezone in GTFS data. 
+It will throw an error if GTFS feeds contain conflicting time zones unless this is set. 
 
 <h3 id="transitServiceEnd">transitServiceEnd</h3>
 
