@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.util.BitSet;
 import java.util.Set;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.JarFile;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
@@ -42,6 +43,8 @@ public class GraphSerializationTest {
 
   static Class<?>[] IGNORED_CLASSES = Set
     .of(
+      // Skip AtomicInteger, it does not implement equals/hashCode
+      AtomicInteger.class,
       ThreadPoolExecutor.class,
       WeakValueHashMap.class,
       Method.class,
