@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.emissions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
 import java.time.OffsetDateTime;
@@ -9,12 +10,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.framework.model.Grams;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.street.search.TraverseMode;
@@ -22,63 +24,46 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.organization.Agency;
+import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class EmissionsTest {
 
-  private DefaultEmissionsService eService;
-  private EmissionsFilter emissionsFilter;
+  private static DefaultEmissionsService eService;
+  private static EmissionsFilter emissionsFilter;
 
   static final ZonedDateTime TIME = OffsetDateTime
     .parse("2023-07-20T17:49:06+03:00")
     .toZonedDateTime();
 
-  private static final Agency subject = Agency
-    .of(TransitModelForTest.id("F:1"))
-    .withName("Foo_CO")
-    .withTimezone("Europe/Helsinki")
+  private static final StreetLeg STREET_LEG = StreetLeg
+    .create()
+    .withMode(TraverseMode.CAR)
+    .withDistanceMeters(214.4)
+    .withStartTime(TIME)
+    .withEndTime(TIME.plusHours(1))
     .build();
 
-  @BeforeEach
-  void SetUp() {
+  private static final Route ROUTE_WITH_EMISSIONS = TransitModelForTest.route(id("1")).build();
+  private static final Route ROUTE_WITH_ZERO_EMISSIONS = TransitModelForTest.route(id("2")).build();
+  private static final Route ROUTE_WITHOUT_EMISSIONS_CONFIGURED = TransitModelForTest
+    .route(id("3"))
+    .build();
+
+  @BeforeAll
+  static void SetUp() {
     Map<FeedScopedId, Double> emissions = new HashMap<>();
     emissions.put(new FeedScopedId("F", "1"), (0.12 / 12));
     emissions.put(new FeedScopedId("F", "2"), 0.0);
     EmissionsDataModel emissionsDataModel = new EmissionsDataModel(emissions, 0.131);
-    this.eService = new DefaultEmissionsService(emissionsDataModel);
-    this.emissionsFilter = new EmissionsFilter(eService);
+    eService = new DefaultEmissionsService(emissionsDataModel);
+    emissionsFilter = new EmissionsFilter(eService);
   }
 
   @Test
   void testGetEmissionsForItinerary() {
-    var testModel = TransitModelForTest.of();
-    var stopOne = testModel.stop("1:stop1", 60, 25).build();
-    var stopTwo = testModel.stop("1:stop1", 61, 25).build();
-    var stopThree = testModel.stop("1:stop1", 62, 25).build();
-    var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
-    var route = TransitModelForTest.route(id("1")).build();
-    var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();
-    var stoptime = new StopTime();
-    var stoptimes = new ArrayList<StopTime>();
-    stoptimes.add(stoptime);
-    var trip = Trip
-      .of(FeedScopedId.parse("FOO:BAR"))
-      .withMode(TransitMode.BUS)
-      .withRoute(route)
-      .build();
-    var leg = new ScheduledTransitLegBuilder<>()
-      .withTripTimes(new TripTimes(trip, stoptimes, new Deduplicator()))
-      .withTripPattern(pattern)
-      .withBoardStopIndexInPattern(0)
-      .withAlightStopIndexInPattern(2)
-      .withStartTime(TIME)
-      .withEndTime(TIME.plusMinutes(10))
-      .withServiceDate(TIME.toLocalDate())
-      .withZoneId(ZoneIds.BERLIN)
-      .build();
-    Itinerary i = new Itinerary(List.of(leg));
+    Itinerary i = new Itinerary(List.of(createTransitLeg(ROUTE_WITH_EMISSIONS)));
     assertEquals(
       new Grams(2223.902),
       emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
@@ -87,14 +72,7 @@ class EmissionsTest {
 
   @Test
   void testGetEmissionsForCarRoute() {
-    var leg = StreetLeg
-      .create()
-      .withMode(TraverseMode.CAR)
-      .withDistanceMeters(214.4)
-      .withStartTime(TIME)
-      .withEndTime(TIME.plusHours(1))
-      .build();
-    Itinerary i = new Itinerary(List.of(leg));
+    Itinerary i = new Itinerary(List.of(STREET_LEG));
     assertEquals(
       new Grams(28.0864),
       emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
@@ -103,60 +81,56 @@ class EmissionsTest {
 
   @Test
   void testNoEmissionsForFeedWithoutEmissionsConfigured() {
-    var testModel = TransitModelForTest.of();
-    Map<FeedScopedId, Double> emissions = new HashMap<>();
-    emissions.put(new FeedScopedId("G", "1"), (0.12 / 12));
-    EmissionsDataModel emissionsDataModel = new EmissionsDataModel(emissions, 0.131);
-
-    this.eService = new DefaultEmissionsService(emissionsDataModel);
-    this.emissionsFilter = new EmissionsFilter(this.eService);
-
-    var route = TransitModelForTest.route(id("1")).withAgency(subject).build();
-    var pattern = TransitModelForTest
-      .tripPattern("1", route)
-      .withStopPattern(testModel.stopPattern(3))
-      .build();
-    var stoptime = new StopTime();
-    var stoptimes = new ArrayList<StopTime>();
-    stoptimes.add(stoptime);
-    var trip = Trip
-      .of(FeedScopedId.parse("FOO:BAR"))
-      .withMode(TransitMode.BUS)
-      .withRoute(route)
-      .build();
-    var leg = new ScheduledTransitLegBuilder<>()
-      .withTripTimes(new TripTimes(trip, stoptimes, new Deduplicator()))
-      .withTripPattern(pattern)
-      .withBoardStopIndexInPattern(0)
-      .withAlightStopIndexInPattern(2)
-      .withStartTime(TIME)
-      .withEndTime(TIME.plusMinutes(10))
-      .withServiceDate(TIME.toLocalDate())
-      .withZoneId(ZoneIds.BERLIN)
-      .build();
-    Itinerary i = new Itinerary(List.of(leg));
-    assertEquals(null, emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson());
+    Itinerary i = new Itinerary(List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED)));
+    assertNull(emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson());
   }
 
   @Test
   void testZeroEmissionsForItineraryWithZeroEmissions() {
+    Itinerary i = new Itinerary(List.of(createTransitLeg(ROUTE_WITH_ZERO_EMISSIONS)));
+    assertEquals(
+      new Grams(0.0),
+      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
+    );
+  }
+
+  @Test
+  void testGetEmissionsForCombinedRoute() {
+    Itinerary i = new Itinerary(List.of(createTransitLeg(ROUTE_WITH_EMISSIONS), STREET_LEG));
+    assertEquals(
+      new Grams(2251.9884),
+      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
+    );
+  }
+
+  @Test
+  void testNoEmissionsForCombinedRouteWithoutTransitEmissions() {
+    Itinerary i = new Itinerary(
+      List.of(createTransitLeg(ROUTE_WITHOUT_EMISSIONS_CONFIGURED), STREET_LEG)
+    );
+    var emissionsResult = emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson() != null
+      ? emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
+      : null;
+    assertNull(emissionsResult);
+  }
+
+  private ScheduledTransitLeg createTransitLeg(Route route) {
+    var stoptime = new StopTime();
+    var stopTimes = new ArrayList<StopTime>();
+    stopTimes.add(stoptime);
     var testModel = TransitModelForTest.of();
     var stopOne = testModel.stop("1:stop1", 60, 25).build();
     var stopTwo = testModel.stop("1:stop1", 61, 25).build();
     var stopThree = testModel.stop("1:stop1", 62, 25).build();
     var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
-    var route = TransitModelForTest.route(id("2")).build();
     var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();
-    var stoptime = new StopTime();
-    var stoptimes = new ArrayList<StopTime>();
-    stoptimes.add(stoptime);
     var trip = Trip
       .of(FeedScopedId.parse("FOO:BAR"))
       .withMode(TransitMode.BUS)
       .withRoute(route)
       .build();
-    var leg = new ScheduledTransitLegBuilder<>()
-      .withTripTimes(new TripTimes(trip, stoptimes, new Deduplicator()))
+    return new ScheduledTransitLegBuilder<>()
+      .withTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()))
       .withTripPattern(pattern)
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(2)
@@ -165,10 +139,5 @@ class EmissionsTest {
       .withServiceDate(TIME.toLocalDate())
       .withZoneId(ZoneIds.BERLIN)
       .build();
-    Itinerary i = new Itinerary(List.of(leg));
-    assertEquals(
-      new Grams(0.0),
-      emissionsFilter.filter(List.of(i)).get(0).getEmissionsPerPerson().getCo2()
-    );
   }
 }
