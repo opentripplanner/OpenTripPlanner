@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
@@ -8,16 +9,21 @@ import org.opentripplanner.model.plan.Itinerary;
  * This filter will remove all itineraries that are outside the search-window. In some
  * cases the access is time-shifted after the end of the search-window. These results
  * should appear again when paging to the next page. Hence, this filter will remove
- * such itineraries.
+ * such itineraries. The same is true for when paging to the previous page for arriveBy=true.
+ * <p>
+ * Itineraries matching the start(earliest-departure-time) and end(latest-departure-time)
+ * of the search-window are included [inclusive, inclusive].
  */
 public class OutsideSearchWindowFilter implements ItineraryDeletionFlagger {
 
   public static final String TAG = "outside-search-window";
 
-  private final Instant limit;
+  private final Instant earliestDepartureTime;
+  private final Instant latestDepartureTime;
 
-  public OutsideSearchWindowFilter(Instant latestDepartureTime) {
-    this.limit = latestDepartureTime;
+  public OutsideSearchWindowFilter(Instant earliestDepartureTime, Duration searchWindow) {
+    this.earliestDepartureTime = earliestDepartureTime;
+    this.latestDepartureTime = earliestDepartureTime.plus(searchWindow);
   }
 
   @Override
@@ -27,7 +33,10 @@ public class OutsideSearchWindowFilter implements ItineraryDeletionFlagger {
 
   @Override
   public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
-    return it -> it.startTime().toInstant().isAfter(limit);
+    return it -> {
+      var time = it.startTime().toInstant();
+      return time.isBefore(earliestDepartureTime) || time.isAfter(latestDepartureTime);
+    };
   }
 
   @Override

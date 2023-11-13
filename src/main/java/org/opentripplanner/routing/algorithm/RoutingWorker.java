@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -130,20 +131,24 @@ public class RoutingWorker {
     debugTimingAggregator.finishedRouting();
 
     // Filter itineraries
-    boolean removeWalkAllTheWayResultsFromDirectFlex =
-      request.journey().direct().mode() == StreetMode.FLEXIBLE;
+    List<Itinerary> filteredItineraries;
+    {
+      boolean removeWalkAllTheWayResultsFromDirectFlex =
+        request.journey().direct().mode() == StreetMode.FLEXIBLE;
 
-    ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
-      request,
-      serverContext,
-      filterOnLatestDepartureTime(),
-      emptyDirectModeHandler.removeWalkAllTheWayResults() ||
-      removeWalkAllTheWayResultsFromDirectFlex,
-      res -> numItinerariesFilterResults = res
-    );
+      ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
+        request,
+        serverContext,
+        earliestDepartureTimeUsed(),
+        searchWindowUsed(),
+        emptyDirectModeHandler.removeWalkAllTheWayResults() ||
+        removeWalkAllTheWayResultsFromDirectFlex,
+        it -> numItinerariesFilterResults = it
+      );
 
-    List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
-    routingErrors.addAll(filterChain.getRoutingErrors());
+      filteredItineraries = filterChain.filter(itineraries);
+      routingErrors.addAll(filterChain.getRoutingErrors());
+    }
 
     if (LOG.isDebugEnabled()) {
       LOG.debug(
@@ -211,6 +216,34 @@ public class RoutingWorker {
       return transitSearchTimeZero.plusSeconds(ldt).toInstant();
     }
     return null;
+  }
+
+  /**
+   * Calculate the earliest-departure-time used in the transit search.
+   * This method returns {@code null} if no transit search is performed.
+   */
+  @Nullable
+  private Instant earliestDepartureTimeUsed() {
+    if (raptorSearchParamsUsed == null) {
+      return null;
+    }
+    if (!raptorSearchParamsUsed.isEarliestDepartureTimeSet()) {
+      return null;
+    }
+    return transitSearchTimeZero
+      .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime())
+      .toInstant();
+  }
+
+  /**
+   * Calculate the search-window earliest-departure-time used in the transit search.
+   * This method returns {@code null} if no transit search is performed.
+   */
+  @Nullable
+  private Duration searchWindowUsed() {
+    return raptorSearchParamsUsed == null
+      ? null
+      : Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
   }
 
   private Void routeDirectStreet(
