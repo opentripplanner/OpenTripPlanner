@@ -1,8 +1,6 @@
 FROM maven:3-eclipse-temurin-21
 MAINTAINER Reittiopas version: 0.1
 
-RUN microdnf install curl
-
 ENV OTP_ROOT="/opt/opentripplanner"
 
 WORKDIR ${OTP_ROOT}
