@@ -1,4 +1,4 @@
-FROM maven:3-openjdk-17
+FROM maven:3-eclipse-temurin-21
 MAINTAINER Reittiopas version: 0.1
 
 RUN microdnf install curl
