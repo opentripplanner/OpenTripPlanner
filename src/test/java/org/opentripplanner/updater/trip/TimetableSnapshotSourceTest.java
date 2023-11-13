@@ -630,9 +630,9 @@ public class TimetableSnapshotSourceTest {
         SCHEDULED,
         transitModel.getTimeZone()
       )
-        .addStopTime(1, NO_DATA)
-        .addStopTime(2, SKIPPED)
-        .addStopTime(3, NO_DATA);
+        .addNoDataStop(1)
+        .addSkippedStop(2)
+        .addNoDataStop(3);
 
       var tripUpdate = builder.build();
 
@@ -762,7 +762,7 @@ public class TimetableSnapshotSourceTest {
         transitModel.getTimeZone()
       )
         .addDelayedStopTime(1, 0)
-        .addStopTime(2, SKIPPED)
+        .addSkippedStop(2)
         .addDelayedStopTime(3, 90);
 
       var tripUpdate = builder.build();
@@ -841,8 +841,8 @@ public class TimetableSnapshotSourceTest {
 
         assertEquals(0, newTripTimes.getArrivalDelay(0));
         assertEquals(0, newTripTimes.getDepartureDelay(0));
-        assertEquals(0, newTripTimes.getArrivalDelay(1));
-        assertEquals(0, newTripTimes.getDepartureDelay(1));
+        assertEquals(45, newTripTimes.getArrivalDelay(1));
+        assertEquals(45, newTripTimes.getDepartureDelay(1));
         assertEquals(90, newTripTimes.getArrivalDelay(2));
         assertEquals(90, newTripTimes.getDepartureDelay(2));
         assertFalse(newTripTimes.isCancelledStop(0));
