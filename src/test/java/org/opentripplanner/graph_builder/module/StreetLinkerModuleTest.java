@@ -33,6 +33,19 @@ class StreetLinkerModuleTest {
   private static final double DELTA = 0.0001;
 
   @Test
+  void linkingIsIdempotent() {
+    var model = new TestModel();
+    var module = model.streetLinkerModule();
+
+    module.buildGraph();
+    module.buildGraph();
+    module.buildGraph();
+
+    assertTrue(model.stopVertex().isConnectedToGraph());
+    assertEquals(1, model.stopVertex().getOutgoing().size());
+  }
+
+  @Test
   void linkRegularStop() {
     var model = new TestModel();
     var module = model.streetLinkerModule();
@@ -42,7 +55,7 @@ class StreetLinkerModuleTest {
     assertTrue(model.stopVertex().isConnectedToGraph());
 
     assertEquals(1, model.stopVertex().getOutgoing().size());
-    var outgoing = model.outgoingLinks().get(0);
+    var outgoing = model.outgoingLinks().getFirst();
     assertInstanceOf(StreetTransitStopLink.class, outgoing);
 
     SplitterVertex linkedTo = (SplitterVertex) outgoing.getToVertex();
@@ -66,13 +79,13 @@ class StreetLinkerModuleTest {
 
       // stop is used by a flex trip, needs to be linked to both the walk and car edge
       assertEquals(2, model.stopVertex().getOutgoing().size());
-      var linkToWalk = model.outgoingLinks().get(0);
+      var linkToWalk = model.outgoingLinks().getFirst();
       SplitterVertex walkSplit = (SplitterVertex) linkToWalk.getToVertex();
 
       assertTrue(walkSplit.isConnectedToWalkingEdge());
       assertFalse(walkSplit.isConnectedToDriveableEdge());
 
-      var linkToCar = model.outgoingLinks().get(1);
+      var linkToCar = model.outgoingLinks().getLast();
       SplitterVertex carSplit = (SplitterVertex) linkToCar.getToVertex();
 
       assertFalse(carSplit.isConnectedToWalkingEdge());

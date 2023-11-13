@@ -362,8 +362,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
      */
     WALK_ONLY,
     /**
-     * Make sure that the stop is linked to an edge that is both walkable and drivable which is
-     * required if the stop used by a flex trip.
+     * Make sure that the stop is linked to an edge each that is walkable and drivable.
      * This may lead to several links being created.
      */
     WALK_AND_CAR,
