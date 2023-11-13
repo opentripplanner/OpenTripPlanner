@@ -33,6 +33,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Ignore negative travel-times in Raptor [#5443](https://github.com/opentripplanner/OpenTripPlanner/pull/5443)
 - Fix sort order bug in optimized transfers [#5446](https://github.com/opentripplanner/OpenTripPlanner/pull/5446)
 - Siri file loader [#5460](https://github.com/opentripplanner/OpenTripPlanner/pull/5460)
+- Calculate CO₂ emissions of itineraries [#5278](https://github.com/opentripplanner/OpenTripPlanner/pull/5278)
+- Update NeTEx Java Model 2.0.15 [#5466](https://github.com/opentripplanner/OpenTripPlanner/pull/5466)
+- Migrate to Java 21 [#5421](https://github.com/opentripplanner/OpenTripPlanner/pull/5421)
+- Add Roadmap setup docs [#5468](https://github.com/opentripplanner/OpenTripPlanner/pull/5468)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)

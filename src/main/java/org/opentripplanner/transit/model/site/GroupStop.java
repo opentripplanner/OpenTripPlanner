@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -27,15 +28,15 @@ public class GroupStop
 
   GroupStop(GroupStopBuilder builder) {
     super(builder.getId());
-    this.index = INDEX_COUNTER.getAndIncrement();
+    this.index = builder.createIndex();
     this.name = builder.name();
     this.geometry = builder.geometry();
     this.centroid = Objects.requireNonNull(builder.centroid());
     this.stopLocations = builder.stopLocations();
   }
 
-  public static GroupStopBuilder of(FeedScopedId id) {
-    return new GroupStopBuilder(id);
+  public static GroupStopBuilder of(FeedScopedId id, IntSupplier indexCounter) {
+    return new GroupStopBuilder(id, indexCounter);
   }
 
   @Override

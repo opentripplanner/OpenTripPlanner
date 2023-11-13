@@ -41,6 +41,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
  */
 public class TestStateBuilder {
 
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
   private static final Instant DEFAULT_START_TIME = OffsetDateTime
     .parse("2023-04-18T12:00:00+02:00")
     .toInstant();
@@ -194,7 +196,7 @@ public class TestStateBuilder {
    */
   public TestStateBuilder stop() {
     count++;
-    return arriveAtStop(TransitModelForTest.stopForTest("stop", count, count));
+    return arriveAtStop(testModel.stop("stop", count, count).build());
   }
 
   public TestStateBuilder enterStation(String id) {

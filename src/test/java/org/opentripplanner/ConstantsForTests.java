@@ -23,6 +23,7 @@ import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -99,7 +100,9 @@ public class ConstantsForTests {
 
     var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
-    return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
+    var transitService = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
+
+    return new NetexConfigure(buildConfig).netexBundle(transitService, configuredDataSource);
   }
 
   public static NetexBundle createMinimalNetexEpipBundle() {
@@ -109,7 +112,9 @@ public class ConstantsForTests {
 
     var dataSource = new DirectoryDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
-    return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
+    var transitService = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
+
+    return new NetexConfigure(buildConfig).netexBundle(transitService, configuredDataSource);
   }
 
   /**

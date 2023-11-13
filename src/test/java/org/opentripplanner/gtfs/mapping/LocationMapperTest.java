@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Location;
 import org.opentripplanner.test.support.VariableSource;
+import org.opentripplanner.transit.service.StopModel;
 
 class LocationMapperTest {
 
@@ -31,7 +32,7 @@ class LocationMapperTest {
       )
     );
 
-    var mapper = new LocationMapper();
+    var mapper = new LocationMapper(StopModel.of());
     var flexLocation = mapper.map(gtfsLocation);
 
     assertEquals(isBogusName, flexLocation.hasFallbackName());

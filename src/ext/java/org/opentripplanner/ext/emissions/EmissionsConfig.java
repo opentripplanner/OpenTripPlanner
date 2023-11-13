@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.emissions;
 
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
+
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 /**
@@ -13,6 +15,7 @@ public class EmissionsConfig {
   public EmissionsConfig(String parameterName, NodeAdapter root) {
     var c = root
       .of(parameterName)
+      .since(V2_5)
       .summary("Emissions configuration.")
       .description(
         """
@@ -26,11 +29,16 @@ public class EmissionsConfig {
     this.carAvgCo2PerKm =
       c
         .of("carAvgCo2PerKm")
+        .since(V2_5)
         .summary("The average CO₂ emissions of a car in grams per kilometer.")
         .asInt(170);
 
     this.carAvgOccupancy =
-      c.of("carAvgOccupancy").summary("The average number of passengers in a car.").asDouble(1.3);
+      c
+        .of("carAvgOccupancy")
+        .since(V2_5)
+        .summary("The average number of passengers in a car.")
+        .asDouble(1.3);
   }
 
   public int getCarAvgCo2PerKm() {

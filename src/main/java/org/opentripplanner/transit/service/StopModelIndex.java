@@ -32,9 +32,10 @@ class StopModelIndex {
     Collection<RegularStop> stops,
     Collection<AreaStop> flexStops,
     Collection<GroupStop> groupStops,
-    Collection<MultiModalStation> multiModalStations
+    Collection<MultiModalStation> multiModalStations,
+    int indexSize
   ) {
-    stopsByIndex = new StopLocation[StopLocation.indexCounter()];
+    stopsByIndex = new StopLocation[indexSize];
 
     var allStops = new CollectionsView<StopLocation>(stops, flexStops, groupStops);
     for (StopLocation it : allStops) {

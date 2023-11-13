@@ -118,9 +118,10 @@ class EmissionsTest {
     var stoptime = new StopTime();
     var stopTimes = new ArrayList<StopTime>();
     stopTimes.add(stoptime);
-    var stopOne = TransitModelForTest.stopForTest("1:stop1", 60, 25);
-    var stopTwo = TransitModelForTest.stopForTest("1:stop1", 61, 25);
-    var stopThree = TransitModelForTest.stopForTest("1:stop1", 62, 25);
+    var testModel = TransitModelForTest.of();
+    var stopOne = testModel.stop("1:stop1", 60, 25).build();
+    var stopTwo = testModel.stop("1:stop1", 61, 25).build();
+    var stopThree = testModel.stop("1:stop1", 62, 25).build();
     var stopPattern = TransitModelForTest.stopPattern(stopOne, stopTwo, stopThree);
     var pattern = TransitModelForTest.tripPattern("1", route).withStopPattern(stopPattern).build();
     var trip = Trip

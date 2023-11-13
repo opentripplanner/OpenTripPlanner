@@ -23,6 +23,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 class TripTimesTest {
 
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
   private static final String TRIP_ID = "testTripId";
 
   private static final List<FeedScopedId> stops = List.of(
@@ -44,7 +46,7 @@ class TripTimesTest {
     for (int i = 0; i < stops.size(); ++i) {
       StopTime stopTime = new StopTime();
 
-      RegularStop stop = TransitModelForTest.stopForTest(stops.get(i).getId(), 0.0, 0.0);
+      RegularStop stop = TEST_MODEL.stop(stops.get(i).getId(), 0.0, 0.0).build();
       stopTime.setStop(stop);
       stopTime.setArrivalTime(i * 60);
       stopTime.setDepartureTime(i * 60);
@@ -257,9 +259,9 @@ class TripTimesTest {
     StopTime stopTime1 = new StopTime();
     StopTime stopTime2 = new StopTime();
 
-    RegularStop stop0 = TransitModelForTest.stopForTest(stops.get(0).getId(), 0.0, 0.0);
-    RegularStop stop1 = TransitModelForTest.stopForTest(stops.get(1).getId(), 0.0, 0.0);
-    RegularStop stop2 = TransitModelForTest.stopForTest(stops.get(2).getId(), 0.0, 0.0);
+    RegularStop stop0 = TEST_MODEL.stop(stops.get(0).getId(), 0.0, 0.0).build();
+    RegularStop stop1 = TEST_MODEL.stop(stops.get(1).getId(), 0.0, 0.0).build();
+    RegularStop stop2 = TEST_MODEL.stop(stops.get(2).getId(), 0.0, 0.0).build();
 
     stopTime0.setStop(stop0);
     stopTime0.setDepartureTime(0);

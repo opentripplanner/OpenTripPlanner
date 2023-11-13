@@ -25,6 +25,8 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
 
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
   public static final FeedScopedId TP_ID_1 = id("1");
   public static final FeedScopedId TP_ID_2 = id("2");
   public static final FeedScopedId TP_ID_3 = id("3");
@@ -115,7 +117,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
    */
   private static StopTime createStopTime() {
     var st = new StopTime();
-    st.setStop(TransitModelForTest.stopForTest("Stop:1", 0.0, 0.0));
+    st.setStop(TEST_MODEL.stop("Stop:1", 0.0, 0.0).build());
     return st;
   }
 

@@ -46,12 +46,12 @@ public class UnscheduledTripTest {
   private static final int T11_00 = TimeUtils.hm2time(11, 0);
   private static final int T14_00 = TimeUtils.hm2time(14, 0);
   private static final int T15_00 = TimeUtils.hm2time(15, 0);
-  private static final RegularStop REGULAR_STOP = TransitModelForTest.stop("stop").build();
 
-  private static final StopLocation AREA_STOP = TransitModelForTest.areaStopForTest(
-    "area",
-    Polygons.BERLIN
-  );
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
+  private static final RegularStop REGULAR_STOP = TEST_MODEL.stop("stop").build();
+
+  private static final StopLocation AREA_STOP = TEST_MODEL.areaStopForTest("area", Polygons.BERLIN);
 
   @Nested
   class IsUnscheduledTrip {
@@ -152,7 +152,7 @@ public class UnscheduledTripTest {
   @Test
   void testUnscheduledFeederTripFromScheduledStop() {
     var fromStopTime = new StopTime();
-    fromStopTime.setStop(TransitModelForTest.stop("stop").build());
+    fromStopTime.setStop(TEST_MODEL.stop("stop").build());
     fromStopTime.setDepartureTime(T10_00);
 
     var toStopTime = new StopTime();
@@ -546,9 +546,9 @@ public class UnscheduledTripTest {
 
   @Test
   void boardingAlighting() {
-    var AREA_STOP1 = TransitModelForTest.areaStopForTest("area-1", Polygons.BERLIN);
-    var AREA_STOP2 = TransitModelForTest.areaStopForTest("area-2", Polygons.BERLIN);
-    var AREA_STOP3 = TransitModelForTest.areaStopForTest("area-3", Polygons.BERLIN);
+    var AREA_STOP1 = TEST_MODEL.areaStopForTest("area-1", Polygons.BERLIN);
+    var AREA_STOP2 = TEST_MODEL.areaStopForTest("area-2", Polygons.BERLIN);
+    var AREA_STOP3 = TEST_MODEL.areaStopForTest("area-3", Polygons.BERLIN);
 
     var first = area(AREA_STOP1, "10:00", "10:05");
     first.setDropOffType(NONE);

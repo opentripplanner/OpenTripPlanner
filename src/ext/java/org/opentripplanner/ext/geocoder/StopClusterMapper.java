@@ -1,11 +1,11 @@
 package org.opentripplanner.ext.geocoder;
 
+import com.google.common.collect.Iterables;
 import java.util.Collection;
 import java.util.Optional;
-import java.util.stream.Stream;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.lang.PredicateUtils;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.service.TransitService;
@@ -29,7 +29,7 @@ class StopClusterMapper {
    * - of "identical" stops which are very close to each other and have an identical name, only one
    *   is chosen (at random)
    */
-  Stream<StopCluster> generateStopClusters(
+  Iterable<StopCluster> generateStopClusters(
     Collection<StopLocation> stopLocations,
     Collection<StopLocationsGroup> stopLocationsGroups
   ) {
@@ -39,16 +39,20 @@ class StopClusterMapper {
       .filter(sl -> sl.getParentStation() == null)
       // stops without a name (for example flex areas) are useless for searching, so we remove them, too
       .filter(sl -> sl.getName() != null)
-      // if they are very close to each other and have the same name, only one is chosen (at random)
-      .filter(
-        PredicateUtils.distinctByKey(sl ->
-          new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate100m())
-        )
-      )
-      .flatMap(sl -> this.map(sl).stream());
-    var stations = stopLocationsGroups.stream().map(this::map);
+      .toList();
 
-    return Stream.concat(stops, stations);
+    // if they are very close to each other and have the same name, only one is chosen (at random)
+    var deduplicatedStops = ListUtils
+      .distinctByKey(
+        stops,
+        sl -> new DeduplicationKey(sl.getName(), sl.getCoordinate().roundToApproximate100m())
+      )
+      .stream()
+      .flatMap(s -> this.map(s).stream())
+      .toList();
+    var stations = stopLocationsGroups.stream().map(this::map).toList();
+
+    return Iterables.concat(deduplicatedStops, stations);
   }
 
   StopCluster map(StopLocationsGroup g) {
