@@ -108,7 +108,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
         continue;
       }
       // check if stop is already linked, to allow multiple idempotent linking cycles
-      if (tStop.getDegreeOut() + tStop.getDegreeIn() > 0) {
+      if (tStop.isConnectedToGraph()) {
         continue;
       }
 

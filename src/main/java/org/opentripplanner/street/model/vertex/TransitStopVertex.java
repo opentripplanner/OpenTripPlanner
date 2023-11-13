@@ -86,6 +86,9 @@ public class TransitStopVertex extends StationElementVertex {
     return this.stop;
   }
 
+  /**
+   * Is this vertex already linked to the street network?
+   */
   public boolean isConnectedToGraph() {
     return getDegreeOut() + getDegreeIn() > 0;
   }
