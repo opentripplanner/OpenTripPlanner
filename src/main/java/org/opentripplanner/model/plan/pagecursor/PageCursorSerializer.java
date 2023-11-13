@@ -41,6 +41,16 @@ final class PageCursorSerializer {
       writeTime(cursor.latestArrivalTime, out);
       writeDuration(cursor.searchWindow, out);
       writeEnum(cursor.originalSortOrder, out);
+      if (cursor.containsDeduplicationParameters()) {
+        writeTime(cursor.deduplicationParameters.windowStart, out);
+        writeTime(cursor.deduplicationParameters.windowEnd, out);
+        writeEnum(cursor.deduplicationParameters.deduplicationSection, out);
+        writeBoolean(cursor.deduplicationParameters.isOnStreetAllTheWayThreshold, out);
+        writeTime(cursor.deduplicationParameters.arrivalTimeThreshold, out);
+        writeInt(cursor.deduplicationParameters.generalizedCostThreshold, out);
+        writeInt(cursor.deduplicationParameters.numOfTransfersThreshold, out);
+        writeTime(cursor.deduplicationParameters.departureTimeThreshold, out);
+      }
       out.flush();
       return Base64.getUrlEncoder().encodeToString(buf.toByteArray());
     } catch (IOException e) {
@@ -70,6 +80,31 @@ final class PageCursorSerializer {
       var searchWindow = readDuration(in);
       var originalSortOrder = readEnum(in, SortOrder.class);
 
+      if (in.available() > 0) {
+        var dedupeWindowStart = readTime(in);
+        var dedupeWindowEnd = readTime(in);
+        var cropSection = readEnum(in, PagingDeduplicationSection.class);
+        var isOnStreetAllTheWayThreshold = readBoolean(in);
+        var arrivalTimeDeletionThreshold = readTime(in);
+        var generalizedCostDeletionThreshold = readInt(in);
+        var numOfTransfersDeletionThreshold = readInt(in);
+        var departureTimeDeletionThreshold = readTime(in);
+
+        PagingDeduplicationParameters dedupeParams = new PagingDeduplicationParameters(
+          dedupeWindowStart,
+          dedupeWindowEnd,
+          originalSortOrder,
+          cropSection,
+          isOnStreetAllTheWayThreshold,
+          arrivalTimeDeletionThreshold,
+          generalizedCostDeletionThreshold,
+          numOfTransfersDeletionThreshold,
+          departureTimeDeletionThreshold
+        );
+        return new PageCursor(type, originalSortOrder, edt, lat, searchWindow)
+          .withDeduplicationParameters(dedupeParams);
+      }
+
       return new PageCursor(type, originalSortOrder, edt, lat, searchWindow);
     } catch (Exception e) {
       String details = e.getMessage();
@@ -88,6 +123,22 @@ final class PageCursorSerializer {
 
   private static byte readByte(ObjectInputStream in) throws IOException {
     return in.readByte();
+  }
+
+  private static void writeInt(int value, ObjectOutputStream out) throws IOException {
+    out.writeInt(value);
+  }
+
+  private static int readInt(ObjectInputStream in) throws IOException {
+    return in.readInt();
+  }
+
+  private static void writeBoolean(boolean value, ObjectOutputStream out) throws IOException {
+    out.writeBoolean(value);
+  }
+
+  private static boolean readBoolean(ObjectInputStream in) throws IOException {
+    return in.readBoolean();
   }
 
   private static void writeTime(Instant time, ObjectOutputStream out) throws IOException {

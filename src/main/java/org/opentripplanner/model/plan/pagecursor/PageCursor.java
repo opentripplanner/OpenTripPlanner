@@ -24,6 +24,8 @@ public class PageCursor {
   public final Instant latestArrivalTime;
   public final Duration searchWindow;
 
+  public PagingDeduplicationParameters deduplicationParameters;
+
   PageCursor(
     PageType type,
     SortOrder originalSortOrder,
@@ -36,6 +38,15 @@ public class PageCursor {
     this.earliestDepartureTime = earliestDepartureTime;
     this.latestArrivalTime = latestArrivalTime;
     this.originalSortOrder = originalSortOrder;
+  }
+
+  public PageCursor withDeduplicationParameters(PagingDeduplicationParameters dedupeParams) {
+    this.deduplicationParameters = dedupeParams;
+    return this;
+  }
+
+  public boolean containsDeduplicationParameters() {
+    return deduplicationParameters != null;
   }
 
   @Nullable
@@ -52,6 +63,10 @@ public class PageCursor {
       .addDateTime("edt", earliestDepartureTime)
       .addDateTime("lat", latestArrivalTime)
       .addDuration("searchWindow", searchWindow)
+      .addStr(
+        "deduplicationParameters",
+        deduplicationParameters == null ? "null" : deduplicationParameters.toString()
+      )
       .toString();
   }
 

@@ -18,6 +18,7 @@ public class PageCursorFactory {
   private SearchTime current = null;
   private Duration currentSearchWindow = null;
   private boolean wholeSwUsed = true;
+  private PagingDeduplicationParameters deduplicationParameters = null;
   private PageCursorFactoryParameters pageCursorFactoryParams = null;
 
   private PageCursor nextCursor = null;
@@ -50,15 +51,28 @@ public class PageCursorFactory {
    * If there were itineraries removed in the current search because the numItineraries parameter
    * was used, then we want to allow the caller to move within some of the itineraries that were
    * removed in the next and previous pages. This means we will use information from when we cropped
-   * the list of itineraries to create the new search encoded in the page cursors.
+   * the list of itineraries to create the new search encoded in the page cursors. We will also add
+   * information necessary for removing potential duplicates when paging.
    *
-   * @param pageCursorFactoryParams the result from the {@code NumItinerariesFilter}
+   * @param pageCursorFactoryParams contains the result from the {@code NumItinerariesFilter}
    */
   public PageCursorFactory withRemovedItineraries(
     PageCursorFactoryParameters pageCursorFactoryParams
   ) {
     this.wholeSwUsed = false;
     this.pageCursorFactoryParams = pageCursorFactoryParams;
+    this.deduplicationParameters =
+      new PagingDeduplicationParameters(
+        pageCursorFactoryParams.earliestRemovedDeparture().truncatedTo(ChronoUnit.MINUTES),
+        current.edt.plus(currentSearchWindow),
+        sortOrder,
+        pageCursorFactoryParams.deduplicationSection(),
+        pageCursorFactoryParams.firstRemovedIsOnStreetAllTheWay(),
+        pageCursorFactoryParams.firstRemovedArrivalTime(),
+        pageCursorFactoryParams.firstRemovedGeneralizedCost(),
+        pageCursorFactoryParams.firstRemovedNumOfTransfers(),
+        pageCursorFactoryParams.firstRemovedDepartureTime()
+      );
     return this;
   }
 
@@ -135,6 +149,11 @@ public class PageCursorFactory {
     }
     prevCursor = new PageCursor(PREVIOUS_PAGE, sortOrder, prev.edt, prev.lat, newSearchWindow);
     nextCursor = new PageCursor(NEXT_PAGE, sortOrder, next.edt, next.lat, newSearchWindow);
+
+    if (deduplicationParameters != null) {
+      nextCursor = nextCursor.withDeduplicationParameters(deduplicationParameters);
+      prevCursor = prevCursor.withDeduplicationParameters(deduplicationParameters);
+    }
   }
 
   private Instant edtBeforeNewSw() {

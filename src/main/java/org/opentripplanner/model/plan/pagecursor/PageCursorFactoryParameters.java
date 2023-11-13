@@ -11,10 +11,13 @@ import java.time.Instant;
  */
 public interface PageCursorFactoryParameters {
   Instant earliestRemovedDeparture();
-
   Instant earliestKeptArrival();
-
   Instant latestRemovedDeparture();
-
   Instant latestRemovedArrival();
+  Instant firstRemovedArrivalTime();
+  boolean firstRemovedIsOnStreetAllTheWay();
+  int firstRemovedGeneralizedCost();
+  int firstRemovedNumOfTransfers();
+  Instant firstRemovedDepartureTime();
+  PagingDeduplicationSection deduplicationSection();
 }
