@@ -129,6 +129,13 @@ public class StreetLinkerModule implements GraphBuilderModule {
     LOG.info(progress.completeMessage());
   }
 
+  /**
+   * Link a stop to the nearest "relevant" edges.
+   * <p>
+   * These are mostly walk edges but if a stop is used by a flex pattern it also needs to be
+   * car-accessible. Therefore, flex stops are ensured to be connected to the car-accessible
+   * edge. This may lead to several links being created.
+   */
   private void linkStopToStreetNetwork(TransitStopVertex tStop, StopLinkType linkType) {
     graph
       .getLinker()
