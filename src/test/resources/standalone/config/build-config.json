@@ -50,7 +50,7 @@
     {
       "type" : "gtfs",
       "feedId" : "SE",
-      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/sweeden-gtfs.obj"
+      "source" : "https://skanetrafiken.se/download/sweden.gtfs.zip"
     },
     {
       "type" : "netex",
@@ -61,11 +61,6 @@
       "groupFilePattern" : "(\\w{3})_.*\\.xml",
       "ignoreFilePattern" : "(temp|tmp)"
       //"ferryIdsNotAllowedForBicycle" : ["RUT:B107", "RUT:B209"]
-    },
-    {
-      "source": "https://data.itsfactory.fi/journeys/files/gtfs/latest/gtfs_tampere.zip",
-      "type": "gtfs",
-      "feedId": "tampere"
     }
   ],
   "transferRequests": [
