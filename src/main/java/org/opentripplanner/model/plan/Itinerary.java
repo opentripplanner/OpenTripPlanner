@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -189,8 +190,8 @@ public class Itinerary implements ItinerarySortKey {
   /**
    * Remove all deletion flags of this itinerary, in effect undeleting it from the result.
    */
-  public void removeDeletionFlags() {
-    systemNotices.clear();
+  public void removeDeletionFlags(Set<String> removeTags) {
+    systemNotices.removeIf(it -> removeTags.contains(it.tag()));
   }
 
   public boolean isFlaggedForDeletion() {

@@ -482,6 +482,8 @@ public class ItineraryListFilterChainBuilder {
    * The filter name is dynamically created: similar-legs-filter-68p-1
    */
   private List<ItineraryListFilter> buildGroupByTripIdAndDistanceFilters() {
+    var sysTags = new ArrayList<String>();
+
     List<GroupBySimilarity> groupBy = groupBySimilarity
       .stream()
       .sorted(Comparator.comparingDouble(o -> o.groupByP))
@@ -490,16 +492,18 @@ public class ItineraryListFilterChainBuilder {
     List<ItineraryListFilter> groupByFilters = new ArrayList<>();
 
     for (GroupBySimilarity group : groupBy) {
-      String name =
+      String tag =
         "similar-legs-filter-%.0fp-%dx".formatted(
             100d * group.groupByP,
             group.maxNumOfItinerariesPerGroup
           );
+      sysTags.add(tag);
 
       List<ItineraryListFilter> nested = new ArrayList<>();
 
       if (group.nestedGroupingByAllSameStations) {
-        final String innerGroupName = name + "-group-by-all-same-stations";
+        final String innerGroupName = tag + "-group-by-all-same-stations";
+        sysTags.add(tag);
         nested.add(
           new GroupByFilter<>(
             GroupByAllSameStations::new,
@@ -512,19 +516,17 @@ public class ItineraryListFilterChainBuilder {
       }
 
       if (group.maxCostOtherLegsFactor > 1.0) {
-        nested.add(
-          new DeletionFlaggingFilter(
-            new OtherThanSameLegsMaxGeneralizedCostFilter(group.maxCostOtherLegsFactor)
-          )
-        );
+        var flagger = new OtherThanSameLegsMaxGeneralizedCostFilter(group.maxCostOtherLegsFactor);
+        sysTags.add(flagger.name());
+        nested.add(new DeletionFlaggingFilter(flagger));
       }
 
       nested.add(new SortingFilter(generalizedCostComparator()));
       nested.add(
-        new DeletionFlaggingFilter(new MaxLimitFilter(name, group.maxNumOfItinerariesPerGroup))
+        new DeletionFlaggingFilter(new MaxLimitFilter(tag, group.maxNumOfItinerariesPerGroup))
       );
 
-      nested.add(new RemoveDeletionFlagForLeastTransfersItinerary());
+      nested.add(new RemoveDeletionFlagForLeastTransfersItinerary(sysTags));
 
       groupByFilters.add(
         new GroupByFilter<>(it -> new GroupByDistance(it, group.groupByP), nested)
