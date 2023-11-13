@@ -61,11 +61,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
   }
 
-  /** For test only */
-  public static void linkStreetsForTestOnly(Graph graph, TransitModel model) {
-    new StreetLinkerModule(graph, model, DataImportIssueStore.NOOP, false).buildGraph();
-  }
-
   @Override
   public void buildGraph() {
     transitModel.index();
@@ -148,7 +143,9 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
           // If regular stops or group stops are used for flex trips, they also need to be connected to car routable
           // street edges. This does not apply to zones as street vertices store which zones they are part of.
-          if (linkType == StopLinkType.WALK_AND_CAR && !walkStreetVertex.isConnectedToDriveableEdge()) {
+          if (
+            linkType == StopLinkType.WALK_AND_CAR && !walkStreetVertex.isConnectedToDriveableEdge()
+          ) {
             graph
               .getLinker()
               .linkVertexPermanently(
@@ -358,9 +355,10 @@ public class StreetLinkerModule implements GraphBuilderModule {
      */
     WALK_ONLY,
     /**
-     * Make sure that the stop is linked to an edge that is both walkable and drivable.
-     * This may lead to several links created.
+     * Make sure that the stop is linked to an edge that is both walkable and drivable which is
+     * required if the stop used by a flex trip.
+     * This may lead to several links being created.
      */
-    WALK_AND_CAR
+    WALK_AND_CAR,
   }
 }

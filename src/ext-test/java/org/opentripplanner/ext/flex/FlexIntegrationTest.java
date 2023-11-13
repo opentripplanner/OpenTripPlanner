@@ -23,7 +23,7 @@ import org.opentripplanner.TestServerContext;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.GenericLocation;
@@ -34,7 +34,6 @@ import org.opentripplanner.routing.api.RoutingService;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.test.support.ResourceLoader;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
@@ -186,7 +185,7 @@ public class FlexIntegrationTest {
     gtfsModule.buildGraph();
 
     // link stations to streets
-    StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
+    TestStreetLinkerModule.link(graph, transitModel);
 
     // link flex locations to streets
     new AreaStopsToVerticesMapper(graph, transitModel).buildGraph();
