@@ -12,6 +12,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ext.stopconsolidation.internal.DefaultStopConsolidationRepository;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
+import org.opentripplanner.transit.model.network.TripPattern;
 
 class StopConsolidationModuleTest {
 
@@ -37,9 +38,8 @@ class StopConsolidationModuleTest {
     assertEquals(modifiedStop, STOP_D);
 
     var patterns = List.copyOf(transitModel.getAllTripPatterns());
-    assertEquals(1, patterns.size());
 
-    var p = patterns.get(0);
-    assertEquals(List.of(STOP_A, STOP_D, STOP_C), p.getStops());
+    var stops = patterns.stream().map(TripPattern::getStops).toList();
+    assertEquals(List.of(List.of(STOP_A, STOP_D, STOP_C)), stops);
   }
 }

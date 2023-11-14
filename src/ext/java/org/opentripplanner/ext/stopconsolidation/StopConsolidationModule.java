@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.stopconsolidation;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -78,7 +78,11 @@ public class StopConsolidationModule implements GraphBuilderModule {
     DataSource ds
   ) {
     LOG.info("Reading stop consolidation information from '{}'", ds);
-    var groups = StopConsolidationParser.parseGroups(ds.asInputStream());
-    return new StopConsolidationModule(transitModel, repo, groups);
+    try (var inputStream = ds.asInputStream()) {
+      var groups = StopConsolidationParser.parseGroups(inputStream);
+      return new StopConsolidationModule(transitModel, repo, groups);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
