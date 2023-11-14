@@ -72,6 +72,11 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   }
 
   @Override
+  public DataFetcher<Integer> numberOfTransfers() {
+    return environment -> getSource(environment).getNumberOfTransfers();
+  }
+
+  @Override
   public DataFetcher<Long> startTime() {
     return environment -> getSource(environment).startTime().toInstant().toEpochMilli();
   }

@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>125</otp.serialization.version.id>
+        <otp.serialization.version.id>126</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>30.0</geotools.version>
         <google.dagger.version>2.48.1</google.dagger.version>
@@ -742,7 +742,7 @@
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>kryo-tools</artifactId>
-            <version>1.5.0</version>
+            <version>1.6.0</version>
         </dependency>
         <!-- kryo serializers for Guava types !-->
         <dependency>

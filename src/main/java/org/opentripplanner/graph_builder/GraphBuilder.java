@@ -196,9 +196,10 @@ public class GraphBuilder implements Runnable {
 
     new DataImportIssueSummary(issueStore.listIssues()).logSummary();
 
-    validate();
-
+    // Log before we validate, this way we have more information if the validation fails
     logGraphBuilderCompleteStatus(startTime, graph, transitModel);
+
+    validate();
   }
 
   private void addModule(GraphBuilderModule module) {
@@ -227,9 +228,9 @@ public class GraphBuilder implements Runnable {
   private void validate() {
     if (hasTransitData() && !transitModel.hasTransit()) {
       throw new OtpAppException(
-        "The provided transit data have no trips within the configured transit " +
-        "service period. See build config 'transitServiceStart' and " +
-        "'transitServiceEnd'"
+        "The provided transit data have no trips within the configured transit service period. " +
+        "There is something wrong with your data - see the log above. Another possibility is that the " +
+        "'transitServiceStart' and 'transitServiceEnd' are not correctly configured."
       );
     }
   }

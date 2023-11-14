@@ -10,6 +10,7 @@
           "emissionsPerPerson" : {
             "co2" : 123.0
           },
+          "numberOfTransfers" : 1,
           "legs" : [
             {
               "mode" : "WALK",
