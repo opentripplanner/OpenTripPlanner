@@ -14,7 +14,7 @@ public class BikePreferencesMapper {
   ) {
     callWith.argument("bikeSpeed", bike::withSpeed);
 
-    // These are not wsposed on the Transmodel API
+    // These are not supported on the Transmodel API
     // callWith.argument("bikeSwitchTime", bike::withSwitchTime);
     // callWith.argument("bikeSwitchCost", bike::withSwitchCost);
 
