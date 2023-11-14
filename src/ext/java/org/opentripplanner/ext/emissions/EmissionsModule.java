@@ -22,10 +22,9 @@ import org.slf4j.LoggerFactory;
 public class EmissionsModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(EmissionsModule.class);
-  private BuildConfig config;
-  private EmissionsDataModel emissionsDataModel;
-  private GraphBuilderDataSources dataSources;
-  private Map<FeedScopedId, Double> emissionsData = new HashMap<>();
+  private final BuildConfig config;
+  private final EmissionsDataModel emissionsDataModel;
+  private final GraphBuilderDataSources dataSources;
   private final DataImportIssueStore issueStore;
 
   @Inject
@@ -48,6 +47,7 @@ public class EmissionsModule implements GraphBuilderModule {
       double carAvgCo2PerKm = config.emissions.getCarAvgCo2PerKm();
       double carAvgOccupancy = config.emissions.getCarAvgOccupancy();
       double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
+      Map<FeedScopedId, Double> emissionsData = new HashMap<>();
 
       for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
         Map<FeedScopedId, Double> co2Emissions;
@@ -60,7 +60,7 @@ public class EmissionsModule implements GraphBuilderModule {
           emissionsData.putAll(co2Emissions);
         }
       }
-      this.emissionsDataModel.setCo2Emissions(this.emissionsData);
+      this.emissionsDataModel.setCo2Emissions(emissionsData);
       this.emissionsDataModel.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
     }
   }
