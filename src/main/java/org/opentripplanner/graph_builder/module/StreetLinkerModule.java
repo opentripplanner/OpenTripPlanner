@@ -143,36 +143,35 @@ public class StreetLinkerModule implements GraphBuilderModule {
         tStop,
         WALK_ONLY,
         LinkingDirection.BOTH_WAYS,
-        (walkVertex, walkStreetVertex) -> {
-          ArrayList<Edge> linkEdges = new ArrayList<>(
-            createStopLinkEdges((TransitStopVertex) walkVertex, walkStreetVertex)
-          );
+        (transitVertex, streetVertex) -> {
+          var linkEdges = createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex);
 
-          // If regular stops or group stops are used for flex trips, they also need to be connected to car routable
-          // street edges. This does not apply to zones as street vertices store which zones they are part of.
-          // see https://github.com/opentripplanner/OpenTripPlanner/issues/5498
-          if (
-            linkType == StopLinkType.WALK_AND_CAR && !walkStreetVertex.isConnectedToDriveableEdge()
-          ) {
-            graph
-              .getLinker()
-              .linkVertexPermanently(
-                tStop,
-                CAR_ONLY,
-                LinkingDirection.BOTH_WAYS,
-                (carVertex, carStreetVertex) -> {
-                  List<Edge> edges = createStopLinkEdges(
-                    (TransitStopVertex) carVertex,
-                    carStreetVertex
-                  );
-                  linkEdges.addAll(edges);
-                  return edges;
-                }
-              );
+          if (linkType == StopLinkType.WALK_AND_CAR && !streetVertex.isConnectedToDriveableEdge()) {
+            linkToDriveableEdge(tStop);
           }
 
           return linkEdges;
         }
+      );
+  }
+
+  /**
+   * If regular stops or group stops are used for flex trips, they also need to be connected to car
+   * routable street edges.
+   * <p>
+   * This does not apply to zones as street vertices store which zones they are part of.
+   *
+   * @see https://github.com/opentripplanner/OpenTripPlanner/issues/5498
+   */
+  private void linkToDriveableEdge(TransitStopVertex tStop) {
+    graph
+      .getLinker()
+      .linkVertexPermanently(
+        tStop,
+        CAR_ONLY,
+        LinkingDirection.BOTH_WAYS,
+        (transitVertex, streetVertex) ->
+          createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex)
       );
   }
 
