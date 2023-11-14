@@ -140,7 +140,7 @@ public class StreetIndex {
   }
 
   @Nullable
-  public TransitStopVertex getTransitStopVertex(FeedScopedId stopId) {
+  public TransitStopVertex findTransitStopVertices(FeedScopedId stopId) {
     return transitStopVertices.get(stopId);
   }
 

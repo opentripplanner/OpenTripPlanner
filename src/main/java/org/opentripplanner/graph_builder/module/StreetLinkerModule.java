@@ -150,6 +150,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
 
           // If regular stops or group stops are used for flex trips, they also need to be connected to car routable
           // street edges. This does not apply to zones as street vertices store which zones they are part of.
+          // see https://github.com/opentripplanner/OpenTripPlanner/issues/5498
           if (
             linkType == StopLinkType.WALK_AND_CAR && !walkStreetVertex.isConnectedToDriveableEdge()
           ) {
