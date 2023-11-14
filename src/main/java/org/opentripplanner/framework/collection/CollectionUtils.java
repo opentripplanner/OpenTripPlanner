@@ -17,7 +17,7 @@ public class CollectionUtils {
    * {@code null} to the given {@code nullText}.
    * <p>
    * If the collection is a set, but not a SortedSet then the elements are sorted. This is done
-   * to return the elements in a deterministic manner, witch is important if this is used in
+   * to return the elements in a deterministic manner, which is important if this is used in
    * for example a unit-test.
    * <p>
    * The final result string examples: {@code "[]", "[a]", "[a, b, c]"}
