@@ -40,6 +40,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Interpolate increasing stop times for GTFS-RT cancelled trips [#5348](https://github.com/opentripplanner/OpenTripPlanner/pull/5348)
 - Remove itineraries outside the search window in arriveBy search [#5433](https://github.com/opentripplanner/OpenTripPlanner/pull/5433)
 - Add back walk-reluctance in Transmodel API [#5471](https://github.com/opentripplanner/OpenTripPlanner/pull/5471)
+- Make `feedId` required for realtime updaters [#5502](https://github.com/opentripplanner/OpenTripPlanner/pull/5502)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
