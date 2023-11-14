@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.emissions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
@@ -42,12 +42,12 @@ public class Co2EmissionsDataReaderTest {
   @Test
   void testMissingCo2EmissionsZipDataReading() {
     var emissions = co2EmissionsDataReader.readGtfsZip(CO2_MISSING_GTFS_ZIP);
-    assertNull(emissions);
+    assertTrue(emissions.isEmpty());
   }
 
   @Test
   void testMissingCo2EmissionsDataReading() {
     var emissions = co2EmissionsDataReader.readGtfs(CO2_MISSING_GTFS);
-    assertNull(emissions);
+    assertTrue(emissions.isEmpty());
   }
 }

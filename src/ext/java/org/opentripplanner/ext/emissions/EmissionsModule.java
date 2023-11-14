@@ -6,7 +6,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
@@ -24,12 +23,12 @@ public class EmissionsModule implements GraphBuilderModule {
   private static final Logger LOG = LoggerFactory.getLogger(EmissionsModule.class);
   private final BuildConfig config;
   private final EmissionsDataModel emissionsDataModel;
-  private final GraphBuilderDataSources dataSources;
+  private final Iterable<ConfiguredDataSource<GtfsFeedParameters>> dataSources;
   private final DataImportIssueStore issueStore;
 
   @Inject
   public EmissionsModule(
-    GraphBuilderDataSources dataSources,
+    Iterable<ConfiguredDataSource<GtfsFeedParameters>> dataSources,
     BuildConfig config,
     EmissionsDataModel emissionsDataModel,
     DataImportIssueStore issueStore
@@ -48,17 +47,14 @@ public class EmissionsModule implements GraphBuilderModule {
       double carAvgOccupancy = config.emissions.getCarAvgOccupancy();
       double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
       Map<FeedScopedId, Double> emissionsData = new HashMap<>();
-
-      for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+      for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources) {
         Map<FeedScopedId, Double> co2Emissions;
         if (gtfsData.dataSource().name().contains(".zip")) {
           co2Emissions = co2EmissionsDataReader.readGtfsZip(new File(gtfsData.dataSource().uri()));
         } else {
           co2Emissions = co2EmissionsDataReader.readGtfs(new File(gtfsData.dataSource().uri()));
         }
-        if (co2Emissions != null) {
-          emissionsData.putAll(co2Emissions);
-        }
+        emissionsData.putAll(co2Emissions);
       }
       this.emissionsDataModel.setCo2Emissions(emissionsData);
       this.emissionsDataModel.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);

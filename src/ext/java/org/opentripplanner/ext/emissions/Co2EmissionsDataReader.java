@@ -55,7 +55,7 @@ public class Co2EmissionsDataReader {
         LOG.error("InvalidEmissionData: reading emissions.txt failed.", e);
       }
     }
-    return null;
+    return Map.of();
   }
 
   /**
@@ -78,7 +78,7 @@ public class Co2EmissionsDataReader {
       issueStore.add("InvalidEmissionData", "Reading emissions data failed.");
       LOG.error("InvalidEmissionData: Reading emissions data failed.", e);
     }
-    return null;
+    return Map.of();
   }
 
   private Map<FeedScopedId, Double> readEmissions(InputStream stream, String feedId)
