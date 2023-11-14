@@ -21,9 +21,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class EmissionsModuleTest {
 
-  private final ResourceLoader RES = ResourceLoader.of(
-    EmissionsModuleTest.class
-  );
+  private final ResourceLoader RES = ResourceLoader.of(EmissionsModuleTest.class);
   private final File CO2_GTFS_ZIP = RES.file("emissions-test-gtfs.zip");
   private final File CO2_GTFS = RES.file("emissions-test-gtfs/");
   private final String CONFIG_PATH = "standalone/config/" + OtpFileNames.BUILD_CONFIG_FILENAME;
