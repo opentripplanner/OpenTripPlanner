@@ -50,10 +50,14 @@ public class EmissionsModule implements GraphBuilderModule {
       double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
 
       for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+        Map<FeedScopedId, Double> co2Emissions;
         if (gtfsData.dataSource().name().contains(".zip")) {
-          emissionsData = co2EmissionsDataReader.readGtfsZip(new File(gtfsData.dataSource().uri()));
+          co2Emissions = co2EmissionsDataReader.readGtfsZip(new File(gtfsData.dataSource().uri()));
         } else {
-          emissionsData = co2EmissionsDataReader.readGtfs(new File(gtfsData.dataSource().uri()));
+          co2Emissions = co2EmissionsDataReader.readGtfs(new File(gtfsData.dataSource().uri()));
+        }
+        if (co2Emissions != null) {
+          emissionsData.putAll(co2Emissions);
         }
       }
       this.emissionsDataModel.setCo2Emissions(this.emissionsData);
