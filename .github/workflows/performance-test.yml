@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - dev-2.x
+      ## remove before merge
+      - fix-int-serialization
 
 jobs:
   perf-test:
