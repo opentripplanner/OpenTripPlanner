@@ -11,7 +11,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 class StopFinderTraverseVisitorTest {
 
-  static final RegularStop STOP = TransitModelForTest.stopForTest("a-stop", 1, 1);
+  static final RegularStop STOP = TransitModelForTest.of().stop("a-stop", 1, 1).build();
 
   @Test
   void deduplicateStops() {

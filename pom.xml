@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>124</otp.serialization.version.id>
+        <otp.serialization.version.id>126</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>30.0</geotools.version>
         <google.dagger.version>2.48.1</google.dagger.version>
@@ -68,9 +68,9 @@
         <logback.version>1.4.11</logback.version>
         <lucene.version>9.8.0</lucene.version>
         <slf4j.version>2.0.9</slf4j.version>
-        <netex-java-model.version>2.0.14</netex-java-model.version>
+        <netex-java-model.version>2.0.15</netex-java-model.version>
         <siri-java-model.version>1.25</siri-java-model.version>
-        <jaxb-runtime.version>3.0.2</jaxb-runtime.version>
+        <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <GITHUB_REPOSITORY>opentripplanner/OpenTripPlanner</GITHUB_REPOSITORY>
@@ -147,7 +147,7 @@
                 <version>3.11.0</version>
                 <configuration>
                     <!-- Target Java version -->
-                    <release>17</release>
+                    <release>21</release>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>com.google.dagger</groupId>
@@ -468,6 +468,7 @@
                         </ports>
                     </container>
                     <from>
+                        <image>eclipse-temurin:21-jre</image>
                         <platforms>
                             <platform>
                                 <architecture>amd64</architecture>
@@ -548,41 +549,29 @@
 
     <dependencyManagement>
         <dependencies>
-
-
-            <!-- Jakarta EE-->
-            <dependency>
-                <groupId>jakarta.annotation</groupId>
-                <artifactId>jakarta.annotation-api</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.ws.rs</groupId>
-                <artifactId>jakarta.ws.rs-api</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.validation</groupId>
-                <artifactId>jakarta.validation-api</artifactId>
-            </dependency>
-            <!--
-                The jaxb-api provides annotations like XmlElement indicating how classes should be (de)serialized.
-                The jaxb-runtime pulls in the jaxb-api of the same version transitively. But we specify both api and
-                runtime dependencies anyway here at the top level to prevent transitive dependencies from pulling in
-                mismatched versions. This is overriding an older version of jaxb-api pulled in by the netex-java-model.
-            -->
-            <dependency>
-                <groupId>jakarta.xml.bind</groupId>
-                <artifactId>jakarta.xml.bind-api</artifactId>
-                <version>3.0.1</version>
-            </dependency>
-
             <dependency>
                 <!-- This make sure all google libraries are using compatible versions. -->
                 <groupId>com.google.cloud</groupId>
                 <artifactId>libraries-bom</artifactId>
-                <version>26.26.0</version>
+                <version>26.27.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!--
+                this is necessary because async-http-client uses an old netty version that can crash the
+                Java 21 JVM: https://github.com/netty/netty/pull/13640
+
+                when ACH has been upgraded to the (as of now unreleased) version 3, this can be removed again.
+            -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.1.100.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -760,7 +749,7 @@
         <dependency>
             <groupId>com.conveyal</groupId>
             <artifactId>kryo-tools</artifactId>
-            <version>1.5.0</version>
+            <version>1.6.0</version>
         </dependency>
         <!-- kryo serializers for Guava types !-->
         <dependency>
@@ -954,17 +943,17 @@
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
-            <version>1.43.0</version>
+            <version>1.45.0</version>
         </dependency>
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-messaging-servicebus</artifactId>
-            <version>7.14.4</version>
+            <version>7.14.5</version>
         </dependency>
         <dependency>
             <groupId>com.azure.resourcemanager</groupId>
             <artifactId>azure-resourcemanager-servicebus</artifactId>
-            <version>2.30.0</version>
+            <version>2.32.0</version>
         </dependency>
         <dependency>
             <groupId>ch.poole</groupId>

@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
@@ -27,7 +28,8 @@ public class RouteRequestToFilterChainMapper {
   public static ItineraryListFilterChain createFilterChain(
     RouteRequest request,
     OtpServerRequestContext context,
-    Instant filterOnLatestDepartureTime,
+    Instant earliestDepartureTimeUsed,
+    Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
     Consumer<NumItinerariesFilterResults> maxLimitFilterResultsSubscriber
   ) {
@@ -84,7 +86,7 @@ public class RouteRequestToFilterChainMapper {
         context.transitService().getTransitAlertService(),
         context.transitService()::getMultiModalStationForStation
       )
-      .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
+      .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
       .withNumItinerariesFilterResultsConsumer(maxLimitFilterResultsSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
       .withRemoveTransitIfWalkingIsBetter(true)

@@ -2,12 +2,15 @@ package org.opentripplanner.routing.algorithm.filterchain;
 
 import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.generalizedCostComparator;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.framework.lang.Sandbox;
@@ -66,8 +69,9 @@ public class ItineraryListFilterChainBuilder {
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
-  private Instant latestDepartureTimeLimit = null;
   private Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsConsumer;
+  private Instant earliestDepartureTime = null;
+  private Duration searchWindow = null;
   private boolean accessibilityScore;
   private double wheelchairMaxSlope;
   private FareService faresService;
@@ -227,13 +231,20 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * Max departure time(end of search-window). This is an absolute filter on the itinerary
-   * departure time from the origin. The filter is ignored if the value is {@code null}.
+   * Set the search window for the current request. This is used to filter out itineraries outside
+   * the search window. The filter uses the itinerary-departure-time. The filter is ignored if
+   * both arguments are {@code null}, the searchWindow is required if the earliestDepartureTime is
+   * set.
    */
-  public ItineraryListFilterChainBuilder withLatestDepartureTimeLimit(
-    Instant latestDepartureTimeLimit
+  public ItineraryListFilterChainBuilder withSearchWindow(
+    @Nullable Instant earliestDepartureTime,
+    Duration searchWindow
   ) {
-    this.latestDepartureTimeLimit = latestDepartureTimeLimit;
+    if (earliestDepartureTime != null) {
+      Objects.requireNonNull(searchWindow);
+    }
+    this.earliestDepartureTime = earliestDepartureTime;
+    this.searchWindow = searchWindow;
     return this;
   }
 
@@ -395,9 +406,11 @@ public class ItineraryListFilterChainBuilder {
         filters.add(new DeletionFlaggingFilter(new RemoveWalkOnlyFilter()));
       }
 
-      if (latestDepartureTimeLimit != null) {
+      if (earliestDepartureTime != null) {
         filters.add(
-          new DeletionFlaggingFilter(new OutsideSearchWindowFilter(latestDepartureTimeLimit))
+          new DeletionFlaggingFilter(
+            new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow)
+          )
         );
       }
 

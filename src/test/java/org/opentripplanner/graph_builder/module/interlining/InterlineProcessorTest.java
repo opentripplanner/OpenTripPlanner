@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.interlining;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.stopTime;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -25,6 +24,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class InterlineProcessorTest implements PlanTestConstants {
+
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   List<TripPattern> patterns = List.of(
     tripPattern("trip-1", "block-1", "service-1"),
@@ -154,7 +155,11 @@ class InterlineProcessorTest implements PlanTestConstants {
       .withServiceId(new FeedScopedId("1", serviceId))
       .build();
 
-    var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
+    var stopTimes = List.of(
+      TEST_MODEL.stopTime(trip, 0),
+      TEST_MODEL.stopTime(trip, 1),
+      TEST_MODEL.stopTime(trip, 2)
+    );
     var stopPattern = new StopPattern(stopTimes);
 
     var tp = TripPattern

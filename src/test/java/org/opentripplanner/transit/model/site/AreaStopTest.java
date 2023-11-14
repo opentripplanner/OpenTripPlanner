@@ -13,6 +13,7 @@ import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.service.StopModel;
 
 class AreaStopTest {
 
@@ -28,8 +29,9 @@ class AreaStopTest {
 
   private static final WgsCoordinate COORDINATE = new WgsCoordinate(2, 11);
 
-  private static final AreaStop subject = AreaStop
-    .of(TransitModelForTest.id(ID))
+  private static final AreaStop subject = StopModel
+    .of()
+    .areaStop(TransitModelForTest.id(ID))
     .withName(NAME)
     .withDescription(DESCRIPTION)
     .withUrl(URL)

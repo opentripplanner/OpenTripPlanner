@@ -4,10 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.opentripplanner.model.plan.PlanTestConstants.A;
-import static org.opentripplanner.model.plan.PlanTestConstants.B;
-import static org.opentripplanner.model.plan.PlanTestConstants.C;
-import static org.opentripplanner.model.plan.PlanTestConstants.place;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.time.Duration;
@@ -17,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.RouteViaRequest;
@@ -24,6 +21,7 @@ import org.opentripplanner.routing.api.request.ViaLocation;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponseConnection;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 /**
  * Create search from point A to point B via point C. Search will start at 12:00 and will find two
@@ -51,6 +49,12 @@ public class ViaRoutingWorkerTest {
 
   private static List<Itinerary> firstSearch;
   private static List<Itinerary> secondSearch;
+
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
+  private final Place fromA = testModel.place("A", 5.0, 8.0);
+  private final Place viaC = testModel.place("C", 7.0, 9.0);
+  private final Place toB = testModel.place("B", 6.0, 8.5);
 
   @Test
   public void testViaRoutingWorker() {
@@ -114,10 +118,10 @@ public class ViaRoutingWorkerTest {
    */
   private RoutingResponse createRoutingResponse(RouteRequest req) {
     // request from A or C?
-    var fromA =
-      req.from().lng == A.coordinate.longitude() && req.from().lat == A.coordinate.latitude();
+    var c = fromA.coordinate;
+    var firstOrSecondSearch = req.from().lng == c.longitude() && req.from().lat == c.latitude();
 
-    var searchItineraries = fromA ? firstSearch : secondSearch;
+    var searchItineraries = firstOrSecondSearch ? firstSearch : secondSearch;
 
     var tripPlan = new TripPlan(null, null, null, searchItineraries);
     return new RoutingResponse(tripPlan, null, null, null, null, null);
@@ -133,7 +137,7 @@ public class ViaRoutingWorkerTest {
     int maxSlack = 45;
     var viaLocations = List.of(
       new ViaLocation(
-        new GenericLocation(C.coordinate.latitude(), C.coordinate.longitude()),
+        location(viaC),
         false,
         Duration.ofMinutes(minSlack),
         Duration.ofMinutes(maxSlack)
@@ -145,8 +149,8 @@ public class ViaRoutingWorkerTest {
     return RouteViaRequest
       .of(viaLocations, viaJourneys)
       .withDateTime(dateTime)
-      .withFrom(new GenericLocation(A.coordinate.latitude(), A.coordinate.longitude()))
-      .withTo(new GenericLocation(B.coordinate.latitude(), B.coordinate.longitude()))
+      .withFrom(location(fromA))
+      .withTo(location(toB))
       .withSearchWindow(Duration.ofHours(1))
       .build();
   }
@@ -154,11 +158,7 @@ public class ViaRoutingWorkerTest {
   /**
    * Create itinerary as described in class documentation.
    */
-  static void createItinieraries() {
-    var fromA = place("A", A.coordinate.latitude(), A.coordinate.longitude());
-    var viaC = place("C", C.coordinate.latitude(), C.coordinate.longitude());
-    var toB = place("B", B.coordinate.latitude(), B.coordinate.longitude());
-
+  void createItinieraries() {
     // Arrive 13
     s1i1 =
       newItinerary(fromA).bus(1, TimeUtils.hm2time(12, 0), TimeUtils.hm2time(13, 0), viaC).build();
@@ -178,5 +178,9 @@ public class ViaRoutingWorkerTest {
 
     firstSearch = List.of(s1i1, s1i2);
     secondSearch = List.of(s2i1, s2i2, s2i3);
+  }
+
+  private static GenericLocation location(Place p) {
+    return new GenericLocation(p.coordinate.latitude(), p.coordinate.longitude());
   }
 }

@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.model.plan.PlanTestConstants.place;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
@@ -28,6 +27,8 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 class GtfsFaresV2ServiceTest implements PlanTestConstants {
+
+  private final TransitModelForTest testModel = TransitModelForTest.of();
 
   FeedScopedId LEG_GROUP1 = id("leg-group1");
   FeedScopedId LEG_GROUP2 = id("leg-group2");
@@ -79,10 +80,10 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
     .build();
 
   Place INNER_ZONE_STOP = Place.forStop(
-    TransitModelForTest.stop("inner city stop").withCoordinate(1, 1).build()
+    testModel.stop("inner city stop").withCoordinate(1, 1).build()
   );
   Place OUTER_ZONE_STOP = Place.forStop(
-    TransitModelForTest.stop("outer city stop").withCoordinate(2, 2).build()
+    testModel.stop("outer city stop").withCoordinate(2, 2).build()
   );
   String INNER_ZONE = "inner-zone";
   String OUTER_ZONE = "outer-zone";
@@ -357,7 +358,7 @@ class GtfsFaresV2ServiceTest implements PlanTestConstants {
 
     @Test
     void directDistance() {
-      Place dest = place(
+      Place dest = testModel.place(
         "Destination",
         A.coordinate.latitude(),
         A.coordinate.longitude() + SphericalDistanceLibrary.metersToDegrees(5_000)

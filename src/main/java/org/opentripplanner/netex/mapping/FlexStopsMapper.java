@@ -12,9 +12,9 @@ import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.StopModelBuilder;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.KeyListStructure;
@@ -33,12 +33,13 @@ class FlexStopsMapper {
     "UnrestrictedPublicTransportAreas";
   private final FeedScopedIdFactory idFactory;
   private final HashGridSpatialIndex<RegularStop> stopsSpatialIndex;
-
+  private final StopModelBuilder stopModelBuilder;
   private final DataImportIssueStore issueStore;
 
   FlexStopsMapper(
     FeedScopedIdFactory idFactory,
     Collection<RegularStop> stops,
+    StopModelBuilder stopModelBuilder,
     DataImportIssueStore issueStore
   ) {
     this.idFactory = idFactory;
@@ -47,6 +48,7 @@ class FlexStopsMapper {
       Envelope env = new Envelope(stop.getCoordinate().asJtsCoordinate());
       this.stopsSpatialIndex.insert(env, stop);
     }
+    this.stopModelBuilder = stopModelBuilder;
     this.issueStore = issueStore;
   }
 
@@ -92,8 +94,8 @@ class FlexStopsMapper {
     } else {
       // We create a new GroupStop, even if the stop place consists of a single area, in order to
       // get the ids for the area and stop place correct
-      var builder = GroupStop
-        .of(idFactory.createId(flexibleStopPlace.getId()))
+      var builder = stopModelBuilder
+        .groupStop(idFactory.createId(flexibleStopPlace.getId()))
         .withName(new NonLocalizedString(flexibleStopPlace.getName().getValue()));
       stops.forEach(builder::addLocation);
       return builder.build();
@@ -109,8 +111,8 @@ class FlexStopsMapper {
     }
 
     var areaName = area.getName();
-    return AreaStop
-      .of(idFactory.createId(area.getId()))
+    return stopModelBuilder
+      .areaStop(idFactory.createId(area.getId()))
       .withName(new NonLocalizedString(areaName != null ? areaName.getValue() : backupName))
       .withGeometry(geometry)
       .build();

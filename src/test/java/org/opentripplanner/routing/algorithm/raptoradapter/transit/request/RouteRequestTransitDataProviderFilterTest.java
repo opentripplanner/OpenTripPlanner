@@ -15,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
@@ -46,15 +47,13 @@ import org.opentripplanner.transit.model.timetable.TripTimes;
 
 class RouteRequestTransitDataProviderFilterTest {
 
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
   private static final Route ROUTE = TransitModelForTest.route("1").build();
 
   private static final FeedScopedId TRIP_ID = TransitModelForTest.id("T1");
 
-  private static final RegularStop STOP_FOR_TEST = TransitModelForTest.stopForTest(
-    "TEST:STOP",
-    0,
-    0
-  );
+  private static final RegularStop STOP_FOR_TEST = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
 
   private static final WheelchairPreferences DEFAULT_ACCESSIBILITY = WheelchairPreferences.DEFAULT;
 
@@ -86,8 +85,8 @@ class RouteRequestTransitDataProviderFilterTest {
   @ParameterizedTest
   @VariableSource("wheelchairCases")
   void testWheelchairAccess(Accessibility wheelchair, WheelchairPreferences accessibility) {
-    var firstStop = TransitModelForTest.stopForTest("TEST:START", wheelchair, 0.0, 0.0);
-    var lastStop = TransitModelForTest.stopForTest("TEST:END", wheelchair, 0.0, 0.0);
+    var firstStop = stopForTest("TEST:START", wheelchair, 0.0, 0.0);
+    var lastStop = stopForTest("TEST:END", wheelchair, 0.0, 0.0);
 
     var stopTimeStart = new StopTime();
     var stopTimeEnd = new StopTime();
@@ -900,9 +899,22 @@ class RouteRequestTransitDataProviderFilterTest {
     );
   }
 
+  public static RegularStop stopForTest(
+    String idAndName,
+    Accessibility wheelchair,
+    double lat,
+    double lon
+  ) {
+    return TEST_MODEL
+      .stop(idAndName)
+      .withCoordinate(new WgsCoordinate(lat, lon))
+      .withWheelchairAccessibility(wheelchair)
+      .build();
+  }
+
   private static StopTime getStopTime(String idAndName, PickDrop scheduled) {
     var stopTime1 = new StopTime();
-    stopTime1.setStop(TransitModelForTest.stopForTest(idAndName, 0.0, 0.0));
+    stopTime1.setStop(TEST_MODEL.stop(idAndName, 0.0, 0.0).build());
     stopTime1.setDropOffType(scheduled);
     stopTime1.setPickupType(scheduled);
     return stopTime1;
