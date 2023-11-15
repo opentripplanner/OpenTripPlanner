@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.lang.ObjectUtils.requireNotInitializ
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -479,6 +480,21 @@ public class State implements AStarState<State, Edge, Vertex>, Cloneable {
       )
       .addBoolIfTrue("VEHICLE_PARKED", isVehicleParked())
       .toString();
+  }
+
+  /**
+   * Iterates over all back states of this instance and returns them as a list.
+   * <p>
+   * Note: Use this only for debugging not for performance-critical paths!
+   */
+  public List<State> chain() {
+    List<State> states = new ArrayList<>();
+    State current = this;
+    while (current != null) {
+      states.add(current);
+      current = current.backState;
+    }
+    return states;
   }
 
   void checkNegativeWeight() {
