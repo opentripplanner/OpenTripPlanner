@@ -41,6 +41,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove itineraries outside the search window in arriveBy search [#5433](https://github.com/opentripplanner/OpenTripPlanner/pull/5433)
 - Add back walk-reluctance in Transmodel API [#5471](https://github.com/opentripplanner/OpenTripPlanner/pull/5471)
 - Make `feedId` required for realtime updaters [#5502](https://github.com/opentripplanner/OpenTripPlanner/pull/5502)
+- Fix serialization of `AtomicInteger` [#5508](https://github.com/opentripplanner/OpenTripPlanner/pull/5508)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
