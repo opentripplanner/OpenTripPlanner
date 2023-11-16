@@ -54,8 +54,8 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitEditorService;
@@ -892,7 +892,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     );
 
     // Create new trip times
-    final TripTimes newTripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
+    final RealTimeTripTimes newTripTimes = TripTimesFactory.tripTimes(
+      trip,
+      stopTimes,
+      deduplicator
+    );
 
     // Update all times to mark trip times as realtime
     // TODO: should we incorporate the delay field if present?
@@ -952,7 +956,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (tripIndex == -1) {
         debug(tripId, "Could not cancel scheduled trip because it's not in the timetable");
       } else {
-        final TripTimes newTripTimes = timetable.getTripTimes(tripIndex).copyOfScheduledTimes();
+        final RealTimeTripTimes newTripTimes = timetable
+          .getTripTimes(tripIndex)
+          .copyScheduledTimes();
         switch (cancelationType) {
           case CANCEL -> newTripTimes.cancelTrip();
           case DELETE -> newTripTimes.deleteTrip();
@@ -992,7 +998,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       if (tripIndex == -1) {
         debug(tripId, "Could not cancel previously added trip on {}", serviceDate);
       } else {
-        final TripTimes newTripTimes = timetable.getTripTimes(tripIndex).copyOfScheduledTimes();
+        final RealTimeTripTimes newTripTimes = timetable
+          .getTripTimes(tripIndex)
+          .copyScheduledTimes();
         switch (cancelationType) {
           case CANCEL -> newTripTimes.cancelTrip();
           case DELETE -> newTripTimes.deleteTrip();

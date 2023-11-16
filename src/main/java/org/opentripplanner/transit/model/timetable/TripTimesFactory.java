@@ -18,11 +18,13 @@ public class TripTimesFactory {
    * non-interpolated stoptimes should already be marked at timepoints by a previous filtering
    * step.
    */
-  public static TripTimes tripTimes(
+  public static RealTimeTripTimes tripTimes(
     Trip trip,
     List<StopTime> stopTimes,
     Deduplicator deduplicator
   ) {
-    return new TripTimes(StopTimeToScheduledTripTimesMapper.map(trip, stopTimes, deduplicator));
+    return new RealTimeTripTimes(
+      StopTimeToScheduledTripTimesMapper.map(trip, stopTimes, deduplicator)
+    );
   }
 }

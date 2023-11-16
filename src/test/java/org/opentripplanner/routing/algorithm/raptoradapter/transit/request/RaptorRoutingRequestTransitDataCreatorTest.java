@@ -96,13 +96,11 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   }
 
   private TripTimes createTripTimesForTest() {
-    return TripTimes.of(
-      ScheduledTripTimes
-        .of()
-        .withTrip(TransitModelForTest.trip("Test").build())
-        .withDepartureTimes("00:00 02:00")
-        .build()
-    );
+    return ScheduledTripTimes
+      .of()
+      .withTrip(TransitModelForTest.trip("Test").build())
+      .withDepartureTimes("00:00 02:00")
+      .build();
   }
 
   /**

@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.timetable;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
 import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
-import java.io.Serializable;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
@@ -20,7 +20,7 @@ import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 
-public final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTripTimes> {
+public final class ScheduledTripTimes implements TripTimes {
 
   /**
    * When time-shifting from one time-zone to another negative times may occur.
@@ -111,132 +111,127 @@ public final class ScheduledTripTimes implements Serializable, Comparable<Schedu
     return copyOf(null);
   }
 
-  /** The code for the service on which this trip runs. For departure search optimizations. */
+  @Override
+  public RealTimeTripTimes copyScheduledTimes() {
+    return RealTimeTripTimes.of(this);
+  }
+
+  @Override
+  public TripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
+    return copyOfNoDuplication().plusTimeShift((int) shiftDelta.toSeconds()).build();
+  }
+
+  @Override
   public int getServiceCode() {
     return serviceCode;
   }
 
-  /**
-   * The time in seconds after midnight at which the vehicle should arrive at the given stop
-   * according to the original schedule.
-   */
+  @Override
   public int getScheduledArrivalTime(final int stop) {
     return arrivalTimes[stop] + timeShift;
   }
 
-  /**
-   * The time in seconds after midnight at which the vehicle arrives at each stop, accounting for
-   * any real-time updates.
-   */
+  @Override
   public int getArrivalTime(final int stop) {
     return getScheduledArrivalTime(stop);
   }
 
-  /** @return the difference between the scheduled and actual arrival times at this stop. */
+  @Override
   public int getArrivalDelay(final int stop) {
     return getArrivalTime(stop) - (arrivalTimes[stop] + timeShift);
   }
 
-  /**
-   * The time in seconds after midnight at which the vehicle should leave the given stop according
-   * to the original schedule.
-   */
+  @Override
   public int getScheduledDepartureTime(final int stop) {
     return departureTimes[stop] + timeShift;
   }
 
-  /**
-   * The time in seconds after midnight at which the vehicle leaves each stop, accounting for any
-   * real-time updates.
-   */
+  @Override
   public int getDepartureTime(final int stop) {
     return getScheduledDepartureTime(stop);
   }
 
-  /** @return the difference between the scheduled and actual departure times at this stop. */
+  @Override
   public int getDepartureDelay(final int stop) {
     return getDepartureTime(stop) - (departureTimes[stop] + timeShift);
   }
 
-  /**
-   * Whether or not stopIndex is considered a GTFS timepoint.
-   */
+  @Override
   public boolean isTimepoint(final int stopIndex) {
     return timepoints.get(stopIndex);
   }
 
-  /** The trips whose arrivals and departures are represented by this class */
+  @Override
   public Trip getTrip() {
     return trip;
   }
 
-  /**
-   * Return an integer which can be used to sort TripTimes in order of departure/arrivals.
-   * <p>
-   * This sorted trip times is used to search for trips. OTP assume one trip do NOT pass another
-   * trip down the line.
-   */
+  @Override
   public int sortIndex() {
     return getDepartureTime(0);
   }
 
+  @Override
   public BookingInfo getDropOffBookingInfo(int stop) {
     return dropOffBookingInfos.get(stop);
   }
 
+  @Override
   public BookingInfo getPickupBookingInfo(int stop) {
     return pickupBookingInfos.get(stop);
   }
 
-  /**
-   * Return {@code true} if the trip is unmodified, a scheduled trip from a published timetable.
-   * Return {@code false} if the trip is an updated, cancelled, or otherwise modified one. This
-   * method differs from {@link #getRealTimeState()} in that it checks whether real-time
-   * information is actually available.
-   */
+  @Override
   public boolean isScheduled() {
     return true;
   }
 
-  /**
-   * Return {@code true} if canceled or soft-deleted
-   */
+  @Override
   public boolean isCanceledOrDeleted() {
     return false;
   }
 
-  /**
-   * Return {@code true} if canceled
-   */
+  @Override
   public boolean isCanceled() {
     return false;
   }
 
-  /**
-   * Return true if trip is soft-deleted, and should not be visible to the user
-   */
+  @Override
   public boolean isDeleted() {
     return false;
   }
 
+  @Override
   public RealTimeState getRealTimeState() {
     return RealTimeState.SCHEDULED;
   }
 
-  /**
-   * @return the whole trip's headsign. Individual stops can have different headsigns.
-   */
+  @Override
+  public boolean isCancelledStop(int stop) {
+    return false;
+  }
+
+  @Override
+  public boolean isRecordedStop(int stop) {
+    return false;
+  }
+
+  @Override
+  public boolean isNoDataStop(int stop) {
+    return false;
+  }
+
+  @Override
+  public boolean isPredictionInaccurate(int stop) {
+    return false;
+  }
+
+  @Override
   public I18NString getTripHeadsign() {
     return trip.getHeadsign();
   }
 
-  /**
-   * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS fields.
-   * A trip may not have a headsign, in which case we should fall back on a Timetable or
-   * Pattern-level headsign. Such a string will be available when we give TripPatterns or
-   * StopPatterns unique human-readable route variant names, but a ScheduledTripTimes currently
-   * does not have a pointer to its enclosing timetable or pattern.
-   */
+  @Override
   @Nullable
   public I18NString getHeadsign(final int stop) {
     return (headsigns != null && headsigns[stop] != null)
@@ -244,13 +239,7 @@ public final class ScheduledTripTimes implements Serializable, Comparable<Schedu
       : getTrip().getHeadsign();
   }
 
-  /**
-   * Return list of via names per particular stop. This field provides info about intermediate stops
-   * between current stop and final trip destination. Mapped from NeTEx DestinationDisplay.vias. No
-   * GTFS mapping at the moment.
-   *
-   * @return Empty list if there are no vias registered for a stop.
-   */
+  @Override
   public List<String> getHeadsignVias(final int stop) {
     if (headsignVias == null || headsignVias[stop] == null) {
       return List.of();
@@ -258,45 +247,27 @@ public final class ScheduledTripTimes implements Serializable, Comparable<Schedu
     return List.of(headsignVias[stop]);
   }
 
+  @Override
   public int getNumStops() {
     return arrivalTimes.length;
   }
 
+  @Override
   public Accessibility getWheelchairAccessibility() {
     return trip.getWheelchairBoarding();
   }
 
-  /**
-   * This is only for API-purposes (does not affect routing).
-   */
+  @Override
   public OccupancyStatus getOccupancyStatus(int ignore) {
     return OccupancyStatus.NO_DATA_AVAILABLE;
   }
 
-  /** Sort trips based on first departure time. */
   @Override
-  public int compareTo(final ScheduledTripTimes other) {
-    return this.getDepartureTime(0) - other.getDepartureTime(0);
-  }
-
-  /**
-   * Returns the GTFS sequence number of the given 0-based stop position.
-   *
-   * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits the
-   * stops. Despite the fact that the StopPattern or TripPattern enclosing this class provides
-   * an ordered list of Stops, the original stop sequence numbers may still be needed for matching
-   * with GTFS-RT update messages. Unfortunately, each individual trip can have totally different
-   * sequence numbers for the same stops, so we need to store them at the individual trip level. An
-   * effort is made to re-use the sequence number arrays when they are the same across different
-   * trips in the same pattern.
-   */
   public int gtfsSequenceOfStopIndex(final int stop) {
     return originalGtfsStopSequence[stop];
   }
 
-  /**
-   * Returns the 0-based stop index of the given GTFS sequence number.
-   */
+  @Override
   public OptionalInt stopIndexOfGtfsSequence(int stopSequence) {
     if (originalGtfsStopSequence == null) {
       return OptionalInt.empty();

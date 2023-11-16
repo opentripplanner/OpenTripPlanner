@@ -31,6 +31,7 @@ import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
@@ -204,7 +205,7 @@ public class Timetable implements Serializable {
       LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
     }
 
-    TripTimes newTimes = getTripTimes(tripIndex).copyOfScheduledTimes();
+    RealTimeTripTimes newTimes = getTripTimes(tripIndex).copyScheduledTimes();
     List<Integer> skippedStopIndices = new ArrayList<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
@@ -429,12 +430,12 @@ public class Timetable implements Serializable {
   // TODO maybe put this is a more appropriate place
   public void setServiceCodes(Map<FeedScopedId, Integer> serviceCodes) {
     for (TripTimes tt : this.tripTimes) {
-      tt.setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
+      ((RealTimeTripTimes) tt).setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
     }
     // Repeated code... bad sign...
     for (FrequencyEntry freq : this.frequencyEntries) {
       TripTimes tt = freq.tripTimes;
-      tt.setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
+      ((RealTimeTripTimes) tt).setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
     }
   }
 

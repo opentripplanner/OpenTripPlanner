@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
@@ -361,7 +362,8 @@ class TripPatternMapper {
 
   private void createTripTimes(List<Trip> trips, TripPattern tripPattern) {
     for (Trip trip : trips) {
-      if (result.tripStopTimes.get(trip).size() == 0) {
+      List<StopTime> stopTimes = result.tripStopTimes.get(trip);
+      if (stopTimes.size() == 0) {
         issueStore.add(
           "TripWithoutTripTimes",
           "Trip %s does not contain any trip times.",
@@ -369,11 +371,7 @@ class TripPatternMapper {
         );
       } else {
         try {
-          TripTimes tripTimes = TripTimesFactory.tripTimes(
-            trip,
-            result.tripStopTimes.get(trip),
-            deduplicator
-          );
+          TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
           tripPattern.add(tripTimes);
         } catch (DataValidationException e) {
           issueStore.add(e.error());

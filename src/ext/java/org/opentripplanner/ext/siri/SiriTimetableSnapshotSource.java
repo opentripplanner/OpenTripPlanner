@@ -21,6 +21,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.Trans
 import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -399,7 +400,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       if (tripTimes == null) {
         LOG.warn("Could not mark scheduled trip as deleted {}", trip.getId());
       } else {
-        final TripTimes newTripTimes = tripTimes.copyOfScheduledTimes();
+        final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
         newTripTimes.deleteTrip();
         buffer.update(pattern, newTripTimes, serviceDate);
         success = true;

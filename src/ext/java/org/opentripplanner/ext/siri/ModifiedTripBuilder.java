@@ -19,6 +19,7 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
@@ -94,7 +95,7 @@ public class ModifiedTripBuilder {
    * in form the SIRI-ET update.
    */
   public Result<TripUpdate, UpdateError> build() {
-    TripTimes newTimes = existingTripTimes.copyOfScheduledTimes();
+    RealTimeTripTimes newTimes = existingTripTimes.copyScheduledTimes();
 
     StopPattern stopPattern = createStopPattern(pattern, calls, entityResolver);
 
@@ -145,7 +146,7 @@ public class ModifiedTripBuilder {
   /**
    * Applies real-time updates from the calls into newTimes.
    */
-  private void applyUpdates(TripTimes newTimes) {
+  private void applyUpdates(RealTimeTripTimes newTimes) {
     ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, zoneId);
     Set<CallWrapper> alreadyVisited = new HashSet<>();
 
