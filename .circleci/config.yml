@@ -17,7 +17,7 @@ aliases:
 jobs:
   build:
     docker:
-      - image: cimg/openjdk:17.0
+      - image: cimg/openjdk:21.0
     environment:
       DEBIAN_FRONTEND: "noninteractive"
       MAVEN_OPTS: -Xmx6G
