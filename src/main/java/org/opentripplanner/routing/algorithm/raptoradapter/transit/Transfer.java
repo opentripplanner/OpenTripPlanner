@@ -26,12 +26,15 @@ public class Transfer {
    * (see https://docs.opentripplanner.org/en/dev-2.x/Accessibility/).
    * <p>
    * For this reason there is this sanity limit that makes sure that the transfer cost stays below a
-   * limit is still very high (several days of transit-equivalent cost) but far away from the
+   * limit that is still very high (several days of transit-equivalent cost) but far away from the
    * integer overflow.
+   * <p>
+   * The unit is in RAPTOR cost, so it's centiseconds.
    *
+   * @see RaptorCostConverter
    * @see EdgeTraverser
    */
-  private static final int MAX_TRANSFER_COST = Integer.MAX_VALUE / 100 / 30;
+  private static final int MAX_TRANSFER_RAPTOR_COST = Integer.MAX_VALUE / 30;
 
   private final int toStop;
 
@@ -77,22 +80,21 @@ public class Transfer {
   }
 
   public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
+    return toRaptor(request).filter(s -> s.generalizedCost() < MAX_TRANSFER_RAPTOR_COST);
+  }
+
+  private Optional<RaptorTransfer> toRaptor(StreetSearchRequest request) {
     WalkPreferences walkPreferences = request.preferences().walk();
     if (edges == null || edges.isEmpty()) {
       double durationSeconds = distanceMeters / walkPreferences.speed();
-      final double domainCost = durationSeconds * walkPreferences.reluctance();
-      if (domainCost < MAX_TRANSFER_COST) {
-        return Optional.of(
-          new DefaultRaptorTransfer(
-            this.toStop,
-            (int) Math.ceil(durationSeconds),
-            RaptorCostConverter.toRaptorCost(domainCost),
-            this
-          )
-        );
-      } else {
-        return Optional.empty();
-      }
+      return Optional.of(
+        new DefaultRaptorTransfer(
+          this.toStop,
+          (int) Math.ceil(durationSeconds),
+          RaptorCostConverter.toRaptorCost(durationSeconds * walkPreferences.reluctance()),
+          this
+        )
+      );
     }
 
     StateEditor se = new StateEditor(edges.get(0).getFromVertex(), request);
@@ -100,16 +102,14 @@ public class Transfer {
 
     var state = EdgeTraverser.traverseEdges(se.makeState(), edges);
 
-    return state
-      .filter(s -> s.weight < MAX_TRANSFER_COST)
-      .map(s ->
-        new DefaultRaptorTransfer(
-          this.toStop,
-          (int) s.getElapsedTimeSeconds(),
-          RaptorCostConverter.toRaptorCost(s.getWeight()),
-          this
-        )
-      );
+    return state.map(s ->
+      new DefaultRaptorTransfer(
+        this.toStop,
+        (int) s.getElapsedTimeSeconds(),
+        RaptorCostConverter.toRaptorCost(s.getWeight()),
+        this
+      )
+    );
   }
 
   @Override
