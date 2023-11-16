@@ -1473,7 +1473,7 @@ input PlanStopLocationInput {
     If set as true, one must either board or alight from this stop location. Otherwise,
     it's optional and alternatively one can just walk to or from this location.
     """
-    transitConnectionRequired: Boolean
+    strict: Boolean = false
 }
 
 """
