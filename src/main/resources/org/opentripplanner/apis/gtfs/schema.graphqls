@@ -1385,13 +1385,36 @@ input ParkingFilter {
 }
 
 """
-Settings related to debugging why certain itineraries are returned.
+Settings that control the behavior of itinerary filtering. These settings are meant mainly
+for debugging purposes.
 """
-input PlanDebugSettingsInput {
+input PlanItineraryFilterSettingsInput {
     """
     Itinerary filter debug profile used to control the behaviour of itinerary filters.
     """
     itineraryFilterDebugProfile: ItineraryFilterDebugProfile = OFF
+
+    """
+    Pick one itinerary from each group after putting itineraries that are `85%` similar together,
+    if the given value is `0.85`, for example. Itineraries are grouped together based on relative
+    the distance of travel that is identical between the itineraries.
+    """
+    groupSimilarityKeepOne: Float = 0.85
+
+    """
+    Pick three itineraries from each group after putting itineraries that are `68%` similar together,
+    if the given value is `0.68`, for example. The itineraries are grouped by similar legs
+    (on board same journey). The value must be at least `0.5`.
+    """
+    groupSimilarityKeepThree: Float = 0.68
+
+    """
+    Of the itineraries grouped to maximum of three itineraries, how much worse can the non-grouped
+    legs be compared to the lowest cost. `2.0` means that they can be double the cost, and any
+    itineraries having a higher cost will be filtered away. Use a value lower than `1.0` to turn the
+    grouping off.
+    """
+    groupedOtherThanSameLegsMaxCostMultiplier: Float = 2.0
 }
 
 """
@@ -4150,9 +4173,10 @@ type QueryType {
         preferences: PlanPreferencesInput
 
         """
-        Settings meant for debugging purposes that control the search and the returned itineraries.
+        Settings that control the behavior of itinerary filtering. These settings are meant mainly
+        for debugging purposes.
         """
-        debugSettings: PlanDebugSettingsInput
+        itineraryFilterSettings: PlanItineraryFilterSettingsInput
 
         """
         Locale used for translations. Note, there might not necessarily be translations available.
