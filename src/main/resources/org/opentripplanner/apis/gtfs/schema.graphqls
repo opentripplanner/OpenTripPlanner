@@ -2459,7 +2459,7 @@ enum PlanAccessMode {
     Getting dropped off by a car to a location that is accessible with a car.
     Note, this can include walking after the drop-off.
     """
-    CAR_DROPOFF
+    CAR_DROP_OFF
 
     """
     Flexible transit. This can include different forms of flexible transit that
