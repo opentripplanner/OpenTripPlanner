@@ -1568,32 +1568,73 @@ input PlanStopLocationInput {
 }
 
 """
-Street mode options for different phases of an itinerary.
+Mode selections for the plan search.
 """
-input PlanStreetModesInput {
+input PlanModesInput {
+    """
+    Should only the direct search without any transit be done.
+    """
+    directOnly: Boolean = false
+
+    """
+    Should only the transit search be done and never suggest itineraries that don't
+    contain any transit legs.
+    """
+    transitOnly: Boolean = false
+
     """
     Street mode that is used when searching for itineraries that don't use any transit.
-    Selection of only one allowed for now.
+    If more than one mode is selected, at least one of them must be used but not necessarily all.
+    There are modes that automatically also use walking such as the rental modes. To force rental
+    to be used, this should only include the rental mode and not `WALK` in addition.
+    The default access mode is `WALK`.
     """
     direct: [PlanDirectMode!]
 
     """
-    Street mode that is used when searching for access to transit network from origin.
-    Selection of only one allowed for now.
+    Modes for different phases of an itinerary when transit is included. Also
+    includes street mode selections related to connecting to the transit network
+    and transfers. By default, all transit modes are usable and `WALK` is used for
+    access, egress and transfers.
+    """
+    transit: PlanTransitModesInput
+}
+
+"""
+Modes for different phases of an itinerary when transit is included. Also includes street
+mode selections related to connecting to the transit network and transfers.
+"""
+input PlanTransitModesInput {
+    """
+    Street mode that is used when searching for access to the transit network from origin.
+    If more than one mode is selected, at least one of them must be used but not necessarily all.
+    There are modes that automatically also use walking such as the rental modes. To force rental
+    to be used, this should only include the rental mode and not `WALK` in addition.
+    The default access mode is `WALK`.
     """
     access: [PlanAccessMode!]
 
     """
-    Street mode that is used when searching for egress to destination from transit network.
-    Selection of only one allowed for now.
+    Street mode that is used when searching for egress to destination from the transit network.
+    If more than one mode is selected, at least one of them must be used but not necessarily all.
+    There are modes that automatically also use walking such as the rental modes. To force rental
+    to be used, this should only include the rental mode and not `WALK` in addition.
+    The default access mode is `WALK`.
     """
     egress: [PlanEgressMode!]
 
     """
-    Street mode that is used when searching for transfers.
-    Selection of only one allowed for now.
+    Street mode that is used when searching for transfers. Selection of only one allowed for now.
+    The default transfer mode is `WALK`.
     """
     transfer: [PlanTransferMode!]
+
+    """
+    Transit modes and reluctancies associated with them. Each defined mode can be used in
+    an itinerary but doesn't have to be. If direct search is not disabled, there can be an
+    itinerary without any transit legs. By default, all transit modes are usable.
+    """
+    transit: [TransitModePreferenceInput!]
 }
 
 """
@@ -1602,11 +1643,6 @@ the transit legs but can change how preferable walking or cycling, for example, 
 transit.
 """
 input PlanStreetPreferencesInput {
-    """
-    Which modes of travel can be used for street routing at different stages.
-    """
-    modes: PlanStreetModesInput
-
     """
     Cycling related preferences.
     """
@@ -2494,7 +2530,7 @@ type PageInfo {
 }
 
 """
-Street modes that can be used for access to transit network from origin.
+Street modes that can be used for access to the transit network from origin.
 """
 enum PlanAccessMode {
     """
@@ -2647,7 +2683,7 @@ enum PlanDirectMode {
 }
 
 """
-Street modes that can be used for egress from transit network to destination.
+Street modes that can be used for egress from the transit network to destination.
 """
 enum PlanEgressMode {
     """
@@ -4226,6 +4262,14 @@ type QueryType {
         destination: PlanLabeledLocationInput
 
         """
+        Street and transit modes used during the search. This also includes options to only return
+        an itinerary that contains no transit legs or force transit to be used in all itineraries.
+        By default, all transit modes are usable and `WALK` is used for direct street suggestions,
+        access, egress and transfers.
+        """
+        modes: PlanModesInput
+
+        """
         Preferences that affect what itineraries are returned. Preferences are split into categories.
         """
         preferences: PlanPreferencesInput
@@ -5218,13 +5262,6 @@ input TransitPreferencesInput {
     Preferences related to cancellations and realtime.
     """
     timetable: TimetablePreferencesInput
-
-    """
-    Transit modes and reluctancies associated with them. Each defined mode can be used in
-    an itinerary but doesn't have to be. If a direct mode is set under street preferences,
-    an itinerary without any transit modes can be returned.
-    """
-    modes: [TransitModePreferenceInput!]!
 }
 
 """Text with language"""
