@@ -2,9 +2,11 @@ package org.opentripplanner.transit.model.timetable;
 
 import java.util.BitSet;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 
 public class ScheduledTripTimesBuilder {
 
@@ -22,10 +24,10 @@ public class ScheduledTripTimesBuilder {
   String[][] headsignVias;
   int[] originalGtfsStopSequence;
 
-  private final Deduplicator deduplicator;
+  private final DeduplicatorService deduplicator;
 
-  ScheduledTripTimesBuilder(Deduplicator deduplicator) {
-    this.deduplicator = deduplicator;
+  ScheduledTripTimesBuilder(@Nullable DeduplicatorService deduplicator) {
+    this.deduplicator = deduplicator == null ? DeduplicatorService.NOOP : deduplicator;
   }
 
   ScheduledTripTimesBuilder(
