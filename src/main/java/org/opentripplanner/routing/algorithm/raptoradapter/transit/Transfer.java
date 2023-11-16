@@ -17,7 +17,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 public class Transfer {
 
   /**
-   * Since transfers costs are not computed through a full A* with pruning they can incur an
+   * Since transfer costs are not computed through a full A* with pruning they can incur an
    * absurdly high cost that overflows the integer cost inside RAPTOR
    * (https://github.com/opentripplanner/OpenTripPlanner/issues/5509).
    * <p>
@@ -31,8 +31,8 @@ public class Transfer {
    * <p>
    * The unit is in RAPTOR cost, so it's centiseconds.
    *
-   * @see RaptorCostConverter
    * @see EdgeTraverser
+   * @see RaptorCostConverter
    */
   private static final int MAX_TRANSFER_RAPTOR_COST = Integer.MAX_VALUE / 30;
 
@@ -80,7 +80,8 @@ public class Transfer {
   }
 
   public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
-    return toRaptor(request).filter(s -> s.generalizedCost() < MAX_TRANSFER_RAPTOR_COST);
+    return toRaptor(request)
+      .filter(s -> s.generalizedCost() < MAX_TRANSFER_RAPTOR_COST && s.generalizedCost() >= 0);
   }
 
   private Optional<RaptorTransfer> toRaptor(StreetSearchRequest request) {

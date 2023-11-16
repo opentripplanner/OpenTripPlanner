@@ -54,6 +54,18 @@ class TransferTest {
   class WithoutEdges {
 
     @Test
+    void overflow() {
+      var veryLongTransfer = new Transfer(0, Integer.MAX_VALUE);
+      assertTrue(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).isEmpty());
+    }
+
+    @Test
+    void negativeCost() {
+      var veryLongTransfer = new Transfer(0, -5);
+      assertTrue(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).isEmpty());
+    }
+
+    @Test
     void limitMaxCost() {
       var veryLongTransfer = new Transfer(0, 800_000);
       // cost would be too high, so it should not be included in RAPTOR search
