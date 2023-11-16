@@ -44,6 +44,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
@@ -62,6 +63,7 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.ResultLogger;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
@@ -279,31 +281,36 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
           tripDescriptor
         );
 
-        Result<UpdateSuccess, UpdateError> result =
-          switch (tripScheduleRelationship) {
-            case SCHEDULED -> handleScheduledTrip(
-              tripUpdate,
-              tripId,
-              serviceDate,
-              backwardsDelayPropagationType
-            );
-            case ADDED -> validateAndHandleAddedTrip(
-              tripUpdate,
-              tripDescriptor,
-              tripId,
-              serviceDate
-            );
-            case CANCELED -> handleCanceledTrip(tripId, serviceDate, CancelationType.CANCEL);
-            case DELETED -> handleCanceledTrip(tripId, serviceDate, CancelationType.DELETE);
-            case REPLACEMENT -> validateAndHandleModifiedTrip(
-              tripUpdate,
-              tripDescriptor,
-              tripId,
-              serviceDate
-            );
-            case UNSCHEDULED -> UpdateError.result(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
-            case DUPLICATED -> UpdateError.result(tripId, NOT_IMPLEMENTED_DUPLICATED);
-          };
+        Result<UpdateSuccess, UpdateError> result;
+        try {
+          result =
+            switch (tripScheduleRelationship) {
+              case SCHEDULED -> handleScheduledTrip(
+                tripUpdate,
+                tripId,
+                serviceDate,
+                backwardsDelayPropagationType
+              );
+              case ADDED -> validateAndHandleAddedTrip(
+                tripUpdate,
+                tripDescriptor,
+                tripId,
+                serviceDate
+              );
+              case CANCELED -> handleCanceledTrip(tripId, serviceDate, CancelationType.CANCEL);
+              case DELETED -> handleCanceledTrip(tripId, serviceDate, CancelationType.DELETE);
+              case REPLACEMENT -> validateAndHandleModifiedTrip(
+                tripUpdate,
+                tripDescriptor,
+                tripId,
+                serviceDate
+              );
+              case UNSCHEDULED -> UpdateError.result(tripId, NOT_IMPLEMENTED_UNSCHEDULED);
+              case DUPLICATED -> UpdateError.result(tripId, NOT_IMPLEMENTED_DUPLICATED);
+            };
+        } catch (DataValidationException e) {
+          result = DataValidationExceptionMapper.toResult(e);
+        }
 
         results.add(result);
         if (result.isFailure()) {
@@ -708,7 +715,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
       // Just use first service id of set
       tripBuilder.withServiceId(serviceIds.iterator().next());
     }
-
     return addTripToGraphAndBuffer(
       tripBuilder.build(),
       tripUpdate.getVehicle(),

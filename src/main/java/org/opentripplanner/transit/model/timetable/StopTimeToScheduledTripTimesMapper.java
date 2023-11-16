@@ -7,7 +7,7 @@ import java.util.List;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 
 class StopTimeToScheduledTripTimesMapper {
 
@@ -16,7 +16,7 @@ class StopTimeToScheduledTripTimesMapper {
 
   private static final String[] EMPTY_STRING_ARRAY = new String[0];
 
-  private StopTimeToScheduledTripTimesMapper(Trip trip, Deduplicator deduplicator) {
+  private StopTimeToScheduledTripTimesMapper(Trip trip, DeduplicatorService deduplicator) {
     this.trip = trip;
     this.builder = ScheduledTripTimes.of(deduplicator).withTrip(trip);
   }
@@ -29,7 +29,7 @@ class StopTimeToScheduledTripTimesMapper {
   public static ScheduledTripTimes map(
     Trip trip,
     Collection<StopTime> stopTimes,
-    Deduplicator deduplicator
+    DeduplicatorService deduplicator
   ) {
     return new StopTimeToScheduledTripTimesMapper(trip, deduplicator).doMap(stopTimes);
   }

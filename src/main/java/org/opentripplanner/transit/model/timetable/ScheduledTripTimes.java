@@ -1,5 +1,8 @@
 package org.opentripplanner.transit.model.timetable;
 
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -13,7 +16,9 @@ import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 
 public final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTripTimes> {
 
@@ -78,7 +83,7 @@ public final class ScheduledTripTimes implements Serializable, Comparable<Schedu
     return new ScheduledTripTimesBuilder(null);
   }
 
-  public static ScheduledTripTimesBuilder of(Deduplicator deduplicator) {
+  public static ScheduledTripTimesBuilder of(DeduplicatorService deduplicator) {
     return new ScheduledTripTimesBuilder(deduplicator);
   }
 
@@ -361,16 +366,14 @@ public final class ScheduledTripTimes implements Serializable, Comparable<Schedu
       final int dep = getDepartureTime(i);
 
       if (prevDep > arr) {
-        throw new IllegalArgumentException(
-          "Negative hop time for stop position " + i + " for " + trip + "."
-        );
+        throw new DataValidationException(new TimetableValidationError(NEGATIVE_HOP_TIME, i, trip));
       }
       if (i == lastStop) {
         return;
       }
       if (dep < arr) {
-        throw new IllegalArgumentException(
-          "Negative dwell time for stop position " + i + " for " + trip + "."
+        throw new DataValidationException(
+          new TimetableValidationError(NEGATIVE_DWELL_TIME, i, trip)
         );
       }
       prevDep = dep;
