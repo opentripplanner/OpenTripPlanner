@@ -849,7 +849,7 @@ input BicyclePreferencesInput {
     """
     What criteria should be used when optimizing a cycling route.
     """
-    optimization: CyclingOptimizationCriteriaInput
+    optimization: CyclingOptimizationInput
 
     """
     Cost of boarding a vehicle with a bicycle.
@@ -2898,7 +2898,7 @@ type BookingInfo {
 """
 What criteria should be used when optimizing a cycling route.
 """
-input CyclingOptimizationCriteriaInput @oneOf {
+input CyclingOptimizationInput @oneOf {
     """
     Use one of the predefined optimization types.
     """
@@ -2947,7 +2947,7 @@ enum CyclingOptimizationType {
 """
 What criteria should be used when optimizing a scooter route.
 """
-input ScooterOptimizationCriteriaInput @oneOf {
+input ScooterOptimizationInput @oneOf {
     """
     Use one of the predefined optimization types.
     """
@@ -4541,7 +4541,7 @@ input ScooterPreferencesInput {
     """
     What criteria should be used when optimizing a scooter route.
     """
-    optimization: ScooterOptimizationCriteriaInput
+    optimization: ScooterOptimizationInput
 
     """
     Cost of boarding a vehicle with a scooter.
