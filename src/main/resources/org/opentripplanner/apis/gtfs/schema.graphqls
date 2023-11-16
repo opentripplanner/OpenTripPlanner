@@ -1465,16 +1465,18 @@ input PlanItineraryFilterSettingsInput {
     """
     Pick one itinerary from each group after putting itineraries that are `85%` similar together,
     if the given value is `0.85`, for example. Itineraries are grouped together based on relative
-    the distance of travel that is identical between the itineraries.
+    the distance of transit travel that is identical between the itineraries (access, egress and
+    transfers are ignored). The value must be at least `0.5`.
     """
-    groupSimilarityKeepOne: Float = 0.85
+    groupSimilarityKeepOne: Ratio = 0.85
 
     """
     Pick three itineraries from each group after putting itineraries that are `68%` similar together,
-    if the given value is `0.68`, for example. The itineraries are grouped by similar legs
-    (on board same journey). The value must be at least `0.5`.
+    if the given value is `0.68`, for example. Itineraries are grouped together based on relative
+    the distance of transit travel that is identical between the itineraries (access, egress and
+    transfers are ignored). The value must be at least `0.5`.
     """
-    groupSimilarityKeepThree: Float = 0.68
+    groupSimilarityKeepThree: Ratio = 0.68
 
     """
     Of the itineraries grouped to maximum of three itineraries, how much worse can the non-grouped
@@ -1691,13 +1693,13 @@ input TriangleCyclingFactorsInput {
     concerns such as convenience and general cyclist preferences by taking into account
     road surface etc.
     """
-    safety: WeightingFactor
+    safety: Ratio
 
     """Relative importance of flat terrain"""
-    flatness: WeightingFactor
+    flatness: Ratio
 
     """Relative importance of duration"""
-    time: WeightingFactor
+    time: Ratio
 }
 
 """
@@ -1710,13 +1712,13 @@ input TriangleScooterFactorsInput {
     concerns such as convenience and general scooter preferences by taking into account
     road surface etc.
     """
-    safety: WeightingFactor
+    safety: Ratio
 
     """Relative importance of flat terrain"""
-    flatness: WeightingFactor
+    flatness: Ratio
 
     """Relative importance of duration"""
-    time: WeightingFactor
+    time: Ratio
 }
 
 input InputUnpreferred {
@@ -5553,7 +5555,7 @@ input WalkPreferencesInput {
     Factor for how much the walk safety is considered in routing. Value should be between 0 and 1.
     If the value is set to be 0, safety is ignored.
     """
-    walkSafetyFactor: WeightingFactor
+    walkSafetyFactor: Ratio
 
     """
     The cost of boarding a vehicle while walking.
@@ -5561,8 +5563,8 @@ input WalkPreferencesInput {
     boardCost: Cost
 }
 
-"""A fractional multiplier between 0 and 1, for example 0.25."""
-scalar WeightingFactor
+"""A fractional multiplier between 0 and 1, for example 0.25. 0 means 0% and 1 means 100%."""
+scalar Ratio
 
 enum WheelchairBoarding {
     """There is no accessibility information for the stop."""
