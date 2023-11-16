@@ -835,9 +835,8 @@ input BicyclePreferencesInput {
 
     """
     Walking preferences when walking a bicycle.
-    TODO: review with @t2gran
     """
-    bicycleWalking: VehicleWalkPreferencesInput
+    walking: VehicleWalkPreferencesInput
 
     """
     Maximum speed on flat ground while riding a bicycle. Note, this speed is higher than
@@ -4529,7 +4528,7 @@ input ScooterPreferencesInput {
     """
     Walking preferences when walking a scooter.
     """
-    scooterWalking: VehicleWalkPreferencesInput
+    walking: VehicleWalkPreferencesInput
 
     """
     Maximum speed on flat ground while riding a scooter. Note, this speed is higher than
