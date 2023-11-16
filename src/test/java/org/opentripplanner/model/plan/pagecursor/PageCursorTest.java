@@ -51,7 +51,7 @@ public class PageCursorTest {
       "PageCursor{type: NEXT_PAGE, sortOrder: STREET_AND_ARRIVAL_TIME, " +
       "edt: " +
       EDT_STR +
-      ", searchWindow: 2h, deduplicationParameters: 'null'}",
+      ", searchWindow: 2h}",
       subjectDepartAfter.toString()
     );
     assertEquals(
@@ -60,7 +60,7 @@ public class PageCursorTest {
       EDT_STR +
       ", lat: " +
       LAT_STR +
-      ", searchWindow: 2h, deduplicationParameters: 'null'}",
+      ", searchWindow: 2h}",
       subjectArriveBy.toString()
     );
   }

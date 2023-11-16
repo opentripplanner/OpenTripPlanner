@@ -13,7 +13,7 @@ import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationParameters;
+import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
@@ -76,7 +76,7 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
-  private PagingDeduplicationParameters deduplicationParameters;
+  private ItineraryPageCut itineraryPageCut;
 
   @Sandbox
   private ItineraryListFilter emissionsFilter;
@@ -258,12 +258,12 @@ public class ItineraryListFilterChainBuilder {
    * If the search is done with a page cursor that contains encoded deduplication parameters, then
    * this function adds the filter that removes duplicates.
    *
-   * @param deduplicationParameters contains the parameters to use for deduplication.
+   * @param itineraryPageCut contains the parameters to use for deduplication.
    */
   public ItineraryListFilterChainBuilder withPagingDeduplicationFilter(
-    PagingDeduplicationParameters deduplicationParameters
+    ItineraryPageCut itineraryPageCut
   ) {
-    this.deduplicationParameters = deduplicationParameters;
+    this.itineraryPageCut = itineraryPageCut;
     return this;
   }
 
@@ -326,8 +326,8 @@ public class ItineraryListFilterChainBuilder {
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
-    if (deduplicationParameters != null) {
-      filters.add(new DeletionFlaggingFilter(new PagingDuplicateFilter(deduplicationParameters)));
+    if (itineraryPageCut != null) {
+      filters.add(new DeletionFlaggingFilter(new PagingDuplicateFilter(itineraryPageCut)));
     }
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());

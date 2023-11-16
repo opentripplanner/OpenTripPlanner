@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationParameters;
+import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationSection;
 
 public class PagingDuplicateFilterTest implements PlanTestConstants {
@@ -32,7 +32,7 @@ public class PagingDuplicateFilterTest implements PlanTestConstants {
   public void setup() {
     pagingDuplicateFilter =
       new PagingDuplicateFilter(
-        new PagingDeduplicationParameters(
+        new ItineraryPageCut(
           late.startTime().toInstant(),
           oldSearchWindowEndTime,
           SortOrder.STREET_AND_ARRIVAL_TIME,

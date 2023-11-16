@@ -18,7 +18,7 @@ public class PageCursorFactory {
   private SearchTime current = null;
   private Duration currentSearchWindow = null;
   private boolean wholeSwUsed = true;
-  private PagingDeduplicationParameters deduplicationParameters = null;
+  private ItineraryPageCut itineraryPageCut = null;
   private PageCursorFactoryParameters pageCursorFactoryParams = null;
 
   private PageCursor nextCursor = null;
@@ -54,16 +54,16 @@ public class PageCursorFactory {
    * the list of itineraries to create the new search encoded in the page cursors. We will also add
    * information necessary for removing potential duplicates when paging.
    *
-   * @param pageCursorFactoryParams contains the result from the {@code NumItinerariesFilter}
+   * @param pageCursorFactoryParams contains the result from the {@code PagingDuplicateFilter}
    */
   public PageCursorFactory withRemovedItineraries(
     PageCursorFactoryParameters pageCursorFactoryParams
   ) {
     this.wholeSwUsed = false;
     this.pageCursorFactoryParams = pageCursorFactoryParams;
-    this.deduplicationParameters =
-      new PagingDeduplicationParameters(
-        pageCursorFactoryParams.earliestRemovedDeparture().truncatedTo(ChronoUnit.MINUTES),
+    this.itineraryPageCut =
+      new ItineraryPageCut(
+        pageCursorFactoryParams.earliestRemovedDeparture().truncatedTo(ChronoUnit.SECONDS),
         current.edt.plus(currentSearchWindow),
         sortOrder,
         pageCursorFactoryParams.deduplicationSection(),
@@ -150,9 +150,9 @@ public class PageCursorFactory {
     prevCursor = new PageCursor(PREVIOUS_PAGE, sortOrder, prev.edt, prev.lat, newSearchWindow);
     nextCursor = new PageCursor(NEXT_PAGE, sortOrder, next.edt, next.lat, newSearchWindow);
 
-    if (deduplicationParameters != null) {
-      nextCursor = nextCursor.withDeduplicationParameters(deduplicationParameters);
-      prevCursor = prevCursor.withDeduplicationParameters(deduplicationParameters);
+    if (itineraryPageCut != null) {
+      nextCursor = nextCursor.withItineraryPageCut(itineraryPageCut);
+      prevCursor = prevCursor.withItineraryPageCut(itineraryPageCut);
     }
   }
 

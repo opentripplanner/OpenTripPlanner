@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
-import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationParameters;
+import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 
 /**
@@ -21,12 +21,12 @@ public class PagingDuplicateFilter implements ItineraryDeletionFlagger {
 
   public static final String TAG = "paging-deduplication-filter";
 
-  private final PagingDeduplicationParameters deduplicationParams;
+  private final ItineraryPageCut itineraryPageCut;
   private final Comparator<ItinerarySortKey> sortOrderComparator;
 
-  public PagingDuplicateFilter(PagingDeduplicationParameters deduplicationParams) {
-    this.deduplicationParams = deduplicationParams;
-    this.sortOrderComparator = SortOrderComparator.comparator(deduplicationParams.sortOrder);
+  public PagingDuplicateFilter(ItineraryPageCut itineraryPageCut) {
+    this.itineraryPageCut = itineraryPageCut;
+    this.sortOrderComparator = SortOrderComparator.comparator(itineraryPageCut.getSortOrder());
   }
 
   @Override
@@ -35,9 +35,9 @@ public class PagingDuplicateFilter implements ItineraryDeletionFlagger {
   }
 
   private boolean sortsIntoDeduplicationAreaRelativeToRemovedItinerary(Itinerary itinerary) {
-    return switch (deduplicationParams.deduplicationSection) {
-      case HEAD -> sortOrderComparator.compare(itinerary, deduplicationParams) < 0;
-      case TAIL -> sortOrderComparator.compare(itinerary, deduplicationParams) > 0;
+    return switch (itineraryPageCut.getDeduplicationSection()) {
+      case HEAD -> sortOrderComparator.compare(itinerary, itineraryPageCut) < 0;
+      case TAIL -> sortOrderComparator.compare(itinerary, itineraryPageCut) > 0;
     };
   }
 
@@ -47,8 +47,8 @@ public class PagingDuplicateFilter implements ItineraryDeletionFlagger {
       .stream()
       .filter(it ->
         (
-          it.startTime().toInstant().isAfter(deduplicationParams.windowStart) &&
-          it.startTime().toInstant().isBefore(deduplicationParams.windowEnd) &&
+          it.startTime().toInstant().isAfter(itineraryPageCut.getWindowStart()) &&
+          it.startTime().toInstant().isBefore(itineraryPageCut.getWindowEnd()) &&
           sortsIntoDeduplicationAreaRelativeToRemovedItinerary(it)
         )
       )

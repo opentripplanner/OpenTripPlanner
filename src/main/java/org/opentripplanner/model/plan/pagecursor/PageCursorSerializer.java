@@ -41,15 +41,15 @@ final class PageCursorSerializer {
       writeTime(cursor.latestArrivalTime, out);
       writeDuration(cursor.searchWindow, out);
       writeEnum(cursor.originalSortOrder, out);
-      if (cursor.containsDeduplicationParameters()) {
-        writeTime(cursor.deduplicationParameters.windowStart, out);
-        writeTime(cursor.deduplicationParameters.windowEnd, out);
-        writeEnum(cursor.deduplicationParameters.deduplicationSection, out);
-        writeBoolean(cursor.deduplicationParameters.isOnStreetAllTheWayThreshold, out);
-        writeTime(cursor.deduplicationParameters.arrivalTimeThreshold, out);
-        writeInt(cursor.deduplicationParameters.generalizedCostThreshold, out);
-        writeInt(cursor.deduplicationParameters.numOfTransfersThreshold, out);
-        writeTime(cursor.deduplicationParameters.departureTimeThreshold, out);
+      if (cursor.containsItineraryPageCut()) {
+        writeTime(cursor.itineraryPageCut.getWindowStart(), out);
+        writeTime(cursor.itineraryPageCut.getWindowEnd(), out);
+        writeEnum(cursor.itineraryPageCut.getDeduplicationSection(), out);
+        writeBoolean(cursor.itineraryPageCut.isOnStreetAllTheWayThreshold(), out);
+        writeTime(cursor.itineraryPageCut.getArrivalTimeThreshold(), out);
+        writeInt(cursor.itineraryPageCut.getGeneralizedCostThreshold(), out);
+        writeInt(cursor.itineraryPageCut.getNumOfTransfersThreshold(), out);
+        writeTime(cursor.itineraryPageCut.getDepartureTimeThreshold(), out);
       }
       out.flush();
       return Base64.getUrlEncoder().encodeToString(buf.toByteArray());
@@ -90,7 +90,7 @@ final class PageCursorSerializer {
         var numOfTransfersDeletionThreshold = readInt(in);
         var departureTimeDeletionThreshold = readTime(in);
 
-        PagingDeduplicationParameters dedupeParams = new PagingDeduplicationParameters(
+        ItineraryPageCut itineraryPageCut = new ItineraryPageCut(
           dedupeWindowStart,
           dedupeWindowEnd,
           originalSortOrder,
@@ -102,7 +102,7 @@ final class PageCursorSerializer {
           departureTimeDeletionThreshold
         );
         return new PageCursor(type, originalSortOrder, edt, lat, searchWindow)
-          .withDeduplicationParameters(dedupeParams);
+          .withItineraryPageCut(itineraryPageCut);
       }
 
       return new PageCursor(type, originalSortOrder, edt, lat, searchWindow);

@@ -174,7 +174,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assertEquals(expLat, pageCursor.latestArrivalTime);
     assertEquals(expSearchWindow, pageCursor.searchWindow);
     assertEquals(expPageType, pageCursor.type);
-    assertEquals(hasDedupeParams, pageCursor.deduplicationParameters != null);
+    assertEquals(hasDedupeParams, pageCursor.itineraryPageCut != null);
   }
 
   private record PageCursorFactoryParametersImpl(
