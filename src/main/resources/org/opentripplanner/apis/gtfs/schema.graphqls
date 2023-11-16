@@ -1627,37 +1627,6 @@ input InputUnpreferred {
     useUnpreferredRoutesPenalty: Int @deprecated(reason: "Use unpreferredCost instead")
 }
 
-"""
-Unpreferred entities and an extra cost attached to using them in routing.
-"""
-input PlanUnpreferredInput {
-    """List of feedscoped route IDs (format is `FeedId:RouteId`) unpreferred by the user."""
-    routes: [String!]
-
-    """List of feedscoped agency IDs (format is `FeedId:AgencyId`) unpreferred by the user."""
-    agencies: [String!]
-
-    """
-    Costs related to using unpreferred entities.
-    """
-    cost: PlanUnpreferredCostInput
-}
-
-"""
-Costs related to using unpreferred entities.
-"""
-input PlanUnpreferredCostInput {
-    """
-    A static cost that is added each time something that is unpreferred is used.
-    """
-    cost: Cost
-
-    """
-    A cost multiplier of transit leg travel time.
-    """
-    reluctance: Reluctance
-}
-
 enum RoutingErrorCode {
     """
     No transit connection was found between the origin and destination within the operating day or
@@ -5100,11 +5069,6 @@ input TransitModePreferenceCostInput {
 Transit routing preferences used for transit legs.
 """
 input TransitPreferencesInput {
-    """
-    Unprefer routes or agencies by giving them extra cost.
-    """
-    unpreferred: PlanUnpreferredInput
-
     """
     Preferences related to boarding a transit vehicle. Note, board costs for each street mode
     can be found under the street mode preferences.
