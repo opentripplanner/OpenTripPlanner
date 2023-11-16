@@ -854,6 +854,16 @@ input BicyclePreferencesInput {
     Cost of boarding a vehicle with a bicycle.
     """
     boardCost: Cost
+
+    """
+    Bicycle rental related preferences.
+    """
+    rental: BicycleRentalPreferencesInput
+
+    """
+    Bicycle parking related preferences.
+    """
+    parking: BicycleParkingPreferencesInput
 }
 
 """
@@ -926,6 +936,16 @@ input CarPreferencesInput {
     A multiplier for how bad travelling on car is compared to being in transit for equal lengths of time.
     """
     reluctance: Reluctance
+
+    """
+    Car rental related preferences.
+    """
+    rental: CarRentalPreferencesInput
+
+    """
+    Car parking related preferences.
+    """
+    parking: CarParkingPreferencesInput
 }
 
 """Cluster is a list of stops grouped by name and proximity"""
@@ -1325,6 +1345,54 @@ Locale in string format. For example, `en` or `en-US`.
 scalar Locale
 
 """
+Preferences for car parking facilities used during the routing.
+"""
+input CarParkingPreferencesInput {
+    """
+    Selection filters to include or exclude parking facilities.
+    An empty list will include all facilities in the routing search.
+    """
+    filters: [ParkingFilter!]
+
+    """
+    If `preferred` is non-empty, using a parking facility that doesn't contain
+    at least one of the preferred conditions, will receive this extra cost and therefore avoided if
+    preferred options are available.
+    """
+    unpreferredCost: Int
+
+    """
+    If non-empty every parking facility that doesn't match this set of conditions will
+    receive an extra cost (defined by `unpreferredCost`) and therefore avoided.
+    """
+    preferred: [ParkingFilter!]
+}
+
+"""
+Preferences for bicycle parking facilities used during the routing.
+"""
+input BicycleParkingPreferencesInput {
+    """
+    Selection filters to include or exclude parking facilities.
+    An empty list will include all facilities in the routing search.
+    """
+    filters: [ParkingFilter!]
+
+    """
+    If `preferred` is non-empty, using a parking facility that doesn't contain
+    at least one of the preferred conditions, will receive this extra cost and therefore avoided if
+    preferred options are available.
+    """
+    unpreferredCost: Int
+
+    """
+    If non-empty every parking facility that doesn't match this set of conditions will
+    receive an extra cost (defined by `unpreferredCost`) and therefore avoided.
+    """
+    preferred: [ParkingFilter!]
+}
+
+"""
 Preferences for parking facilities used during the routing.
 """
 input VehicleParkingInput {
@@ -1560,16 +1628,6 @@ input PlanStreetPreferencesInput {
     have their own preferences.
     """
     walk: WalkPreferencesInput
-
-    """
-    Rental related preferences.
-    """
-    rental: RentalPreferencesInput
-
-    """
-    Parking related preferences.
-    """
-    parking: VehicleParkingInput
 }
 
 """
@@ -4255,14 +4313,56 @@ The value should be greater than 0.
 scalar Reluctance
 
 """
-Preferences related to rental (station based or floating vehicle rental).
+Preferences related to scooter rental (station based or floating scooter rental).
 """
-input RentalPreferencesInput {
+input ScooterRentalPreferencesInput {
     """
-    Is it possible to arrive to the destination with a rented vehicle and does it
+    Is it possible to arrive to the destination with a rented scooter and does it
     come with an extra cost.
     """
-    destinationVehiclePolicy: DestinationVehiclePolicyInput
+    destinationScooterPolicy: DestinationVehiclePolicyInput
+
+    """
+    Rental networks which can be potentially used as part of an itinerary.
+    """
+    allowedNetworks: [String!]
+
+    """
+    Rental networks which cannot be used as part of an itinerary.
+    """
+    bannedNetworks: [String!]
+}
+
+"""
+Preferences related to car rental (station based or floating car rental).
+"""
+input CarRentalPreferencesInput {
+    """
+    Is it possible to arrive to the destination with a rented car and does it
+    come with an extra cost.
+    """
+    destinationCarPolicy: DestinationVehiclePolicyInput
+
+    """
+    Rental networks which can be potentially used as part of an itinerary.
+    """
+    allowedNetworks: [String!]
+
+    """
+    Rental networks which cannot be used as part of an itinerary.
+    """
+    bannedNetworks: [String!]
+}
+
+"""
+Preferences related to bicycle rental (station based or floating bicycle rental).
+"""
+input BicycleRentalPreferencesInput {
+    """
+    Is it possible to arrive to the destination with a rented bicycle and does it
+    come with an extra cost.
+    """
+    destinationBicyclePolicy: DestinationVehiclePolicyInput
 
     """
     Rental networks which can be potentially used as part of an itinerary.
@@ -4539,6 +4639,11 @@ input ScooterPreferencesInput {
     Cost of boarding a vehicle with a scooter.
     """
     boardCost: Cost
+
+    """
+    Scooter rental related preferences.
+    """
+    rental: ScooterRentalPreferencesInput
 }
 
 type step {
