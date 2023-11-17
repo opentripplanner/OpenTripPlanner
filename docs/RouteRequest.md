@@ -813,7 +813,7 @@ Transit priority groups configuration
 Use this to separate transit patterns into groups. Each group will be given a priority
 when compared with other groups. Hence, two paths with a different set of groups will BOTH
 be returned unless the cost is worse then the relaxation specified in the
-`relaxTransitPriorityGroup` parameter. Only available in TransmodelAPI for now.
+`relaxTransitPriorityGroup` parameter. This is only available in the TransmodelAPI for now.
 
 
 THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!

@@ -64,7 +64,6 @@ public class TestTripPattern implements DefaultTripPattern {
     return this;
   }
 
-
   public TestTripPattern withRoute(Route route) {
     this.route = route;
     return this;
