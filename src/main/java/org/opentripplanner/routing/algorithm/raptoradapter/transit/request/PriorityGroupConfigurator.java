@@ -3,8 +3,8 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Predicate;
 import java.util.stream.Stream;
+import org.opentripplanner.framework.lang.ArrayUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitPriorityGroup32n;
 import org.opentripplanner.routing.api.request.request.filter.TransitPriorityGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -41,26 +41,11 @@ public class PriorityGroupConfigurator {
     Collection<TransitPriorityGroupSelect> byAgency,
     Collection<TransitPriorityGroupSelect> global
   ) {
-    this.baseMatchers =
-      base
-        .stream()
-        .map(PriorityGroupMatcher::of)
-        .filter(Predicate.not(PriorityGroupMatcher::isEmpty))
-        .toArray(PriorityGroupMatcher[]::new);
-    this.agencyMatchers =
-      byAgency
-        .stream()
-        .map(PriorityGroupMatcher::of)
-        .filter(Predicate.not(PriorityGroupMatcher::isEmpty))
-        .toArray(PriorityGroupMatcher[]::new);
-    this.globalMatchers =
-      global
-        .stream()
-        .map(PriorityGroupMatcher::of)
-        .filter(Predicate.not(PriorityGroupMatcher::isEmpty))
-        .toArray(PriorityGroupMatcher[]::new);
+    this.baseMatchers = PriorityGroupMatcher.of(base);
+    this.agencyMatchers = PriorityGroupMatcher.of(byAgency);
+    this.globalMatchers = PriorityGroupMatcher.of(global);
     this.enabled =
-      (baseMatchers.length > 0) || (agencyMatchers.length > 0) || (globalMatchers.length > 0);
+      Stream.of(baseMatchers, agencyMatchers, globalMatchers).anyMatch(ArrayUtils::hasContent);
   }
 
   public static PriorityGroupConfigurator empty() {

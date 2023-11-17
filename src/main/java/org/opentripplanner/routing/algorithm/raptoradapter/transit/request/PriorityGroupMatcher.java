@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -54,6 +55,14 @@ public abstract class PriorityGroupMatcher {
       list.add(new IdMatcher(select.agencyIds(), p -> p.getRoute().getId()));
     }
     return compositeOf(list);
+  }
+
+  static PriorityGroupMatcher[] of(Collection<TransitPriorityGroupSelect> selectors) {
+    return selectors
+      .stream()
+      .map(PriorityGroupMatcher::of)
+      .filter(Predicate.not(PriorityGroupMatcher::isEmpty))
+      .toArray(PriorityGroupMatcher[]::new);
   }
 
   private static PriorityGroupMatcher compositeOf(List<PriorityGroupMatcher> list) {
