@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.routerequest;
 
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,13 +20,13 @@ public class TransitPriorityGroupConfig {
       .summary("Transit priority groups configuration")
       .description(
         """
-        Use this to separate transit patterns into groups. Each group will be given priority
-        over other groups in the trip search. Hence, two paths with a different different
-        set of groups will BOTH be returned unless the cost is worse then the relaxation
-        specified in the `` parameter . 
-        
-        """.stripIndent()
+        Use this to separate transit patterns into groups. Each group will be given a priority
+        when compared with other groups. Hence, two paths with a different set of groups will BOTH
+        be returned unless the cost is worse then the relaxation specified in the
+        `relaxTransitPriorityGroup` parameter. This is only available in the TransmodelAPI for now.
+        """
       )
+      .experimentalFeature()
       .asObject();
 
     transit.addPriorityGroupsBase(

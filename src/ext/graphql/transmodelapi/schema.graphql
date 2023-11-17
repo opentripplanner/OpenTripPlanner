@@ -826,10 +826,10 @@ type QueryType {
     """
     Relax generalized-cost when comparing trips with a different set of
     transit-priority-groups. The groups are set server side for service-journey and
-    can not be configured in the API. This mainly help return competition neutral
+    can not be configured in the API. This mainly helps to return competition neutral
     services. Long distance authorities are put in different transit-priority-groups.
     
-    This relax the comparison inside the routing engine for each stop-arrival. If two
+    This relaxes the comparison inside the routing engine for each stop-arrival. If two
     paths have a different set of transit-priority-groups, then the generalized-cost
     comparison is relaxed. The final set of paths are filtered through the normal
     itinerary-filters.

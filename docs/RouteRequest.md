@@ -254,7 +254,7 @@ We return number of seconds that we are willing to wait for preferred route.
 
 The relax function for transit-priority-groups
 
-A path is considered optimal if it the generalized-cost is smaller than an other the
+A path is considered optimal if it the generalized-cost is less than the
 generalized-cost of another path. If this parameter is set, the comparison is relaxed
 further if they belong to different transit-priority-groups.
 
@@ -810,12 +810,13 @@ If not enabled generalizedCost function is used to pick the optimal transfer poi
 
 Transit priority groups configuration
 
-Use this to group transit patterns into groups. Each group will be given priority
-over others groups in the trip search. Hence; To paths with a different different
-set of groups will BOTH be returned unless the cost is worse then the relaxation
-specified in the `` parameter .
+Use this to separate transit patterns into groups. Each group will be given a priority
+when compared with other groups. Hence, two paths with a different set of groups will BOTH
+be returned unless the cost is worse then the relaxation specified in the
+`relaxTransitPriorityGroup` parameter. Only available in TransmodelAPI for now.
 
 
+THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!
 
 <h3 id="rd_transitReluctanceForMode">transitReluctanceForMode</h3>
 
