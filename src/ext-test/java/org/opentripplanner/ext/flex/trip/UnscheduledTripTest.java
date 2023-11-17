@@ -633,8 +633,8 @@ public class UnscheduledTripTest {
 
       assertEquals(4, templates.size());
       var template = templates.get(0);
-      assertEquals(template.fromStopIndex, 3);
-      assertEquals(template.toStopIndex, 0);
+      assertEquals(template.fromStopIndex, 0);
+      assertEquals(template.toStopIndex, 3);
     }
 
     @Nonnull
