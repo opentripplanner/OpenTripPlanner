@@ -244,7 +244,7 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
   }
 
   private PriorityGroupConfigurator createTransitPriorityGroupConfigurator(RouteRequest request) {
-    if (!request.preferences().transit().relaxTransitPriorityGroup().isNormal()) {
+    if (request.preferences().transit().relaxTransitPriorityGroup().isNormal()) {
       return PriorityGroupConfigurator.empty();
     }
     var transitRequest = request.journey().transit();
