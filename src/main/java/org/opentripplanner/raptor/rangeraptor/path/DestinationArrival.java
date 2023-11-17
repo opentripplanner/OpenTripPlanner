@@ -71,11 +71,13 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
 
   @Override
   public boolean supportsC2() {
-    return false;
+    return previous.supportsC2();
   }
 
   @Override
   public int c2() {
+    // Both pass-through and transit-priority have no additional cost for the egress, so
+    // we can delegate to the previous arrival.
     return previous.c2();
   }
 
