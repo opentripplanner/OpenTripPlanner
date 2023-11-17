@@ -26,7 +26,6 @@ public class PriorityGroupConfigurator {
   private static final int BASE_GROUP_ID = TransitPriorityGroup32n.groupId(0);
   private int groupIndexCounter = 0;
   private final boolean enabled;
-  private final PriorityGroupMatcher[] baseMatchers;
   private final PriorityGroupMatcher[] agencyMatchers;
   private final PriorityGroupMatcher[] globalMatchers;
 
@@ -36,7 +35,6 @@ public class PriorityGroupConfigurator {
 
   private PriorityGroupConfigurator() {
     this.enabled = false;
-    this.baseMatchers = null;
     this.agencyMatchers = null;
     this.globalMatchers = null;
     this.agencyMatchersIds = List.of();
@@ -44,15 +42,12 @@ public class PriorityGroupConfigurator {
   }
 
   private PriorityGroupConfigurator(
-    Collection<TransitPriorityGroupSelect> base,
     Collection<TransitPriorityGroupSelect> byAgency,
     Collection<TransitPriorityGroupSelect> global
   ) {
-    this.baseMatchers = PriorityGroupMatcher.of(base);
     this.agencyMatchers = PriorityGroupMatcher.of(byAgency);
     this.globalMatchers = PriorityGroupMatcher.of(global);
-    this.enabled =
-      Stream.of(baseMatchers, agencyMatchers, globalMatchers).anyMatch(ArrayUtils::hasContent);
+    this.enabled = Stream.of(agencyMatchers, globalMatchers).anyMatch(ArrayUtils::hasContent);
     this.globalMatchersIds =
       Arrays.stream(globalMatchers).map(m -> new MatcherAndId(m, nextGroupId())).toList();
     // We need to populate this dynamically
@@ -64,14 +59,13 @@ public class PriorityGroupConfigurator {
   }
 
   public static PriorityGroupConfigurator of(
-    Collection<TransitPriorityGroupSelect> base,
     Collection<TransitPriorityGroupSelect> byAgency,
     Collection<TransitPriorityGroupSelect> global
   ) {
-    if (Stream.of(base, byAgency, global).allMatch(Collection::isEmpty)) {
+    if (Stream.of(byAgency, global).allMatch(Collection::isEmpty)) {
       return empty();
     }
-    return new PriorityGroupConfigurator(base, byAgency, global);
+    return new PriorityGroupConfigurator(byAgency, global);
   }
 
   /**
@@ -86,11 +80,6 @@ public class PriorityGroupConfigurator {
 
     var p = tripPattern.getPattern();
 
-    for (PriorityGroupMatcher m : baseMatchers) {
-      if (m.match(p)) {
-        return BASE_GROUP_ID;
-      }
-    }
     for (var it : agencyMatchersIds) {
       if (it.matcher().match(p)) {
         var agencyId = p.getRoute().getAgency().getId();
