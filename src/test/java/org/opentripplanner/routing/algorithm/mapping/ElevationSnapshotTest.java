@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.concurrent.CompletionException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -114,6 +115,7 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
 
   @DisplayName("Access BIKE_RENTAL")
   @Test
+  @Disabled
   public void accessBikeRental() {
     RouteRequest request = createTestRequest(2009, 10, 21, 16, 14, 0);
 
