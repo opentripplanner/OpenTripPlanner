@@ -24,6 +24,7 @@ import org.opentripplanner.ext.emissions.DefaultEmissionsService;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsFilter;
 import org.opentripplanner.ext.emissions.EmissionsService;
+import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
@@ -105,11 +106,12 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
 
     // Walk first, then transit sorted on arrival-time
     assertEquals(toStr(List.of(i1, i2, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
-    assertTrue(i1.getSystemNotices().isEmpty());
-    assertFalse(i2.getSystemNotices().isEmpty());
-    assertFalse(i3.getSystemNotices().isEmpty());
-    assertEquals("transit-vs-street-filter", i2.getSystemNotices().get(0).tag);
-    assertEquals("outside-search-window", i3.getSystemNotices().get(0).tag);
+    assertEquals("[]", toStringOfTags(i1.getSystemNotices()));
+    assertEquals(
+      "[transit-vs-street-filter, transit-vs-walk-filter]",
+      toStringOfTags(i2.getSystemNotices())
+    );
+    assertEquals("[outside-search-window]", toStringOfTags(i3.getSystemNotices()));
   }
 
   @Test
@@ -330,6 +332,12 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
         .build();
       assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
     }
+  }
+
+  private static String toStringOfTags(List<SystemNotice> systemNotices) {
+    return systemNotices == null
+      ? "[]"
+      : systemNotices.stream().map(SystemNotice::tag).toList().toString();
   }
 
   @Nested

@@ -24,6 +24,6 @@ public final class SystemNoticeMapper {
   }
 
   public static ApiSystemNotice mapSystemNotice(SystemNotice domain) {
-    return new ApiSystemNotice(domain.tag, domain.text);
+    return new ApiSystemNotice(domain.tag(), domain.text());
   }
 }
