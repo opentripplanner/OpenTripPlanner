@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.DurationUtils.durationToStr;
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
+import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexWithOnBoard;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
@@ -24,6 +25,7 @@ import org.opentripplanner.raptor.api.path.PathLeg;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.lifecycle.LifeCycleSubscriptions;
@@ -222,8 +224,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
   }
 
   public static DestinationArrival<TestTripSchedule> basicTripByForwardSearch() {
-    AbstractStopArrival prevArrival;
-    prevArrival = new Access(STOP_A, ACCESS_START, ACCESS_END, ACCESS_COST);
+    ArrivalView<TestTripSchedule> prevArrival;
+    prevArrival = access(STOP_A, ACCESS_START, ACCESS_END, ACCESS_COST);
     prevArrival = new Bus(1, STOP_B, L11_END, LINE_11_COST, TRIP_1, prevArrival);
     prevArrival = new Transfer(1, STOP_C, TX_START, TX_END, TX_COST, prevArrival);
     prevArrival = new Bus(2, STOP_D, L21_END, LINE_21_COST, TRIP_2, prevArrival);
@@ -242,8 +244,8 @@ public class BasicPathTestCase implements RaptorTestConstants {
    * search:
    */
   public static DestinationArrival<TestTripSchedule> basicTripByReverseSearch() {
-    AbstractStopArrival nextArrival;
-    nextArrival = new Access(STOP_E, EGRESS_END, EGRESS_START, EGRESS_COST);
+    ArrivalView<TestTripSchedule> nextArrival;
+    nextArrival = access(STOP_E, EGRESS_END, EGRESS_START, EGRESS_COST);
     // Board slack is subtracted from the arrival time to get the latest possible
     nextArrival = new Bus(1, STOP_D, L31_START, LINE_31_COST, TRIP_3, nextArrival);
     nextArrival = new Bus(2, STOP_C, L21_START, LINE_21_COST, TRIP_2, nextArrival);

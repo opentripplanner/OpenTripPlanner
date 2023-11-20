@@ -1,15 +1,39 @@
 package org.opentripplanner.raptor._data.stoparrival;
 
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 
-public abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
+abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
 
   private final int round;
   private final int stop;
   private final int arrivalTime;
-  private final int cost;
+  private final int c1;
+  private final int c2;
   private final ArrivalView<TestTripSchedule> previous;
+
+  AbstractStopArrival(
+    int round,
+    int stop,
+    int arrivalTime,
+    int extraCost,
+    int c2,
+    ArrivalView<TestTripSchedule> previous
+  ) {
+    this.round = round;
+    this.stop = stop;
+    this.arrivalTime = arrivalTime;
+    this.previous = previous;
+
+    if (previous == null) {
+      this.c1 = extraCost;
+      this.c2 = c2;
+    } else {
+      this.c1 = previous.c1() + extraCost;
+      this.c2 = c2 == RaptorConstants.NOT_SET ? previous.c2() : c2;
+    }
+  }
 
   AbstractStopArrival(
     int round,
@@ -18,11 +42,7 @@ public abstract class AbstractStopArrival implements ArrivalView<TestTripSchedul
     int extraCost,
     ArrivalView<TestTripSchedule> previous
   ) {
-    this.round = round;
-    this.stop = stop;
-    this.arrivalTime = arrivalTime;
-    this.cost = (previous == null ? 0 : previous.c1()) + extraCost;
-    this.previous = previous;
+    this(round, stop, arrivalTime, extraCost, RaptorConstants.NOT_SET, previous);
   }
 
   @Override
@@ -42,12 +62,17 @@ public abstract class AbstractStopArrival implements ArrivalView<TestTripSchedul
 
   @Override
   public int c1() {
-    return cost;
+    return c1;
   }
 
   @Override
   public int c2() {
-    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
+    return c2;
+  }
+
+  @Override
+  public boolean supportsC2() {
+    return c2 != RaptorConstants.NOT_SET;
   }
 
   @Override

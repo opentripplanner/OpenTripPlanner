@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.opentripplanner.framework.time.TimeUtils.timeToStrLong;
+import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.free;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.findTripForwardSearch;
@@ -13,7 +14,6 @@ import static org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch.fin
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
-import org.opentripplanner.raptor._data.stoparrival.Access;
 import org.opentripplanner.raptor._data.stoparrival.Bus;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.spi.BoardAndAlightTime;
@@ -229,7 +229,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     int arrivalTime,
     TestTripSchedule trip
   ) {
-    Access access = new Access(accessStop, -9999, free(accessStop));
+    var access = access(accessStop, -9999, free(accessStop));
     return new Bus(1, transitToStop, arrivalTime, -9999, trip, access);
   }
 
@@ -239,7 +239,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     int arrivalTime,
     TestTripSchedule trip
   ) {
-    Access access = new Access(accessStop, -9999, free(accessStop));
+    var access = access(accessStop, -9999, free(accessStop));
     return new Bus(1, transitToStop, arrivalTime, -9999, trip, access);
   }
 
