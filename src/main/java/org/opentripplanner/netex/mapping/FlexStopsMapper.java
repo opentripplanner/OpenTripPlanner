@@ -3,7 +3,7 @@ package org.opentripplanner.netex.mapping;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.HashGridSpatialIndex;
@@ -11,6 +11,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issue.api.Issue;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -35,6 +36,7 @@ class FlexStopsMapper {
   private final HashGridSpatialIndex<RegularStop> stopsSpatialIndex;
   private final StopModelBuilder stopModelBuilder;
   private final DataImportIssueStore issueStore;
+  private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
   FlexStopsMapper(
     FeedScopedIdFactory idFactory,
@@ -58,7 +60,7 @@ class FlexStopsMapper {
    */
   StopLocation map(FlexibleStopPlace flexibleStopPlace) {
     List<StopLocation> stops = new ArrayList<>();
-
+    TransitMode flexibleStopTransitMode = mapTransitMode(flexibleStopPlace);
     var areas = flexibleStopPlace.getAreas().getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea();
     for (var area : areas) {
       if (!(area instanceof FlexibleArea flexibleArea)) {
@@ -76,7 +78,9 @@ class FlexStopsMapper {
       Geometry flexibleAreaGeometry = mapGeometry(flexibleArea);
 
       if (shouldAddStopsFromArea(flexibleArea, flexibleStopPlace)) {
-        stops.addAll(findStopsInFlexArea(flexibleArea, flexibleAreaGeometry));
+        stops.addAll(
+          findStopsInFlexArea(flexibleArea, flexibleAreaGeometry, flexibleStopTransitMode)
+        );
       } else {
         AreaStop areaStop = mapFlexArea(
           flexibleArea,
@@ -119,17 +123,23 @@ class FlexStopsMapper {
   }
 
   /**
-   * Allows pickup / drop off at any regular Stop inside the area
+   * Allows pickup / drop off at all regular stops inside the area that match the transit mode of the
+   * flexible stop place.
    */
-  List<RegularStop> findStopsInFlexArea(FlexibleArea area, Geometry geometry) {
+  List<RegularStop> findStopsInFlexArea(
+    FlexibleArea area,
+    Geometry geometry,
+    TransitMode flexibleStopTransitMode
+  ) {
     if (geometry == null) {
       return List.of();
     }
     List<RegularStop> stops = stopsSpatialIndex
       .query(geometry.getEnvelopeInternal())
       .stream()
+      .filter(stop -> flexibleStopTransitMode == stop.getGtfsVehicleType())
       .filter(stop -> geometry.contains(stop.getGeometry()))
-      .collect(Collectors.toList());
+      .toList();
 
     if (stops.isEmpty()) {
       issueStore.add(
@@ -156,6 +166,17 @@ class FlexStopsMapper {
           area.getId()
         )
       );
+      return null;
+    }
+  }
+
+  @Nullable
+  private TransitMode mapTransitMode(FlexibleStopPlace flexibleStopPlace) {
+    try {
+      return transportModeMapper.mapAllVehicleModesOfTransport(
+        flexibleStopPlace.getTransportMode()
+      );
+    } catch (TransportModeMapper.UnsupportedModeException e) {
       return null;
     }
   }
