@@ -28,6 +28,14 @@
 
 .itinerary-header-wrapper {
   position: relative;
+  background: #0a53be;
+}
+
+.accordion-item-filtered {
+  margin-bottom: 0;
+  background-color: lightpink;
+  --bs-accordion-btn-bg: lightpink;
+  --bs-accordion-active-bg: pink;
 }
 
 .itinerary-header-itinerary-number {

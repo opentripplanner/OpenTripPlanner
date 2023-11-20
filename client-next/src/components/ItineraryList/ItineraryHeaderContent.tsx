@@ -2,6 +2,7 @@ import { TripPattern } from '../../gql/graphql.ts';
 import { TIME_BOX_WIDTH, useHeaderContentStyleCalculations } from './useHeaderContentStyleCalculations.ts';
 import { ItineraryHeaderLegContent } from './ItineraryHeaderLegContent.tsx';
 import { useMemo } from 'react';
+import { formatTime } from '../../util/formatTime.ts';
 
 export function ItineraryHeaderContent({
   tripPattern,
@@ -24,20 +25,12 @@ export function ItineraryHeaderContent({
   );
 
   const formattedStartTime = useMemo(
-    () =>
-      new Date(tripPattern.expectedStartTime).toLocaleTimeString('en-US', {
-        timeStyle: 'short',
-        hourCycle: 'h24',
-      }),
+    () => formatTime(tripPattern.expectedStartTime, 'short'),
     [tripPattern.expectedStartTime],
   );
 
   const formattedEndTime = useMemo(
-    () =>
-      new Date(tripPattern.expectedEndTime).toLocaleTimeString('en-US', {
-        timeStyle: 'short',
-        hourCycle: 'h24',
-      }),
+    () => formatTime(tripPattern.expectedEndTime, 'short'),
     [tripPattern.expectedEndTime],
   );
 

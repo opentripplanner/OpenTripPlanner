@@ -32,6 +32,7 @@ export function App() {
           tripQueryResult={tripQueryResult}
           selectedTripPatternIndex={selectedTripPatternIndex}
           setSelectedTripPatternIndex={setSelectedTripPatternIndex}
+          pageResults={callback}
         />
         <MapView
           tripQueryResult={tripQueryResult}

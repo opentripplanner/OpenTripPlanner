@@ -3,28 +3,41 @@ import { Accordion } from 'react-bootstrap';
 import { useContainerWidth } from './useContainerWidth.ts';
 import { ItineraryHeaderContent } from './ItineraryHeaderContent.tsx';
 import { useEarliestAndLatestTimes } from './useEarliestAndLatestTimes.ts';
+import { ItineraryDetails } from './ItineraryDetails.tsx';
+import { ItineraryPaginationControl } from './ItineraryPaginationControl.tsx';
 
 export function ItineraryListContainer({
   tripQueryResult,
   selectedTripPatternIndex,
   setSelectedTripPatternIndex,
+  pageResults,
 }: {
   tripQueryResult: QueryType | null;
   selectedTripPatternIndex: number;
   setSelectedTripPatternIndex: (selectedTripPatterIndex: number) => void;
+  pageResults: (cursor: string) => void;
 }) {
   const [earliestStartTime, latestEndTime] = useEarliestAndLatestTimes(tripQueryResult);
   const { containerRef, containerWidth } = useContainerWidth();
 
   return (
     <section className="itinerary-list-container" ref={containerRef}>
+      <ItineraryPaginationControl
+        onPagination={pageResults}
+        previousPageCursor={tripQueryResult?.trip.previousPageCursor}
+        nextPageCursor={tripQueryResult?.trip.nextPageCursor}
+      />
       <Accordion
         activeKey={`${selectedTripPatternIndex}`}
         onSelect={(eventKey) => setSelectedTripPatternIndex(parseInt(eventKey as string))}
       >
         {tripQueryResult &&
           tripQueryResult.trip.tripPatterns.map((tripPattern, itineraryIndex) => (
-            <Accordion.Item eventKey={`${itineraryIndex}`} key={`${itineraryIndex}`}>
+            <Accordion.Item
+              eventKey={`${itineraryIndex}`}
+              key={`${itineraryIndex}`}
+              bsPrefix={tripPattern.systemNotices.length === 0 ? '' : 'accordion-item-filtered'}
+            >
               <Accordion.Header>
                 <ItineraryHeaderContent
                   containerWidth={containerWidth}
@@ -34,7 +47,9 @@ export function ItineraryListContainer({
                   latestEndTime={latestEndTime}
                 />
               </Accordion.Header>
-              <Accordion.Body>Itinerary details</Accordion.Body>
+              <Accordion.Body>
+                <ItineraryDetails tripPattern={tripPattern} />
+              </Accordion.Body>
             </Accordion.Item>
           ))}
       </Accordion>

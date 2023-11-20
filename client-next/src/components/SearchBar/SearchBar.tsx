@@ -40,7 +40,7 @@ export function SearchBar({
           setTripQueryVariables={setTripQueryVariables}
         />
         <div className="search-bar-route-button-wrapper">
-          <Button variant="primary" onClick={onRoute}>
+          <Button variant="primary" onClick={() => onRoute()}>
             Route
           </Button>
         </div>

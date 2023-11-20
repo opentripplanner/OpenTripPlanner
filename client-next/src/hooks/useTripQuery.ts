@@ -20,6 +20,7 @@ const query = graphql(`
     $searchWindow: Int
     $modes: Modes
     $itineraryFiltersDebug: ItineraryFilterDebugProfile
+    $pageCursor: String
   ) {
     trip(
       from: $from
@@ -30,7 +31,10 @@ const query = graphql(`
       searchWindow: $searchWindow
       modes: $modes
       itineraryFilters: { debug: $itineraryFiltersDebug }
+      pageCursor: $pageCursor
     ) {
+      previousPageCursor
+      nextPageCursor
       tripPatterns {
         aimedStartTime
         aimedEndTime
@@ -45,28 +49,56 @@ const query = graphql(`
           aimedEndTime
           expectedEndTime
           expectedStartTime
+          distance
+          duration
+          fromPlace {
+            name
+          }
+          toPlace {
+            name
+          }
+          toEstimatedCall {
+            destinationDisplay {
+              frontText
+            }
+          }
           line {
             publicCode
+            name
+          }
+          authority {
+            name
           }
           pointsOnLink {
             points
           }
+        }
+        systemNotices {
+          tag
         }
       }
     }
   }
 `);
 
-type TripQueryHook = (variables?: TripQueryVariables) => [QueryType | null, () => Promise<void>];
+type TripQueryHook = (variables?: TripQueryVariables) => [QueryType | null, (pageCursor?: string) => Promise<void>];
 
 export const useTripQuery: TripQueryHook = (variables) => {
   const [data, setData] = useState<QueryType | null>(null);
-  const callback = useCallback(async () => {
-    if (variables) {
-      setData((await request(endpoint, query, variables)) as QueryType);
-    } else {
-      console.warn("Can't search without variables");
-    }
-  }, [setData, variables]);
+  const callback = useCallback(
+    async (pageCursor?: string) => {
+      console.log({ pageCursor });
+      if (variables) {
+        if (pageCursor) {
+          setData((await request(endpoint, query, { ...variables, pageCursor })) as QueryType);
+        } else {
+          setData((await request(endpoint, query, variables)) as QueryType);
+        }
+      } else {
+        console.warn("Can't search without variables");
+      }
+    },
+    [setData, variables],
+  );
   return [data, callback];
 };
