@@ -15,7 +15,7 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationSection;
 
-public class PagingDuplicateFilterTest implements PlanTestConstants {
+public class PagingFilterTest implements PlanTestConstants {
 
   private static final Itinerary early = newItinerary(A).bus(1, T11_04, T11_07, B).build();
 
@@ -26,12 +26,12 @@ public class PagingDuplicateFilterTest implements PlanTestConstants {
   private static final Itinerary late = newItinerary(A).bus(3, T11_00, T11_12, B).build();
   private static final Instant oldSearchWindowEndTime = newTime(T11_05).toInstant();
 
-  private static PagingDuplicateFilter pagingDuplicateFilter;
+  private static PagingFilter pagingFilter;
 
   @BeforeEach
   public void setup() {
-    pagingDuplicateFilter =
-      new PagingDuplicateFilter(
+    pagingFilter =
+      new PagingFilter(
         new ItineraryPageCut(
           late.startTime().toInstant(),
           oldSearchWindowEndTime,
@@ -48,7 +48,7 @@ public class PagingDuplicateFilterTest implements PlanTestConstants {
 
   @Test
   public void testName() {
-    assertEquals("paging-deduplication-filter", pagingDuplicateFilter.name());
+    assertEquals("paging-filter", pagingFilter.name());
   }
 
   @Test
@@ -57,7 +57,7 @@ public class PagingDuplicateFilterTest implements PlanTestConstants {
 
     assertEquals(
       toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingDuplicateFilter))
+      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
     );
   }
 
@@ -74,7 +74,7 @@ public class PagingDuplicateFilterTest implements PlanTestConstants {
 
     assertEquals(
       toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingDuplicateFilter))
+      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
     );
   }
 
@@ -88,7 +88,7 @@ public class PagingDuplicateFilterTest implements PlanTestConstants {
 
     assertEquals(
       toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingDuplicateFilter))
+      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
     );
   }
 
@@ -105,7 +105,7 @@ public class PagingDuplicateFilterTest implements PlanTestConstants {
 
     assertEquals(
       toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingDuplicateFilter))
+      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
     );
   }
 }

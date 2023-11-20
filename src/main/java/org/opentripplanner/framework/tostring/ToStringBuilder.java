@@ -372,7 +372,7 @@ public class ToStringBuilder {
    * Map the given object to a String. If the input object is {@code null} the string
    * {@code "null"} is returned if not the {@link Object#toString()} method is called.
    */
-  public static String nullSafeToString(@Nullable Object object) {
+  static String nullSafeToString(@Nullable Object object) {
     if (object == null) {
       return NULL_VALUE;
     }
