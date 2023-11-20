@@ -26,7 +26,7 @@ public class PagingDuplicateFilter implements ItineraryDeletionFlagger {
 
   public PagingDuplicateFilter(ItineraryPageCut itineraryPageCut) {
     this.itineraryPageCut = itineraryPageCut;
-    this.sortOrderComparator = SortOrderComparator.comparator(itineraryPageCut.getSortOrder());
+    this.sortOrderComparator = SortOrderComparator.comparator(itineraryPageCut.sortOrder());
   }
 
   @Override
@@ -35,7 +35,7 @@ public class PagingDuplicateFilter implements ItineraryDeletionFlagger {
   }
 
   private boolean sortsIntoDeduplicationAreaRelativeToRemovedItinerary(Itinerary itinerary) {
-    return switch (itineraryPageCut.getDeduplicationSection()) {
+    return switch (itineraryPageCut.deduplicationSection()) {
       case HEAD -> sortOrderComparator.compare(itinerary, itineraryPageCut) < 0;
       case TAIL -> sortOrderComparator.compare(itinerary, itineraryPageCut) > 0;
     };
@@ -47,8 +47,8 @@ public class PagingDuplicateFilter implements ItineraryDeletionFlagger {
       .stream()
       .filter(it ->
         (
-          it.startTime().toInstant().isAfter(itineraryPageCut.getWindowStart()) &&
-          it.startTime().toInstant().isBefore(itineraryPageCut.getWindowEnd()) &&
+          it.startTime().toInstant().isAfter(itineraryPageCut.windowStart()) &&
+          it.startTime().toInstant().isBefore(itineraryPageCut.windowEnd()) &&
           sortsIntoDeduplicationAreaRelativeToRemovedItinerary(it)
         )
       )

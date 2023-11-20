@@ -8,6 +8,5 @@ package org.opentripplanner.model.plan.pagecursor;
  */
 public enum PagingDeduplicationSection {
   HEAD,
-
   TAIL,
 }

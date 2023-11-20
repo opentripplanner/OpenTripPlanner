@@ -41,15 +41,16 @@ final class PageCursorSerializer {
       writeTime(cursor.latestArrivalTime, out);
       writeDuration(cursor.searchWindow, out);
       writeEnum(cursor.originalSortOrder, out);
+
       if (cursor.containsItineraryPageCut()) {
-        writeTime(cursor.itineraryPageCut.getWindowStart(), out);
-        writeTime(cursor.itineraryPageCut.getWindowEnd(), out);
-        writeEnum(cursor.itineraryPageCut.getDeduplicationSection(), out);
+        writeTime(cursor.itineraryPageCut.windowStart(), out);
+        writeTime(cursor.itineraryPageCut.windowEnd(), out);
+        writeEnum(cursor.itineraryPageCut.deduplicationSection(), out);
         writeBoolean(cursor.itineraryPageCut.isOnStreetAllTheWayThreshold(), out);
-        writeTime(cursor.itineraryPageCut.getArrivalTimeThreshold(), out);
-        writeInt(cursor.itineraryPageCut.getGeneralizedCostThreshold(), out);
-        writeInt(cursor.itineraryPageCut.getNumOfTransfersThreshold(), out);
-        writeTime(cursor.itineraryPageCut.getDepartureTimeThreshold(), out);
+        writeTime(cursor.itineraryPageCut.arrivalTimeThreshold(), out);
+        writeInt(cursor.itineraryPageCut.generalizedCostThreshold(), out);
+        writeInt(cursor.itineraryPageCut.numOfTransfersThreshold(), out);
+        writeTime(cursor.itineraryPageCut.departureTimeThreshold(), out);
       }
       out.flush();
       return Base64.getUrlEncoder().encodeToString(buf.toByteArray());
@@ -95,11 +96,11 @@ final class PageCursorSerializer {
           dedupeWindowEnd,
           originalSortOrder,
           cropSection,
-          isOnStreetAllTheWayThreshold,
           arrivalTimeDeletionThreshold,
+          departureTimeDeletionThreshold,
           generalizedCostDeletionThreshold,
           numOfTransfersDeletionThreshold,
-          departureTimeDeletionThreshold
+          isOnStreetAllTheWayThreshold
         );
         return new PageCursor(type, originalSortOrder, edt, lat, searchWindow)
           .withItineraryPageCut(itineraryPageCut);

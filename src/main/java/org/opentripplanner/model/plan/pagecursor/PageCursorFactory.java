@@ -67,11 +67,11 @@ public class PageCursorFactory {
         current.edt.plus(currentSearchWindow),
         sortOrder,
         pageCursorFactoryParams.deduplicationSection(),
-        pageCursorFactoryParams.firstRemovedIsOnStreetAllTheWay(),
         pageCursorFactoryParams.firstRemovedArrivalTime(),
+        pageCursorFactoryParams.firstRemovedDepartureTime(),
         pageCursorFactoryParams.firstRemovedGeneralizedCost(),
         pageCursorFactoryParams.firstRemovedNumOfTransfers(),
-        pageCursorFactoryParams.firstRemovedDepartureTime()
+        pageCursorFactoryParams.firstRemovedIsOnStreetAllTheWay()
       );
     return this;
   }

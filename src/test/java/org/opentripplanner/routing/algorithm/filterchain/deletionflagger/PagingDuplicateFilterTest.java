@@ -37,11 +37,11 @@ public class PagingDuplicateFilterTest implements PlanTestConstants {
           oldSearchWindowEndTime,
           SortOrder.STREET_AND_ARRIVAL_TIME,
           PagingDeduplicationSection.HEAD,
-          false,
           middle.endTime().toInstant(),
+          middle.startTime().toInstant(),
           middle.getGeneralizedCost(),
           middle.getNumberOfTransfers(),
-          middle.startTime().toInstant()
+          false
         )
       );
   }
