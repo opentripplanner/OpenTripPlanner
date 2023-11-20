@@ -39,6 +39,11 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add Roadmap setup docs [#5468](https://github.com/opentripplanner/OpenTripPlanner/pull/5468)
 - Interpolate increasing stop times for GTFS-RT cancelled trips [#5348](https://github.com/opentripplanner/OpenTripPlanner/pull/5348)
 - Remove itineraries outside the search window in arriveBy search [#5433](https://github.com/opentripplanner/OpenTripPlanner/pull/5433)
+- Add back walk-reluctance in Transmodel API [#5471](https://github.com/opentripplanner/OpenTripPlanner/pull/5471)
+- Make `feedId` required for realtime updaters [#5502](https://github.com/opentripplanner/OpenTripPlanner/pull/5502)
+- Fix serialization of `AtomicInteger` [#5508](https://github.com/opentripplanner/OpenTripPlanner/pull/5508)
+- Improve linking of fixed stops used by flex trips [#5503](https://github.com/opentripplanner/OpenTripPlanner/pull/5503)
+- Keep min transfer filter is not local to group-by-filters [#5436](https://github.com/opentripplanner/OpenTripPlanner/pull/5436)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)

@@ -50,12 +50,12 @@ class RoutingErrorsAttacher {
         it
           .getSystemNotices()
           .stream()
-          .anyMatch(notice -> notice.tag.equals(RemoveTransitIfStreetOnlyIsBetterFilter.TAG));
+          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfStreetOnlyIsBetterFilter.TAG));
       Predicate<Itinerary> isWorseThanWalking = it ->
         it
           .getSystemNotices()
           .stream()
-          .anyMatch(notice -> notice.tag.equals(RemoveTransitIfWalkingIsBetterFilter.TAG));
+          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfWalkingIsBetterFilter.TAG));
       if (
         filteredItineraries
           .stream()

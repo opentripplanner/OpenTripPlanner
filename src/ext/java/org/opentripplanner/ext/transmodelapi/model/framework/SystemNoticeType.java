@@ -28,7 +28,7 @@ public class SystemNoticeType {
           .newFieldDefinition()
           .name("tag")
           .type(Scalars.GraphQLString)
-          .dataFetcher(env -> ((SystemNotice) env.getSource()).tag)
+          .dataFetcher(env -> ((SystemNotice) env.getSource()).tag())
           .build()
       )
       .field(
@@ -36,7 +36,7 @@ public class SystemNoticeType {
           .newFieldDefinition()
           .name("text")
           .type(Scalars.GraphQLString)
-          .dataFetcher(env -> ((SystemNotice) env.getSource()).text)
+          .dataFetcher(env -> ((SystemNotice) env.getSource()).text())
           .build()
       )
       .build();

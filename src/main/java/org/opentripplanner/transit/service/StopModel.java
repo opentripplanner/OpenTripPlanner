@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.collection.CollectionsView;
@@ -28,10 +29,8 @@ import org.slf4j.LoggerFactory;
 public class StopModel implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopModel.class);
-  private static final int NO_PARENT = -1;
 
-  private final int parentHash;
-  private final int stopIndexSize;
+  private final AtomicInteger stopIndexCounter;
   private final Map<FeedScopedId, RegularStop> regularStopById;
   private final Map<FeedScopedId, Station> stationById;
   private final Map<FeedScopedId, MultiModalStation> multiModalStationById;
@@ -42,8 +41,7 @@ public class StopModel implements Serializable {
 
   @Inject
   public StopModel() {
-    this.parentHash = NO_PARENT;
-    this.stopIndexSize = 0;
+    this.stopIndexCounter = new AtomicInteger(0);
     this.regularStopById = Map.of();
     this.stationById = Map.of();
     this.multiModalStationById = Map.of();
@@ -54,8 +52,7 @@ public class StopModel implements Serializable {
   }
 
   StopModel(StopModelBuilder builder) {
-    this.parentHash = builder.original().hashCode();
-    this.stopIndexSize = builder.stopIndexSize();
+    this.stopIndexCounter = builder.stopIndexCounter();
     this.regularStopById = builder.regularStopsById().asImmutableMap();
     this.stationById = builder.stationById().asImmutableMap();
     this.multiModalStationById = builder.multiModalStationById().asImmutableMap();
@@ -71,14 +68,7 @@ public class StopModel implements Serializable {
    * this feature is normally not allowed, but not enforced here.
    */
   private StopModel(StopModel main, StopModel child) {
-    if (main.hashCode() != child.parentHash) {
-      throw new IllegalArgumentException(
-        "A Stop model can only be merged with its parent, this is done to avoid duplicates/gaps " +
-        "in the stopIndex."
-      );
-    }
-    this.parentHash = NO_PARENT;
-    this.stopIndexSize = child.stopIndexSize();
+    this.stopIndexCounter = assertSameStopIndexCounterIsUsedToCreateBothModels(main, child);
     this.areaStopById = MapUtils.combine(main.areaStopById, child.areaStopById);
     this.regularStopById = MapUtils.combine(main.regularStopById, child.regularStopById);
     this.groupOfStationsById =
@@ -91,14 +81,15 @@ public class StopModel implements Serializable {
   }
 
   /**
-   * Create a new builder based on a empty model. This is useful in unit-tests, but should
-   * NOT be used in the main code.
+   * Create a new builder based on an empty model. This is useful in unit-tests, but should
+   * NOT be used in the main code. It is not possible to merge the result with another
+   * {@link StopModel}, because they do not share the same context(stopIndexCounter).
    * <p>
-   * In the application code the correct way is to retrieve a model instance and the n use the
+   * In the application code the correct way is to retrieve a model instance and then use the
    * {@link #withContext()} method to create a builder.
    */
   public static StopModelBuilder of() {
-    return new StopModelBuilder(new StopModel());
+    return new StopModelBuilder(new AtomicInteger(0));
   }
 
   /**
@@ -113,12 +104,7 @@ public class StopModel implements Serializable {
    * StopModel and the {@link #of()} method should be used if a stop-model in not needed.
    */
   public StopModelBuilder withContext() {
-    return new StopModelBuilder(this);
-  }
-
-  @Deprecated
-  public StopModelBuilder copy() {
-    return withContext().addAll(this);
+    return new StopModelBuilder(this.stopIndexCounter);
   }
 
   /**
@@ -305,7 +291,7 @@ public class StopModel implements Serializable {
       areaStopById.values(),
       groupStopById.values(),
       multiModalStationById.values(),
-      stopIndexSize
+      stopIndexCounter.get()
     );
   }
 
@@ -322,5 +308,23 @@ public class StopModel implements Serializable {
       }
     }
     return null;
+  }
+
+  /**
+   * The 'stopIndexCounter' must be the same instance, hence the '!=' operator.
+   */
+  @SuppressWarnings("NumberEquality")
+  private static AtomicInteger assertSameStopIndexCounterIsUsedToCreateBothModels(
+    StopModel main,
+    StopModel child
+  ) {
+    if (main.stopIndexCounter != child.stopIndexCounter) {
+      throw new IllegalArgumentException(
+        "Two Stop models can only be merged if they are created with the same stopIndexCounter. " +
+        "This is archived by using the 'StopModel.withContext()' method. We do this to avoid " +
+        "duplicates/gaps in the stopIndex."
+      );
+    }
+    return main.stopIndexCounter;
   }
 }

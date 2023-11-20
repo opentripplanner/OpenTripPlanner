@@ -119,7 +119,6 @@ public class OrcaFareService extends DefaultFareService {
           }
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         } catch (NumberFormatException e) {
-          LOG.warn("Unable to determine comm trans route id from {}.", route.getShortName(), e);
           yield RideType.COMM_TRANS_LOCAL_SWIFT;
         }
       }
@@ -149,7 +148,6 @@ public class OrcaFareService extends DefaultFareService {
           }
           yield RideType.PIERCE_COUNTY_TRANSIT;
         } catch (NumberFormatException e) {
-          LOG.warn("Unable to determine comm trans route id from {}.", route.getShortName(), e);
           yield RideType.PIERCE_COUNTY_TRANSIT;
         }
       }

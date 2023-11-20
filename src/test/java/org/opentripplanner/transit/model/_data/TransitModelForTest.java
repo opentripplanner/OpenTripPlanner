@@ -1,9 +1,12 @@
 package org.opentripplanner.transit.model._data;
 
+import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
@@ -241,5 +244,24 @@ public class TransitModelForTest {
   public TripPatternBuilder pattern(TransitMode mode) {
     return tripPattern(mode.name(), route(mode.name()).withMode(mode).build())
       .withStopPattern(stopPattern(3));
+  }
+
+  public UnscheduledTrip unscheduledTrip(FeedScopedId id, StopLocation... stops) {
+    var stopTimes = Arrays
+      .stream(stops)
+      .map(s -> {
+        var st = new StopTime();
+        st.setStop(s);
+        st.setFlexWindowStart(LocalTime.of(10, 0).toSecondOfDay());
+        st.setFlexWindowEnd(LocalTime.of(18, 0).toSecondOfDay());
+
+        return st;
+      })
+      .toList();
+    return UnscheduledTrip
+      .of(id)
+      .withTrip(trip("flex-trip").build())
+      .withStopTimes(stopTimes)
+      .build();
   }
 }
