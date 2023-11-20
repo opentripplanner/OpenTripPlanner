@@ -16,6 +16,7 @@ import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
@@ -24,6 +25,7 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItin
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.PagingDuplicateFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
@@ -54,8 +56,6 @@ import org.opentripplanner.transit.model.site.Station;
 public class ItineraryListFilterChainBuilder {
 
   private static final int NOT_SET = -1;
-  public static final String MAX_NUMBER_OF_ITINERARIES_TAG = "number-of-itineraries-filter";
-
   private final SortOrder sortOrder;
   private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
 
@@ -80,6 +80,7 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
+  private ItineraryPageCut itineraryPageCut;
 
   @Sandbox
   private ItineraryListFilter emissionsFilter;
@@ -265,6 +266,19 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
+   * If the search is done with a page cursor that contains encoded deduplication parameters, then
+   * this function adds the filter that removes duplicates.
+   *
+   * @param itineraryPageCut contains the parameters to use for deduplication.
+   */
+  public ItineraryListFilterChainBuilder withPagingDeduplicationFilter(
+    ItineraryPageCut itineraryPageCut
+  ) {
+    this.itineraryPageCut = itineraryPageCut;
+    return this;
+  }
+
+  /**
    * If set, walk-all-the-way itineraries are removed. This happens AFTER e.g. the group-by and
    * remove-transit-with-higher-cost-than-best-on-street-only filter. This make sure that poor
    * transit itineraries are filtered away before the walk-all-the-way itinerary is removed.
@@ -322,6 +336,10 @@ public class ItineraryListFilterChainBuilder {
   @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
+
+    if (itineraryPageCut != null) {
+      filters.add(new DeletionFlaggingFilter(new PagingDuplicateFilter(itineraryPageCut)));
+    }
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 

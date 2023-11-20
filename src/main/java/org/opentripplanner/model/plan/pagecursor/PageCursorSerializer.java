@@ -41,6 +41,17 @@ final class PageCursorSerializer {
       writeTime(cursor.latestArrivalTime, out);
       writeDuration(cursor.searchWindow, out);
       writeEnum(cursor.originalSortOrder, out);
+
+      if (cursor.containsItineraryPageCut()) {
+        writeTime(cursor.itineraryPageCut.windowStart(), out);
+        writeTime(cursor.itineraryPageCut.windowEnd(), out);
+        writeEnum(cursor.itineraryPageCut.deduplicationSection(), out);
+        writeBoolean(cursor.itineraryPageCut.isOnStreetAllTheWayThreshold(), out);
+        writeTime(cursor.itineraryPageCut.arrivalTimeThreshold(), out);
+        writeInt(cursor.itineraryPageCut.generalizedCostThreshold(), out);
+        writeInt(cursor.itineraryPageCut.numOfTransfersThreshold(), out);
+        writeTime(cursor.itineraryPageCut.departureTimeThreshold(), out);
+      }
       out.flush();
       return Base64.getUrlEncoder().encodeToString(buf.toByteArray());
     } catch (IOException e) {
@@ -70,6 +81,31 @@ final class PageCursorSerializer {
       var searchWindow = readDuration(in);
       var originalSortOrder = readEnum(in, SortOrder.class);
 
+      if (in.available() > 0) {
+        var dedupeWindowStart = readTime(in);
+        var dedupeWindowEnd = readTime(in);
+        var cropSection = readEnum(in, PagingDeduplicationSection.class);
+        var isOnStreetAllTheWayThreshold = readBoolean(in);
+        var arrivalTimeDeletionThreshold = readTime(in);
+        var generalizedCostDeletionThreshold = readInt(in);
+        var numOfTransfersDeletionThreshold = readInt(in);
+        var departureTimeDeletionThreshold = readTime(in);
+
+        ItineraryPageCut itineraryPageCut = new ItineraryPageCut(
+          dedupeWindowStart,
+          dedupeWindowEnd,
+          originalSortOrder,
+          cropSection,
+          arrivalTimeDeletionThreshold,
+          departureTimeDeletionThreshold,
+          generalizedCostDeletionThreshold,
+          numOfTransfersDeletionThreshold,
+          isOnStreetAllTheWayThreshold
+        );
+        return new PageCursor(type, originalSortOrder, edt, lat, searchWindow)
+          .withItineraryPageCut(itineraryPageCut);
+      }
+
       return new PageCursor(type, originalSortOrder, edt, lat, searchWindow);
     } catch (Exception e) {
       String details = e.getMessage();
@@ -88,6 +124,22 @@ final class PageCursorSerializer {
 
   private static byte readByte(ObjectInputStream in) throws IOException {
     return in.readByte();
+  }
+
+  private static void writeInt(int value, ObjectOutputStream out) throws IOException {
+    out.writeInt(value);
+  }
+
+  private static int readInt(ObjectInputStream in) throws IOException {
+    return in.readInt();
+  }
+
+  private static void writeBoolean(boolean value, ObjectOutputStream out) throws IOException {
+    out.writeBoolean(value);
+  }
+
+  private static boolean readBoolean(ObjectInputStream in) throws IOException {
+    return in.readBoolean();
   }
 
   private static void writeTime(Instant time, ObjectOutputStream out) throws IOException {

@@ -24,6 +24,8 @@ public class PageCursor {
   public final Instant latestArrivalTime;
   public final Duration searchWindow;
 
+  public ItineraryPageCut itineraryPageCut;
+
   PageCursor(
     PageType type,
     SortOrder originalSortOrder,
@@ -36,6 +38,15 @@ public class PageCursor {
     this.earliestDepartureTime = earliestDepartureTime;
     this.latestArrivalTime = latestArrivalTime;
     this.originalSortOrder = originalSortOrder;
+  }
+
+  public PageCursor withItineraryPageCut(ItineraryPageCut itineraryPageCut) {
+    this.itineraryPageCut = itineraryPageCut;
+    return this;
+  }
+
+  public boolean containsItineraryPageCut() {
+    return itineraryPageCut != null;
   }
 
   @Nullable
@@ -52,6 +63,7 @@ public class PageCursor {
       .addDateTime("edt", earliestDepartureTime)
       .addDateTime("lat", latestArrivalTime)
       .addDuration("searchWindow", searchWindow)
+      .addObj("itineraryPageCut", itineraryPageCut)
       .toString();
   }
 

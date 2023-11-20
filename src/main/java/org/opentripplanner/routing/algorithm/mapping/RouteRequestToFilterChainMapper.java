@@ -40,6 +40,11 @@ public class RouteRequestToFilterChainMapper {
       return builder.build();
     }
 
+    // The page cursor has deduplication information only in certain cases.
+    if (request.pageCursor() != null && request.pageCursor().containsItineraryPageCut()) {
+      builder = builder.withPagingDeduplicationFilter(request.pageCursor().itineraryPageCut);
+    }
+
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
     // Group by similar legs filter
     if (params.groupSimilarityKeepOne() >= 0.5) {
