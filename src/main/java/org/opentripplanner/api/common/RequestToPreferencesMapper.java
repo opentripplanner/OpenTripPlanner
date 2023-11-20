@@ -6,6 +6,7 @@ import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
+import org.opentripplanner.routing.api.request.preference.ParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
@@ -44,6 +45,7 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.carReluctance, car::withReluctance);
       setIfNotNull(req.carParkCost, car::withParkCost);
       setIfNotNull(req.carParkTime, car::withParkTime);
+      car.withParking(parking -> mapParking(parking));
     });
   }
 
@@ -76,6 +78,8 @@ class RequestToPreferencesMapper {
           setIfNotNull(req.triangleSafetyFactor, triangle::withSafety);
         });
       }
+
+      bike.withParking(parking -> mapParking(parking));
     });
   }
 
@@ -157,6 +161,16 @@ class RequestToPreferencesMapper {
     );
 
     return new TransitGeneralizedCostFilterParams(costLimitFunction, intervalRelaxFactor);
+  }
+
+  private void mapParking(ParkingPreferences.Builder builder) {
+    setIfNotNull(
+      req.useVehicleParkingAvailabilityInformation,
+      builder::withUseAvailabilityInformation
+    );
+
+    builder.withRequiredVehicleParkingTags(req.requiredVehicleParkingTags);
+    builder.withBannedVehicleParkingTags(req.bannedVehicleParkingTags);
   }
 
   private void mapSystem() {

@@ -27,8 +27,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
@@ -748,20 +746,6 @@ public abstract class RoutingResource {
         );
         setIfNotNull(allowedVehicleRentalNetworks, rental::setAllowedNetworks);
         setIfNotNull(bannedVehicleRentalNetworks, rental::setBannedNetworks);
-      }
-      {
-        var parking = journey.parking();
-        setIfNotNull(
-          useVehicleParkingAvailabilityInformation,
-          parking::setUseAvailabilityInformation
-        );
-
-        parking.setFilter(
-          new VehicleParkingFilterRequest(
-            new TagsFilter(bannedVehicleParkingTags),
-            new TagsFilter(requiredVehicleParkingTags)
-          )
-        );
       }
 
       setIfNotNull(arriveBy, request::setArriveBy);

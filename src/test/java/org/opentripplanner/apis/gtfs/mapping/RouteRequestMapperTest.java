@@ -25,7 +25,6 @@ import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
-import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
@@ -55,45 +54,6 @@ class RouteRequestMapperTest implements PlanTestConstants {
         GraphFinder.getInstance(graph, transitService::findRegularStop),
         new RouteRequest()
       );
-  }
-
-  @Test
-  void parkingFilters() {
-    Map<String, Object> arguments = Map.of(
-      "parking",
-      Map.of(
-        "unpreferredCost",
-        555,
-        "filters",
-        List.of(
-          Map.of(
-            "not",
-            List.of(Map.of("tags", List.of("wheelbender"))),
-            "select",
-            List.of(Map.of("tags", List.of("roof", "locker")))
-          )
-        ),
-        "preferred",
-        List.of(Map.of("select", List.of(Map.of("tags", List.of("a", "b")))))
-      )
-    );
-
-    var env = executionContext(arguments);
-
-    var routeRequest = RouteRequestMapper.toRouteRequest(env, context);
-
-    assertNotNull(routeRequest);
-
-    final VehicleParkingRequest parking = routeRequest.journey().parking();
-    assertEquals(
-      "VehicleParkingFilterRequest{not: [tags=[wheelbender]], select: [tags=[locker, roof]]}",
-      parking.filter().toString()
-    );
-    assertEquals(
-      "VehicleParkingFilterRequest{select: [tags=[a, b]]}",
-      parking.preferred().toString()
-    );
-    assertEquals(555, parking.unpreferredCost());
   }
 
   static Stream<Arguments> banningCases = Stream.of(

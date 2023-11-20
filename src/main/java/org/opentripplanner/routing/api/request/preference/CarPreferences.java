@@ -23,6 +23,7 @@ public final class CarPreferences implements Serializable {
   private final double reluctance;
   private final int parkTime;
   private final Cost parkCost;
+  private final ParkingPreferences parkingPreferences;
   private final int pickupTime;
   private final Cost pickupCost;
   private final int dropoffTime;
@@ -35,6 +36,7 @@ public final class CarPreferences implements Serializable {
     this.reluctance = 2.0;
     this.parkTime = 60;
     this.parkCost = Cost.costOfMinutes(2);
+    this.parkingPreferences = ParkingPreferences.DEFAULT;
     this.pickupTime = 60;
     this.pickupCost = Cost.costOfMinutes(2);
     this.dropoffTime = 120;
@@ -47,6 +49,7 @@ public final class CarPreferences implements Serializable {
     this.reluctance = Units.reluctance(builder.reluctance);
     this.parkTime = Units.duration(builder.parkTime);
     this.parkCost = builder.parkCost;
+    this.parkingPreferences = builder.parkingPreferences;
     this.pickupTime = Units.duration(builder.pickupTime);
     this.pickupCost = builder.pickupCost;
     this.dropoffTime = Units.duration(builder.dropoffTime);
@@ -83,6 +86,11 @@ public final class CarPreferences implements Serializable {
   /** Cost of parking a car. */
   public int parkCost() {
     return parkCost.toSeconds();
+  }
+
+  /** Parking preferences that can be different per request */
+  public ParkingPreferences parkingPreferences() {
+    return parkingPreferences;
   }
 
   /** Time of getting in/out of a carPickup (taxi) */
@@ -129,6 +137,7 @@ public final class CarPreferences implements Serializable {
       DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
       parkTime == that.parkTime &&
       parkCost.equals(that.parkCost) &&
+      parkingPreferences.equals(that.parkingPreferences) &&
       pickupTime == that.pickupTime &&
       pickupCost.equals(that.pickupCost) &&
       dropoffTime == that.dropoffTime &&
@@ -144,6 +153,7 @@ public final class CarPreferences implements Serializable {
       reluctance,
       parkTime,
       parkCost,
+      parkingPreferences,
       pickupTime,
       pickupCost,
       dropoffTime,
@@ -160,6 +170,7 @@ public final class CarPreferences implements Serializable {
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
       .addNum("parkTime", parkTime, DEFAULT.parkTime)
       .addObj("parkCost", parkCost, DEFAULT.parkCost)
+      .addObj("parkingPreferences", parkingPreferences, DEFAULT.parkingPreferences)
       .addNum("pickupTime", pickupTime, DEFAULT.pickupTime)
       .addObj("pickupCost", pickupCost, DEFAULT.pickupCost)
       .addNum("dropoffTime", dropoffTime, DEFAULT.dropoffTime)
@@ -176,6 +187,7 @@ public final class CarPreferences implements Serializable {
     private double reluctance;
     private int parkTime;
     private Cost parkCost;
+    private ParkingPreferences parkingPreferences;
     private int pickupTime;
     private Cost pickupCost;
     private int dropoffTime;
@@ -188,6 +200,7 @@ public final class CarPreferences implements Serializable {
       this.reluctance = original.reluctance;
       this.parkTime = original.parkTime;
       this.parkCost = original.parkCost;
+      this.parkingPreferences = original.parkingPreferences;
       this.pickupTime = original.pickupTime;
       this.pickupCost = original.pickupCost;
       this.dropoffTime = original.dropoffTime;
@@ -216,6 +229,13 @@ public final class CarPreferences implements Serializable {
 
     public Builder withParkCost(int parkCost) {
       this.parkCost = Cost.costOfSeconds(parkCost);
+      return this;
+    }
+
+    public Builder withParking(Consumer<ParkingPreferences.Builder> body) {
+      var builder = ParkingPreferences.of();
+      body.accept(builder);
+      this.parkingPreferences = builder.build();
       return this;
     }
 

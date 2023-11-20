@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -156,9 +155,19 @@ class VehicleParkingEdgeTest {
 
     vehicleParkingEdge = VehicleParkingEdge.createVehicleParkingEdge(vertex);
 
-    var parking = new VehicleParkingRequest();
-    parking.setUseAvailabilityInformation(realtime);
-    this.request = StreetSearchRequest.of().withMode(parkingMode).withParking(parking).build();
+    this.request =
+      StreetSearchRequest
+        .of()
+        .withMode(parkingMode)
+        .withPreferences(preferences -> {
+          preferences.withBike(bike ->
+            bike.withParking(parking -> parking.withUseAvailabilityInformation(realtime))
+          );
+          preferences.withCar(car ->
+            car.withParking(parking -> parking.withUseAvailabilityInformation(realtime))
+          );
+        })
+        .build();
   }
 
   private VehicleParking createVehicleParking(

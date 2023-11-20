@@ -135,8 +135,12 @@ public class Place {
       traverseMode = TraverseMode.BICYCLE;
     }
 
+    var parkingPreferences = traverseMode == TraverseMode.CAR
+      ? request.preferences().car().parkingPreferences()
+      : request.preferences().bike().parkingPreferences();
+
     boolean realTime =
-      request.parking().useAvailabilityInformation() &&
+      parkingPreferences.useAvailabilityInformation() &&
       vertex.getVehicleParking().hasRealTimeDataForMode(traverseMode, request.wheelchair());
     return new Place(
       vertex.getName(),

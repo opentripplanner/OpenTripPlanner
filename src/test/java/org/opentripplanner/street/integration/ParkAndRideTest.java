@@ -11,8 +11,6 @@ import org.opentripplanner.routing.algorithm.GraphRoutingTest;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.request.StreetRequest;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -140,19 +138,26 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     var request = new RouteRequest();
     request.withPreferences(preferences ->
       preferences
-        .withBike(b -> b.withParkCost(120).withParkTime(60))
-        .withCar(c -> c.withParkCost(240).withParkTime(180))
+        .withBike(b ->
+          b
+            .withParkCost(120)
+            .withParkTime(60)
+            .withParking(parking -> {
+              parking.withRequiredVehicleParkingTags(requiredTags);
+              parking.withBannedVehicleParkingTags(bannedTags);
+            })
+        )
+        .withCar(c ->
+          c
+            .withParkCost(240)
+            .withParkTime(180)
+            .withParking(parking -> {
+              parking.withRequiredVehicleParkingTags(requiredTags);
+              parking.withBannedVehicleParkingTags(bannedTags);
+            })
+        )
     );
     request.setWheelchair(requireWheelChairAccessible);
-    request
-      .journey()
-      .parking()
-      .setFilter(
-        new VehicleParkingFilterRequest(
-          List.of(new TagsFilter(bannedTags)),
-          List.of(new TagsFilter(requiredTags))
-        )
-      );
     request.setArriveBy(arriveBy);
 
     var tree = StreetSearchBuilder

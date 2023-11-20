@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request.request.filter;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -11,7 +12,7 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
  * A request object that checks if parking faclities match certain conditions for
  * inclusion/exclusion or preference/unpreference.
  */
-public class VehicleParkingFilterRequest {
+public class VehicleParkingFilterRequest implements Serializable {
 
   private final VehicleParkingFilter[] not;
   private final VehicleParkingFilter[] select;
@@ -26,6 +27,14 @@ public class VehicleParkingFilterRequest {
 
   public VehicleParkingFilterRequest(VehicleParkingFilter not, VehicleParkingFilter select) {
     this(List.of(not), List.of(select));
+  }
+
+  public List<VehicleParkingFilter> not() {
+    return Arrays.asList(not);
+  }
+
+  public List<VehicleParkingFilter> select() {
+    return Arrays.asList(select);
   }
 
   /**
@@ -63,6 +72,19 @@ public class VehicleParkingFilterRequest {
       .addCol("not", Arrays.asList(not))
       .addCol("select", Arrays.asList(select))
       .toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    VehicleParkingFilterRequest that = (VehicleParkingFilterRequest) o;
+    return (Arrays.equals(not, that.not) && Arrays.equals(select, that.select));
+  }
+
+  @Override
+  public int hashCode() {
+    return Arrays.hashCode(not) + Arrays.hashCode(select);
   }
 
   @Nonnull
