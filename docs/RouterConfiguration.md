@@ -473,7 +473,7 @@ Used to group requests when monitoring OTP.
       "dropOffTime" : 30,
       "dropOffCost" : 30
     },
-    "bikeParkTime" : 60,
+    "bikeParkTime" : "1m",
     "bikeParkCost" : 120,
     "carDropoffTime" : 120,
     "waitReluctance" : 1.0,

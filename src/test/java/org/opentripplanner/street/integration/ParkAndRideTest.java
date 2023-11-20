@@ -139,22 +139,20 @@ public abstract class ParkAndRideTest extends GraphRoutingTest {
     request.withPreferences(preferences ->
       preferences
         .withBike(b ->
-          b
-            .withParkCost(120)
-            .withParkTime(60)
-            .withParking(parking -> {
-              parking.withRequiredVehicleParkingTags(requiredTags);
-              parking.withBannedVehicleParkingTags(bannedTags);
-            })
+          b.withParking(parking -> {
+            parking.withRequiredVehicleParkingTags(requiredTags);
+            parking.withBannedVehicleParkingTags(bannedTags);
+            parking.withParkCost(120);
+            parking.withParkTime(60);
+          })
         )
         .withCar(c ->
-          c
-            .withParkCost(240)
-            .withParkTime(180)
-            .withParking(parking -> {
-              parking.withRequiredVehicleParkingTags(requiredTags);
-              parking.withBannedVehicleParkingTags(bannedTags);
-            })
+          c.withParking(parking -> {
+            parking.withRequiredVehicleParkingTags(requiredTags);
+            parking.withBannedVehicleParkingTags(bannedTags);
+            parking.withParkCost(240);
+            parking.withParkTime(180);
+          })
         )
     );
     request.setWheelchair(requireWheelChairAccessible);

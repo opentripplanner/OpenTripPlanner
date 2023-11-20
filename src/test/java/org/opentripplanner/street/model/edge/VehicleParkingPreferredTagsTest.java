@@ -85,10 +85,10 @@ class VehicleParkingPreferredTagsTest {
     req.withArriveBy(arriveBy);
     req.withPreferences(p ->
       p.withBike(bike -> {
-        bike.withParkCost(0);
         bike.withParking(parkingPreferences -> {
           parkingPreferences.withUnpreferredVehicleParkingTagCost(EXTRA_COST);
           parkingPreferences.withPreferredVehicleParkingTags(preferredTags);
+          parkingPreferences.withParkCost(0);
         });
       })
     );

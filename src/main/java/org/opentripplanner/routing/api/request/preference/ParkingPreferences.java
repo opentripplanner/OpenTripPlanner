@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -22,13 +23,17 @@ public final class ParkingPreferences implements Serializable {
   private final boolean useAvailabilityInformation;
   private final VehicleParkingFilterRequest filter;
   private final VehicleParkingFilterRequest preferred;
+  private final Duration parkTime;
+  private final Cost parkCost;
 
   /** Create a new instance with default values. */
   private ParkingPreferences() {
-    this.unpreferredVehicleParkingTagCost = Cost.costOfSeconds(5 * 60);
+    this.unpreferredVehicleParkingTagCost = Cost.costOfMinutes(5);
     this.useAvailabilityInformation = true;
     this.filter = VehicleParkingFilterRequest.empty();
     this.preferred = VehicleParkingFilterRequest.empty();
+    this.parkTime = Duration.ofMinutes(1);
+    this.parkCost = Cost.costOfMinutes(2);
   }
 
   private ParkingPreferences(Builder builder) {
@@ -44,6 +49,8 @@ public final class ParkingPreferences implements Serializable {
         builder.notPreferredVehicleParkingTags,
         builder.preferredVehicleParkingTags
       );
+    this.parkTime = builder.parkTime;
+    this.parkCost = builder.parkCost;
   }
 
   public static ParkingPreferences.Builder of() {
@@ -82,6 +89,16 @@ public final class ParkingPreferences implements Serializable {
     return preferred;
   }
 
+  /** Time to park a vehicle */
+  public Duration parkTime() {
+    return parkTime;
+  }
+
+  /** Cost of parking a bike. */
+  public Cost parkCost() {
+    return parkCost;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -91,7 +108,9 @@ public final class ParkingPreferences implements Serializable {
       Objects.equals(unpreferredVehicleParkingTagCost, that.unpreferredVehicleParkingTagCost) &&
       useAvailabilityInformation == that.useAvailabilityInformation &&
       Objects.equals(filter, that.filter) &&
-      Objects.equals(preferred, that.preferred)
+      Objects.equals(preferred, that.preferred) &&
+      Objects.equals(parkCost, that.parkCost) &&
+      Objects.equals(parkTime, that.parkTime)
     );
   }
 
@@ -101,7 +120,9 @@ public final class ParkingPreferences implements Serializable {
       unpreferredVehicleParkingTagCost,
       useAvailabilityInformation,
       filter,
-      preferred
+      preferred,
+      parkCost,
+      parkTime
     );
   }
 
@@ -121,6 +142,8 @@ public final class ParkingPreferences implements Serializable {
       )
       .addObj("filter", filter, DEFAULT.filter)
       .addObj("preferred", preferred, DEFAULT.preferred)
+      .addObj("parkCost", parkCost, DEFAULT.parkCost)
+      .addObj("parkTime", parkTime, DEFAULT.parkTime)
       .toString();
   }
 
@@ -133,6 +156,8 @@ public final class ParkingPreferences implements Serializable {
     private List<VehicleParkingFilter> requiredVehicleParkingTags;
     private List<VehicleParkingFilter> preferredVehicleParkingTags;
     private List<VehicleParkingFilter> notPreferredVehicleParkingTags;
+    private Cost parkCost;
+    private Duration parkTime;
 
     private Builder(ParkingPreferences original) {
       this.original = original;
@@ -142,6 +167,8 @@ public final class ParkingPreferences implements Serializable {
       this.requiredVehicleParkingTags = original.filter.select();
       this.preferredVehicleParkingTags = original.preferred.select();
       this.notPreferredVehicleParkingTags = original.preferred.not();
+      this.parkCost = original.parkCost;
+      this.parkTime = original.parkTime;
     }
 
     public Builder withUnpreferredVehicleParkingTagCost(int cost) {
@@ -175,6 +202,21 @@ public final class ParkingPreferences implements Serializable {
     public Builder withNotPreferredVehicleParkingTags(Set<String> notPreferredVehicleParkingTags) {
       this.notPreferredVehicleParkingTags =
         List.of(new VehicleParkingFilter.TagsFilter(notPreferredVehicleParkingTags));
+      return this;
+    }
+
+    public Builder withParkCost(int cost) {
+      this.parkCost = Cost.costOfSeconds(cost);
+      return this;
+    }
+
+    public Builder withParkTime(int seconds) {
+      this.parkTime = Duration.ofSeconds(seconds);
+      return this;
+    }
+
+    public Builder withParkTime(Duration duration) {
+      this.parkTime = duration;
       return this;
     }
 

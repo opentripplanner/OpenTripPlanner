@@ -92,10 +92,20 @@ public class VehicleParkingEdge extends Edge {
 
     if (streetMode.includesBiking()) {
       final BikePreferences bike = s0.getPreferences().bike();
-      return traverseUnPark(s0, bike.parkCost(), bike.parkTime(), TraverseMode.BICYCLE);
+      return traverseUnPark(
+        s0,
+        bike.parkingPreferences().parkCost().toSeconds(),
+        (int) bike.parkingPreferences().parkTime().toSeconds(),
+        TraverseMode.BICYCLE
+      );
     } else if (streetMode.includesDriving()) {
       final CarPreferences car = s0.getPreferences().car();
-      return traverseUnPark(s0, car.parkCost(), car.parkTime(), TraverseMode.CAR);
+      return traverseUnPark(
+        s0,
+        car.parkingPreferences().parkCost().toSeconds(),
+        (int) car.parkingPreferences().parkTime().toSeconds(),
+        TraverseMode.CAR
+      );
     } else {
       return State.empty();
     }
@@ -138,9 +148,17 @@ public class VehicleParkingEdge extends Edge {
         return State.empty();
       }
 
-      return traversePark(s0, preferences.bike().parkCost(), preferences.bike().parkTime());
+      return traversePark(
+        s0,
+        preferences.bike().parkingPreferences().parkCost().toSeconds(),
+        (int) preferences.bike().parkingPreferences().parkTime().toSeconds()
+      );
     } else if (streetMode.includesDriving()) {
-      return traversePark(s0, preferences.car().parkCost(), preferences.car().parkTime());
+      return traversePark(
+        s0,
+        preferences.car().parkingPreferences().parkCost().toSeconds(),
+        (int) preferences.car().parkingPreferences().parkTime().toSeconds()
+      );
     } else {
       return State.empty();
     }

@@ -4,17 +4,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
+import java.time.Duration;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
 
 class ParkingPreferencesTest {
 
   private static final Set<String> PREFERRED_TAGS = Set.of("foo");
   private static final Set<String> NOT_PREFERRED_TAGS = Set.of("bar");
-  private static final int UNPREFERRED_COST = 300;
+  private static final int UNPREFERRED_COST = 360;
   private static final boolean REALTIME = false;
   private static final Set<String> REQUIRED_TAGS = Set.of("bar");
   private static final Set<String> BANNED_TAGS = Set.of("not");
+  private static final Cost PARKING_COST = Cost.costOfMinutes(4);
+  private static final Duration PARKING_TIME = Duration.ofMinutes(2);
 
   private final ParkingPreferences subject = createPreferences();
 
@@ -41,6 +45,16 @@ class ParkingPreferencesTest {
   }
 
   @Test
+  void parkCost() {
+    assertEquals(PARKING_COST, subject.parkCost());
+  }
+
+  @Test
+  void parkTime() {
+    assertEquals(PARKING_TIME, subject.parkTime());
+  }
+
+  @Test
   void testCopyOfEqualsAndHashCode() {
     // Return same object if no value is set
     assertSame(ParkingPreferences.DEFAULT, ParkingPreferences.of().build());
@@ -54,6 +68,8 @@ class ParkingPreferencesTest {
       .withUseAvailabilityInformation(true)
       .withRequiredVehicleParkingTags(Set.of())
       .withBannedVehicleParkingTags(Set.of())
+      .withParkCost(0)
+      .withParkTime(0)
       .build();
     var same = createPreferences();
     assertEqualsAndHashCode(subject, other, same);
@@ -64,9 +80,12 @@ class ParkingPreferencesTest {
     assertEquals("ParkingPreferences{}", ParkingPreferences.DEFAULT.toString());
     assertEquals(
       "ParkingPreferences{" +
+      "unpreferredVehicleParkingTagCost: $360, " +
       "useAvailabilityInformation: false, " +
       "filter: VehicleParkingFilterRequest{not: [tags=[not]], select: [tags=[bar]]}, " +
-      "preferred: VehicleParkingFilterRequest{not: [tags=[bar]], select: [tags=[foo]]}}",
+      "preferred: VehicleParkingFilterRequest{not: [tags=[bar]], select: [tags=[foo]]}, " +
+      "parkCost: $240, " +
+      "parkTime: PT2M}",
       subject.toString()
     );
   }
@@ -84,6 +103,8 @@ class ParkingPreferencesTest {
       .withUseAvailabilityInformation(REALTIME)
       .withRequiredVehicleParkingTags(REQUIRED_TAGS)
       .withBannedVehicleParkingTags(BANNED_TAGS)
+      .withParkCost(PARKING_COST.toSeconds())
+      .withParkTime(PARKING_TIME)
       .build();
   }
 }

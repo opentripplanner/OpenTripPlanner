@@ -344,12 +344,6 @@ ferries, where the check-in process needs to be done in good time before ride.
           )
           .asInt(dft.boardCost())
       )
-      .withParkTime(
-        c.of("bikeParkTime").since(V2_0).summary("Time to park a bike.").asInt(dft.parkTime())
-      )
-      .withParkCost(
-        c.of("bikeParkCost").since(V2_0).summary("Cost to park a bike.").asInt(dft.parkCost())
-      )
       .withWalkingSpeed(
         c
           .of("bikeWalkingSpeed")
@@ -449,6 +443,20 @@ ferries, where the check-in process needs to be done in good time before ride.
                 "Tags without which a vehicle parking will not be used. If empty, no tags are required."
               )
               .asStringSet(List.of())
+          )
+          .withParkTime(
+            c
+              .of("bikeParkTime")
+              .since(V2_0)
+              .summary("Time to park a bike.")
+              .asDuration(ParkingPreferences.DEFAULT.parkTime())
+          )
+          .withParkCost(
+            c
+              .of("bikeParkCost")
+              .since(V2_0)
+              .summary("Cost to park a bike.")
+              .asInt(ParkingPreferences.DEFAULT.parkCost().toSeconds())
           )
           .withPreferredVehicleParkingTags(
             c
@@ -676,12 +684,6 @@ your users receive a timely response. You can also limit the max duration. There
           )
           .asInt(dft.dropoffTime())
       )
-      .withParkCost(
-        c.of("carParkCost").since(V2_1).summary("Cost of parking a car.").asInt(dft.parkCost())
-      )
-      .withParkTime(
-        c.of("carParkTime").since(V2_1).summary("Time to park a car").asInt(dft.parkTime())
-      )
       .withPickupCost(
         c
           .of("carPickupCost")
@@ -737,6 +739,20 @@ your users receive a timely response. You can also limit the max duration. There
                 "Tags without which a vehicle parking will not be used. If empty, no tags are required."
               )
               .asStringSet(List.of())
+          )
+          .withParkCost(
+            c
+              .of("carParkCost")
+              .since(V2_1)
+              .summary("Cost of parking a car.")
+              .asInt(ParkingPreferences.DEFAULT.parkCost().toSeconds())
+          )
+          .withParkTime(
+            c
+              .of("carParkTime")
+              .since(V2_1)
+              .summary("Time to park a car")
+              .asDuration(ParkingPreferences.DEFAULT.parkTime())
           )
           .withPreferredVehicleParkingTags(
             c

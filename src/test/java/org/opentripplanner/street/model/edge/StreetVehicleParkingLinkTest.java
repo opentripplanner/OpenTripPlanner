@@ -61,10 +61,10 @@ class StreetVehicleParkingLinkTest {
     req.withMode(StreetMode.BIKE_TO_PARK);
     req.withPreferences(p ->
       p.withBike(bike -> {
-        bike.withParkCost(0);
         bike.withParking(parkingPreferences -> {
           parkingPreferences.withRequiredVehicleParkingTags(select);
           parkingPreferences.withBannedVehicleParkingTags(not);
+          parkingPreferences.withParkCost(0);
         });
       })
     );
