@@ -285,9 +285,9 @@ public class SearchParams {
       .of(SearchParams.class)
       .addServiceTime("earliestDepartureTime", earliestDepartureTime, RaptorConstants.TIME_NOT_SET)
       .addServiceTime("latestArrivalTime", latestArrivalTime, RaptorConstants.TIME_NOT_SET)
-      .addDurationSec("searchWindow", searchWindowInSeconds)
+      .addDurationSec("searchWindow", searchWindowInSeconds, RaptorConstants.NOT_SET)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
-      .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers)
+      .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers, RaptorConstants.NOT_SET)
       .addCollection("accessPaths", accessPaths, 5)
       .addCollection("egressPaths", egressPaths, 5)
       .toString();
