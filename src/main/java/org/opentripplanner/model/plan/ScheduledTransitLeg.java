@@ -389,6 +389,9 @@ public class ScheduledTransitLeg implements TransitLeg {
 
   /**
    * Should be used for debug logging only
+   * <p>
+   * The {@code legGeometry} and {@code transitAlerts} are skipped to avoid
+   * spamming logs. Explicit access should be used if needed.
    */
   @Override
   public String toString() {
@@ -407,8 +410,7 @@ public class ScheduledTransitLeg implements TransitLeg {
       .addObjOp("tripId", getTrip(), AbstractTransitEntity::getId)
       .addObj("headsign", getHeadsign())
       .addObj("serviceDate", serviceDate)
-      .addObj("legGeometry", legGeometry)
-      .addCol("transitAlerts", transitAlerts)
+      .addColSize("transitAlerts", transitAlerts)
       .addEnum("boardRule", getBoardRule())
       .addEnum("alightRule", getAlightRule())
       .addObj("transferFromPrevLeg", transferFromPrevLeg)
