@@ -1,6 +1,8 @@
 package org.opentripplanner.smoketest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.client.model.RequestMode.BUS;
 import static org.opentripplanner.client.model.RequestMode.FLEX_ACCESS;
 import static org.opentripplanner.client.model.RequestMode.FLEX_DIRECT;
@@ -13,11 +15,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.client.model.Coordinate;
 import org.opentripplanner.client.model.LegMode;
 import org.opentripplanner.client.model.Route;
+import org.opentripplanner.client.model.TripPlan;
+import org.opentripplanner.client.parameters.TripPlanParametersBuilder;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 @Tag("smoke-test")
@@ -42,6 +47,40 @@ public class SeattleSmokeTest {
     );
 
     SmokeTest.assertThatAllTransitLegsHaveFareProducts(plan);
+  }
+
+  @Test
+  public void accessibleRouting() throws IOException {
+    var tripPlan = testAccessibleRouting(1.6f);
+    assertFalse(tripPlan.transitItineraries().isEmpty());
+  }
+
+  @Test
+  @Disabled
+  public void accessibleRoutingWithVeryHighWalkReluctance() throws IOException {
+    testAccessibleRouting(50);
+  }
+
+  private TripPlan testAccessibleRouting(float walkReluctance) throws IOException {
+    var req = new TripPlanParametersBuilder()
+      .withFrom(sodo)
+      .withTo(clydeHill)
+      .withTime(SmokeTest.weekdayAtNoon())
+      .withWheelchair(true)
+      .withModes(TRANSIT)
+      .withWalkReluctance(walkReluctance)
+      .build();
+
+    var tripPlan = SmokeTest.API_CLIENT.plan(req);
+
+    // assert that accessibility score is there
+    tripPlan
+      .itineraries()
+      .forEach(i -> {
+        assertTrue(i.accessibilityScore().isPresent());
+        i.legs().forEach(l -> assertTrue(l.accessibilityScore().isPresent()));
+      });
+    return tripPlan;
   }
 
   @Test
@@ -85,7 +124,7 @@ public class SeattleSmokeTest {
 
   @Test
   public void monorailRoute() throws IOException {
-    Set<Object> modes = SmokeTest.API_CLIENT
+    var modes = SmokeTest.API_CLIENT
       .routes()
       .stream()
       .map(Route::mode)

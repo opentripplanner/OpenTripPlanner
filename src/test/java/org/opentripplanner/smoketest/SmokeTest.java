@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
@@ -46,9 +47,9 @@ public class SmokeTest {
    * This is a problem in particular in the case of MARTA as they only publish new data about 2 days
    * before the expiration date of the old one.
    */
-  public static LocalDate nextMonday() {
+  public static LocalDateTime weekdayAtNoon() {
     var today = LocalDate.now();
-    return today.with(TemporalAdjusters.next(DayOfWeek.FRIDAY));
+    return today.with(TemporalAdjusters.next(DayOfWeek.TUESDAY)).atTime(LocalTime.of(12, 0));
   }
 
   public static void assertThatThereAreVehicleRentalStations() {
@@ -86,7 +87,7 @@ public class SmokeTest {
         .withFrom(req.from())
         .withTo(req.to())
         .withModes(req.modes())
-        .withTime(SmokeTest.nextMonday().atTime(LocalTime.of(12, 0)))
+        .withTime(SmokeTest.weekdayAtNoon())
         .withSearchDirection(req.searchDirection())
         .build();
       var plan = API_CLIENT.plan(tpr);

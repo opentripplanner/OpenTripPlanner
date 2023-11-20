@@ -23,8 +23,8 @@ jobs:
             sleep: 15
           - name: houston
             sleep: 15
-          - name: denver
-            sleep: 15
+          #- name: denver
+          #  sleep: 15
           - name: septa
             sleep: 15
           - name: portland
