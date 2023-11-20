@@ -23,14 +23,14 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   public FlexEgressTemplate(
     NearbyStop accessEgress,
     FlexTrip trip,
-    int fromStopTime,
-    int toStopTime,
+    int fromStopIndex,
+    int toStopIndex,
     StopLocation transferStop,
     FlexServiceDate date,
     FlexPathCalculator calculator,
     FlexConfig config
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator, config);
+    super(accessEgress, trip, fromStopIndex, toStopIndex, transferStop, date, calculator, config);
   }
 
   protected List<Edge> getTransferEdges(PathTransfer transfer) {
@@ -38,7 +38,7 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   }
 
   protected RegularStop getFinalStop(PathTransfer transfer) {
-    return transfer.from instanceof RegularStop ? (RegularStop) transfer.from : null;
+    return transfer.from instanceof RegularStop regularStop ? regularStop : null;
   }
 
   protected Collection<PathTransfer> getTransfersFromTransferStop(TransitService transitService) {
