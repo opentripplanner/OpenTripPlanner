@@ -80,7 +80,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     testPriority(
       STOP_D,
       ALLOWED,
-      "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:01:20 10:18:20 17m 1tx $1120 $33pri]"
+      "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:01:20 10:18:20 17m Tₓ1 C₁1120 Tₚ3300]"
     );
   }
 
@@ -89,7 +89,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     testPriority(
       STOP_E,
       RECOMMENDED,
-      "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:01:20 10:24:20 23m 1tx $1540 $32pri]"
+      "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:01:20 10:24:20 23m Tₓ1 C₁1540 Tₚ3200]"
     );
   }
 
@@ -98,7 +98,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     testPriority(
       STOP_F,
       PREFERRED,
-      "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:01:20 10:30:20 29m 1tx $1960 $31pri]"
+      "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:01:20 10:30:20 29m Tₓ1 C₁1960 Tₚ3100]"
     );
   }
 
@@ -106,7 +106,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
   public void testTransferGuaranteed() {
     testGuaranteed(
       STOP_G,
-      "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:01:20 10:36:20 35m 1tx $2350 $23pri]"
+      "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:01:20 10:36:20 35m Tₓ1 C₁2350 Tₚ2300]"
     );
   }
 
@@ -114,7 +114,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
   public void testTransferStaySeated() {
     testStaySeated(
       STOP_H,
-      "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:01:20 10:40:20 39m 0tx $2650 $13pri]"
+      "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:01:20 10:40:20 39m Tₓ0 C₁2650 Tₚ1300]"
     );
   }
 

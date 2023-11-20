@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor._data.stoparrival;
 
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 
 abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
@@ -25,13 +24,12 @@ abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
     this.stop = stop;
     this.arrivalTime = arrivalTime;
     this.previous = previous;
+    this.c2 = c2;
 
     if (previous == null) {
       this.c1 = extraCost;
-      this.c2 = c2;
     } else {
       this.c1 = previous.c1() + extraCost;
-      this.c2 = c2 == RaptorConstants.NOT_SET ? previous.c2() : c2;
     }
   }
 
@@ -42,7 +40,7 @@ abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
     int extraCost,
     ArrivalView<TestTripSchedule> previous
   ) {
-    this(round, stop, arrivalTime, extraCost, RaptorConstants.NOT_SET, previous);
+    this(round, stop, arrivalTime, extraCost, previous.c2(), previous);
   }
 
   @Override
@@ -68,11 +66,6 @@ abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
   @Override
   public int c2() {
     return c2;
-  }
-
-  @Override
-  public boolean supportsC2() {
-    return c2 != RaptorConstants.NOT_SET;
   }
 
   @Override

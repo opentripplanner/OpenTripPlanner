@@ -42,7 +42,7 @@ class TransferStopArrivalC2Test {
 
   private static final int EXPECTED_C1 = ACCESS_C1 + TRANSIT_C1 + TRANSFER_C1;
 
-  private static final int TRANSIT_C2 = 600;
+  private static final int TRANSIT_C2 = 6;
 
   private static final AccessStopArrivalC2<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrivalC2<>(
     ACCESS_DEPARTURE_TIME,
@@ -112,7 +112,7 @@ class TransferStopArrivalC2Test {
   @Test
   public void testToString() {
     assertEquals(
-      "Walk { round: 1, stop: 102, arrival: [9:26 $2600], path: On-Street 6m ~ 102 }",
+      "Walk { round: 1, stop: 102, arrival: [9:26 C₁2600 C₂6], path: On-Street 6m ~ 102 }",
       subject.toString()
     );
   }

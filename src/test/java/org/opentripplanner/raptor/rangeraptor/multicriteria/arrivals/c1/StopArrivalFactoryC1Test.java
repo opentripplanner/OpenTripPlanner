@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -83,7 +82,6 @@ public class StopArrivalFactoryC1Test {
     assertEquals(ORIGIN_DEPARTURE_TIME + ACCESS_DURATION, stopArrival.arrivalTime());
 
     // c2 not supported
-    assertFalse(stopArrival.supportsC2());
     assertEquals(RaptorConstants.NOT_SET, stopArrival.c2());
   }
 
@@ -97,7 +95,6 @@ public class StopArrivalFactoryC1Test {
     assertEquals(STOP_ARRIVAL_TRANSIT_TIME - ORIGIN_DEPARTURE_TIME, stopArrival.travelDuration());
 
     // c2 not supported
-    assertFalse(stopArrival.supportsC2());
     assertEquals(RaptorConstants.NOT_SET, stopArrival.c2());
   }
 
@@ -115,7 +112,6 @@ public class StopArrivalFactoryC1Test {
     assertEquals(DurationUtils.durationInSeconds("11m30s"), stopArrival.travelDuration());
 
     // c2 not supported
-    assertFalse(stopArrival.supportsC2());
     assertEquals(RaptorConstants.NOT_SET, stopArrival.c2());
   }
 }

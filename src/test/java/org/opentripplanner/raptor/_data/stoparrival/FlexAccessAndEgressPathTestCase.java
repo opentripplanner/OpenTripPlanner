@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.bus;
+import static org.opentripplanner.raptor.api.model.RaptorValueFormatter.formatC1;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.opentripplanner.raptor._data.transit.TestTransfer;
 import org.opentripplanner.raptor._data.transit.TestTripPattern;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrival;
@@ -177,9 +179,9 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
   public static String flexCaseAText() {
     return String.format(
       "Flex 5m15s 1x 10:01 10:06:15 %s ~ A 1m45s ~ " +
-      "BUS A 10:08 10:20 12m $996 ~ D 1m15s ~ " +
+      "BUS A 10:08 10:20 12m C₁996 ~ D 1m15s ~ " +
       "Flex 6m 1x 10:21:15 10:27:15 %s " +
-      "[10:01 10:27:15 26m15s 2tx %s]",
+      "[10:01 10:27:15 26m15s Tₓ2 %s]",
       RaptorCostConverter.toString(ACCESS_C1),
       RaptorCostConverter.toString(EGRESS_C1_W_1M_SLACK),
       RaptorCostConverter.toString(TOT_C1_A)
@@ -193,11 +195,11 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
   public static String flexCaseBText() {
     return String.format(
       "Flex 5m15s 1x 10:00 10:05:15 %s ~ A 0s ~ " +
-      "Walk 1m 10:05:15 10:06:15 $120 ~ B 1m45s ~ " +
-      "BUS B 10:08 10:20 12m $996 ~ C 15s ~ " +
-      "Walk 2m 10:20:15 10:22:15 $240 ~ D 1m ~ " +
+      "Walk 1m 10:05:15 10:06:15 C₁120 ~ B 1m45s ~ " +
+      "BUS B 10:08 10:20 12m C₁996 ~ C 15s ~ " +
+      "Walk 2m 10:20:15 10:22:15 C₁240 ~ D 1m ~ " +
       "Flex 6m 1x 10:23:15 10:29:15 %s" +
-      " [10:00 10:29:15 29m15s 2tx %s]",
+      " [10:00 10:29:15 29m15s Tₓ2 %s]",
       RaptorCostConverter.toString(ACCESS_C1),
       RaptorCostConverter.toString(EGRESS_C1_W_1M_SLACK),
       RaptorCostConverter.toString(TOT_C1_B)
@@ -213,11 +215,11 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       "Flex 5m15s 1x Open(9:00 9:50) 9:50 9:55:15 %s ~ A 12m45s ~ " +
       "BUS A 10:08 10:20 12m %s ~ D 10m ~ " +
       "Flex 6m 1x Open(10:30 11:00) 10:30 10:36 %s " +
-      "[9:50 10:36 46m 2tx %s]",
-      RaptorCostConverter.toString(ACCESS_C1),
-      RaptorCostConverter.toString(L1_C1_INC_WAIT_W_OPENING_HOURS_A),
-      RaptorCostConverter.toString(EGRESS_C1_W_9M45S_SLACK),
-      RaptorCostConverter.toString(TOT_C1_W_OPENING_HOURS_A)
+      "[9:50 10:36 46m Tₓ2 %s]",
+      formatC1(ACCESS_C1),
+      formatC1(L1_C1_INC_WAIT_W_OPENING_HOURS_A),
+      formatC1(EGRESS_C1_W_9M45S_SLACK),
+      formatC1(TOT_C1_W_OPENING_HOURS_A)
     );
   }
 
@@ -228,15 +230,15 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
   public static String flexCaseBWithOpeningHoursText() {
     return String.format(
       "Flex 5m15s 1x Open(9:00 9:50) 9:50 9:55:15 %s ~ A 0s ~ " +
-      "Walk 1m 9:55:15 9:56:15 $120 ~ B 11m45s ~ " +
+      "Walk 1m 9:55:15 9:56:15 C₁120 ~ B 11m45s ~ " +
       "BUS B 10:08 10:20 12m %s ~ C 15s ~ " +
-      "Walk 2m 10:20:15 10:22:15 $240 ~ D 7m45s ~ " +
+      "Walk 2m 10:20:15 10:22:15 C₁240 ~ D 7m45s ~ " +
       "Flex 6m 1x Open(10:30 11:00) 10:30 10:36 %s" +
-      " [9:50 10:36 46m 2tx %s]",
-      RaptorCostConverter.toString(ACCESS_C1),
-      RaptorCostConverter.toString(L1_C1_INC_WAIT_W_OPENING_HOURS_B),
-      RaptorCostConverter.toString(EGRESS_C1_W_7M45S_SLACK),
-      RaptorCostConverter.toString(TOT_C1_W_OPENING_HOURS_B)
+      " [9:50 10:36 46m Tₓ2 %s]",
+      formatC1(ACCESS_C1),
+      formatC1(L1_C1_INC_WAIT_W_OPENING_HOURS_B),
+      formatC1(EGRESS_C1_W_7M45S_SLACK),
+      formatC1(TOT_C1_W_OPENING_HOURS_B)
     );
   }
 
@@ -293,7 +295,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       prevArrival = access(accessPath.stop(), arrivalTime, accessPath);
 
       int waitCost = costL1ForwardIncWait(prevArrival.arrivalTime());
-      prevArrival = bus(2, STOP_D, L1_STOP_ARR_TIME, waitCost, TRIP_A, prevArrival);
+      prevArrival = bus(2, STOP_D, L1_STOP_ARR_TIME, waitCost, 0, TRIP_A, prevArrival);
     } else {
       arrivalTime = accessPath.latestArrivalTime(TX1_START);
       prevArrival = access(accessPath.stop(), arrivalTime, accessPath);
@@ -302,7 +304,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       prevArrival = new Transfer(1, TX1_END - timeShift, TX1_TRANSFER, prevArrival);
 
       int waitCost = costL1ForwardIncWait(prevArrival.arrivalTime());
-      prevArrival = bus(2, STOP_C, L1_STOP_ARR_TIME, waitCost, TRIP_B, prevArrival);
+      prevArrival = bus(2, STOP_C, L1_STOP_ARR_TIME, waitCost, 0, TRIP_B, prevArrival);
 
       prevArrival = new Transfer(2, TX2_END, TX2_TRANSFER, prevArrival);
     }
@@ -316,7 +318,13 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     int additionalCost =
       egressPath.c1() + toRaptorCost(waitTime * WAIT_RELUCTANCE + TRANSFER_C1_SEC);
 
-    return new DestinationArrival<>(egressPath, prevArrival, arrivalTime, additionalCost);
+    return new DestinationArrival<>(
+      egressPath,
+      prevArrival,
+      arrivalTime,
+      additionalCost,
+      RaptorConstants.NOT_SET
+    );
   }
 
   private static DestinationArrival<TestTripSchedule> flexReverseSearch(
@@ -333,7 +341,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       prevArrival = access(egressPath.stop(), arrivalTime, egressPath);
 
       cost = costL1ReverseIncWait(prevArrival.arrivalTime());
-      prevArrival = bus(2, STOP_A, L1_STOP_ARR_TIME_REV, cost, TRIP_A, prevArrival);
+      prevArrival = bus(2, STOP_A, L1_STOP_ARR_TIME_REV, cost, 0, TRIP_A, prevArrival);
     } else {
       arrivalTime = L1_END + ALIGHT_SLACK + TX2_DURATION + TRANSFER_SLACK;
       arrivalTime = egressPath.earliestDepartureTime(arrivalTime);
@@ -341,7 +349,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       arrivalTime = prevArrival.arrivalTime() - TX2_DURATION;
       prevArrival = new Transfer(1, arrivalTime, TX2_TRANSFER_REV, prevArrival);
       cost = costL1ReverseIncWait(prevArrival.arrivalTime());
-      prevArrival = bus(2, STOP_B, L1_STOP_ARR_TIME_REV, cost, TRIP_B, prevArrival);
+      prevArrival = bus(2, STOP_B, L1_STOP_ARR_TIME_REV, cost, 0, TRIP_B, prevArrival);
       arrivalTime = prevArrival.arrivalTime() - TX1_DURATION;
       prevArrival = new Transfer(2, arrivalTime, TX1_TRANSFER_REV, prevArrival);
     }
@@ -355,7 +363,13 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
     int additionalCost =
       accessPath.c1() + toRaptorCost(waitTime * WAIT_RELUCTANCE + TRANSFER_C1_SEC);
 
-    return new DestinationArrival<>(accessPath, prevArrival, arrivalTime, additionalCost);
+    return new DestinationArrival<>(
+      accessPath,
+      prevArrival,
+      arrivalTime,
+      additionalCost,
+      RaptorConstants.NOT_SET
+    );
   }
 
   private static int costL1ForwardIncWait(int prevArrivalTime) {

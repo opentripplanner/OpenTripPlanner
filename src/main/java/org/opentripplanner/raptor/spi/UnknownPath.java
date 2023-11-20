@@ -127,7 +127,7 @@ public class UnknownPath<T extends RaptorTripSchedule> implements RaptorPath<T> 
     if (departureTime == 0 && arrivalTime == 0) {
       pathBuilder.summary(c1());
     } else {
-      pathBuilder.summary(startTime(), endTime(), numberOfTransfers, c1());
+      pathBuilder.summary(startTime(), endTime(), numberOfTransfers, c1(), c2());
     }
     return pathBuilder.toString();
   }

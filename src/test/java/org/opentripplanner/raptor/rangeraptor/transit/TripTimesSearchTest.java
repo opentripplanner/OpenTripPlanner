@@ -231,7 +231,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     TestTripSchedule trip
   ) {
     var access = access(accessStop, -9999, free(accessStop));
-    return bus(1, transitToStop, arrivalTime, -9999, trip, access);
+    return bus(1, transitToStop, arrivalTime, -9999, -9999, trip, access);
   }
 
   private static ArrivalView<TestTripSchedule> busRev(
@@ -241,7 +241,7 @@ public class TripTimesSearchTest implements RaptorTestConstants {
     TestTripSchedule trip
   ) {
     var access = access(accessStop, -9999, free(accessStop));
-    return bus(1, transitToStop, arrivalTime, -9999, trip, access);
+    return bus(1, transitToStop, arrivalTime, -9999, -9999, trip, access);
   }
 
   private void assertForwardAppxTime(

@@ -4,7 +4,6 @@ import static org.opentripplanner.raptor.api.model.RaptorConstants.SECONDS_IN_A_
 import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 
@@ -204,7 +203,7 @@ public interface RaptorAccessEgress {
     }
     buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
     if (includeCost && c1() > 0) {
-      buf.append(' ').append(OtpNumberFormat.formatCostCenti(c1()));
+      buf.append(' ').append(RaptorValueFormatter.formatC1(c1()));
     }
     if (hasRides()) {
       buf.append(' ').append(numberOfRides()).append('x');

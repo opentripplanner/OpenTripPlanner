@@ -15,11 +15,12 @@ class Transit extends AbstractStopArrival implements TransitPathView<TestTripSch
     int round,
     int stop,
     int arrivalTime,
-    int cost,
+    int c1,
+    int c2,
     TestTripSchedule trip,
     ArrivalView<TestTripSchedule> previous
   ) {
-    super(round, stop, arrivalTime, cost, previous);
+    super(round, stop, arrivalTime, c1, c2, previous);
     this.trip = trip;
   }
 

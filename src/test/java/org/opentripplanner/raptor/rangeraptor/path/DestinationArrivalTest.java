@@ -21,20 +21,20 @@ public class DestinationArrivalTest {
     ACCESS_STOP,
     ACCESS_DURATION
   );
-  private static final int ACCESS_C1 = ACCESS_WALK.c1();
+  private static final int ACCESS_COST = ACCESS_WALK.c1();
 
   private static final int TRANSIT_STOP = 101;
   private static final int TRANSIT_BOARD_TIME = ACCESS_DEPARTURE_TIME + 10 * 60;
   private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + 4 * 60;
   private static final RaptorTripSchedule A_TRIP = null;
-  private static final int TRANSIT_C1 = 84000;
+  private static final int TRANSIT_COST = 84000;
 
   private static final int DESTINATION_DURATION_TIME = 50;
   private static final int DESTINATION_C1 = 50000;
   private static final int DESTINATION_C2 = 5;
 
   private static final int EXPECTED_ARRIVAL_TIME = TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME;
-  private static final int EXPECTED_TOTAL_C1 = ACCESS_C1 + TRANSIT_C1 + DESTINATION_C1;
+  private static final int EXPECTED_TOTAL_COST = ACCESS_COST + TRANSIT_COST + DESTINATION_C1;
 
   private static final StopArrivalFactoryC1<RaptorTripSchedule> STOP_ARRIVAL_FACTORY = new StopArrivalFactoryC1<RaptorTripSchedule>();
 
@@ -50,14 +50,15 @@ public class DestinationArrivalTest {
     new PatternRideC1<>(ACCESS_ARRIVAL, ANY, ANY, ANY, ANY, ANY, ANY, A_TRIP),
     TRANSIT_STOP,
     TRANSIT_ALIGHT_TIME,
-    ACCESS_ARRIVAL.c1() + TRANSIT_C1
+    ACCESS_ARRIVAL.c1() + TRANSIT_COST
   );
 
   private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
     TestAccessEgress.walk(TRANSIT_STOP, DESTINATION_DURATION_TIME),
     TRANSIT_ARRIVAL,
     TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
-    DESTINATION_C1
+    DESTINATION_C1,
+    DESTINATION_C2
   );
 
   @Test
@@ -67,7 +68,7 @@ public class DestinationArrivalTest {
 
   @Test
   public void cost() {
-    assertEquals(EXPECTED_TOTAL_C1, subject.c1());
+    assertEquals(EXPECTED_TOTAL_COST, subject.c1());
   }
 
   @Test
@@ -83,7 +84,7 @@ public class DestinationArrivalTest {
   @Test
   public void testToString() {
     assertEquals(
-      "Egress { round: 1, from-stop: 101, arrival: [8:14:50 $1484], path: Walk 50s $100 ~ 101 }",
+      "Egress { round: 1, from-stop: 101, arrival: [8:14:50 C₁1484 C₂5], path: Walk 50s C₁100 ~ 101 }",
       subject.toString()
     );
   }

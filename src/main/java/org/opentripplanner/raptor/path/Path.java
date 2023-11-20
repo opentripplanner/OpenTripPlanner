@@ -241,7 +241,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
             );
             if (detailed) {
               buf.duration(leg.duration());
-              buf.generalizedCostSentiSec(leg.c1());
+              buf.c1(leg.c1());
             }
             if (transitLeg.getConstrainedTransferAfterLeg() != null) {
               constraintPrevLeg =
@@ -264,7 +264,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
       }
     }
     // Add summary info
-    buf.summary(startTime, endTime, numberOfTransfers, c1, appendToSummary);
+    buf.summary(startTime, endTime, numberOfTransfers, c1, c2, appendToSummary);
 
     return buf.toString();
   }
@@ -294,7 +294,10 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
 
   private void addWalkDetails(boolean detailed, PathStringBuilder buf, PathLeg<T> leg) {
     if (detailed) {
-      buf.timeAndCostCentiSec(leg.fromTime(), leg.toTime(), leg.c1());
+      int fromTime = leg.fromTime();
+      int toTime = leg.toTime();
+      int cost = leg.c1();
+      buf.time(fromTime, toTime).c1(cost);
     }
   }
 }

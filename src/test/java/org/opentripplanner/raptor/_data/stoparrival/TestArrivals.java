@@ -80,22 +80,25 @@ public class TestArrivals {
     int round,
     int stop,
     int arrivalTime,
-    int cost,
+    int c1,
+    int c2,
     TestTripSchedule trip,
     ArrivalView<TestTripSchedule> previous
   ) {
-    return new Transit(round, stop, arrivalTime, cost, trip, previous);
+    return new Transit(round, stop, arrivalTime, c1, c2, trip, previous);
   }
 
   public static ArrivalView<TestTripSchedule> egress(
     int departureTime,
     int arrivalTime,
-    int cost,
+    int c1,
+    int c2,
     ArrivalView<TestTripSchedule> previous
   ) {
     return new Egress(
       departureTime,
-      TestAccessEgress.walk(previous.stop(), Math.abs(arrivalTime - departureTime), cost),
+      TestAccessEgress.walk(previous.stop(), Math.abs(arrivalTime - departureTime), c1),
+      c2,
       previous
     );
   }

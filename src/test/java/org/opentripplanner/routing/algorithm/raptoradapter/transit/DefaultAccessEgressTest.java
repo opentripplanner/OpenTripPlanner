@@ -129,8 +129,8 @@ class DefaultAccessEgressTest {
 
   @Test
   void testToString() {
-    assertEquals("Walk 1d8h50m15s $236429 ~ 5", subject.toString());
-    assertEquals("Walk 1d8h50m16s $236440 w/penalty(1s $11) ~ 5", subjectWithPenalty.toString());
+    assertEquals("Walk 1d8h50m15s C₁236_429 ~ 5", subject.toString());
+    assertEquals("Walk 1d8h50m16s C₁236_440 w/penalty(1s $11) ~ 5", subjectWithPenalty.toString());
   }
 
   @Test

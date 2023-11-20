@@ -50,10 +50,10 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
 
     assertEquals(accessEgressCost + transitCost, path.c1());
     assertEquals(
-      "Walk 1m 10:00:15 10:01:15 $120 ~ A 45s " +
-      "~ BUS L1 10:02 10:07 5m $438 ~ B 15s " +
-      "~ Walk 2m 10:07:15 10:09:15 $210 " +
-      "[10:00:15 10:09:15 9m 0tx $768]",
+      "Walk 1m 10:00:15 10:01:15 C₁120 ~ A 45s " +
+      "~ BUS L1 10:02 10:07 5m C₁438 ~ B 15s " +
+      "~ Walk 2m 10:07:15 10:09:15 C₁210 " +
+      "[10:00:15 10:09:15 9m Tₓ0 C₁768]",
       path.toStringDetailed(this::stopIndexToName)
     );
   }
@@ -61,6 +61,7 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
   @Test
   public void testBasicPath() {
     var path = subject
+      .c2(7)
       .access(BasicPathTestCase.ACCESS_START, STOP_A, BasicPathTestCase.ACCESS_DURATION)
       .bus(
         BasicPathTestCase.LINE_11,
@@ -82,6 +83,7 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
         STOP_E
       )
       .egress(BasicPathTestCase.EGRESS_DURATION);
+
     Assertions.assertEquals(
       BasicPathTestCase.BASIC_PATH_AS_STRING,
       path.toString(this::stopIndexToName)

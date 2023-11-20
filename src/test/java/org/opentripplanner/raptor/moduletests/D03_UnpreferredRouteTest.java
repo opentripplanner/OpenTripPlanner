@@ -31,7 +31,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class D03_UnpreferredRouteTest implements RaptorTestConstants {
 
   private static final String EXPECTED =
-    "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s 0tx $%d]";
+    "Walk 30s ~ A ~ BUS %s 0:01 0:02:40 ~ B ~ Walk 20s " + "[0:00:30 0:03 2m30s Tₓ0 C₁%d]";
   private static final FeedScopedId ROUTE_ID_1 = TransitModelForTest.id("1");
   private static final FeedScopedId ROUTE_ID_2 = TransitModelForTest.id("2");
   private static final CostLinearFunction UNPREFERRED_C1 = CostLinearFunction.of("5m + 1t");

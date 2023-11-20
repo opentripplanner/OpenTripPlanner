@@ -77,12 +77,12 @@ public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
       "~ BUS R1 0:30 0:45 ~ C " +
       "~ BUS R2 0:45 0:55 ~ D " +
       "~ Walk 1m " +
-      "[0:16 0:56 40m 2tx $3820]";
+      "[0:16 0:56 40m Tₓ2 C₁3820]";
 
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, "[0:00 0:40 40m 2tx]")
-      .add(TC_MIN_DURATION_REV, "[0:20 1:00 40m 2tx]")
+      .add(TC_MIN_DURATION, "[0:00 0:40 40m Tₓ2]")
+      .add(TC_MIN_DURATION_REV, "[0:20 1:00 40m Tₓ2]")
       .add(standard(), withoutCost(expected))
       .add(multiCriteria(), expected)
       .build();

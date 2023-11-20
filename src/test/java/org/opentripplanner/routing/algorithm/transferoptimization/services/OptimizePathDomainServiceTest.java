@@ -5,9 +5,7 @@ import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.tx;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
@@ -86,9 +84,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     // Then expect a set containing the original path
     assertEquals(
       original.toStringDetailed(this::stopIndexToName),
-      first(result).toStringDetailed(this::stopIndexToName)
+      PathUtils.pathsToStringDetailed(result)
     );
-    assertEquals(1, result.size());
   }
 
   /**
@@ -133,10 +130,9 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     // Insert wait-time cost summary info
     var expected = original
       .toStringDetailed(this::stopIndexToName)
-      .replace("$2770]", "$2770 $33pri $3103.81wtc]");
+      .replace("C₁2770]", "C₁2770 Tₚ3300 wtC₁3_103.81]");
 
-    assertEquals(expected, first(result).toStringDetailed(this::stopIndexToName));
-    assertEquals(1, result.size());
+    assertEquals(expected, PathUtils.pathsToStringDetailed(result));
   }
 
   /**
@@ -197,7 +193,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     assertEquals(
       "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ BUS T3 10:37 10:49 ~ G " +
-      "[10:01:20 10:49:20 48m 2tx $2950 $66pri]",
+      "[10:01:20 10:49:20 48m Tₓ2 C₁2950 Tₚ6600]",
       PathUtils.pathsToString(result)
     );
 
@@ -214,7 +210,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C " +
       "~ BUS T2 10:15 10:35 ~ F " +
       "~ BUS T3 10:37 10:49 ~ G " +
-      "[10:01:20 10:49:20 48m 2tx $2980 $66pri $3294.05wtc]",
+      "[10:01:20 10:49:20 48m Tₓ2 C₁2980 Tₚ6600 wtC₁3_294.05]",
       PathUtils.pathsToString(result)
     );
   }
@@ -267,7 +263,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var it = result.iterator().next();
 
     assertEquals(
-      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:01:20 10:30:20 29m 1tx $1750 $23pri]",
+      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:01:20 10:30:20 29m Tₓ1 C₁1750 Tₚ2300]",
       it.toString(this::stopIndexToName)
     );
     // Verify the attached Transfer is exist and is valid
@@ -327,8 +323,8 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var result = subject.findBestTransitPath(original);
 
     assertEquals(
-      "A ~ BUS T1 10:10 10:10 ~ B ~ BUS T2 10:13 10:30 ~ D [10:09:20 10:30:20 21m 1tx $1300 $33pri]",
-      result.stream().map(it -> it.toString(this::stopIndexToName)).collect(Collectors.joining())
+      "A ~ BUS T1 10:10 10:10 ~ B ~ BUS T2 10:13 10:30 ~ D [10:09:20 10:30:20 21m Tₓ1 C₁1300 Tₚ3300]",
+      PathUtils.pathsToString(result)
     );
   }
 
@@ -360,9 +356,5 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       filter,
       (new RaptorTestConstants() {})::stopIndexToName
     );
-  }
-
-  static <T> T first(Collection<T> c) {
-    return c.stream().findFirst().orElseThrow();
   }
 }
