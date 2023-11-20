@@ -95,6 +95,10 @@ public class ToStringBuilder {
     return addIfNotNull(name, value);
   }
 
+  public ToStringBuilder addBool(String name, Boolean value, Boolean ignoreValue) {
+    return addIfNotIgnored(name, value, ignoreValue, Object::toString);
+  }
+
   public ToStringBuilder addBoolIfTrue(String name, Boolean value) {
     if (TRUE.equals(value)) {
       addLabel(name);

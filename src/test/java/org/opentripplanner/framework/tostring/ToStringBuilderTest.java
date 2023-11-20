@@ -77,6 +77,11 @@ public class ToStringBuilderTest {
       "ToStringBuilderTest{a: true, b: false}",
       subject().addBool("a", true).addBool("b", false).toString()
     );
+
+    assertEquals(
+      "ToStringBuilderTest{a: true}",
+      subject().addBool("a", true, false).addBool("b", false, false).toString()
+    );
   }
 
   @Test
