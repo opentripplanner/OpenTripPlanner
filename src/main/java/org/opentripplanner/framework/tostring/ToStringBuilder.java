@@ -186,19 +186,25 @@ public class ToStringBuilder {
   }
 
   /** Add the collection, truncate the number of elements at given maxLimit. */
-  public ToStringBuilder addCollection(String name, Collection<?> c, int maxLimit) {
+  public <T> ToStringBuilder addCollection(
+    String name,
+    Collection<T> c,
+    int maxLimit,
+    Function<T, String> toString
+  ) {
     if (c == null) {
       return this;
     }
     if (c.size() > maxLimit + 1) {
-      String value = c
-        .stream()
-        .limit(maxLimit)
-        .map(Object::toString)
-        .collect(Collectors.joining(", "));
+      String value = c.stream().limit(maxLimit).map(toString).collect(Collectors.joining(", "));
       return addIt(name + "(" + maxLimit + "/" + c.size() + ")", "[" + value + ", ..]");
     }
     return addIfNotNull(name, c);
+  }
+
+  /** Add the collection, truncate the number of elements at given maxLimit. */
+  public <T> ToStringBuilder addCollection(String name, Collection<T> c, int maxLimit) {
+    return addCollection(name, c, maxLimit, Object::toString);
   }
 
   public ToStringBuilder addColSize(String name, Collection<?> c) {

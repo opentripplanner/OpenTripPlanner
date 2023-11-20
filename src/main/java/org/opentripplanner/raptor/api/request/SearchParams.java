@@ -288,8 +288,8 @@ public class SearchParams {
       .addDurationSec("searchWindow", searchWindowInSeconds, RaptorConstants.NOT_SET)
       .addBoolIfTrue("departAsLateAsPossible", preferLateArrival)
       .addNum("numberOfAdditionalTransfers", numberOfAdditionalTransfers, RaptorConstants.NOT_SET)
-      .addCollection("accessPaths", accessPaths, 5)
-      .addCollection("egressPaths", egressPaths, 5)
+      .addCollection("accessPaths", accessPaths, 5, RaptorAccessEgress::defaultToString)
+      .addCollection("egressPaths", egressPaths, 5, RaptorAccessEgress::defaultToString)
       .toString();
   }
 
