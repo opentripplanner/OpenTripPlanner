@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.linking;
+package org.opentripplanner.routing.linking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,8 +16,6 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.LinkingDirection;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;

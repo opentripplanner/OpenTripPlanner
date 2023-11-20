@@ -119,7 +119,12 @@ public class GraphBuilderModules {
     @Nullable EmissionsDataModel emissionsDataModel,
     DataImportIssueStore issueStore
   ) {
-    return new EmissionsModule(dataSources, config, emissionsDataModel, issueStore);
+    return new EmissionsModule(
+      dataSources.getGtfsConfiguredDatasource(),
+      config,
+      emissionsDataModel,
+      issueStore
+    );
   }
 
   @Provides

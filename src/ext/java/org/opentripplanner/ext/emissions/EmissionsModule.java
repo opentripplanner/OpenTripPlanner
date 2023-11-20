@@ -6,7 +6,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
-import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GraphBuilderModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
@@ -22,15 +21,14 @@ import org.slf4j.LoggerFactory;
 public class EmissionsModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(EmissionsModule.class);
-  private BuildConfig config;
-  private EmissionsDataModel emissionsDataModel;
-  private GraphBuilderDataSources dataSources;
-  private Map<FeedScopedId, Double> emissionsData = new HashMap<>();
+  private final BuildConfig config;
+  private final EmissionsDataModel emissionsDataModel;
+  private final Iterable<ConfiguredDataSource<GtfsFeedParameters>> dataSources;
   private final DataImportIssueStore issueStore;
 
   @Inject
   public EmissionsModule(
-    GraphBuilderDataSources dataSources,
+    Iterable<ConfiguredDataSource<GtfsFeedParameters>> dataSources,
     BuildConfig config,
     EmissionsDataModel emissionsDataModel,
     DataImportIssueStore issueStore
@@ -48,15 +46,17 @@ public class EmissionsModule implements GraphBuilderModule {
       double carAvgCo2PerKm = config.emissions.getCarAvgCo2PerKm();
       double carAvgOccupancy = config.emissions.getCarAvgOccupancy();
       double carAvgEmissionsPerMeter = carAvgCo2PerKm / 1000 / carAvgOccupancy;
-
-      for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources.getGtfsConfiguredDatasource()) {
+      Map<FeedScopedId, Double> emissionsData = new HashMap<>();
+      for (ConfiguredDataSource<GtfsFeedParameters> gtfsData : dataSources) {
+        Map<FeedScopedId, Double> co2Emissions;
         if (gtfsData.dataSource().name().contains(".zip")) {
-          emissionsData = co2EmissionsDataReader.readGtfsZip(new File(gtfsData.dataSource().uri()));
+          co2Emissions = co2EmissionsDataReader.readGtfsZip(new File(gtfsData.dataSource().uri()));
         } else {
-          emissionsData = co2EmissionsDataReader.readGtfs(new File(gtfsData.dataSource().uri()));
+          co2Emissions = co2EmissionsDataReader.readGtfs(new File(gtfsData.dataSource().uri()));
         }
+        emissionsData.putAll(co2Emissions);
       }
-      this.emissionsDataModel.setCo2Emissions(this.emissionsData);
+      this.emissionsDataModel.setCo2Emissions(emissionsData);
       this.emissionsDataModel.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
     }
   }

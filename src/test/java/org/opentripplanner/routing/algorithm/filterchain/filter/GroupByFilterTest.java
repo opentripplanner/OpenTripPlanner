@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
@@ -13,6 +14,8 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimi
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 public class GroupByFilterTest implements PlanTestConstants {
+
+  private static final String TEST_FILTER_TAG = "test";
 
   /**
    * This test group by exact trip ids and test that the reduce function works properly. It does not
@@ -35,8 +38,11 @@ public class GroupByFilterTest implements PlanTestConstants {
     assertFalse(i2a.isFlaggedForDeletion());
     assertTrue(i2b.isFlaggedForDeletion());
 
-    // Remove notice after asserting
-    i2b.removeDeletionFlags();
+    // Remove an none existing set of tags
+    i2b.removeDeletionFlags(Set.of("ANY_TAG"));
+    assertTrue(i2b.isFlaggedForDeletion());
+
+    i2b.removeDeletionFlags(Set.of(TEST_FILTER_TAG));
 
     // With min Limit = 2, we get two from each group
     createFilter(2).filter(all);
@@ -78,9 +84,9 @@ public class GroupByFilterTest implements PlanTestConstants {
 
       // Remove notices after asserting
       assertTrue(i11.isFlaggedForDeletion());
-      i11.removeDeletionFlags();
+      i11.removeDeletionFlags(Set.of());
       assertTrue(i12.isFlaggedForDeletion());
-      i12.removeDeletionFlags();
+      i12.removeDeletionFlags(Set.of());
     }
   }
 
@@ -92,7 +98,9 @@ public class GroupByFilterTest implements PlanTestConstants {
       i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
       List.of(
         new SortingFilter(SortOrderComparator.defaultComparatorDepartAfter()),
-        new DeletionFlaggingFilter(new MaxLimitFilter("test", maxNumberOfItinerariesPrGroup))
+        new DeletionFlaggingFilter(
+          new MaxLimitFilter(TEST_FILTER_TAG, maxNumberOfItinerariesPrGroup)
+        )
       )
     );
   }

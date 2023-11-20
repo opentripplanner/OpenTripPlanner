@@ -1143,7 +1143,7 @@ case where this is not the case.
     {
       "type" : "gtfs",
       "feedId" : "SE",
-      "source" : "gs://BUCKET/OTP_GCS_WORK_DIR/sweeden-gtfs.obj"
+      "source" : "https://skanetrafiken.se/download/sweden.gtfs.zip"
     },
     {
       "type" : "netex",

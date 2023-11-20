@@ -485,6 +485,7 @@ public class TripQuery {
           )
           .type(Scalars.GraphQLBoolean)
           .defaultValue(preferences.itineraryFilter().debug().debugEnabled())
+          .deprecate("Use `itineraryFilter.debug` instead.")
           .build()
       )
       .argument(
