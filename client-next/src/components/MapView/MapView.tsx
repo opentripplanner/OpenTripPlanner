@@ -33,7 +33,7 @@ export function MapView({
       // @ts-ignore
       mapStyle={mapStyle}
       initialViewState={initialViewState}
-      style={{ width: '100%', height: 'calc(100vh - 200px)' }}
+      style={{ width: '100%', height: 'calc(100vh - 126px)' }}
       onDblClick={onMapDoubleClick}
     >
       <NavigationControl position="top-left" />
