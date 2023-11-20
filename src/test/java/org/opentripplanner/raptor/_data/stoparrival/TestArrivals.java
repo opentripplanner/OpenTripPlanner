@@ -75,4 +75,15 @@ public class TestArrivals {
       previous
     );
   }
+
+  public static ArrivalView<TestTripSchedule> bus(
+    int round,
+    int stop,
+    int arrivalTime,
+    int cost,
+    TestTripSchedule trip,
+    ArrivalView<TestTripSchedule> previous
+  ) {
+    return new Transit(round, stop, arrivalTime, cost, trip, previous);
+  }
 }

@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
+import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.bus;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
 
 import org.junit.jupiter.api.Test;
@@ -292,7 +293,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       prevArrival = access(accessPath.stop(), arrivalTime, accessPath);
 
       int waitCost = costL1ForwardIncWait(prevArrival.arrivalTime());
-      prevArrival = new Bus(2, STOP_D, L1_STOP_ARR_TIME, waitCost, TRIP_A, prevArrival);
+      prevArrival = bus(2, STOP_D, L1_STOP_ARR_TIME, waitCost, TRIP_A, prevArrival);
     } else {
       arrivalTime = accessPath.latestArrivalTime(TX1_START);
       prevArrival = access(accessPath.stop(), arrivalTime, accessPath);
@@ -301,7 +302,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       prevArrival = new Transfer(1, TX1_END - timeShift, TX1_TRANSFER, prevArrival);
 
       int waitCost = costL1ForwardIncWait(prevArrival.arrivalTime());
-      prevArrival = new Bus(2, STOP_C, L1_STOP_ARR_TIME, waitCost, TRIP_B, prevArrival);
+      prevArrival = bus(2, STOP_C, L1_STOP_ARR_TIME, waitCost, TRIP_B, prevArrival);
 
       prevArrival = new Transfer(2, TX2_END, TX2_TRANSFER, prevArrival);
     }
@@ -332,7 +333,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       prevArrival = access(egressPath.stop(), arrivalTime, egressPath);
 
       cost = costL1ReverseIncWait(prevArrival.arrivalTime());
-      prevArrival = new Bus(2, STOP_A, L1_STOP_ARR_TIME_REV, cost, TRIP_A, prevArrival);
+      prevArrival = bus(2, STOP_A, L1_STOP_ARR_TIME_REV, cost, TRIP_A, prevArrival);
     } else {
       arrivalTime = L1_END + ALIGHT_SLACK + TX2_DURATION + TRANSFER_SLACK;
       arrivalTime = egressPath.earliestDepartureTime(arrivalTime);
@@ -340,7 +341,7 @@ public class FlexAccessAndEgressPathTestCase implements RaptorTestConstants {
       arrivalTime = prevArrival.arrivalTime() - TX2_DURATION;
       prevArrival = new Transfer(1, arrivalTime, TX2_TRANSFER_REV, prevArrival);
       cost = costL1ReverseIncWait(prevArrival.arrivalTime());
-      prevArrival = new Bus(2, STOP_B, L1_STOP_ARR_TIME_REV, cost, TRIP_B, prevArrival);
+      prevArrival = bus(2, STOP_B, L1_STOP_ARR_TIME_REV, cost, TRIP_B, prevArrival);
       arrivalTime = prevArrival.arrivalTime() - TX1_DURATION;
       prevArrival = new Transfer(2, arrivalTime, TX1_TRANSFER_REV, prevArrival);
     }

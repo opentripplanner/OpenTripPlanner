@@ -7,11 +7,11 @@ import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.TransitPathView;
 
-public class Bus extends AbstractStopArrival implements TransitPathView<TestTripSchedule> {
+class Transit extends AbstractStopArrival implements TransitPathView<TestTripSchedule> {
 
   private final TestTripSchedule trip;
 
-  public Bus(
+  Transit(
     int round,
     int stop,
     int arrivalTime,
