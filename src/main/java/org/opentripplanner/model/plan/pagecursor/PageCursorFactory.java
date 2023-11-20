@@ -19,7 +19,7 @@ public class PageCursorFactory {
   private Duration currentSearchWindow = null;
   private boolean wholeSwUsed = true;
   private ItineraryPageCut itineraryPageCut = null;
-  private PageCursorFactoryParameters pageCursorFactoryParams = null;
+  private PageCursorInput pageCursorFactoryParams = null;
 
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;
@@ -56,9 +56,7 @@ public class PageCursorFactory {
    *
    * @param pageCursorFactoryParams contains the result from the {@code PagingDuplicateFilter}
    */
-  public PageCursorFactory withRemovedItineraries(
-    PageCursorFactoryParameters pageCursorFactoryParams
-  ) {
+  public PageCursorFactory withRemovedItineraries(PageCursorInput pageCursorFactoryParams) {
     this.wholeSwUsed = false;
     this.pageCursorFactoryParams = pageCursorFactoryParams;
     this.itineraryPageCut =
