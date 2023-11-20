@@ -86,4 +86,17 @@ public class TestArrivals {
   ) {
     return new Transit(round, stop, arrivalTime, cost, trip, previous);
   }
+
+  public static ArrivalView<TestTripSchedule> egress(
+    int departureTime,
+    int arrivalTime,
+    int cost,
+    ArrivalView<TestTripSchedule> previous
+  ) {
+    return new Egress(
+      departureTime,
+      TestAccessEgress.walk(previous.stop(), Math.abs(arrivalTime - departureTime), cost),
+      previous
+    );
+  }
 }
