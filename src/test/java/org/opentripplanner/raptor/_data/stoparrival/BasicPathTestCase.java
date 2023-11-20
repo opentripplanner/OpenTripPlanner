@@ -5,6 +5,7 @@ import static org.opentripplanner.framework.time.DurationUtils.durationToStr;
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
 import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.access;
+import static org.opentripplanner.raptor._data.stoparrival.TestArrivals.transfer;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexWithOnBoard;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter.toRaptorCost;
@@ -227,7 +228,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     ArrivalView<TestTripSchedule> prevArrival;
     prevArrival = access(STOP_A, ACCESS_START, ACCESS_END, ACCESS_COST);
     prevArrival = new Bus(1, STOP_B, L11_END, LINE_11_COST, TRIP_1, prevArrival);
-    prevArrival = new Transfer(1, STOP_C, TX_START, TX_END, TX_COST, prevArrival);
+    prevArrival = transfer(1, STOP_C, TX_START, TX_END, TX_COST, prevArrival);
     prevArrival = new Bus(2, STOP_D, L21_END, LINE_21_COST, TRIP_2, prevArrival);
     prevArrival = new Bus(3, STOP_E, L31_END, LINE_31_COST, TRIP_3, prevArrival);
     Egress egress = new Egress(EGRESS_START, EGRESS_END, EGRESS_COST, prevArrival);
@@ -249,7 +250,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     // Board slack is subtracted from the arrival time to get the latest possible
     nextArrival = new Bus(1, STOP_D, L31_START, LINE_31_COST, TRIP_3, nextArrival);
     nextArrival = new Bus(2, STOP_C, L21_START, LINE_21_COST, TRIP_2, nextArrival);
-    nextArrival = new Transfer(2, STOP_B, TX_END, TX_START, TX_COST, nextArrival);
+    nextArrival = transfer(2, STOP_B, TX_END, TX_START, TX_COST, nextArrival);
     nextArrival = new Bus(3, STOP_A, L11_START, LINE_11_COST, TRIP_1, nextArrival);
     Egress egress = new Egress(ACCESS_END, ACCESS_START, ACCESS_COST, nextArrival);
     return new DestinationArrival<>(
