@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -32,7 +33,7 @@ public class RoutingResponseMapper {
   public static RoutingResponse map(
     RouteRequest request,
     ZonedDateTime transitSearchTimeZero,
-    SearchParams searchParams,
+    SearchParams raptorSearchParamsUsed,
     Duration searchWindowForNextSearch,
     NumItinerariesFilterResults numItinerariesFilterResults,
     List<Itinerary> itineraries,
@@ -54,7 +55,7 @@ public class RoutingResponseMapper {
     var factory = mapIntoPageCursorFactory(
       request.itinerariesSortOrder(),
       transitSearchTimeZero,
-      searchParams,
+      raptorSearchParamsUsed,
       searchWindowForNextSearch,
       numItinerariesFilterResults,
       request.pageCursor() == null ? null : request.pageCursor().type
@@ -69,7 +70,7 @@ public class RoutingResponseMapper {
 
     var metadata = createTripSearchMetadata(
       request,
-      searchParams,
+      raptorSearchParamsUsed,
       numItinerariesFilterResults == null
         ? null
         : numItinerariesFilterResults.firstRemovedDepartureTime,
@@ -91,40 +92,54 @@ public class RoutingResponseMapper {
   public static PageCursorFactory mapIntoPageCursorFactory(
     SortOrder sortOrder,
     ZonedDateTime transitSearchTimeZero,
-    SearchParams searchParams,
+    SearchParams raptorSearchParamsUsed,
     Duration searchWindowNextSearch,
     NumItinerariesFilterResults numItinerariesFilterResults,
     @Nullable PageType currentPageType
   ) {
+    Objects.requireNonNull(sortOrder);
+    Objects.requireNonNull(transitSearchTimeZero);
+
     var factory = new PageCursorFactory(sortOrder, searchWindowNextSearch);
 
-    if (searchParams == null) {
-      LOG.debug("SearchParams are null");
-      return factory;
-    }
-    if (!searchParams.isSearchWindowSet()) {
-      LOG.debug("SearchWindow not set");
-      return factory;
-    }
-    if (!searchParams.isEarliestDepartureTimeSet()) {
-      LOG.debug("Earliest departure time not set");
+    // No transit search performed
+    if (raptorSearchParamsUsed == null) {
       return factory;
     }
 
-    Instant edt = transitSearchTimeZero
-      .plusSeconds(searchParams.earliestDepartureTime())
-      .toInstant();
-    Instant lat = searchParams.isLatestArrivalTimeSet()
-      ? transitSearchTimeZero.plusSeconds(searchParams.latestArrivalTime()).toInstant()
-      : null;
-    Duration searchWindow = Duration.ofSeconds(searchParams.searchWindowInSeconds());
-    factory = factory.withOriginalSearch(currentPageType, edt, lat, searchWindow);
+    assertRequestPrerequisites(raptorSearchParamsUsed);
+
+    factory =
+      mapSearchParametersIntoFactory(
+        factory,
+        transitSearchTimeZero,
+        raptorSearchParamsUsed,
+        currentPageType
+      );
 
     if (numItinerariesFilterResults != null) {
       factory = factory.withRemovedItineraries(numItinerariesFilterResults);
     }
-
     return factory;
+  }
+
+  private static PageCursorFactory mapSearchParametersIntoFactory(
+    PageCursorFactory factory,
+    ZonedDateTime transitSearchTimeZero,
+    SearchParams raptorSearchParamsUsed,
+    PageType currentPageType
+  ) {
+    Instant edt = transitSearchTimeZero
+      .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime())
+      .toInstant();
+
+    Instant lat = raptorSearchParamsUsed.isLatestArrivalTimeSet()
+      ? transitSearchTimeZero.plusSeconds(raptorSearchParamsUsed.latestArrivalTime()).toInstant()
+      : null;
+
+    var searchWindowUsed = Duration.ofSeconds(raptorSearchParamsUsed.routerSearchWindowInSeconds());
+
+    return factory.withOriginalSearch(currentPageType, edt, lat, searchWindowUsed);
   }
 
   @Nullable
@@ -152,6 +167,15 @@ public class RoutingResponseMapper {
         searchParams.searchWindowInSeconds(),
         firstRemovedDepartureTime
       );
+    }
+  }
+
+  private static void assertRequestPrerequisites(SearchParams raptorSearchParamsUsed) {
+    if (!raptorSearchParamsUsed.isSearchWindowSet()) {
+      throw new IllegalStateException("SearchWindow not set");
+    }
+    if (!raptorSearchParamsUsed.isEarliestDepartureTimeSet()) {
+      throw new IllegalStateException("Earliest departure time not set");
     }
   }
 
