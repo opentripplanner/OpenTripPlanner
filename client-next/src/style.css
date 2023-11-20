@@ -1,28 +1,59 @@
-.navbar {
-  background-color: #fff;
-}
-
-.navbar-container {
-  margin-left: 1rem;
-}
-
 .navbar-brand {
   color: #4078bc;
+  margin-top: 20px;
+  margin-right: 14px;
 }
 
-.search-bar-container {
-  height: 5rem;
+@media (min-width: 2160px) {
+  .top-content {
+    height: 75px;
+  }
+
+  .below-content {
+    height: calc(100vh - 75px);
+  }
+}
+
+@media (max-width: 2159px) {
+  .top-content {
+    height: 150px;
+  }
+
+  .below-content {
+    height: calc(100vh - 150px);
+  }
+}
+
+@media (max-width: 1120px) {
+  .top-content {
+    height: 200px;
+  }
+
+  .below-content {
+    height: calc(100vh - 200px);
+  }
+}
+
+.map-container {
+  width: 100%;
+}
+
+.search-bar {
   padding-left: 1rem;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-right: 1rem;
 }
 
 .search-bar-route-button-wrapper {
   height: 5rem;
-  padding-top: 2rem;
+  padding-top: 25px;
 }
 
 .itinerary-list-container {
   width: 36rem;
-  height: calc(100vh - 200px);
   overflow-y: auto;
 }
 

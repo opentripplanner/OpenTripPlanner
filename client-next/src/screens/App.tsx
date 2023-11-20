@@ -1,6 +1,5 @@
 import { Stack } from 'react-bootstrap';
 import { MapView } from '../components/MapView/MapView.tsx';
-import { NavBarContainer } from '../components/NavBarContainer.tsx';
 import { SearchBar } from '../components/SearchBar/SearchBar.tsx';
 import { ItineraryListContainer } from '../components/ItineraryList/ItineraryListContainer.tsx';
 import { useState } from 'react';
@@ -20,12 +19,12 @@ export function App() {
 
   return (
     <div className="app">
-      <NavBarContainer />
       <SearchBar
         onRoute={callback}
         tripQueryVariables={tripQueryVariables}
         setTripQueryVariables={setTripQueryVariables}
       />
+
       <Stack direction="horizontal" gap={0}>
         <ItineraryListContainer
           tripQueryResult={tripQueryResult}

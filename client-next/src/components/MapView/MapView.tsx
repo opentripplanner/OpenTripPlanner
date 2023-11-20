@@ -27,20 +27,21 @@ export function MapView({
   const onMapDoubleClick = useMapDoubleClick({ tripQueryVariables, setTripQueryVariables });
 
   return (
-    <Map
-      // @ts-ignore
-      mapLib={import('maplibre-gl')}
-      // @ts-ignore
-      mapStyle={mapStyle}
-      initialViewState={initialViewState}
-      style={{ width: '100%', height: 'calc(100vh - 126px)' }}
-      onDblClick={onMapDoubleClick}
-    >
-      <NavigationControl position="top-left" />
-      <NavigationMarkers tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
-      {tripQueryResult?.trip.tripPatterns.length && (
-        <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
-      )}
-    </Map>
+    <div className="map-container below-content">
+      <Map
+        // @ts-ignore
+        mapLib={import('maplibre-gl')}
+        // @ts-ignore
+        mapStyle={mapStyle}
+        initialViewState={initialViewState}
+        onDblClick={onMapDoubleClick}
+      >
+        <NavigationControl position="top-left" />
+        <NavigationMarkers tripQueryVariables={tripQueryVariables} setTripQueryVariables={setTripQueryVariables} />
+        {tripQueryResult?.trip.tripPatterns.length && (
+          <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
+        )}
+      </Map>
+    </div>
   );
 }

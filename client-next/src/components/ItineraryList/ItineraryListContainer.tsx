@@ -21,7 +21,7 @@ export function ItineraryListContainer({
   const { containerRef, containerWidth } = useContainerWidth();
 
   return (
-    <section className="itinerary-list-container" ref={containerRef}>
+    <section className="itinerary-list-container below-content" ref={containerRef}>
       <ItineraryPaginationControl
         onPagination={pageResults}
         previousPageCursor={tripQueryResult?.trip.previousPageCursor}
