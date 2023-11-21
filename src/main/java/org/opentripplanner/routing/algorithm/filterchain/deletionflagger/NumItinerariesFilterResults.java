@@ -4,11 +4,11 @@ import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.pagecursor.PageCursorFactoryParameters;
+import org.opentripplanner.model.plan.pagecursor.PageCursorInput;
 import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationSection;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 
-public class NumItinerariesFilterResults implements PageCursorFactoryParameters {
+public class NumItinerariesFilterResults implements PageCursorInput {
 
   public final Instant earliestRemovedDeparture;
   public final Instant latestRemovedDeparture;

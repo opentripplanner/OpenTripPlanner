@@ -9,22 +9,23 @@ import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 
 /**
- * The PagingDuplicateFilter is used to remove potential duplicates when paging. It uses information
- * from the page cursor to determine which itineraries are potential duplicates.
+ * This class is used to enforce the cut/limit between two pages. It removes potential duplicates
+ * and keep missed itineraries. It uses information from the page cursor to determine which
+ * itineraries are potential duplicates and missed ones.
  * <p>
  * Based on where the previous results were cropped the potential duplicates will appear either at
  * the top of the list, or the bottom. If the previous results were cropped at the top, then the
  * potential duplicates will appear at the bottom of the list. If the previous results were cropped
  * at the bottom, then the potential duplicates will appear at the top of the list.
  */
-public class PagingDuplicateFilter implements ItineraryDeletionFlagger {
+public class PagingFilter implements ItineraryDeletionFlagger {
 
-  public static final String TAG = "paging-deduplication-filter";
+  public static final String TAG = "paging-filter";
 
   private final ItineraryPageCut itineraryPageCut;
   private final Comparator<ItinerarySortKey> sortOrderComparator;
 
-  public PagingDuplicateFilter(ItineraryPageCut itineraryPageCut) {
+  public PagingFilter(ItineraryPageCut itineraryPageCut) {
     this.itineraryPageCut = itineraryPageCut;
     this.sortOrderComparator = SortOrderComparator.comparator(itineraryPageCut.sortOrder());
   }

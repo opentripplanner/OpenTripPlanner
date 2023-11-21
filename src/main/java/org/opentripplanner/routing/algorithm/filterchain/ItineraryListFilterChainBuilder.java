@@ -24,7 +24,7 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItin
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OtherThanSameLegsMaxGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.PagingDuplicateFilter;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.PagingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveBikerentalWithMostlyWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveItinerariesWithShortStreetLeg;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveParkAndRideWithMostlyWalkingFilter;
@@ -347,12 +347,11 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
     if (itineraryPageCut != null) {
-      filters.add(new DeletionFlaggingFilter(new PagingDuplicateFilter(itineraryPageCut)));
+      filters.add(new DeletionFlaggingFilter(new PagingFilter(itineraryPageCut)));
     }
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
@@ -380,8 +379,8 @@ public class ItineraryListFilterChainBuilder {
       filters.add(faresFilter);
     }
 
-    if (this.emissionsFilter != null) {
-      filters.add(this.emissionsFilter);
+    if (emissionsFilter != null) {
+      filters.add(emissionsFilter);
     }
 
     if (transitAlertService != null) {

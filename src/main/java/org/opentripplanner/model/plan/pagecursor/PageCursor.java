@@ -50,6 +50,11 @@ public class PageCursor {
   }
 
   @Nullable
+  public String encode() {
+    return PageCursorSerializer.encode(this);
+  }
+
+  @Nullable
   public static PageCursor decode(String cursor) {
     return PageCursorSerializer.decode(cursor);
   }
@@ -65,10 +70,5 @@ public class PageCursor {
       .addDuration("searchWindow", searchWindow)
       .addObj("itineraryPageCut", itineraryPageCut)
       .toString();
-  }
-
-  @Nullable
-  public String encode() {
-    return PageCursorSerializer.encode(this);
   }
 }

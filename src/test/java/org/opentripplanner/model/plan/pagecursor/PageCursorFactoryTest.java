@@ -47,7 +47,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
       .withOriginalSearch(NEXT_PAGE, T12_00, null, D1H)
       .withRemovedItineraries(
-        new PageCursorFactoryParametersImpl(
+        new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_10), B).build(),
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
           PagingDeduplicationSection.HEAD
@@ -78,7 +78,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     var factory = new PageCursorFactory(STREET_AND_ARRIVAL_TIME, D90M)
       .withOriginalSearch(PREVIOUS_PAGE, T12_00, null, D1H)
       .withRemovedItineraries(
-        new PageCursorFactoryParametersImpl(
+        new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_10), B).build(),
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
           PagingDeduplicationSection.TAIL
@@ -109,7 +109,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
       .withOriginalSearch(PREVIOUS_PAGE, T12_00, T13_30, D1H)
       .withRemovedItineraries(
-        new PageCursorFactoryParametersImpl(
+        new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_30), B).build(),
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
           PagingDeduplicationSection.HEAD
@@ -140,7 +140,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     var factory = new PageCursorFactory(STREET_AND_DEPARTURE_TIME, D90M)
       .withOriginalSearch(NEXT_PAGE, T12_00, T13_30, D1H)
       .withRemovedItineraries(
-        new PageCursorFactoryParametersImpl(
+        new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_30), B).build(),
           newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
           PagingDeduplicationSection.TAIL
@@ -177,7 +177,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assertEquals(hasDedupeParams, pageCursor.itineraryPageCut != null);
   }
 
-  private record PageCursorFactoryParametersImpl(
+  private record TestPageCursorInput(
     Instant earliestKeptArrival,
     Instant earliestRemovedDeparture,
     Instant latestRemovedDeparture,
@@ -189,8 +189,8 @@ class PageCursorFactoryTest implements PlanTestConstants {
     Instant firstRemovedDepartureTime,
     PagingDeduplicationSection deduplicationSection
   )
-    implements PageCursorFactoryParameters {
-    public PageCursorFactoryParametersImpl(
+    implements PageCursorInput {
+    public TestPageCursorInput(
       Itinerary keptItinerary,
       Itinerary removedItinerary,
       PagingDeduplicationSection deduplicationSection
