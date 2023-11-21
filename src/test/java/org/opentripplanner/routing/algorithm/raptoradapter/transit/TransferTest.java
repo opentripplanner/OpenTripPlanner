@@ -22,6 +22,9 @@ class TransferTest {
     Coordinates.BERLIN_BRANDENBURG_GATE
   );
   private static final IntersectionVertex BOSTON_V = intersectionVertex(Coordinates.BOSTON);
+  private static final int MAX_RAPTOR_TRANSFER_COST = RaptorCostConverter.toRaptorCost(
+    Transfer.MAX_TRANSFER_COST
+  );
 
   @Nested
   class WithEdges {
@@ -33,7 +36,7 @@ class TransferTest {
 
       var veryLongTransfer = new Transfer(0, List.of(edge));
       assertTrue(veryLongTransfer.getDistanceMeters() > 1_000_000);
-      // cost would be too high, so it should not be included in RAPTOR search
+      // cost would be too high, so it should be capped to a maximum value
       assertMaxCost(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).get());
     }
 
@@ -45,7 +48,7 @@ class TransferTest {
       final Optional<RaptorTransfer> raptorTransfer = transfer.asRaptorTransfer(
         StreetSearchRequest.of().build()
       );
-      // cost is below max limit and included in RAPTOR unchanged
+      // cost is below max limit and included as is in RAPTOR unchanged
       assertBelowMaxCost(raptorTransfer.get());
     }
   }
@@ -68,7 +71,7 @@ class TransferTest {
     @Test
     void limitMaxCost() {
       var veryLongTransfer = new Transfer(0, 8_000_000);
-      // cost would be too high, so it should not be included in RAPTOR search
+      // cost would be too high, so it will be capped before passing to RAPTOR
       assertMaxCost(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).get());
     }
 
@@ -78,21 +81,16 @@ class TransferTest {
       final Optional<RaptorTransfer> raptorTransfer = transfer.asRaptorTransfer(
         StreetSearchRequest.of().build()
       );
-      // cost is below max limit and should be included in RAPTOR
+      // cost is below max limit and should be included as is in RAPTOR
       assertBelowMaxCost(raptorTransfer.get());
     }
   }
 
   private static void assertMaxCost(RaptorTransfer transfer) {
-    assertEquals(
-      RaptorCostConverter.toRaptorCost(Transfer.MAX_TRANSFER_COST),
-      transfer.generalizedCost()
-    );
+    assertEquals(MAX_RAPTOR_TRANSFER_COST, transfer.generalizedCost());
   }
 
   private static void assertBelowMaxCost(RaptorTransfer transfer) {
-    assertTrue(
-      RaptorCostConverter.toRaptorCost(Transfer.MAX_TRANSFER_COST) > transfer.generalizedCost()
-    );
+    assertTrue(MAX_RAPTOR_TRANSFER_COST > transfer.generalizedCost());
   }
 }
