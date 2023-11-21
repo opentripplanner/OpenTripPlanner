@@ -55,7 +55,7 @@ class VehicleParkingPreferencesTest {
   }
 
   @Test
-  void testCopyOfEqualsAndHashCode() {
+  void testEqualsAndHashCode() {
     // Return same object if no value is set
     assertSame(VehicleParkingPreferences.DEFAULT, VehicleParkingPreferences.of().build());
 
