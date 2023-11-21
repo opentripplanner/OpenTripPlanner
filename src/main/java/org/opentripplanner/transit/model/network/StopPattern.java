@@ -5,11 +5,13 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -320,6 +322,20 @@ public final class StopPattern implements Serializable {
         pickups[index] = PickDrop.CANCELLED;
         dropoffs[index] = PickDrop.CANCELLED;
       });
+      return this;
+    }
+
+    /**
+     * Replace the stop {@code old} in the stop pattern with ${code newStop}.
+     */
+    public StopPatternBuilder replaceStop(FeedScopedId old, StopLocation newStop) {
+      Objects.requireNonNull(old);
+      Objects.requireNonNull(newStop);
+      for (int i = 0; i < stops.length; i++) {
+        if (stops[i].getId().equals(old)) {
+          stops[i] = newStop;
+        }
+      }
       return this;
     }
 

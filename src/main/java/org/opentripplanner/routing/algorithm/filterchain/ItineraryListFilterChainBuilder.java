@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
-import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
@@ -44,7 +43,6 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistanc
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
-import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.site.MultiModalStation;
@@ -74,7 +72,6 @@ public class ItineraryListFilterChainBuilder {
   private Duration searchWindow = null;
   private boolean accessibilityScore;
   private double wheelchairMaxSlope;
-  private FareService faresService;
   private TransitAlertService transitAlertService;
   private Function<Station, MultiModalStation> getMultiModalStation;
   private boolean removeItinerariesWithSameRoutesAndStops;
@@ -82,11 +79,21 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeTransitIfWalkingIsBetter = true;
   private ItineraryPageCut itineraryPageCut;
 
+  /**
+   * Sandbox filters which decorate the itineraries with extra information.
+   */
+
   @Sandbox
   private ItineraryListFilter emissionsFilter;
 
   @Sandbox
+  private ItineraryListFilter faresFilter;
+
+  @Sandbox
   private ItineraryListFilter rideHailingFilter;
+
+  @Sandbox
+  private ItineraryListFilter stopConsolidationFilter;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -306,8 +313,8 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withFares(FareService fareService) {
-    this.faresService = fareService;
+  public ItineraryListFilterChainBuilder withFaresFilter(ItineraryListFilter filter) {
+    this.faresFilter = filter;
     return this;
   }
 
@@ -330,6 +337,13 @@ public class ItineraryListFilterChainBuilder {
 
   public ItineraryListFilterChainBuilder withRideHailingFilter(ItineraryListFilter filter) {
     this.rideHailingFilter = filter;
+    return this;
+  }
+
+  public ItineraryListFilterChainBuilder withStopConsolidationFilter(
+    @Nullable ItineraryListFilter filter
+  ) {
+    this.stopConsolidationFilter = filter;
     return this;
   }
 
@@ -362,8 +376,8 @@ public class ItineraryListFilterChainBuilder {
       filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
     }
 
-    if (faresService != null) {
-      filters.add(new FaresFilter(faresService));
+    if (faresFilter != null) {
+      filters.add(faresFilter);
     }
 
     if (this.emissionsFilter != null) {
@@ -466,8 +480,18 @@ public class ItineraryListFilterChainBuilder {
     // Do the final itineraries sort
     filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
 
+    // Sandbox filters to decorate itineraries
+
+    if (faresFilter != null) {
+      filters.add(faresFilter);
+    }
+
     if (rideHailingFilter != null) {
       filters.add(rideHailingFilter);
+    }
+
+    if (stopConsolidationFilter != null) {
+      filters.add(stopConsolidationFilter);
     }
 
     var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
