@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.street.model._data.StreetModelForTest.intersectionVertex;
 
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.Coordinates;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.model.vertex.IntersectionVertex;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
@@ -19,8 +21,8 @@ class TransferTest {
   private static final IntersectionVertex BRANDENBURG_GATE_V = intersectionVertex(
     Coordinates.BERLIN_BRANDENBURG_GATE
   );
-  private static final IntersectionVertex KONGSBERG_V = intersectionVertex(
-    Coordinates.KONGSBERG_PLATFORM_1
+  private static final IntersectionVertex BOSTON_V = intersectionVertex(
+    Coordinates.BOSTON
   );
 
   @Nested
@@ -28,13 +30,13 @@ class TransferTest {
 
     @Test
     void limitMaxCost() {
-      // very long edge from Berlin to Kongsberg, Norway that has of course a huge cost to traverse
-      var edge = StreetModelForTest.streetEdge(BERLIN_V, KONGSBERG_V);
+      // very long edge from Berlin to Boston that has of course a huge cost to traverse
+      var edge = StreetModelForTest.streetEdge(BERLIN_V, BOSTON_V);
 
       var veryLongTransfer = new Transfer(0, List.of(edge));
-      assertTrue(veryLongTransfer.getDistanceMeters() > 800_000);
+      assertTrue(veryLongTransfer.getDistanceMeters() > 1_000_000);
       // cost would be too high, so it should not be included in RAPTOR search
-      assertTrue(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).isEmpty());
+      assertMaxCost(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).get());
     }
 
     @Test
@@ -50,26 +52,27 @@ class TransferTest {
     }
   }
 
+
   @Nested
   class WithoutEdges {
 
     @Test
     void overflow() {
       var veryLongTransfer = new Transfer(0, Integer.MAX_VALUE);
-      assertTrue(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).isEmpty());
+      assertMaxCost(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).get());
     }
 
     @Test
     void negativeCost() {
       var veryLongTransfer = new Transfer(0, -5);
-      assertTrue(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).isEmpty());
+      assertMaxCost(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).get());
     }
 
     @Test
     void limitMaxCost() {
-      var veryLongTransfer = new Transfer(0, 800_000);
+      var veryLongTransfer = new Transfer(0, 8_000_000);
       // cost would be too high, so it should not be included in RAPTOR search
-      assertTrue(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).isEmpty());
+      assertMaxCost(veryLongTransfer.asRaptorTransfer(StreetSearchRequest.of().build()).get());
     }
 
     @Test
@@ -82,4 +85,9 @@ class TransferTest {
       assertTrue(raptorTransfer.isPresent());
     }
   }
+
+  private static void assertMaxCost(RaptorTransfer transfer) {
+    assertEquals(RaptorCostConverter.toRaptorCost(Transfer.MAX_TRANSFER_COST), transfer.generalizedCost());
+  }
+
 }

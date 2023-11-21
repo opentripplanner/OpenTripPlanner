@@ -16,25 +16,7 @@ import org.opentripplanner.street.search.state.StateEditor;
 
 public class Transfer {
 
-  /**
-   * Since transfer costs are not computed through a full A* with pruning they can incur an
-   * absurdly high cost that overflows the integer cost inside RAPTOR
-   * (https://github.com/opentripplanner/OpenTripPlanner/issues/5509).
-   * <p>
-   * An example would be a transfer using lots of stairs being used on a wheelchair when no
-   * wheelchair-specific one has been generated.
-   * (see https://docs.opentripplanner.org/en/dev-2.x/Accessibility/).
-   * <p>
-   * For this reason there is this sanity limit that makes sure that the transfer cost stays below a
-   * limit that is still very high (several days of transit-equivalent cost) but far away from the
-   * integer overflow.
-   * <p>
-   * The unit is in RAPTOR cost, so it's centiseconds.
-   *
-   * @see EdgeTraverser
-   * @see RaptorCostConverter
-   */
-  private static final int MAX_TRANSFER_RAPTOR_COST = Integer.MAX_VALUE / 30;
+  protected static final int MAX_TRANSFER_COST = 2_000_000;
 
   private final int toStop;
 
@@ -80,19 +62,15 @@ public class Transfer {
   }
 
   public Optional<RaptorTransfer> asRaptorTransfer(StreetSearchRequest request) {
-    return toRaptor(request)
-      .filter(s -> s.generalizedCost() < MAX_TRANSFER_RAPTOR_COST && s.generalizedCost() >= 0);
-  }
-
-  private Optional<RaptorTransfer> toRaptor(StreetSearchRequest request) {
     WalkPreferences walkPreferences = request.preferences().walk();
     if (edges == null || edges.isEmpty()) {
       double durationSeconds = distanceMeters / walkPreferences.speed();
+      final double domainCost = costLimitSanityCheck(durationSeconds * walkPreferences.reluctance());
       return Optional.of(
         new DefaultRaptorTransfer(
           this.toStop,
           (int) Math.ceil(durationSeconds),
-          RaptorCostConverter.toRaptorCost(durationSeconds * walkPreferences.reluctance()),
+          RaptorCostConverter.toRaptorCost(domainCost),
           this
         )
       );
@@ -107,10 +85,30 @@ public class Transfer {
       new DefaultRaptorTransfer(
         this.toStop,
         (int) s.getElapsedTimeSeconds(),
-        RaptorCostConverter.toRaptorCost(s.getWeight()),
+        RaptorCostConverter.toRaptorCost(costLimitSanityCheck(s.getWeight())),
         this
       )
     );
+  }
+
+  /**
+   * Since transfer costs are not computed through a full A* with pruning they can incur an
+   * absurdly high cost that overflows the integer cost inside RAPTOR
+   * (https://github.com/opentripplanner/OpenTripPlanner/issues/5509).
+   * <p>
+   * An example would be a transfer using lots of stairs being used on a wheelchair when no
+   * wheelchair-specific one has been generated.
+   * (see https://docs.opentripplanner.org/en/dev-2.x/Accessibility/).
+   * <p>
+   * For this reason there is this sanity limit that makes sure that the transfer cost stays below a
+   * limit that is still very high (several days of transit-equivalent cost) but far away from the
+   * integer overflow.
+   *
+   * @see EdgeTraverser
+   * @see RaptorCostConverter
+   */
+  private static int costLimitSanityCheck(double cost) {
+    return (cost >= 0 && cost <= MAX_TRANSFER_COST) ? (int) cost : MAX_TRANSFER_COST;
   }
 
   @Override
