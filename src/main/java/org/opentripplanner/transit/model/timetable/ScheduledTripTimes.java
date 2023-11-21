@@ -263,7 +263,7 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
    * negative running or dwell times. We really don't want those being used in routing. This method
    * checks that all times are increasing.
    *
-   * @return empty if times were found to be increasing, stop index of the first error otherwise
+   * @return empty if times were found to be increasing, the first validation error otherwise
    */
   public Optional<ValidationError> validateNonIncreasingTimes() {
     final int nStops = arrivalTimes.length;
@@ -293,7 +293,7 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
    * Returns the GTFS sequence number of the given 0-based stop position.
    *
    * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits the
-   * stops. Despite the face that the StopPattern or TripPattern enclosing this class provides
+   * stops. Despite the fact that the StopPattern or TripPattern enclosing this class provides
    * an ordered list of Stops, the original stop sequence numbers may still be needed for matching
    * with GTFS-RT update messages. Unfortunately, each individual trip can have totally different
    * sequence numbers for the same stops, so we need to store them at the individual trip level. An
