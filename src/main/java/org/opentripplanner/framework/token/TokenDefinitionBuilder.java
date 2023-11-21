@@ -17,7 +17,7 @@ public class TokenDefinitionBuilder {
 
   TokenDefinitionBuilder(List<TokenDefinition> head, TokenDefinition last) {
     this(last.version() + 1);
-    this.fields.addAll(last.listNoneDeprecatedFields());
+    this.fields.addAll(last.listNonDeprecatedFields());
     this.tokensHead.addAll(head);
     this.tokensHead.add(last);
   }

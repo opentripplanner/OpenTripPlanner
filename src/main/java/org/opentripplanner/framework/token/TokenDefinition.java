@@ -74,7 +74,7 @@ public class TokenDefinition {
     throw unknownFieldNameException(name);
   }
 
-  List<FieldDefinition> listNoneDeprecatedFields() {
+  List<FieldDefinition> listNonDeprecatedFields() {
     return listFields().stream().filter(it -> !it.deprecated()).toList();
   }
 
