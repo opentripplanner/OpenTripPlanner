@@ -19,7 +19,7 @@ public class PageCursorFactory {
   private Duration currentSearchWindow = null;
   private boolean wholeSwUsed = true;
   private ItineraryPageCut itineraryPageCut = null;
-  private PageCursorInput pageCursorFactoryParams = null;
+  private PageCursorInput pageCursorInput = null;
 
   private PageCursor nextCursor = null;
   private PageCursor prevCursor = null;
@@ -58,7 +58,7 @@ public class PageCursorFactory {
    */
   public PageCursorFactory withRemovedItineraries(PageCursorInput pageCursorFactoryParams) {
     this.wholeSwUsed = false;
-    this.pageCursorFactoryParams = pageCursorFactoryParams;
+    this.pageCursorInput = pageCursorFactoryParams;
     this.itineraryPageCut =
       new ItineraryPageCut(
         pageCursorFactoryParams.earliestRemovedDeparture().truncatedTo(ChronoUnit.SECONDS),
@@ -96,7 +96,7 @@ public class PageCursorFactory {
       .addDuration("currentSearchWindow", currentSearchWindow)
       .addDuration("newSearchWindow", newSearchWindow)
       .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
-      .addObj("pageCursorFactoryParams", pageCursorFactoryParams)
+      .addObj("pageCursorFactoryParams", pageCursorInput)
       .addObj("nextCursor", nextCursor)
       .addObj("prevCursor", prevCursor)
       .toString();
@@ -129,9 +129,9 @@ public class PageCursorFactory {
     } else { // If the whole search window was not used (i.e. if there were removed itineraries)
       if (currentPageType == NEXT_PAGE) {
         prev.edt = edtBeforeNewSw();
-        next.edt = pageCursorFactoryParams.earliestRemovedDeparture();
+        next.edt = pageCursorInput.earliestRemovedDeparture();
         if (sortOrder.isSortedByArrivalTimeAscending()) {
-          prev.lat = pageCursorFactoryParams.earliestKeptArrival().truncatedTo(ChronoUnit.MINUTES);
+          prev.lat = pageCursorInput.earliestKeptArrival().truncatedTo(ChronoUnit.MINUTES);
         } else {
           prev.lat = current.lat;
         }
@@ -139,10 +139,9 @@ public class PageCursorFactory {
         // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
         // search-window from the last time included in the search window we need to include one extra
         // minute at the end.
-        prev.edt =
-          pageCursorFactoryParams.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
+        prev.edt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
         next.edt = edtAfterUsedSw();
-        prev.lat = pageCursorFactoryParams.latestRemovedArrival();
+        prev.lat = pageCursorInput.latestRemovedArrival();
       }
     }
     prevCursor = new PageCursor(PREVIOUS_PAGE, sortOrder, prev.edt, prev.lat, newSearchWindow);

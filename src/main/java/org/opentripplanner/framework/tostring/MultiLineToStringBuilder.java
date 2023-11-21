@@ -12,7 +12,7 @@ import org.opentripplanner.framework.time.DurationUtils;
 
 /**
  * When debug logging it is much more readable if the logging is nicely formatted with line-breaks.
- * This builder can be used to create a nice list of key/values. It also allows braking a
+ * This builder can be used to create a nice list of key/values. It also allows breaking a
  * collection of values into lines. It only allows for two nested levels, see {@code PageCursor}
  * below.
  * <p>
@@ -29,7 +29,7 @@ import org.opentripplanner.framework.time.DurationUtils;
  * 	]
  * }
  * </pre>
- * The {@code '...'} is just to shorten the doc, this class do not truncate lines.
+ * The {@code '...'} is just to shorten the doc, this class does not truncate lines.
  */
 public class MultiLineToStringBuilder {
 

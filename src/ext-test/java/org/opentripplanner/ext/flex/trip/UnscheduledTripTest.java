@@ -37,7 +37,7 @@ import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class UnscheduledTripTest {
+class UnscheduledTripTest {
 
   private static final int STOP_A = 0;
   private static final int STOP_B = 1;
@@ -620,8 +620,8 @@ public class UnscheduledTripTest {
         .of(0, 1)
         .forEach(index -> {
           var template = templates.get(index);
-          assertEquals(template.fromStopIndex, 0);
-          assertEquals(template.toStopIndex, index + 2);
+          assertEquals(0, template.fromStopIndex);
+          assertEquals(index + 2, template.toStopIndex);
         });
     }
 
@@ -633,8 +633,8 @@ public class UnscheduledTripTest {
 
       assertEquals(4, templates.size());
       var template = templates.get(0);
-      assertEquals(template.fromStopIndex, 3);
-      assertEquals(template.toStopIndex, 0);
+      assertEquals(0, template.fromStopIndex);
+      assertEquals(3, template.toStopIndex);
     }
 
     @Nonnull

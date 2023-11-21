@@ -41,7 +41,7 @@ public class GenerateTripPatternsOperation {
   private final DataImportIssueStore issueStore;
   private final Deduplicator deduplicator;
   private final Set<FeedScopedId> calendarServiceIds;
-  private GeometryProcessor geometryProcessor;
+  private final GeometryProcessor geometryProcessor;
 
   private final Multimap<StopPattern, TripPattern> tripPatterns;
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
