@@ -1,6 +1,7 @@
 package org.opentripplanner.framework.token;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.time.Duration;
@@ -8,57 +9,73 @@ import java.time.Instant;
 import java.util.Base64;
 import org.opentripplanner.framework.time.DurationUtils;
 
-class Serializer {
+class Serializer implements Closeable {
 
   private final TokenDefinition definition;
+  private final Object[] values;
+  private final ObjectOutputStream out;
   private final ByteArrayOutputStream buf = new ByteArrayOutputStream();
 
-  Serializer(TokenDefinition definition) {
+  private Serializer(TokenDefinition definition, Object[] values) throws IOException {
     this.definition = definition;
+    this.values = values;
+    this.out = new ObjectOutputStream(buf);
   }
 
-  String serialize(Object[] values) throws IOException {
-    try (var out = new ObjectOutputStream(buf)) {
-      writeInt(out, definition.version());
+  @Override
+  public void close() throws IOException {
+    out.close();
+  }
+
+  static String serialize(TokenDefinition definition, Object[] values) throws IOException {
+    try (var s = new Serializer(definition, values)) {
+      s.writeInt(definition.version());
 
       for (var fieldName : definition.fieldNames()) {
-        var value = values[definition.index(fieldName)];
-        write(out, fieldName, value);
+        s.write(fieldName);
       }
-      out.flush();
+      return s.serialize();
     }
+  }
+
+  private String serialize() throws IOException {
+    out.close();
     return Base64.getUrlEncoder().encodeToString(buf.toByteArray());
   }
 
-  private void write(ObjectOutputStream out, String fieldName, Object value) throws IOException {
+  private void write(String fieldName) throws IOException {
+    write(fieldName, values[definition.index(fieldName)]);
+  }
+
+  private void write(String fieldName, Object value) throws IOException {
     var type = definition.type(fieldName);
     switch (type) {
-      case BYTE -> writeByte(out, (byte) value);
-      case DURATION -> writeDuration(out, (Duration) value);
-      case INT -> writeInt(out, (int) value);
-      case STRING -> writeString(out, (String) value);
-      case TIME_INSTANT -> writeTimeInstant(out, (Instant) value);
+      case BYTE -> writeByte((byte) value);
+      case DURATION -> writeDuration((Duration) value);
+      case INT -> writeInt((int) value);
+      case STRING -> writeString((String) value);
+      case TIME_INSTANT -> writeTimeInstant((Instant) value);
       default -> throw new IllegalArgumentException("Unknown type: " + type);
     }
   }
 
-  private static void writeByte(ObjectOutputStream out, byte value) throws IOException {
+  private void writeByte(byte value) throws IOException {
     out.writeByte(value);
   }
 
-  private static void writeInt(ObjectOutputStream out, int value) throws IOException {
+  private void writeInt(int value) throws IOException {
     out.writeUTF(Integer.toString(value));
   }
 
-  private static void writeString(ObjectOutputStream out, String value) throws IOException {
+  private void writeString(String value) throws IOException {
     out.writeUTF(value);
   }
 
-  private static void writeDuration(ObjectOutputStream out, Duration duration) throws IOException {
+  private void writeDuration(Duration duration) throws IOException {
     out.writeUTF(DurationUtils.durationToStr(duration));
   }
 
-  private static void writeTimeInstant(ObjectOutputStream out, Instant time) throws IOException {
+  private void writeTimeInstant(Instant time) throws IOException {
     out.writeUTF(time.toString());
   }
 }

@@ -8,7 +8,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DurationUtils;
 
 class Deserializer {
@@ -92,7 +91,6 @@ class Deserializer {
     return DurationUtils.duration(in.readUTF());
   }
 
-  @Nullable
   private static Instant readTimeInstant(ObjectInputStream in) throws IOException {
     return Instant.parse(in.readUTF());
   }

@@ -40,7 +40,7 @@ public class TokenBuilder {
 
   public String build() {
     try {
-      return new Serializer(definition).serialize(values);
+      return Serializer.serialize(definition, values);
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
