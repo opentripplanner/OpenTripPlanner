@@ -45,7 +45,7 @@ class TransferTest {
       final Optional<RaptorTransfer> raptorTransfer = transfer.asRaptorTransfer(
         StreetSearchRequest.of().build()
       );
-      // cost is below max limit and should be included in RAPTOR
+      // cost is below max limit and included in RAPTOR unchanged
       assertBelowMaxCost(raptorTransfer.get());
     }
   }
