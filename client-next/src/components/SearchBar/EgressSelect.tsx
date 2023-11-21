@@ -22,7 +22,6 @@ export function EgressSelect({
               ...tripQueryVariables,
               modes: {
                 ...tripQueryVariables.modes,
-                accessMode: tripQueryVariables.modes?.accessMode || (e.target.value as StreetMode),
                 egressMode: e.target.value as StreetMode,
               },
             });
@@ -33,7 +32,6 @@ export function EgressSelect({
                 tripQueryVariables.modes?.directMode || tripQueryVariables.modes?.transportModes
                   ? {
                       ...tripQueryVariables.modes,
-                      accessMode: undefined,
                       egressMode: undefined,
                     }
                   : undefined,

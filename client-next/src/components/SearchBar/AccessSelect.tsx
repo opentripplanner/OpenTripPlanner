@@ -23,7 +23,6 @@ export function AccessSelect({
               modes: {
                 ...tripQueryVariables.modes,
                 accessMode: e.target.value as StreetMode,
-                egressMode: tripQueryVariables.modes?.egressMode || (e.target.value as StreetMode),
               },
             });
           } else {
@@ -34,7 +33,6 @@ export function AccessSelect({
                   ? {
                       ...tripQueryVariables.modes,
                       accessMode: undefined,
-                      egressMode: undefined,
                     }
                   : undefined,
             });
