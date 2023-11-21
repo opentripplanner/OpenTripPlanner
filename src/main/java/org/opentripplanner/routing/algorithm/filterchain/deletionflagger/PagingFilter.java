@@ -9,7 +9,7 @@ import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 
 /**
- * This class is used to enforce the cut/limit between to pages. It removes potential duplicates
+ * This class is used to enforce the cut/limit between two pages. It removes potential duplicates
  * and keep missed itineraries. It uses information from the page cursor to determine which
  * itineraries are potential duplicates and missed ones.
  * <p>
