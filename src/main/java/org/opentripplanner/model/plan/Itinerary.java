@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -371,6 +372,27 @@ public class Itinerary implements ItinerarySortKey {
    */
   public List<Leg> getLegs() {
     return legs;
+  }
+
+  /**
+   * Applies the transformation in {@code mapper} to all instances of {@link TransitLeg} in the
+   * legs of this Itinerary.
+   * <p>
+   * NOTE: The itinerary is mutable so the transformation is done in-place!
+   */
+  public Itinerary transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
+    legs =
+      legs
+        .stream()
+        .map(l -> {
+          if (l instanceof TransitLeg tl) {
+            return mapper.apply(tl);
+          } else {
+            return l;
+          }
+        })
+        .toList();
+    return this;
   }
 
   public Stream<StreetLeg> getStreetLegs() {
