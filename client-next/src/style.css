@@ -1,3 +1,6 @@
+.app {
+  min-width: 810px;
+}
 .navbar-brand {
   color: #4078bc;
   margin-top: 20px;

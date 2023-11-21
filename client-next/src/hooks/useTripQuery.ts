@@ -3,8 +3,7 @@ import { graphql } from '../gql';
 import request from 'graphql-request';
 import { QueryType, TripQueryVariables } from '../gql/graphql.ts';
 
-// TODO: make this endpoint url configurable
-const endpoint = `https://api.entur.io/journey-planner/v3/graphql`;
+const endpoint = import.meta.env.VITE_API_URL;
 
 /**
   General purpose trip query document for debugging trip searches
