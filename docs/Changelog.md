@@ -46,6 +46,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Keep min transfer filter is not local to group-by-filters [#5436](https://github.com/opentripplanner/OpenTripPlanner/pull/5436)
 - Add paging deduplication when cropping. [#5458](https://github.com/opentripplanner/OpenTripPlanner/pull/5458)
 - Consolidate equivalent stops from several feeds  [#5429](https://github.com/opentripplanner/OpenTripPlanner/pull/5429)
+- Check transport mode when mapping GroupStops [#5518](https://github.com/opentripplanner/OpenTripPlanner/pull/5518)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
