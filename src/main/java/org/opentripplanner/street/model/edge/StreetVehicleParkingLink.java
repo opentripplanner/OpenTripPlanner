@@ -68,9 +68,10 @@ public class StreetVehicleParkingLink extends Edge {
     }
 
     var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
-    final VehicleParkingPreferences parkingPreferences = s0.currentMode() == TraverseMode.CAR
-      ? s0.getRequest().preferences().car().parking()
-      : s0.getRequest().preferences().bike().parking();
+    final VehicleParkingPreferences parkingPreferences = s0
+      .getRequest()
+      .preferences()
+      .parking(s0.currentMode());
     if (traversalBanned(parkingPreferences, vehicleParking)) {
       return State.empty();
     }

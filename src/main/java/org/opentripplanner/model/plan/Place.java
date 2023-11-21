@@ -135,9 +135,7 @@ public class Place {
       traverseMode = TraverseMode.BICYCLE;
     }
 
-    var parkingPreferences = traverseMode == TraverseMode.CAR
-      ? request.preferences().car().parking()
-      : request.preferences().bike().parking();
+    var parkingPreferences = request.preferences().parking(traverseMode);
 
     boolean realTime =
       parkingPreferences.useAvailabilityInformation() &&
