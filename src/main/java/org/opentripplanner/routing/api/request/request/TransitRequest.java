@@ -60,8 +60,8 @@ public class TransitRequest implements Cloneable, Serializable {
 
   /**
    * All transit patterns matching one of the {@link TransitPriorityGroupSelect}s is assigned the
-   * BASE-GROUP-ID. This is normally EVERYTHING including local-traffic, that does not
-   * need to be threaded in a special way.
+   * BASE-GROUP-ID. This is normally EVERYTHING, including local-traffic, that does not
+   * need to be treated in a special way.
    * <p>
    * Note! Entities that do not mach any of the three sets({@code #priorityGroupsBase()},
    * {@link #priorityGroupsByAgency} and {@link #priorityGroupsGlobal()})

@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
 import static org.opentripplanner.standalone.config.routerequest.VehicleRentalConfig.setVehicleRental;
@@ -339,11 +340,11 @@ ferries, where the check-in process needs to be done in good time before ride.
 
     String relaxTransitPriorityGroupValue = c
       .of("relaxTransitPriorityGroup")
-      .since(V2_3)
+      .since(V2_5)
       .summary("The relax function for transit-priority-groups")
       .description(
         """
-        A path is considered optimal if it the generalized-cost is less than the 
+        A path is considered optimal if the generalized-cost is less than the 
         generalized-cost of another path. If this parameter is set, the comparison is relaxed
         further if they belong to different transit-priority-groups.
         """

@@ -4,7 +4,7 @@ import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
 
 /**
- * This is a "BitSet" implementation for groupId. It can store until 32 groups,
+ * This is a "BitSet" implementation for groupId. It can store upto 32 groups,
  * a set with few elements does NOT dominate a set with more elements.
  */
 public class TransitPriorityGroup32n {
@@ -33,7 +33,7 @@ public class TransitPriorityGroup32n {
   }
 
   /**
-   * Left dominate right, if right contains a group witch does not exist in left. Left
+   * Left dominate right, if right contains a group which does not exist in left. Left
    * do NOT dominate right if they are equals or left is a super set of right.
    */
   public static boolean dominate(int left, int right) {

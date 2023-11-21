@@ -15,7 +15,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
- * This class turn a {@link TransitPriorityGroupSelect} into a matcher.
+ * This class turns a {@link TransitPriorityGroupSelect} into a matcher.
  * <p>
  * Design: It uses the composite design pattern. A matcher is created for each
  * value in the "select", then the list of non-empty matchers is merged into
@@ -138,7 +138,7 @@ public abstract class PriorityGroupMatcher {
 
   /**
    * Take a list of matchers and provide a single interface. At least one matcher in the
-   * list must match for the composite mather to return a match.
+   * list must match for the composite matcher to return a match.
    */
   private static final class CompositeMatcher extends PriorityGroupMatcher {
 

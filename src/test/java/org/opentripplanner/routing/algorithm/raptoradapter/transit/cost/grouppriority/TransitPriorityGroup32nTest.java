@@ -13,12 +13,13 @@ class TransitPriorityGroup32nTest {
   private static final int GROUP_INDEX_0 = 0;
   private static final int GROUP_INDEX_1 = 1;
   private static final int GROUP_INDEX_2 = 2;
+  private static final int GROUP_INDEX_30 = 30;
   private static final int GROUP_INDEX_31 = 31;
 
   private static final int GROUP_0 = TransitPriorityGroup32n.groupId(GROUP_INDEX_0);
   private static final int GROUP_1 = TransitPriorityGroup32n.groupId(GROUP_INDEX_1);
   private static final int GROUP_2 = TransitPriorityGroup32n.groupId(GROUP_INDEX_2);
-  private static final int GROUP_30 = TransitPriorityGroup32n.groupId(GROUP_INDEX_31);
+  private static final int GROUP_30 = TransitPriorityGroup32n.groupId(GROUP_INDEX_30);
   private static final int GROUP_31 = TransitPriorityGroup32n.groupId(GROUP_INDEX_31);
   private static final RaptorTransitPriorityGroupCalculator subjct = TransitPriorityGroup32n.priorityCalculator();
 

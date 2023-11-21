@@ -16,7 +16,7 @@ public class TransitPriorityGroupConfig {
   public static void mapTransitRequest(NodeAdapter root, TransitRequest transit) {
     var c = root
       .of("transitPriorityGroups")
-      .since(OtpVersion.V2_3)
+      .since(OtpVersion.V2_5)
       .summary("Transit priority groups configuration")
       .description(
         """
@@ -63,7 +63,7 @@ public class TransitPriorityGroupConfig {
   ) {
     return root
       .of(parameterName)
-      .since(V2_3)
+      .since(V2_5)
       .summary("Configuration for transit priority groups.")
       .description(description + " The max total number of group-ids are 32, so be careful.")
       .asObjects(TransitPriorityGroupConfig::mapTransitGroupSelect);

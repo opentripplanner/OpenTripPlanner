@@ -42,7 +42,7 @@ public record NodeInfo(
 )
   implements Comparable<NodeInfo> {
   static final String EXPERIMENTAL_FEATURE =
-    "THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!";
+    "**THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!**";
 
   static final String TYPE_QUALIFIER = "type";
   static final String SOURCETYPE_QUALIFIER = "sourceType";
