@@ -241,11 +241,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   }
 
   private List<Object> getStops(DataFetchingEnvironment environment) {
-    return getSource(environment)
-      .getStops()
-      .stream()
-      .map(Object.class::cast)
-      .collect(Collectors.toList());
+    return getSource(environment).getStops().stream().map(Object.class::cast).toList();
   }
 
   private List<Trip> getTrips(DataFetchingEnvironment environment) {

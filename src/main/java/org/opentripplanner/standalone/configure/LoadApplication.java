@@ -1,7 +1,9 @@
 package org.opentripplanner.standalone.configure;
 
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.routing.graph.Graph;
@@ -54,7 +56,8 @@ public class LoadApplication {
       obj.transitModel,
       obj.worldEnvelopeRepository,
       obj.issueSummary,
-      obj.emissionsDataModel
+      obj.emissionsDataModel,
+      obj.stopConsolidationRepository
     );
   }
 
@@ -65,7 +68,8 @@ public class LoadApplication {
       factory.emptyTransitModel(),
       factory.emptyWorldEnvelopeRepository(),
       DataImportIssueSummary.empty(),
-      factory.emptyEmissionsDataModel()
+      factory.emptyEmissionsDataModel(),
+      factory.emptyStopConsolidationRepository()
     );
   }
 
@@ -85,7 +89,8 @@ public class LoadApplication {
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
     DataImportIssueSummary issueSummary,
-    EmissionsDataModel emissionsDataModel
+    @Nullable EmissionsDataModel emissionsDataModel,
+    @Nullable StopConsolidationRepository stopConsolidationRepository
   ) {
     return new ConstructApplication(
       cli,
@@ -95,7 +100,8 @@ public class LoadApplication {
       config(),
       graphBuilderDataSources(),
       issueSummary,
-      emissionsDataModel
+      emissionsDataModel,
+      stopConsolidationRepository
     );
   }
 }

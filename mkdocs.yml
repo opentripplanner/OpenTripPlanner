@@ -37,6 +37,7 @@ markdown_extensions:
     - pymdownx.inlinehilite
     - pymdownx.snippets
     - pymdownx.superfences
+    - admonition
 
 # MkDocs will automatically discover pages if you don't list them here.
 # In that case subdirectories can be used to organize pages.
@@ -112,3 +113,4 @@ nav:
     - Fares: 'sandbox/Fares.md'
     - Ride Hailing: 'sandbox/RideHailing.md'
     - Emissions: 'sandbox/Emissions.md'
+    - Stop Consolidation: 'sandbox/StopConsolidation.md'

@@ -8,6 +8,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
 import org.opentripplanner.routing.graph.Graph;
@@ -33,6 +34,7 @@ public class ConstructApplicationModule {
     RealtimeVehicleService realtimeVehicleService,
     VehicleRentalService vehicleRentalService,
     List<RideHailingService> rideHailingServices,
+    @Nullable StopConsolidationService stopConsolidationService,
     @Nullable TraverseVisitor<?, ?> traverseVisitor,
     EmissionsService emissionsService
   ) {
@@ -50,6 +52,7 @@ public class ConstructApplicationModule {
       emissionsService,
       routerConfig.flexConfig(),
       rideHailingServices,
+      stopConsolidationService,
       traverseVisitor
     );
   }

@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.model.network;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -59,5 +60,20 @@ class StopPatternTest {
     assertTrue(stopPattern.canBoard(1), "Allowed at RegularStop");
     assertFalse(stopPattern.canBoard(2), "Forbidden at GroupStop");
     assertFalse(stopPattern.canBoard(3), "Forbidden at AreaStop");
+  }
+
+  @Test
+  void replaceStop() {
+    var s1 = testModel.stop("1").build();
+    var s2 = testModel.stop("2").build();
+    var s3 = testModel.stop("3").build();
+    var s4 = testModel.stop("4").build();
+
+    var pattern = TransitModelForTest.stopPattern(s1, s2, s3);
+
+    assertEquals(List.of(s1, s2, s3), pattern.getStops());
+
+    var updated = pattern.mutate().replaceStop(s2.getId(), s4).build();
+    assertEquals(List.of(s1, s4, s3), updated.getStops());
   }
 }

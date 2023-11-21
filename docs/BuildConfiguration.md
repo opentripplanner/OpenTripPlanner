@@ -41,6 +41,7 @@ Sections follow that describe particular settings in more depth.
 | [readCachedElevations](#readCachedElevations)                            |  `boolean`  | Whether to read cached elevation data.                                                                                                                         | *Optional* | `true`                            |  2.0  |
 | staticBikeParkAndRide                                                    |  `boolean`  | Whether we should create bike P+R stations from OSM data.                                                                                                      | *Optional* | `false`                           |  1.5  |
 | staticParkAndRide                                                        |  `boolean`  | Whether we should create car P+R stations from OSM data.                                                                                                       | *Optional* | `true`                            |  1.5  |
+| stopConsolidationFile                                                    |   `string`  | Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation.                                                 | *Optional* |                                   |  2.5  |
 | [streetGraph](#streetGraph)                                              |    `uri`    | URI to the street graph object file for reading and writing.                                                                                                   | *Optional* |                                   |  2.0  |
 | [subwayAccessTime](#subwayAccessTime)                                    |   `double`  | Minutes necessary to reach stops served by trips on routes of route_type=1 (subway) from the street.                                                           | *Optional* | `2.0`                             |  1.5  |
 | [transitModelTimeZone](#transitModelTimeZone)                            | `time-zone` | Time zone for the graph.                                                                                                                                       | *Optional* |                                   |  2.2  |
@@ -1165,6 +1166,7 @@ case where this is not the case.
       }
     }
   ],
+  "stopConsolidationFile" : "consolidated-stops.csv",
   "emissions" : {
     "carAvgCo2PerKm" : 170,
     "carAvgOccupancy" : 1.3

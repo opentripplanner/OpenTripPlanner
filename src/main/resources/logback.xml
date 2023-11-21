@@ -73,6 +73,10 @@
   <!-- Raptor request debug logging - Turn on/off: debug/info -->
   <logger name="org.opentripplanner.raptor.RaptorService" level="info"/>
 
+  <!-- Turn on/off: debug/info to log OTP request/response -->
+  <logger name="org.opentripplanner.routing.service.DefaultRoutingService" level="info" />
+
+
   <!-- THIRD PARTY LOGGERS -->
 
   <logger name="ch.qos.logback" level="warn"/>
