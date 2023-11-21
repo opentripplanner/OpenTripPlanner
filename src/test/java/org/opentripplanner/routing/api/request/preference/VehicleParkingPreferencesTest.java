@@ -77,9 +77,9 @@ class VehicleParkingPreferencesTest {
 
   @Test
   void testToString() {
-    assertEquals("ParkingPreferences{}", VehicleParkingPreferences.DEFAULT.toString());
+    assertEquals("VehicleParkingPreferences{}", VehicleParkingPreferences.DEFAULT.toString());
     assertEquals(
-      "ParkingPreferences{" +
+      "VehicleParkingPreferences{" +
       "unpreferredVehicleParkingTagCost: $360, " +
       "useAvailabilityInformation: false, " +
       "filter: VehicleParkingFilterRequest{not: [tags=[not]], select: [tags=[bar]]}, " +
