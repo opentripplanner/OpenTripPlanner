@@ -128,10 +128,10 @@ class FlexStopsMapper {
    */
   List<RegularStop> findStopsInFlexArea(
     FlexibleArea area,
-    Geometry geometry,
-    TransitMode flexibleStopTransitMode
+    @Nullable Geometry geometry,
+    @Nullable TransitMode flexibleStopTransitMode
   ) {
-    if (geometry == null) {
+    if (geometry == null || flexibleStopTransitMode == null) {
       return List.of();
     }
     List<RegularStop> stops = stopsSpatialIndex
