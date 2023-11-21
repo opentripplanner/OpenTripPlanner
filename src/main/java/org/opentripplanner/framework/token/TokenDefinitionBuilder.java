@@ -2,7 +2,7 @@ package org.opentripplanner.framework.token;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.lang.IntUtils;
 
 public class TokenDefinitionBuilder {
@@ -74,7 +74,7 @@ public class TokenDefinitionBuilder {
   }
 
   public TokenSchema build() {
-    return new TokenSchema(Stream.concat(tokensHead.stream(), Stream.of(buildIt())).toList());
+    return new TokenSchema(ListUtils.combine(tokensHead, List.of(buildIt())));
   }
 
   private TokenDefinition buildIt() {

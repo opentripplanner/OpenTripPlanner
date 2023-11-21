@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 /**
- * A token definition is an ordered list of files. A field has a name and a type. The
+ * A token definition is an ordered list of fields. A field has a name and a type. The
  * definition is used to encode/decode a token.
  */
 public class TokenDefinition {

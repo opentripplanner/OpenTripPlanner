@@ -8,7 +8,7 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 /**
  * A token schema contains a set of token definitions, one for each version. This is
  * used to decode a token - the same version used to encode a token is used to
- * decode it. When encodeing a token the latest version is always used.
+ * decode it. When encoding a token the latest version is always used.
  * <p>
  * OTP only need to be backward compatible with the last version of otp. So, for each release of
  * OTP the schema that is older than the previous version can be merged. By doing so, you do not
