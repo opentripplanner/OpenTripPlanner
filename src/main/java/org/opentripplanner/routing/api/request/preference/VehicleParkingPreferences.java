@@ -16,9 +16,9 @@ import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilt
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
-public final class ParkingPreferences implements Serializable {
+public final class VehicleParkingPreferences implements Serializable {
 
-  public static final ParkingPreferences DEFAULT = new ParkingPreferences();
+  public static final VehicleParkingPreferences DEFAULT = new VehicleParkingPreferences();
   private final Cost unpreferredVehicleParkingTagCost;
   private final boolean useAvailabilityInformation;
   private final VehicleParkingFilterRequest filter;
@@ -27,7 +27,7 @@ public final class ParkingPreferences implements Serializable {
   private final Cost parkCost;
 
   /** Create a new instance with default values. */
-  private ParkingPreferences() {
+  private VehicleParkingPreferences() {
     this.unpreferredVehicleParkingTagCost = Cost.costOfMinutes(5);
     this.useAvailabilityInformation = true;
     this.filter = VehicleParkingFilterRequest.empty();
@@ -36,7 +36,7 @@ public final class ParkingPreferences implements Serializable {
     this.parkCost = Cost.costOfMinutes(2);
   }
 
-  private ParkingPreferences(Builder builder) {
+  private VehicleParkingPreferences(Builder builder) {
     this.unpreferredVehicleParkingTagCost = builder.unpreferredVehicleParkingTagCost;
     this.useAvailabilityInformation = builder.useAvailabilityInformation;
     this.filter =
@@ -53,7 +53,7 @@ public final class ParkingPreferences implements Serializable {
     this.parkCost = builder.parkCost;
   }
 
-  public static ParkingPreferences.Builder of() {
+  public static VehicleParkingPreferences.Builder of() {
     return new Builder(DEFAULT);
   }
 
@@ -103,7 +103,7 @@ public final class ParkingPreferences implements Serializable {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    ParkingPreferences that = (ParkingPreferences) o;
+    VehicleParkingPreferences that = (VehicleParkingPreferences) o;
     return (
       Objects.equals(unpreferredVehicleParkingTagCost, that.unpreferredVehicleParkingTagCost) &&
       useAvailabilityInformation == that.useAvailabilityInformation &&
@@ -129,7 +129,7 @@ public final class ParkingPreferences implements Serializable {
   @Override
   public String toString() {
     return ToStringBuilder
-      .of(ParkingPreferences.class)
+      .of(VehicleParkingPreferences.class)
       .addObj(
         "unpreferredVehicleParkingTagCost",
         unpreferredVehicleParkingTagCost,
@@ -149,7 +149,7 @@ public final class ParkingPreferences implements Serializable {
 
   public static class Builder {
 
-    private final ParkingPreferences original;
+    private final VehicleParkingPreferences original;
     private Cost unpreferredVehicleParkingTagCost;
     private boolean useAvailabilityInformation;
     private List<VehicleParkingFilter> bannedVehicleParkingTags;
@@ -159,7 +159,7 @@ public final class ParkingPreferences implements Serializable {
     private Cost parkCost;
     private Duration parkTime;
 
-    private Builder(ParkingPreferences original) {
+    private Builder(VehicleParkingPreferences original) {
       this.original = original;
       this.unpreferredVehicleParkingTagCost = original.unpreferredVehicleParkingTagCost;
       this.useAvailabilityInformation = original.useAvailabilityInformation;
@@ -220,8 +220,8 @@ public final class ParkingPreferences implements Serializable {
       return this;
     }
 
-    public ParkingPreferences build() {
-      var newObj = new ParkingPreferences(this);
+    public VehicleParkingPreferences build() {
+      var newObj = new VehicleParkingPreferences(this);
       return original.equals(newObj) ? original : newObj;
     }
   }

@@ -21,7 +21,7 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
-import org.opentripplanner.routing.api.request.preference.ParkingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -303,7 +303,7 @@ public class RouteRequestMapper {
 
   private static void setParkingPreferences(
     CallerWithEnvironment callWith,
-    ParkingPreferences.Builder parking
+    VehicleParkingPreferences.Builder parking
   ) {
     callWith.argument("parking.unpreferredCost", parking::withUnpreferredVehicleParkingTagCost);
 

@@ -21,7 +21,7 @@ public final class CarPreferences implements Serializable {
 
   private final double speed;
   private final double reluctance;
-  private final ParkingPreferences parkingPreferences;
+  private final VehicleParkingPreferences parking;
   private final int pickupTime;
   private final Cost pickupCost;
   private final int dropoffTime;
@@ -32,7 +32,7 @@ public final class CarPreferences implements Serializable {
   private CarPreferences() {
     this.speed = 40.0;
     this.reluctance = 2.0;
-    this.parkingPreferences = ParkingPreferences.DEFAULT;
+    this.parking = VehicleParkingPreferences.DEFAULT;
     this.pickupTime = 60;
     this.pickupCost = Cost.costOfMinutes(2);
     this.dropoffTime = 120;
@@ -43,7 +43,7 @@ public final class CarPreferences implements Serializable {
   private CarPreferences(Builder builder) {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
-    this.parkingPreferences = builder.parkingPreferences;
+    this.parking = builder.parking;
     this.pickupTime = Units.duration(builder.pickupTime);
     this.pickupCost = builder.pickupCost;
     this.dropoffTime = Units.duration(builder.dropoffTime);
@@ -73,8 +73,8 @@ public final class CarPreferences implements Serializable {
   }
 
   /** Parking preferences that can be different per request */
-  public ParkingPreferences parkingPreferences() {
-    return parkingPreferences;
+  public VehicleParkingPreferences parking() {
+    return parking;
   }
 
   /** Time of getting in/out of a carPickup (taxi) */
@@ -119,7 +119,7 @@ public final class CarPreferences implements Serializable {
     return (
       DoubleUtils.doubleEquals(that.speed, speed) &&
       DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
-      parkingPreferences.equals(that.parkingPreferences) &&
+      parking.equals(that.parking) &&
       pickupTime == that.pickupTime &&
       pickupCost.equals(that.pickupCost) &&
       dropoffTime == that.dropoffTime &&
@@ -133,7 +133,7 @@ public final class CarPreferences implements Serializable {
     return Objects.hash(
       speed,
       reluctance,
-      parkingPreferences,
+      parking,
       pickupTime,
       pickupCost,
       dropoffTime,
@@ -148,7 +148,7 @@ public final class CarPreferences implements Serializable {
       .of(CarPreferences.class)
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
-      .addObj("parkingPreferences", parkingPreferences, DEFAULT.parkingPreferences)
+      .addObj("parking", parking, DEFAULT.parking)
       .addNum("pickupTime", pickupTime, DEFAULT.pickupTime)
       .addObj("pickupCost", pickupCost, DEFAULT.pickupCost)
       .addNum("dropoffTime", dropoffTime, DEFAULT.dropoffTime)
@@ -163,7 +163,7 @@ public final class CarPreferences implements Serializable {
     private final CarPreferences original;
     private double speed;
     private double reluctance;
-    private ParkingPreferences parkingPreferences;
+    private VehicleParkingPreferences parking;
     private int pickupTime;
     private Cost pickupCost;
     private int dropoffTime;
@@ -174,7 +174,7 @@ public final class CarPreferences implements Serializable {
       this.original = original;
       this.speed = original.speed;
       this.reluctance = original.reluctance;
-      this.parkingPreferences = original.parkingPreferences;
+      this.parking = original.parking;
       this.pickupTime = original.pickupTime;
       this.pickupCost = original.pickupCost;
       this.dropoffTime = original.dropoffTime;
@@ -196,10 +196,10 @@ public final class CarPreferences implements Serializable {
       return this;
     }
 
-    public Builder withParking(Consumer<ParkingPreferences.Builder> body) {
-      var builder = ParkingPreferences.of();
+    public Builder withParking(Consumer<VehicleParkingPreferences.Builder> body) {
+      var builder = VehicleParkingPreferences.of();
       body.accept(builder);
-      this.parkingPreferences = builder.build();
+      this.parking = builder.build();
       return this;
     }
 

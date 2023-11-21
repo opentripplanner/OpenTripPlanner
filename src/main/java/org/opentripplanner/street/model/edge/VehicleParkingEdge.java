@@ -5,7 +5,7 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
-import org.opentripplanner.routing.api.request.preference.ParkingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -94,16 +94,16 @@ public class VehicleParkingEdge extends Edge {
       final BikePreferences bike = s0.getPreferences().bike();
       return traverseUnPark(
         s0,
-        bike.parkingPreferences().parkCost().toSeconds(),
-        (int) bike.parkingPreferences().parkTime().toSeconds(),
+        bike.parking().parkCost().toSeconds(),
+        (int) bike.parking().parkTime().toSeconds(),
         TraverseMode.BICYCLE
       );
     } else if (streetMode.includesDriving()) {
       final CarPreferences car = s0.getPreferences().car();
       return traverseUnPark(
         s0,
-        car.parkingPreferences().parkCost().toSeconds(),
-        (int) car.parkingPreferences().parkTime().toSeconds(),
+        car.parking().parkCost().toSeconds(),
+        (int) car.parking().parkTime().toSeconds(),
         TraverseMode.CAR
       );
     } else {
@@ -150,14 +150,14 @@ public class VehicleParkingEdge extends Edge {
 
       return traversePark(
         s0,
-        preferences.bike().parkingPreferences().parkCost().toSeconds(),
-        (int) preferences.bike().parkingPreferences().parkTime().toSeconds()
+        preferences.bike().parking().parkCost().toSeconds(),
+        (int) preferences.bike().parking().parkTime().toSeconds()
       );
     } else if (streetMode.includesDriving()) {
       return traversePark(
         s0,
-        preferences.car().parkingPreferences().parkCost().toSeconds(),
-        (int) preferences.car().parkingPreferences().parkTime().toSeconds()
+        preferences.car().parking().parkCost().toSeconds(),
+        (int) preferences.car().parking().parkTime().toSeconds()
       );
     } else {
       return State.empty();
@@ -186,15 +186,15 @@ public class VehicleParkingEdge extends Edge {
     return s0e.makeStateArray();
   }
 
-  private void addUnpreferredTagCost(ParkingPreferences preferences, StateEditor s0e) {
+  private void addUnpreferredTagCost(VehicleParkingPreferences preferences, StateEditor s0e) {
     if (!preferences.preferred().matches(vehicleParking)) {
       s0e.incrementWeight(preferences.unpreferredVehicleParkingTagCost().toSeconds());
     }
   }
 
-  private ParkingPreferences getParkingPreferences(TraverseMode mode, StreetSearchRequest request) {
+  private VehicleParkingPreferences getParkingPreferences(TraverseMode mode, StreetSearchRequest request) {
     return mode == TraverseMode.CAR
-      ? request.preferences().car().parkingPreferences()
-      : request.preferences().bike().parkingPreferences();
+      ? request.preferences().car().parking()
+      : request.preferences().bike().parking();
   }
 }

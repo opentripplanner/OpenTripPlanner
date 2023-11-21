@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.api.request.preference.ParkingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -68,9 +68,9 @@ public class StreetVehicleParkingLink extends Edge {
     }
 
     var vehicleParking = vehicleParkingEntranceVertex.getVehicleParking();
-    final ParkingPreferences parkingPreferences = s0.currentMode() == TraverseMode.CAR
-      ? s0.getRequest().preferences().car().parkingPreferences()
-      : s0.getRequest().preferences().bike().parkingPreferences();
+    final VehicleParkingPreferences parkingPreferences = s0.currentMode() == TraverseMode.CAR
+      ? s0.getRequest().preferences().car().parking()
+      : s0.getRequest().preferences().bike().parking();
     if (traversalBanned(parkingPreferences, vehicleParking)) {
       return State.empty();
     }
@@ -83,7 +83,7 @@ public class StreetVehicleParkingLink extends Edge {
   }
 
   private boolean traversalBanned(
-    ParkingPreferences parkingPreferences,
+    VehicleParkingPreferences parkingPreferences,
     VehicleParking vehicleParking
   ) {
     return !parkingPreferences.filter().matches(vehicleParking);

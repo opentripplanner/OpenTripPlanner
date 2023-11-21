@@ -9,7 +9,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.model.Cost;
 
-class ParkingPreferencesTest {
+class VehicleParkingPreferencesTest {
 
   private static final Set<String> PREFERRED_TAGS = Set.of("foo");
   private static final Set<String> NOT_PREFERRED_TAGS = Set.of("bar");
@@ -20,7 +20,7 @@ class ParkingPreferencesTest {
   private static final Cost PARKING_COST = Cost.costOfMinutes(4);
   private static final Duration PARKING_TIME = Duration.ofMinutes(2);
 
-  private final ParkingPreferences subject = createPreferences();
+  private final VehicleParkingPreferences subject = createPreferences();
 
   @Test
   void preferred() {
@@ -57,10 +57,10 @@ class ParkingPreferencesTest {
   @Test
   void testCopyOfEqualsAndHashCode() {
     // Return same object if no value is set
-    assertSame(ParkingPreferences.DEFAULT, ParkingPreferences.of().build());
+    assertSame(VehicleParkingPreferences.DEFAULT, VehicleParkingPreferences.of().build());
 
     // Create a copy, make a change and set it back again to force creating a new object
-    var other = ParkingPreferences
+    var other = VehicleParkingPreferences
       .of()
       .withPreferredVehicleParkingTags(Set.of())
       .withNotPreferredVehicleParkingTags(Set.of())
@@ -77,7 +77,7 @@ class ParkingPreferencesTest {
 
   @Test
   void testToString() {
-    assertEquals("ParkingPreferences{}", ParkingPreferences.DEFAULT.toString());
+    assertEquals("ParkingPreferences{}", VehicleParkingPreferences.DEFAULT.toString());
     assertEquals(
       "ParkingPreferences{" +
       "unpreferredVehicleParkingTagCost: $360, " +
@@ -94,8 +94,8 @@ class ParkingPreferencesTest {
     return "[tags=" + tags + "]";
   }
 
-  private ParkingPreferences createPreferences() {
-    return ParkingPreferences
+  private VehicleParkingPreferences createPreferences() {
+    return VehicleParkingPreferences
       .of()
       .withPreferredVehicleParkingTags(PREFERRED_TAGS)
       .withNotPreferredVehicleParkingTags(NOT_PREFERRED_TAGS)

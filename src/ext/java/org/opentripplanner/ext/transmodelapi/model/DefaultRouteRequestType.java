@@ -220,7 +220,7 @@ public class DefaultRouteRequestType {
           .name("bikeParkTime")
           .description("Time to park a bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> (int) preferences.bike().parkingPreferences().parkTime().toSeconds())
+          .dataFetcher(env -> (int) preferences.bike().parking().parkTime().toSeconds())
           .build()
       )
       .field(
@@ -229,7 +229,7 @@ public class DefaultRouteRequestType {
           .name("bikeParkCost")
           .description("Cost to park a bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.bike().parkingPreferences().parkCost().toSeconds())
+          .dataFetcher(env -> preferences.bike().parking().parkCost().toSeconds())
           .build()
       )
       .field(

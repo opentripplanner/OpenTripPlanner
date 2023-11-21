@@ -19,7 +19,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
-import org.opentripplanner.routing.api.request.preference.ParkingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
@@ -424,7 +424,7 @@ ferries, where the check-in process needs to be done in good time before ride.
               .since(V2_3)
               .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
               .description("See `preferredVehicleParkingTags`.")
-              .asInt(ParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds())
+              .asInt(VehicleParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds())
           )
           .withBannedVehicleParkingTags(
             c
@@ -449,14 +449,14 @@ ferries, where the check-in process needs to be done in good time before ride.
               .of("bikeParkTime")
               .since(V2_0)
               .summary("Time to park a bike.")
-              .asDuration(ParkingPreferences.DEFAULT.parkTime())
+              .asDuration(VehicleParkingPreferences.DEFAULT.parkTime())
           )
           .withParkCost(
             c
               .of("bikeParkCost")
               .since(V2_0)
               .summary("Cost to park a bike.")
-              .asInt(ParkingPreferences.DEFAULT.parkCost().toSeconds())
+              .asInt(VehicleParkingPreferences.DEFAULT.parkCost().toSeconds())
           )
           .withPreferredVehicleParkingTags(
             c
@@ -720,7 +720,7 @@ your users receive a timely response. You can also limit the max duration. There
               .since(V2_3)
               .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
               .description("See `preferredVehicleParkingTags`.")
-              .asInt(ParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds())
+              .asInt(VehicleParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds())
           )
           .withBannedVehicleParkingTags(
             c
@@ -745,14 +745,14 @@ your users receive a timely response. You can also limit the max duration. There
               .of("carParkCost")
               .since(V2_1)
               .summary("Cost of parking a car.")
-              .asInt(ParkingPreferences.DEFAULT.parkCost().toSeconds())
+              .asInt(VehicleParkingPreferences.DEFAULT.parkCost().toSeconds())
           )
           .withParkTime(
             c
               .of("carParkTime")
               .since(V2_1)
               .summary("Time to park a car")
-              .asDuration(ParkingPreferences.DEFAULT.parkTime())
+              .asDuration(VehicleParkingPreferences.DEFAULT.parkTime())
           )
           .withPreferredVehicleParkingTags(
             c
