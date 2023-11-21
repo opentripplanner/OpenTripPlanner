@@ -4,7 +4,7 @@
  * Adapted from src/client/js/otp/util/Geo.js#distanceStringMetric
  */
 export function formatDistance(meters: number) {
-  let kilometers = meters / 1000;
+  const kilometers = meters / 1000;
   if (kilometers > 100) {
     //100 km => 999999999 km
     return `${kilometers.toFixed(0)} km`;

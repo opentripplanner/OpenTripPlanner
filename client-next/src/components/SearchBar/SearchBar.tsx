@@ -1,4 +1,4 @@
-import { Button, Stack } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { ServerInfo, TripQueryVariables } from '../../gql/graphql.ts';
 import { LocationInputField } from './LocationInputField.tsx';
 import { DepartureArrivalSelect } from './DepartureArrivalSelect.tsx';

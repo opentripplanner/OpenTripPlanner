@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { graphql } from '../gql';
 import request from 'graphql-request';
-import { QueryType, TripQueryVariables } from '../gql/graphql.ts';
+import { QueryType } from '../gql/graphql.ts';
 
 const endpoint = import.meta.env.VITE_API_URL;
 
