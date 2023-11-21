@@ -24,7 +24,7 @@ class TransportModeMapper {
     }
   }
 
-  private TransitMode mapAllVehicleModesOfTransport(AllVehicleModesOfTransportEnumeration mode)
+  public TransitMode mapAllVehicleModesOfTransport(AllVehicleModesOfTransportEnumeration mode)
     throws UnsupportedModeException {
     if (mode == null) {
       throw new UnsupportedModeException(null);
