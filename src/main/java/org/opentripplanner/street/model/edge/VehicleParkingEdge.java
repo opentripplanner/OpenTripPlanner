@@ -5,8 +5,8 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
 import org.opentripplanner.street.search.TraverseMode;
@@ -192,7 +192,10 @@ public class VehicleParkingEdge extends Edge {
     }
   }
 
-  private VehicleParkingPreferences getParkingPreferences(TraverseMode mode, StreetSearchRequest request) {
+  private VehicleParkingPreferences getParkingPreferences(
+    TraverseMode mode,
+    StreetSearchRequest request
+  ) {
     return mode == TraverseMode.CAR
       ? request.preferences().car().parking()
       : request.preferences().bike().parking();

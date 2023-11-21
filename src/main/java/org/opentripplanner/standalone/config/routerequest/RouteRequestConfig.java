@@ -19,11 +19,11 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
@@ -424,7 +424,9 @@ ferries, where the check-in process needs to be done in good time before ride.
               .since(V2_3)
               .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
               .description("See `preferredVehicleParkingTags`.")
-              .asInt(VehicleParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds())
+              .asInt(
+                VehicleParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds()
+              )
           )
           .withBannedVehicleParkingTags(
             c
@@ -720,7 +722,9 @@ your users receive a timely response. You can also limit the max duration. There
               .since(V2_3)
               .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
               .description("See `preferredVehicleParkingTags`.")
-              .asInt(VehicleParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds())
+              .asInt(
+                VehicleParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds()
+              )
           )
           .withBannedVehicleParkingTags(
             c
