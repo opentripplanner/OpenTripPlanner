@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.framework.logging.Throttle;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
@@ -13,8 +14,13 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.EdgeTraverser;
 import org.opentripplanner.street.search.state.StateEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Transfer {
+
+  private static final Logger LOG = LoggerFactory.getLogger(Transfer.class);
+  private static final Throttle THROTTLE_COST_EXCEEDED = Throttle.ofOneSecond();
 
   protected static final int MAX_TRANSFER_COST = 2_000_000;
 
@@ -65,7 +71,9 @@ public class Transfer {
     WalkPreferences walkPreferences = request.preferences().walk();
     if (edges == null || edges.isEmpty()) {
       double durationSeconds = distanceMeters / walkPreferences.speed();
-      final double domainCost = costLimitSanityCheck(durationSeconds * walkPreferences.reluctance());
+      final double domainCost = costLimitSanityCheck(
+        durationSeconds * walkPreferences.reluctance()
+      );
       return Optional.of(
         new DefaultRaptorTransfer(
           this.toStop,
@@ -107,8 +115,17 @@ public class Transfer {
    * @see EdgeTraverser
    * @see RaptorCostConverter
    */
-  private static int costLimitSanityCheck(double cost) {
-    return (cost >= 0 && cost <= MAX_TRANSFER_COST) ? (int) cost : MAX_TRANSFER_COST;
+  private int costLimitSanityCheck(double cost) {
+    if (cost >= 0 && cost <= MAX_TRANSFER_COST) {
+      return (int) cost;
+    } else {
+      THROTTLE_COST_EXCEEDED.throttle(() ->
+        LOG.warn(
+          "Transfer exceeded maximum cost. Please consider changing the transfer cost calculation. More information: https://github.com/opentripplanner/OpenTripPlanner/pull/5516#issuecomment-1819138078"
+        )
+      );
+      return MAX_TRANSFER_COST;
+    }
   }
 
   @Override

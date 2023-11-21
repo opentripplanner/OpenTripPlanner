@@ -21,9 +21,7 @@ class TransferTest {
   private static final IntersectionVertex BRANDENBURG_GATE_V = intersectionVertex(
     Coordinates.BERLIN_BRANDENBURG_GATE
   );
-  private static final IntersectionVertex BOSTON_V = intersectionVertex(
-    Coordinates.BOSTON
-  );
+  private static final IntersectionVertex BOSTON_V = intersectionVertex(Coordinates.BOSTON);
 
   @Nested
   class WithEdges {
@@ -48,10 +46,9 @@ class TransferTest {
         StreetSearchRequest.of().build()
       );
       // cost is below max limit and should be included in RAPTOR
-      assertTrue(raptorTransfer.isPresent());
+      assertBelowMaxCost(raptorTransfer.get());
     }
   }
-
 
   @Nested
   class WithoutEdges {
@@ -82,12 +79,20 @@ class TransferTest {
         StreetSearchRequest.of().build()
       );
       // cost is below max limit and should be included in RAPTOR
-      assertTrue(raptorTransfer.isPresent());
+      assertBelowMaxCost(raptorTransfer.get());
     }
   }
 
   private static void assertMaxCost(RaptorTransfer transfer) {
-    assertEquals(RaptorCostConverter.toRaptorCost(Transfer.MAX_TRANSFER_COST), transfer.generalizedCost());
+    assertEquals(
+      RaptorCostConverter.toRaptorCost(Transfer.MAX_TRANSFER_COST),
+      transfer.generalizedCost()
+    );
   }
 
+  private static void assertBelowMaxCost(RaptorTransfer transfer) {
+    assertTrue(
+      RaptorCostConverter.toRaptorCost(Transfer.MAX_TRANSFER_COST) > transfer.generalizedCost()
+    );
+  }
 }
