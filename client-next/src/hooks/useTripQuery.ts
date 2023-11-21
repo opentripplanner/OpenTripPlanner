@@ -48,6 +48,7 @@ const query = graphql(`
           aimedEndTime
           expectedEndTime
           expectedStartTime
+          realtime
           distance
           duration
           fromPlace {

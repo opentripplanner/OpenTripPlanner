@@ -6,8 +6,9 @@ import { formatDuration } from '../../util/formatDuration.ts';
 export function ItineraryLegDetails({ leg, isLast }: { leg: Leg; isLast: boolean }) {
   return (
     <div style={{ border: '1px dotted grey' }}>
-      <LegTime aimedTime={leg.aimedStartTime} expectedTime={leg.expectedStartTime} />-{' '}
-      <LegTime aimedTime={leg.aimedEndTime} expectedTime={leg.expectedEndTime} /> <b>{leg.mode}</b>{' '}
+      <LegTime aimedTime={leg.aimedStartTime} expectedTime={leg.expectedStartTime} hasRealtime={leg.realtime} />-{' '}
+      <LegTime aimedTime={leg.aimedEndTime} expectedTime={leg.expectedEndTime} hasRealtime={leg.realtime} />{' '}
+      <b>{leg.mode}</b>{' '}
       {leg.line && (
         <>
           <u>
