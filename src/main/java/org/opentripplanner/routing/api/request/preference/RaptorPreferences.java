@@ -34,7 +34,6 @@ public final class RaptorPreferences implements Serializable {
   private final SearchDirection searchDirection;
 
   private final Instant timeLimit;
-
   private final Double relaxGeneralizedCostAtDestination;
 
   private RaptorPreferences() {
@@ -50,7 +49,6 @@ public final class RaptorPreferences implements Serializable {
     this.profile = Objects.requireNonNull(builder.profile);
     this.searchDirection = Objects.requireNonNull(builder.searchDirection);
     this.timeLimit = builder.timeLimit;
-
     this.relaxGeneralizedCostAtDestination =
       Units.normalizedOptionalFactor(
         builder.relaxGeneralizedCostAtDestination,
@@ -91,6 +89,7 @@ public final class RaptorPreferences implements Serializable {
   /**
    * See {@link SearchParams#relaxCostAtDestination()} for documentation.
    */
+  @Deprecated
   public Optional<Double> relaxGeneralizedCostAtDestination() {
     return Optional.ofNullable(relaxGeneralizedCostAtDestination);
   }

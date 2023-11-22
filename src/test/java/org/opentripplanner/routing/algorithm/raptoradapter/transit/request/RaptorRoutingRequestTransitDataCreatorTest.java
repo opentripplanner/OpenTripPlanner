@@ -66,7 +66,8 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(
       startOfTime,
       tripPatternsForDates,
-      new TestTransitDataProviderFilter()
+      new TestTransitDataProviderFilter(),
+      PriorityGroupConfigurator.empty()
     );
 
     // Get the results

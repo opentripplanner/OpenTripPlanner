@@ -11,11 +11,13 @@ public class RoutingPreferencesTest {
   @Test
   public void copyOfShouldReturnTheSameInstanceWhenBuild() {
     var pref = new RoutingPreferences();
-    var copy = pref.copyOf().build();
-    assertNotSame(pref, copy);
+    var same = pref.copyOf().build();
+    assertSame(pref, same);
+    // Change one thing to force making a copy
+    var copy = pref.copyOf().withCar(c -> c.withReluctance(3.5)).build();
+    assertNotSame(pref.car(), copy.car());
 
     // Immutable classes should not change
-    assertSame(pref.car(), copy.car());
     assertSame(pref.bike(), copy.bike());
     assertSame(pref.walk(), copy.walk());
     assertSame(pref.transfer(), copy.transfer());

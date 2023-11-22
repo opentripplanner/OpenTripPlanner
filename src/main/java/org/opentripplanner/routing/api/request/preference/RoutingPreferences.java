@@ -4,6 +4,7 @@ import static java.util.Objects.requireNonNull;
 import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import org.opentripplanner.street.search.TraverseMode;
@@ -114,6 +115,41 @@ public final class RoutingPreferences implements Serializable {
       case CAR -> car.speed();
       default -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
     };
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    RoutingPreferences that = (RoutingPreferences) o;
+    return (
+      Objects.equals(transit, that.transit) &&
+      Objects.equals(transfer, that.transfer) &&
+      Objects.equals(walk, that.walk) &&
+      Objects.equals(street, that.street) &&
+      Objects.equals(wheelchair, that.wheelchair) &&
+      Objects.equals(bike, that.bike) &&
+      Objects.equals(car, that.car) &&
+      Objects.equals(rental, that.rental) &&
+      Objects.equals(system, that.system) &&
+      Objects.equals(itineraryFilter, that.itineraryFilter)
+    );
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(
+      transit,
+      transfer,
+      walk,
+      street,
+      wheelchair,
+      bike,
+      car,
+      rental,
+      system,
+      itineraryFilter
+    );
   }
 
   public static class Builder {
