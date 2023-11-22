@@ -63,7 +63,6 @@ public class PageCursorFactory {
       new ItineraryPageCut(
         pageCursorFactoryParams.earliestRemovedDeparture().truncatedTo(ChronoUnit.SECONDS),
         current.edt.plus(currentSearchWindow),
-        sortOrder,
         pageCursorFactoryParams.deduplicationSection(),
         pageCursorFactoryParams.firstRemovedArrivalTime(),
         pageCursorFactoryParams.firstRemovedDepartureTime(),

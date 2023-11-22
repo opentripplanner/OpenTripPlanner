@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 
@@ -25,9 +26,9 @@ public class PagingFilter implements ItineraryDeletionFlagger {
   private final ItineraryPageCut itineraryPageCut;
   private final Comparator<ItinerarySortKey> sortOrderComparator;
 
-  public PagingFilter(ItineraryPageCut itineraryPageCut) {
+  public PagingFilter(SortOrder sortOrder, ItineraryPageCut itineraryPageCut) {
     this.itineraryPageCut = itineraryPageCut;
-    this.sortOrderComparator = SortOrderComparator.comparator(itineraryPageCut.sortOrder());
+    this.sortOrderComparator = SortOrderComparator.comparator(sortOrder);
   }
 
   @Override

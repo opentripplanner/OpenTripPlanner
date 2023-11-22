@@ -351,7 +351,7 @@ public class ItineraryListFilterChainBuilder {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
     if (itineraryPageCut != null) {
-      filters.add(new DeletionFlaggingFilter(new PagingFilter(itineraryPageCut)));
+      filters.add(new DeletionFlaggingFilter(new PagingFilter(sortOrder, itineraryPageCut)));
     }
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());

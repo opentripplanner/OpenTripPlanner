@@ -92,7 +92,6 @@ final class PageCursorSerializer {
         ItineraryPageCut itineraryPageCut = new ItineraryPageCut(
           dedupeWindowStart,
           dedupeWindowEnd,
-          originalSortOrder,
           cropSection,
           arrivalTimeDeletionThreshold,
           departureTimeDeletionThreshold,
