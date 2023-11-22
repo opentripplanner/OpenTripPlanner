@@ -19,5 +19,16 @@
       "feedId" : "MARTA",
       "source" : "https://itsmarta.com/google_transit_feed/google_transit.zip"
     }
+  ],
+  "transferRequests": [
+    {
+      "modes": "WALK"
+    },
+    {
+      "modes": "WALK",
+      "wheelchairAccessibility": {
+        "enabled": true
+      }
+    }
   ]
 }
