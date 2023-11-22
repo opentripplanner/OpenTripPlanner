@@ -42,6 +42,8 @@ public class AtlantaSmokeTest {
 
   static Coordinate peachtreeCreek = new Coordinate(33.7310, -84.3823);
   static Coordinate lindberghCenter = new Coordinate(33.8235, -84.3674);
+  static Coordinate maddoxPark = new Coordinate(33.7705, -84.4265);
+  static Coordinate druidHills = new Coordinate(33.77933, -84.33689);
 
   @Test
   public void regularRouteFromCentralAtlantaToPowderSprings() {
@@ -81,7 +83,7 @@ public class AtlantaSmokeTest {
 
   static List<TripPlanParameters> buildCombinations() {
     return new RequestCombinationsBuilder()
-      .withLocations(lindberghCenter, peachtreeCreek)
+      .withLocations(lindberghCenter, peachtreeCreek, maddoxPark, druidHills)
       .withModes(TRANSIT, WALK)
       .withTime(SmokeTest.weekdayAtNoon())
       .includeWheelchair()
