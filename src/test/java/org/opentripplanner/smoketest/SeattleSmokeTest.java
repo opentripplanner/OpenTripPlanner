@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.client.model.Coordinate;
@@ -49,38 +49,41 @@ public class SeattleSmokeTest {
     SmokeTest.assertThatAllTransitLegsHaveFareProducts(plan);
   }
 
-  @Test
-  public void accessibleRouting() throws IOException {
-    var tripPlan = testAccessibleRouting(1.6f);
-    assertFalse(tripPlan.transitItineraries().isEmpty());
-  }
+  @Nested
+  class AccessibleRouting {
 
-  @Test
-  @Disabled
-  public void accessibleRoutingWithVeryHighWalkReluctance() throws IOException {
-    testAccessibleRouting(50);
-  }
+    @Test
+    public void accessibleRouting() throws IOException {
+      var tripPlan = testAccessibleRouting(1.6f);
+      assertFalse(tripPlan.transitItineraries().isEmpty());
+    }
 
-  private TripPlan testAccessibleRouting(float walkReluctance) throws IOException {
-    var req = new TripPlanParametersBuilder()
-      .withFrom(sodo)
-      .withTo(clydeHill)
-      .withTime(SmokeTest.weekdayAtNoon())
-      .withWheelchair(true)
-      .withModes(TRANSIT)
-      .withWalkReluctance(walkReluctance)
-      .build();
+    @Test
+    public void accessibleRoutingWithVeryHighWalkReluctance() throws IOException {
+      testAccessibleRouting(50);
+    }
 
-    var tripPlan = SmokeTest.API_CLIENT.plan(req);
+    private TripPlan testAccessibleRouting(float walkReluctance) throws IOException {
+      var req = new TripPlanParametersBuilder()
+        .withFrom(sodo)
+        .withTo(clydeHill)
+        .withTime(SmokeTest.weekdayAtNoon())
+        .withWheelchair(true)
+        .withModes(TRANSIT)
+        .withWalkReluctance(walkReluctance)
+        .build();
 
-    // assert that accessibility score is there
-    tripPlan
-      .itineraries()
-      .forEach(i -> {
-        assertTrue(i.accessibilityScore().isPresent());
-        i.legs().forEach(l -> assertTrue(l.accessibilityScore().isPresent()));
-      });
-    return tripPlan;
+      var tripPlan = SmokeTest.API_CLIENT.plan(req);
+
+      // assert that accessibility score is there
+      tripPlan
+        .itineraries()
+        .forEach(i -> {
+          assertTrue(i.accessibilityScore().isPresent());
+          i.legs().forEach(l -> assertTrue(l.accessibilityScore().isPresent()));
+        });
+      return tripPlan;
+    }
   }
 
   @Test
