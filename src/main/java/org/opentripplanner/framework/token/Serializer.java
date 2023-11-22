@@ -52,6 +52,7 @@ class Serializer implements Closeable {
     switch (type) {
       case BYTE -> writeByte((byte) value);
       case DURATION -> writeDuration((Duration) value);
+      case ENUM -> writeString(((Enum<?>) value).name());
       case INT -> writeInt((int) value);
       case STRING -> writeString((String) value);
       case TIME_INSTANT -> writeTimeInstant((Instant) value);

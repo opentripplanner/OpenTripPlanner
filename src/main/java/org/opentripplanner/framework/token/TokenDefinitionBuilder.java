@@ -30,6 +30,10 @@ public class TokenDefinitionBuilder {
     return add(fieldName, TokenType.DURATION);
   }
 
+  public TokenDefinitionBuilder addEnum(String fieldName) {
+    return add(fieldName, TokenType.ENUM);
+  }
+
   public TokenDefinitionBuilder addInt(String fieldName) {
     return add(fieldName, TokenType.INT);
   }

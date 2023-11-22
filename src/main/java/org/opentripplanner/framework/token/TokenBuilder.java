@@ -22,6 +22,10 @@ public class TokenBuilder {
     return with(fieldName, TokenType.BYTE, v);
   }
 
+  public TokenBuilder withEnum(String fieldName, Enum<?> v) {
+    return with(fieldName, TokenType.ENUM, v);
+  }
+
   public TokenBuilder withDuration(String fieldName, Duration v) {
     return with(fieldName, TokenType.DURATION, v);
   }

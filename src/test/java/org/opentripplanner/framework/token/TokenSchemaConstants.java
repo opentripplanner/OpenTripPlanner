@@ -2,6 +2,7 @@ package org.opentripplanner.framework.token;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import org.opentripplanner.framework.time.DurationUtils;
 
 public interface TokenSchemaConstants {
@@ -9,18 +10,22 @@ public interface TokenSchemaConstants {
   // token to avoid index errors. They are not part of the serialized token.String DURATION_FIELD = "ADur";
   String BYTE_FIELD = "AByte";
   String DURATION_FIELD = "ADur";
+  String ENUM_FIELD = "EnField";
   String INT_FIELD = "ANum";
   String STRING_FIELD = "AStr";
   String TIME_INSTANT_FIELD = "ATime";
 
   byte BYTE_VALUE = 17;
   Duration DURATION_VALUE = DurationUtils.duration("2m13s");
+  ChronoUnit ENUM_VALUE = ChronoUnit.MINUTES;
+  Class<ChronoUnit> ENUM_CLASS = ChronoUnit.class;
   int INT_VALUE = 31;
   String STRING_VALUE = "text";
   Instant TIME_INSTANT_VALUE = Instant.parse("2023-10-23T10:00:59Z");
 
   String BYTE_ENCODED = "rO0ABXcEAAExEQ==";
   String DURATION_ENCODED = "rO0ABXcKAAEyAAUybTEzcw==";
+  String ENUM_ENCODED = "rO0ABXcMAAEzAAdNSU5VVEVT";
   String INT_ENCODED = "rO0ABXcHAAEzAAIzMQ==";
   String STRING_ENCODED = "rO0ABXcJAAE3AAR0ZXh0";
   String TIME_INSTANT_ENCODED = "rO0ABXcaAAIxMwAUMjAyMy0xMC0yM1QxMDowMDo1OVo=";

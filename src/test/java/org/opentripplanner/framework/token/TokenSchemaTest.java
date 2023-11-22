@@ -3,6 +3,8 @@ package org.opentripplanner.framework.token;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+import java.time.Month;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,6 +20,10 @@ class TokenSchemaTest implements TokenSchemaConstants {
   private static final TokenSchema DURATION_SCHEMA = TokenSchema
     .ofVersion(2)
     .addDuration(DURATION_FIELD)
+    .build();
+  private static final TokenSchema ENUM_SCHEMA = TokenSchema
+    .ofVersion(3)
+    .addEnum(ENUM_FIELD)
     .build();
   private static final TokenSchema INT_SCHEMA = TokenSchema.ofVersion(3).addInt(INT_FIELD).build();
   private static final TokenSchema STRING_SCHEMA = TokenSchema
@@ -41,6 +47,14 @@ class TokenSchemaTest implements TokenSchemaConstants {
     var token = DURATION_SCHEMA.encode().withDuration(DURATION_FIELD, DURATION_VALUE).build();
     assertEquals(DURATION_ENCODED, token);
     assertEquals(DURATION_VALUE, DURATION_SCHEMA.decode(token).getDuration(DURATION_FIELD));
+  }
+
+  @Test
+  public void testEnum() {
+    var token = ENUM_SCHEMA.encode().withEnum(ENUM_FIELD, ENUM_VALUE).build();
+    assertEquals(ENUM_ENCODED, token);
+    assertEquals(ENUM_VALUE, ENUM_SCHEMA.decode(token).getEnum(ENUM_FIELD, ENUM_CLASS).get());
+    assertEquals(Optional.empty(), ENUM_SCHEMA.decode(token).getEnum(ENUM_FIELD, Month.class));
   }
 
   @Test

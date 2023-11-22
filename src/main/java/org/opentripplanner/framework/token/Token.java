@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +39,26 @@ public class Token {
 
   public String getString(String fieldName) {
     return (String) get(fieldName, TokenType.STRING);
+  }
+
+  /**
+   * Be careful with enums. If values are added or deleted the backward/forward compatibility
+   * is compromised. This method return an empty value if the enum does not exist.
+   * <p>
+   * To keep enum values forward compatible the value must first be added, and then it
+   * can not be used in a token before OTP is released and deployed. Then when the enum value
+   * exit in the deployed server, then a new version of OTP can be rolled out witch now can use
+   * the new value.
+   * <p>
+   * To keep backwards compatible enum values should be **deprecated**, not removed. The enum
+   * value can only be deleted, when all tokens with the value is expired (depend on use-case).
+   */
+  public <T extends Enum<T>> Optional<T> getEnum(String fieldName, Class<T> enumClass) {
+    try {
+      return Optional.of(Enum.valueOf(enumClass, (String) get(fieldName, TokenType.ENUM)));
+    } catch (IllegalArgumentException ignore) {
+      return Optional.empty();
+    }
   }
 
   public Instant getTimeInstant(String fieldName) {

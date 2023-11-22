@@ -70,7 +70,7 @@ class Deserializer {
       case BYTE -> readByte(in);
       case DURATION -> readDuration(in);
       case INT -> readInt(in);
-      case STRING -> readString(in);
+      case ENUM, STRING -> readString(in);
       case TIME_INSTANT -> readTimeInstant(in);
     };
   }

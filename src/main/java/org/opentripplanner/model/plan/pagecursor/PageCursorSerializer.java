@@ -26,9 +26,7 @@ final class PageCursorSerializer {
   private static final Logger LOG = LoggerFactory.getLogger(PageCursor.class);
 
   /** private constructor to prevent instantiating this utility class */
-  private PageCursorSerializer() {
-    /* empty */
-  }
+  private PageCursorSerializer() {}
 
   @Nullable
   public static String encode(PageCursor cursor) {

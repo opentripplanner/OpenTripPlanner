@@ -10,6 +10,7 @@ package org.opentripplanner.framework.token;
 public enum TokenType {
   BYTE,
   DURATION,
+  ENUM,
   INT,
   STRING,
   TIME_INSTANT;
