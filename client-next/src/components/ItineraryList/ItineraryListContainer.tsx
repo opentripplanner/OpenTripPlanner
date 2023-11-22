@@ -11,11 +11,13 @@ export function ItineraryListContainer({
   selectedTripPatternIndex,
   setSelectedTripPatternIndex,
   pageResults,
+  loading,
 }: {
   tripQueryResult: QueryType | null;
   selectedTripPatternIndex: number;
   setSelectedTripPatternIndex: (selectedTripPatterIndex: number) => void;
   pageResults: (cursor: string) => void;
+  loading: boolean;
 }) {
   const [earliestStartTime, latestEndTime] = useEarliestAndLatestTimes(tripQueryResult);
   const { containerRef, containerWidth } = useContainerWidth();
@@ -26,6 +28,7 @@ export function ItineraryListContainer({
         onPagination={pageResults}
         previousPageCursor={tripQueryResult?.trip.previousPageCursor}
         nextPageCursor={tripQueryResult?.trip.nextPageCursor}
+        loading={loading}
       />
       <Accordion
         activeKey={`${selectedTripPatternIndex}`}

@@ -1,4 +1,4 @@
-import { Button } from 'react-bootstrap';
+import { Button, Spinner } from 'react-bootstrap';
 import { ServerInfo, TripQueryVariables } from '../../gql/graphql.ts';
 import { LocationInputField } from './LocationInputField.tsx';
 import { DepartureArrivalSelect } from './DepartureArrivalSelect.tsx';
@@ -20,11 +20,13 @@ export function SearchBar({
   tripQueryVariables,
   setTripQueryVariables,
   serverInfo,
+  loading,
 }: {
   onRoute: () => void;
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (tripQueryVariables: TripQueryVariables) => void;
   serverInfo?: ServerInfo;
+  loading: boolean;
 }) {
   const [showServerInfo, setShowServerInfo] = useState(false);
   const target = useRef(null);
@@ -60,7 +62,12 @@ export function SearchBar({
         setTripQueryVariables={setTripQueryVariables}
       />
       <div className="search-bar-route-button-wrapper">
-        <Button variant="primary" onClick={() => onRoute()}>
+        <Button variant="primary" onClick={() => onRoute()} disabled={loading}>
+          {loading && (
+            <>
+              <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" />{' '}
+            </>
+          )}
           Route
         </Button>
       </div>

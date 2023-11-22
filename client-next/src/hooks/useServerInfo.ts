@@ -20,11 +20,8 @@ const query = graphql(`
 
 export const useServerInfo = () => {
   const [data, setData] = useState<QueryType | null>(null);
-
   useEffect(() => {
     const fetchData = async () => {
-      console.log('i fire once');
-
       setData((await request(endpoint, query)) as QueryType);
     };
     fetchData();

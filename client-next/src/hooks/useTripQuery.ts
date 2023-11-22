@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { graphql } from '../gql';
 import request from 'graphql-request';
 import { QueryType, TripQueryVariables } from '../gql/graphql.ts';
@@ -81,23 +81,40 @@ const query = graphql(`
   }
 `);
 
-type TripQueryHook = (variables?: TripQueryVariables) => [QueryType | null, (pageCursor?: string) => Promise<void>];
+type TripQueryHook = (
+  variables?: TripQueryVariables,
+) => [QueryType | null, boolean, (pageCursor?: string) => Promise<void>];
 
 export const useTripQuery: TripQueryHook = (variables) => {
   const [data, setData] = useState<QueryType | null>(null);
+  const [loading, setLoading] = useState(false);
   const callback = useCallback(
     async (pageCursor?: string) => {
-      if (variables) {
-        if (pageCursor) {
-          setData((await request(endpoint, query, { ...variables, pageCursor })) as QueryType);
-        } else {
-          setData((await request(endpoint, query, variables)) as QueryType);
-        }
+      if (loading) {
+        console.warn('Wait for previous search to finish');
       } else {
-        console.warn("Can't search without variables");
+        if (variables) {
+          setLoading(true);
+          if (pageCursor) {
+            setData((await request(endpoint, query, { ...variables, pageCursor })) as QueryType);
+          } else {
+            setData((await request(endpoint, query, variables)) as QueryType);
+          }
+          setLoading(false);
+        } else {
+          console.warn("Can't search without variables");
+        }
       }
     },
-    [setData, variables],
+    [setData, variables, loading],
   );
-  return [data, callback];
+
+  useEffect(() => {
+    if (variables?.from.coordinates && variables?.to.coordinates) {
+      callback();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [variables?.from, variables?.to]);
+
+  return [data, loading, callback];
 };
