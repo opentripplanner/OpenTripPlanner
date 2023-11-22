@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.model.timetable;
 
-import java.util.Collection;
+import java.util.List;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
@@ -20,7 +20,7 @@ public class TripTimesFactory {
    */
   public static TripTimes tripTimes(
     Trip trip,
-    Collection<StopTime> stopTimes,
+    List<StopTime> stopTimes,
     Deduplicator deduplicator
   ) {
     return new TripTimes(StopTimeToScheduledTripTimesMapper.map(trip, stopTimes, deduplicator));

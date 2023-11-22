@@ -1,23 +1,30 @@
 package org.opentripplanner.transit.model.timetable;
 
-import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 
-final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTripTimes> {
+public final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTripTimes> {
+
+  /**
+   * When time-shifting from one time-zone to another negative times may occur.
+   */
+  private static final int MIN_TIME = DurationUtils.durationInSeconds("-12h");
+  /**
+   * We allow a trip to last for maximum 10 days. In Norway the longest trip is 6 days.
+   */
+  private static final int MAX_TIME = DurationUtils.durationInSeconds("10d");
 
   /**
    * Implementation notes: This allows re-using the same scheduled arrival and departure time
@@ -48,17 +55,22 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
   private final int[] originalGtfsStopSequence;
 
   ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
-    this.timeShift = builder.timeShift;
-    this.serviceCode = builder.serviceCode;
-    this.arrivalTimes = builder.arrivalTimes;
-    this.departureTimes = builder.departureTimes;
-    this.timepoints = builder.timepoints;
-    this.trip = builder.trip;
-    this.pickupBookingInfos = builder.pickupBookingInfos;
-    this.dropOffBookingInfos = builder.dropOffBookingInfos;
-    this.headsigns = builder.headsigns;
-    this.headsignVias = builder.headsignVias;
-    this.originalGtfsStopSequence = builder.originalGtfsStopSequence;
+    this.timeShift = builder.timeShift();
+    this.serviceCode = builder.serviceCode();
+    this.arrivalTimes = Objects.requireNonNull(builder.arrivalTimes());
+    this.departureTimes = Objects.requireNonNull(builder.departureTimes());
+    this.timepoints = Objects.requireNonNull(builder.timepoints());
+    this.trip = Objects.requireNonNull(builder.trip());
+    this.pickupBookingInfos = Objects.requireNonNull(builder.pickupBookingInfos());
+    this.dropOffBookingInfos = Objects.requireNonNull(builder.dropOffBookingInfos());
+    this.headsigns = builder.headsigns();
+    this.headsignVias = builder.headsignVias();
+    this.originalGtfsStopSequence = builder.originalGtfsStopSequence();
+    validate();
+  }
+
+  public static ScheduledTripTimesBuilder of() {
+    return new ScheduledTripTimesBuilder(null);
   }
 
   public static ScheduledTripTimesBuilder of(@Nullable Deduplicator deduplicator) {
@@ -254,33 +266,8 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
   /**
    * This is only for API-purposes (does not affect routing).
    */
-  public OccupancyStatus getOccupancyStatus(int stop) {
+  public OccupancyStatus getOccupancyStatus(int ignore) {
     return OccupancyStatus.NO_DATA_AVAILABLE;
-  }
-
-  /**
-   * When creating ScheduledTripTimes or wrapping it in updates, we could potentially imply
-   * negative running or dwell times. We really don't want those being used in routing. This method
-   * checks that all times are increasing.
-   *
-   * @return empty if times were found to be increasing, the first validation error otherwise
-   */
-  public Optional<ValidationError> validateNonIncreasingTimes() {
-    final int nStops = arrivalTimes.length;
-    int prevDep = -9_999_999;
-    for (int s = 0; s < nStops; s++) {
-      final int arr = getArrivalTime(s);
-      final int dep = getDepartureTime(s);
-
-      if (dep < arr) {
-        return Optional.of(new ValidationError(NEGATIVE_DWELL_TIME, s));
-      }
-      if (prevDep > arr) {
-        return Optional.of(new ValidationError(NEGATIVE_HOP_TIME, s));
-      }
-      prevDep = dep;
-    }
-    return Optional.empty();
   }
 
   /** Sort trips based on first departure time. */
@@ -342,5 +329,53 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
 
   I18NString[] copyHeadsigns(Supplier<I18NString[]> defaultValue) {
     return headsigns == null ? defaultValue.get() : Arrays.copyOf(headsigns, headsigns.length);
+  }
+
+  /* private methods */
+
+  private void validate() {
+    int lastStop = departureTimes.length - 1;
+    IntUtils.requireInRange(departureTimes[0], MIN_TIME, MAX_TIME);
+    IntUtils.requireInRange(arrivalTimes[lastStop], MIN_TIME, MAX_TIME);
+    // TODO: This class is used by FLEX, so we can not validate increasing TripTimes
+    // validateNonIncreasingTimes();
+  }
+
+  /**
+   * When creating scheduled trip times we could potentially imply negative running or dwell times.
+   * We really don't want those being used in routing. This method checks that all times are
+   * increasing. The first stop arrival time and the last stops depature time is NOT checked -
+   * these should be ignored by raptor.
+   */
+  private void validateNonIncreasingTimes() {
+    final int lastStop = arrivalTimes.length - 1;
+
+    // This check is currently used since Flex trips may have only one stop. This class should
+    // not be used to represent FLEX, so remove this check and create new data classes for FLEX
+    // trips.
+    if (lastStop < 1) {
+      return;
+    }
+    int prevDep = getDepartureTime(0);
+
+    for (int i = 1; true; ++i) {
+      final int arr = getArrivalTime(i);
+      final int dep = getDepartureTime(i);
+
+      if (prevDep > arr) {
+        throw new IllegalArgumentException(
+          "Negative hop time for stop position " + i + " for " + trip + "."
+        );
+      }
+      if (i == lastStop) {
+        return;
+      }
+      if (dep < arr) {
+        throw new IllegalArgumentException(
+          "Negative dwell time for stop position " + i + " for " + trip + "."
+        );
+      }
+      prevDep = dep;
+    }
   }
 }

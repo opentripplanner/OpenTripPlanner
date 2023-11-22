@@ -4,6 +4,7 @@ import java.util.BitSet;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
@@ -11,18 +12,19 @@ import org.opentripplanner.transit.model.framework.DeduplicatorService;
 public class ScheduledTripTimesBuilder {
 
   private final int NOT_SET = -1;
+  private final BitSet EMPTY_BIT_SET = new BitSet(0);
 
-  int timeShift;
-  int serviceCode = NOT_SET;
-  int[] arrivalTimes;
-  int[] departureTimes;
-  BitSet timepoints;
-  Trip trip;
-  List<BookingInfo> dropOffBookingInfos;
-  List<BookingInfo> pickupBookingInfos;
-  I18NString[] headsigns;
-  String[][] headsignVias;
-  int[] originalGtfsStopSequence;
+  private int timeShift;
+  private int serviceCode = NOT_SET;
+  private int[] arrivalTimes;
+  private int[] departureTimes;
+  private BitSet timepoints;
+  private Trip trip;
+  private List<BookingInfo> dropOffBookingInfos;
+  private List<BookingInfo> pickupBookingInfos;
+  private I18NString[] headsigns;
+  private String[][] headsignVias;
+  private int[] originalGtfsStopSequence;
   private final DeduplicatorService deduplicator;
 
   ScheduledTripTimesBuilder(@Nullable DeduplicatorService deduplicator) {
@@ -57,6 +59,10 @@ public class ScheduledTripTimesBuilder {
     this.originalGtfsStopSequence = originalGtfsStopSequence;
   }
 
+  public int timeShift() {
+    return timeShift;
+  }
+
   public ScheduledTripTimesBuilder withTimeShift(int timeShift) {
     this.timeShift = timeShift;
     return this;
@@ -71,9 +77,17 @@ public class ScheduledTripTimesBuilder {
     return this;
   }
 
+  public int serviceCode() {
+    return serviceCode;
+  }
+
   public ScheduledTripTimesBuilder withServiceCode(int serviceCode) {
     this.serviceCode = serviceCode;
     return this;
+  }
+
+  public int[] arrivalTimes() {
+    return arrivalTimes == null ? departureTimes : arrivalTimes;
   }
 
   public ScheduledTripTimesBuilder withArrivalTimes(int[] arrivalTimes) {
@@ -81,9 +95,27 @@ public class ScheduledTripTimesBuilder {
     return this;
   }
 
+  /** For unit testing, uses {@link TimeUtils#time(java.lang.String)}. */
+  public ScheduledTripTimesBuilder withArrivalTimes(String arrivalTimes) {
+    return withArrivalTimes(TimeUtils.times(arrivalTimes));
+  }
+
+  public int[] departureTimes() {
+    return departureTimes == null ? arrivalTimes : departureTimes;
+  }
+
   public ScheduledTripTimesBuilder withDepartureTimes(int[] departureTimes) {
     this.departureTimes = deduplicator.deduplicateIntArray(departureTimes);
     return this;
+  }
+
+  /** For unit testing, uses {@link TimeUtils#time(java.lang.String)}. */
+  public ScheduledTripTimesBuilder withDepartureTimes(String departureTimes) {
+    return withDepartureTimes(TimeUtils.times(departureTimes));
+  }
+
+  public BitSet timepoints() {
+    return timepoints == null ? EMPTY_BIT_SET : timepoints;
   }
 
   public ScheduledTripTimesBuilder withTimepoints(BitSet timepoints) {
@@ -91,9 +123,17 @@ public class ScheduledTripTimesBuilder {
     return this;
   }
 
+  public Trip trip() {
+    return trip;
+  }
+
   public ScheduledTripTimesBuilder withTrip(Trip trip) {
     this.trip = trip;
     return this;
+  }
+
+  public List<BookingInfo> dropOffBookingInfos() {
+    return dropOffBookingInfos == null ? List.of() : dropOffBookingInfos;
   }
 
   public ScheduledTripTimesBuilder withDropOffBookingInfos(List<BookingInfo> dropOffBookingInfos) {
@@ -102,10 +142,18 @@ public class ScheduledTripTimesBuilder {
     return this;
   }
 
+  public List<BookingInfo> pickupBookingInfos() {
+    return pickupBookingInfos == null ? List.of() : pickupBookingInfos;
+  }
+
   public ScheduledTripTimesBuilder withPickupBookingInfos(List<BookingInfo> pickupBookingInfos) {
     this.pickupBookingInfos =
       deduplicator.deduplicateImmutableList(BookingInfo.class, pickupBookingInfos);
     return this;
+  }
+
+  public I18NString[] headsigns() {
+    return headsigns;
   }
 
   public ScheduledTripTimesBuilder withHeadsigns(I18NString[] headsigns) {
@@ -113,9 +161,17 @@ public class ScheduledTripTimesBuilder {
     return this;
   }
 
+  public String[][] headsignVias() {
+    return headsignVias;
+  }
+
   public ScheduledTripTimesBuilder withHeadsignVias(String[][] headsignVias) {
     this.headsignVias = deduplicator.deduplicateString2DArray(headsignVias);
     return this;
+  }
+
+  public int[] originalGtfsStopSequence() {
+    return originalGtfsStopSequence;
   }
 
   public ScheduledTripTimesBuilder withOriginalGtfsStopSequence(int[] originalGtfsStopSequence) {
