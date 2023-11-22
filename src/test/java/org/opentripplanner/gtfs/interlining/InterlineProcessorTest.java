@@ -21,7 +21,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class InterlineProcessorTest implements PlanTestConstants {
 
@@ -167,7 +167,7 @@ class InterlineProcessorTest implements PlanTestConstants {
       .withRoute(trip.getRoute())
       .withStopPattern(stopPattern)
       .build();
-    var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
     tp.add(tripTimes);
     return tp;
   }

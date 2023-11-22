@@ -44,6 +44,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class RouteRequestTransitDataProviderFilterTest {
 
@@ -811,7 +812,7 @@ class RouteRequestTransitDataProviderFilterTest {
       .build()
       .getRoutingTripPattern();
 
-    TripTimes tripTimes = new TripTimes(
+    TripTimes tripTimes = TripTimesFactory.tripTimes(
       TransitModelForTest.trip("1").withRoute(route).build(),
       List.of(new StopTime()),
       new Deduplicator()
@@ -884,7 +885,7 @@ class RouteRequestTransitDataProviderFilterTest {
     stopTime.setDepartureTime(60);
     stopTime.setStopSequence(0);
 
-    return new TripTimes(trip, List.of(stopTime), new Deduplicator());
+    return TripTimesFactory.tripTimes(trip, List.of(stopTime), new Deduplicator());
   }
 
   private TripTimes createTestTripTimesWithSubmode(String submode) {

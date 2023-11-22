@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -202,7 +203,7 @@ public class Timetable implements Serializable {
       LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
     }
 
-    TripTimes newTimes = new TripTimes(getTripTimes(tripIndex));
+    TripTimes newTimes = getTripTimes(tripIndex).copyOfScheduledTimes();
     List<Integer> skippedStopIndices = new ArrayList<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
@@ -394,6 +395,25 @@ public class Timetable implements Serializable {
    */
   public void addTripTimes(TripTimes tt) {
     tripTimes.add(tt);
+  }
+
+  /**
+   * Apply the same update to all trip-times inculuding scheduled and frequency based
+   * trip times.
+   * <p>
+   * THIS IS NOT THREAD-SAFE - ONLY USE THIS METHOD DURING GRAPH-BUILD!
+   */
+  public void updateAllTripTimes(UnaryOperator<TripTimes> update) {
+    tripTimes.replaceAll(update);
+    frequencyEntries.replaceAll(it ->
+      new FrequencyEntry(
+        it.startTime,
+        it.endTime,
+        it.headway,
+        it.exactTimes,
+        update.apply(it.tripTimes)
+      )
+    );
   }
 
   /**

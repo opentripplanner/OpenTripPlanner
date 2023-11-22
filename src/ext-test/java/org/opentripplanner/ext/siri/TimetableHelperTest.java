@@ -21,6 +21,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.StopModel;
 import uk.org.siri.siri20.OccupancyEnumeration;
 
@@ -74,7 +75,7 @@ public class TimetableHelperTest {
       .build();
 
     Trip trip = Trip.of(new FeedScopedId(FEED_ID, "TRIP_ID")).withRoute(route).build();
-    tripTimes = new TripTimes(trip, List.of(stopTime), new Deduplicator());
+    tripTimes = TripTimesFactory.tripTimes(trip, List.of(stopTime), new Deduplicator());
   }
 
   @Test

@@ -82,7 +82,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 
@@ -138,7 +138,7 @@ class GraphQLIntegrationTest {
     final TripPattern pattern = TEST_MODEL.pattern(BUS).build();
     var trip = TransitModelForTest.trip("123").withHeadsign(I18NString.of("Trip Headsign")).build();
     var stopTimes = TEST_MODEL.stopTimesEvery5Minutes(3, trip, T11_00);
-    var tripTimes = new TripTimes(trip, stopTimes, DEDUPLICATOR);
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, DEDUPLICATOR);
     pattern.add(tripTimes);
 
     transitModel.addTripPattern(id("pattern-1"), pattern);
