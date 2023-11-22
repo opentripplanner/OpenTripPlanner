@@ -48,6 +48,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Consolidate equivalent stops from several feeds  [#5429](https://github.com/opentripplanner/OpenTripPlanner/pull/5429)
 - Check transport mode when mapping GroupStops [#5518](https://github.com/opentripplanner/OpenTripPlanner/pull/5518)
 - Cleanup trip times - Part A [#5437](https://github.com/opentripplanner/OpenTripPlanner/pull/5437)
+- Transfer cost limit [#5516](https://github.com/opentripplanner/OpenTripPlanner/pull/5516)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
