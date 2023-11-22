@@ -87,7 +87,6 @@ export const useTripQuery: TripQueryHook = (variables) => {
   const [data, setData] = useState<QueryType | null>(null);
   const callback = useCallback(
     async (pageCursor?: string) => {
-      console.log({ pageCursor });
       if (variables) {
         if (pageCursor) {
           setData((await request(endpoint, query, { ...variables, pageCursor })) as QueryType);
