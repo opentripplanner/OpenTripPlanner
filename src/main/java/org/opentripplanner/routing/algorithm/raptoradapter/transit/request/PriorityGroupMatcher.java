@@ -1,14 +1,17 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.opentripplanner.routing.api.request.request.filter.TransitPriorityGroupSelect;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -46,13 +49,15 @@ public abstract class PriorityGroupMatcher {
       list.add(new ModeMatcher(select.modes()));
     }
     if (!select.subModeRegexp().isEmpty()) {
-      list.add(new RegExpMatcher(select.subModeRegexp(), p -> p.getNetexSubmode().name()));
+      list.add(
+        new RegExpMatcher("SubMode", select.subModeRegexp(), p -> p.getNetexSubmode().name())
+      );
     }
     if (!select.agencyIds().isEmpty()) {
-      list.add(new IdMatcher(select.agencyIds(), p -> p.getRoute().getAgency().getId()));
+      list.add(new IdMatcher("Agency", select.agencyIds(), p -> p.getRoute().getAgency().getId()));
     }
     if (!select.routeIds().isEmpty()) {
-      list.add(new IdMatcher(select.agencyIds(), p -> p.getRoute().getId()));
+      list.add(new IdMatcher("Route", select.routeIds(), p -> p.getRoute().getId()));
     }
     return compositeOf(list);
   }
@@ -63,6 +68,14 @@ public abstract class PriorityGroupMatcher {
       .map(PriorityGroupMatcher::of)
       .filter(Predicate.not(PriorityGroupMatcher::isEmpty))
       .toArray(PriorityGroupMatcher[]::new);
+  }
+
+  private static <T> String arrayToString(T[] values) {
+    return colToString(Arrays.asList(values));
+  }
+
+  private static <T> String colToString(Collection<T> values) {
+    return values.stream().map(Objects::toString).collect(Collectors.joining(" | "));
   }
 
   private static PriorityGroupMatcher compositeOf(List<PriorityGroupMatcher> list) {
@@ -96,14 +109,25 @@ public abstract class PriorityGroupMatcher {
     boolean match(TripPattern pattern) {
       return modes.contains(pattern.getMode());
     }
+
+    @Override
+    public String toString() {
+      return "Mode(" + colToString(modes) + ')';
+    }
   }
 
   private static final class RegExpMatcher extends PriorityGroupMatcher {
 
+    private final String typeName;
     private final Pattern[] subModeRegexp;
     private final Function<TripPattern, String> toValue;
 
-    public RegExpMatcher(List<String> subModeRegexp, Function<TripPattern, String> toValue) {
+    public RegExpMatcher(
+      String typeName,
+      List<String> subModeRegexp,
+      Function<TripPattern, String> toValue
+    ) {
+      this.typeName = typeName;
       this.subModeRegexp = subModeRegexp.stream().map(Pattern::compile).toArray(Pattern[]::new);
       this.toValue = toValue;
     }
@@ -118,14 +142,25 @@ public abstract class PriorityGroupMatcher {
       }
       return false;
     }
+
+    @Override
+    public String toString() {
+      return typeName + "Regexp(" + arrayToString(subModeRegexp) + ')';
+    }
   }
 
   private static final class IdMatcher extends PriorityGroupMatcher {
 
+    private final String typeName;
     private final Set<FeedScopedId> ids;
     private final Function<TripPattern, FeedScopedId> idProvider;
 
-    public IdMatcher(List<FeedScopedId> ids, Function<TripPattern, FeedScopedId> idProvider) {
+    public IdMatcher(
+      String typeName,
+      List<FeedScopedId> ids,
+      Function<TripPattern, FeedScopedId> idProvider
+    ) {
+      this.typeName = typeName;
       this.ids = new HashSet<>(ids);
       this.idProvider = idProvider;
     }
@@ -133,6 +168,11 @@ public abstract class PriorityGroupMatcher {
     @Override
     boolean match(TripPattern pattern) {
       return ids.contains(idProvider.apply(pattern));
+    }
+
+    @Override
+    public String toString() {
+      return typeName + "Id(" + colToString(ids) + ')';
     }
   }
 
@@ -156,6 +196,11 @@ public abstract class PriorityGroupMatcher {
         }
       }
       return false;
+    }
+
+    @Override
+    public String toString() {
+      return "(" + arrayToString(matchers) + ')';
     }
   }
 }
