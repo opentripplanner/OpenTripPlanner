@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.module.interlining;
+package org.opentripplanner.gtfs.interlining;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;

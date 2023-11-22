@@ -29,6 +29,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -111,7 +112,7 @@ class ModifiedTripBuilderTest {
     STOP_TIME_C_1.setStopSequence(1);
   }
 
-  private static final TripTimes TRIP_TIMES = new TripTimes(
+  private static final TripTimes TRIP_TIMES = TripTimesFactory.tripTimes(
     TRIP,
     List.of(STOP_TIME_A_1, STOP_TIME_B_1, STOP_TIME_C_1),
     DEDUPLICATOR

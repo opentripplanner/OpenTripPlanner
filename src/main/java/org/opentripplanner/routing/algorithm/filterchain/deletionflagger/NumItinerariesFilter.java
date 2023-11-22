@@ -13,6 +13,8 @@ import org.opentripplanner.routing.algorithm.filterchain.ListSection;
  */
 public class NumItinerariesFilter implements ItineraryDeletionFlagger {
 
+  public static final String TAG = "number-of-itineraries-filter";
+
   private static final Consumer<NumItinerariesFilterResults> IGNORE_SUBSCRIBER = i -> {};
 
   private final int maxLimit;
@@ -34,7 +36,7 @@ public class NumItinerariesFilter implements ItineraryDeletionFlagger {
 
   @Override
   public String name() {
-    return "number-of-itineraries-filter";
+    return TAG;
   }
 
   @Override

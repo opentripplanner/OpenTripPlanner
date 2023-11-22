@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -64,7 +64,7 @@ class ScheduledTransitLegReferenceTest {
     stopIdAtPosition0 = tripPattern.getStop(0).getId();
     stopIdAtPosition1 = tripPattern.getStop(1).getId();
     stopIdAtPosition2 = tripPattern.getStop(2).getId();
-    TripTimes tripTimes = new TripTimes(
+    var tripTimes = TripTimesFactory.tripTimes(
       trip,
       TEST_MODEL.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),
       new Deduplicator()

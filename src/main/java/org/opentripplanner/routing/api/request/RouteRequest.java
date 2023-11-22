@@ -14,6 +14,7 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.DateUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
@@ -239,21 +240,6 @@ public class RouteRequest implements Cloneable, Serializable {
     }
   }
 
-  public String toString(String sep) {
-    return (
-      from +
-      sep +
-      to +
-      sep +
-      dateTime +
-      sep +
-      arriveBy +
-      sep +
-      journey.modes() +
-      journey.transit().filters()
-    );
-  }
-
   /* INSTANCE METHODS */
 
   /**
@@ -278,10 +264,6 @@ public class RouteRequest implements Cloneable, Serializable {
       /* this will never happen since our super is the cloneable object */
       throw new RuntimeException(e);
     }
-  }
-
-  public String toString() {
-    return toString(" ");
   }
 
   /** The start location */
@@ -443,5 +425,17 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public void setNumItineraries(int numItineraries) {
     this.numItineraries = numItineraries;
+  }
+
+  public String toString() {
+    return ToStringBuilder
+      .of(RouteRequest.class)
+      .addObj("from", from)
+      .addObj("to", to)
+      .addDateTime("dateTime", dateTime)
+      .addBoolIfTrue("arriveBy", arriveBy)
+      .addObj("modes", journey.modes())
+      .addCol("filters", journey.transit().filters())
+      .toString();
   }
 }

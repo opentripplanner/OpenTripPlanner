@@ -183,7 +183,12 @@ public interface RaptorAccessEgress {
     return durationInSeconds() == 0;
   }
 
-  /** Call this from toString */
+  /** Call this from toString or {@link #asString(boolean, boolean, String)}*/
+  default String defaultToString() {
+    return asString(true, true, null);
+  }
+
+  /** Call this from toString or {@link #defaultToString()} */
   default String asString(boolean includeStop, boolean includeCost, @Nullable String summary) {
     StringBuilder buf = new StringBuilder();
     if (isFree()) {

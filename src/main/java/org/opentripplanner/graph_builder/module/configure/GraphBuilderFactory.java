@@ -10,6 +10,8 @@ import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.emissions.EmissionsModule;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -56,6 +58,12 @@ public interface GraphBuilderFactory {
   DataImportIssueReporter dataImportIssueReporter();
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
 
+  @Nullable
+  StopConsolidationModule stopConsolidationModule();
+
+  @Nullable
+  StopConsolidationRepository stopConsolidationRepository();
+
   @Component.Builder
   interface Builder {
     @BindsInstance
@@ -69,6 +77,11 @@ public interface GraphBuilderFactory {
 
     @BindsInstance
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
+
+    @BindsInstance
+    Builder stopConsolidationRepository(
+      @Nullable StopConsolidationRepository stopConsolidationRepository
+    );
 
     @BindsInstance
     Builder dataSources(GraphBuilderDataSources graphBuilderDataSources);
