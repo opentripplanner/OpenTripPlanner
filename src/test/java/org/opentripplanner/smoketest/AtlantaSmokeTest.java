@@ -1,5 +1,6 @@
 package org.opentripplanner.smoketest;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.client.model.RequestMode.FLEX_EGRESS;
 import static org.opentripplanner.client.model.RequestMode.TRANSIT;
@@ -7,11 +8,16 @@ import static org.opentripplanner.client.model.RequestMode.WALK;
 import static org.opentripplanner.smoketest.SmokeTest.assertThatItineraryHasModes;
 import static org.opentripplanner.smoketest.SmokeTest.basicRouteTest;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.client.model.Coordinate;
+import org.opentripplanner.client.parameters.TripPlanParameters;
+import org.opentripplanner.smoketest.util.RequestCombinationsBuilder;
 import org.opentripplanner.smoketest.util.SmokeTestRequest;
 
 /**
@@ -28,8 +34,14 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
 @Tag("atlanta")
 public class AtlantaSmokeTest {
 
-  Coordinate nearGeorgiaStateStation = new Coordinate(33.74139944890028, -84.38607215881348);
-  Coordinate powderSpringsInsideFlexZone1 = new Coordinate(33.86916840022388, -84.66315507888794);
+  static Coordinate nearGeorgiaStateStation = new Coordinate(33.74139944890028, -84.38607215881348);
+  static Coordinate powderSpringsInsideFlexZone1 = new Coordinate(
+    33.86916840022388,
+    -84.66315507888794
+  );
+
+  static Coordinate peachtreeCreek = new Coordinate(33.7310, -84.3823);
+  static Coordinate lindberghCenter = new Coordinate(33.8235, -84.3674);
 
   @Test
   public void regularRouteFromCentralAtlantaToPowderSprings() {
@@ -65,5 +77,22 @@ public class AtlantaSmokeTest {
       .anyMatch(name -> name.equals("Zone 1"));
 
     assertTrue(usesZone1Route);
+  }
+
+  static List<TripPlanParameters> buildCombinations() {
+    return new RequestCombinationsBuilder()
+      .withLocations(lindberghCenter, peachtreeCreek)
+      .withModes(TRANSIT, WALK)
+      .withTime(SmokeTest.weekdayAtNoon())
+      .includeWheelchair()
+      .includeArriveBy()
+      .build();
+  }
+
+  @ParameterizedTest
+  @MethodSource("buildCombinations")
+  public void accessibleRouting(TripPlanParameters params) throws IOException {
+    var tripPlan = SmokeTest.API_CLIENT.plan(params);
+    assertFalse(tripPlan.transitItineraries().isEmpty());
   }
 }
