@@ -5,7 +5,6 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.OCCUPANCY;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.POSITION;
 import static org.opentripplanner.standalone.config.routerconfig.updaters.VehiclePositionsUpdaterConfig.VehiclePositionFeature.STOP_POSITION;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.stopTime;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 
 import com.google.transit.realtime.GtfsRealtime;
@@ -38,9 +37,11 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 public class RealtimeVehicleMatcherTest {
+
+  private final TransitModelForTest testModel = TransitModelForTest.of();
 
   private static final Route ROUTE = TransitModelForTest.route("1").build();
   private static final Set<VehiclePositionsUpdaterConfig.VehiclePositionFeature> FEATURES = Set.of(
@@ -91,7 +92,7 @@ public class RealtimeVehicleMatcherTest {
     var trip1 = TransitModelForTest.trip(tripId).build();
     var trip2 = TransitModelForTest.trip(secondTripId).build();
 
-    var stopTimes = TransitModelForTest.stopTimesEvery5Minutes(3, trip1, T11_00);
+    var stopTimes = testModel.stopTimesEvery5Minutes(3, trip1, T11_00);
     var pattern = tripPattern(trip1, stopTimes);
 
     // Map positions to trips in feed
@@ -121,7 +122,11 @@ public class RealtimeVehicleMatcherTest {
     var scopedTripId = TransitModelForTest.id(tripId);
     var trip1 = TransitModelForTest.trip(tripId).build();
 
-    var stopTimes = List.of(stopTime(trip1, 10), stopTime(trip1, 20), stopTime(trip1, 30));
+    var stopTimes = List.of(
+      testModel.stopTime(trip1, 10),
+      testModel.stopTime(trip1, 20),
+      testModel.stopTime(trip1, 30)
+    );
     var pattern1 = tripPattern(trip1, stopTimes);
 
     var tripForId = Map.of(scopedTripId, trip1);
@@ -172,7 +177,11 @@ public class RealtimeVehicleMatcherTest {
   private void testVehiclePositions(VehiclePosition pos) {
     var service = new DefaultRealtimeVehicleService(null);
     var trip = TransitModelForTest.trip(tripId).build();
-    var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
+    var stopTimes = List.of(
+      testModel.stopTime(trip, 0),
+      testModel.stopTime(trip, 1),
+      testModel.stopTime(trip, 2)
+    );
 
     TripPattern pattern = tripPattern(trip, stopTimes);
 
@@ -216,7 +225,11 @@ public class RealtimeVehicleMatcherTest {
   private void testVehiclePositionOccupancy(VehiclePosition pos) {
     var service = new DefaultRealtimeVehicleService(null);
     var trip = TransitModelForTest.trip(tripId).build();
-    var stopTimes = List.of(stopTime(trip, 0), stopTime(trip, 1), stopTime(trip, 2));
+    var stopTimes = List.of(
+      testModel.stopTime(trip, 0),
+      testModel.stopTime(trip, 1),
+      testModel.stopTime(trip, 2)
+    );
 
     TripPattern pattern = tripPattern(trip, stopTimes);
 
@@ -260,9 +273,17 @@ public class RealtimeVehicleMatcherTest {
     var trip1 = TransitModelForTest.trip(tripId1).build();
     var trip2 = TransitModelForTest.trip(tripId2).build();
 
-    var stopTimes1 = List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip1, 2));
+    var stopTimes1 = List.of(
+      testModel.stopTime(trip1, 0),
+      testModel.stopTime(trip1, 1),
+      testModel.stopTime(trip1, 2)
+    );
 
-    var stopTime2 = List.of(stopTime(trip1, 0), stopTime(trip1, 1), stopTime(trip2, 2));
+    var stopTime2 = List.of(
+      testModel.stopTime(trip1, 0),
+      testModel.stopTime(trip1, 1),
+      testModel.stopTime(trip2, 2)
+    );
 
     var pattern1 = tripPattern(trip1, stopTimes1);
     var pattern2 = tripPattern(trip2, stopTime2);
@@ -319,9 +340,12 @@ public class RealtimeVehicleMatcherTest {
     var sixOclock = (int) Duration.ofHours(18).toSeconds();
     var fivePast6 = sixOclock + 300;
 
-    var stopTimes = List.of(stopTime(trip, 0, sixOclock), stopTime(trip, 1, fivePast6));
+    var stopTimes = List.of(
+      testModel.stopTime(trip, 0, sixOclock),
+      testModel.stopTime(trip, 1, fivePast6)
+    );
 
-    var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
     var instant = OffsetDateTime.parse(time).toInstant();
     var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, instant);
@@ -335,9 +359,12 @@ public class RealtimeVehicleMatcherTest {
 
     var fiveToMidnight = LocalTime.parse("23:55").toSecondOfDay();
     var fivePastMidnight = fiveToMidnight + (10 * 60);
-    var stopTimes = List.of(stopTime(trip, 0, fiveToMidnight), stopTime(trip, 1, fivePastMidnight));
+    var stopTimes = List.of(
+      testModel.stopTime(trip, 0, fiveToMidnight),
+      testModel.stopTime(trip, 1, fivePastMidnight)
+    );
 
-    var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
     var time = OffsetDateTime.parse("2022-04-05T00:04:00+02:00").toInstant();
 
@@ -357,7 +384,7 @@ public class RealtimeVehicleMatcherTest {
       .build();
     pattern
       .getScheduledTimetable()
-      .addTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()));
+      .addTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()));
     return pattern;
   }
 

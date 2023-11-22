@@ -180,8 +180,8 @@ public class UnscheduledTrip extends FlexTrip<UnscheduledTrip, UnscheduledTripBu
         new FlexEgressTemplate(
           egress,
           this,
-          toIndex,
           boardStop.index,
+          toIndex,
           boardStop.stop,
           date,
           calculator,

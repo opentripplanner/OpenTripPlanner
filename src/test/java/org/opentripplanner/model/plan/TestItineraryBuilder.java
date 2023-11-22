@@ -44,6 +44,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 /**
  * This is a helper class to allow unit-testing on Itineraries. The builder does not necessarily
@@ -475,7 +476,7 @@ public class TestItineraryBuilder implements PlanTestConstants {
       .withRoute(route)
       .withStopPattern(stopPattern)
       .build();
-    final TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    final TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
     tripPattern.add(tripTimes);
 
     ScheduledTransitLeg leg;

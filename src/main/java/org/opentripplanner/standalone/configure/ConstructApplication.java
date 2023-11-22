@@ -3,7 +3,9 @@ package org.opentripplanner.standalone.configure;
 import jakarta.ws.rs.core.Application;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.geocoder.LuceneIndex;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.framework.application.LogMDCSupport;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -70,7 +72,9 @@ public class ConstructApplication {
     WorldEnvelopeRepository worldEnvelopeRepository,
     ConfigModel config,
     GraphBuilderDataSources graphBuilderDataSources,
-    DataImportIssueSummary issueSummary
+    DataImportIssueSummary issueSummary,
+    EmissionsDataModel emissionsDataModel,
+    @Nullable StopConsolidationRepository stopConsolidationRepository
   ) {
     this.cli = cli;
     this.graphBuilderDataSources = graphBuilderDataSources;
@@ -87,7 +91,9 @@ public class ConstructApplication {
         .transitModel(transitModel)
         .graphVisualizer(graphVisualizer)
         .worldEnvelopeRepository(worldEnvelopeRepository)
+        .emissionsDataModel(emissionsDataModel)
         .dataImportIssueSummary(issueSummary)
+        .stopConsolidationRepository(stopConsolidationRepository)
         .build();
   }
 
@@ -118,6 +124,8 @@ public class ConstructApplication {
       graph(),
       transitModel(),
       factory.worldEnvelopeRepository(),
+      factory.emissionsDataModel(),
+      factory.stopConsolidationRepository(),
       cli.doLoadStreetGraph(),
       cli.doSaveStreetGraph()
     );
@@ -239,6 +247,10 @@ public class ConstructApplication {
     return factory.dataImportIssueSummary();
   }
 
+  public StopConsolidationRepository stopConsolidationRepository() {
+    return factory.stopConsolidationRepository();
+  }
+
   public RealtimeVehicleRepository realtimeVehicleRepository() {
     return factory.realtimeVehicleRepository();
   }
@@ -287,5 +299,9 @@ public class ConstructApplication {
 
   private void createMetricsLogging() {
     factory.metricsLogging();
+  }
+
+  public EmissionsDataModel emissionsDataModel() {
+    return factory.emissionsDataModel();
   }
 }

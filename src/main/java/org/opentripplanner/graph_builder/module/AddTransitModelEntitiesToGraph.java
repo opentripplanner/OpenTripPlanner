@@ -90,7 +90,8 @@ public class AddTransitModelEntitiesToGraph {
     addPathwayNodesToGraph();
     addBoardingAreasToGraph();
 
-    // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
+    // Although pathways are loaded from GTFS they are street data, so we will put them in the
+    // street graph.
     createPathwayEdgesAndAddThemToGraph();
     addFeedInfoToGraph(transitModel);
     addAgenciesToGraph(transitModel);

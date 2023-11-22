@@ -49,16 +49,18 @@
         "@graphql-codegen/java-resolvers",
         "graphql",
         "io.micrometer:micrometer-registry-prometheus",
-        "io.micrometer:micrometer-registry-influx"
+        "io.micrometer:micrometer-registry-influx",
+        "org.entur.gbfs:gbfs-java-model"
       ],
       // we don't use the 'monthly' preset because that only fires on the first day of the month
       // when there might already other PRs open
-      "schedule": "on the 7th through 10th day of the month"
+      "schedule": "on the 7th through 8th day of the month"
     },
     {
       "description": "in order to keep review burden low, don't update these quite so frequently",
       "matchPackagePrefixes": [
-        "org.apache.lucene:"
+        "org.apache.lucene:",
+        "io.netty:"
       ],
       "extends": [
         "schedule:quarterly"

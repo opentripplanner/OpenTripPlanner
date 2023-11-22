@@ -19,16 +19,24 @@ public class SystemNotice {
   /**
    * An id or code identifying the notice. Use a descriptive tag like: 'transit-walking-filter'.
    */
-  public final String tag;
+  private final String tag;
 
   /**
    * An english text explaining why the element is tagged, and/or what the tag means.
    */
-  public final String text;
+  private final String text;
 
   public SystemNotice(String tag, String text) {
     this.tag = tag;
     this.text = text;
+  }
+
+  public String tag() {
+    return tag;
+  }
+
+  public String text() {
+    return text;
   }
 
   @Override

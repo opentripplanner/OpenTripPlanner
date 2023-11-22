@@ -7,6 +7,10 @@
           "endTime" : 1580644800000,
           "generalizedCost" : 4072,
           "accessibilityScore" : 0.5,
+          "emissionsPerPerson" : {
+            "co2" : 123.0
+          },
+          "numberOfTransfers" : 1,
           "legs" : [
             {
               "mode" : "WALK",

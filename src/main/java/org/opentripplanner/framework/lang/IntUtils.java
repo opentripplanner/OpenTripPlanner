@@ -60,9 +60,9 @@ public final class IntUtils {
    * Copy int array and shift all values by the given {@code offset}.
    */
   public static int[] shiftArray(int offset, int[] array) {
-    int[] a = new int[array.length];
-    for (int i = 0; i < array.length; i++) {
-      a[i] = array[i] + offset;
+    int[] a = Arrays.copyOf(array, array.length);
+    for (int i = 0; i < array.length; ++i) {
+      a[i] += offset;
     }
     return a;
   }

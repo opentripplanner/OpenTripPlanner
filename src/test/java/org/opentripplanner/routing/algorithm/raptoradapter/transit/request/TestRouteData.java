@@ -28,6 +28,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 public class TestRouteData {
 
@@ -171,7 +172,7 @@ public class TestRouteData {
       .build();
     var stopTimes = stopTimes(trip, stops, tripTimes);
     this.stopTimesByTrip.put(trip, stopTimes);
-    this.tripTimesByTrip.put(trip, new TripTimes(trip, stopTimes, deduplicator));
+    this.tripTimesByTrip.put(trip, TripTimesFactory.tripTimes(trip, stopTimes, deduplicator));
     return trip;
   }
 

@@ -6,6 +6,8 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -51,6 +53,8 @@ public class Itinerary implements ItinerarySortKey {
 
   /* Sandbox experimental properties */
   private Float accessibilityScore;
+
+  private Emissions emissionsPerPerson;
 
   /* other properties */
 
@@ -187,8 +191,8 @@ public class Itinerary implements ItinerarySortKey {
   /**
    * Remove all deletion flags of this itinerary, in effect undeleting it from the result.
    */
-  public void removeDeletionFlags() {
-    systemNotices.clear();
+  public void removeDeletionFlags(Set<String> removeTags) {
+    systemNotices.removeIf(it -> removeTags.contains(it.tag()));
   }
 
   public boolean isFlaggedForDeletion() {
@@ -200,7 +204,7 @@ public class Itinerary implements ItinerarySortKey {
    * given {@code tag}.
    */
   public boolean hasSystemNoticeTag(String tag) {
-    return systemNotices.stream().map(n -> n.tag).anyMatch(tag::equals);
+    return systemNotices.stream().map(SystemNotice::tag).anyMatch(tag::equals);
   }
 
   public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
@@ -264,6 +268,7 @@ public class Itinerary implements ItinerarySortKey {
       .addNum("elevationGained", elevationGained, 0.0)
       .addCol("legs", legs)
       .addObj("fare", fare)
+      .addObj("emissionsPerPerson", emissionsPerPerson)
       .toString();
   }
 
@@ -367,6 +372,27 @@ public class Itinerary implements ItinerarySortKey {
    */
   public List<Leg> getLegs() {
     return legs;
+  }
+
+  /**
+   * Applies the transformation in {@code mapper} to all instances of {@link TransitLeg} in the
+   * legs of this Itinerary.
+   * <p>
+   * NOTE: The itinerary is mutable so the transformation is done in-place!
+   */
+  public Itinerary transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
+    legs =
+      legs
+        .stream()
+        .map(l -> {
+          if (l instanceof TransitLeg tl) {
+            return mapper.apply(tl);
+          } else {
+            return l;
+          }
+        })
+        .toList();
+    return this;
   }
 
   public Stream<StreetLeg> getStreetLegs() {
@@ -599,5 +625,17 @@ public class Itinerary implements ItinerarySortKey {
       .filter(ScheduledTransitLeg.class::isInstance)
       .map(ScheduledTransitLeg.class::cast)
       .toList();
+  }
+
+  /**
+   * The emissions of this itinerary.
+   */
+  public void setEmissionsPerPerson(Emissions emissionsPerPerson) {
+    this.emissionsPerPerson = emissionsPerPerson;
+  }
+
+  @Nullable
+  public Emissions getEmissionsPerPerson() {
+    return this.emissionsPerPerson;
   }
 }

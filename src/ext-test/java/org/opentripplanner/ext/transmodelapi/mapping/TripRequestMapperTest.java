@@ -24,6 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.ext.emissions.DefaultEmissionsService;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -54,10 +56,11 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class TripRequestMapperTest implements PlanTestConstants {
+
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   static final TransmodelRequestContext context;
   private static final Duration MAX_FLEXIBLE = Duration.ofMinutes(20);
@@ -67,9 +70,9 @@ public class TripRequestMapperTest implements PlanTestConstants {
   private static final Route route1 = TransitModelForTest.route("route1").build();
   private static final Route route2 = TransitModelForTest.route("route2").build();
 
-  private static final RegularStop stop1 = TransitModelForTest.stopForTest("ST:stop1", 1, 1);
-  private static final RegularStop stop2 = TransitModelForTest.stopForTest("ST:stop2", 2, 1);
-  private static final RegularStop stop3 = TransitModelForTest.stopForTest("ST:stop3", 3, 1);
+  private static final RegularStop stop1 = TEST_MODEL.stop("ST:stop1", 1, 1).build();
+  private static final RegularStop stop2 = TEST_MODEL.stop("ST:stop2", 2, 1).build();
+  private static final RegularStop stop3 = TEST_MODEL.stop("ST:stop3", 3, 1).build();
 
   static {
     var graph = new Graph();
@@ -78,8 +81,8 @@ public class TripRequestMapperTest implements PlanTestConstants {
       .bus(route2, 2, time("11:20"), time("11:40"), Place.forStop(stop3))
       .build();
     var patterns = itineraryPatterns(itinerary);
-    var stopModel = StopModel
-      .of()
+    var stopModel = TEST_MODEL
+      .stopModelBuilder()
       .withRegularStop(stop1)
       .withRegularStop(stop2)
       .withRegularStop(stop3)
@@ -125,8 +128,10 @@ public class TripRequestMapperTest implements PlanTestConstants {
           new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository()),
           new DefaultRealtimeVehicleService(transitService),
           new DefaultVehicleRentalService(),
+          new DefaultEmissionsService(new EmissionsDataModel()),
           RouterConfig.DEFAULT.flexConfig(),
           List.of(),
+          null,
           null
         ),
         null,

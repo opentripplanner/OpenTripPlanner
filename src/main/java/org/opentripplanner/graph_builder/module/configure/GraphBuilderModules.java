@@ -8,9 +8,14 @@ import jakarta.inject.Singleton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
 import org.opentripplanner.ext.dataoverlay.configure.DataOverlayFactory;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsModule;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -103,6 +108,22 @@ public class GraphBuilderModules {
       issueStore,
       config.getTransitServicePeriod(),
       config.fareServiceFactory
+    );
+  }
+
+  @Provides
+  @Singleton
+  static EmissionsModule provideEmissionsModule(
+    GraphBuilderDataSources dataSources,
+    BuildConfig config,
+    @Nullable EmissionsDataModel emissionsDataModel,
+    DataImportIssueStore issueStore
+  ) {
+    return new EmissionsModule(
+      dataSources.getGtfsConfiguredDatasource(),
+      config,
+      emissionsDataModel,
+      issueStore
     );
   }
 
@@ -258,8 +279,23 @@ public class GraphBuilderModules {
   }
 
   @Provides
+  @Singleton
   static DataImportIssueSummary providesDataImportIssueSummary(DataImportIssueStore issueStore) {
     return new DataImportIssueSummary(issueStore.listIssues());
+  }
+
+  @Provides
+  @Singleton
+  @Nullable
+  static StopConsolidationModule providesStopConsolidationModule(
+    TransitModel transitModel,
+    @Nullable StopConsolidationRepository repo,
+    GraphBuilderDataSources dataSources
+  ) {
+    return dataSources
+      .stopConsolidationDataSource()
+      .map(ds -> StopConsolidationModule.of(transitModel, repo, ds))
+      .orElse(null);
   }
 
   /* private methods */

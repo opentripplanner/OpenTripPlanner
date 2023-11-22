@@ -456,9 +456,9 @@ public class TransitModel implements Serializable {
   /**
    * Updating the stop model is only allowed during graph build
    */
-  public void mergeStopModels(StopModel newStopModel) {
+  public void mergeStopModels(StopModel childStopModel) {
     invalidateIndex();
-    this.stopModel = this.stopModel.copy().addAll(newStopModel).build();
+    this.stopModel = this.stopModel.merge(childStopModel);
   }
 
   public void addFlexTrip(FeedScopedId id, FlexTrip<?, ?> flexTrip) {

@@ -72,7 +72,7 @@ public enum OTPFeature {
     false,
     "Whether the @async annotation in the GraphQL schema should lead to the fetch being executed asynchronously. This allows batch or alias queries to run in parallel at the cost of consuming extra threads."
   ),
-
+  Co2Emissions(false, true, "Enable the emissions sandbox module."),
   DataOverlay(
     false,
     true,

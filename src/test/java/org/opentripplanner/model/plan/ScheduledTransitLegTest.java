@@ -18,10 +18,11 @@ class ScheduledTransitLegTest {
 
   @Test
   void defaultFares() {
+    var testModel = TransitModelForTest.of();
     var route = TransitModelForTest.route(id("2")).build();
     var pattern = TransitModelForTest
       .tripPattern("1", route)
-      .withStopPattern(TransitModelForTest.stopPattern(3))
+      .withStopPattern(testModel.stopPattern(3))
       .build();
     var leg = new ScheduledTransitLegBuilder()
       .withTripTimes(null)

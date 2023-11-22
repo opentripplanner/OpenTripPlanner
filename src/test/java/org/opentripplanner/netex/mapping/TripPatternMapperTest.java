@@ -10,7 +10,7 @@ import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMapById;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
-import org.opentripplanner.transit.model.framework.EntityById;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -34,10 +34,10 @@ public class TripPatternMapperTest {
     TripPatternMapper tripPatternMapper = new TripPatternMapper(
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       sample.getStopsById(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       sample.getOtpRouteByid(),
       sample.getRouteById(),
       sample.getJourneyPatternById(),
@@ -94,10 +94,10 @@ public class TripPatternMapperTest {
     TripPatternMapper tripPatternMapper = new TripPatternMapper(
       DataImportIssueStore.NOOP,
       MappingSupport.ID_FACTORY,
-      new EntityById<>(),
+      new DefaultEntityById<>(),
       sample.getStopsById(),
-      new EntityById<>(),
-      new EntityById<>(),
+      new DefaultEntityById<>(),
+      new DefaultEntityById<>(),
       sample.getOtpRouteByid(),
       sample.getRouteById(),
       sample.getJourneyPatternById(),

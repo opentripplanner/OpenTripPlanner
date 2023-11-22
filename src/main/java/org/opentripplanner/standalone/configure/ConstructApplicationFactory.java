@@ -4,7 +4,11 @@ import dagger.BindsInstance;
 import dagger.Component;
 import jakarta.inject.Singleton;
 import javax.annotation.Nullable;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsServiceModule;
 import org.opentripplanner.ext.ridehailing.configure.RideHailingServicesModule;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
+import org.opentripplanner.ext.stopconsolidation.configure.StopConsolidationServiceModule;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueSummary;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -44,6 +48,8 @@ import org.opentripplanner.visualizer.GraphVisualizer;
     VehicleRentalRepositoryModule.class,
     ConstructApplicationModule.class,
     RideHailingServicesModule.class,
+    EmissionsServiceModule.class,
+    StopConsolidationServiceModule.class,
   }
 )
 public interface ConstructApplicationFactory {
@@ -60,12 +66,18 @@ public interface ConstructApplicationFactory {
   DataImportIssueSummary dataImportIssueSummary();
 
   @Nullable
+  EmissionsDataModel emissionsDataModel();
+
+  @Nullable
   GraphVisualizer graphVisualizer();
 
   TransitService transitService();
   OtpServerRequestContext createServerContext();
 
   MetricsLogging metricsLogging();
+
+  @Nullable
+  StopConsolidationRepository stopConsolidationRepository();
 
   @Component.Builder
   interface Builder {
@@ -85,7 +97,15 @@ public interface ConstructApplicationFactory {
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
 
     @BindsInstance
+    Builder stopConsolidationRepository(
+      @Nullable StopConsolidationRepository stopConsolidationRepository
+    );
+
+    @BindsInstance
     Builder dataImportIssueSummary(DataImportIssueSummary issueSummary);
+
+    @BindsInstance
+    Builder emissionsDataModel(EmissionsDataModel emissionsDataModel);
 
     ConstructApplicationFactory build();
   }

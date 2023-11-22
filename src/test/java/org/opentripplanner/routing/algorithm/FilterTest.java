@@ -53,7 +53,7 @@ public class FilterTest {
   static final String JOURNEY_PATTERN_ID_3 = "RUT:JourneyPattern:3";
   static final String JOURNEY_PATTERN_ID_4 = "RUT:JourneyPattern:4";
 
-  static final StopPattern STOP_PATTERN = TransitModelForTest.stopPattern(2);
+  static final StopPattern STOP_PATTERN = TransitModelForTest.of().stopPattern(2);
 
   private static final SubMode LOCAL_BUS = SubMode.getOrBuildAndCacheForever("localBus");
   private static final SubMode NIGHT_BUS = SubMode.getOrBuildAndCacheForever("nightBus");

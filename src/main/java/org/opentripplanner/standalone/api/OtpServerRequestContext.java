@@ -3,9 +3,12 @@ package org.opentripplanner.standalone.api;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import java.util.Locale;
+import javax.annotation.Nullable;
 import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.dataoverlay.routing.DataOverlayContext;
+import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.inspector.raster.TileRendererManager;
@@ -92,7 +95,13 @@ public interface OtpServerRequestContext {
 
   List<RideHailingService> rideHailingServices();
 
+  @Nullable
+  StopConsolidationService stopConsolidationService();
+
   MeterRegistry meterRegistry();
+
+  @Nullable
+  EmissionsService emissionsService();
 
   /** Inspector/debug services */
   TileRendererManager tileRendererManager();

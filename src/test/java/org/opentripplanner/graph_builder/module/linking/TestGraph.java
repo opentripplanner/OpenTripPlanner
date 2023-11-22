@@ -19,13 +19,15 @@ import org.opentripplanner.transit.service.TransitModel;
  */
 class TestGraph {
 
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
   /** Add a regular grid of stops to the graph */
   public static void addRegularStopGrid(Graph graph) {
     int count = 0;
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
         String id = Integer.toString(count++);
-        RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
+        RegularStop stop = TEST_MODEL.stop(id).withCoordinate(lat, lon).build();
         graph.addVertex(new TransitStopVertexBuilder().withStop(stop).build());
       }
     }
@@ -37,7 +39,7 @@ class TestGraph {
     double lon = -83;
     for (double lat = 40; lat < 40.01; lat += 0.005) {
       String id = "EXTRA_" + count++;
-      RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
+      RegularStop stop = TEST_MODEL.stop(id).withCoordinate(lat, lon).build();
       graph.addVertex(new TransitStopVertexBuilder().withStop(stop).build());
     }
 
@@ -45,7 +47,7 @@ class TestGraph {
     lon = -83.1341 + 0.1;
     for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
       String id = "DUPE_" + count++;
-      RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
+      RegularStop stop = TEST_MODEL.stop(id).withCoordinate(lat, lon).build();
       graph.addVertex(new TransitStopVertexBuilder().withStop(stop).build());
     }
 
@@ -53,7 +55,7 @@ class TestGraph {
     lon = -83.1341 + 0.15;
     for (double lat = 39.9059; lat < 40.0281; lat += 0.005) {
       String id = "ALMOST_" + count++;
-      RegularStop stop = TransitModelForTest.stop(id).withCoordinate(lat, lon).build();
+      RegularStop stop = TEST_MODEL.stop(id).withCoordinate(lat, lon).build();
       graph.addVertex(new TransitStopVertexBuilder().withStop(stop).build());
     }
   }

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
@@ -162,7 +163,7 @@ public class Timetable implements Serializable {
    *           - its job without sending in GTFS specific classes. A generic update would support
    *           - other RealTime updats, not just from GTFS.
    */
-  public Result<TripTimesPatch, UpdateError> createUpdatedTripTimes(
+  public Result<TripTimesPatch, UpdateError> createUpdatedTripTimesFromGTFSRT(
     TripUpdate tripUpdate,
     ZoneId timeZone,
     LocalDate updateServiceDate,
@@ -202,7 +203,7 @@ public class Timetable implements Serializable {
       LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
     }
 
-    TripTimes newTimes = new TripTimes(getTripTimes(tripIndex));
+    TripTimes newTimes = getTripTimes(tripIndex).copyOfScheduledTimes();
     List<Integer> skippedStopIndices = new ArrayList<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
@@ -235,18 +236,24 @@ public class Timetable implements Serializable {
         StopTimeUpdate.ScheduleRelationship scheduleRelationship = update.hasScheduleRelationship()
           ? update.getScheduleRelationship()
           : StopTimeUpdate.ScheduleRelationship.SCHEDULED;
+        // Handle each schedule relationship case
         if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
+          // Set status to cancelled and delays to previously recorded delays or to 0 otherwise.
+          // Note: This will discard the times from TripUpdates even if they are present.
           skippedStopIndices.add(i);
           newTimes.setCancelled(i);
           int delayOrZero = delay != null ? delay : 0;
           newTimes.updateArrivalDelay(i, delayOrZero);
           newTimes.updateDepartureDelay(i, delayOrZero);
         } else if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.NO_DATA) {
+          // Set status to NO_DATA and delays to 0.
+          // Note: GTFS-RT requires NO_DATA stops to have no arrival departure times.
           newTimes.updateArrivalDelay(i, 0);
           newTimes.updateDepartureDelay(i, 0);
           delay = 0;
           newTimes.setNoData(i);
         } else {
+          // Else the status is SCHEDULED, update times as needed.
           if (update.hasArrival()) {
             if (firstUpdatedIndex == null) {
               firstUpdatedIndex = i;
@@ -308,6 +315,7 @@ public class Timetable implements Serializable {
           update = null;
         }
       } else if (delay != null) {
+        // If not match and has previously set delays, propagate delays.
         newTimes.updateArrivalDelay(i, delay);
         newTimes.updateDepartureDelay(i, delay);
       }
@@ -320,6 +328,8 @@ public class Timetable implements Serializable {
       return Result.failure(new UpdateError(feedScopedTripId, INVALID_STOP_SEQUENCE));
     }
 
+    // Backwards propagation for past stops that are no longer present in GTFS-RT, that is, up until
+    // the first SCHEDULED stop sequence included in the GTFS-RT feed.
     if (firstUpdatedIndex != null && firstUpdatedIndex > 0) {
       if (
         (
@@ -343,6 +353,13 @@ public class Timetable implements Serializable {
       }
     }
 
+    // Interpolate missing times from SKIPPED stops since they don't necessarily have times
+    // associated. Note: Currently for GTFS-RT updates ONLY not for SIRI updates.
+    if (newTimes.interpolateMissingTimes()) {
+      LOG.debug("Interpolated delays for cancelled stops on trip {}.", tripId);
+    }
+
+    // Validate for non-increasing times. Log error if present.
     var error = newTimes.validateNonIncreasingTimes();
     if (error.isPresent()) {
       LOG.debug(
@@ -378,6 +395,25 @@ public class Timetable implements Serializable {
    */
   public void addTripTimes(TripTimes tt) {
     tripTimes.add(tt);
+  }
+
+  /**
+   * Apply the same update to all trip-times inculuding scheduled and frequency based
+   * trip times.
+   * <p>
+   * THIS IS NOT THREAD-SAFE - ONLY USE THIS METHOD DURING GRAPH-BUILD!
+   */
+  public void updateAllTripTimes(UnaryOperator<TripTimes> update) {
+    tripTimes.replaceAll(update);
+    frequencyEntries.replaceAll(it ->
+      new FrequencyEntry(
+        it.startTime,
+        it.endTime,
+        it.headway,
+        it.exactTimes,
+        update.apply(it.tripTimes)
+      )
+    );
   }
 
   /**

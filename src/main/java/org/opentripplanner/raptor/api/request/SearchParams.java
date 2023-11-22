@@ -293,8 +293,8 @@ public class SearchParams {
         numberOfAdditionalTransfers,
         dft.numberOfAdditionalTransfers
       )
-      .addCollection("accessPaths", accessPaths, 5)
-      .addCollection("egressPaths", egressPaths, 5)
+      .addCollection("accessPaths", accessPaths, 5, RaptorAccessEgress::defaultToString)
+      .addCollection("egressPaths", egressPaths, 5, RaptorAccessEgress::defaultToString)
       .toString();
   }
 

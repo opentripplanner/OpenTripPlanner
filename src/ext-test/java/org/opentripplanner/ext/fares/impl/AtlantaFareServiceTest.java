@@ -33,10 +33,11 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.StopModel;
 
 public class AtlantaFareServiceTest implements PlanTestConstants {
 
-  public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
+  private static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
   private static final String FEED_ID = "A";
   private static AtlantaFareService atlFareService;
 
@@ -254,6 +255,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   }
 
   private static Itinerary createItinerary(String agencyId, String shortName, long startTimeMins) {
+    var stopModelBuilder = StopModel.of();
     Agency agency = Agency
       .of(new FeedScopedId(FEED_ID, agencyId))
       .withName(agencyId)
@@ -261,13 +263,13 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       .build();
 
     // Set up stops
-    RegularStop firstStop = RegularStop
-      .of(new FeedScopedId(FEED_ID, "1"))
+    RegularStop firstStop = stopModelBuilder
+      .regularStop(new FeedScopedId(FEED_ID, "1"))
       .withCoordinate(new WgsCoordinate(1, 1))
       .withName(new NonLocalizedString("first stop"))
       .build();
-    RegularStop lastStop = RegularStop
-      .of(new FeedScopedId(FEED_ID, "2"))
+    RegularStop lastStop = stopModelBuilder
+      .regularStop(new FeedScopedId(FEED_ID, "2"))
       .withCoordinate(new WgsCoordinate(1, 2))
       .withName(new NonLocalizedString("last stop"))
       .build();

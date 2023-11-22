@@ -19,6 +19,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.network.TripPatternBuilder;
@@ -29,6 +30,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.rutebanken.netex.model.DatedServiceJourney;
 import org.rutebanken.netex.model.DatedServiceJourneyRefStructure;
 import org.rutebanken.netex.model.DestinationDisplay;
@@ -86,9 +88,9 @@ class TripPatternMapper {
     DataImportIssueStore issueStore,
     FeedScopedIdFactory idFactory,
     EntityById<Operator> operatorById,
-    EntityById<RegularStop> stopById,
-    EntityById<AreaStop> areaStopById,
-    EntityById<GroupStop> groupStopById,
+    ImmutableEntityById<RegularStop> stopById,
+    ImmutableEntityById<AreaStop> areaStopById,
+    ImmutableEntityById<GroupStop> groupStopById,
     EntityById<org.opentripplanner.transit.model.network.Route> otpRouteById,
     ReadOnlyHierarchicalMap<String, Route> routeById,
     ReadOnlyHierarchicalMap<String, JourneyPattern_VersionStructure> journeyPatternById,
@@ -365,7 +367,11 @@ class TripPatternMapper {
           trip.getId()
         );
       } else {
-        TripTimes tripTimes = new TripTimes(trip, result.tripStopTimes.get(trip), deduplicator);
+        TripTimes tripTimes = TripTimesFactory.tripTimes(
+          trip,
+          result.tripStopTimes.get(trip),
+          deduplicator
+        );
         tripPattern.add(tripTimes);
       }
     }

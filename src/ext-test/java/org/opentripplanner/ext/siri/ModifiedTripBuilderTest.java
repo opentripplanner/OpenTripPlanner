@@ -29,6 +29,7 @@ import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -41,27 +42,28 @@ class ModifiedTripBuilderTest {
 
   private static final Agency AGENCY = TransitModelForTest.AGENCY;
   private static final ZoneId TIME_ZONE = AGENCY.getTimezone();
-  private static final Station STATION_A = TransitModelForTest.station("A").build();
-  private static final Station STATION_B = TransitModelForTest.station("B").build();
-  private static final Station STATION_C = TransitModelForTest.station("C").build();
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final Station STATION_A = TEST_MODEL.station("A").build();
+  private static final Station STATION_B = TEST_MODEL.station("B").build();
+  private static final Station STATION_C = TEST_MODEL.station("C").build();
 
-  private static final RegularStop STOP_A_1 = TransitModelForTest
+  private static final RegularStop STOP_A_1 = TEST_MODEL
     .stop("A_1")
     .withParentStation(STATION_A)
     .build();
-  private static final RegularStop STOP_A_2 = TransitModelForTest
+  private static final RegularStop STOP_A_2 = TEST_MODEL
     .stop("A_2")
     .withParentStation(STATION_A)
     .build();
-  private static final RegularStop STOP_B_1 = TransitModelForTest
+  private static final RegularStop STOP_B_1 = TEST_MODEL
     .stop("B_1")
     .withParentStation(STATION_B)
     .build();
-  private static final RegularStop STOP_C_1 = TransitModelForTest
+  private static final RegularStop STOP_C_1 = TEST_MODEL
     .stop("C_1")
     .withParentStation(STATION_C)
     .build();
-  private static final RegularStop STOP_D = TransitModelForTest.stop("D").build();
+  private static final RegularStop STOP_D = TEST_MODEL.stop("D").build();
 
   private static final Route ROUTE = TransitModelForTest
     .route("ROUTE_ID")
@@ -110,15 +112,15 @@ class ModifiedTripBuilderTest {
     STOP_TIME_C_1.setStopSequence(1);
   }
 
-  private static final TripTimes TRIP_TIMES = new TripTimes(
+  private static final TripTimes TRIP_TIMES = TripTimesFactory.tripTimes(
     TRIP,
     List.of(STOP_TIME_A_1, STOP_TIME_B_1, STOP_TIME_C_1),
     DEDUPLICATOR
   );
 
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 2, 17);
-  private final StopModel stopModel = StopModel
-    .of()
+  private final StopModel stopModel = TEST_MODEL
+    .stopModelBuilder()
     .withRegularStop(STOP_A_1)
     .withRegularStop(STOP_A_2)
     .withRegularStop(STOP_B_1)

@@ -20,12 +20,14 @@ import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class TripPatternForDateTest {
 
-  private static final RegularStop STOP = TransitModelForTest.stopForTest("TEST:STOP", 0, 0);
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final RegularStop STOP = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
   private static final Route ROUTE = TransitModelForTest.route("1").build();
-  private static final TripTimes tripTimes = new TripTimes(
+  private static final TripTimes tripTimes = TripTimesFactory.tripTimes(
     TransitModelForTest.trip("1").withRoute(ROUTE).build(),
     List.of(new StopTime()),
     new Deduplicator()

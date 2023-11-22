@@ -10,6 +10,7 @@ import static org.opentripplanner.ext.fares.impl.OrcaFareService.PIERCE_COUNTY_T
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.SKAGIT_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.SOUND_TRANSIT_AGENCY_ID;
 import static org.opentripplanner.ext.fares.impl.OrcaFareService.WASHINGTON_STATE_FERRIES_AGENCY_ID;
+import static org.opentripplanner.ext.fares.impl.OrcaFareService.WHATCOM_AGENCY_ID;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_12;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
@@ -47,6 +48,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.StopModel;
 
 public class OrcaFareServiceTest {
 
@@ -55,6 +57,8 @@ public class OrcaFareServiceTest {
   private static final Money FERRY_FARE = usDollars(6.50f);
   private static final Money HALF_FERRY_FARE = usDollars(3.25f);
   private static final Money ORCA_SPECIAL_FARE = usDollars(1.00f);
+  public static final Money VASHON_WATER_TAXI_CASH_FARE = usDollars(6.75f);
+  public static final Money WEST_SEATTLE_WATER_TAXI_CASH_FARE = usDollars(5.75f);
   private static final String FEED_ID = "A";
   private static TestOrcaFareService orcaFareService;
   public static final Money DEFAULT_TEST_RIDE_PRICE = usDollars(3.49f);
@@ -340,12 +344,13 @@ public class OrcaFareServiceTest {
    * Single trip with Link Light Rail to ensure distance fare is calculated correctly.
    */
   @Test
-  void calculateFareForLightRailLeg() {
+  void calculateFareForSTRail() {
     List<Leg> rides = List.of(
-      getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Roosevelt Station", "Int'l Dist/Chinatown")
+      getLeg(SOUND_TRANSIT_AGENCY_ID, "1-Line", 0, "Roosevelt Station", "Int'l Dist/Chinatown"),
+      getLeg(SOUND_TRANSIT_AGENCY_ID, "S Line", 100, "King Street Station", "Auburn Station")
     );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE);
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2));
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(2));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, ORCA_SPECIAL_FARE);
     calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE);
@@ -353,17 +358,28 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
   }
 
+  /**
+   * Test King County Water Taxis
+   */
   @Test
-  void calculateFareForSounderLeg() {
-    List<Leg> rides = List.of(
-      getLeg(SOUND_TRANSIT_AGENCY_ID, "S Line", 0, "King Street Station", "Auburn Station")
-    );
-    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE);
+  void calculateWaterTaxiFares() {
+    List<Leg> rides = List.of(getLeg(KC_METRO_AGENCY_ID, "973", 1));
+    calculateFare(rides, regular, WEST_SEATTLE_WATER_TAXI_CASH_FARE);
+    calculateFare(rides, FareType.senior, WEST_SEATTLE_WATER_TAXI_CASH_FARE);
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
-    calculateFare(rides, FareType.electronicSpecial, ORCA_SPECIAL_FARE);
-    calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.electronicSenior, ONE_DOLLAR);
+    calculateFare(rides, FareType.electronicSpecial, usDollars(3.75f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(5f));
+    calculateFare(rides, FareType.electronicSenior, usDollars(2.50f));
+    calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
+
+    rides = List.of(getLeg(KC_METRO_AGENCY_ID, "975", 1));
+
+    calculateFare(rides, regular, VASHON_WATER_TAXI_CASH_FARE);
+    calculateFare(rides, FareType.senior, VASHON_WATER_TAXI_CASH_FARE);
+    calculateFare(rides, FareType.youth, Money.ZERO_USD);
+    calculateFare(rides, FareType.electronicSpecial, usDollars(4.50f));
+    calculateFare(rides, FareType.electronicRegular, usDollars(5.75f));
+    calculateFare(rides, FareType.electronicSenior, usDollars(3f));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
   }
 
@@ -436,6 +452,24 @@ public class OrcaFareServiceTest {
     calculateFare(rides, FareType.electronicRegular, usDollars(10f)); // transfer extended on second leg
     calculateFare(rides, FareType.electronicSenior, usDollars(6f));
     calculateFare(rides, FareType.electronicYouth, Money.ZERO_USD);
+  }
+
+  /**
+   * Tests fares from non ORCA accepting agencies
+   */
+  @Test
+  void testNonOrcaAgencies() {
+    List<Leg> rides = List.of(
+      getLeg(SKAGIT_TRANSIT_AGENCY_ID, 0, "80X"),
+      getLeg(WHATCOM_AGENCY_ID, 0, "80X")
+    );
+
+    calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(2));
+    calculateFare(rides, FareType.senior, usDollars(0.50f).times(2));
+    // TODO: Check that these are undefined, not zero
+    calculateFare(rides, FareType.youth, ZERO_USD);
+    calculateFare(rides, FareType.electronicSpecial, ZERO_USD);
+    calculateFare(rides, FareType.electronicRegular, ZERO_USD);
   }
 
   static Stream<Arguments> allTypes() {
@@ -634,14 +668,16 @@ public class OrcaFareServiceTest {
       .withTimezone(ZoneIds.NEW_YORK.getId())
       .build();
 
+    var stopModelBuilder = StopModel.of();
+
     // Set up stops
-    RegularStop firstStop = RegularStop
-      .of(new FeedScopedId(agencyId, "1"))
+    RegularStop firstStop = stopModelBuilder
+      .regularStop(new FeedScopedId(agencyId, "1"))
       .withCoordinate(new WgsCoordinate(1, 1))
       .withName(new NonLocalizedString(firstStopName))
       .build();
-    RegularStop lastStop = RegularStop
-      .of(new FeedScopedId(agencyId, "2"))
+    RegularStop lastStop = stopModelBuilder
+      .regularStop(new FeedScopedId(agencyId, "2"))
       .withCoordinate(new WgsCoordinate(1, 2))
       .withName(new NonLocalizedString(lastStopName))
       .build();

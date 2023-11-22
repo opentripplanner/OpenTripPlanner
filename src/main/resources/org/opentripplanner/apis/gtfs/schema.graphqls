@@ -926,6 +926,13 @@ type elevationProfileComponent {
     elevation: Float
 }
 
+type Emissions {
+    """
+    CO₂ emissions in grams.
+    """
+    co2: Grams
+}
+
 type fare {
     type: String @deprecated
 
@@ -1026,6 +1033,8 @@ type Geometry {
 }
 
 scalar GeoJson
+
+scalar Grams
 
 type StopGeometries {
     """Representation of the stop geometries as GeoJSON (https://geojson.org/)"""
@@ -1493,6 +1502,9 @@ type Itinerary {
     """How far the user has to walk, in meters."""
     walkDistance: Float
 
+    """Emissions of this itinerary per traveler."""
+    emissionsPerPerson: Emissions
+    
     """
     A list of Legs. Each Leg is either a walking (cycling, car) portion of the
     itinerary, or a transit leg on a particular vehicle. So a itinerary where the
@@ -1533,6 +1545,15 @@ type Itinerary {
     More information is available in the [feature documentation](https://docs.opentripplanner.org/en/dev-2.x/sandbox/IBIAccessibilityScore/).
     """
     accessibilityScore: Float
+
+    """
+    How many transfers are part of this itinerary.
+
+    Notes:
+     - Interlined/stay-seated transfers do not increase this count.
+     - Transferring from a flex to a fixed schedule trip and vice versa increases this count.
+    """
+    numberOfTransfers: Int!
 
     #
     # deprecated fields
