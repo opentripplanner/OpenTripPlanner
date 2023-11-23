@@ -214,6 +214,14 @@ jobs:
           java-version: 17
           distribution: temurin
           cache: maven
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Build debug client
+        working-directory: ./client-next
+        run: |
+          npm install
+          npm run build
       - name: Build container image with Jib, push to Dockerhub
         env:
           CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
