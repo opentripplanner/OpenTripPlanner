@@ -4,9 +4,11 @@ import { Marker } from 'react-map-gl';
 export function NavigationMarkers({
   tripQueryVariables,
   setTripQueryVariables,
+  loading,
 }: {
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (variables: TripQueryVariables) => void;
+  loading: boolean;
 }) {
   return (
     <>
@@ -16,10 +18,12 @@ export function NavigationMarkers({
           latitude={tripQueryVariables.from.coordinates?.latitude}
           longitude={tripQueryVariables.from.coordinates?.longitude}
           onDragEnd={(e) => {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              from: { coordinates: { latitude: e.lngLat.lat, longitude: e.lngLat.lng } },
-            });
+            if (!loading) {
+              setTripQueryVariables({
+                ...tripQueryVariables,
+                from: { coordinates: { latitude: e.lngLat.lat, longitude: e.lngLat.lng } },
+              });
+            }
           }}
           anchor="bottom-right"
         >
@@ -32,10 +36,12 @@ export function NavigationMarkers({
           latitude={tripQueryVariables.to.coordinates?.latitude}
           longitude={tripQueryVariables.to.coordinates?.longitude}
           onDragEnd={(e) => {
-            setTripQueryVariables({
-              ...tripQueryVariables,
-              to: { coordinates: { latitude: e.lngLat.lat, longitude: e.lngLat.lng } },
-            });
+            if (!loading) {
+              setTripQueryVariables({
+                ...tripQueryVariables,
+                to: { coordinates: { latitude: e.lngLat.lat, longitude: e.lngLat.lng } },
+              });
+            }
           }}
           anchor="bottom-right"
         >

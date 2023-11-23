@@ -42,6 +42,7 @@ export function App() {
           tripQueryVariables={tripQueryVariables}
           setTripQueryVariables={setTripQueryVariables}
           selectedTripPatternIndex={selectedTripPatternIndex}
+          loading={loading}
         />
       </Stack>
     </div>
