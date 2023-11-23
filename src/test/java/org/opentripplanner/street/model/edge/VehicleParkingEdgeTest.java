@@ -46,7 +46,7 @@ class VehicleParkingEdgeTest {
       false,
       true,
       VehicleParkingSpaces.builder().carSpaces(1).build(),
-      true
+      false
     );
 
     var s1 = traverse();
@@ -56,7 +56,7 @@ class VehicleParkingEdgeTest {
 
   @Test
   public void realtimeAvailableCarPlacesFallbackTest() {
-    initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true, null, true);
+    initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true, null, false);
 
     var s1 = traverse();
 
@@ -70,7 +70,7 @@ class VehicleParkingEdgeTest {
       false,
       true,
       VehicleParkingSpaces.builder().carSpaces(0).build(),
-      true
+      false
     );
 
     var s1 = traverse();
@@ -103,7 +103,7 @@ class VehicleParkingEdgeTest {
       true,
       false,
       VehicleParkingSpaces.builder().bicycleSpaces(1).build(),
-      true
+      false
     );
 
     var s1 = traverse();
@@ -113,7 +113,7 @@ class VehicleParkingEdgeTest {
 
   @Test
   public void realtimeAvailableBicyclePlacesFallbackTest() {
-    initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false, null, true);
+    initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false, null, false);
 
     var s1 = traverse();
 
@@ -127,7 +127,7 @@ class VehicleParkingEdgeTest {
       true,
       false,
       VehicleParkingSpaces.builder().bicycleSpaces(0).build(),
-      true
+      false
     );
 
     var s1 = traverse();
@@ -140,7 +140,7 @@ class VehicleParkingEdgeTest {
     boolean bicyclePlaces,
     boolean carPlaces
   ) {
-    initEdgeAndRequest(parkingMode, bicyclePlaces, carPlaces, null, false);
+    initEdgeAndRequest(parkingMode, bicyclePlaces, carPlaces, null, true);
   }
 
   private void initEdgeAndRequest(
@@ -148,7 +148,7 @@ class VehicleParkingEdgeTest {
     boolean bicyclePlaces,
     boolean carPlaces,
     VehicleParkingSpaces availability,
-    boolean realtime
+    boolean ignoreRealtime
   ) {
     var vehicleParking = createVehicleParking(bicyclePlaces, carPlaces, availability);
     this.vertex = new VehicleParkingEntranceVertex(vehicleParking.getEntrances().get(0));
@@ -161,10 +161,10 @@ class VehicleParkingEdgeTest {
         .withMode(parkingMode)
         .withPreferences(preferences -> {
           preferences.withBike(bike ->
-            bike.withParking(parking -> parking.withUseAvailabilityInformation(realtime))
+            bike.withParking(parking -> parking.withIgnoreRealtimeAvailability(ignoreRealtime))
           );
           preferences.withCar(car ->
-            car.withParking(parking -> parking.withUseAvailabilityInformation(realtime))
+            car.withParking(parking -> parking.withIgnoreRealtimeAvailability(ignoreRealtime))
           );
         })
         .build();

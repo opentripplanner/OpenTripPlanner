@@ -125,7 +125,7 @@ public class VehicleParkingEdge extends Edge {
       !vehicleParking.hasSpacesAvailable(
         mode,
         request.wheelchair(),
-        parkingPreferences.useAvailabilityInformation()
+        parkingPreferences.ignoreRealtimeAvailability()
       )
     ) {
       return State.empty();
@@ -177,7 +177,7 @@ public class VehicleParkingEdge extends Edge {
       !vehicleParking.hasSpacesAvailable(
         s0.currentMode(),
         s0.getRequest().wheelchair(),
-        parkingPreferences.useAvailabilityInformation()
+        parkingPreferences.ignoreRealtimeAvailability()
       )
     ) {
       return State.empty();

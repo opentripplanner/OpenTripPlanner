@@ -138,7 +138,7 @@ public class Place {
     var parkingPreferences = request.preferences().parking(traverseMode);
 
     boolean realTime =
-      parkingPreferences.useAvailabilityInformation() &&
+      !parkingPreferences.ignoreRealtimeAvailability() &&
       vertex.getVehicleParking().hasRealTimeDataForMode(traverseMode, request.wheelchair());
     return new Place(
       vertex.getName(),
