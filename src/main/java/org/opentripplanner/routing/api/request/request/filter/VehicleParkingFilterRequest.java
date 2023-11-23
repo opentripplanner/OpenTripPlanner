@@ -14,26 +14,26 @@ import org.opentripplanner.routing.vehicle_parking.VehicleParking;
  */
 public class VehicleParkingFilterRequest implements Serializable {
 
-  private final VehicleParkingFilter[] not;
-  private final VehicleParkingFilter[] select;
+  private final VehicleParkingSelect[] not;
+  private final VehicleParkingSelect[] select;
 
   public VehicleParkingFilterRequest(
-    Collection<VehicleParkingFilter> not,
-    Collection<VehicleParkingFilter> select
+    Collection<VehicleParkingSelect> not,
+    Collection<VehicleParkingSelect> select
   ) {
     this.not = makeFilter(not);
     this.select = makeFilter(select);
   }
 
-  public VehicleParkingFilterRequest(VehicleParkingFilter not, VehicleParkingFilter select) {
+  public VehicleParkingFilterRequest(VehicleParkingSelect not, VehicleParkingSelect select) {
     this(List.of(not), List.of(select));
   }
 
-  public List<VehicleParkingFilter> not() {
+  public List<VehicleParkingSelect> not() {
     return Arrays.asList(not);
   }
 
-  public List<VehicleParkingFilter> select() {
+  public List<VehicleParkingSelect> select() {
     return Arrays.asList(select);
   }
 
@@ -88,7 +88,7 @@ public class VehicleParkingFilterRequest implements Serializable {
   }
 
   @Nonnull
-  private static VehicleParkingFilter[] makeFilter(Collection<VehicleParkingFilter> select) {
-    return select.stream().filter(f -> !f.isEmpty()).toArray(VehicleParkingFilter[]::new);
+  private static VehicleParkingSelect[] makeFilter(Collection<VehicleParkingSelect> select) {
+    return select.stream().filter(f -> !f.isEmpty()).toArray(VehicleParkingSelect[]::new);
   }
 }
