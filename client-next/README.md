@@ -24,7 +24,7 @@ Use latest LTS version of Node/npm (currently v18). Recommend using av version m
 The dev and production builds require graphql schema to be present at
 `../src/ext/graphql/transmodelapi/schema.graphql`.
 
-## Getting started
+## Getting started (development)
 
 Change directory to `client-next` (current) if you haven't already.
 
@@ -33,3 +33,35 @@ Change directory to `client-next` (current) if you haven't already.
 Then
 
     npm run dev
+
+The debug client will now be available at `http://localhost:5173/debug-client-preview`. It has
+hot reloading enabled, so you don't have to restart it when you save files.
+
+If you change graphql code during development you can issue the following command:
+
+    npm run codegen
+
+You don't have to restart the development server for the changes to take effect.
+
+## Build for production
+
+Change directory to `client-next` (current) if you haven't already.
+
+    npm install
+
+Then
+
+    npm run build
+
+
+## Which OTP instance do I use?
+
+In development mode, the debug client by default assumes you are running an OTP instance locally at
+port 8080 (see `.env.development`). If you wish to point to a different OTP instance
+(like a remote server), use the  environment variable`VITE_API_URL`, either at the command line,
+or add it to a new `.env.development.local` file (this file will be ignored by git).
+
+In production mode, the default is to access OTP via the same origin as the client (see `.env`).
+This behavior can also be modified by changing the previously mentioned environment variable at
+build-time.
+
