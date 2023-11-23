@@ -16,13 +16,14 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
-import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.TestStreetLinkerModule;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsBundle;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexBundle;
 import org.opentripplanner.netex.configure.NetexConfigure;
 import org.opentripplanner.openstreetmap.OsmProvider;
@@ -99,7 +100,9 @@ public class ConstantsForTests {
 
     var dataSource = new ZipFileDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
-    return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
+    var transitService = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
+
+    return new NetexConfigure(buildConfig).netexBundle(transitService, configuredDataSource);
   }
 
   public static NetexBundle createMinimalNetexEpipBundle() {
@@ -109,7 +112,9 @@ public class ConstantsForTests {
 
     var dataSource = new DirectoryDataSource(netexZipFile, FileType.NETEX);
     var configuredDataSource = new ConfiguredDataSource<>(dataSource, buildConfig.netexDefaults);
-    return new NetexConfigure(buildConfig).netexBundle(configuredDataSource);
+    var transitService = new OtpTransitServiceBuilder(new StopModel(), DataImportIssueStore.NOOP);
+
+    return new NetexConfigure(buildConfig).netexBundle(transitService, configuredDataSource);
   }
 
   /**
@@ -135,7 +140,7 @@ public class ConstantsForTests {
         addGtfsToGraph(graph, transitModel, PORTLAND_GTFS, new DefaultFareServiceFactory(), "prt");
       }
       // Link transit stops to streets
-      StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
+      TestStreetLinkerModule.link(graph, transitModel);
 
       // Add elevation data
       if (withElevation) {
@@ -187,7 +192,7 @@ public class ConstantsForTests {
     );
 
     // Link transit stops to streets
-    StreetLinkerModule.linkStreetsForTestOnly(otpModel.graph(), otpModel.transitModel());
+    TestStreetLinkerModule.link(otpModel.graph(), otpModel.transitModel());
 
     return otpModel;
   }
@@ -231,7 +236,7 @@ public class ConstantsForTests {
           .buildGraph();
       }
       // Link transit stops to streets
-      StreetLinkerModule.linkStreetsForTestOnly(graph, transitModel);
+      TestStreetLinkerModule.link(graph, transitModel);
 
       return new TestOtpModel(graph, transitModel);
     } catch (Exception e) {

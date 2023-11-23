@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.model.site;
 
+import java.util.Objects;
+import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
@@ -9,6 +11,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class AreaStopBuilder extends AbstractEntityBuilder<AreaStop, AreaStopBuilder> {
 
+  private final IntSupplier indexCounter;
   private I18NString name;
   private boolean hasFallbackName;
   private I18NString description;
@@ -18,12 +21,14 @@ public class AreaStopBuilder extends AbstractEntityBuilder<AreaStop, AreaStopBui
   private I18NString url;
   private String zoneId;
 
-  AreaStopBuilder(FeedScopedId id) {
+  AreaStopBuilder(FeedScopedId id, IntSupplier indexCounter) {
     super(id);
+    this.indexCounter = Objects.requireNonNull(indexCounter);
   }
 
   AreaStopBuilder(@Nonnull AreaStop original) {
     super(original);
+    this.indexCounter = original::getIndex;
     // Optional fields
     this.name = original.getName();
     this.hasFallbackName = original.hasFallbackName();
@@ -91,5 +96,9 @@ public class AreaStopBuilder extends AbstractEntityBuilder<AreaStop, AreaStopBui
 
   public WgsCoordinate centroid() {
     return centroid;
+  }
+
+  int createIndex() {
+    return indexCounter.getAsInt();
   }
 }

@@ -37,5 +37,16 @@
       "feedId" : "monorail",
       "source" : "https://github.com/transitland/gtfs-archives-not-hosted-elsewhere/raw/master/seattlemonorail-wa-us.zip"
     }
+  ],
+  "transferRequests": [
+    {
+      "modes": "WALK"
+    },
+    {
+      "modes": "WALK",
+      "wheelchairAccessibility": {
+        "enabled": true
+      }
+    }
   ]
 }

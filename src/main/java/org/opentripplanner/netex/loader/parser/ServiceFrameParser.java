@@ -149,7 +149,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
             assignment.getId()
           );
         } else {
-          String quayRef = assignment.getQuayRef().getRef();
+          String quayRef = assignment.getQuayRef().getValue().getRef();
           String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();
           quayIdByStopPointRef.put(stopPointRef, quayRef);
         }
@@ -180,8 +180,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     if (routes == null) return;
 
     for (JAXBElement<?> element : routes.getRoute_()) {
-      if (element.getValue() instanceof Route) {
-        Route route = (Route) element.getValue();
+      if (element.getValue() instanceof Route route) {
         this.routes.add(route);
       }
     }

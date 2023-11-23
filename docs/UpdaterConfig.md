@@ -40,7 +40,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 |---------------------------|:---------------:|------------------------------------------------------------------------------|:----------:|---------------|:-----:|
 | type = "real-time-alerts" |      `enum`     | The type of the updater.                                                     | *Required* |               |  1.5  |
 | earlyStartSec             |    `integer`    | How long before the posted start of an event it should be displayed to users | *Optional* | `0`           |  1.5  |
-| feedId                    |     `string`    | The id of the feed to apply the alerts to.                                   | *Optional* |               |  1.5  |
+| feedId                    |     `string`    | The id of the feed to apply the alerts to.                                   | *Required* |               |  1.5  |
 | frequency                 |    `duration`   | How often the URL should be fetched.                                         | *Optional* | `"PT1M"`      |  1.5  |
 | fuzzyTripMatching         |    `boolean`    | Whether to match trips fuzzily.                                              | *Optional* | `false`       |  1.5  |
 | url                       |     `string`    | URL to fetch the GTFS-RT feed from.                                          | *Required* |               |  1.5  |
@@ -93,7 +93,7 @@ The information is downloaded in a single HTTP request and polled regularly.
 |-----------------------------------------------------------------------|:---------------:|----------------------------------------------------------------------------|:----------:|----------------------|:-----:|
 | type = "stop-time-updater"                                            |      `enum`     | The type of the updater.                                                   | *Required* |                      |  1.5  |
 | [backwardsDelayPropagationType](#u__5__backwardsDelayPropagationType) |      `enum`     | How backwards propagation should be handled.                               | *Optional* | `"required-no-data"` |  2.2  |
-| feedId                                                                |     `string`    | Which feed the updates apply to.                                           | *Optional* |                      |  1.5  |
+| feedId                                                                |     `string`    | Which feed the updates apply to.                                           | *Required* |                      |  1.5  |
 | frequency                                                             |    `duration`   | How often the data should be downloaded.                                   | *Optional* | `"PT1M"`             |  1.5  |
 | fuzzyTripMatching                                                     |    `boolean`    | If the trips should be matched fuzzily.                                    | *Optional* | `false`              |  1.5  |
 | [url](#u__5__url)                                                     |     `string`    | The URL of the GTFS-RT resource.                                           | *Required* |                      |  1.5  |
@@ -181,7 +181,7 @@ file.
 |-----------------------------------------------------------------------|:---------:|--------------------------|:----------:|----------------------|:-----:|
 | type = "websocket-gtfs-rt-updater"                                    |   `enum`  | The type of the updater. | *Required* |                      |  1.5  |
 | [backwardsDelayPropagationType](#u__7__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |  1.5  |
-| feedId                                                                |  `string` | TODO                     | *Optional* |                      |  1.5  |
+| feedId                                                                |  `string` | TODO                     | *Required* |                      |  1.5  |
 | reconnectPeriodSec                                                    | `integer` | TODO                     | *Optional* | `60`                 |  1.5  |
 | url                                                                   |  `string` | TODO                     | *Optional* |                      |  1.5  |
 
@@ -205,7 +205,8 @@ TODO
 {
   "updaters" : [
     {
-      "type" : "websocket-gtfs-rt-updater"
+      "type" : "websocket-gtfs-rt-updater",
+      "feedId" : "ov"
     }
   ]
 }

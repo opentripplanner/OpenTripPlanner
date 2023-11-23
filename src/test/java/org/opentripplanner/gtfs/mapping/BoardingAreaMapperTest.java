@@ -40,8 +40,9 @@ public class BoardingAreaMapperTest {
   private static final int VEHICLE_TYPE = 5;
 
   private static final int WHEELCHAIR_BOARDING = 1;
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
-  private static final RegularStop PARENT_STOP = TransitModelForTest.stop(PARENT).build();
+  private static final RegularStop PARENT_STOP = TEST_MODEL.stop(PARENT).build();
 
   private static final String ZONE_ID = "Zone Id";
   private static final Stop STOP = new Stop();

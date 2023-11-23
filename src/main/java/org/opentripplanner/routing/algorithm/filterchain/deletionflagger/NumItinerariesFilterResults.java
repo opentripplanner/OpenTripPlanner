@@ -4,10 +4,11 @@ import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.pagecursor.PageCursorFactoryParameters;
+import org.opentripplanner.model.plan.pagecursor.PageCursorInput;
+import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationSection;
 import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 
-public class NumItinerariesFilterResults implements PageCursorFactoryParameters {
+public class NumItinerariesFilterResults implements PageCursorInput {
 
   public final Instant earliestRemovedDeparture;
   public final Instant latestRemovedDeparture;
@@ -15,6 +16,7 @@ public class NumItinerariesFilterResults implements PageCursorFactoryParameters 
   public final Instant latestRemovedArrival;
   public final Instant earliestKeptArrival;
   public final Instant firstRemovedArrivalTime;
+  public final boolean firstRemovedIsOnStreetAllTheWay;
   public final int firstRemovedGeneralizedCost;
   public final int firstRemovedNumOfTransfers;
   public final Instant firstRemovedDepartureTime;
@@ -59,6 +61,7 @@ public class NumItinerariesFilterResults implements PageCursorFactoryParameters 
       firstRemovedItinerary = removedItineraries.get(0);
     }
 
+    this.firstRemovedIsOnStreetAllTheWay = firstRemovedItinerary.isOnStreetAllTheWay();
     this.firstRemovedArrivalTime = firstRemovedItinerary.endTime().toInstant();
     this.firstRemovedGeneralizedCost = firstRemovedItinerary.getGeneralizedCost();
     this.firstRemovedNumOfTransfers = firstRemovedItinerary.getNumberOfTransfers();
@@ -102,5 +105,38 @@ public class NumItinerariesFilterResults implements PageCursorFactoryParameters 
   @Override
   public Instant latestRemovedArrival() {
     return latestRemovedArrival;
+  }
+
+  @Override
+  public Instant firstRemovedArrivalTime() {
+    return firstRemovedArrivalTime;
+  }
+
+  @Override
+  public boolean firstRemovedIsOnStreetAllTheWay() {
+    return firstRemovedIsOnStreetAllTheWay;
+  }
+
+  @Override
+  public int firstRemovedGeneralizedCost() {
+    return firstRemovedGeneralizedCost;
+  }
+
+  @Override
+  public int firstRemovedNumOfTransfers() {
+    return firstRemovedNumOfTransfers;
+  }
+
+  @Override
+  public Instant firstRemovedDepartureTime() {
+    return firstRemovedDepartureTime;
+  }
+
+  @Override
+  public PagingDeduplicationSection deduplicationSection() {
+    return switch (cropSection) {
+      case HEAD -> PagingDeduplicationSection.TAIL;
+      case TAIL -> PagingDeduplicationSection.HEAD;
+    };
   }
 }

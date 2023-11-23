@@ -39,8 +39,8 @@ import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.ValidateAndInterpolateStopTimesForEachTrip;
 import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
-import org.opentripplanner.graph_builder.module.interlining.InterlineProcessor;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
+import org.opentripplanner.gtfs.interlining.InterlineProcessor;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
@@ -124,6 +124,7 @@ public class GtfsModule implements GraphBuilderModule {
       for (GtfsBundle gtfsBundle : gtfsBundles) {
         GtfsMutableRelationalDao gtfsDao = loadBundle(gtfsBundle);
         GTFSToOtpTransitServiceMapper mapper = new GTFSToOtpTransitServiceMapper(
+          new OtpTransitServiceBuilder(transitModel.getStopModel(), issueStore),
           gtfsBundle.getFeedId().getId(),
           issueStore,
           gtfsBundle.discardMinTransferTimes(),

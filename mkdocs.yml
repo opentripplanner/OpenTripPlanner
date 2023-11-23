@@ -37,6 +37,7 @@ markdown_extensions:
     - pymdownx.inlinehilite
     - pymdownx.snippets
     - pymdownx.superfences
+    - admonition
 
 # MkDocs will automatically discover pages if you don't list them here.
 # In that case subdirectories can be used to organize pages.
@@ -49,6 +50,7 @@ nav:
     - Governance: 'Governance.md'
     - History: 'History.md'
     - Presentations: 'Presentations.md'
+    - Roadmap: 'Roadmap.md'
     - Deployments: 'Deployments.md'
     - Changelog: 'Changelog.md'
     - Visual Identity: 'Visual-Identity.md'
@@ -110,3 +112,5 @@ nav:
     - IBI Accessibility Score: 'sandbox/IBIAccessibilityScore.md'
     - Fares: 'sandbox/Fares.md'
     - Ride Hailing: 'sandbox/RideHailing.md'
+    - Emissions: 'sandbox/Emissions.md'
+    - Stop Consolidation: 'sandbox/StopConsolidation.md'

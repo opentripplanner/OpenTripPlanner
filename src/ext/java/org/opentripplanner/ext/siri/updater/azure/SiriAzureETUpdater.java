@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.siri.updater.azure;
 
-import static net.logstash.logback.argument.StructuredArguments.keyValue;
-
 import com.azure.messaging.servicebus.ServiceBusErrorContext;
 import com.azure.messaging.servicebus.ServiceBusReceivedMessageContext;
 import jakarta.xml.bind.JAXBException;
@@ -16,14 +14,12 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import javax.xml.stream.XMLStreamException;
 import org.apache.hc.core5.net.URIBuilder;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.ResultLogger;
-import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.trip.metrics.TripUpdateMetrics;
 import org.rutebanken.siri20.util.SiriXml;

@@ -13,10 +13,12 @@ import org.opentripplanner.transit.model.site.Station;
 
 class GroupByAllSameStationsTest implements PlanTestConstants {
 
-  Station STATION_1 = TransitModelForTest.station("1").build();
-  Station STATION_2 = TransitModelForTest.station("2").build();
-  Station STATION_3 = TransitModelForTest.station("3").build();
-  Station STATION_4 = TransitModelForTest.station("4").build();
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
+  Station STATION_1 = testModel.station("1").build();
+  Station STATION_2 = testModel.station("2").build();
+  Station STATION_3 = testModel.station("3").build();
+  Station STATION_4 = testModel.station("4").build();
 
   Place P_A = place("A", 5.0, 8.0, STATION_1);
   Place P_B = place("B", 6.0, 8.5, STATION_2);
@@ -81,8 +83,8 @@ class GroupByAllSameStationsTest implements PlanTestConstants {
     assertTrue(first.match(withAccessEgressWalk));
   }
 
-  static Place place(String name, double lat, double lon, Station parent) {
-    RegularStopBuilder stop = TransitModelForTest.stop(name).withCoordinate(lat, lon);
+  Place place(String name, double lat, double lon, Station parent) {
+    RegularStopBuilder stop = testModel.stop(name).withCoordinate(lat, lon);
     if (parent != null) {
       stop.withParentStation(parent);
     }

@@ -24,8 +24,10 @@ import org.opentripplanner.model.transfer.ConstrainedTransfer;
 import org.opentripplanner.model.transfer.TransferPoint;
 import org.opentripplanner.transit.model.basic.Notice;
 import org.opentripplanner.transit.model.framework.AbstractTransitEntity;
+import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.framework.ImmutableEntityById;
 import org.opentripplanner.transit.model.network.GroupOfRoutes;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.network.StopPattern;
@@ -60,7 +62,7 @@ public class OtpTransitServiceBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(OtpTransitServiceBuilder.class);
 
-  private final EntityById<Agency> agenciesById = new EntityById<>();
+  private final EntityById<Agency> agenciesById = new DefaultEntityById<>();
 
   private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
 
@@ -74,46 +76,46 @@ public class OtpTransitServiceBuilder {
 
   private final Multimap<AbstractTransitEntity, Notice> noticeAssignments = ArrayListMultimap.create();
 
-  private final EntityById<Operator> operatorsById = new EntityById<>();
+  private final EntityById<Operator> operatorsById = new DefaultEntityById<>();
 
   private final List<Pathway> pathways = new ArrayList<>();
 
-  private final EntityById<Route> routesById = new EntityById<>();
+  private final EntityById<Route> routesById = new DefaultEntityById<>();
 
   private final Multimap<FeedScopedId, ShapePoint> shapePoints = ArrayListMultimap.create();
 
-  private final EntityById<Entrance> entrancesById = new EntityById<>();
+  private final EntityById<Entrance> entrancesById = new DefaultEntityById<>();
 
-  private final EntityById<PathwayNode> pathwayNodesById = new EntityById<>();
+  private final EntityById<PathwayNode> pathwayNodesById = new DefaultEntityById<>();
 
-  private final EntityById<BoardingArea> boardingAreasById = new EntityById<>();
+  private final EntityById<BoardingArea> boardingAreasById = new DefaultEntityById<>();
 
   private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
-  private final EntityById<FareZone> fareZonesById = new EntityById<>();
+  private final EntityById<FareZone> fareZonesById = new DefaultEntityById<>();
 
   private final List<ConstrainedTransfer> transfers = new ArrayList<>();
 
   private final List<StaySeatedNotAllowed> staySeatedNotAllowed = new ArrayList<>();
 
-  private final EntityById<Trip> tripsById = new EntityById<>();
+  private final EntityById<Trip> tripsById = new DefaultEntityById<>();
 
   private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
-  private final EntityById<FlexTrip<?, ?>> flexTripsById = new EntityById<>();
+  private final EntityById<FlexTrip<?, ?>> flexTripsById = new DefaultEntityById<>();
 
-  private final EntityById<Branding> brandingsById = new EntityById<>();
+  private final EntityById<Branding> brandingsById = new DefaultEntityById<>();
 
   private final Multimap<FeedScopedId, GroupOfRoutes> groupsOfRoutesByRouteId = ArrayListMultimap.create();
 
-  private final EntityById<TripOnServiceDate> tripOnServiceDates = new EntityById<>();
+  private final EntityById<TripOnServiceDate> tripOnServiceDates = new DefaultEntityById<>();
 
-  private final EntityById<GroupOfRoutes> groupOfRouteById = new EntityById<>();
+  private final EntityById<GroupOfRoutes> groupOfRouteById = new DefaultEntityById<>();
 
   private final DataImportIssueStore issueStore;
 
-  public OtpTransitServiceBuilder(DataImportIssueStore issueStore) {
-    this.stopModelBuilder = StopModel.of();
+  public OtpTransitServiceBuilder(StopModel stopModel, DataImportIssueStore issueStore) {
+    this.stopModelBuilder = stopModel.withContext();
     this.issueStore = issueStore;
   }
 
@@ -139,16 +141,16 @@ public class OtpTransitServiceBuilder {
     return frequencies;
   }
 
-  public StopModelBuilder stopModelBuilder() {
+  public StopModelBuilder stopModel() {
     return stopModelBuilder;
   }
 
-  public EntityById<GroupOfStations> getGroupsOfStationsById() {
-    return stopModelBuilder().groupOfStationById();
+  public ImmutableEntityById<GroupOfStations> getGroupsOfStationsById() {
+    return stopModelBuilder.groupOfStationById();
   }
 
-  public EntityById<MultiModalStation> getMultiModalStationsById() {
-    return stopModelBuilder().multiModalStationById();
+  public ImmutableEntityById<MultiModalStation> getMultiModalStationsById() {
+    return stopModelBuilder.multiModalStationById();
   }
 
   /**
@@ -175,12 +177,12 @@ public class OtpTransitServiceBuilder {
     return shapePoints;
   }
 
-  public EntityById<Station> getStations() {
-    return stopModelBuilder().stationById();
+  public ImmutableEntityById<Station> getStations() {
+    return stopModelBuilder.stationById();
   }
 
-  public EntityById<RegularStop> getStops() {
-    return stopModelBuilder().regularStopsById();
+  public ImmutableEntityById<RegularStop> getStops() {
+    return stopModelBuilder.regularStopsById();
   }
 
   public EntityById<Entrance> getEntrances() {
@@ -195,12 +197,12 @@ public class OtpTransitServiceBuilder {
     return boardingAreasById;
   }
 
-  public EntityById<AreaStop> getAreaStops() {
-    return stopModelBuilder().areaStopById();
+  public ImmutableEntityById<AreaStop> getAreaStops() {
+    return stopModelBuilder.areaStopById();
   }
 
-  public EntityById<GroupStop> getGroupStops() {
-    return stopModelBuilder().groupStopById();
+  public ImmutableEntityById<GroupStop> getGroupStops() {
+    return stopModelBuilder.groupStopById();
   }
 
   public TripStopTimes getStopTimesSortedByTrip() {

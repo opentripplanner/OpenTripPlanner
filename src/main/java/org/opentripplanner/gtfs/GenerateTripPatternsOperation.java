@@ -25,6 +25,7 @@ import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,7 @@ public class GenerateTripPatternsOperation {
   private final DataImportIssueStore issueStore;
   private final Deduplicator deduplicator;
   private final Set<FeedScopedId> calendarServiceIds;
-  private GeometryProcessor geometryProcessor;
+  private final GeometryProcessor geometryProcessor;
 
   private final Multimap<StopPattern, TripPattern> tripPatterns;
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
@@ -132,7 +133,7 @@ public class GenerateTripPatternsOperation {
     TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip, direction);
 
     // Create a TripTimes object for this list of stoptimes, which form one trip.
-    TripTimes tripTimes = new TripTimes(trip, stopTimes, deduplicator);
+    TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
 
     // If this trip is referenced by one or more lines in frequencies.txt, wrap it in a FrequencyEntry.
     List<Frequency> frequencies = frequenciesForTrip.get(trip);

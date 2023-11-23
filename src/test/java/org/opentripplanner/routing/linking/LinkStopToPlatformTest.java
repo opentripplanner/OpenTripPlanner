@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.linking;
+package org.opentripplanner.routing.linking;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -16,8 +16,6 @@ import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.LocalizedString;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.linking.LinkingDirection;
-import org.opentripplanner.routing.linking.VertexLinker;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeBuilder;
@@ -44,6 +42,7 @@ public class LinkStopToPlatformTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(LinkStopToPlatformTest.class);
   private static final GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+  private final TransitModelForTest testModel = TransitModelForTest.of();
 
   private Graph prepareTest(Coordinate[] platform, int[] visible, Coordinate[] stops) {
     var deduplicator = new Deduplicator();
@@ -105,8 +104,7 @@ public class LinkStopToPlatformTest {
     RegularStop[] transitStops = new RegularStop[stops.length];
     for (int i = 0; i < stops.length; i++) {
       Coordinate stop = stops[i];
-      transitStops[i] =
-        TransitModelForTest.stop("TestStop " + i).withCoordinate(stop.y, stop.x).build();
+      transitStops[i] = testModel.stop("TestStop " + i).withCoordinate(stop.y, stop.x).build();
     }
 
     transitModel.index();

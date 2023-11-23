@@ -19,22 +19,24 @@ import org.opentripplanner.transit.model.site.StopLocation;
 
 class DefaultTransitServiceTest {
 
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
   static TransitService service;
-  static Station STATION = TransitModelForTest.station("C").build();
-  static RegularStop STOP_A = TransitModelForTest
+  static Station STATION = TEST_MODEL.station("C").build();
+  static RegularStop STOP_A = TEST_MODEL
     .stop("A")
     .withVehicleType(TRAM)
     .withParentStation(STATION)
     .build();
-  static RegularStop STOP_B = TransitModelForTest.stop("B").withParentStation(STATION).build();
-  static TripPattern RAIL_PATTERN = TransitModelForTest.pattern(RAIL).build();
-  static TripPattern FERRY_PATTERN = TransitModelForTest.pattern(FERRY).build();
-  static TripPattern BUS_PATTERN = TransitModelForTest.pattern(BUS).build();
+  static RegularStop STOP_B = TEST_MODEL.stop("B").withParentStation(STATION).build();
+  static TripPattern RAIL_PATTERN = TEST_MODEL.pattern(RAIL).build();
+  static TripPattern FERRY_PATTERN = TEST_MODEL.pattern(FERRY).build();
+  static TripPattern BUS_PATTERN = TEST_MODEL.pattern(BUS).build();
 
   @BeforeAll
   static void setup() {
-    var stopModel = StopModel
-      .of()
+    var stopModel = TEST_MODEL
+      .stopModelBuilder()
       .withRegularStop(STOP_A)
       .withRegularStop(STOP_B)
       .withStation(STATION)

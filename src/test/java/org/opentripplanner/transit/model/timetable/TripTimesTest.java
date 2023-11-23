@@ -23,6 +23,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 
 class TripTimesTest {
 
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
   private static final String TRIP_ID = "testTripId";
 
   private static final List<FeedScopedId> stops = List.of(
@@ -44,7 +46,7 @@ class TripTimesTest {
     for (int i = 0; i < stops.size(); ++i) {
       StopTime stopTime = new StopTime();
 
-      RegularStop stop = TransitModelForTest.stopForTest(stops.get(i).getId(), 0.0, 0.0);
+      RegularStop stop = TEST_MODEL.stop(stops.get(i).getId(), 0.0, 0.0).build();
       stopTime.setStop(stop);
       stopTime.setArrivalTime(i * 60);
       stopTime.setDepartureTime(i * 60);
@@ -52,7 +54,7 @@ class TripTimesTest {
       stopTimes.add(stopTime);
     }
 
-    return new TripTimes(trip, stopTimes, new Deduplicator());
+    return TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
   }
 
   @Nested
@@ -69,7 +71,7 @@ class TripTimesTest {
       Trip trip = TransitModelForTest.trip("TRIP").build();
       Collection<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
 
-      TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+      TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
       I18NString headsignFirstStop = tripTimes.getHeadsign(0);
       assertNull(headsignFirstStop);
@@ -80,7 +82,7 @@ class TripTimesTest {
       Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
       Collection<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
 
-      TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+      TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
       I18NString headsignFirstStop = tripTimes.getHeadsign(0);
       assertEquals(DIRECTION, headsignFirstStop);
@@ -97,7 +99,7 @@ class TripTimesTest {
         stopWithHeadsign
       );
 
-      TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+      TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
       I18NString headsignFirstStop = tripTimes.getHeadsign(0);
       assertEquals(STOP_TEST_DIRECTION, headsignFirstStop);
@@ -114,7 +116,7 @@ class TripTimesTest {
         stopWithHeadsign
       );
 
-      TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+      TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
       I18NString headsignFirstStop = tripTimes.getHeadsign(0);
       assertEquals(DIRECTION, headsignFirstStop);
@@ -127,7 +129,7 @@ class TripTimesTest {
       stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
       Collection<StopTime> stopTimes = List.of(stopWithHeadsign, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
 
-      TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+      TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
       I18NString headsignFirstStop = tripTimes.getHeadsign(0);
       assertEquals(STOP_TEST_DIRECTION, headsignFirstStop);
@@ -139,7 +141,7 @@ class TripTimesTest {
 
   @Test
   public void testStopUpdate() {
-    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
 
     updatedTripTimesA.updateArrivalTime(3, 190);
     updatedTripTimesA.updateDepartureTime(3, 190);
@@ -154,7 +156,7 @@ class TripTimesTest {
 
   @Test
   public void testPassedUpdate() {
-    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
 
     updatedTripTimesA.updateDepartureTime(0, 30);
 
@@ -164,7 +166,7 @@ class TripTimesTest {
 
   @Test
   public void testNegativeDwellTime() {
-    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
 
     updatedTripTimesA.updateArrivalTime(1, 60);
     updatedTripTimesA.updateDepartureTime(1, 59);
@@ -177,7 +179,7 @@ class TripTimesTest {
 
   @Test
   public void testNegativeHopTime() {
-    TripTimes updatedTripTimesB = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimesB = createInitialTripTimes().copyOfScheduledTimes();
 
     updatedTripTimesB.updateDepartureTime(6, 421);
     updatedTripTimesB.updateArrivalTime(7, 420);
@@ -188,9 +190,192 @@ class TripTimesTest {
     assertEquals(NEGATIVE_HOP_TIME, error.get().code());
   }
 
+  /**
+   * Test negative hop time with stop cancellations.
+   * Scheduled: 5 at 300, 6 at 360, 7 at 420
+   * Test case: 5 at 421, 6 cancelled (with internal representation 481, since delays are propagated
+   * to later stops without arrival or departure), 7 at 420
+   * Result: Error to be present at stop 7, due to negative hop time. Error should stay after
+   * interpolation, since 6 would be then less than 5 due to interpolation.
+   */
+  @Test
+  public void testNegativeHopTimeWithStopCancellations() {
+    TripTimes updatedTripTimes = createInitialTripTimes();
+
+    updatedTripTimes.updateDepartureTime(5, 421);
+    updatedTripTimes.updateArrivalTime(6, 481);
+    updatedTripTimes.updateDepartureTime(6, 481);
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.updateArrivalTime(7, 420);
+
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+  }
+
+  /**
+   * Test positive hop time with stop cancellations when buses run late.
+   * Scheduled: 5 at 300, 6 at 360, 7 at 420
+   * Test case: 5 at 400, 6 cancelled (with internal representation 460, since delays are propagated
+   * to later stops without arrival or departure), 7 at 420.
+   * Result: Expect error before interpolation. Expect no errors, after interpolation.
+   */
+  @Test
+  public void testPositiveHopTimeWithStopCancellationsLate() {
+    TripTimes updatedTripTimes = createInitialTripTimes();
+
+    updatedTripTimes.updateDepartureTime(5, 400);
+    updatedTripTimes.updateArrivalTime(6, 460);
+    updatedTripTimes.updateDepartureTime(6, 460);
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.updateArrivalTime(7, 420);
+
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
+  /**
+   * Test positive hop time with stop cancellations when buses run early.
+   * Scheduled: 5 at 300, 6 at 360, 7 at 420
+   * Test case: 5 at 300, 6 cancelled(with internal representation 360, since delays are propagated
+   * to later stops without arrival or departure), 7 at 320.
+   * Result: Expect errors, but no errors after interpolation.
+   */
+  @Test
+  public void testPositiveHopTimeWithStopCancellationsEarly() {
+    TripTimes updatedTripTimes = createInitialTripTimes();
+
+    updatedTripTimes.updateDepartureTime(5, 300);
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.updateArrivalTime(7, 320);
+
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
+  /**
+   * Test positive hop time with stop cancellations at the beginning of the trip.
+   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
+   * Test case: 0 and 1 cancelled, start trip at stop 2 at time 0.
+   * Result: Expect errors, since 0 and 1 is cancelled and not backward propagated. Expect no
+   * interpolation, since there is no times to interpolate before 0. Expect same error after
+   * interpolation.
+   */
+  @Test
+  public void testPositiveHopTimeWithTerminalCancellation() {
+    TripTimes updatedTripTimes = createInitialTripTimes();
+
+    updatedTripTimes.setCancelled(0);
+    updatedTripTimes.setCancelled(1);
+    updatedTripTimes.updateArrivalTime(2, 0);
+    updatedTripTimes.updateDepartureTime(2, 10);
+
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertFalse(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+  }
+
+  /**
+   * Test positive hop time with stop cancellations at the beginning of the trip.
+   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
+   * Test case: 6 and 7 are cancelled.
+   * Result: Expect no errors and no interpolations, since there is no time to interpolate at the
+   * end terminal.
+   */
+  @Test
+  public void testInterpolationWithTerminalCancellation() {
+    TripTimes updatedTripTimes = createInitialTripTimes();
+
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.setCancelled(7);
+
+    assertFalse(updatedTripTimes.interpolateMissingTimes());
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
+  /**
+   * Test interpolation with multiple cancelled stops together.
+   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
+   * Test case: 0 at 0, 1 to 6 are cancelled, 7 at time 350.
+   * Result: Expect errors, since 7 is less than the scheduled time at 6. Expect no errors after
+   * interpolation.
+   */
+  @Test
+  public void testInterpolationWithMultipleStopCancellations() {
+    TripTimes updatedTripTimes = createInitialTripTimes();
+
+    updatedTripTimes.setCancelled(1);
+    updatedTripTimes.setCancelled(2);
+    updatedTripTimes.setCancelled(3);
+    updatedTripTimes.setCancelled(4);
+    updatedTripTimes.setCancelled(5);
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.updateArrivalTime(7, 350);
+    updatedTripTimes.updateDepartureTime(7, 350);
+
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
+  /**
+   * Test interpolation with multiple cancelled stops together.
+   * Scheduled: 0 at 0, 1 at 60, 2 at 120, 3 at 180, 4 at 240, 5 at 300, 6 at 360, 7 at 420
+   * Test case: 0 at 0, 1 2 cancelled, 3 at 90, 4 5 6 cancelled, 7 at time 240.
+   * Result: Expect errors, since 3 is less than scheduled time at 2, and 7 is less than the
+   * propagated delay time at 6. Expect no errors after interpolation.
+   */
+  @Test
+  public void testInterpolationWithMultipleStopCancellations2() {
+    TripTimes updatedTripTimes = createInitialTripTimes();
+
+    updatedTripTimes.setCancelled(1);
+    updatedTripTimes.setCancelled(2);
+    updatedTripTimes.updateArrivalTime(3, 90);
+    updatedTripTimes.updateDepartureTime(3, 90);
+    updatedTripTimes.setCancelled(4);
+    updatedTripTimes.setCancelled(5);
+    updatedTripTimes.setCancelled(6);
+    updatedTripTimes.updateArrivalTime(7, 240);
+    updatedTripTimes.updateDepartureTime(7, 240);
+
+    var error = updatedTripTimes.validateNonIncreasingTimes();
+    assertTrue(error.isPresent());
+    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+
+    assertTrue(updatedTripTimes.interpolateMissingTimes());
+    error = updatedTripTimes.validateNonIncreasingTimes();
+    assertFalse(error.isPresent());
+  }
+
   @Test
   public void testNonIncreasingUpdateCrossingMidnight() {
-    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
 
     updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
     updatedTripTimesA.updateDepartureTime(0, 50);
@@ -200,7 +385,7 @@ class TripTimesTest {
 
   @Test
   public void testDelay() {
-    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
     updatedTripTimesA.updateDepartureDelay(0, 10);
     updatedTripTimesA.updateArrivalDelay(6, 13);
 
@@ -210,14 +395,14 @@ class TripTimesTest {
 
   @Test
   public void testCancel() {
-    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
     updatedTripTimesA.cancelTrip();
     assertEquals(RealTimeState.CANCELED, updatedTripTimesA.getRealTimeState());
   }
 
   @Test
   public void testNoData() {
-    TripTimes updatedTripTimesA = new TripTimes(createInitialTripTimes());
+    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
     updatedTripTimesA.setNoData(1);
     assertFalse(updatedTripTimesA.isNoDataStop(0));
     assertTrue(updatedTripTimesA.isNoDataStop(1));
@@ -257,9 +442,9 @@ class TripTimesTest {
     StopTime stopTime1 = new StopTime();
     StopTime stopTime2 = new StopTime();
 
-    RegularStop stop0 = TransitModelForTest.stopForTest(stops.get(0).getId(), 0.0, 0.0);
-    RegularStop stop1 = TransitModelForTest.stopForTest(stops.get(1).getId(), 0.0, 0.0);
-    RegularStop stop2 = TransitModelForTest.stopForTest(stops.get(2).getId(), 0.0, 0.0);
+    RegularStop stop0 = TEST_MODEL.stop(stops.get(0).getId(), 0.0, 0.0).build();
+    RegularStop stop1 = TEST_MODEL.stop(stops.get(1).getId(), 0.0, 0.0).build();
+    RegularStop stop2 = TEST_MODEL.stop(stops.get(2).getId(), 0.0, 0.0).build();
 
     stopTime0.setStop(stop0);
     stopTime0.setDepartureTime(0);
@@ -278,9 +463,9 @@ class TripTimesTest {
     stopTimes.add(stopTime1);
     stopTimes.add(stopTime2);
 
-    TripTimes differingTripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    TripTimes differingTripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
-    TripTimes updatedTripTimesA = new TripTimes(differingTripTimes);
+    TripTimes updatedTripTimesA = differingTripTimes.copyOfScheduledTimes();
 
     updatedTripTimesA.updateArrivalTime(1, 89);
     updatedTripTimesA.updateDepartureTime(1, 98);

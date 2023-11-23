@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -31,6 +31,7 @@ import org.opentripplanner.transit.service.TransitService;
 
 class ScheduledTransitLegReferenceTest {
 
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
   private static final int SERVICE_CODE = 555;
   private static final LocalDate SERVICE_DATE = LocalDate.of(2023, 1, 1);
   private static final int NUMBER_OF_STOPS = 3;
@@ -45,12 +46,12 @@ class ScheduledTransitLegReferenceTest {
 
   @BeforeAll
   static void buildTransitService() {
-    Station parentStation = TransitModelForTest.station("PARENT_STATION").build();
+    Station parentStation = TEST_MODEL.station("PARENT_STATION").build();
 
-    RegularStop stop1 = TransitModelForTest.stopForTest("STOP1", 0, 0);
-    RegularStop stop2 = TransitModelForTest.stopForTest("STOP2", 0, 0);
-    RegularStop stop3 = TransitModelForTest.stopForTest("STOP3", 0, 0, parentStation);
-    stop4 = TransitModelForTest.stopForTest("STOP4", 0, 0, parentStation);
+    RegularStop stop1 = TEST_MODEL.stop("STOP1", 0, 0).build();
+    RegularStop stop2 = TEST_MODEL.stop("STOP2", 0, 0).build();
+    RegularStop stop3 = TEST_MODEL.stop("STOP3", 0, 0).withParentStation(parentStation).build();
+    stop4 = TEST_MODEL.stop("STOP4", 0, 0).withParentStation(parentStation).build();
 
     // build transit data
     TripPattern tripPattern = TransitModelForTest
@@ -63,17 +64,17 @@ class ScheduledTransitLegReferenceTest {
     stopIdAtPosition0 = tripPattern.getStop(0).getId();
     stopIdAtPosition1 = tripPattern.getStop(1).getId();
     stopIdAtPosition2 = tripPattern.getStop(2).getId();
-    TripTimes tripTimes = new TripTimes(
+    var tripTimes = TripTimesFactory.tripTimes(
       trip,
-      TransitModelForTest.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),
+      TEST_MODEL.stopTimesEvery5Minutes(5, trip, PlanTestConstants.T11_00),
       new Deduplicator()
     );
     tripTimes.setServiceCode(SERVICE_CODE);
     timetable.addTripTimes(tripTimes);
 
     // build transit model
-    StopModel stopModel = StopModel
-      .of()
+    StopModel stopModel = TEST_MODEL
+      .stopModelBuilder()
       .withRegularStop(stop1)
       .withRegularStop(stop2)
       .withRegularStop(stop3)

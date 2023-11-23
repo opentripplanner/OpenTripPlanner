@@ -9,6 +9,7 @@ import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LinearRingType;
@@ -18,10 +19,13 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.GroupStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.StopModelBuilder;
+import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
 import org.rutebanken.netex.model.FlexibleArea;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.FlexibleStopPlace_VersionStructure;
@@ -116,12 +120,22 @@ class FlexStopsMapperTest {
     63.596915083462335,
     10.878374152208456
   );
+  private static final KeyListStructure KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS = new KeyListStructure()
+    .withKeyValue(
+      new KeyValueStructure()
+        .withKey("FlexibleStopAreaType")
+        .withValue("UnrestrictedPublicTransportAreas")
+    );
+
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+  private final StopModelBuilder stopModelBuilder = testModel.stopModelBuilder();
 
   @Test
   void testMapAreaStop() {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -157,81 +171,34 @@ class FlexStopsMapperTest {
   }
 
   @Test
-  void testMapGroupStop() {
-    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
-
+  void testMapGroupStopWithKeyValueOnFlexibleStopPlace() {
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
-    flexibleStopPlace.setKeyList(
-      new KeyListStructure()
-        .withKeyValue(
-          new KeyValueStructure()
-            .withKey("FlexibleStopAreaType")
-            .withValue("UnrestrictedPublicTransportAreas")
-        )
-    );
-
-    FlexStopsMapper subject = new FlexStopsMapper(
-      ID_FACTORY,
-      List.of(stop1, stop2),
-      DataImportIssueStore.NOOP
-    );
-
-    GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
-
-    assertNotNull(groupStop);
-
-    // Only one of the stops should be inside the polygon
-    assertEquals(1, groupStop.getLocations().size());
+    flexibleStopPlace.setKeyList(KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS);
+    assertGroupStopMapping(flexibleStopPlace);
   }
 
   @Test
-  void testMapGroupStopVariantWithKeyValueOnArea() {
-    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
-
+  void testMapGroupStopWithKeyValueOnArea() {
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
-
     var area = (FlexibleArea) flexibleStopPlace
       .getAreas()
       .getFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea()
       .get(0);
-    area.withKeyList(
-      new KeyListStructure()
-        .withKeyValue(
-          new KeyValueStructure()
-            .withKey("FlexibleStopAreaType")
-            .withValue("UnrestrictedPublicTransportAreas")
-        )
-    );
-
-    FlexStopsMapper subject = new FlexStopsMapper(
-      ID_FACTORY,
-      List.of(stop1, stop2),
-      DataImportIssueStore.NOOP
-    );
-
-    GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
-
-    assertNotNull(groupStop);
-
-    // Only one of the stops should be inside the polygon
-    assertEquals(1, groupStop.getLocations().size());
+    area.withKeyList(KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS);
+    assertGroupStopMapping(flexibleStopPlace);
   }
 
   @Test
   void testMapFlexibleStopPlaceMissingStops() {
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(AREA_POS_LIST);
-    flexibleStopPlace.setKeyList(
-      new KeyListStructure()
-        .withKeyValue(
-          new KeyValueStructure()
-            .withKey("FlexibleStopAreaType")
-            .withValue("UnrestrictedPublicTransportAreas")
-        )
-    );
+    flexibleStopPlace.setKeyList(KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS);
 
-    FlexStopsMapper subject = new FlexStopsMapper(ID_FACTORY, List.of(), DataImportIssueStore.NOOP);
+    FlexStopsMapper subject = new FlexStopsMapper(
+      ID_FACTORY,
+      List.of(),
+      stopModelBuilder,
+      DataImportIssueStore.NOOP
+    );
 
     GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
 
@@ -240,23 +207,17 @@ class FlexStopsMapperTest {
 
   @Test
   void testMapFlexibleStopPlaceWithInvalidGeometryOnUnrestrictedPublicTransportAreas() {
-    RegularStop stop1 = TransitModelForTest.stop("A").withCoordinate(59.6505778, 6.3608759).build();
-    RegularStop stop2 = TransitModelForTest.stop("B").withCoordinate(59.6630333, 6.3697245).build();
+    RegularStop stop1 = testModel.stop("A").withCoordinate(59.6505778, 6.3608759).build();
+    RegularStop stop2 = testModel.stop("B").withCoordinate(59.6630333, 6.3697245).build();
 
     var invalidPolygon = List.of(1.0);
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(invalidPolygon);
-    flexibleStopPlace.setKeyList(
-      new KeyListStructure()
-        .withKeyValue(
-          new KeyValueStructure()
-            .withKey("FlexibleStopAreaType")
-            .withValue("UnrestrictedPublicTransportAreas")
-        )
-    );
+    flexibleStopPlace.setKeyList(KEY_LIST_UNRESTRICTED_PUBLIC_TRANSPORT_AREAS);
 
     FlexStopsMapper subject = new FlexStopsMapper(
       ID_FACTORY,
       List.of(stop1, stop2),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
 
@@ -265,10 +226,48 @@ class FlexStopsMapperTest {
     assertNull(groupStop);
   }
 
+  private void assertGroupStopMapping(FlexibleStopPlace flexibleStopPlace) {
+    // Regular stop inside the polygon with same transport mode as the flexible stop
+    RegularStop stop1 = testModel
+      .stop("A")
+      .withCoordinate(59.6505778, 6.3608759)
+      .withVehicleType(TransitMode.BUS)
+      .build();
+    // Regular stop outside the polygon with same transport mode as the flexible stop
+    RegularStop stop2 = testModel
+      .stop("B")
+      .withCoordinate(59.6630333, 6.3697245)
+      .withVehicleType(TransitMode.BUS)
+      .build();
+    // Regular stop inside the polygon with another transport mode than the flexible stop
+    RegularStop stop3 = testModel
+      .stop("A")
+      .withCoordinate(59.6505778, 6.3608759)
+      .withVehicleType(TransitMode.RAIL)
+      .build();
+
+    FlexStopsMapper subject = new FlexStopsMapper(
+      ID_FACTORY,
+      List.of(stop1, stop2, stop3),
+      stopModelBuilder,
+      DataImportIssueStore.NOOP
+    );
+
+    GroupStop groupStop = (GroupStop) subject.map(flexibleStopPlace);
+
+    assertNotNull(groupStop);
+
+    // Only one of the stops should be inside the polygon
+    Set<StopLocation> locations = groupStop.getLocations();
+    assertEquals(1, locations.size());
+    assertEquals(stop1.getId(), locations.stream().findFirst().orElseThrow().getId());
+  }
+
   private FlexibleStopPlace getFlexibleStopPlace(Collection<Double> areaPosList) {
     return new FlexibleStopPlace()
       .withId(FLEXIBLE_STOP_PLACE_ID)
       .withName(new MultilingualString().withValue(FLEXIBLE_STOP_PLACE_NAME))
+      .withTransportMode(AllVehicleModesOfTransportEnumeration.BUS)
       .withAreas(
         new FlexibleStopPlace_VersionStructure.Areas()
           .withFlexibleAreaOrFlexibleAreaRefOrHailAndRideArea(
@@ -294,6 +293,7 @@ class FlexStopsMapperTest {
     FlexStopsMapper flexStopsMapper = new FlexStopsMapper(
       ID_FACTORY,
       List.of(),
+      stopModelBuilder,
       DataImportIssueStore.NOOP
     );
     FlexibleStopPlace flexibleStopPlace = getFlexibleStopPlace(polygonCoordinates);

@@ -1,0 +1,21 @@
+{
+  "routingDefaults": {
+    "itineraryFilters": {
+      // add IBI accessibility score between 0 and 1
+      "accessibilityScore": true
+    },
+    // use stop and trip with unknown wheelchair accessibility during routing
+    "wheelchairAccessibility": {
+      "trip": {
+        "onlyConsiderAccessible": false,
+        "unknownCost": 600,
+        "inaccessibleCost": 3600
+      },
+      "stop": {
+        "onlyConsiderAccessible": false,
+        "unknownCost": 600,
+        "inaccessibleCost": 3600
+      }
+    }
+  }
+}

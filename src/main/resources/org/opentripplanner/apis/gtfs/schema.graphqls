@@ -1546,6 +1546,15 @@ type Itinerary {
     """
     accessibilityScore: Float
 
+    """
+    How many transfers are part of this itinerary.
+
+    Notes:
+     - Interlined/stay-seated transfers do not increase this count.
+     - Transferring from a flex to a fixed schedule trip and vice versa increases this count.
+    """
+    numberOfTransfers: Int!
+
     #
     # deprecated fields
     #

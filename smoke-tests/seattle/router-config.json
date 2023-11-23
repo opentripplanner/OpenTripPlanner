@@ -1,4 +1,21 @@
 {
+  "routingDefaults": {
+    "itineraryFilters": {
+      "accessibilityScore": true
+    },
+    "wheelchairAccessibility": {
+      "trip": {
+        "onlyConsiderAccessible": false,
+        "unknownCost": 600,
+        "inaccessibleCost": 3600
+      },
+      "stop": {
+        "onlyConsiderAccessible": false,
+        "unknownCost": 600,
+        "inaccessibleCost": 3600
+      }
+    }
+  },
   "updaters": [
     {
       "type": "stop-time-updater",

@@ -29,7 +29,7 @@ public class HoustonSmokeTest {
     var modes = Set.of(TRANSIT, WALK);
     var plan = SmokeTest.basicRouteTest(
       new SmokeTestRequest(galvestonRoad, northLindale, modes),
-      List.of("WALK", "BUS", "BUS", "WALK", "TRAM", "WALK")
+      List.of("WALK", "BUS", "WALK", "TRAM", "WALK")
     );
 
     SmokeTest.assertThatAllTransitLegsHaveFareProducts(plan);
@@ -40,7 +40,7 @@ public class HoustonSmokeTest {
     var modes = Set.of(BUS, WALK);
     var plan = SmokeTest.basicRouteTest(
       new SmokeTestRequest(galvestonRoad, northLindale, modes),
-      List.of("WALK", "BUS", "WALK", "BUS", "WALK", "BUS", "WALK")
+      List.of("WALK", "BUS", "WALK", "BUS", "WALK")
     );
 
     SmokeTest.assertThatAllTransitLegsHaveFareProducts(plan);

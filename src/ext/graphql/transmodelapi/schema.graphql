@@ -792,7 +792,7 @@ type QueryType {
     "Date and time for the earliest time the user is willing to start the journey (if arriveBy=false/not set) or the latest acceptable time of arriving (arriveBy=true). Defaults to now"
     dateTime: DateTime,
     "Debug the itinerary-filter-chain. OTP will attach a system notice to itineraries instead of removing them. This is very convenient when tuning the filters."
-    debugItineraryFilter: Boolean = false,
+    debugItineraryFilter: Boolean = false @deprecated(reason : "Use `itineraryFilter.debug` instead."),
     "A list of filters for which trips should be included. A trip will be included if it matches with at least one filter. An empty list of filters means that all trips should be included. If a search include this parameter, \"whiteListed\", \"banned\" & \"modes.transportModes\" filters will be ignored."
     filters: [TripFilterInput!],
     "The start location"
