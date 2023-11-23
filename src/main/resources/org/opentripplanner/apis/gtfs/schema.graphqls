@@ -3342,7 +3342,7 @@ type PlanEdge {
     An itinerary suggestion. Part of the
     [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
     """
-    node: Itinerary
+    node: Itinerary!
 
     """
     The cursor of the edge. Part of the
