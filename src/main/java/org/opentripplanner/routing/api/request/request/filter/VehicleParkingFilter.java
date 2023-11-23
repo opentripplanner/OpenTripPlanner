@@ -9,15 +9,15 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 
 /**
- * A request object that checks if parking faclities match certain conditions for
+ * A filter class that checks if parking faclities match certain conditions for
  * inclusion/exclusion or preference/unpreference.
  */
-public class VehicleParkingFilterRequest implements Serializable {
+public class VehicleParkingFilter implements Serializable {
 
   private final VehicleParkingSelect[] not;
   private final VehicleParkingSelect[] select;
 
-  public VehicleParkingFilterRequest(
+  public VehicleParkingFilter(
     Collection<VehicleParkingSelect> not,
     Collection<VehicleParkingSelect> select
   ) {
@@ -25,7 +25,7 @@ public class VehicleParkingFilterRequest implements Serializable {
     this.select = makeFilter(select);
   }
 
-  public VehicleParkingFilterRequest(VehicleParkingSelect not, VehicleParkingSelect select) {
+  public VehicleParkingFilter(VehicleParkingSelect not, VehicleParkingSelect select) {
     this(List.of(not), List.of(select));
   }
 
@@ -40,8 +40,8 @@ public class VehicleParkingFilterRequest implements Serializable {
   /**
    * Create a request with no conditions.
    */
-  public static VehicleParkingFilterRequest empty() {
-    return new VehicleParkingFilterRequest(List.of(), List.of());
+  public static VehicleParkingFilter empty() {
+    return new VehicleParkingFilter(List.of(), List.of());
   }
 
   /**
@@ -78,7 +78,7 @@ public class VehicleParkingFilterRequest implements Serializable {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    VehicleParkingFilterRequest that = (VehicleParkingFilterRequest) o;
+    VehicleParkingFilter that = (VehicleParkingFilter) o;
     return (Arrays.equals(not, that.not) && Arrays.equals(select, that.select));
   }
 

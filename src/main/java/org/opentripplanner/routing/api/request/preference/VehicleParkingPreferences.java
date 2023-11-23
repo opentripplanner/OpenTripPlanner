@@ -8,7 +8,7 @@ import java.util.Set;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.request.filter.VehicleParkingSelect;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
+import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter;
 
 /**
  * The parking preferences contain preferences for car and bicycle parking. These preferences
@@ -21,8 +21,8 @@ public final class VehicleParkingPreferences implements Serializable {
   public static final VehicleParkingPreferences DEFAULT = new VehicleParkingPreferences();
   private final Cost unpreferredVehicleParkingTagCost;
   private final boolean ignoreRealtimeAvailability;
-  private final VehicleParkingFilterRequest filter;
-  private final VehicleParkingFilterRequest preferred;
+  private final VehicleParkingFilter filter;
+  private final VehicleParkingFilter preferred;
   private final Duration parkTime;
   private final Cost parkCost;
 
@@ -30,8 +30,8 @@ public final class VehicleParkingPreferences implements Serializable {
   private VehicleParkingPreferences() {
     this.unpreferredVehicleParkingTagCost = Cost.costOfMinutes(5);
     this.ignoreRealtimeAvailability = false;
-    this.filter = VehicleParkingFilterRequest.empty();
-    this.preferred = VehicleParkingFilterRequest.empty();
+    this.filter = VehicleParkingFilter.empty();
+    this.preferred = VehicleParkingFilter.empty();
     this.parkTime = Duration.ofMinutes(1);
     this.parkCost = Cost.costOfMinutes(2);
   }
@@ -40,12 +40,12 @@ public final class VehicleParkingPreferences implements Serializable {
     this.unpreferredVehicleParkingTagCost = builder.unpreferredVehicleParkingTagCost;
     this.ignoreRealtimeAvailability = builder.ignoreRealtimeAvailability;
     this.filter =
-      new VehicleParkingFilterRequest(
+      new VehicleParkingFilter(
         builder.bannedVehicleParkingTags,
         builder.requiredVehicleParkingTags
       );
     this.preferred =
-      new VehicleParkingFilterRequest(
+      new VehicleParkingFilter(
         builder.notPreferredVehicleParkingTags,
         builder.preferredVehicleParkingTags
       );
@@ -75,7 +75,7 @@ public final class VehicleParkingPreferences implements Serializable {
    * Parking containing select filters must only be usable and parking containing with not filters
    * cannot be used.
    */
-  public VehicleParkingFilterRequest filter() {
+  public VehicleParkingFilter filter() {
     return filter;
   }
 
@@ -85,7 +85,7 @@ public final class VehicleParkingPreferences implements Serializable {
    * <p>
    * This is useful if you want to use certain kind of facilities, like lockers for expensive e-bikes.
    */
-  public VehicleParkingFilterRequest preferred() {
+  public VehicleParkingFilter preferred() {
     return preferred;
   }
 
