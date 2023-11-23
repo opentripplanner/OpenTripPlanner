@@ -7,8 +7,8 @@ import java.util.Objects;
 import java.util.Set;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingSelect;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter;
+import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingSelect;
+import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingFilter;
 
 /**
  * The parking preferences contain preferences for car and bicycle parking. These preferences

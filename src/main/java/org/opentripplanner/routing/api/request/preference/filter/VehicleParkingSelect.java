@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.api.request.request.filter;
+package org.opentripplanner.routing.api.request.preference.filter;
 
 import java.util.Collections;
 import java.util.Set;
