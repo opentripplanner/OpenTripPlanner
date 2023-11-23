@@ -17,7 +17,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationSection;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
@@ -64,8 +63,6 @@ public class PagingFilterTest implements PlanTestConstants {
       new PagingFilter(
         SortOrder.STREET_AND_ARRIVAL_TIME,
         new ItineraryPageCut(
-          late.startTime().toInstant(),
-          oldSearchWindowEndTime,
           PagingDeduplicationSection.HEAD,
           middle.endTime().toInstant(),
           middle.startTime().toInstant(),
@@ -276,8 +273,6 @@ public class PagingFilterTest implements PlanTestConstants {
     return new PagingFilter(
       sortOrder,
       new ItineraryPageCut(
-        TestItineraryBuilder.newTime(edt).toInstant(),
-        TestItineraryBuilder.newTime(lat).toInstant(),
         pageCut,
         cut.endTimeAsInstant(),
         cut.startTimeAsInstant(),

@@ -47,13 +47,7 @@ public class PagingFilter implements ItineraryDeletionFlagger {
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     return itineraries
       .stream()
-      .filter(it ->
-        (
-          it.startTime().toInstant().isAfter(itineraryPageCut.windowStart()) &&
-          it.startTime().toInstant().isBefore(itineraryPageCut.windowEnd()) &&
-          sortsIntoDeduplicationAreaRelativeToRemovedItinerary(it)
-        )
-      )
+      .filter(this::sortsIntoDeduplicationAreaRelativeToRemovedItinerary)
       .collect(Collectors.toList());
   }
 }

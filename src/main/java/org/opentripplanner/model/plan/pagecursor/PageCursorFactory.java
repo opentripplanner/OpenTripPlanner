@@ -61,8 +61,6 @@ public class PageCursorFactory {
     this.pageCursorInput = pageCursorFactoryParams;
     this.itineraryPageCut =
       new ItineraryPageCut(
-        pageCursorFactoryParams.earliestRemovedDeparture().truncatedTo(ChronoUnit.SECONDS),
-        current.edt.plus(currentSearchWindow),
         pageCursorFactoryParams.deduplicationSection(),
         pageCursorFactoryParams.firstRemovedArrivalTime(),
         pageCursorFactoryParams.firstRemovedDepartureTime(),
