@@ -81,9 +81,9 @@ class VehicleParkingPreferencesTest {
     assertEquals(
       "VehicleParkingPreferences{" +
       "unpreferredVehicleParkingTagCost: $360, " +
-      "useAvailabilityInformation: false, " +
-      "filter: VehicleParkingFilterRequest{not: [tags=[not]], select: [tags=[bar]]}, " +
-      "preferred: VehicleParkingFilterRequest{not: [tags=[bar]], select: [tags=[foo]]}, " +
+      "ignoreRealtimeAvailability, " +
+      "filter: VehicleParkingFilter{not: [tags=[not]], select: [tags=[bar]]}, " +
+      "preferred: VehicleParkingFilter{not: [tags=[bar]], select: [tags=[foo]]}, " +
       "parkCost: $240, " +
       "parkTime: PT2M}",
       subject.toString()

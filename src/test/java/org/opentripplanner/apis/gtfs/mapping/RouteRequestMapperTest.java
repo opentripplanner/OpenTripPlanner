@@ -215,11 +215,11 @@ class RouteRequestMapperTest implements PlanTestConstants {
 
   private void testParkingFilters(VehicleParkingPreferences parkingPreferences) {
     assertEquals(
-      "VehicleParkingFilterRequest{not: [tags=[wheelbender]], select: [tags=[locker, roof]]}",
+      "VehicleParkingFilter{not: [tags=[wheelbender]], select: [tags=[locker, roof]]}",
       parkingPreferences.filter().toString()
     );
     assertEquals(
-      "VehicleParkingFilterRequest{select: [tags=[a, b]]}",
+      "VehicleParkingFilter{select: [tags=[a, b]]}",
       parkingPreferences.preferred().toString()
     );
     assertEquals(555, parkingPreferences.unpreferredVehicleParkingTagCost().toSeconds());
