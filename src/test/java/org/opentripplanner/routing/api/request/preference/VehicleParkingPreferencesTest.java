@@ -59,7 +59,7 @@ class VehicleParkingPreferencesTest {
     // Return same object if no value is set
     assertSame(VehicleParkingPreferences.DEFAULT, VehicleParkingPreferences.of().build());
 
-    // Create a copy, make a change and set it back again to force creating a new object
+    // Create other with different values and same with the same values as the subject
     var other = VehicleParkingPreferences
       .of()
       .withPreferredVehicleParkingTags(Set.of())
