@@ -3296,9 +3296,9 @@ type PlanConnection {
     routingErrors: [RoutingError!]!
 
     """
-    Debug information about the search.
+    The search window that was used for the search.
     """
-    debugInformation: PlanDebugInformation!
+    searchWindowUsed: Duration
 
     """
     Edges which contain the itineraries. Part of the
@@ -3311,26 +3311,6 @@ type PlanConnection {
     Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
     """
     pageInfo: PageInfo!
-}
-
-"""
-Debug information about an itinerary search.
-"""
-type PlanDebugInformation {
-    """
-    Total time taken for the route request.
-    """
-    totalTime: Duration
-
-    """
-    Time taken in the transit router (including access/egress street router).
-    """
-    pathCalculationTime: Duration
-
-    """
-    The search window that was used for the search.
-    """
-    searchWindowUsed: Duration
 }
 
 """
