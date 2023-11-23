@@ -53,15 +53,13 @@ Then
 
     npm run build
 
-
 ## Which OTP instance do I use?
 
 In development mode, the debug client by default assumes you are running an OTP instance locally at
 port 8080 (see `.env.development`). If you wish to point to a different OTP instance
-(like a remote server), use the  environment variable`VITE_API_URL`, either at the command line,
+(like a remote server), use the environment variable`VITE_API_URL`, either at the command line,
 or add it to a new `.env.development.local` file (this file will be ignored by git).
 
 In production mode, the default is to access OTP via the same origin as the client (see `.env`).
 This behavior can also be modified by changing the previously mentioned environment variable at
 build-time.
-
