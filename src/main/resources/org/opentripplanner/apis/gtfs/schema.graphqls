@@ -3286,9 +3286,16 @@ type PlanConnection {
     searchDateTime: OffsetDateTime
 
     """
-    Origin and destination of the search.
+    Origin of the itinerary search.
+    TODO figure out the best output type
     """
-    locations: PlanPlaces!
+    origin: Place!
+
+    """
+    Destination of the itinerary search.
+    TODO figure out the best output type
+    """
+    destination: Place!
 
     """
     Errors faced during the routing search.
@@ -3329,21 +3336,6 @@ type PlanEdge {
     [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
     """
     cursor: String!
-}
-
-"""
-Origin and destination of an itinerary search.
-"""
-type PlanPlaces {
-    """
-    Origin of the itinerary search.
-    """
-    from: Place!
-
-    """
-    Destination of the itinerary search.
-    """
-    to: Place!
 }
 
 """
