@@ -435,6 +435,11 @@ ferries, where the check-in process needs to be done in good time before ride.
               .summary(
                 "Tags with which a vehicle parking will not be used. If empty, no tags are banned."
               )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
+              )
               .asStringSet(List.of())
           )
           .withRequiredVehicleParkingTags(
@@ -443,6 +448,11 @@ ferries, where the check-in process needs to be done in good time before ride.
               .since(V2_1)
               .summary(
                 "Tags without which a vehicle parking will not be used. If empty, no tags are required."
+              )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
               )
               .asStringSet(List.of())
           )
@@ -466,6 +476,11 @@ ferries, where the check-in process needs to be done in good time before ride.
               .since(V2_3)
               .summary(
                 "Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised."
+              )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
               )
               .asStringSet(List.of())
           )
@@ -733,6 +748,11 @@ your users receive a timely response. You can also limit the max duration. There
               .summary(
                 "Tags with which a vehicle parking will not be used. If empty, no tags are banned."
               )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
+              )
               .asStringSet(List.of())
           )
           .withRequiredVehicleParkingTags(
@@ -741,6 +761,11 @@ your users receive a timely response. You can also limit the max duration. There
               .since(V2_1)
               .summary(
                 "Tags without which a vehicle parking will not be used. If empty, no tags are required."
+              )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
               )
               .asStringSet(List.of())
           )
@@ -764,6 +789,11 @@ your users receive a timely response. You can also limit the max duration. There
               .since(V2_3)
               .summary(
                 "Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised."
+              )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
               )
               .asStringSet(List.of())
           )

@@ -466,6 +466,9 @@ Sometimes there is a need to configure a longer alighting times for specific mod
 
 Tags with which a vehicle parking will not be used. If empty, no tags are banned.
 
+Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+
+
 <h3 id="rd_boardSlackForMode">boardSlackForMode</h3>
 
 **Since version:** `2.0` ∙ **Type:** `enum map of duration` ∙ **Cardinality:** `Optional`   
@@ -700,12 +703,18 @@ done because some street modes searches are much more resource intensive than ot
 
 Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.
 
+Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+
+
 <h3 id="rd_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
 
 **Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults 
 
 Tags without which a vehicle parking will not be used. If empty, no tags are required.
+
+Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+
 
 <h3 id="rd_transferOptimization">transferOptimization</h3>
 
