@@ -428,7 +428,7 @@ public class Itinerary implements ItinerarySortKey {
    * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
    * guidance that expresses certainty or uncertainty about the accessibility.
    * <p>
-   * An alternative to this is to use the `generalized-cost` and use that to indicate witch itineraries is the
+   * An alternative to this is to use the `generalized-cost` and use that to indicate which itineraries is the
    * best/most friendly with respect to making the journey in a wheelchair. The `generalized-cost` include, not
    * only a penalty for unknown and inaccessible boardings, but also a penalty for undesired uphill and downhill
    * street traversal.

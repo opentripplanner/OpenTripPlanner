@@ -201,7 +201,7 @@ public class OSMWithTags {
 
   /**
    * Get tag and convert it to an integer. If the tag exist, but can not be parsed into a number,
-   * then the error handler is called with the value witch failed to parse.
+   * then the error handler is called with the value which failed to parse.
    */
   public OptionalInt getTagAsInt(String tag, Consumer<String> errorHandler) {
     String value = getTag(tag);
