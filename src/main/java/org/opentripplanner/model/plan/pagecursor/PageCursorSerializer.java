@@ -87,7 +87,7 @@ final class PageCursorSerializer {
         var departureTimeDeletionThreshold = readTime(in);
 
         itineraryPageCut =
-          new ItineraryPageCut(
+          new DeduplicationPageCut(
             arrivalTimeDeletionThreshold,
             departureTimeDeletionThreshold,
             generalizedCostDeletionThreshold,

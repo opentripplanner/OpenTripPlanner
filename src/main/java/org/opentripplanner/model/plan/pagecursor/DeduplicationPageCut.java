@@ -10,7 +10,7 @@ import org.opentripplanner.model.plan.ItinerarySortKey;
  * It implements the ItinerarySortKey interface so that it can be sorted with itineraries which
  * potentially contain duplicates.
  */
-public record ItineraryPageCut(
+public record DeduplicationPageCut(
   Instant arrivalTimeThreshold,
   Instant departureTimeThreshold,
   int generalizedCostThreshold,
