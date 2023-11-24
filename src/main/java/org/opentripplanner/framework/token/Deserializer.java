@@ -67,12 +67,17 @@ class Deserializer {
 
   private Object read(ObjectInputStream in, FieldDefinition field) throws IOException {
     return switch (field.type()) {
+      case BOOLEAN -> readBoolean(in);
       case BYTE -> readByte(in);
       case DURATION -> readDuration(in);
       case INT -> readInt(in);
       case ENUM, STRING -> readString(in);
       case TIME_INSTANT -> readTimeInstant(in);
     };
+  }
+
+  private static boolean readBoolean(ObjectInputStream in) throws IOException {
+    return in.readBoolean();
   }
 
   private static byte readByte(ObjectInputStream in) throws IOException {

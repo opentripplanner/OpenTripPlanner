@@ -1,7 +1,9 @@
 package org.opentripplanner.framework.token;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Month;
 import java.util.Optional;
@@ -12,6 +14,12 @@ class TokenSchemaTest implements TokenSchemaConstants {
 
   // Token field names. These are used to reference a specific field value in the
   // token to avoid index errors. They are not part of the serialized token.
+
+  private static final TokenSchema BOOLEAN_SCHEMA = TokenSchema
+    .ofVersion(1)
+    .addBoolean(BOOLEAN_TRUE_FIELD)
+    .addBoolean(BOOLEAN_FALSE_FIELD)
+    .build();
 
   private static final TokenSchema BYTE_SCHEMA = TokenSchema
     .ofVersion(1)
@@ -34,6 +42,19 @@ class TokenSchemaTest implements TokenSchemaConstants {
     .ofVersion(13)
     .addTimeInstant(TIME_INSTANT_FIELD)
     .build();
+
+  @Test
+  public void encodeBoolean() {
+    // Add in opposite order of Schema, test naming fields work
+    var token = BOOLEAN_SCHEMA
+      .encode()
+      .withBoolean(BOOLEAN_FALSE_FIELD, false)
+      .withBoolean(BOOLEAN_TRUE_FIELD, true)
+      .build();
+    assertEquals(BOOLEAN_ENCODED, token);
+    assertTrue(BOOLEAN_SCHEMA.decode(token).getBoolean(BOOLEAN_TRUE_FIELD));
+    assertFalse(BOOLEAN_SCHEMA.decode(token).getBoolean(BOOLEAN_FALSE_FIELD));
+  }
 
   @Test
   public void encodeByte() {

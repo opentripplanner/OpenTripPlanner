@@ -25,6 +25,10 @@ public class Token {
     return definition.version();
   }
 
+  public boolean getBoolean(String fieldName) {
+    return (boolean) get(fieldName, TokenType.BOOLEAN);
+  }
+
   public byte getByte(String fieldName) {
     return (byte) get(fieldName, TokenType.BYTE);
   }

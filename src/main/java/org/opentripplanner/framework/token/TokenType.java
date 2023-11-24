@@ -8,6 +8,7 @@ package org.opentripplanner.framework.token;
  * compatible with the new value of the enum.
  */
 public enum TokenType {
+  BOOLEAN,
   BYTE,
   DURATION,
   ENUM,

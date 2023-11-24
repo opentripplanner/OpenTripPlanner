@@ -18,6 +18,10 @@ public class TokenBuilder {
     this.values = new Object[definition.size()];
   }
 
+  public TokenBuilder withBoolean(String fieldName, boolean v) {
+    return with(fieldName, TokenType.BOOLEAN, v);
+  }
+
   public TokenBuilder withByte(String fieldName, byte v) {
     return with(fieldName, TokenType.BYTE, v);
   }

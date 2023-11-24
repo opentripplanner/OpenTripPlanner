@@ -50,6 +50,7 @@ class Serializer implements Closeable {
   private void write(String fieldName, Object value) throws IOException {
     var type = definition.type(fieldName);
     switch (type) {
+      case BOOLEAN -> writeBoolean((boolean) value);
       case BYTE -> writeByte((byte) value);
       case DURATION -> writeDuration((Duration) value);
       case ENUM -> writeString(((Enum<?>) value).name());
@@ -58,6 +59,10 @@ class Serializer implements Closeable {
       case TIME_INSTANT -> writeTimeInstant((Instant) value);
       default -> throw new IllegalArgumentException("Unknown type: " + type);
     }
+  }
+
+  private void writeBoolean(boolean value) throws IOException {
+    out.writeBoolean(value);
   }
 
   private void writeByte(byte value) throws IOException {

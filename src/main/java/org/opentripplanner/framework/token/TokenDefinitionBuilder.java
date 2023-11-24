@@ -26,6 +26,10 @@ public class TokenDefinitionBuilder {
     return add(fieldName, TokenType.BYTE);
   }
 
+  public TokenDefinitionBuilder addBoolean(String fieldName) {
+    return add(fieldName, TokenType.BOOLEAN);
+  }
+
   public TokenDefinitionBuilder addDuration(String fieldName) {
     return add(fieldName, TokenType.DURATION);
   }
