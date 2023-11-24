@@ -15,8 +15,8 @@ import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
 import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
@@ -78,7 +78,7 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
-  private ItineraryPageCut itineraryPageCut;
+  private ItinerarySortKey itineraryPageCut;
 
   /**
    * Sandbox filters which decorate the itineraries with extra information.
@@ -280,7 +280,7 @@ public class ItineraryListFilterChainBuilder {
    * @param itineraryPageCut contains the parameters to use for deduplication.
    */
   public ItineraryListFilterChainBuilder withPagingDeduplicationFilter(
-    ItineraryPageCut itineraryPageCut
+    ItinerarySortKey itineraryPageCut
   ) {
     this.itineraryPageCut = itineraryPageCut;
     return this;

@@ -12,6 +12,7 @@ import java.time.ZonedDateTime;
 import java.util.Base64;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.StringUtils;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,18 +35,19 @@ final class PageCursorSerializer {
     try (var out = new ObjectOutputStream(buf)) {
       // The order must be the same in the encode and decode function
       writeByte(VERSION, out);
-      writeEnum(cursor.type, out);
-      writeTime(cursor.earliestDepartureTime, out);
-      writeTime(cursor.latestArrivalTime, out);
-      writeDuration(cursor.searchWindow, out);
-      writeEnum(cursor.originalSortOrder, out);
+      writeEnum(cursor.type(), out);
+      writeTime(cursor.earliestDepartureTime(), out);
+      writeTime(cursor.latestArrivalTime(), out);
+      writeDuration(cursor.searchWindow(), out);
+      writeEnum(cursor.originalSortOrder(), out);
 
-      if (cursor.containsItineraryPageCut()) {
-        writeBoolean(cursor.itineraryPageCut.isOnStreetAllTheWayThreshold(), out);
-        writeTime(cursor.itineraryPageCut.arrivalTimeThreshold(), out);
-        writeInt(cursor.itineraryPageCut.generalizedCostThreshold(), out);
-        writeInt(cursor.itineraryPageCut.numOfTransfersThreshold(), out);
-        writeTime(cursor.itineraryPageCut.departureTimeThreshold(), out);
+      var pageCut = cursor.itineraryPageCut();
+      if (pageCut != null) {
+        writeBoolean(pageCut.isOnStreetAllTheWay(), out);
+        writeTime(pageCut.endTimeAsInstant(), out);
+        writeInt(pageCut.getGeneralizedCost(), out);
+        writeInt(pageCut.getNumberOfTransfers(), out);
+        writeTime(pageCut.startTimeAsInstant(), out);
       }
       out.flush();
       return Base64.getUrlEncoder().encodeToString(buf.toByteArray());
@@ -61,6 +63,7 @@ final class PageCursorSerializer {
       return null;
     }
     try {
+      ItinerarySortKey itineraryPageCut = null;
       var buf = Base64.getUrlDecoder().decode(cursor);
       var input = new ByteArrayInputStream(buf);
 
@@ -83,18 +86,16 @@ final class PageCursorSerializer {
         var numOfTransfersDeletionThreshold = readInt(in);
         var departureTimeDeletionThreshold = readTime(in);
 
-        ItineraryPageCut itineraryPageCut = new ItineraryPageCut(
-          arrivalTimeDeletionThreshold,
-          departureTimeDeletionThreshold,
-          generalizedCostDeletionThreshold,
-          numOfTransfersDeletionThreshold,
-          isOnStreetAllTheWayThreshold
-        );
-        return new PageCursor(type, originalSortOrder, edt, lat, searchWindow)
-          .withItineraryPageCut(itineraryPageCut);
+        itineraryPageCut =
+          new ItineraryPageCut(
+            arrivalTimeDeletionThreshold,
+            departureTimeDeletionThreshold,
+            generalizedCostDeletionThreshold,
+            numOfTransfersDeletionThreshold,
+            isOnStreetAllTheWayThreshold
+          );
       }
-
-      return new PageCursor(type, originalSortOrder, edt, lat, searchWindow);
+      return new PageCursor(type, originalSortOrder, edt, lat, searchWindow, itineraryPageCut);
     } catch (Exception e) {
       String details = e.getMessage();
       if (details != null && !details.isBlank()) {

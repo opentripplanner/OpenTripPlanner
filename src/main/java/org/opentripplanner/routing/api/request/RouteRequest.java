@@ -19,7 +19,6 @@ import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.PageCursor;
-import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.request.JourneyRequest;
 import org.opentripplanner.routing.api.response.InputField;
@@ -158,7 +157,7 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public SortOrder itinerariesSortOrder() {
     if (pageCursor != null) {
-      return pageCursor.originalSortOrder;
+      return pageCursor.originalSortOrder();
     }
     return arriveBy ? SortOrder.STREET_AND_DEPARTURE_TIME : SortOrder.STREET_AND_ARRIVAL_TIME;
   }
@@ -172,10 +171,11 @@ public class RouteRequest implements Cloneable, Serializable {
     if (pageCursor != null) {
       // We switch to "depart-after" search when paging next(lat==null). It does not make
       // sense anymore to keep the latest-arrival-time when going to the "next page".
-      if (pageCursor.latestArrivalTime == null) {
+      if (pageCursor.latestArrivalTime() == null) {
         arriveBy = false;
       }
-      this.dateTime = arriveBy ? pageCursor.latestArrivalTime : pageCursor.earliestDepartureTime;
+      this.dateTime =
+        arriveBy ? pageCursor.latestArrivalTime() : pageCursor.earliestDepartureTime();
       journey.setModes(journey.modes().copyOf().withDirectMode(StreetMode.NOT_SET).build());
       LOG.debug("Request dateTime={} set from pageCursor.", dateTime);
     }
@@ -192,12 +192,18 @@ public class RouteRequest implements Cloneable, Serializable {
     }
 
     // Depart after search
-    if (pageCursor.originalSortOrder.isSortedByAscendingArrivalTime()) {
-      return pageCursor.type.isNext() ? ListSection.TAIL : ListSection.HEAD;
+    if (pageCursor.originalSortOrder().isSortedByAscendingArrivalTime()) {
+      return switch (pageCursor.type()) {
+        case NEXT_PAGE -> ListSection.TAIL;
+        case PREVIOUS_PAGE -> ListSection.HEAD;
+      };
     }
     // Arrive by search
     else {
-      return pageCursor.type.isNext() ? ListSection.HEAD : ListSection.TAIL;
+      return switch (pageCursor.type()) {
+        case NEXT_PAGE -> ListSection.HEAD;
+        case PREVIOUS_PAGE -> ListSection.TAIL;
+      };
     }
   }
 
@@ -212,7 +218,7 @@ public class RouteRequest implements Cloneable, Serializable {
     if (pageCursor == null) {
       return itinerariesSortOrder().isSortedByAscendingArrivalTime();
     }
-    return pageCursor.type == PageType.NEXT_PAGE;
+    return pageCursor.type().isNext();
   }
 
   /**

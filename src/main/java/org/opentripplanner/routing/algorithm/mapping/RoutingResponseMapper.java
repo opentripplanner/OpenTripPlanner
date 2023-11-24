@@ -58,7 +58,7 @@ public class RoutingResponseMapper {
       raptorSearchParamsUsed,
       searchWindowForNextSearch,
       numItinerariesFilterResults,
-      request.pageCursor() == null ? null : request.pageCursor().type
+      request.pageCursor() == null ? null : request.pageCursor().type()
     );
 
     PageCursor nextPageCursor = factory.nextPageCursor();

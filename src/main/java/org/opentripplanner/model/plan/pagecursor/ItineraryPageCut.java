@@ -1,9 +1,7 @@
 package org.opentripplanner.model.plan.pagecursor;
 
 import java.time.Instant;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.ItinerarySortKey;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
 
 /**
  * This class contains all the information needed to dedupe itineraries when
@@ -22,62 +20,31 @@ public record ItineraryPageCut(
   implements ItinerarySortKey {
   @Override
   public Instant startTimeAsInstant() {
-    return departureTimeThreshold();
-  }
-
-  @Override
-  public Instant endTimeAsInstant() {
-    return arrivalTimeThreshold();
-  }
-
-  @Override
-  public int getGeneralizedCost() {
-    return generalizedCostThreshold();
-  }
-
-  @Override
-  public int getNumberOfTransfers() {
-    return numOfTransfersThreshold();
-  }
-
-  @Override
-  public boolean isOnStreetAllTheWay() {
-    return isOnStreetAllTheWayThreshold();
-  }
-
-  public boolean isOnStreetAllTheWayThreshold() {
-    return onStreetAllTheWayThreshold;
-  }
-
-  public Instant arrivalTimeThreshold() {
-    return arrivalTimeThreshold;
-  }
-
-  public int generalizedCostThreshold() {
-    return generalizedCostThreshold;
-  }
-
-  public int numOfTransfersThreshold() {
-    return numOfTransfersThreshold;
-  }
-
-  public Instant departureTimeThreshold() {
     return departureTimeThreshold;
   }
 
   @Override
+  public Instant endTimeAsInstant() {
+    return arrivalTimeThreshold;
+  }
+
+  @Override
+  public int getGeneralizedCost() {
+    return generalizedCostThreshold;
+  }
+
+  @Override
+  public int getNumberOfTransfers() {
+    return numOfTransfersThreshold;
+  }
+
+  @Override
+  public boolean isOnStreetAllTheWay() {
+    return onStreetAllTheWayThreshold;
+  }
+
+  @Override
   public String toString() {
-    return ToStringBuilder
-      .of(ItineraryPageCut.class)
-      .addBool("isOnStreetAllTheWayThreshold", onStreetAllTheWayThreshold)
-      .addDateTime("arrivalTimeThreshold", arrivalTimeThreshold)
-      .addCost(
-        "generalizedCostThreshold",
-        generalizedCostThreshold,
-        DefaultCostCalculator.ZERO_COST
-      )
-      .addNum("numOfTransfersThreshold", numOfTransfersThreshold)
-      .addDateTime("departureTimeThreshold", departureTimeThreshold)
-      .toString();
+    return keyAsString();
   }
 }

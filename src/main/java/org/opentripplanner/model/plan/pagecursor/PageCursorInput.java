@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan.pagecursor;
 
 import java.time.Instant;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 
 /**
  * This class holds information needed to create the next/previous page cursors when there were
@@ -14,9 +15,5 @@ public interface PageCursorInput {
   Instant earliestKeptArrival();
   Instant latestRemovedDeparture();
   Instant latestRemovedArrival();
-  Instant firstRemovedArrivalTime();
-  boolean firstRemovedIsOnStreetAllTheWay();
-  int firstRemovedGeneralizedCost();
-  int firstRemovedNumOfTransfers();
-  Instant firstRemovedDepartureTime();
+  ItinerarySortKey firstRemoved();
 }

@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 
 public class PageCursorFactory {
@@ -18,7 +19,7 @@ public class PageCursorFactory {
   private SearchTime current = null;
   private Duration currentSearchWindow = null;
   private boolean wholeSwUsed = true;
-  private ItineraryPageCut itineraryPageCut = null;
+  private ItinerarySortKey itineraryPageCut = null;
   private PageCursorInput pageCursorInput = null;
 
   private PageCursor nextCursor = null;
@@ -59,14 +60,7 @@ public class PageCursorFactory {
   public PageCursorFactory withRemovedItineraries(PageCursorInput pageCursorFactoryParams) {
     this.wholeSwUsed = false;
     this.pageCursorInput = pageCursorFactoryParams;
-    this.itineraryPageCut =
-      new ItineraryPageCut(
-        pageCursorFactoryParams.firstRemovedArrivalTime(),
-        pageCursorFactoryParams.firstRemovedDepartureTime(),
-        pageCursorFactoryParams.firstRemovedGeneralizedCost(),
-        pageCursorFactoryParams.firstRemovedNumOfTransfers(),
-        pageCursorFactoryParams.firstRemovedIsOnStreetAllTheWay()
-      );
+    this.itineraryPageCut = pageCursorFactoryParams.firstRemoved();
     return this;
   }
 
@@ -140,13 +134,17 @@ public class PageCursorFactory {
         prev.lat = pageCursorInput.latestRemovedArrival();
       }
     }
-    prevCursor = new PageCursor(PREVIOUS_PAGE, sortOrder, prev.edt, prev.lat, newSearchWindow);
-    nextCursor = new PageCursor(NEXT_PAGE, sortOrder, next.edt, next.lat, newSearchWindow);
-
-    if (itineraryPageCut != null) {
-      nextCursor = nextCursor.withItineraryPageCut(itineraryPageCut);
-      prevCursor = prevCursor.withItineraryPageCut(itineraryPageCut);
-    }
+    prevCursor =
+      new PageCursor(
+        PREVIOUS_PAGE,
+        sortOrder,
+        prev.edt,
+        prev.lat,
+        newSearchWindow,
+        itineraryPageCut
+      );
+    nextCursor =
+      new PageCursor(NEXT_PAGE, sortOrder, next.edt, next.lat, newSearchWindow, itineraryPageCut);
   }
 
   private Instant edtBeforeNewSw() {

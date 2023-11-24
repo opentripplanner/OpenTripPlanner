@@ -7,7 +7,6 @@ import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 
 /**
@@ -25,13 +24,13 @@ public class PagingFilter implements ItineraryDeletionFlagger {
   public static final String TAG = "paging-filter";
 
   private final ListSection deduplicateSection;
-  private final ItineraryPageCut itineraryPageCut;
+  private final ItinerarySortKey itineraryPageCut;
   private final Comparator<ItinerarySortKey> sortOrderComparator;
 
   public PagingFilter(
     SortOrder sortOrder,
     ListSection deduplicateSection,
-    ItineraryPageCut itineraryPageCut
+    ItinerarySortKey itineraryPageCut
   ) {
     this.deduplicateSection = deduplicateSection;
     this.itineraryPageCut = itineraryPageCut;

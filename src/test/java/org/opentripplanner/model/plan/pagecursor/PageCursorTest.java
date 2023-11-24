@@ -35,9 +35,9 @@ public class PageCursorTest {
     TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
 
     subjectDepartAfter =
-      new PageCursor(NEXT_PAGE, STREET_AND_ARRIVAL_TIME, EDT, null, SEARCH_WINDOW);
+      new PageCursor(NEXT_PAGE, STREET_AND_ARRIVAL_TIME, EDT, null, SEARCH_WINDOW, null);
     subjectArriveBy =
-      new PageCursor(PREVIOUS_PAGE, STREET_AND_DEPARTURE_TIME, EDT, LAT, SEARCH_WINDOW);
+      new PageCursor(PREVIOUS_PAGE, STREET_AND_DEPARTURE_TIME, EDT, LAT, SEARCH_WINDOW, null);
   }
 
   @AfterEach

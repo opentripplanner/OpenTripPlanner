@@ -5,6 +5,7 @@ import java.util.List;
 import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.pagecursor.PageCursorInput;
 
 public class NumItinerariesFilterResults implements PageCursorInput {
@@ -107,27 +108,32 @@ public class NumItinerariesFilterResults implements PageCursorInput {
   }
 
   @Override
-  public Instant firstRemovedArrivalTime() {
-    return firstRemovedArrivalTime;
-  }
+  public ItinerarySortKey firstRemoved() {
+    return new ItinerarySortKey() {
+      @Override
+      public Instant startTimeAsInstant() {
+        return firstRemovedDepartureTime;
+      }
 
-  @Override
-  public boolean firstRemovedIsOnStreetAllTheWay() {
-    return firstRemovedIsOnStreetAllTheWay;
-  }
+      @Override
+      public Instant endTimeAsInstant() {
+        return firstRemovedArrivalTime;
+      }
 
-  @Override
-  public int firstRemovedGeneralizedCost() {
-    return firstRemovedGeneralizedCost;
-  }
+      @Override
+      public int getGeneralizedCost() {
+        return firstRemovedGeneralizedCost;
+      }
 
-  @Override
-  public int firstRemovedNumOfTransfers() {
-    return firstRemovedNumOfTransfers;
-  }
+      @Override
+      public int getNumberOfTransfers() {
+        return firstRemovedNumOfTransfers;
+      }
 
-  @Override
-  public Instant firstRemovedDepartureTime() {
-    return firstRemovedDepartureTime;
+      @Override
+      public boolean isOnStreetAllTheWay() {
+        return firstRemovedIsOnStreetAllTheWay;
+      }
+    };
   }
 }

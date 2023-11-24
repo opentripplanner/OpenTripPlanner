@@ -12,6 +12,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
 @SuppressWarnings("ConstantConditions")
@@ -166,11 +167,11 @@ class PageCursorFactoryTest implements PlanTestConstants {
     PageType expPageType,
     Boolean hasDedupeParams
   ) {
-    assertEquals(expEdt, pageCursor.earliestDepartureTime);
-    assertEquals(expLat, pageCursor.latestArrivalTime);
-    assertEquals(expSearchWindow, pageCursor.searchWindow);
-    assertEquals(expPageType, pageCursor.type);
-    assertEquals(hasDedupeParams, pageCursor.itineraryPageCut != null);
+    assertEquals(expEdt, pageCursor.earliestDepartureTime());
+    assertEquals(expLat, pageCursor.latestArrivalTime());
+    assertEquals(expSearchWindow, pageCursor.searchWindow());
+    assertEquals(expPageType, pageCursor.type());
+    assertEquals(hasDedupeParams, pageCursor.itineraryPageCut() != null);
   }
 
   private record TestPageCursorInput(
@@ -178,11 +179,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     Instant earliestRemovedDeparture,
     Instant latestRemovedDeparture,
     Instant latestRemovedArrival,
-    Instant firstRemovedArrivalTime,
-    boolean firstRemovedIsOnStreetAllTheWay,
-    int firstRemovedGeneralizedCost,
-    int firstRemovedNumOfTransfers,
-    Instant firstRemovedDepartureTime
+    ItinerarySortKey firstRemoved
   )
     implements PageCursorInput {
     public TestPageCursorInput(Itinerary keptItinerary, Itinerary removedItinerary) {
@@ -191,11 +188,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
         removedItinerary.startTimeAsInstant(),
         removedItinerary.startTimeAsInstant(),
         removedItinerary.endTimeAsInstant(),
-        removedItinerary.endTimeAsInstant(),
-        removedItinerary.isOnStreetAllTheWay(),
-        removedItinerary.getGeneralizedCost(),
-        removedItinerary.getNumberOfTransfers(),
-        removedItinerary.startTimeAsInstant()
+        removedItinerary
       );
     }
   }
