@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.ridehailing.RideHailingFilter;
 import org.opentripplanner.ext.stopconsolidation.ConsolidatedStopNameFilter;
-import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
@@ -64,11 +63,8 @@ public class RouteRequestToFilterChainMapper {
       );
     }
 
-    if (request.maxNumberOfItinerariesCropHead()) {
-      builder.withMaxNumberOfItinerariesCrop(ListSection.HEAD);
-    }
-
     builder
+      .withMaxNumberOfItinerariesCrop(request.cropItinerariesAt())
       .withMaxNumberOfItineraries(Math.min(request.numItineraries(), MAX_NUMBER_OF_ITINERARIES))
       .withTransitGeneralizedCostLimit(params.transitGeneralizedCostLimit())
       .withBikeRentalDistanceRatio(params.bikeRentalDistanceRatio())

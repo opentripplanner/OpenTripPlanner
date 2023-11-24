@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.time.DateUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.GenericLocation;
@@ -182,25 +183,26 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /**
    * When paging we must crop the list of itineraries in the right end according to the sorting of
-   * the original search and according to the page cursor type (next or previous).
-   * <p>
-   * We need to flip the cropping and crop the head/start of the itineraries when:
-   * <ul>
-   * <li>Paging to the previous page for a {@code depart-after/sort-on-arrival-time} search.
-   * <li>Paging to the next page for a {@code arrive-by/sort-on-departure-time} search.
-   * </ul>
+   * the original search and according to the paging direction(next or previous). We always
+   * crop at the end of the initial search.
    */
-  public boolean maxNumberOfItinerariesCropHead() {
+  public ListSection cropItinerariesAt() {
     if (pageCursor == null) {
-      return false;
+      return ListSection.TAIL;
     }
 
-    var previousPage = pageCursor.type == PageType.PREVIOUS_PAGE;
-    return pageCursor.originalSortOrder.isSortedByArrivalTimeAscending() == previousPage;
+    // Depart after search
+    if (pageCursor.originalSortOrder.isSortedByAscendingArrivalTime()) {
+      return pageCursor.type.isNext() ? ListSection.TAIL : ListSection.HEAD;
+    }
+    // Arrive by search
+    else {
+      return pageCursor.type.isNext() ? ListSection.HEAD : ListSection.TAIL;
+    }
   }
 
   /**
-   * Related to {@link #maxNumberOfItinerariesCropHead()}, but is {@code true} if we should crop the
+   * Related to {@link #cropItinerariesAt()}, but is {@code true} if we should crop the
    * search-window head(in the beginning) or tail(in the end).
    * <p>
    * For the first search we look if the sort is ascending(crop tail) or descending(crop head), and
@@ -208,7 +210,7 @@ public class RouteRequest implements Cloneable, Serializable {
    */
   public boolean doCropSearchWindowAtTail() {
     if (pageCursor == null) {
-      return itinerariesSortOrder().isSortedByArrivalTimeAscending();
+      return itinerariesSortOrder().isSortedByAscendingArrivalTime();
     }
     return pageCursor.type == PageType.NEXT_PAGE;
   }

@@ -17,5 +17,9 @@ public enum PageType {
    * the sort order, the next page may hold itineraries which depart/arrive after or before the
    * current result.
    */
-  NEXT_PAGE,
+  NEXT_PAGE;
+
+  public boolean isNext() {
+    return this == NEXT_PAGE;
+  }
 }

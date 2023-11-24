@@ -351,6 +351,7 @@ public class ItineraryListFilterChainBuilder {
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
+    // Remove itineraries present in the page retrieved before this.
     if (itineraryPageCut != null) {
       filters.add(new DeletionFlaggingFilter(new PagingFilter(sortOrder, itineraryPageCut)));
     }

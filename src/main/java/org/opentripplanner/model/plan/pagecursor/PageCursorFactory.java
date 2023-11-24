@@ -105,7 +105,7 @@ public class PageCursorFactory {
    * equivalent when creating new cursors.
    */
   private static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
-    return sortOrder.isSortedByArrivalTimeAscending() ? NEXT_PAGE : PREVIOUS_PAGE;
+    return sortOrder.isSortedByAscendingArrivalTime() ? NEXT_PAGE : PREVIOUS_PAGE;
   }
 
   /** Create page cursor pair (next and previous) */
@@ -120,14 +120,14 @@ public class PageCursorFactory {
     if (wholeSwUsed) {
       prev.edt = edtBeforeNewSw();
       next.edt = edtAfterUsedSw();
-      if (!sortOrder.isSortedByArrivalTimeAscending()) {
+      if (!sortOrder.isSortedByAscendingArrivalTime()) {
         prev.lat = current.lat;
       }
     } else { // If the whole search window was not used (i.e. if there were removed itineraries)
       if (currentPageType == NEXT_PAGE) {
         prev.edt = edtBeforeNewSw();
         next.edt = pageCursorInput.earliestRemovedDeparture();
-        if (sortOrder.isSortedByArrivalTimeAscending()) {
+        if (sortOrder.isSortedByAscendingArrivalTime()) {
           prev.lat = pageCursorInput.earliestKeptArrival().truncatedTo(ChronoUnit.MINUTES);
         } else {
           prev.lat = current.lat;
