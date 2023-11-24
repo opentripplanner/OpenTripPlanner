@@ -47,7 +47,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | elevatorHopTime                                                                                              |        `integer`       | How long does it take to advance one floor on an elevator?                                                                                     | *Optional* | `20`             |  2.0  |
 | escalatorReluctance                                                                                          |        `double`        | A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time                                       | *Optional* | `1.5`            |  2.4  |
 | geoidElevation                                                                                               |        `boolean`       | If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.                                           | *Optional* | `false`          |  2.0  |
-| ignoreRealtimeUpdates                                                                                        |        `boolean`       | When true, realtime updates are ignored during this search.                                                                                    | *Optional* | `false`          |  2.0  |
+| ignoreRealtimeUpdates                                                                                        |        `boolean`       | When true, real-time updates are ignored during this search.                                                                                   | *Optional* | `false`          |  2.0  |
 | [intersectionTraversalModel](#rd_intersectionTraversalModel)                                                 |         `enum`         | The model that computes the costs of turns.                                                                                                    | *Optional* | `"simple"`       |  2.2  |
 | locale                                                                                                       |        `locale`        | TODO                                                                                                                                           | *Optional* | `"en_US"`        |  2.0  |
 | [maxDirectStreetDuration](#rd_maxDirectStreetDuration)                                                       |       `duration`       | This is the maximum duration for a direct street search for each mode.                                                                         | *Optional* | `"PT4H"`         |  2.1  |
@@ -297,7 +297,7 @@ Raptor iteration. The value is dynamically  assigned a suitable value, if not se
 medium size operation you may use a fixed value, like 60 minutes. If you have a mixture of high
 frequency cities routes and  infrequent long distant journeys, the best option is normally to use
 the dynamic auto assignment. If not provided the value is resolved depending on the other input
-parameters, available transit options and realtime changes.
+parameters, available transit options and real-time changes.
 
 There is no need to set this when going to the next/previous page. The OTP Server will
 increase/decrease the search-window when paging to match the requested number of itineraries.
