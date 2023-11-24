@@ -157,21 +157,21 @@ public class VehicleParkingEdge extends Edge {
 
       return traversePark(
         s0,
-        preferences.bike().parking().parkCost().toSeconds(),
-        (int) preferences.bike().parking().parkTime().toSeconds()
+        preferences.bike().parking().parkCost(),
+        preferences.bike().parking().parkTime()
       );
     } else if (streetMode.includesDriving()) {
       return traversePark(
         s0,
-        preferences.car().parking().parkCost().toSeconds(),
-        (int) preferences.car().parking().parkTime().toSeconds()
+        preferences.car().parking().parkCost(),
+        preferences.car().parking().parkTime()
       );
     } else {
       return State.empty();
     }
   }
 
-  private State[] traversePark(State s0, int parkingCost, int parkingTime) {
+  private State[] traversePark(State s0, Cost parkingCost, Duration parkingTime) {
     var parkingPreferences = s0.getRequest().preferences().parking(s0.currentMode());
     if (
       !vehicleParking.hasSpacesAvailable(
@@ -184,8 +184,8 @@ public class VehicleParkingEdge extends Edge {
     }
 
     StateEditor s0e = s0.edit(this);
-    s0e.incrementWeight(parkingCost);
-    s0e.incrementTimeInSeconds(parkingTime);
+    s0e.incrementWeight(parkingCost.toSeconds());
+    s0e.incrementTimeInSeconds((int) parkingTime.toSeconds());
     s0e.setVehicleParked(true, TraverseMode.WALK);
 
     addUnpreferredTagCost(parkingPreferences, s0e);
