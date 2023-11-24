@@ -25,3 +25,6 @@ dist-ssr
 
 # generated code
 src/gql/
+
+# Vite cache folder
+.vite/
