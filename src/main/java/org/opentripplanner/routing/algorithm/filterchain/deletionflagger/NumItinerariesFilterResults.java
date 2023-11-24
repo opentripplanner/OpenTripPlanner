@@ -2,11 +2,11 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.time.Instant;
 import java.util.List;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.pagecursor.PageCursorInput;
 import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationSection;
-import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 
 public class NumItinerariesFilterResults implements PageCursorInput {
 

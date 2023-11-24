@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain;
+package org.opentripplanner.framework.collection;
 
 /**
  * This enum is used to signal which part of a list an operation apply to. You may remove elements

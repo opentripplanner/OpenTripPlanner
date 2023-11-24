@@ -10,6 +10,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.SortOrder;
@@ -18,7 +19,6 @@ import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.SearchParams;
-import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 
 public class RoutingResponseMapperTest {
