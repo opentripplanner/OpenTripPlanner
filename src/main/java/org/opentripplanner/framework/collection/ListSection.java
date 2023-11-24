@@ -9,5 +9,16 @@ public enum ListSection {
   HEAD,
 
   /** The end of the list */
-  TAIL,
+  TAIL;
+
+  public boolean isHead() {
+    return this == HEAD;
+  }
+
+  public ListSection invert() {
+    return switch (this) {
+      case HEAD -> TAIL;
+      case TAIL -> HEAD;
+    };
+  }
 }

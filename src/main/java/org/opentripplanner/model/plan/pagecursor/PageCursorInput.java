@@ -19,5 +19,4 @@ public interface PageCursorInput {
   int firstRemovedGeneralizedCost();
   int firstRemovedNumOfTransfers();
   Instant firstRemovedDepartureTime();
-  PagingDeduplicationSection deduplicationSection();
 }

@@ -49,8 +49,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withRemovedItineraries(
         new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_10), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
-          PagingDeduplicationSection.HEAD
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build()
         )
       );
 
@@ -80,8 +79,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withRemovedItineraries(
         new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_10), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
-          PagingDeduplicationSection.TAIL
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build()
         )
       );
 
@@ -111,8 +109,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withRemovedItineraries(
         new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_30), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
-          PagingDeduplicationSection.HEAD
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build()
         )
       );
 
@@ -142,8 +139,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withRemovedItineraries(
         new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_30), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
-          PagingDeduplicationSection.TAIL
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build()
         )
       );
 
@@ -186,15 +182,10 @@ class PageCursorFactoryTest implements PlanTestConstants {
     boolean firstRemovedIsOnStreetAllTheWay,
     int firstRemovedGeneralizedCost,
     int firstRemovedNumOfTransfers,
-    Instant firstRemovedDepartureTime,
-    PagingDeduplicationSection deduplicationSection
+    Instant firstRemovedDepartureTime
   )
     implements PageCursorInput {
-    public TestPageCursorInput(
-      Itinerary keptItinerary,
-      Itinerary removedItinerary,
-      PagingDeduplicationSection deduplicationSection
-    ) {
+    public TestPageCursorInput(Itinerary keptItinerary, Itinerary removedItinerary) {
       this(
         keptItinerary.endTimeAsInstant(),
         removedItinerary.startTimeAsInstant(),
@@ -204,8 +195,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
         removedItinerary.isOnStreetAllTheWay(),
         removedItinerary.getGeneralizedCost(),
         removedItinerary.getNumberOfTransfers(),
-        removedItinerary.startTimeAsInstant(),
-        deduplicationSection
+        removedItinerary.startTimeAsInstant()
       );
     }
   }

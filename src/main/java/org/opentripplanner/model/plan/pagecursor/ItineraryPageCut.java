@@ -13,7 +13,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultC
  * potentially contain duplicates.
  */
 public record ItineraryPageCut(
-  PagingDeduplicationSection deduplicationSection,
   Instant arrivalTimeThreshold,
   Instant departureTimeThreshold,
   int generalizedCostThreshold,
@@ -46,10 +45,6 @@ public record ItineraryPageCut(
     return isOnStreetAllTheWayThreshold();
   }
 
-  public PagingDeduplicationSection deduplicationSection() {
-    return deduplicationSection;
-  }
-
   public boolean isOnStreetAllTheWayThreshold() {
     return onStreetAllTheWayThreshold;
   }
@@ -74,7 +69,6 @@ public record ItineraryPageCut(
   public String toString() {
     return ToStringBuilder
       .of(ItineraryPageCut.class)
-      .addEnum("deduplicationSection", deduplicationSection)
       .addBool("isOnStreetAllTheWayThreshold", onStreetAllTheWayThreshold)
       .addDateTime("arrivalTimeThreshold", arrivalTimeThreshold)
       .addCost(

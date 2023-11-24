@@ -12,13 +12,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
-import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationSection;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
@@ -62,8 +62,8 @@ public class PagingFilterTest implements PlanTestConstants {
     pagingFilter =
       new PagingFilter(
         SortOrder.STREET_AND_ARRIVAL_TIME,
+        ListSection.HEAD,
         new ItineraryPageCut(
-          PagingDeduplicationSection.HEAD,
           middle.endTime().toInstant(),
           middle.startTime().toInstant(),
           middle.getGeneralizedCost(),
@@ -149,11 +149,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
     // Crop at top of list
     var itinerary = itineraries.get(index);
-    var f = createFilter(
-      SortOrder.STREET_AND_ARRIVAL_TIME,
-      PagingDeduplicationSection.HEAD,
-      itinerary
-    );
+    var f = createFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.HEAD, itinerary);
 
     var result = DeletionFlaggerTestHelper.process(itineraries, f);
 
@@ -176,11 +172,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
     // Crop at top of list
     var itinerary = itineraries.get(index);
-    var f = createFilter(
-      SortOrder.STREET_AND_ARRIVAL_TIME,
-      PagingDeduplicationSection.TAIL,
-      itinerary
-    );
+    var f = createFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.TAIL, itinerary);
 
     var result = DeletionFlaggerTestHelper.process(itineraries, f);
 
@@ -203,11 +195,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
     // Crop at top of list
     var itinerary = itineraries.get(index);
-    var f = createFilter(
-      SortOrder.STREET_AND_DEPARTURE_TIME,
-      PagingDeduplicationSection.HEAD,
-      itinerary
-    );
+    var f = createFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.HEAD, itinerary);
 
     var result = DeletionFlaggerTestHelper.process(itineraries, f);
 
@@ -230,11 +218,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
     // Crop at top of list
     var itinerary = itineraries.get(index);
-    var f = createFilter(
-      SortOrder.STREET_AND_DEPARTURE_TIME,
-      PagingDeduplicationSection.TAIL,
-      itinerary
-    );
+    var f = createFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.TAIL, itinerary);
 
     var result = DeletionFlaggerTestHelper.process(itineraries, f);
 
@@ -263,17 +247,13 @@ public class PagingFilterTest implements PlanTestConstants {
     return itineraries;
   }
 
-  private PagingFilter createFilter(
-    SortOrder sortOrder,
-    PagingDeduplicationSection pageCut,
-    Itinerary cut
-  ) {
+  private PagingFilter createFilter(SortOrder sortOrder, ListSection pageCut, Itinerary cut) {
     int edt = TimeUtils.time("09:00");
     int lat = TimeUtils.time("12:00");
     return new PagingFilter(
       sortOrder,
+      pageCut,
       new ItineraryPageCut(
-        pageCut,
         cut.endTimeAsInstant(),
         cut.startTimeAsInstant(),
         cut.getGeneralizedCost(),

@@ -6,7 +6,6 @@ import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.pagecursor.PageCursorInput;
-import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationSection;
 
 public class NumItinerariesFilterResults implements PageCursorInput {
 
@@ -130,13 +129,5 @@ public class NumItinerariesFilterResults implements PageCursorInput {
   @Override
   public Instant firstRemovedDepartureTime() {
     return firstRemovedDepartureTime;
-  }
-
-  @Override
-  public PagingDeduplicationSection deduplicationSection() {
-    return switch (cropSection) {
-      case HEAD -> PagingDeduplicationSection.TAIL;
-      case TAIL -> PagingDeduplicationSection.HEAD;
-    };
   }
 }

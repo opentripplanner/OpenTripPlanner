@@ -41,7 +41,6 @@ final class PageCursorSerializer {
       writeEnum(cursor.originalSortOrder, out);
 
       if (cursor.containsItineraryPageCut()) {
-        writeEnum(cursor.itineraryPageCut.deduplicationSection(), out);
         writeBoolean(cursor.itineraryPageCut.isOnStreetAllTheWayThreshold(), out);
         writeTime(cursor.itineraryPageCut.arrivalTimeThreshold(), out);
         writeInt(cursor.itineraryPageCut.generalizedCostThreshold(), out);
@@ -78,7 +77,6 @@ final class PageCursorSerializer {
       var originalSortOrder = readEnum(in, SortOrder.class);
 
       if (in.available() > 0) {
-        var cropSection = readEnum(in, PagingDeduplicationSection.class);
         var isOnStreetAllTheWayThreshold = readBoolean(in);
         var arrivalTimeDeletionThreshold = readTime(in);
         var generalizedCostDeletionThreshold = readInt(in);
@@ -86,7 +84,6 @@ final class PageCursorSerializer {
         var departureTimeDeletionThreshold = readTime(in);
 
         ItineraryPageCut itineraryPageCut = new ItineraryPageCut(
-          cropSection,
           arrivalTimeDeletionThreshold,
           departureTimeDeletionThreshold,
           generalizedCostDeletionThreshold,

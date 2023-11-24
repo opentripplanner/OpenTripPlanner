@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -23,10 +24,16 @@ public class PagingFilter implements ItineraryDeletionFlagger {
 
   public static final String TAG = "paging-filter";
 
+  private final ListSection deduplicateSection;
   private final ItineraryPageCut itineraryPageCut;
   private final Comparator<ItinerarySortKey> sortOrderComparator;
 
-  public PagingFilter(SortOrder sortOrder, ItineraryPageCut itineraryPageCut) {
+  public PagingFilter(
+    SortOrder sortOrder,
+    ListSection deduplicateSection,
+    ItineraryPageCut itineraryPageCut
+  ) {
+    this.deduplicateSection = deduplicateSection;
     this.itineraryPageCut = itineraryPageCut;
     this.sortOrderComparator = SortOrderComparator.comparator(sortOrder);
   }
@@ -37,7 +44,7 @@ public class PagingFilter implements ItineraryDeletionFlagger {
   }
 
   private boolean sortsIntoDeduplicationAreaRelativeToRemovedItinerary(Itinerary itinerary) {
-    return switch (itineraryPageCut.deduplicationSection()) {
+    return switch (deduplicateSection) {
       case HEAD -> sortOrderComparator.compare(itinerary, itineraryPageCut) < 0;
       case TAIL -> sortOrderComparator.compare(itinerary, itineraryPageCut) > 0;
     };

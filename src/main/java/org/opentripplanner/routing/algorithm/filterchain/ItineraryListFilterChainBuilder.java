@@ -353,7 +353,11 @@ public class ItineraryListFilterChainBuilder {
 
     // Remove itineraries present in the page retrieved before this.
     if (itineraryPageCut != null) {
-      filters.add(new DeletionFlaggingFilter(new PagingFilter(sortOrder, itineraryPageCut)));
+      filters.add(
+        new DeletionFlaggingFilter(
+          new PagingFilter(sortOrder, deduplicateSection(), itineraryPageCut)
+        )
+      );
     }
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
@@ -590,5 +594,9 @@ public class ItineraryListFilterChainBuilder {
     }
 
     return groupByFilters;
+  }
+
+  private ListSection deduplicateSection() {
+    return maxNumberOfItinerariesCrop.invert();
   }
 }

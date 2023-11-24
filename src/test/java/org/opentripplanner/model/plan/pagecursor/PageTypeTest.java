@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 class PageTypeTest {
+
   @Test
   void isNext() {
     assertTrue(PageType.NEXT_PAGE.isNext());
