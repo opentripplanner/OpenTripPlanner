@@ -94,7 +94,8 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     List<TripPatternForDates> tripPatterns = transitDataCreator.createTripPatterns(
       additionalPastSearchDays,
       additionalFutureSearchDays,
-      filter
+      filter,
+      createTransitPriorityGroupConfigurator(request)
     );
     this.patternIndex = transitDataCreator.createPatternIndex(tripPatterns);
     this.activeTripPatternsPerStop = transitDataCreator.createTripPatternsPerStop(tripPatterns);
@@ -245,33 +246,15 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     return new ConstrainedBoardingSearch(false, toStopTransfers, fromStopTransfers);
   }
 
-  /*--  HACK SØRLANDSBANEN  ::  BEGIN  --*/
-
-  private RaptorRoutingRequestTransitData(
-    RaptorRoutingRequestTransitData original,
-    Function<FactorStrategy, FactorStrategy> mapFactors
-  ) {
-    this.transitLayer = original.transitLayer;
-    this.transitSearchTimeZero = original.transitSearchTimeZero;
-    this.activeTripPatternsPerStop = original.activeTripPatternsPerStop;
-    this.patternIndex = original.patternIndex;
-    this.transferIndex = original.transferIndex;
-    this.transferService = original.transferService;
-    this.constrainedTransfers = original.constrainedTransfers;
-    this.validTransitDataStartTime = original.validTransitDataStartTime;
-    this.validTransitDataEndTime = original.validTransitDataEndTime;
-    this.generalizedCostCalculator =
-      new DefaultCostCalculator<>(
-        (DefaultCostCalculator<TripSchedule>) original.generalizedCostCalculator,
-        mapFactors
-      );
-    this.slackProvider = original.slackProvider();
+  private PriorityGroupConfigurator createTransitPriorityGroupConfigurator(RouteRequest request) {
+    if (!request.preferences().transit().relaxTransitPriorityGroup().isNormal()) {
+      return PriorityGroupConfigurator.empty();
+    }
+    var transitRequest = request.journey().transit();
+    return PriorityGroupConfigurator.of(
+      transitRequest.priorityGroupsBase(),
+      transitRequest.priorityGroupsByAgency(),
+      transitRequest.priorityGroupsGlobal()
+    );
   }
-
-  public RaptorTransitDataProvider<TripSchedule> enturHackSorlandsbanen(
-    Function<FactorStrategy, FactorStrategy> mapFactors
-  ) {
-    return new RaptorRoutingRequestTransitData(this, mapFactors);
-  }
-  /*--  HACK SØRLANDSBANEN  ::  END  --*/
 }

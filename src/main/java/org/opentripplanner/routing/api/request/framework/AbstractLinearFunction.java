@@ -46,6 +46,13 @@ abstract sealed class AbstractLinearFunction<T>
     return isZero(constant) && coefficient == 0.0;
   }
 
+  /**
+   * Return true if the {@code f(x) = x} for all times (constant is zero and the coefficient is one).
+   */
+  public final boolean isNormal() {
+    return isZero(constant) && coefficient == 1.0;
+  }
+
   public final String serialize() {
     return LinearFunctionSerialization.serialize(this);
   }

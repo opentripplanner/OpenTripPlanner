@@ -395,7 +395,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       if (tripTimes == null) {
         LOG.warn("Could not mark scheduled trip as deleted {}", trip.getId());
       } else {
-        final TripTimes newTripTimes = new TripTimes(tripTimes);
+        final TripTimes newTripTimes = tripTimes.copyOfScheduledTimes();
         newTripTimes.deleteTrip();
         buffer.update(pattern, newTripTimes, serviceDate);
         success = true;

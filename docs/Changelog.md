@@ -44,6 +44,13 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Fix serialization of `AtomicInteger` [#5508](https://github.com/opentripplanner/OpenTripPlanner/pull/5508)
 - Improve linking of fixed stops used by flex trips [#5503](https://github.com/opentripplanner/OpenTripPlanner/pull/5503)
 - Keep min transfer filter is not local to group-by-filters [#5436](https://github.com/opentripplanner/OpenTripPlanner/pull/5436)
+- Add paging deduplication when cropping. [#5458](https://github.com/opentripplanner/OpenTripPlanner/pull/5458)
+- Consolidate equivalent stops from several feeds  [#5429](https://github.com/opentripplanner/OpenTripPlanner/pull/5429)
+- Check transport mode when mapping GroupStops [#5518](https://github.com/opentripplanner/OpenTripPlanner/pull/5518)
+- Cleanup trip times - Part A [#5437](https://github.com/opentripplanner/OpenTripPlanner/pull/5437)
+- Transfer cost limit [#5516](https://github.com/opentripplanner/OpenTripPlanner/pull/5516)
+- Fix missed trip when arrive-by search-window is off by one minute [#5520](https://github.com/opentripplanner/OpenTripPlanner/pull/5520)
+- Transit group priority - Part 1 [#4999](https://github.com/opentripplanner/OpenTripPlanner/pull/4999)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)

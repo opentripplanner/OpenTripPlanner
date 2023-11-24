@@ -22,6 +22,7 @@ import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
 
@@ -65,7 +66,8 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(
       startOfTime,
       tripPatternsForDates,
-      new TestTransitDataProviderFilter()
+      new TestTransitDataProviderFilter(),
+      PriorityGroupConfigurator.empty()
     );
 
     // Get the results
@@ -103,7 +105,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     stopTime1.setDepartureTime(0);
     stopTime2.setArrivalTime(7200);
 
-    return new TripTimes(
+    return TripTimesFactory.tripTimes(
       TransitModelForTest.trip("Test").build(),
       Arrays.asList(stopTime1, stopTime2),
       new Deduplicator()

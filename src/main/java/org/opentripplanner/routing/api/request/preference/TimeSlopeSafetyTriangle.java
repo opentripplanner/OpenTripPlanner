@@ -52,7 +52,7 @@ public record TimeSlopeSafetyTriangle(double time, double slope, double safety) 
   }
 
   /**
-   * Creates a special builder, witch used together with the
+   * Creates a special builder, which used together with the
    * {@link Builder#buildOrDefault(TimeSlopeSafetyTriangle)} can return a new instance or the
    * default value if no values are set. This is useful in the APIs where we want to fall back to
    * the default {@link TimeSlopeSafetyTriangle}, if no values are set. If only one or two values

@@ -201,7 +201,7 @@ public class OSMWithTags {
 
   /**
    * Get tag and convert it to an integer. If the tag exist, but can not be parsed into a number,
-   * then the error handler is called with the value witch failed to parse.
+   * then the error handler is called with the value which failed to parse.
    */
   public OptionalInt getTagAsInt(String tag, Consumer<String> errorHandler) {
     String value = getTag(tag);
@@ -444,7 +444,7 @@ public class OSMWithTags {
    * This intentionally excludes railway=stop and public_transport=stop because these are supposed
    * to be placed on the tracks not on the platform.
    *
-   * @return whether the node is a transit stop
+   * @return whether the node is a place used to board a public transport vehicle
    */
   public boolean isBoardingLocation() {
     return (
@@ -588,6 +588,7 @@ public class OSMWithTags {
    * Returns level tag (i.e. building floor) or layer tag values, defaults to "0"
    * Some entities can have a semicolon separated list of levels (e.g. elevators)
    */
+  @Nonnull
   public Set<String> getLevels() {
     var levels = getMultiTagValues(LEVEL_TAGS);
     if (levels.isEmpty()) {

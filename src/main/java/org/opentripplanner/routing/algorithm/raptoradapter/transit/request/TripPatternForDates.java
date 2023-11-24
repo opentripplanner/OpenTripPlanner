@@ -60,18 +60,22 @@ public class TripPatternForDates
   private final BitSet boardingPossible;
   private final BitSet alightingPossible;
 
+  private final int priorityGroupId;
+
   TripPatternForDates(
     RoutingTripPattern tripPattern,
     TripPatternForDate[] tripPatternForDates,
     int[] offsets,
     BitSet boardingPossible,
-    BitSet alightningPossible
+    BitSet alightningPossible,
+    int priorityGroupId
   ) {
     this.tripPattern = tripPattern;
     this.tripPatternForDates = tripPatternForDates;
     this.offsets = offsets;
     this.boardingPossible = boardingPossible;
     this.alightingPossible = alightningPossible;
+    this.priorityGroupId = priorityGroupId;
 
     int numberOfTripSchedules = 0;
     boolean hasFrequencies = false;
@@ -173,8 +177,7 @@ public class TripPatternForDates
 
   @Override
   public int priorityGroupId() {
-    // TODO C2 - Implement this.
-    throw new UnsupportedOperationException();
+    return priorityGroupId;
   }
 
   public int transitReluctanceFactorIndex() {

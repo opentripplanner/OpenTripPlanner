@@ -2,9 +2,13 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.request.DynamicSearchWindowCoefficients;
@@ -58,19 +62,48 @@ public class RaptorSearchWindowCalculatorTest {
     subject.withHeuristics(minTransitTime, minWaitTime).withSearchParams(searchParams).calculate();
 
     /*
-           search-window: round_N(C + T * minTransitTime + W * minWaitTime)
+           search-window: round_60(C + T * minTransitTime + W * minWaitTime)
                = round_60(600 + 0.6 * 500 + 0.4 * 200)
                = round_60(980) = 960
 
            EDT = LAT - (search-window + minTripTime)
-           EDT = 3000 - (960s + roundUp_60(500))
-           EDT = 3000 - (960s + 540s)
-           EDT = 1500
+           EDT = 3000 - (960s + round_60(500))
+           EDT = 3000 - (960s + 480s)
+           EDT = 1560
          */
     assertEquals(960, subject.getSearchWindowSeconds());
-    assertEquals(1_500, subject.getEarliestDepartureTime());
+    assertEquals(1_560, subject.getEarliestDepartureTime());
     // Given - verify not changed
     assertEquals(3_000, subject.getLatestArrivalTime());
+    assertTrue(
+      minTransitTime >
+      subject.getLatestArrivalTime() -
+      (subject.getSearchWindowSeconds() + subject.getEarliestDepartureTime())
+    );
+  }
+
+  @Test
+  public void calcEarliestDepartureExact() {
+    SearchParams searchParams = new RaptorRequestBuilder<TestTripSchedule>()
+      .searchParams()
+      .latestArrivalTime(3_000)
+      .buildSearchParam();
+
+    int minTransitTime = 600;
+    int minWaitTime = 0;
+
+    subject.withHeuristics(minTransitTime, minWaitTime).withSearchParams(searchParams).calculate();
+
+    assertEquals(960, subject.getSearchWindowSeconds());
+    assertEquals(1_440, subject.getEarliestDepartureTime());
+    // Given - verify not changed
+    assertEquals(3_000, subject.getLatestArrivalTime());
+
+    assertEquals(
+      minTransitTime,
+      subject.getLatestArrivalTime() -
+      (subject.getSearchWindowSeconds() + subject.getEarliestDepartureTime())
+    );
   }
 
   @Test
@@ -166,17 +199,23 @@ public class RaptorSearchWindowCalculatorTest {
     assertThrows(IllegalArgumentException.class, subject::calculate);
   }
 
-  @Test
-  public void roundUpToNearestMinute() {
-    assertEquals(0, subject.roundUpToNearestMinute(0));
-    assertEquals(60, subject.roundUpToNearestMinute(1));
-    assertEquals(60, subject.roundUpToNearestMinute(60));
-    assertEquals(120, subject.roundUpToNearestMinute(61));
+  static List<V2> roundUpToNearestMinuteTestCase() {
+    return List.of(V2.of(0, 0), V2.of(0, 59), V2.of(60, 60), V2.of(60, 119), V2.of(120, 120));
+  }
+
+  @ParameterizedTest
+  @MethodSource("roundUpToNearestMinuteTestCase")
+  void roundUpToNearestMinute(V2 v2) {
+    assertEquals(v2.expected(), subject.roundDownToNearestMinute(v2.value()));
   }
 
   @Test
-  public void roundUpToNearestMinuteNotDefinedForNegativeNumbers() {
-    assertThrows(IllegalArgumentException.class, () -> subject.roundUpToNearestMinute(-1));
+  void roundUpToNearestMinuteNotDefinedForNegativeNumbers() {
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () -> subject.roundDownToNearestMinute(-1)
+    );
+    assertEquals("This operation is not defined for negative numbers: -1", ex.getMessage());
   }
 
   @Test
@@ -187,5 +226,11 @@ public class RaptorSearchWindowCalculatorTest {
     assertEquals(0, subject.roundStep(29f));
     assertEquals(60, subject.roundStep(30f));
     assertEquals(480, subject.roundStep(450f));
+  }
+
+  record V2(int expected, int value) {
+    static V2 of(int expected, int value) {
+      return new V2(expected, value);
+    }
   }
 }

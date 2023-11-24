@@ -37,7 +37,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.OccupancyStatus;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 public class RealtimeVehicleMatcherTest {
 
@@ -345,7 +345,7 @@ public class RealtimeVehicleMatcherTest {
       testModel.stopTime(trip, 1, fivePast6)
     );
 
-    var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
     var instant = OffsetDateTime.parse(time).toInstant();
     var inferredDate = RealtimeVehiclePatternMatcher.inferServiceDate(tripTimes, zoneId, instant);
@@ -364,7 +364,7 @@ public class RealtimeVehicleMatcherTest {
       testModel.stopTime(trip, 1, fivePastMidnight)
     );
 
-    var tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    var tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
     var time = OffsetDateTime.parse("2022-04-05T00:04:00+02:00").toInstant();
 
@@ -384,7 +384,7 @@ public class RealtimeVehicleMatcherTest {
       .build();
     pattern
       .getScheduledTimetable()
-      .addTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()));
+      .addTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()));
     return pattern;
   }
 

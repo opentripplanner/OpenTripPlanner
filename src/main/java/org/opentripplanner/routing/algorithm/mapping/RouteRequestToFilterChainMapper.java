@@ -4,9 +4,9 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.emissions.EmissionsFilter;
+import org.opentripplanner.ext.fares.FaresFilter;
 import org.opentripplanner.ext.ridehailing.RideHailingFilter;
-import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.ext.stopconsolidation.ConsolidatedStopNameFilter;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
@@ -38,6 +38,11 @@ public class RouteRequestToFilterChainMapper {
     // Skip filtering itineraries if generalized-cost is not computed
     if (!request.preferences().transit().raptor().profile().producesGeneralizedCost()) {
       return builder.build();
+    }
+
+    // The page cursor has deduplication information only in certain cases.
+    if (request.pageCursor() != null && request.pageCursor().containsItineraryPageCut()) {
+      builder = builder.withPagingDeduplicationFilter(request.pageCursor().itineraryPageCut);
     }
 
     ItineraryFilterPreferences params = request.preferences().itineraryFilter();
@@ -77,7 +82,6 @@ public class RouteRequestToFilterChainMapper {
         params.useAccessibilityScore() && request.wheelchair(),
         request.preferences().wheelchair().maxSlope()
       )
-      .withFares(context.graph().getFareService())
       .withMinBikeParkingDistance(minBikeParkingDistance(request))
       .withRemoveTimeshiftedItinerariesWithSameRoutesAndStops(
         params.removeItinerariesWithSameRoutesAndStops()
@@ -92,14 +96,21 @@ public class RouteRequestToFilterChainMapper {
       .withRemoveTransitIfWalkingIsBetter(true)
       .withDebugEnabled(params.debug());
 
+    var fareService = context.graph().getFareService();
+    if (fareService != null) {
+      builder.withFaresFilter(new FaresFilter(fareService));
+    }
+
     if (!context.rideHailingServices().isEmpty()) {
       builder.withRideHailingFilter(
         new RideHailingFilter(context.rideHailingServices(), request.wheelchair())
       );
     }
 
-    if (OTPFeature.Co2Emissions.isOn() && context.emissionsService() != null) {
-      builder.withEmissions(new EmissionsFilter(context.emissionsService()));
+    if (context.stopConsolidationService() != null) {
+      builder.withStopConsolidationFilter(
+        new ConsolidatedStopNameFilter(context.stopConsolidationService())
+      );
     }
 
     return builder.build();

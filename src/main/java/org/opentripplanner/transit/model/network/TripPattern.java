@@ -5,9 +5,11 @@ import static java.util.Objects.requireNonNullElseGet;
 import static org.opentripplanner.framework.lang.ObjectUtils.requireNotInitialized;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 import org.locationtech.jts.geom.Coordinate;
@@ -415,14 +417,6 @@ public final class TripPattern
       : getTripHeadSignFromTripTimes(tripTimes);
   }
 
-  public I18NString getStopHeadsign(int stopIndex) {
-    var tripTimes = scheduledTimetable.getRepresentativeTripTimes();
-    if (tripTimes == null) {
-      return null;
-    }
-    return tripTimes.getHeadsign(stopIndex);
-  }
-
   public TripPattern clone() {
     try {
       return (TripPattern) super.clone();
@@ -451,8 +445,25 @@ public final class TripPattern
     return route.logName();
   }
 
+  /**
+   * Does the pattern contain any stops passed in as argument?
+   * This method is not optimized for performance so don't use it where that is critical.
+   */
+  public boolean containsAnyStopId(Collection<FeedScopedId> ids) {
+    return ids
+      .stream()
+      .anyMatch(id ->
+        stopPattern
+          .getStops()
+          .stream()
+          .map(StopLocation::getId)
+          .collect(Collectors.toUnmodifiableSet())
+          .contains(id)
+      );
+  }
+
   private static Coordinate coordinate(StopLocation s) {
-    return new Coordinate(s.getLon(), s.getLat());
+    return s.getCoordinate().asJtsCoordinate();
   }
 
   @Override

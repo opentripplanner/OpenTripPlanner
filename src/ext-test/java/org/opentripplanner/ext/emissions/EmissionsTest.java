@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class EmissionsTest {
 
@@ -130,7 +130,7 @@ class EmissionsTest {
       .withRoute(route)
       .build();
     return new ScheduledTransitLegBuilder<>()
-      .withTripTimes(new TripTimes(trip, stopTimes, new Deduplicator()))
+      .withTripTimes(TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator()))
       .withTripPattern(pattern)
       .withBoardStopIndexInPattern(0)
       .withAlightStopIndexInPattern(2)
