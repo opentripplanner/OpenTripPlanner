@@ -18,7 +18,6 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.model.plan.pagecursor.DeduplicationPageCut;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
@@ -55,22 +54,9 @@ public class PagingFilterTest implements PlanTestConstants {
    */
   private final List<Itinerary> allItineraries = allPossibleSortingCombinationsOfItineraries();
 
-  private static final int[] INDEXES = intArrayFromTo(0, 24);
-
   @BeforeEach
   public void setup() {
-    pagingFilter =
-      new PagingFilter(
-        SortOrder.STREET_AND_ARRIVAL_TIME,
-        ListSection.HEAD,
-        new DeduplicationPageCut(
-          middle.endTime().toInstant(),
-          middle.startTime().toInstant(),
-          middle.getGeneralizedCost(),
-          middle.getNumberOfTransfers(),
-          false
-        )
-      );
+    pagingFilter = new PagingFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.HEAD, middle);
   }
 
   @Test
@@ -141,21 +127,17 @@ public class PagingFilterTest implements PlanTestConstants {
     ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 }
   )
   public void testDepartAfterSearchHeadFilter(int index) {
-    var itineraries = allPossibleSortingCombinationsOfItineraries();
-
-    // DEPART AFTER SEARCH
-
-    itineraries.sort(SortOrderComparator.defaultComparatorDepartAfter());
+    allItineraries.sort(SortOrderComparator.defaultComparatorDepartAfter());
 
     // Crop at top of list
-    var itinerary = itineraries.get(index);
+    var itinerary = allItineraries.get(index);
     var f = createFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.HEAD, itinerary);
 
-    var result = DeletionFlaggerTestHelper.process(itineraries, f);
+    var result = DeletionFlaggerTestHelper.process(allItineraries, f);
 
     //result.forEach(it -> System.out.println(it.toStr()));
 
-    assertEquals(toStr(itineraries.subList(index, 24)), toStr(result));
+    assertEquals(toStr(allItineraries.subList(index, 24)), toStr(result));
     //assertFalse(result.contains(itinerary), itinerary.toStr());
   }
 
@@ -164,21 +146,17 @@ public class PagingFilterTest implements PlanTestConstants {
     ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 }
   )
   public void testDepartAfterSearchTailFilter(int index) {
-    var itineraries = allPossibleSortingCombinationsOfItineraries();
-
-    // DEPART AFTER SEARCH
-
-    itineraries.sort(SortOrderComparator.defaultComparatorDepartAfter());
+    allItineraries.sort(SortOrderComparator.defaultComparatorDepartAfter());
 
     // Crop at top of list
-    var itinerary = itineraries.get(index);
+    var itinerary = allItineraries.get(index);
     var f = createFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.TAIL, itinerary);
 
-    var result = DeletionFlaggerTestHelper.process(itineraries, f);
+    var result = DeletionFlaggerTestHelper.process(allItineraries, f);
 
     //result.forEach(it -> System.out.println(it.toStr()));
 
-    assertEquals(toStr(itineraries.subList(0, index + 1)), toStr(result));
+    assertEquals(toStr(allItineraries.subList(0, index + 1)), toStr(result));
     //assertFalse(result.contains(itinerary), itinerary.toStr());
   }
 
@@ -187,21 +165,17 @@ public class PagingFilterTest implements PlanTestConstants {
     ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 }
   )
   public void testArrivaBySearchHeadFilter(int index) {
-    var itineraries = allPossibleSortingCombinationsOfItineraries();
-
-    // DEPART AFTER SEARCH
-
-    itineraries.sort(SortOrderComparator.defaultComparatorArriveBy());
+    allItineraries.sort(SortOrderComparator.defaultComparatorArriveBy());
 
     // Crop at top of list
-    var itinerary = itineraries.get(index);
+    var itinerary = allItineraries.get(index);
     var f = createFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.HEAD, itinerary);
 
-    var result = DeletionFlaggerTestHelper.process(itineraries, f);
+    var result = DeletionFlaggerTestHelper.process(allItineraries, f);
 
     //result.forEach(it -> System.out.println(it.toStr()));
 
-    assertEquals(toStr(itineraries.subList(index, 24)), toStr(result));
+    assertEquals(toStr(allItineraries.subList(index, 24)), toStr(result));
     //assertFalse(result.contains(itinerary), itinerary.toStr());
   }
 
@@ -210,21 +184,17 @@ public class PagingFilterTest implements PlanTestConstants {
     ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 }
   )
   public void testArrivaBySearchTailFilter(int index) {
-    var itineraries = allPossibleSortingCombinationsOfItineraries();
-
-    // DEPART AFTER SEARCH
-
-    itineraries.sort(SortOrderComparator.defaultComparatorArriveBy());
+    allItineraries.sort(SortOrderComparator.defaultComparatorArriveBy());
 
     // Crop at top of list
-    var itinerary = itineraries.get(index);
+    var itinerary = allItineraries.get(index);
     var f = createFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.TAIL, itinerary);
 
-    var result = DeletionFlaggerTestHelper.process(itineraries, f);
+    var result = DeletionFlaggerTestHelper.process(allItineraries, f);
 
     //result.forEach(it -> System.out.println(it.toStr()));
 
-    assertEquals(toStr(itineraries.subList(0, index + 1)), toStr(result));
+    assertEquals(toStr(allItineraries.subList(0, index + 1)), toStr(result));
     //assertFalse(result.contains(itinerary), itinerary.toStr());
   }
 
@@ -247,20 +217,12 @@ public class PagingFilterTest implements PlanTestConstants {
     return itineraries;
   }
 
-  private PagingFilter createFilter(SortOrder sortOrder, ListSection pageCut, Itinerary cut) {
-    int edt = TimeUtils.time("09:00");
-    int lat = TimeUtils.time("12:00");
-    return new PagingFilter(
-      sortOrder,
-      pageCut,
-      new DeduplicationPageCut(
-        cut.endTimeAsInstant(),
-        cut.startTimeAsInstant(),
-        cut.getGeneralizedCost(),
-        cut.getNumberOfTransfers(),
-        cut.isOnStreetAllTheWay()
-      )
-    );
+  private PagingFilter createFilter(
+    SortOrder sortOrder,
+    ListSection deduplicateSection,
+    Itinerary deduplicateCut
+  ) {
+    return new PagingFilter(sortOrder, deduplicateSection, deduplicateCut);
   }
 
   private static Itinerary itinerary(
