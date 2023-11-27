@@ -1,6 +1,5 @@
 package org.opentripplanner.framework.token;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import org.opentripplanner.framework.lang.ObjectUtils;
@@ -47,11 +46,7 @@ public class TokenBuilder {
   }
 
   public String build() {
-    try {
-      return Serializer.serialize(definition, values);
-    } catch (IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
+    return Serializer.serialize(definition, values);
   }
 
   private TokenBuilder with(String fieldName, TokenType type, Object value) {

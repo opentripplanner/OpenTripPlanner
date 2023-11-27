@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
 
 class CharacterEscapeFormatterTest {
+
   @Test
   public void encodeDecode() {
     var subject = new CharacterEscapeFormatter('\\', ';', '|');

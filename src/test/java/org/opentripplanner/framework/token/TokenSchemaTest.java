@@ -5,12 +5,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.time.Month;
+import java.time.DayOfWeek;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class TokenSchemaTest implements TokenSchemaConstants {
+class TokenSchemaTest implements TestTokenSchemaConstants {
 
   // Token field names. These are used to reference a specific field value in the
   // token to avoid index errors. They are not part of the serialized token.
@@ -53,7 +53,9 @@ class TokenSchemaTest implements TokenSchemaConstants {
       .build();
     assertEquals(BOOLEAN_ENCODED, token);
     assertTrue(BOOLEAN_SCHEMA.decode(token).getBoolean(BOOLEAN_TRUE_FIELD));
-    assertFalse(BOOLEAN_SCHEMA.decode(token).getBoolean(BOOLEAN_FALSE_FIELD));
+
+    var tokenResult = BOOLEAN_SCHEMA.decode(token);
+    assertFalse(tokenResult.getBoolean(BOOLEAN_FALSE_FIELD));
   }
 
   @Test
@@ -75,7 +77,7 @@ class TokenSchemaTest implements TokenSchemaConstants {
     var token = ENUM_SCHEMA.encode().withEnum(ENUM_FIELD, ENUM_VALUE).build();
     assertEquals(ENUM_ENCODED, token);
     assertEquals(ENUM_VALUE, ENUM_SCHEMA.decode(token).getEnum(ENUM_FIELD, ENUM_CLASS).get());
-    assertEquals(Optional.empty(), ENUM_SCHEMA.decode(token).getEnum(ENUM_FIELD, Month.class));
+    assertEquals(Optional.empty(), ENUM_SCHEMA.decode(token).getEnum(ENUM_FIELD, DayOfWeek.class));
   }
 
   @Test

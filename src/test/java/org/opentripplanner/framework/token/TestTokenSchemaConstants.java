@@ -2,10 +2,10 @@ package org.opentripplanner.framework.token;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.Month;
 import org.opentripplanner.framework.time.DurationUtils;
 
-public interface TokenSchemaConstants {
+public interface TestTokenSchemaConstants {
   // Token field names. These are used to reference a specific field value in theString BYTE_FIELD = "AByte";
   // token to avoid index errors. They are not part of the serialized token.String DURATION_FIELD = "ADur";
   String BOOLEAN_TRUE_FIELD = "ABoolTrue";
@@ -19,17 +19,17 @@ public interface TokenSchemaConstants {
 
   byte BYTE_VALUE = 17;
   Duration DURATION_VALUE = DurationUtils.duration("2m13s");
-  ChronoUnit ENUM_VALUE = ChronoUnit.MINUTES;
-  Class<ChronoUnit> ENUM_CLASS = ChronoUnit.class;
+  Month ENUM_VALUE = Month.MAY;
+  Class<Month> ENUM_CLASS = Month.class;
   int INT_VALUE = 31;
   String STRING_VALUE = "text";
   Instant TIME_INSTANT_VALUE = Instant.parse("2023-10-23T10:00:59Z");
 
-  String BOOLEAN_ENCODED = "rO0ABXcFAAExAQA=";
-  String BYTE_ENCODED = "rO0ABXcEAAExEQ==";
-  String DURATION_ENCODED = "rO0ABXcKAAEyAAUybTEzcw==";
-  String ENUM_ENCODED = "rO0ABXcMAAEzAAdNSU5VVEVT";
-  String INT_ENCODED = "rO0ABXcHAAEzAAIzMQ==";
-  String STRING_ENCODED = "rO0ABXcJAAE3AAR0ZXh0";
-  String TIME_INSTANT_ENCODED = "rO0ABXcaAAIxMwAUMjAyMy0xMC0yM1QxMDowMDo1OVo=";
+  String BOOLEAN_ENCODED = "MXx0cnVlfGZhbHNlfA==";
+  String BYTE_ENCODED = "MXwxN3w=";
+  String DURATION_ENCODED = "MnwybTEzc3w=";
+  String ENUM_ENCODED = "M3xNQVl8";
+  String INT_ENCODED = "M3wzMXw=";
+  String STRING_ENCODED = "N3x0ZXh0fA==";
+  String TIME_INSTANT_ENCODED = "MTN8MjAyMy0xMC0yM1QxMDowMDo1OVp8";
 }
