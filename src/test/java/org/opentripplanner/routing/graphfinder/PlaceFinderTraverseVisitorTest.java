@@ -10,6 +10,7 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.tripPa
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.street.search.state.TestStateBuilder;
@@ -25,25 +26,30 @@ import org.opentripplanner.transit.service.TransitModel;
 
 public class PlaceFinderTraverseVisitorTest {
 
+  static TransitModelForTest model = TransitModelForTest.of();
   static final Station STATION1 = Station
     .of(id("S1"))
     .withName(new NonLocalizedString("Station 1"))
     .withCoordinate(1.1, 1.1)
     .build();
+
   static final Station STATION2 = Station
     .of(id("S2"))
     .withName(new NonLocalizedString("Station 2"))
     .withCoordinate(1.1, 1.1)
     .build();
-  static final RegularStop STOP1 = TransitModelForTest.stopForTest("stop-1", 1, 1, STATION1);
-  static final RegularStop STOP2 = TransitModelForTest.stopForTest(
-    "stop-2",
-    1.001,
-    1.001,
-    STATION2
-  );
+  static final RegularStop STOP1 = model
+    .stop("stop-1")
+    .withCoordinate(new WgsCoordinate(1, 1))
+    .withParentStation(STATION1)
+    .build(); // 1, 1, STATION1);
+  static final RegularStop STOP2 = model
+    .stop("stop-2")
+    .withCoordinate(1.001, 1.001)
+    .withParentStation(STATION2)
+    .build();
 
-  static final RegularStop STOP3 = TransitModelForTest.stopForTest("stop-3", 1.002, 1.002);
+  static final RegularStop STOP3 = model.stop("stop-3").withCoordinate(1.002, 1.002).build();
 
   static final Route r = route("r").build();
 

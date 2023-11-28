@@ -402,8 +402,8 @@ class GraphQLIntegrationTest {
       List<String> filterByBikeRentalStations,
       TransitService transitService
     ) {
-      return PlanTestConstants
-        .listStops()
+      return List
+        .of(TransitModelForTest.of().stop("A").build())
         .stream()
         .map(stop -> new PlaceAtDistance(stop, 0))
         .toList();
