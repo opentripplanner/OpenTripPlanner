@@ -15,8 +15,21 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.TestItineraryBuilder;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
-public class PageCursorTest {
+public class PageCursorTest implements PlanTestConstants {
+
+  public static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  public static final Place A = Place.forStop(
+    TEST_MODEL.stop("A").withCoordinate(5.0, 8.0).build()
+  );
+  public static final Place B = Place.forStop(
+    TEST_MODEL.stop("B").withCoordinate(6.0, 8.5).build()
+  );
 
   private static final ZoneId ZONE_ID = ZoneIds.GMT;
   private static final String EDT_STR = "2021-01-31T12:20:00Z";
@@ -24,6 +37,11 @@ public class PageCursorTest {
   private static final Instant EDT = Instant.parse(EDT_STR);
   private static final Instant LAT = Instant.parse(LAT_STR);
   private static final Duration SEARCH_WINDOW = Duration.parse("PT2h");
+  private static final Itinerary PAGE_CUT = TestItineraryBuilder
+    .newItinerary(A, 0)
+    .walk(20, Place.forStop(TEST_MODEL.stop("1:stop", 1d, 1d).build()))
+    .bus(23, 0, 50, B)
+    .build();
 
   private TimeZone originalTimeZone;
   private PageCursor subjectDepartAfter;
@@ -37,7 +55,7 @@ public class PageCursorTest {
     subjectDepartAfter =
       new PageCursor(NEXT_PAGE, STREET_AND_ARRIVAL_TIME, EDT, null, SEARCH_WINDOW, null);
     subjectArriveBy =
-      new PageCursor(PREVIOUS_PAGE, STREET_AND_DEPARTURE_TIME, EDT, LAT, SEARCH_WINDOW, null);
+      new PageCursor(PREVIOUS_PAGE, STREET_AND_DEPARTURE_TIME, EDT, LAT, SEARCH_WINDOW, PAGE_CUT);
   }
 
   @AfterEach
@@ -60,7 +78,8 @@ public class PageCursorTest {
       EDT_STR +
       ", lat: " +
       LAT_STR +
-      ", searchWindow: 2h}",
+      ", searchWindow: 2h, " +
+      "itineraryPageCut: [2020-02-02T00:00:00Z, 2020-02-02T00:00:50Z, $194, Tx0, transit]}",
       subjectArriveBy.toString()
     );
   }

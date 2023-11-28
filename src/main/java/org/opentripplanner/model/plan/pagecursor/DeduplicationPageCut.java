@@ -11,36 +11,36 @@ import org.opentripplanner.model.plan.ItinerarySortKey;
  * potentially contain duplicates.
  */
 record DeduplicationPageCut(
-  Instant arrivalTimeThreshold,
-  Instant departureTimeThreshold,
-  int generalizedCostThreshold,
-  int numOfTransfersThreshold,
-  boolean onStreetAllTheWayThreshold
+  Instant departureTime,
+  Instant arrivalTime,
+  int generalizedCost,
+  int numOfTransfers,
+  boolean onStreet
 )
   implements ItinerarySortKey {
   @Override
   public Instant startTimeAsInstant() {
-    return departureTimeThreshold;
+    return departureTime;
   }
 
   @Override
   public Instant endTimeAsInstant() {
-    return arrivalTimeThreshold;
+    return arrivalTime;
   }
 
   @Override
   public int getGeneralizedCost() {
-    return generalizedCostThreshold;
+    return generalizedCost;
   }
 
   @Override
   public int getNumberOfTransfers() {
-    return numOfTransfersThreshold;
+    return numOfTransfers;
   }
 
   @Override
   public boolean isOnStreetAllTheWay() {
-    return onStreetAllTheWayThreshold;
+    return onStreet;
   }
 
   @Override
