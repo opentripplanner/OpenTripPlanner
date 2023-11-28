@@ -313,7 +313,9 @@ public class RoutingWorker {
       Instant swStartTime = searchStartTime()
         .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime());
       boolean cropSWHead = request.doCropSearchWindowAtTail();
-      Instant rmItineraryStartTime = numItinerariesFilterResults.firstRemovedDepartureTime;
+      Instant rmItineraryStartTime = numItinerariesFilterResults
+        .firstRemoved()
+        .startTimeAsInstant();
 
       return pagingSearchWindowAdjuster.decreaseSearchWindow(
         sw,

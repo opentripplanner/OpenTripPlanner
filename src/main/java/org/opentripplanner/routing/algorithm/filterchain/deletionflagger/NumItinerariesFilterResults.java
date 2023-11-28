@@ -10,17 +10,12 @@ import org.opentripplanner.model.plan.pagecursor.PageCursorInput;
 
 public class NumItinerariesFilterResults implements PageCursorInput {
 
-  public final Instant earliestRemovedDeparture;
-  public final Instant latestRemovedDeparture;
-  public final Instant earliestRemovedArrival;
-  public final Instant latestRemovedArrival;
-  public final Instant earliestKeptArrival;
-  public final Instant firstRemovedArrivalTime;
-  public final boolean firstRemovedIsOnStreetAllTheWay;
-  public final int firstRemovedGeneralizedCost;
-  public final int firstRemovedNumOfTransfers;
-  public final Instant firstRemovedDepartureTime;
-  public final ListSection cropSection;
+  private final Instant earliestRemovedDeparture;
+  private final Instant latestRemovedDeparture;
+  private final Instant latestRemovedArrival;
+  private final Instant earliestKeptArrival;
+  private final ItinerarySortKey firstRemoved;
+  private final ListSection cropSection;
 
   /**
    * The NumItinerariesFilter removes itineraries from a list of itineraries based on the number to
@@ -44,7 +39,6 @@ public class NumItinerariesFilterResults implements PageCursorInput {
       .toList();
     this.earliestRemovedDeparture = removedDepartures.stream().min(Instant::compareTo).orElse(null);
     this.latestRemovedDeparture = removedDepartures.stream().max(Instant::compareTo).orElse(null);
-    this.earliestRemovedArrival = removedArrivals.stream().min(Instant::compareTo).orElse(null);
     this.latestRemovedArrival = removedArrivals.stream().max(Instant::compareTo).orElse(null);
 
     this.earliestKeptArrival =
@@ -54,37 +48,12 @@ public class NumItinerariesFilterResults implements PageCursorInput {
         .min(Instant::compareTo)
         .orElseThrow();
 
-    Itinerary firstRemovedItinerary;
     if (cropSection == ListSection.HEAD) {
-      firstRemovedItinerary = removedItineraries.get(removedItineraries.size() - 1);
+      firstRemoved = removedItineraries.get(removedItineraries.size() - 1);
     } else {
-      firstRemovedItinerary = removedItineraries.get(0);
+      firstRemoved = removedItineraries.get(0);
     }
-
-    this.firstRemovedIsOnStreetAllTheWay = firstRemovedItinerary.isOnStreetAllTheWay();
-    this.firstRemovedArrivalTime = firstRemovedItinerary.endTime().toInstant();
-    this.firstRemovedGeneralizedCost = firstRemovedItinerary.getGeneralizedCost();
-    this.firstRemovedNumOfTransfers = firstRemovedItinerary.getNumberOfTransfers();
-    this.firstRemovedDepartureTime = firstRemovedItinerary.startTime().toInstant();
-
     this.cropSection = cropSection;
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder
-      .of(NumItinerariesFilterResults.class)
-      .addDateTime("earliestRemovedDeparture", earliestRemovedDeparture)
-      .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
-      .addDateTime("earliestRemovedArrival", earliestRemovedArrival)
-      .addDateTime("latestRemovedArrival", latestRemovedArrival)
-      .addDateTime("earliestKeptArrival", earliestKeptArrival)
-      .addDateTime("firstRemovedArrivalTime", firstRemovedArrivalTime)
-      .addNum("firstRemovedGeneralizedCost", firstRemovedGeneralizedCost)
-      .addNum("firstRemovedNumOfTransfers", firstRemovedNumOfTransfers)
-      .addDateTime("firstRemovedDepartureTime", firstRemovedDepartureTime)
-      .addEnum("cropSection", cropSection)
-      .toString();
   }
 
   @Override
@@ -109,31 +78,19 @@ public class NumItinerariesFilterResults implements PageCursorInput {
 
   @Override
   public ItinerarySortKey firstRemoved() {
-    return new ItinerarySortKey() {
-      @Override
-      public Instant startTimeAsInstant() {
-        return firstRemovedDepartureTime;
-      }
+    return firstRemoved;
+  }
 
-      @Override
-      public Instant endTimeAsInstant() {
-        return firstRemovedArrivalTime;
-      }
-
-      @Override
-      public int getGeneralizedCost() {
-        return firstRemovedGeneralizedCost;
-      }
-
-      @Override
-      public int getNumberOfTransfers() {
-        return firstRemovedNumOfTransfers;
-      }
-
-      @Override
-      public boolean isOnStreetAllTheWay() {
-        return firstRemovedIsOnStreetAllTheWay;
-      }
-    };
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(NumItinerariesFilterResults.class)
+      .addDateTime("earliestRemovedDeparture", earliestRemovedDeparture)
+      .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
+      .addDateTime("latestRemovedArrival", latestRemovedArrival)
+      .addDateTime("earliestKeptArrival", earliestKeptArrival)
+      .addObjOp("firstRemoved", firstRemoved, ItinerarySortKey::keyAsString)
+      .addEnum("cropSection", cropSection)
+      .toString();
   }
 }

@@ -116,7 +116,9 @@ public class PageCursorFactory {
       if (!sortOrder.isSortedByAscendingArrivalTime()) {
         prev.lat = current.lat;
       }
-    } else { // If the whole search window was not used (i.e. if there were removed itineraries)
+    }
+    // If the whole search window was not used (i.e. if there were removed itineraries)
+    else {
       if (currentPageType == NEXT_PAGE) {
         prev.edt = edtBeforeNewSw();
         next.edt = pageCursorInput.earliestRemovedDeparture();

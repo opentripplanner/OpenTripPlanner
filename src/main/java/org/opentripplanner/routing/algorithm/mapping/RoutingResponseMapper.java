@@ -73,10 +73,10 @@ public class RoutingResponseMapper {
       raptorSearchParamsUsed,
       numItinerariesFilterResults == null
         ? null
-        : numItinerariesFilterResults.firstRemovedDepartureTime,
+        : numItinerariesFilterResults.firstRemoved().startTimeAsInstant(),
       numItinerariesFilterResults == null
         ? null
-        : numItinerariesFilterResults.firstRemovedArrivalTime
+        : numItinerariesFilterResults.firstRemoved().endTimeAsInstant()
     );
 
     return new RoutingResponse(
