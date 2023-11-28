@@ -39,6 +39,7 @@ public class NetexBundle implements Closeable {
   private final CompositeDataSource source;
 
   private final NetexDataSourceHierarchy hierarchy;
+  private final OtpTransitServiceBuilder transitBuilder;
 
   private final String feedId;
   private final Set<String> ferryIdsNotAllowedForBicycle;
@@ -57,6 +58,7 @@ public class NetexBundle implements Closeable {
     String feedId,
     CompositeDataSource source,
     NetexDataSourceHierarchy hierarchy,
+    OtpTransitServiceBuilder transitBuilder,
     Set<String> ferryIdsNotAllowedForBicycle,
     double maxStopToShapeSnapDistance,
     boolean noTransfersOnIsolatedStops,
@@ -65,6 +67,7 @@ public class NetexBundle implements Closeable {
     this.feedId = feedId;
     this.source = source;
     this.hierarchy = hierarchy;
+    this.transitBuilder = transitBuilder;
     this.ferryIdsNotAllowedForBicycle = ferryIdsNotAllowedForBicycle;
     this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     this.noTransfersOnIsolatedStops = noTransfersOnIsolatedStops;
@@ -79,9 +82,6 @@ public class NetexBundle implements Closeable {
     LOG.info("Reading {}", hierarchy.description());
 
     this.issueStore = issueStore;
-
-    // Store result in a mutable OTP Transit Model
-    OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder(issueStore);
 
     // init parser and mapper
     xmlParser = new NetexXmlParser();

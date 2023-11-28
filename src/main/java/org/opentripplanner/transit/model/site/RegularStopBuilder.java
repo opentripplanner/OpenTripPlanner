@@ -4,7 +4,9 @@ package org.opentripplanner.transit.model.site;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.IntSupplier;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -15,6 +17,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public final class RegularStopBuilder
   extends StationElementBuilder<RegularStop, RegularStopBuilder> {
+
+  private final IntSupplier indexCounter;
 
   private String platformCode;
 
@@ -30,12 +34,14 @@ public final class RegularStopBuilder
 
   private final Set<FareZone> fareZones = new HashSet<>();
 
-  RegularStopBuilder(FeedScopedId id) {
+  RegularStopBuilder(FeedScopedId id, IntSupplier indexCounter) {
     super(id);
+    this.indexCounter = Objects.requireNonNull(indexCounter);
   }
 
   RegularStopBuilder(RegularStop original) {
     super(original);
+    this.indexCounter = original::getIndex;
     this.platformCode = original.getPlatformCode();
     this.url = original.getUrl();
     this.timeZone = original.getTimeZone();
@@ -114,5 +120,9 @@ public final class RegularStopBuilder
   @Override
   protected RegularStop buildFromValues() {
     return new RegularStop(this);
+  }
+
+  int createIndex() {
+    return indexCounter.getAsInt();
   }
 }

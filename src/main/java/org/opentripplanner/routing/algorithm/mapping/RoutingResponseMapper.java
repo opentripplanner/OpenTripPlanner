@@ -6,6 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -15,6 +16,7 @@ import org.opentripplanner.model.plan.pagecursor.PageCursor;
 import org.opentripplanner.model.plan.pagecursor.PageCursorFactory;
 import org.opentripplanner.model.plan.pagecursor.PageType;
 import org.opentripplanner.raptor.api.request.SearchParams;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -31,9 +33,9 @@ public class RoutingResponseMapper {
   public static RoutingResponse map(
     RouteRequest request,
     ZonedDateTime transitSearchTimeZero,
-    SearchParams searchParams,
+    SearchParams raptorSearchParamsUsed,
     Duration searchWindowForNextSearch,
-    Itinerary firstRemovedItinerary,
+    NumItinerariesFilterResults numItinerariesFilterResults,
     List<Itinerary> itineraries,
     Set<RoutingError> routingErrors,
     DebugTimingAggregator debugTimingAggregator,
@@ -53,9 +55,9 @@ public class RoutingResponseMapper {
     var factory = mapIntoPageCursorFactory(
       request.itinerariesSortOrder(),
       transitSearchTimeZero,
-      searchParams,
+      raptorSearchParamsUsed,
       searchWindowForNextSearch,
-      firstRemovedItinerary,
+      numItinerariesFilterResults,
       request.pageCursor() == null ? null : request.pageCursor().type
     );
 
@@ -66,7 +68,16 @@ public class RoutingResponseMapper {
       logPagingInformation(request.pageCursor(), prevPageCursor, nextPageCursor, routingErrors);
     }
 
-    var metadata = createTripSearchMetadata(request, searchParams, firstRemovedItinerary);
+    var metadata = createTripSearchMetadata(
+      request,
+      raptorSearchParamsUsed,
+      numItinerariesFilterResults == null
+        ? null
+        : numItinerariesFilterResults.firstRemovedDepartureTime,
+      numItinerariesFilterResults == null
+        ? null
+        : numItinerariesFilterResults.firstRemovedArrivalTime
+    );
 
     return new RoutingResponse(
       tripPlan,
@@ -81,47 +92,62 @@ public class RoutingResponseMapper {
   public static PageCursorFactory mapIntoPageCursorFactory(
     SortOrder sortOrder,
     ZonedDateTime transitSearchTimeZero,
-    SearchParams searchParams,
+    SearchParams raptorSearchParamsUsed,
     Duration searchWindowNextSearch,
-    Itinerary firstRemovedItinerary,
+    NumItinerariesFilterResults numItinerariesFilterResults,
     @Nullable PageType currentPageType
   ) {
+    Objects.requireNonNull(sortOrder);
+    Objects.requireNonNull(transitSearchTimeZero);
+
     var factory = new PageCursorFactory(sortOrder, searchWindowNextSearch);
 
-    if (searchParams != null) {
-      if (!searchParams.isSearchWindowSet()) {
-        LOG.debug("SearchWindow not set");
-        return factory;
-      }
-      if (!searchParams.isEarliestDepartureTimeSet()) {
-        LOG.debug("Earliest departure time not set");
-        return factory;
-      }
-
-      long t0 = transitSearchTimeZero.toEpochSecond();
-      var edt = Instant.ofEpochSecond(t0 + searchParams.earliestDepartureTime());
-      var lat = searchParams.isLatestArrivalTimeSet()
-        ? Instant.ofEpochSecond(t0 + searchParams.latestArrivalTime())
-        : null;
-      var searchWindow = Duration.ofSeconds(searchParams.searchWindowInSeconds());
-      factory.withOriginalSearch(currentPageType, edt, lat, searchWindow);
+    // No transit search performed
+    if (raptorSearchParamsUsed == null) {
+      return factory;
     }
 
-    if (firstRemovedItinerary != null) {
-      factory.withRemovedItineraries(
-        firstRemovedItinerary.startTime().toInstant(),
-        firstRemovedItinerary.endTime().toInstant()
+    assertRequestPrerequisites(raptorSearchParamsUsed);
+
+    factory =
+      mapSearchParametersIntoFactory(
+        factory,
+        transitSearchTimeZero,
+        raptorSearchParamsUsed,
+        currentPageType
       );
-    }
 
+    if (numItinerariesFilterResults != null) {
+      factory = factory.withRemovedItineraries(numItinerariesFilterResults);
+    }
     return factory;
+  }
+
+  private static PageCursorFactory mapSearchParametersIntoFactory(
+    PageCursorFactory factory,
+    ZonedDateTime transitSearchTimeZero,
+    SearchParams raptorSearchParamsUsed,
+    PageType currentPageType
+  ) {
+    Instant edt = transitSearchTimeZero
+      .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime())
+      .toInstant();
+
+    Instant lat = raptorSearchParamsUsed.isLatestArrivalTimeSet()
+      ? transitSearchTimeZero.plusSeconds(raptorSearchParamsUsed.latestArrivalTime()).toInstant()
+      : null;
+
+    var searchWindowUsed = Duration.ofSeconds(raptorSearchParamsUsed.routerSearchWindowInSeconds());
+
+    return factory.withOriginalSearch(currentPageType, edt, lat, searchWindowUsed);
   }
 
   @Nullable
   private static TripSearchMetadata createTripSearchMetadata(
     RouteRequest request,
     SearchParams searchParams,
-    Itinerary firstRemovedItinerary
+    Instant firstRemovedDepartureTime,
+    Instant firstRemovedArrivalTime
   ) {
     if (searchParams == null) {
       return null;
@@ -133,14 +159,23 @@ public class RoutingResponseMapper {
       return TripSearchMetadata.createForArriveBy(
         reqTime,
         searchParams.searchWindowInSeconds(),
-        firstRemovedItinerary == null ? null : firstRemovedItinerary.endTime().toInstant()
+        firstRemovedArrivalTime
       );
     } else {
       return TripSearchMetadata.createForDepartAfter(
         reqTime,
         searchParams.searchWindowInSeconds(),
-        firstRemovedItinerary == null ? null : firstRemovedItinerary.startTime().toInstant()
+        firstRemovedDepartureTime
       );
+    }
+  }
+
+  private static void assertRequestPrerequisites(SearchParams raptorSearchParamsUsed) {
+    if (!raptorSearchParamsUsed.isSearchWindowSet()) {
+      throw new IllegalStateException("SearchWindow not set");
+    }
+    if (!raptorSearchParamsUsed.isEarliestDepartureTimeSet()) {
+      throw new IllegalStateException("Earliest departure time not set");
     }
   }
 

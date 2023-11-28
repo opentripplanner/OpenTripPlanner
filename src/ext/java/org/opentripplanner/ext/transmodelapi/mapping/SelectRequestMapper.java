@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
-import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomainNullSafe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +19,17 @@ class SelectRequestMapper {
 
     if (input.containsKey("lines")) {
       var lines = (List<String>) input.get("lines");
-      selectRequestBuilder.withRoutes(mapIDsToDomain(lines));
+      selectRequestBuilder.withRoutes(mapIDsToDomainNullSafe(lines));
     }
 
     if (input.containsKey("authorities")) {
       var authorities = (List<String>) input.get("authorities");
-      selectRequestBuilder.withAgencies(mapIDsToDomain(authorities));
+      selectRequestBuilder.withAgencies(mapIDsToDomainNullSafe(authorities));
     }
 
     if (input.containsKey("groupOfLines")) {
       var groupOfLines = (List<String>) input.get("groupOfLines");
-      selectRequestBuilder.withGroupOfRoutes(mapIDsToDomain(groupOfLines));
+      selectRequestBuilder.withGroupOfRoutes(mapIDsToDomainNullSafe(groupOfLines));
     }
 
     if (input.containsKey("transportModes")) {

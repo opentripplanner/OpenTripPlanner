@@ -10,9 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Currency;
 import org.junit.jupiter.api.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
+import org.opentripplanner.transit.model.basic.Money;
 
 public class FareAttributeMapperTest {
 
@@ -35,6 +37,7 @@ public class FareAttributeMapperTest {
   private static final int TRANSFER_DURATION = 3;
 
   private static final int TRANSFERS = 2;
+  private static final Currency NOK = Currency.getInstance("NOK");
   private final FareAttributeMapper subject = new FareAttributeMapper();
 
   static {
@@ -61,12 +64,9 @@ public class FareAttributeMapperTest {
     org.opentripplanner.ext.fares.model.FareAttribute result = subject.map(FARE_ATTRIBUTE);
 
     assertEquals("A:1", result.getId().toString());
-    assertEquals(CURRENCY_TYPE, result.getCurrencyType());
     assertEquals(JOURNEY_DURATION, result.getJourneyDuration());
     assertEquals(PAY_MENTMETHOD, result.getPaymentMethod());
-    assertEquals(PRICE, result.getPrice(), 0.00001f);
-    assertEquals(SENIOR_PRICE, result.getSeniorPrice(), 0.00001f);
-    assertEquals(YOUTH_PRICE, result.getYouthPrice(), 0.00001f);
+    assertEquals(Money.ofFractionalAmount(NOK, PRICE), result.getPrice());
     assertEquals(TRANSFER_DURATION, result.getTransferDuration());
     assertEquals(TRANSFERS, result.getTransfers());
   }
@@ -75,15 +75,13 @@ public class FareAttributeMapperTest {
   public void testMapWithNulls() throws Exception {
     FareAttribute orginal = new FareAttribute();
     orginal.setId(ID);
+    orginal.setCurrencyType("EUR");
     org.opentripplanner.ext.fares.model.FareAttribute result = subject.map(orginal);
 
     assertNotNull(result.getId());
-    assertNull(result.getCurrencyType());
     assertFalse(result.isJourneyDurationSet());
     assertEquals(0, result.getPaymentMethod());
-    assertEquals(0, result.getPrice(), 0.001d);
-    assertEquals(0, result.getSeniorPrice(), 0.001d);
-    assertEquals(0, result.getYouthPrice(), 0.001d);
+    assertEquals(Money.euros(0), result.getPrice());
     assertFalse(result.isTransferDurationSet());
     assertFalse(result.isTransfersSet());
   }

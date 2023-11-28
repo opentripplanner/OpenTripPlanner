@@ -1,10 +1,13 @@
 package org.opentripplanner.model.plan;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -22,7 +25,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
  */
-public class Itinerary {
+public class Itinerary implements ItinerarySortKey {
 
   public static final int UNKNOWN = -1;
 
@@ -50,6 +53,8 @@ public class Itinerary {
 
   /* Sandbox experimental properties */
   private Float accessibilityScore;
+
+  private Emissions emissionsPerPerson;
 
   /* other properties */
 
@@ -83,10 +88,24 @@ public class Itinerary {
   }
 
   /**
+   * Time that the trip departs as a Java Instant type.
+   */
+  public Instant startTimeAsInstant() {
+    return firstLeg().getStartTime().toInstant();
+  }
+
+  /**
    * Time that the trip arrives.
    */
   public ZonedDateTime endTime() {
     return lastLeg().getEndTime();
+  }
+
+  /**
+   * Time that the trip arrives as a Java Instant type.
+   */
+  public Instant endTimeAsInstant() {
+    return lastLeg().getEndTime().toInstant();
   }
 
   /**
@@ -172,8 +191,8 @@ public class Itinerary {
   /**
    * Remove all deletion flags of this itinerary, in effect undeleting it from the result.
    */
-  public void removeDeletionFlags() {
-    systemNotices.clear();
+  public void removeDeletionFlags(Set<String> removeTags) {
+    systemNotices.removeIf(it -> removeTags.contains(it.tag()));
   }
 
   public boolean isFlaggedForDeletion() {
@@ -185,7 +204,7 @@ public class Itinerary {
    * given {@code tag}.
    */
   public boolean hasSystemNoticeTag(String tag) {
-    return systemNotices.stream().map(n -> n.tag).anyMatch(tag::equals);
+    return systemNotices.stream().map(SystemNotice::tag).anyMatch(tag::equals);
   }
 
   public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
@@ -249,6 +268,7 @@ public class Itinerary {
       .addNum("elevationGained", elevationGained, 0.0)
       .addCol("legs", legs)
       .addObj("fare", fare)
+      .addObj("emissionsPerPerson", emissionsPerPerson)
       .toString();
   }
 
@@ -354,6 +374,27 @@ public class Itinerary {
     return legs;
   }
 
+  /**
+   * Applies the transformation in {@code mapper} to all instances of {@link TransitLeg} in the
+   * legs of this Itinerary.
+   * <p>
+   * NOTE: The itinerary is mutable so the transformation is done in-place!
+   */
+  public Itinerary transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
+    legs =
+      legs
+        .stream()
+        .map(l -> {
+          if (l instanceof TransitLeg tl) {
+            return mapper.apply(tl);
+          } else {
+            return l;
+          }
+        })
+        .toList();
+    return this;
+  }
+
   public Stream<StreetLeg> getStreetLegs() {
     return legs.stream().filter(StreetLeg.class::isInstance).map(StreetLeg.class::cast);
   }
@@ -387,7 +428,7 @@ public class Itinerary {
    * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
    * guidance that expresses certainty or uncertainty about the accessibility.
    * <p>
-   * An alternative to this is to use the `generalized-cost` and use that to indicate witch itineraries is the
+   * An alternative to this is to use the `generalized-cost` and use that to indicate which itineraries is the
    * best/most friendly with respect to making the journey in a wheelchair. The `generalized-cost` include, not
    * only a penalty for unknown and inaccessible boardings, but also a penalty for undesired uphill and downhill
    * street traversal.
@@ -584,5 +625,17 @@ public class Itinerary {
       .filter(ScheduledTransitLeg.class::isInstance)
       .map(ScheduledTransitLeg.class::cast)
       .toList();
+  }
+
+  /**
+   * The emissions of this itinerary.
+   */
+  public void setEmissionsPerPerson(Emissions emissionsPerPerson) {
+    this.emissionsPerPerson = emissionsPerPerson;
+  }
+
+  @Nullable
+  public Emissions getEmissionsPerPerson() {
+    return this.emissionsPerPerson;
   }
 }

@@ -9,6 +9,7 @@ import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.mapping.NumberMapper;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.model.plan.Emissions;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 
@@ -71,6 +72,11 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   }
 
   @Override
+  public DataFetcher<Integer> numberOfTransfers() {
+    return environment -> getSource(environment).getNumberOfTransfers();
+  }
+
+  @Override
   public DataFetcher<Long> startTime() {
     return environment -> getSource(environment).startTime().toInstant().toEpochMilli();
   }
@@ -98,6 +104,11 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
   @Override
   public DataFetcher<Double> accessibilityScore() {
     return environment -> NumberMapper.toDouble(getSource(environment).getAccessibilityScore());
+  }
+
+  @Override
+  public DataFetcher<Emissions> emissionsPerPerson() {
+    return environment -> getSource(environment).getEmissionsPerPerson();
   }
 
   private Itinerary getSource(DataFetchingEnvironment environment) {

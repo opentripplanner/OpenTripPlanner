@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V1
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 import org.opentripplanner.datastore.api.OtpDataStoreConfig;
 import org.opentripplanner.ext.dataoverlay.configuration.DataOverlayConfig;
+import org.opentripplanner.ext.emissions.EmissionsConfig;
 import org.opentripplanner.ext.fares.FaresConfiguration;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.lang.ObjectUtils;
@@ -164,22 +166,25 @@ public class BuildConfig implements OtpDataStoreConfig {
   public final Set<String> boardingLocationTags;
   public final DemExtractParametersList dem;
   public final OsmExtractParametersList osm;
+  public final EmissionsConfig emissions;
   public final TransitFeeds transitFeeds;
-  public boolean staticParkAndRide;
-  public boolean staticBikeParkAndRide;
-  public double distanceBetweenElevationSamples;
-  public double maxElevationPropagationMeters;
-  public boolean readCachedElevations;
-  public boolean writeCachedElevations;
+  public final boolean staticParkAndRide;
+  public final boolean staticBikeParkAndRide;
+  public final double distanceBetweenElevationSamples;
+  public final double maxElevationPropagationMeters;
+  public final boolean readCachedElevations;
+  public final boolean writeCachedElevations;
 
-  public boolean includeEllipsoidToGeoidDifference;
+  public final boolean includeEllipsoidToGeoidDifference;
 
-  public boolean multiThreadElevationCalculations;
+  public final boolean multiThreadElevationCalculations;
 
-  public LocalDate transitServiceStart;
+  public final LocalDate transitServiceStart;
 
-  public LocalDate transitServiceEnd;
-  public ZoneId transitModelTimeZone;
+  public final LocalDate transitServiceEnd;
+  public final ZoneId transitModelTimeZone;
+
+  public final String stopConsolidationFile;
 
   /**
    * Set all parameters from the given Jackson JSON tree, applying defaults. Supplying
@@ -607,10 +612,21 @@ Netex data is also often supplied in a ZIP file.
         )
         .asUri(null);
 
+    stopConsolidationFile =
+      root
+        .of("stopConsolidationFile")
+        .since(V2_5)
+        .summary(
+          "Name of the CSV-formatted file in the build directory which contains the configuration for stop consolidation."
+        )
+        .asString(null);
+
     osmDefaults = OsmConfig.mapOsmDefaults(root, "osmDefaults");
     osm = OsmConfig.mapOsmConfig(root, "osm", osmDefaults);
     demDefaults = DemConfig.mapDemDefaultsConfig(root, "demDefaults");
     dem = DemConfig.mapDemConfig(root, "dem", demDefaults);
+    emissions = new EmissionsConfig("emissions", root);
+
     netexDefaults = NetexConfig.mapNetexDefaultParameters(root, "netexDefaults");
     gtfsDefaults = GtfsConfig.mapGtfsDefaultParameters(root, "gtfsDefaults");
     transitFeeds =

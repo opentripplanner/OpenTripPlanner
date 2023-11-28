@@ -269,7 +269,7 @@ public class TimetableSnapshotTest {
   ) {
     var result = pattern
       .getScheduledTimetable()
-      .createUpdatedTripTimes(
+      .createUpdatedTripTimesFromGTFSRT(
         tripUpdate,
         timeZone,
         serviceDate,

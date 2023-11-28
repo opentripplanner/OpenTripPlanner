@@ -142,17 +142,16 @@ public class TransitRouter {
     Collection<RaptorPath<TripSchedule>> paths = transitResponse.paths();
 
     if (OTPFeature.OptimizeTransfers.isOn() && !transitResponse.containsUnknownPaths()) {
-      paths =
-        TransferOptimizationServiceConfigurator
-          .createOptimizeTransferService(
-            transitLayer::getStopByIndex,
-            requestTransitDataProvider.stopNameResolver(),
-            serverContext.transitService().getTransferService(),
-            requestTransitDataProvider,
-            transitLayer.getStopBoardAlightCosts(),
-            request.preferences().transfer().optimization()
-          )
-          .optimize(transitResponse.paths());
+      var service = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
+        transitLayer::getStopByIndex,
+        requestTransitDataProvider.stopNameResolver(),
+        serverContext.transitService().getTransferService(),
+        requestTransitDataProvider,
+        transitLayer.getStopBoardAlightCosts(),
+        request.preferences().transfer().optimization(),
+        raptorRequest.multiCriteria()
+      );
+      paths = service.optimize(transitResponse.paths());
     }
 
     // Create itineraries
@@ -178,7 +177,7 @@ public class TransitRouter {
 
     if (OTPFeature.ParallelRouting.isOn()) {
       try {
-        // TODO: This is not using {@link OtpRequestThreadFactory} witch mean we do not get
+        // TODO: This is not using {@link OtpRequestThreadFactory} which mean we do not get
         //       log-trace-parameters-propagation and graceful timeout handling here.
         CompletableFuture
           .allOf(

@@ -115,8 +115,10 @@ public class SpeedTest {
         TestServerContext.createWorldEnvelopeService(),
         TestServerContext.createRealtimeVehicleService(transitService),
         TestServerContext.createVehicleRentalService(),
+        TestServerContext.createEmissionsService(),
         config.flexConfig,
         List.of(),
+        null,
         null
       );
     // Creating transitLayerForRaptor should be integrated into the TransitModel, but for now

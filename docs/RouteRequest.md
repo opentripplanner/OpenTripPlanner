@@ -57,6 +57,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | numItineraries                                                                                               |        `integer`       | The maximum number of itineraries to return.                                                                                                   | *Optional* | `50`             |  2.0  |
 | [optimize](#rd_optimize)                                                                                     |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                                | *Optional* | `"safe"`         |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                                       |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                                  | *Optional* | `300`            |  2.0  |
+| [relaxTransitPriorityGroup](#rd_relaxTransitPriorityGroup)                                                   |        `string`        | The relax function for transit-priority-groups                                                                                                 | *Optional* | `"0s + 1.00 t"`  |  2.5  |
 | [relaxTransitSearchGeneralizedCostAtDestination](#rd_relaxTransitSearchGeneralizedCostAtDestination)         |        `double`        | Whether non-optimal transit paths at the destination should be returned                                                                        | *Optional* |                  |  2.3  |
 | [searchWindow](#rd_searchWindow)                                                                             |       `duration`       | The duration of the search-window.                                                                                                             | *Optional* |                  |  2.0  |
 | stairsReluctance                                                                                             |        `double`        | Used instead of walkReluctance for stairs.                                                                                                     | *Optional* | `2.0`            |  2.0  |
@@ -107,6 +108,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [extraStopBoardAlightCostsFactor](#rd_to_extraStopBoardAlightCostsFactor)                                 |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                                     | *Optional* | `0.0`            |  2.1  |
 |    [minSafeWaitTimeFactor](#rd_to_minSafeWaitTimeFactor)                                                     |        `double`        | Used to set a maximum wait-time cost, base on min-safe-transfer-time.                                                                          | *Optional* | `5.0`            |  2.1  |
 |    [optimizeTransferWaitTime](#rd_to_optimizeTransferWaitTime)                                               |        `boolean`       | This enables the transfer wait time optimization.                                                                                              | *Optional* | `true`           |  2.1  |
+| [transitPriorityGroups](#rd_transitPriorityGroups)                                                           |        `object`        | Transit priority groups configuration                                                                                                          | *Optional* |                  |  2.5  |
 | [transitReluctanceForMode](#rd_transitReluctanceForMode)                                                     |  `enum map of double`  | Transit reluctance for a given transport mode                                                                                                  | *Optional* |                  |  2.1  |
 | [unpreferred](#rd_unpreferred)                                                                               |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                                    | *Optional* |                  |  2.2  |
 |    [agencies](#rd_unpreferred_agencies)                                                                      |   `feed-scoped-id[]`   | The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`                                                    | *Optional* |                  |  2.2  |
@@ -244,6 +246,18 @@ The set of characteristics that the user wants to optimize for.
 Penalty added for using every route that is not preferred if user set any route as preferred.
 
 We return number of seconds that we are willing to wait for preferred route.
+
+<h3 id="rd_relaxTransitPriorityGroup">relaxTransitPriorityGroup</h3>
+
+**Since version:** `2.5` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"0s + 1.00 t"`   
+**Path:** /routingDefaults 
+
+The relax function for transit-priority-groups
+
+A path is considered optimal if the generalized-cost is less than the
+generalized-cost of another path. If this parameter is set, the comparison is relaxed
+further if they belong to different transit-priority-groups.
+
 
 <h3 id="rd_relaxTransitSearchGeneralizedCostAtDestination">relaxTransitSearchGeneralizedCostAtDestination</h3>
 
@@ -788,6 +802,21 @@ This defines the maximum cost for the logarithmic function relative to the min-s
 This enables the transfer wait time optimization.
 
 If not enabled generalizedCost function is used to pick the optimal transfer point.
+
+<h3 id="rd_transitPriorityGroups">transitPriorityGroups</h3>
+
+**Since version:** `2.5` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults 
+
+Transit priority groups configuration
+
+Use this to separate transit patterns into groups. Each group will be given a priority
+when compared with other groups. Hence, two paths with a different set of groups will BOTH
+be returned unless the cost is worse then the relaxation specified in the
+`relaxTransitPriorityGroup` parameter. This is only available in the TransmodelAPI for now.
+
+
+**THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!**
 
 <h3 id="rd_transitReluctanceForMode">transitReluctanceForMode</h3>
 

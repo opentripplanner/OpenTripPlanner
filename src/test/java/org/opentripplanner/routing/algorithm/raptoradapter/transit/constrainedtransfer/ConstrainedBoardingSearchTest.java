@@ -110,7 +110,7 @@ public class ConstrainedBoardingSearchTest {
   @BeforeEach
   void setup() {
     route1 =
-      new TestRouteData(
+      TestRouteData.of(
         "R1",
         TransitMode.RAIL,
         List.of(STOP_A, STOP_B, STOP_C),
@@ -119,7 +119,7 @@ public class ConstrainedBoardingSearchTest {
       );
 
     route2 =
-      new TestRouteData(
+      TestRouteData.of(
         "R2",
         TransitMode.BUS,
         List.of(STOP_B, STOP_C, STOP_D),

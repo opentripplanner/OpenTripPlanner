@@ -22,8 +22,11 @@ import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
+
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   public static final FeedScopedId TP_ID_1 = id("1");
   public static final FeedScopedId TP_ID_2 = id("2");
@@ -63,7 +66,8 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(
       startOfTime,
       tripPatternsForDates,
-      new TestTransitDataProviderFilter()
+      new TestTransitDataProviderFilter(),
+      PriorityGroupConfigurator.empty()
     );
 
     // Get the results
@@ -101,7 +105,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     stopTime1.setDepartureTime(0);
     stopTime2.setArrivalTime(7200);
 
-    return new TripTimes(
+    return TripTimesFactory.tripTimes(
       TransitModelForTest.trip("Test").build(),
       Arrays.asList(stopTime1, stopTime2),
       new Deduplicator()
@@ -115,7 +119,7 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
    */
   private static StopTime createStopTime() {
     var st = new StopTime();
-    st.setStop(TransitModelForTest.stopForTest("Stop:1", 0.0, 0.0));
+    st.setStop(TEST_MODEL.stop("Stop:1", 0.0, 0.0).build());
     return st;
   }
 

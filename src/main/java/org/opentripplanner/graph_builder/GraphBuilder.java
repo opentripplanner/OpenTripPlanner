@@ -9,6 +9,9 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
@@ -60,10 +63,11 @@ public class GraphBuilder implements Runnable {
     Graph graph,
     TransitModel transitModel,
     WorldEnvelopeRepository worldEnvelopeRepository,
+    @Nullable EmissionsDataModel emissionsDataModel,
+    @Nullable StopConsolidationRepository stopConsolidationRepository,
     boolean loadStreetGraph,
     boolean saveStreetGraph
   ) {
-    //DaggerGraphBuilderFactory appFactory = GraphBuilderFactoryDa
     boolean hasOsm = dataSources.has(OSM);
     boolean hasGtfs = dataSources.has(GTFS);
     boolean hasNetex = dataSources.has(NETEX);
@@ -71,15 +75,21 @@ public class GraphBuilder implements Runnable {
 
     transitModel.initTimeZone(config.transitModelTimeZone);
 
-    var factory = DaggerGraphBuilderFactory
+    var builder = DaggerGraphBuilderFactory
       .builder()
       .config(config)
       .graph(graph)
       .transitModel(transitModel)
       .worldEnvelopeRepository(worldEnvelopeRepository)
+      .stopConsolidationRepository(stopConsolidationRepository)
       .dataSources(dataSources)
-      .timeZoneId(transitModel.getTimeZone())
-      .build();
+      .timeZoneId(transitModel.getTimeZone());
+
+    if (OTPFeature.Co2Emissions.isOn()) {
+      builder.emissionsDataModel(emissionsDataModel);
+    }
+
+    var factory = builder.build();
 
     var graphBuilder = factory.graphBuilder();
 
@@ -95,6 +105,11 @@ public class GraphBuilder implements Runnable {
 
     if (hasNetex) {
       graphBuilder.addModule(factory.netexModule());
+    }
+
+    // Consolidate stops only if a stop consolidation repo has been provided
+    if (hasTransitData && factory.stopConsolidationModule() != null) {
+      graphBuilder.addModule(factory.stopConsolidationModule());
     }
 
     if (hasTransitData) {
@@ -156,6 +171,10 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModuleOptional(factory.dataOverlayFactory());
     }
 
+    if (OTPFeature.Co2Emissions.isOn()) {
+      graphBuilder.addModule(factory.emissionsModule());
+    }
+
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());
 
     return graphBuilder;
@@ -177,9 +196,10 @@ public class GraphBuilder implements Runnable {
 
     new DataImportIssueSummary(issueStore.listIssues()).logSummary();
 
-    validate();
-
+    // Log before we validate, this way we have more information if the validation fails
     logGraphBuilderCompleteStatus(startTime, graph, transitModel);
+
+    validate();
   }
 
   private void addModule(GraphBuilderModule module) {
@@ -208,9 +228,9 @@ public class GraphBuilder implements Runnable {
   private void validate() {
     if (hasTransitData() && !transitModel.hasTransit()) {
       throw new OtpAppException(
-        "The provided transit data have no trips within the configured transit " +
-        "service period. See build config 'transitServiceStart' and " +
-        "'transitServiceEnd'"
+        "The provided transit data have no trips within the configured transit service period. " +
+        "There is something wrong with your data - see the log above. Another possibility is that the " +
+        "'transitServiceStart' and 'transitServiceEnd' are not correctly configured."
       );
     }
   }

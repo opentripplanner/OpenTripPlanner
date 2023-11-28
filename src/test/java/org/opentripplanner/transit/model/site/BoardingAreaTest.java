@@ -17,7 +17,7 @@ class BoardingAreaTest {
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
   private static final I18NString DESCRIPTION = new NonLocalizedString("description");
-  private static final RegularStop PARENT_STOP = TransitModelForTest.stop("stopId").build();
+  private static final RegularStop PARENT_STOP = TransitModelForTest.of().stop("stopId").build();
 
   private static final BoardingArea subject = BoardingArea
     .of(TransitModelForTest.id(ID))

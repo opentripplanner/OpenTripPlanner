@@ -29,6 +29,7 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.TripTimesValidationMapper;
 import org.opentripplanner.updater.spi.UpdateError;
@@ -201,10 +202,14 @@ class AddedTripBuilder {
       .withStopPattern(stopPattern)
       .build();
 
-    TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, transitModel.getDeduplicator());
+    TripTimes tripTimes = TripTimesFactory.tripTimes(
+      trip,
+      aimedStopTimes,
+      transitModel.getDeduplicator()
+    );
     tripTimes.setServiceCode(transitModel.getServiceCodes().get(trip.getServiceId()));
     pattern.add(tripTimes);
-    TripTimes updatedTripTimes = new TripTimes(tripTimes);
+    TripTimes updatedTripTimes = tripTimes.copyOfScheduledTimes();
 
     // Loop through calls again and apply updates
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {

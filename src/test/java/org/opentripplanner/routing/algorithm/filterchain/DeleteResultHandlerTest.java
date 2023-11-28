@@ -9,7 +9,6 @@ import static org.opentripplanner.model.plan.PlanTestConstants.T11_06;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_09;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_33;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder.MAX_NUMBER_OF_ITINERARIES_TAG;
 import static org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile.LIMIT_TO_NUM_OF_ITINERARIES;
 import static org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile.LIMIT_TO_SEARCH_WINDOW;
 import static org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile.LIST_ALL;
@@ -22,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
 
 class DeleteResultHandlerTest {
@@ -29,7 +29,7 @@ class DeleteResultHandlerTest {
   private static final String NO_TAG = null;
   private static final String ANY_TAG = "any-tag";
   private static final String OUT_SW_TAG = OutsideSearchWindowFilter.TAG;
-  private static final String MAX_N_TAG = MAX_NUMBER_OF_ITINERARIES_TAG;
+  private static final String MAX_N_TAG = NumItinerariesFilter.TAG;
   private static final List<Boolean> EXP_ALL = List.of(true, true, true);
   private static final List<Boolean> EXP_1_AND_2 = List.of(true, true, false);
   private static final List<Boolean> EXP_1 = List.of(true, false, false);
@@ -160,7 +160,7 @@ class DeleteResultHandlerTest {
     }
 
     private String tag(Itinerary it) {
-      return it.getSystemNotices().stream().map(n -> n.tag).findFirst().orElse("na");
+      return it.getSystemNotices().stream().map(SystemNotice::tag).findFirst().orElse("na");
     }
   }
 }

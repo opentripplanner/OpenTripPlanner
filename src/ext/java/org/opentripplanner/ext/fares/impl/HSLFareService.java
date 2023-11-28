@@ -118,7 +118,7 @@ public class HSLFareService extends DefaultFareService {
             Duration.between(lastRideStartTime, startTime).getSeconds() <
             attribute.getTransferDuration()
           ) {
-            Money newFare = getFarePrice(attribute, fareType);
+            Money newFare = attribute.getPrice();
             if (newFare.lessThan(bestSpecialFare)) {
               bestSpecialFare = newFare;
               ruleZones = ruleSet.getContains();
@@ -181,7 +181,7 @@ public class HSLFareService extends DefaultFareService {
               );
             }
           }
-          Money newFare = getFarePrice(attribute, fareType);
+          Money newFare = attribute.getPrice();
           if (newFare.lessThan(bestFare)) {
             bestAttribute = attribute;
             bestFare = newFare;

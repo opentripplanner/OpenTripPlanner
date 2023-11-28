@@ -17,6 +17,8 @@ import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.datastore.api.DataSource;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.framework.application.OtpAppException;
 import org.opentripplanner.framework.geometry.CompactElevationProfile;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
@@ -32,7 +34,6 @@ import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
-import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,8 +74,9 @@ public class SerializedGraphObject implements Serializable {
   private final List<SubMode> allTransitSubModes;
 
   public final DataImportIssueSummary issueSummary;
-  private final int stopLocationCounter;
+  public final StopConsolidationRepository stopConsolidationRepository;
   private final int routingTripPatternCounter;
+  public final EmissionsDataModel emissionsDataModel;
 
   public SerializedGraphObject(
     Graph graph,
@@ -82,7 +84,9 @@ public class SerializedGraphObject implements Serializable {
     WorldEnvelopeRepository worldEnvelopeRepository,
     BuildConfig buildConfig,
     RouterConfig routerConfig,
-    DataImportIssueSummary issueSummary
+    DataImportIssueSummary issueSummary,
+    EmissionsDataModel emissionsDataModel,
+    StopConsolidationRepository stopConsolidationRepository
   ) {
     this.graph = graph;
     this.edges = graph.getEdges();
@@ -91,9 +95,10 @@ public class SerializedGraphObject implements Serializable {
     this.buildConfig = buildConfig;
     this.routerConfig = routerConfig;
     this.issueSummary = issueSummary;
+    this.emissionsDataModel = emissionsDataModel;
     this.allTransitSubModes = SubMode.listAllCachedSubModes();
-    this.stopLocationCounter = StopLocation.indexCounter();
     this.routingTripPatternCounter = RoutingTripPattern.indexCounter();
+    this.stopConsolidationRepository = stopConsolidationRepository;
   }
 
   public static void verifyTheOutputGraphIsWritableIfDataSourceExist(DataSource graphOutput) {
@@ -169,7 +174,6 @@ public class SerializedGraphObject implements Serializable {
       Kryo kryo = KryoBuilder.create();
       SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
       SubMode.deserializeSubModeCache(serObj.allTransitSubModes);
-      StopLocation.initIndexCounter(serObj.stopLocationCounter);
       RoutingTripPattern.initIndexCounter(serObj.routingTripPatternCounter);
       CompactElevationProfile.setDistanceBetweenSamplesM(
         serObj.graph.getDistanceBetweenElevationSamples()

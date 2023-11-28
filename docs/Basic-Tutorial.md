@@ -6,9 +6,9 @@ take a few minutes!
 ## Get Java
 
 As a Java program, OTP must be run within a Java virtual machine (JVM), which is provided as part of
-the Java runtime (JRE) or Java development kit (JDK). OTP2 is compatible with Java 17 or later. We
-recommend running on Java 17 rather than a later version, as it is a long-term support release.
-Run `java -version` to check that you have version 17 or newer of the JVM installed. If you do not,
+the Java runtime (JRE) or Java development kit (JDK). OTP2 is compatible with Java 21 or later. We
+recommend running on Java 21 rather than a later version, as it is a long-term support release.
+Run `java -version` to check that you have version 21 or newer of the JVM installed. If you do not,
 you will need to install a recent OpenJDK or Oracle Java package for your operating system.
 
 ## Get OTP
@@ -139,10 +139,11 @@ with your local OpenTripPlanner instance.
 
 This map-based user interface is in fact sending HTTP GET requests to the OTP server running on your
 local machine. It can be informative to watch the HTTP requests and responses being generated using
-the developer tools in your web browser. OTP's built-in web server will run by default on ports 8080
-and 8081 for HTTP and HTTPS respectively. If by any chance some other software is already using one
-or both of those port numbers, you can specify different port numbers with switches
-like `--port 8801 --securePort 8802`.
+the developer tools in your web browser. OTP's built-in web server will run by default on port 8080.
+If by any chance some other software is already using that port number, you can specify a different
+port number with a switch
+`--port 8801`.
+
 
 ## Saving a Graph
 

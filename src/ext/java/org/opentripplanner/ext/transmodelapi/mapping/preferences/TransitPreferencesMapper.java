@@ -34,6 +34,10 @@ public class TransitPreferencesMapper {
     callWith.argument("includePlannedCancellations", transit::setIncludePlannedCancellations);
     callWith.argument("includeRealtimeCancellations", transit::setIncludeRealtimeCancellations);
     callWith.argument(
+      "relaxTransitPriorityGroup",
+      transit::withTransitGroupPriorityGeneralizedCostSlack
+    );
+    callWith.argument(
       "relaxTransitSearchGeneralizedCostAtDestination",
       (Double value) -> transit.withRaptor(it -> it.withRelaxGeneralizedCostAtDestination(value))
     );

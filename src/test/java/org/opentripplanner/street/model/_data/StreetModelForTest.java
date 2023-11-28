@@ -85,4 +85,12 @@ public class StreetModelForTest {
   ) {
     return streetEdgeBuilder(vA, vB, length, perm).buildAndConnect();
   }
+
+  public static StreetEdge streetEdge(
+    StreetVertex from,
+    StreetVertex to,
+    StreetTraversalPermission permissions
+  ) {
+    return streetEdge(from, to, 1, permissions);
+  }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.annotation.Nonnull;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
@@ -13,10 +14,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.linking.LinkingDirection;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingHelper;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
 import org.opentripplanner.street.model.edge.StreetVehicleParkingLink;
 import org.opentripplanner.street.model.edge.VehicleParkingEdge;
+import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitEntranceVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -33,12 +36,14 @@ import org.slf4j.LoggerFactory;
  * {@link GraphBuilderModule} plugin that links various
  * objects in the graph to the street network. It should be run after both the transit network and
  * street network are loaded. It links four things: transit stops, transit entrances, bike rental
- * stations, and bike parks. Therefore it should be run even when there's no GTFS data present to
+ * stations, and bike parks. Therefore, it should be run even when there's no GTFS data present to
  * make bike rental services and bike parks usable.
  */
 public class StreetLinkerModule implements GraphBuilderModule {
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetLinkerModule.class);
+  private static final TraverseModeSet CAR_ONLY = new TraverseModeSet(TraverseMode.CAR);
+  private static final TraverseModeSet WALK_ONLY = new TraverseModeSet(TraverseMode.WALK);
   private final Graph graph;
   private final TransitModel transitModel;
   private final DataImportIssueStore issueStore;
@@ -54,11 +59,6 @@ public class StreetLinkerModule implements GraphBuilderModule {
     this.transitModel = transitModel;
     this.issueStore = issueStore;
     this.addExtraEdgesToAreas = addExtraEdgesToAreas;
-  }
-
-  /** For test only */
-  public static void linkStreetsForTestOnly(Graph graph, TransitModel model) {
-    new StreetLinkerModule(graph, model, DataImportIssueStore.NOOP, false).buildGraph();
   }
 
   @Override
@@ -103,46 +103,87 @@ public class StreetLinkerModule implements GraphBuilderModule {
     }
 
     for (TransitStopVertex tStop : vertices) {
-      // Stops with pathways do not need to be connected to the street network, since there are explicit entraces defined for that
+      // Stops with pathways do not need to be connected to the street network, since there are explicit entrances defined for that
       if (tStop.hasPathways()) {
         continue;
       }
-      // check if stop is already linked, to allow multiple linking cycles
-      if (tStop.getDegreeOut() + tStop.getDegreeIn() > 0) {
+      // check if stop is already linked, to allow multiple idempotent linking cycles
+      if (tStop.isConnectedToGraph()) {
         continue;
       }
-      TraverseModeSet modes = new TraverseModeSet(TraverseMode.WALK);
 
-      if (OTPFeature.FlexRouting.isOn()) {
-        // If regular stops are used for flex trips, they also need to be connected to car routable
-        // street edges.
-        if (stopLocationsUsedForFlexTrips.contains(tStop.getStop())) {
-          modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR);
-        }
+      // ordinarily stops only need to be accessible by foot
+      StopLinkType linkType = StopLinkType.WALK_ONLY;
+
+      if (
+        OTPFeature.FlexRouting.isOn() && stopLocationsUsedForFlexTrips.contains(tStop.getStop())
+      ) {
+        linkType = StopLinkType.WALK_AND_CAR;
       }
 
-      graph
-        .getLinker()
-        .linkVertexPermanently(
-          tStop,
-          modes,
-          LinkingDirection.BOTH_WAYS,
-          (vertex, streetVertex) ->
-            List.of(
-              StreetTransitStopLink.createStreetTransitStopLink(
-                (TransitStopVertex) vertex,
-                streetVertex
-              ),
-              StreetTransitStopLink.createStreetTransitStopLink(
-                streetVertex,
-                (TransitStopVertex) vertex
-              )
-            )
-        );
+      linkStopToStreetNetwork(tStop, linkType);
+
       //noinspection Convert2MethodRef
       progress.step(m -> LOG.info(m));
     }
     LOG.info(progress.completeMessage());
+  }
+
+  /**
+   * Link a stop to the nearest "relevant" edges.
+   * <p>
+   * These are mostly walk edges but if a stop is used by a flex pattern it also needs to be
+   * car-accessible. Therefore, flex stops are ensured to be connected to the car-accessible
+   * edge. This may lead to several links being created.
+   */
+  private void linkStopToStreetNetwork(TransitStopVertex tStop, StopLinkType linkType) {
+    graph
+      .getLinker()
+      .linkVertexPermanently(
+        tStop,
+        WALK_ONLY,
+        LinkingDirection.BOTH_WAYS,
+        (transitVertex, streetVertex) -> {
+          var linkEdges = createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex);
+
+          if (linkType == StopLinkType.WALK_AND_CAR && !streetVertex.isConnectedToDriveableEdge()) {
+            linkToDriveableEdge(tStop);
+          }
+
+          return linkEdges;
+        }
+      );
+  }
+
+  /**
+   * If regular stops or group stops are used for flex trips, they also need to be connected to car
+   * routable street edges.
+   * <p>
+   * This does not apply to zones as street vertices store which zones they are part of.
+   *
+   * @see https://github.com/opentripplanner/OpenTripPlanner/issues/5498
+   */
+  private void linkToDriveableEdge(TransitStopVertex tStop) {
+    graph
+      .getLinker()
+      .linkVertexPermanently(
+        tStop,
+        CAR_ONLY,
+        LinkingDirection.BOTH_WAYS,
+        (transitVertex, streetVertex) ->
+          createStopLinkEdges((TransitStopVertex) transitVertex, streetVertex)
+      );
+  }
+
+  @Nonnull
+  private static List<Edge> createStopLinkEdges(
+    TransitStopVertex vertex,
+    StreetVertex streetVertex
+  ) {
+    return List.of(
+      StreetTransitStopLink.createStreetTransitStopLink(vertex, streetVertex),
+      StreetTransitStopLink.createStreetTransitStopLink(streetVertex, vertex)
+    );
   }
 
   private static void linkVehicleParkingWithLinker(
@@ -274,7 +315,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
   }
 
   /**
-   * Removes vehicle parking entrace vertex from graph.
+   * Removes vehicle parking entrance vertex from graph.
    *
    * @return vehicle parking for removal if the removed entrance was its only entrance.
    */
@@ -312,5 +353,18 @@ public class StreetLinkerModule implements GraphBuilderModule {
       vehicleParking.getEntrances().remove(entrance);
       return null;
     }
+  }
+
+  private enum StopLinkType {
+    /**
+     * Only ensure that the link leads to a walkable edge.
+     * (The same edge may also be drivable but this is not guaranteed.)
+     */
+    WALK_ONLY,
+    /**
+     * Make sure that the stop is linked to an edge each that is walkable and drivable.
+     * This may lead to several links being created.
+     */
+    WALK_AND_CAR,
   }
 }

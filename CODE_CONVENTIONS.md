@@ -30,6 +30,12 @@ Builder initStop(Stop stop) {
 
 ## Naming Conventions
 
+In general, we use American English. We use the GTFS terminology inside OTP as the transit domain
+specific language. In cases where GTFS does not provide an alternative we use NeTEx. The naming
+should follow the Java standard naming conventions. For example a "real-time updater" class
+is named `RealTimeUpdater`. If in doubt check the Oxford Dictionary(American).
+
+
 ### Packages
 
 Try to arrange code by domain functionality, not technology. The main structure of a package should
@@ -38,7 +44,7 @@ be `org.opentripplanner.<domain>.<component>.<sub-component>`.
 | Package                         | Description                                                                                                                                                                                              |
 | ------------------------------- |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `o.o.<domain>`                  | At the top level we should divide OTP into "domain"s like `apis`, `framework`, `transit`, `street`, `astar`, `raptor`, `feeds`, `updaters`, and `application`.                                           |
-| `component` and `sub-component` | A group of packages/classes witch naturally belong together, think aggregate as in Domain Driven Design.                                                                                                 |
+| `component` and `sub-component` | A group of packages/classes which naturally belong together, think aggregate as in Domain Driven Design.                                                                                                 |
 | `component.api`                 | Used for components to define the programing interface for the component. If present, (see Raptor) all outside dependencies to the component should be through the `api`.                                |
 | `component.model`               | Used to create a model of a Entites, ValueObjects, ++. If exposed outside the component you should include an entry point like `xyz.model.XyzModel` and/or a Service (in api or component root package). |
 | `component.service`             | Implementation of the service like `DefaultTransitService`, may also contain use-case specific code. Note, the Service interface goes into the component root or `api`, not in the service package.      |

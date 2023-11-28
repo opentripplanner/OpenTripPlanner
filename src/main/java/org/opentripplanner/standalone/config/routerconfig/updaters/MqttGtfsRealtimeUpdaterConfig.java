@@ -12,7 +12,7 @@ public class MqttGtfsRealtimeUpdaterConfig {
   public static MqttGtfsRealtimeUpdaterParameters create(String configRef, NodeAdapter c) {
     return new MqttGtfsRealtimeUpdaterParameters(
       configRef,
-      c.of("feedId").since(NA).summary("The feed id to apply the updates to.").asString(null),
+      c.of("feedId").since(NA).summary("The feed id to apply the updates to.").asString(),
       c.of("url").since(NA).summary("URL of the MQTT broker.").asString(),
       c.of("topic").since(NA).summary("The topic to subscribe to.").asString(),
       c.of("qos").since(NA).summary("QOS level.").asInt(0),
