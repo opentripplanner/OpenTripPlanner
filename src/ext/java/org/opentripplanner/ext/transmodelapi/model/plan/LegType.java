@@ -308,17 +308,7 @@ public class LegType {
           .name("datedServiceJourney")
           .description("The dated service journey used for this leg.")
           .type(datedServiceJourneyType)
-          .dataFetcher(env -> {
-            var trip = leg(env).getTrip();
-            if (trip == null) {
-              return null;
-            }
-            return GqlUtil
-              .getTransitService(env)
-              .getTripOnServiceDateForTripAndDay(
-                new TripIdAndServiceDate(leg(env).getTrip().getId(), leg(env).getServiceDate())
-              );
-          })
+          .dataFetcher(env -> leg(env).getTripOnServiceDate())
           .build()
       )
       .field(
