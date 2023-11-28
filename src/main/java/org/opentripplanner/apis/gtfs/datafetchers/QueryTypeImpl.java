@@ -281,6 +281,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
   public DataFetcher<Connection<PlaceAtDistance>> nearest() {
     return environment -> {
       List<FeedScopedId> filterByStops = null;
+      List<FeedScopedId> filterByStations = null;
       List<FeedScopedId> filterByRoutes = null;
       List<String> filterByBikeRentalStations = null;
       // TODO implement
@@ -298,6 +299,14 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
           filterByIds.getGraphQLStops() != null
             ? filterByIds
               .getGraphQLStops()
+              .stream()
+              .map(FeedScopedId::parse)
+              .collect(Collectors.toList())
+            : null;
+        filterByStations =
+          filterByIds.getGraphQLStations() != null
+            ? filterByIds
+              .getGraphQLStations()
               .stream()
               .map(FeedScopedId::parse)
               .collect(Collectors.toList())
@@ -346,6 +355,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
                 filterByModes,
                 filterByPlaceTypes,
                 filterByStops,
+                filterByStations,
                 filterByRoutes,
                 filterByBikeRentalStations,
                 getTransitService(environment)

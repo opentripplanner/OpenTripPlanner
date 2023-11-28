@@ -900,6 +900,7 @@ public class TransmodelGraphQLSchema {
           .argument(relay.getConnectionFieldArguments())
           .dataFetcher(environment -> {
             List<FeedScopedId> filterByStops = null;
+            List<FeedScopedId> filterByStations = null;
             List<FeedScopedId> filterByRoutes = null;
             List<String> filterByBikeRentalStations = null;
             List<String> filterByBikeParks = null;
@@ -949,6 +950,7 @@ public class TransmodelGraphQLSchema {
                   filterByTransportModes,
                   filterByPlaceTypes,
                   filterByStops,
+                  filterByStations,
                   filterByRoutes,
                   filterByBikeRentalStations,
                   GqlUtil.getTransitService(environment)

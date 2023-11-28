@@ -29,6 +29,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   private final TransitService transitService;
   private final Set<TransitMode> filterByModes;
   private final Set<FeedScopedId> filterByStops;
+  private final Set<FeedScopedId> filterByStations;
   private final Set<FeedScopedId> filterByRoutes;
   private final Set<String> filterByVehicleRental;
   private final Set<String> seenPatternAtStops = new HashSet<>();
@@ -65,6 +66,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     List<TransitMode> filterByModes,
     List<PlaceType> filterByPlaceTypes,
     List<FeedScopedId> filterByStops,
+    List<FeedScopedId> filterByStations,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
     int maxResults,
@@ -77,6 +79,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
 
     this.filterByModes = toSet(filterByModes);
     this.filterByStops = toSet(filterByStops);
+    this.filterByStations = toSet(filterByStations);
     this.filterByRoutes = toSet(filterByRoutes);
     this.filterByVehicleRental = toSet(filterByBikeRentalStations);
     includeStops = shouldInclude(filterByPlaceTypes, PlaceType.STOP);
@@ -178,6 +181,12 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     return filterByStops.isEmpty() || filterByStops.contains(stop.getId());
   }
 
+  private boolean stopIsIncludedByStationFilter(RegularStop stop) {
+    return (
+      ((filterByStations.isEmpty() || filterByStations.contains(stop.getParentStation().getId())))
+    );
+  }
+
   private boolean stopIsIncludedByModeFilter(RegularStop stop) {
     return filterByModes.isEmpty() || stopHasPatternsWithMode(stop, filterByModes);
   }
@@ -188,14 +197,19 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
      or if it or its parent station has already been seen.
      */
     if (
-      !stopIsIncludedByStopFilter(stop) ||
+      (!stop.isPartOfStation() && !stopIsIncludedByStopFilter(stop)) ||
+      (stop.isPartOfStation() && !stopIsIncludedByStationFilter(stop)) ||
       seenStops.contains(stop.getStationOrStopId()) ||
       !stopIsIncludedByModeFilter(stop)
     ) {
       return;
     }
     if (includeStops && includeStations) {
-      if (stop.getParentStation() != null && !seenStops.contains(stop.getParentStation().getId())) {
+      if (
+        stop.getParentStation() != null &&
+        !seenStops.contains(stop.getParentStation().getId()) &&
+        stopIsIncludedByStationFilter(stop)
+      ) {
         seenStops.add(stop.getParentStation().getId());
         placesFound.add(new PlaceAtDistance(stop.getParentStation(), distance));
       } else {

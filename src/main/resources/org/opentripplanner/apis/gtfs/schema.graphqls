@@ -1073,6 +1073,9 @@ input InputFilters {
     """Stops to include by GTFS id."""
     stops: [String]
 
+    """Stations to include by GTFS id."""
+    stations: [String]
+
     """Routes to include by GTFS id."""
     routes: [String]
 

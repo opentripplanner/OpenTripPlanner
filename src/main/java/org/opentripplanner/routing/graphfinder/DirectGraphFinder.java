@@ -60,6 +60,7 @@ public class DirectGraphFinder implements GraphFinder {
     List<TransitMode> filterByModes,
     List<PlaceType> filterByPlaceTypes,
     List<FeedScopedId> filterByStops,
+    List<FeedScopedId> filterByStations,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
     TransitService transitService

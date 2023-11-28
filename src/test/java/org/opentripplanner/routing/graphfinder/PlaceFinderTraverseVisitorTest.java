@@ -3,6 +3,7 @@ package org.opentripplanner.routing.graphfinder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_00;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_05;
+import static org.opentripplanner.model.plan.PlanTestConstants.T11_10;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.route;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.tripPattern;
@@ -24,13 +25,25 @@ import org.opentripplanner.transit.service.TransitModel;
 
 public class PlaceFinderTraverseVisitorTest {
 
-  static final Station STATION = Station
-    .of(id("S"))
-    .withName(new NonLocalizedString("Station"))
+  static final Station STATION1 = Station
+    .of(id("S1"))
+    .withName(new NonLocalizedString("Station 1"))
     .withCoordinate(1.1, 1.1)
     .build();
-  static final RegularStop STOP1 = TransitModelForTest.stopForTest("stop-1", 1, 1, STATION);
-  static final RegularStop STOP2 = TransitModelForTest.stopForTest("stop-2", 1.001, 1.001);
+  static final Station STATION2 = Station
+    .of(id("S2"))
+    .withName(new NonLocalizedString("Station 2"))
+    .withCoordinate(1.1, 1.1)
+    .build();
+  static final RegularStop STOP1 = TransitModelForTest.stopForTest("stop-1", 1, 1, STATION1);
+  static final RegularStop STOP2 = TransitModelForTest.stopForTest(
+    "stop-2",
+    1.001,
+    1.001,
+    STATION2
+  );
+
+  static final RegularStop STOP3 = TransitModelForTest.stopForTest("stop-3", 1.002, 1.002);
 
   static final Route r = route("r").build();
 
@@ -49,6 +62,12 @@ public class PlaceFinderTraverseVisitorTest {
     t.withStopPattern(new StopPattern(List.of(st1, st2)));
     a.addTripPattern(id("asd"), t.build());
 
+    var st3 = new StopTime();
+    st3.setStop(STOP3);
+    st3.setArrivalTime(T11_10);
+    t.withStopPattern(new StopPattern(List.of(st3)));
+    a.addTripPattern(id("asd2"), t.build());
+
     a.index();
   }
 
@@ -60,6 +79,7 @@ public class PlaceFinderTraverseVisitorTest {
       transitService,
       List.of(TransitMode.BUS),
       List.of(PlaceType.STOP),
+      null,
       null,
       null,
       null,
@@ -90,6 +110,7 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
       1,
       500
     );
@@ -103,7 +124,7 @@ public class PlaceFinderTraverseVisitorTest {
     visitor.visitVertex(state2);
     var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
 
-    assertEquals(List.of(STATION), res);
+    assertEquals(List.of(STATION1, STATION2), res);
 
     visitor.visitVertex(state1);
   }
@@ -117,6 +138,38 @@ public class PlaceFinderTraverseVisitorTest {
       null,
       null,
       null,
+      null,
+      1,
+      500
+    );
+
+    assertEquals(List.of(), visitor.placesFound);
+    var state1 = TestStateBuilder.ofWalking().streetEdge().stop(STOP1).build();
+
+    visitor.visitVertex(state1);
+
+    var state2 = TestStateBuilder.ofWalking().streetEdge().streetEdge().stop(STOP3).build();
+    visitor.visitVertex(state2);
+
+    // Revisited stop should not be added to found places
+    visitor.visitVertex(state1);
+    var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
+
+    assertEquals(List.of(STATION1, STOP3), res);
+
+    visitor.visitVertex(state1);
+  }
+
+  @Test
+  void stopsAndStationsWithStationFilter() {
+    var visitor = new PlaceFinderTraverseVisitor(
+      transitService,
+      List.of(TransitMode.BUS),
+      List.of(PlaceType.STOP, PlaceType.STATION),
+      List.of(STOP2.getId(), STOP3.getId()),
+      List.of(STATION1.getId()),
+      null,
+      null,
       1,
       500
     );
@@ -129,11 +182,47 @@ public class PlaceFinderTraverseVisitorTest {
     var state2 = TestStateBuilder.ofWalking().streetEdge().streetEdge().stop(STOP2).build();
     visitor.visitVertex(state2);
 
-    // Revisited stop should not be added to found places
-    visitor.visitVertex(state1);
+    var state3 = TestStateBuilder.ofWalking().streetEdge().streetEdge().stop(STOP3).build();
+    visitor.visitVertex(state3);
+
     var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
 
-    assertEquals(List.of(STATION, STOP2), res);
+    // Stop 3 should be included as it is not part of a station.
+    // Stop 2 should not be included as its parent station is not included in the station filter.
+    assertEquals(List.of(STATION1, STOP3), res);
+
+    visitor.visitVertex(state1);
+  }
+
+  @Test
+  void stopsAndStationsWithStopFilter() {
+    var visitor = new PlaceFinderTraverseVisitor(
+      transitService,
+      List.of(TransitMode.BUS),
+      List.of(PlaceType.STOP, PlaceType.STATION),
+      List.of(STOP2.getId()),
+      null,
+      null,
+      null,
+      1,
+      500
+    );
+
+    assertEquals(List.of(), visitor.placesFound);
+    var state1 = TestStateBuilder.ofWalking().streetEdge().stop(STOP1).build();
+
+    visitor.visitVertex(state1);
+
+    var state2 = TestStateBuilder.ofWalking().streetEdge().streetEdge().stop(STOP2).build();
+    visitor.visitVertex(state2);
+
+    var state3 = TestStateBuilder.ofWalking().streetEdge().streetEdge().stop(STOP3).build();
+    visitor.visitVertex(state3);
+
+    var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
+
+    // Stop 3 should not be included as it is included in the stop filter
+    assertEquals(List.of(STATION1, STATION2), res);
 
     visitor.visitVertex(state1);
   }
