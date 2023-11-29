@@ -104,7 +104,7 @@ public class ItineraryListFilterChainBuilder {
    * The maximum number of itineraries returned. This will remove all itineraries at the end of the
    * list AFTER the final sort of the itineraries.
    * <p>
-   * Se also the {@link #withMaxNumberOfItinerariesCrop(ListSection)} to change which end of the
+   * Se also the {@link #withMaxNumberOfItinerariesCropSection(ListSection)} to change which end of the
    * list is cropped.
    * <p>
    * Use {@code -1} to disable.
@@ -122,7 +122,9 @@ public class ItineraryListFilterChainBuilder {
    * The default is to crop the tail. But, we need to crop the head to be able to paginate in the
    * opposite direction of the main sort-order of the original search.
    */
-  public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCrop(ListSection section) {
+  public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCropSection(
+    ListSection section
+  ) {
     this.maxNumberOfItinerariesCrop = section;
     return this;
   }
