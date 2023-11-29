@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan;
+package org.opentripplanner.model.plan.paging;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.DurationUtils.duration;
