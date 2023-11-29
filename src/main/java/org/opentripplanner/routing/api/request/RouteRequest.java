@@ -208,20 +208,6 @@ public class RouteRequest implements Cloneable, Serializable {
   }
 
   /**
-   * Related to {@link #cropItinerariesAt()}, but is {@code true} if we should crop the
-   * search-window head(in the beginning) or tail(in the end).
-   * <p>
-   * For the first search we look if the sort is ascending(crop tail) or descending(crop head), and
-   * for paged results we look at the paging type: next(tail) and previous(head).
-   */
-  public boolean doCropSearchWindowAtTail() {
-    if (pageCursor == null) {
-      return itinerariesSortOrder().isSortedByAscendingArrivalTime();
-    }
-    return pageCursor.type().isNext();
-  }
-
-  /**
    * Validate that the routing request contains both an origin and a destination. Origin and
    * destination can be specified either by a reference to a stop place or by geographical
    * coordinates. Origin and destination are required in a one-to-one search, but not in a

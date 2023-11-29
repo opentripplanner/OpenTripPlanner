@@ -16,7 +16,6 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.paging.PagingSearchWindowAdjuster;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
@@ -28,13 +27,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +48,7 @@ public class RoutingWorker {
   private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
   /** An object that accumulates profiling and debugging info for inclusion in the response. */
-  public final DebugTimingAggregator debugTimingAggregator;
-  public final PagingSearchWindowAdjuster pagingSearchWindowAdjuster;
+  private final DebugTimingAggregator debugTimingAggregator;
 
   private final RouteRequest request;
   private final OtpServerRequestContext serverContext;
@@ -78,11 +76,6 @@ public class RoutingWorker {
         request.preferences().system().tags()
       );
     this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
-    this.pagingSearchWindowAdjuster =
-      createPagingSearchWindowAdjuster(
-        serverContext.transitTuningParameters(),
-        serverContext.raptorTuningParameters()
-      );
     this.additionalSearchDays =
       createAdditionalSearchDays(serverContext.raptorTuningParameters(), zoneId, request);
   }
@@ -165,18 +158,25 @@ public class RoutingWorker {
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).
-    var searchWindowNextSearch = calculateSearchWindowNextSearch(filteredItineraries);
+
+    var pagingService = new PagingService(
+      searchStartTime(),
+      serverContext.transitTuningParameters(),
+      serverContext.raptorTuningParameters(),
+      request,
+      raptorSearchParamsUsed,
+      numItinerariesFilterResults,
+      itineraries
+    );
 
     return RoutingResponseMapper.map(
       request,
-      transitSearchTimeZero,
       raptorSearchParamsUsed,
-      searchWindowNextSearch,
-      numItinerariesFilterResults,
       filteredItineraries,
       routingErrors,
       debugTimingAggregator,
-      serverContext.transitService()
+      serverContext.transitService(),
+      pagingService
     );
   }
 
@@ -300,55 +300,7 @@ public class RoutingWorker {
     return null;
   }
 
-  private Duration calculateSearchWindowNextSearch(List<Itinerary> itineraries) {
-    // No transit search performed
-    if (raptorSearchParamsUsed == null) {
-      return null;
-    }
-
-    var sw = Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
-
-    // SearchWindow cropped -> decrease search-window
-    if (numItinerariesFilterResults != null) {
-      Instant swStartTime = searchStartTime()
-        .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime());
-      boolean cropSWHead = request.doCropSearchWindowAtTail();
-      Instant rmItineraryStartTime = numItinerariesFilterResults
-        .firstRemoved()
-        .startTimeAsInstant();
-
-      return pagingSearchWindowAdjuster.decreaseSearchWindow(
-        sw,
-        swStartTime,
-        rmItineraryStartTime,
-        cropSWHead
-      );
-    }
-    // (num-of-itineraries found <= numItineraries)  ->  increase or keep search-window
-    else {
-      int nRequested = request.numItineraries();
-      int nFound = (int) itineraries
-        .stream()
-        .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())
-        .count();
-
-      return pagingSearchWindowAdjuster.increaseOrKeepSearchWindow(sw, nRequested, nFound);
-    }
-  }
-
   private Instant searchStartTime() {
     return transitSearchTimeZero.toInstant();
-  }
-
-  private PagingSearchWindowAdjuster createPagingSearchWindowAdjuster(
-    TransitTuningParameters transitTuningParameters,
-    RaptorTuningParameters raptorTuningParameters
-  ) {
-    var c = raptorTuningParameters.dynamicSearchWindowCoefficients();
-    return new PagingSearchWindowAdjuster(
-      c.minWindow(),
-      c.maxWindow(),
-      transitTuningParameters.pagingSearchWindowAdjustments()
-    );
   }
 }
