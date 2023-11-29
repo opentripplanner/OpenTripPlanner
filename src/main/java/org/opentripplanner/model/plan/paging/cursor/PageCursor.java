@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan.pagecursor;
+package org.opentripplanner.model.plan.paging.cursor;
 
 import java.time.Duration;
 import java.time.Instant;

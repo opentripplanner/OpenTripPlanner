@@ -1,11 +1,11 @@
-package org.opentripplanner.model.plan.pagecursor;
+package org.opentripplanner.model.plan.paging.cursor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
-import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
+import static org.opentripplanner.model.plan.paging.cursor.PageType.NEXT_PAGE;
+import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAGE;
 
 import java.time.Duration;
 import java.time.Instant;

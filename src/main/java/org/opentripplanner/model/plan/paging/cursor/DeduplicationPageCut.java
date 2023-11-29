@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan.pagecursor;
+package org.opentripplanner.model.plan.paging.cursor;
 
 import java.time.Instant;
 import org.opentripplanner.model.plan.ItinerarySortKey;

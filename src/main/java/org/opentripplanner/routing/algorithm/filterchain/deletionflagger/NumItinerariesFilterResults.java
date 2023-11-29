@@ -6,7 +6,7 @@ import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
-import org.opentripplanner.model.plan.pagecursor.PageCursorInput;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 
 public class NumItinerariesFilterResults implements PageCursorInput {
 

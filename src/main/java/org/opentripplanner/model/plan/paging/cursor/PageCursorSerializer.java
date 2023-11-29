@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan.pagecursor;
+package org.opentripplanner.model.plan.paging.cursor;
 
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.StringUtils;

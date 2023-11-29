@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan.pagecursor;
+package org.opentripplanner.model.plan.paging.cursor;
 
 /**
  * Used to tell which way the paging is going, to the {@link #NEXT_PAGE} or to the {@link
