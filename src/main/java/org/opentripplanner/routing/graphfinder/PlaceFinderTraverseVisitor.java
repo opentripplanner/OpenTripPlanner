@@ -216,14 +216,10 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
         seenStops.add(stop.getId());
         placesFound.add(new PlaceAtDistance(stop, distance));
       }
-    } else if (
-      includeStations &&
-      stop.getParentStation() != null &&
-      !seenStops.contains(stop.getParentStation().getId())
-    ) {
+    } else if (includeStations && stop.getParentStation() != null) {
       seenStops.add(stop.getParentStation().getId());
       placesFound.add(new PlaceAtDistance(stop.getParentStation(), distance));
-    } else if (includeStops && !seenStops.contains(stop.getId())) {
+    } else if (includeStops) {
       seenStops.add(stop.getId());
       placesFound.add(new PlaceAtDistance(stop, distance));
     }
