@@ -10,6 +10,15 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.transit.model.basic.Accessibility;
 
+/**
+ * A TripTimes represents the arrival and departure times for a single trip in a timetable. It is
+ * one of the core class used for transit routing. This interface allow different kind of trip
+ * to implement their own trip times. Scheduled/planned trips should be immutable, real-time
+ * trip times should allow updates and more info, frequency-based trips can use a more compact
+ * implementation, and Flex may expose part of the trip as a "scheduled/regular" stop-to-stop
+ * trip using this interface. All times are expressed as seconds since midnight (as in
+ * GTFS).
+ */
 public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
    * Copy scheduled times, but not the actual times.
