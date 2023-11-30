@@ -3,7 +3,7 @@ package org.opentripplanner.transit.model.framework;
 import org.opentripplanner.framework.error.OtpError;
 
 /**
- * This class is used to throw a data validation exception. It holds an error witch can be
+ * This class is used to throw a data validation exception. It holds an error which can be
  * inserted into build issue store, into the updater logs or returned to the APIs. The framework
  * to catch and handle this is NOT IN PLACE, see
  * <a href="https://github.com/opentripplanner/OpenTripPlanner/issues/5070">Error code design #5070</a>.

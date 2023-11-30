@@ -24,7 +24,7 @@ examples. The Transit model is more complex than the VehiclePosition model.
    a use-case or set of features. It may have an api with request/response classes. These are 
    usually stateless; Hence the `Use Case Service` does normally not have a model. The implementing
    class has the same name as the interface with prefix `Default`.
- - `Domain Model` A model witch encapsulate a business area. In the drawing two examples are shown,
+ - `Domain Model` A model which encapsulate a business area. In the drawing two examples are shown,
    the `transit` and `vhicleposition` domain model. The transit model is more complex so the 
    implementation have a separate `Service` and `Repository`. Almost all http endpoints are , 
    read-only so the `Service` can focus on serving the http API endpoints, while the repository
