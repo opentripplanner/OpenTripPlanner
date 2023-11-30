@@ -23,7 +23,7 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   /**
    * Copy scheduled times, but not the actual times.
    */
-  public RealTimeTripTimes copyScheduledTimes();
+  RealTimeTripTimes copyScheduledTimes();
 
   /** The code for the service on which this trip runs. For departure search optimizations. */
   int getServiceCode();
@@ -59,7 +59,7 @@ public interface TripTimes extends Serializable, Comparable<TripTimes> {
   int getDepartureDelay(int stop);
 
   /**
-   * Whether or not stopIndex is considered a GTFS timepoint.
+   * Whether stopIndex is considered a GTFS timepoint.
    */
   boolean isTimepoint(int stopIndex);
 

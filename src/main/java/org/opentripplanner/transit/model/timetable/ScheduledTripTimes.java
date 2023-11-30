@@ -20,6 +20,12 @@ import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DeduplicatorService;
 
+/**
+ * Regular/planed/scheduled read-only version of {@link TripTimes}. The set of static
+ * trip-times are build during graph-build and can not be changed using real-time updates.
+ *
+ * @see RealTimeTripTimes for real-time version
+ */
 public final class ScheduledTripTimes implements TripTimes {
 
   /**
@@ -318,7 +324,7 @@ public final class ScheduledTripTimes implements TripTimes {
   /**
    * When creating scheduled trip times we could potentially imply negative running or dwell times.
    * We really don't want those being used in routing. This method checks that all times are
-   * increasing. The first stop arrival time and the last stops depature time is NOT checked -
+   * increasing. The first stop arrival time and the last stops departure time is NOT checked -
    * these should be ignored by raptor.
    */
   private void validateNonIncreasingTimes() {

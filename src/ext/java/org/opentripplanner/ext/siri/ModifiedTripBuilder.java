@@ -34,7 +34,8 @@ import uk.org.siri.siri20.OccupancyEnumeration;
  */
 public class ModifiedTripBuilder {
 
-  private static final Logger LOG = LoggerFactory.getLogger(TimetableHelper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ModifiedTripBuilder.class);
+
   private final TripTimes existingTripTimes;
   private final TripPattern pattern;
   private final LocalDate serviceDate;

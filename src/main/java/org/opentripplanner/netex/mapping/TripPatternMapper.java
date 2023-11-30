@@ -363,7 +363,7 @@ class TripPatternMapper {
   private void createTripTimes(List<Trip> trips, TripPattern tripPattern) {
     for (Trip trip : trips) {
       List<StopTime> stopTimes = result.tripStopTimes.get(trip);
-      if (stopTimes.size() == 0) {
+      if (stopTimes.isEmpty()) {
         issueStore.add(
           "TripWithoutTripTimes",
           "Trip %s does not contain any trip times.",
