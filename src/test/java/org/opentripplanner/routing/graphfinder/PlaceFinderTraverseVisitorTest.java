@@ -42,7 +42,7 @@ public class PlaceFinderTraverseVisitorTest {
     .stop("stop-1")
     .withCoordinate(new WgsCoordinate(1, 1))
     .withParentStation(STATION1)
-    .build(); // 1, 1, STATION1);
+    .build();
   static final RegularStop STOP2 = model
     .stop("stop-2")
     .withCoordinate(1.001, 1.001)
