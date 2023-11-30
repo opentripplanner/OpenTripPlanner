@@ -114,8 +114,6 @@ public class BuildConfig implements OtpDataStoreConfig {
 
   public final boolean platformEntriesLinking;
 
-  public final boolean matchBusRoutesToStreets;
-
   /** See {@link S3BucketConfig}. */
   public final S3BucketConfig elevationBucket;
 
@@ -271,14 +269,6 @@ all of the elevation values in the street edges.
 
     islandPruning = IslandPruningConfig.fromConfig(root);
 
-    matchBusRoutesToStreets =
-      root
-        .of("matchBusRoutesToStreets")
-        .since(V1_5)
-        .summary(
-          "Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking."
-        )
-        .asBoolean(false);
     maxDataImportIssuesPerFile =
       root
         .of("maxDataImportIssuesPerFile")
