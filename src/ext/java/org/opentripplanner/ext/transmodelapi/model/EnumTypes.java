@@ -49,6 +49,7 @@ public class EnumTypes {
     .value("noFilter", AlternativeLegsFilter.NO_FILTER)
     .value("sameAuthority", AlternativeLegsFilter.SAME_AGENCY)
     .value("sameMode", AlternativeLegsFilter.SAME_MODE)
+    .value("sameSubmode", AlternativeLegsFilter.SAME_SUBMODE)
     .value("sameLine", AlternativeLegsFilter.SAME_ROUTE)
     .build();
 
