@@ -61,7 +61,7 @@ public class ItineraryListFilterChainBuilder {
 
   private ItineraryFilterDebugProfile debug = ItineraryFilterDebugProfile.OFF;
   private int maxNumberOfItineraries = NOT_SET;
-  private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
+  private ListSection maxNumberOfItinerariesCropSection = ListSection.TAIL;
   private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
   private boolean removeWalkAllTheWayResults;
   private boolean sameFirstOrLastTripFilter;
@@ -126,7 +126,7 @@ public class ItineraryListFilterChainBuilder {
   public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCropSection(
     ListSection section
   ) {
-    this.maxNumberOfItinerariesCrop = section;
+    this.maxNumberOfItinerariesCropSection = section;
     return this;
   }
 
@@ -354,11 +354,6 @@ public class ItineraryListFilterChainBuilder {
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
-    // Remove itineraries present in the page retrieved before this.
-    if (itineraryPageCut != null) {
-      addRmFilter(filters, new PagingFilter(sortOrder, deduplicateSection(), itineraryPageCut));
-    }
-
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
     if (removeItinerariesWithSameRoutesAndStops) {
@@ -436,10 +431,6 @@ public class ItineraryListFilterChainBuilder {
         addRmFilter(filters, new RemoveWalkOnlyFilter());
       }
 
-      if (earliestDepartureTime != null) {
-        addRmFilter(filters, new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow));
-      }
-
       if (bikeRentalDistanceRatio > 0) {
         addRmFilter(filters, new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio));
       }
@@ -452,17 +443,32 @@ public class ItineraryListFilterChainBuilder {
       }
     }
 
-    // Remove itineraries if max limit is set
-    if (maxNumberOfItineraries > 0) {
-      filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
-      addRmFilter(
-        filters,
-        new NumItinerariesFilter(
-          maxNumberOfItineraries,
-          maxNumberOfItinerariesCrop,
-          numItinerariesFilterResultsConsumer
-        )
-      );
+    // Paging related filters - these filters are run after group-by filters to allow a result
+    // outside the page to also take effect inside the window. This is debatable but lead to less
+    // noise, but is not deterministic because the result depend on the search-window size and
+    // where "cut" between each page is
+    {
+      // Remove itineraries present in the page retrieved before this page/search.
+      if (itineraryPageCut != null) {
+        addRmFilter(filters, new PagingFilter(sortOrder, deduplicateSection(), itineraryPageCut));
+      }
+
+      if (earliestDepartureTime != null) {
+        addRmFilter(filters, new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow));
+      }
+
+      // Remove itineraries if max limit is set
+      if (maxNumberOfItineraries > 0) {
+        filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
+        addRmFilter(
+          filters,
+          new NumItinerariesFilter(
+            maxNumberOfItineraries,
+            maxNumberOfItinerariesCropSection,
+            numItinerariesFilterResultsConsumer
+          )
+        );
+      }
     }
 
     // Do the final itineraries sort
@@ -579,7 +585,7 @@ public class ItineraryListFilterChainBuilder {
   }
 
   private ListSection deduplicateSection() {
-    return maxNumberOfItinerariesCrop.invert();
+    return maxNumberOfItinerariesCropSection.invert();
   }
 
   private static void addRmFilter(
