@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -52,5 +53,17 @@ public interface ItineraryDeletionFlagger {
    */
   default boolean skipAlreadyFlaggedItineraries() {
     return true;
+  }
+
+  /**
+   * Filter given {@code input} and remove itineraries which should be flagged for removal. This
+   * can be used in unit-tests - either testing the filter or using the filter in a test.
+   * <p>
+   * This method should be used in unit-tests only.
+   */
+  default List<Itinerary> removeMatchesForTest(List<Itinerary> input) {
+    var res = new ArrayList<>(input);
+    res.removeAll(flagForRemoval(input));
+    return res;
   }
 }
