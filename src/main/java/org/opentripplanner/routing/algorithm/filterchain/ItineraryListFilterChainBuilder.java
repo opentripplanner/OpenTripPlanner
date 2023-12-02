@@ -19,6 +19,7 @@ import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.ItineraryDeletionFlagger;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilter;
@@ -355,11 +356,7 @@ public class ItineraryListFilterChainBuilder {
 
     // Remove itineraries present in the page retrieved before this.
     if (itineraryPageCut != null) {
-      filters.add(
-        new DeletionFlaggingFilter(
-          new PagingFilter(sortOrder, deduplicateSection(), itineraryPageCut)
-        )
-      );
+      addRmFilter(filters, new PagingFilter(sortOrder, deduplicateSection(), itineraryPageCut));
     }
 
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
@@ -370,7 +367,7 @@ public class ItineraryListFilterChainBuilder {
 
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
-      filters.add(new DeletionFlaggingFilter(new SameFirstOrLastTripFilter()));
+      addRmFilter(filters, new SameFirstOrLastTripFilter());
     }
 
     if (minBikeParkingDistance > 0) {
@@ -397,23 +394,18 @@ public class ItineraryListFilterChainBuilder {
 
     // Filter transit itineraries on generalized-cost
     if (transitGeneralizedCostFilterParams != null) {
-      filters.add(
-        new DeletionFlaggingFilter(
-          new TransitGeneralizedCostFilter(
-            transitGeneralizedCostFilterParams.costLimitFunction(),
-            transitGeneralizedCostFilterParams.intervalRelaxFactor()
-          )
+      addRmFilter(
+        filters,
+        new TransitGeneralizedCostFilter(
+          transitGeneralizedCostFilterParams.costLimitFunction(),
+          transitGeneralizedCostFilterParams.intervalRelaxFactor()
         )
       );
     }
 
     // Filter non-transit itineraries on generalized-cost
     if (nonTransitGeneralizedCostLimit != null) {
-      filters.add(
-        new DeletionFlaggingFilter(
-          new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit)
-        )
-      );
+      addRmFilter(filters, new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit));
     }
 
     // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
@@ -428,44 +420,34 @@ public class ItineraryListFilterChainBuilder {
     {
       // Filter transit itineraries by comparing against non-transit using generalized-cost
       if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
-        filters.add(
-          new DeletionFlaggingFilter(
-            new RemoveTransitIfStreetOnlyIsBetterFilter(
-              removeTransitWithHigherCostThanBestOnStreetOnly
-            )
+        addRmFilter(
+          filters,
+          new RemoveTransitIfStreetOnlyIsBetterFilter(
+            removeTransitWithHigherCostThanBestOnStreetOnly
           )
         );
       }
 
       if (removeTransitIfWalkingIsBetter) {
-        filters.add(new DeletionFlaggingFilter(new RemoveTransitIfWalkingIsBetterFilter()));
+        addRmFilter(filters, new RemoveTransitIfWalkingIsBetterFilter());
       }
 
       if (removeWalkAllTheWayResults) {
-        filters.add(new DeletionFlaggingFilter(new RemoveWalkOnlyFilter()));
+        addRmFilter(filters, new RemoveWalkOnlyFilter());
       }
 
       if (earliestDepartureTime != null) {
-        filters.add(
-          new DeletionFlaggingFilter(
-            new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow)
-          )
-        );
+        addRmFilter(filters, new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow));
       }
 
       if (bikeRentalDistanceRatio > 0) {
-        filters.add(
-          new DeletionFlaggingFilter(
-            new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio)
-          )
-        );
+        addRmFilter(filters, new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio));
       }
 
       if (parkAndRideDurationRatio > 0) {
-        filters.add(
-          new DeletionFlaggingFilter(
-            new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio)
-          )
+        addRmFilter(
+          filters,
+          new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio)
         );
       }
     }
@@ -473,13 +455,12 @@ public class ItineraryListFilterChainBuilder {
     // Remove itineraries if max limit is set
     if (maxNumberOfItineraries > 0) {
       filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
-      filters.add(
-        new DeletionFlaggingFilter(
-          new NumItinerariesFilter(
-            maxNumberOfItineraries,
-            maxNumberOfItinerariesCrop,
-            numItinerariesFilterResultsConsumer
-          )
+      addRmFilter(
+        filters,
+        new NumItinerariesFilter(
+          maxNumberOfItineraries,
+          maxNumberOfItinerariesCrop,
+          numItinerariesFilterResultsConsumer
         )
       );
     }
@@ -580,13 +561,12 @@ public class ItineraryListFilterChainBuilder {
       if (group.maxCostOtherLegsFactor > 1.0) {
         var flagger = new OtherThanSameLegsMaxGeneralizedCostFilter(group.maxCostOtherLegsFactor);
         sysTags.add(flagger.name());
-        nested.add(new DeletionFlaggingFilter(flagger));
+        addRmFilter(nested, flagger);
       }
 
       nested.add(new SortingFilter(generalizedCostComparator()));
-      nested.add(
-        new DeletionFlaggingFilter(new MaxLimitFilter(tag, group.maxNumOfItinerariesPerGroup))
-      );
+
+      addRmFilter(nested, new MaxLimitFilter(tag, group.maxNumOfItinerariesPerGroup));
 
       nested.add(new RemoveDeletionFlagForLeastTransfersItinerary(sysTags));
 
@@ -600,5 +580,12 @@ public class ItineraryListFilterChainBuilder {
 
   private ListSection deduplicateSection() {
     return maxNumberOfItinerariesCrop.invert();
+  }
+
+  private static void addRmFilter(
+    List<ItineraryListFilter> filters,
+    ItineraryDeletionFlagger removeFilter
+  ) {
+    filters.add(new DeletionFlaggingFilter(removeFilter));
   }
 }
