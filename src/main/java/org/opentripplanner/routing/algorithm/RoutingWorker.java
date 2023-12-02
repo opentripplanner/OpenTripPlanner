@@ -20,6 +20,7 @@ import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
@@ -159,15 +160,7 @@ public class RoutingWorker {
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).
 
-    var pagingService = new PagingService(
-      searchStartTime(),
-      serverContext.transitTuningParameters(),
-      serverContext.raptorTuningParameters(),
-      request,
-      raptorSearchParamsUsed,
-      numItinerariesFilterResults,
-      itineraries
-    );
+    var pagingService = createPagingService(itineraries);
 
     return RoutingResponseMapper.map(
       request,
@@ -195,27 +188,6 @@ public class RoutingWorker {
       maxWindow,
       request.preferences().system().maxJourneyDuration()
     );
-  }
-
-  /**
-   * Filter itineraries away that depart after the latest-departure-time for depart after search.
-   * These itineraries are a result of time-shifting the access leg and is needed for the raptor to
-   * prune the results. These itineraries are often not ideal, but if they pareto optimal for the
-   * "next" window, they will appear when a "next" search is performed.
-   */
-  private Instant filterOnLatestDepartureTime() {
-    if (
-      !request.arriveBy() &&
-      raptorSearchParamsUsed != null &&
-      raptorSearchParamsUsed.isSearchWindowSet() &&
-      raptorSearchParamsUsed.isEarliestDepartureTimeSet()
-    ) {
-      int ldt =
-        raptorSearchParamsUsed.earliestDepartureTime() +
-        raptorSearchParamsUsed.searchWindowInSeconds();
-      return transitSearchTimeZero.plusSeconds(ldt).toInstant();
-    }
-    return null;
   }
 
   /**
@@ -302,5 +274,17 @@ public class RoutingWorker {
 
   private Instant searchStartTime() {
     return transitSearchTimeZero.toInstant();
+  }
+
+  private PagingService createPagingService(List<Itinerary> itineraries) {
+    return PagingServiceFactory.createPagingService(
+      searchStartTime(),
+      serverContext.transitTuningParameters(),
+      serverContext.raptorTuningParameters(),
+      request,
+      raptorSearchParamsUsed,
+      numItinerariesFilterResults,
+      itineraries
+    );
   }
 }
