@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan.paging.cursor;
 import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
@@ -36,6 +37,27 @@ public record PageCursor(
   @Nullable
   public static PageCursor decode(String cursor) {
     return PageCursorSerializer.decode(cursor);
+  }
+
+  /**
+   * When paging we must crop the list of itineraries in the right end according to the sorting of
+   * the original search and according to the paging direction(next or previous).
+   */
+  public ListSection cropItinerariesAt() {
+    // Depart after search
+    if (originalSortOrder().isSortedByAscendingArrivalTime()) {
+      return switch (type) {
+        case NEXT_PAGE -> ListSection.TAIL;
+        case PREVIOUS_PAGE -> ListSection.HEAD;
+      };
+    }
+    // Arrive by search
+    else {
+      return switch (type) {
+        case NEXT_PAGE -> ListSection.HEAD;
+        case PREVIOUS_PAGE -> ListSection.TAIL;
+      };
+    }
   }
 
   @Override

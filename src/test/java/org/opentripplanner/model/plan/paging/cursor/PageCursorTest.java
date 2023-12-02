@@ -2,6 +2,8 @@ package org.opentripplanner.model.plan.paging.cursor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.framework.collection.ListSection.HEAD;
+import static org.opentripplanner.framework.collection.ListSection.TAIL;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
 import static org.opentripplanner.model.plan.paging.cursor.PageType.NEXT_PAGE;
@@ -10,18 +12,24 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.TimeZone;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner._support.time.ZoneIds;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
-public class PageCursorTest implements PlanTestConstants {
+class PageCursorTest implements PlanTestConstants {
 
   public static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
   public static final Place A = Place.forStop(
@@ -81,6 +89,24 @@ public class PageCursorTest implements PlanTestConstants {
       ", searchWindow: 2h, " +
       "itineraryPageCut: [2020-02-02T00:00:00Z, 2020-02-02T00:00:50Z, $194, Tx0, transit]}",
       subjectArriveBy.toString()
+    );
+  }
+
+  static List<Arguments> cropItinerariesAtTestCase() {
+    return List.of(
+      Arguments.of(NEXT_PAGE, STREET_AND_ARRIVAL_TIME, TAIL),
+      Arguments.of(NEXT_PAGE, STREET_AND_DEPARTURE_TIME, HEAD),
+      Arguments.of(PREVIOUS_PAGE, STREET_AND_ARRIVAL_TIME, HEAD),
+      Arguments.of(PREVIOUS_PAGE, STREET_AND_DEPARTURE_TIME, TAIL)
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("cropItinerariesAtTestCase")
+  public void cropItinerariesAt(PageType page, SortOrder order, ListSection expSection) {
+    assertEquals(
+      expSection,
+      new PageCursor(page, order, EDT, null, SEARCH_WINDOW, null).cropItinerariesAt()
     );
   }
 
