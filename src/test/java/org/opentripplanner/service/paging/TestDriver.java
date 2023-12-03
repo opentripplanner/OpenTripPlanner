@@ -103,7 +103,7 @@ final class TestDriver {
   }
 
   ItinerarySortKey expectedCut() {
-    return results == null ? null : results.firstRemoved();
+    return results == null ? null : results.pageCut();
   }
 
   TestDriver newPage(PageCursor cursor) {

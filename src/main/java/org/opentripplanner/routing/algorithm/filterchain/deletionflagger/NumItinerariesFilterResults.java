@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 import java.time.Instant;
 import java.util.List;
 import org.opentripplanner.framework.collection.ListSection;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
@@ -14,7 +15,7 @@ public class NumItinerariesFilterResults implements PageCursorInput {
   private final Instant latestRemovedDeparture;
   private final Instant latestRemovedArrival;
   private final Instant earliestKeptArrival;
-  private final ItinerarySortKey firstRemoved;
+  private final ItinerarySortKey pageCut;
   private final ListSection cropSection;
 
   /**
@@ -49,9 +50,9 @@ public class NumItinerariesFilterResults implements PageCursorInput {
         .orElseThrow();
 
     if (cropSection == ListSection.HEAD) {
-      firstRemoved = removedItineraries.get(removedItineraries.size() - 1);
+      pageCut = ListUtils.last(removedItineraries);
     } else {
-      firstRemoved = removedItineraries.get(0);
+      pageCut = ListUtils.first(removedItineraries);
     }
     this.cropSection = cropSection;
   }
@@ -77,8 +78,8 @@ public class NumItinerariesFilterResults implements PageCursorInput {
   }
 
   @Override
-  public ItinerarySortKey firstRemoved() {
-    return firstRemoved;
+  public ItinerarySortKey pageCut() {
+    return pageCut;
   }
 
   @Override
@@ -89,7 +90,7 @@ public class NumItinerariesFilterResults implements PageCursorInput {
       .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
       .addDateTime("latestRemovedArrival", latestRemovedArrival)
       .addDateTime("earliestKeptArrival", earliestKeptArrival)
-      .addObjOp("firstRemoved", firstRemoved, ItinerarySortKey::keyAsString)
+      .addObjOp("pageCut", pageCut, ItinerarySortKey::keyAsString)
       .addEnum("cropSection", cropSection)
       .toString();
   }

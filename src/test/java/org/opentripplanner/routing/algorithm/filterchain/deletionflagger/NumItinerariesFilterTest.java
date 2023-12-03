@@ -56,7 +56,7 @@ public class NumItinerariesFilterTest {
 
     assertEquals(
       i3.startTime().toInstant().toString(),
-      subscribeResult.firstRemoved().startTimeAsInstant().toString()
+      subscribeResult.pageCut().startTimeAsInstant().toString()
     );
 
     assertEquals(
@@ -90,7 +90,7 @@ public class NumItinerariesFilterTest {
 
     assertEquals(
       i2.startTime().toInstant().toString(),
-      subscribeResult.firstRemoved().startTimeAsInstant().toString()
+      subscribeResult.pageCut().startTimeAsInstant().toString()
     );
 
     assertEquals(

@@ -16,7 +16,8 @@ public class PageCursorFactory {
   private final SortOrder sortOrder;
   private final Duration newSearchWindow;
   private PageType currentPageType;
-  private SearchTime current = null;
+  private Instant currentEdt = null;
+  private Instant currentLat = null;
   private Duration currentSearchWindow = null;
   private boolean wholeSwUsed = true;
   private ItinerarySortKey itineraryPageCut = null;
@@ -43,7 +44,8 @@ public class PageCursorFactory {
     this.currentPageType =
       pageType == null ? resolvePageTypeForTheFirstSearch(sortOrder) : pageType;
 
-    this.current = new SearchTime(edt, lat);
+    this.currentEdt = edt;
+    this.currentLat = lat;
     this.currentSearchWindow = searchWindow;
     return this;
   }
@@ -60,7 +62,7 @@ public class PageCursorFactory {
   public PageCursorFactory withRemovedItineraries(PageCursorInput pageCursorFactoryParams) {
     this.wholeSwUsed = false;
     this.pageCursorInput = pageCursorFactoryParams;
-    this.itineraryPageCut = pageCursorFactoryParams.firstRemoved();
+    this.itineraryPageCut = pageCursorFactoryParams.pageCut();
     return this;
   }
 
@@ -82,7 +84,8 @@ public class PageCursorFactory {
       .of(PageCursorFactory.class)
       .addEnum("sortOrder", sortOrder)
       .addEnum("currentPageType", currentPageType)
-      .addObj("current", current)
+      .addDateTime("currentEdt", currentEdt)
+      .addDateTime("currentLat", currentLat)
       .addDuration("currentSearchWindow", currentSearchWindow)
       .addDuration("newSearchWindow", newSearchWindow)
       .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
@@ -103,78 +106,51 @@ public class PageCursorFactory {
 
   /** Create page cursor pair (next and previous) */
   private void createPageCursors() {
-    if (current == null || nextCursor != null || prevCursor != null) {
+    if (currentEdt == null || nextCursor != null || prevCursor != null) {
       return;
     }
 
-    SearchTime prev = new SearchTime(null, null);
-    SearchTime next = new SearchTime(null, null);
+    Instant prevEdt = null;
+    Instant prevLat = null;
+    Instant nextEdt = null;
 
     if (wholeSwUsed) {
-      prev.edt = edtBeforeNewSw();
-      next.edt = edtAfterUsedSw();
+      prevEdt = edtBeforeNewSw();
+      nextEdt = edtAfterUsedSw();
       if (!sortOrder.isSortedByAscendingArrivalTime()) {
-        prev.lat = current.lat;
+        prevLat = currentLat;
       }
     }
     // If the whole search window was not used (i.e. if there were removed itineraries)
     else {
       if (currentPageType == NEXT_PAGE) {
-        prev.edt = edtBeforeNewSw();
-        next.edt = pageCursorInput.earliestRemovedDeparture();
+        prevEdt = edtBeforeNewSw();
+        nextEdt = pageCursorInput.earliestRemovedDeparture();
         if (sortOrder.isSortedByAscendingArrivalTime()) {
-          prev.lat = pageCursorInput.earliestKeptArrival().truncatedTo(ChronoUnit.MINUTES);
+          prevLat = pageCursorInput.earliestKeptArrival().truncatedTo(ChronoUnit.MINUTES);
         } else {
-          prev.lat = current.lat;
+          prevLat = currentLat;
         }
       } else {
         // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
         // search-window from the last time included in the search window we need to include one extra
         // minute at the end.
-        prev.edt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
-        next.edt = edtAfterUsedSw();
-        prev.lat = pageCursorInput.latestRemovedArrival();
+        prevEdt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
+        nextEdt = edtAfterUsedSw();
+        prevLat = pageCursorInput.latestRemovedArrival();
       }
     }
     prevCursor =
-      new PageCursor(
-        PREVIOUS_PAGE,
-        sortOrder,
-        prev.edt,
-        prev.lat,
-        newSearchWindow,
-        itineraryPageCut
-      );
+      new PageCursor(PREVIOUS_PAGE, sortOrder, prevEdt, prevLat, newSearchWindow, itineraryPageCut);
     nextCursor =
-      new PageCursor(NEXT_PAGE, sortOrder, next.edt, next.lat, newSearchWindow, itineraryPageCut);
+      new PageCursor(NEXT_PAGE, sortOrder, nextEdt, null, newSearchWindow, itineraryPageCut);
   }
 
   private Instant edtBeforeNewSw() {
-    return current.edt.minus(newSearchWindow);
+    return currentEdt.minus(newSearchWindow);
   }
 
   private Instant edtAfterUsedSw() {
-    return current.edt.plus(currentSearchWindow);
-  }
-
-  /** Temporary data class used to hold a pair of edt and lat */
-  private static class SearchTime {
-
-    Instant edt;
-    Instant lat;
-
-    private SearchTime(Instant edt, Instant lat) {
-      this.edt = edt;
-      this.lat = lat;
-    }
-
-    @Override
-    public String toString() {
-      return ToStringBuilder
-        .of(SearchTime.class)
-        .addDateTime("edt", edt)
-        .addDateTime("lat", lat)
-        .toString();
-    }
+    return currentEdt.plus(currentSearchWindow);
   }
 }

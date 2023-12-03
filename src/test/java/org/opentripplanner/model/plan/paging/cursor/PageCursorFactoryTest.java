@@ -179,7 +179,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     Instant earliestRemovedDeparture,
     Instant latestRemovedDeparture,
     Instant latestRemovedArrival,
-    ItinerarySortKey firstRemoved
+    ItinerarySortKey pageCut
   )
     implements PageCursorInput {
     public TestPageCursorInput(Itinerary keptItinerary, Itinerary removedItinerary) {

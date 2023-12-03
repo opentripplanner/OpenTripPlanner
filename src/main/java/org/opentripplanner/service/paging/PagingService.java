@@ -101,9 +101,7 @@ public class PagingService {
     // SearchWindow cropped -> decrease search-window
     if (numItinerariesFilterResults != null) {
       boolean cropSWHead = doCropSearchWindowAtTail();
-      Instant rmItineraryStartTime = numItinerariesFilterResults
-        .firstRemoved()
-        .startTimeAsInstant();
+      Instant rmItineraryStartTime = numItinerariesFilterResults.pageCut().startTimeAsInstant();
 
       return searchWindowAdjuster.decreaseSearchWindow(
         searchWindowUsed,
@@ -130,13 +128,13 @@ public class PagingService {
   private Instant firstRemovedDepartureTime() {
     return numItinerariesFilterResults == null
       ? null
-      : numItinerariesFilterResults.firstRemoved().startTimeAsInstant();
+      : numItinerariesFilterResults.pageCut().startTimeAsInstant();
   }
 
   private Instant firstRemovedArrivalTime() {
     return numItinerariesFilterResults == null
       ? null
-      : numItinerariesFilterResults.firstRemoved().endTimeAsInstant();
+      : numItinerariesFilterResults.pageCut().endTimeAsInstant();
   }
 
   private PagingSearchWindowAdjuster createSearchWindowAdjuster(
