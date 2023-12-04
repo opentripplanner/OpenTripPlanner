@@ -35,8 +35,8 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 
 /**
- * This class should be used to create snapshots of lookup tables of realtime data. This is
- * necessary to provide planning threads a consistent constant view of a graph with realtime data at
+ * This class should be used to create snapshots of lookup tables of real-time data. This is
+ * necessary to provide planning threads a consistent constant view of a graph with real-time data at
  * a specific point in time.
  */
 public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
@@ -59,7 +59,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private final SiriTripPatternIdGenerator tripPatternIdGenerator = new SiriTripPatternIdGenerator();
   /**
-   * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
+   * A synchronized cache of trip patterns that are added to the graph due to GTFS-real-time
    * messages.
    */
   private final SiriTripPatternCache tripPatternCache;
@@ -81,7 +81,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private volatile TimetableSnapshot snapshot = null;
 
-  /** Should expired realtime data be purged from the graph. */
+  /** Should expired real-time data be purged from the graph. */
   private final boolean purgeExpiredData;
 
   protected LocalDate lastPurgeDate = null;
@@ -371,7 +371,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // Add new trip times to the buffer and return success
     var result = buffer.update(pattern, tripUpdate.tripTimes(), serviceDate);
 
-    LOG.debug("Applied realtime data for trip {} on {}", trip, serviceDate);
+    LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
 
     return result;
   }
@@ -416,10 +416,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     final TripPattern pattern = buffer.getRealtimeAddedTripPattern(trip.getId(), serviceDate);
     if (pattern != null) {
-      /*
-              Remove the previous realtime-added TripPattern from buffer.
-              Only one version of the realtime-update should exist
-             */
+      // Remove the previous real-time-added TripPattern from buffer.
+      // Only one version of the real-time-update should exist
       buffer.removeLastAddedTripPattern(trip.getId(), serviceDate);
       buffer.removeRealtimeUpdatedTripTimes(pattern, trip.getId(), serviceDate);
       success = true;
@@ -436,7 +434,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    LOG.debug("purging expired realtime data");
+    LOG.debug("purging expired real-time data");
 
     lastPurgeDate = previously;
 

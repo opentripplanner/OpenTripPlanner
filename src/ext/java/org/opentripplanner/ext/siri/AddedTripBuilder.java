@@ -246,7 +246,7 @@ class AddedTripBuilder {
   }
 
   /**
-   * Method to create a Route. Commonly used to create a route if a realtime message
+   * Method to create a Route. Commonly used to create a route if a real-time message
    * refers to a route that is not in the transit model.
    *
    * We will find the first Route with same Operator, and use the same Authority

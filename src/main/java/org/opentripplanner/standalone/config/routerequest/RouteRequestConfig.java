@@ -302,7 +302,7 @@ ferries, where the check-in process needs to be done in good time before ride.
         c
           .of("ignoreRealtimeUpdates")
           .since(V2_0)
-          .summary("When true, realtime updates are ignored during this search.")
+          .summary("When true, real-time updates are ignored during this search.")
           .asBoolean(dft.ignoreRealtimeUpdates())
       )
       .setOtherThanPreferredRoutesPenalty(

@@ -84,7 +84,7 @@ public enum OTPFeature {
   RealtimeResolver(
     false,
     true,
-    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with realtime data"
+    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with real-time data"
   ),
   ReportApi(false, true, "Enable the report API."),
   RestAPIPassInDefaultConfigAsJson(

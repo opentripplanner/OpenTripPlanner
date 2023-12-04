@@ -297,7 +297,7 @@ Raptor iteration. The value is dynamically  assigned a suitable value, if not se
 medium size operation you may use a fixed value, like 60 minutes. If you have a mixture of high
 frequency cities routes and  infrequent long distant journeys, the best option is normally to use
 the dynamic auto assignment. If not provided the value is resolved depending on the other input
-parameters, available transit options and real-time changes.
+parameters, available transit options and realtime changes.
 
 There is no need to set this when going to the next/previous page. The OTP Server will
 increase/decrease the search-window when paging to match the requested number of itineraries.

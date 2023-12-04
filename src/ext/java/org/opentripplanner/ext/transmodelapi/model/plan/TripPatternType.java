@@ -50,7 +50,8 @@ public class TripPatternType {
           .name("aimedStartTime")
           .description("The aimed date and time the trip starts.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
-          .dataFetcher(env -> // startTime is already adjusted for realtime - need to subtract delay to get aimed time
+          .dataFetcher(env ->
+            // startTime is already adjusted for real-time - need to subtract delay to get aimed time
             itinerary(env)
               .startTime()
               .minusSeconds(itinerary(env).departureDelay())
@@ -63,7 +64,7 @@ public class TripPatternType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("expectedStartTime")
-          .description("The expected, realtime adjusted date and time the trip starts.")
+          .description("The expected, real-time adjusted date and time the trip starts.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
           .dataFetcher(env -> itinerary(env).startTime().toInstant().toEpochMilli())
           .build()
@@ -74,7 +75,8 @@ public class TripPatternType {
           .name("aimedEndTime")
           .description("The aimed date and time the trip ends.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
-          .dataFetcher(env -> // endTime is already adjusted for realtime - need to subtract delay to get aimed time
+          .dataFetcher(env ->
+            // endTime is already adjusted for real-time - need to subtract delay to get aimed time
             itinerary(env)
               .endTime()
               .minusSeconds(itinerary(env).arrivalDelay())
@@ -87,7 +89,7 @@ public class TripPatternType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("expectedEndTime")
-          .description("The expected, realtime adjusted date and time the trip ends.")
+          .description("The expected, real-time adjusted date and time the trip ends.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
           .dataFetcher(env -> itinerary(env).endTime().toInstant().toEpochMilli())
           .build()

@@ -158,7 +158,7 @@ type Contact {
 
 "A planned journey on a specific day"
 type DatedServiceJourney {
-  "Returns scheduled passingTimes for this dated service journey, updated with realtime-updates (if available). "
+  "Returns scheduled passingTimes for this dated service journey, updated with real-time-updates (if available). "
   estimatedCalls: [EstimatedCall] @timingData
   id: ID!
   "JourneyPattern for the dated service journey."
@@ -211,7 +211,7 @@ type EstimatedCall {
   aimedDepartureTime: DateTime!
   "Booking arrangements for this EstimatedCall."
   bookingArrangements: BookingArrangement
-  "Whether stop is cancelled. This means that either the ServiceJourney has a planned cancellation, the ServiceJourney has been cancelled by realtime data, or this particular StopPoint has been cancelled. This also means that both boarding and alighting has been cancelled."
+  "Whether stop is cancelled. This means that either the ServiceJourney has a planned cancellation, the ServiceJourney has been cancelled by real-time data, or this particular StopPoint has been cancelled. This also means that both boarding and alighting has been cancelled."
   cancellation: Boolean!
   "The date the estimated call is valid for."
   date: Date!
@@ -315,9 +315,9 @@ type Leg {
   includes both the start and end coordinate.
   """
   elevationProfile: [ElevationProfileStep]!
-  "The expected, realtime adjusted date and time this leg ends."
+  "The expected, real-time adjusted date and time this leg ends."
   expectedEndTime: DateTime!
-  "The expected, realtime adjusted date and time this leg starts."
+  "The expected, real-time adjusted date and time this leg starts."
   expectedStartTime: DateTime!
   "EstimatedCall for the quay where the leg originates."
   fromEstimatedCall: EstimatedCall @timingData
@@ -560,7 +560,7 @@ type Quay implements PlaceInterface {
   estimatedCalls(
     "Filters results by either departures, arrivals or both. For departures forBoarding has to be true and the departure time has to be within the specified time range. For arrivals, forAlight has to be true and the arrival time has to be within the specified time range. If both are asked for, either the conditions for arrivals or the conditions for departures will have to be true for an EstimatedCall to show."
     arrivalDeparture: ArrivalDeparture = departures,
-    "Indicates that realtime-cancelled trips should also be included."
+    "Indicates that real-time-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
     "Limit the total number of departures returned."
     numberOfDepartures: Int = 5,
@@ -797,7 +797,7 @@ type QueryType {
     filters: [TripFilterInput!],
     "The start location"
     from: Location!,
-    "When true, realtime updates are ignored during this search."
+    "When true, real-time updates are ignored during this search."
     ignoreRealtimeUpdates: Boolean = false,
     "When true, service journeys cancelled in scheduled route data will be included during this search."
     includePlannedCancellations: Boolean = false,
@@ -1012,7 +1012,7 @@ type RoutingParameters {
   elevatorHopTime: Int
   "Whether to apply the ellipsoid->geoid offset to all elevations in the response."
   geoIdElevation: Boolean
-  "When true, realtime updates are ignored during this search."
+  "When true, real-time updates are ignored during this search."
   ignoreRealTimeUpdates: Boolean
   "When true, service journeys cancelled in scheduled route data will be included during this search."
   includedPlannedCancellations: Boolean
@@ -1081,7 +1081,7 @@ type ServiceJourney {
   "Booking arrangements for flexible services."
   bookingArrangements: BookingArrangement @deprecated(reason : "BookingArrangements are defined per stop, and can be found under `passingTimes` or `estimatedCalls`")
   directionType: DirectionType
-  "Returns scheduled passingTimes for this ServiceJourney for a given date, updated with realtime-updates (if available). NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is known when creating the request. For fetching estimatedCalls for a given trip.leg, use leg.serviceJourneyEstimatedCalls instead."
+  "Returns scheduled passingTimes for this ServiceJourney for a given date, updated with real-time-updates (if available). NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is known when creating the request. For fetching estimatedCalls for a given trip.leg, use leg.serviceJourneyEstimatedCalls instead."
   estimatedCalls(
     "Date to get estimated calls for. Defaults to today."
     date: Date
@@ -1092,7 +1092,7 @@ type ServiceJourney {
   line: Line!
   notices: [Notice!]!
   operator: Operator
-  "Returns scheduled passing times only - without realtime-updates, for realtime-data use 'estimatedCalls'"
+  "Returns scheduled passing times only - without real-time-updates, for realtime-data use 'estimatedCalls'"
   passingTimes: [TimetabledPassingTime]! @timingData
   "Detailed path travelled by service journey. Not available for flexible trips."
   pointsOnLink: PointsOnLink
@@ -1122,7 +1122,7 @@ type StopPlace implements PlaceInterface {
   "List of visits to this stop place as part of vehicle journeys."
   estimatedCalls(
     arrivalDeparture: ArrivalDeparture = departures,
-    "Indicates that realtime-cancelled trips should also be included."
+    "Indicates that real-time-cancelled trips should also be included."
     includeCancelledTrips: Boolean = false,
     "Limit the total number of departures returned."
     numberOfDepartures: Int = 5,
@@ -1280,9 +1280,9 @@ type TripPattern {
   duration: Long
   "Time that the trip arrives."
   endTime: DateTime @deprecated(reason : "Replaced with expectedEndTime")
-  "The expected, realtime adjusted date and time the trip ends."
+  "The expected, real-time adjusted date and time the trip ends."
   expectedEndTime: DateTime!
-  "The expected, realtime adjusted date and time the trip starts."
+  "The expected, real-time adjusted date and time the trip starts."
   expectedStartTime: DateTime!
   "Generalized cost or weight of the itinerary. Used for debugging."
   generalizedCost: Int

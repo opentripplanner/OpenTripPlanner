@@ -138,7 +138,7 @@ public final class TransitPreferences implements Serializable {
   }
 
   /**
-   * When true, realtime updates are ignored during this search.
+   * When true, real-time updates are ignored during this search.
    */
   public boolean ignoreRealtimeUpdates() {
     return ignoreRealtimeUpdates;

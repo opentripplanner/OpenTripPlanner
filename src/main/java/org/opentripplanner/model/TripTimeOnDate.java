@@ -189,7 +189,7 @@ public class TripTimeOnDate {
     return tripTimes.isNoDataStop(stopIndex);
   }
 
-  public RealTimeState getRealtimeState() {
+  public RealTimeState getRealTimeState() {
     return tripTimes.isNoDataStop(stopIndex)
       ? RealTimeState.SCHEDULED
       : tripTimes.getRealTimeState();
