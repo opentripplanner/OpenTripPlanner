@@ -197,19 +197,17 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
      or if it or its parent station has already been seen.
      */
     if (
-      (!stop.isPartOfStation() && !stopIsIncludedByStopFilter(stop)) ||
+      (includeStations && !stop.isPartOfStation() && !stopIsIncludedByStopFilter(stop)) ||
+      (!includeStations && !stopIsIncludedByStopFilter(stop)) ||
       (stop.isPartOfStation() && !stopIsIncludedByStationFilter(stop)) ||
+      seenStops.contains(stop.getId()) ||
       seenStops.contains(stop.getStationOrStopId()) ||
       !stopIsIncludedByModeFilter(stop)
     ) {
       return;
     }
     if (includeStops && includeStations) {
-      if (
-        stop.getParentStation() != null &&
-        !seenStops.contains(stop.getParentStation().getId()) &&
-        stopIsIncludedByStationFilter(stop)
-      ) {
+      if (stop.getParentStation() != null) {
         seenStops.add(stop.getParentStation().getId());
         placesFound.add(new PlaceAtDistance(stop.getParentStation(), distance));
       } else {

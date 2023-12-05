@@ -50,6 +50,7 @@ public class PlaceFinderTraverseVisitorTest {
     .build();
 
   static final RegularStop STOP3 = model.stop("stop-3").withCoordinate(1.002, 1.002).build();
+  static final RegularStop STOP4 = model.stop("stop-4").withCoordinate(1.003, 1.003).build();
 
   static final Route r = route("r").build();
 
@@ -66,13 +67,19 @@ public class PlaceFinderTraverseVisitorTest {
     st2.setStop(STOP2);
     st2.setArrivalTime(T11_05);
     t.withStopPattern(new StopPattern(List.of(st1, st2)));
-    a.addTripPattern(id("asd"), t.build());
+    a.addTripPattern(id("tp1"), t.build());
 
     var st3 = new StopTime();
     st3.setStop(STOP3);
     st3.setArrivalTime(T11_10);
     t.withStopPattern(new StopPattern(List.of(st3)));
-    a.addTripPattern(id("asd2"), t.build());
+    a.addTripPattern(id("tp2"), t.build());
+
+    var st4 = new StopTime();
+    st4.setStop(STOP4);
+    st4.setArrivalTime(T11_10);
+    t.withStopPattern(new StopPattern(List.of(st4)));
+    a.addTripPattern(id("tp3"), t.build());
 
     a.index();
   }
@@ -229,6 +236,41 @@ public class PlaceFinderTraverseVisitorTest {
 
     // Stop 3 should not be included as it is included in the stop filter
     assertEquals(List.of(STATION1, STATION2), res);
+
+    visitor.visitVertex(state1);
+  }
+
+  @Test
+  void stopsAndStationsWithStopAndStationFilter() {
+    var visitor = new PlaceFinderTraverseVisitor(
+      transitService,
+      List.of(TransitMode.BUS),
+      List.of(PlaceType.STOP, PlaceType.STATION),
+      List.of(STOP4.getId()),
+      List.of(STATION1.getId()),
+      null,
+      null,
+      1,
+      500
+    );
+
+    assertEquals(List.of(), visitor.placesFound);
+    var state1 = TestStateBuilder.ofWalking().streetEdge().stop(STOP1).build();
+
+    visitor.visitVertex(state1);
+
+    var state2 = TestStateBuilder.ofWalking().streetEdge().streetEdge().stop(STOP2).build();
+    visitor.visitVertex(state2);
+
+    var state3 = TestStateBuilder.ofWalking().streetEdge().streetEdge().stop(STOP3).build();
+    visitor.visitVertex(state3);
+
+    var state4 = TestStateBuilder.ofWalking().streetEdge().streetEdge().stop(STOP4).build();
+    visitor.visitVertex(state4);
+
+    var res = visitor.placesFound.stream().map(PlaceAtDistance::place).toList();
+
+    assertEquals(List.of(STATION1, STOP4), res);
 
     visitor.visitVertex(state1);
   }
