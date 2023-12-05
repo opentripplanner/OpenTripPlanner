@@ -22,7 +22,7 @@ public class ApiTripSearchMetadata {
    * This is the suggested search time for the "next page" or time-window. Insert it together with
    * the {@link #searchWindowUsed} in the request to get a new set of trips following in the
    * time-window AFTER the current search. No duplicate trips should be returned, unless a trip is
-   * delayed and new realtime-data is available.
+   * delayed and new real-time-data is available.
    * <p>
    * Be careful to use paging/scrolling with the {@code numOfItineraries} parameter set. It is safe
    * to scroll forward when the {@code arriveBy=false}, but not if {@code arriveBy=true}. If you
@@ -42,7 +42,7 @@ public class ApiTripSearchMetadata {
    * This is the suggested search time for the "previous page" or time window. Insert it together
    * with the {@link #searchWindowUsed} in the request to get a new set of trips preceding in the
    * time-window BEFORE the current search. No duplicate trips should be returned, unless a trip is
-   * delayed and new realtime-data is available.
+   * delayed and new real-time-data is available.
    * <p>
    * Be careful to use paging/scrolling with the {@code numOfItineraries} parameter set. It is safe
    * to scroll backward when the {@code arriveBy=true}, but not if {@code arriveBy=false}. If you

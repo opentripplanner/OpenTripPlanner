@@ -88,7 +88,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
   }
 
   private static SiriLoader createLoader(String url, Parameters parameters) {
-    // Load realtime updates from a file.
+    // Load real-time updates from a file.
     if (SiriFileLoader.matchesUrl(url)) {
       return new SiriFileLoader(url);
     }

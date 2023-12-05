@@ -119,7 +119,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private volatile TimetableSnapshot snapshot = null;
 
-  /** Should expired realtime data be purged from the graph. */
+  /** Should expired real-time data be purged from the graph. */
   private final boolean purgeExpiredData;
 
   protected LocalDate lastPurgeDate = null;

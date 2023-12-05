@@ -126,10 +126,10 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     SiriTimetableSnapshotSource timetableSnapshot
   ) {
     this.configRef = config.configRef();
-    /*
-           URL that responds to HTTP GET which returns all initial data in protobuf-format.
-           Will be called once to initialize realtime-data. All updates will be received from Google Cloud Pubsub
-          */
+
+    // URL that responds to HTTP GET which returns all initial data in protobuf-format. Will be
+    // called once to initialize real-time-data. All updates will be received from Google Cloud
+    // Pubsub
     this.dataInitializationUrl = URI.create(config.dataInitializationUrl());
     this.feedId = config.feedId();
     this.reconnectPeriod = config.reconnectPeriod();

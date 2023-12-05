@@ -75,7 +75,8 @@ public class LegType {
           .name("aimedStartTime")
           .description("The aimed date and time this leg starts.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
-          .dataFetcher(env -> // startTime is already adjusted for realtime - need to subtract delay to get aimed time
+          .dataFetcher(env ->
+            // startTime is already adjusted for real-time - need to subtract delay to get aimed time
             leg(env)
               .getStartTime()
               .minusSeconds(leg(env).getDepartureDelay())
@@ -88,7 +89,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("expectedStartTime")
-          .description("The expected, realtime adjusted date and time this leg starts.")
+          .description("The expected, real-time adjusted date and time this leg starts.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
           .dataFetcher(env -> leg(env).getStartTime().toInstant().toEpochMilli())
           .build()
@@ -99,7 +100,7 @@ public class LegType {
           .name("aimedEndTime")
           .description("The aimed date and time this leg ends.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
-          .dataFetcher(env -> // endTime is already adjusted for realtime - need to subtract delay to get aimed time
+          .dataFetcher(env -> // endTime is already adjusted for real-time - need to subtract delay to get aimed time
             leg(env)
               .getEndTime()
               .minusSeconds(leg(env).getArrivalDelay())
@@ -112,7 +113,7 @@ public class LegType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("expectedEndTime")
-          .description("The expected, realtime adjusted date and time this leg ends.")
+          .description("The expected, real-time adjusted date and time this leg ends.")
           .type(new GraphQLNonNull(gqlUtil.dateTimeScalar))
           .dataFetcher(env -> leg(env).getEndTime().toInstant().toEpochMilli())
           .build()

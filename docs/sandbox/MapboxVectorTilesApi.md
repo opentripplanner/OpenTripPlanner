@@ -80,7 +80,7 @@ The feature must be configured in `router-config.json` as follows
       "minZoom": 14,
       "cacheMaxSeconds": 600
     },
-    // Contains just stations and realtime information for them
+    // Contains just stations and real-time information for them
     {
       "name": "realtimeRentalStations",
       "type": "VehicleRentalStation",
@@ -90,7 +90,7 @@ The feature must be configured in `router-config.json` as follows
       "cacheMaxSeconds": 60
     },
     // This exists for backwards compatibility. At some point, we might want
-    // to add a new realtime parking mapper with better translation support
+    // to add a new real-time parking mapper with better translation support
     // and less unnecessary fields.
     {
       "name": "stadtnaviVehicleParking",
@@ -101,7 +101,7 @@ The feature must be configured in `router-config.json` as follows
       "cacheMaxSeconds": 60,
       "expansionFactor": 0.25
     },
-    // no realtime, translatable fields are translated based on accept-language header
+    // no real-time, translatable fields are translated based on accept-language header
     // and contains less fields than the Stadtnavi mapper
     {
       "name": "vehicleParking",
@@ -190,4 +190,4 @@ key, and a function to create the mapper, with a `Graph` object as a parameter, 
   * Translatable fields are now translated based on accept-language header
   * Added DigitransitRealtime for vehicle rental stations
   * Changed old vehicle parking mapper to be Stadtnavi
-  * Added a new Digitransit vehicle parking mapper with no realtime information and less fields
+  * Added a new Digitransit vehicle parking mapper with no real-time information and less fields

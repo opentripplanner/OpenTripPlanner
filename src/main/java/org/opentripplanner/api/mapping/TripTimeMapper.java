@@ -28,13 +28,13 @@ public class TripTimeMapper {
     api.stopCount = domain.getStopCount();
     api.scheduledArrival = domain.getScheduledArrival();
     api.scheduledDeparture = domain.getScheduledDeparture();
-    api.realtimeArrival = domain.getRealtimeArrival();
-    api.realtimeDeparture = domain.getRealtimeDeparture();
+    api.realTimeArrival = domain.getRealtimeArrival();
+    api.realTimeDeparture = domain.getRealtimeDeparture();
     api.arrivalDelay = domain.getArrivalDelay();
     api.departureDelay = domain.getDepartureDelay();
     api.timepoint = domain.isTimepoint();
-    api.realtime = domain.isRealtime();
-    api.realtimeState = ApiRealTimeState.RealTimeState(domain.getRealtimeState());
+    api.realTime = domain.isRealtime();
+    api.realTimeState = ApiRealTimeState.RealTimeState(domain.getRealTimeState());
     api.blockId = domain.getBlockId();
     api.headsign = I18NStringMapper.mapToApi(domain.getHeadsign(), null);
     api.tripId = FeedScopedIdMapper.mapToApi(domain.getTrip().getId());

@@ -106,7 +106,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
               "hasWheelchairAccessibleCarPlaces" : false,
               "id" : "OSM:OSMWay/-102488",
               "name" : "P+R",
-              "realtime" : false,
+              "realTime" : false,
               "tags" : [
                 "osm:amenity=parking"
               ]
@@ -137,7 +137,7 @@ org.opentripplanner.routing.algorithm.mapping.CarSnapshotTest.directCarPark=[
               "hasWheelchairAccessibleCarPlaces" : false,
               "id" : "OSM:OSMWay/-102488",
               "name" : "P+R",
-              "realtime" : false,
+              "realTime" : false,
               "tags" : [
                 "osm:amenity=parking"
               ]

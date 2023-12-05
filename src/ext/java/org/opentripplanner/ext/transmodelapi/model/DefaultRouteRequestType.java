@@ -394,7 +394,7 @@ public class DefaultRouteRequestType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("ignoreRealTimeUpdates")
-          .description("When true, realtime updates are ignored during this search.")
+          .description("When true, real-time updates are ignored during this search.")
           .type(Scalars.GraphQLBoolean)
           .dataFetcher(env -> preferences.transit().ignoreRealtimeUpdates())
           .build()

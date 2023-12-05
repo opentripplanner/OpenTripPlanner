@@ -20,7 +20,6 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -34,7 +33,6 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.plan.JourneyWhiteListed;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TripTimeOnDate;
 import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
@@ -348,7 +346,7 @@ public class StopPlaceType {
             GraphQLArgument
               .newArgument()
               .name("includeCancelledTrips")
-              .description("Indicates that realtime-cancelled trips should also be included.")
+              .description("Indicates that real-time-cancelled trips should also be included.")
               .type(Scalars.GraphQLBoolean)
               .defaultValue(false)
               .build()
