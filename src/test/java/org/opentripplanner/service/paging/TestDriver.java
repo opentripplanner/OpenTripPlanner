@@ -78,8 +78,16 @@ final class TestDriver {
     return nResults;
   }
 
+  public Duration searchWindow() {
+    return searchWindow;
+  }
+
   List<Itinerary> kept() {
     return kept;
+  }
+
+  List<Itinerary> all() {
+    return all;
   }
 
   Instant earliestDepartureTime() {
@@ -117,6 +125,14 @@ final class TestDriver {
       cursor.cropItinerariesAt(),
       cursor.itineraryPageCut()
     );
+  }
+
+  PagingService pagingService() {
+    return TestPagingModel.pagingService(this);
+  }
+
+  PagingService pagingService(PageCursor cursor) {
+    return TestPagingModel.pagingService(this, cursor);
   }
 
   private static TestDriver createNewDriver(
