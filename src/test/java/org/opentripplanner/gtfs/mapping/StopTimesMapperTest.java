@@ -147,7 +147,7 @@ public class StopTimesMapperTest {
     assertFalse(result.isTimepointSet());
   }
 
-  /** Mapping the same object twice, should return the the same instance. */
+  /** Mapping the same object twice, should return the same instance. */
   @Test
   public void testMapCache() {
     org.opentripplanner.model.StopTime result1 = subject.map(STOP_TIME);

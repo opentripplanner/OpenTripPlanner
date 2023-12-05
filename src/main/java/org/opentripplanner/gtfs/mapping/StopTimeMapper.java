@@ -57,12 +57,13 @@ class StopTimeMapper {
     StopTime lhs = new StopTime();
 
     lhs.setTrip(tripMapper.map(rhs.getTrip()));
-    if (rhs.getStop() instanceof Stop) {
-      lhs.setStop(stopMapper.map((Stop) rhs.getStop()));
-    } else if (rhs.getStop() instanceof Location) {
-      lhs.setStop(locationMapper.map((Location) rhs.getStop()));
-    } else if (rhs.getStop() instanceof LocationGroup) {
-      lhs.setStop(locationGroupMapper.map((LocationGroup) rhs.getStop()));
+    var stopLocation = rhs.getStopLocation();
+    if (stopLocation instanceof Stop stop) {
+      lhs.setStop(stopMapper.map(stop));
+    } else if (stopLocation instanceof Location location) {
+      lhs.setStop(locationMapper.map(location));
+    } else if (stopLocation instanceof LocationGroup locGroup) {
+      lhs.setStop(locationGroupMapper.map(locGroup));
     }
 
     I18NString stopHeadsign = null;
