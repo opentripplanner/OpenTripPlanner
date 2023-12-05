@@ -19,7 +19,7 @@ import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.StopModelBuilder;
 
-public class StopTimesMapperTest {
+public class StopTimeMapperTest {
 
   private static final String FEED_ID = "FEED";
 
