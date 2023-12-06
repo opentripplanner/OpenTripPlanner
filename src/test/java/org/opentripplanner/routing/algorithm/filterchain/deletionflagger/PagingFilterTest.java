@@ -1,17 +1,18 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.framework.collection.ListUtils.first;
+import static org.opentripplanner.framework.collection.ListUtils.last;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner._support.debug.TestDebug;
 import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.Itinerary;
@@ -30,14 +31,21 @@ public class PagingFilterTest implements PlanTestConstants {
   private static final Place C = TEST_MODEL.place("C", 10, 14);
   private static final Place D = TEST_MODEL.place("D", 10, 15);
 
-  private static final Itinerary early = newItinerary(A).bus(1, T11_04, T11_07, B).build();
+  private static final int EARLY_START = T11_04;
+  private static final int EARLY_END = T11_07;
+  private static final int MIDDLE_START = T11_03;
+  private static final int MIDDLE_END = T11_10;
+  private static final int LATE_START = T11_00;
+  private static final int LATE_END = T11_12;
 
-  private static final Itinerary middle = newItinerary(A)
-    .bus(2, T11_03, T11_05, B)
-    .bus(21, T11_07, T11_10, C)
-    .build();
-  private static final Itinerary late = newItinerary(A).bus(3, T11_00, T11_12, B).build();
-  private static final Instant oldSearchWindowEndTime = newTime(T11_05).toInstant();
+  /** [11:04, 11:07, $300, Tx0, transit] */
+  private static final Itinerary early = newItinerary(A).bus(1, EARLY_START, EARLY_END, D).build();
+
+  /**  [11:03, 11:10, $636, Tx1, transit] */
+  private static final Itinerary middle = createMiddle();
+
+  /** [11:00, 11:12, $840, Tx0, transit] */
+  private static final Itinerary late = newItinerary(A).bus(3, LATE_START, LATE_END, D).build();
 
   private static PagingFilter pagingFilter;
 
@@ -68,56 +76,57 @@ public class PagingFilterTest implements PlanTestConstants {
   public void testPotentialDuplicateMarkedForDeletionWithEarlierArrival() {
     List<Itinerary> itineraries = List.of(early, middle, late);
 
-    assertEquals(
-      toStr(List.of(middle, late)),
-      toStr(pagingFilter.removeMatchesForTest(itineraries))
-    );
+    itineraries.forEach(it -> TestDebug.println(it.keyAsString()));
+    assertEquals(toStr(List.of(late)), toStr(pagingFilter.removeMatchesForTest(itineraries)));
   }
 
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithLowerGeneralizedCost() {
-    Itinerary middleLowCost = newItinerary(A)
-      .bus(2, T11_03, T11_05, B)
-      .bus(21, T11_07, T11_10, C)
-      .build();
+    Itinerary middleHighCost = createMiddle();
+    middleHighCost.setGeneralizedCost(middle.getGeneralizedCost() + 1);
 
-    middleLowCost.setGeneralizedCost(1);
-
-    List<Itinerary> itineraries = List.of(middleLowCost, middle, late);
+    List<Itinerary> itineraries = List.of(middleHighCost, middle, late);
 
     assertEquals(
-      toStr(List.of(middle, late)),
+      toStr(List.of(middleHighCost, late)),
       toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
 
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithFewerNumberOfTransfers() {
-    Itinerary middleNumberOfTransfers = newItinerary(A).bus(21, T11_03, T11_10, C).build();
+    int t0 = MIDDLE_START;
 
-    middleNumberOfTransfers.setGeneralizedCost(middle.getGeneralizedCost());
+    Itinerary middleHighNumberOfTransfers = newItinerary(A)
+      .bus(21, t0, t0 + D1m, B)
+      .bus(22, t0 + D2m, t0 + D3m, C)
+      .bus(23, t0 + D4m, MIDDLE_END, D)
+      .build();
 
-    List<Itinerary> itineraries = List.of(middleNumberOfTransfers, middle, late);
+    middleHighNumberOfTransfers.setGeneralizedCost(middle.getGeneralizedCost());
+
+    List<Itinerary> itineraries = List.of(middleHighNumberOfTransfers, middle, late);
 
     assertEquals(
-      toStr(List.of(middle, late)),
+      toStr(List.of(middleHighNumberOfTransfers, late)),
       toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
 
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithLaterDepartureTime() {
-    Itinerary middleLaterDepartureTime = newItinerary(A)
-      .bus(2, T11_04, T11_05, B)
-      .bus(21, T11_07, T11_10, C)
+    int t0 = MIDDLE_START;
+    Itinerary middleEarlierDepartureTime = newItinerary(A)
+      .bus(2, t0 - D1m, t0 + D3m, B)
+      .bus(21, t0 + D4m, MIDDLE_END, C)
       .build();
 
-    middleLaterDepartureTime.setGeneralizedCost(middle.getGeneralizedCost());
+    middleEarlierDepartureTime.setGeneralizedCost(middle.getGeneralizedCost());
 
-    List<Itinerary> itineraries = List.of(middleLaterDepartureTime, middle, late);
+    List<Itinerary> itineraries = List.of(middleEarlierDepartureTime, middle, late);
 
     assertEquals(
-      toStr(List.of(middle, late)),
+      toStr(List.of(middleEarlierDepartureTime, late)),
       toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
@@ -131,14 +140,17 @@ public class PagingFilterTest implements PlanTestConstants {
 
     // Crop at top of list
     var itinerary = allItineraries.get(index);
-    var f = createFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.HEAD, itinerary);
+    var f = new PagingFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.HEAD, itinerary);
 
     var result = f.removeMatchesForTest(allItineraries);
 
-    //result.forEach(it -> System.out.println(it.toStr()));
+    result.forEach(it -> TestDebug.println(it.toStr()));
 
-    assertEquals(toStr(allItineraries.subList(index, 24)), toStr(result));
-    //assertFalse(result.contains(itinerary), itinerary.toStr());
+    if (index == 23) {
+      assertEquals("", toStr(result));
+    } else {
+      assertItineraryEq(allItineraries.get(index + 1), first(result));
+    }
   }
 
   @ParameterizedTest
@@ -150,14 +162,17 @@ public class PagingFilterTest implements PlanTestConstants {
 
     // Crop at top of list
     var itinerary = allItineraries.get(index);
-    var f = createFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.TAIL, itinerary);
+    var f = new PagingFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.TAIL, itinerary);
 
     var result = f.removeMatchesForTest(allItineraries);
 
-    //result.forEach(it -> System.out.println(it.toStr()));
+    result.forEach(it -> TestDebug.println(it.toStr()));
 
-    assertEquals(toStr(allItineraries.subList(0, index + 1)), toStr(result));
-    //assertFalse(result.contains(itinerary), itinerary.toStr());
+    if (index == 0) {
+      assertEquals("", toStr(result));
+    } else {
+      assertItineraryEq(allItineraries.get(index - 1), last(result));
+    }
   }
 
   @ParameterizedTest
@@ -169,14 +184,17 @@ public class PagingFilterTest implements PlanTestConstants {
 
     // Crop at top of list
     var itinerary = allItineraries.get(index);
-    var f = createFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.HEAD, itinerary);
+    var f = new PagingFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.HEAD, itinerary);
 
     var result = f.removeMatchesForTest(allItineraries);
 
-    //result.forEach(it -> System.out.println(it.toStr()));
+    result.forEach(it -> TestDebug.println(it.toStr()));
 
-    assertEquals(toStr(allItineraries.subList(index, 24)), toStr(result));
-    //assertFalse(result.contains(itinerary), itinerary.toStr());
+    if (index == 23) {
+      assertEquals("", toStr(result));
+    } else {
+      assertItineraryEq(allItineraries.get(index + 1), first(result));
+    }
   }
 
   @ParameterizedTest
@@ -187,15 +205,18 @@ public class PagingFilterTest implements PlanTestConstants {
     allItineraries.sort(SortOrderComparator.defaultComparatorArriveBy());
 
     // Crop at top of list
-    var itinerary = allItineraries.get(index);
-    var f = createFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.TAIL, itinerary);
+    var pageCut = allItineraries.get(index);
+    var f = new PagingFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.TAIL, pageCut);
 
     var result = f.removeMatchesForTest(allItineraries);
 
-    //result.forEach(it -> System.out.println(it.toStr()));
+    result.forEach(it -> TestDebug.println(it.toStr()));
 
-    assertEquals(toStr(allItineraries.subList(0, index + 1)), toStr(result));
-    //assertFalse(result.contains(itinerary), itinerary.toStr());
+    if (index == 0) {
+      assertEquals("", toStr(result));
+    } else {
+      assertItineraryEq(allItineraries.get(index - 1), last(result));
+    }
   }
 
   private static List<Itinerary> allPossibleSortingCombinationsOfItineraries() {
@@ -215,14 +236,6 @@ public class PagingFilterTest implements PlanTestConstants {
       }
     }
     return itineraries;
-  }
-
-  private PagingFilter createFilter(
-    SortOrder sortOrder,
-    ListSection deduplicateSection,
-    Itinerary deduplicateCut
-  ) {
-    return new PagingFilter(sortOrder, deduplicateSection, deduplicateCut);
   }
 
   private static Itinerary itinerary(
@@ -250,5 +263,16 @@ public class PagingFilterTest implements PlanTestConstants {
     var it = builder.build();
     it.setGeneralizedCost(cost);
     return it;
+  }
+
+  private static Itinerary createMiddle() {
+    return newItinerary(A)
+      .bus(2, MIDDLE_START, MIDDLE_START + D2m, B)
+      .bus(21, MIDDLE_END - D3m, MIDDLE_END, D)
+      .build();
+  }
+
+  private static void assertItineraryEq(Itinerary expected, Itinerary actual) {
+    assertEquals(expected.keyAsString(), actual.keyAsString());
   }
 }

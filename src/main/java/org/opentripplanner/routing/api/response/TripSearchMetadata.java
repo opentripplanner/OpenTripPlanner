@@ -63,11 +63,13 @@ public class TripSearchMetadata {
   public static TripSearchMetadata createForDepartAfter(
     Instant reqTime,
     Duration searchWindowUsed,
-    Instant nextDateTimeExcusive
+    Instant nextDateTimeExclusive
   ) {
-    Instant nextDateTime = nextDateTimeExcusive == null
+    Instant nextDateTime = nextDateTimeExclusive == null
       ? reqTime.plus(searchWindowUsed)
-      : nextDateTimeExcusive.truncatedTo(ChronoUnit.MINUTES);
+      // There is no way to make this work properly. If we round down we get duplicates, if we
+      // round up we skip itineraries.
+      : nextDateTimeExclusive.plusSeconds(60).truncatedTo(ChronoUnit.MINUTES);
 
     return new TripSearchMetadata(searchWindowUsed, reqTime.minus(searchWindowUsed), nextDateTime);
   }

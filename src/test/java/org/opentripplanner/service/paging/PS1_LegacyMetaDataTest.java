@@ -36,10 +36,10 @@ class PS1_LegacyMetaDataTest {
       "11:30",
       TestPagingUtils.cleanStr(subject.createTripSearchMetadata().prevDateTime)
     );
-    // 12:09 will cause duplicates, the solution is to use the complete sort-vector.
+    // 12:11 will drop results, the solution is to use the complete sort-vector.
     // The cursor implementation does that
     assertEquals(
-      "12:09",
+      "12:11",
       TestPagingUtils.cleanStr(subject.createTripSearchMetadata().nextDateTime)
     );
   }

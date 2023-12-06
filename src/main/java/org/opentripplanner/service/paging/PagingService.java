@@ -87,7 +87,7 @@ public class PagingService {
       return TripSearchMetadata.createForDepartAfter(
         earliestDepartureTime,
         searchWindowUsed,
-        firstRemovedDepartureTime()
+        lastKeptDepartureTime()
       );
     }
   }
@@ -125,7 +125,7 @@ public class PagingService {
     }
   }
 
-  private Instant firstRemovedDepartureTime() {
+  private Instant lastKeptDepartureTime() {
     return numItinerariesFilterResults == null
       ? null
       : numItinerariesFilterResults.pageCut().startTimeAsInstant();

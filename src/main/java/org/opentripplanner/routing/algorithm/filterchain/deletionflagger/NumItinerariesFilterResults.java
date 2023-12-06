@@ -50,9 +50,9 @@ public class NumItinerariesFilterResults implements PageCursorInput {
         .orElseThrow();
 
     if (cropSection == ListSection.HEAD) {
-      pageCut = ListUtils.last(removedItineraries);
+      pageCut = ListUtils.first(keptItineraries);
     } else {
-      pageCut = ListUtils.first(removedItineraries);
+      pageCut = ListUtils.last(keptItineraries);
     }
     this.cropSection = cropSection;
   }

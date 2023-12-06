@@ -44,8 +44,8 @@ public class PagingFilter implements ItineraryDeletionFlagger {
 
   private boolean sortsIntoDeduplicationAreaRelativeToRemovedItinerary(Itinerary itinerary) {
     return switch (deduplicateSection) {
-      case HEAD -> sortOrderComparator.compare(itinerary, itineraryPageCut) < 0;
-      case TAIL -> sortOrderComparator.compare(itinerary, itineraryPageCut) > 0;
+      case HEAD -> sortOrderComparator.compare(itinerary, itineraryPageCut) <= 0;
+      case TAIL -> sortOrderComparator.compare(itinerary, itineraryPageCut) >= 0;
     };
   }
 
