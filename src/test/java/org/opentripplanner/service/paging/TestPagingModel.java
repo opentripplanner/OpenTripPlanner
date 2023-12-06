@@ -29,13 +29,13 @@ class TestPagingModel {
   static final int T12_40 = hm2time(12, 40);
   static final int T12_41 = hm2time(12, 41);
   static final int T12_55 = hm2time(12, 55);
+  static final int T12_59 = hm2time(12, 59);
   static final int T13_00 = hm2time(13, 0);
   static final int T13_10 = hm2time(13, 10);
   static final int T13_11 = hm2time(13, 11);
   static final int T13_25 = hm2time(13, 25);
   static final int T13_30 = hm2time(13, 30);
   static final int TIME_NOT_SET = -9_999_999;
-
 
   // Times CASE - B
   static final int T15_00_MINUS_1d = TimeUtils.time("15:00:00-1d");
@@ -83,7 +83,7 @@ class TestPagingModel {
     itinerary(T12_39, T13_10, COST_HIGH, TX_1, TRANSIT),
     itinerary(T12_55, T13_25, COST_HIGH, TX_1, TRANSIT),
     // LAT time-shifted onStreet result (apply to first arrive-by search)
-    itinerary(T13_00, T13_30, COST_HIGH, TX_0, ON_STREET)
+    itinerary(T12_59, T13_30, COST_HIGH, TX_0, ON_STREET)
   );
   static final List<Itinerary> ITINERARIES_CASE_A_DEPART_AFTER = ITINERARIES_CASE_A
     // Skip last itinerary (onStreet arriveBy)

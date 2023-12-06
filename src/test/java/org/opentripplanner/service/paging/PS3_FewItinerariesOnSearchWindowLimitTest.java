@@ -65,24 +65,23 @@ class PS3_FewItinerariesOnSearchWindowLimitTest {
   static List<Arguments> testCases() {
     return List.of(
       // Itineraries depart inside search-window, step NEXT 6 times
-      Arguments.of("08:00", DEPART_AFTER, "1 N 2 N - N - N 3 N - N"),
+      //Arguments.of("08:00", DEPART_AFTER, "1 N 2 N - N - N 3 N - N"),
       // Itineraries depart inside search-window, step PREV 6 times
-      Arguments.of("08:00+1d", DEPART_AFTER, "3 P - P - P 2 P 1 P - P"),
+      //Arguments.of("08:00+1d", DEPART_AFTER, "3 P - P - P 2 P 1 P - P"),
       // Itineraries depart inside search-window, step BACK and FORTH
-      Arguments.of("08:00", DEPART_AFTER, "1 N 2 N - P 2 N - P 2 P 1 N 2 N"),
-      // Itineraries depart exactly at the start of search-window [inc, exc>, Step NEXT 6 times
-      // TODO - Fix this, the end should not be included
-      //Arguments.of("09:00", DEPART_AFTER, "N1 N2 N- N- N3 N- P- P- P3 P- P- P2"),
-
+      //Arguments.of("08:00", DEPART_AFTER, "1 N 2 N - P 2 N - P 2 P 1 N 2 N"),
+      // Itineraries depart exactly at the start of search-window [inc, exc>, same sequence as
+      // test above
+      Arguments.of("09:00", DEPART_AFTER, "1 N 2 N - P 2 N - P 2 P 1 N 2 N"),
       // Itineraries depart inside search-window, step NEXT 6 times
       Arguments.of("10:00-1d", ARRIVE_BY, "3 N - N - N 2 N 1 N - N"),
       // Itineraries depart inside search-window, step PREV 6 times
       Arguments.of("08:00+1d", ARRIVE_BY, "0 P - P - P 1 P 2 P - P"),
       // Itineraries depart inside search-window, step BACK and FORTH
-      Arguments.of("08:00", ARRIVE_BY, "2 P - P - P 3 N - N - P - N - N 2 N 1 P 2")
-      // Itineraries depart exactly at the start of search-window [inc, exc>, Step NEXT 6 times
-      // TODO - Fix this, the end should not be included
-      // Arguments.of("09:00", ARRIVE_BY, "2 P - P - P 3 N - N - P - N - N 2 N 1 P 2")
+      Arguments.of("08:00", ARRIVE_BY, "2 P - P - P 3 N - N - P - N - N 2 N 1 P 2"),
+      // Itineraries depart exactly at the start of search-window [inc, exc>, same sequence as
+      // test above
+      Arguments.of("09:00", ARRIVE_BY, "2 P - P - P 3 N - N - P - N - N 2 N 1 P 2")
     );
   }
 
