@@ -70,7 +70,7 @@ class PS2_ManyParetoOptimalItinerariesTest {
         PageType.PREVIOUS_PAGE,
         SortOrder.STREET_AND_ARRIVAL_TIME,
         "11:39",
-        "12:40"
+        ""
       );
       // NEXT
       assertPageCursor(
@@ -97,9 +97,7 @@ class PS2_ManyParetoOptimalItinerariesTest {
       PageType.PREVIOUS_PAGE,
       SortOrder.STREET_AND_ARRIVAL_TIME,
       "12:00",
-      // THIS IS NOT CORRECT, MAY LEAD TO MISSED ITINERARIES (12:29~13:11), THIS DOES NOT
-      // OCCUR IN THIS TEST, BECAUSE THIS WILL HAPPEN IN RAPTOR
-      "13:10"
+      ""
     );
 
     // TEST PAGING AFTER PREVIOUS
@@ -113,7 +111,7 @@ class PS2_ManyParetoOptimalItinerariesTest {
         PageType.PREVIOUS_PAGE,
         SortOrder.STREET_AND_ARRIVAL_TIME,
         "11:41",
-        "12:40"
+        ""
       );
       // NEXT
       assertPageCursor(
@@ -182,11 +180,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
       cursor,
       PageType.PREVIOUS_PAGE,
       SortOrder.STREET_AND_DEPARTURE_TIME,
-      // THIS SHOULD BE 12:10 ?
       "12:11",
-      // This is wrong, the LAT should be kept until the paging direction is turned from PREV to
-      // NEXT. Expected 13:30
-      "13:11"
+      "13:30"
     );
 
     // TEST PAGING AFTER PREVIOUS
@@ -199,11 +194,8 @@ class PS2_ManyParetoOptimalItinerariesTest {
         prevSubject.previousPageCursor(),
         PageType.PREVIOUS_PAGE,
         SortOrder.STREET_AND_DEPARTURE_TIME,
-        // THIS SHOULD BE 12:10 - 30m = 11:40 ?
         "12:00",
-        // This is wrong, the LAT should be kept until the paging direction is turned from PREV to
-        // NEXT. Expected 13:30
-        "13:11"
+        "13:30"
       );
       // NEXT
       assertPageCursor(

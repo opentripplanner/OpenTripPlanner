@@ -58,7 +58,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assertPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE, true);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T10_30, T12_10, D90M, PREVIOUS_PAGE, true);
+    assertPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE, true);
   }
 
   @Test
@@ -88,7 +88,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, true);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T11_01, T13_30, D90M, PREVIOUS_PAGE, true);
+    assertPageCursor(prevPage, T11_01, null, D90M, PREVIOUS_PAGE, true);
   }
 
   @Test
@@ -118,7 +118,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, true);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T11_01, T13_00, D90M, PREVIOUS_PAGE, true);
+    assertPageCursor(prevPage, T11_01, T13_30, D90M, PREVIOUS_PAGE, true);
   }
 
   @Test

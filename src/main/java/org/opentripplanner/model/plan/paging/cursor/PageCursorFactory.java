@@ -5,7 +5,6 @@ import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAG
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.ItinerarySortKey;
@@ -110,38 +109,35 @@ public class PageCursorFactory {
       return;
     }
 
-    Instant prevEdt = null;
-    Instant prevLat = null;
-    Instant nextEdt = null;
+    Instant prevEdt;
+    Instant nextEdt;
 
     if (wholeSwUsed) {
       prevEdt = edtBeforeNewSw();
       nextEdt = edtAfterUsedSw();
-      if (!sortOrder.isSortedByAscendingArrivalTime()) {
-        prevLat = currentLat;
-      }
     }
     // If the whole search window was not used (i.e. if there were removed itineraries)
     else {
       if (currentPageType == NEXT_PAGE) {
         prevEdt = edtBeforeNewSw();
         nextEdt = pageCursorInput.earliestRemovedDeparture();
-        if (sortOrder.isSortedByAscendingArrivalTime()) {
-          prevLat = pageCursorInput.earliestKeptArrival().truncatedTo(ChronoUnit.MINUTES);
-        } else {
-          prevLat = currentLat;
-        }
       } else {
         // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
         // search-window from the last time included in the search window we need to include one extra
         // minute at the end.
         prevEdt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
         nextEdt = edtAfterUsedSw();
-        prevLat = pageCursorInput.latestRemovedArrival();
       }
     }
     prevCursor =
-      new PageCursor(PREVIOUS_PAGE, sortOrder, prevEdt, prevLat, newSearchWindow, itineraryPageCut);
+      new PageCursor(
+        PREVIOUS_PAGE,
+        sortOrder,
+        prevEdt,
+        currentLat,
+        newSearchWindow,
+        itineraryPageCut
+      );
     nextCursor =
       new PageCursor(NEXT_PAGE, sortOrder, nextEdt, null, newSearchWindow, itineraryPageCut);
   }
