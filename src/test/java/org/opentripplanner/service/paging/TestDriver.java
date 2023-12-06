@@ -146,20 +146,16 @@ final class TestDriver {
     @Nullable ItinerarySortKey pageCut
   ) {
     List<Itinerary> kept = all;
-    // LAT - Done by Raptor
-    if (lat != null) {
-      kept = kept.stream().filter(it -> !lat.isBefore(it.endTime().toInstant())).toList();
-    }
+
+    // Filter search-window
+    var swFilter = new OutsideSearchWindowFilter(edt, searchWindow);
+    kept = swFilter.removeMatchesForTest(kept);
 
     //Page filter
     if (pageCut != null) {
       var pageFilter = new PagingFilter(sortOrder, cropItineraries.invert(), pageCut);
       kept = pageFilter.removeMatchesForTest(kept);
     }
-
-    // Filter search-window
-    var swFilter = new OutsideSearchWindowFilter(edt, searchWindow);
-    kept = swFilter.removeMatchesForTest(kept);
 
     // Filter nResults
     var filterResultBox = new Box<NumItinerariesFilterResults>();

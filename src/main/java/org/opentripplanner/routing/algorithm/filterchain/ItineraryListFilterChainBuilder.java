@@ -448,13 +448,14 @@ public class ItineraryListFilterChainBuilder {
     // noise, but is not deterministic because the result depend on the search-window size and
     // where "cut" between each page is
     {
+      // Limit to search-window
+      if (earliestDepartureTime != null) {
+        addRmFilter(filters, new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow));
+      }
+
       // Remove itineraries present in the page retrieved before this page/search.
       if (itineraryPageCut != null) {
         addRmFilter(filters, new PagingFilter(sortOrder, deduplicateSection(), itineraryPageCut));
-      }
-
-      if (earliestDepartureTime != null) {
-        addRmFilter(filters, new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow));
       }
 
       // Remove itineraries if max limit is set
