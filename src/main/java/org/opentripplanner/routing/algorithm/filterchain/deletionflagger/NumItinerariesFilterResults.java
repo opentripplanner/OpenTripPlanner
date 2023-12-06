@@ -13,8 +13,6 @@ public class NumItinerariesFilterResults implements PageCursorInput {
 
   private final Instant earliestRemovedDeparture;
   private final Instant latestRemovedDeparture;
-  private final Instant latestRemovedArrival;
-  private final Instant earliestKeptArrival;
   private final ItinerarySortKey pageCut;
   private final ListSection cropSection;
 
@@ -34,20 +32,8 @@ public class NumItinerariesFilterResults implements PageCursorInput {
       .stream()
       .map(it -> it.startTime().toInstant())
       .toList();
-    List<Instant> removedArrivals = removedItineraries
-      .stream()
-      .map(it -> it.endTime().toInstant())
-      .toList();
     this.earliestRemovedDeparture = removedDepartures.stream().min(Instant::compareTo).orElse(null);
     this.latestRemovedDeparture = removedDepartures.stream().max(Instant::compareTo).orElse(null);
-    this.latestRemovedArrival = removedArrivals.stream().max(Instant::compareTo).orElse(null);
-
-    this.earliestKeptArrival =
-      keptItineraries
-        .stream()
-        .map(it -> it.endTime().toInstant())
-        .min(Instant::compareTo)
-        .orElseThrow();
 
     if (cropSection == ListSection.HEAD) {
       pageCut = ListUtils.first(keptItineraries);
@@ -63,18 +49,8 @@ public class NumItinerariesFilterResults implements PageCursorInput {
   }
 
   @Override
-  public Instant earliestKeptArrival() {
-    return earliestKeptArrival;
-  }
-
-  @Override
   public Instant latestRemovedDeparture() {
     return latestRemovedDeparture;
-  }
-
-  @Override
-  public Instant latestRemovedArrival() {
-    return latestRemovedArrival;
   }
 
   @Override
@@ -88,8 +64,6 @@ public class NumItinerariesFilterResults implements PageCursorInput {
       .of(NumItinerariesFilterResults.class)
       .addDateTime("earliestRemovedDeparture", earliestRemovedDeparture)
       .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
-      .addDateTime("latestRemovedArrival", latestRemovedArrival)
-      .addDateTime("earliestKeptArrival", earliestKeptArrival)
       .addObjOp("pageCut", pageCut, ItinerarySortKey::keyAsString)
       .addEnum("cropSection", cropSection)
       .toString();

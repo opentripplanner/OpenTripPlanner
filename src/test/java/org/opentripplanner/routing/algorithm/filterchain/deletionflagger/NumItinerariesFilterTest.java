@@ -49,17 +49,8 @@ public class NumItinerariesFilterTest {
       i3.startTime().toInstant().toString(),
       subscribeResult.latestRemovedDeparture().toString()
     );
-    assertEquals(
-      i3.endTime().toInstant().toString(),
-      subscribeResult.latestRemovedArrival().toString()
-    );
 
     assertEquals(i2.keyAsString(), subscribeResult.pageCut().keyAsString());
-
-    assertEquals(
-      i1.endTime().toInstant().toString(),
-      subscribeResult.earliestKeptArrival().toString()
-    );
 
     assertEquals(toStr(List.of(i1, i2)), toStr(processedList));
   }
@@ -80,17 +71,8 @@ public class NumItinerariesFilterTest {
       i2.startTime().toInstant().toString(),
       subscribeResult.latestRemovedDeparture().toString()
     );
-    assertEquals(
-      i2.endTime().toInstant().toString(),
-      subscribeResult.latestRemovedArrival().toString()
-    );
 
     assertEquals(i3.keyAsString(), subscribeResult.pageCut().keyAsString());
-
-    assertEquals(
-      i3.endTime().toInstant().toString(),
-      subscribeResult.earliestKeptArrival().toString()
-    );
 
     assertEquals(toStr(List.of(i3)), toStr(processedList));
   }

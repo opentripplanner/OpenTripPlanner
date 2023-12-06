@@ -17,9 +17,7 @@ public interface PageCursorInput {
    * in the next-page search the search windows must overlap.
    */
   Instant earliestRemovedDeparture();
-  Instant earliestKeptArrival();
   Instant latestRemovedDeparture();
-  Instant latestRemovedArrival();
 
   /**
    * In case the result have too many results; The {@code numberOfItineraries} request parameter
