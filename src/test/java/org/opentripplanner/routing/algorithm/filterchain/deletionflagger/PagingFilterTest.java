@@ -70,7 +70,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
     assertEquals(
       toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
+      toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
 
@@ -87,7 +87,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
     assertEquals(
       toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
+      toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
 
@@ -101,7 +101,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
     assertEquals(
       toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
+      toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
 
@@ -118,7 +118,7 @@ public class PagingFilterTest implements PlanTestConstants {
 
     assertEquals(
       toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
+      toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
 
@@ -133,7 +133,7 @@ public class PagingFilterTest implements PlanTestConstants {
     var itinerary = allItineraries.get(index);
     var f = createFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.HEAD, itinerary);
 
-    var result = DeletionFlaggerTestHelper.process(allItineraries, f);
+    var result = f.removeMatchesForTest(allItineraries);
 
     //result.forEach(it -> System.out.println(it.toStr()));
 
@@ -152,7 +152,7 @@ public class PagingFilterTest implements PlanTestConstants {
     var itinerary = allItineraries.get(index);
     var f = createFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.TAIL, itinerary);
 
-    var result = DeletionFlaggerTestHelper.process(allItineraries, f);
+    var result = f.removeMatchesForTest(allItineraries);
 
     //result.forEach(it -> System.out.println(it.toStr()));
 
@@ -171,7 +171,7 @@ public class PagingFilterTest implements PlanTestConstants {
     var itinerary = allItineraries.get(index);
     var f = createFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.HEAD, itinerary);
 
-    var result = DeletionFlaggerTestHelper.process(allItineraries, f);
+    var result = f.removeMatchesForTest(allItineraries);
 
     //result.forEach(it -> System.out.println(it.toStr()));
 
@@ -190,7 +190,7 @@ public class PagingFilterTest implements PlanTestConstants {
     var itinerary = allItineraries.get(index);
     var f = createFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.TAIL, itinerary);
 
-    var result = DeletionFlaggerTestHelper.process(allItineraries, f);
+    var result = f.removeMatchesForTest(allItineraries);
 
     //result.forEach(it -> System.out.println(it.toStr()));
 

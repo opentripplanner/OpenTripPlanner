@@ -41,7 +41,7 @@ public class RemoveBikeRentalWithMostlyWalkingTest {
 
     Assertions.assertEquals(
       Itinerary.toStr(expected),
-      Itinerary.toStr(DeletionFlaggerTestHelper.process(input, subject))
+      Itinerary.toStr(subject.removeMatchesForTest(input))
     );
   }
 }

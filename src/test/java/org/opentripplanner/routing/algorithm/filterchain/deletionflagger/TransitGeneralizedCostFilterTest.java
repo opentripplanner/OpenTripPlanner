@@ -38,10 +38,7 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     var all = List.of(i1, i2, i3, i4);
 
     // Expect - i4 to be dropped
-    assertEquals(
-      toStr(List.of(i1, i2, i3)),
-      toStr(DeletionFlaggerTestHelper.process(all, subject))
-    );
+    assertEquals(toStr(List.of(i1, i2, i3)), toStr(subject.removeMatchesForTest(all)));
   }
 
   @Test
@@ -69,10 +66,7 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     var all = List.of(i1, i2, i3, i4);
 
     // Expect - i4 to be dropped
-    assertEquals(
-      toStr(List.of(i1, i2, i3)),
-      toStr(DeletionFlaggerTestHelper.process(all, subject))
-    );
+    assertEquals(toStr(List.of(i1, i2, i3)), toStr(subject.removeMatchesForTest(all)));
   }
 
   @Test
@@ -100,9 +94,6 @@ public class TransitGeneralizedCostFilterTest implements PlanTestConstants {
     var all = List.of(i1, i2, i3, i4);
 
     // Expect - i3 to be dropped
-    assertEquals(
-      toStr(List.of(i1, i2, i4)),
-      toStr(DeletionFlaggerTestHelper.process(all, subject))
-    );
+    assertEquals(toStr(List.of(i1, i2, i4)), toStr(subject.removeMatchesForTest(all)));
   }
 }

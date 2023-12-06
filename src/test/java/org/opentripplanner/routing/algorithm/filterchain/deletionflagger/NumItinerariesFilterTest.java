@@ -29,7 +29,7 @@ public class NumItinerariesFilterTest {
   public void testCropHead() {
     NumItinerariesFilter subject = new NumItinerariesFilter(1, ListSection.HEAD, null);
     List<Itinerary> itineraries = List.of(i1, i2, i3);
-    var result = DeletionFlaggerTestHelper.process(itineraries, subject);
+    var result = subject.removeMatchesForTest(itineraries);
     assertEquals(toStr(List.of(i3)), toStr(result));
   }
 
@@ -38,7 +38,7 @@ public class NumItinerariesFilterTest {
     var subject = new NumItinerariesFilter(2, ListSection.TAIL, it -> subscribeResult = it);
     var itineraries = List.of(i1, i2, i3);
 
-    var processedList = DeletionFlaggerTestHelper.process(itineraries, subject);
+    var processedList = subject.removeMatchesForTest(itineraries);
 
     assertEquals(
       i3.startTime().toInstant().toString(),
@@ -72,7 +72,7 @@ public class NumItinerariesFilterTest {
     var subject = new NumItinerariesFilter(1, ListSection.HEAD, it -> subscribeResult = it);
     var itineraries = List.of(i1, i2, i3);
 
-    var processedList = DeletionFlaggerTestHelper.process(itineraries, subject);
+    var processedList = subject.removeMatchesForTest(itineraries);
 
     assertEquals(
       i2.startTime().toInstant().toString(),
