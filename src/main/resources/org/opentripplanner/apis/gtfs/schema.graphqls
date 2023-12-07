@@ -982,9 +982,25 @@ for example `450`. One cost unit should roughly match a one second travel on tra
 scalar Cost
 
 """
-Either a latitude or a longitude coordinate as a WGS 84 format floating point number.
+Coordinate (often referred as coordinates), which is used to specify a location using in the
+WGS84 coordinate system.
 """
-scalar Coordinate
+type Coordinate {
+    """
+    Latitude as a WGS84 format number.
+    """
+    latitude: CoordinateValue!
+
+    """
+    Longitude as a WGS84 format number.
+    """
+    longitude: CoordinateValue!
+}
+
+"""
+Either a latitude or a longitude as a WGS84 format floating point number.
+"""
+scalar CoordinateValue
 
 type Coordinates {
     """Latitude (WGS 84)"""
@@ -1207,13 +1223,13 @@ A coordinate pair used for a location in a plan query.
 """
 input PlanCoordinatesInput {
     """
-    Latitude as a WGS 84 format number.
+    Latitude as a WGS84 format number.
     """
-    latitude: Coordinate!
+    latitude: CoordinateValue!
     """
-    Longitude as a WGS 84 format number.
+    Longitude as a WGS84 format number.
     """
-    longitude: Coordinate!
+    longitude: CoordinateValue!
 }
 
 input InputBanned {
@@ -1488,6 +1504,22 @@ input PlanItineraryFilterInput {
 }
 
 """
+Location that was used in the itinerary search as a origin or destination.
+"""
+type PlanLabeledLocation {
+    """
+    A location used in a plan query. This can be null if a stop location ID was specified as an input
+    location but a stop location with that ID does not exist.
+    """
+    location: PlanLocation
+
+    """
+    A label that was attached to the location.
+    """
+    label: String
+}
+
+"""
 Plan location settings. Location must be set. Label is optional
 and used for naming the location.
 """
@@ -1503,6 +1535,11 @@ input PlanLabeledLocationInput {
     """
     label: String
 }
+
+"""
+Union of locations types that could be used in a plan query.
+"""
+union PlanLocation = Stop | Coordinate
 
 """
 Plan location. Either coordinates or a stop location should be defined.
@@ -3287,15 +3324,13 @@ type PlanConnection {
 
     """
     Origin of the itinerary search.
-    TODO figure out the best output type
     """
-    origin: Place!
+    origin: PlanLabeledLocation!
 
     """
     Destination of the itinerary search.
-    TODO figure out the best output type
     """
-    destination: Place!
+    destination: PlanLabeledLocation!
 
     """
     Errors faced during the routing search.
