@@ -1,23 +1,41 @@
 package org.opentripplanner.transit.model.timetable;
 
-import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
-import java.io.Serializable;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.IntUtils;
+import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.transit.model.basic.Accessibility;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.DeduplicatorService;
 
-final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTripTimes> {
+/**
+ * Regular/planed/scheduled read-only version of {@link TripTimes}. The set of static
+ * trip-times are build during graph-build and can not be changed using real-time updates.
+ *
+ * @see RealTimeTripTimes for real-time version
+ */
+public final class ScheduledTripTimes implements TripTimes {
+
+  /**
+   * When time-shifting from one time-zone to another negative times may occur.
+   */
+  private static final int MIN_TIME = DurationUtils.durationInSeconds("-12h");
+  /**
+   * We allow a trip to last for maximum 10 days. In Norway the longest trip is 6 days.
+   */
+  private static final int MAX_TIME = DurationUtils.durationInSeconds("10d");
 
   /**
    * Implementation notes: This allows re-using the same scheduled arrival and departure time
@@ -48,31 +66,34 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
   private final int[] originalGtfsStopSequence;
 
   ScheduledTripTimes(ScheduledTripTimesBuilder builder) {
-    this.timeShift = builder.timeShift;
-    this.serviceCode = builder.serviceCode;
-    this.arrivalTimes = builder.arrivalTimes;
-    this.departureTimes = builder.departureTimes;
-    this.timepoints = builder.timepoints;
-    this.trip = builder.trip;
-    this.pickupBookingInfos = builder.pickupBookingInfos;
-    this.dropOffBookingInfos = builder.dropOffBookingInfos;
-    this.headsigns = builder.headsigns;
-    this.headsignVias = builder.headsignVias;
-    this.originalGtfsStopSequence = builder.originalGtfsStopSequence;
-  }
-
-  public static ScheduledTripTimesBuilder of(@Nullable Deduplicator deduplicator) {
-    return new ScheduledTripTimesBuilder(deduplicator);
+    this.timeShift = builder.timeShift();
+    this.serviceCode = builder.serviceCode();
+    this.arrivalTimes = Objects.requireNonNull(builder.arrivalTimes());
+    this.departureTimes = Objects.requireNonNull(builder.departureTimes());
+    this.timepoints = Objects.requireNonNull(builder.timepoints());
+    this.trip = Objects.requireNonNull(builder.trip());
+    this.pickupBookingInfos = Objects.requireNonNull(builder.pickupBookingInfos());
+    this.dropOffBookingInfos = Objects.requireNonNull(builder.dropOffBookingInfos());
+    this.headsigns = builder.headsigns();
+    this.headsignVias = builder.headsignVias();
+    this.originalGtfsStopSequence = builder.originalGtfsStopSequence();
+    validate();
   }
 
   /**
-   * Create a builder with or without deduplication.
-   * <p>
    * Always provide a deduplicator when building the graph. No deduplication is ok when changing
-   * simple fields like {@code timeShift} and {@code serviceCode} or even the prefered way in a
+   * simple fields like {@code timeShift} and {@code serviceCode} or even the prefered way in an
    * unittest.
    */
-  public ScheduledTripTimesBuilder copyOf(@Nullable Deduplicator deduplicator) {
+  public static ScheduledTripTimesBuilder of() {
+    return new ScheduledTripTimesBuilder(null);
+  }
+
+  public static ScheduledTripTimesBuilder of(DeduplicatorService deduplicator) {
+    return new ScheduledTripTimesBuilder(deduplicator);
+  }
+
+  public ScheduledTripTimesBuilder copyOf(Deduplicator deduplicator) {
     return new ScheduledTripTimesBuilder(
       timeShift,
       serviceCode,
@@ -96,132 +117,127 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
     return copyOf(null);
   }
 
-  /** The code for the service on which this trip runs. For departure search optimizations. */
+  @Override
+  public RealTimeTripTimes copyScheduledTimes() {
+    return RealTimeTripTimes.of(this);
+  }
+
+  @Override
+  public TripTimes adjustTimesToGraphTimeZone(Duration shiftDelta) {
+    return copyOfNoDuplication().plusTimeShift((int) shiftDelta.toSeconds()).build();
+  }
+
+  @Override
   public int getServiceCode() {
     return serviceCode;
   }
 
-  /**
-   * The time in seconds after midnight at which the vehicle should arrive at the given stop
-   * according to the original schedule.
-   */
+  @Override
   public int getScheduledArrivalTime(final int stop) {
     return arrivalTimes[stop] + timeShift;
   }
 
-  /**
-   * The time in seconds after midnight at which the vehicle arrives at each stop, accounting for
-   * any real-time updates.
-   */
+  @Override
   public int getArrivalTime(final int stop) {
     return getScheduledArrivalTime(stop);
   }
 
-  /** @return the difference between the scheduled and actual arrival times at this stop. */
+  @Override
   public int getArrivalDelay(final int stop) {
     return getArrivalTime(stop) - (arrivalTimes[stop] + timeShift);
   }
 
-  /**
-   * The time in seconds after midnight at which the vehicle should leave the given stop according
-   * to the original schedule.
-   */
+  @Override
   public int getScheduledDepartureTime(final int stop) {
     return departureTimes[stop] + timeShift;
   }
 
-  /**
-   * The time in seconds after midnight at which the vehicle leaves each stop, accounting for any
-   * real-time updates.
-   */
+  @Override
   public int getDepartureTime(final int stop) {
     return getScheduledDepartureTime(stop);
   }
 
-  /** @return the difference between the scheduled and actual departure times at this stop. */
+  @Override
   public int getDepartureDelay(final int stop) {
     return getDepartureTime(stop) - (departureTimes[stop] + timeShift);
   }
 
-  /**
-   * Whether or not stopIndex is considered a GTFS timepoint.
-   */
+  @Override
   public boolean isTimepoint(final int stopIndex) {
     return timepoints.get(stopIndex);
   }
 
-  /** The trips whose arrivals and departures are represented by this class */
+  @Override
   public Trip getTrip() {
     return trip;
   }
 
-  /**
-   * Return an integer which can be used to sort TripTimes in order of departure/arrivals.
-   * <p>
-   * This sorted trip times is used to search for trips. OTP assume one trip do NOT pass another
-   * trip down the line.
-   */
+  @Override
   public int sortIndex() {
     return getDepartureTime(0);
   }
 
+  @Override
   public BookingInfo getDropOffBookingInfo(int stop) {
     return dropOffBookingInfos.get(stop);
   }
 
+  @Override
   public BookingInfo getPickupBookingInfo(int stop) {
     return pickupBookingInfos.get(stop);
   }
 
-  /**
-   * Return {@code true} if the trip is unmodified, a scheduled trip from a published timetable.
-   * Return {@code false} if the trip is an updated, cancelled, or otherwise modified one. This
-   * method differs from {@link #getRealTimeState()} in that it checks whether real-time
-   * information is actually available.
-   */
+  @Override
   public boolean isScheduled() {
     return true;
   }
 
-  /**
-   * Return {@code true} if canceled or soft-deleted
-   */
+  @Override
   public boolean isCanceledOrDeleted() {
     return false;
   }
 
-  /**
-   * Return {@code true} if canceled
-   */
+  @Override
   public boolean isCanceled() {
     return false;
   }
 
-  /**
-   * Return true if trip is soft-deleted, and should not be visible to the user
-   */
+  @Override
   public boolean isDeleted() {
     return false;
   }
 
+  @Override
   public RealTimeState getRealTimeState() {
     return RealTimeState.SCHEDULED;
   }
 
-  /**
-   * @return the whole trip's headsign. Individual stops can have different headsigns.
-   */
+  @Override
+  public boolean isCancelledStop(int stop) {
+    return false;
+  }
+
+  @Override
+  public boolean isRecordedStop(int stop) {
+    return false;
+  }
+
+  @Override
+  public boolean isNoDataStop(int stop) {
+    return false;
+  }
+
+  @Override
+  public boolean isPredictionInaccurate(int stop) {
+    return false;
+  }
+
+  @Override
   public I18NString getTripHeadsign() {
     return trip.getHeadsign();
   }
 
-  /**
-   * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS fields.
-   * A trip may not have a headsign, in which case we should fall back on a Timetable or
-   * Pattern-level headsign. Such a string will be available when we give TripPatterns or
-   * StopPatterns unique human-readable route variant names, but a ScheduledTripTimes currently
-   * does not have a pointer to its enclosing timetable or pattern.
-   */
+  @Override
   @Nullable
   public I18NString getHeadsign(final int stop) {
     return (headsigns != null && headsigns[stop] != null)
@@ -229,13 +245,7 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
       : getTrip().getHeadsign();
   }
 
-  /**
-   * Return list of via names per particular stop. This field provides info about intermediate stops
-   * between current stop and final trip destination. Mapped from NeTEx DestinationDisplay.vias. No
-   * GTFS mapping at the moment.
-   *
-   * @return Empty list if there are no vias registered for a stop.
-   */
+  @Override
   public List<String> getHeadsignVias(final int stop) {
     if (headsignVias == null || headsignVias[stop] == null) {
       return List.of();
@@ -243,70 +253,27 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
     return List.of(headsignVias[stop]);
   }
 
+  @Override
   public int getNumStops() {
     return arrivalTimes.length;
   }
 
+  @Override
   public Accessibility getWheelchairAccessibility() {
     return trip.getWheelchairBoarding();
   }
 
-  /**
-   * This is only for API-purposes (does not affect routing).
-   */
-  public OccupancyStatus getOccupancyStatus(int stop) {
+  @Override
+  public OccupancyStatus getOccupancyStatus(int ignore) {
     return OccupancyStatus.NO_DATA_AVAILABLE;
   }
 
-  /**
-   * When creating ScheduledTripTimes or wrapping it in updates, we could potentially imply
-   * negative running or dwell times. We really don't want those being used in routing. This method
-   * checks that all times are increasing.
-   *
-   * @return empty if times were found to be increasing, the first validation error otherwise
-   */
-  public Optional<ValidationError> validateNonIncreasingTimes() {
-    final int nStops = arrivalTimes.length;
-    int prevDep = -9_999_999;
-    for (int s = 0; s < nStops; s++) {
-      final int arr = getArrivalTime(s);
-      final int dep = getDepartureTime(s);
-
-      if (dep < arr) {
-        return Optional.of(new ValidationError(NEGATIVE_DWELL_TIME, s));
-      }
-      if (prevDep > arr) {
-        return Optional.of(new ValidationError(NEGATIVE_HOP_TIME, s));
-      }
-      prevDep = dep;
-    }
-    return Optional.empty();
-  }
-
-  /** Sort trips based on first departure time. */
   @Override
-  public int compareTo(final ScheduledTripTimes other) {
-    return this.getDepartureTime(0) - other.getDepartureTime(0);
-  }
-
-  /**
-   * Returns the GTFS sequence number of the given 0-based stop position.
-   *
-   * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits the
-   * stops. Despite the fact that the StopPattern or TripPattern enclosing this class provides
-   * an ordered list of Stops, the original stop sequence numbers may still be needed for matching
-   * with GTFS-RT update messages. Unfortunately, each individual trip can have totally different
-   * sequence numbers for the same stops, so we need to store them at the individual trip level. An
-   * effort is made to re-use the sequence number arrays when they are the same across different
-   * trips in the same pattern.
-   */
   public int gtfsSequenceOfStopIndex(final int stop) {
     return originalGtfsStopSequence[stop];
   }
 
-  /**
-   * Returns the 0-based stop index of the given GTFS sequence number.
-   */
+  @Override
   public OptionalInt stopIndexOfGtfsSequence(int stopSequence) {
     if (originalGtfsStopSequence == null) {
       return OptionalInt.empty();
@@ -342,5 +309,51 @@ final class ScheduledTripTimes implements Serializable, Comparable<ScheduledTrip
 
   I18NString[] copyHeadsigns(Supplier<I18NString[]> defaultValue) {
     return headsigns == null ? defaultValue.get() : Arrays.copyOf(headsigns, headsigns.length);
+  }
+
+  /* private methods */
+
+  private void validate() {
+    int lastStop = departureTimes.length - 1;
+    IntUtils.requireInRange(departureTimes[0], MIN_TIME, MAX_TIME);
+    IntUtils.requireInRange(arrivalTimes[lastStop], MIN_TIME, MAX_TIME);
+    // TODO: This class is used by FLEX, so we can not validate increasing TripTimes
+    // validateNonIncreasingTimes();
+  }
+
+  /**
+   * When creating scheduled trip times we could potentially imply negative running or dwell times.
+   * We really don't want those being used in routing. This method checks that all times are
+   * increasing. The first stop arrival time and the last stops departure time is NOT checked -
+   * these should be ignored by raptor.
+   */
+  private void validateNonIncreasingTimes() {
+    final int lastStop = arrivalTimes.length - 1;
+
+    // This check is currently used since Flex trips may have only one stop. This class should
+    // not be used to represent FLEX, so remove this check and create new data classes for FLEX
+    // trips.
+    if (lastStop < 1) {
+      return;
+    }
+    int prevDep = getDepartureTime(0);
+
+    for (int i = 1; true; ++i) {
+      final int arr = getArrivalTime(i);
+      final int dep = getDepartureTime(i);
+
+      if (prevDep > arr) {
+        throw new DataValidationException(new TimetableValidationError(NEGATIVE_HOP_TIME, i, trip));
+      }
+      if (i == lastStop) {
+        return;
+      }
+      if (dep < arr) {
+        throw new DataValidationException(
+          new TimetableValidationError(NEGATIVE_DWELL_TIME, i, trip)
+        );
+      }
+      prevDep = dep;
+    }
   }
 }

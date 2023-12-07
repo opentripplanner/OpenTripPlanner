@@ -38,7 +38,9 @@ class StopTimesHelperTest {
         transitService.getTripForId(new FeedScopedId(feedId, "5.1"))
       );
     var tt = transitService.getTimetableForTripPattern(pattern, LocalDate.now());
-    tt.getTripTimes(0).cancelTrip();
+    var newTripTimes = tt.getTripTimes(0).copyScheduledTimes();
+    newTripTimes.cancelTrip();
+    tt.setTripTimes(0, newTripTimes);
   }
 
   /**

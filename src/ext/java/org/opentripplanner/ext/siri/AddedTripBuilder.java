@@ -18,6 +18,7 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.Route;
@@ -27,11 +28,11 @@ import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
-import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitModel;
-import org.opentripplanner.updater.spi.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.rutebanken.netex.model.BusSubmodeEnumeration;
 import org.rutebanken.netex.model.RailSubmodeEnumeration;
@@ -202,14 +203,14 @@ class AddedTripBuilder {
       .withStopPattern(stopPattern)
       .build();
 
-    TripTimes tripTimes = TripTimesFactory.tripTimes(
+    RealTimeTripTimes tripTimes = TripTimesFactory.tripTimes(
       trip,
       aimedStopTimes,
       transitModel.getDeduplicator()
     );
     tripTimes.setServiceCode(transitModel.getServiceCodes().get(trip.getServiceId()));
     pattern.add(tripTimes);
-    TripTimes updatedTripTimes = tripTimes.copyOfScheduledTimes();
+    RealTimeTripTimes updatedTripTimes = tripTimes.copyScheduledTimes();
 
     // Loop through calls again and apply updates
     for (int stopSequence = 0; stopSequence < calls.size(); stopSequence++) {
@@ -231,9 +232,10 @@ class AddedTripBuilder {
     }
 
     /* Validate */
-    var validityResult = updatedTripTimes.validateNonIncreasingTimes();
-    if (validityResult.isPresent()) {
-      return TripTimesValidationMapper.toResult(tripId, validityResult.get());
+    try {
+      updatedTripTimes.validateNonIncreasingTimes();
+    } catch (DataValidationException e) {
+      return DataValidationExceptionMapper.toResult(e);
     }
 
     // Adding trip to index necessary to include values in graphql-queries

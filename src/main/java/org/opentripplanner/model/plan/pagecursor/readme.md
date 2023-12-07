@@ -18,7 +18,7 @@ moving on to the next.
   request to the next page.  **sw'** is the search window for the new next/previous page. The search
   window may change between requests, so we need to account for it when computing the next/previous
   page cursors.
-- **earliest-departure-time (edt)**  The search-window start with the earliest-depature-time, which
+- **earliest-departure-time (edt)**  The search-window start with the earliest-departure-time, which
   is the first possible time any itinerary may start. **edt'** is the calculated value for the new
   cursor.
 - **latest-arrival-time (lat)**  The latest time an itinerary can arrive to get accepted. The

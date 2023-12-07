@@ -25,15 +25,17 @@ import java.util.function.UnaryOperator;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.time.ServiceDateUtils;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Direction;
 import org.opentripplanner.transit.model.timetable.FrequencyEntry;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeMapper;
-import org.opentripplanner.updater.spi.TripTimesValidationMapper;
+import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.trip.BackwardsDelayPropagationType;
 import org.slf4j.Logger;
@@ -203,7 +205,7 @@ public class Timetable implements Serializable {
       LOG.trace("tripId {} found at index {} in timetable.", tripId, tripIndex);
     }
 
-    TripTimes newTimes = getTripTimes(tripIndex).copyOfScheduledTimes();
+    RealTimeTripTimes newTimes = getTripTimes(tripIndex).copyScheduledTimes();
     List<Integer> skippedStopIndices = new ArrayList<>();
 
     // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
@@ -360,14 +362,10 @@ public class Timetable implements Serializable {
     }
 
     // Validate for non-increasing times. Log error if present.
-    var error = newTimes.validateNonIncreasingTimes();
-    if (error.isPresent()) {
-      LOG.debug(
-        "TripTimes are non-increasing after applying GTFS-RT delay propagation to trip {} after stop index {}.",
-        tripId,
-        error.get().stopIndex()
-      );
-      return TripTimesValidationMapper.toResult(newTimes.getTrip().getId(), error.get());
+    try {
+      newTimes.validateNonIncreasingTimes();
+    } catch (DataValidationException e) {
+      return DataValidationExceptionMapper.toResult(e);
     }
 
     if (tripUpdate.hasVehicle()) {
@@ -432,12 +430,12 @@ public class Timetable implements Serializable {
   // TODO maybe put this is a more appropriate place
   public void setServiceCodes(Map<FeedScopedId, Integer> serviceCodes) {
     for (TripTimes tt : this.tripTimes) {
-      tt.setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
+      ((RealTimeTripTimes) tt).setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
     }
     // Repeated code... bad sign...
     for (FrequencyEntry freq : this.frequencyEntries) {
       TripTimes tt = freq.tripTimes;
-      tt.setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
+      ((RealTimeTripTimes) tt).setServiceCode(serviceCodes.get(tt.getTrip().getServiceId()));
     }
   }
 
