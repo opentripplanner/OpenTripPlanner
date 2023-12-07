@@ -1219,9 +1219,9 @@ type StopGeometries {
 }
 
 """
-A coordinate pair used for a location in a plan query.
+A coordinate used for a location in a plan query.
 """
-input PlanCoordinatesInput {
+input PlanCoordinateInput {
     """
     Latitude as a WGS84 format number.
     """
@@ -1542,13 +1542,13 @@ Union of locations types that could be used in a plan query.
 union PlanLocation = Stop | Coordinate
 
 """
-Plan location. Either coordinates or a stop location should be defined.
+Plan location. Either a coordinate or a stop location should be defined.
 """
 input PlanLocationInput @oneOf {
     """
-    Coordinates of the location. Note, either coordinates or a stop location should be defined.
+    Coordinate of the location. Note, either a coordinate or a stop location should be defined.
     """
-    coordinates: PlanCoordinatesInput
+    coordinate: PlanCoordinateInput
 
     """
     Stop, station, a group of stop places or multimodal stop place that should be used as
