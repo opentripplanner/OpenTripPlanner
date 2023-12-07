@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.timetable;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 
@@ -36,7 +37,7 @@ class ScheduledTripTimesTest {
   }
 
   private final ScheduledTripTimes subject = ScheduledTripTimes
-    .of(null)
+    .of()
     .withArrivalTimes("10:00 11:00 12:00")
     .withDepartureTimes("10:01 11:02 12:03")
     .withServiceCode(SERVICE_CODE)
@@ -96,6 +97,21 @@ class ScheduledTripTimesTest {
     assertFalse(subject.isTimepoint(STOP_POS_0));
     assertTrue(subject.isTimepoint(STOP_POS_1));
     assertFalse(subject.isTimepoint(STOP_POS_2));
+  }
+
+  @Test
+  void validateLastArrivalTimeIsNotMoreThan20DaysAfterFirstDepartureTime() {
+    var ex = assertThrows(
+      IllegalArgumentException.class,
+      () ->
+        ScheduledTripTimes
+          .of()
+          .withDepartureTimes("10:00 12:00 10:00:01+20d")
+          .withServiceCode(SERVICE_CODE)
+          .withTrip(TRIP)
+          .build()
+    );
+    assertEquals("The value is not in range[-43200, 1728000]: 1728001", ex.getMessage());
   }
 
   @Test
