@@ -2573,7 +2573,7 @@ type QueryType {
         filterByModes: [Mode]
 
         """Only include places that match one of the given GTFS ids."""
-        filterByIds: InputFilters
+        filterByIds: InputFilters @deprecated(reason: "Not actively maintained")
         before: String
         after: String
         first: Int
