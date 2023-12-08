@@ -969,7 +969,7 @@
             <activation>
                 <property>
                     <!--
-                      This work as a short alias to enable this from the command line. To skip
+                      This works as a short alias to enable this from the command line. To skip
                       prettier, set the 'ps' system property with the '-D ps' parameter:
                       # mvn test -D ps
                     -->
