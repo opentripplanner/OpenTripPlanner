@@ -24,7 +24,6 @@ import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.graph_builder.module.TripPatternNamer;
 import org.opentripplanner.graph_builder.module.geometry.CalculateWorldEnvelopeModule;
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
-import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -45,7 +44,6 @@ public interface GraphBuilderFactory {
   NetexModule netexModule();
   TimeZoneAdjusterModule timeZoneAdjusterModule();
   TripPatternNamer tripPatternNamer();
-  BusRouteStreetMatcher busRouteStreetMatcher();
   OsmBoardingLocationsModule osmBoardingLocationsModule();
   StreetLinkerModule streetLinkerModule();
   PruneIslands pruneIslands();

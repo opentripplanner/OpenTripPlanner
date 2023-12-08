@@ -205,7 +205,7 @@ public class TimeUtils {
    * busy-wait again.
    * <p>
    * This method does a "busy" wait - it is not affected by a thread interrupt like
-   * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic witch uses the interrupt
+   * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic which uses the interrupt
    * flag.
    * <p>
    * THIS CODE IS NOT MEANT FOR PRODUCTION!
@@ -226,7 +226,7 @@ public class TimeUtils {
    * number.
    * <p>
    * This method does a "busy" wait - it is not affected by a thread interrupt like
-   * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic witch uses the interrupt
+   * {@link Thread#sleep(long)}; Hence do not interfere with timeout logic which uses the interrupt
    * flag.
    * <p>
    * THIS CODE IS NOT MEANT FOR PRODUCTION!

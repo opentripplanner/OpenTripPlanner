@@ -130,7 +130,7 @@ public class PlaceMapper {
       .hasWheelchairAccessibleCarPlaces(vp.hasWheelchairAccessibleCarPlaces())
       .availability(mapVehicleParkingSpaces(vp.getAvailability()))
       .capacity(mapVehicleParkingSpaces(vp.getCapacity()))
-      .realtime(vehicleParkingWithEntrance.isRealtime())
+      .realTime(vehicleParkingWithEntrance.isRealtime())
       .build();
   }
 }

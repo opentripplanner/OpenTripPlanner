@@ -7,7 +7,7 @@ import org.opentripplanner.framework.application.LogMDCSupport;
 
 /**
  * This thread pool factory should be used to create all threads handling "user" requests in OTP.
- * It is used to instrument new threads witch enable log information propagation and error handling,
+ * It is used to instrument new threads which enable log information propagation and error handling,
  * like thread interruption. By "user" we mean users of the query APIs like GTFS GraphQL API,
  * Transmodel GraphQL API and other http endpoints.
  * <p>

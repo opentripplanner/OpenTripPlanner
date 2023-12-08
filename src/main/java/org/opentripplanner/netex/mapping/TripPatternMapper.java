@@ -11,11 +11,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
+import org.opentripplanner.model.StopTime;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.index.api.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.mapping.support.FeedScopedIdFactory;
 import org.opentripplanner.transit.model.basic.SubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.EntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
@@ -360,19 +362,20 @@ class TripPatternMapper {
 
   private void createTripTimes(List<Trip> trips, TripPattern tripPattern) {
     for (Trip trip : trips) {
-      if (result.tripStopTimes.get(trip).size() == 0) {
+      List<StopTime> stopTimes = result.tripStopTimes.get(trip);
+      if (stopTimes.isEmpty()) {
         issueStore.add(
           "TripWithoutTripTimes",
           "Trip %s does not contain any trip times.",
           trip.getId()
         );
       } else {
-        TripTimes tripTimes = TripTimesFactory.tripTimes(
-          trip,
-          result.tripStopTimes.get(trip),
-          deduplicator
-        );
-        tripPattern.add(tripTimes);
+        try {
+          TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, deduplicator);
+          tripPattern.add(tripTimes);
+        } catch (DataValidationException e) {
+          issueStore.add(e.error());
+        }
       }
     }
   }

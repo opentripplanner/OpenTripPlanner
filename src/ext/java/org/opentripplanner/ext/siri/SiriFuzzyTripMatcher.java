@@ -297,9 +297,9 @@ public class SiriFuzzyTripMatcher {
         continue;
       }
 
-      var realtimeAddedTripPattern = getRealtimeAddedTripPattern.apply(trip.getId(), serviceDate);
-      TripPattern tripPattern = realtimeAddedTripPattern != null
-        ? realtimeAddedTripPattern
+      var realTimeAddedTripPattern = getRealtimeAddedTripPattern.apply(trip.getId(), serviceDate);
+      TripPattern tripPattern = realTimeAddedTripPattern != null
+        ? realTimeAddedTripPattern
         : transitService.getPatternForTrip(trip);
 
       var firstStop = tripPattern.firstStop();

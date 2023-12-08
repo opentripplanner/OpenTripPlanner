@@ -146,7 +146,7 @@ public class DatedServiceJourneyType {
           .withDirective(gqlUtil.timingData)
           .description(
             "Returns scheduled passingTimes for this dated service journey, " +
-            "updated with realtime-updates (if available). "
+            "updated with real-time-updates (if available). "
           )
           .dataFetcher(environment -> {
             TripOnServiceDate tripOnServiceDate = tripOnServiceDate(environment);

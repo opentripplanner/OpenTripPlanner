@@ -395,7 +395,7 @@ public class OrcaFareService extends DefaultFareService {
    * If free transfers are applicable, the most expensive discount fare across all legs is added to
    * the final cumulative price.
    * <p>
-   * The computed fare for Orca card users takes into account realtime trip updates where available,
+   * The computed fare for Orca card users takes into account real-time trip updates where available,
    * so that, for instance, when a leg on a long itinerary is delayed to begin after the initial two
    * hour window has expired, the calculated fare for that trip will be two one-way fares instead of
    * one.

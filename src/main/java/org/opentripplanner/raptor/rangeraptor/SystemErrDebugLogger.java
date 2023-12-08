@@ -28,7 +28,7 @@ import org.opentripplanner.raptor.api.view.PatternRideView;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
 
 /**
- * A debug logger witch can be plugged into Raptor to do debug logging to standard error. This is
+ * A debug logger which can be plugged into Raptor to do debug logging to standard error. This is
  * used by the REST API, SpeedTest and in module tests.
  * <p>
  * See the Raptor design doc for a general description of the logging functionality.

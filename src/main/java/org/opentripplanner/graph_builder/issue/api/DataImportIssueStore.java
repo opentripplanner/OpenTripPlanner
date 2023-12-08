@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.issue.api;
 
 import java.util.List;
+import org.opentripplanner.framework.error.OtpError;
 
 /**
  * This service is used to store issued during data import. When the import is complete
@@ -18,6 +19,9 @@ public interface DataImportIssueStore {
 
   /** Add an issue to the issue report. */
   void add(DataImportIssue issue);
+
+  /** Add an issue to the issue report. */
+  void add(OtpError issue);
 
   /** Add an issue to the issue report without the need of creating an issue class. */
   void add(String type, String message);

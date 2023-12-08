@@ -240,7 +240,7 @@ public class ServiceJourneyType {
           .type(new GraphQLNonNull(new GraphQLList(timetabledPassingTimeType)))
           .withDirective(gqlUtil.timingData)
           .description(
-            "Returns scheduled passing times only - without realtime-updates, for realtime-data use 'estimatedCalls'"
+            "Returns scheduled passing times only - without real-time-updates, for realtime-data use 'estimatedCalls'"
           )
           .dataFetcher(env -> {
             Trip trip = trip(env);
@@ -259,7 +259,7 @@ public class ServiceJourneyType {
           .type(new GraphQLList(estimatedCallType))
           .withDirective(gqlUtil.timingData)
           .description(
-            "Returns scheduled passingTimes for this ServiceJourney for a given date, updated with realtime-updates (if available). " +
+            "Returns scheduled passingTimes for this ServiceJourney for a given date, updated with real-time-updates (if available). " +
             "NB! This takes a date as argument (default=today) and returns estimatedCalls for that date and should only be used if the date is " +
             "known when creating the request. For fetching estimatedCalls for a given trip.leg, use leg.serviceJourneyEstimatedCalls instead."
           )

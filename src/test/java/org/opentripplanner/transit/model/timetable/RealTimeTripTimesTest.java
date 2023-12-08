@@ -3,12 +3,12 @@ package org.opentripplanner.transit.model.timetable;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
-import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
-import static org.opentripplanner.transit.model.timetable.ValidationError.ErrorCode.NEGATIVE_HOP_TIME;
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_DWELL_TIME;
+import static org.opentripplanner.transit.model.timetable.TimetableValidationError.ErrorCode.NEGATIVE_HOP_TIME;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -17,17 +17,18 @@ import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.RegularStop;
 
-class TripTimesTest {
+class RealTimeTripTimesTest {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   private static final String TRIP_ID = "testTripId";
 
-  private static final List<FeedScopedId> stops = List.of(
+  private static final List<FeedScopedId> stopIds = List.of(
     id("A"),
     id("B"),
     id("C"),
@@ -43,10 +44,10 @@ class TripTimesTest {
 
     List<StopTime> stopTimes = new LinkedList<>();
 
-    for (int i = 0; i < stops.size(); ++i) {
+    for (int i = 0; i < stopIds.size(); ++i) {
       StopTime stopTime = new StopTime();
 
-      RegularStop stop = TEST_MODEL.stop(stops.get(i).getId(), 0.0, 0.0).build();
+      RegularStop stop = TEST_MODEL.stop(stopIds.get(i).getId(), 0.0, 0.0).build();
       stopTime.setStop(stop);
       stopTime.setArrivalTime(i * 60);
       stopTime.setDepartureTime(i * 60);
@@ -69,7 +70,7 @@ class TripTimesTest {
     @Test
     void shouldHandleBothNullScenario() {
       Trip trip = TransitModelForTest.trip("TRIP").build();
-      Collection<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
+      List<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -80,7 +81,7 @@ class TripTimesTest {
     @Test
     void shouldHandleTripOnlyHeadSignScenario() {
       Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
-      Collection<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
+      List<StopTime> stopTimes = List.of(EMPTY_STOPPOINT, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -93,11 +94,7 @@ class TripTimesTest {
       Trip trip = TransitModelForTest.trip("TRIP").build();
       StopTime stopWithHeadsign = new StopTime();
       stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
-      Collection<StopTime> stopTimes = List.of(
-        stopWithHeadsign,
-        stopWithHeadsign,
-        stopWithHeadsign
-      );
+      List<StopTime> stopTimes = List.of(stopWithHeadsign, stopWithHeadsign, stopWithHeadsign);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -110,11 +107,7 @@ class TripTimesTest {
       Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
       StopTime stopWithHeadsign = new StopTime();
       stopWithHeadsign.setStopHeadsign(DIRECTION);
-      Collection<StopTime> stopTimes = List.of(
-        stopWithHeadsign,
-        stopWithHeadsign,
-        stopWithHeadsign
-      );
+      List<StopTime> stopTimes = List.of(stopWithHeadsign, stopWithHeadsign, stopWithHeadsign);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -127,7 +120,7 @@ class TripTimesTest {
       Trip trip = TransitModelForTest.trip("TRIP").withHeadsign(DIRECTION).build();
       StopTime stopWithHeadsign = new StopTime();
       stopWithHeadsign.setStopHeadsign(STOP_TEST_DIRECTION);
-      Collection<StopTime> stopTimes = List.of(stopWithHeadsign, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
+      List<StopTime> stopTimes = List.of(stopWithHeadsign, EMPTY_STOPPOINT, EMPTY_STOPPOINT);
 
       TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
 
@@ -141,7 +134,7 @@ class TripTimesTest {
 
   @Test
   public void testStopUpdate() {
-    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
+    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimesA.updateArrivalTime(3, 190);
     updatedTripTimesA.updateDepartureTime(3, 190);
@@ -156,38 +149,12 @@ class TripTimesTest {
 
   @Test
   public void testPassedUpdate() {
-    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
+    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimesA.updateDepartureTime(0, 30);
 
     assertEquals(30, updatedTripTimesA.getDepartureTime(0));
     assertEquals(60, updatedTripTimesA.getArrivalTime(1));
-  }
-
-  @Test
-  public void testNegativeDwellTime() {
-    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
-
-    updatedTripTimesA.updateArrivalTime(1, 60);
-    updatedTripTimesA.updateDepartureTime(1, 59);
-
-    var error = updatedTripTimesA.validateNonIncreasingTimes();
-    assertTrue(error.isPresent());
-    assertEquals(1, error.get().stopIndex());
-    assertEquals(NEGATIVE_DWELL_TIME, error.get().code());
-  }
-
-  @Test
-  public void testNegativeHopTime() {
-    TripTimes updatedTripTimesB = createInitialTripTimes().copyOfScheduledTimes();
-
-    updatedTripTimesB.updateDepartureTime(6, 421);
-    updatedTripTimesB.updateArrivalTime(7, 420);
-
-    var error = updatedTripTimesB.validateNonIncreasingTimes();
-    assertTrue(error.isPresent());
-    assertEquals(7, error.get().stopIndex());
-    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
   }
 
   /**
@@ -200,7 +167,7 @@ class TripTimesTest {
    */
   @Test
   public void testNegativeHopTimeWithStopCancellations() {
-    TripTimes updatedTripTimes = createInitialTripTimes();
+    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.updateDepartureTime(5, 421);
     updatedTripTimes.updateArrivalTime(6, 481);
@@ -208,14 +175,14 @@ class TripTimesTest {
     updatedTripTimes.setCancelled(6);
     updatedTripTimes.updateArrivalTime(7, 420);
 
-    var error = updatedTripTimes.validateNonIncreasingTimes();
-    assertTrue(error.isPresent());
-    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
-
-    assertTrue(updatedTripTimes.interpolateMissingTimes());
-    error = updatedTripTimes.validateNonIncreasingTimes();
-    assertTrue(error.isPresent());
-    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+    var error = assertThrows(
+      DataValidationException.class,
+      updatedTripTimes::validateNonIncreasingTimes
+    );
+    assertEquals(
+      "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
+      error.error().message()
+    );
   }
 
   /**
@@ -227,7 +194,7 @@ class TripTimesTest {
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsLate() {
-    TripTimes updatedTripTimes = createInitialTripTimes();
+    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.updateDepartureTime(5, 400);
     updatedTripTimes.updateArrivalTime(6, 460);
@@ -235,13 +202,18 @@ class TripTimesTest {
     updatedTripTimes.setCancelled(6);
     updatedTripTimes.updateArrivalTime(7, 420);
 
-    var error = updatedTripTimes.validateNonIncreasingTimes();
-    assertTrue(error.isPresent());
-    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+    var error = assertThrows(
+      DataValidationException.class,
+      updatedTripTimes::validateNonIncreasingTimes
+    );
+    assertEquals(
+      "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
+      error.error().message()
+    );
 
     assertTrue(updatedTripTimes.interpolateMissingTimes());
-    error = updatedTripTimes.validateNonIncreasingTimes();
-    assertFalse(error.isPresent());
+
+    updatedTripTimes.validateNonIncreasingTimes();
   }
 
   /**
@@ -253,19 +225,23 @@ class TripTimesTest {
    */
   @Test
   public void testPositiveHopTimeWithStopCancellationsEarly() {
-    TripTimes updatedTripTimes = createInitialTripTimes();
+    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.updateDepartureTime(5, 300);
     updatedTripTimes.setCancelled(6);
     updatedTripTimes.updateArrivalTime(7, 320);
 
-    var error = updatedTripTimes.validateNonIncreasingTimes();
-    assertTrue(error.isPresent());
-    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+    var error = assertThrows(
+      DataValidationException.class,
+      updatedTripTimes::validateNonIncreasingTimes
+    );
+    assertEquals(
+      "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
+      error.error().message()
+    );
 
     assertTrue(updatedTripTimes.interpolateMissingTimes());
-    error = updatedTripTimes.validateNonIncreasingTimes();
-    assertFalse(error.isPresent());
+    updatedTripTimes.validateNonIncreasingTimes();
   }
 
   /**
@@ -278,21 +254,29 @@ class TripTimesTest {
    */
   @Test
   public void testPositiveHopTimeWithTerminalCancellation() {
-    TripTimes updatedTripTimes = createInitialTripTimes();
+    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.setCancelled(0);
     updatedTripTimes.setCancelled(1);
     updatedTripTimes.updateArrivalTime(2, 0);
     updatedTripTimes.updateDepartureTime(2, 10);
 
-    var error = updatedTripTimes.validateNonIncreasingTimes();
-    assertTrue(error.isPresent());
-    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+    var error = assertThrows(
+      DataValidationException.class,
+      updatedTripTimes::validateNonIncreasingTimes
+    );
+    assertEquals(
+      "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.",
+      error.error().message()
+    );
 
     assertFalse(updatedTripTimes.interpolateMissingTimes());
-    error = updatedTripTimes.validateNonIncreasingTimes();
-    assertTrue(error.isPresent());
-    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+    error =
+      assertThrows(DataValidationException.class, updatedTripTimes::validateNonIncreasingTimes);
+    assertEquals(
+      "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.",
+      error.error().message()
+    );
   }
 
   /**
@@ -304,14 +288,14 @@ class TripTimesTest {
    */
   @Test
   public void testInterpolationWithTerminalCancellation() {
-    TripTimes updatedTripTimes = createInitialTripTimes();
+    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.setCancelled(6);
     updatedTripTimes.setCancelled(7);
 
     assertFalse(updatedTripTimes.interpolateMissingTimes());
-    var error = updatedTripTimes.validateNonIncreasingTimes();
-    assertFalse(error.isPresent());
+
+    updatedTripTimes.validateNonIncreasingTimes();
   }
 
   /**
@@ -323,7 +307,7 @@ class TripTimesTest {
    */
   @Test
   public void testInterpolationWithMultipleStopCancellations() {
-    TripTimes updatedTripTimes = createInitialTripTimes();
+    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.setCancelled(1);
     updatedTripTimes.setCancelled(2);
@@ -334,13 +318,18 @@ class TripTimesTest {
     updatedTripTimes.updateArrivalTime(7, 350);
     updatedTripTimes.updateDepartureTime(7, 350);
 
-    var error = updatedTripTimes.validateNonIncreasingTimes();
-    assertTrue(error.isPresent());
-    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+    var error = assertThrows(
+      DataValidationException.class,
+      updatedTripTimes::validateNonIncreasingTimes
+    );
+    assertEquals(
+      "NEGATIVE_HOP_TIME for stop position 7 in trip Trip{F:testTripId RRtestTripId}.",
+      error.error().message()
+    );
 
     assertTrue(updatedTripTimes.interpolateMissingTimes());
-    error = updatedTripTimes.validateNonIncreasingTimes();
-    assertFalse(error.isPresent());
+
+    updatedTripTimes.validateNonIncreasingTimes();
   }
 
   /**
@@ -352,7 +341,7 @@ class TripTimesTest {
    */
   @Test
   public void testInterpolationWithMultipleStopCancellations2() {
-    TripTimes updatedTripTimes = createInitialTripTimes();
+    var updatedTripTimes = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimes.setCancelled(1);
     updatedTripTimes.setCancelled(2);
@@ -364,28 +353,32 @@ class TripTimesTest {
     updatedTripTimes.updateArrivalTime(7, 240);
     updatedTripTimes.updateDepartureTime(7, 240);
 
-    var error = updatedTripTimes.validateNonIncreasingTimes();
-    assertTrue(error.isPresent());
-    assertEquals(NEGATIVE_HOP_TIME, error.get().code());
+    var error = assertThrows(
+      DataValidationException.class,
+      updatedTripTimes::validateNonIncreasingTimes
+    );
+    assertEquals(
+      "NEGATIVE_HOP_TIME for stop position 3 in trip Trip{F:testTripId RRtestTripId}.",
+      error.error().message()
+    );
 
     assertTrue(updatedTripTimes.interpolateMissingTimes());
-    error = updatedTripTimes.validateNonIncreasingTimes();
-    assertFalse(error.isPresent());
+    updatedTripTimes.validateNonIncreasingTimes();
   }
 
   @Test
   public void testNonIncreasingUpdateCrossingMidnight() {
-    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
+    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
 
     updatedTripTimesA.updateArrivalTime(0, -300); //"Yesterday"
     updatedTripTimesA.updateDepartureTime(0, 50);
 
-    assertTrue(updatedTripTimesA.validateNonIncreasingTimes().isEmpty());
+    updatedTripTimesA.validateNonIncreasingTimes();
   }
 
   @Test
   public void testDelay() {
-    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
+    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
     updatedTripTimesA.updateDepartureDelay(0, 10);
     updatedTripTimesA.updateArrivalDelay(6, 13);
 
@@ -395,14 +388,14 @@ class TripTimesTest {
 
   @Test
   public void testCancel() {
-    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
+    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
     updatedTripTimesA.cancelTrip();
     assertEquals(RealTimeState.CANCELED, updatedTripTimesA.getRealTimeState());
   }
 
   @Test
   public void testNoData() {
-    TripTimes updatedTripTimesA = createInitialTripTimes().copyOfScheduledTimes();
+    RealTimeTripTimes updatedTripTimesA = createInitialTripTimes().copyScheduledTimes();
     updatedTripTimesA.setNoData(1);
     assertFalse(updatedTripTimesA.isNoDataStop(0));
     assertTrue(updatedTripTimesA.isNoDataStop(1));
@@ -433,46 +426,38 @@ class TripTimesTest {
   }
 
   @Test
-  public void testApply() {
-    Trip trip = TransitModelForTest.trip(TRIP_ID).build();
+  public void validateNegativeDwellTime() {
+    var expMsg = "NEGATIVE_DWELL_TIME for stop position 3 in trip Trip{F:testTripId RRtestTripId}.";
+    var tt = createInitialTripTimes();
+    var updatedTt = tt.copyScheduledTimes();
 
-    List<StopTime> stopTimes = new LinkedList<>();
+    updatedTt.updateArrivalTime(3, 69);
+    updatedTt.updateDepartureTime(3, 68);
 
-    StopTime stopTime0 = new StopTime();
-    StopTime stopTime1 = new StopTime();
-    StopTime stopTime2 = new StopTime();
+    var ex = assertThrows(DataValidationException.class, updatedTt::validateNonIncreasingTimes);
+    var error = (TimetableValidationError) ex.error();
 
-    RegularStop stop0 = TEST_MODEL.stop(stops.get(0).getId(), 0.0, 0.0).build();
-    RegularStop stop1 = TEST_MODEL.stop(stops.get(1).getId(), 0.0, 0.0).build();
-    RegularStop stop2 = TEST_MODEL.stop(stops.get(2).getId(), 0.0, 0.0).build();
+    assertEquals(3, error.stopIndex());
+    assertEquals(NEGATIVE_DWELL_TIME, error.code());
+    assertEquals(expMsg, error.message());
+    assertEquals(expMsg, ex.getMessage());
+  }
 
-    stopTime0.setStop(stop0);
-    stopTime0.setDepartureTime(0);
-    stopTime0.setStopSequence(0);
+  @Test
+  public void validateNegativeHopTime() {
+    var expMsg = "NEGATIVE_HOP_TIME for stop position 2 in trip Trip{F:testTripId RRtestTripId}.";
+    var tt = createInitialTripTimes();
+    var updatedTt = tt.copyScheduledTimes();
 
-    stopTime1.setStop(stop1);
-    stopTime1.setArrivalTime(30);
-    stopTime1.setDepartureTime(60);
-    stopTime1.setStopSequence(1);
+    updatedTt.updateDepartureTime(1, 100);
+    updatedTt.updateArrivalTime(2, 99);
 
-    stopTime2.setStop(stop2);
-    stopTime2.setArrivalTime(90);
-    stopTime2.setStopSequence(2);
+    var ex = assertThrows(DataValidationException.class, updatedTt::validateNonIncreasingTimes);
+    var error = (TimetableValidationError) ex.error();
 
-    stopTimes.add(stopTime0);
-    stopTimes.add(stopTime1);
-    stopTimes.add(stopTime2);
-
-    TripTimes differingTripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
-
-    TripTimes updatedTripTimesA = differingTripTimes.copyOfScheduledTimes();
-
-    updatedTripTimesA.updateArrivalTime(1, 89);
-    updatedTripTimesA.updateDepartureTime(1, 98);
-
-    var validationResult = updatedTripTimesA.validateNonIncreasingTimes();
-    assertTrue(validationResult.isPresent());
-    assertEquals(2, validationResult.get().stopIndex());
-    assertEquals(NEGATIVE_DWELL_TIME, validationResult.get().code());
+    assertEquals(2, error.stopIndex());
+    assertEquals(NEGATIVE_HOP_TIME, error.code());
+    assertEquals(expMsg, error.message());
+    assertEquals(expMsg, ex.getMessage());
   }
 }

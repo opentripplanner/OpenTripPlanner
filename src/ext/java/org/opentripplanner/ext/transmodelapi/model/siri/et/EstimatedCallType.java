@@ -194,7 +194,7 @@ public class EstimatedCallType {
           .newFieldDefinition()
           .name("realtimeState")
           .type(new GraphQLNonNull(EnumTypes.REALTIME_STATE))
-          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getRealtimeState())
+          .dataFetcher(environment -> ((TripTimeOnDate) environment.getSource()).getRealTimeState())
           .build()
       )
       .field(
@@ -258,7 +258,7 @@ public class EstimatedCallType {
           .description(
             "Whether stop is cancelled. This means that either the " +
             "ServiceJourney has a planned cancellation, the ServiceJourney has been " +
-            "cancelled by realtime data, or this particular StopPoint has been " +
+            "cancelled by real-time data, or this particular StopPoint has been " +
             "cancelled. This also means that both boarding and alighting has been " +
             "cancelled."
           )
