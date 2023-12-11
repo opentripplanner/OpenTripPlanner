@@ -229,7 +229,10 @@ public class TransitRouter {
     RouteRequest accessRequest = request.clone();
 
     if (type.isAccess()) {
-      accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
+      accessRequest.withPreferences(p -> {
+        p.withBike(b -> b.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
+        p.withCar(c -> c.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
+      });
     }
 
     Duration durationLimit = accessRequest

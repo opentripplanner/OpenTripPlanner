@@ -5,10 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 
-import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
-import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class VehicleRentalConfig {
@@ -53,56 +50,42 @@ public class VehicleRentalConfig {
             "The cost of arriving at the destination with the rented vehicle, to discourage doing so."
           )
           .asDouble(dft.arrivingInRentalVehicleAtDestinationCost())
-      );
-  }
-
-  static void setVehicleRentalRequestOptions(NodeAdapter c, RouteRequest request) {
-    VehicleRentalRequest vehicleRentalRequest = request.journey().rental();
-
-    vehicleRentalRequest.setAllowedNetworks(
-      c
-        .of("allowedNetworks")
-        .since(V2_1)
-        .summary(
-          "The vehicle rental networks which may be used. If empty all networks may be used."
-        )
-        .asStringSet(vehicleRentalRequest.allowedNetworks())
-    );
-    vehicleRentalRequest.setBannedNetworks(
-      c
-        .of("bannedNetworks")
-        .since(V2_1)
-        .summary(
-          "The vehicle rental networks which may not be used. If empty, no networks are banned."
-        )
-        .asStringSet(vehicleRentalRequest.bannedNetworks())
-    );
-
-    request
-      .journey()
-      .rental()
-      .setAllowArrivingInRentedVehicleAtDestination(
+      )
+      .withAllowArrivingInRentedVehicleAtDestination(
         c
           .of("allowKeepingAtDestination")
           .since(V2_2)
           .summary(
             "If a vehicle should be allowed to be kept at the end of a station-based rental."
           )
-          .asBoolean(request.journey().rental().allowArrivingInRentedVehicleAtDestination())
+          .asBoolean(dft.allowArrivingInRentedVehicleAtDestination())
+      )
+      .withAllowedNetworks(
+        c
+          .of("allowedNetworks")
+          .since(V2_1)
+          .summary(
+            "The vehicle rental networks which may be used. If empty all networks may be used."
+          )
+          .asStringSet(dft.allowedNetworks())
+      )
+      .withBannedNetworks(
+        c
+          .of("bannedNetworks")
+          .since(V2_1)
+          .summary(
+            "The vehicle rental networks which may not be used. If empty, no networks are banned."
+          )
+          .asStringSet(dft.bannedNetworks())
       );
   }
 
-  static void setVehicleRental(
-    NodeAdapter c,
-    RouteRequest request,
-    VehicleRentalPreferences.Builder preferences
-  ) {
+  static void setVehicleRental(NodeAdapter c, VehicleRentalPreferences.Builder preferences) {
     var vehicleRental = c
       .of("vehicleRental")
       .since(V2_3)
       .summary("Vehicle rental options")
       .asObject();
     mapRentalPreferences(vehicleRental, preferences);
-    setVehicleRentalRequestOptions(vehicleRental, request);
   }
 }
