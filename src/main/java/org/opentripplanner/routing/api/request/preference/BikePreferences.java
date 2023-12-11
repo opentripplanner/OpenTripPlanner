@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
+import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -294,9 +295,7 @@ public final class BikePreferences implements Serializable {
     }
 
     public Builder withParking(Consumer<VehicleParkingPreferences.Builder> body) {
-      var builder = VehicleParkingPreferences.of();
-      body.accept(builder);
-      this.parking = builder.build();
+      this.parking = ifNotNull(this.parking, original.parking).copyOf().apply(body).build();
       return this;
     }
 

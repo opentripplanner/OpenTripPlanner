@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.api.request.preference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
 import java.time.Duration;
@@ -49,22 +48,10 @@ class VehicleParkingPreferencesTest {
   }
 
   @Test
-  void testEqualsAndHashCode() {
-    // Return same object if no value is set
-    assertSame(VehicleParkingPreferences.DEFAULT, VehicleParkingPreferences.of().build());
-
-    // Create other with different values and same with the same values as the subject
-    var other = VehicleParkingPreferences
-      .of()
-      .withPreferredVehicleParkingTags(Set.of())
-      .withNotPreferredVehicleParkingTags(Set.of())
-      .withUnpreferredVehicleParkingTagCost(0)
-      .withRequiredVehicleParkingTags(Set.of())
-      .withBannedVehicleParkingTags(Set.of())
-      .withParkCost(0)
-      .withParkTime(0)
-      .build();
-    var same = createPreferences();
+  void testCopyOfEqualsAndHashCode() {
+    // Create a copy, make a change and set it back again to force creating a new object
+    var other = subject.copyOf().withParkCost(10).build();
+    var same = other.copyOf().withParkCost(PARKING_COST.toSeconds()).build();
     assertEqualsAndHashCode(subject, other, same);
   }
 

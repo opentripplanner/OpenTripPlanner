@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.routing.api.request.preference.filter.VehicleParkingFilter;
@@ -52,6 +53,10 @@ public final class VehicleParkingPreferences implements Serializable {
 
   public static VehicleParkingPreferences.Builder of() {
     return new Builder(DEFAULT);
+  }
+
+  public VehicleParkingPreferences.Builder copyOf() {
+    return new Builder(this);
   }
 
   /**
@@ -187,6 +192,11 @@ public final class VehicleParkingPreferences implements Serializable {
 
     public Builder withParkTime(Duration duration) {
       this.parkTime = duration;
+      return this;
+    }
+
+    public Builder apply(Consumer<Builder> body) {
+      body.accept(this);
       return this;
     }
 
