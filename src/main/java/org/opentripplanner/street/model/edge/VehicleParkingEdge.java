@@ -120,14 +120,7 @@ public class VehicleParkingEdge extends Edge {
     TraverseMode mode
   ) {
     final StreetSearchRequest request = s0.getRequest();
-    var parkingPreferences = s0.getRequest().preferences().parking(s0.currentMode());
-    if (
-      !vehicleParking.hasSpacesAvailable(
-        mode,
-        request.wheelchair(),
-        parkingPreferences.ignoreRealtimeAvailability()
-      )
-    ) {
+    if (!vehicleParking.hasSpacesAvailable(mode, request.wheelchair())) {
       return State.empty();
     }
 
@@ -136,6 +129,7 @@ public class VehicleParkingEdge extends Edge {
     s0e.incrementTimeInSeconds((int) parkingTime.toSeconds());
     s0e.setVehicleParked(false, mode);
 
+    var parkingPreferences = s0.getRequest().preferences().parking(s0.currentMode());
     addUnpreferredTagCost(parkingPreferences, s0e);
 
     return s0e.makeStateArray();
@@ -172,14 +166,7 @@ public class VehicleParkingEdge extends Edge {
   }
 
   private State[] traversePark(State s0, Cost parkingCost, Duration parkingTime) {
-    var parkingPreferences = s0.getRequest().preferences().parking(s0.currentMode());
-    if (
-      !vehicleParking.hasSpacesAvailable(
-        s0.currentMode(),
-        s0.getRequest().wheelchair(),
-        parkingPreferences.ignoreRealtimeAvailability()
-      )
-    ) {
+    if (!vehicleParking.hasSpacesAvailable(s0.currentMode(), s0.getRequest().wheelchair())) {
       return State.empty();
     }
 
@@ -188,6 +175,7 @@ public class VehicleParkingEdge extends Edge {
     s0e.incrementTimeInSeconds((int) parkingTime.toSeconds());
     s0e.setVehicleParked(true, TraverseMode.WALK);
 
+    var parkingPreferences = s0.getRequest().preferences().parking(s0.currentMode());
     addUnpreferredTagCost(parkingPreferences, s0e);
 
     return s0e.makeStateArray();

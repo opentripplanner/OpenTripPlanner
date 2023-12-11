@@ -14,7 +14,6 @@ class VehicleParkingPreferencesTest {
   private static final Set<String> PREFERRED_TAGS = Set.of("foo");
   private static final Set<String> NOT_PREFERRED_TAGS = Set.of("bar");
   private static final int UNPREFERRED_COST = 360;
-  private static final boolean IGNORE_REALTIME = true;
   private static final Set<String> REQUIRED_TAGS = Set.of("bar");
   private static final Set<String> BANNED_TAGS = Set.of("not");
   private static final Cost PARKING_COST = Cost.costOfMinutes(4);
@@ -40,11 +39,6 @@ class VehicleParkingPreferencesTest {
   }
 
   @Test
-  void useAvailabilityInformation() {
-    assertEquals(IGNORE_REALTIME, subject.ignoreRealtimeAvailability());
-  }
-
-  @Test
   void parkCost() {
     assertEquals(PARKING_COST, subject.parkCost());
   }
@@ -65,7 +59,6 @@ class VehicleParkingPreferencesTest {
       .withPreferredVehicleParkingTags(Set.of())
       .withNotPreferredVehicleParkingTags(Set.of())
       .withUnpreferredVehicleParkingTagCost(0)
-      .withIgnoreRealtimeAvailability(false)
       .withRequiredVehicleParkingTags(Set.of())
       .withBannedVehicleParkingTags(Set.of())
       .withParkCost(0)
@@ -81,7 +74,6 @@ class VehicleParkingPreferencesTest {
     assertEquals(
       "VehicleParkingPreferences{" +
       "unpreferredVehicleParkingTagCost: $360, " +
-      "ignoreRealtimeAvailability, " +
       "filter: VehicleParkingFilter{not: [tags=[not]], select: [tags=[bar]]}, " +
       "preferred: VehicleParkingFilter{not: [tags=[bar]], select: [tags=[foo]]}, " +
       "parkCost: $240, " +
@@ -100,7 +92,6 @@ class VehicleParkingPreferencesTest {
       .withPreferredVehicleParkingTags(PREFERRED_TAGS)
       .withNotPreferredVehicleParkingTags(NOT_PREFERRED_TAGS)
       .withUnpreferredVehicleParkingTagCost(UNPREFERRED_COST)
-      .withIgnoreRealtimeAvailability(IGNORE_REALTIME)
       .withRequiredVehicleParkingTags(REQUIRED_TAGS)
       .withBannedVehicleParkingTags(BANNED_TAGS)
       .withParkCost(PARKING_COST.toSeconds())

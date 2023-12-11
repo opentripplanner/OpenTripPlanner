@@ -215,31 +215,15 @@ public class VehicleParking implements Serializable {
     return availability != null;
   }
 
-  public boolean hasSpacesAvailable(
-    TraverseMode traverseMode,
-    boolean wheelchairAccessible,
-    boolean ignoreRealtimeAvailability
-  ) {
+  public boolean hasSpacesAvailable(TraverseMode traverseMode, boolean wheelchairAccessible) {
     switch (traverseMode) {
       case BICYCLE:
-        if (!ignoreRealtimeAvailability && hasRealTimeDataForMode(TraverseMode.BICYCLE, false)) {
-          return availability.getBicycleSpaces() > 0;
-        } else {
-          return bicyclePlaces;
-        }
+        return bicyclePlaces;
       case CAR:
         if (wheelchairAccessible) {
-          if (!ignoreRealtimeAvailability && hasRealTimeDataForMode(TraverseMode.CAR, true)) {
-            return availability.getWheelchairAccessibleCarSpaces() > 0;
-          } else {
-            return wheelchairAccessibleCarPlaces;
-          }
+          return wheelchairAccessibleCarPlaces;
         } else {
-          if (!ignoreRealtimeAvailability && hasRealTimeDataForMode(TraverseMode.CAR, false)) {
-            return availability.getCarSpaces() > 0;
-          } else {
-            return carPlaces;
-          }
+          return carPlaces;
         }
       default:
         return false;

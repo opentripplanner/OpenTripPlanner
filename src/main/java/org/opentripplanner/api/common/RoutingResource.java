@@ -651,6 +651,10 @@ public abstract class RoutingResource {
   @QueryParam("geoidElevation")
   protected Boolean geoidElevation;
 
+  /**
+   * @deprecated Support has been removed.
+   */
+  @Deprecated
   @QueryParam("useVehicleParkingAvailabilityInformation")
   protected Boolean useVehicleParkingAvailabilityInformation;
 

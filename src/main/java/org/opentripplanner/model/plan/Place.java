@@ -135,11 +135,9 @@ public class Place {
       traverseMode = TraverseMode.BICYCLE;
     }
 
-    var parkingPreferences = request.preferences().parking(traverseMode);
-
-    boolean realTime =
-      !parkingPreferences.ignoreRealtimeAvailability() &&
-      vertex.getVehicleParking().hasRealTimeDataForMode(traverseMode, request.wheelchair());
+    boolean realTime = vertex
+      .getVehicleParking()
+      .hasRealTimeDataForMode(traverseMode, request.wheelchair());
     return new Place(
       vertex.getName(),
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),

@@ -20,7 +20,6 @@ public final class VehicleParkingPreferences implements Serializable {
 
   public static final VehicleParkingPreferences DEFAULT = new VehicleParkingPreferences();
   private final Cost unpreferredVehicleParkingTagCost;
-  private final boolean ignoreRealtimeAvailability;
   private final VehicleParkingFilter filter;
   private final VehicleParkingFilter preferred;
   private final Duration parkTime;
@@ -29,7 +28,6 @@ public final class VehicleParkingPreferences implements Serializable {
   /** Create a new instance with default values. */
   private VehicleParkingPreferences() {
     this.unpreferredVehicleParkingTagCost = Cost.costOfMinutes(5);
-    this.ignoreRealtimeAvailability = false;
     this.filter = VehicleParkingFilter.empty();
     this.preferred = VehicleParkingFilter.empty();
     this.parkTime = Duration.ofMinutes(1);
@@ -38,7 +36,6 @@ public final class VehicleParkingPreferences implements Serializable {
 
   private VehicleParkingPreferences(Builder builder) {
     this.unpreferredVehicleParkingTagCost = builder.unpreferredVehicleParkingTagCost;
-    this.ignoreRealtimeAvailability = builder.ignoreRealtimeAvailability;
     this.filter =
       new VehicleParkingFilter(
         builder.bannedVehicleParkingTags,
@@ -62,13 +59,6 @@ public final class VehicleParkingPreferences implements Serializable {
    */
   public Cost unpreferredVehicleParkingTagCost() {
     return unpreferredVehicleParkingTagCost;
-  }
-
-  /**
-   * Should availability information be used during routing.
-   */
-  public boolean ignoreRealtimeAvailability() {
-    return ignoreRealtimeAvailability;
   }
 
   /**
@@ -106,7 +96,6 @@ public final class VehicleParkingPreferences implements Serializable {
     VehicleParkingPreferences that = (VehicleParkingPreferences) o;
     return (
       Objects.equals(unpreferredVehicleParkingTagCost, that.unpreferredVehicleParkingTagCost) &&
-      ignoreRealtimeAvailability == that.ignoreRealtimeAvailability &&
       Objects.equals(filter, that.filter) &&
       Objects.equals(preferred, that.preferred) &&
       Objects.equals(parkCost, that.parkCost) &&
@@ -116,14 +105,7 @@ public final class VehicleParkingPreferences implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(
-      unpreferredVehicleParkingTagCost,
-      ignoreRealtimeAvailability,
-      filter,
-      preferred,
-      parkCost,
-      parkTime
-    );
+    return Objects.hash(unpreferredVehicleParkingTagCost, filter, preferred, parkCost, parkTime);
   }
 
   @Override
@@ -135,7 +117,6 @@ public final class VehicleParkingPreferences implements Serializable {
         unpreferredVehicleParkingTagCost,
         DEFAULT.unpreferredVehicleParkingTagCost
       )
-      .addBoolIfTrue("ignoreRealtimeAvailability", ignoreRealtimeAvailability)
       .addObj("filter", filter, DEFAULT.filter)
       .addObj("preferred", preferred, DEFAULT.preferred)
       .addObj("parkCost", parkCost, DEFAULT.parkCost)
@@ -147,7 +128,6 @@ public final class VehicleParkingPreferences implements Serializable {
 
     private final VehicleParkingPreferences original;
     private Cost unpreferredVehicleParkingTagCost;
-    private boolean ignoreRealtimeAvailability;
     private List<VehicleParkingSelect> bannedVehicleParkingTags;
     private List<VehicleParkingSelect> requiredVehicleParkingTags;
     private List<VehicleParkingSelect> preferredVehicleParkingTags;
@@ -158,7 +138,6 @@ public final class VehicleParkingPreferences implements Serializable {
     private Builder(VehicleParkingPreferences original) {
       this.original = original;
       this.unpreferredVehicleParkingTagCost = original.unpreferredVehicleParkingTagCost;
-      this.ignoreRealtimeAvailability = original.ignoreRealtimeAvailability;
       this.bannedVehicleParkingTags = original.filter.not();
       this.requiredVehicleParkingTags = original.filter.select();
       this.preferredVehicleParkingTags = original.preferred.select();
@@ -169,11 +148,6 @@ public final class VehicleParkingPreferences implements Serializable {
 
     public Builder withUnpreferredVehicleParkingTagCost(int cost) {
       this.unpreferredVehicleParkingTagCost = Cost.costOfSeconds(cost);
-      return this;
-    }
-
-    public Builder withIgnoreRealtimeAvailability(boolean ignoreRealtimeAvailability) {
-      this.ignoreRealtimeAvailability = ignoreRealtimeAvailability;
       return this;
     }
 

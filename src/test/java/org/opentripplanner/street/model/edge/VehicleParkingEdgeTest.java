@@ -45,8 +45,7 @@ class VehicleParkingEdgeTest {
       StreetMode.CAR_TO_PARK,
       false,
       true,
-      VehicleParkingSpaces.builder().carSpaces(1).build(),
-      false
+      VehicleParkingSpaces.builder().carSpaces(1).build()
     );
 
     var s1 = traverse();
@@ -56,26 +55,11 @@ class VehicleParkingEdgeTest {
 
   @Test
   public void realtimeAvailableCarPlacesFallbackTest() {
-    initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true, null, false);
+    initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true, null);
 
     var s1 = traverse();
 
     assertFalse(State.isEmpty(s1));
-  }
-
-  @Test
-  public void realtimeNotAvailableCarPlacesTest() {
-    initEdgeAndRequest(
-      StreetMode.CAR_TO_PARK,
-      false,
-      true,
-      VehicleParkingSpaces.builder().carSpaces(0).build(),
-      false
-    );
-
-    var s1 = traverse();
-
-    assertTrue(State.isEmpty(s1));
   }
 
   @Test
@@ -102,8 +86,7 @@ class VehicleParkingEdgeTest {
       StreetMode.BIKE_TO_PARK,
       true,
       false,
-      VehicleParkingSpaces.builder().bicycleSpaces(1).build(),
-      false
+      VehicleParkingSpaces.builder().bicycleSpaces(1).build()
     );
 
     var s1 = traverse();
@@ -113,26 +96,11 @@ class VehicleParkingEdgeTest {
 
   @Test
   public void realtimeAvailableBicyclePlacesFallbackTest() {
-    initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false, null, false);
+    initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false, null);
 
     var s1 = traverse();
 
     assertFalse(State.isEmpty(s1));
-  }
-
-  @Test
-  public void realtimeNotAvailableBicyclePlacesTest() {
-    initEdgeAndRequest(
-      StreetMode.BIKE_TO_PARK,
-      true,
-      false,
-      VehicleParkingSpaces.builder().bicycleSpaces(0).build(),
-      false
-    );
-
-    var s1 = traverse();
-
-    assertTrue(State.isEmpty(s1));
   }
 
   private void initEdgeAndRequest(
@@ -140,34 +108,21 @@ class VehicleParkingEdgeTest {
     boolean bicyclePlaces,
     boolean carPlaces
   ) {
-    initEdgeAndRequest(parkingMode, bicyclePlaces, carPlaces, null, true);
+    initEdgeAndRequest(parkingMode, bicyclePlaces, carPlaces, null);
   }
 
   private void initEdgeAndRequest(
     StreetMode parkingMode,
     boolean bicyclePlaces,
     boolean carPlaces,
-    VehicleParkingSpaces availability,
-    boolean ignoreRealtime
+    VehicleParkingSpaces availability
   ) {
     var vehicleParking = createVehicleParking(bicyclePlaces, carPlaces, availability);
     this.vertex = new VehicleParkingEntranceVertex(vehicleParking.getEntrances().get(0));
 
     vehicleParkingEdge = VehicleParkingEdge.createVehicleParkingEdge(vertex);
 
-    this.request =
-      StreetSearchRequest
-        .of()
-        .withMode(parkingMode)
-        .withPreferences(preferences -> {
-          preferences.withBike(bike ->
-            bike.withParking(parking -> parking.withIgnoreRealtimeAvailability(ignoreRealtime))
-          );
-          preferences.withCar(car ->
-            car.withParking(parking -> parking.withIgnoreRealtimeAvailability(ignoreRealtime))
-          );
-        })
-        .build();
+    this.request = StreetSearchRequest.of().withMode(parkingMode).build();
   }
 
   private VehicleParking createVehicleParking(

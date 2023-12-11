@@ -168,12 +168,6 @@ class RequestToPreferencesMapper {
   }
 
   private void mapParking(VehicleParkingPreferences.Builder builder) {
-    setIfNotNull(
-      req.useVehicleParkingAvailabilityInformation,
-      useVehicleParkingAvailabilityInformation ->
-        builder.withIgnoreRealtimeAvailability(!useVehicleParkingAvailabilityInformation)
-    );
-
     builder.withRequiredVehicleParkingTags(req.requiredVehicleParkingTags);
     builder.withBannedVehicleParkingTags(req.bannedVehicleParkingTags);
   }
