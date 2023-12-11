@@ -61,7 +61,7 @@ public class ToStringBuilder {
   }
 
   /**
-   * Create a ToStringBuilder for a "named" type. The prefered method is {@link #of(Class)},
+   * Create a ToStringBuilder for a "named" type. The preferred method is {@link #of(Class)},
    * but this can be used if the type is unknown or irrelevant.
    */
   public static ToStringBuilder of(String name) {

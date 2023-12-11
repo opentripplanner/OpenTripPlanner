@@ -8,7 +8,7 @@ package org.opentripplanner.framework.text;
  * does not contain the special character anymore. The original string can be computed by
  * reversing the process.
  * <p>
- * A "special-characters" is removed from a text using an escape character and
+ * A "special-character" is removed from a text using an escape character and
  * a substitution character. For example, if:
  * <ul>
  *   <li>the escape char is '\'</li>
@@ -96,10 +96,10 @@ public class CharacterEscapeFormatter {
           );
         }
         prevEsc = false;
-      } else if (ch != escapeChar) {
-        buf.append(ch);
-      } else {
+      } else if (ch == escapeChar) {
         prevEsc = true;
+      } else {
+        buf.append(ch);
       }
     }
     return buf.toString();

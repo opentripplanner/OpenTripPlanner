@@ -12,7 +12,7 @@ import org.opentripplanner.model.plan.ItinerarySortKey;
  */
 public interface PageCursorInput {
   /**
-   * The earliest-removed-departure define the start of the search-window following the
+   * The earliest-removed-departure defines the start of the search-window following the
    * current window. To include this removed itinerary (and all other removed itineraries)
    * in the next-page search the search windows must overlap.
    */
@@ -20,7 +20,7 @@ public interface PageCursorInput {
   Instant latestRemovedDeparture();
 
   /**
-   * In case the result have too many results; The {@code numberOfItineraries} request parameter
+   * In case the result has too many results: The {@code numberOfItineraries} request parameter
    * is less than the number of itineraries found, then we keep the last itinerary kept and
    * returned as part of the result. The sort vector will be included in the page-cursor and
    * used in the next/previous page to filter away duplicates.

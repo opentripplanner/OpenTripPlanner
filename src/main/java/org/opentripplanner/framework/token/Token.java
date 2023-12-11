@@ -49,13 +49,13 @@ public class Token {
    * Be careful with enums. If values are added or deleted the backward/forward compatibility
    * is compromised. This method return an empty value if the enum does not exist.
    * <p>
-   * To keep enum values forward compatible the value must first be added, and then it
+   * To ensure that enum values are forward compatible the value must first be added, and then it
    * can not be used in a token before OTP is released and deployed. Then when the enum value
-   * exit in the deployed server, then a new version of OTP can be rolled out witch now can use
+   * exist in the deployed server, then a new version of OTP can be rolled out which now can use
    * the new value.
    * <p>
-   * To keep backwards compatible enum values should be **deprecated**, not removed. The enum
-   * value can only be deleted, when all tokens with the value is expired (depend on use-case).
+   * To ensure backwards compatibility, enum values should be **deprecated**, not removed. The enum
+   * value can only be deleted, when all tokens with the value has expired (depends on use-case).
    */
   public <T extends Enum<T>> Optional<T> getEnum(String fieldName, Class<T> enumClass) {
     try {

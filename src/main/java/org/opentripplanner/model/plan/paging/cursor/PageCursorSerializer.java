@@ -73,7 +73,7 @@ final class PageCursorSerializer {
       ItinerarySortKey itineraryPageCut = null;
       var token = SCHEMA_TOKEN.decode(cursor);
 
-      // This throws an exception if an enum is serialized witch is not in the code.
+      // This throws an exception if an enum is serialized which is not in the code.
       // This is a forward compatibility issue. To avoid this, add the value enum, role out.
       // Start using the enum, roll out again.
       PageType type = token.getEnum(TYPE_FIELD, PageType.class).orElseThrow();

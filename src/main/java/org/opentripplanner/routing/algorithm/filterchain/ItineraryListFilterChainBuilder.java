@@ -445,8 +445,8 @@ public class ItineraryListFilterChainBuilder {
 
     // Paging related filters - these filters are run after group-by filters to allow a result
     // outside the page to also take effect inside the window. This is debatable but lead to less
-    // noise, but is not deterministic because the result depend on the search-window size and
-    // where "cut" between each page is
+    // noise, however it is not deterministic because the result depends on the size of the search-window and
+    // where the "cut" between each page is located.
     {
       // Limit to search-window
       if (earliestDepartureTime != null) {
