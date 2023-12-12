@@ -703,7 +703,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>3.0.13</version>
+            <version>3.0.16</version>
         </dependency>
 
         <!-- TESTING -->
