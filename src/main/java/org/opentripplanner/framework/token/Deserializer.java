@@ -9,14 +9,14 @@ import java.util.stream.Stream;
 class Deserializer {
 
   private static final Pattern SPLIT_PATTERN = Pattern.compile(
-    "[" + Character.toString(TokenFormat.FIELD_SEPARATOR) + "]"
+    "[" + TokenFormatterConfiguration.fieldSeparator() + "]"
   );
 
   private final List<String> values;
 
   Deserializer(String token) {
     byte[] bytes = Base64.getUrlDecoder().decode(token);
-    var tokenFormatter = TokenFormat.tokenFormatter();
+    var tokenFormatter = TokenFormatterConfiguration.tokenFormatter();
     this.values =
       Stream.of(SPLIT_PATTERN.split(new String(bytes), -1)).map(tokenFormatter::decode).toList();
   }

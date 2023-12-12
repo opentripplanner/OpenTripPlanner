@@ -8,7 +8,7 @@ class Serializer {
   private final TokenDefinition definition;
   private final Object[] values;
   private final StringBuilder buf = new StringBuilder();
-  private final CharacterEscapeFormatter tokenFormatter = TokenFormat.tokenFormatter();
+  private final CharacterEscapeFormatter tokenFormatter = TokenFormatterConfiguration.tokenFormatter();
 
   private Serializer(TokenDefinition definition, Object[] values) {
     this.definition = definition;
@@ -45,6 +45,6 @@ class Serializer {
     if (value != null) {
       buf.append(tokenFormatter.encode(value));
     }
-    buf.append(TokenFormat.FIELD_SEPARATOR);
+    buf.append(TokenFormatterConfiguration.fieldSeparator());
   }
 }
