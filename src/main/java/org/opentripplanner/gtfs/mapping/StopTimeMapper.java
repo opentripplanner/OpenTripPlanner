@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
@@ -58,12 +59,17 @@ class StopTimeMapper {
 
     lhs.setTrip(tripMapper.map(rhs.getTrip()));
     var stopLocation = rhs.getStopLocation();
-    if (stopLocation instanceof Stop stop) {
-      lhs.setStop(stopMapper.map(stop));
-    } else if (stopLocation instanceof Location location) {
-      lhs.setStop(locationMapper.map(location));
-    } else if (stopLocation instanceof LocationGroup locGroup) {
-      lhs.setStop(locationGroupMapper.map(locGroup));
+    Objects.requireNonNull(
+      stopLocation,
+      "Trip %s contains stop_time with no stop, location or group.".formatted(rhs.getTrip())
+    );
+    switch (stopLocation) {
+      case Stop stop -> lhs.setStop(stopMapper.map(stop));
+      case Location location -> lhs.setStop(locationMapper.map(location));
+      case LocationGroup locGroup -> lhs.setStop(locationGroupMapper.map(locGroup));
+      default -> throw new IllegalArgumentException(
+        "Unknown location type: %s".formatted(stopLocation)
+      );
     }
 
     I18NString stopHeadsign = null;
