@@ -363,14 +363,14 @@ input DestinationVehiclePolicyInput {
     Is it possible to arrive to the destination without dropping off the rental
     vehicle first.
     """
-    allowKeepingVehicleAtDestination: Boolean
+    allowKeeping: Boolean
 
     """
     Cost associated with arriving to the destination with a rented vehicle.
     No cost is applied if arriving to the destination after dropping off the rented
     vehicle.
     """
-    keepingVehicleAtDestinationCost: Cost
+    keepingCost: Cost
 }
 
 """Vehicle parking represents a location where bicycles or cars can be parked."""
@@ -2418,66 +2418,6 @@ Equivalent to GTFS route_type or to NeTEx TransportMode.
 """
 enum TransitMode {
     AIRPLANE
-
-    """
-    Most busses or coaches use this mode but sometimes the other bus-like modes such
-    `COACH` or `TROLLEYBUS` are used.
-    """
-    BUS
-
-    CABLE_CAR
-
-    """
-    Sometimes coaches use this mode but sometimes they are modelled to use `BUS` mode
-    instead.
-    """
-    COACH
-
-    FERRY
-
-    FUNICULAR
-
-    GONDOLA
-
-    """
-    This includes long or short distance trains. Tram, subway, monorail and funicular have
-    their own modes but it's possible that sometimes they use this mode instead.
-    """
-    RAIL
-
-    """
-    Subway or metro, depending on the local terminology.
-    """
-    SUBWAY
-
-    TRAM
-
-    """Private car trips shared with others."""
-    CARPOOL
-
-    """A taxi, possibly operated by a public transport agency."""
-    TAXI
-
-    "Electric buses that draw power from overhead wires using poles."
-    TROLLEYBUS
-
-    "Railway in which the track consists of a single rail or a beam."
-    MONORAIL
-}
-
-"""
-Transit modes include modes that are used within organized transportation networks
-run by public transportation authorities, taxi companies etc.
-Equivalent to GTFS route_type or to NeTEx TransportMode with an addition of `ANY`
-mode that enables all modes.
-"""
-enum PlanTransitMode {
-    AIRPLANE
-
-    """
-    Selecting this enables all modes to be usable in routing.
-    """
-    ANY
 
     """
     Most busses or coaches use this mode but sometimes the other bus-like modes such
@@ -5224,7 +5164,7 @@ input TransitModePreferenceInput {
     """
     Transit mode that could be (but doesn't have to be) used in an itinerary.
     """
-    mode: PlanTransitMode!
+    mode: TransitMode!
 
     """
     Costs related to using a transit mode.
@@ -5521,7 +5461,7 @@ input VehicleWalkPreferencesInput {
     or when getting on the vehicle again. However, this is not applied when getting
     on a rented vehicle for the first time or off the vehicle when returning the vehicle.
     """
-    hopOnOrOffTime: Duration
+    hopTime: Duration
 }
 
 """
