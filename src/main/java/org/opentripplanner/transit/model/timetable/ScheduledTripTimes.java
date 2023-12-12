@@ -33,9 +33,9 @@ public final class ScheduledTripTimes implements TripTimes {
    */
   private static final int MIN_TIME = DurationUtils.durationInSeconds("-12h");
   /**
-   * We allow a trip to last for maximum 10 days. In Norway the longest trip is 6 days.
+   * We allow a trip to last for maximum 20 days. In Norway the longest trip is 6 days.
    */
-  private static final int MAX_TIME = DurationUtils.durationInSeconds("10d");
+  private static final int MAX_TIME = DurationUtils.durationInSeconds("20d");
 
   /**
    * Implementation notes: This allows re-using the same scheduled arrival and departure time
