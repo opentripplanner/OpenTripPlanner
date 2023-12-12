@@ -53,6 +53,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Transit group priority - Part 1 [#4999](https://github.com/opentripplanner/OpenTripPlanner/pull/4999)
 - Remove `matchBusRoutesToStreets` [#5523](https://github.com/opentripplanner/OpenTripPlanner/pull/5523)
 - Rename realtime to real-time in docs [#5535](https://github.com/opentripplanner/OpenTripPlanner/pull/5535)
+- Add same submode in alternative legs filter [#5548](https://github.com/opentripplanner/OpenTripPlanner/pull/5548)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
