@@ -966,6 +966,17 @@
         </profile>
         <profile>
             <id>prettierSkip</id>
+            <activation>
+                <property>
+                    <!--
+                      This works as a short alias to enable this from the command line. To skip
+                      prettier, set the 'ps' system property with the '-D ps' parameter:
+                      # mvn test -D ps
+                    -->
+                    <name>ps</name>
+                    <value/>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
