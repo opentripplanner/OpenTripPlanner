@@ -191,13 +191,27 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
     return filterByModes.isEmpty() || stopHasPatternsWithMode(stop, filterByModes);
   }
 
+  /* Checks whether the stop is included in the stop filter and whether the stop should be considered
+  * a stop or a station in the search.*/
+  private boolean stopShouldNotBeIncludedAsStop(RegularStop stop) {
+    return (
+      (includeStations && !stop.isPartOfStation() && !stopIsIncludedByStopFilter(stop)) ||
+      (!includeStations && !stopIsIncludedByStopFilter(stop))
+    );
+  }
+
+  /* Checks if the stop is a part of a station and whether that station is
+   * included in the station filter */
+  private boolean stopShouldNotBeIncludedAsStation(RegularStop stop) {
+    return stop.isPartOfStation() && !stopIsIncludedByStationFilter(stop);
+  }
+
   private void handleStop(RegularStop stop, double distance) {
     // Do not consider stop if it is not included in the stop or mode filter
     // or if it or its parent station has already been seen.
     if (
-      (includeStations && !stop.isPartOfStation() && !stopIsIncludedByStopFilter(stop)) ||
-      (!includeStations && !stopIsIncludedByStopFilter(stop)) ||
-      (stop.isPartOfStation() && !stopIsIncludedByStationFilter(stop)) ||
+      stopShouldNotBeIncludedAsStop(stop) ||
+      stopShouldNotBeIncludedAsStation(stop) ||
       seenStops.contains(stop.getId()) ||
       seenStops.contains(stop.getStationOrStopId()) ||
       !stopIsIncludedByModeFilter(stop)
