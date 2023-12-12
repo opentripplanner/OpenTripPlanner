@@ -2419,18 +2419,10 @@ Equivalent to GTFS route_type or to NeTEx TransportMode.
 enum TransitMode {
     AIRPLANE
 
-    """
-    Most busses or coaches use this mode but sometimes the other bus-like modes such
-    `COACH` or `TROLLEYBUS` are used.
-    """
     BUS
 
     CABLE_CAR
 
-    """
-    Sometimes coaches use this mode but sometimes they are modelled to use `BUS` mode
-    instead.
-    """
     COACH
 
     FERRY
@@ -2440,8 +2432,7 @@ enum TransitMode {
     GONDOLA
 
     """
-    This includes long or short distance trains. Tram, subway, monorail and funicular have
-    their own modes but it's possible that sometimes they use this mode instead.
+    This includes long or short distance trains.
     """
     RAIL
 
@@ -4301,7 +4292,9 @@ enum RealtimeState {
 
 """
 A cost multiplier for how bad something is compared to being in transit for equal lengths of time.
-The value should be greater than 0.
+The value should be greater than 0. 1 means neutral and values below 1 mean that something is
+preferred over transit.
+
 """
 scalar Reluctance
 
