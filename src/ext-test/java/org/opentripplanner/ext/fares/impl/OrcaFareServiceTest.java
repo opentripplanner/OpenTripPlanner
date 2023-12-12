@@ -145,11 +145,7 @@ public class OrcaFareServiceTest {
       getLeg(COMM_TRANS_AGENCY_ID, 2)
     );
     calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(3));
-    calculateFare(
-      rides,
-      FareType.senior,
-      DEFAULT_TEST_RIDE_PRICE.times(3)
-    );
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(3));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(
       rides,
