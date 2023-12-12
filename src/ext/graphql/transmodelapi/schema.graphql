@@ -1405,6 +1405,8 @@ enum AlternativeLegsFilter {
   sameAuthority
   sameLine
   sameMode
+  "Must match both subMode and mode"
+  sameSubmode
 }
 
 enum ArrivalDeparture {
