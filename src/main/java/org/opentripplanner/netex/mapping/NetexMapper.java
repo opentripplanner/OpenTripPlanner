@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import jakarta.xml.bind.JAXBElement;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -469,7 +470,7 @@ public class NetexMapper {
         transitBuilder.getTripPatterns().put(it.getKey(), it.getValue());
       }
       currentMapperIndexes.addStopTimesByNetexId(result.stopTimeByNetexId);
-      groupMapper.scheduledStopPointsIndex.putAll(result.scheduledStopPointsIndex);
+      groupMapper.scheduledStopPointsIndex.putAll(Multimaps.asMap(result.scheduledStopPointsIndex));
       transitBuilder.getTripOnServiceDates().addAll(result.tripOnServiceDates);
     }
   }
