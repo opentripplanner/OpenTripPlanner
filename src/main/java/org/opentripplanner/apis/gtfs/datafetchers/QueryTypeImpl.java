@@ -306,7 +306,7 @@ public class QueryTypeImpl implements GraphQLDataFetchers.GraphQLQueryType {
               .getGraphQLStations()
               .stream()
               .map(FeedScopedId::parse)
-              .collect(Collectors.toList())
+              .toList()
             : null;
         filterByRoutes =
           filterByIds.getGraphQLRoutes() != null
