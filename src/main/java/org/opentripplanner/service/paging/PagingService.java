@@ -176,7 +176,6 @@ public class PagingService {
   }
 
   private PageCursorFactory mapIntoPageCursorFactory(@Nullable PageType currentPageType) {
-    Objects.requireNonNull(itinerariesSortOrder);
     var searchWindowNextSearch = calculateSearchWindowNextSearch();
     var factory = new PageCursorFactory(itinerariesSortOrder, searchWindowNextSearch);
 
