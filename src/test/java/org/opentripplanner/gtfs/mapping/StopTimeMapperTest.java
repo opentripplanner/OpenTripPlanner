@@ -167,7 +167,9 @@ public class StopTimeMapperTest {
 
   @Test
   public void testMapWithNulls() {
-    org.opentripplanner.model.StopTime result = subject.map(new StopTime());
+    var st = new StopTime();
+    st.setStop(buildStop());
+    org.opentripplanner.model.StopTime result = subject.map(st);
 
     assertFalse(result.isArrivalTimeSet());
     assertFalse(result.isDepartureTimeSet());
@@ -176,7 +178,7 @@ public class StopTimeMapperTest {
     assertEquals(PickDrop.SCHEDULED, result.getPickupType());
     assertNull(result.getRouteShortName());
     assertFalse(result.isShapeDistTraveledSet());
-    assertNull(result.getStop());
+    assertNotNull(result.getStop());
     assertNull(result.getStopHeadsign());
     assertEquals(0, result.getStopSequence());
     assertFalse(result.isTimepointSet());
