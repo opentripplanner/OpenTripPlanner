@@ -304,7 +304,8 @@ public class OrcaFareService extends DefaultFareService {
     return switch (rideType) {
       case COMM_TRANS_LOCAL_SWIFT -> usesOrca(fareType) ? optionalUSD(1.25f) : regularFare;
       case COMM_TRANS_COMMUTER_EXPRESS -> usesOrca(fareType) ? optionalUSD(2f) : regularFare;
-      case EVERETT_TRANSIT, SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
+      case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
+      case EVERETT_TRANSIT -> usesOrca(fareType) ? optionalUSD(0.5f) : regularFare;
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND,
         SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
