@@ -300,8 +300,12 @@ public class OrcaFareService extends DefaultFareService {
   ) {
     var route = leg.getRoute();
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
-      case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
+      case COMM_TRANS_LOCAL_SWIFT -> usesOrca(fareType)
+        ? optionalUSD(1.25f)
+        : getRegularFare(fareType, rideType, defaultFare, leg);
+      case COMM_TRANS_COMMUTER_EXPRESS -> usesOrca(fareType)
+        ? optionalUSD(2f)
+        : getRegularFare(fareType, rideType, defaultFare, leg);
       case EVERETT_TRANSIT, SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
       case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> fareType.equals(FareType.electronicSenior) // Kitsap only provide discounted senior fare for orca.
         ? optionalUSD(1f)
