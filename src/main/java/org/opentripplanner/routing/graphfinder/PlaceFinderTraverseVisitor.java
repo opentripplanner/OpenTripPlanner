@@ -192,7 +192,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   }
 
   /* Checks whether the stop is included in the stop filter and whether the stop should be considered
-  * a stop or a station in the search.*/
+   * a stop or a station in the search.*/
   private boolean stopShouldNotBeIncludedAsStop(RegularStop stop) {
     return (
       (includeStations && !stop.isPartOfStation() && !stopIsIncludedByStopFilter(stop)) ||
