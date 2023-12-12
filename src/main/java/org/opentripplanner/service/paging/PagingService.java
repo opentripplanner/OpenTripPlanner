@@ -46,7 +46,11 @@ public class PagingService {
     List<Itinerary> itineraries
   ) {
     this.searchWindowUsed = searchWindowUsed;
-    this.earliestDepartureTime = earliestDepartureTime;
+    // EDT is required if search-window is set
+    this.earliestDepartureTime =
+      searchWindowUsed == null
+        ? earliestDepartureTime
+        : Objects.requireNonNull(earliestDepartureTime);
     this.latestArrivalTime = latestArrivalTime;
     this.itinerariesSortOrder = Objects.requireNonNull(itinerariesSortOrder);
     this.arriveBy = arriveBy;
@@ -73,15 +77,15 @@ public class PagingService {
 
   @Nullable
   public TripSearchMetadata createTripSearchMetadata() {
-    if (searchWindowUsed == null) {
+    if (noTransitSearchPerformed()) {
       return null;
     }
 
     if (arriveBy) {
       return TripSearchMetadata.createForArriveBy(
-        latestArrivalTime,
+        earliestDepartureTime,
         searchWindowUsed,
-        firstRemovedArrivalTime()
+        firstKeptDepartureTime()
       );
     } else {
       return TripSearchMetadata.createForDepartAfter(
@@ -93,8 +97,7 @@ public class PagingService {
   }
 
   private Duration calculateSearchWindowNextSearch() {
-    // No transit search performed
-    if (searchWindowUsed == null) {
+    if (noTransitSearchPerformed()) {
       return null;
     }
 
@@ -131,10 +134,10 @@ public class PagingService {
       : numItinerariesFilterResults.pageCut().startTimeAsInstant();
   }
 
-  private Instant firstRemovedArrivalTime() {
+  private Instant firstKeptDepartureTime() {
     return numItinerariesFilterResults == null
       ? null
-      : numItinerariesFilterResults.pageCut().endTimeAsInstant();
+      : numItinerariesFilterResults.pageCut().startTimeAsInstant();
   }
 
   private PagingSearchWindowAdjuster createSearchWindowAdjuster(
@@ -177,7 +180,6 @@ public class PagingService {
     var searchWindowNextSearch = calculateSearchWindowNextSearch();
     var factory = new PageCursorFactory(itinerariesSortOrder, searchWindowNextSearch);
 
-    // No transit search performed
     if (noTransitSearchPerformed()) {
       return factory;
     }
@@ -199,7 +201,7 @@ public class PagingService {
   }
 
   private void assertRequestPrerequisites() {
-    if (searchWindowUsed == null) {
+    if (noTransitSearchPerformed()) {
       throw new IllegalStateException("SearchWindow not set");
     }
     if (earliestDepartureTime == null) {

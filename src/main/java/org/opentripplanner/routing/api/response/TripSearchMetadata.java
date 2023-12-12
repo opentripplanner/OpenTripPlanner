@@ -48,30 +48,38 @@ public class TripSearchMetadata {
   }
 
   public static TripSearchMetadata createForArriveBy(
-    Instant reqTime,
+    Instant earliestDepartureTimeUsed,
     Duration searchWindowUsed,
-    @Nullable Instant previousTimeInclusive
+    @Nullable Instant firstDepartureTime
   ) {
-    Instant prevDateTime = previousTimeInclusive == null
-      ? reqTime.minus(searchWindowUsed)
-      // Round up to closest minute, to meet the _inclusive_ requirement
-      : previousTimeInclusive.minusSeconds(1).truncatedTo(ChronoUnit.MINUTES).plusSeconds(60);
+    Instant actualEdt = firstDepartureTime == null
+      ? earliestDepartureTimeUsed
+      // Round down to the minute before to avoid duplicates. This may cause missed itineraries.
+      : firstDepartureTime.minusSeconds(60).truncatedTo(ChronoUnit.MINUTES);
 
-    return new TripSearchMetadata(searchWindowUsed, prevDateTime, reqTime.plus(searchWindowUsed));
+    return new TripSearchMetadata(
+      searchWindowUsed,
+      actualEdt.minus(searchWindowUsed),
+      earliestDepartureTimeUsed.plus(searchWindowUsed)
+    );
   }
 
   public static TripSearchMetadata createForDepartAfter(
-    Instant reqTime,
+    Instant requestDepartureTime,
     Duration searchWindowUsed,
-    Instant nextDateTimeExclusive
+    Instant lastDepartureTime
   ) {
-    Instant nextDateTime = nextDateTimeExclusive == null
-      ? reqTime.plus(searchWindowUsed)
+    Instant nextDateTime = lastDepartureTime == null
+      ? requestDepartureTime.plus(searchWindowUsed)
       // There is no way to make this work properly. If we round down we get duplicates, if we
-      // round up we skip itineraries.
-      : nextDateTimeExclusive.plusSeconds(60).truncatedTo(ChronoUnit.MINUTES);
+      // round up we might skip itineraries.
+      : lastDepartureTime.plusSeconds(60).truncatedTo(ChronoUnit.MINUTES);
 
-    return new TripSearchMetadata(searchWindowUsed, reqTime.minus(searchWindowUsed), nextDateTime);
+    return new TripSearchMetadata(
+      searchWindowUsed,
+      requestDepartureTime.minus(searchWindowUsed),
+      nextDateTime
+    );
   }
 
   @Override

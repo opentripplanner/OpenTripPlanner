@@ -52,5 +52,4 @@ class TokenTypeTest {
     assertNull(TokenType.STRING.stringToValue(""));
     assertNull(TokenType.TIME_INSTANT.stringToValue(""));
   }
-
 }

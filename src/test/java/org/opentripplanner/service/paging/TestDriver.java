@@ -151,6 +151,11 @@ final class TestDriver {
     var swFilter = new OutsideSearchWindowFilter(edt, searchWindow);
     kept = swFilter.removeMatchesForTest(kept);
 
+    // Simulate Raptor - apply LAT filtering done by raptor
+    if (lat != null) {
+      kept = kept.stream().filter(it -> !lat.isBefore(it.endTime().toInstant())).toList();
+    }
+
     //Page filter
     if (pageCut != null) {
       var pageFilter = new PagingFilter(sortOrder, cropItineraries.invert(), pageCut);
