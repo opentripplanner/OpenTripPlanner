@@ -6,7 +6,6 @@
   "embedRouterConfig": true,
   "areaVisibility": true,
   "platformEntriesLinking": true,
-  "matchBusRoutesToStreets": false,
   "staticParkAndRide": true,
   "staticBikeParkAndRide": true,
   "maxDataImportIssuesPerFile": 1000,

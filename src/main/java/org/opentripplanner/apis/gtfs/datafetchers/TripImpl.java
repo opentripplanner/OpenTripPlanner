@@ -405,7 +405,7 @@ public class TripImpl implements GraphQLDataFetchers.GraphQLTrip {
   }
 
   private RealtimeVehicleService getRealtimeVehiclesService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().realtimeVehicleService();
+    return environment.<GraphQLRequestContext>getContext().realTimeVehicleService();
   }
 
   private Trip getSource(DataFetchingEnvironment environment) {

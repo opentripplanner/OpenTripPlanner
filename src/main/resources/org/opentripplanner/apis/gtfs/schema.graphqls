@@ -3098,7 +3098,7 @@ type QueryType {
         omitCanceled: Boolean = true
 
         """
-        When true, realtime updates are ignored during this search. Default value: false
+        When true, real-time updates are ignored during this search. Default value: false
         """
         ignoreRealtimeUpdates: Boolean
 

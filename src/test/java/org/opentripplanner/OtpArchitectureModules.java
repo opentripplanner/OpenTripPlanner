@@ -39,6 +39,7 @@ public interface OtpArchitectureModules {
    */
   Module FRAMEWORK_UTILS = Module.of(
     FRAMEWORK.subPackage("application"),
+    FRAMEWORK.subPackage("error"),
     FRAMEWORK.subPackage("i18n"),
     FRAMEWORK.subPackage("lang"),
     FRAMEWORK.subPackage("logging"),

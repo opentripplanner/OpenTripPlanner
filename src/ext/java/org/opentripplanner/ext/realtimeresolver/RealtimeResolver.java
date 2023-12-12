@@ -11,7 +11,7 @@ import org.opentripplanner.transit.service.TransitService;
 public class RealtimeResolver {
 
   /**
-   * Loop through all itineraries and populate legs with realtime data using legReference from the original leg
+   * Loop through all itineraries and populate legs with real-time data using legReference from the original leg
    */
   public static void populateLegsWithRealtime(
     List<Itinerary> itineraries,
@@ -35,10 +35,10 @@ public class RealtimeResolver {
             return leg;
           }
 
-          var realtimeLeg = ref.getLeg(transitService);
-          if (realtimeLeg != null) {
+          var realTimeLeg = ref.getLeg(transitService);
+          if (realTimeLeg != null) {
             return combineReferenceWithOriginal(
-              realtimeLeg.asScheduledTransitLeg(),
+              realTimeLeg.asScheduledTransitLeg(),
               leg.asScheduledTransitLeg()
             );
           }
