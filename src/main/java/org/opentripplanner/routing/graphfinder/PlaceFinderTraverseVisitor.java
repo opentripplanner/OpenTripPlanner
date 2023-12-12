@@ -192,10 +192,8 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor<State, Edge> 
   }
 
   private void handleStop(RegularStop stop, double distance) {
-    /*
-     Do not consider stop if it is not included in the stop or mode filter
-     or if it or its parent station has already been seen.
-     */
+    // Do not consider stop if it is not included in the stop or mode filter
+    // or if it or its parent station has already been seen.
     if (
       (includeStations && !stop.isPartOfStation() && !stopIsIncludedByStopFilter(stop)) ||
       (!includeStations && !stopIsIncludedByStopFilter(stop)) ||
