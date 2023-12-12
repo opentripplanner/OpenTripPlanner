@@ -92,21 +92,27 @@ public class Co2EmissionsDataReader {
       String avgCo2PerVehiclePerKmString = reader.get("avg_co2_per_vehicle_per_km");
       String avgPassengerCountString = reader.get("avg_passenger_count");
 
-      if (avgCo2PerVehiclePerKmString.isEmpty()) {
+      if (routeId.isEmpty() || routeId.isBlank()) {
+        issueStore.add(
+          "InvalidEmissionData",
+          "Value for routeId is missing in the Emissions.txt for line: %s.",
+          reader.getRawRecord()
+        );
+      }
+      if (avgCo2PerVehiclePerKmString.isEmpty() || avgCo2PerVehiclePerKmString.isBlank()) {
         issueStore.add(
           "InvalidEmissionData",
           "Value for avg_co2_per_vehicle_per_km is missing in the Emissions.txt for route %s",
           routeId
         );
       }
-      if (avgPassengerCountString.isEmpty()) {
+      if (avgPassengerCountString.isEmpty() || avgPassengerCountString.isBlank()) {
         issueStore.add(
           "InvalidEmissionData",
           "Value for avg_passenger_count is missing in the Emissions.txt for route %s",
           routeId
         );
       }
-
       Double avgCo2PerVehiclePerMeter = Double.parseDouble(avgCo2PerVehiclePerKmString) / 1000;
       Double avgPassengerCount = Double.parseDouble(reader.get("avg_passenger_count"));
       Optional<Double> emissions = calculateEmissionsPerPassengerPerMeter(
@@ -114,7 +120,13 @@ public class Co2EmissionsDataReader {
         avgCo2PerVehiclePerMeter,
         avgPassengerCount
       );
-      if (emissions.isPresent()) {
+      if (
+        emissions.isPresent() &&
+        !feedId.isBlank() &&
+        !feedId.isEmpty() &&
+        !routeId.isBlank() &&
+        !routeId.isEmpty()
+      ) {
         emissionsData.put(new FeedScopedId(feedId, routeId), emissions.get());
       }
     }
