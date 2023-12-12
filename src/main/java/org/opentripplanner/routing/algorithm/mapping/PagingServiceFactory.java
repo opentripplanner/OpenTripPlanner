@@ -39,9 +39,10 @@ public class PagingServiceFactory {
   }
 
   static Duration searchWindowOf(SearchParams searchParamsUsed) {
-    return searchParamsUsed == null || !searchParamsUsed.isSearchWindowSet()
-      ? null
-      : Duration.ofSeconds(searchParamsUsed.searchWindowInSeconds());
+    if (searchParamsUsed == null || !searchParamsUsed.isSearchWindowSet()) {
+      return null;
+    }
+    return Duration.ofSeconds(searchParamsUsed.searchWindowInSeconds());
   }
 
   static Instant edt(Instant transitSearchStartTime, SearchParams searchParamsUsed) {
