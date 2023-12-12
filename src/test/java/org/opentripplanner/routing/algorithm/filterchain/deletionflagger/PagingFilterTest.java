@@ -58,7 +58,7 @@ public class PagingFilterTest implements PlanTestConstants {
    *   <li>cost: 5 or 7</li>
    *   <li>mode: car or transit</li>
    * </ol>
-   * There is 8 car itineraries and 16 transit (car do not have transfers) = 24 itineraries
+   * There are 8 car itineraries and 16 transit (car do not have transfers) = 24 itineraries
    */
   private final List<Itinerary> allItineraries = allPossibleSortingCombinationsOfItineraries();
 

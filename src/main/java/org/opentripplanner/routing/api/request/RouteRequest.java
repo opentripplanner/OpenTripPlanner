@@ -183,9 +183,9 @@ public class RouteRequest implements Cloneable, Serializable {
 
   /**
    * When paging we must crop the list of itineraries in the right end according to the sorting of
-   * the original search and according to the paging direction(next or previous). We always
+   * the original search and according to the paging direction (next or previous). We always
    * crop at the end of the initial search. This is a utility function delegating to the
-   * pageCursor, fi available.
+   * pageCursor, if available.
    */
   public ListSection cropItinerariesAt() {
     return pageCursor == null ? ListSection.TAIL : pageCursor.cropItinerariesAt();

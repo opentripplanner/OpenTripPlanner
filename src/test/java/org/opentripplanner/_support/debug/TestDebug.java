@@ -12,7 +12,7 @@ package org.opentripplanner._support.debug;
  * or
  * $ java -DtestDebug ..
  * </pre>
- * In IntelliJ I recommend adding the system property in the <em>JUnit template</em>. In the test
+ * In IntelliJ it's recommended to add the system property in the <em>JUnit template</em>. In the test
  * drop down, choose <b>Edit Configuration...</b> then <b>Edit Configuration Templates..</b> and
  * choose <b>JUnit</b>.
  */

@@ -53,9 +53,4 @@ class TokenTypeTest {
     assertNull(TokenType.TIME_INSTANT.stringToValue(""));
   }
 
-  @Test
-  void values() {}
-
-  @Test
-  void valueOf() {}
 }
