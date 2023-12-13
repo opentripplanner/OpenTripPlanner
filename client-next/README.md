@@ -19,7 +19,7 @@ generated during build and are not checked into the repository.
 
 ## Prerequisites
 
-Use latest LTS version of Node/npm (currently v18). Recommend using av version manager such as `nvm`.
+Use latest LTS version of Node/npm (currently v18). Recommend using a version manager such as `nvm`.
 
 The dev and production builds require graphql schema to be present at
 `../src/ext/graphql/transmodelapi/schema.graphql`.
