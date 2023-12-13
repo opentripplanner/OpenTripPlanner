@@ -4,7 +4,26 @@
 
 - Entur, Norway
 
-## Changelog
+## Documentation
+
+This is the official OTP2 API for Transmodel(NeTEx). The terminology is based on the 
+Transmodel(NeTEx) with some limitations/simplification. It provides both a routing API 
+(trip query) and index API for transit data.
+
+Entur provide a [GraphQL explorer](https://api.entur.io/graphql-explorer) where you may browse the GraphQL schema and try your own
+queries.
+
+When running OTP locally the endpoint is available at: `http://localhost:8080/otp/routers/default/transmodel/index/graphql`
+
+### Configuration
+
+To turn this API off need to add the feature `TransmodelGraphQlApi : false` in _otp-config.json_.
+
+
+## Changelog - old
+
+The Transmodel API is now part of the main OTP supported APIs. New changes in the changelog 
+will be added to the main change log, and NOT here (2023-12-13).
 
 - Initial version of Transmodel Graph QL API (September 2019)
 - Added support for multimodal StopPlaces (November 2019)
@@ -43,7 +62,7 @@
   [#4074](https://github.com/opentripplanner/OpenTripPlanner/pull/4074)
 - Transmodel API transport mode not present or null is all transport modes
   [#4123](https://github.com/opentripplanner/OpenTripPlanner/pull/4123)
-- Expose datedServiceJourney from EstimatedCall 
+- Expose datedServiceJourney from EstimatedCall
   [#4128](https://github.com/opentripplanner/OpenTripPlanner/pull/4128)
 - Expose stop-to-stop journey pattern geometries
   [#4161](https://github.com/opentripplanner/OpenTripPlanner/pull/4161)
@@ -58,26 +77,5 @@
 - Add flexible stops
   [#4485](https://github.com/opentripplanner/OpenTripPlanner/pull/4485)
 
-## Documentation
-
-This is the official Entur OTP2 API. The terminology is based on the Transmodel(NeTEx) with some
-limitations/simplification. It provides both a routing API (trip query) and index API for transit
-data.
-
-Entur provide a [GraphQL explorer](https://api.entur.io/graphql-explorer) where you may browse the
-GraphQL schema and try your own queries.
-
-After enabling this feature (see below), the endpoint is available
-at: `http://localhost:8080/otp/routers/default/transmodel/index/graphql`
-
-### OTP2 Official GraphQL API (Not available)
-
-We **plan** to make a new offical OTP2 API, replacing the REST API. The plan is to base the new API
-on this API and the [GTFS GraphQL API](../apis/GTFS-GraphQL-API.md). The new API will most likely have two
-"translations": A GTFS version and a Transmodel version, we will try to keep the semantics the same.
-
-### Configuration
-
-To enable this you need to add the feature `SandboxAPITransmodelApi`.
  
  
