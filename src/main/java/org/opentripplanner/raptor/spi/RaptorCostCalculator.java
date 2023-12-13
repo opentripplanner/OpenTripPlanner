@@ -12,7 +12,7 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
  */
 public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
   /**
-   * The cost is zero(0) it it is not calculated or if the cost "element" have no cost associated
+   * The cost is zero(0) it is not calculated or if the cost "element" have no cost associated
    * with it.
    */
   int ZERO_COST = 0;

@@ -11,6 +11,7 @@ import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTransfer;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 class TransferStopArrivalTest {
@@ -87,7 +88,7 @@ class TransferStopArrivalTest {
 
   @Test
   public void c2() {
-    assertThrows(UnsupportedOperationException.class, subject::c2);
+    assertEquals(RaptorConstants.NOT_SET, subject.c2());
   }
 
   @Test

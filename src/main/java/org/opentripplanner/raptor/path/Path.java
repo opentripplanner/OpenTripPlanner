@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransferConstraint;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.AccessPathLeg;
@@ -48,7 +49,7 @@ public class Path<T extends RaptorTripSchedule> implements RaptorPath<T> {
     this.generalizedCost = generalizedCost;
     this.accessLeg = null;
     this.egressLeg = null;
-    this.c2 = 0;
+    this.c2 = RaptorConstants.NOT_SET;
   }
 
   public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost, int c2) {

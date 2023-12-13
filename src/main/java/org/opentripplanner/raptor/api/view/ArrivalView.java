@@ -93,7 +93,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
    * state with c1 and c2 is created dynamically if c2 is in use, if not this method will
    * throw an exception.
    * <p>
-   * {@link RaptorCostCalculator#ZERO_COST} is returned if no criteria exist, but the model
+   * {@link RaptorConstants#NOT_SET} is returned if no criteria exist, but the model
    * support it.
    */
   int c2();
@@ -157,7 +157,7 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
 
   boolean arrivedOnBoard();
 
-  /** Use this to easy create a to String implementation. */
+  /** Use this to create a {@code toString()} implementation. */
   default String asString() {
     String arrival =
       "[" +

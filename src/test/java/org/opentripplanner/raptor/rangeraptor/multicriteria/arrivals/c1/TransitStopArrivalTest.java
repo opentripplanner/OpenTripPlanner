@@ -2,7 +2,6 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
@@ -10,6 +9,7 @@ import static org.opentripplanner.raptor.api.model.PathLegType.TRANSIT;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 
 class TransitStopArrivalTest {
@@ -81,7 +81,7 @@ class TransitStopArrivalTest {
 
   @Test
   public void c2() {
-    assertThrows(UnsupportedOperationException.class, subject::c2);
+    assertEquals(RaptorConstants.NOT_SET, subject.c2());
   }
 
   @Test

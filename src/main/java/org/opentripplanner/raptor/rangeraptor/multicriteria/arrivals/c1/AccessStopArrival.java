@@ -31,7 +31,7 @@ final class AccessStopArrival<T extends RaptorTripSchedule> extends McStopArriva
 
   @Override
   public int c2() {
-    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
+    return RaptorConstants.NOT_SET;
   }
 
   @Override
