@@ -14,7 +14,9 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 
 class TransmodelGraphQLSchemaTest {
 
-  public static final File SCHEMA_FILE = new File("src/ext/graphql/transmodelapi/schema.graphql");
+  public static final File SCHEMA_FILE = new File(
+    "src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql"
+  );
 
   @Test
   void testSchemaBuild() {
