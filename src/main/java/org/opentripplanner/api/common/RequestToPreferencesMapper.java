@@ -6,6 +6,7 @@ import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
+import org.opentripplanner.routing.api.request.preference.Relax;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
@@ -85,10 +86,17 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.alightSlack, tr::withDefaultAlightSlackSec);
       setIfNotNull(req.otherThanPreferredRoutesPenalty, tr::setOtherThanPreferredRoutesPenalty);
       setIfNotNull(req.ignoreRealtimeUpdates, tr::setIgnoreRealtimeUpdates);
-      setIfNotNull(
-        req.relaxTransitSearchGeneralizedCostAtDestination,
-        value -> tr.withRaptor(it -> it.withRelaxGeneralizedCostAtDestination(value))
-      );
+
+      if (req.relaxTransitPriorityGroup != null) {
+        tr.withTransitGroupPriorityGeneralizedCostSlack(
+          CostLinearFunction.of(req.relaxTransitPriorityGroup)
+        );
+      } else {
+        setIfNotNull(
+          req.relaxTransitSearchGeneralizedCostAtDestination,
+          v -> tr.withRaptor(r -> r.withRelaxGeneralizedCostAtDestination(v))
+        );
+      }
     });
 
     return new BoardAndAlightSlack(
@@ -169,6 +177,17 @@ class RequestToPreferencesMapper {
     if (value != null) {
       body.accept(value);
     }
+  }
+
+  static <T> void mapRelaxIfNotNull(String fx, @NotNull Consumer<Relax> body) {
+    if (fx == null) {
+      return;
+    }
+    var a = fx.split("[\\sxXuUvVtT*+]+");
+    if (a.length != 2) {
+      return;
+    }
+    body.accept(new Relax(Double.parseDouble(a[0]), Integer.parseInt(a[1])));
   }
 
   /**

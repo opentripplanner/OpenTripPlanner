@@ -222,7 +222,8 @@ public class OTPMain {
     TransitModel transitModel,
     RaptorConfig<?> raptorConfig
   ) {
-    var hook = new Thread(
+    ApplicationShutdownSupport.addShutdownHook(
+      "server-shutdown",
       () -> {
         LOG.info("OTP shutdown started...");
         UpdaterConfigurator.shutdownGraph(transitModel);
@@ -230,10 +231,8 @@ public class OTPMain {
         WeakCollectionCleaner.DEFAULT.exit();
         DeferredAuthorityFactory.exit();
         LOG.info("OTP shutdown: resources released...");
-      },
-      "server-shutdown"
+      }
     );
-    ApplicationShutdownSupport.addShutdownHook(hook, hook.getName());
   }
 
   private static void setOtpConfigVersionsOnServerInfo(ConstructApplication app) {

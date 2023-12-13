@@ -28,35 +28,35 @@ import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 
-/*
-FEATURE UNDER TEST
-
-Raptor should be able to handle route request with a specified pass-through point.
-If a stop point is specified as pass-through point in the request then all the results returned
-from raptor should include this stop point either as alight or board point for a trip or as an
-intermediate point in the trip.
-
-It should be possible to specify more than one pass through point. The result should include stop
-points in the order as they were specified in the request. Only alternatives that passes through
-all the stop point should be included in the result.
-
-In order to support stop areas raptor should also support multiple stop points in the same pass-through
-group. It should be possible to define both stop A and B as a pass-through. Then alternatives that
-pass either stop A or B should not be dropped.
+/**
+ * FEATURE UNDER TEST
+ *
+ * Raptor should be able to handle route request with a specified pass-through point.
+ * If a stop point is specified as pass-through point in the request then all the results returned
+ * from raptor should include this stop point either as alight or board point for a trip or as an
+ * intermediate point in the trip.
+ *
+ * It should be possible to specify more than one pass through point. The result should include
+ * stop points in the order as they were specified in the request. Only alternatives that pass
+ * through all the stop point should be included in the result.
+ *
+ * In order to support stop areas raptor should also support multiple stop points in the same
+ * pass-through group. It should be possible to define both stop A and B as a pass-through. Then
+ * alternatives that pass either stop A or B should not be dropped.
  */
-public class J01_PassThroughTest {
+class J01_PassThroughTest {
 
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_A = List.of(point("A", STOP_A));
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_C = List.of(point("C", STOP_C));
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_D = List.of(point("D", STOP_D));
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_B_OR_C = List.of(
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_A = List.of(point("A", STOP_A));
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_C = List.of(point("C", STOP_C));
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_D = List.of(point("D", STOP_D));
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_B_OR_C = List.of(
     point("B&C", STOP_B, STOP_C)
   );
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_C = List.of(
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_C = List.of(
     point("B", STOP_B),
     point("C", STOP_C)
   );
-  public static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_D = List.of(
+  static final List<PassThroughPoint> PASS_THROUGH_STOP_B_THEN_D = List.of(
     point("B", STOP_B),
     point("D", STOP_D)
   );
@@ -86,7 +86,7 @@ public class J01_PassThroughTest {
 
   @Test
   @DisplayName("Pass-through stop point as a last point in the journey.")
-  public void passThroughPointOnEgress() {
+  void passThroughPointOnEgress() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -117,7 +117,7 @@ public class J01_PassThroughTest {
 
   @Test
   @DisplayName("Pass-through stop point as a first point in the journey.")
-  public void passThroughPointOnAccess() {
+  void passThroughPointOnAccess() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -151,7 +151,7 @@ public class J01_PassThroughTest {
 
   @Test
   @DisplayName("Pass-through stop point as an intermediate point in the journey.")
-  public void passThroughPointInTheMiddle() {
+  void passThroughPointInTheMiddle() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -182,7 +182,7 @@ public class J01_PassThroughTest {
 
   @Test
   @DisplayName("Multiple pass-through stop points")
-  public void multiplePassThroughPoints() {
+  void multiplePassThroughPoints() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -215,7 +215,7 @@ public class J01_PassThroughTest {
 
   @Test
   @DisplayName("Pass-through order")
-  public void passThroughOrder() {
+  void passThroughOrder() {
     var data = new TestTransitData();
 
     // Create two routes.
@@ -244,7 +244,7 @@ public class J01_PassThroughTest {
 
   @Test
   @DisplayName("Multiple stops in same pass-through group")
-  public void passThroughGroup() {
+  void passThroughGroup() {
     var data = new TestTransitData();
 
     // Create two routes.

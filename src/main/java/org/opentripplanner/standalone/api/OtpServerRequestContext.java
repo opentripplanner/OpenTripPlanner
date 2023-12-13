@@ -47,7 +47,7 @@ import org.opentripplanner.transit.service.TransitService;
  * </ol>
  * <p>
  * This class is not THREAD-SAFE, each HTTP request gets its own copy, but if there are multiple
- * threads witch accesses this context within the HTTP Request, then the caller is responsible
+ * threads which accesses this context within the HTTP Request, then the caller is responsible
  * for the synchronization. Only request scoped components need to be synchronized - they are
  * potentially lazy initialized.
  */
@@ -107,7 +107,7 @@ public interface OtpServerRequestContext {
   TileRendererManager tileRendererManager();
 
   /**
-   * Callback witch is injected into the {@code DirectStreetRouter}, used to visualize the
+   * Callback which is injected into the {@code DirectStreetRouter}, used to visualize the
    * search.
    */
   @HttpRequestScoped
