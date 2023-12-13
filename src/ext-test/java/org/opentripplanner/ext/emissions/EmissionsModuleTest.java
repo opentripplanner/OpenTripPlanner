@@ -14,6 +14,7 @@ import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.framework.application.OtpFileNames;
 import org.opentripplanner.graph_builder.ConfiguredDataSource;
+import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.gtfs.graphbuilder.GtfsFeedParameters;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.test.support.ResourceLoader;
@@ -42,7 +43,7 @@ public class EmissionsModuleTest {
       configuredDataSource,
       buildConfig,
       emissionsDataModel,
-      null
+      DataImportIssueStore.NOOP
     );
     emissionsModule.buildGraph();
     assertEquals(
