@@ -1,4 +1,4 @@
-import { LngLat, Map, NavigationControl, Popup } from 'react-map-gl';
+import { LngLat, Map, NavigationControl } from 'react-map-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
@@ -6,7 +6,7 @@ import { LegLines } from './LegLines.tsx';
 import { useMapDoubleClick } from './useMapDoubleClick.ts';
 import { mapStyle } from './mapStyle.ts';
 import { useState } from 'react';
-import { Button, ButtonGroup } from 'react-bootstrap';
+import { ContextMenuPopup } from './ContextMenuPopup.tsx';
 
 // TODO: this should be configurable
 const initialViewState = {
@@ -54,46 +54,12 @@ export function MapView({
           <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
         )}
         {showPopup && (
-          <Popup longitude={showPopup.lng} latitude={showPopup.lat} anchor="bottom" onClose={() => setShowPopup(null)}>
-            <ButtonGroup vertical>
-              <Button
-                onClick={() => {
-                  if (showPopup) {
-                    setTripQueryVariables({
-                      ...tripQueryVariables,
-                      from: {
-                        coordinates: {
-                          latitude: showPopup.lat,
-                          longitude: showPopup.lng,
-                        },
-                      },
-                    });
-                    setShowPopup(null);
-                  }
-                }}
-              >
-                Start here
-              </Button>
-              <Button
-                onClick={() => {
-                  if (showPopup) {
-                    setTripQueryVariables({
-                      ...tripQueryVariables,
-                      to: {
-                        coordinates: {
-                          latitude: showPopup.lat,
-                          longitude: showPopup.lng,
-                        },
-                      },
-                    });
-                    setShowPopup(null);
-                  }
-                }}
-              >
-                End here
-              </Button>
-            </ButtonGroup>
-          </Popup>
+          <ContextMenuPopup
+            tripQueryVariables={tripQueryVariables}
+            setTripQueryVariables={setTripQueryVariables}
+            coordinates={showPopup}
+            onClose={() => setShowPopup(null)}
+          />
         )}
       </Map>
     </div>
