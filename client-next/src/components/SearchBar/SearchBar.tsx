@@ -15,19 +15,15 @@ import Navbar from 'react-bootstrap/Navbar';
 import { ServerInfoTooltip } from './ServerInfoTooltip.tsx';
 import { useRef, useState } from 'react';
 
-export function SearchBar({
-  onRoute,
-  tripQueryVariables,
-  setTripQueryVariables,
-  serverInfo,
-  loading,
-}: {
+type SearchBarProps = {
   onRoute: () => void;
   tripQueryVariables: TripQueryVariables;
   setTripQueryVariables: (tripQueryVariables: TripQueryVariables) => void;
   serverInfo?: ServerInfo;
   loading: boolean;
-}) {
+};
+
+export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, serverInfo, loading }: SearchBarProps) {
   const [showServerInfo, setShowServerInfo] = useState(false);
   const target = useRef(null);
 
