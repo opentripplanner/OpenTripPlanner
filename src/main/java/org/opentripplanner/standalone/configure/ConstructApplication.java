@@ -167,7 +167,7 @@ public class ConstructApplication {
 
     initializeTransferCache(routerConfig().transitTuningConfig(), transitModel());
 
-    if (OTPFeature.SandboxAPITransmodelApi.isOn()) {
+    if (OTPFeature.TransmodelGraphQlApi.isOn()) {
       TransmodelAPI.setUp(
         routerConfig().transmodelApi(),
         transitModel(),
