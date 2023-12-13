@@ -49,7 +49,7 @@ public class SmokeTest {
    */
   public static LocalDateTime weekdayAtNoon() {
     var today = LocalDate.now();
-    return today.with(TemporalAdjusters.next(DayOfWeek.TUESDAY)).atTime(LocalTime.of(12, 0));
+    return today.with(TemporalAdjusters.next(DayOfWeek.THURSDAY)).atTime(LocalTime.of(12, 0));
   }
 
   public static void assertThatThereAreVehicleRentalStations() {
