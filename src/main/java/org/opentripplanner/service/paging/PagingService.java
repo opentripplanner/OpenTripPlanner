@@ -46,11 +46,7 @@ public class PagingService {
     List<Itinerary> itineraries
   ) {
     this.searchWindowUsed = searchWindowUsed;
-    // EDT is required if search-window is set
-    this.earliestDepartureTime =
-      searchWindowUsed == null
-        ? earliestDepartureTime
-        : Objects.requireNonNull(earliestDepartureTime);
+    this.earliestDepartureTime = earliestDepartureTime;
     this.latestArrivalTime = latestArrivalTime;
     this.itinerariesSortOrder = Objects.requireNonNull(itinerariesSortOrder);
     this.arriveBy = arriveBy;
@@ -58,7 +54,7 @@ public class PagingService {
     this.pageCursor = pageCursor;
 
     this.numItinerariesFilterResults = numItinerariesFilterResults;
-    this.itineraries = itineraries;
+    this.itineraries = Objects.requireNonNull(itineraries);
     this.searchWindowAdjuster =
       createSearchWindowAdjuster(
         pagingSearchWindowAdjustments,
@@ -77,7 +73,7 @@ public class PagingService {
 
   @Nullable
   public TripSearchMetadata createTripSearchMetadata() {
-    if (noTransitSearchPerformed()) {
+    if (noSuccessfulTransitSearchPerformed()) {
       return null;
     }
 
@@ -97,7 +93,7 @@ public class PagingService {
   }
 
   private Duration calculateSearchWindowNextSearch() {
-    if (noTransitSearchPerformed()) {
+    if (noSuccessfulTransitSearchPerformed()) {
       return null;
     }
 
@@ -179,7 +175,7 @@ public class PagingService {
     var searchWindowNextSearch = calculateSearchWindowNextSearch();
     var factory = new PageCursorFactory(itinerariesSortOrder, searchWindowNextSearch);
 
-    if (noTransitSearchPerformed()) {
+    if (noSuccessfulTransitSearchPerformed()) {
       return factory;
     }
 
@@ -200,7 +196,7 @@ public class PagingService {
   }
 
   private void assertRequestPrerequisites() {
-    if (noTransitSearchPerformed()) {
+    if (noSuccessfulTransitSearchPerformed()) {
       throw new IllegalStateException("SearchWindow not set");
     }
     if (earliestDepartureTime == null) {
@@ -208,8 +204,11 @@ public class PagingService {
     }
   }
 
-  private boolean noTransitSearchPerformed() {
-    return searchWindowUsed == null;
+  /**
+   * Both SW and EDT must be available to compute paging tokens.
+   */
+  private boolean noSuccessfulTransitSearchPerformed() {
+    return searchWindowUsed == null || earliestDepartureTime == null;
   }
 
   @Override
