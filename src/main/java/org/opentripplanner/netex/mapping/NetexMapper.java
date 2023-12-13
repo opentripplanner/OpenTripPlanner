@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -460,18 +461,36 @@ public class NetexMapper {
     for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex
       .getJourneyPatternsById()
       .localValues()) {
-      TripPatternMapperResult result = tripPatternMapper.mapTripPattern(journeyPattern);
+      tripPatternMapper
+        .mapTripPattern(journeyPattern)
+        .ifPresent(result -> {
+          var journeyPatternExists = transitBuilder
+            .getTripPatterns()
+            .get(result.tripPattern().getStopPattern())
+            .stream()
+            .anyMatch(tripPattern -> result.tripPattern().getId().equals(tripPattern.getId()));
+          if (journeyPatternExists) {
+            issueStore.add(
+              "DuplicateJourneyPattern",
+              "Duplicate of JourneyPattern %s found",
+              journeyPattern.getId()
+            );
+          }
 
-      for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes.entrySet()) {
-        transitBuilder.getStopTimesSortedByTrip().put(it.getKey(), it.getValue());
-        transitBuilder.getTripsById().add(it.getKey());
-      }
-      for (var it : result.tripPatterns.entries()) {
-        transitBuilder.getTripPatterns().put(it.getKey(), it.getValue());
-      }
-      currentMapperIndexes.addStopTimesByNetexId(result.stopTimeByNetexId);
-      groupMapper.scheduledStopPointsIndex.putAll(Multimaps.asMap(result.scheduledStopPointsIndex));
-      transitBuilder.getTripOnServiceDates().addAll(result.tripOnServiceDates);
+          for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes().entrySet()) {
+            transitBuilder.getStopTimesSortedByTrip().put(it.getKey(), it.getValue());
+            transitBuilder.getTripsById().add(it.getKey());
+          }
+
+          transitBuilder
+            .getTripPatterns()
+            .put(result.tripPattern().getStopPattern(), result.tripPattern());
+          currentMapperIndexes.addStopTimesByNetexId(result.stopTimeByNetexId());
+          groupMapper.scheduledStopPointsIndex.putAll(
+            Multimaps.asMap(result.scheduledStopPointsIndex())
+          );
+          transitBuilder.getTripOnServiceDates().addAll(result.tripOnServiceDates());
+        });
     }
   }
 
