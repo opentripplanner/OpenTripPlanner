@@ -1644,7 +1644,7 @@ enum RoutingErrorCode {
   noStopsInRange
   "No transit connection was found between the origin and destination withing the operating day or the next day"
   noTransitConnection
-  "Transit connection was found, but it was outside the search window, see metadata for the next search window"
+  "A transit connection was found, but it was outside the search window. Use paging to navigate to a result."
   noTransitConnectionInSearchWindow
   "The coordinates are outside the bounds of the data currently loaded into the system"
   outsideBounds
