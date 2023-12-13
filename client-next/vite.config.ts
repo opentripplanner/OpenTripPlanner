@@ -7,5 +7,6 @@ export default defineConfig({
   base: '/debug-client-preview/',
   build: {
     outDir: '../src/client/debug-client-preview',
+    emptyOutDir: true,
   },
 });
