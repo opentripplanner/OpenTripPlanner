@@ -103,14 +103,14 @@ public class Co2EmissionsDataReader {
       {
         issueStore.add(
           "InvalidEmissionData",
-          "Value for avg_co2_per_vehicle_per_km is missing in the Emissions.txt for route %s",
+          "Value for avg_co2_per_vehicle_per_km is missing in the emissions.txt for route %s",
           routeId
         );
       }
       if (!exists(avgPassengerCountString)) {
         issueStore.add(
           "InvalidEmissionData",
-          "Value for avg_passenger_count is missing in the Emissions.txt for route %s",
+          "Value for avg_passenger_count is missing in the emissions.txt for route %s",
           routeId
         );
       }
