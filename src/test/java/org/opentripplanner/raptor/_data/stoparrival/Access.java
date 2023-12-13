@@ -10,8 +10,8 @@ class Access extends AbstractStopArrival {
 
   private final RaptorAccessEgress access;
 
-  public Access(int stop, int arrivalTime, RaptorAccessEgress path, int c2) {
-    super(0, stop, arrivalTime, path.generalizedCost(), c2, null);
+  Access(int stop, int arrivalTime, RaptorAccessEgress path, int c2) {
+    super(0, stop, arrivalTime, path.c1(), c2, null);
     this.access = path;
   }
 

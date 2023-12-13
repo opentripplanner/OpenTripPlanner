@@ -26,7 +26,7 @@ final class TransferStopArrival<T extends RaptorTripSchedule> extends McStopArri
       1,
       transferPath.stop(),
       arrivalTime,
-      previousState.c1() + transferPath.generalizedCost()
+      previousState.c1() + transferPath.c1()
     );
     this.transfer = transferPath;
   }

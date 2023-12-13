@@ -69,7 +69,7 @@ public interface PathLeg<T extends RaptorTripSchedule> {
    * <p>
    * The unit is centi-seconds (Raptor cost unit)
    */
-  int generalizedCost();
+  int c1();
 
   /**
    * The computed generalized-cost for this leg plus all legs following it.
@@ -78,11 +78,11 @@ public interface PathLeg<T extends RaptorTripSchedule> {
    * <p>
    * The unit is centi-seconds (Raptor cost unit)
    */
-  default int generalizedCostTotal() {
-    if (generalizedCost() < 0) {
-      return generalizedCost();
+  default int c1Total() {
+    if (c1() < 0) {
+      return c1();
     }
-    return stream().mapToInt(PathLeg::generalizedCost).sum();
+    return stream().mapToInt(PathLeg::c1).sum();
   }
 
   /**

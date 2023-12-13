@@ -22,7 +22,7 @@ class AccessStopArrivalTest {
   private static final int ACCESS_DURATION = 10 * 60;
   private static final int ALIGHT_TIME = DEPARTURE_TIME + ACCESS_DURATION;
   private static final TestAccessEgress WALK = TestAccessEgress.walk(ALIGHT_STOP, ACCESS_DURATION);
-  private static final int COST = WALK.generalizedCost();
+  private static final int C1 = WALK.c1();
 
   private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
     DEPARTURE_TIME,
@@ -47,7 +47,7 @@ class AccessStopArrivalTest {
 
   @Test
   public void c1() {
-    assertEquals(COST, subject.c1());
+    assertEquals(C1, subject.c1());
   }
 
   @Test

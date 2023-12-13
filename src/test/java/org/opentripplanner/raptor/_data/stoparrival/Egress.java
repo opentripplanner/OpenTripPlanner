@@ -16,7 +16,7 @@ public class Egress extends AbstractStopArrival {
     RaptorAccessEgress egressPath,
     ArrivalView<TestTripSchedule> previous
   ) {
-    super(previous.round(), previous.stop(), arrivalTime, egressPath.generalizedCost(), previous);
+    super(previous.round(), previous.stop(), arrivalTime, egressPath.c1(), previous);
     this.egressPath = egressPath;
   }
 

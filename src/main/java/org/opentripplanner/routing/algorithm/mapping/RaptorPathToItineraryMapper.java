@@ -191,7 +191,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     int lastLegCost = 0;
     PathLeg<T> nextLeg = pathLeg.nextLeg();
     if (nextLeg.isEgressLeg() && isFree(nextLeg.asEgressLeg())) {
-      lastLegCost = pathLeg.nextLeg().generalizedCost();
+      lastLegCost = pathLeg.nextLeg().c1();
     }
 
     // Find stop positions in pattern where this leg boards and alights.
@@ -221,7 +221,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg())
         )
         .withTransferToNextLeg((ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg())
-        .withGeneralizedCost(toOtpDomainCost(pathLeg.generalizedCost() + lastLegCost))
+        .withGeneralizedCost(toOtpDomainCost(pathLeg.c1() + lastLegCost))
         .withFrequencyHeadwayInSeconds(frequencyHeadwayInSeconds)
         .build();
     }
@@ -242,7 +242,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
         (prevTransitLeg == null ? null : prevTransitLeg.getTransferToNextLeg())
       )
       .withTransferToNextLeg((ConstrainedTransfer) pathLeg.getConstrainedTransferAfterLeg())
-      .withGeneralizedCost(toOtpDomainCost(pathLeg.generalizedCost() + lastLegCost))
+      .withGeneralizedCost(toOtpDomainCost(pathLeg.c1() + lastLegCost))
       .build();
   }
 
@@ -308,7 +308,7 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
           .withFrom(from)
           .withTo(to)
           .withDistanceMeters(transfer.getDistanceMeters())
-          .withGeneralizedCost(toOtpDomainCost(pathLeg.generalizedCost()))
+          .withGeneralizedCost(toOtpDomainCost(pathLeg.c1()))
           .withGeometry(GeometryUtils.makeLineString(transfer.getCoordinates()))
           .withWalkSteps(List.of())
           .build()

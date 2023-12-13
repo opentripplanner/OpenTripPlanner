@@ -57,7 +57,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
 
   private final OptimizedPathTail<TestTripSchedule> subject = new OptimizedPathTail<>(
     SLACK_PROVIDER,
-    BasicPathTestCase.COST_CALCULATOR,
+    BasicPathTestCase.C1_CALCULATOR,
     0,
     waitTimeCalc,
     stopBoardAlightCost,

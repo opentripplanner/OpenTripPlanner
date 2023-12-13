@@ -35,7 +35,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  */
 public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConstants {
 
-  private static final int COST_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
+  private static final int C1_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -58,7 +58,7 @@ public class H11_GuaranteedTransferWithFlexAccessTest implements RaptorTestConst
 
     requestBuilder
       .searchParams()
-      .addAccessPaths(flex(STOP_A, D3m, ONE_RIDE, 2 * COST_ONE_STOP))
+      .addAccessPaths(flex(STOP_A, D3m, ONE_RIDE, 2 * C1_ONE_STOP))
       .addEgressPaths(walk(STOP_D, D1m));
 
     requestBuilder

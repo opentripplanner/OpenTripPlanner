@@ -65,7 +65,7 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
   private static final String EXPECTED_PATH_WALK_7M =
     "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 7m [0:04 0:27 23m 0tx $2400]";
 
-  private static final int COST_10m = RaptorCostConverter.toRaptorCost(D10m);
+  private static final int C1_10m = RaptorCostConverter.toRaptorCost(D10m);
 
   private final RaptorService<TestTripSchedule> raptorService = new RaptorService<>(
     RaptorConfig.defaultConfigForTest()
@@ -102,7 +102,7 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
       .of()
       // with Flex egress as the best destination arrival-time
       .withRequest(r ->
-        r.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D7m))
+        r.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, C1_10m), walk(STOP_C, D7m))
       )
       .add(TC_MIN_DURATION, "[0:00 0:21 21m 1tx]", "[0:00 0:23 23m 0tx]")
       .add(TC_MIN_DURATION_REV, "[0:09 0:30 21m 0tx]")
@@ -125,7 +125,7 @@ public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestCo
       .of()
       // with walk egress as the best destination arrival-time
       .withRequest(r ->
-        r.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, COST_10m), walk(STOP_C, D5m))
+        r.searchParams().addEgressPaths(flex(STOP_C, D7m, 1, C1_10m), walk(STOP_C, D5m))
       )
       .addMinDuration("21m", TX_0, T00_00, T00_30)
       .add(standard().forwardOnly(), withoutCost(EXPECTED_PATH_WALK_5M))

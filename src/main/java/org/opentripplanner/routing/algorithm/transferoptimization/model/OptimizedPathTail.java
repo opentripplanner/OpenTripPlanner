@@ -203,7 +203,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
       return;
     }
     this.generalizedCost =
-      legsAsStream().mapToInt(it -> it.generalizedCost(costCalculator(), slackProvider())).sum();
+      legsAsStream().mapToInt(it -> it.c1(costCalculator(), slackProvider())).sum();
   }
 
   /*private methods */

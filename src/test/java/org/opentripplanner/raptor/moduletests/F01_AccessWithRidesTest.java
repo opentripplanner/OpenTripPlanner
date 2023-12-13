@@ -37,9 +37,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
 public class F01_AccessWithRidesTest implements RaptorTestConstants {
 
   private static final int TRANSFER_SLACK = 60;
-  private static final int COST_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
-  private static final int COST_TRANSFER_SLACK = RaptorCostConverter.toRaptorCost(TRANSFER_SLACK);
-  private static final int COST_ONE_SEC = RaptorCostConverter.toRaptorCost(1);
+  private static final int C1_ONE_STOP = RaptorCostConverter.toRaptorCost(2 * 60);
+  private static final int C1_TRANSFER_SLACK = RaptorCostConverter.toRaptorCost(TRANSFER_SLACK);
+  private static final int C1_ONE_SEC = RaptorCostConverter.toRaptorCost(1);
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -61,13 +61,13 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
       // All access paths are all pareto-optimal (McRaptor).
       .addAccessPaths(
         // lowest num-of-transfers (0)
-        walk(STOP_B, D10m, COST_ONE_STOP + COST_TRANSFER_SLACK),
+        walk(STOP_B, D10m, C1_ONE_STOP + C1_TRANSFER_SLACK),
         // lowest cost
-        flexAndWalk(STOP_C, D2m, TWO_RIDES, 2 * COST_ONE_STOP - COST_ONE_SEC),
+        flexAndWalk(STOP_C, D2m, TWO_RIDES, 2 * C1_ONE_STOP - C1_ONE_SEC),
         // latest departure time
-        flex(STOP_D, D3m, TWO_RIDES, 3 * COST_ONE_STOP),
+        flex(STOP_D, D3m, TWO_RIDES, 3 * C1_ONE_STOP),
         // best on combination of transfers and time
-        flexAndWalk(STOP_E, D7m, ONE_RIDE, 4 * COST_ONE_STOP)
+        flexAndWalk(STOP_E, D7m, ONE_RIDE, 4 * C1_ONE_STOP)
       )
       .addEgressPaths(walk(STOP_F, D1m));
 

@@ -80,7 +80,7 @@ public class StopArrivalFactoryC2Test {
     var stopArrival = accessArrival();
 
     assertEquals(STOP_A, stopArrival.stop());
-    assertEquals(ACCESS.generalizedCost(), stopArrival.c1());
+    assertEquals(ACCESS.c1(), stopArrival.c1());
     assertEquals(ACCESS_DURATION, stopArrival.travelDuration());
     assertEquals(ORIGIN_DEPARTURE_TIME + ACCESS_DURATION, stopArrival.arrivalTime());
     assertTrue(stopArrival.supportsC2());
@@ -105,7 +105,7 @@ public class StopArrivalFactoryC2Test {
     var stopArrival = transferArrival(prevArrival);
 
     assertEquals(STOP_C, stopArrival.stop());
-    assertEquals(prevArrival.c1() + TRANSFER.generalizedCost(), stopArrival.c1());
+    assertEquals(prevArrival.c1() + TRANSFER.c1(), stopArrival.c1());
     assertEquals(
       prevArrival.arrivalTime() + TRANSFER.durationInSeconds(),
       stopArrival.arrivalTime()

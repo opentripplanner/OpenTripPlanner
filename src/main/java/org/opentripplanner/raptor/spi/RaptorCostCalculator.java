@@ -63,7 +63,7 @@ public interface RaptorCostCalculator<T extends RaptorTripSchedule> {
    * This method allows the cost calculator to add cost in addition to the generalized-cost of the
    * given egress itself. For example you might want to add a transfer cost to FLEX egress.
    *
-   * @return the {@link RaptorTransfer#generalizedCost()} plus any additional board or transfer
+   * @return the {@link RaptorTransfer#c1()} plus any additional board or transfer
    * cost.
    */
   int costEgress(RaptorAccessEgress egress);

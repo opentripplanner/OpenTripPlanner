@@ -46,8 +46,8 @@ class DefaultAccessEgressTest {
   void generalizedCost() {
     // TODO - The value is ?
     int expected = 23642959;
-    assertEquals(expected, subject.generalizedCost());
-    assertEquals(expected + COST_PENALTY.toCentiSeconds(), subjectWithPenalty.generalizedCost());
+    assertEquals(expected, subject.c1());
+    assertEquals(expected + COST_PENALTY.toCentiSeconds(), subjectWithPenalty.c1());
   }
 
   @Test

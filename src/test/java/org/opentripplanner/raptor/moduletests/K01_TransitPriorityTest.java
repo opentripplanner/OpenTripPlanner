@@ -59,7 +59,7 @@ public class K01_TransitPriorityTest {
     GROUP_A,
     GROUP_C
   );
-  private static final int COST_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
+  private static final int C1_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -96,7 +96,7 @@ public class K01_TransitPriorityTest {
     requestBuilder.withMultiCriteria(mc ->
       // Raptor cost 9000 ~= 90 seconds slack
       mc
-        .withRelaxC1(value -> value + COST_SLACK_90s)
+        .withRelaxC1(value -> value + C1_SLACK_90s)
         .withTransitPriorityCalculator(PRIORITY_GROUP_CALCULATOR)
     );
     // Add 1 second access/egress paths

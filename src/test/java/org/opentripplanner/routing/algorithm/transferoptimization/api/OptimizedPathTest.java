@@ -15,9 +15,9 @@ class OptimizedPathTest implements RaptorTestConstants {
     var path = new OptimizedPath<>(BasicPathTestCase.basicTripAsPath());
 
     // Verify all costs
-    assertEquals(BasicPathTestCase.TOTAL_COST, path.c1());
+    assertEquals(BasicPathTestCase.TOTAL_C1, path.c1());
     assertEquals(0, path.breakTieCost());
-    assertEquals(BasicPathTestCase.TOTAL_COST, path.generalizedCostWaitTimeOptimized());
+    assertEquals(BasicPathTestCase.TOTAL_C1, path.generalizedCostWaitTimeOptimized());
     assertEquals(66_00, path.transferPriorityCost());
 
     // And toString is the same (transfer priority cost added)

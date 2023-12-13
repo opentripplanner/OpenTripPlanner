@@ -17,7 +17,7 @@ class Transfer extends AbstractStopArrival {
     RaptorTransfer transfer,
     ArrivalView<TestTripSchedule> previous
   ) {
-    super(round, transfer.stop(), arrivalTime, transfer.generalizedCost(), previous);
+    super(round, transfer.stop(), arrivalTime, transfer.c1(), previous.c2(), previous);
     this.transfer = transfer;
   }
 

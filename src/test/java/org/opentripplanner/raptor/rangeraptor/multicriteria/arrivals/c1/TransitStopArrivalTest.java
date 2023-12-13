@@ -23,7 +23,7 @@ class TransitStopArrivalTest {
     ACCESS_TO_STOP,
     ACCESS_DURATION
   );
-  private static final int ACCESS_COST = ACCESS_WALK.generalizedCost();
+  private static final int ACCESS_C1 = ACCESS_WALK.c1();
   private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
     ACCESS_DEPARTURE_TIME,
     ACCESS_WALK
@@ -38,13 +38,13 @@ class TransitStopArrivalTest {
     .build();
   private static final int TRANSIT_TRAVEL_DURATION =
     ACCESS_DURATION + BOARD_SLACK + TRANSIT_LEG_DURATION;
-  private static final int TRANSIT_COST = 128000;
+  private static final int TRANSIT_C1 = 128000;
   private static final int ROUND = 1;
   private final TransitStopArrival<RaptorTripSchedule> subject = new TransitStopArrival<>(
     ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
     TRANSIT_TO_STOP,
     TRANSIT_ALIGHT_TIME,
-    ACCESS_ARRIVAL.c1() + TRANSIT_COST,
+    ACCESS_ARRIVAL.c1() + TRANSIT_C1,
     TRANSIT_TRIP
   );
 
@@ -76,7 +76,7 @@ class TransitStopArrivalTest {
 
   @Test
   public void c1() {
-    assertEquals(ACCESS_COST + TRANSIT_COST, subject.c1());
+    assertEquals(ACCESS_C1 + TRANSIT_C1, subject.c1());
   }
 
   @Test
