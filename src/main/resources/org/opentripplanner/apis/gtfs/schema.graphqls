@@ -2737,7 +2737,7 @@ enum PlanTransferMode {
     WALK
 }
 
-"""Realtime vehicle position"""
+"""Real-time vehicle position"""
 type VehiclePosition {
     """Feed-scoped ID that uniquely identifies the vehicle in the format FeedId:VehicleId"""
     vehicleId: String,
@@ -2855,7 +2855,7 @@ type Pattern implements Node {
     ): [Alert]
 
     """
-    Realtime-updated position of vehicles that are serving this pattern.
+    Real-time updated position of vehicles that are serving this pattern.
     """
     vehiclePositions: [VehiclePosition!]
 
@@ -3110,7 +3110,7 @@ type Place {
 
     The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
     between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
-    However, it should be noted that realtime updates can change the values, so don't store it for
+    However, it should be noted that real-time updates can change the values, so don't store it for
     longer amounts of time.
 
     Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
@@ -3219,7 +3219,7 @@ type Plan {
     This is the suggested search time for the "previous page" or time window. Insert it together
     with the searchWindowUsed in the request to get a new set of trips preceding in the
     search-window BEFORE the current search. No duplicate trips should be returned, unless a trip
-    is delayed and new realtime-data is available.
+    is delayed and new real-time data is available.
     """
     prevDateTime: Long @deprecated(reason: "Use previousPageCursor instead")
 
@@ -3227,7 +3227,7 @@ type Plan {
     This is the suggested search time for the "next page" or time window. Insert it together
     with the searchWindowUsed in the request to get a new set of trips following in the
     search-window AFTER the current search. No duplicate trips should be returned, unless a trip
-    is delayed and new realtime-data is available.
+    is delayed and new real-time data is available.
     """
     nextDateTime: Long @deprecated(reason: "Use nextPageCursor instead")
 
@@ -4011,7 +4011,7 @@ type QueryType {
         omitCanceled: Boolean = true
 
         """
-        When true, realtime updates are ignored during this search. Default value: false
+        When true, real-time updates are ignored during this search. Default value: false
         """
         ignoreRealtimeUpdates: Boolean
 
@@ -4319,9 +4319,9 @@ input ScooterRentalPreferencesInput {
     bannedNetworks: [String!]
 
     """
-    It realtime availability of vehicles and spaces checked during routing.
+    Should real-time availability of vehicles and spaces checked during routing.
     """
-    useRealtimeAvailability: Boolean
+    includeRealTimeAvailability: Boolean
 }
 
 """
@@ -4345,9 +4345,9 @@ input CarRentalPreferencesInput {
     bannedNetworks: [String!]
 
     """
-    It realtime availability of vehicles and spaces checked during routing.
+    Should real-time availability of vehicles and spaces checked during routing.
     """
-    useRealtimeAvailability: Boolean
+    includeRealTimeAvailability: Boolean
 }
 
 """
@@ -4371,9 +4371,9 @@ input BicycleRentalPreferencesInput {
     bannedNetworks: [String!]
 
     """
-    It realtime availability of vehicles and spaces checked during routing.
+    Should real-time availability of vehicles and spaces checked during routing.
     """
-    useRealtimeAvailability: Boolean
+    includeRealTimeAvailability: Boolean
 }
 
 """
@@ -4992,7 +4992,7 @@ type Stoptime {
 
     The purpose of this field is to identify the stop within the pattern so it can be cross-referenced
     between it and the itinerary. It is safe to cross-reference when done quickly, i.e. within seconds.
-    However, it should be noted that realtime updates can change the values, so don't store it for
+    However, it should be noted that real-time updates can change the values, so don't store it for
     longer amounts of time.
 
     Depending on the source data, this might not be the GTFS `stop_sequence` but another value, perhaps
@@ -5006,7 +5006,7 @@ type Stoptime {
     scheduledArrival: Int
 
     """
-    Realtime prediction of arrival time. Format: seconds since midnight of the departure date
+    Real-time prediction of arrival time. Format: seconds since midnight of the departure date
     """
     realtimeArrival: Int
 
@@ -5022,7 +5022,7 @@ type Stoptime {
     scheduledDeparture: Int
 
     """
-    Realtime prediction of departure time. Format: seconds since midnight of the departure date
+    Real-time prediction of departure time. Format: seconds since midnight of the departure date
     """
     realtimeDeparture: Int
 
@@ -5109,12 +5109,12 @@ type TicketType implements Node {
 
 input TimetablePreferencesInput {
     """
-    When false, realtime updates are considered during the routing.
+    When false, real-time updates are considered during the routing.
     In practice, when this option is set as true, some of the suggestions might not be
     realistic as the transfers could be invalid due to delays,
     trips can be cancelled or stops can be skipped.
     """
-    excludeRealtimeUpdates: Boolean = false
+    excludeRealTimeUpdates: Boolean = false
 
     """
     When true, departures that have been cancelled ahead of time will be
@@ -5126,13 +5126,13 @@ input TimetablePreferencesInput {
     includePlannedCancellations: Boolean = false
 
     """
-    When true, departures that have been cancelled through a realtime feed will be
+    When true, departures that have been cancelled through a real-time feed will be
     included during the routing. This means that an itinerary can include
     a cancelled departure while some other alternative that contains no cancellations
     could be filtered out as the alternative containing a cancellation would normally
-    be better. This option can't be set to true while `includeRealtimeUpdates` is false.
+    be better. This option can't be set to true while `includeRealTimeUpdates` is false.
     """
-    includeRealtimeCancellations: Boolean = false
+    includeRealTimeCancellations: Boolean = false
 }
 
 """
@@ -5216,7 +5216,7 @@ input TransitPreferencesInput {
     transfer: TransferPreferencesInput
 
     """
-    Preferences related to cancellations and realtime.
+    Preferences related to cancellations and real-time.
     """
     timetable: TimetablePreferencesInput
 }
@@ -5341,7 +5341,7 @@ type Trip implements Node {
     ): [Alert]
 
     """
-    The latest realtime occupancy information for the latest occurance of this
+    The latest real-time occupancy information for the latest occurance of this
     trip.
     """
     occupancy: TripOccupancy
