@@ -39,6 +39,12 @@ jobs:
           distribution: temurin
           cache: maven
 
+      - name: Build debug client
+        working-directory: ./client-next
+        run: |
+          npm install
+          npm run build
+
       - name: Prepare coverage agent, build and test
         # these are split into two steps because otherwise maven keeps long-running HTTP connections
         # to Maven Central open which then hang during the package phase because the Azure (Github Actions)
@@ -208,6 +214,14 @@ jobs:
           java-version: 21
           distribution: temurin
           cache: maven
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Build debug client
+        working-directory: ./client-next
+        run: |
+          npm install
+          npm run build
       - name: Build container image with Jib, push to Dockerhub
         env:
           CONTAINER_REPO: docker.io/opentripplanner/opentripplanner
