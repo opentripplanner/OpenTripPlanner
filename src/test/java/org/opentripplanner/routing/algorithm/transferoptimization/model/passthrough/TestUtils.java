@@ -82,6 +82,6 @@ class TestUtils implements RaptorTestConstants {
    * Remove stuff we do not care about, like the priority cost and times.
    */
   static String pathFocus(String resultString) {
-    return resultString.replaceAll(" Tₚ\\d+]", "]").replaceAll(" \\d{2}:\\d{2}", "");
+    return resultString.replaceAll(" Tₚ[\\d_]+]", "]").replaceAll(" \\d{2}:\\d{2}", "");
   }
 }

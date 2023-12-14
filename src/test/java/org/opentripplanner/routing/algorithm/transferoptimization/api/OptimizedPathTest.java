@@ -23,13 +23,13 @@ class OptimizedPathTest implements RaptorTestConstants {
 
     // And toString is the same (transfer priority cost added)
     assertEquals(
-      BasicPathTestCase.BASIC_PATH_AS_STRING.replace("]", " Tₚ6600]"),
+      BasicPathTestCase.BASIC_PATH_AS_STRING.replace("]", " Tₚ6_600]"),
       path.toString(this::stopIndexToName)
     );
 
     // Verify details
     assertEquals(
-      BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING.replace("]", " Tₚ6600]"),
+      BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING.replace("]", " Tₚ6_600]"),
       path.toStringDetailed(this::stopIndexToName)
     );
 
@@ -66,7 +66,7 @@ class OptimizedPathTest implements RaptorTestConstants {
     assertEquals(transferPriorityCost, path.transferPriorityCost());
 
     var exp = BasicPathTestCase.BASIC_PATH_AS_STRING.replace(
-      "C₁8154 C₂7]",
+      "C₁8_154 C₂7]",
       RaptorValueFormatter.formatC1(generalizedCost) +
       " " +
       RaptorValueFormatter.formatC2(c2) +

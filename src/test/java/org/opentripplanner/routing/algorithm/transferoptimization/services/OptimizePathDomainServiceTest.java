@@ -130,7 +130,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     // Insert wait-time cost summary info
     var expected = original
       .toStringDetailed(this::stopIndexToName)
-      .replace("C₁2770]", "C₁2770 Tₚ3300 wtC₁3_103.81]");
+      .replace("C₁2_770]", "C₁2_770 Tₚ3_300 wtC₁3_103.81]");
 
     assertEquals(expected, PathUtils.pathsToStringDetailed(result));
   }
@@ -193,7 +193,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
 
     assertEquals(
       "A ~ BUS T1 10:02 10:10 ~ B ~ BUS T2 10:12 10:35 ~ F ~ BUS T3 10:37 10:49 ~ G " +
-      "[10:01:20 10:49:20 48m Tₓ2 C₁2950 Tₚ6600]",
+      "[10:01:20 10:49:20 48m Tₓ2 C₁2_950 Tₚ6_600]",
       PathUtils.pathsToString(result)
     );
 
@@ -210,7 +210,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
       "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 30s ~ C " +
       "~ BUS T2 10:15 10:35 ~ F " +
       "~ BUS T3 10:37 10:49 ~ G " +
-      "[10:01:20 10:49:20 48m Tₓ2 C₁2980 Tₚ6600 wtC₁3_294.05]",
+      "[10:01:20 10:49:20 48m Tₓ2 C₁2_980 Tₚ6_600 wtC₁3_294.05]",
       PathUtils.pathsToString(result)
     );
   }
@@ -263,7 +263,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var it = result.iterator().next();
 
     assertEquals(
-      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:01:20 10:30:20 29m Tₓ1 C₁1750 Tₚ2300]",
+      "A ~ BUS T1 10:02 10:15 ~ C ~ BUS T2 10:17 10:30 ~ D [10:01:20 10:30:20 29m Tₓ1 C₁1_750 Tₚ2_300]",
       it.toString(this::stopIndexToName)
     );
     // Verify the attached Transfer is exist and is valid
@@ -323,7 +323,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var result = subject.findBestTransitPath(original);
 
     assertEquals(
-      "A ~ BUS T1 10:10 10:10 ~ B ~ BUS T2 10:13 10:30 ~ D [10:09:20 10:30:20 21m Tₓ1 C₁1300 Tₚ3300]",
+      "A ~ BUS T1 10:10 10:10 ~ B ~ BUS T2 10:13 10:30 ~ D [10:09:20 10:30:20 21m Tₓ1 C₁1_300 Tₚ3_300]",
       PathUtils.pathsToString(result)
     );
   }

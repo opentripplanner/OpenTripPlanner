@@ -80,7 +80,7 @@ public class B04_AccessEgressBoardingTest implements RaptorTestConstants {
 
   static List<RaptorModuleTestCase> testCases() {
     var expected =
-      "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s Tₓ0 C₁1840]";
+      "Walk 10s ~ B ~ BUS R1 0:14 0:34 ~ E ~ Walk 10s [0:13:50 0:34:10 20m20s Tₓ0 C₁1_840]";
 
     return RaptorModuleTestCase
       .of()

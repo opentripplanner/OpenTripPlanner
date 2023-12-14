@@ -57,13 +57,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
 public class F12_EgressWithRidesMultipleOptimalPathsTest implements RaptorTestConstants {
 
   private static final String EXPECTED_PATH_FLEX_7M =
-    "A ~ BUS R2 0:05 0:16 ~ B ~ Walk 2m ~ C ~ Flex 7m 1x [0:05 0:26 21m Tₓ1 C₁2160]";
+    "A ~ BUS R2 0:05 0:16 ~ B ~ Walk 2m ~ C ~ Flex 7m 1x [0:05 0:26 21m Tₓ1 C₁2_160]";
 
   private static final String EXPECTED_PATH_WALK_5M =
-    "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 5m [0:04 0:25 21m Tₓ0 C₁2160]";
+    "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 5m [0:04 0:25 21m Tₓ0 C₁2_160]";
 
   private static final String EXPECTED_PATH_WALK_7M =
-    "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 7m [0:04 0:27 23m Tₓ0 C₁2400]";
+    "A ~ BUS R1 0:04 0:20 ~ C ~ Walk 7m [0:04 0:27 23m Tₓ0 C₁2_400]";
 
   private static final int C1_10m = RaptorCostConverter.toRaptorCost(D10m);
 

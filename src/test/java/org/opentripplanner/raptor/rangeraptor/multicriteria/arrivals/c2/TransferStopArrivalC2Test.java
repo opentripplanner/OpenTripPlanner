@@ -112,7 +112,7 @@ class TransferStopArrivalC2Test {
   @Test
   public void testToString() {
     assertEquals(
-      "Walk { round: 1, stop: 102, arrival: [9:26 C₁2600 C₂6], path: On-Street 6m ~ 102 }",
+      "Walk { round: 1, stop: 102, arrival: [9:26 C₁2_600 C₂6], path: On-Street 6m ~ 102 }",
       subject.toString()
     );
   }

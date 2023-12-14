@@ -70,9 +70,9 @@ public class B02_EgressTest implements RaptorTestConstants {
       .add(TC_STANDARD_REV_ONE, expStdRevOne)
       .add(
         multiCriteria(),
-        "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s Tₓ0 C₁2080]",
-        "Walk 20s ~ B ~ BUS R1 0:10 0:24 ~ F ~ Walk 4m [0:09:40 0:28 18m20s Tₓ0 C₁1960]",
-        "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s Tₓ0 C₁1722]"
+        "Walk 20s ~ B ~ BUS R1 0:10 0:20 ~ E ~ Walk 7m [0:09:40 0:27 17m20s Tₓ0 C₁2_080]",
+        "Walk 20s ~ B ~ BUS R1 0:10 0:24 ~ F ~ Walk 4m [0:09:40 0:28 18m20s Tₓ0 C₁1_960]",
+        "Walk 20s ~ B ~ BUS R1 0:10 0:28 ~ G ~ Walk 1s [0:09:40 0:28:01 18m21s Tₓ0 C₁1_722]"
       )
       .build();
   }

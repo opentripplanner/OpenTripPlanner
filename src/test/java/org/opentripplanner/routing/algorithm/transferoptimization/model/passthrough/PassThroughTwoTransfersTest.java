@@ -228,7 +228,7 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
     assertEquals(
       expectedPath.toString(this::stopIndexToName),
       // Remove transferPriority cost
-      PathUtils.pathsToString(result).replace(" Tₚ6600", "")
+      PathUtils.pathsToString(result).replace(" Tₚ6_600", "")
     );
   }
 }

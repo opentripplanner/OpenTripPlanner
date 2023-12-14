@@ -66,16 +66,16 @@ public class BasicPathTestCase implements RaptorTestConstants {
   public static final String BASIC_PATH_AS_DETAILED_STRING =
     "Walk 3m 10:00:15 10:03:15 C₁360 " +
     "~ A 45s ~ " +
-    "BUS L11 10:04 10:35 31m C₁1998 " +
+    "BUS L11 10:04 10:35 31m C₁1_998 " +
     "~ B 15s ~ " +
     "Walk 3m45s 10:35:15 10:39 C₁450 " +
     "~ C 21m ~ " +
-    "BUS L21 11:00 11:23 23m C₁2640 " +
+    "BUS L21 11:00 11:23 23m C₁2_640 " +
     "~ D 17m ~ " +
-    "BUS L31 11:40 11:52 12m C₁1776 " +
+    "BUS L31 11:40 11:52 12m C₁1_776 " +
     "~ E 15s ~ " +
     "Walk 7m45s 11:52:15 12:00 C₁930 " +
-    "[10:00:15 12:00 1h59m45s Tₓ2 C₁8154 C₂7]";
+    "[10:00:15 12:00 1h59m45s Tₓ2 C₁8_154 C₂7]";
 
   public static final String BASIC_PATH_AS_STRING =
     "Walk 3m ~ A" +
@@ -84,7 +84,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
     " ~ BUS L21 11:00 11:23 ~ D" +
     " ~ BUS L31 11:40 11:52 ~ E" +
     " ~ Walk 7m45s " +
-    "[10:00:15 12:00 1h59m45s Tₓ2 C₁8154 C₂7]";
+    "[10:00:15 12:00 1h59m45s Tₓ2 C₁8_154 C₂7]";
 
   private static final int BOARD_C1_SEC = 60;
   private static final int TRANSFER_C1_SEC = 120;

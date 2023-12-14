@@ -57,7 +57,7 @@ public class F05_OnBoardAccessEgressAndTransfersTest implements RaptorTestConsta
 
   static List<RaptorModuleTestCase> testCases() {
     var path =
-      "Flex 5m 1x ~ A ~ Walk 10s ~ B ~ BUS R1 0:10 0:20 ~ C ~ Walk 10s ~ D ~ Flex 5m 1x [0:03:50 0:26:10 22m20s Tₓ2 C₁2560]";
+      "Flex 5m 1x ~ A ~ Walk 10s ~ B ~ BUS R1 0:10 0:20 ~ C ~ Walk 10s ~ D ~ Flex 5m 1x [0:03:50 0:26:10 22m20s Tₓ2 C₁2_560]";
 
     return RaptorModuleTestCase
       .of()

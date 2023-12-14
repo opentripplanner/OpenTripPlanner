@@ -84,7 +84,7 @@ public class DestinationArrivalTest {
   @Test
   public void testToString() {
     assertEquals(
-      "Egress { round: 1, from-stop: 101, arrival: [8:14:50 C₁1484 C₂5], path: Walk 50s C₁100 ~ 101 }",
+      "Egress { round: 1, from-stop: 101, arrival: [8:14:50 C₁1_484 C₂5], path: Walk 50s C₁100 ~ 101 }",
       subject.toString()
     );
   }

@@ -71,10 +71,10 @@ public class F02_EgressWithRidesTest implements RaptorTestConstants {
 
   static List<RaptorModuleTestCase> testCases() {
     var prefix = "Walk 1m ~ B ~ BUS R1 0:10 ";
-    var bestArrivalTime = prefix + "0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m Tₓ2 C₁1380]";
-    var bestNTransfers = prefix + "0:18 ~ F ~ Walk 10m [0:09 0:28 19m Tₓ0 C₁2400]";
-    var bestCost = prefix + "0:16 ~ E ~ Flex+Walk 1m59s 2x [0:09 0:18:59 9m59s Tₓ2 C₁1378]";
-    var bestTxAndTime = prefix + "0:12 ~ C ~ Flex+Walk 7m 1x [0:09 0:20 11m Tₓ1 C₁1740]";
+    var bestArrivalTime = prefix + "0:14 ~ D ~ Flex 3m 2x [0:09 0:18 9m Tₓ2 C₁1_380]";
+    var bestNTransfers = prefix + "0:18 ~ F ~ Walk 10m [0:09 0:28 19m Tₓ0 C₁2_400]";
+    var bestCost = prefix + "0:16 ~ E ~ Flex+Walk 1m59s 2x [0:09 0:18:59 9m59s Tₓ2 C₁1_378]";
+    var bestTxAndTime = prefix + "0:12 ~ C ~ Flex+Walk 7m 1x [0:09 0:20 11m Tₓ1 C₁1_740]";
 
     return RaptorModuleTestCase
       .of()

@@ -80,7 +80,7 @@ class AccessStopArrivalTest {
   @Test
   public void testToString() {
     assertEquals(
-      "Access { stop: 100, arrival: [8:10 C₁1200], path: Walk 10m C₁1200 ~ 100 }",
+      "Access { stop: 100, arrival: [8:10 C₁1_200], path: Walk 10m C₁1_200 ~ 100 }",
       subject.toString()
     );
   }

@@ -116,7 +116,7 @@ public class A04_BoardingTest implements RaptorTestConstants {
         "~ BUS L1_2 0:14 0:18 ~ C " +
         "~ BUS L2 0:21 0:31 ~ F " +
         "~ BUS L3_2 0:35 0:40 ~ H " +
-        "~ Walk 1m [0:13 0:41 28m Tₓ2 C₁3600]"
+        "~ Walk 1m [0:13 0:41 28m Tₓ2 C₁3_600]"
       )
       .build();
   }

@@ -110,7 +110,7 @@ class J01_PassThroughTest {
 
     // Verify that only the journey with pass-through stop point is included in response
     assertEquals(
-      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m Tₓ0 C₁3600 C₂1]",
+      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m Tₓ0 C₁3_600 C₂1]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
@@ -144,7 +144,7 @@ class J01_PassThroughTest {
 
     // Verify that only the journey with pass-through stop point is included in response
     assertEquals(
-      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m Tₓ0 C₁3600 C₂1]",
+      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m Tₓ0 C₁3_600 C₂1]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
@@ -175,7 +175,7 @@ class J01_PassThroughTest {
 
     // Verify that only the journey with pass-through stop point is included in response
     assertEquals(
-      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m Tₓ0 C₁3600 C₂1]",
+      "Walk 30s ~ A ~ BUS R2 0:02 0:50 ~ D ~ Walk 30s [0:01:30 0:50:30 49m Tₓ0 C₁3_600 C₂1]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
@@ -208,7 +208,7 @@ class J01_PassThroughTest {
     // Verify that Raptor generated journey with a transfer to r2 so that both pass-through points
     //  are included
     assertEquals(
-      "Walk 30s ~ A ~ BUS R1 0:02 0:10 ~ C ~ BUS R2 0:15 0:50 ~ F ~ Walk 30s [0:01:30 0:50:30 49m Tₓ1 C₁4300 C₂2]",
+      "Walk 30s ~ A ~ BUS R1 0:02 0:10 ~ C ~ BUS R2 0:15 0:50 ~ F ~ Walk 30s [0:01:30 0:50:30 49m Tₓ1 C₁4_300 C₂2]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
@@ -237,7 +237,7 @@ class J01_PassThroughTest {
 
     // Verify that only route with correct pass-through order is returned
     assertEquals(
-      "Walk 30s ~ A ~ BUS R1 0:05 0:20 ~ D ~ Walk 30s [0:04:30 0:20:30 16m Tₓ0 C₁1620 C₂2]",
+      "Walk 30s ~ A ~ BUS R1 0:05 0:20 ~ D ~ Walk 30s [0:04:30 0:20:30 16m Tₓ0 C₁1_620 C₂2]",
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
   }
@@ -270,8 +270,8 @@ class J01_PassThroughTest {
     // Verify that both routes are included as a valid result
     assertEquals(
       """
-      Walk 2m ~ B ~ BUS R2 0:05 0:14 ~ E ~ Walk 30s [0:03 0:14:30 11m30s Tₓ0 C₁1440 C₂1]
-      Walk 30s ~ A ~ BUS R1 0:04 0:15 ~ E ~ Walk 30s [0:03:30 0:15:30 12m Tₓ0 C₁1380 C₂1]
+      Walk 2m ~ B ~ BUS R2 0:05 0:14 ~ E ~ Walk 30s [0:03 0:14:30 11m30s Tₓ0 C₁1_440 C₂1]
+      Walk 30s ~ A ~ BUS R1 0:04 0:15 ~ E ~ Walk 30s [0:03:30 0:15:30 12m Tₓ0 C₁1_380 C₂1]
       """.trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );

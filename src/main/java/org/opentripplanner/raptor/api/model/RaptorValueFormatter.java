@@ -16,6 +16,7 @@ public class RaptorValueFormatter {
   static {
     DECIMAL_SYMBOLS.setDecimalSeparator('.');
     DECIMAL_SYMBOLS.setGroupingSeparator('_');
+    DECIMAL_SYMBOLS.setMinusSign('-');
   }
 
   // In general DecimalFormat is not thread-safe, but we are not changing the state here,
@@ -36,18 +37,18 @@ public class RaptorValueFormatter {
   }
 
   public static String formatNumOfTransfers(int value) {
-    return UNIT_TRANSFERS + value;
+    return UNIT_TRANSFERS + FORMAT_INT.format(value);
   }
 
   public static String formatTransferPriority(int value) {
-    return UNIT_TRANSFER_PRIORITY + value;
+    return UNIT_TRANSFER_PRIORITY + FORMAT_INT.format(value);
   }
 
   /** Used to format integer in centi units like 1234 => 12.34.  */
   private static String formatCenti(int value) {
     if (value % 100 == 0) {
       value /= 100;
-      return value >= 10_000 ? FORMAT_INT.format(value) : Integer.toString(value);
+      return FORMAT_INT.format(value);
     }
     if (Math.abs(value) >= 1_000_000) {
       return FORMAT_INT.format(value / 100);

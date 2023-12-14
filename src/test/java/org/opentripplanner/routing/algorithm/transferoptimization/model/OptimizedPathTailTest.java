@@ -84,7 +84,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
       "~ BUS L21 11:00 11:23 ~ D " +
       "~ BUS L31 11:40 11:52 ~ E " +
       "~ Walk 7m45s " +
-      "[C₁7989 Tₚ4600 wtC₁−93_137]";
+      "[C₁7_989 Tₚ4_600 wtC₁-93_137]";
 
     assertEquals(exp, subject.toString());
   }
@@ -99,7 +99,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
       "~ BUS L11 10:04 10:35 ~ B " +
       "~ Walk 3m45s ~ E " +
       "~ Flex 7m45s 1x " +
-      "[C₁3906 wtC₁3966]";
+      "[C₁3_906 wtC₁3_966]";
 
     assertEquals(exp, subject.toString());
   }
@@ -141,12 +141,12 @@ class OptimizedPathTailTest implements RaptorTestConstants {
     // We have replaced the first transfer with a 2 minute walk
     var expPath =
       "Walk 3m 10:00:15 10:03:15 C₁360 ~ A 45s " +
-      "~ BUS L11 10:04 10:35 31m C₁1998 ~ B 15s " +
+      "~ BUS L11 10:04 10:35 31m C₁1_998 ~ B 15s " +
       "~ Walk 2m 10:35:15 10:37:15 C₁240 ~ C 22m45s " +
-      "~ BUS L21 11:00 11:23 23m C₁2724 ~ D 17m {staySeated} " +
-      "~ BUS L31 11:40 11:52 12m C₁1737 ~ E 15s " +
+      "~ BUS L21 11:00 11:23 23m C₁2_724 ~ D 17m {staySeated} " +
+      "~ BUS L31 11:40 11:52 12m C₁1_737 ~ E 15s " +
       "~ Walk 7m45s 11:52:15 12:00 C₁930 " +
-      "[10:00:15 12:00 1h59m45s Tₓ1 C₁7989 Tₚ4600 wtC₁−93_137]";
+      "[10:00:15 12:00 1h59m45s Tₓ1 C₁7_989 Tₚ4_600 wtC₁-93_137]";
 
     assertEquals(expPath, path.toStringDetailed(this::stopIndexToName));
   }

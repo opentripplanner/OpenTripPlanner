@@ -68,7 +68,7 @@ public class C03_OnBoardArrivalDominateTransfersTest implements RaptorTestConsta
       "BUS R1 0:05 0:08 ~ B ~ " +
       "BUS R2 0:12 0:15 ~ C ~ " +
       "Walk 1m " +
-      "[0:04 0:16 12m Tₓ1 C₁2040]";
+      "[0:04 0:16 12m Tₓ1 C₁2_040]";
 
     return RaptorModuleTestCase
       .of()

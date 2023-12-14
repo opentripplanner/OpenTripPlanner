@@ -91,10 +91,10 @@ public class F01_AccessWithRidesTest implements RaptorTestConstants {
       .add(TC_STANDARD_ONE, expWalkAccess)
       .add(
         multiCriteria(),
-        "Flex 3m 2x ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m Tₓ2 C₁1500]", // ldt
-        "Flex+Walk 2m 2x ~ C ~ BUS R1 0:12 0:20 ~ F ~ Walk 1m [0:09 0:21 12m Tₓ2 C₁1499]", // cost
-        "Flex+Walk 7m 1x ~ E ~ BUS R1 0:16 0:20 ~ F ~ Walk 1m [0:08 0:21 13m Tₓ1 C₁1500]", // tx+time
-        "Walk 10m ~ B ~ BUS R1 0:10 0:20 ~ F ~ Walk 1m [0:00 0:21 21m Tₓ0 C₁1500]" // tx
+        "Flex 3m 2x ~ D ~ BUS R1 0:14 0:20 ~ F ~ Walk 1m [0:10 0:21 11m Tₓ2 C₁1_500]", // ldt
+        "Flex+Walk 2m 2x ~ C ~ BUS R1 0:12 0:20 ~ F ~ Walk 1m [0:09 0:21 12m Tₓ2 C₁1_499]", // cost
+        "Flex+Walk 7m 1x ~ E ~ BUS R1 0:16 0:20 ~ F ~ Walk 1m [0:08 0:21 13m Tₓ1 C₁1_500]", // tx+time
+        "Walk 10m ~ B ~ BUS R1 0:10 0:20 ~ F ~ Walk 1m [0:00 0:21 21m Tₓ0 C₁1_500]" // tx
       )
       .build();
   }

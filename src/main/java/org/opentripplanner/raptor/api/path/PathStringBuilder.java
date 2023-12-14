@@ -139,9 +139,9 @@ public class PathStringBuilder {
     summaryStart()
       .time(startTime, endTime)
       .duration(Math.abs(endTime - startTime))
-      .numberOfTransfers(nTransfers);
-    c1(c1);
-    c2(c2);
+      .numberOfTransfers(nTransfers)
+      .c1(c1)
+      .c2(c2);
 
     if (appendToSummary != null) {
       appendToSummary.accept(this);

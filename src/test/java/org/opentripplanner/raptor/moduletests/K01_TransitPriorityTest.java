@@ -109,8 +109,8 @@ public class K01_TransitPriorityTest {
     // We expect L1 & L2 but not L3, since the cost of L3 is > $90.00.
     assertEquals(
       """
-      Walk 1s ~ B ~ BUS L1 0:02 0:12 ~ C ~ Walk 1s [0:01:59 0:12:01 10m2s Tₓ0 C₁1204 C₂1]
-      Walk 1s ~ B ~ BUS L2 0:02 0:13 ~ C ~ Walk 1s [0:01:59 0:13:01 11m2s Tₓ0 C₁1264 C₂2]
+      Walk 1s ~ B ~ BUS L1 0:02 0:12 ~ C ~ Walk 1s [0:01:59 0:12:01 10m2s Tₓ0 C₁1_204 C₂1]
+      Walk 1s ~ B ~ BUS L2 0:02 0:13 ~ C ~ Walk 1s [0:01:59 0:13:01 11m2s Tₓ0 C₁1_264 C₂2]
       """.trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
