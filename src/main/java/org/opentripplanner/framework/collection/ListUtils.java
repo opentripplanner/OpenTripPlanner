@@ -11,6 +11,22 @@ import java.util.function.Function;
 public class ListUtils {
 
   /**
+   * Return the first element in the list. {@code null} is returned if the list is
+   * null or empty.
+   */
+  public static <T> T first(List<T> list) {
+    return list == null || list.isEmpty() ? null : list.getFirst();
+  }
+
+  /**
+   * Return the last element in the list. {@code null} is returned if the list is
+   * null or empty.
+   */
+  public static <T> T last(List<T> list) {
+    return list == null || list.isEmpty() ? null : list.getLast();
+  }
+
+  /**
    * Combine a number of collections into a single list.
    */
   @SafeVarargs

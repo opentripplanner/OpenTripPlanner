@@ -1,9 +1,11 @@
-package org.opentripplanner.model.plan.pagecursor;
+package org.opentripplanner.model.plan.paging.cursor;
 
 import java.time.Duration;
 import java.time.Instant;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 
 /**
@@ -16,39 +18,17 @@ import org.opentripplanner.model.plan.SortOrder;
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE
  */
-public class PageCursor {
-
-  public final PageType type;
-  public final SortOrder originalSortOrder;
-  public final Instant earliestDepartureTime;
-  public final Instant latestArrivalTime;
-  public final Duration searchWindow;
-
-  public ItineraryPageCut itineraryPageCut;
-
-  PageCursor(
-    PageType type,
-    SortOrder originalSortOrder,
-    Instant earliestDepartureTime,
-    Instant latestArrivalTime,
-    Duration searchWindow
-  ) {
-    this.type = type;
-    this.searchWindow = searchWindow;
-    this.earliestDepartureTime = earliestDepartureTime;
-    this.latestArrivalTime = latestArrivalTime;
-    this.originalSortOrder = originalSortOrder;
-  }
-
-  public PageCursor withItineraryPageCut(ItineraryPageCut itineraryPageCut) {
-    this.itineraryPageCut = itineraryPageCut;
-    return this;
-  }
-
+public record PageCursor(
+  PageType type,
+  SortOrder originalSortOrder,
+  Instant earliestDepartureTime,
+  Instant latestArrivalTime,
+  Duration searchWindow,
+  @Nullable ItinerarySortKey itineraryPageCut
+) {
   public boolean containsItineraryPageCut() {
     return itineraryPageCut != null;
   }
-
   @Nullable
   public String encode() {
     return PageCursorSerializer.encode(this);
@@ -57,6 +37,27 @@ public class PageCursor {
   @Nullable
   public static PageCursor decode(String cursor) {
     return PageCursorSerializer.decode(cursor);
+  }
+
+  /**
+   * When paging we must crop the list of itineraries in the right end according to the sorting of
+   * the original search and according to the paging direction(next or previous).
+   */
+  public ListSection cropItinerariesAt() {
+    // Depart after search
+    if (originalSortOrder().isSortedByAscendingArrivalTime()) {
+      return switch (type) {
+        case NEXT_PAGE -> ListSection.TAIL;
+        case PREVIOUS_PAGE -> ListSection.HEAD;
+      };
+    }
+    // Arrive by search
+    else {
+      return switch (type) {
+        case NEXT_PAGE -> ListSection.HEAD;
+        case PREVIOUS_PAGE -> ListSection.TAIL;
+      };
+    }
   }
 
   @Override
@@ -68,7 +69,8 @@ public class PageCursor {
       .addDateTime("edt", earliestDepartureTime)
       .addDateTime("lat", latestArrivalTime)
       .addDuration("searchWindow", searchWindow)
-      .addObj("itineraryPageCut", itineraryPageCut)
+      // This will only include the sort vector, not everything else in the itinerary
+      .addObjOp("itineraryPageCut", itineraryPageCut, ItinerarySortKey::keyAsString)
       .toString();
   }
 }

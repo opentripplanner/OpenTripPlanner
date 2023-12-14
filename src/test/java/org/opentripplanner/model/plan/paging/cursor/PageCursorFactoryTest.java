@@ -1,17 +1,18 @@
-package org.opentripplanner.model.plan.pagecursor;
+package org.opentripplanner.model.plan.paging.cursor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_ARRIVAL_TIME;
 import static org.opentripplanner.model.plan.SortOrder.STREET_AND_DEPARTURE_TIME;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
-import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
+import static org.opentripplanner.model.plan.paging.cursor.PageType.NEXT_PAGE;
+import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAGE;
 
 import java.time.Duration;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
 @SuppressWarnings("ConstantConditions")
@@ -49,8 +50,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withRemovedItineraries(
         new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_10), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
-          PagingDeduplicationSection.HEAD
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build()
         )
       );
 
@@ -58,7 +58,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assertPageCursor(nextPage, T12_30, null, D90M, NEXT_PAGE, true);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T10_30, T12_10, D90M, PREVIOUS_PAGE, true);
+    assertPageCursor(prevPage, T10_30, null, D90M, PREVIOUS_PAGE, true);
   }
 
   @Test
@@ -80,8 +80,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withRemovedItineraries(
         new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_10), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build(),
-          PagingDeduplicationSection.TAIL
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_30), B).build()
         )
       );
 
@@ -89,7 +88,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, true);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T11_01, T13_30, D90M, PREVIOUS_PAGE, true);
+    assertPageCursor(prevPage, T11_01, null, D90M, PREVIOUS_PAGE, true);
   }
 
   @Test
@@ -111,8 +110,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withRemovedItineraries(
         new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_30), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
-          PagingDeduplicationSection.HEAD
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build()
         )
       );
 
@@ -120,7 +118,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
     assertPageCursor(nextPage, T13_00, null, D90M, NEXT_PAGE, true);
 
     var prevPage = factory.previousPageCursor();
-    assertPageCursor(prevPage, T11_01, T13_00, D90M, PREVIOUS_PAGE, true);
+    assertPageCursor(prevPage, T11_01, T13_30, D90M, PREVIOUS_PAGE, true);
   }
 
   @Test
@@ -142,8 +140,7 @@ class PageCursorFactoryTest implements PlanTestConstants {
       .withRemovedItineraries(
         new TestPageCursorInput(
           newItinerary(A).bus(55, timeAsSeconds(T12_00), timeAsSeconds(T12_30), B).build(),
-          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build(),
-          PagingDeduplicationSection.TAIL
+          newItinerary(A).bus(65, timeAsSeconds(T12_30), timeAsSeconds(T13_00), B).build()
         )
       );
 
@@ -170,11 +167,11 @@ class PageCursorFactoryTest implements PlanTestConstants {
     PageType expPageType,
     Boolean hasDedupeParams
   ) {
-    assertEquals(expEdt, pageCursor.earliestDepartureTime);
-    assertEquals(expLat, pageCursor.latestArrivalTime);
-    assertEquals(expSearchWindow, pageCursor.searchWindow);
-    assertEquals(expPageType, pageCursor.type);
-    assertEquals(hasDedupeParams, pageCursor.itineraryPageCut != null);
+    assertEquals(expEdt, pageCursor.earliestDepartureTime());
+    assertEquals(expLat, pageCursor.latestArrivalTime());
+    assertEquals(expSearchWindow, pageCursor.searchWindow());
+    assertEquals(expPageType, pageCursor.type());
+    assertEquals(hasDedupeParams, pageCursor.itineraryPageCut() != null);
   }
 
   private record TestPageCursorInput(
@@ -182,30 +179,16 @@ class PageCursorFactoryTest implements PlanTestConstants {
     Instant earliestRemovedDeparture,
     Instant latestRemovedDeparture,
     Instant latestRemovedArrival,
-    Instant firstRemovedArrivalTime,
-    boolean firstRemovedIsOnStreetAllTheWay,
-    int firstRemovedGeneralizedCost,
-    int firstRemovedNumOfTransfers,
-    Instant firstRemovedDepartureTime,
-    PagingDeduplicationSection deduplicationSection
+    ItinerarySortKey pageCut
   )
     implements PageCursorInput {
-    public TestPageCursorInput(
-      Itinerary keptItinerary,
-      Itinerary removedItinerary,
-      PagingDeduplicationSection deduplicationSection
-    ) {
+    public TestPageCursorInput(Itinerary keptItinerary, Itinerary removedItinerary) {
       this(
         keptItinerary.endTimeAsInstant(),
         removedItinerary.startTimeAsInstant(),
         removedItinerary.startTimeAsInstant(),
         removedItinerary.endTimeAsInstant(),
-        removedItinerary.endTimeAsInstant(),
-        removedItinerary.isOnStreetAllTheWay(),
-        removedItinerary.getGeneralizedCost(),
-        removedItinerary.getNumberOfTransfers(),
-        removedItinerary.startTimeAsInstant(),
-        deduplicationSection
+        removedItinerary
       );
     }
   }

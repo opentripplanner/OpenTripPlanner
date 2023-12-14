@@ -12,12 +12,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.ItineraryDeletionFlagger;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilter;
@@ -59,7 +61,7 @@ public class ItineraryListFilterChainBuilder {
 
   private ItineraryFilterDebugProfile debug = ItineraryFilterDebugProfile.OFF;
   private int maxNumberOfItineraries = NOT_SET;
-  private ListSection maxNumberOfItinerariesCrop = ListSection.TAIL;
+  private ListSection maxNumberOfItinerariesCropSection = ListSection.TAIL;
   private CostLinearFunction removeTransitWithHigherCostThanBestOnStreetOnly;
   private boolean removeWalkAllTheWayResults;
   private boolean sameFirstOrLastTripFilter;
@@ -77,7 +79,7 @@ public class ItineraryListFilterChainBuilder {
   private boolean removeItinerariesWithSameRoutesAndStops;
   private double minBikeParkingDistance;
   private boolean removeTransitIfWalkingIsBetter = true;
-  private ItineraryPageCut itineraryPageCut;
+  private ItinerarySortKey itineraryPageCut;
 
   /**
    * Sandbox filters which decorate the itineraries with extra information.
@@ -103,7 +105,7 @@ public class ItineraryListFilterChainBuilder {
    * The maximum number of itineraries returned. This will remove all itineraries at the end of the
    * list AFTER the final sort of the itineraries.
    * <p>
-   * Se also the {@link #withMaxNumberOfItinerariesCrop(ListSection)} to change which end of the
+   * Se also the {@link #withMaxNumberOfItinerariesCropSection(ListSection)} to change which end of the
    * list is cropped.
    * <p>
    * Use {@code -1} to disable.
@@ -121,8 +123,10 @@ public class ItineraryListFilterChainBuilder {
    * The default is to crop the tail. But, we need to crop the head to be able to paginate in the
    * opposite direction of the main sort-order of the original search.
    */
-  public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCrop(ListSection section) {
-    this.maxNumberOfItinerariesCrop = section;
+  public ItineraryListFilterChainBuilder withMaxNumberOfItinerariesCropSection(
+    ListSection section
+  ) {
+    this.maxNumberOfItinerariesCropSection = section;
     return this;
   }
 
@@ -279,7 +283,7 @@ public class ItineraryListFilterChainBuilder {
    * @param itineraryPageCut contains the parameters to use for deduplication.
    */
   public ItineraryListFilterChainBuilder withPagingDeduplicationFilter(
-    ItineraryPageCut itineraryPageCut
+    ItinerarySortKey itineraryPageCut
   ) {
     this.itineraryPageCut = itineraryPageCut;
     return this;
@@ -350,10 +354,6 @@ public class ItineraryListFilterChainBuilder {
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
-    if (itineraryPageCut != null) {
-      filters.add(new DeletionFlaggingFilter(new PagingFilter(itineraryPageCut)));
-    }
-
     filters.addAll(buildGroupByTripIdAndDistanceFilters());
 
     if (removeItinerariesWithSameRoutesAndStops) {
@@ -362,7 +362,7 @@ public class ItineraryListFilterChainBuilder {
 
     if (sameFirstOrLastTripFilter) {
       filters.add(new SortingFilter(generalizedCostComparator()));
-      filters.add(new DeletionFlaggingFilter(new SameFirstOrLastTripFilter()));
+      addRmFilter(filters, new SameFirstOrLastTripFilter());
     }
 
     if (minBikeParkingDistance > 0) {
@@ -389,23 +389,18 @@ public class ItineraryListFilterChainBuilder {
 
     // Filter transit itineraries on generalized-cost
     if (transitGeneralizedCostFilterParams != null) {
-      filters.add(
-        new DeletionFlaggingFilter(
-          new TransitGeneralizedCostFilter(
-            transitGeneralizedCostFilterParams.costLimitFunction(),
-            transitGeneralizedCostFilterParams.intervalRelaxFactor()
-          )
+      addRmFilter(
+        filters,
+        new TransitGeneralizedCostFilter(
+          transitGeneralizedCostFilterParams.costLimitFunction(),
+          transitGeneralizedCostFilterParams.intervalRelaxFactor()
         )
       );
     }
 
     // Filter non-transit itineraries on generalized-cost
     if (nonTransitGeneralizedCostLimit != null) {
-      filters.add(
-        new DeletionFlaggingFilter(
-          new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit)
-        )
-      );
+      addRmFilter(filters, new NonTransitGeneralizedCostFilter(nonTransitGeneralizedCostLimit));
     }
 
     // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
@@ -420,60 +415,61 @@ public class ItineraryListFilterChainBuilder {
     {
       // Filter transit itineraries by comparing against non-transit using generalized-cost
       if (removeTransitWithHigherCostThanBestOnStreetOnly != null) {
-        filters.add(
-          new DeletionFlaggingFilter(
-            new RemoveTransitIfStreetOnlyIsBetterFilter(
-              removeTransitWithHigherCostThanBestOnStreetOnly
-            )
+        addRmFilter(
+          filters,
+          new RemoveTransitIfStreetOnlyIsBetterFilter(
+            removeTransitWithHigherCostThanBestOnStreetOnly
           )
         );
       }
 
       if (removeTransitIfWalkingIsBetter) {
-        filters.add(new DeletionFlaggingFilter(new RemoveTransitIfWalkingIsBetterFilter()));
+        addRmFilter(filters, new RemoveTransitIfWalkingIsBetterFilter());
       }
 
       if (removeWalkAllTheWayResults) {
-        filters.add(new DeletionFlaggingFilter(new RemoveWalkOnlyFilter()));
-      }
-
-      if (earliestDepartureTime != null) {
-        filters.add(
-          new DeletionFlaggingFilter(
-            new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow)
-          )
-        );
+        addRmFilter(filters, new RemoveWalkOnlyFilter());
       }
 
       if (bikeRentalDistanceRatio > 0) {
-        filters.add(
-          new DeletionFlaggingFilter(
-            new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio)
-          )
-        );
+        addRmFilter(filters, new RemoveBikerentalWithMostlyWalkingFilter(bikeRentalDistanceRatio));
       }
 
       if (parkAndRideDurationRatio > 0) {
-        filters.add(
-          new DeletionFlaggingFilter(
-            new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio)
-          )
+        addRmFilter(
+          filters,
+          new RemoveParkAndRideWithMostlyWalkingFilter(parkAndRideDurationRatio)
         );
       }
     }
 
-    // Remove itineraries if max limit is set
-    if (maxNumberOfItineraries > 0) {
-      filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
-      filters.add(
-        new DeletionFlaggingFilter(
+    // Paging related filters - these filters are run after group-by filters to allow a result
+    // outside the page to also take effect inside the window. This is debatable but lead to less
+    // noise, however it is not deterministic because the result depends on the size of the search-window and
+    // where the "cut" between each page is located.
+    {
+      // Limit to search-window
+      if (earliestDepartureTime != null) {
+        addRmFilter(filters, new OutsideSearchWindowFilter(earliestDepartureTime, searchWindow));
+      }
+
+      // Remove itineraries present in the page retrieved before this page/search.
+      if (itineraryPageCut != null) {
+        addRmFilter(filters, new PagingFilter(sortOrder, deduplicateSection(), itineraryPageCut));
+      }
+
+      // Remove itineraries if max limit is set
+      if (maxNumberOfItineraries > 0) {
+        filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
+        addRmFilter(
+          filters,
           new NumItinerariesFilter(
             maxNumberOfItineraries,
-            maxNumberOfItinerariesCrop,
+            maxNumberOfItinerariesCropSection,
             numItinerariesFilterResultsConsumer
           )
-        )
-      );
+        );
+      }
     }
 
     // Do the final itineraries sort
@@ -572,13 +568,12 @@ public class ItineraryListFilterChainBuilder {
       if (group.maxCostOtherLegsFactor > 1.0) {
         var flagger = new OtherThanSameLegsMaxGeneralizedCostFilter(group.maxCostOtherLegsFactor);
         sysTags.add(flagger.name());
-        nested.add(new DeletionFlaggingFilter(flagger));
+        addRmFilter(nested, flagger);
       }
 
       nested.add(new SortingFilter(generalizedCostComparator()));
-      nested.add(
-        new DeletionFlaggingFilter(new MaxLimitFilter(tag, group.maxNumOfItinerariesPerGroup))
-      );
+
+      addRmFilter(nested, new MaxLimitFilter(tag, group.maxNumOfItinerariesPerGroup));
 
       nested.add(new RemoveDeletionFlagForLeastTransfersItinerary(sysTags));
 
@@ -588,5 +583,16 @@ public class ItineraryListFilterChainBuilder {
     }
 
     return groupByFilters;
+  }
+
+  private ListSection deduplicateSection() {
+    return maxNumberOfItinerariesCropSection.invert();
+  }
+
+  private static void addRmFilter(
+    List<ItineraryListFilter> filters,
+    ItineraryDeletionFlagger removeFilter
+  ) {
+    filters.add(new DeletionFlaggingFilter(removeFilter));
   }
 }

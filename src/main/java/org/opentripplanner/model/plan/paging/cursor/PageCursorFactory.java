@@ -1,13 +1,13 @@
-package org.opentripplanner.model.plan.pagecursor;
+package org.opentripplanner.model.plan.paging.cursor;
 
-import static org.opentripplanner.model.plan.pagecursor.PageType.NEXT_PAGE;
-import static org.opentripplanner.model.plan.pagecursor.PageType.PREVIOUS_PAGE;
+import static org.opentripplanner.model.plan.paging.cursor.PageType.NEXT_PAGE;
+import static org.opentripplanner.model.plan.paging.cursor.PageType.PREVIOUS_PAGE;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 
 public class PageCursorFactory {
@@ -15,10 +15,11 @@ public class PageCursorFactory {
   private final SortOrder sortOrder;
   private final Duration newSearchWindow;
   private PageType currentPageType;
-  private SearchTime current = null;
+  private Instant currentEdt = null;
+  private Instant currentLat = null;
   private Duration currentSearchWindow = null;
   private boolean wholeSwUsed = true;
-  private ItineraryPageCut itineraryPageCut = null;
+  private ItinerarySortKey itineraryPageCut = null;
   private PageCursorInput pageCursorInput = null;
 
   private PageCursor nextCursor = null;
@@ -42,7 +43,8 @@ public class PageCursorFactory {
     this.currentPageType =
       pageType == null ? resolvePageTypeForTheFirstSearch(sortOrder) : pageType;
 
-    this.current = new SearchTime(edt, lat);
+    this.currentEdt = edt;
+    this.currentLat = lat;
     this.currentSearchWindow = searchWindow;
     return this;
   }
@@ -59,18 +61,7 @@ public class PageCursorFactory {
   public PageCursorFactory withRemovedItineraries(PageCursorInput pageCursorFactoryParams) {
     this.wholeSwUsed = false;
     this.pageCursorInput = pageCursorFactoryParams;
-    this.itineraryPageCut =
-      new ItineraryPageCut(
-        pageCursorFactoryParams.earliestRemovedDeparture().truncatedTo(ChronoUnit.SECONDS),
-        current.edt.plus(currentSearchWindow),
-        sortOrder,
-        pageCursorFactoryParams.deduplicationSection(),
-        pageCursorFactoryParams.firstRemovedArrivalTime(),
-        pageCursorFactoryParams.firstRemovedDepartureTime(),
-        pageCursorFactoryParams.firstRemovedGeneralizedCost(),
-        pageCursorFactoryParams.firstRemovedNumOfTransfers(),
-        pageCursorFactoryParams.firstRemovedIsOnStreetAllTheWay()
-      );
+    this.itineraryPageCut = pageCursorFactoryParams.pageCut();
     return this;
   }
 
@@ -92,7 +83,8 @@ public class PageCursorFactory {
       .of(PageCursorFactory.class)
       .addEnum("sortOrder", sortOrder)
       .addEnum("currentPageType", currentPageType)
-      .addObj("current", current)
+      .addDateTime("currentEdt", currentEdt)
+      .addDateTime("currentLat", currentLat)
       .addDuration("currentSearchWindow", currentSearchWindow)
       .addDuration("newSearchWindow", newSearchWindow)
       .addBoolIfTrue("searchWindowCropped", !wholeSwUsed)
@@ -108,77 +100,53 @@ public class PageCursorFactory {
    * equivalent when creating new cursors.
    */
   private static PageType resolvePageTypeForTheFirstSearch(SortOrder sortOrder) {
-    return sortOrder.isSortedByArrivalTimeAscending() ? NEXT_PAGE : PREVIOUS_PAGE;
+    return sortOrder.isSortedByAscendingArrivalTime() ? NEXT_PAGE : PREVIOUS_PAGE;
   }
 
   /** Create page cursor pair (next and previous) */
   private void createPageCursors() {
-    if (current == null || nextCursor != null || prevCursor != null) {
+    if (currentEdt == null || nextCursor != null || prevCursor != null) {
       return;
     }
 
-    SearchTime prev = new SearchTime(null, null);
-    SearchTime next = new SearchTime(null, null);
+    Instant prevEdt;
+    Instant nextEdt;
 
     if (wholeSwUsed) {
-      prev.edt = edtBeforeNewSw();
-      next.edt = edtAfterUsedSw();
-      if (!sortOrder.isSortedByArrivalTimeAscending()) {
-        prev.lat = current.lat;
-      }
-    } else { // If the whole search window was not used (i.e. if there were removed itineraries)
+      prevEdt = edtBeforeNewSw();
+      nextEdt = edtAfterUsedSw();
+    }
+    // If the whole search window was not used (i.e. if there were removed itineraries)
+    else {
       if (currentPageType == NEXT_PAGE) {
-        prev.edt = edtBeforeNewSw();
-        next.edt = pageCursorInput.earliestRemovedDeparture();
-        if (sortOrder.isSortedByArrivalTimeAscending()) {
-          prev.lat = pageCursorInput.earliestKeptArrival().truncatedTo(ChronoUnit.MINUTES);
-        } else {
-          prev.lat = current.lat;
-        }
+        prevEdt = edtBeforeNewSw();
+        nextEdt = pageCursorInput.earliestRemovedDeparture();
       } else {
         // The search-window start and end is [inclusive, exclusive], so to calculate the start of the
         // search-window from the last time included in the search window we need to include one extra
         // minute at the end.
-        prev.edt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
-        next.edt = edtAfterUsedSw();
-        prev.lat = pageCursorInput.latestRemovedArrival();
+        prevEdt = pageCursorInput.latestRemovedDeparture().minus(newSearchWindow).plusSeconds(60);
+        nextEdt = edtAfterUsedSw();
       }
     }
-    prevCursor = new PageCursor(PREVIOUS_PAGE, sortOrder, prev.edt, prev.lat, newSearchWindow);
-    nextCursor = new PageCursor(NEXT_PAGE, sortOrder, next.edt, next.lat, newSearchWindow);
-
-    if (itineraryPageCut != null) {
-      nextCursor = nextCursor.withItineraryPageCut(itineraryPageCut);
-      prevCursor = prevCursor.withItineraryPageCut(itineraryPageCut);
-    }
+    prevCursor =
+      new PageCursor(
+        PREVIOUS_PAGE,
+        sortOrder,
+        prevEdt,
+        currentLat,
+        newSearchWindow,
+        itineraryPageCut
+      );
+    nextCursor =
+      new PageCursor(NEXT_PAGE, sortOrder, nextEdt, null, newSearchWindow, itineraryPageCut);
   }
 
   private Instant edtBeforeNewSw() {
-    return current.edt.minus(newSearchWindow);
+    return currentEdt.minus(newSearchWindow);
   }
 
   private Instant edtAfterUsedSw() {
-    return current.edt.plus(currentSearchWindow);
-  }
-
-  /** Temporary data class used to hold a pair of edt and lat */
-  private static class SearchTime {
-
-    Instant edt;
-    Instant lat;
-
-    private SearchTime(Instant edt, Instant lat) {
-      this.edt = edt;
-      this.lat = lat;
-    }
-
-    @Override
-    public String toString() {
-      return ToStringBuilder
-        .of(SearchTime.class)
-        .addDateTime("edt", edt)
-        .addDateTime("lat", lat)
-        .toString();
-    }
+    return currentEdt.plus(currentSearchWindow);
   }
 }

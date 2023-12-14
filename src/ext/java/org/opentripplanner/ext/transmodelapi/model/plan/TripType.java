@@ -12,7 +12,7 @@ import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
-import org.opentripplanner.model.plan.pagecursor.PageCursor;
+import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 
 public class TripType {
 

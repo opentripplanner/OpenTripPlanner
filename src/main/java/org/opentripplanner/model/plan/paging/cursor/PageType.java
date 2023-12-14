@@ -1,4 +1,4 @@
-package org.opentripplanner.model.plan.pagecursor;
+package org.opentripplanner.model.plan.paging.cursor;
 
 /**
  * Used to tell which way the paging is going, to the {@link #NEXT_PAGE} or to the {@link
@@ -17,5 +17,9 @@ public enum PageType {
    * the sort order, the next page may hold itineraries which depart/arrive after or before the
    * current result.
    */
-  NEXT_PAGE,
+  NEXT_PAGE;
+
+  public boolean isNext() {
+    return this == NEXT_PAGE;
+  }
 }

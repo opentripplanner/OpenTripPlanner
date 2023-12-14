@@ -20,12 +20,10 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
     Itinerary i2 = newItinerary(A).rail(110, 6, 9, E).build();
 
     // When:
-    List<Itinerary> result = DeletionFlaggerTestHelper.process(
-      List.of(i1, i2),
-      new RemoveTransitIfStreetOnlyIsBetterFilter(
-        CostLinearFunction.of(Duration.ofSeconds(200), 1.2)
-      )
+    ItineraryDeletionFlagger flagger = new RemoveTransitIfStreetOnlyIsBetterFilter(
+      CostLinearFunction.of(Duration.ofSeconds(200), 1.2)
     );
+    List<Itinerary> result = flagger.removeMatchesForTest(List.of(i1, i2));
 
     // Then:
     assertEquals(toStr(List.of(i1, i2)), toStr(result));
@@ -50,12 +48,10 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
     i2.setGeneralizedCost(360);
 
     // When:
-    List<Itinerary> result = DeletionFlaggerTestHelper.process(
-      List.of(i2, bicycle, walk, i1),
-      new RemoveTransitIfStreetOnlyIsBetterFilter(
-        CostLinearFunction.of(Duration.ofSeconds(60), 1.2)
-      )
+    ItineraryDeletionFlagger flagger = new RemoveTransitIfStreetOnlyIsBetterFilter(
+      CostLinearFunction.of(Duration.ofSeconds(60), 1.2)
     );
+    List<Itinerary> result = flagger.removeMatchesForTest(List.of(i2, bicycle, walk, i1));
 
     // Then:
     assertEquals(toStr(List.of(bicycle, walk, i1)), toStr(result));
