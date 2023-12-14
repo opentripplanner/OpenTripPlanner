@@ -355,20 +355,58 @@ type BikePark implements Node & PlaceInterface {
 }
 
 """
-Is it possible to arrive to the destination with a rented vehicle and does it
+Is it possible to arrive to the destination with a rented bicycle and does it
 come with an extra cost.
 """
-input DestinationVehiclePolicyInput {
+input DestinationBicyclePolicyInput {
     """
     Is it possible to arrive to the destination without dropping off the rental
-    vehicle first.
+    bicycle first.
     """
     allowKeeping: Boolean
 
     """
-    Cost associated with arriving to the destination with a rented vehicle.
+    Cost associated with arriving to the destination with a rented bicycle.
     No cost is applied if arriving to the destination after dropping off the rented
-    vehicle.
+    bicycle.
+    """
+    keepingCost: Cost
+}
+
+"""
+Is it possible to arrive to the destination with a rented car and does it
+come with an extra cost.
+"""
+input DestinationCarPolicyInput {
+    """
+    Is it possible to arrive to the destination without dropping off the rental
+    car first.
+    """
+    allowKeeping: Boolean
+
+    """
+    Cost associated with arriving to the destination with a rented car.
+    No cost is applied if arriving to the destination after dropping off the rented
+    car.
+    """
+    keepingCost: Cost
+}
+
+"""
+Is it possible to arrive to the destination with a rented scooter and does it
+come with an extra cost.
+"""
+input DestinationScooterPolicyInput {
+    """
+    Is it possible to arrive to the destination without dropping off the rental
+    scooter first.
+    """
+    allowKeeping: Boolean
+
+    """
+    Cost associated with arriving to the destination with a rented scooter.
+    No cost is applied if arriving to the destination after dropping off the rented
+    scooter.
     """
     keepingCost: Cost
 }
@@ -4306,7 +4344,7 @@ input ScooterRentalPreferencesInput {
     Is it possible to arrive to the destination with a rented scooter and does it
     come with an extra cost.
     """
-    destinationScooterPolicy: DestinationVehiclePolicyInput
+    destinationScooterPolicy: DestinationScooterPolicyInput
 
     """
     Rental networks which can be potentially used as part of an itinerary.
@@ -4327,7 +4365,7 @@ input CarRentalPreferencesInput {
     Is it possible to arrive to the destination with a rented car and does it
     come with an extra cost.
     """
-    destinationCarPolicy: DestinationVehiclePolicyInput
+    destinationCarPolicy: DestinationCarPolicyInput
 
     """
     Rental networks which can be potentially used as part of an itinerary.
@@ -4348,7 +4386,7 @@ input BicycleRentalPreferencesInput {
     Is it possible to arrive to the destination with a rented bicycle and does it
     come with an extra cost.
     """
-    destinationBicyclePolicy: DestinationVehiclePolicyInput
+    destinationBicyclePolicy: DestinationBicyclePolicyInput
 
     """
     Rental networks which can be potentially used as part of an itinerary.
