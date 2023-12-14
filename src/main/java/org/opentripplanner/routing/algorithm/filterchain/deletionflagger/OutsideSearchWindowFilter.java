@@ -12,7 +12,7 @@ import org.opentripplanner.model.plan.Itinerary;
  * such itineraries. The same is true for when paging to the previous page for arriveBy=true.
  * <p>
  * Itineraries matching the start(earliest-departure-time) are included and itineraries matching
- * the end(latest-departure-time) is not. The filter is {@code [inclusive, exclusive]}.
+ * the end(latest-departure-time) are not. The filter is {@code [inclusive, exclusive]}.
  */
 public class OutsideSearchWindowFilter implements ItineraryDeletionFlagger {
 
