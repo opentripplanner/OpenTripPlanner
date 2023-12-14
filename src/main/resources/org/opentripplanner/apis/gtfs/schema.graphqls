@@ -4317,11 +4317,6 @@ input ScooterRentalPreferencesInput {
     Rental networks which cannot be used as part of an itinerary.
     """
     bannedNetworks: [String!]
-
-    """
-    Should real-time availability of vehicles and spaces checked during routing.
-    """
-    includeRealTimeAvailability: Boolean
 }
 
 """
@@ -4343,11 +4338,6 @@ input CarRentalPreferencesInput {
     Rental networks which cannot be used as part of an itinerary.
     """
     bannedNetworks: [String!]
-
-    """
-    Should real-time availability of vehicles and spaces checked during routing.
-    """
-    includeRealTimeAvailability: Boolean
 }
 
 """
@@ -4369,11 +4359,6 @@ input BicycleRentalPreferencesInput {
     Rental networks which cannot be used as part of an itinerary.
     """
     bannedNetworks: [String!]
-
-    """
-    Should real-time availability of vehicles and spaces checked during routing.
-    """
-    includeRealTimeAvailability: Boolean
 }
 
 """
