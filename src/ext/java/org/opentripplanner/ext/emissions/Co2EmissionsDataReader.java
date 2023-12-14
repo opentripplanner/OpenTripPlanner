@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.opentripplanner.framework.lang.Sandbox;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -92,14 +93,14 @@ public class Co2EmissionsDataReader {
       String avgCo2PerVehiclePerKmString = reader.get("avg_co2_per_vehicle_per_km");
       String avgPassengerCountString = reader.get("avg_passenger_count");
 
-      if (!exists(routeId)) {
+      if (!StringUtils.hasValue(routeId)) {
         issueStore.add(
           "InvalidEmissionData",
           "Value for routeId is missing in the emissions.txt for line: %s.",
           reader.getRawRecord()
         );
       }
-      if (!exists(avgCo2PerVehiclePerKmString)) {}
+      if (!StringUtils.hasValue(avgCo2PerVehiclePerKmString)) {}
       {
         issueStore.add(
           "InvalidEmissionData",
@@ -107,7 +108,7 @@ public class Co2EmissionsDataReader {
           routeId
         );
       }
-      if (!exists(avgPassengerCountString)) {
+      if (!StringUtils.hasValue(avgPassengerCountString)) {
         issueStore.add(
           "InvalidEmissionData",
           "Value for avg_passenger_count is missing in the emissions.txt for route %s",
@@ -115,10 +116,10 @@ public class Co2EmissionsDataReader {
         );
       }
       if (
-        exists(feedId) &&
-        exists(routeId) &&
-        exists(avgCo2PerVehiclePerKmString) &&
-        exists(avgPassengerCountString)
+        StringUtils.hasValue(feedId) &&
+        StringUtils.hasValue(routeId) &&
+        StringUtils.hasValue(avgCo2PerVehiclePerKmString) &&
+        StringUtils.hasValue(avgPassengerCountString)
       ) {
         Double avgCo2PerVehiclePerMeter = Double.parseDouble(avgCo2PerVehiclePerKmString) / 1000;
         Double avgPassengerCount = Double.parseDouble(reader.get("avg_passenger_count"));
@@ -133,10 +134,6 @@ public class Co2EmissionsDataReader {
       }
     }
     return emissionsData;
-  }
-
-  private boolean exists(String s) {
-    return !s.isBlank() && !s.isEmpty();
   }
 
   private String readFeedId(InputStream stream) {
