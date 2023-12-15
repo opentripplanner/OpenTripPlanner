@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -21,8 +23,7 @@ public final class CarPreferences implements Serializable {
 
   private final double speed;
   private final double reluctance;
-  private final int parkTime;
-  private final Cost parkCost;
+  private final VehicleParkingPreferences parking;
   private final int pickupTime;
   private final Cost pickupCost;
   private final int dropoffTime;
@@ -33,8 +34,7 @@ public final class CarPreferences implements Serializable {
   private CarPreferences() {
     this.speed = 40.0;
     this.reluctance = 2.0;
-    this.parkTime = 60;
-    this.parkCost = Cost.costOfMinutes(2);
+    this.parking = VehicleParkingPreferences.DEFAULT;
     this.pickupTime = 60;
     this.pickupCost = Cost.costOfMinutes(2);
     this.dropoffTime = 120;
@@ -45,8 +45,7 @@ public final class CarPreferences implements Serializable {
   private CarPreferences(Builder builder) {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
-    this.parkTime = Units.duration(builder.parkTime);
-    this.parkCost = builder.parkCost;
+    this.parking = builder.parking;
     this.pickupTime = Units.duration(builder.pickupTime);
     this.pickupCost = builder.pickupCost;
     this.dropoffTime = Units.duration(builder.dropoffTime);
@@ -75,14 +74,9 @@ public final class CarPreferences implements Serializable {
     return reluctance;
   }
 
-  /** Time to park a car. */
-  public int parkTime() {
-    return parkTime;
-  }
-
-  /** Cost of parking a car. */
-  public int parkCost() {
-    return parkCost.toSeconds();
+  /** Parking preferences that can be different per request */
+  public VehicleParkingPreferences parking() {
+    return parking;
   }
 
   /** Time of getting in/out of a carPickup (taxi) */
@@ -127,8 +121,7 @@ public final class CarPreferences implements Serializable {
     return (
       DoubleUtils.doubleEquals(that.speed, speed) &&
       DoubleUtils.doubleEquals(that.reluctance, reluctance) &&
-      parkTime == that.parkTime &&
-      parkCost.equals(that.parkCost) &&
+      parking.equals(that.parking) &&
       pickupTime == that.pickupTime &&
       pickupCost.equals(that.pickupCost) &&
       dropoffTime == that.dropoffTime &&
@@ -142,8 +135,7 @@ public final class CarPreferences implements Serializable {
     return Objects.hash(
       speed,
       reluctance,
-      parkTime,
-      parkCost,
+      parking,
       pickupTime,
       pickupCost,
       dropoffTime,
@@ -158,8 +150,7 @@ public final class CarPreferences implements Serializable {
       .of(CarPreferences.class)
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
-      .addNum("parkTime", parkTime, DEFAULT.parkTime)
-      .addObj("parkCost", parkCost, DEFAULT.parkCost)
+      .addObj("parking", parking, DEFAULT.parking)
       .addNum("pickupTime", pickupTime, DEFAULT.pickupTime)
       .addObj("pickupCost", pickupCost, DEFAULT.pickupCost)
       .addNum("dropoffTime", dropoffTime, DEFAULT.dropoffTime)
@@ -174,8 +165,7 @@ public final class CarPreferences implements Serializable {
     private final CarPreferences original;
     private double speed;
     private double reluctance;
-    private int parkTime;
-    private Cost parkCost;
+    private VehicleParkingPreferences parking;
     private int pickupTime;
     private Cost pickupCost;
     private int dropoffTime;
@@ -186,8 +176,7 @@ public final class CarPreferences implements Serializable {
       this.original = original;
       this.speed = original.speed;
       this.reluctance = original.reluctance;
-      this.parkTime = original.parkTime;
-      this.parkCost = original.parkCost;
+      this.parking = original.parking;
       this.pickupTime = original.pickupTime;
       this.pickupCost = original.pickupCost;
       this.dropoffTime = original.dropoffTime;
@@ -209,13 +198,8 @@ public final class CarPreferences implements Serializable {
       return this;
     }
 
-    public Builder withParkTime(int parkTime) {
-      this.parkTime = parkTime;
-      return this;
-    }
-
-    public Builder withParkCost(int parkCost) {
-      this.parkCost = Cost.costOfSeconds(parkCost);
+    public Builder withParking(Consumer<VehicleParkingPreferences.Builder> body) {
+      this.parking = ifNotNull(this.parking, original.parking).copyOf().apply(body).build();
       return this;
     }
 
