@@ -96,7 +96,7 @@ public class BasicPathTestCase implements RaptorTestConstants {
   /** Stop cost for stop NA, A, C, E .. H is zero(0), B: 30s, and D: 60s. ?=0, A=1 .. H=8 */
   private static final int[] STOP_C1S = { 0, 0, 3_000, 0, 6_000, 0, 0, 0, 0, 0 };
 
-  // Sometimes which should not have eny effect on tests
+  // Some times which should not have eny effect on tests
   private static final int VERY_EARLY = time("00:00");
   private static final int VERY_LATE = time("23:59");
 

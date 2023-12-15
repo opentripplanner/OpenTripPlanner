@@ -72,7 +72,7 @@ public interface PathLeg<T extends RaptorTripSchedule> {
   int c1();
 
   /**
-   * The computed generalized-cost for this leg plus all legs following it.
+   * The c1 for this leg plus all legs following it.
    * <p>
    * {@code -1} is returned if no cost is computed by raptor.
    * <p>
