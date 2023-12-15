@@ -133,10 +133,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
   /**
    * Method to apply a trip update list to the most recent version of the timetable snapshot.
+   * FIXME TripUpdate is the GTFS term, and these SIRI ETs are never converted into that same internal model.
    *
    * @param fullDataset  true iff the list with updates represent all updates that are active right
    *                     now, i.e. all previous updates should be disregarded
    * @param updates      SIRI VehicleMonitoringDeliveries that should be applied atomically
+   *                     FIXME aren't these ET deliveries, not VM?
    */
   public UpdateResult applyEstimatedTimetable(
     @Nullable SiriFuzzyTripMatcher fuzzyTripMatcher,

@@ -3,6 +3,11 @@ package org.opentripplanner.ext.siri.updater;
 import java.util.Optional;
 import uk.org.siri.siri20.Siri;
 
+/**
+ * Interface for a blocking, polling approach
+ * TODO should the methods return as fast as possible?
+ * Or do they intentionally wait for refreshed data?
+ */
 public interface EstimatedTimetableSource {
   /**
    * Wait for one message to arrive, and decode it into a List of TripUpdates. Blocking call.
