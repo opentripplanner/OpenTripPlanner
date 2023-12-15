@@ -78,6 +78,9 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         new GtfsRealtimeFuzzyTripMatcher(new DefaultTransitService(transitModel));
     }
     this.recordMetrics = TripUpdateMetrics.streaming(parameters);
+    LOG.info(
+      "Creating streaming GTFS-RT TripUpdate updater subscribing to MQTT broker at {}", url
+    );
   }
 
   @Override
@@ -187,4 +190,15 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     @Override
     public void deliveryComplete(IMqttDeliveryToken token) {}
   }
+
+  @Override
+  public String toString() {
+    return "MqttGtfsRealtimeUpdater{" +
+      "url='" + url + '\'' +
+      ", topic='" + topic + '\'' +
+      ", feedId='" + feedId + '\'' +
+      '}';
+  }
+
 }
+
