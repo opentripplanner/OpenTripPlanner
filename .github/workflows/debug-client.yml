@@ -1,0 +1,67 @@
+name: Debug client
+
+on:
+  push:
+    paths:
+      - 'client-next/**'
+
+jobs:
+  debug-client:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # this is necessary so that the correct credentials are put into the git configuration
+      # when we push to dev-2.x and push the HTML to the git repo
+      - uses: actions/checkout@v4
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/debug-client-cdn' || github.ref == 'refs/heads/master')
+        with:
+          token: ${{ secrets.CHANGELOG_TOKEN }}
+          fetch-depth: 0
+
+      # for a simple PR where we don't push, we don't need any credentials
+      - uses: actions/checkout@v4
+        if: github.event_name == 'pull_request'
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Build debug client
+        working-directory: client-next
+        run: |
+          npm install
+          npm run build
+
+      - name: Deploy compiled assets to repo
+        if: github.event_name == 'push' && github.ref == 'refs/heads/debug-client-cdn'
+        env:
+          REMOTE: debug-client
+          LOCAL_BRANCH: local-assets
+          REMOTE_BRANCH: main
+        run: |
+          git config --global user.name 'OTP Bot'
+          git config --global user.email 'bot@opentripplanner.org'
+          
+          git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/debug-client-assets.git 
+          git fetch --depth=1 $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
+
+          git checkout $LOCAL_BRANCH
+          
+          version=`date +%Y-%m-%dT%H-%M`
+          
+          mkdir -p $version
+          rsync -r client-next/output/* $version
+          git add $version
+          git commit -am "Add version ${version} of debug client"
+          
+          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
+          
+          git checkout dev-2.x
+          git pull
+          
+          CLIENT_HTML=src/client/debug-client-preview/index.html
+          mkdir -p src/client/debug-client-preview/
+          # this line is admittedly pretty unreadable it replaces the string "/debug-client-preview/" with the JsDelivr CDN URL prefix
+          sed "s|\/debug-client-preview\/|https:\/\/cdn.jsdelivr.net\/gh\/opentripplanner\/debug-client-assets@main\/${version}\/|g" <client-next/output/index.html >${CLIENT_HTML}
+          
+          cat ${CLIENT_HTML}
