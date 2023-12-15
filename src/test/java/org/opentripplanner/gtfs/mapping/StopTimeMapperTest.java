@@ -149,7 +149,7 @@ public class StopTimeMapperTest {
 
   @Test
   public void testMap() {
-    org.opentripplanner.model.StopTime result = subject.map(buildDefaultStopTime());
+    var result = subject.map(buildDefaultStopTime());
 
     assertEquals(ARRIVAL_TIME, result.getArrivalTime());
     assertEquals(DEPARTURE_TIME, result.getDepartureTime());
@@ -198,9 +198,7 @@ public class StopTimeMapperTest {
     var st = buildStopTime();
     Assertions.assertThrows(
       NullPointerException.class,
-      () -> {
-        subject.map(st);
-      }
+      () -> subject.map(st)
     );
   }
 
