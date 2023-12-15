@@ -69,7 +69,7 @@
         <lucene.version>9.8.0</lucene.version>
         <slf4j.version>2.0.9</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
-        <siri-java-model.version>1.25</siri-java-model.version>
+        <siri-java-model.version>1.26</siri-java-model.version>
         <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
