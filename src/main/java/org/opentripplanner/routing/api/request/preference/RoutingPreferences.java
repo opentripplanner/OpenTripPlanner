@@ -149,7 +149,6 @@ public final class RoutingPreferences implements Serializable {
       Objects.equals(wheelchair, that.wheelchair) &&
       Objects.equals(bike, that.bike) &&
       Objects.equals(car, that.car) &&
-      Objects.equals(rental, that.rental) &&
       Objects.equals(system, that.system) &&
       Objects.equals(itineraryFilter, that.itineraryFilter)
     );
@@ -165,7 +164,6 @@ public final class RoutingPreferences implements Serializable {
       wheelchair,
       bike,
       car,
-      rental,
       system,
       itineraryFilter
     );
