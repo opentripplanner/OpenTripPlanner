@@ -5,15 +5,19 @@ on:
     paths:
       - 'client-next/**'
 
+concurrency:
+  group: git-commit
+
 jobs:
   debug-client:
+    if: github.repository_owner == 'opentripplanner'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
       # this is necessary so that the correct credentials are put into the git configuration
       # when we push to dev-2.x and push the HTML to the git repo
       - uses: actions/checkout@v4
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/debug-client-cdn' || github.ref == 'refs/heads/master')
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x')
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
           fetch-depth: 0
@@ -33,35 +37,47 @@ jobs:
           npm run build
 
       - name: Deploy compiled assets to repo
-        if: github.event_name == 'push' && github.ref == 'refs/heads/debug-client-cdn'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
         env:
           REMOTE: debug-client
           LOCAL_BRANCH: local-assets
           REMOTE_BRANCH: main
+          TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
         run: |
+          # Configure git user
           git config --global user.name 'OTP Bot'
           git config --global user.email 'bot@opentripplanner.org'
           
+          # Fetch the assets repo
           git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/debug-client-assets.git 
           git fetch --depth=1 $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
 
           git checkout $LOCAL_BRANCH
           
-          version=`date +%Y-%m-%dT%H-%M`
+          VERSION=`date +%Y-%m-%dT%H-%M`
           
-          mkdir -p $version
-          rsync -r client-next/output/* $version
-          git add $version
-          git commit -am "Add version ${version} of debug client"
+          # Copy the compiled output to a versioned folder
+          mkdir -p $VERSION
+          rsync -r client-next/output/* $VERSION
+          git add $VERSION
+          git commit -am "Add version ${VERSION} of debug client"
           
+          # Push to assets repo https://github.com/opentripplanner/debug-client-assets
           git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
           
+          # Switch back to the OTP code
           git checkout dev-2.x
-          git pull
+          git pull --rebase
           
-          CLIENT_HTML=src/client/debug-client-preview/index.html
+          # Modify the compiled output of the index.html to the CDN version
+          CLIENT_HTML_OUTPUT=src/client/debug-client-preview/index.html
           mkdir -p src/client/debug-client-preview/
           # this line is admittedly pretty unreadable it replaces the string "/debug-client-preview/" with the JsDelivr CDN URL prefix
-          sed "s|\/debug-client-preview\/|https:\/\/cdn.jsdelivr.net\/gh\/opentripplanner\/debug-client-assets@main\/${version}\/|g" <client-next/output/index.html >${CLIENT_HTML}
+          sed "s|\/debug-client-preview\/|https:\/\/cdn.jsdelivr.net\/gh\/opentripplanner\/debug-client-assets@main\/${VERSION}\/|g" <client-next/output/index.html >${CLIENT_HTML_OUTPUT}
           
-          cat ${CLIENT_HTML}
+          # just to debug
+          cat ${CLIENT_HTML_OUTPUT}
+          
+          git add ${CLIENT_HTML_OUTPUT}
+          git commit -m "Upgrade debug client to version ${VERSION}"
+          git push origin dev-2.x
