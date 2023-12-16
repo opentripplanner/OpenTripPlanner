@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - 'client-next/**'
+  pull_request:
+    paths:
+      - 'client-next/**'
 
 concurrency:
   group: git-commit
