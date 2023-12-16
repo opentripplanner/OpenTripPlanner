@@ -8,8 +8,9 @@ on:
     paths:
       - 'client-next/**'
 
+# to avoid conflicts, make sure that only one workflow pushes to Github at the same time
 concurrency:
-  group: git-commit
+  group: github-push
 
 jobs:
   debug-client:
@@ -83,4 +84,4 @@ jobs:
           
           git add ${CLIENT_HTML_OUTPUT}
           git commit -m "Upgrade debug client to version ${VERSION}"
-          git push origin dev-2.x
+          git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
