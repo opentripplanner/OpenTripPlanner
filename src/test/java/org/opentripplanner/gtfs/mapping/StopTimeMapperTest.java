@@ -188,18 +188,15 @@ public class StopTimeMapperTest {
   @Test
   public void testMapCache() {
     var st = buildDefaultStopTime();
-    org.opentripplanner.model.StopTime result1 = subject.map(st);
-    org.opentripplanner.model.StopTime result2 = subject.map(st);
+    var result1 = subject.map(st);
+    var result2 = subject.map(st);
     assertSame(result1, result2);
   }
 
   @Test
   public void testNull() {
     var st = buildStopTime();
-    Assertions.assertThrows(
-      NullPointerException.class,
-      () -> subject.map(st)
-    );
+    Assertions.assertThrows(NullPointerException.class, () -> subject.map(st));
   }
 
   @Test
