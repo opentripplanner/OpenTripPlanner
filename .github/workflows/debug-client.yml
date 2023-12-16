@@ -19,9 +19,9 @@ jobs:
     timeout-minutes: 20
     steps:
       # this is necessary so that the correct credentials are put into the git configuration
-      # when we push to dev-2.x and push the HTML to the git repo
+      # when we push to dev-2.x and push the compiled output to the git repo
       - uses: actions/checkout@v4
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/dev-2.x')
+        if: github.event_name == 'push'
         with:
           token: ${{ secrets.CHANGELOG_TOKEN }}
           fetch-depth: 0
@@ -34,11 +34,14 @@ jobs:
         with:
           node-version: 18
 
+      - name: Set version
+        run: echo "VERSION=`date +%Y-%m-%dT%H:%M`" >> $GITHUB_ENV
+
       - name: Build debug client
         working-directory: client-next
         run: |
           npm install
-          npm run build
+          npm run build -- --base https://cdn.jsdelivr.net/gh/opentripplanner/debug-client-assets@main/${VERSION}/
 
       - name: Deploy compiled assets to repo
         if: github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
@@ -58,11 +61,10 @@ jobs:
 
           git checkout $LOCAL_BRANCH
           
-          VERSION=`date +%Y-%m-%dT%H-%M`
           
           # Copy the compiled output to a versioned folder
           mkdir -p $VERSION
-          rsync -r client-next/output/* $VERSION
+          rsync -r client-next/output/* ./$VERSION/
           git add $VERSION
           git commit -am "Add version ${VERSION} of debug client"
           
@@ -73,15 +75,13 @@ jobs:
           git checkout dev-2.x
           git pull --rebase
           
-          # Modify the compiled output of the index.html to the CDN version
           CLIENT_HTML_OUTPUT=src/client/debug-client-preview/index.html
           mkdir -p src/client/debug-client-preview/
-          # this line is admittedly pretty unreadable it replaces the string "/debug-client-preview/" with the JsDelivr CDN URL prefix
-          sed "s|\/debug-client-preview\/|https:\/\/cdn.jsdelivr.net\/gh\/opentripplanner\/debug-client-assets@main\/${VERSION}\/|g" <client-next/output/index.html >${CLIENT_HTML_OUTPUT}
+          cp client-next/output/index.html ${CLIENT_HTML_OUTPUT}
           
           # just to debug
           cat ${CLIENT_HTML_OUTPUT}
           
-          git add ${CLIENT_HTML_OUTPUT}
+          git add -f ${CLIENT_HTML_OUTPUT}
           git commit -m "Upgrade debug client to version ${VERSION}"
           git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
