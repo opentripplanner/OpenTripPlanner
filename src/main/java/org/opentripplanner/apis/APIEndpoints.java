@@ -6,6 +6,7 @@ import static org.opentripplanner.framework.application.OTPFeature.APIServerInfo
 import static org.opentripplanner.framework.application.OTPFeature.APIUpdaterStatus;
 import static org.opentripplanner.framework.application.OTPFeature.ActuatorAPI;
 import static org.opentripplanner.framework.application.OTPFeature.GtfsGraphQlApi;
+import static org.opentripplanner.framework.application.OTPFeature.LegacyRestApi;
 import static org.opentripplanner.framework.application.OTPFeature.ReportApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIGeocoder;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIMapboxVectorTilesApi;
@@ -43,13 +44,12 @@ public class APIEndpoints {
   private final List<Class<?>> resources = new ArrayList<>();
 
   private APIEndpoints() {
-    // Add mandatory APIs
-    add(Routers.class);
-    add(PlannerResource.class);
-    add(IndexAPI.class);
-
     // Add feature enabled APIs, these can be enabled by default, some is not.
     // See the OTPFeature enum for details.
+    addIfEnabled(LegacyRestApi, Routers.class);
+    addIfEnabled(LegacyRestApi, PlannerResource.class);
+    addIfEnabled(LegacyRestApi, IndexAPI.class);
+
     addIfEnabled(APIBikeRental, BikeRental.class);
     addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);
     addIfEnabled(APIGraphInspectorTile, GraphInspectorVectorTileResource.class);
