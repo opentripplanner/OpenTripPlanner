@@ -29,9 +29,9 @@ public class OutsideSearchWindowFilterTest implements PlanTestConstants {
   static List<Arguments> filterOnSearchWindowTestCases() {
     return List.of(
       Arguments.of("Departure time(09:30) matches earliest-departure-time", "09:30", false),
-      Arguments.of("Departure time(09:30) matches latest-departure-time", "09:20", false),
+      Arguments.of("Departure time(09:30) matches latest-departure-time", "09:20:01", false),
       Arguments.of("Departure time(09:30) is before earliest-departure-time", "09:30:01", true),
-      Arguments.of("Departure time(09:30) is after latest-departure-time", "09:19:59", true)
+      Arguments.of("Departure time(09:30) is after latest-departure-time", "09:20", true)
     );
   }
 

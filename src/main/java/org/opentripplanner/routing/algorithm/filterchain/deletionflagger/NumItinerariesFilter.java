@@ -2,8 +2,8 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.List;
 import java.util.function.Consumer;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 
 /**
  * Flag all itineraries after the provided limit. This flags the itineraries at the end of the list

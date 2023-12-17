@@ -25,27 +25,21 @@ public class MaxLimitFilterTest implements PlanTestConstants {
   public void testNormalFilterMaxLimit3() {
     MaxLimitFilter subject = new MaxLimitFilter("Test", 3);
     List<Itinerary> itineraries = List.of(i1, i2, i3);
-    assertEquals(
-      toStr(itineraries),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, subject))
-    );
+    assertEquals(toStr(itineraries), toStr(subject.removeMatchesForTest(itineraries)));
   }
 
   @Test
   public void testNormalFilterMaxLimit1() {
     MaxLimitFilter subject = new MaxLimitFilter("Test", 1);
     List<Itinerary> itineraries = List.of(i1, i2, i3);
-    assertEquals(
-      toStr(List.of(i1)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, subject))
-    );
+    assertEquals(toStr(List.of(i1)), toStr(subject.removeMatchesForTest(itineraries)));
   }
 
   @Test
   public void testNormalFilterMaxLimit0() {
     MaxLimitFilter subject = new MaxLimitFilter("Test", 0);
     List<Itinerary> itineraries = List.of(i1, i2, i3);
-    var result = DeletionFlaggerTestHelper.process(itineraries, subject);
+    var result = subject.removeMatchesForTest(itineraries);
     assertEquals(toStr(List.of()), toStr(result));
   }
 }

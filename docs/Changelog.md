@@ -56,6 +56,9 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add same submode in alternative legs filter [#5548](https://github.com/opentripplanner/OpenTripPlanner/pull/5548)
 - Fix issue where stop points are sometimes added twice to index [#5552](https://github.com/opentripplanner/OpenTripPlanner/pull/5552)
 - Improve shutdown logic [#5514](https://github.com/opentripplanner/OpenTripPlanner/pull/5514)
+- Create TripOnServiceDate for new siri realtime servicejourneys [#5542](https://github.com/opentripplanner/OpenTripPlanner/pull/5542)
+- New debug client [#5334](https://github.com/opentripplanner/OpenTripPlanner/pull/5334)
+- Improve paging - avoid duplicates and missed itineraries when paging [#5551](https://github.com/opentripplanner/OpenTripPlanner/pull/5551)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)

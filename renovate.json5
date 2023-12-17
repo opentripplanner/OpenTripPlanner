@@ -30,6 +30,10 @@
       "enabled": false
     },
     {
+      "matchFiles": ["client-next/package.json"],
+      "enabled": false
+    },
+    {
       // https://github.com/graphql-java-kickstart/renovate-config/blob/main/default.json
       "description": "GraphQL Java (ignoring snapshot builds)",
       "matchPackagePrefixes": [

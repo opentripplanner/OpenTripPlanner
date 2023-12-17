@@ -61,6 +61,14 @@ public class ToStringBuilder {
   }
 
   /**
+   * Create a ToStringBuilder for a "named" type. The preferred method is {@link #of(Class)},
+   * but this can be used if the type is unknown or irrelevant.
+   */
+  public static ToStringBuilder of(String name) {
+    return new ToStringBuilder(name);
+  }
+
+  /**
    * Create a ToStringBuilder for a regular POJO type without including the type in the name. Some
    * classes are always embedded in other classes and the type is given, for these cases this
    * builder make the toString a bit easier to read.
