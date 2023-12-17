@@ -4,7 +4,7 @@ import static org.opentripplanner.apis.gtfs.GraphQLUtils.toGraphQL;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
-import org.opentripplanner.api.mapping.PlannerErrorMapper;
+import org.opentripplanner.apis.common.mapping.PlannerErrorMapper;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
 import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.routing.api.response.RoutingError;

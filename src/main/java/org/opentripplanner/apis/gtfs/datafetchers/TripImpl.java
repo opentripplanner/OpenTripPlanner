@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.support.SemanticHash;
+import org.opentripplanner.apis.common.SemanticHash;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.GraphQLUtils;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;

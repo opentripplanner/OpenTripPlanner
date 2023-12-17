@@ -3,8 +3,8 @@ package org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.api.mapping.I18NStringMapper;
-import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.apis.common.mapping.PropertyMapper;
+import org.opentripplanner.ext.restapi.mapping.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalPlace;
 

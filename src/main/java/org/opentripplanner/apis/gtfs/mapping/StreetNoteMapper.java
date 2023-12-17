@@ -1,6 +1,6 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import org.opentripplanner.api.mapping.StreetNoteMaperMapper;
+import org.opentripplanner.ext.restapi.mapping.StreetNoteMaperMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;

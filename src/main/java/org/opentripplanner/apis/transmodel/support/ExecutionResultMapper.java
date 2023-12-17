@@ -4,7 +4,7 @@ import graphql.ErrorClassification;
 import graphql.ExecutionResult;
 import graphql.GraphQLError;
 import jakarta.ws.rs.core.Response;
-import org.opentripplanner.api.json.GraphQLResponseSerializer;
+import org.opentripplanner.apis.common.json.GraphQLResponseSerializer;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.http.OtpHttpStatus;
 
