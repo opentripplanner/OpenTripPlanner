@@ -120,8 +120,7 @@ public class PathStringBuilder {
   }
 
   public PathStringBuilder summary(int c1) {
-    PathStringBuilder pathStringBuilder = summaryStart();
-    return pathStringBuilder.c1(c1).summaryEnd();
+    return summaryStart().c1(c1).summaryEnd();
   }
 
   public PathStringBuilder summary(int startTime, int endTime, int nTransfers, int c1, int c2) {

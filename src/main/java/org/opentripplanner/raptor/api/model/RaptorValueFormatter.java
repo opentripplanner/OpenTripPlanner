@@ -44,7 +44,7 @@ public class RaptorValueFormatter {
     return UNIT_TRANSFER_PRIORITY + FORMAT_INT.format(value);
   }
 
-  /** Used to format integer in centi units like 1234 => 12.34.  */
+  /** Format integers in centi units like 1234 => 12.34.  */
   private static String formatCenti(int value) {
     if (value % 100 == 0) {
       value /= 100;

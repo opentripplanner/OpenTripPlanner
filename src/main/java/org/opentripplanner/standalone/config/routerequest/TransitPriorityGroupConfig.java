@@ -23,11 +23,11 @@ public class TransitPriorityGroupConfig {
         Use this to separate transit patterns into groups. Each group will be given a group-id. A
         path (multiple legs) will then have a set of group-ids based on the group-id from each leg.
         Hence, two paths with a different set of group-ids will BOTH be optimal unless the cost is
-        worse then the relaxation specified in the`relaxTransitPriorityGroup` parameter. This is 
+        worse than the relaxation specified in the `relaxTransitPriorityGroup` parameter. This is 
         only available in the TransmodelAPI for now.
         
-        Unmatched patterns is put in the BASE priority-group(group id: 0). This group is special.
-        If a path only have legs in the base group, then the path dominate other paths, but other
+        Unmatched patterns are put in the BASE priority-group (group id: 0). This group is special.
+        If a path only have legs in the base group, then that path dominates other paths, but other
         paths must be better to make it. 
         """
       )

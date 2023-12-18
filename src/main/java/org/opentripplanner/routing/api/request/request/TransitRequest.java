@@ -62,7 +62,7 @@ public class TransitRequest implements Cloneable, Serializable {
    * In other words, two patterns matching the same select and with the same agency-id
    * will get the same group-id.
    * <p>
-   * Note! Entities that is not matched is put in the BASE-GROUP with id 0.
+   * Note! Entities that are not matched are put in the BASE-GROUP with id 0.
    */
   public List<TransitPriorityGroupSelect> priorityGroupsByAgency() {
     return priorityGroupsByAgency;
@@ -80,7 +80,7 @@ public class TransitRequest implements Cloneable, Serializable {
   /**
    * A unique group-id is assigned all patterns grouped by matching selects.
    * <p>
-   * Note! Entities that is not matched is put in the BASE-GROUP with id 0.
+   * Note! Entities that are not matched are put in the BASE-GROUP with id 0.
    */
   public List<TransitPriorityGroupSelect> priorityGroupsGlobal() {
     return priorityGroupsGlobal;
