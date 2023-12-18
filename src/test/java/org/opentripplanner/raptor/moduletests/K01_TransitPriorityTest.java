@@ -70,10 +70,13 @@ public class K01_TransitPriorityTest {
   @BeforeEach
   private void prepareRequest() {
     // Each pattern depart at the same time, but arrive with 60s between them.
-    // Given a slack on the cost equals to ~90s make both L1 and L2 optimal, but no L3
+    // Given a slack on the cost equals to ~90s make both L1 and L2 optimal, but no L3.
+    // Line U1 is not optimal, because it slower than L1 and is in the same group
     data.withRoutes(
       route(pattern("L1", STOP_B, STOP_C).withPriorityGroup(GROUP_A))
         .withTimetable(schedule("00:02 00:12")),
+      route(pattern("U1", STOP_B, STOP_C).withPriorityGroup(GROUP_A))
+        .withTimetable(schedule("00:02 00:12:01")),
       route(pattern("L2", STOP_B, STOP_C).withPriorityGroup(GROUP_B))
         .withTimetable(schedule("00:02 00:13")),
       route(pattern("L3", STOP_B, STOP_C).withPriorityGroup(GROUP_C))
