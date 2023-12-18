@@ -462,7 +462,7 @@ Used to group requests when monitoring OTP.
       "speed" : 5,
       "reluctance" : 5.0,
       "boardCost" : 600,
-      "walking" : {
+      "walk" : {
         "reluctance" : 10.0,
         "stairsReluctance" : 150.0
       },

@@ -74,9 +74,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [allowedNetworks](#rd_bicycle_rental_allowedNetworks)                                                  |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                              | *Optional* |                  |  2.1  |
 |       [bannedNetworks](#rd_bicycle_rental_bannedNetworks)                                                    |       `string[]`       | The vehicle rental networks which may not be used. If empty, no networks are banned.                                                           | *Optional* |                  |  2.1  |
 |    triangle                                                                                                  |        `object`        | Triangle optimization criteria.                                                                                                                | *Optional* |                  |  2.5  |
-|    walking                                                                                                   |        `object`        | Preferences for walking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
-|       [hopCost](#rd_bicycle_walking_hopCost)                                                                 |        `integer`       | The cost of hopping on or off a vehicle.                                                                                                       | *Optional* | `0`              |  2.0  |
-|       [hopTime](#rd_bicycle_walking_hopTime)                                                                 |       `duration`       | The time it takes the user to hop on or off a vehicle in seconds.                                                                              | *Optional* | `"PT0S"`         |  2.0  |
+|    walk                                                                                                      |        `object`        | Preferences for walking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
+|       [hopCost](#rd_bicycle_walk_hopCost)                                                                    |        `integer`       | The cost of hopping on or off a vehicle.                                                                                                       | *Optional* | `0`              |  2.0  |
+|       [hopTime](#rd_bicycle_walk_hopTime)                                                                    |       `duration`       | The time it takes the user to hop on or off a vehicle in seconds.                                                                              | *Optional* | `"PT0S"`         |  2.0  |
 |       reluctance                                                                                             |        `double`        | A multiplier for how bad walking with a vehicle is, compared to being in transit for equal lengths of time.                                    | *Optional* | `5.0`            |  2.1  |
 |       speed                                                                                                  |        `double`        | The user's vehicle walking speed in meters/second. Defaults to approximately 3 MPH.                                                            | *Optional* | `1.33`           |  2.1  |
 |       stairsReluctance                                                                                       |        `double`        | How bad is it to walk the vehicle up/down a flight of stairs compared to taking a detour.                                                      | *Optional* | `10.0`           |  2.3  |
@@ -495,10 +495,10 @@ The vehicle rental networks which may be used. If empty all networks may be used
 
 The vehicle rental networks which may not be used. If empty, no networks are banned.
 
-<h3 id="rd_bicycle_walking_hopCost">hopCost</h3>
+<h3 id="rd_bicycle_walk_hopCost">hopCost</h3>
 
 **Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`   
-**Path:** /routingDefaults/bicycle/walking 
+**Path:** /routingDefaults/bicycle/walk 
 
 The cost of hopping on or off a vehicle.
 
@@ -506,10 +506,10 @@ There are different parameters for the cost of renting or parking a vehicle and 
 not meant for controlling the cost of those events.
 
 
-<h3 id="rd_bicycle_walking_hopTime">hopTime</h3>
+<h3 id="rd_bicycle_walk_hopTime">hopTime</h3>
 
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
-**Path:** /routingDefaults/bicycle/walking 
+**Path:** /routingDefaults/bicycle/walk 
 
 The time it takes the user to hop on or off a vehicle in seconds.
 
@@ -992,7 +992,7 @@ include stairs as a last result.
       "speed" : 5,
       "reluctance" : 5.0,
       "boardCost" : 600,
-      "walking" : {
+      "walk" : {
         "reluctance" : 10.0,
         "stairsReluctance" : 150.0
       },

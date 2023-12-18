@@ -73,7 +73,7 @@ public class VehicleWalkingConfig {
 
   static void mapVehicleWalking(NodeAdapter c, VehicleWalkingPreferences.Builder preferences) {
     var vehicleWalking = c
-      .of("walking")
+      .of("walk")
       .since(V2_5)
       .summary("Preferences for walking a vehicle.")
       .asObject();
