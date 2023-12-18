@@ -48,7 +48,10 @@ public class LocationGroupMapper {
       .withName(new NonLocalizedString(element.getName()));
 
     for (var location : element.getLocations()) {
-      Objects.requireNonNull(location, "Location group '%s' contains a null element.".formatted(element.getId()));
+      Objects.requireNonNull(
+        location,
+        "Location group '%s' contains a null element.".formatted(element.getId())
+      );
       switch (location) {
         case Stop stop -> groupStopBuilder.addLocation(stopMapper.map(stop));
         case Location loc -> groupStopBuilder.addLocation(locationMapper.map(loc));
