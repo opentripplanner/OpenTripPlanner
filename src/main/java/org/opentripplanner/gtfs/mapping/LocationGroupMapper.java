@@ -5,6 +5,7 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import org.onebusaway.gtfs.model.Location;
 import org.onebusaway.gtfs.model.LocationGroup;
 import org.onebusaway.gtfs.model.Stop;
@@ -46,14 +47,15 @@ public class LocationGroupMapper {
       .groupStop(mapAgencyAndId(element.getId()))
       .withName(new NonLocalizedString(element.getName()));
 
-    for (org.onebusaway.gtfs.model.StopLocation location : element.getLocations()) {
+    for (var location : element.getLocations()) {
+      Objects.requireNonNull(location, "Location group '%s' contains a null element.".formatted(element.getId()));
       switch (location) {
         case Stop stop -> groupStopBuilder.addLocation(stopMapper.map(stop));
         case Location loc -> groupStopBuilder.addLocation(locationMapper.map(loc));
         case LocationGroup ignored -> throw new RuntimeException(
           "Nested GroupStops are not allowed"
         );
-        case null, default -> throw new RuntimeException(
+        default -> throw new RuntimeException(
           "Unknown location type: " + location.getClass().getSimpleName()
         );
       }
