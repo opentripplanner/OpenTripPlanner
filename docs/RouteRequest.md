@@ -23,7 +23,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | elevatorBoardTime                                                                                            |        `integer`       | How long does it take to get on an elevator, on average.                                                                                       | *Optional* | `90`             |  2.0  |
 | elevatorHopCost                                                                                              |        `integer`       | What is the cost of travelling one floor on an elevator?                                                                                       | *Optional* | `20`             |  2.0  |
 | elevatorHopTime                                                                                              |        `integer`       | How long does it take to advance one floor on an elevator?                                                                                     | *Optional* | `20`             |  2.0  |
-| escalatorReluctance                                                                                          |        `double`        | A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time                                       | *Optional* | `1.5`            |  2.4  |
 | geoidElevation                                                                                               |        `boolean`       | If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.                                           | *Optional* | `false`          |  2.0  |
 | ignoreRealtimeUpdates                                                                                        |        `boolean`       | When true, real-time updates are ignored during this search.                                                                                   | *Optional* | `false`          |  2.0  |
 | [intersectionTraversalModel](#rd_intersectionTraversalModel)                                                 |         `enum`         | The model that computes the costs of turns.                                                                                                    | *Optional* | `"simple"`       |  2.2  |
@@ -37,18 +36,12 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [relaxTransitPriorityGroup](#rd_relaxTransitPriorityGroup)                                                   |        `string`        | The relax function for transit-priority-groups                                                                                                 | *Optional* | `"0s + 1.00 t"`  |  2.5  |
 | [relaxTransitSearchGeneralizedCostAtDestination](#rd_relaxTransitSearchGeneralizedCostAtDestination)         |        `double`        | Whether non-optimal transit paths at the destination should be returned                                                                        | *Optional* |                  |  2.3  |
 | [searchWindow](#rd_searchWindow)                                                                             |       `duration`       | The duration of the search-window.                                                                                                             | *Optional* |                  |  2.0  |
-| stairsReluctance                                                                                             |        `double`        | Used instead of walkReluctance for stairs.                                                                                                     | *Optional* | `2.0`            |  2.0  |
-| [stairsTimeFactor](#rd_stairsTimeFactor)                                                                     |        `double`        | How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.                                    | *Optional* | `3.0`            |  2.1  |
 | [streetRoutingTimeout](#rd_streetRoutingTimeout)                                                             |       `duration`       | The maximum time a street routing request is allowed to take before returning the results.                                                     | *Optional* | `"PT5S"`         |  2.2  |
 | [transferPenalty](#rd_transferPenalty)                                                                       |        `integer`       | An additional penalty added to boardings after the first.                                                                                      | *Optional* | `0`              |  2.0  |
 | [transferSlack](#rd_transferSlack)                                                                           |        `integer`       | The extra time needed to make a safe transfer in seconds.                                                                                      | *Optional* | `120`            |  2.0  |
 | turnReluctance                                                                                               |        `double`        | Multiplicative factor on expected turning time.                                                                                                | *Optional* | `1.0`            |  2.0  |
 | [unpreferredCost](#rd_unpreferredCost)                                                                       | `cost-linear-function` | A cost function used to calculate penalty for an unpreferred route.                                                                            | *Optional* | `"0s + 1.00 t"`  |  2.2  |
 | waitReluctance                                                                                               |        `double`        | How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.                                              | *Optional* | `1.0`            |  2.0  |
-| walkBoardCost                                                                                                |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that is used when boarding while walking.             | *Optional* | `600`            |  2.0  |
-| [walkReluctance](#rd_walkReluctance)                                                                         |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`            |  2.0  |
-| [walkSafetyFactor](#rd_walkSafetyFactor)                                                                     |        `double`        | Factor for how much the walk safety is considered in routing.                                                                                  | *Optional* | `1.0`            |  2.2  |
-| walkSpeed                                                                                                    |        `double`        | The user's walking speed in meters/second.                                                                                                     | *Optional* | `1.33`           |  2.0  |
 | accessEgress                                                                                                 |        `object`        | Parameters for access and egress routing.                                                                                                      | *Optional* |                  |  2.4  |
 |    [maxDuration](#rd_accessEgress_maxDuration)                                                               |       `duration`       | This is the maximum duration for access/egress for street searches.                                                                            | *Optional* | `"PT45M"`        |  2.1  |
 |    [maxStopCount](#rd_accessEgress_maxStopCount)                                                             |        `integer`       | Maximal number of stops collected in access/egress routing                                                                                     | *Optional* | `500`            |  2.4  |
@@ -134,6 +127,14 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [unpreferred](#rd_unpreferred)                                                                               |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                                    | *Optional* |                  |  2.2  |
 |    [agencies](#rd_unpreferred_agencies)                                                                      |   `feed-scoped-id[]`   | The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`                                                    | *Optional* |                  |  2.2  |
 |    [routes](#rd_unpreferred_routes)                                                                          |   `feed-scoped-id[]`   | The ids of the routes that incur an extra cost when being used. Format: `FeedId:RouteId`                                                       | *Optional* |                  |  2.2  |
+| walk                                                                                                         |        `object`        | Walking preferences.                                                                                                                           | *Optional* |                  |  2.5  |
+|    boardCost                                                                                                 |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that is used when boarding while walking.             | *Optional* | `600`            |  2.0  |
+|    escalatorReluctance                                                                                       |        `double`        | A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time                                       | *Optional* | `1.5`            |  2.4  |
+|    [reluctance](#rd_walk_reluctance)                                                                         |        `double`        | A multiplier for how bad walking is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`            |  2.0  |
+|    [safetyFactor](#rd_walk_safetyFactor)                                                                     |        `double`        | Factor for how much the walk safety is considered in routing.                                                                                  | *Optional* | `1.0`            |  2.2  |
+|    speed                                                                                                     |        `double`        | The user's walking speed in meters/second.                                                                                                     | *Optional* | `1.33`           |  2.0  |
+|    stairsReluctance                                                                                          |        `double`        | Used instead of walkReluctance for stairs.                                                                                                     | *Optional* | `2.0`            |  2.0  |
+|    [stairsTimeFactor](#rd_walk_stairsTimeFactor)                                                             |        `double`        | How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.                                    | *Optional* | `3.0`            |  2.1  |
 | wheelchairAccessibility                                                                                      |        `object`        | See [Wheelchair Accessibility](Accessibility.md)                                                                                               | *Optional* |                  |  2.2  |
 |    enabled                                                                                                   |        `boolean`       | Enable wheelchair accessibility.                                                                                                               | *Optional* | `false`          |  2.0  |
 |    inaccessibleStreetReluctance                                                                              |        `double`        | The factor to multiply the cost of traversing a street edge that is not wheelchair-accessible.                                                 | *Optional* | `25.0`           |  2.2  |
@@ -297,17 +298,6 @@ There is no need to set this when going to the next/previous page. The OTP Serve
 increase/decrease the search-window when paging to match the requested number of itineraries.
 
 
-<h3 id="rd_stairsTimeFactor">stairsTimeFactor</h3>
-
-**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `3.0`   
-**Path:** /routingDefaults 
-
-How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.
-
-Default value is based on: Fujiyama, T., & Tyler, N. (2010). Predicting the walking
-speed of pedestrians on stairs. Transportation Planning and Technology, 33(2), 177–202.
-
-
 <h3 id="rd_streetRoutingTimeout">streetRoutingTimeout</h3>
 
 **Since version:** `2.2` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT5S"`   
@@ -357,29 +347,6 @@ A cost function used to calculate penalty for an unpreferred route.
 Function should return number of seconds that we are willing to wait for preferred route
 or for an unpreferred agency's departure. For example: `5m + 2.0 t`
 
-
-<h3 id="rd_walkReluctance">walkReluctance</h3>
-
-**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`   
-**Path:** /routingDefaults 
-
-A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
-
-Empirically, values between 2 and 4 seem to correspond well to the concept of not wanting to walk
-too much without asking for totally ridiculous itineraries, but this observation should in no way
-be taken as scientific or definitive. Your mileage may vary.
-See https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on performance with
-high values.
-
-
-<h3 id="rd_walkSafetyFactor">walkSafetyFactor</h3>
-
-**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
-**Path:** /routingDefaults 
-
-Factor for how much the walk safety is considered in routing.
-
-Value should be between 0 and 1. If the value is set to be 0, safety is ignored.
 
 <h3 id="rd_accessEgress_maxDuration">maxDuration</h3>
 
@@ -934,6 +901,40 @@ The ids of the routes that incur an extra cost when being used. Format: `FeedId:
 
 How much cost is added is configured in `unpreferredCost`.
 
+<h3 id="rd_walk_reluctance">reluctance</h3>
+
+**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `2.0`   
+**Path:** /routingDefaults/walk 
+
+A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
+
+Empirically, values between 2 and 4 seem to correspond well to the concept of not wanting to walk
+too much without asking for totally ridiculous itineraries, but this observation should in no way
+be taken as scientific or definitive. Your mileage may vary.
+See https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on performance with
+high values.
+
+
+<h3 id="rd_walk_safetyFactor">safetyFactor</h3>
+
+**Since version:** `2.2` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `1.0`   
+**Path:** /routingDefaults/walk 
+
+Factor for how much the walk safety is considered in routing.
+
+Value should be between 0 and 1. If the value is set to be 0, safety is ignored.
+
+<h3 id="rd_walk_stairsTimeFactor">stairsTimeFactor</h3>
+
+**Since version:** `2.1` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `3.0`   
+**Path:** /routingDefaults/walk 
+
+How much more time does it take to walk a flight of stairs compared to walking a similar horizontal length.
+
+Default value is based on: Fujiyama, T., & Tyler, N. (2010). Predicting the walking
+speed of pedestrians on stairs. Transportation Planning and Technology, 33(2), 177–202.
+
+
 <h3 id="rd_wheelchairAccessibility_maxSlope">maxSlope</h3>
 
 **Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.083`   
@@ -980,17 +981,13 @@ include stairs as a last result.
 // router-config.json
 {
   "routingDefaults" : {
-    "walkSpeed" : 1.3,
     "numItineraries" : 12,
     "transferPenalty" : 0,
-    "walkReluctance" : 4.0,
-    "stairsReluctance" : 1.65,
     "turnReluctance" : 1.0,
     "elevatorBoardTime" : 90,
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
-    "escalatorReluctance" : 1.5,
     "bicycle" : {
       "speed" : 5,
       "reluctance" : 5.0,
@@ -1021,8 +1018,14 @@ include stairs as a last result.
         "dropOffCost" : 30
       }
     },
+    "walk" : {
+      "speed" : 1.3,
+      "reluctance" : 4.0,
+      "stairsReluctance" : 1.65,
+      "boardCost" : 600,
+      "escalatorReluctance" : 1.5
+    },
     "waitReluctance" : 1.0,
-    "walkBoardCost" : 600,
     "otherThanPreferredRoutesPenalty" : 300,
     "transferSlack" : 120,
     "boardSlackForMode" : {

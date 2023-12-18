@@ -451,17 +451,13 @@ Used to group requests when monitoring OTP.
     ]
   },
   "routingDefaults" : {
-    "walkSpeed" : 1.3,
     "numItineraries" : 12,
     "transferPenalty" : 0,
-    "walkReluctance" : 4.0,
-    "stairsReluctance" : 1.65,
     "turnReluctance" : 1.0,
     "elevatorBoardTime" : 90,
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
-    "escalatorReluctance" : 1.5,
     "bicycle" : {
       "speed" : 5,
       "reluctance" : 5.0,
@@ -492,8 +488,14 @@ Used to group requests when monitoring OTP.
         "dropOffCost" : 30
       }
     },
+    "walk" : {
+      "speed" : 1.3,
+      "reluctance" : 4.0,
+      "stairsReluctance" : 1.65,
+      "boardCost" : 600,
+      "escalatorReluctance" : 1.5
+    },
     "waitReluctance" : 1.0,
-    "walkBoardCost" : 600,
     "otherThanPreferredRoutesPenalty" : 300,
     "transferSlack" : 120,
     "boardSlackForMode" : {

@@ -1,11 +1,8 @@
 {
   "configVersion" : "{{ Entur CI config build number inserted here }}",
   "routingDefaults": {
-    "walkSpeed": 1.3,
     "numItineraries": 12,
     "transferPenalty": 0,
-    "walkReluctance": 4.0,
-    "stairsReluctance": 1.65,
     "turnReluctance": 1.0,
     "elevatorBoardTime": 90,
     "elevatorBoardCost": 90,
@@ -40,8 +37,13 @@
         "dropOffCost": 30
       }
     },
+    "walk": {
+      "speed": 1.3,
+      "reluctance": 4.0,
+      "stairsReluctance": 1.65,
+      "boardCost": 600
+    },
     "waitReluctance": 1.0,
-    "walkBoardCost": 600,
     "otherThanPreferredRoutesPenalty": 300,
     "transferSlack": 120,
     // Default slack for any mode is 0 (zero)

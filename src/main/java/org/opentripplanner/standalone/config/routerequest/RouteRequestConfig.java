@@ -677,17 +677,18 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
 
   private static void mapWalkPreferences(NodeAdapter c, WalkPreferences.Builder walk) {
     var dft = walk.original();
+    NodeAdapter cw = c.of("walk").since(V2_5).summary("Walking preferences.").asObject();
     walk
       .withSpeed(
-        c
-          .of("walkSpeed")
+        cw
+          .of("speed")
           .since(V2_0)
           .summary("The user's walking speed in meters/second.")
           .asDouble(dft.speed())
       )
       .withReluctance(
-        c
-          .of("walkReluctance")
+        cw
+          .of("reluctance")
           .since(V2_0)
           .summary(
             "A multiplier for how bad walking is, compared to being in transit for equal lengths of time."
@@ -704,8 +705,8 @@ high values.
           .asDouble(dft.reluctance())
       )
       .withBoardCost(
-        c
-          .of("walkBoardCost")
+        cw
+          .of("boardCost")
           .since(V2_0)
           .summary(
             """
@@ -716,14 +717,14 @@ high values.
           .asInt(dft.boardCost())
       )
       .withStairsReluctance(
-        c
+        cw
           .of("stairsReluctance")
           .since(V2_0)
           .summary("Used instead of walkReluctance for stairs.")
           .asDouble(dft.stairsReluctance())
       )
       .withStairsTimeFactor(
-        c
+        cw
           .of("stairsTimeFactor")
           .since(V2_1)
           .summary(
@@ -738,8 +739,8 @@ high values.
           .asDouble(dft.stairsTimeFactor())
       )
       .withSafetyFactor(
-        c
-          .of("walkSafetyFactor")
+        cw
+          .of("safetyFactor")
           .since(V2_2)
           .summary("Factor for how much the walk safety is considered in routing.")
           .description(
@@ -748,7 +749,7 @@ high values.
           .asDouble(dft.safetyFactor())
       )
       .withEscalatorReluctance(
-        c
+        cw
           .of("escalatorReluctance")
           .since(V2_4)
           .summary(
