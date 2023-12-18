@@ -375,11 +375,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       serviceDate
     );
 
-    // Add new trip times to the buffer and return success
+    // Add new trip times to the buffer and return result with success or error. The update method
+    // will perform protective copies as needed whether TripPattern is from realtime data or not.
     var result = buffer.update(pattern, tripUpdate.tripTimes(), serviceDate);
-
     LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
-
     return result;
   }
 

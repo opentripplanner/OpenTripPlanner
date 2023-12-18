@@ -12,7 +12,6 @@ import java.util.function.Function;
 import javax.annotation.Nonnull;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.network.TripPatternBuilder;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -20,23 +19,42 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
+ * Threadsafe mechanism for tracking any TripPatterns added to the graph via SIRI realtime messages.
+ * This tracks only patterns added by realtime messages, not ones that already existed from the
+ * scheduled NeTEx. This is a "cache" in the sense that it will keep returning the same TripPattern
+ * when presented with the same StopPattern, so if realtime messages add many trips passing through
+ * the same sequence of stops, they will all end up on this same TripPattern.
+ * <p>
+ * Note that there are two versions of this class, this one for GTFS-RT and another for SIRI.
+ * See additional comments in the Javadoc of the GTFS-RT version of this class.
  */
 public class SiriTripPatternCache {
 
   private static final Logger log = LoggerFactory.getLogger(SiriTripPatternCache.class);
 
+  // Seems to be the primary collection of added TripPatterns, with other collections serving as
+  // indexes. Similar to TripPatternCache.cache but with service date as part of the key.
   private final Map<StopPatternServiceDateKey, TripPattern> cache = new HashMap<>();
 
+  // Apparently a SIRI-specific index for use in GraphQL APIs (missing on GTFS-RT version).
   private final ListMultimap<StopLocation, TripPattern> patternsForStop = Multimaps.synchronizedListMultimap(
     ArrayListMultimap.create()
   );
 
+  // TODO clarify name and add documentation to this field
   private final Map<TripServiceDateKey, TripPattern> updatedTripPatternsForTripCache = new HashMap<>();
 
+  // TODO generalize this so we can generate IDs for SIRI or GTFS-RT sources
   private final SiriTripPatternIdGenerator tripPatternIdGenerator;
+
+  // TODO clarify name and add documentation to this field, and why it's constructor injected
   private final Function<Trip, TripPattern> getPatternForTrip;
 
+  /**
+   * Constructor.
+   * TODO: clarify why the ID generator and pattern fetching function are injected. Potentially
+   *     make the class usable for GTFS-RT cases by injecting different ID generator etc.
+   */
   public SiriTripPatternCache(
     SiriTripPatternIdGenerator tripPatternIdGenerator,
     Function<Trip, TripPattern> getPatternForTrip
@@ -45,9 +63,15 @@ public class SiriTripPatternCache {
     this.getPatternForTrip = getPatternForTrip;
   }
 
+  // Below was clearly derived from a method from TripPatternCache, down to the obsolete Javadoc
+  // mentioning transit vertices and edges (which don't exist since raptor was adopted).
+  // Note that this is the only non-dead-code public method on this class, and mirrors the only
+  // public method on the GTFS-RT version of TripPatternCache.
+  // It also explains why this class is called a "cache". It allows reusing the same TripPattern
+  // instance when many different trips are created or updated with the same pattern.
+
   /**
-   * Get cached trip pattern or create one if it doesn't exist yet. If a trip pattern is created,
-   * vertices and edges for this trip pattern are also created in the transitModel.
+   * Get cached trip pattern or create one if it doesn't exist yet.
    *
    * @param stopPattern stop pattern to retrieve/create trip pattern
    * @param trip        Trip containing route of new trip pattern in case a new trip pattern will be
@@ -61,6 +85,9 @@ public class SiriTripPatternCache {
   ) {
     TripPattern originalTripPattern = getPatternForTrip.apply(trip);
 
+    // TODO: verify, this is different than GTFS-RT version
+    //   It can return a TripPattern from the scheduled data, but protective copies are handled
+    //   in TimetableSnapshot.update. Document better this aspect of the contract in this method's Javadoc.
     if (originalTripPattern.getStopPattern().equals(stopPattern)) {
       return originalTripPattern;
     }
@@ -90,38 +117,41 @@ public class SiriTripPatternCache {
       cache.put(key, tripPattern);
     }
 
-    /**
-     *
-     * When the StopPattern is first modified (e.g. change of platform), then updated (or vice versa), the stopPattern is altered, and
-     * the StopPattern-object for the different states will not be equal.
-     *
-     * This causes both tripPatterns to be added to all unchanged stops along the route, which again causes duplicate results
-     * in departureRow-searches (one departure for "updated", one for "modified").
-     *
-     * Full example:
-     *      Planned stops: Stop 1 - Platform 1, Stop 2 - Platform 1
-     *
-     *      StopPattern #rt1: "updated" stopPattern cached in 'patternsForStop':
-     *          - Stop 1, Platform 1
-     *          	- StopPattern #rt1
-     *          - Stop 2, Platform 1
-     *          	- StopPattern #rt1
-     *
-     *      "modified" stopPattern: Stop 1 - Platform 1, Stop 2 - Platform 2
-     *
-     *      StopPattern #rt2: "modified" stopPattern cached in 'patternsForStop' will then be:
-     *          - Stop 1, Platform 1
-     *          	- StopPattern #rt1, StopPattern #rt2
-     *          - Stop 2, Platform 1
-     *          	- StopPattern #rt1
-     *          - Stop 2, Platform 2
-     *          	- StopPattern #rt2
-     *
-     *
-     * Therefore, we must cleanup the duplicates by deleting the previously added (and thus outdated)
-     * tripPattern for all affected stops. In example above, "StopPattern #rt1" should be removed from all stops
-     *
-     */
+    /*
+     When the StopPattern is first modified (e.g. change of platform), then updated (or vice
+     versa), the stopPattern is altered, and the StopPattern-object for the different states will
+     not be equal.
+
+     This causes both tripPatterns to be added to all unchanged stops along the route, which again
+     causes duplicate results in departureRow-searches (one departure for "updated", one for
+     "modified").
+
+     Full example:
+          Planned stops: Stop 1 - Platform 1, Stop 2 - Platform 1
+
+          StopPattern #rt1: "updated" stopPattern cached in 'patternsForStop':
+              - Stop 1, Platform 1
+              	- StopPattern #rt1
+              - Stop 2, Platform 1
+              	- StopPattern #rt1
+
+          "modified" stopPattern: Stop 1 - Platform 1, Stop 2 - Platform 2
+
+          StopPattern #rt2: "modified" stopPattern cached in 'patternsForStop' will then be:
+              - Stop 1, Platform 1
+              	- StopPattern #rt1, StopPattern #rt2
+              - Stop 2, Platform 1
+              	- StopPattern #rt1
+              - Stop 2, Platform 2
+              	- StopPattern #rt2
+
+     Therefore, we must clean up the duplicates by deleting the previously added (and thus
+     outdated) tripPattern for all affected stops. In example above, "StopPattern #rt1" should be
+     removed from all stops.
+
+     TODO explore why this particular case is handled in an ad-hoc manner. It seems like all such
+       indexes should be constantly rebuilt and versioned along with the TimetableSnapshot.
+    */
     TripServiceDateKey tripServiceDateKey = new TripServiceDateKey(trip, serviceDate);
     if (updatedTripPatternsForTripCache.containsKey(tripServiceDateKey)) {
       // Remove previously added TripPatterns for the trip currently being updated - if the stopPattern does not match
@@ -138,10 +168,8 @@ public class SiriTripPatternCache {
           (System.currentTimeMillis() - t1),
           trip.getId()
         );
-        /*
-                  TODO: Also remove previously updated - now outdated - TripPattern from cache ?
-                  cache.remove(new StopPatternServiceDateKey(cachedTripPattern.stopPattern, serviceDate));
-                */
+        // TODO: Also remove previously updated - now outdated - TripPattern from cache ?
+        // cache.remove(new StopPatternServiceDateKey(cachedTripPattern.stopPattern, serviceDate));
       }
     }
 
@@ -160,6 +188,7 @@ public class SiriTripPatternCache {
 
   /**
    * Returns any new TripPatterns added by real time information for a given stop.
+   * TODO: this appears to be currently unused. Perhaps remove it if the API has changed.
    *
    * @param stop the stop
    * @return list of TripPatterns created by real time sources for the stop.
@@ -169,6 +198,16 @@ public class SiriTripPatternCache {
   }
 }
 
+//// Below here are multiple additional private classes defined in the same top-level class file.
+//// TODO: move these private classes inside the above class as private static inner classes.
+
+/**
+ * Serves as the key for the collection of realtime-added TripPatterns.
+ * Must define hashcode and equals to confer semantic identity.
+ * It seems like there's a separate TripPattern instance for each StopPattern and service date,
+ * rather a single TripPattern instance associated with a separate timetable for each date.
+ * TODO: clarify why each date has a different TripPattern instead of a different Timetable.
+ */
 class StopPatternServiceDateKey {
 
   StopPattern stopPattern;
@@ -194,6 +233,11 @@ class StopPatternServiceDateKey {
   }
 }
 
+/**
+ * An alternative key for looking up realtime-added TripPatterns by trip and service date instead
+ * of stop pattern and service date. Must define hashcode and equals to confer semantic identity.
+ * TODO verify whether one map is considered the definitive collection and the other an index.
+ */
 class TripServiceDateKey {
 
   Trip trip;

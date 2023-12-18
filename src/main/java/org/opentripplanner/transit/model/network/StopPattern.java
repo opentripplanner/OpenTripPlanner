@@ -84,6 +84,7 @@ public final class StopPattern implements Serializable {
     return new StopPatternBuilder(new StopPattern(length));
   }
 
+  // TODO: name is deceptive as this does not mutate the object in place, it mutates a copy
   public StopPatternBuilder mutate() {
     return new StopPatternBuilder(this);
   }

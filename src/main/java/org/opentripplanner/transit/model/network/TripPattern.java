@@ -56,29 +56,55 @@ public final class TripPattern
   private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
   private final Route route;
+
   /**
-   * The stop-pattern help us reuse the same stops in several trip-patterns; Hence saving memory.
-   * The field should not be accessible outside the class, and all access is done through method
-   * delegation, like the {@link #numberOfStops()} and {@link #canBoard(int)} methods.
+   * The Route and StopPattern together form the primary key of the TripPattern. They are the shared
+   * set of characteristics that group many trips together into one TripPattern. This grouping saves
+   * memory by not replicating any details shared across all trips in the TripPattern, but it is
+   * also essential to some optimizations in routing algorithms like Raptor.
+   * <p>
+   * This field should not be accessed outside this class. All access to the StopPattern is
+   * performed through method  delegation, like the {@link #numberOfStops()} and
+   * {@link #canBoard(int)} methods.
    */
   private final StopPattern stopPattern;
+
+  /**
+   * TripPatterns hold a reference to a Timetable (i.e. TripTimes for all Trips in the pattern) for
+   * only scheduled trips from the GTFS or NeTEx data. If any trips were later updated in real time,
+   * there will be another Timetable holding those updates and reading through to the scheduled one.
+   * This realtime Timetable is retrieved from a TimetableSnapshot.
+   * Also see end of Javadoc on TimetableSnapshot for more details.
+   */
   private final Timetable scheduledTimetable;
+
+  // This TransitMode is a redundant replication/memoization of information on the Route.
+  // It appears that in the TripPatternBuilder it is only ever set from a Trip which is itself set
+  // from a Route. TODO confirm whether there is any reason this doesn't just read through to Route.
   private final TransitMode mode;
+
   private final SubMode netexSubMode;
   private final boolean containsMultipleModes;
   private String name;
-  /**
-   * Geometries of each inter-stop segment of the tripPattern.
-   */
+
+  /** Geometries of each inter-stop segment of the tripPattern. */
   private final byte[][] hopGeometries;
 
   /**
    * The original TripPattern this replaces at least for one modified trip.
+   *
+   * Currently this seems to only be set (via TripPatternBuilder) from TripPatternCache and
+   * SiriTripPatternCache.
+   *
+   * FIXME this is only used rarely, make that obvious from comments.
    */
   private final TripPattern originalTripPattern;
 
   /**
-   * Has the TripPattern been created by a real-time update.
+   * When a trip is added or rerouted by a realtime update, this may give rise to a new TripPattern
+   * that did not exist in the scheduled data. For such TripPatterns this field will be true. If on
+   * the other hand this TripPattern instance was created from the schedule data, this field will be
+   * false.
    */
   private final boolean createdByRealtimeUpdater;
 

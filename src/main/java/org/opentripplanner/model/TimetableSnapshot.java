@@ -20,7 +20,6 @@ import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
-import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateSuccess;
@@ -28,58 +27,106 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Part of concurrency control for stoptime updates.
+ * A TimetableSnapshot holds a set of realtime-updated Timetables frozen at a moment in time. It
+ * can return a Timetable for any TripPattern in the public transit network considering all
+ * accumulated realtime updates, falling back on the scheduled Timetable if no updates have been
+ * applied for a given TripPattern.
  * <p>
- * All updates should be performed on a snapshot before it is handed off to any searches. A single
+ * This is a central part of managing concurrency when many routing searches may be happening, but
+ * realtime updates are also streaming in which change the vehicle arrival and departure times.
+ * Any given request will only see one unchanging TimetableSnapshot over the course of its search.
+ * <p>
+ * An instance of TimetableSnapshot first serves as a buffer to accumulate a batch of incoming
+ * updates on top of any already known updates to the base schedules. From time to time such a batch
+ * of updates is committed (like a database transaction). At this point the TimetableSnapshot is
+ * treated as immutable and becomes available for use by new incoming routing requests.
+ * <p>
+ * All updates to a snapshot must be completed before it is handed off to any searches. A single
  * snapshot should be used for an entire search, and should remain unchanged for that duration to
  * provide a consistent view not only of trips that have been boarded, but of relative arrival and
  * departure times of other trips that have not necessarily been boarded.
  * <p>
- * At this point, only one writing thread at a time is supported.
+ * A TimetableSnapshot instance may only be modified by a single thread. This makes it easier to
+ * reason about how the snapshot is built up and used. Write operation are applied one by one in
+ * order with no concurrent access, then read operations are allowed concurrently by many threads
+ * once writing is forbidden.
  * <p>
+ * The fact that TripPattern instances carry a reference only to their scheduled Timetable and not
+ * to their realtime timetable is largely due to historical path-dependence in OTP development.
+ * Streaming realtime support was added around 2013 as a sort of sandbox feature that was switched
+ * off by default. Looking up realtime timetables during routing was a fringe feature that needed
+ * to impose near-zero cost and avoid introducing complexity into the primary codebase. Now over
+ * ten years later, the principles of how this system operates are rather stable, but the
+ * implementation would benefit from some deduplication and cleanup. Once that is complete, looking
+ * up timetables on this class could conceivably be replaced with snapshotting entire views of the
+ * transit network. It would also be possible to make the realtime version of Timetables or
+ * TripTimes the primary view, and include references back to their scheduled versions.
  */
 public class TimetableSnapshot {
 
   private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
 
   /**
-   * A set of all timetables which have been modified and are waiting to be indexed. When
-   * <code>dirty</code> is <code>null</code>, it indicates that the snapshot is read-only.
+   * During the construction phase of the TimetableSnapshot, before it is considered immutable and
+   * used in routing, this Set holds all timetables that have been modified and are waiting to be
+   * indexed. This field will be set to null when the TimetableSnapshot becomes read-only.
    */
   private final Set<Timetable> dirtyTimetables = new HashSet<>();
 
   /**
-   * The timetables for different days, for each TripPattern (each sequence of stops on a particular
-   * Route) for which we have an updated Timetable. The keys include both TripPatterns from the
-   * scheduled GTFS, and TripPatterns added by realtime messages and tracked by the
-   * TripPatternCache. Note that the keys will not include all scheduled TripPatterns, only those
-   * for which we've got an update. We use a HashMap rather than a Map so we can clone it. If this
-   * turns out to be slow/spacious we can use an array with integer pattern indexes. The SortedSet
-   * members are copy-on-write.
-   * FIXME: this could be made into a flat hashtable with compound keys.
+   * For each TripPattern (sequence of stops on a particular Route) for which we have received a
+   * realtime update, an ordered set of timetables on different days. The key TripPatterns may
+   * include ones from the scheduled GTFS, as well as ones added by realtime messages and
+   * tracked by the TripPatternCache. <p>
+   * Note that the keys do not include all scheduled TripPatterns, only those for which we have at
+   * least one update. The type of the field is specifically HashMap (rather than the more general
+   * Map interface) because we need to efficiently clone it. <p>
+   * The members of the SortedSet (the Timetable for a particular day) are treated as copy-on-write
+   * when we're updating them. If an update will modify the timetable for a particular day, that
+   * timetable is replicated before any modifications are applied to avoid affecting any previous
+   * TimetableSnapshots still in circulation which reference that same Timetable instance. <p>
+   * Alternative implementations: A. This could be an array indexed using the integer pattern
+   * indexes. B. It could be made into a flat hashtable with compound keys (TripPattern, LocalDate).
+   * The compound key approach better reflects the fact that there should be only one Timetable per
+   * TripPattern and date.
    */
   private HashMap<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
 
   /**
-   * <p>
-   * Map containing the current trip pattern given a trip id and a service date, if it has been
-   * changed from the scheduled pattern with an update, for which the stopPattern is different.
-   * </p>
-   * <p>
-   * This is a HashMap and not a Map so the clone function is available.
+   * For cases where the trip pattern (sequence of stops visited) has been changed by a realtime
+   * update, a Map associating the updated trip pattern with a compound key of the feed-scoped
+   * trip ID and the service date. The type of this field is HashMap rather than the more general
+   * Map interface because we need to efficiently clone it whenever we start building up a new
+   * snapshot. TODO: clarify if this is an index or the original source of truth.
    */
   private HashMap<TripIdAndServiceDate, TripPattern> realtimeAddedTripPattern = new HashMap<>();
 
   /**
-   * This maps contains all of the new or updated TripPatterns added by realtime data indexed on
-   * stop. This has to be kept in order for them to be included in the stop times api call on a
-   * specific stop.
-   * <p>
-   * This is a SetMultimap, so that each pattern can only be added once.
-   * <p>
-   * TODO Find a generic way to keep all realtime indexes.
+   * This is an index of TripPatterns, not the primary collection.
+   * It tracks which TripPatterns that were updated or newly created by realtime messages contain
+   * which stops. This allows them to be readily found and included in API responses containing
+   * stop times at a specific stop. This is a SetMultimap, so that each pattern is only retained
+   * once per stop even if it's added more than once.
+   * TODO: Better, more general handling of all realtime indexes outside primary data structures.
    */
   private SetMultimap<StopLocation, TripPattern> patternsForStop = HashMultimap.create();
+
+  /**
+   * This is an as-yet unused alternative to the current boolean fields readOnly and dirty, as well
+   * as setting dirtyTimetables to null. A given instance of TimetableSnapshot should progress
+   * through all these states in order, and cannot return to a previous state.
+   */
+  private enum TimetableSnapshotState {
+    WRITABLE_CLEAN, WRITBLE_DIRTY, INDEXING, READ_ONLY
+  }
+
+  /**
+   * Which stage of existence this TimetableSnapshot is in, which determines whether it's read-only.
+   * Writing to TimetableSnapshots is not concurrent and does not happen in hot methods. On the
+   * other hand, reading is expected to be highly concurrent and happens during core routing
+   * processes. Therefore, any assertions about state should be concentrated in the writing methods.
+   */
+  private TimetableSnapshotState state;
 
   /**
    * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it
@@ -164,8 +211,9 @@ public class TimetableSnapshot {
   }
 
   /**
-   * Update the trip times of one trip in a timetable of a trip pattern. If the trip of the trip
-   * times does not exist yet in the timetable, add it.
+   * Update the TripTimes of one Trip in a Timetable of a TripPattern. If the Trip of the TripTimes
+   * does not exist yet in the Timetable, add it. This method will make a protective copy
+   * of the Timetable if such a copy has not already been made while building up this snapshot.
    *
    * @param pattern          trip pattern
    * @param updatedTripTimes updated trip times
