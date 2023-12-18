@@ -14,6 +14,7 @@ import { ItineraryFilterDebugSelect } from './ItineraryFilterDebugSelect.tsx';
 import Navbar from 'react-bootstrap/Navbar';
 import { ServerInfoTooltip } from './ServerInfoTooltip.tsx';
 import { useRef, useState } from 'react';
+import logo from '../../static/img/otp-logo.svg';
 
 type SearchBarProps = {
   onRoute: () => void;
@@ -31,14 +32,7 @@ export function SearchBar({ onRoute, tripQueryVariables, setTripQueryVariables, 
     <div className="search-bar top-content">
       <Navbar.Brand onClick={() => setShowServerInfo((v) => !v)}>
         <div style={{ position: 'relative' }} ref={target}>
-          <img
-            alt=""
-            src="/debug-client-preview/img/otp-logo.svg"
-            width="30"
-            height="30"
-            className="d-inline-block align-top"
-          />{' '}
-          OTP Debug Client
+          <img alt="" src={logo} width="30" height="30" className="d-inline-block align-top" /> OTP Debug Client
           {showServerInfo && <ServerInfoTooltip serverInfo={serverInfo} target={target} />}
         </div>
       </Navbar.Brand>
