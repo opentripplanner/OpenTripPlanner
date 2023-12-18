@@ -37,7 +37,7 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     }
     this.stop = other.stop();
     this.durationInSeconds = other.durationInSeconds() + (int) penalty.time().toSeconds();
-    this.generalizedCost = other.generalizedCost() + penalty.cost().toCentiSeconds();
+    this.generalizedCost = other.c1() + penalty.cost().toCentiSeconds();
     this.penalty = penalty;
     this.lastState = other.getLastState();
   }
@@ -62,7 +62,7 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
-  public int generalizedCost() {
+  public int c1() {
     return generalizedCost;
   }
 
@@ -119,7 +119,7 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     return (
       stop() == that.stop() &&
       durationInSeconds() == that.durationInSeconds() &&
-      generalizedCost() == that.generalizedCost() &&
+      c1() == that.c1() &&
       penalty().equals(that.penalty())
     );
   }

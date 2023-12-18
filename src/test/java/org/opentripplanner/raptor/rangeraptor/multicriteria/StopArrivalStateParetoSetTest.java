@@ -44,27 +44,27 @@ public class StopArrivalStateParetoSetTest {
   private static final int STOP_6 = 6;
 
   // Make sure all "base" arrivals have the same cost
-  private static final int BASE_COST = 1;
+  private static final int BASE_C1 = 1;
 
   private static final StopArrivalFactoryC1<RaptorTripSchedule> STOP_ARRIVAL_FACTORY = new StopArrivalFactoryC1<>();
   private static final McStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = newAccessStopState(
     999,
     5,
-    BASE_COST
+    BASE_C1
   );
 
   private static final McStopArrival<RaptorTripSchedule> TRANSIT_L1 = newTransitStopState(
     ROUND_1,
     998,
     10,
-    BASE_COST
+    BASE_C1
   );
 
   private static final McStopArrival<RaptorTripSchedule> TRANSIT_L2 = newTransitStopState(
     ROUND_2,
     997,
     20,
-    BASE_COST
+    BASE_C1
   );
   public static final ArrivalParetoSetComparatorFactory<McStopArrival<RaptorTripSchedule>> COMPARATOR_FACTORY = ArrivalParetoSetComparatorFactory.factory(
     RelaxFunction.NORMAL,

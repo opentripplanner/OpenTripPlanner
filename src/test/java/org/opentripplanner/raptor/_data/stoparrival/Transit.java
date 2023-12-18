@@ -7,19 +7,20 @@ import org.opentripplanner.raptor.api.model.PathLegType;
 import org.opentripplanner.raptor.api.view.ArrivalView;
 import org.opentripplanner.raptor.api.view.TransitPathView;
 
-public class Bus extends AbstractStopArrival implements TransitPathView<TestTripSchedule> {
+class Transit extends AbstractStopArrival implements TransitPathView<TestTripSchedule> {
 
   private final TestTripSchedule trip;
 
-  public Bus(
+  Transit(
     int round,
     int stop,
     int arrivalTime,
-    int cost,
+    int c1,
+    int c2,
     TestTripSchedule trip,
     ArrivalView<TestTripSchedule> previous
   ) {
-    super(round, stop, arrivalTime, cost, previous);
+    super(round, stop, arrivalTime, c1, c2, previous);
     this.trip = trip;
   }
 

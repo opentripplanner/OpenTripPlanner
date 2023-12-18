@@ -3,9 +3,9 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model.passthr
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestCase.testCase;
+import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.domainService;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.pathBuilder;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.pathFocus;
-import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.subject;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.tx;
 
 import java.util.List;
@@ -141,6 +141,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
 
     // We need *a* path - the transfer here can be any.
     var originalPath = pathBuilder()
+      .c2(tc.points().size())
       .access(ITERATION_START_TIME, STOP_B, D1s)
       .bus(trip1, STOP_D)
       .walk(txCost.walkDuration(STOP_D, STOP_F), STOP_F)
@@ -148,6 +149,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
       .egress(D1s);
 
     var expectedPath = pathBuilder()
+      .c2(tc.points().size())
       .access(ITERATION_START_TIME, STOP_B, D1s)
       .bus(trip1, tc.stopIndexA())
       .walk(txCost.walkDuration(tc.stopIndexA(), tc.stopIndexB()), tc.stopIndexB())
@@ -157,7 +159,7 @@ public class PassThroughOneTransferTest implements RaptorTestConstants {
     // These are illegal transfers for the given path, we add them here to make sure they
     // do not interfere with the result. For simpler debugging problems try commenting out these
     // lines, just do not forget to comment them back in when the problem is fixed.
-    var subject = subject(
+    var subject = domainService(
       tc.points(),
       List.of(
         tx(trip1, STOP_C, trip2, STOP_G, txCost),

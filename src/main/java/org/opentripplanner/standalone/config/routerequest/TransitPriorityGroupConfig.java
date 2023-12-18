@@ -20,23 +20,20 @@ public class TransitPriorityGroupConfig {
       .summary("Transit priority groups configuration")
       .description(
         """
-        Use this to separate transit patterns into groups. Each group will be given a priority
-        when compared with other groups. Hence, two paths with a different set of groups will BOTH
-        be returned unless the cost is worse then the relaxation specified in the
-        `relaxTransitPriorityGroup` parameter. This is only available in the TransmodelAPI for now.
+        Use this to separate transit patterns into groups. Each group will be given a group-id. A
+        path (multiple legs) will then have a set of group-ids based on the group-id from each leg.
+        Hence, two paths with a different set of group-ids will BOTH be optimal unless the cost is
+        worse than the relaxation specified in the `relaxTransitPriorityGroup` parameter. This is 
+        only available in the TransmodelAPI for now.
+        
+        Unmatched patterns are put in the BASE priority-group (group id: 0). This group is special.
+        If a path only have legs in the base group, then that path dominates other paths, but other
+        paths must be better to make it. 
         """
       )
       .experimentalFeature()
       .asObject();
 
-    transit.addPriorityGroupsBase(
-      TransitPriorityGroupConfig.mapList(
-        c,
-        "base",
-        "All groups in base get the same group-id(GROUP_ZERO). Normally you will put all " +
-        "local-traffic and other 'non-problematic' services here."
-      )
-    );
     transit.addPriorityGroupsByAgency(
       TransitPriorityGroupConfig.mapList(
         c,
