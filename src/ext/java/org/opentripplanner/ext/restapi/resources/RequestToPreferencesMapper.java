@@ -70,7 +70,6 @@ class RequestToPreferencesMapper {
       setIfNotNull(
         req.bikeOptimizeType,
         optimizeType -> bike.withOptimizeType(LegacyBicycleOptimizeType.map(optimizeType))
-      );
 
       if (req.bikeOptimizeType == LegacyBicycleOptimizeType.TRIANGLE) {
         bike.withOptimizeTriangle(triangle -> {
