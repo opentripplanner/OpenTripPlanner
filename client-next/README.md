@@ -22,7 +22,7 @@ generated during build and are not checked into the repository.
 Use latest LTS version of Node/npm (currently v18). Recommend using a version manager such as `nvm`.
 
 The dev and production builds require graphql schema to be present at
-`../src/ext/graphql/transmodelapi/schema.graphql`.
+`../src/main/resources/org/opentripplanner/apis/transmodel/schema.graphql`.
 
 ## Getting started (development)
 
