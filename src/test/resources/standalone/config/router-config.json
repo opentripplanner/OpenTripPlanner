@@ -13,15 +13,9 @@
   },
   "routingDefaults": {
     "walkSpeed": 1.3,
-    "bikeSpeed": 5,
-    "carSpeed": 40,
     "numItineraries": 12,
     "transferPenalty": 0,
     "walkReluctance": 4.0,
-    "bikeReluctance": 5.0,
-    "bikeWalkingReluctance": 10.0,
-    "bikeStairsReluctance": 150.0,
-    "carReluctance": 10.0,
     "stairsReluctance": 1.65,
     "turnReluctance": 1.0,
     "elevatorBoardTime": 90,
@@ -29,17 +23,38 @@
     "elevatorHopTime": 20,
     "elevatorHopCost": 20,
     "escalatorReluctance": 1.5,
-    "vehicleRental": {
-      "pickupCost": 120,
-      "dropOffTime": 30,
-      "dropOffCost": 30
+    "bicycle": {
+      "speed": 5,
+      "reluctance": 5.0,
+      "boardCost": 600,
+      "walking": {
+        "reluctance": 10.0,
+        "stairsReluctance": 150.0
+      },
+      "rental": {
+        "pickupCost": 120,
+        "dropOffTime": 30,
+        "dropOffCost": 30
+      },
+      "parking": {
+        "parkTime": "1m",
+        "parkCost": 120
+      }
     },
-    "bikeParkTime": "1m",
-    "bikeParkCost": 120,
-    "carDropoffTime": 120,
+    "car": {
+      "speed": 40,
+      "reluctance": 10,
+      "dropoffTime": 120,
+      "decelerationSpeed": 2.9,
+      "accelerationSpeed": 2.9,
+      "rental": {
+        "pickupCost": 120,
+        "dropOffTime": 30,
+        "dropOffCost": 30
+      }
+    },
     "waitReluctance": 1.0,
     "walkBoardCost": 600,
-    "bikeBoardCost": 600,
     "otherThanPreferredRoutesPenalty": 300,
     "transferSlack": 120,
     // Default slack for any mode is 0 (zero)
@@ -74,8 +89,6 @@
       "minBikeParkingDistance": 300,
       "debug": "limit-to-search-window"
     },
-    "carDecelerationSpeed": 2.9,
-    "carAccelerationSpeed": 2.9,
     "ignoreRealtimeUpdates": false,
     "geoidElevation": false,
     "maxJourneyDuration": "36h",

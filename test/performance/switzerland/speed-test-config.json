@@ -41,8 +41,10 @@
   "routingDefaults": {
     // Default is 1.4 m/s = ~ 5.0 km/t
     "walkSpeed": 1.4,
-    // Should not be used - a high cost indicate an error
-    "bikeBoardCost": 222000,
+    "bicycle": {
+      // Should not be used - a high cost indicate an error
+      "boardCost": 222000
+    },
     "walkBoardCost": 600,
     "transferPenalty": 0,
     "walkReluctance": 4.0,

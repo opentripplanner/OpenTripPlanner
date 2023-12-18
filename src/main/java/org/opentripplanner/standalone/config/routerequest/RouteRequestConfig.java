@@ -8,11 +8,13 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
-import static org.opentripplanner.standalone.config.routerequest.VehicleRentalConfig.setVehicleRental;
+import static org.opentripplanner.standalone.config.routerequest.TriangleOptimizationConfig.mapOptimizationTriangle;
+import static org.opentripplanner.standalone.config.routerequest.VehicleParkingConfig.mapParking;
+import static org.opentripplanner.standalone.config.routerequest.VehicleRentalConfig.mapRental;
+import static org.opentripplanner.standalone.config.routerequest.VehicleWalkingConfig.mapVehicleWalking;
 import static org.opentripplanner.standalone.config.routerequest.WheelchairConfig.mapWheelchairPreferences;
 
 import java.time.Duration;
-import java.util.List;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
@@ -25,7 +27,6 @@ import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
-import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
@@ -335,176 +336,48 @@ ferries, where the check-in process needs to be done in good time before ride.
 
   private static void mapBikePreferences(NodeAdapter c, BikePreferences.Builder builder) {
     var dft = builder.original();
+    NodeAdapter cb = c.of("bicycle").since(V2_5).summary("Bicycle preferences.").asObject();
     builder
       .withSpeed(
-        c
-          .of("bikeSpeed")
+        cb
+          .of("speed")
           .since(V2_0)
-          .summary("Max bike speed along streets, in meters per second")
+          .summary("Max bicycle speed along streets, in meters per second")
           .asDouble(dft.speed())
       )
       .withReluctance(
-        c
-          .of("bikeReluctance")
+        cb
+          .of("reluctance")
           .since(V2_0)
           .summary(
-            "A multiplier for how bad biking is, compared to being in transit for equal lengths of time."
+            "A multiplier for how bad cycling is, compared to being in transit for equal lengths of time."
           )
           .asDouble(dft.reluctance())
       )
       .withBoardCost(
-        c
-          .of("bikeBoardCost")
+        cb
+          .of("boardCost")
           .since(V2_0)
-          .summary("Prevents unnecessary transfers by adding a cost for boarding a vehicle.")
+          .summary(
+            "Prevents unnecessary transfers by adding a cost for boarding a transit vehicle."
+          )
           .description(
             "This is the cost that is used when boarding while cycling." +
             "This is usually higher that walkBoardCost."
           )
           .asInt(dft.boardCost())
       )
-      .withWalkingSpeed(
-        c
-          .of("bikeWalkingSpeed")
-          .since(V2_1)
-          .summary(
-            "The user's bike walking speed in meters/second. Defaults to approximately 3 MPH."
-          )
-          .asDouble(dft.walkingSpeed())
-      )
-      .withWalkingReluctance(
-        c
-          .of("bikeWalkingReluctance")
-          .since(V2_1)
-          .summary(
-            "A multiplier for how bad walking with a bike is, compared to being in transit for equal lengths of time."
-          )
-          .asDouble(dft.walkingReluctance())
-      )
-      .withSwitchTime(
-        c
-          .of("bikeSwitchTime")
-          .since(V2_0)
-          .summary("The time it takes the user to fetch their bike and park it again in seconds.")
-          .asInt(dft.switchTime())
-      )
-      .withSwitchCost(
-        c
-          .of("bikeSwitchCost")
-          .since(V2_0)
-          .summary("The cost of the user fetching their bike and parking it again.")
-          .asInt(dft.switchCost())
-      )
       .withOptimizeType(
-        c
-          .of("optimize")
+        cb
+          .of("optimization")
           .since(V2_0)
           .summary("The set of characteristics that the user wants to optimize for.")
           .asEnum(dft.optimizeType())
       )
-      .withOptimizeTriangle(it ->
-        it
-          .withTime(
-            c
-              .of("bikeTriangleTimeFactor")
-              .since(V2_0)
-              .summary("For bike triangle routing, how much time matters (range 0-1).")
-              .asDouble(it.time())
-          )
-          .withSlope(
-            c
-              .of("bikeTriangleSlopeFactor")
-              .since(V2_0)
-              .summary("For bike triangle routing, how much slope matters (range 0-1).")
-              .asDouble(it.slope())
-          )
-          .withSafety(
-            c
-              .of("bikeTriangleSafetyFactor")
-              .since(V2_0)
-              .summary("For bike triangle routing, how much safety matters (range 0-1).")
-              .asDouble(it.safety())
-          )
-      )
-      .withStairsReluctance(
-        c
-          .of("bikeStairsReluctance")
-          .since(V2_3)
-          .summary(
-            "How bad is it to walk the bicycle up/down a flight of stairs compared to taking a detour."
-          )
-          .asDouble(dft.stairsReluctance())
-      )
-      .withParking(it ->
-        it
-          .withUnpreferredVehicleParkingTagCost(
-            c
-              .of("unpreferredVehicleParkingTagCost")
-              .since(V2_3)
-              .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
-              .description("See `preferredVehicleParkingTags`.")
-              .asInt(
-                VehicleParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds()
-              )
-          )
-          .withBannedVehicleParkingTags(
-            c
-              .of("bannedVehicleParkingTags")
-              .since(V2_1)
-              .summary(
-                "Tags with which a vehicle parking will not be used. If empty, no tags are banned."
-              )
-              .description(
-                """
-                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
-                """
-              )
-              .asStringSet(List.of())
-          )
-          .withRequiredVehicleParkingTags(
-            c
-              .of("requiredVehicleParkingTags")
-              .since(V2_1)
-              .summary(
-                "Tags without which a vehicle parking will not be used. If empty, no tags are required."
-              )
-              .description(
-                """
-                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
-                """
-              )
-              .asStringSet(List.of())
-          )
-          .withParkTime(
-            c
-              .of("bikeParkTime")
-              .since(V2_0)
-              .summary("Time to park a bike.")
-              .asDuration(VehicleParkingPreferences.DEFAULT.parkTime())
-          )
-          .withParkCost(
-            c
-              .of("bikeParkCost")
-              .since(V2_0)
-              .summary("Cost to park a bike.")
-              .asInt(VehicleParkingPreferences.DEFAULT.parkCost().toSeconds())
-          )
-          .withPreferredVehicleParkingTags(
-            c
-              .of("preferredVehicleParkingTags")
-              .since(V2_3)
-              .summary(
-                "Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised."
-              )
-              .description(
-                """
-                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
-                """
-              )
-              .asStringSet(List.of())
-          )
-      )
-      .withRental(it -> setVehicleRental(c, it));
+      .withOptimizeTriangle(it -> mapOptimizationTriangle(cb, it))
+      .withWalking(it -> mapVehicleWalking(cb, it))
+      .withParking(it -> mapParking(cb, it))
+      .withRental(it -> mapRental(cb, it));
   }
 
   private static void mapStreetPreferences(NodeAdapter c, StreetPreferences.Builder builder) {
@@ -695,17 +568,18 @@ your users receive a timely response. You can also limit the max duration. There
 
   private static void mapCarPreferences(NodeAdapter c, CarPreferences.Builder builder) {
     var dft = builder.original();
+    NodeAdapter cc = c.of("car").since(V2_5).summary("Car preferences.").asObject();
     builder
       .withSpeed(
-        c
-          .of("carSpeed")
+        cc
+          .of("speed")
           .since(V2_0)
           .summary("Max car speed along streets, in meters per second")
           .asDouble(dft.speed())
       )
       .withReluctance(
-        c
-          .of("carReluctance")
+        cc
+          .of("reluctance")
           .since(V2_0)
           .summary(
             "A multiplier for how bad driving is, compared to being in transit for equal lengths of time."
@@ -713,8 +587,8 @@ your users receive a timely response. You can also limit the max duration. There
           .asDouble(dft.reluctance())
       )
       .withDropoffTime(
-        c
-          .of("carDropoffTime")
+        cc
+          .of("dropoffTime")
           .since(V2_0)
           .summary(
             "Time to park a car in a park and ride, w/o taking into account driving and walking cost."
@@ -722,103 +596,35 @@ your users receive a timely response. You can also limit the max duration. There
           .asInt(dft.dropoffTime())
       )
       .withPickupCost(
-        c
-          .of("carPickupCost")
+        cc
+          .of("pickupCost")
           .since(V2_1)
           .summary("Add a cost for car pickup changes when a pickup or drop off takes place")
           .asInt(dft.pickupCost())
       )
       .withPickupTime(
-        c
-          .of("carPickupTime")
+        cc
+          .of("pickupTime")
           .since(V2_1)
           .summary("Add a time for car pickup changes when a pickup or drop off takes place")
           .asInt(dft.pickupTime())
       )
       .withAccelerationSpeed(
-        c
-          .of("carAccelerationSpeed")
+        cc
+          .of("accelerationSpeed")
           .since(V2_0)
           .summary("The acceleration speed of an automobile, in meters per second per second.")
           .asDouble(dft.accelerationSpeed())
       )
       .withDecelerationSpeed(
-        c
-          .of("carDecelerationSpeed")
+        cc
+          .of("decelerationSpeed")
           .since(V2_0)
           .summary("The deceleration speed of an automobile, in meters per second per second.")
           .asDouble(dft.decelerationSpeed())
       )
-      .withParking(it ->
-        it
-          .withUnpreferredVehicleParkingTagCost(
-            c
-              .of("unpreferredVehicleParkingTagCost")
-              .since(V2_3)
-              .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
-              .description("See `preferredVehicleParkingTags`.")
-              .asInt(
-                VehicleParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds()
-              )
-          )
-          .withBannedVehicleParkingTags(
-            c
-              .of("bannedVehicleParkingTags")
-              .since(V2_1)
-              .summary(
-                "Tags with which a vehicle parking will not be used. If empty, no tags are banned."
-              )
-              .description(
-                """
-                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
-                """
-              )
-              .asStringSet(List.of())
-          )
-          .withRequiredVehicleParkingTags(
-            c
-              .of("requiredVehicleParkingTags")
-              .since(V2_1)
-              .summary(
-                "Tags without which a vehicle parking will not be used. If empty, no tags are required."
-              )
-              .description(
-                """
-                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
-                """
-              )
-              .asStringSet(List.of())
-          )
-          .withParkCost(
-            c
-              .of("carParkCost")
-              .since(V2_1)
-              .summary("Cost of parking a car.")
-              .asInt(VehicleParkingPreferences.DEFAULT.parkCost().toSeconds())
-          )
-          .withParkTime(
-            c
-              .of("carParkTime")
-              .since(V2_1)
-              .summary("Time to park a car")
-              .asDuration(VehicleParkingPreferences.DEFAULT.parkTime())
-          )
-          .withPreferredVehicleParkingTags(
-            c
-              .of("preferredVehicleParkingTags")
-              .since(V2_3)
-              .summary(
-                "Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised."
-              )
-              .description(
-                """
-                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
-                """
-              )
-              .asStringSet(List.of())
-          )
-      )
-      .withRental(it -> setVehicleRental(c, it));
+      .withParking(it -> mapParking(cc, it))
+      .withRental(it -> mapRental(cc, it));
   }
 
   private static void mapSystemPreferences(NodeAdapter c, SystemPreferences.Builder builder) {

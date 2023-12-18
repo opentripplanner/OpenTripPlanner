@@ -80,12 +80,8 @@ public class VehicleRentalConfig {
       );
   }
 
-  static void setVehicleRental(NodeAdapter c, VehicleRentalPreferences.Builder preferences) {
-    var vehicleRental = c
-      .of("vehicleRental")
-      .since(V2_3)
-      .summary("Vehicle rental options")
-      .asObject();
+  static void mapRental(NodeAdapter c, VehicleRentalPreferences.Builder preferences) {
+    var vehicleRental = c.of("rental").since(V2_3).summary("Vehicle rental options").asObject();
     mapRentalPreferences(vehicleRental, preferences);
   }
 }
