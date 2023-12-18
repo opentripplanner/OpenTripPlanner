@@ -169,7 +169,7 @@ public class StopTimeMapperTest {
   public void testMapWithNulls() {
     var st = new StopTime();
     st.setStop(buildStop());
-    org.opentripplanner.model.StopTime result = subject.map(st);
+    var result = subject.map(st);
 
     assertFalse(result.isArrivalTimeSet());
     assertFalse(result.isDepartureTimeSet());
