@@ -68,7 +68,7 @@ nav:
     - Introduction: 'apis/Apis.md'
     - GraphQL Tutorial: 'apis/GraphQL-Tutorial.md'
     - GTFS GraphQL API: 'apis/GTFS-GraphQL-API.md'
-    - Transmodel(NeTEx) GraphQL API: 'apis/TransmodelApi.md'
+    - Transmodel (NeTEx) GraphQL API: 'apis/TransmodelApi.md'
 - Configuration:
     - Introduction: 'Configuration.md'
     - Build: 'BuildConfiguration.md'

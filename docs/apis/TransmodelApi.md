@@ -6,18 +6,18 @@
 
 ## Documentation
 
-This is the official OTP2 API for Transmodel(NeTEx). The terminology is based on the 
-Transmodel(NeTEx) with some limitations/simplification. It provides both a routing API 
+This is the official OTP2 API for Transmodel (NeTEx). The terminology is based on the 
+Transmodel (NeTEx) with some limitations/simplification. It provides both a routing API 
 (trip query) and index API for transit data.
 
-Entur provide a [GraphQL explorer](https://api.entur.io/graphql-explorer) where you may browse the GraphQL schema and try your own
+Entur provides a [GraphQL explorer](https://api.entur.io/graphql-explorer) where you may browse the GraphQL schema and try your own
 queries.
 
 When running OTP locally the endpoint is available at: `http://localhost:8080/otp/routers/default/transmodel/index/graphql`
 
 ### Configuration
 
-To turn this API off need to add the feature `TransmodelGraphQlApi : false` in _otp-config.json_.
+To turn this API off, add the feature `TransmodelGraphQlApi : false` in _otp-config.json_.
 
 
 ## Changelog - old
