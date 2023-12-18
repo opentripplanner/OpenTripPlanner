@@ -4,7 +4,6 @@ import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.view.ArrivalView;
-import org.opentripplanner.raptor.path.Path;
 import org.opentripplanner.raptor.path.PathBuilder;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.transit.TripTimesSearch;
@@ -70,9 +69,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
       arrival = arrival.previous();
     }
 
-    if (destinationArrival.supportsC2()) {
-      pathBuilder.c2(destinationArrival.c2());
-    }
+    pathBuilder.c2(destinationArrival.c2());
 
     return pathBuilder.build();
   }

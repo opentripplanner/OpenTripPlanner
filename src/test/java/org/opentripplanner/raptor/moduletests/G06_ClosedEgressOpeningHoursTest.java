@@ -53,7 +53,7 @@ public class G06_ClosedEgressOpeningHoursTest implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var expected = "A ~ BUS R1 0:05 0:10 ~ E ~ Walk 5m [0:05 0:15 10m 0tx $1500]";
+    var expected = "A ~ BUS R1 0:05 0:10 ~ E ~ Walk 5m [0:05 0:15 10m Tₓ0 C₁1_500]";
 
     return RaptorModuleTestCase
       .of()

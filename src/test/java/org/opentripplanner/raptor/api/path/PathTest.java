@@ -10,7 +10,7 @@ import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.BAS
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.BASIC_PATH_AS_STRING;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.EGRESS_END;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.RAPTOR_ITERATION_START_TIME;
-import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.TOTAL_COST;
+import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.TOTAL_C1;
 import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.basicTripStops;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 
@@ -99,7 +99,7 @@ public class PathTest implements RaptorTestConstants {
 
   @Test
   public void cost() {
-    assertEquals(TOTAL_COST, subject.c1());
+    assertEquals(TOTAL_C1, subject.c1());
   }
 
   @Test
@@ -153,7 +153,7 @@ public class PathTest implements RaptorTestConstants {
       egress,
       egressStart,
       egressEnd,
-      egress.generalizedCost()
+      egress.c1()
     );
 
     var trip3 = TestTripSchedule
@@ -195,10 +195,10 @@ public class PathTest implements RaptorTestConstants {
       access,
       accessStart,
       accessEnd,
-      access.generalizedCost(),
+      access.c1(),
       leg2.asTransitLeg()
     );
-    RaptorPath<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST, 0);
+    RaptorPath<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_C1, 0);
     assertEquals(0, path.numberOfTransfers());
   }
 
@@ -211,7 +211,7 @@ public class PathTest implements RaptorTestConstants {
       egress,
       egressStart,
       egressEnd,
-      egress.generalizedCost()
+      egress.c1()
     );
 
     var trip3 = TestTripSchedule
@@ -252,10 +252,10 @@ public class PathTest implements RaptorTestConstants {
       access,
       accessStart,
       accessEnd,
-      access.generalizedCost(),
+      access.c1(),
       leg2.asTransitLeg()
     );
-    RaptorPath<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_COST, 0);
+    RaptorPath<TestTripSchedule> path = new Path<>(accessStart, leg1, TOTAL_C1, 0);
     assertEquals(1, path.numberOfTransfers());
   }
 }

@@ -8,8 +8,8 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ListSection;
 
 public class NumItinerariesFilterTest {
 
@@ -29,7 +29,7 @@ public class NumItinerariesFilterTest {
   public void testCropHead() {
     NumItinerariesFilter subject = new NumItinerariesFilter(1, ListSection.HEAD, null);
     List<Itinerary> itineraries = List.of(i1, i2, i3);
-    var result = DeletionFlaggerTestHelper.process(itineraries, subject);
+    var result = subject.removeMatchesForTest(itineraries);
     assertEquals(toStr(List.of(i3)), toStr(result));
   }
 
@@ -38,35 +38,19 @@ public class NumItinerariesFilterTest {
     var subject = new NumItinerariesFilter(2, ListSection.TAIL, it -> subscribeResult = it);
     var itineraries = List.of(i1, i2, i3);
 
-    var processedList = DeletionFlaggerTestHelper.process(itineraries, subject);
+    var processedList = subject.removeMatchesForTest(itineraries);
 
     assertEquals(
       i3.startTime().toInstant().toString(),
-      subscribeResult.earliestRemovedDeparture.toString()
-    );
-    assertEquals(
-      i3.endTime().toInstant().toString(),
-      subscribeResult.earliestRemovedArrival.toString()
+      subscribeResult.earliestRemovedDeparture().toString()
     );
 
     assertEquals(
       i3.startTime().toInstant().toString(),
-      subscribeResult.latestRemovedDeparture.toString()
-    );
-    assertEquals(
-      i3.endTime().toInstant().toString(),
-      subscribeResult.latestRemovedArrival.toString()
+      subscribeResult.latestRemovedDeparture().toString()
     );
 
-    assertEquals(
-      i3.startTime().toInstant().toString(),
-      subscribeResult.firstRemovedDepartureTime.toString()
-    );
-
-    assertEquals(
-      i1.endTime().toInstant().toString(),
-      subscribeResult.earliestKeptArrival.toString()
-    );
+    assertEquals(i2.keyAsString(), subscribeResult.pageCut().keyAsString());
 
     assertEquals(toStr(List.of(i1, i2)), toStr(processedList));
   }
@@ -76,35 +60,19 @@ public class NumItinerariesFilterTest {
     var subject = new NumItinerariesFilter(1, ListSection.HEAD, it -> subscribeResult = it);
     var itineraries = List.of(i1, i2, i3);
 
-    var processedList = DeletionFlaggerTestHelper.process(itineraries, subject);
+    var processedList = subject.removeMatchesForTest(itineraries);
 
     assertEquals(
       i2.startTime().toInstant().toString(),
-      subscribeResult.earliestRemovedDeparture.toString()
-    );
-    assertEquals(
-      i1.endTime().toInstant().toString(),
-      subscribeResult.earliestRemovedArrival.toString()
+      subscribeResult.earliestRemovedDeparture().toString()
     );
 
     assertEquals(
       i2.startTime().toInstant().toString(),
-      subscribeResult.latestRemovedDeparture.toString()
-    );
-    assertEquals(
-      i2.endTime().toInstant().toString(),
-      subscribeResult.latestRemovedArrival.toString()
+      subscribeResult.latestRemovedDeparture().toString()
     );
 
-    assertEquals(
-      i2.startTime().toInstant().toString(),
-      subscribeResult.firstRemovedDepartureTime.toString()
-    );
-
-    assertEquals(
-      i3.endTime().toInstant().toString(),
-      subscribeResult.earliestKeptArrival.toString()
-    );
+    assertEquals(i3.keyAsString(), subscribeResult.pageCut().keyAsString());
 
     assertEquals(toStr(List.of(i3)), toStr(processedList));
   }

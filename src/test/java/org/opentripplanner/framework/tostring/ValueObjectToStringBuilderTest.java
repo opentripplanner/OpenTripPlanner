@@ -3,6 +3,7 @@ package org.opentripplanner.framework.tostring;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.time.Duration;
+import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
 public class ValueObjectToStringBuilderTest {
@@ -105,6 +106,11 @@ public class ValueObjectToStringBuilderTest {
 
     assertEquals("", subject().skipNull().addDurationSec(null).toString());
     assertEquals("", subject().skipNull().addDuration(null).toString());
+  }
+
+  @Test
+  public void addTime() {
+    assertEquals("1970-01-01T01:01:01Z", subject().addTime(Instant.ofEpochSecond(3661)).toString());
   }
 
   @Test

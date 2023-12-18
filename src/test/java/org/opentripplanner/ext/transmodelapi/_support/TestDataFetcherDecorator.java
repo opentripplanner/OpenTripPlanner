@@ -1,8 +1,8 @@
-package org.opentripplanner.ext.transmodelapi._support;
+package org.opentripplanner.apis.transmodel._support;
 
 import java.util.Map;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
+import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 
 public class TestDataFetcherDecorator extends DataFetcherDecorator {
 

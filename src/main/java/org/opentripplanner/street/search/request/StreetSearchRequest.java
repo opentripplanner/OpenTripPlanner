@@ -12,7 +12,6 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.intersection_model.IntersectionTraversalCalculator;
@@ -40,7 +39,6 @@ public class StreetSearchRequest implements AStarRequest {
   private final StreetMode mode;
   private final boolean arriveBy;
   private final boolean wheelchair;
-  private final VehicleParkingRequest parking;
   private final VehicleRentalRequest rental;
 
   private final GenericLocation from;
@@ -62,7 +60,6 @@ public class StreetSearchRequest implements AStarRequest {
     this.mode = StreetMode.WALK;
     this.arriveBy = false;
     this.wheelchair = false;
-    this.parking = new VehicleParkingRequest();
     this.rental = new VehicleRentalRequest();
     this.from = null;
     this.fromEnvelope = null;
@@ -76,7 +73,6 @@ public class StreetSearchRequest implements AStarRequest {
     this.mode = builder.mode;
     this.arriveBy = builder.arriveBy;
     this.wheelchair = builder.wheelchair;
-    this.parking = builder.parking;
     this.rental = builder.rental;
     this.from = builder.from;
     this.fromEnvelope = createEnvelope(from);
@@ -117,10 +113,6 @@ public class StreetSearchRequest implements AStarRequest {
 
   public boolean wheelchair() {
     return wheelchair;
-  }
-
-  public VehicleParkingRequest parking() {
-    return parking;
   }
 
   public VehicleRentalRequest rental() {

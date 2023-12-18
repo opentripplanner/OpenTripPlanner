@@ -185,7 +185,7 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
   public RaptorPath<T> build() {
     updateAggregatedFields();
     var pathLegs = createPathLegs(costCalculator, slackProvider);
-    return new Path<>(iterationDepartureTime, pathLegs, pathLegs.generalizedCostTotal(), c2());
+    return new Path<>(iterationDepartureTime, pathLegs, pathLegs.c1Total(), c2());
   }
 
   @Override

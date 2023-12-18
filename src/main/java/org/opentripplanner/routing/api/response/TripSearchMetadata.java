@@ -18,15 +18,6 @@ public class TripSearchMetadata {
   public Duration searchWindowUsed;
 
   /**
-   * This is the suggested search time for the "next page" or time window. Insert it together with
-   * the {@link #searchWindowUsed} in the request to get a new set of trips following in the
-   * time-window AFTER the current search. No duplicate trips should be returned, unless a trip is
-   * delayed and new realtime-data is available.
-   */
-  @Deprecated
-  public Instant nextDateTime;
-
-  /**
    * This is the suggested search time for the "previous page" or time window. Insert it together
    * with the {@link #searchWindowUsed} in the request to get a new set of trips preceding in the
    * time-window BEFORE the current search. No duplicate trips should be returned, unless a trip is
@@ -37,45 +28,56 @@ public class TripSearchMetadata {
   @Deprecated
   public Instant prevDateTime;
 
+  /**
+   * This is the suggested search time for the "next page" or time window. Insert it together with
+   * the {@link #searchWindowUsed} in the request to get a new set of trips following in the
+   * time-window AFTER the current search. No duplicate trips should be returned, unless a trip is
+   * delayed and new realtime-data is available.
+   */
+  @Deprecated
+  public Instant nextDateTime;
+
   private TripSearchMetadata(
     Duration searchWindowUsed,
     Instant prevDateTime,
     Instant nextDateTime
   ) {
     this.searchWindowUsed = searchWindowUsed;
-    this.nextDateTime = nextDateTime;
     this.prevDateTime = prevDateTime;
+    this.nextDateTime = nextDateTime;
   }
 
   public static TripSearchMetadata createForArriveBy(
-    Instant reqTime,
-    int searchWindowUsed,
-    @Nullable Instant previousTimeInclusive
+    Instant earliestDepartureTimeUsed,
+    Duration searchWindowUsed,
+    @Nullable Instant firstDepartureTime
   ) {
-    Instant prevDateTime = previousTimeInclusive == null
-      ? reqTime.minusSeconds(searchWindowUsed)
-      // Round up to closest minute, to meet the _inclusive_ requirement
-      : previousTimeInclusive.minusSeconds(1).truncatedTo(ChronoUnit.MINUTES).plusSeconds(60);
+    Instant actualEdt = firstDepartureTime == null
+      ? earliestDepartureTimeUsed
+      // Round down to the minute before to avoid duplicates. This may cause missed itineraries.
+      : firstDepartureTime.minusSeconds(60).truncatedTo(ChronoUnit.MINUTES);
 
     return new TripSearchMetadata(
-      Duration.ofSeconds(searchWindowUsed),
-      prevDateTime,
-      reqTime.plusSeconds(searchWindowUsed)
+      searchWindowUsed,
+      actualEdt.minus(searchWindowUsed),
+      earliestDepartureTimeUsed.plus(searchWindowUsed)
     );
   }
 
   public static TripSearchMetadata createForDepartAfter(
-    Instant reqTime,
-    int searchWindowUsed,
-    Instant nextDateTimeExcusive
+    Instant requestDepartureTime,
+    Duration searchWindowUsed,
+    Instant lastDepartureTime
   ) {
-    Instant nextDateTime = nextDateTimeExcusive == null
-      ? reqTime.plusSeconds(searchWindowUsed)
-      : nextDateTimeExcusive.truncatedTo(ChronoUnit.MINUTES);
+    Instant nextDateTime = lastDepartureTime == null
+      ? requestDepartureTime.plus(searchWindowUsed)
+      // There is no way to make this work properly. If we round down we get duplicates, if we
+      // round up we might skip itineraries.
+      : lastDepartureTime.plusSeconds(60).truncatedTo(ChronoUnit.MINUTES);
 
     return new TripSearchMetadata(
-      Duration.ofSeconds(searchWindowUsed),
-      reqTime.minusSeconds(searchWindowUsed),
+      searchWindowUsed,
+      requestDepartureTime.minus(searchWindowUsed),
       nextDateTime
     );
   }

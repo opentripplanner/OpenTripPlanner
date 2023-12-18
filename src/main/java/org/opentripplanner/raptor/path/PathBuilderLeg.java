@@ -214,18 +214,15 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
    * <p>
    * This method is safe to use event as long as the next leg is set.
    */
-  public int generalizedCost(
-    RaptorCostCalculator<T> costCalculator,
-    RaptorSlackProvider slackProvider
-  ) {
+  public int c1(RaptorCostCalculator<T> costCalculator, RaptorSlackProvider slackProvider) {
     if (costCalculator == null) {
       return RaptorCostCalculator.ZERO_COST;
     }
     if (isAccess()) {
-      return asAccessLeg().streetPath.generalizedCost();
+      return asAccessLeg().streetPath.c1();
     }
     if (isTransfer()) {
-      return asTransferLeg().transfer.generalizedCost();
+      return asTransferLeg().transfer.c1();
     }
     if (isTransit()) {
       return transitCost(costCalculator, slackProvider);
@@ -360,11 +357,11 @@ public class PathBuilderLeg<T extends RaptorTripSchedule> {
   /* Build helper methods, package local */
 
   private static int cost(RaptorCostCalculator<?> costCalculator, RaptorAccessEgress streetPath) {
-    return costCalculator != null ? streetPath.generalizedCost() : RaptorCostCalculator.ZERO_COST;
+    return costCalculator != null ? streetPath.c1() : RaptorCostCalculator.ZERO_COST;
   }
 
   private static int cost(RaptorCostCalculator<?> costCalculator, RaptorTransfer transfer) {
-    return costCalculator != null ? transfer.generalizedCost() : RaptorCostCalculator.ZERO_COST;
+    return costCalculator != null ? transfer.c1() : RaptorCostCalculator.ZERO_COST;
   }
 
   private void setTime(int fromTime, int toTime) {

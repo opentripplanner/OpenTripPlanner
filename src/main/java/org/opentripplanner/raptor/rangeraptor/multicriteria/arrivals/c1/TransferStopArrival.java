@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c1;
 import static org.opentripplanner.raptor.api.model.PathLegType.TRANSFER;
 
 import org.opentripplanner.raptor.api.model.PathLegType;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.TransitArrival;
@@ -25,14 +26,14 @@ final class TransferStopArrival<T extends RaptorTripSchedule> extends McStopArri
       1,
       transferPath.stop(),
       arrivalTime,
-      previousState.c1() + transferPath.generalizedCost()
+      previousState.c1() + transferPath.c1()
     );
     this.transfer = transferPath;
   }
 
   @Override
   public int c2() {
-    throw new UnsupportedOperationException("C2 is not available for the C1 implementation");
+    return RaptorConstants.NOT_SET;
   }
 
   @Override
