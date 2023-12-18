@@ -30,6 +30,7 @@ public class OptimizedPath<T extends RaptorTripSchedule>
       originalPath.accessLeg(),
       originalPath.rangeRaptorIterationDepartureTime(),
       originalPath.c1(),
+      originalPath.c2(),
       priorityCost(originalPath),
       NEUTRAL_COST,
       NEUTRAL_COST
@@ -40,11 +41,12 @@ public class OptimizedPath<T extends RaptorTripSchedule>
     AccessPathLeg<T> accessPathLeg,
     int iterationStartTime,
     int generalizedCost,
+    int c2,
     int transferPriorityCost,
     int waitTimeOptimizedCost,
     int breakTieCost
   ) {
-    super(iterationStartTime, accessPathLeg, generalizedCost);
+    super(iterationStartTime, accessPathLeg, generalizedCost, c2);
     this.transferPriorityCost = transferPriorityCost;
     this.waitTimeOptimizedCost = waitTimeOptimizedCost;
     this.breakTieCost = breakTieCost;
@@ -61,7 +63,7 @@ public class OptimizedPath<T extends RaptorTripSchedule>
       var c = tx == null ? null : (TransferConstraint) tx.getTransferConstraint();
       return TransferConstraint.cost(c);
     }
-    // Return no zero cost if a transfer do not exist
+    // Return zero cost if no transfer exist
     return TransferConstraint.ZERO_COST;
   }
 
@@ -109,7 +111,7 @@ public class OptimizedPath<T extends RaptorTripSchedule>
   }
 
   private void appendSummary(PathStringBuilder buf) {
-    buf.costCentiSec(transferPriorityCost, TransferConstraint.ZERO_COST, "pri");
-    buf.costCentiSec(generalizedCostWaitTimeOptimized(), c1(), "wtc");
+    buf.transferPriority(transferPriorityCost, TransferConstraint.ZERO_COST);
+    buf.waitTimeCost(generalizedCostWaitTimeOptimized(), c1());
   }
 }

@@ -40,6 +40,6 @@ public class RaptorCostConverterTest {
 
   @Test
   public void testToString() {
-    assertEquals("$120", RaptorCostConverter.toString(12_000));
+    assertEquals("C₁120", RaptorCostConverter.toString(12_000));
   }
 }

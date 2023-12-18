@@ -1,6 +1,5 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -14,8 +13,8 @@ public class PatternRideC1Test {
 
   @Test
   public void testParetoComparatorRelativeCost() {
-    final var LOW_COST = 100;
-    final var HIGH_COST = 500;
+    final var C1_LOW = 100;
+    final var C1_HIGH = 500;
     final var TRIP_SORT_INDEX_1 = 1;
     final var TRIP_SORT_INDEX_2 = 2;
 
@@ -23,29 +22,29 @@ public class PatternRideC1Test {
 
     assertTrue(
       comparator.leftDominanceExist(
-        new PatternRideC1<>(null, 0, 0, 0, LOW_COST, LOW_COST, TRIP_SORT_INDEX_1, null),
-        new PatternRideC1<>(null, 0, 0, 0, LOW_COST, LOW_COST, TRIP_SORT_INDEX_2, null)
+        new PatternRideC1<>(null, 0, 0, 0, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
+        new PatternRideC1<>(null, 0, 0, 0, C1_LOW, C1_LOW, TRIP_SORT_INDEX_2, null)
       )
     );
 
     assertFalse(
       comparator.leftDominanceExist(
-        new PatternRideC1<>(null, 0, 0, 0, LOW_COST, LOW_COST, TRIP_SORT_INDEX_1, null),
-        new PatternRideC1<>(null, 0, 0, 0, LOW_COST, LOW_COST, TRIP_SORT_INDEX_1, null)
+        new PatternRideC1<>(null, 0, 0, 0, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
+        new PatternRideC1<>(null, 0, 0, 0, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
       )
     );
 
     assertTrue(
       comparator.leftDominanceExist(
-        new PatternRideC1<>(null, 0, 0, 0, LOW_COST, LOW_COST, TRIP_SORT_INDEX_1, null),
-        new PatternRideC1<>(null, 0, 0, 0, HIGH_COST, HIGH_COST, TRIP_SORT_INDEX_1, null)
+        new PatternRideC1<>(null, 0, 0, 0, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null),
+        new PatternRideC1<>(null, 0, 0, 0, C1_HIGH, C1_HIGH, TRIP_SORT_INDEX_1, null)
       )
     );
 
     assertFalse(
       comparator.leftDominanceExist(
-        new PatternRideC1<>(null, 0, 0, 0, HIGH_COST, HIGH_COST, TRIP_SORT_INDEX_1, null),
-        new PatternRideC1<>(null, 0, 0, 0, LOW_COST, LOW_COST, TRIP_SORT_INDEX_1, null)
+        new PatternRideC1<>(null, 0, 0, 0, C1_HIGH, C1_HIGH, TRIP_SORT_INDEX_1, null),
+        new PatternRideC1<>(null, 0, 0, 0, C1_LOW, C1_LOW, TRIP_SORT_INDEX_1, null)
       )
     );
   }

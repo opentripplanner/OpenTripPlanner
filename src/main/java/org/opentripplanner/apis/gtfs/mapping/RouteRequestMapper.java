@@ -21,11 +21,9 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -84,9 +82,14 @@ public class RouteRequestMapper {
             callWith.argument("triangle.safetyFactor", triangle::withSafety);
           });
         }
+
+        bike.withParking(parking -> setParkingPreferences(callWith, parking));
       });
 
-      preferences.withCar(car -> callWith.argument("carReluctance", car::withReluctance));
+      preferences.withCar(car -> {
+        callWith.argument("carReluctance", car::withReluctance);
+        car.withParking(parking -> setParkingPreferences(callWith, parking));
+      });
 
       preferences.withWalk(b -> {
         callWith.argument("walkReluctance", b::withReluctance);
@@ -244,19 +247,6 @@ public class RouteRequestMapper {
       (Collection<String> v) -> vehicleRental.setBannedNetworks(new HashSet<>(v))
     );
 
-    var parking = request.journey().parking();
-    callWith.argument("parking.unpreferredCost", parking::setUnpreferredCost);
-
-    callWith.argument(
-      "parking.filters",
-      (Collection<Map<String, Object>> filters) -> parking.setFilter(parseFilters(filters))
-    );
-
-    callWith.argument(
-      "parking.preferred",
-      (Collection<Map<String, Object>> filters) -> parking.setPreferred(parseFilters(filters))
-    );
-
     callWith.argument(
       "locale",
       (String v) -> request.setLocale(GraphQLUtils.getLocale(environment, v))
@@ -264,17 +254,16 @@ public class RouteRequestMapper {
     return request;
   }
 
-  private static VehicleParkingFilterRequest parseFilters(Collection<Map<String, Object>> filters) {
-    var not = parseFilters(filters, "not");
-    var select = parseFilters(filters, "select");
-    return new VehicleParkingFilterRequest(not, select);
+  private static Set<String> parseNotFilters(Collection<Map<String, Object>> filters) {
+    return parseFilters(filters, "not");
+  }
+
+  private static Set<String> parseSelectFilters(Collection<Map<String, Object>> filters) {
+    return parseFilters(filters, "select");
   }
 
   @Nonnull
-  private static Set<VehicleParkingFilter> parseFilters(
-    Collection<Map<String, Object>> filters,
-    String key
-  ) {
+  private static Set<String> parseFilters(Collection<Map<String, Object>> filters, String key) {
     return filters
       .stream()
       .flatMap(f ->
@@ -283,14 +272,12 @@ public class RouteRequestMapper {
       .collect(Collectors.toSet());
   }
 
-  private static Stream<VehicleParkingFilter> parseOperation(
-    Collection<Map<String, Collection<String>>> map
-  ) {
+  private static Stream<String> parseOperation(Collection<Map<String, Collection<String>>> map) {
     return map
       .stream()
-      .map(f -> {
+      .flatMap(f -> {
         var tags = f.getOrDefault("tags", List.of());
-        return new TagsFilter(Set.copyOf(tags));
+        return tags.stream();
       });
   }
 
@@ -312,6 +299,29 @@ public class RouteRequestMapper {
     }
 
     return new GenericLocation(lat, lng);
+  }
+
+  private static void setParkingPreferences(
+    CallerWithEnvironment callWith,
+    VehicleParkingPreferences.Builder parking
+  ) {
+    callWith.argument("parking.unpreferredCost", parking::withUnpreferredVehicleParkingTagCost);
+
+    callWith.argument(
+      "parking.filters",
+      (Collection<Map<String, Object>> filters) -> {
+        parking.withRequiredVehicleParkingTags(parseSelectFilters(filters));
+        parking.withBannedVehicleParkingTags(parseNotFilters(filters));
+      }
+    );
+
+    callWith.argument(
+      "parking.preferred",
+      (Collection<Map<String, Object>> preferred) -> {
+        parking.withPreferredVehicleParkingTags(parseSelectFilters(preferred));
+        parking.withNotPreferredVehicleParkingTags(parseNotFilters(preferred));
+      }
+    );
   }
 
   private static class CallerWithEnvironment {

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingSpaces;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -46,8 +45,7 @@ class VehicleParkingEdgeTest {
       StreetMode.CAR_TO_PARK,
       false,
       true,
-      VehicleParkingSpaces.builder().carSpaces(1).build(),
-      true
+      VehicleParkingSpaces.builder().carSpaces(1).build()
     );
 
     var s1 = traverse();
@@ -57,26 +55,11 @@ class VehicleParkingEdgeTest {
 
   @Test
   public void realtimeAvailableCarPlacesFallbackTest() {
-    initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true, null, true);
+    initEdgeAndRequest(StreetMode.CAR_TO_PARK, false, true, null);
 
     var s1 = traverse();
 
     assertFalse(State.isEmpty(s1));
-  }
-
-  @Test
-  public void realtimeNotAvailableCarPlacesTest() {
-    initEdgeAndRequest(
-      StreetMode.CAR_TO_PARK,
-      false,
-      true,
-      VehicleParkingSpaces.builder().carSpaces(0).build(),
-      true
-    );
-
-    var s1 = traverse();
-
-    assertTrue(State.isEmpty(s1));
   }
 
   @Test
@@ -103,8 +86,7 @@ class VehicleParkingEdgeTest {
       StreetMode.BIKE_TO_PARK,
       true,
       false,
-      VehicleParkingSpaces.builder().bicycleSpaces(1).build(),
-      true
+      VehicleParkingSpaces.builder().bicycleSpaces(1).build()
     );
 
     var s1 = traverse();
@@ -114,26 +96,11 @@ class VehicleParkingEdgeTest {
 
   @Test
   public void realtimeAvailableBicyclePlacesFallbackTest() {
-    initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false, null, true);
+    initEdgeAndRequest(StreetMode.BIKE_TO_PARK, true, false, null);
 
     var s1 = traverse();
 
     assertFalse(State.isEmpty(s1));
-  }
-
-  @Test
-  public void realtimeNotAvailableBicyclePlacesTest() {
-    initEdgeAndRequest(
-      StreetMode.BIKE_TO_PARK,
-      true,
-      false,
-      VehicleParkingSpaces.builder().bicycleSpaces(0).build(),
-      true
-    );
-
-    var s1 = traverse();
-
-    assertTrue(State.isEmpty(s1));
   }
 
   private void initEdgeAndRequest(
@@ -141,24 +108,21 @@ class VehicleParkingEdgeTest {
     boolean bicyclePlaces,
     boolean carPlaces
   ) {
-    initEdgeAndRequest(parkingMode, bicyclePlaces, carPlaces, null, false);
+    initEdgeAndRequest(parkingMode, bicyclePlaces, carPlaces, null);
   }
 
   private void initEdgeAndRequest(
     StreetMode parkingMode,
     boolean bicyclePlaces,
     boolean carPlaces,
-    VehicleParkingSpaces availability,
-    boolean realtime
+    VehicleParkingSpaces availability
   ) {
     var vehicleParking = createVehicleParking(bicyclePlaces, carPlaces, availability);
     this.vertex = new VehicleParkingEntranceVertex(vehicleParking.getEntrances().get(0));
 
     vehicleParkingEdge = VehicleParkingEdge.createVehicleParkingEdge(vertex);
 
-    var parking = new VehicleParkingRequest();
-    parking.setUseAvailabilityInformation(realtime);
-    this.request = StreetSearchRequest.of().withMode(parkingMode).withParking(parking).build();
+    this.request = StreetSearchRequest.of().withMode(parkingMode).build();
   }
 
   private VehicleParking createVehicleParking(

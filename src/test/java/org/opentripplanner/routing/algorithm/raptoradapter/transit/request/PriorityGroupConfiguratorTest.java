@@ -45,7 +45,7 @@ class PriorityGroupConfiguratorTest {
 
   @Test
   void emptyConfigurationShouldReturnGroupZero() {
-    var subject = PriorityGroupConfigurator.of(List.of(), List.of(), List.of());
+    var subject = PriorityGroupConfigurator.of(List.of(), List.of());
     assertEquals(0, subject.lookupTransitPriorityGroupId(railA));
     assertEquals(0, subject.lookupTransitPriorityGroupId(busB));
     assertEquals(0, subject.lookupTransitPriorityGroupId(null));
@@ -54,7 +54,6 @@ class PriorityGroupConfiguratorTest {
   @Test
   void lookupTransitPriorityGroupIdBySameAgency() {
     var subject = PriorityGroupConfigurator.of(
-      List.of(),
       List.of(
         TransitPriorityGroupSelect.of().addModes(List.of(TransitMode.BUS)).build(),
         TransitPriorityGroupSelect.of().addModes(List.of(TransitMode.RAIL)).build()
@@ -72,7 +71,6 @@ class PriorityGroupConfiguratorTest {
   @Test
   void lookupTransitPriorityGroupIdByGlobalMode() {
     var subject = PriorityGroupConfigurator.of(
-      List.of(),
       List.of(),
       List.of(
         TransitPriorityGroupSelect.of().addModes(List.of(TransitMode.BUS)).build(),

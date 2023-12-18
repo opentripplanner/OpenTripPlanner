@@ -51,12 +51,12 @@ class EgressPathsTest {
   @Test
   void byStopStandard() {
     var byStop = subjectStd.byStop();
-    assertEquals("[Walk 1m $120 ~ 2]", byStop.get(STOP_A).toString());
-    assertEquals("[Flex 1m $120 1x ~ 3]", byStop.get(STOP_B).toString());
-    assertEquals("[Flex 1m $120 1x ~ 4]", byStop.get(STOP_C).toString());
-    assertEquals("[Flex 1m $120 2x ~ 5]", byStop.get(STOP_D).toString());
+    assertEquals("[Walk 1m C₁120 ~ 2]", byStop.get(STOP_A).toString());
+    assertEquals("[Flex 1m C₁120 1x ~ 3]", byStop.get(STOP_B).toString());
+    assertEquals("[Flex 1m C₁120 1x ~ 4]", byStop.get(STOP_C).toString());
+    assertEquals("[Flex 1m C₁120 2x ~ 5]", byStop.get(STOP_D).toString());
     assertEquals(
-      "[Walk 2m $240 ~ 6, Walk 1m $120 Open(10:00 11:45) ~ 6, Walk 1m $120 Open(11:30 12:30) ~ 6]",
+      "[Walk 2m C₁240 ~ 6, Walk 1m C₁120 Open(10:00 11:45) ~ 6, Walk 1m C₁120 Open(11:30 12:30) ~ 6]",
       byStop.get(STOP_E).toString()
     );
     // Verify no more stops (A, B, C, D, E)
@@ -73,29 +73,29 @@ class EgressPathsTest {
   void listAll() {
     assertEquals(
       """
-      Flex 1m $120 1x ~ 3
-      Flex 1m $120 1x ~ 4
-      Flex 1m $120 2x ~ 5
-      Walk 1m $120 Open(10:00 11:45) ~ 6
-      Walk 1m $120 Open(11:30 12:30) ~ 6
-      Walk 1m $120 ~ 2
-      Walk 2m $240 ~ 6
+      Flex 1m C₁120 1x ~ 3
+      Flex 1m C₁120 1x ~ 4
+      Flex 1m C₁120 2x ~ 5
+      Walk 1m C₁120 Open(10:00 11:45) ~ 6
+      Walk 1m C₁120 Open(11:30 12:30) ~ 6
+      Walk 1m C₁120 ~ 2
+      Walk 2m C₁240 ~ 6
       """.strip(),
       subjectStd.listAll().stream().map(Object::toString).sorted().collect(Collectors.joining("\n"))
     );
     assertEquals(
       """
-      Flex 1m $120 1x ~ 3
-      Flex 1m $120 1x ~ 4
-      Flex 1m $120 2x ~ 5
-      Flex 1m $120 3x ~ 5
-      Flex 2m $240 1x ~ 3
-      Flex+Walk 1m $120 1x ~ 4
-      Walk 1m $120 Open(10:00 11:45) ~ 6
-      Walk 1m $120 Open(11:30 12:30) ~ 6
-      Walk 1m $120 ~ 2
-      Walk 2m $240 Open(14:00 14:00) ~ 6
-      Walk 2m $240 ~ 6
+      Flex 1m C₁120 1x ~ 3
+      Flex 1m C₁120 1x ~ 4
+      Flex 1m C₁120 2x ~ 5
+      Flex 1m C₁120 3x ~ 5
+      Flex 2m C₁240 1x ~ 3
+      Flex+Walk 1m C₁120 1x ~ 4
+      Walk 1m C₁120 Open(10:00 11:45) ~ 6
+      Walk 1m C₁120 Open(11:30 12:30) ~ 6
+      Walk 1m C₁120 ~ 2
+      Walk 2m C₁240 Open(14:00 14:00) ~ 6
+      Walk 2m C₁240 ~ 6
       """.strip(),
       subjectMc.listAll().stream().map(Object::toString).sorted().collect(Collectors.joining("\n"))
     );

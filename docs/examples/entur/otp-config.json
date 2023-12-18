@@ -1,7 +1,6 @@
 {
   "otpFeatures": {
     "ActuatorAPI": true,
-    "SandboxAPITransmodelApi": true,
     "FlexRouting": true,
     "FloatingBike": true,
     "OptimizeTransfers": true,

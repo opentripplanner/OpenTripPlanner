@@ -30,6 +30,8 @@ import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
+import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
@@ -41,6 +43,7 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
 import uk.org.siri.siri20.OccupancyEnumeration;
+import uk.org.siri.siri20.VehicleJourneyRef;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
 class AddedTripBuilder {
@@ -63,6 +66,7 @@ class AddedTripBuilder {
   private final boolean cancellation;
   private final String shortName;
   private final String headsign;
+  private final List<TripOnServiceDate> replacedTrips;
 
   AddedTripBuilder(
     EstimatedVehicleJourney estimatedVehicleJourney,
@@ -109,6 +113,8 @@ class AddedTripBuilder {
     this.entityResolver = entityResolver;
     this.getTripPatternId = getTripPatternId;
     timeZone = transitModel.getTimeZone();
+
+    replacedTrips = getReplacedVehicleJourneys(estimatedVehicleJourney);
   }
 
   AddedTripBuilder(
@@ -127,7 +133,8 @@ class AddedTripBuilder {
     OccupancyEnumeration occupancy,
     boolean cancellation,
     String shortName,
-    String headsign
+    String headsign,
+    List<TripOnServiceDate> replacedTrips
   ) {
     this.transitModel = transitModel;
     this.entityResolver = entityResolver;
@@ -146,6 +153,7 @@ class AddedTripBuilder {
     this.cancellation = cancellation;
     this.shortName = shortName;
     this.headsign = headsign;
+    this.replacedTrips = replacedTrips;
   }
 
   Result<TripUpdate, UpdateError> build() {
@@ -238,11 +246,26 @@ class AddedTripBuilder {
       return DataValidationExceptionMapper.toResult(e);
     }
 
+    var tripOnServiceDate = TripOnServiceDate
+      .of(tripId)
+      .withTrip(trip)
+      .withServiceDate(serviceDate)
+      .withReplacementFor(replacedTrips)
+      .build();
+
     // Adding trip to index necessary to include values in graphql-queries
     // TODO - SIRI: should more data be added to index?
     transitModel.getTransitModelIndex().getTripForId().put(tripId, trip);
     transitModel.getTransitModelIndex().getPatternForTrip().put(trip, pattern);
     transitModel.getTransitModelIndex().getPatternsForRoute().put(route, pattern);
+    transitModel
+      .getTransitModelIndex()
+      .getTripOnServiceDateById()
+      .put(tripOnServiceDate.getId(), tripOnServiceDate);
+    transitModel
+      .getTransitModelIndex()
+      .getTripOnServiceDateForTripAndDay()
+      .put(new TripIdAndServiceDate(tripId, serviceDate), tripOnServiceDate);
 
     return Result.success(new TripUpdate(stopPattern, updatedTripTimes, serviceDate));
   }
@@ -395,5 +418,32 @@ class AddedTripBuilder {
       case BUS -> BusSubmodeEnumeration.RAIL_REPLACEMENT_BUS.value();
       default -> null;
     };
+  }
+
+  private List<TripOnServiceDate> getReplacedVehicleJourneys(
+    EstimatedVehicleJourney estimatedVehicleJourney
+  ) {
+    List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
+
+    // VehicleJourneyRef is the reference to the serviceJourney being replaced.
+    VehicleJourneyRef vehicleJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef(); // getVehicleJourneyRef
+    if (vehicleJourneyRef != null) {
+      var replacedDatedServiceJourney = entityResolver.resolveTripOnServiceDate(
+        vehicleJourneyRef.getValue()
+      );
+      if (replacedDatedServiceJourney != null) {
+        listOfReplacedVehicleJourneys.add(replacedDatedServiceJourney);
+      }
+    }
+
+    // Add additional replaced service journeys if present.
+    estimatedVehicleJourney
+      .getAdditionalVehicleJourneyReves()
+      .stream()
+      .map(entityResolver::resolveTripOnServiceDate)
+      .filter(Objects::nonNull)
+      .forEach(listOfReplacedVehicleJourneys::add);
+
+    return listOfReplacedVehicleJourneys;
   }
 }

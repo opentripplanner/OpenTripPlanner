@@ -32,6 +32,7 @@ import org.opentripplanner.transit.model.organization.Operator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.timetable.RealTimeState;
 import org.opentripplanner.transit.model.timetable.Trip;
+import org.opentripplanner.transit.model.timetable.TripIdAndServiceDate;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
@@ -124,7 +125,8 @@ class AddedTripBuilderTest {
       null,
       false,
       SHORT_NAME,
-      HEADSIGN
+      HEADSIGN,
+      List.of()
     )
       .build();
 
@@ -171,6 +173,16 @@ class AddedTripBuilderTest {
         .get(SERVICE_DATE)
         .contains(TRANSIT_MODEL.getServiceCodes().get(trip.getServiceId())),
       "serviceId should be running on service date"
+    );
+    assertNotNull(
+      transitModelIndex.getTripOnServiceDateById().get(TRIP_ID),
+      "TripOnServiceDate should be added to transit index by id"
+    );
+    assertNotNull(
+      transitModelIndex
+        .getTripOnServiceDateForTripAndDay()
+        .get(new TripIdAndServiceDate(TRIP_ID, SERVICE_DATE)),
+      "TripOnServiceDate should be added to transit index for trip and day"
     );
 
     // Assert stop pattern
@@ -242,7 +254,8 @@ class AddedTripBuilderTest {
       null,
       false,
       SHORT_NAME,
-      HEADSIGN
+      HEADSIGN,
+      List.of()
     )
       .build();
 
@@ -267,7 +280,8 @@ class AddedTripBuilderTest {
       null,
       false,
       SHORT_NAME,
-      HEADSIGN
+      HEADSIGN,
+      List.of()
     )
       .build();
 
@@ -317,7 +331,8 @@ class AddedTripBuilderTest {
       null,
       false,
       SHORT_NAME,
-      HEADSIGN
+      HEADSIGN,
+      List.of()
     )
       .build();
 
@@ -347,7 +362,8 @@ class AddedTripBuilderTest {
       null,
       false,
       SHORT_NAME,
-      HEADSIGN
+      HEADSIGN,
+      List.of()
     )
       .build();
 
@@ -389,7 +405,8 @@ class AddedTripBuilderTest {
       null,
       false,
       SHORT_NAME,
-      HEADSIGN
+      HEADSIGN,
+      List.of()
     )
       .build();
 
@@ -443,7 +460,8 @@ class AddedTripBuilderTest {
       null,
       false,
       SHORT_NAME,
-      HEADSIGN
+      HEADSIGN,
+      List.of()
     )
       .build();
 
@@ -481,7 +499,8 @@ class AddedTripBuilderTest {
       null,
       false,
       SHORT_NAME,
-      HEADSIGN
+      HEADSIGN,
+      List.of()
     )
       .build();
 
@@ -527,7 +546,8 @@ class AddedTripBuilderTest {
       null,
       false,
       SHORT_NAME,
-      HEADSIGN
+      HEADSIGN,
+      List.of()
     )
       .build();
 

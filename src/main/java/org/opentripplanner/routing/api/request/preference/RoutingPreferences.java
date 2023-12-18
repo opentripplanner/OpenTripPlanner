@@ -96,6 +96,13 @@ public final class RoutingPreferences implements Serializable {
     return rental;
   }
 
+  /**
+   * Get parking preferences for the traverse mode. Note, only car and bike are supported.
+   */
+  public VehicleParkingPreferences parking(TraverseMode mode) {
+    return mode == TraverseMode.CAR ? car.parking() : bike.parking();
+  }
+
   @Nonnull
   public ItineraryFilterPreferences itineraryFilter() {
     return itineraryFilter;

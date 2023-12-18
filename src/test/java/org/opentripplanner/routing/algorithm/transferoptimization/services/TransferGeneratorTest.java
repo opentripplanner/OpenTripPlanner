@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import static java.time.Duration.ofMinutes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.COST_CALCULATOR;
+import static org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase.C1_CALCULATOR;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
 
@@ -46,7 +46,7 @@ public class TransferGeneratorTest implements RaptorTestConstants {
     ALIGHT_SLACK
   );
 
-  private final TestPathBuilder pathBuilder = new TestPathBuilder(SLACK_PROVIDER, COST_CALCULATOR);
+  private final TestPathBuilder pathBuilder = new TestPathBuilder(SLACK_PROVIDER, C1_CALCULATOR);
 
   private final TestTransitData data = new TestTransitData().withSlackProvider(SLACK_PROVIDER);
 

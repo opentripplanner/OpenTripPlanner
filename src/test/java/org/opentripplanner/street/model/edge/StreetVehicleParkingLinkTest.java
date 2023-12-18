@@ -14,9 +14,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingEntrance;
 import org.opentripplanner.street.model.vertex.VehicleParkingEntranceVertex;
@@ -59,17 +56,18 @@ class StreetVehicleParkingLinkTest {
       .build();
 
     var entranceVertex = new VehicleParkingEntranceVertex(entrance);
-    var parkingReq = new VehicleParkingRequest();
-
-    Set<VehicleParkingFilter> notFilter = Set.of(new VehicleParkingFilter.TagsFilter(not));
-    Set<VehicleParkingFilter> selectFilter = Set.of(new VehicleParkingFilter.TagsFilter(select));
-
-    parkingReq.setFilter(new VehicleParkingFilterRequest(notFilter, selectFilter));
 
     var req = StreetSearchRequest.of();
     req.withMode(StreetMode.BIKE_TO_PARK);
-    req.withParking(parkingReq);
-    req.withPreferences(p -> p.withBike(bike -> bike.withParkCost(0)));
+    req.withPreferences(p ->
+      p.withBike(bike -> {
+        bike.withParking(parkingPreferences -> {
+          parkingPreferences.withRequiredVehicleParkingTags(select);
+          parkingPreferences.withBannedVehicleParkingTags(not);
+          parkingPreferences.withParkCost(0);
+        });
+      })
+    );
 
     var edge = StreetVehicleParkingLink.createStreetVehicleParkingLink(
       streetVertex,

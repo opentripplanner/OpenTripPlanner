@@ -1,11 +1,30 @@
 package org.opentripplanner.framework.collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.opentripplanner.framework.collection.ListUtils.first;
+import static org.opentripplanner.framework.collection.ListUtils.last;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class ListUtilsTest {
+
+  @Test
+  void testFirst() {
+    assertNull(first(null));
+    assertNull(first(List.of()));
+    assertEquals("A", first(List.of("A")));
+    assertEquals("B", first(List.of("B", "C")));
+  }
+
+  @Test
+  void testLast() {
+    assertNull(last(null));
+    assertNull(last(List.of()));
+    assertEquals("A", last(List.of("A")));
+    assertEquals("C", last(List.of("B", "C")));
+  }
 
   @Test
   void combine() {

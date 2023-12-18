@@ -1,7 +1,6 @@
 package org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.c2;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -80,10 +79,9 @@ public class StopArrivalFactoryC2Test {
     var stopArrival = accessArrival();
 
     assertEquals(STOP_A, stopArrival.stop());
-    assertEquals(ACCESS.generalizedCost(), stopArrival.c1());
+    assertEquals(ACCESS.c1(), stopArrival.c1());
     assertEquals(ACCESS_DURATION, stopArrival.travelDuration());
     assertEquals(ORIGIN_DEPARTURE_TIME + ACCESS_DURATION, stopArrival.arrivalTime());
-    assertTrue(stopArrival.supportsC2());
     assertEquals(RaptorCostCalculator.ZERO_COST, stopArrival.c2());
   }
 
@@ -95,7 +93,6 @@ public class StopArrivalFactoryC2Test {
     assertEquals(STOP_ARRIVAL_TRANSIT_C1, stopArrival.c1());
     assertEquals(STOP_ARRIVAL_TRANSIT_TIME, stopArrival.arrivalTime());
     assertEquals(STOP_ARRIVAL_TRANSIT_TIME - ORIGIN_DEPARTURE_TIME, stopArrival.travelDuration());
-    assertTrue(stopArrival.supportsC2());
     assertEquals(RIDE_C2, stopArrival.c2());
   }
 
@@ -105,13 +102,12 @@ public class StopArrivalFactoryC2Test {
     var stopArrival = transferArrival(prevArrival);
 
     assertEquals(STOP_C, stopArrival.stop());
-    assertEquals(prevArrival.c1() + TRANSFER.generalizedCost(), stopArrival.c1());
+    assertEquals(prevArrival.c1() + TRANSFER.c1(), stopArrival.c1());
     assertEquals(
       prevArrival.arrivalTime() + TRANSFER.durationInSeconds(),
       stopArrival.arrivalTime()
     );
     assertEquals(DurationUtils.durationInSeconds("11m30s"), stopArrival.travelDuration());
-    assertTrue(stopArrival.supportsC2());
     assertEquals(RIDE_C2, stopArrival.c2());
   }
 }
