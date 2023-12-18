@@ -1,97 +1,74 @@
 package org.opentripplanner.framework.token;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
-import org.opentripplanner.framework.time.DurationUtils;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 class Deserializer {
 
-  private final ByteArrayInputStream input;
+  private static final Pattern SPLIT_PATTERN = Pattern.compile(
+    "[" + TokenFormatterConfiguration.fieldSeparator() + "]"
+  );
+
+  private final List<String> values;
 
   Deserializer(String token) {
-    this.input = new ByteArrayInputStream(Base64.getUrlDecoder().decode(token));
+    byte[] bytes = Base64.getUrlDecoder().decode(token);
+    var tokenFormatter = TokenFormatterConfiguration.tokenFormatter();
+    this.values =
+      Stream.of(SPLIT_PATTERN.split(new String(bytes), -1)).map(tokenFormatter::decode).toList();
   }
 
-  List<Object> deserialize(TokenDefinition definition) throws IOException {
+  List<Object> deserialize(TokenDefinition definition) {
     try {
       // Assume deprecated fields are included in the token
       return readFields(definition, false);
-    } catch (IOException ignore) {
+    } catch (Exception ignore) {
       // If the token is the next version, then deprecated field are removed. Try
       // skipping the deprecated tokens
       return readFields(definition, true);
     }
   }
 
-  private List<Object> readFields(TokenDefinition definition, boolean matchNewVersionPlusOne)
-    throws IOException {
-    input.reset();
+  private List<Object> readFields(TokenDefinition definition, boolean matchNewVersionPlusOne) {
     List<Object> result = new ArrayList<>();
-
-    var in = new ObjectInputStream(input);
-
-    readAndMatchVersion(in, definition, matchNewVersionPlusOne);
+    matchVersion(definition, matchNewVersionPlusOne);
+    int index = 1;
 
     for (FieldDefinition field : definition.listFields()) {
       if (matchNewVersionPlusOne && field.deprecated()) {
         continue;
       }
-      var v = read(in, field);
+      var v = read(field, index);
       if (!field.deprecated()) {
         result.add(v);
       }
+      ++index;
     }
     return result;
   }
 
-  private void readAndMatchVersion(
-    ObjectInputStream in,
-    TokenDefinition definition,
-    boolean matchVersionPlusOne
-  ) throws IOException {
+  private void matchVersion(TokenDefinition definition, boolean matchVersionPlusOne) {
     int matchVersion = (matchVersionPlusOne ? 1 : 0) + definition.version();
 
-    int v = readInt(in);
-    if (v != matchVersion) {
-      throw new IOException(
-        "Version does not match. Token version: " + v + ", schema version: " + definition.version()
+    int version = readVersion();
+    if (version != matchVersion) {
+      throw new IllegalStateException(
+        "Version does not match. Token version: " +
+        version +
+        ", schema version: " +
+        definition.version()
       );
     }
   }
 
-  private Object read(ObjectInputStream in, FieldDefinition field) throws IOException {
-    return switch (field.type()) {
-      case BYTE -> readByte(in);
-      case DURATION -> readDuration(in);
-      case INT -> readInt(in);
-      case STRING -> readString(in);
-      case TIME_INSTANT -> readTimeInstant(in);
-    };
+  private Object read(FieldDefinition field, int index) {
+    return field.type().stringToValue(values.get(index));
   }
 
-  private static byte readByte(ObjectInputStream in) throws IOException {
-    return in.readByte();
-  }
-
-  private static int readInt(ObjectInputStream in) throws IOException {
-    return Integer.parseInt(in.readUTF());
-  }
-
-  private static String readString(ObjectInputStream in) throws IOException {
-    return in.readUTF();
-  }
-
-  private static Duration readDuration(ObjectInputStream in) throws IOException {
-    return DurationUtils.duration(in.readUTF());
-  }
-
-  private static Instant readTimeInstant(ObjectInputStream in) throws IOException {
-    return Instant.parse(in.readUTF());
+  private int readVersion() {
+    return Integer.parseInt(values.get(0));
   }
 }

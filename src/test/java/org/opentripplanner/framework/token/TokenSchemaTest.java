@@ -1,15 +1,25 @@
 package org.opentripplanner.framework.token;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.DayOfWeek;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class TokenSchemaTest implements TokenSchemaConstants {
+class TokenSchemaTest implements TestTokenSchemaConstants {
 
   // Token field names. These are used to reference a specific field value in the
   // token to avoid index errors. They are not part of the serialized token.
+
+  private static final TokenSchema BOOLEAN_SCHEMA = TokenSchema
+    .ofVersion(1)
+    .addBoolean(BOOLEAN_TRUE_FIELD)
+    .addBoolean(BOOLEAN_FALSE_FIELD)
+    .build();
 
   private static final TokenSchema BYTE_SCHEMA = TokenSchema
     .ofVersion(1)
@@ -18,6 +28,10 @@ class TokenSchemaTest implements TokenSchemaConstants {
   private static final TokenSchema DURATION_SCHEMA = TokenSchema
     .ofVersion(2)
     .addDuration(DURATION_FIELD)
+    .build();
+  private static final TokenSchema ENUM_SCHEMA = TokenSchema
+    .ofVersion(3)
+    .addEnum(ENUM_FIELD)
     .build();
   private static final TokenSchema INT_SCHEMA = TokenSchema.ofVersion(3).addInt(INT_FIELD).build();
   private static final TokenSchema STRING_SCHEMA = TokenSchema
@@ -28,6 +42,21 @@ class TokenSchemaTest implements TokenSchemaConstants {
     .ofVersion(13)
     .addTimeInstant(TIME_INSTANT_FIELD)
     .build();
+
+  @Test
+  public void encodeBoolean() {
+    // Add in opposite order of Schema, test naming fields work
+    var token = BOOLEAN_SCHEMA
+      .encode()
+      .withBoolean(BOOLEAN_FALSE_FIELD, false)
+      .withBoolean(BOOLEAN_TRUE_FIELD, true)
+      .build();
+    assertEquals(BOOLEAN_ENCODED, token);
+    assertTrue(BOOLEAN_SCHEMA.decode(token).getBoolean(BOOLEAN_TRUE_FIELD));
+
+    var tokenResult = BOOLEAN_SCHEMA.decode(token);
+    assertFalse(tokenResult.getBoolean(BOOLEAN_FALSE_FIELD));
+  }
 
   @Test
   public void encodeByte() {
@@ -41,6 +70,14 @@ class TokenSchemaTest implements TokenSchemaConstants {
     var token = DURATION_SCHEMA.encode().withDuration(DURATION_FIELD, DURATION_VALUE).build();
     assertEquals(DURATION_ENCODED, token);
     assertEquals(DURATION_VALUE, DURATION_SCHEMA.decode(token).getDuration(DURATION_FIELD));
+  }
+
+  @Test
+  public void testEnum() {
+    var token = ENUM_SCHEMA.encode().withEnum(ENUM_FIELD, ENUM_VALUE).build();
+    assertEquals(ENUM_ENCODED, token);
+    assertEquals(ENUM_VALUE, ENUM_SCHEMA.decode(token).getEnum(ENUM_FIELD, ENUM_CLASS).get());
+    assertEquals(Optional.empty(), ENUM_SCHEMA.decode(token).getEnum(ENUM_FIELD, DayOfWeek.class));
   }
 
   @Test

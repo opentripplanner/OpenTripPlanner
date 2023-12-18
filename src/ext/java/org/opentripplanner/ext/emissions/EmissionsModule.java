@@ -58,6 +58,9 @@ public class EmissionsModule implements GraphBuilderModule {
       }
       this.emissionsDataModel.setCo2Emissions(emissionsData);
       this.emissionsDataModel.setCarAvgCo2PerMeter(carAvgEmissionsPerMeter);
+      LOG.info(
+        "Emissions building finished. Number of CO2 emission records saved: " + emissionsData.size()
+      );
     }
   }
 }

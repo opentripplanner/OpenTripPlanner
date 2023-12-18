@@ -22,6 +22,7 @@ public interface PlanTestConstants {
   int D1m = DurationUtils.durationInSeconds("1m");
   int D2m = DurationUtils.durationInSeconds("2m");
   int D3m = DurationUtils.durationInSeconds("3m");
+  int D4m = DurationUtils.durationInSeconds("4m");
   int D5m = DurationUtils.durationInSeconds("5m");
   int D10m = DurationUtils.durationInSeconds("10m");
   int D12m = DurationUtils.durationInSeconds("12m");

@@ -5,3 +5,7 @@ route_id,avg_co2_per_vehicle_per_km,avg_passenger_count
 1004,0.0,0.0
 1005,0,-1
 1006,0,1
+1007,,
+,1,
+,,2
+,,

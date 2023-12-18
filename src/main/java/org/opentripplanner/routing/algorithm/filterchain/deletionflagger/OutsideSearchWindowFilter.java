@@ -11,8 +11,8 @@ import org.opentripplanner.model.plan.Itinerary;
  * should appear again when paging to the next page. Hence, this filter will remove
  * such itineraries. The same is true for when paging to the previous page for arriveBy=true.
  * <p>
- * Itineraries matching the start(earliest-departure-time) and end(latest-departure-time)
- * of the search-window are included [inclusive, inclusive].
+ * Itineraries matching the start(earliest-departure-time) are included and itineraries matching
+ * the end(latest-departure-time) are not. The filter is {@code [inclusive, exclusive]}.
  */
 public class OutsideSearchWindowFilter implements ItineraryDeletionFlagger {
 
@@ -35,7 +35,7 @@ public class OutsideSearchWindowFilter implements ItineraryDeletionFlagger {
   public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return it -> {
       var time = it.startTime().toInstant();
-      return time.isBefore(earliestDepartureTime) || time.isAfter(latestDepartureTime);
+      return time.isBefore(earliestDepartureTime) || !time.isBefore(latestDepartureTime);
     };
   }
 
