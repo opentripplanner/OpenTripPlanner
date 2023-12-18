@@ -55,7 +55,9 @@ public class StreetEdgeTest {
           references
             .withStreet(s -> s.withTurnReluctance(1.0))
             .withWalk(it -> it.withSpeed(1.0).withReluctance(1.0).withStairsReluctance(1.0))
-            .withBike(it -> it.withSpeed(5.0f).withReluctance(1.0).withWalkingSpeed(0.8))
+            .withBike(it ->
+              it.withSpeed(5.0f).withReluctance(1.0).withWalking(w -> w.withSpeed(0.8))
+            )
             .withCar(c -> c.withSpeed(15.0f).withReluctance(1.0))
         )
         .build();
@@ -218,7 +220,9 @@ public class StreetEdgeTest {
     StreetEdge e2 = streetEdge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
     StreetSearchRequestBuilder noPenalty = StreetSearchRequest.copyOf(proto);
-    noPenalty.withPreferences(p -> p.withBike(it -> it.withSwitchTime(0).withSwitchCost(0)));
+    noPenalty.withPreferences(p ->
+      p.withBike(it -> it.withWalking(w -> w.withHopTime(0).withHopCost(0)))
+    );
 
     State s0 = new State(v0, noPenalty.withMode(StreetMode.BIKE).build());
     State s1 = e0.traverse(s0)[0];
@@ -226,7 +230,9 @@ public class StreetEdgeTest {
     State s3 = e2.traverse(s2)[0];
 
     StreetSearchRequestBuilder withPenalty = StreetSearchRequest.copyOf(proto);
-    withPenalty.withPreferences(p -> p.withBike(it -> it.withSwitchTime(42).withSwitchCost(23)));
+    withPenalty.withPreferences(p ->
+      p.withBike(it -> it.withWalking(w -> w.withHopTime(42).withHopCost(23)))
+    );
 
     State s4 = new State(v0, withPenalty.withMode(StreetMode.BIKE).build());
     State s5 = e0.traverse(s4)[0];

@@ -18,7 +18,7 @@ class BikePreferencesMapperTest {
       Arguments.of(
         "walkReluctance",
         10.0,
-        "BikePreferences{reluctance: 10.0, walkingReluctance: 27.0}"
+        "BikePreferences{reluctance: 10.0, walking: VehicleWalkingPreferences{reluctance: 27.0}}"
       ),
       Arguments.of("bikeSpeed", 10.0, "BikePreferences{speed: 10.0}"),
       Arguments.of(

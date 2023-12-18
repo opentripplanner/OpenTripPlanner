@@ -67,10 +67,6 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.bikeSpeed, bike::withSpeed);
       setIfNotNull(req.bikeReluctance, bike::withReluctance);
       setIfNotNull(req.bikeBoardCost, bike::withBoardCost);
-      setIfNotNull(req.bikeWalkingSpeed, bike::withWalkingSpeed);
-      setIfNotNull(req.bikeWalkingReluctance, bike::withWalkingReluctance);
-      setIfNotNull(req.bikeSwitchTime, bike::withSwitchTime);
-      setIfNotNull(req.bikeSwitchCost, bike::withSwitchCost);
       setIfNotNull(req.bikeOptimizeType, bike::withOptimizeType);
 
       if (req.bikeOptimizeType == BicycleOptimizeType.TRIANGLE) {
@@ -87,6 +83,12 @@ class RequestToPreferencesMapper {
         setIfNotNull(req.bikeParkTime, parking::withParkTime);
       });
       bike.withRental(this::mapRental);
+      bike.withWalking(walk -> {
+        setIfNotNull(req.bikeWalkingSpeed, walk::withSpeed);
+        setIfNotNull(req.bikeWalkingReluctance, walk::withReluctance);
+        setIfNotNull(req.bikeSwitchTime, walk::withHopTime);
+        setIfNotNull(req.bikeSwitchCost, walk::withHopCost);
+      });
     });
   }
 

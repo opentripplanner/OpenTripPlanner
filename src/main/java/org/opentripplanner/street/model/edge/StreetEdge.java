@@ -231,7 +231,9 @@ public class StreetEdge
 
     final double speed =
       switch (traverseMode) {
-        case WALK -> walkingBike ? preferences.bike().walkingSpeed() : preferences.walk().speed();
+        case WALK -> walkingBike
+          ? preferences.bike().walking().speed()
+          : preferences.walk().speed();
         case BICYCLE, SCOOTER -> preferences.bike().speed();
         case CAR -> getCarSpeed();
         case FLEX -> throw new IllegalArgumentException("getSpeed(): Invalid mode " + traverseMode);
@@ -1276,7 +1278,7 @@ public class StreetEdge
         time = weight = (getEffectiveBikeDistance() / speed);
         if (isStairs()) {
           // we do allow walking the bike across a stairs but there is a very high default penalty
-          weight *= preferences.bike().stairsReluctance();
+          weight *= preferences.bike().walking().stairsReluctance();
         }
       } else {
         // take slopes into account when walking

@@ -11,11 +11,7 @@ class BikePreferencesTest {
 
   public static final double SPEED = 2.0;
   public static final double RELUCTANCE = 1.2;
-  public static final double WALKING_SPEED = 1.15;
   public static final int BOARD_COST = 660;
-  public static final double WALKING_RELUCTANCE = 1.45;
-  public static final int SWITCH_TIME = 200;
-  public static final int SWITCH_COST = 450;
   public static final TimeSlopeSafetyTriangle TRIANGLE = TimeSlopeSafetyTriangle
     .of()
     .withSlope(1)
@@ -29,10 +25,6 @@ class BikePreferencesTest {
     .withSpeed(SPEED)
     .withReluctance(RELUCTANCE)
     .withBoardCost(BOARD_COST)
-    .withWalkingSpeed(WALKING_SPEED)
-    .withWalkingReluctance(WALKING_RELUCTANCE)
-    .withSwitchTime(SWITCH_TIME)
-    .withSwitchCost(SWITCH_COST)
     .withOptimizeType(OPTIMIZE_TYPE)
     .withRental(rental -> rental.withPickupTime(RENTAL_PICKUP_TIME).build())
     .withParking(parking -> parking.withParkCost(PARK_COST).build())
@@ -52,26 +44,6 @@ class BikePreferencesTest {
   @Test
   void boardCost() {
     assertEquals(BOARD_COST, subject.boardCost());
-  }
-
-  @Test
-  void walkingSpeed() {
-    assertEquals(WALKING_SPEED, subject.walkingSpeed());
-  }
-
-  @Test
-  void walkingReluctance() {
-    assertEquals(WALKING_RELUCTANCE, subject.walkingReluctance());
-  }
-
-  @Test
-  void switchTime() {
-    assertEquals(SWITCH_TIME, subject.switchTime());
-  }
-
-  @Test
-  void switchCost() {
-    assertEquals(SWITCH_COST, subject.switchCost());
   }
 
   @Test
