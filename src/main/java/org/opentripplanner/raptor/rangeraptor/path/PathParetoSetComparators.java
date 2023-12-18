@@ -63,57 +63,63 @@ public class PathParetoSetComparators {
     RelaxFunction relaxC1,
     DominanceFunction c2Comp
   ) {
-    Objects.requireNonNull(costConfig);
-    Objects.requireNonNull(searchDirection);
-
     boolean preferLatestDeparture = preferLateArrival != searchDirection.isInReverse();
 
-    switch (costConfig) {
-      case NONE:
-        if (includeTimetable) {
-          return comparatorTimetable();
-        }
-        if (preferLatestDeparture) {
-          return comparatorStandardDepartureTime();
-        }
-        return comparatorStandardArrivalTime();
-      case USE_C1:
-        if (includeTimetable) {
-          return comparatorTimetableAndC1();
-        }
-        if (preferLatestDeparture) {
-          return comparatorDepartureTimeAndC1();
-        }
-        return comparatorWithC1();
-      case USE_C1_AND_C2:
-        if (includeTimetable) {
-          return comparatorTimetableAndC1AndC2(c2Comp);
-        }
-        if (preferLatestDeparture) {
-          return comparatorDepartureTimeAndC1AndC2(c2Comp);
-        }
-        return comparatorWithC1AndC2(c2Comp);
-      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL:
-        if (includeTimetable) {
-          return comparatorTimetableAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
-        }
-        if (preferLateArrival) {
-          return comparatorDepartureTimeAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
-        } else {
-          return comparatorArrivalTimeAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
-        }
-      case USE_C1_RELAX_DESTINATION:
-        if (includeTimetable) {
-          return comparatorTimetableAndRelaxedC1(relaxC1);
-        }
-        if (preferLateArrival) {
-          return comparatorDepartureTimeAndRelaxedC1(relaxC1);
-        } else {
-          return comparatorArrivalTimeAndRelaxedC1(relaxC1);
-        }
-      case null:
-        throw new IllegalArgumentException("Add support for: " + costConfig);
-    }
+    ParetoSetTime timeConfig = includeTimetable
+      ? ParetoSetTime.USE_TIMETABLE
+      : (preferLatestDeparture ? ParetoSetTime.USE_DEPARTURE_TIME : ParetoSetTime.USE_ARRIVAL_TIME);
+
+    return paretoComparator(timeConfig, costConfig, relaxC1, c2Comp);
+  }
+
+  /**
+   * Create pareto-set comparison function.
+   *
+   * @param timeConfig Supported timing information to include in comparator.
+   * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
+   * @param relaxC1    Relax function for the generalized cost
+   * @param c2Comp     Dominance function for accumulated criteria TWO. If function is null,
+   *                   C2 will not be included in the comparison.
+   */
+  public static <T extends RaptorTripSchedule> ParetoComparator<RaptorPath<T>> paretoComparator(
+    ParetoSetTime timeConfig,
+    ParetoSetCost costConfig,
+    RelaxFunction relaxC1,
+    DominanceFunction c2Comp
+  ) {
+    Objects.requireNonNull(timeConfig);
+    Objects.requireNonNull(costConfig);
+
+    return switch (costConfig) {
+      case NONE -> switch (timeConfig) {
+        case USE_TIMETABLE -> comparatorTimetable();
+        case USE_ARRIVAL_TIME -> comparatorStandardArrivalTime();
+        case USE_DEPARTURE_TIME -> comparatorStandardDepartureTime();
+      };
+      case USE_C1 -> switch (timeConfig) {
+        case USE_TIMETABLE -> comparatorTimetableAndC1();
+        case USE_ARRIVAL_TIME -> comparatorArrivalTimeAndC1();
+        case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndC1();
+      };
+      case USE_C1_AND_C2 -> switch (timeConfig) {
+        case USE_TIMETABLE -> comparatorTimetableAndC1AndC2(c2Comp);
+        case USE_ARRIVAL_TIME -> comparatorWithC1AndC2(c2Comp);
+        case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndC1AndC2(c2Comp);
+      };
+      case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> switch (timeConfig) {
+        case USE_TIMETABLE -> comparatorTimetableAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
+        case USE_ARRIVAL_TIME -> comparatorArrivalTimeAndRelaxedC1IfC2IsOptimal(relaxC1, c2Comp);
+        case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndRelaxedC1IfC2IsOptimal(
+          relaxC1,
+          c2Comp
+        );
+      };
+      case USE_C1_RELAX_DESTINATION -> switch (timeConfig) {
+        case USE_TIMETABLE -> comparatorTimetableAndRelaxedC1(relaxC1);
+        case USE_ARRIVAL_TIME -> comparatorArrivalTimeAndRelaxedC1(relaxC1);
+        case USE_DEPARTURE_TIME -> comparatorDepartureTimeAndRelaxedC1(relaxC1);
+      };
+    };
   }
 
   private static <
@@ -161,7 +167,9 @@ public class PathParetoSetComparators {
       compareC1(relaxCost, l, r);
   }
 
-  private static <T extends RaptorTripSchedule> ParetoComparator<RaptorPath<T>> comparatorWithC1() {
+  private static <
+    T extends RaptorTripSchedule
+  > ParetoComparator<RaptorPath<T>> comparatorArrivalTimeAndC1() {
     return (l, r) ->
       compareArrivalTime(l, r) ||
       compareNumberOfTransfers(l, r) ||

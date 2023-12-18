@@ -12,6 +12,7 @@ import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
+import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.ForwardPathMapper;
@@ -70,7 +71,8 @@ public class PathConfig<T extends RaptorTripSchedule> {
     ParetoSetCost costConfig,
     DominanceFunction c2Comp
   ) {
-    RelaxFunction relaxC1 =
+    // This code goes away when the USE_C1_RELAX_DESTINATION is deleted
+    var relaxC1 =
       switch (costConfig) {
         case USE_C1_RELAXED_IF_C2_IS_OPTIMAL -> ctx.multiCriteria().relaxC1();
         case USE_C1_RELAX_DESTINATION -> GeneralizedCostRelaxFunction.of(
@@ -79,14 +81,17 @@ public class PathConfig<T extends RaptorTripSchedule> {
         default -> RelaxFunction.NORMAL;
       };
 
-    return paretoComparator(
-      costConfig,
-      ctx.searchParams().timetable(),
-      ctx.searchParams().preferLateArrival(),
-      ctx.searchDirection(),
-      relaxC1,
-      c2Comp
-    );
+    return paretoComparator(paretoSetTimeConfig(), costConfig, relaxC1, c2Comp);
+  }
+
+  private ParetoSetTime paretoSetTimeConfig() {
+    boolean preferLatestDeparture =
+      ctx.searchParams().preferLateArrival() != ctx.searchDirection().isInReverse();
+
+    ParetoSetTime timeConfig = ctx.searchParams().timetable()
+      ? ParetoSetTime.USE_TIMETABLE
+      : (preferLatestDeparture ? ParetoSetTime.USE_DEPARTURE_TIME : ParetoSetTime.USE_ARRIVAL_TIME);
+    return timeConfig;
   }
 
   private PathMapper<T> createPathMapper(boolean includeCost) {
