@@ -61,7 +61,7 @@ public enum OTPFeature {
   TransferConstraints(
     true,
     false,
-    "Enforce transfers to happen according to the _transfers.txt_ (GTFS) and Interchanges (NeTEx). Turing this _off_ will increase the routing performance a little."
+    "Enforce transfers to happen according to the _transfers.txt_ (GTFS) and Interchanges (NeTEx). Turning this _off_ will increase the routing performance a little."
   ),
   TransmodelGraphQlApi(true, true, "Enable Transmodel (NeTEx) GraphQL API."),
 
