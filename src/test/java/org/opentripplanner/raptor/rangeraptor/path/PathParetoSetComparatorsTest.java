@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.NONE;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1_AND_C2;
+import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1_RELAXED_IF_C2_IS_OPTIMAL;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.USE_C1_RELAX_DESTINATION;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_ARRIVAL_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME;
@@ -50,19 +51,19 @@ public class PathParetoSetComparatorsTest {
       Arguments.of(USE_ARRIVAL_TIME, USE_C1, NO_RELAX_FN, NO_COMP),
       Arguments.of(USE_ARRIVAL_TIME, USE_C1_AND_C2, NO_RELAX_FN, DOMINANCE_FN),
       // TODO: This is failing, error in implementation
-      //Arguments.of(USE_ARRIVAL_TIME, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
+      Arguments.of(USE_ARRIVAL_TIME, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
       Arguments.of(USE_ARRIVAL_TIME, USE_C1_RELAX_DESTINATION, RELAX_FN, NO_COMP),
       // Departure time
       Arguments.of(USE_DEPARTURE_TIME, NONE, NO_RELAX_FN, NO_COMP),
       Arguments.of(USE_DEPARTURE_TIME, USE_C1_AND_C2, NO_RELAX_FN, DOMINANCE_FN),
       // TODO: This is failing, error in implementation
-      // Arguments.of(USE_DEPARTURE_TIME, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
+      Arguments.of(USE_DEPARTURE_TIME, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
       Arguments.of(USE_DEPARTURE_TIME, USE_C1_RELAX_DESTINATION, RELAX_FN, NO_COMP),
       // Timetable
       Arguments.of(USE_TIMETABLE, NONE, NO_RELAX_FN, NO_COMP),
       Arguments.of(USE_TIMETABLE, USE_C1_AND_C2, NO_RELAX_FN, DOMINANCE_FN),
       // TODO: This is failing, error in implementation
-      // Arguments.of(USE_TIMETABLE, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
+      Arguments.of(USE_TIMETABLE, USE_C1_RELAXED_IF_C2_IS_OPTIMAL, RELAX_FN, DOMINANCE_FN),
       Arguments.of(USE_TIMETABLE, USE_C1_RELAX_DESTINATION, RELAX_FN, NO_COMP)
     );
   }
@@ -76,7 +77,7 @@ public class PathParetoSetComparatorsTest {
     DominanceFunction comp2
   ) {
     var comparator = PathParetoSetComparators.paretoComparator(
-      cost.includeC1(),
+      cost,
       time == USE_TIMETABLE,
       time == USE_DEPARTURE_TIME,
       SearchDirection.FORWARD,
