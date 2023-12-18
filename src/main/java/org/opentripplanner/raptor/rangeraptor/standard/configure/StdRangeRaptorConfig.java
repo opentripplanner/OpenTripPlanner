@@ -251,14 +251,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
       ctx.slackProvider().transferSlack(),
       ctx.egressPaths(),
       MIN_TRAVEL_DURATION.is(ctx.profile()),
-      paretoComparator(
-        ParetoSetCost.NONE,
-        ctx.searchParams().timetable(),
-        ctx.searchParams().preferLateArrival(),
-        ctx.searchDirection(),
-        null,
-        null
-      ),
+      paretoComparator(ctx.paretoSetTimeConfig(), ParetoSetCost.NONE, null, null),
       ctx.lifeCycle()
     );
   }

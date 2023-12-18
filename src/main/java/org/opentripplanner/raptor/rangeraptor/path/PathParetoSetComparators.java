@@ -48,33 +48,6 @@ public class PathParetoSetComparators {
   /**
    * Create pareto-set comparison function.
    *
-   * @param costConfig            Supported configurations of c1, c2 and relaxed cost(c1).
-   * @param includeTimetable  Include both departure-tine and arrival-time in pareto-function.
-   * @param preferLateArrival Arrive as late as possible (arriveBy=True).
-   * @param relaxC1           Relax function for the generalized cost
-   * @param c2Comp            Dominance function for accumulated criteria TWO. If function is null,
-   *                          C2 will not be included in the comparison.
-   */
-  public static <T extends RaptorTripSchedule> ParetoComparator<RaptorPath<T>> paretoComparator(
-    ParetoSetCost costConfig,
-    boolean includeTimetable,
-    boolean preferLateArrival,
-    SearchDirection searchDirection,
-    RelaxFunction relaxC1,
-    DominanceFunction c2Comp
-  ) {
-    boolean preferLatestDeparture = preferLateArrival != searchDirection.isInReverse();
-
-    ParetoSetTime timeConfig = includeTimetable
-      ? ParetoSetTime.USE_TIMETABLE
-      : (preferLatestDeparture ? ParetoSetTime.USE_DEPARTURE_TIME : ParetoSetTime.USE_ARRIVAL_TIME);
-
-    return paretoComparator(timeConfig, costConfig, relaxC1, c2Comp);
-  }
-
-  /**
-   * Create pareto-set comparison function.
-   *
    * @param timeConfig Supported timing information to include in comparator.
    * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
    * @param relaxC1    Relax function for the generalized cost

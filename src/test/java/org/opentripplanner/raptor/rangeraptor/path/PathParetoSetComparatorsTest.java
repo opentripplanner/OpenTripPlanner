@@ -10,6 +10,7 @@ import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost.U
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_ARRIVAL_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME;
 import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_TIMETABLE;
+import static org.opentripplanner.raptor.rangeraptor.path.PathParetoSetComparators.paretoComparator;
 
 import java.util.List;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -76,14 +77,7 @@ public class PathParetoSetComparatorsTest {
     RelaxFunction relaxC1,
     DominanceFunction comp2
   ) {
-    var comparator = PathParetoSetComparators.paretoComparator(
-      cost,
-      time == USE_TIMETABLE,
-      time == USE_DEPARTURE_TIME,
-      SearchDirection.FORWARD,
-      relaxC1,
-      comp2
-    );
+    var comparator = paretoComparator(time, cost, relaxC1, comp2);
     verifyNumberOfTransfers(comparator);
     switch (time) {
       case USE_ARRIVAL_TIME:
