@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SiriTripPatternCache {
 
-  private static final Logger log = LoggerFactory.getLogger(SiriTripPatternCache.class);
+  private static final Logger LOG = LoggerFactory.getLogger(SiriTripPatternCache.class);
 
   // Seems to be the primary collection of added TripPatterns, with other collections serving as
   // indexes. Similar to TripPatternCache.cache but with service date as part of the key.
@@ -99,19 +99,16 @@ public class SiriTripPatternCache {
     // Create TripPattern if it doesn't exist yet
     if (tripPattern == null) {
       var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
-      TripPatternBuilder tripPatternBuilder = TripPattern
+      tripPattern = TripPattern
         .of(id)
         .withRoute(trip.getRoute())
         .withMode(trip.getMode())
         .withNetexSubmode(trip.getNetexSubMode())
-        .withStopPattern(stopPattern);
-
+        .withStopPattern(stopPattern)
+        .withCreatedByRealtimeUpdater(true)
+        .withOriginalTripPattern(originalTripPattern)
+        .build();
       // TODO - SIRI: Add pattern to transitModel index?
-
-      tripPatternBuilder.withCreatedByRealtimeUpdater(true);
-      tripPatternBuilder.withOriginalTripPattern(originalTripPattern);
-
-      tripPattern = tripPatternBuilder.build();
 
       // Add pattern to cache
       cache.put(key, tripPattern);
@@ -162,7 +159,7 @@ public class SiriTripPatternCache {
         patternsForStop.values().removeAll(Arrays.asList(cachedTripPattern));
         int sizeAfter = patternsForStop.values().size();
 
-        log.debug(
+        LOG.debug(
           "Removed outdated TripPattern for {} stops in {} ms - tripId: {}",
           (sizeBefore - sizeAfter),
           (System.currentTimeMillis() - t1),
