@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.opentripplanner.framework.lang.Sandbox;
+import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.slf4j.Logger;
@@ -92,30 +93,44 @@ public class Co2EmissionsDataReader {
       String avgCo2PerVehiclePerKmString = reader.get("avg_co2_per_vehicle_per_km");
       String avgPassengerCountString = reader.get("avg_passenger_count");
 
-      if (avgCo2PerVehiclePerKmString.isEmpty()) {
+      if (!StringUtils.hasValue(routeId)) {
         issueStore.add(
           "InvalidEmissionData",
-          "Value for avg_co2_per_vehicle_per_km is missing in the Emissions.txt for route %s",
+          "Value for routeId is missing in the emissions.txt for line: %s.",
+          reader.getRawRecord()
+        );
+      }
+      if (!StringUtils.hasValue(avgCo2PerVehiclePerKmString)) {}
+      {
+        issueStore.add(
+          "InvalidEmissionData",
+          "Value for avg_co2_per_vehicle_per_km is missing in the emissions.txt for route %s",
           routeId
         );
       }
-      if (avgPassengerCountString.isEmpty()) {
+      if (!StringUtils.hasValue(avgPassengerCountString)) {
         issueStore.add(
           "InvalidEmissionData",
-          "Value for avg_passenger_count is missing in the Emissions.txt for route %s",
+          "Value for avg_passenger_count is missing in the emissions.txt for route %s",
           routeId
         );
       }
-
-      Double avgCo2PerVehiclePerMeter = Double.parseDouble(avgCo2PerVehiclePerKmString) / 1000;
-      Double avgPassengerCount = Double.parseDouble(reader.get("avg_passenger_count"));
-      Optional<Double> emissions = calculateEmissionsPerPassengerPerMeter(
-        routeId,
-        avgCo2PerVehiclePerMeter,
-        avgPassengerCount
-      );
-      if (emissions.isPresent()) {
-        emissionsData.put(new FeedScopedId(feedId, routeId), emissions.get());
+      if (
+        StringUtils.hasValue(feedId) &&
+        StringUtils.hasValue(routeId) &&
+        StringUtils.hasValue(avgCo2PerVehiclePerKmString) &&
+        StringUtils.hasValue(avgPassengerCountString)
+      ) {
+        Double avgCo2PerVehiclePerMeter = Double.parseDouble(avgCo2PerVehiclePerKmString) / 1000;
+        Double avgPassengerCount = Double.parseDouble(reader.get("avg_passenger_count"));
+        Optional<Double> emissions = calculateEmissionsPerPassengerPerMeter(
+          routeId,
+          avgCo2PerVehiclePerMeter,
+          avgPassengerCount
+        );
+        if (emissions.isPresent()) {
+          emissionsData.put(new FeedScopedId(feedId, routeId), emissions.get());
+        }
       }
     }
     return emissionsData;

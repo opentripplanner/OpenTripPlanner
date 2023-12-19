@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.mapping;
 
-import com.google.common.collect.ArrayListMultimap;
+import java.util.List;
+import java.util.Map;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.transfer.ConstrainedTransfer;
@@ -23,13 +24,13 @@ public class TransferMapper {
 
   private final FeedScopedIdFactory idFactory;
   private final DataImportIssueStore issueStore;
-  private final ArrayListMultimap<String, String> scheduledStopPointsIndex;
+  private final Map<String, List<String>> scheduledStopPointsIndex;
   private final EntityById<Trip> trips;
 
   public TransferMapper(
     FeedScopedIdFactory idFactory,
     DataImportIssueStore issueStore,
-    ArrayListMultimap<String, String> scheduledStopPointsIndex,
+    Map<String, List<String>> scheduledStopPointsIndex,
     EntityById<Trip> trips
   ) {
     this.idFactory = idFactory;
@@ -139,32 +140,34 @@ public class TransferMapper {
     ScheduledStopPointRefStructure scheduledStopPointRef
   ) {
     String sspId = scheduledStopPointRef.getRef();
+    var scheduledStopPoints = scheduledStopPointsIndex.get(sjId);
+    String errorMessage;
 
-    int index = -1;
-    if (label == Label.TO) {
-      index = scheduledStopPointsIndex.get(sjId).indexOf(sspId);
-    } else if (label == Label.FROM) {
-      index = scheduledStopPointsIndex.get(sjId).lastIndexOf(sspId);
+    if (scheduledStopPoints != null) {
+      var index =
+        switch (label) {
+          case Label.TO -> scheduledStopPoints.indexOf(sspId);
+          case Label.FROM -> scheduledStopPoints.lastIndexOf(sspId);
+        };
+      if (index >= 0) {
+        return index;
+      }
+
+      errorMessage = "Scheduled-stop-point-ref not found";
+    } else {
+      errorMessage = "Service-journey not found";
     }
-
-    if (index >= 0) {
-      return index;
-    }
-
-    String detailedMsg = scheduledStopPointsIndex.containsKey(sjId)
-      ? "Scheduled-stop-point-ref not found"
-      : "Service-journey not found";
 
     issueStore.add(
       new InterchangePointMappingFailed(
-        detailedMsg,
+        errorMessage,
         interchangeId,
         label.label(fieldName),
         sjId,
         sspId
       )
     );
-    return index;
+    return -1;
   }
 
   private FeedScopedId createId(String id) {

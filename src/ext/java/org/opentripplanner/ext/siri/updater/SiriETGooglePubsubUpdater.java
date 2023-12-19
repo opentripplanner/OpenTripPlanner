@@ -126,10 +126,10 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
     SiriTimetableSnapshotSource timetableSnapshot
   ) {
     this.configRef = config.configRef();
-    /*
-           URL that responds to HTTP GET which returns all initial data in protobuf-format.
-           Will be called once to initialize realtime-data. All updates will be received from Google Cloud Pubsub
-          */
+
+    // URL that responds to HTTP GET which returns all initial data in protobuf-format. Will be
+    // called once to initialize real-time-data. All updates will be received from Google Cloud
+    // Pubsub
     this.dataInitializationUrl = URI.create(config.dataInitializationUrl());
     this.feedId = config.feedId();
     this.reconnectPeriod = config.reconnectPeriod();
@@ -196,15 +196,6 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   }
 
   @Override
-  public void teardown() {
-    if (subscriber != null) {
-      LOG.info("Stopping SIRI-ET PubSub subscriber  {}", subscriptionName);
-      subscriber.stopAsync();
-    }
-    deleteSubscription();
-  }
-
-  @Override
   public boolean isPrimed() {
     return this.primed;
   }
@@ -215,17 +206,16 @@ public class SiriETGooglePubsubUpdater implements GraphUpdater {
   }
 
   private void addShutdownHook() {
-    // TODO: This should probably be on a higher level?
-    Thread shutdownHook = new Thread(this::teardown, "siri-et-google-pubsub-shutdown");
-    boolean added = ApplicationShutdownSupport.addShutdownHook(
-      shutdownHook,
-      shutdownHook.getName()
+    ApplicationShutdownSupport.addShutdownHook(
+      "siri-et-google-pubsub-shutdown",
+      () -> {
+        if (subscriber != null) {
+          LOG.info("Stopping SIRI-ET PubSub subscriber '{}'.", subscriptionName);
+          subscriber.stopAsync();
+        }
+        deleteSubscription();
+      }
     );
-    if (!added) {
-      // Handling corner case when instance is being shut down before it has been initialized
-      LOG.info("Instance is already shutting down - cleaning up immediately.");
-      teardown();
-    }
   }
 
   /**

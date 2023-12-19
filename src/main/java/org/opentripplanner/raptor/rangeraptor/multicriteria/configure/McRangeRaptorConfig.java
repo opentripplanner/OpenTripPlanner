@@ -57,7 +57,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   /**
    * The PassThroughPointsService is injected into the transit-calculator, so it needs to be
-   * created before the context(witch create the calculator).So, to be able to do this, this
+   * created before the context(which create the calculator).So, to be able to do this, this
    * factory is static, and the service is passed back in when this config is instantiated.
    */
   public static PassThroughPointsService passThroughPointsService(

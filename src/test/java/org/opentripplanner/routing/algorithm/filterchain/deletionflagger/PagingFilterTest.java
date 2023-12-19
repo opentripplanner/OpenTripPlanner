@@ -1,49 +1,70 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.opentripplanner.framework.collection.ListUtils.first;
+import static org.opentripplanner.framework.collection.ListUtils.last;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.opentripplanner._support.debug.TestDebug;
+import org.opentripplanner.framework.collection.ListSection;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
-import org.opentripplanner.model.plan.pagecursor.PagingDeduplicationSection;
+import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 public class PagingFilterTest implements PlanTestConstants {
 
-  private static final Itinerary early = newItinerary(A).bus(1, T11_04, T11_07, B).build();
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
-  private static final Itinerary middle = newItinerary(A)
-    .bus(2, T11_03, T11_05, B)
-    .bus(21, T11_07, T11_10, C)
-    .build();
-  private static final Itinerary late = newItinerary(A).bus(3, T11_00, T11_12, B).build();
-  private static final Instant oldSearchWindowEndTime = newTime(T11_05).toInstant();
+  private static final Place A = TEST_MODEL.place("A", 10, 11);
+  private static final Place B = TEST_MODEL.place("B", 10, 13);
+  private static final Place C = TEST_MODEL.place("C", 10, 14);
+  private static final Place D = TEST_MODEL.place("D", 10, 15);
+
+  private static final int EARLY_START = T11_04;
+  private static final int EARLY_END = T11_07;
+  private static final int MIDDLE_START = T11_03;
+  private static final int MIDDLE_END = T11_10;
+  private static final int LATE_START = T11_00;
+  private static final int LATE_END = T11_12;
+
+  /** [11:04, 11:07, $300, Tx0, transit] */
+  private static final Itinerary early = newItinerary(A).bus(1, EARLY_START, EARLY_END, D).build();
+
+  /**  [11:03, 11:10, $636, Tx1, transit] */
+  private static final Itinerary middle = createMiddle();
+
+  /** [11:00, 11:12, $840, Tx0, transit] */
+  private static final Itinerary late = newItinerary(A).bus(3, LATE_START, LATE_END, D).build();
 
   private static PagingFilter pagingFilter;
 
+  /**
+   * This set of itineraries contains all combinations of itineraries with the following values:
+   * <ol>
+   *   <li>departure-time: 10:00 and 10:01</li>
+   *   <li>arrival-time: 11:00 and 11:01</li>
+   *   <li>number of transfers: zero or one</li>
+   *   <li>cost: 5 or 7</li>
+   *   <li>mode: car or transit</li>
+   * </ol>
+   * There are 8 car itineraries and 16 transit (car do not have transfers) = 24 itineraries
+   */
+  private final List<Itinerary> allItineraries = allPossibleSortingCombinationsOfItineraries();
+
   @BeforeEach
   public void setup() {
-    pagingFilter =
-      new PagingFilter(
-        new ItineraryPageCut(
-          late.startTime().toInstant(),
-          oldSearchWindowEndTime,
-          SortOrder.STREET_AND_ARRIVAL_TIME,
-          PagingDeduplicationSection.HEAD,
-          middle.endTime().toInstant(),
-          middle.startTime().toInstant(),
-          middle.getGeneralizedCost(),
-          middle.getNumberOfTransfers(),
-          false
-        )
-      );
+    pagingFilter = new PagingFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.HEAD, middle);
   }
 
   @Test
@@ -55,57 +76,203 @@ public class PagingFilterTest implements PlanTestConstants {
   public void testPotentialDuplicateMarkedForDeletionWithEarlierArrival() {
     List<Itinerary> itineraries = List.of(early, middle, late);
 
-    assertEquals(
-      toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
-    );
+    itineraries.forEach(it -> TestDebug.println(it.keyAsString()));
+    assertEquals(toStr(List.of(late)), toStr(pagingFilter.removeMatchesForTest(itineraries)));
   }
 
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithLowerGeneralizedCost() {
-    Itinerary middleLowCost = newItinerary(A)
-      .bus(2, T11_03, T11_05, B)
-      .bus(21, T11_07, T11_10, C)
-      .build();
+    Itinerary middleHighCost = createMiddle();
+    middleHighCost.setGeneralizedCost(middle.getGeneralizedCost() + 1);
 
-    middleLowCost.setGeneralizedCost(1);
-
-    List<Itinerary> itineraries = List.of(middleLowCost, middle, late);
+    List<Itinerary> itineraries = List.of(middleHighCost, middle, late);
 
     assertEquals(
-      toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
+      toStr(List.of(middleHighCost, late)),
+      toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
 
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithFewerNumberOfTransfers() {
-    Itinerary middleNumberOfTransfers = newItinerary(A).bus(21, T11_03, T11_10, C).build();
+    int t0 = MIDDLE_START;
 
-    middleNumberOfTransfers.setGeneralizedCost(middle.getGeneralizedCost());
+    Itinerary middleHighNumberOfTransfers = newItinerary(A)
+      .bus(21, t0, t0 + D1m, B)
+      .bus(22, t0 + D2m, t0 + D3m, C)
+      .bus(23, t0 + D4m, MIDDLE_END, D)
+      .build();
 
-    List<Itinerary> itineraries = List.of(middleNumberOfTransfers, middle, late);
+    middleHighNumberOfTransfers.setGeneralizedCost(middle.getGeneralizedCost());
+
+    List<Itinerary> itineraries = List.of(middleHighNumberOfTransfers, middle, late);
 
     assertEquals(
-      toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
+      toStr(List.of(middleHighNumberOfTransfers, late)),
+      toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
   }
 
   @Test
   public void testPotentialDuplicateMarkedForDeletionWithLaterDepartureTime() {
-    Itinerary middleLaterDepartureTime = newItinerary(A)
-      .bus(2, T11_04, T11_05, B)
-      .bus(21, T11_07, T11_10, C)
+    int t0 = MIDDLE_START;
+    Itinerary middleEarlierDepartureTime = newItinerary(A)
+      .bus(2, t0 - D1m, t0 + D3m, B)
+      .bus(21, t0 + D4m, MIDDLE_END, C)
       .build();
 
-    middleLaterDepartureTime.setGeneralizedCost(middle.getGeneralizedCost());
+    middleEarlierDepartureTime.setGeneralizedCost(middle.getGeneralizedCost());
 
-    List<Itinerary> itineraries = List.of(middleLaterDepartureTime, middle, late);
+    List<Itinerary> itineraries = List.of(middleEarlierDepartureTime, middle, late);
 
     assertEquals(
-      toStr(List.of(middle, late)),
-      toStr(DeletionFlaggerTestHelper.process(itineraries, pagingFilter))
+      toStr(List.of(middleEarlierDepartureTime, late)),
+      toStr(pagingFilter.removeMatchesForTest(itineraries))
     );
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 }
+  )
+  public void testDepartAfterSearchHeadFilter(int index) {
+    allItineraries.sort(SortOrderComparator.defaultComparatorDepartAfter());
+
+    // Crop at top of list
+    var itinerary = allItineraries.get(index);
+    var f = new PagingFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.HEAD, itinerary);
+
+    var result = f.removeMatchesForTest(allItineraries);
+
+    result.forEach(it -> TestDebug.println(it.toStr()));
+
+    if (index == 23) {
+      assertEquals("", toStr(result));
+    } else {
+      assertItineraryEq(allItineraries.get(index + 1), first(result));
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 }
+  )
+  public void testDepartAfterSearchTailFilter(int index) {
+    allItineraries.sort(SortOrderComparator.defaultComparatorDepartAfter());
+
+    // Crop at top of list
+    var itinerary = allItineraries.get(index);
+    var f = new PagingFilter(SortOrder.STREET_AND_ARRIVAL_TIME, ListSection.TAIL, itinerary);
+
+    var result = f.removeMatchesForTest(allItineraries);
+
+    result.forEach(it -> TestDebug.println(it.toStr()));
+
+    if (index == 0) {
+      assertEquals("", toStr(result));
+    } else {
+      assertItineraryEq(allItineraries.get(index - 1), last(result));
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 }
+  )
+  public void testArriveBySearchHeadFilter(int index) {
+    allItineraries.sort(SortOrderComparator.defaultComparatorArriveBy());
+
+    // Crop at top of list
+    var itinerary = allItineraries.get(index);
+    var f = new PagingFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.HEAD, itinerary);
+
+    var result = f.removeMatchesForTest(allItineraries);
+
+    result.forEach(it -> TestDebug.println(it.toStr()));
+
+    if (index == 23) {
+      assertEquals("", toStr(result));
+    } else {
+      assertItineraryEq(allItineraries.get(index + 1), first(result));
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+    ints = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23 }
+  )
+  public void testArriveBySearchTailFilter(int index) {
+    allItineraries.sort(SortOrderComparator.defaultComparatorArriveBy());
+
+    // Crop at top of list
+    var pageCut = allItineraries.get(index);
+    var f = new PagingFilter(SortOrder.STREET_AND_DEPARTURE_TIME, ListSection.TAIL, pageCut);
+
+    var result = f.removeMatchesForTest(allItineraries);
+
+    result.forEach(it -> TestDebug.println(it.toStr()));
+
+    if (index == 0) {
+      assertEquals("", toStr(result));
+    } else {
+      assertItineraryEq(allItineraries.get(index - 1), last(result));
+    }
+  }
+
+  private static List<Itinerary> allPossibleSortingCombinationsOfItineraries() {
+    int tx_0 = 0;
+    int tx_1 = 1;
+    boolean car = false;
+    boolean transit = true;
+    List<Itinerary> itineraries = new ArrayList<>();
+
+    for (int start : List.of(TimeUtils.time("10:00"), TimeUtils.time("10:01"))) {
+      for (int end : List.of(TimeUtils.time("11:00"), TimeUtils.time("11:01"))) {
+        for (int cost : List.of(5, 7)) {
+          itineraries.add(itinerary(start, end, cost, tx_0, car));
+          itineraries.add(itinerary(start, end, cost, tx_0, transit));
+          itineraries.add(itinerary(start, end, cost, tx_1, transit));
+        }
+      }
+    }
+    return itineraries;
+  }
+
+  private static Itinerary itinerary(
+    int departureTime,
+    int arrivalTime,
+    int cost,
+    int nTransfers,
+    boolean transit
+  ) {
+    var builder = newItinerary(A);
+
+    if (transit) {
+      if (nTransfers == 0) {
+        builder.bus(10, departureTime, arrivalTime, B);
+      } else if (nTransfers == 1) {
+        builder
+          .bus(20, departureTime, departureTime + 120, B)
+          .bus(21, departureTime + 240, arrivalTime, B);
+      } else {
+        throw new IllegalArgumentException("nTransfers not supported: " + nTransfers);
+      }
+    } else {
+      builder.drive(departureTime, arrivalTime, B);
+    }
+    var it = builder.build();
+    it.setGeneralizedCost(cost);
+    return it;
+  }
+
+  private static Itinerary createMiddle() {
+    return newItinerary(A)
+      .bus(2, MIDDLE_START, MIDDLE_START + D2m, B)
+      .bus(21, MIDDLE_END - D3m, MIDDLE_END, D)
+      .build();
+  }
+
+  private static void assertItineraryEq(Itinerary expected, Itinerary actual) {
+    assertEquals(expected.keyAsString(), actual.keyAsString());
   }
 }

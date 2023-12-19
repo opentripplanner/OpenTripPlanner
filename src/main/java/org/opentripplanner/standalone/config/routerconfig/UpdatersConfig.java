@@ -125,7 +125,7 @@ public class UpdatersConfig implements UpdatersParameters {
         .of("purgeExpiredData")
         .since(V2_2)
         .summary(
-          "Should expired realtime data be purged from the graph. Apply to GTFS-RT and Siri updates."
+          "Should expired real-time data be purged from the graph. Apply to GTFS-RT and Siri updates."
         )
         .asBoolean(dflt.purgeExpiredData())
     );

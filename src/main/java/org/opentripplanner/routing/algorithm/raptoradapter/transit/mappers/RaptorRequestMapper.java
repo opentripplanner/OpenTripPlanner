@@ -97,13 +97,13 @@ public class RaptorRequestMapper {
     } else {
       var c = request.pageCursor();
 
-      if (c.earliestDepartureTime != null) {
-        searchParams.earliestDepartureTime(relativeTime(c.earliestDepartureTime));
+      if (c.earliestDepartureTime() != null) {
+        searchParams.earliestDepartureTime(relativeTime(c.earliestDepartureTime()));
       }
-      if (c.latestArrivalTime != null) {
-        searchParams.latestArrivalTime(relativeTime(c.latestArrivalTime));
+      if (c.latestArrivalTime() != null) {
+        searchParams.latestArrivalTime(relativeTime(c.latestArrivalTime()));
       }
-      searchParams.searchWindow(c.searchWindow);
+      searchParams.searchWindow(c.searchWindow());
     }
 
     if (preferences.transfer().maxTransfers() != null) {

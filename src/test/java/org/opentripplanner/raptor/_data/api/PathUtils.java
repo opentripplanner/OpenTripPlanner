@@ -29,7 +29,11 @@ public class PathUtils {
   }
 
   public static String pathsToStringDetailed(RaptorResponse<?> response) {
-    return pathsToString(response.paths(), p -> p.toStringDetailed(TRANSLATOR::stopIndexToName));
+    return pathsToStringDetailed(response.paths());
+  }
+
+  public static String pathsToStringDetailed(Collection<? extends RaptorPath<?>> paths) {
+    return pathsToString(paths, p -> p.toStringDetailed(TRANSLATOR::stopIndexToName));
   }
 
   public static String join(String... paths) {
@@ -37,16 +41,14 @@ public class PathUtils {
   }
 
   public static String withoutCost(String path) {
-    return path.replaceAll(" \\$\\d+", "");
+    return path.replaceAll(" C₁[\\d_]+", "");
   }
 
   public static String[] withoutCost(String... paths) {
     return Stream.of(paths).map(path -> withoutCost(path)).toList().toArray(new String[0]);
   }
 
-  /* private methods */
-
-  private static String pathsToString(
+  public static String pathsToString(
     Collection<? extends RaptorPath<?>> paths,
     Function<RaptorPath<?>, String> mapToStr
   ) {

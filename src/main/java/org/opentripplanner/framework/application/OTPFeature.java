@@ -61,8 +61,9 @@ public enum OTPFeature {
   TransferConstraints(
     true,
     false,
-    "Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little."
+    "Enforce transfers to happen according to the _transfers.txt_ (GTFS) and Interchanges (NeTEx). Turning this _off_ will increase the routing performance a little."
   ),
+  TransmodelGraphQlApi(true, true, "Enable Transmodel (NeTEx) GraphQL API."),
 
   /* Sandbox extension features - Must be turned OFF by default */
 
@@ -84,7 +85,7 @@ public enum OTPFeature {
   RealtimeResolver(
     false,
     true,
-    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with realtime data"
+    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with real-time data"
   ),
   ReportApi(false, true, "Enable the report API."),
   RestAPIPassInDefaultConfigAsJson(
@@ -95,7 +96,6 @@ public enum OTPFeature {
   SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
   SandboxAPIMapboxVectorTilesApi(false, true, "Enable Mapbox vector tiles API."),
   SandboxAPIParkAndRideApi(false, true, "Enable park-and-ride endpoint."),
-  SandboxAPITransmodelApi(false, true, "Enable Entur Transmodel(NeTEx) GraphQL API."),
   SandboxAPITravelTime(false, true, "Enable the isochrone/travel time surface API."),
   TransferAnalyzer(false, true, "Analyze transfers during graph build."),
   VehicleToStopHeuristics(false, true, "Enable improved heuristic for park-and-ride queries.");

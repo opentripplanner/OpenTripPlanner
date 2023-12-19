@@ -94,7 +94,7 @@ public enum ConfigType {
   TIME_PENALTY(
     JsonType.string,
     """
-        A time-penalty is used to add a penalty to the duration/arrival-time/depature-time for
+        A time-penalty is used to add a penalty to the duration/arrival-time/departure-time for
         a path. It will be invisible to the end user, but used during the routing when comparing
         stop-arrival/paths.
             

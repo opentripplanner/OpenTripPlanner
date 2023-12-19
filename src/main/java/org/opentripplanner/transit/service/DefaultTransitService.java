@@ -465,15 +465,6 @@ public class DefaultTransitService implements TransitEditorService {
 
   @Override
   public TripOnServiceDate getTripOnServiceDateById(FeedScopedId datedServiceJourneyId) {
-    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
-    if (timetableSnapshot != null) {
-      TripOnServiceDate tripOnServiceDate = timetableSnapshot
-        .getRealtimeAddedTripOnServiceDate()
-        .get(datedServiceJourneyId);
-      if (tripOnServiceDate != null) {
-        return tripOnServiceDate;
-      }
-    }
     return transitModelIndex.getTripOnServiceDateById().get(datedServiceJourneyId);
   }
 
@@ -486,15 +477,6 @@ public class DefaultTransitService implements TransitEditorService {
   public TripOnServiceDate getTripOnServiceDateForTripAndDay(
     TripIdAndServiceDate tripIdAndServiceDate
   ) {
-    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
-    if (timetableSnapshot != null) {
-      TripOnServiceDate tripOnServiceDate = timetableSnapshot
-        .getRealtimeAddedTripOnServiceDateByTripIdAndServiceDate()
-        .get(tripIdAndServiceDate);
-      if (tripOnServiceDate != null) {
-        return tripOnServiceDate;
-      }
-    }
     return transitModelIndex.getTripOnServiceDateForTripAndDay().get(tripIdAndServiceDate);
   }
 

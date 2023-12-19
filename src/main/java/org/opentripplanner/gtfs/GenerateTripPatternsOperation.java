@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.framework.logging.ProgressTracker;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
@@ -16,6 +17,7 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryProcessor;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -47,7 +49,6 @@ public class GenerateTripPatternsOperation {
   private final Multimap<StopPattern, TripPattern> tripPatterns;
   private final ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();
 
-  private int tripCount = 0;
   private int freqCount = 0;
   private int scheduledCount = 0;
 
@@ -70,17 +71,21 @@ public class GenerateTripPatternsOperation {
     collectFrequencyByTrip();
 
     final Collection<Trip> trips = transitDaoBuilder.getTripsById().values();
-    final int tripsSize = trips.size();
+    var progressLogger = ProgressTracker.track("build trip patterns", 50_000, trips.size());
+    LOG.info(progressLogger.startMessage());
 
     /* Loop over all trips, handling each one as a frequency-based or scheduled trip. */
     for (Trip trip : trips) {
-      if (++tripCount % 100000 == 0) {
-        LOG.debug("build trip patterns {}/{}", tripCount, tripsSize);
+      try {
+        buildTripPatternForTrip(trip);
+        //noinspection Convert2MethodRef
+        progressLogger.step(m -> LOG.info(m));
+      } catch (DataValidationException e) {
+        issueStore.add(e.error());
       }
-
-      buildTripPatternForTrip(trip);
     }
 
+    LOG.info(progressLogger.completeMessage());
     LOG.info(
       "Added {} frequency-based and {} single-trip timetable entries.",
       freqCount,

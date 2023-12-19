@@ -159,11 +159,6 @@ public final class TripPattern
     return stopPattern;
   }
 
-  // TODO OTP2 this method modifies the state, it will be refactored in a subsequent step
-  public void setHopGeometry(int i, LineString hopGeometry) {
-    this.hopGeometries[i] = CompactLineStringUtils.compactLineString(hopGeometry, false);
-  }
-
   public LineString getGeometry() {
     if (hopGeometries == null || hopGeometries.length == 0) {
       return null;
@@ -174,10 +169,6 @@ public final class TripPattern
       lineStrings.add(getHopGeometry(i));
     }
     return GeometryUtils.concatenateLineStrings(lineStrings);
-  }
-
-  public int numHopGeometries() {
-    return hopGeometries.length;
   }
 
   public int numberOfStops() {
