@@ -874,7 +874,7 @@ input BicyclePreferencesInput {
     """
     Walking preferences when walking a bicycle.
     """
-    walk: VehicleWalkPreferencesInput
+    walk: BicycleWalkPreferencesInput
 
     """
     Maximum speed on flat ground while riding a bicycle. Note, this speed is higher than
@@ -4661,7 +4661,7 @@ input ScooterPreferencesInput {
     """
     Walking preferences when walking a scooter.
     """
-    walk: VehicleWalkPreferencesInput
+    walk: ScooterWalkPreferencesInput
 
     """
     Maximum speed on flat ground while riding a scooter. Note, this speed is higher than
@@ -5488,9 +5488,9 @@ enum VertexType {
 }
 
 """
-Preferences for walking a vehicle (scooter or bicycle).
+Preferences for walking a bicycle.
 """
-input VehicleWalkPreferencesInput {
+input BicycleWalkPreferencesInput {
     """
     Maximum walk speed on flat ground. Note, this speed is higher than the average speed
     will be in itineraries as this is the maximum speed but there are
@@ -5499,32 +5499,74 @@ input VehicleWalkPreferencesInput {
     speed: Speed
 
     """
-    Costs related to walking a vehicle.
+    Costs related to walking a bicycle.
     """
-    cost: VehicleWalkPreferencesCostInput
+    cost: BicycleWalkPreferencesCostInput
 
     """"
-    How long it takes to hop on or off a vehicle when switching to walking the vehicle
-    or when getting on the vehicle again. However, this is not applied when getting
-    on a rented vehicle for the first time or off the vehicle when returning the vehicle.
+    How long it takes to hop on or off a bicycle when switching to walking the bicycle
+    or when getting on the bicycle again. However, this is not applied when getting
+    on a rented bicycle for the first time or off the bicycle when returning the bicycle.
     """
     hopTime: Duration
 }
 
 """
-Costs related to walking a vehicle.
+Preferences for walking a scooter.
 """
-input VehicleWalkPreferencesCostInput {
+input ScooterWalkPreferencesInput {
     """
-    A static cost that is added each time hopping on or off a vehicle to start or end
-    vehicle walking. However, this cost is not applied when getting on a rented vehicle
-    for the first time or when getting off the vehicle when returning the vehicle.
+    Maximum walk speed on flat ground. Note, this speed is higher than the average speed
+    will be in itineraries as this is the maximum speed but there are
+    factors that slow down walking such as crossings, intersections and elevation changes.
+    """
+    speed: Speed
+
+    """
+    Costs related to walking a scooter.
+    """
+    cost: ScooterWalkPreferencesCostInput
+
+    """"
+    How long it takes to hop on or off a scooter when switching to walking the scooter
+    or when getting on the scooter again. However, this is not applied when getting
+    on a rented scooter for the first time or off the scooter when returning the scooter.
+    """
+    hopTime: Duration
+}
+
+"""
+Costs related to walking a bicycle.
+"""
+input BicycleWalkPreferencesCostInput {
+    """
+    A static cost that is added each time hopping on or off a bicycle to start or end
+    bicycle walking. However, this cost is not applied when getting on a rented bicycle
+    for the first time or when getting off the bicycle when returning the bicycle.
     """
     hopOnOrOffCost: Cost
 
     """
-    A cost multiplier of vehicle walking travel time. The multiplier is for how bad
-    walking the vehicle is compared to being in transit for equal lengths of time.
+    A cost multiplier of bicycle walking travel time. The multiplier is for how bad
+    walking the bicycle is compared to being in transit for equal lengths of time.
+    """
+    reluctance: Reluctance
+}
+
+"""
+Costs related to walking a scooter.
+"""
+input ScooterWalkPreferencesCostInput {
+    """
+    A static cost that is added each time hopping on or off a scooter to start or end
+    scooter walking. However, this cost is not applied when getting on a rented scooter
+    for the first time or when getting off the scooter when returning the scooter.
+    """
+    hopOnOrOffCost: Cost
+
+    """
+    A cost multiplier of scooter walking travel time. The multiplier is for how bad
+    walking the scooter is compared to being in transit for equal lengths of time.
     """
     reluctance: Reluctance
 }
