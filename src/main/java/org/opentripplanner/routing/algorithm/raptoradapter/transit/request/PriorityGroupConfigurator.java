@@ -23,7 +23,7 @@ import org.opentripplanner.transit.model.network.RoutingTripPattern;
  */
 public class PriorityGroupConfigurator {
 
-  private static final int BASE_GROUP_ID = TransitPriorityGroup32n.groupId(0);
+  private static final int BASE_GROUP_ID = TransitPriorityGroup32n.groupId(1);
   private int groupIndexCounter = 0;
   private final boolean enabled;
   private final PriorityGroupMatcher[] agencyMatchers;
