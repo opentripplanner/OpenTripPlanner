@@ -2538,6 +2538,27 @@ type PageInfo {
 }
 
 """
+Information about pagination in a connection. Part of the
+[GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
+"""
+type PlanPageInfo {
+    """When paginating forwards, are there more items?"""
+    hasNextPage: Boolean!
+
+    """When paginating backwards, are there more items?"""
+    hasPreviousPage: Boolean!
+
+    """When paginating backwards, the cursor to continue."""
+    startCursor: String
+
+    """When paginating forwards, the cursor to continue."""
+    endCursor: String
+
+    """The search window that was used for the search in the current page."""
+    searchWindowUsed: Duration
+}
+
+"""
 Street modes that can be used for access to the transit network from origin.
 """
 enum PlanAccessMode {
@@ -3307,11 +3328,6 @@ type PlanConnection {
     routingErrors: [RoutingError!]!
 
     """
-    The search window that was used for the search.
-    """
-    searchWindowUsed: Duration
-
-    """
     Edges which contain the itineraries. Part of the
     [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
     """
@@ -3321,7 +3337,7 @@ type PlanConnection {
     Contains cursors to continue the search and the information if there are more itineraries available.
     Part of the [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm).
     """
-    pageInfo: PageInfo!
+    pageInfo: PlanPageInfo!
 }
 
 """
