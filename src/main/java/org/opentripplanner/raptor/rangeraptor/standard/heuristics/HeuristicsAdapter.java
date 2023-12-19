@@ -159,7 +159,8 @@ public class HeuristicsAdapter implements Heuristics {
   private record AggregatedResults(
     int minJourneyTravelDuration,
     int minJourneyNumOfTransfers,
-    int earliestArrivalTime
+    int earliestArrivalTime,
+    boolean reached
   ) {
     private static AggregatedResults create(
       TransitCalculator<?> calculator,
@@ -204,7 +205,8 @@ public class HeuristicsAdapter implements Heuristics {
       return new AggregatedResults(
         bestJourneyTravelDuration,
         bestJourneyNumOfTransfers,
-        bestArrivalTime
+        bestArrivalTime,
+        bestArrivalTime != NOT_SET
       );
     }
   }
