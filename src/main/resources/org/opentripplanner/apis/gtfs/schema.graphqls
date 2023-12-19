@@ -1711,7 +1711,7 @@ input PlanTransitModesInput {
     an itinerary but doesn't have to be. If direct search is not disabled, there can be an
     itinerary without any transit legs. By default, all transit modes are usable.
     """
-    transit: [TransitModePreferenceInput!]
+    transit: [PlanTransitModePreferenceInput!]
 }
 
 """
@@ -5207,7 +5207,7 @@ input TransferPreferencesInput {
 """
 Transit mode and a reluctance associated with it.
 """
-input TransitModePreferenceInput {
+input PlanTransitModePreferenceInput {
     """
     Transit mode that could be (but doesn't have to be) used in an itinerary.
     """
