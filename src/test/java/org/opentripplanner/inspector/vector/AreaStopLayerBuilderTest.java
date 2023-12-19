@@ -38,10 +38,7 @@ class AreaStopLayerBuilderTest {
 
   @Test
   void map() {
-    var subject = new DebugClientAreaStopPropertyMapper(
-      new DefaultTransitService(new TransitModel()),
-      Locale.ENGLISH
-    );
+    var subject = new DebugClientAreaStopPropertyMapper(Locale.ENGLISH);
 
     var properties = subject.map(areaStop);
 

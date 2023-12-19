@@ -3,24 +3,18 @@ package org.opentripplanner.inspector.vector;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.Function;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.apis.common.mapping.PropertyMapper;
-import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A vector tile layer containing all {@link RegularStop}s inside the vector tile bounds.
  */
-public class RegularStopsLayerBuilder extends LayerBuilder<AreaStop> {
+public class RegularStopsLayerBuilder extends LayerBuilder<StopLocation> {
 
-  private static final Map<MapperType, MapperFactory> mappers = Map.of(
-    MapperType.DebugClient,
-    DebugClientAreaStopPropertyMapper::create
-  );
   private final Function<Envelope, Collection<RegularStop>> findAreaStops;
 
   public RegularStopsLayerBuilder(
@@ -29,7 +23,7 @@ public class RegularStopsLayerBuilder extends LayerBuilder<AreaStop> {
     Locale locale
   ) {
     super(
-      mappers.get(MapperType.valueOf(layerParameters.mapper())).build(transitService, locale),
+      new DebugClientAreaStopPropertyMapper(locale),
       layerParameters.name(),
       layerParameters.expansionFactor()
     );
@@ -49,12 +43,4 @@ public class RegularStopsLayerBuilder extends LayerBuilder<AreaStop> {
       .toList();
   }
 
-  enum MapperType {
-    DebugClient,
-  }
-
-  @FunctionalInterface
-  private interface MapperFactory {
-    PropertyMapper<AreaStop> build(TransitService transitService, Locale locale);
-  }
 }
