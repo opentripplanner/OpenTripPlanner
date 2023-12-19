@@ -4,7 +4,7 @@ import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_MONITORED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_TRIP_ID;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN;
 
@@ -325,7 +325,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       trip = tripAndPattern.trip();
       pattern = tripAndPattern.tripPattern();
     } else {
-      return UpdateError.result(null, NO_TRIP_ID);
+      return UpdateError.result(null, TRIP_NOT_FOUND);
     }
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);

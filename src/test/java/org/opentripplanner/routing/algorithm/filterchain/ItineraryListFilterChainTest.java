@@ -26,6 +26,7 @@ import org.opentripplanner.ext.emissions.EmissionsFilter;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.routing.alertpatch.StopCondition;
@@ -33,6 +34,7 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
@@ -41,12 +43,19 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 public class ItineraryListFilterChainTest implements PlanTestConstants {
 
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+  private static final Place A = Place.forStop(TEST_MODEL.stop("A").build());
+  private static final Place B = Place.forStop(TEST_MODEL.stop("B").build());
+  private static final Place C = Place.forStop(TEST_MODEL.stop("C").build());
+  private static final Place D = Place.forStop(TEST_MODEL.stop("D").build());
+  private static final Place E = Place.forStop(TEST_MODEL.stop("E").build());
+
   private static final int I3_LATE_START_TIME = T11_33;
+  private static final Duration SW_D10m = Duration.ofSeconds(D10m);
 
   private Itinerary i1;
   private Itinerary i2;
   private Itinerary i3;
-  private Itinerary i4;
 
   @BeforeEach
   public void setUpItineraries() {
@@ -59,9 +68,6 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
 
     // Not optimal, departure is very late
     i3 = newItinerary(A).bus(20, I3_LATE_START_TIME, I3_LATE_START_TIME + D1m, E).build();
-
-    // car itinerary for emissions test
-    i4 = newItinerary(A).drive(T11_30, PlanTestConstants.T11_50, B).build();
   }
 
   @Test
@@ -75,7 +81,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   @Test
   public void testFilterChainWithSearchWindowFilterSet() {
     ItineraryListFilterChain chain = createBuilder(false, false, 10)
-      .withSearchWindow(TestItineraryBuilder.newTime(T11_00).toInstant(), Duration.ofMinutes(10))
+      .withSearchWindow(TestItineraryBuilder.newTime(T11_00).toInstant(), SW_D10m)
       .build();
     var result = chain.filter(List.of(i1, i2, i3));
     assertEquals(toStr(List.of(i1)), toStr(result));
@@ -101,7 +107,7 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
   public void testDebugFilterChain() {
     // Given a filter-chain with debugging enabled
     ItineraryListFilterChain chain = createBuilder(false, true, 3)
-      .withSearchWindow(newTime(T11_00).toInstant(), Duration.ofMinutes(6))
+      .withSearchWindow(newTime(T11_00).toInstant(), SW_D10m)
       .build();
 
     // Walk first, then transit sorted on arrival-time
@@ -160,7 +166,6 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
     int ID_3 = 3;
 
     Itinerary i1 = newItinerary(A).bus(ID_1, 0, 50, B).bus(ID_2, 52, 100, C).build();
-
     Itinerary i2 = newItinerary(A).bus(ID_1, 0, 50, B).bus(ID_3, 52, 150, C).build();
 
     List<Itinerary> input = List.of(i1, i2);

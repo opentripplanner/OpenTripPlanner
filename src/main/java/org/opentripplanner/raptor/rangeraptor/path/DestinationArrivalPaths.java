@@ -188,7 +188,13 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
       additionalCost += costCalculator.costEgress(egressPath);
     }
 
-    return new DestinationArrival<>(egressPath, stopArrival, arrivalTime, additionalCost);
+    return new DestinationArrival<>(
+      egressPath,
+      stopArrival,
+      arrivalTime,
+      additionalCost,
+      stopArrival.c2()
+    );
   }
 
   /**

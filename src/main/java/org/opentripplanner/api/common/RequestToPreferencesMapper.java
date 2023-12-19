@@ -8,6 +8,7 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.routing.api.request.preference.Relax;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 class RequestToPreferencesMapper {
@@ -43,8 +44,11 @@ class RequestToPreferencesMapper {
   private void mapCar() {
     preferences.withCar(car -> {
       setIfNotNull(req.carReluctance, car::withReluctance);
-      setIfNotNull(req.carParkCost, car::withParkCost);
-      setIfNotNull(req.carParkTime, car::withParkTime);
+      car.withParking(parking -> {
+        mapParking(parking);
+        setIfNotNull(req.carParkCost, parking::withParkCost);
+        setIfNotNull(req.carParkTime, parking::withParkTime);
+      });
     });
   }
 
@@ -64,8 +68,6 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.bikeBoardCost, bike::withBoardCost);
       setIfNotNull(req.bikeWalkingSpeed, bike::withWalkingSpeed);
       setIfNotNull(req.bikeWalkingReluctance, bike::withWalkingReluctance);
-      setIfNotNull(req.bikeParkCost, bike::withParkCost);
-      setIfNotNull(req.bikeParkTime, bike::withParkTime);
       setIfNotNull(req.bikeSwitchTime, bike::withSwitchTime);
       setIfNotNull(req.bikeSwitchCost, bike::withSwitchCost);
       setIfNotNull(req.bikeOptimizeType, bike::withOptimizeType);
@@ -77,6 +79,12 @@ class RequestToPreferencesMapper {
           setIfNotNull(req.triangleSafetyFactor, triangle::withSafety);
         });
       }
+
+      bike.withParking(parking -> {
+        mapParking(parking);
+        setIfNotNull(req.bikeParkCost, parking::withParkCost);
+        setIfNotNull(req.bikeParkTime, parking::withParkTime);
+      });
     });
   }
 
@@ -165,6 +173,11 @@ class RequestToPreferencesMapper {
     );
 
     return new TransitGeneralizedCostFilterParams(costLimitFunction, intervalRelaxFactor);
+  }
+
+  private void mapParking(VehicleParkingPreferences.Builder builder) {
+    builder.withRequiredVehicleParkingTags(req.requiredVehicleParkingTags);
+    builder.withBannedVehicleParkingTags(req.bannedVehicleParkingTags);
   }
 
   private void mapSystem() {

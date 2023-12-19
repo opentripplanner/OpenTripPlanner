@@ -8,7 +8,6 @@ public class JourneyRequest implements Cloneable, Serializable {
 
   // TODO VIA (Hannes): Move the fields below into StreetRequest
   private VehicleRentalRequest rental = new VehicleRentalRequest();
-  private VehicleParkingRequest parking = new VehicleParkingRequest();
   private TransitRequest transit = new TransitRequest();
   private StreetRequest access = new StreetRequest();
   private StreetRequest egress = new StreetRequest();
@@ -17,10 +16,6 @@ public class JourneyRequest implements Cloneable, Serializable {
 
   public VehicleRentalRequest rental() {
     return rental;
-  }
-
-  public VehicleParkingRequest parking() {
-    return parking;
   }
 
   public TransitRequest transit() {
@@ -64,7 +59,6 @@ public class JourneyRequest implements Cloneable, Serializable {
     try {
       var clone = (JourneyRequest) super.clone();
       clone.rental = this.rental.clone();
-      clone.parking = this.parking.clone();
       clone.transit = this.transit.clone();
       clone.access = this.access.clone();
       clone.egress = this.egress.clone();

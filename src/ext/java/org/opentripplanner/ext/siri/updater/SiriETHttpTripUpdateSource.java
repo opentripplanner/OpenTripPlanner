@@ -49,7 +49,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
     long t1 = System.currentTimeMillis();
     try {
       var siri = siriLoader.fetchETFeed(requestorRef);
-      if (siri.isEmpty()) {
+      if (siri.map(Siri::getServiceDelivery).isEmpty()) {
         return Optional.empty();
       }
 

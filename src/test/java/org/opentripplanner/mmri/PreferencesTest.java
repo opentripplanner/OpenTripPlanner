@@ -26,7 +26,7 @@ public class PreferencesTest extends GtfsTest {
     validateLeg(legs[1], 1388530980000L, 1388531040000L, "2c3", "2c2", null);
 
     assertEquals(
-      "Stop 2c1 ~ RAIL train 1 0:01 0:02 ~ Stop 2c2 ~ RAIL train 2 0:03 0:04 ~ Stop 2c3 [$240]",
+      "Stop 2c1 ~ RAIL train 1 0:01 0:02 ~ Stop 2c2 ~ RAIL train 2 0:03 0:04 ~ Stop 2c3 [C₁240]",
       itinerary.toStr()
     );
   }

@@ -1,6 +1,5 @@
 package org.opentripplanner.framework.token;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import org.opentripplanner.framework.lang.ObjectUtils;
@@ -18,8 +17,16 @@ public class TokenBuilder {
     this.values = new Object[definition.size()];
   }
 
+  public TokenBuilder withBoolean(String fieldName, boolean v) {
+    return with(fieldName, TokenType.BOOLEAN, v);
+  }
+
   public TokenBuilder withByte(String fieldName, byte v) {
     return with(fieldName, TokenType.BYTE, v);
+  }
+
+  public TokenBuilder withEnum(String fieldName, Enum<?> v) {
+    return with(fieldName, TokenType.ENUM, v);
   }
 
   public TokenBuilder withDuration(String fieldName, Duration v) {
@@ -39,11 +46,7 @@ public class TokenBuilder {
   }
 
   public String build() {
-    try {
-      return Serializer.serialize(definition, values);
-    } catch (IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
+    return Serializer.serialize(definition, values);
   }
 
   private TokenBuilder with(String fieldName, TokenType type, Object value) {
