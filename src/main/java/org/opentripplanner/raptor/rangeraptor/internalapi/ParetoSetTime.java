@@ -2,7 +2,8 @@ package org.opentripplanner.raptor.rangeraptor.internalapi;
 
 /**
  * These are the different time configurations Raptor support. Each configuration will
- * be used to change the pareto-function. Note! There is a small difference betw */
+ * be used to change the pareto-function.
+ */
 public enum ParetoSetTime {
   /**
    * Uses iteration-departure-time and arrival-time as criteria in pareto function. Note!

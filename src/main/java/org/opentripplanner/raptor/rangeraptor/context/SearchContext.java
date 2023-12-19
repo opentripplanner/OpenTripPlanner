@@ -224,7 +224,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Resolve witch pareto-set time config to use.
+   * Resolve which pareto-set time config to use.
    */
   public ParetoSetTime paretoSetTimeConfig() {
     return paretoSetTimeConfig(searchParams(), searchDirection());

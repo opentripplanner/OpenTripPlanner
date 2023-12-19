@@ -33,7 +33,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
  *     <li>Prefer late arrival - arriveBy search</li>
  *     <li>Include c1 - include c1 in pareto function (generalized-cost).</li>
  *     <li>Include c2 - include c2 in pareto function (custom criteria).</li>
- *     <li>Relax c1 - accept c1 values witch is slightly worse than the best result</li>
+ *     <li>Relax c1 - accept c1 values which is slightly worse than the best result.</li>
  *     <li>Relax c1, if c2 is optimal</li>
  * </ul>
  * The {@code travelDuration} is added as a criteria to the pareto comparator in addition to the
@@ -48,7 +48,7 @@ public class PathParetoSetComparators {
   /**
    * Create pareto-set comparison function.
    *
-   * @param timeConfig Supported timing information to include in comparator.
+   * @param timeConfig Which time information (arrival-time, departure-time, or timetable) to include in comparator.
    * @param costConfig Supported configurations of c1, c2 and relaxed cost(c1).
    * @param relaxC1    Relax function for the generalized cost
    * @param c2Comp     Dominance function for accumulated criteria TWO. If function is null,
