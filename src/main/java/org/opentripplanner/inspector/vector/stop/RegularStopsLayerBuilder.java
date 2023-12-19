@@ -1,4 +1,4 @@
-package org.opentripplanner.inspector.vector;
+package org.opentripplanner.inspector.vector.stop;
 
 import java.util.Collection;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.Locale;
 import java.util.function.Function;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.inspector.vector.LayerBuilder;
+import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
@@ -23,7 +25,7 @@ public class RegularStopsLayerBuilder extends LayerBuilder<StopLocation> {
     Locale locale
   ) {
     super(
-      new DebugClientAreaStopPropertyMapper(locale),
+      new StopLocationPropertyMapper(locale),
       layerParameters.name(),
       layerParameters.expansionFactor()
     );
@@ -42,5 +44,4 @@ public class RegularStopsLayerBuilder extends LayerBuilder<StopLocation> {
       })
       .toList();
   }
-
 }

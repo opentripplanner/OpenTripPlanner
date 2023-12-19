@@ -1,4 +1,4 @@
-package org.opentripplanner.inspector.vector;
+package org.opentripplanner.inspector.vector.stop;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,12 +9,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.StopModelBuilder;
-import org.opentripplanner.transit.service.TransitModel;
 
 class AreaStopLayerBuilderTest {
 
@@ -38,7 +37,7 @@ class AreaStopLayerBuilderTest {
 
   @Test
   void map() {
-    var subject = new DebugClientAreaStopPropertyMapper(Locale.ENGLISH);
+    var subject = new StopLocationPropertyMapper(Locale.ENGLISH);
 
     var properties = subject.map(areaStop);
 

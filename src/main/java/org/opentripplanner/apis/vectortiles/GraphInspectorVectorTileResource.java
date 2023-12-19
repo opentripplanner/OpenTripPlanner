@@ -26,12 +26,12 @@ import org.opentripplanner.apis.vectortiles.model.TileSource;
 import org.opentripplanner.apis.vectortiles.model.TileSource.RasterSource;
 import org.opentripplanner.apis.vectortiles.model.TileSource.VectorSource;
 import org.opentripplanner.framework.io.HttpUtils;
-import org.opentripplanner.inspector.vector.AreaStopsLayerBuilder;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.inspector.vector.RegularStopsLayerBuilder;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
+import org.opentripplanner.inspector.vector.stop.AreaStopsLayerBuilder;
+import org.opentripplanner.inspector.vector.stop.RegularStopsLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
@@ -129,10 +129,7 @@ public class GraphInspectorVectorTileResource {
       List.of("https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"),
       256
     );
-    List<TileSource> sources = List.of(
-      backgroundSource,
-      vectorSource
-    );
+    List<TileSource> sources = List.of(backgroundSource, vectorSource);
     return new MapboxStyleJson(
       "OTP Debug Tiles",
       sources,

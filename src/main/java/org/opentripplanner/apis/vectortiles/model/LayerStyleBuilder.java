@@ -51,6 +51,11 @@ public class LayerStyleBuilder {
     return this;
   }
 
+  /**
+   * For vector tile sources, specify which source layer in the tile the styles should apply to.
+   * There is an unfortunate collision in the name "layer" as it can both refer to a styling layer
+   * and the layer inside the vector tile.
+   */
   public LayerStyleBuilder sourceLayer(String source) {
     props.put(SOURCE_LAYER, source);
     return this;
