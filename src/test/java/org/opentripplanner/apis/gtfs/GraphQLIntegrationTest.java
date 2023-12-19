@@ -33,6 +33,7 @@ import javax.annotation.Nonnull;
 import org.glassfish.jersey.message.internal.OutboundJaxrsResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner._support.text.I18NStrings;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.FaresToItineraryMapper;
@@ -64,6 +65,9 @@ import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
@@ -79,12 +83,14 @@ import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.AbstractBuilder;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 class GraphQLIntegrationTest {
 
@@ -275,7 +281,7 @@ class GraphQLIntegrationTest {
         GRAPH.getVehicleParkingService(),
         defaultVehicleRentalService,
         realtimeVehicleService,
-        GraphFinder.getInstance(GRAPH, transitService::findRegularStop),
+        finder,
         new RouteRequest()
       );
   }
@@ -375,4 +381,32 @@ class GraphQLIntegrationTest {
     fail("expected an outbound response but got %s".formatted(response.getClass().getSimpleName()));
     return null;
   }
+
+  private static final GraphFinder finder = new GraphFinder() {
+    @Override
+    public List<NearbyStop> findClosestStops(Coordinate coordinate, double radiusMeters) {
+      return null;
+    }
+
+    @Override
+    public List<PlaceAtDistance> findClosestPlaces(
+      double lat,
+      double lon,
+      double radiusMeters,
+      int maxResults,
+      List<TransitMode> filterByModes,
+      List<PlaceType> filterByPlaceTypes,
+      List<FeedScopedId> filterByStops,
+      List<FeedScopedId> filterByStations,
+      List<FeedScopedId> filterByRoutes,
+      List<String> filterByBikeRentalStations,
+      TransitService transitService
+    ) {
+      return List
+        .of(TransitModelForTest.of().stop("A").build())
+        .stream()
+        .map(stop -> new PlaceAtDistance(stop, 0))
+        .toList();
+    }
+  };
 }
