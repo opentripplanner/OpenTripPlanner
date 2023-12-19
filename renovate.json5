@@ -97,7 +97,8 @@
         "io.github.git-commit-id:git-commit-id-maven-plugin",
         "com.hubspot.maven.plugins:prettier-maven-plugin",
         "com.google.cloud.tools:jib-maven-plugin",
-        "org.apache.maven.plugins:maven-shade-plugin"
+        "org.apache.maven.plugins:maven-shade-plugin",
+        "org.apache.maven.plugins:maven-compiler-plugin"
       ],
       "matchPackagePrefixes": [
         "org.junit.jupiter:",
