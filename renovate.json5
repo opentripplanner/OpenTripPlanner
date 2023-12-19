@@ -33,6 +33,15 @@
       "matchFiles": ["client-next/package.json"],
       "enabled": false
     },
+    // gbfs-java-model patch releases are automatic dependency upgrades so we automerge
+    {
+      "matchPackageNames": [
+        "org.entur.gbfs:gbfs-java-model"
+      ],
+      "matchUpdateTypes": ["patch"],
+      "schedule": "on the 18th day of the month",
+      "automerge": true
+    },
     {
       // https://github.com/graphql-java-kickstart/renovate-config/blob/main/default.json
       "description": "GraphQL Java (ignoring snapshot builds)",
