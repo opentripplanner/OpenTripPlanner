@@ -17,6 +17,7 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -43,6 +44,7 @@ public class Itinerary implements ItinerarySortKey {
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
   private int generalizedCost = UNKNOWN;
+  private Integer generalizedCost2 = null;
   private TimeAndCost accessPenalty = null;
   private TimeAndCost egressPenalty = null;
   private int waitTimeOptimizedCost = UNKNOWN;
@@ -260,6 +262,7 @@ public class Itinerary implements ItinerarySortKey {
       .addDuration("transitTime", transitDuration)
       .addDuration("waitingTime", waitingDuration)
       .addNum("generalizedCost", generalizedCost, UNKNOWN)
+      .addNum("generalizedCost2", generalizedCost2)
       .addNum("waitTimeOptimizedCost", waitTimeOptimizedCost, UNKNOWN)
       .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
@@ -306,7 +309,12 @@ public class Itinerary implements ItinerarySortKey {
       buf.stop(leg.getTo().name.toString());
     }
 
-    buf.summary(RaptorCostConverter.toRaptorCost(generalizedCost));
+    // The generalizedCost2 is printed as is, it is a special cost and the scale depend on the
+    // use-case.
+    buf.summary(
+      RaptorCostConverter.toRaptorCost(generalizedCost),
+      getGeneralizedCost2().orElse(RaptorConstants.NOT_SET)
+    );
 
     return buf.toString();
   }
@@ -493,6 +501,24 @@ public class Itinerary implements ItinerarySortKey {
 
   public void setGeneralizedCost(int generalizedCost) {
     this.generalizedCost = generalizedCost;
+  }
+
+  /**
+   * The transit router allow the usage of a second generalized-cost parameter to be used in
+   * routing. In Raptor this is called c2, but in OTP it is generalized-cost-2. What this cost
+   * represent depend on the use-case and the unit and scale is also given by the use-case.
+   * <p>
+   * Currently, the pass-through search and the transit-priority uses this. This is relevant for
+   * anyone who want to debug a search and tuning the system.
+   * <p>
+   * {@link RaptorConstants#NOT_SET} indicate that the cost is not set/computed.
+   */
+  public Optional<Integer> getGeneralizedCost2() {
+    return Optional.ofNullable(generalizedCost2);
+  }
+
+  public void setGeneralizedCost2(Integer generalizedCost2) {
+    this.generalizedCost2 = generalizedCost2;
   }
 
   @Nullable

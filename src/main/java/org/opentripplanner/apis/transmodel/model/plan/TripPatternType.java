@@ -196,6 +196,18 @@ public class TripPatternType {
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
+          .name("generalizedCost2")
+          .description(
+            "A second cost or weight of the itinerary. Some use-cases like pass-through " +
+            "and transit-priority-groups uses a second cost during routing. This is used for debugging."
+          )
+          .type(Scalars.GraphQLInt)
+          .dataFetcher(env -> itinerary(env).getGeneralizedCost2().orElse(null))
+          .build()
+      )
+      .field(
+        GraphQLFieldDefinition
+          .newFieldDefinition()
           .name("waitTimeOptimizedCost")
           .description(
             "A cost calculated to distribute wait-time and avoid very " +

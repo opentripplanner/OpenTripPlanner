@@ -153,6 +153,9 @@ public class RaptorPathToItineraryMapper<T extends TripSchedule> {
     if (egressPathLeg.egress() instanceof DefaultAccessEgress ae) {
       itinerary.setAccessPenalty(ae.penalty());
     }
+    if (path.isC2Set()) {
+      itinerary.setGeneralizedCost2(path.c2());
+    }
 
     return itinerary;
   }

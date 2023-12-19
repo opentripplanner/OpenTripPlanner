@@ -1286,6 +1286,8 @@ type TripPattern {
   expectedStartTime: DateTime!
   "Generalized cost or weight of the itinerary. Used for debugging."
   generalizedCost: Int
+  "A second cost or weight of the itinerary. Some use-cases like pass-through and transit-priority-groups uses a second cost during routing. This is used for debugging."
+  generalizedCost2: Int
   "A list of legs. Each leg is either a walking (cycling, car) portion of the trip, or a ride leg on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6, then walks to their destination, has four legs."
   legs: [Leg!]!
   "Time that the trip departs."
