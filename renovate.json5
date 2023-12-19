@@ -62,8 +62,7 @@
         "@graphql-codegen/java-resolvers",
         "graphql",
         "io.micrometer:micrometer-registry-prometheus",
-        "io.micrometer:micrometer-registry-influx",
-        "org.entur.gbfs:gbfs-java-model"
+        "io.micrometer:micrometer-registry-influx"
       ],
       // we don't use the 'monthly' preset because that only fires on the first day of the month
       // when there might already other PRs open
