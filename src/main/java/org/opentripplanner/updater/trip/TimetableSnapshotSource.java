@@ -88,20 +88,18 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
   /**
    * The working copy of the timetable snapshot. Should not be visible to routing threads. Should
    * only be modified by a thread that holds a lock on {@link #bufferLock}. All public methods that
-   * might modify this buffer will correctly acquire the lock.
+   * might modify this buffer will correctly acquire the lock. By design, only one thread should
+   * ever be writing to this buffer. But we need to suspend writes while we're indexing and swapping
+   * out the buffer (Or do we? Can't we just make a new copy of the buffer first?)
+   * TODO: research why this lock is needed since only one thread should ever be writing to this buffer.
+   *   Instead we should throw an exception if a writing section is entered by more than one thread.
    */
   private final TimetableSnapshot buffer = new TimetableSnapshot();
 
-  /**
-   * Lock to indicate that buffer is in use
-   */
+  /** Lock to indicate that buffer is in use. */
   private final ReentrantLock bufferLock = new ReentrantLock(true);
 
-  /**
-   * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
-   * messages.
-   */
-
+  /** A synchronized cache of trip patterns added to the graph due to GTFS-realtime messages. */
   private final TripPatternCache tripPatternCache = new TripPatternCache();
 
   private final ZoneId timeZone;
@@ -121,7 +119,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private volatile TimetableSnapshot snapshot = null;
 
-  /** Should expired real-time data be purged from the graph. */
+  /**
+   * Should expired real-time data be purged from the graph.
+   * TODO clarify exactly what this means? In what circumstances would you want to turn it off?
+   */
   private final boolean purgeExpiredData;
 
   protected LocalDate lastPurgeDate = null;
