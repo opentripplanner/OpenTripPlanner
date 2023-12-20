@@ -835,7 +835,7 @@ type QueryType {
     itinerary-filters.
     
     - The `ratio` must be greater or equal to 1.0 and less then 1.2.
-    - The `slack` must be greater or equal to 0 and less then 3600.
+    - The `constant` must be greater or equal to '0s' and less then '1h'.
     
     THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!
     """
@@ -1867,6 +1867,9 @@ enum WheelchairBoarding {
 "List of coordinates like: [[60.89, 11.12], [62.56, 12.10]]"
 scalar Coordinates
 
+"A cost value, normally a value of 1 is equivalent to riding transit for 1 second, but it might not depending on the use-case. Format: 3665 = DT1h1m5s = 1h1m5s"
+scalar Cost
+
 "Local date using the ISO 8601 format: `YYYY-MM-DD`. Example: `2020-05-17`."
 scalar Date
 
@@ -2028,12 +2031,12 @@ This is used to include more results into the result. A `ratio=2.0` means a path
 with twice as high cost as another one, is accepted. A `constant=$300` means a "fixed"
 constant is added to the limit. A `{ratio=1.0, constant=0}` is said to be the NORMAL relaxed
 cost - the limit is the same as the cost used to calculate the limit. The NORMAL is usually
-the default. We can express the RelaxCost as a function `f(x) = constant + ratio * x`.
-`f(x)=x` is the NORMAL function.
+the default. We can express the RelaxCost as a function `f(t) = constant + ratio * t`.
+`f(t)=t` is the NORMAL function.
 """
 input RelaxCostInput {
-  "The constant value to add to the limit. Must be a positive number. The unit is cost-seconds."
-  constant: [ID!] = 0
+  "The constant value to add to the limit. Must be a positive number. The value isequivalent to transit-cost-seconds. Integers is treated as seconds, but you may use the duration format. Example: '3665 = 'DT1h1m5s' = '1h1m5s'."
+  constant: Cost = "0s"
   "The factor to multiply with the 'other cost'. Minimum value is 1.0."
   ratio: Float = 1.0
 }

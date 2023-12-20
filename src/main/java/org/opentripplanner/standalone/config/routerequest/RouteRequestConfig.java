@@ -311,9 +311,7 @@ ferries, where the check-in process needs to be done in good time before ride.
       .asString(dft.relaxTransitGroupPriority().toString());
 
     if (relaxTransitGroupPriorityValue != null) {
-      builder.withTransitGroupPriorityGeneralizedCostSlack(
-        CostLinearFunction.of(relaxTransitGroupPriorityValue)
-      );
+      builder.withRelaxTransitGroupPriority(CostLinearFunction.of(relaxTransitGroupPriorityValue));
     }
 
     // TODO REMOVE THIS

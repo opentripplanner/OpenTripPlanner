@@ -291,7 +291,7 @@ public class TripQuery {
             itinerary-filters.
             
             - The `ratio` must be greater or equal to 1.0 and less then 1.2.
-            - The `slack` must be greater or equal to 0 and less then 3600.
+            - The `constant` must be greater or equal to '0s' and less then '1h'.
             
             THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!
             """.stripIndent()

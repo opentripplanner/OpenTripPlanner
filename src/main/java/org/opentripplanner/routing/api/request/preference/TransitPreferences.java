@@ -302,7 +302,7 @@ public final class TransitPreferences implements Serializable {
       return setUnpreferredCost(CostLinearFunction.of(constFunction));
     }
 
-    public Builder withTransitGroupPriorityGeneralizedCostSlack(CostLinearFunction value) {
+    public Builder withRelaxTransitGroupPriority(CostLinearFunction value) {
       this.relaxTransitGroupPriority = value;
       return this;
     }

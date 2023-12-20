@@ -42,7 +42,7 @@ class TransitPreferencesTest {
     .setUnpreferredCost(UNPREFERRED_COST)
     .withBoardSlack(b -> b.withDefault(D45s).with(TransitMode.AIRPLANE, D35m))
     .withAlightSlack(b -> b.withDefault(D15s).with(TransitMode.AIRPLANE, D25m))
-    .withTransitGroupPriorityGeneralizedCostSlack(TRANSIT_GROUP_PRIORITY_RELAX)
+    .withRelaxTransitGroupPriority(TRANSIT_GROUP_PRIORITY_RELAX)
     .setIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES)
     .setIncludePlannedCancellations(INCLUDE_PLANNED_CANCELLATIONS)
     .setIncludeRealtimeCancellations(INCLUDE_REALTIME_CANCELLATIONS)
