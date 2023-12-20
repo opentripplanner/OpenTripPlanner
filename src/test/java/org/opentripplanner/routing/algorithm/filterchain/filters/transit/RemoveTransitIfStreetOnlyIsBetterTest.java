@@ -74,10 +74,8 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
     var itineraries = List.of(walk, busWithPenalty);
     var subject = new RemoveTransitIfStreetOnlyIsBetter(CostLinearFunction.of(Duration.ZERO, 1.0));
 
-    // When:
-    var result = subject.flagForRemoval(itineraries);
+    var result = subject.removeMatchesForTest(itineraries);
 
-    // Then:
     assertEquals(List.of(), result);
   }
 }
