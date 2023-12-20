@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.DefaultAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenalty;
 import org.opentripplanner.routing.api.request.framework.TimeAndCostPenaltyForEnum;
@@ -24,8 +25,8 @@ class AccessEgressPenaltyDecoratorTest {
   private static final int DURATION_CAR_RENTAL = 45;
   private static final int DURATION_WALKING = 135;
   private static final Duration D10m = DurationUtils.duration("10m");
-  private static final DefaultAccessEgress WALK = ofWalking(DURATION_WALKING);
-  private static final DefaultAccessEgress CAR_RENTAL = ofCarRental(DURATION_CAR_RENTAL);
+  private static final RoutingAccessEgress WALK = ofWalking(DURATION_WALKING);
+  private static final RoutingAccessEgress CAR_RENTAL = ofCarRental(DURATION_CAR_RENTAL);
   private static final TimeAndCostPenalty PENALTY = new TimeAndCostPenalty(
     TimePenalty.of(D10m, 1.5),
     2.0
@@ -33,10 +34,10 @@ class AccessEgressPenaltyDecoratorTest {
 
   // We use the penalty to calculate the expected value, this is not pure, but the
   // TimeAndCostPenalty is unit-tested elsewhere.
-  private static final DefaultAccessEgress EXP_WALK_W_PENALTY = WALK.withPenalty(
+  private static final RoutingAccessEgress EXP_WALK_W_PENALTY = WALK.withPenalty(
     PENALTY.calculate(DURATION_WALKING)
   );
-  private static final DefaultAccessEgress EXP_CAR_RENTAL_W_PENALTY = CAR_RENTAL.withPenalty(
+  private static final RoutingAccessEgress EXP_CAR_RENTAL_W_PENALTY = CAR_RENTAL.withPenalty(
     PENALTY.calculate(DURATION_CAR_RENTAL)
   );
 
@@ -60,7 +61,7 @@ class AccessEgressPenaltyDecoratorTest {
 
   @ParameterizedTest
   @MethodSource("decorateCarRentalTestCase")
-  void decorateCarRentalTest(List<DefaultAccessEgress> expected, List<DefaultAccessEgress> input) {
+  void decorateCarRentalTest(List<RoutingAccessEgress> expected, List<RoutingAccessEgress> input) {
     var subject = new AccessEgressPenaltyDecorator(
       StreetMode.CAR_RENTAL,
       StreetMode.WALK,
@@ -81,7 +82,7 @@ class AccessEgressPenaltyDecoratorTest {
 
   @ParameterizedTest
   @MethodSource("decorateWalkTestCase")
-  void decorateWalkTest(List<DefaultAccessEgress> expected, List<DefaultAccessEgress> input) {
+  void decorateWalkTest(List<RoutingAccessEgress> expected, List<RoutingAccessEgress> input) {
     var subject = new AccessEgressPenaltyDecorator(
       StreetMode.CAR_RENTAL,
       StreetMode.WALK,
@@ -111,18 +112,18 @@ class AccessEgressPenaltyDecoratorTest {
   @Test
   void filterEgress() {}
 
-  private static DefaultAccessEgress ofCarRental(int duration) {
+  private static RoutingAccessEgress ofCarRental(int duration) {
     return ofAccessEgress(
       duration,
       TestStateBuilder.ofCarRental().streetEdge().pickUpCarFromStation().build()
     );
   }
 
-  private static DefaultAccessEgress ofWalking(int durationInSeconds) {
+  private static RoutingAccessEgress ofWalking(int durationInSeconds) {
     return ofAccessEgress(durationInSeconds, TestStateBuilder.ofWalking().streetEdge().build());
   }
 
-  private static DefaultAccessEgress ofAccessEgress(int duration, State state) {
+  private static RoutingAccessEgress ofAccessEgress(int duration, State state) {
     // We do NOT need to override #withPenalty(...), because all fields including
     // 'durationInSeconds' is copied over using the getters.
 

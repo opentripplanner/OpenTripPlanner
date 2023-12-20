@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.util.Objects;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.street.search.state.State;
@@ -10,7 +9,7 @@ import org.opentripplanner.street.search.state.State;
 /**
  * Default implementation of the RaptorAccessEgress interface.
  */
-public class DefaultAccessEgress implements RaptorAccessEgress {
+public class DefaultAccessEgress implements RoutingAccessEgress {
 
   private final int stop;
   private final int durationInSeconds;
@@ -34,7 +33,7 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     this.penalty = TimeAndCost.ZERO;
   }
 
-  protected DefaultAccessEgress(DefaultAccessEgress other, TimeAndCost penalty) {
+  protected DefaultAccessEgress(RoutingAccessEgress other, TimeAndCost penalty) {
     if (other.hasPenalty()) {
       throw new IllegalStateException("Can not add penalty twice...");
     }
@@ -54,6 +53,7 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
    * <p>
    * OVERRIDE THIS IF KEEPING THE TYPE IS IMPORTANT!
    */
+  @Override
   public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
     return new DefaultAccessEgress(this, penalty);
   }
@@ -83,18 +83,22 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     return false;
   }
 
+  @Override
   public State getLastState() {
     return lastState;
   }
 
+  @Override
   public boolean isWalkOnly() {
     return lastState.containsOnlyWalkMode();
   }
 
+  @Override
   public boolean hasPenalty() {
     return !penalty.isZero();
   }
 
+  @Override
   public TimeAndCost penalty() {
     return penalty;
   }
@@ -121,7 +125,7 @@ public class DefaultAccessEgress implements RaptorAccessEgress {
     }
     // We check the contract of DefaultAccessEgress used for routing for equality, we do not care
     // if the entries are different implementation or have different AStar paths(lastState).
-    if (!(o instanceof DefaultAccessEgress that)) {
+    if (!(o instanceof RoutingAccessEgress that)) {
       return false;
     }
     return (
