@@ -35,18 +35,21 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   private final int arrivalTime;
   private final int numberOfTransfers;
   private final int c1;
+  private final int c2;
 
   public DestinationArrival(
     RaptorAccessEgress egress,
     ArrivalView<T> previous,
     int arrivalTime,
-    int additionalCost
+    int additionalC1,
+    int c2
   ) {
     this.previous = previous;
     this.egress = egress;
     this.arrivalTime = arrivalTime;
     this.numberOfTransfers = previous.round() - 1;
-    this.c1 = previous.c1() + additionalCost;
+    this.c1 = previous.c1() + additionalC1;
+    this.c2 = c2;
   }
 
   @Override
@@ -70,13 +73,8 @@ public class DestinationArrival<T extends RaptorTripSchedule> implements Arrival
   }
 
   @Override
-  public boolean supportsC2() {
-    return false;
-  }
-
-  @Override
   public int c2() {
-    return previous.c2();
+    return c2;
   }
 
   @Override

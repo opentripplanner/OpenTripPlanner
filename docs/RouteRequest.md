@@ -19,7 +19,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | arriveBy                                                                                                     |        `boolean`       | Whether the trip should depart or arrive at the specified date and time.                                                                       | *Optional* | `false`          |  2.0  |
 | [bikeBoardCost](#rd_bikeBoardCost)                                                                           |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a vehicle.                                                                        | *Optional* | `600`            |  2.0  |
 | bikeParkCost                                                                                                 |        `integer`       | Cost to park a bike.                                                                                                                           | *Optional* | `120`            |  2.0  |
-| bikeParkTime                                                                                                 |        `integer`       | Time to park a bike.                                                                                                                           | *Optional* | `60`             |  2.0  |
+| bikeParkTime                                                                                                 |       `duration`       | Time to park a bike.                                                                                                                           | *Optional* | `"PT1M"`         |  2.0  |
 | bikeReluctance                                                                                               |        `double`        | A multiplier for how bad biking is, compared to being in transit for equal lengths of time.                                                    | *Optional* | `2.0`            |  2.0  |
 | bikeSpeed                                                                                                    |        `double`        | Max bike speed along streets, in meters per second                                                                                             | *Optional* | `5.0`            |  2.0  |
 | bikeStairsReluctance                                                                                         |        `double`        | How bad is it to walk the bicycle up/down a flight of stairs compared to taking a detour.                                                      | *Optional* | `10.0`           |  2.3  |
@@ -35,7 +35,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | carDecelerationSpeed                                                                                         |        `double`        | The deceleration speed of an automobile, in meters per second per second.                                                                      | *Optional* | `2.9`            |  2.0  |
 | carDropoffTime                                                                                               |        `integer`       | Time to park a car in a park and ride, w/o taking into account driving and walking cost.                                                       | *Optional* | `120`            |  2.0  |
 | carParkCost                                                                                                  |        `integer`       | Cost of parking a car.                                                                                                                         | *Optional* | `120`            |  2.1  |
-| carParkTime                                                                                                  |        `integer`       | Time to park a car                                                                                                                             | *Optional* | `60`             |  2.1  |
+| carParkTime                                                                                                  |       `duration`       | Time to park a car                                                                                                                             | *Optional* | `"PT1M"`         |  2.1  |
 | carPickupCost                                                                                                |        `integer`       | Add a cost for car pickup changes when a pickup or drop off takes place                                                                        | *Optional* | `120`            |  2.1  |
 | carPickupTime                                                                                                |        `integer`       | Add a time for car pickup changes when a pickup or drop off takes place                                                                        | *Optional* | `60`             |  2.1  |
 | carReluctance                                                                                                |        `double`        | A multiplier for how bad driving is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`            |  2.0  |
@@ -47,7 +47,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | elevatorHopTime                                                                                              |        `integer`       | How long does it take to advance one floor on an elevator?                                                                                     | *Optional* | `20`             |  2.0  |
 | escalatorReluctance                                                                                          |        `double`        | A multiplier for how bad being in an escalator is compared to being in transit for equal lengths of time                                       | *Optional* | `1.5`            |  2.4  |
 | geoidElevation                                                                                               |        `boolean`       | If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.                                           | *Optional* | `false`          |  2.0  |
-| ignoreRealtimeUpdates                                                                                        |        `boolean`       | When true, realtime updates are ignored during this search.                                                                                    | *Optional* | `false`          |  2.0  |
+| ignoreRealtimeUpdates                                                                                        |        `boolean`       | When true, real-time updates are ignored during this search.                                                                                   | *Optional* | `false`          |  2.0  |
 | [intersectionTraversalModel](#rd_intersectionTraversalModel)                                                 |         `enum`         | The model that computes the costs of turns.                                                                                                    | *Optional* | `"simple"`       |  2.2  |
 | locale                                                                                                       |        `locale`        | TODO                                                                                                                                           | *Optional* | `"en_US"`        |  2.0  |
 | [maxDirectStreetDuration](#rd_maxDirectStreetDuration)                                                       |       `duration`       | This is the maximum duration for a direct street search for each mode.                                                                         | *Optional* | `"PT4H"`         |  2.1  |
@@ -57,6 +57,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | numItineraries                                                                                               |        `integer`       | The maximum number of itineraries to return.                                                                                                   | *Optional* | `50`             |  2.0  |
 | [optimize](#rd_optimize)                                                                                     |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                                | *Optional* | `"safe"`         |  2.0  |
 | [otherThanPreferredRoutesPenalty](#rd_otherThanPreferredRoutesPenalty)                                       |        `integer`       | Penalty added for using every route that is not preferred if user set any route as preferred.                                                  | *Optional* | `300`            |  2.0  |
+| [relaxTransitPriorityGroup](#rd_relaxTransitPriorityGroup)                                                   |        `string`        | The relax function for transit-priority-groups                                                                                                 | *Optional* | `"0s + 1.00 t"`  |  2.5  |
 | [relaxTransitSearchGeneralizedCostAtDestination](#rd_relaxTransitSearchGeneralizedCostAtDestination)         |        `double`        | Whether non-optimal transit paths at the destination should be returned                                                                        | *Optional* |                  |  2.3  |
 | [searchWindow](#rd_searchWindow)                                                                             |       `duration`       | The duration of the search-window.                                                                                                             | *Optional* |                  |  2.0  |
 | stairsReluctance                                                                                             |        `double`        | Used instead of walkReluctance for stairs.                                                                                                     | *Optional* | `2.0`            |  2.0  |
@@ -107,6 +108,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    [extraStopBoardAlightCostsFactor](#rd_to_extraStopBoardAlightCostsFactor)                                 |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                                     | *Optional* | `0.0`            |  2.1  |
 |    [minSafeWaitTimeFactor](#rd_to_minSafeWaitTimeFactor)                                                     |        `double`        | Used to set a maximum wait-time cost, base on min-safe-transfer-time.                                                                          | *Optional* | `5.0`            |  2.1  |
 |    [optimizeTransferWaitTime](#rd_to_optimizeTransferWaitTime)                                               |        `boolean`       | This enables the transfer wait time optimization.                                                                                              | *Optional* | `true`           |  2.1  |
+| [transitPriorityGroups](#rd_transitPriorityGroups)                                                           |        `object`        | Transit priority groups configuration                                                                                                          | *Optional* |                  |  2.5  |
 | [transitReluctanceForMode](#rd_transitReluctanceForMode)                                                     |  `enum map of double`  | Transit reluctance for a given transport mode                                                                                                  | *Optional* |                  |  2.1  |
 | [unpreferred](#rd_unpreferred)                                                                               |        `object`        | Parameters listing authorities or lines that preferably should not be used in trip patters.                                                    | *Optional* |                  |  2.2  |
 |    [agencies](#rd_unpreferred_agencies)                                                                      |   `feed-scoped-id[]`   | The ids of the agencies that incur an extra cost when being used. Format: `FeedId:AgencyId`                                                    | *Optional* |                  |  2.2  |
@@ -244,6 +246,18 @@ The set of characteristics that the user wants to optimize for.
 Penalty added for using every route that is not preferred if user set any route as preferred.
 
 We return number of seconds that we are willing to wait for preferred route.
+
+<h3 id="rd_relaxTransitPriorityGroup">relaxTransitPriorityGroup</h3>
+
+**Since version:** `2.5` ∙ **Type:** `string` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"0s + 1.00 t"`   
+**Path:** /routingDefaults 
+
+The relax function for transit-priority-groups
+
+A path is considered optimal if the generalized-cost is less than the
+generalized-cost of another path. If this parameter is set, the comparison is relaxed
+further if they belong to different transit-priority-groups.
+
 
 <h3 id="rd_relaxTransitSearchGeneralizedCostAtDestination">relaxTransitSearchGeneralizedCostAtDestination</h3>
 
@@ -465,6 +479,9 @@ Sometimes there is a need to configure a longer alighting times for specific mod
 **Path:** /routingDefaults 
 
 Tags with which a vehicle parking will not be used. If empty, no tags are banned.
+
+Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+
 
 <h3 id="rd_boardSlackForMode">boardSlackForMode</h3>
 
@@ -700,12 +717,18 @@ done because some street modes searches are much more resource intensive than ot
 
 Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.
 
+Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+
+
 <h3 id="rd_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
 
 **Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
 **Path:** /routingDefaults 
 
 Tags without which a vehicle parking will not be used. If empty, no tags are required.
+
+Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+
 
 <h3 id="rd_transferOptimization">transferOptimization</h3>
 
@@ -788,6 +811,26 @@ This defines the maximum cost for the logarithmic function relative to the min-s
 This enables the transfer wait time optimization.
 
 If not enabled generalizedCost function is used to pick the optimal transfer point.
+
+<h3 id="rd_transitPriorityGroups">transitPriorityGroups</h3>
+
+**Since version:** `2.5` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults 
+
+Transit priority groups configuration
+
+Use this to separate transit patterns into groups. Each group will be given a group-id. A
+path (multiple legs) will then have a set of group-ids based on the group-id from each leg.
+Hence, two paths with a different set of group-ids will BOTH be optimal unless the cost is
+worse than the relaxation specified in the `relaxTransitPriorityGroup` parameter. This is
+only available in the TransmodelAPI for now.
+
+Unmatched patterns are put in the BASE priority-group (group id: 0). This group is special.
+If a path only have legs in the base group, then that path dominates other paths, but other
+paths must be better to make it.
+
+
+**THIS IS STILL AN EXPERIMENTAL FEATURE - IT MAY CHANGE WITHOUT ANY NOTICE!**
 
 <h3 id="rd_transitReluctanceForMode">transitReluctanceForMode</h3>
 
@@ -912,7 +955,7 @@ include stairs as a last result.
       "dropOffTime" : 30,
       "dropOffCost" : 30
     },
-    "bikeParkTime" : 60,
+    "bikeParkTime" : "1m",
     "bikeParkCost" : 120,
     "carDropoffTime" : 120,
     "waitReluctance" : 1.0,

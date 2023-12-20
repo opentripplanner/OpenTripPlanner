@@ -238,51 +238,6 @@ public class EntityResolver {
     return date.toLocalDate().minusDays(daysOffset);
   }
 
-  TripOnServiceDateBuilder createTripOnServiceDateBuilder(
-    EstimatedVehicleJourney estimatedVehicleJourney
-  ) {
-    var datedServiceJourneyId = resolveDatedServiceJourneyId(estimatedVehicleJourney);
-
-    if (datedServiceJourneyId == null) {
-      if (estimatedVehicleJourney.getFramedVehicleJourneyRef() != null) {
-        var tripOnDate = resolveTripOnServiceDate(
-          estimatedVehicleJourney.getFramedVehicleJourneyRef()
-        );
-        if (tripOnDate == null) {
-          return null;
-        }
-        datedServiceJourneyId = tripOnDate.getId();
-      }
-    }
-
-    if (datedServiceJourneyId == null) {
-      return null;
-    }
-
-    List<TripOnServiceDate> listOfReplacedVehicleJourneys = new ArrayList<>();
-
-    // VehicleJourneyRef is the reference to the serviceJourney being replaced.
-    VehicleJourneyRef vehicleJourneyRef = estimatedVehicleJourney.getVehicleJourneyRef();
-    if (vehicleJourneyRef != null) {
-      var replacedDatedServiceJourney = resolveTripOnServiceDate(vehicleJourneyRef.getValue());
-      if (replacedDatedServiceJourney != null) {
-        listOfReplacedVehicleJourneys.add(replacedDatedServiceJourney);
-      }
-    }
-
-    // Add additional replaced service journeys if present.
-    estimatedVehicleJourney
-      .getAdditionalVehicleJourneyReves()
-      .stream()
-      .map(this::resolveTripOnServiceDate)
-      .filter(Objects::nonNull)
-      .forEach(listOfReplacedVehicleJourneys::add);
-
-    return TripOnServiceDate
-      .of(datedServiceJourneyId)
-      .withReplacementFor(listOfReplacedVehicleJourneys);
-  }
-
   /**
    * Calculate the difference in days between the service date and the departure at the first stop.
    */

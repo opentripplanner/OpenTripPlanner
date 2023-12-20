@@ -33,7 +33,7 @@
       "fuzzyTripMatching": false,
       "history": {
         "url": "<history_endpoint_url>",
-        // Get all realtime history for current operating day date
+        // Get all real-time history for current operating day date
         "fromDateTime": "-P0D",
         "timeout": 300000
       }

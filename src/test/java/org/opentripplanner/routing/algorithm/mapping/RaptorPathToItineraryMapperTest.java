@@ -90,8 +90,8 @@ public class RaptorPathToItineraryMapperTest {
     RaptorPath<TestTripSchedule> path = createTestTripSchedulePath(getTestTripSchedule())
       .egress(TestAccessEgress.free(2, RaptorCostConverter.toRaptorCost(LAST_LEG_COST)));
 
-    int transitLegCost = path.accessLeg().nextLeg().generalizedCost();
-    int egressLegCost = path.accessLeg().nextLeg().nextLeg().generalizedCost();
+    int transitLegCost = path.accessLeg().nextLeg().c1();
+    int egressLegCost = path.accessLeg().nextLeg().nextLeg().c1();
 
     // Act
     var itinerary = mapper.createItinerary(path);

@@ -39,7 +39,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
   protected WriteToGraphCallback saveResultOnGraph;
 
   /**
-   * The place where we'll record the incoming realtime timetables to make them available to the
+   * The place where we'll record the incoming real-time timetables to make them available to the
    * router in a thread safe way.
    */
   private final SiriTimetableSnapshotSource snapshotSource;

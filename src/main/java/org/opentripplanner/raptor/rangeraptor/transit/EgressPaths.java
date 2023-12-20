@@ -54,7 +54,7 @@ public class EgressPaths {
   }
 
   /**
-   * List all stops with an egress path witch start by walking. These egress paths can only be used
+   * List all stops with an egress path which start by walking. These egress paths can only be used
    * if arriving at the stop by transit.
    */
   public int[] egressesWitchStartByWalking() {
@@ -62,7 +62,7 @@ public class EgressPaths {
   }
 
   /**
-   * List all stops with an egress path witch start on-board a "transit" ride. These
+   * List all stops with an egress path which start on-board a "transit" ride. These
    * egress paths can be used when arriving at the stop with both transfer or transit.
    */
   public int[] egressesWitchStartByARide() {

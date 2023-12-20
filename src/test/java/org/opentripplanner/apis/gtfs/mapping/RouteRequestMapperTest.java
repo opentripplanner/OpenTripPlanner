@@ -25,12 +25,13 @@ import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
-import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalService;
+import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
@@ -84,16 +85,8 @@ class RouteRequestMapperTest implements PlanTestConstants {
 
     assertNotNull(routeRequest);
 
-    final VehicleParkingRequest parking = routeRequest.journey().parking();
-    assertEquals(
-      "VehicleParkingFilterRequest{not: [tags=[wheelbender]], select: [tags=[locker, roof]]}",
-      parking.filter().toString()
-    );
-    assertEquals(
-      "VehicleParkingFilterRequest{select: [tags=[a, b]]}",
-      parking.preferred().toString()
-    );
-    assertEquals(555, parking.unpreferredCost());
+    testParkingFilters(routeRequest.preferences().parking(TraverseMode.CAR));
+    testParkingFilters(routeRequest.preferences().parking(TraverseMode.BICYCLE));
   }
 
   static Stream<Arguments> banningCases = Stream.of(
@@ -218,5 +211,17 @@ class RouteRequestMapperTest implements PlanTestConstants {
       .newDataFetchingEnvironment(executionContext)
       .arguments(arguments)
       .build();
+  }
+
+  private void testParkingFilters(VehicleParkingPreferences parkingPreferences) {
+    assertEquals(
+      "VehicleParkingFilter{not: [tags=[wheelbender]], select: [tags=[locker, roof]]}",
+      parkingPreferences.filter().toString()
+    );
+    assertEquals(
+      "VehicleParkingFilter{select: [tags=[a, b]]}",
+      parkingPreferences.preferred().toString()
+    );
+    assertEquals(555, parkingPreferences.unpreferredVehicleParkingTagCost().toSeconds());
   }
 }

@@ -176,7 +176,7 @@ public class TestAccessEgress implements RaptorAccessEgress {
   }
 
   @Override
-  public int generalizedCost() {
+  public int c1() {
     return cost;
   }
 

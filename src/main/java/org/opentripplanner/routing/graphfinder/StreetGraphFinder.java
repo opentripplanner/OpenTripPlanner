@@ -53,6 +53,7 @@ public class StreetGraphFinder implements GraphFinder {
     List<TransitMode> filterByModes,
     List<PlaceType> filterByPlaceTypes,
     List<FeedScopedId> filterByStops,
+    List<FeedScopedId> filterByStations,
     List<FeedScopedId> filterByRoutes,
     List<String> filterByBikeRentalStations,
     TransitService transitService
@@ -62,6 +63,7 @@ public class StreetGraphFinder implements GraphFinder {
       filterByModes,
       filterByPlaceTypes,
       filterByStops,
+      filterByStations,
       filterByRoutes,
       filterByBikeRentalStations,
       maxResults,

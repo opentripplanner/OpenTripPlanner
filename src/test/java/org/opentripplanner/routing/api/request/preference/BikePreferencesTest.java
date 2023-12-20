@@ -16,8 +16,6 @@ class BikePreferencesTest {
   public static final double WALKING_RELUCTANCE = 1.45;
   public static final int SWITCH_TIME = 200;
   public static final int SWITCH_COST = 450;
-  public static final int PARK_TIME = 330;
-  public static final int PARK_COST = 950;
   public static final TimeSlopeSafetyTriangle TRIANGLE = TimeSlopeSafetyTriangle
     .of()
     .withSlope(1)
@@ -33,8 +31,6 @@ class BikePreferencesTest {
     .withWalkingReluctance(WALKING_RELUCTANCE)
     .withSwitchTime(SWITCH_TIME)
     .withSwitchCost(SWITCH_COST)
-    .withParkTime(PARK_TIME)
-    .withParkCost(PARK_COST)
     .withOptimizeType(OPTIMIZE_TYPE)
     .withOptimizeTriangle(it -> it.withSlope(1).build())
     .build();
@@ -75,16 +71,6 @@ class BikePreferencesTest {
   }
 
   @Test
-  void parkTime() {
-    assertEquals(PARK_TIME, subject.parkTime());
-  }
-
-  @Test
-  void parkCost() {
-    assertEquals(PARK_COST, subject.parkCost());
-  }
-
-  @Test
   void optimizeType() {
     assertEquals(OPTIMIZE_TYPE, subject.optimizeType());
   }
@@ -121,8 +107,6 @@ class BikePreferencesTest {
       "walkingReluctance: 1.45, " +
       "switchTime: 3m20s, " +
       "switchCost: $450, " +
-      "parkTime: 5m30s, " +
-      "parkCost: $950, " +
       "optimizeType: TRIANGLE, " +
       "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
       "}",

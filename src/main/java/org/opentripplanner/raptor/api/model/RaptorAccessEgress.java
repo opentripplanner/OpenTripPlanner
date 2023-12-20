@@ -4,7 +4,6 @@ import static org.opentripplanner.raptor.api.model.RaptorConstants.SECONDS_IN_A_
 import static org.opentripplanner.raptor.api.model.RaptorConstants.TIME_NOT_SET;
 
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 
@@ -34,7 +33,7 @@ public interface RaptorAccessEgress {
    * <p>
    * If this is {@link #isFree()}, then this method must return 0(zero).
    */
-  int generalizedCost();
+  int c1();
 
   /**
    * The time duration to walk or travel the path in seconds. This is not the entire duration from
@@ -203,8 +202,8 @@ public interface RaptorAccessEgress {
       buf.append("Walk");
     }
     buf.append(' ').append(DurationUtils.durationToStr(durationInSeconds()));
-    if (includeCost && generalizedCost() > 0) {
-      buf.append(' ').append(OtpNumberFormat.formatCostCenti(generalizedCost()));
+    if (includeCost && c1() > 0) {
+      buf.append(' ').append(RaptorValueFormatter.formatC1(c1()));
     }
     if (hasRides()) {
       buf.append(' ').append(numberOfRides()).append('x');

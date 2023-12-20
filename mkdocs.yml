@@ -68,6 +68,7 @@ nav:
     - Introduction: 'apis/Apis.md'
     - GraphQL Tutorial: 'apis/GraphQL-Tutorial.md'
     - GTFS GraphQL API: 'apis/GTFS-GraphQL-API.md'
+    - Transmodel (NeTEx) GraphQL API: 'apis/TransmodelApi.md'
 - Configuration:
     - Introduction: 'Configuration.md'
     - Build: 'BuildConfiguration.md'
@@ -94,7 +95,6 @@ nav:
     - Actuator API: 'sandbox/ActuatorAPI.md'
     - Direct Transfer Analyzer: 'sandbox/transferanalyzer.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
-    - Transmodel(NeTEx) GraphQL API: 'sandbox/TransmodelApi.md'
     - SIRI Updaters: 'sandbox/SiriUpdater.md'
     - SIRI Updater (Azure): 'sandbox/SiriAzureUpdater.md'
     - Vehicle Rental Service Directory API support: 'sandbox/VehicleRentalServiceDirectory.md'

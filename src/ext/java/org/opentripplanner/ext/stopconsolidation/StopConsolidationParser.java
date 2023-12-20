@@ -2,8 +2,6 @@ package org.opentripplanner.ext.stopconsolidation;
 
 import com.csvreader.CsvReader;
 import com.google.common.collect.ImmutableListMultimap;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -14,8 +12,6 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopGroup;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class StopConsolidationParser {
 

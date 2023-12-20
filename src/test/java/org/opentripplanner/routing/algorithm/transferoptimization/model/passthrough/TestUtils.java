@@ -54,7 +54,7 @@ class TestUtils implements RaptorTestConstants {
     return TestTransferBuilder.tx(fromTrip, fromStop, toTrip, toStop).walk(txCost).build();
   }
 
-  static OptimizePathDomainService<TestTripSchedule> subject(
+  static OptimizePathDomainService<TestTripSchedule> domainService(
     List<PassThroughPoint> passThroughPoints,
     final List<TripToTripTransfer<TestTripSchedule>>... transfers
   ) {
@@ -82,6 +82,6 @@ class TestUtils implements RaptorTestConstants {
    * Remove stuff we do not care about, like the priority cost and times.
    */
   static String pathFocus(String resultString) {
-    return resultString.replaceAll(" \\$\\d+pri]", "]").replaceAll(" \\d{2}:\\d{2}", "");
+    return resultString.replaceAll(" Tₚ[\\d_]+]", "]").replaceAll(" \\d{2}:\\d{2}", "");
   }
 }

@@ -299,18 +299,15 @@ public class OrcaFareService extends DefaultFareService {
     Leg leg
   ) {
     var route = leg.getRoute();
+    var regularFare = getRegularFare(fareType, rideType, defaultFare, leg);
+    // Many agencies only provide senior discount if using ORCA
     return switch (rideType) {
-      case COMM_TRANS_LOCAL_SWIFT -> optionalUSD(1.25f);
-      case COMM_TRANS_COMMUTER_EXPRESS -> optionalUSD(2f);
-      case EVERETT_TRANSIT, SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
-      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND -> fareType.equals(FareType.electronicSenior) // Kitsap only provide discounted senior fare for orca.
-        ? optionalUSD(1f)
-        : optionalUSD(2f);
-      case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType) ? optionalUSD(3f) : optionalUSD(6.75f);
-      case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType)
-        ? optionalUSD(2.5f)
-        : optionalUSD(5.75f);
-      case SOUND_TRANSIT,
+      case COMM_TRANS_LOCAL_SWIFT -> usesOrca(fareType) ? optionalUSD(1.25f) : regularFare;
+      case COMM_TRANS_COMMUTER_EXPRESS -> usesOrca(fareType) ? optionalUSD(2f) : regularFare;
+      case SKAGIT_TRANSIT, WHATCOM_LOCAL, SKAGIT_LOCAL -> optionalUSD(0.5f);
+      case EVERETT_TRANSIT -> usesOrca(fareType) ? optionalUSD(0.5f) : regularFare;
+      case KITSAP_TRANSIT_FAST_FERRY_EASTBOUND,
+        SOUND_TRANSIT,
         SOUND_TRANSIT_BUS,
         SOUND_TRANSIT_LINK,
         SOUND_TRANSIT_SOUNDER,
@@ -320,10 +317,12 @@ public class OrcaFareService extends DefaultFareService {
         SEATTLE_STREET_CAR,
         KITSAP_TRANSIT -> fareType.equals(FareType.electronicSenior)
         ? optionalUSD(1f)
-        : getRegularFare(fareType, rideType, defaultFare, leg);
+        : regularFare;
+      case KC_WATER_TAXI_VASHON_ISLAND -> usesOrca(fareType) ? optionalUSD(3f) : regularFare;
+      case KC_WATER_TAXI_WEST_SEATTLE -> usesOrca(fareType) ? optionalUSD(2.5f) : regularFare;
       case KITSAP_TRANSIT_FAST_FERRY_WESTBOUND -> fareType.equals(FareType.electronicSenior)
         ? optionalUSD(5f)
-        : optionalUSD(10f);
+        : regularFare;
       // Discount specific to Skagit transit and not Orca.
       case WASHINGTON_STATE_FERRIES -> Optional.of(
         getWashingtonStateFerriesFare(route.getLongName(), fareType, defaultFare)
@@ -395,7 +394,7 @@ public class OrcaFareService extends DefaultFareService {
    * If free transfers are applicable, the most expensive discount fare across all legs is added to
    * the final cumulative price.
    * <p>
-   * The computed fare for Orca card users takes into account realtime trip updates where available,
+   * The computed fare for Orca card users takes into account real-time trip updates where available,
    * so that, for instance, when a leg on a long itinerary is delayed to begin after the initial two
    * hour window has expired, the calculated fare for that trip will be two one-way fares instead of
    * one.

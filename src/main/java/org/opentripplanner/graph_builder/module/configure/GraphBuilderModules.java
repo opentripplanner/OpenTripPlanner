@@ -46,7 +46,7 @@ import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.transit.service.TransitModel;
 
 /**
- * Configure all modules witch is not simple enough to be injected.
+ * Configure all modules which is not simple enough to be injected.
  */
 @Module
 public class GraphBuilderModules {

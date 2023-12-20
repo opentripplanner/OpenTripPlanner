@@ -24,7 +24,7 @@ public class SecondPreferredTripToTripTransferTest extends GtfsTest {
     validateLeg(legs[1], 1388531040000L, 1388531100000L, "2e26", "2e24", null);
 
     assertEquals(
-      "Stop 2e21 ~ RAIL train 1 0:01 0:03 ~ Stop 2e24 ~ RAIL train 2 0:04 0:05 ~ Stop 2e26 [$270]",
+      "Stop 2e21 ~ RAIL train 1 0:01 0:03 ~ Stop 2e24 ~ RAIL train 2 0:04 0:05 ~ Stop 2e26 [C₁270]",
       itinerary.toStr()
     );
   }

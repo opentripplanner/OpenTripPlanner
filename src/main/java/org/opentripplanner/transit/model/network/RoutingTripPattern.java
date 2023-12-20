@@ -12,7 +12,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
  *  - The RTP is accessed frequently during the Raptor search, and we want it to be as small as
  *    possible to load/access it in the cache and CPU for performance reasons.
  *  - Also, we deduplicate these so a RTP can be reused by more than one TP.
- *  - This also provide explicit documentation on witch fields are used during a search and which
+ *  - This also provide explicit documentation on which fields are used during a search and which
  *    are not.
  */
 public class RoutingTripPattern implements DefaultTripPattern, Serializable {

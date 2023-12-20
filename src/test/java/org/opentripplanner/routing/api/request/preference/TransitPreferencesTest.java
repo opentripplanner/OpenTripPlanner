@@ -9,6 +9,7 @@ import static org.opentripplanner.routing.api.request.preference.ImmutablePrefer
 import java.time.Duration;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.raptor.api.model.SearchDirection;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -26,6 +27,10 @@ class TransitPreferencesTest {
   private static final Duration D25m = Duration.ofMinutes(25);
   private static final Duration D35m = Duration.ofMinutes(35);
   private static final SearchDirection RAPTOR_SEARCH_DIRECTION = SearchDirection.REVERSE;
+  private static final CostLinearFunction TRANSIT_GROUP_PRIORITY_RELAX = CostLinearFunction.of(
+    Cost.costOfSeconds(300),
+    1.5
+  );
   private static final boolean IGNORE_REALTIME_UPDATES = true;
   private static final boolean INCLUDE_PLANNED_CANCELLATIONS = true;
   private static final boolean INCLUDE_REALTIME_CANCELLATIONS = true;
@@ -37,6 +42,7 @@ class TransitPreferencesTest {
     .setUnpreferredCost(UNPREFERRED_COST)
     .withBoardSlack(b -> b.withDefault(D45s).with(TransitMode.AIRPLANE, D35m))
     .withAlightSlack(b -> b.withDefault(D15s).with(TransitMode.AIRPLANE, D25m))
+    .withTransitGroupPriorityGeneralizedCostSlack(TRANSIT_GROUP_PRIORITY_RELAX)
     .setIgnoreRealtimeUpdates(IGNORE_REALTIME_UPDATES)
     .setIncludePlannedCancellations(INCLUDE_PLANNED_CANCELLATIONS)
     .setIncludeRealtimeCancellations(INCLUDE_REALTIME_CANCELLATIONS)
@@ -68,6 +74,11 @@ class TransitPreferencesTest {
   @Test
   void unpreferredCost() {
     assertEquals(UNPREFERRED_COST, subject.unpreferredCost());
+  }
+
+  @Test
+  void relaxTransitPriorityGroup() {
+    assertEquals(TRANSIT_GROUP_PRIORITY_RELAX, subject.relaxTransitPriorityGroup());
   }
 
   @Test
@@ -114,6 +125,7 @@ class TransitPreferencesTest {
       "reluctanceForMode: {AIRPLANE=2.1}, " +
       "otherThanPreferredRoutesPenalty: $350, " +
       "unpreferredCost: 5m + 1.15 t, " +
+      "relaxTransitPriorityGroup: 5m + 1.50 t, " +
       "ignoreRealtimeUpdates, " +
       "includePlannedCancellations, " +
       "includeRealtimeCancellations, " +

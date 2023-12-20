@@ -125,7 +125,7 @@ public class OrcaFareServiceTest {
   void calculateFareForSingleAgency() {
     List<Leg> rides = List.of(getLeg(COMM_TRANS_AGENCY_ID, "400", 0));
     calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE);
-    calculateFare(rides, FareType.senior, TWO_DOLLARS);
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE);
     calculateFare(rides, FareType.youth, ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, TWO_DOLLARS);
     calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE);
@@ -145,11 +145,7 @@ public class OrcaFareServiceTest {
       getLeg(COMM_TRANS_AGENCY_ID, 2)
     );
     calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(3));
-    calculateFare(
-      rides,
-      FareType.senior,
-      DEFAULT_TEST_RIDE_PRICE.plus(DEFAULT_TEST_RIDE_PRICE).plus(usDollars(1.25f))
-    );
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(3));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(
       rides,
@@ -429,7 +425,7 @@ public class OrcaFareServiceTest {
       getLeg(KC_METRO_AGENCY_ID, 130)
     );
     calculateFare(rides, regular, DEFAULT_TEST_RIDE_PRICE.times(3));
-    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(2).plus(usDollars(1.25f)));
+    calculateFare(rides, FareType.senior, DEFAULT_TEST_RIDE_PRICE.times(3));
     calculateFare(rides, FareType.youth, Money.ZERO_USD);
     calculateFare(rides, FareType.electronicSpecial, usDollars(1.25f));
     calculateFare(rides, FareType.electronicRegular, DEFAULT_TEST_RIDE_PRICE.times(2));

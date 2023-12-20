@@ -1002,7 +1002,10 @@ enum FeedAlertType {
 }
 
 enum FilterPlaceType {
-    """Stops"""
+    """
+    Stops.
+    NOTE: if this is selected at the same time as `STATION`, stops that have a parent station will not be returned but their parent stations will be returned instead.
+    """
     STOP
 
     """Departure rows"""
@@ -1019,6 +1022,13 @@ enum FilterPlaceType {
 
     """Parking lots that contain spaces for cars"""
     CAR_PARK
+
+
+    """
+    Stations.
+    NOTE: if this is selected at the same time as `STOP`, stops that have a parent station will not be returned but their parent stations will be returned instead.
+    """
+    STATION
 }
 
 type Geometry {
@@ -1097,6 +1107,9 @@ input InputCoordinates {
 input InputFilters {
     """Stops to include by GTFS id."""
     stops: [String]
+
+    """Stations to include by GTFS id."""
+    stations: [String]
 
     """Routes to include by GTFS id."""
     routes: [String]
@@ -2560,7 +2573,7 @@ type QueryType {
         filterByModes: [Mode]
 
         """Only include places that match one of the given GTFS ids."""
-        filterByIds: InputFilters
+        filterByIds: InputFilters @deprecated(reason: "Not actively maintained")
         before: String
         after: String
         first: Int
@@ -3098,7 +3111,7 @@ type QueryType {
         omitCanceled: Boolean = true
 
         """
-        When true, realtime updates are ignored during this search. Default value: false
+        When true, real-time updates are ignored during this search. Default value: false
         """
         ignoreRealtimeUpdates: Boolean
 

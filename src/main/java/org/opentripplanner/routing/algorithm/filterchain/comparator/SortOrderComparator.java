@@ -101,12 +101,9 @@ public class SortOrderComparator extends CompositeComparator<ItinerarySortKey> {
   }
 
   public static SortOrderComparator comparator(SortOrder sortOrder) {
-    switch (sortOrder) {
-      case STREET_AND_ARRIVAL_TIME:
-        return STREET_AND_ARRIVAL_TIME;
-      case STREET_AND_DEPARTURE_TIME:
-        return STREET_AND_DEPARTURE_TIME;
-    }
-    throw new IllegalArgumentException();
+    return switch (sortOrder) {
+      case STREET_AND_ARRIVAL_TIME -> STREET_AND_ARRIVAL_TIME;
+      case STREET_AND_DEPARTURE_TIME -> STREET_AND_DEPARTURE_TIME;
+    };
   }
 }

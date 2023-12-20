@@ -124,7 +124,7 @@ public class DurationUtils {
   }
 
   /**
-   * This is used to parse a string witch may be a number {@code NNNN}(number of seconds) or a
+   * This is used to parse a string which may be a number {@code NNNN}(number of seconds) or a
    * duration with format {@code NhNmNs}, where {@code N} is a decimal number and
    * {@code h} is hours, {@code m} minutes and {@code s} seconds.
    * <p>

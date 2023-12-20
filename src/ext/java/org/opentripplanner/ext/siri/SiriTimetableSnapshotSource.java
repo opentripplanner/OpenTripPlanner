@@ -4,7 +4,7 @@ import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_MONITORED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_TRIP_ID;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN;
 
@@ -18,14 +18,17 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
@@ -35,8 +38,8 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 
 /**
- * This class should be used to create snapshots of lookup tables of realtime data. This is
- * necessary to provide planning threads a consistent constant view of a graph with realtime data at
+ * This class should be used to create snapshots of lookup tables of real-time data. This is
+ * necessary to provide planning threads a consistent constant view of a graph with real-time data at
  * a specific point in time.
  */
 public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
@@ -59,7 +62,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private final SiriTripPatternIdGenerator tripPatternIdGenerator = new SiriTripPatternIdGenerator();
   /**
-   * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
+   * A synchronized cache of trip patterns that are added to the graph due to GTFS-real-time
    * messages.
    */
   private final SiriTripPatternCache tripPatternCache;
@@ -81,7 +84,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private volatile TimetableSnapshot snapshot = null;
 
-  /** Should expired realtime data be purged from the graph. */
+  /** Should expired real-time data be purged from the graph. */
   private final boolean purgeExpiredData;
 
   protected LocalDate lastPurgeDate = null;
@@ -215,6 +218,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
       /* commit */
       return addTripToGraphAndBuffer(result.successValue());
+    } catch (DataValidationException e) {
+      return DataValidationExceptionMapper.toResult(e);
     } catch (Exception e) {
       LOG.warn(
         "{} EstimatedJourney {} failed.",
@@ -320,7 +325,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       trip = tripAndPattern.trip();
       pattern = tripAndPattern.tripPattern();
     } else {
-      return UpdateError.result(null, NO_TRIP_ID);
+      return UpdateError.result(null, TRIP_NOT_FOUND);
     }
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
@@ -371,7 +376,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // Add new trip times to the buffer and return success
     var result = buffer.update(pattern, tripUpdate.tripTimes(), serviceDate);
 
-    LOG.debug("Applied realtime data for trip {} on {}", trip, serviceDate);
+    LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
 
     return result;
   }
@@ -395,7 +400,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       if (tripTimes == null) {
         LOG.warn("Could not mark scheduled trip as deleted {}", trip.getId());
       } else {
-        final TripTimes newTripTimes = tripTimes.copyOfScheduledTimes();
+        final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
         newTripTimes.deleteTrip();
         buffer.update(pattern, newTripTimes, serviceDate);
         success = true;
@@ -416,10 +421,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     final TripPattern pattern = buffer.getRealtimeAddedTripPattern(trip.getId(), serviceDate);
     if (pattern != null) {
-      /*
-              Remove the previous realtime-added TripPattern from buffer.
-              Only one version of the realtime-update should exist
-             */
+      // Remove the previous real-time-added TripPattern from buffer.
+      // Only one version of the real-time-update should exist
       buffer.removeLastAddedTripPattern(trip.getId(), serviceDate);
       buffer.removeRealtimeUpdatedTripTimes(pattern, trip.getId(), serviceDate);
       success = true;
@@ -436,7 +439,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    LOG.debug("purging expired realtime data");
+    LOG.debug("purging expired real-time data");
 
     lastPurgeDate = previously;
 

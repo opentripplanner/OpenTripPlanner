@@ -8,7 +8,7 @@ import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
 public interface ArrivalParetoSetComparatorFactory<T extends McStopArrival<?>> {
   /**
    * This comparator is used to compare regular stop arrivals. It uses {@code arrivalTime},
-   * {@code paretoRound} and {@code generalizedCost} to compare arrivals. It does NOT include
+   * {@code paretoRound} and {@code c1} to compare arrivals. It does NOT include
    * {@code arrivedOnBoard}. Normally arriving on-board should give the arrival an advantage
    * - you can continue on foot, walking to the next stop. But, we only do this if it happens
    * in the same Raptor iteration and round - if it does it is taken care of by the order

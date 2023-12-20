@@ -3,9 +3,10 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
-import org.opentripplanner.model.plan.pagecursor.ItineraryPageCut;
+import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
 
 /**
@@ -22,12 +23,18 @@ public class PagingFilter implements ItineraryDeletionFlagger {
 
   public static final String TAG = "paging-filter";
 
-  private final ItineraryPageCut itineraryPageCut;
+  private final ListSection deduplicateSection;
+  private final ItinerarySortKey itineraryPageCut;
   private final Comparator<ItinerarySortKey> sortOrderComparator;
 
-  public PagingFilter(ItineraryPageCut itineraryPageCut) {
+  public PagingFilter(
+    SortOrder sortOrder,
+    ListSection deduplicateSection,
+    ItinerarySortKey itineraryPageCut
+  ) {
+    this.deduplicateSection = deduplicateSection;
     this.itineraryPageCut = itineraryPageCut;
-    this.sortOrderComparator = SortOrderComparator.comparator(itineraryPageCut.sortOrder());
+    this.sortOrderComparator = SortOrderComparator.comparator(sortOrder);
   }
 
   @Override
@@ -36,9 +43,9 @@ public class PagingFilter implements ItineraryDeletionFlagger {
   }
 
   private boolean sortsIntoDeduplicationAreaRelativeToRemovedItinerary(Itinerary itinerary) {
-    return switch (itineraryPageCut.deduplicationSection()) {
-      case HEAD -> sortOrderComparator.compare(itinerary, itineraryPageCut) < 0;
-      case TAIL -> sortOrderComparator.compare(itinerary, itineraryPageCut) > 0;
+    return switch (deduplicateSection) {
+      case HEAD -> sortOrderComparator.compare(itinerary, itineraryPageCut) <= 0;
+      case TAIL -> sortOrderComparator.compare(itinerary, itineraryPageCut) >= 0;
     };
   }
 
@@ -46,13 +53,7 @@ public class PagingFilter implements ItineraryDeletionFlagger {
   public List<Itinerary> flagForRemoval(List<Itinerary> itineraries) {
     return itineraries
       .stream()
-      .filter(it ->
-        (
-          it.startTime().toInstant().isAfter(itineraryPageCut.windowStart()) &&
-          it.startTime().toInstant().isBefore(itineraryPageCut.windowEnd()) &&
-          sortsIntoDeduplicationAreaRelativeToRemovedItinerary(it)
-        )
-      )
+      .filter(this::sortsIntoDeduplicationAreaRelativeToRemovedItinerary)
       .collect(Collectors.toList());
   }
 }

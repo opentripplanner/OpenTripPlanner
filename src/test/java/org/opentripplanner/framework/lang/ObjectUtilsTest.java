@@ -34,10 +34,18 @@ class ObjectUtilsTest {
   @Test
   void requireNotInitialized() {
     assertEquals("new", ObjectUtils.requireNotInitialized(null, "new"));
-    assertThrows(
+    var ex = assertThrows(
       IllegalStateException.class,
-      () -> ObjectUtils.requireNotInitialized("old", "new")
+      () -> ObjectUtils.requireNotInitialized("foo", "old", "new")
     );
+    assertEquals("Field foo is already set! Old value: old, new value: new.", ex.getMessage());
+
+    ex =
+      assertThrows(
+        IllegalStateException.class,
+        () -> ObjectUtils.requireNotInitialized("old", "new")
+      );
+    assertEquals("Field is already set! Old value: old, new value: new.", ex.getMessage());
   }
 
   @Test

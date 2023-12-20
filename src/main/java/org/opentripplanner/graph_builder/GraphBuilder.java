@@ -121,9 +121,6 @@ public class GraphBuilder implements Runnable {
     }
 
     if (hasTransitData && (hasOsm || graphBuilder.graph.hasStreets)) {
-      if (config.matchBusRoutesToStreets) {
-        graphBuilder.addModule(factory.busRouteStreetMatcher());
-      }
       graphBuilder.addModule(factory.osmBoardingLocationsModule());
     }
 
@@ -163,16 +160,16 @@ public class GraphBuilder implements Runnable {
       graphBuilder.addModule(factory.graphCoherencyCheckerModule());
     }
 
+    if (OTPFeature.Co2Emissions.isOn()) {
+      graphBuilder.addModule(factory.emissionsModule());
+    }
+
     if (config.dataImportReport) {
       graphBuilder.addModule(factory.dataImportIssueReporter());
     }
 
     if (OTPFeature.DataOverlay.isOn()) {
       graphBuilder.addModuleOptional(factory.dataOverlayFactory());
-    }
-
-    if (OTPFeature.Co2Emissions.isOn()) {
-      graphBuilder.addModule(factory.emissionsModule());
     }
 
     graphBuilder.addModule(factory.calculateWorldEnvelopeModule());

@@ -22,6 +22,6 @@ public class ExcludedTripsTest extends GtfsTest {
 
     validateLeg(leg, 1388530980000L, 1388531040000L, "3e2", "3e1", null);
 
-    assertEquals("Stop 3e1 ~ BUS bus 0:03 0:04 ~ Stop 3e2 [$90]", itinerary.toStr());
+    assertEquals("Stop 3e1 ~ BUS bus 0:03 0:04 ~ Stop 3e2 [C₁90]", itinerary.toStr());
   }
 }

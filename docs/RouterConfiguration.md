@@ -46,7 +46,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |          [logKey](#server_traceParameters_0_logKey)                                       |        `string`       | The log event key used.                                                                               | *Optional* |               |  2.4  |
 | timetableUpdates                                                                          |        `object`       | Global configuration for timetable updaters.                                                          | *Optional* |               |  2.2  |
 |    [maxSnapshotFrequency](#timetableUpdates_maxSnapshotFrequency)                         |       `duration`      | How long a snapshot should be cached.                                                                 | *Optional* | `"PT1S"`      |  2.2  |
-|    purgeExpiredData                                                                       |       `boolean`       | Should expired realtime data be purged from the graph. Apply to GTFS-RT and Siri updates.             | *Optional* | `true`        |  2.2  |
+|    purgeExpiredData                                                                       |       `boolean`       | Should expired real-time data be purged from the graph. Apply to GTFS-RT and Siri updates.            | *Optional* | `true`        |  2.2  |
 | [transit](#transit)                                                                       |        `object`       | Configuration for transit searches with RAPTOR.                                                       | *Optional* |               |   na  |
 |    [iterationDepartureStepInSeconds](#transit_iterationDepartureStepInSeconds)            |       `integer`       | Step for departure times between each RangeRaptor iterations.                                         | *Optional* | `60`          |   na  |
 |    [maxNumberOfTransfers](#transit_maxNumberOfTransfers)                                  |       `integer`       | This parameter is used to allocate enough memory space for Raptor.                                    | *Optional* | `12`          |   na  |
@@ -473,7 +473,7 @@ Used to group requests when monitoring OTP.
       "dropOffTime" : 30,
       "dropOffCost" : 30
     },
-    "bikeParkTime" : 60,
+    "bikeParkTime" : "1m",
     "bikeParkCost" : 120,
     "carDropoffTime" : 120,
     "waitReluctance" : 1.0,

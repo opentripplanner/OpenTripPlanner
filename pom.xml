@@ -56,20 +56,20 @@
 
 
     <properties>
-        <otp.serialization.version.id>130</otp.serialization.version.id>
+        <otp.serialization.version.id>134</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>30.0</geotools.version>
-        <google.dagger.version>2.48.1</google.dagger.version>
+        <geotools.version>30.1</geotools.version>
+        <google.dagger.version>2.49</google.dagger.version>
         <jackson.version>2.16.0</jackson.version>
-        <jersey.version>3.1.3</jersey.version>
+        <jersey.version>3.1.5</jersey.version>
         <junit.version>5.10.1</junit.version>
         <micrometer.version>1.11.5</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
-        <logback.version>1.4.11</logback.version>
+        <logback.version>1.4.14</logback.version>
         <lucene.version>9.8.0</lucene.version>
         <slf4j.version>2.0.9</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
-        <siri-java-model.version>1.25</siri-java-model.version>
+        <siri-java-model.version>1.26</siri-java-model.version>
         <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -144,7 +144,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
+                <version>3.12.0</version>
                 <configuration>
                     <!-- Target Java version -->
                     <release>21</release>
@@ -214,7 +214,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>build-helper-generate-sources</id>
@@ -247,7 +247,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.2.3</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
@@ -710,7 +710,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>3.0.13</version>
+            <version>3.0.16</version>
         </dependency>
 
         <!-- TESTING -->
@@ -729,13 +729,13 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
-            <version>1.2.0</version>
+            <version>1.2.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.7.0</version>
+            <version>5.8.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -867,7 +867,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -912,7 +912,7 @@
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
-            <version>5.2.1</version>
+            <version>5.3</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
@@ -986,6 +986,17 @@
         </profile>
         <profile>
             <id>prettierSkip</id>
+            <activation>
+                <property>
+                    <!--
+                      This works as a short alias to enable this from the command line. To skip
+                      prettier, set the 'ps' system property with the '-D ps' parameter:
+                      # mvn test -D ps
+                    -->
+                    <name>ps</name>
+                    <value/>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
