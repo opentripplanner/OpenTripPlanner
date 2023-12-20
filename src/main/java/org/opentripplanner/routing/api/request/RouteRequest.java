@@ -81,6 +81,8 @@ public class RouteRequest implements Cloneable, Serializable {
 
   private boolean wheelchair = false;
 
+  private Instant earliestBookingTime;
+
   /* CONSTRUCTORS */
 
   /** Constructor for options; modes defaults to walk and transit */
@@ -110,6 +112,15 @@ public class RouteRequest implements Cloneable, Serializable {
 
   public void withPreferences(Consumer<RoutingPreferences.Builder> body) {
     this.preferences = preferences.copyOf().apply(body).build();
+  }
+
+  public Instant earliestBookingTime() {
+    return earliestBookingTime;
+  }
+
+  public RouteRequest setEarliestBookingTime(Instant earliestBookingTime) {
+    this.earliestBookingTime = earliestBookingTime;
+    return this;
   }
 
   void setPreferences(RoutingPreferences preferences) {
