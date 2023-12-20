@@ -12,10 +12,10 @@ public final class MapboxStyleJson {
   private final List<TileSource> sources;
   private final List<JsonNode> layers;
 
-  public MapboxStyleJson(String name, List<TileSource> sources, List<JsonNode> layers) {
+  public MapboxStyleJson(String name, List<TileSource> sources, List<LayerStyleBuilder> layers) {
     this.name = name;
     this.sources = sources;
-    this.layers = layers;
+    this.layers = layers.stream().map(LayerStyleBuilder::toJson).toList();
   }
 
   @JsonSerialize

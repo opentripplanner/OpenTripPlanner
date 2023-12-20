@@ -20,11 +20,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.model.TileJson;
-import org.opentripplanner.apis.vectortiles.model.LayerStyleBuilder;
 import org.opentripplanner.apis.vectortiles.model.MapboxStyleJson;
-import org.opentripplanner.apis.vectortiles.model.TileSource;
-import org.opentripplanner.apis.vectortiles.model.TileSource.RasterSource;
-import org.opentripplanner.apis.vectortiles.model.TileSource.VectorSource;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
@@ -123,36 +119,7 @@ public class GraphInspectorVectorTileResource {
       "/inspector/vectortile/" +
       allLayers +
       "/tilejson.json";
-    var vectorSource = new VectorSource("debug", url);
-    var backgroundSource = new RasterSource(
-      "background",
-      List.of("https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"),
-      256
-    );
-    List<TileSource> sources = List.of(backgroundSource, vectorSource);
-    return new MapboxStyleJson(
-      "OTP Debug Tiles",
-      sources,
-      List.of(
-        LayerStyleBuilder
-          .ofId("background")
-          .typeRaster()
-          .source(backgroundSource)
-          .minZoom(0)
-          .maxZoom(22)
-          .build(),
-        LayerStyleBuilder
-          .ofId("regular-stop")
-          .source(vectorSource)
-          .sourceLayer("regularStops")
-          .typeCircle()
-          .circleStroke("#140d0e", 1)
-          .circleColor("#fcf9fa")
-          .minZoom(13)
-          .maxZoom(22)
-          .build()
-      )
-    );
+    return DebugStyleJson.build(url);
   }
 
   @Nonnull

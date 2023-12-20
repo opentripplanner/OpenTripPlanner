@@ -85,7 +85,7 @@ public class LayerStyleBuilder {
     return this;
   }
 
-  public JsonNode build() {
+  public JsonNode toJson() {
     validate();
 
     var copy = new HashMap<>(props);
