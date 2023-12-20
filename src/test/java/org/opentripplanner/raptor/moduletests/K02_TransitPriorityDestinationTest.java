@@ -8,7 +8,6 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_C;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_D;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_E;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_F;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_G;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T00_00;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
@@ -26,7 +25,7 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
+import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
 import org.opentripplanner.raptor.configure.RaptorConfig;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
@@ -37,9 +36,9 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  */
 public class K02_TransitPriorityDestinationTest {
 
-  private static final RaptorTransitPriorityGroupCalculator PRIORITY_GROUP_CALCULATOR = new RaptorTransitPriorityGroupCalculator() {
+  private static final RaptorTransitGroupCalculator PRIORITY_GROUP_CALCULATOR = new RaptorTransitGroupCalculator() {
     @Override
-    public int mergeTransitPriorityGroupIds(int currentGroupIds, int boardingGroupId) {
+    public int mergeGroupIds(int currentGroupIds, int boardingGroupId) {
       return currentGroupIds | boardingGroupId;
     }
 
@@ -55,14 +54,8 @@ public class K02_TransitPriorityDestinationTest {
   private static final int GROUP_A = 0x01;
   private static final int GROUP_B = 0x02;
   private static final int GROUP_C = 0x04;
-  private static final int GROUP_AB = PRIORITY_GROUP_CALCULATOR.mergeTransitPriorityGroupIds(
-    GROUP_A,
-    GROUP_B
-  );
-  private static final int GROUP_AC = PRIORITY_GROUP_CALCULATOR.mergeTransitPriorityGroupIds(
-    GROUP_A,
-    GROUP_C
-  );
+  private static final int GROUP_AB = PRIORITY_GROUP_CALCULATOR.mergeGroupIds(GROUP_A, GROUP_B);
+  private static final int GROUP_AC = PRIORITY_GROUP_CALCULATOR.mergeGroupIds(GROUP_A, GROUP_C);
   private static final int C1_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
 
   private final TestTransitData data = new TestTransitData();

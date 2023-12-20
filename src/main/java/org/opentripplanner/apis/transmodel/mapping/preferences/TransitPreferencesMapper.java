@@ -34,7 +34,7 @@ public class TransitPreferencesMapper {
     callWith.argument("includePlannedCancellations", transit::setIncludePlannedCancellations);
     callWith.argument("includeRealtimeCancellations", transit::setIncludeRealtimeCancellations);
     callWith.argument(
-      "relaxTransitPriorityGroup",
+      "relaxTransitGroupPriority",
       transit::withTransitGroupPriorityGeneralizedCostSlack
     );
     callWith.argument(

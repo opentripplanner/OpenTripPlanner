@@ -95,9 +95,9 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.otherThanPreferredRoutesPenalty, tr::setOtherThanPreferredRoutesPenalty);
       setIfNotNull(req.ignoreRealtimeUpdates, tr::setIgnoreRealtimeUpdates);
 
-      if (req.relaxTransitPriorityGroup != null) {
+      if (req.relaxTransitGroupPriority != null) {
         tr.withTransitGroupPriorityGeneralizedCostSlack(
-          CostLinearFunction.of(req.relaxTransitPriorityGroup)
+          CostLinearFunction.of(req.relaxTransitGroupPriority)
         );
       } else {
         setIfNotNull(

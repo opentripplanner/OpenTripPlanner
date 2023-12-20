@@ -77,8 +77,8 @@ class TransitPreferencesTest {
   }
 
   @Test
-  void relaxTransitPriorityGroup() {
-    assertEquals(TRANSIT_GROUP_PRIORITY_RELAX, subject.relaxTransitPriorityGroup());
+  void relaxTransitGroupPriority() {
+    assertEquals(TRANSIT_GROUP_PRIORITY_RELAX, subject.relaxTransitGroupPriority());
   }
 
   @Test
@@ -125,7 +125,7 @@ class TransitPreferencesTest {
       "reluctanceForMode: {AIRPLANE=2.1}, " +
       "otherThanPreferredRoutesPenalty: $350, " +
       "unpreferredCost: 5m + 1.15 t, " +
-      "relaxTransitPriorityGroup: 5m + 1.50 t, " +
+      "relaxTransitGroupPriority: 5m + 1.50 t, " +
       "ignoreRealtimeUpdates, " +
       "includePlannedCancellations, " +
       "includeRealtimeCancellations, " +

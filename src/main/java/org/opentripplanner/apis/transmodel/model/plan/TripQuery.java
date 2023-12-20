@@ -277,16 +277,16 @@ public class TripQuery {
       .argument(
         GraphQLArgument
           .newArgument()
-          .name("relaxTransitPriorityGroup")
+          .name("relaxTransitGroupPriority")
           .description(
             """
             Relax generalized-cost when comparing trips with a different set of
-            transit-priority-groups. The groups are set server side for service-journey and
+            transit-group-priorities. The groups are set server side for service-journey and
             can not be configured in the API. This mainly helps to return competition neutral
-            services. Long distance authorities are put in different transit-priority-groups.
+            services. Long distance authorities are put in different transit-groups.
             
             This relaxes the comparison inside the routing engine for each stop-arrival. If two
-            paths have a different set of transit-priority-groups, then the generalized-cost
+            paths have a different set of transit-group-priorities, then the generalized-cost
             comparison is relaxed. The final set of paths are filtered through the normal
             itinerary-filters.
             
@@ -298,9 +298,9 @@ public class TripQuery {
           )
           .type(RelaxCostType.INPUT_TYPE)
           .defaultValueLiteral(
-            preferences.transit().relaxTransitPriorityGroup().isNormal()
+            preferences.transit().relaxTransitGroupPriority().isNormal()
               ? NullValue.of()
-              : RelaxCostType.valueOf(preferences.transit().relaxTransitPriorityGroup())
+              : RelaxCostType.valueOf(preferences.transit().relaxTransitGroupPriority())
           )
           .build()
       )
@@ -523,7 +523,7 @@ public class TripQuery {
         GraphQLArgument
           .newArgument()
           .name("relaxTransitSearchGeneralizedCostAtDestination")
-          .deprecate("This is replaced by 'relaxTransitPriorityGroup'.")
+          .deprecate("This is replaced by 'relaxTransitGroupPriority'.")
           .description(
             """
               Whether non-optimal transit paths at the destination should be returned. Let c be the

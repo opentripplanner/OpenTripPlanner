@@ -21,23 +21,23 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  *   <li>{@code Entity(mode:SUBWAY, agency:A3)}</li>
  * </ul>
  */
-public class TransitPriorityGroupSelect {
+public class TransitGroupSelect {
 
-  private static final TransitPriorityGroupSelect DEFAULT = new TransitPriorityGroupSelect();
+  private static final TransitGroupSelect DEFAULT = new TransitGroupSelect();
 
   private final List<TransitMode> modes;
   private final List<String> subModeRegexp;
   private final List<FeedScopedId> agencyIds;
   private final List<FeedScopedId> routeIds;
 
-  public TransitPriorityGroupSelect() {
+  public TransitGroupSelect() {
     this.modes = List.of();
     this.subModeRegexp = List.of();
     this.agencyIds = List.of();
     this.routeIds = List.of();
   }
 
-  private TransitPriorityGroupSelect(Builder builder) {
+  private TransitGroupSelect(Builder builder) {
     // Sort and keep only unique entries, this make this
     // implementation consistent for eq/hc/toString.
     this.modes =
@@ -77,7 +77,7 @@ public class TransitPriorityGroupSelect {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    TransitPriorityGroupSelect that = (TransitPriorityGroupSelect) o;
+    TransitGroupSelect that = (TransitGroupSelect) o;
     return (
       Objects.equals(modes, that.modes) &&
       Objects.equals(subModeRegexp, that.subModeRegexp) &&
@@ -96,7 +96,7 @@ public class TransitPriorityGroupSelect {
     return isEmpty()
       ? "TransitGroupSelect{ EMPTY }"
       : ToStringBuilder
-        .of(TransitPriorityGroupSelect.class)
+        .of(TransitGroupSelect.class)
         .addCol("modes", modes)
         .addCol("subModeRegexp", subModeRegexp)
         .addCol("agencyIds", agencyIds)
@@ -106,13 +106,13 @@ public class TransitPriorityGroupSelect {
 
   public static class Builder {
 
-    private final TransitPriorityGroupSelect original;
+    private final TransitGroupSelect original;
     private final List<TransitMode> modes;
     private final List<String> subModeRegexp;
     private final List<FeedScopedId> agencyIds;
     private final List<FeedScopedId> routeIds;
 
-    public Builder(TransitPriorityGroupSelect original) {
+    public Builder(TransitGroupSelect original) {
       this.original = original;
       this.modes = new ArrayList<>(original.modes);
       this.subModeRegexp = new ArrayList<>(original.subModeRegexp);
@@ -140,8 +140,8 @@ public class TransitPriorityGroupSelect {
       return this;
     }
 
-    public TransitPriorityGroupSelect build() {
-      var obj = new TransitPriorityGroupSelect(this);
+    public TransitGroupSelect build() {
+      var obj = new TransitGroupSelect(this);
       return original.equals(obj) ? original : obj;
     }
   }

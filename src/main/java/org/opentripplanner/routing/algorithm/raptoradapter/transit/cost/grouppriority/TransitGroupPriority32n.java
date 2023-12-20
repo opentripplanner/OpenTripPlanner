@@ -1,33 +1,33 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority;
 
 import org.opentripplanner.raptor.api.model.DominanceFunction;
-import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
+import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
 
 /**
  * This is a "BitSet" implementation for groupId. It can store upto 32 groups,
  * a set with few elements does NOT dominate a set with more elements.
  */
-public class TransitPriorityGroup32n {
+public class TransitGroupPriority32n {
 
   private static final int GROUP_ZERO = 0;
   private static final int MIN_SEQ_NO = 0;
   private static final int MAX_SEQ_NO = 32;
 
-  public static RaptorTransitPriorityGroupCalculator priorityCalculator() {
-    return new RaptorTransitPriorityGroupCalculator() {
+  public static RaptorTransitGroupCalculator priorityCalculator() {
+    return new RaptorTransitGroupCalculator() {
       @Override
-      public int mergeTransitPriorityGroupIds(int currentGroupIds, int boardingGroupId) {
+      public int mergeGroupIds(int currentGroupIds, int boardingGroupId) {
         return mergeInGroupId(currentGroupIds, boardingGroupId);
       }
 
       @Override
       public DominanceFunction dominanceFunction() {
-        return TransitPriorityGroup32n::dominate;
+        return TransitGroupPriority32n::dominate;
       }
 
       @Override
       public String toString() {
-        return "TransitPriorityGroup32nCalculator{}";
+        return "TransitGroupPriority32nCalculator{}";
       }
     };
   }
@@ -42,7 +42,7 @@ public class TransitPriorityGroup32n {
 
   @Override
   public String toString() {
-    return "TransitPriorityGroup32n{}";
+    return "TransitGroupPriority32n{}";
   }
 
   /**
@@ -64,12 +64,12 @@ public class TransitPriorityGroup32n {
   private static void assertValidGroupSeqNo(int priorityGroupIndex) {
     if (priorityGroupIndex < MIN_SEQ_NO) {
       throw new IllegalArgumentException(
-        "Transit priority group can not be a negative number: " + priorityGroupIndex
+        "Transit group priority can not be a negative number: " + priorityGroupIndex
       );
     }
     if (priorityGroupIndex > MAX_SEQ_NO) {
       throw new IllegalArgumentException(
-        "Transit priority group exceeds max number of groups: " +
+        "Transit group priority exceeds max number of groups: " +
         priorityGroupIndex +
         " (MAX=" +
         MAX_SEQ_NO +

@@ -2,25 +2,25 @@ package org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2;
 
 import org.opentripplanner.raptor.api.model.RaptorTripPattern;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
+import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.arrivals.McStopArrival;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRide;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFactory;
 
 /**
- * This factory creates new {@link PatternRide}s and merge in transit-priority-group ids
+ * This factory creates new {@link PatternRide}s and merge in transit-group-priority ids
  * into c2.
  */
-public class TransitPriorityGroupRideFactory<T extends RaptorTripSchedule>
+public class TransitGroupPriorityRideFactory<T extends RaptorTripSchedule>
   implements PatternRideFactory<T, PatternRideC2<T>> {
 
   private int currentPatternGroupPriority;
-  private final RaptorTransitPriorityGroupCalculator transitPriorityGroupCalculator;
+  private final RaptorTransitGroupCalculator transitGroupPriorityCalculator;
 
-  public TransitPriorityGroupRideFactory(
-    RaptorTransitPriorityGroupCalculator transitPriorityGroupCalculator
+  public TransitGroupPriorityRideFactory(
+    RaptorTransitGroupCalculator transitGroupPriorityCalculator
   ) {
-    this.transitPriorityGroupCalculator = transitPriorityGroupCalculator;
+    this.transitGroupPriorityCalculator = transitGroupPriorityCalculator;
   }
 
   @Override
@@ -52,12 +52,9 @@ public class TransitPriorityGroupRideFactory<T extends RaptorTripSchedule>
   }
 
   /**
-   * Currently transit-priority-group is the only usage of c2
+   * Currently transit-group-priority is the only usage of c2
    */
   private int calculateC2(int c2) {
-    return transitPriorityGroupCalculator.mergeTransitPriorityGroupIds(
-      c2,
-      currentPatternGroupPriority
-    );
+    return transitGroupPriorityCalculator.mergeGroupIds(c2, currentPatternGroupPriority);
   }
 }
