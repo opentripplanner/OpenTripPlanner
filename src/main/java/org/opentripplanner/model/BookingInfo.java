@@ -2,7 +2,9 @@ package org.opentripplanner.model;
 
 import java.io.Serializable;
 import java.time.Duration;
+import java.time.LocalTime;
 import java.util.EnumSet;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 
 /**
@@ -12,6 +14,8 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
  * // TODO Make the routing take into account booking time and booking notice.
  */
 public class BookingInfo implements Serializable {
+
+  private static final int DAY_IN_SECONDS = 3600 * 24;
 
   private final ContactInfo contactInfo;
 
@@ -78,6 +82,33 @@ public class BookingInfo implements Serializable {
       this.minimumBookingNotice = null;
       this.maximumBookingNotice = null;
     }
+  }
+
+  public int earliestDepartureTime(int requestedDepartureTime, int earliestBookingTime) {
+    if (latestBookingTime != null) {
+      int otpLatestBookingTime = calculateOtpTime(
+        latestBookingTime.getTime(),
+        -latestBookingTime.getDaysPrior()
+      );
+      if (earliestBookingTime <= otpLatestBookingTime) {
+        return requestedDepartureTime;
+      } else {
+        return RaptorConstants.TIME_NOT_SET;
+      }
+    }
+    if (minimumBookingNotice != null) {
+      if (requestedDepartureTime >= earliestBookingTime + minimumBookingNotice.toSeconds()) {
+        return requestedDepartureTime;
+      } else {
+        return earliestBookingTime + (int) minimumBookingNotice.toSeconds();
+      }
+    }
+    // missing booking info
+    return requestedDepartureTime;
+  }
+
+  static int calculateOtpTime(LocalTime time, int dayOffset) {
+    return time.toSecondOfDay() + DAY_IN_SECONDS * dayOffset;
   }
 
   public ContactInfo getContactInfo() {

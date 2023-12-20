@@ -23,6 +23,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.BookingTimeAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -207,21 +208,21 @@ public class TransitRouter {
     return new AccessEgresses(accessList, egressList);
   }
 
-  private Collection<RoutingAccessEgress> fetchAccess() {
+  private Collection<? extends RoutingAccessEgress> fetchAccess() {
     debugTimingAggregator.startedAccessCalculating();
     var list = fetchAccessEgresses(ACCESS);
     debugTimingAggregator.finishedAccessCalculating();
     return list;
   }
 
-  private Collection<RoutingAccessEgress> fetchEgress() {
+  private Collection<? extends RoutingAccessEgress> fetchEgress() {
     debugTimingAggregator.startedEgressCalculating();
     var list = fetchAccessEgresses(EGRESS);
     debugTimingAggregator.finishedEgressCalculating();
     return list;
   }
 
-  private Collection<RoutingAccessEgress> fetchAccessEgresses(AccessEgressType type) {
+  private Collection<? extends RoutingAccessEgress> fetchAccessEgresses(AccessEgressType type) {
     var streetRequest = type.isAccess() ? request.journey().access() : request.journey().egress();
 
     // Prepare access/egress lists
@@ -273,6 +274,16 @@ public class TransitRouter {
       );
 
       results.addAll(AccessEgressMapper.mapFlexAccessEgresses(flexAccessList, type.isEgress()));
+    }
+
+    if (request.earliestBookingTime() != null) {
+
+      return results
+        .stream()
+        .map(routingAccessEgress ->
+          new BookingTimeAccessEgress(routingAccessEgress, request.dateTime(), request.earliestBookingTime(), serverContext.transitService().getTimeZone())
+        )
+        .toList();
     }
 
     return results;
