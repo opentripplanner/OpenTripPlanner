@@ -65,7 +65,7 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
     Itinerary walk = newItinerary(A, 6).walk(1, E).build();
     walk.setGeneralizedCost(300);
 
-    // transit slightly lower cost, however it also has a high penalty which is
+    // transit has slightly lower cost, however it also has a high penalty which is
     // not taken into account when comparing the itineraries
     Itinerary busWithPenalty = newItinerary(A).bus(21, 6, 8, E).build();
     busWithPenalty.setGeneralizedCost(299);
@@ -73,10 +73,11 @@ public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants 
 
     // When:
     var itineraries = List.of(walk, busWithPenalty);
-    List<Itinerary> result = DeletionFlaggerTestHelper.process(
-      itineraries,
-      new RemoveTransitIfStreetOnlyIsBetterFilter(CostLinearFunction.of(Duration.ZERO, 1.0))
+    var flagger = new RemoveTransitIfStreetOnlyIsBetterFilter(
+      CostLinearFunction.of(Duration.ZERO, 1.0)
     );
+
+    List<Itinerary> result = flagger.removeMatchesForTest(itineraries);
 
     // Then:
     assertEquals(toStr(itineraries), toStr(result));
