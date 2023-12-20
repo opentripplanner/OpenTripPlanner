@@ -1,9 +1,8 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.framework.i18n;
 
 import java.util.Locale;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.i18n.I18NString;
 
 public class I18NStringMapper {
 
@@ -24,7 +23,7 @@ public class I18NStringMapper {
   }
 
   @Nullable
-  static String mapToApi(I18NString string, Locale locale) {
+  public static String mapToApi(I18NString string, Locale locale) {
     return string == null ? null : string.toString(locale);
   }
 }

@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.restapi.model.ApiPlace;
 import org.opentripplanner.ext.restapi.model.ApiVehicleParkingSpaces;
 import org.opentripplanner.ext.restapi.model.ApiVehicleParkingWithEntrance;
+import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VehicleParkingWithEntrance;

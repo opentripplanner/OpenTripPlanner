@@ -64,7 +64,6 @@ public enum OTPFeature {
     "Enforce transfers to happen according to the _transfers.txt_ (GTFS) and Interchanges (NeTEx). Turning this _off_ will increase the routing performance a little."
   ),
   TransmodelGraphQlApi(true, true, "Enable Transmodel (NeTEx) GraphQL API."),
-  LegacyRestApi(true, true, "Enable legacy REST API. This API will be removed in the future."),
 
   /* Sandbox extension features - Must be turned OFF by default */
 
@@ -83,6 +82,7 @@ public enum OTPFeature {
   FaresV2(false, true, "Enable import of GTFS-Fares v2 data."),
   FlexRouting(false, true, "Enable FLEX routing."),
   GoogleCloudStorage(false, true, "Enable Google Cloud Storage integration."),
+  LegacyRestApi(true, true, "Enable legacy REST API. This API will be removed in the future."),
   RealtimeResolver(
     false,
     true,

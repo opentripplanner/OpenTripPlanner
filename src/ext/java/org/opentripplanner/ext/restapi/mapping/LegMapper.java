@@ -10,6 +10,7 @@ import java.util.Locale;
 import org.opentripplanner.ext.restapi.model.ApiAlert;
 import org.opentripplanner.ext.restapi.model.ApiLeg;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
+import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;

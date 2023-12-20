@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ext.restapi.model.ApiTrip;
 import org.opentripplanner.ext.restapi.model.ApiTripShort;
+import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Trip;
 

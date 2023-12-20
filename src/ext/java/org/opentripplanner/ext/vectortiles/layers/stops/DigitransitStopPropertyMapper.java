@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.opentripplanner.apis.common.mapping.PropertyMapper;
-import org.opentripplanner.ext.restapi.mapping.I18NStringMapper;
+import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;

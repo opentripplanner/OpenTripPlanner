@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.restapi.model.ApiRoute;
 import org.opentripplanner.ext.restapi.model.ApiRouteShort;
+import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.transit.model.network.Route;
 import org.opentripplanner.transit.model.organization.Branding;
 

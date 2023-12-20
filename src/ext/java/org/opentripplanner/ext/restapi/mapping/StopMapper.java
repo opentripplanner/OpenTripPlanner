@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.restapi.model.ApiStop;
 import org.opentripplanner.ext.restapi.model.ApiStopShort;
+import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 public class StopMapper {

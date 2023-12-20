@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.ext.restapi.model.ApiRealTimeState;
 import org.opentripplanner.ext.restapi.model.ApiTripTimeShort;
+import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.model.TripTimeOnDate;
 
 public class TripTimeMapper {
