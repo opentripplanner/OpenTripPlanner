@@ -25,7 +25,8 @@
         "com.microsoft.azure:azure-servicebus",
         "com.azure.resourcemanager:azure-resourcemanager-servicebus",
         "com.azure:azure-core",
-        "com.azure:azure-messaging-servicebus"
+        "com.azure:azure-messaging-servicebus",
+        "io.netty:netty-bom"
       ],
       "enabled": false
     },
@@ -72,7 +73,6 @@
       "description": "in order to keep review burden low, don't update these quite so frequently",
       "matchPackagePrefixes": [
         "org.apache.lucene:",
-        "io.netty:"
       ],
       "extends": [
         "schedule:quarterly"
