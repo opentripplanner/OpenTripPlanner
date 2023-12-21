@@ -20,7 +20,10 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.model.TileJson;
-import org.opentripplanner.apis.vectortiles.model.MapboxStyleJson;
+import org.opentripplanner.apis.vectortiles.model.LayerParams;
+import org.opentripplanner.apis.vectortiles.model.LayerType;
+import org.opentripplanner.apis.vectortiles.model.StyleSpec;
+import org.opentripplanner.apis.vectortiles.model.TileSource.VectorSource;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
@@ -38,10 +41,19 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 @Path("/routers/{ignoreRouterId}/inspector/vectortile")
 public class GraphInspectorVectorTileResource {
 
+  private static final LayerParams REGULAR_STOPS = new LayerParams(
+    "regularStops",
+    LayerType.RegularStop
+  );
+  private static final LayerParams AREA_STOPS = new LayerParams("areaStops", LayerType.AreaStop);
+  private static final LayerParams GEOFENCING_ZONES = new LayerParams(
+    "geofencingZones",
+    LayerType.GeofencingZones
+  );
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
-    new LayerParams("regularStops", LayerType.RegularStop),
-    new LayerParams("areaStops", LayerType.AreaStop),
-    new LayerParams("geofencingZones", LayerType.GeofencingZones)
+    REGULAR_STOPS,
+    AREA_STOPS,
+    GEOFENCING_ZONES
   );
 
   private final OtpServerRequestContext serverContext;
@@ -106,20 +118,21 @@ public class GraphInspectorVectorTileResource {
   @GET
   @Path("/style.json")
   @Produces(MediaType.APPLICATION_JSON)
-  public MapboxStyleJson getTileJson(@Context UriInfo uri, @Context HttpHeaders headers) {
+  public StyleSpec getTileJson(@Context UriInfo uri, @Context HttpHeaders headers) {
     var base = HttpUtils.getBaseAddress(uri, headers);
     final String allLayers = DEBUG_LAYERS
       .stream()
       .map(LayerParameters::name)
       .collect(Collectors.joining(","));
     var url =
-      base +
-      "/otp/routers/" +
-      ignoreRouterId +
-      "/inspector/vectortile/" +
-      allLayers +
-      "/tilejson.json";
-    return DebugStyleJson.build(url);
+      "%s/otp/routers/%s/inspector/vectortile/%s/tilejson.json".formatted(
+          base,
+          ignoreRouterId,
+          allLayers
+        );
+
+    var vectorSource = new VectorSource("debug", url);
+    return DebugStyleSpec.build(vectorSource, REGULAR_STOPS.toVectorSourceLayer(vectorSource));
   }
 
   @Nonnull
@@ -147,18 +160,5 @@ public class GraphInspectorVectorTileResource {
       case AreaStop -> new AreaStopsLayerBuilder(context.transitService(), layerParameters, locale);
       case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
     };
-  }
-
-  private enum LayerType {
-    RegularStop,
-    AreaStop,
-    GeofencingZones,
-  }
-
-  private record LayerParams(String name, LayerType type) implements LayerParameters<LayerType> {
-    @Override
-    public String mapper() {
-      return "DebugClient";
-    }
   }
 }

@@ -9,6 +9,9 @@ public sealed interface TileSource {
 
   String id();
 
+  /**
+   * Represents a vector tile source.
+   */
   record VectorSource(String id, String url) implements TileSource {
     @Override
     public String type() {
@@ -16,6 +19,9 @@ public sealed interface TileSource {
     }
   }
 
+  /**
+   * Represents a raster-based source for map tiles.
+   */
   record RasterSource(String id, List<String> tiles, int tileSize) implements TileSource {
     @Override
     public String type() {

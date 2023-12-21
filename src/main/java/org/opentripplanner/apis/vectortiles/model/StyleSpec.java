@@ -6,13 +6,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class MapboxStyleJson {
+/**
+ * Represents a style specification for Maplibre/Mapbox vector tile layers.
+ * https://maplibre.org/maplibre-style-spec/root/
+ */
+public final class StyleSpec {
 
   private final String name;
   private final List<TileSource> sources;
   private final List<JsonNode> layers;
 
-  public MapboxStyleJson(String name, List<TileSource> sources, List<LayerStyleBuilder> layers) {
+  public StyleSpec(String name, List<TileSource> sources, List<LayerStyleBuilder> layers) {
     this.name = name;
     this.sources = sources;
     this.layers = layers.stream().map(LayerStyleBuilder::toJson).toList();

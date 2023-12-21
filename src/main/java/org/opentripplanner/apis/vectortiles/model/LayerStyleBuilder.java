@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
+import org.opentripplanner.apis.vectortiles.DebugStyleSpec.VectorSourceLayer;
 import org.opentripplanner.framework.json.ObjectMappers;
 
 /**
@@ -22,6 +23,12 @@ public class LayerStyleBuilder {
 
   public static LayerStyleBuilder ofId(String id) {
     return new LayerStyleBuilder(id);
+  }
+
+  public LayerStyleBuilder vectorSourceLayer(VectorSourceLayer source) {
+    source(source.vectorSource());
+    sourceLayer(source.vectorLayer());
+    return this;
   }
 
   public enum LayerType {
