@@ -92,6 +92,11 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
   private void parseStopPlaces(List<JAXBElement<? extends Site_VersionStructure>> stopPlaceList) {
     for (JAXBElement<? extends Site_VersionStructure> jaxBStopPlace : stopPlaceList) {
       StopPlace stopPlace = (StopPlace) jaxBStopPlace.getValue();
+
+      // null case
+      if (stopPlace.getCentroid() == null) {
+        continue;
+      }
       if (isMultiModalStopPlace(stopPlace)) {
         multiModalStopPlaces.add(stopPlace);
       } else {

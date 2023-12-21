@@ -7,7 +7,7 @@
     <url>https://opentripplanner.org</url>
     <groupId>org.opentripplanner</groupId>
     <artifactId>otp</artifactId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>2.4.0</version>
     <packaging>jar</packaging>
 
     <licenses>
@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>134</otp.serialization.version.id>
+        <otp.serialization.version.id>119</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>30.1</geotools.version>
         <google.dagger.version>2.49</google.dagger.version>
@@ -69,7 +69,7 @@
         <lucene.version>9.8.0</lucene.version>
         <slf4j.version>2.0.9</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
-        <siri-java-model.version>1.26</siri-java-model.version>
+        <siri-java-model.version>1.25</siri-java-model.version>
         <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -512,7 +512,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:3.22.0:exe:${os.detected.classifier}</protocArtifact>
+                    <protocArtifact>com.google.protobuf:protoc:3.25.1:exe:${os.detected.classifier}</protocArtifact>
                 </configuration>
             </plugin>
         </plugins>
@@ -524,9 +524,9 @@
           Maven tries to download from every other repository and fails before checking central.
           Do not change the id from central2 to central, otherwise the entry will be ignored. -->
         <repository>
-          <id>central2</id>
-          <name>Check central first to avoid a lot of not found warnings</name>
-          <url>https://repo.maven.apache.org/maven2</url>
+            <id>central2</id>
+            <name>Check central first to avoid a lot of not found warnings</name>
+            <url>https://repo.maven.apache.org/maven2</url>
         </repository>
         <repository>
             <id>osgeo</id>
@@ -646,14 +646,14 @@
             <version>${lucene.version}</version>
         </dependency>
         <dependency>
-             <groupId>org.apache.lucene</groupId>
-             <artifactId>lucene-queryparser</artifactId>
-             <version>${lucene.version}</version>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
         </dependency>
         <dependency>
-             <groupId>org.apache.lucene</groupId>
-             <artifactId>lucene-suggest</artifactId>
-             <version>${lucene.version}</version>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-suggest</artifactId>
+            <version>${lucene.version}</version>
         </dependency>
 
         <dependency>
@@ -954,6 +954,13 @@
             <version>1.25.0</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- gtfs transit-->
+        <dependency>
+            <groupId>org.mobilitydata</groupId>
+            <artifactId>gtfs-realtime-bindings</artifactId>
+            <version>0.0.8</version>
+        </dependency>
     </dependencies>
 
     <profiles>
@@ -966,17 +973,6 @@
         </profile>
         <profile>
             <id>prettierSkip</id>
-            <activation>
-                <property>
-                    <!--
-                      This works as a short alias to enable this from the command line. To skip
-                      prettier, set the 'ps' system property with the '-D ps' parameter:
-                      # mvn test -D ps
-                    -->
-                    <name>ps</name>
-                    <value/>
-                </property>
-            </activation>
             <build>
                 <plugins>
                     <plugin>

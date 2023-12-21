@@ -2,6 +2,7 @@ package org.opentripplanner.netex.mapping;
 
 import java.time.DateTimeException;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -123,7 +124,8 @@ class StationMapper {
    * returned. If the station do not have any quays an exception is thrown.
    */
   private WgsCoordinate mapCoordinate(StopPlace stopPlace) {
-    if (stopPlace.getCentroid() != null) {
+    //if (stopPlace.getCentroid() != null) {
+    if (stopPlace != null && stopPlace.getCentroid() != null) {
       return WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
     } else {
       issueStore.add(
@@ -131,12 +133,18 @@ class StationMapper {
         "Station %s does not contain any coordinates.",
         stopPlace.getId() + " " + stopPlace.getName()
       );
-      List<WgsCoordinate> coordinates = JAXBUtils
-        .streamJAXBElementValue(Quay.class, stopPlace.getQuays().getQuayRefOrQuay())
-        .map(Zone_VersionStructure::getCentroid)
-        .filter(Objects::nonNull)
-        .map(WgsCoordinateMapper::mapToDomain)
-        .toList();
+
+      List<WgsCoordinate> coordinates = new ArrayList<>();
+      if (stopPlace.getQuays() != null && stopPlace.getQuays().getQuayRefOrQuay() != null) {
+        coordinates =
+          JAXBUtils
+            .streamJAXBElementValue(Quay.class, stopPlace.getQuays().getQuayRefOrQuay())
+            .map(Zone_VersionStructure::getCentroid)
+            .filter(Objects::nonNull)
+            .map(WgsCoordinateMapper::mapToDomain)
+            .toList();
+      }
+
       if (coordinates.isEmpty()) {
         throw new IllegalArgumentException(
           "Station w/quays without coordinates. Station id: " + stopPlace.getId()
