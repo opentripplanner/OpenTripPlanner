@@ -12,6 +12,9 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_A;
+import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_B;
+import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_C;
 
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +27,7 @@ import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
@@ -33,26 +37,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  */
 public class K01_TransitPriorityTest {
 
-  private static final RaptorTransitGroupCalculator PRIORITY_GROUP_CALCULATOR = new RaptorTransitGroupCalculator() {
-    @Override
-    public int mergeGroupIds(int currentGroupIds, int boardingGroupId) {
-      return currentGroupIds | boardingGroupId;
-    }
-
-    /**
-     * Left dominate right, if right has at least one priority group not in left.
-     */
-    @Override
-    public DominanceFunction dominanceFunction() {
-      return (l, r) -> ((l ^ r) & r) != 0;
-    }
-  };
-
-  private static final int GROUP_A = 0x01;
-  private static final int GROUP_B = 0x02;
-  private static final int GROUP_C = 0x04;
-  private static final int GROUP_AB = PRIORITY_GROUP_CALCULATOR.mergeGroupIds(GROUP_A, GROUP_B);
-  private static final int GROUP_AC = PRIORITY_GROUP_CALCULATOR.mergeGroupIds(GROUP_A, GROUP_C);
+  private static final RaptorTransitGroupCalculator PRIORITY_GROUP_CALCULATOR =
+    TestGroupPriorityCalculator.PRIORITY_CALCULATOR;
   private static final int C1_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
 
   private final TestTransitData data = new TestTransitData();
@@ -102,7 +88,6 @@ public class K01_TransitPriorityTest {
     );
     // Add 1 second access/egress paths
     requestBuilder.searchParams().addAccessPaths(walk(STOP_B, 1)).addEgressPaths(walk(STOP_C, 1));
-    assetGroupCalculatorIsSetupCorrect();
   }
 
   @Test
@@ -115,22 +100,5 @@ public class K01_TransitPriorityTest {
       """.trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
-  }
-
-  /**
-   * Make sure the calculator and group setup is done correct.
-   */
-  void assetGroupCalculatorIsSetupCorrect() {
-    var d = PRIORITY_GROUP_CALCULATOR.dominanceFunction();
-
-    assertTrue(d.leftDominateRight(GROUP_A, GROUP_B));
-    assertTrue(d.leftDominateRight(GROUP_B, GROUP_A));
-    assertFalse(d.leftDominateRight(GROUP_A, GROUP_A));
-    // 3 = 1&2, 5 = 1&4
-    assertTrue(d.leftDominateRight(GROUP_A, GROUP_AB));
-    assertFalse(d.leftDominateRight(GROUP_AB, GROUP_A));
-    assertFalse(d.leftDominateRight(GROUP_AB, GROUP_AB));
-    assertTrue(d.leftDominateRight(GROUP_AB, GROUP_AC));
-    assertTrue(d.leftDominateRight(GROUP_AC, GROUP_AB));
   }
 }
