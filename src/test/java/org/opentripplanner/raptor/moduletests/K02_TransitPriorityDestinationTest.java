@@ -5,6 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_B;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_C;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_D;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_E;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_F;
+import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_G;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T00_00;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
@@ -31,7 +35,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  *
  * Raptor should be able to handle route request with transit-priority.
  */
-public class K01_TransitPriorityTest {
+public class K02_TransitPriorityDestinationTest {
 
   private static final RaptorTransitPriorityGroupCalculator PRIORITY_GROUP_CALCULATOR = new RaptorTransitPriorityGroupCalculator() {
     @Override
@@ -67,23 +71,22 @@ public class K01_TransitPriorityTest {
     RaptorConfig.defaultConfigForTest()
   );
 
-  /**
-   * Each pattern departs at the same time, but arrives at different times. They may belong to
-   * different groups. Line U1 is not optimal, because it slower than L1 and is in the same
-   * group as L1. Given a slack on the cost equals to ~90s makes both L1 and L2 optimal (since
-   * they are in different groups), but not L3 (which is in its own group, but its cost is
-   * outside the range allowed by the slack).
-   */
   @BeforeEach
   private void prepareRequest() {
+    // Each pattern depart at the same time, but arrive at different times and they may
+    // belong to different groups.
+    // Line U1 is not optimal, because it slower than L1 and is in the same group.
+    // Given a slack on the cost equals to ~90s this makes both L1 and L2 optimal (since
+    // they are in different groups), but not L3 (which certainly is in its own group but
+    // its cost is outside the range allowed by the slack).
     data.withRoutes(
       route(pattern("L1", STOP_B, STOP_C).withPriorityGroup(GROUP_A))
         .withTimetable(schedule("00:02 00:12")),
-      route(pattern("U1", STOP_B, STOP_C).withPriorityGroup(GROUP_A))
+      route(pattern("U1", STOP_B, STOP_D).withPriorityGroup(GROUP_A))
         .withTimetable(schedule("00:02 00:12:01")),
-      route(pattern("L2", STOP_B, STOP_C).withPriorityGroup(GROUP_B))
+      route(pattern("L2", STOP_B, STOP_E).withPriorityGroup(GROUP_B))
         .withTimetable(schedule("00:02 00:13")),
-      route(pattern("L3", STOP_B, STOP_C).withPriorityGroup(GROUP_C))
+      route(pattern("L3", STOP_B, STOP_F).withPriorityGroup(GROUP_C))
         .withTimetable(schedule("00:02 00:14"))
     );
 
@@ -107,7 +110,13 @@ public class K01_TransitPriorityTest {
         .withTransitPriorityCalculator(PRIORITY_GROUP_CALCULATOR)
     );
     // Add 1 second access/egress paths
-    requestBuilder.searchParams().addAccessPaths(walk(STOP_B, 1)).addEgressPaths(walk(STOP_C, 1));
+    requestBuilder
+      .searchParams()
+      .addAccessPaths(walk(STOP_B, 1))
+      .addEgressPaths(walk(STOP_C, 1))
+      .addEgressPaths(walk(STOP_D, 1))
+      .addEgressPaths(walk(STOP_E, 1))
+      .addEgressPaths(walk(STOP_F, 1));
     assetGroupCalculatorIsSetupCorrect();
   }
 
@@ -117,7 +126,7 @@ public class K01_TransitPriorityTest {
     assertEquals(
       """
       Walk 1s ~ B ~ BUS L1 0:02 0:12 ~ C ~ Walk 1s [0:01:59 0:12:01 10m2s Tₓ0 C₁1_204 C₂1]
-      Walk 1s ~ B ~ BUS L2 0:02 0:13 ~ C ~ Walk 1s [0:01:59 0:13:01 11m2s Tₓ0 C₁1_264 C₂2]
+      Walk 1s ~ B ~ BUS L2 0:02 0:13 ~ E ~ Walk 1s [0:01:59 0:13:01 11m2s Tₓ0 C₁1_264 C₂2]
       """.trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );

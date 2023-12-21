@@ -1,5 +1,9 @@
 package org.opentripplanner.raptor.rangeraptor.context;
 
+import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_ARRIVAL_TIME;
+import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_DEPARTURE_TIME;
+import static org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime.USE_TIMETABLE;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +24,7 @@ import org.opentripplanner.raptor.api.request.RaptorRequest;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.raptor.rangeraptor.debug.DebugHandlerFactory;
+import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetTime;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RoundProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.SlackProvider;
 import org.opentripplanner.raptor.rangeraptor.internalapi.WorkerLifeCycle;
@@ -219,6 +224,13 @@ public class SearchContext<T extends RaptorTripSchedule> {
   }
 
   /**
+   * Resolve which pareto-set time config to use.
+   */
+  public ParetoSetTime paretoSetTimeConfig() {
+    return paretoSetTimeConfig(searchParams(), searchDirection());
+  }
+
+  /**
    * The multi-criteria state can handle multiple access/egress paths to a single stop, but the
    * Standard and BestTime states do not. To get a deterministic behaviour we filter the paths and
    * return the paths with the shortest duration for none multi-criteria search. If two paths have
@@ -306,5 +318,18 @@ public class SearchContext<T extends RaptorTripSchedule> {
     var params = request.searchParams();
     var paths = forward ? params.egressPaths() : params.accessPaths();
     return EgressPaths.create(paths, request.profile());
+  }
+
+  static ParetoSetTime paretoSetTimeConfig(
+    SearchParams searchParams,
+    SearchDirection searchDirection
+  ) {
+    if (searchParams.timetable()) {
+      return USE_TIMETABLE;
+    }
+    boolean preferLatestDeparture =
+      searchParams.preferLateArrival() != searchDirection.isInReverse();
+
+    return preferLatestDeparture ? USE_DEPARTURE_TIME : USE_ARRIVAL_TIME;
   }
 }

@@ -74,6 +74,7 @@ public class OptimizePathDomainServiceTest implements RaptorTestConstants {
     var original = pathBuilder()
       .access(ITERATION_START_TIME, STOP_B, D1m)
       .bus(trip1, STOP_C)
+      .c2(345)
       .egress(D1m);
 
     var subject = subject(transfers, null);
