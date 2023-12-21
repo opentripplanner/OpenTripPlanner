@@ -199,7 +199,7 @@ public class TripPatternType {
           .name("generalizedCost2")
           .description(
             "A second cost or weight of the itinerary. Some use-cases like pass-through " +
-            "and transit-priority-groups uses a second cost during routing. This is used for debugging."
+            "and transit-priority-groups use a second cost during routing. This is used for debugging."
           )
           .type(Scalars.GraphQLInt)
           .dataFetcher(env -> itinerary(env).getGeneralizedCost2().orElse(null))

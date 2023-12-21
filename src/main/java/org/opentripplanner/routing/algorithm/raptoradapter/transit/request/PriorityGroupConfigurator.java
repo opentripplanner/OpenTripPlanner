@@ -26,17 +26,17 @@ public class PriorityGroupConfigurator {
   /**
    * There are two ways we can treat the base (local-traffic) transit priority group:
    * <ol>
-   *   <li> We can assign group id 1(one) to the base group and it will be treated as any other group.
-   *   <li> We can assign group id 0(zero) to the base and it will not be added to the set of groups
+   *   <li> We can assign group id 1 (one) to the base group and it will be treated as any other group.
+   *   <li> We can assign group id 0 (zero) to the base and it will not be added to the set of groups
    *   a given path has.
    * </ol>
-   * When we compare paths we compare set of group ids. A set is dominating another set if it is
+   * When we compare paths we compare sets of group ids. A set is dominating another set if it is
    * a smaller subset or different from the other set.
    * <p>
    * <b>Example - base-group-id = 0 (zero)</b>
    * <p>
    * Let B be the base and G be concrete group. Then: (B) dominates (G), (G) dominates (B), (B)
-   * dominates (BG), but (G) does not dominate (BG). With other words, paths with only agency
+   * dominates (BG), but (G) does not dominate (BG). In other words, paths with only agency
    * X (group G) is not given an advantage in the routing over paths with a combination of agency
    * X (group G) and local traffic (group B).
    * <p>

@@ -68,7 +68,7 @@ public class K01_TransitPriorityTest {
   );
 
   /**
-   * Each pattern depart at the same time, but arrive at different times. They may belong to
+   * Each pattern departs at the same time, but arrives at different times. They may belong to
    * different groups. Line U1 is not optimal, because it slower than L1 and is in the same
    * group as L1. Given a slack on the cost equals to ~90s makes both L1 and L2 optimal (since
    * they are in different groups), but not L3 (which is in its own group, but its cost is
