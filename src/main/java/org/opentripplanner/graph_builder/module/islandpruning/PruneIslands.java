@@ -26,6 +26,7 @@ import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorEdge;
+import org.opentripplanner.street.model.edge.EscalatorEdge;
 import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
@@ -343,7 +344,8 @@ public class PruneIslands implements GraphBuilderModule {
             e instanceof StreetEdge ||
             e instanceof ElevatorEdge ||
             e instanceof FreeEdge ||
-            e instanceof StreetTransitEntityLink
+            e instanceof StreetTransitEntityLink ||
+            e instanceof EscalatorEdge
           )
         ) {
           continue;
