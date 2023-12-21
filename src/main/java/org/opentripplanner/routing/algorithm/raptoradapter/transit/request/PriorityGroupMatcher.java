@@ -180,7 +180,7 @@ public abstract class PriorityGroupMatcher {
   }
 
   /**
-   * Take a list of matchers and provide a single interface. All matchers in the list must match
+   * Takes a list of matchers and provide a single interface. All matchers in the list must match
    * for the composite matcher to return a match.
    */
   private static final class AndMatcher extends PriorityGroupMatcher {

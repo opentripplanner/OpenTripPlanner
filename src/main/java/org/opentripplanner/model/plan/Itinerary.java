@@ -309,7 +309,7 @@ public class Itinerary implements ItinerarySortKey {
       buf.stop(leg.getTo().name.toString());
     }
 
-    // The generalizedCost2 is printed as is, it is a special cost and the scale depend on the
+    // The generalizedCost2 is printed as is, it is a special cost and the scale depends on the
     // use-case.
     buf.summary(
       RaptorCostConverter.toRaptorCost(generalizedCost),
@@ -504,12 +504,12 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   /**
-   * The transit router allow the usage of a second generalized-cost parameter to be used in
+   * The transit router allows the usage of a second generalized-cost parameter to be used in
    * routing. In Raptor this is called c2, but in OTP it is generalized-cost-2. What this cost
-   * represent depend on the use-case and the unit and scale is also given by the use-case.
+   * represents depends on the use-case and the unit and scale is also given by the use-case.
    * <p>
    * Currently, the pass-through search and the transit-priority uses this. This is relevant for
-   * anyone who want to debug a search and tuning the system.
+   * anyone who wants to debug a search and tune the system.
    * <p>
    * {@link RaptorConstants#NOT_SET} indicate that the cost is not set/computed.
    */
