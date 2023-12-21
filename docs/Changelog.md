@@ -64,6 +64,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add option to include stations in `nearest` search [#5390](https://github.com/opentripplanner/OpenTripPlanner/pull/5390)
 - GTFS Flex spec update: separate columns for `location_id`, `location_group_id` [#5564](https://github.com/opentripplanner/OpenTripPlanner/pull/5564)
 - Report NO_TRANSIT_CONNECTION when search-window is set. [#5570](https://github.com/opentripplanner/OpenTripPlanner/pull/5570)
+- Transit priority  - part 3 [#5583](https://github.com/opentripplanner/OpenTripPlanner/pull/5583)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
