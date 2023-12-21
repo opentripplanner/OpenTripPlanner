@@ -1,4 +1,4 @@
-package org.opentripplanner.framework.application;
+package org.opentripplanner.api.support;
 
 import java.time.ZoneId;
 import javax.annotation.Nullable;

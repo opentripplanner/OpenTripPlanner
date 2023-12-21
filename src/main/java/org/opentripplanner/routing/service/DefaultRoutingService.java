@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.service;
 
 import java.time.ZoneId;
+import org.opentripplanner.api.support.ZoneIdFallback;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
-import org.opentripplanner.framework.application.ZoneIdFallback;
 import org.opentripplanner.framework.tostring.MultiLineToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
