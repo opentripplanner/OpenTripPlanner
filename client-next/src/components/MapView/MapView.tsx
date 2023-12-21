@@ -4,7 +4,6 @@ import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts
 import { NavigationMarkers } from './NavigationMarkers.tsx';
 import { LegLines } from './LegLines.tsx';
 import { useMapDoubleClick } from './useMapDoubleClick.ts';
-import { mapStyle } from './mapStyle.ts';
 import { useState } from 'react';
 import { ContextMenuPopup } from './ContextMenuPopup.tsx';
 
@@ -37,12 +36,21 @@ export function MapView({
         // @ts-ignore
         mapLib={import('maplibre-gl')}
         // @ts-ignore
-        mapStyle={mapStyle}
+        mapStyle="http://localhost:8080/otp/routers/default/inspector/vectortile/style.json"
         initialViewState={initialViewState}
         onDblClick={onMapDoubleClick}
         onContextMenu={(e) => {
           setShowPopup(e.lngLat);
         }}
+        interactiveLayerIds={["regular-stop"]}
+        onClick={e => {
+          console.log(e.features);
+        }}
+        // put lat/long in URL and pan to it on page reload
+        hash={true}
+        // disable pitching and rotating the map
+        touchPitch={false}
+        dragRotate={false}
       >
         <NavigationControl position="top-left" />
         <NavigationMarkers
