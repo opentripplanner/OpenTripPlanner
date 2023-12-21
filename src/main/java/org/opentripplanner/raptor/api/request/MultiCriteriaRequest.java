@@ -93,6 +93,7 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
    * is replaced by {@link #relaxC1()}. This parameter is ignored if {@link #relaxC1()} exist.
    */
   @Deprecated
+  @Nullable
   public Double relaxCostAtDestination() {
     return relaxCostAtDestination;
   }
