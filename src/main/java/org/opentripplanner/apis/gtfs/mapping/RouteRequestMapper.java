@@ -16,6 +16,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.framework.application.ZoneIdFallback;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -54,7 +55,7 @@ public class RouteRequestMapper {
     request.setDateTime(
       environment.getArgument("date"),
       environment.getArgument("time"),
-      context.transitService().getTimeZone()
+      ZoneIdFallback.zoneId(context.transitService().getTimeZone())
     );
 
     callWith.argument("wheelchair", request::setWheelchair);

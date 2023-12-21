@@ -21,6 +21,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.framework.application.OTPFeature;
+import org.opentripplanner.framework.application.ZoneIdFallback;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -711,7 +712,7 @@ public abstract class RoutingResource {
 
     {
       //FIXME: move into setter method on routing request
-      ZoneId tz = serverContext.transitService().getTimeZone();
+      ZoneId tz = ZoneIdFallback.zoneId(serverContext.transitService().getTimeZone());
       if (date == null && time != null) { // Time was provided but not date
         LOG.debug("parsing ISO datetime {}", time);
         try {
