@@ -124,7 +124,6 @@ class StationMapper {
    * returned. If the station do not have any quays an exception is thrown.
    */
   private WgsCoordinate mapCoordinate(StopPlace stopPlace) {
-    //if (stopPlace.getCentroid() != null) {
     if (stopPlace != null && stopPlace.getCentroid() != null) {
       return WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
     } else {
@@ -133,7 +132,6 @@ class StationMapper {
         "Station %s does not contain any coordinates.",
         stopPlace.getId() + " " + stopPlace.getName()
       );
-
       List<WgsCoordinate> coordinates = new ArrayList<>();
       if (stopPlace.getQuays() != null && stopPlace.getQuays().getQuayRefOrQuay() != null) {
         coordinates =
@@ -144,7 +142,6 @@ class StationMapper {
             .map(WgsCoordinateMapper::mapToDomain)
             .toList();
       }
-
       if (coordinates.isEmpty()) {
         throw new IllegalArgumentException(
           "Station w/quays without coordinates. Station id: " + stopPlace.getId()
