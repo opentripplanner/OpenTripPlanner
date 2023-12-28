@@ -73,15 +73,15 @@ public class ApiVehicleParkingWithEntrance {
   public final ApiVehicleParkingSpaces capacity;
 
   /**
-   * The number of available spaces. Only present if there is a realtime updater present. Maybe
+   * The number of available spaces. Only present if there is a real-time updater present. Maybe
    * {@code null} if unknown.
    */
   public final ApiVehicleParkingSpaces availability;
 
   /**
-   * True if realtime information is used for checking availability.
+   * True if real-time information is used for checking availability.
    */
-  public final boolean realtime;
+  public final boolean realTime;
 
   ApiVehicleParkingWithEntrance(
     String id,
@@ -98,7 +98,7 @@ public class ApiVehicleParkingWithEntrance {
     boolean hasWheelchairAccessibleCarPlaces,
     ApiVehicleParkingSpaces capacity,
     ApiVehicleParkingSpaces availability,
-    boolean realtime
+    boolean realTime
   ) {
     this.id = id;
     this.name = name;
@@ -114,7 +114,7 @@ public class ApiVehicleParkingWithEntrance {
     this.hasWheelchairAccessibleCarPlaces = hasWheelchairAccessibleCarPlaces;
     this.capacity = capacity;
     this.availability = availability;
-    this.realtime = realtime;
+    this.realTime = realTime;
   }
 
   public static ApiVehicleParkingWithEntranceBuilder builder() {
@@ -137,7 +137,7 @@ public class ApiVehicleParkingWithEntrance {
     private boolean hasWheelchairAccessibleCarPlaces;
     private ApiVehicleParkingSpaces capacity;
     private ApiVehicleParkingSpaces availability;
-    private boolean realtime;
+    private boolean realTime;
 
     ApiVehicleParkingWithEntranceBuilder() {}
 
@@ -213,8 +213,8 @@ public class ApiVehicleParkingWithEntrance {
       return this;
     }
 
-    public ApiVehicleParkingWithEntranceBuilder realtime(boolean realtime) {
-      this.realtime = realtime;
+    public ApiVehicleParkingWithEntranceBuilder realTime(boolean realTime) {
+      this.realTime = realTime;
       return this;
     }
 
@@ -234,7 +234,7 @@ public class ApiVehicleParkingWithEntrance {
         hasWheelchairAccessibleCarPlaces,
         capacity,
         availability,
-        realtime
+        realTime
       );
     }
   }

@@ -2,8 +2,6 @@ package org.opentripplanner.ext.geocoder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.station;
-import static org.opentripplanner.transit.model._data.TransitModelForTest.stop;
 import static org.opentripplanner.transit.model.basic.TransitMode.BUS;
 import static org.opentripplanner.transit.model.basic.TransitMode.FERRY;
 
@@ -17,62 +15,71 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.DefaultTransitService;
-import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
 class LuceneIndexTest {
 
-  static Graph graph = new Graph();
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   // Berlin
-  static Station BERLIN_HAUPTBAHNHOF_STATION = station("Hauptbahnhof")
+  static Station BERLIN_HAUPTBAHNHOF_STATION = TEST_MODEL
+    .station("Hauptbahnhof")
     .withCoordinate(52.52495, 13.36952)
     .build();
-  static Station ALEXANDERPLATZ_STATION = station("Alexanderplatz")
+  static Station ALEXANDERPLATZ_STATION = TEST_MODEL
+    .station("Alexanderplatz")
     .withCoordinate(52.52277, 13.41046)
     .build();
 
-  static RegularStop ALEXANDERPLATZ_BUS = stop("Alexanderplatz Bus")
+  static RegularStop ALEXANDERPLATZ_BUS = TEST_MODEL
+    .stop("Alexanderplatz Bus")
     .withCoordinate(52.52277, 13.41046)
     .withVehicleType(BUS)
     .withParentStation(ALEXANDERPLATZ_STATION)
     .build();
 
-  static RegularStop ALEXANDERPLATZ_RAIL = stop("Alexanderplatz S-Bahn")
+  static RegularStop ALEXANDERPLATZ_RAIL = TEST_MODEL
+    .stop("Alexanderplatz S-Bahn")
     .withCoordinate(52.52157, 13.41123)
     .withVehicleType(TransitMode.RAIL)
     .withParentStation(ALEXANDERPLATZ_STATION)
     .build();
-  static RegularStop LICHTERFELDE_OST_1 = stop("Lichterfelde Ost")
+  static RegularStop LICHTERFELDE_OST_1 = TEST_MODEL
+    .stop("Lichterfelde Ost")
     .withId(id("lichterfelde-gleis-1"))
     .withCoordinate(52.42986, 13.32808)
     .build();
-  static RegularStop LICHTERFELDE_OST_2 = stop("Lichterfelde Ost")
+  static RegularStop LICHTERFELDE_OST_2 = TEST_MODEL
+    .stop("Lichterfelde Ost")
     .withId(id("lichterfelde-gleis-2"))
     .withCoordinate(52.42985, 13.32807)
     .build();
-  static RegularStop WESTHAFEN = stop("Westhafen")
+  static RegularStop WESTHAFEN = TEST_MODEL
+    .stop("Westhafen")
     .withVehicleType(null)
     .withCoordinate(52.42985, 13.32807)
     .build();
 
   // Atlanta
-  static Station FIVE_POINTS_STATION = station("Five Points")
+  static Station FIVE_POINTS_STATION = TEST_MODEL
+    .station("Five Points")
     .withCoordinate(33.753899, -84.39156)
     .build();
 
-  static RegularStop ARTS_CENTER = stop("Arts Center")
+  static RegularStop ARTS_CENTER = TEST_MODEL
+    .stop("Arts Center")
     .withCode("4456")
     .withCoordinate(52.52277, 13.41046)
     .build();
-  static RegularStop ARTHUR = stop("Arthur Langford Jr Pl SW at 220")
+  static RegularStop ARTHUR = TEST_MODEL
+    .stop("Arthur Langford Jr Pl SW at 220")
     .withCoordinate(52.52277, 13.41046)
     .build();
 
@@ -82,7 +89,7 @@ class LuceneIndexTest {
 
   @BeforeAll
   static void setup() {
-    var stopModel = StopModel.of();
+    var stopModel = TEST_MODEL.stopModelBuilder();
     List
       .of(
         ALEXANDERPLATZ_BUS,
@@ -113,7 +120,7 @@ class LuceneIndexTest {
         }
       }
     };
-    index = new LuceneIndex(graph, transitService);
+    index = new LuceneIndex(transitService);
     mapper = new StopClusterMapper(transitService);
   }
 
@@ -145,9 +152,29 @@ class LuceneIndexTest {
   @Nested
   class StopClusters {
 
-    @Test
-    void stopClusters() {
-      var result1 = index.queryStopClusters("alex").toList();
+    @ParameterizedTest
+    @ValueSource(
+      strings = {
+        "Alexanderplatz",
+        "Alexa",
+        "alex",
+        "aleyanderplazt",
+        "alexnderplazt",
+        "Alexnderplatz",
+        "Alexnaderplatz",
+        "xande",
+        "xanderpla",
+        "alexnaderplaz",
+        "Alexanderplat",
+        "alexanderplat",
+        "alexand",
+        "alexander platz",
+        "alexander-platz",
+        "alexander",
+      }
+    )
+    void stopClustersWithTypos(String searchTerm) {
+      var result1 = index.queryStopClusters(searchTerm).toList();
       assertEquals(List.of(mapper.map(ALEXANDERPLATZ_STATION)), result1);
     }
 
@@ -167,7 +194,29 @@ class LuceneIndexTest {
     @ParameterizedTest
     @ValueSource(
       strings = {
-        "five", "five ", "five p", "five po", "five poi", "five poin", "five point", "five points",
+        "five",
+        "five ",
+        "five p",
+        "five po",
+        "five poi",
+        "five poin",
+        "five point",
+        "five points",
+        "fife point",
+        "five poits",
+        "fife",
+        "points",
+        "ife points",
+        "the five points",
+        "five @ points",
+        "five @ the points",
+        "five@points",
+        "five at points",
+        "five&points",
+        "five & points",
+        "five and the points",
+        "points five",
+        "points fife",
       }
     )
     void stopClustersWithSpace(String query) {
@@ -175,9 +224,10 @@ class LuceneIndexTest {
       assertEquals(List.of(mapper.map(FIVE_POINTS_STATION)), result);
     }
 
-    @Test
-    void stopCode() {
-      var result = index.queryStopClusters(ARTS_CENTER.getCode()).toList();
+    @ParameterizedTest
+    @ValueSource(strings = { "4456", "445" })
+    void fuzzyStopCode(String query) {
+      var result = index.queryStopClusters(query).toList();
       assertEquals(1, result.size());
       assertEquals(ARTS_CENTER.getName().toString(), result.get(0).name());
     }

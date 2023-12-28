@@ -18,25 +18,23 @@ class ScheduledTransitLegTest {
 
   @Test
   void defaultFares() {
+    var testModel = TransitModelForTest.of();
     var route = TransitModelForTest.route(id("2")).build();
     var pattern = TransitModelForTest
       .tripPattern("1", route)
-      .withStopPattern(TransitModelForTest.stopPattern(3))
+      .withStopPattern(testModel.stopPattern(3))
       .build();
-    var leg = new ScheduledTransitLeg(
-      null,
-      pattern,
-      0,
-      2,
-      TIME,
-      TIME.plusMinutes(10),
-      TIME.toLocalDate(),
-      ZoneIds.BERLIN,
-      null,
-      null,
-      100,
-      null
-    );
+    var leg = new ScheduledTransitLegBuilder()
+      .withTripTimes(null)
+      .withTripPattern(pattern)
+      .withBoardStopIndexInPattern(0)
+      .withAlightStopIndexInPattern(2)
+      .withStartTime(TIME)
+      .withEndTime(TIME.plusMinutes(10))
+      .withServiceDate(TIME.toLocalDate())
+      .withZoneId(ZoneIds.BERLIN)
+      .withGeneralizedCost(100)
+      .build();
 
     assertEquals(List.of(), leg.fareProducts());
   }

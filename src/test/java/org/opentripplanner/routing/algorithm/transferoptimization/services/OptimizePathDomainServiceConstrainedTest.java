@@ -7,9 +7,7 @@ import static org.opentripplanner.model.transfer.TransferPriority.ALLOWED;
 import static org.opentripplanner.model.transfer.TransferPriority.NOT_ALLOWED;
 import static org.opentripplanner.model.transfer.TransferPriority.PREFERRED;
 import static org.opentripplanner.model.transfer.TransferPriority.RECOMMENDED;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.txConstrained;
 import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.dummyTransferGenerator;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy.tx;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -65,15 +63,15 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
 
   TransferGenerator<TestTripSchedule> transfers = dummyTransferGenerator(
     List.of(
-      tx(txConstrained(trip1, STOP_B, trip2, STOP_C).priority(ALLOWED), D1m),
-      tx(txConstrained(trip1, STOP_C, trip2, STOP_D).priority(RECOMMENDED), D2m),
-      tx(txConstrained(trip1, STOP_D, trip2, STOP_E).priority(PREFERRED), D3m),
-      tx(txConstrained(trip1, STOP_E, trip2, STOP_F).guaranteed(), D4m),
-      tx(txConstrained(trip1, STOP_F, trip2, STOP_G).staySeated(), D5m),
-      tx(txConstrained(trip1, STOP_C, trip2, STOP_C).priority(NOT_ALLOWED)),
-      tx(txConstrained(trip1, STOP_D, trip2, STOP_D).priority(NOT_ALLOWED)),
-      tx(txConstrained(trip1, STOP_E, trip2, STOP_E).priority(NOT_ALLOWED)),
-      tx(txConstrained(trip1, STOP_F, trip2, STOP_F).priority(NOT_ALLOWED))
+      TestTransferBuilder.tx(trip1, STOP_B, trip2, STOP_C).priority(ALLOWED).walk(D1m).build(),
+      TestTransferBuilder.tx(trip1, STOP_C, trip2, STOP_D).priority(RECOMMENDED).walk(D2m).build(),
+      TestTransferBuilder.tx(trip1, STOP_D, trip2, STOP_E).priority(PREFERRED).walk(D3m).build(),
+      TestTransferBuilder.tx(trip1, STOP_E, trip2, STOP_F).guaranteed().walk(D4m).build(),
+      TestTransferBuilder.tx(trip1, STOP_F, trip2, STOP_G).staySeated().walk(D5m).build(),
+      TestTransferBuilder.tx(trip1, STOP_C, trip2, STOP_C).priority(NOT_ALLOWED).build(),
+      TestTransferBuilder.tx(trip1, STOP_D, trip2, STOP_D).priority(NOT_ALLOWED).build(),
+      TestTransferBuilder.tx(trip1, STOP_E, trip2, STOP_E).priority(NOT_ALLOWED).build(),
+      TestTransferBuilder.tx(trip1, STOP_F, trip2, STOP_F).priority(NOT_ALLOWED).build()
     )
   );
 
@@ -82,7 +80,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     testPriority(
       STOP_D,
       ALLOWED,
-      "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:01:20 10:18:20 17m 1tx $1120 $33pri]"
+      "A ~ BUS T1 10:02 10:10 ~ B ~ Walk 1m ~ C ~ BUS T2 10:13 10:18 ~ D [10:01:20 10:18:20 17m Tₓ1 C₁1_120 Tₚ3_300]"
     );
   }
 
@@ -91,7 +89,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     testPriority(
       STOP_E,
       RECOMMENDED,
-      "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:01:20 10:24:20 23m 1tx $1540 $32pri]"
+      "A ~ BUS T1 10:02 10:15 ~ C ~ Walk 2m ~ D ~ BUS T2 10:18 10:24 ~ E [10:01:20 10:24:20 23m Tₓ1 C₁1_540 Tₚ3_200]"
     );
   }
 
@@ -100,7 +98,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
     testPriority(
       STOP_F,
       PREFERRED,
-      "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:01:20 10:30:20 29m 1tx $1960 $31pri]"
+      "A ~ BUS T1 10:02 10:20 ~ D ~ Walk 3m ~ E ~ BUS T2 10:24 10:30 ~ F [10:01:20 10:30:20 29m Tₓ1 C₁1_960 Tₚ3_100]"
     );
   }
 
@@ -108,7 +106,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
   public void testTransferGuaranteed() {
     testGuaranteed(
       STOP_G,
-      "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:01:20 10:36:20 35m 1tx $2350 $23pri]"
+      "A ~ BUS T1 10:02 10:25 ~ E ~ Walk 4m ~ F ~ BUS T2 10:30 10:36 ~ G [10:01:20 10:36:20 35m Tₓ1 C₁2_350 Tₚ2_300]"
     );
   }
 
@@ -116,7 +114,7 @@ public class OptimizePathDomainServiceConstrainedTest implements RaptorTestConst
   public void testTransferStaySeated() {
     testStaySeated(
       STOP_H,
-      "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:01:20 10:40:20 39m 0tx $2650 $13pri]"
+      "A ~ BUS T1 10:02 10:30 ~ F ~ Walk 5m ~ G ~ BUS T2 10:36 10:40 ~ H [10:01:20 10:40:20 39m Tₓ0 C₁2_650 Tₚ1_300]"
     );
   }
 

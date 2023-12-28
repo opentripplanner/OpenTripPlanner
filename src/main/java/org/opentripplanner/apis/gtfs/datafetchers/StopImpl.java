@@ -538,7 +538,7 @@ public class StopImpl implements GraphQLDataFetchers.GraphQLStop {
   }
 
   /**
-   * Get a stream of {@link TripPattern} that were created realtime based of the provided pattern.
+   * Get a stream of {@link TripPattern} that were created real-time based of the provided pattern.
    * Only patterns that don't have removed (stops can still be skipped) or added stops are included.
    */
   private Stream<TripPattern> getRealtimeAddedPatternsAsStream(

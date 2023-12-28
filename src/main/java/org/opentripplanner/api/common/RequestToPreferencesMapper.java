@@ -6,7 +6,9 @@ import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
+import org.opentripplanner.routing.api.request.preference.Relax;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 class RequestToPreferencesMapper {
@@ -42,8 +44,11 @@ class RequestToPreferencesMapper {
   private void mapCar() {
     preferences.withCar(car -> {
       setIfNotNull(req.carReluctance, car::withReluctance);
-      setIfNotNull(req.carParkCost, car::withParkCost);
-      setIfNotNull(req.carParkTime, car::withParkTime);
+      car.withParking(parking -> {
+        mapParking(parking);
+        setIfNotNull(req.carParkCost, parking::withParkCost);
+        setIfNotNull(req.carParkTime, parking::withParkTime);
+      });
     });
   }
 
@@ -63,8 +68,6 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.bikeBoardCost, bike::withBoardCost);
       setIfNotNull(req.bikeWalkingSpeed, bike::withWalkingSpeed);
       setIfNotNull(req.bikeWalkingReluctance, bike::withWalkingReluctance);
-      setIfNotNull(req.bikeParkCost, bike::withParkCost);
-      setIfNotNull(req.bikeParkTime, bike::withParkTime);
       setIfNotNull(req.bikeSwitchTime, bike::withSwitchTime);
       setIfNotNull(req.bikeSwitchCost, bike::withSwitchCost);
       setIfNotNull(req.bikeOptimizeType, bike::withOptimizeType);
@@ -76,6 +79,12 @@ class RequestToPreferencesMapper {
           setIfNotNull(req.triangleSafetyFactor, triangle::withSafety);
         });
       }
+
+      bike.withParking(parking -> {
+        mapParking(parking);
+        setIfNotNull(req.bikeParkCost, parking::withParkCost);
+        setIfNotNull(req.bikeParkTime, parking::withParkTime);
+      });
     });
   }
 
@@ -85,10 +94,17 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.alightSlack, tr::withDefaultAlightSlackSec);
       setIfNotNull(req.otherThanPreferredRoutesPenalty, tr::setOtherThanPreferredRoutesPenalty);
       setIfNotNull(req.ignoreRealtimeUpdates, tr::setIgnoreRealtimeUpdates);
-      setIfNotNull(
-        req.relaxTransitSearchGeneralizedCostAtDestination,
-        value -> tr.withRaptor(it -> it.withRelaxGeneralizedCostAtDestination(value))
-      );
+
+      if (req.relaxTransitPriorityGroup != null) {
+        tr.withTransitGroupPriorityGeneralizedCostSlack(
+          CostLinearFunction.of(req.relaxTransitPriorityGroup)
+        );
+      } else {
+        setIfNotNull(
+          req.relaxTransitSearchGeneralizedCostAtDestination,
+          v -> tr.withRaptor(r -> r.withRelaxGeneralizedCostAtDestination(v))
+        );
+      }
     });
 
     return new BoardAndAlightSlack(
@@ -159,6 +175,11 @@ class RequestToPreferencesMapper {
     return new TransitGeneralizedCostFilterParams(costLimitFunction, intervalRelaxFactor);
   }
 
+  private void mapParking(VehicleParkingPreferences.Builder builder) {
+    builder.withRequiredVehicleParkingTags(req.requiredVehicleParkingTags);
+    builder.withBannedVehicleParkingTags(req.bannedVehicleParkingTags);
+  }
+
   private void mapSystem() {
     preferences.withSystem(system -> {
       setIfNotNull(req.geoidElevation, system::withGeoidElevation);
@@ -169,6 +190,17 @@ class RequestToPreferencesMapper {
     if (value != null) {
       body.accept(value);
     }
+  }
+
+  static <T> void mapRelaxIfNotNull(String fx, @NotNull Consumer<Relax> body) {
+    if (fx == null) {
+      return;
+    }
+    var a = fx.split("[\\sxXuUvVtT*+]+");
+    if (a.length != 2) {
+      return;
+    }
+    body.accept(new Relax(Double.parseDouble(a[0]), Integer.parseInt(a[1])));
   }
 
   /**

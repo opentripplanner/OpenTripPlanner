@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.transferoptimization.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder.txConstrained;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +9,7 @@ import org.opentripplanner.raptor._data.stoparrival.BasicPathTestCase;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.routing.algorithm.transferoptimization.services.TransferGeneratorDummy;
+import org.opentripplanner.routing.algorithm.transferoptimization.services.TestTransferBuilder;
 
 class OptimizedPathTailTest implements RaptorTestConstants {
 
@@ -27,17 +26,16 @@ class OptimizedPathTailTest implements RaptorTestConstants {
   private final TransitPathLeg<TestTripSchedule> t3 = t2.nextTransitLeg();
 
   @SuppressWarnings("ConstantConditions")
-  private final TripToTripTransfer<TestTripSchedule> tx23 = TransferGeneratorDummy.tx(
-    txConstrained(t2.trip(), STOP_D, t3.trip(), STOP_D).staySeated()
-  );
+  private final TripToTripTransfer<TestTripSchedule> tx23 = TestTransferBuilder
+    .tx(t2.trip(), STOP_D, t3.trip(), STOP_D)
+    .staySeated()
+    .build();
 
-  private final TripToTripTransfer<TestTripSchedule> tx12 = TransferGeneratorDummy.tx(
-    t1.trip(),
-    STOP_B,
-    D2m,
-    STOP_C,
-    t2.trip()
-  );
+  private final TripToTripTransfer<TestTripSchedule> tx12 = TestTransferBuilder
+    .tx(t1.trip(), STOP_B, t2.trip(), STOP_C)
+    .walk(D2m)
+    .build();
+
   private final TransferWaitTimeCostCalculator waitTimeCalc = new TransferWaitTimeCostCalculator(
     1.0,
     5.0
@@ -59,7 +57,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
 
   private final OptimizedPathTail<TestTripSchedule> subject = new OptimizedPathTail<>(
     SLACK_PROVIDER,
-    BasicPathTestCase.COST_CALCULATOR,
+    BasicPathTestCase.C1_CALCULATOR,
     0,
     waitTimeCalc,
     stopBoardAlightCost,
@@ -86,7 +84,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
       "~ BUS L21 11:00 11:23 ~ D " +
       "~ BUS L31 11:40 11:52 ~ E " +
       "~ Walk 7m45s " +
-      "[$7989 $46pri $-93137wtc]";
+      "[C₁7_989 Tₚ4_600 wtC₁-93_137]";
 
     assertEquals(exp, subject.toString());
   }
@@ -101,7 +99,7 @@ class OptimizedPathTailTest implements RaptorTestConstants {
       "~ BUS L11 10:04 10:35 ~ B " +
       "~ Walk 3m45s ~ E " +
       "~ Flex 7m45s 1x " +
-      "[$3906 $0pri $3966wtc]";
+      "[C₁3_906 wtC₁3_966]";
 
     assertEquals(exp, subject.toString());
   }
@@ -142,13 +140,13 @@ class OptimizedPathTailTest implements RaptorTestConstants {
 
     // We have replaced the first transfer with a 2 minute walk
     var expPath =
-      "Walk 3m 10:00:15 10:03:15 $360 ~ A 45s " +
-      "~ BUS L11 10:04 10:35 31m $1998 ~ B 15s " +
-      "~ Walk 2m 10:35:15 10:37:15 $240 ~ C 22m45s " +
-      "~ BUS L21 11:00 11:23 23m $2724 ~ D 17m {staySeated} " +
-      "~ BUS L31 11:40 11:52 12m $1737 ~ E 15s " +
-      "~ Walk 7m45s 11:52:15 12:00 $930 " +
-      "[10:00:15 12:00 1h59m45s 1tx $7989 $46pri $-93137wtc]";
+      "Walk 3m 10:00:15 10:03:15 C₁360 ~ A 45s " +
+      "~ BUS L11 10:04 10:35 31m C₁1_998 ~ B 15s " +
+      "~ Walk 2m 10:35:15 10:37:15 C₁240 ~ C 22m45s " +
+      "~ BUS L21 11:00 11:23 23m C₁2_724 ~ D 17m {staySeated} " +
+      "~ BUS L31 11:40 11:52 12m C₁1_737 ~ E 15s " +
+      "~ Walk 7m45s 11:52:15 12:00 C₁930 " +
+      "[10:00:15 12:00 1h59m45s Tₓ1 C₁7_989 Tₚ4_600 wtC₁-93_137]";
 
     assertEquals(expPath, path.toStringDetailed(this::stopIndexToName));
   }

@@ -82,6 +82,12 @@ class MoneyTest {
   }
 
   @Test
+  void half() {
+    assertEquals(Money.usDollars(0.50f), Money.usDollars(0.99f).half());
+    assertEquals(Money.usDollars(0.38f), Money.usDollars(0.75f).half());
+  }
+
+  @Test
   void greaterThan() {
     assertTrue(twoDollars.greaterThan(oneDollar));
     assertFalse(oneDollar.greaterThan(oneDollar));

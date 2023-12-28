@@ -90,7 +90,11 @@ public class Place {
   }
 
   public static Place forStop(StopLocation stop) {
-    return new Place(stop.getName(), stop.getCoordinate(), VertexType.TRANSIT, stop, null, null);
+    return forStop(stop, stop.getName());
+  }
+
+  public static Place forStop(StopLocation stop, I18NString nameOverride) {
+    return new Place(nameOverride, stop.getCoordinate(), VertexType.TRANSIT, stop, null, null);
   }
 
   public static Place forFlexStop(StopLocation stop, Vertex vertex) {
@@ -135,9 +139,9 @@ public class Place {
       traverseMode = TraverseMode.BICYCLE;
     }
 
-    boolean realTime =
-      request.parking().useAvailabilityInformation() &&
-      vertex.getVehicleParking().hasRealTimeDataForMode(traverseMode, request.wheelchair());
+    boolean realTime = vertex
+      .getVehicleParking()
+      .hasRealTimeDataForMode(traverseMode, request.wheelchair());
     return new Place(
       vertex.getName(),
       WgsCoordinate.creatOptionalCoordinate(vertex.getLat(), vertex.getLon()),

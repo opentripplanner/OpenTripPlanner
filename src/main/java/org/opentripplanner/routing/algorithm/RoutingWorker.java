@@ -11,15 +11,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import org.opentripplanner.ext.ridehailing.RideHailingService;
+import javax.annotation.Nullable;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.PagingSearchWindowAdjuster;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSearchDays;
@@ -27,13 +28,13 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.FilterTransitW
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectFlexRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.DirectStreetRouter;
-import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
+import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,8 +49,7 @@ public class RoutingWorker {
   private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
   /** An object that accumulates profiling and debugging info for inclusion in the response. */
-  public final DebugTimingAggregator debugTimingAggregator;
-  public final PagingSearchWindowAdjuster pagingSearchWindowAdjuster;
+  private final DebugTimingAggregator debugTimingAggregator;
 
   private final RouteRequest request;
   private final OtpServerRequestContext serverContext;
@@ -65,7 +65,7 @@ public class RoutingWorker {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private SearchParams raptorSearchParamsUsed = null;
-  private Itinerary firstRemovedItinerary = null;
+  private NumItinerariesFilterResults numItinerariesFilterResults = null;
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
     request.applyPageCursor();
@@ -77,11 +77,6 @@ public class RoutingWorker {
         request.preferences().system().tags()
       );
     this.transitSearchTimeZero = ServiceDateUtils.asStartOfService(request.dateTime(), zoneId);
-    this.pagingSearchWindowAdjuster =
-      createPagingSearchWindowAdjuster(
-        serverContext.transitTuningParameters(),
-        serverContext.raptorTuningParameters()
-      );
     this.additionalSearchDays =
       createAdditionalSearchDays(serverContext.raptorTuningParameters(), zoneId, request);
   }
@@ -103,7 +98,7 @@ public class RoutingWorker {
     var routingErrors = Collections.synchronizedSet(new HashSet<RoutingError>());
 
     if (OTPFeature.ParallelRouting.isOn()) {
-      // TODO: This is not using {@link OtpRequestThreadFactory} witch mean we do not get
+      // TODO: This is not using {@link OtpRequestThreadFactory} which means we do not get
       //       log-trace-parameters-propagation and graceful timeout handling here.
       try {
         CompletableFuture
@@ -130,20 +125,24 @@ public class RoutingWorker {
     debugTimingAggregator.finishedRouting();
 
     // Filter itineraries
-    boolean removeWalkAllTheWayResultsFromDirectFlex =
-      request.journey().direct().mode() == StreetMode.FLEXIBLE;
+    List<Itinerary> filteredItineraries;
+    {
+      boolean removeWalkAllTheWayResultsFromDirectFlex =
+        request.journey().direct().mode() == StreetMode.FLEXIBLE;
 
-    ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
-      request,
-      serverContext,
-      filterOnLatestDepartureTime(),
-      emptyDirectModeHandler.removeWalkAllTheWayResults() ||
-      removeWalkAllTheWayResultsFromDirectFlex,
-      it -> firstRemovedItinerary = it
-    );
+      ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
+        request,
+        serverContext,
+        earliestDepartureTimeUsed(),
+        searchWindowUsed(),
+        emptyDirectModeHandler.removeWalkAllTheWayResults() ||
+        removeWalkAllTheWayResultsFromDirectFlex,
+        it -> numItinerariesFilterResults = it
+      );
 
-    List<Itinerary> filteredItineraries = filterChain.filter(itineraries);
-    routingErrors.addAll(filterChain.getRoutingErrors());
+      filteredItineraries = filterChain.filter(itineraries);
+      routingErrors.addAll(filterChain.getRoutingErrors());
+    }
 
     if (LOG.isDebugEnabled()) {
       LOG.debug(
@@ -160,18 +159,17 @@ public class RoutingWorker {
 
     // Adjust the search-window for the next search if the current search-window
     // is off (too few or too many results found).
-    var searchWindowNextSearch = calculateSearchWindowNextSearch(filteredItineraries);
+
+    var pagingService = createPagingService(itineraries);
 
     return RoutingResponseMapper.map(
       request,
-      transitSearchTimeZero,
       raptorSearchParamsUsed,
-      searchWindowNextSearch,
-      firstRemovedItinerary,
       filteredItineraries,
       routingErrors,
       debugTimingAggregator,
-      serverContext.transitService()
+      serverContext.transitService(),
+      pagingService
     );
   }
 
@@ -193,24 +191,31 @@ public class RoutingWorker {
   }
 
   /**
-   * Filter itineraries away that depart after the latest-departure-time for depart after search.
-   * These itineraries are a result of time-shifting the access leg and is needed for the raptor to
-   * prune the results. These itineraries are often not ideal, but if they pareto optimal for the
-   * "next" window, they will appear when a "next" search is performed.
+   * Calculate the earliest-departure-time used in the transit search.
+   * This method returns {@code null} if no transit search is performed.
    */
-  private Instant filterOnLatestDepartureTime() {
-    if (
-      !request.arriveBy() &&
-      raptorSearchParamsUsed != null &&
-      raptorSearchParamsUsed.isSearchWindowSet() &&
-      raptorSearchParamsUsed.isEarliestDepartureTimeSet()
-    ) {
-      int ldt =
-        raptorSearchParamsUsed.earliestDepartureTime() +
-        raptorSearchParamsUsed.searchWindowInSeconds();
-      return transitSearchTimeZero.plusSeconds(ldt).toInstant();
+  @Nullable
+  private Instant earliestDepartureTimeUsed() {
+    if (raptorSearchParamsUsed == null) {
+      return null;
     }
-    return null;
+    if (!raptorSearchParamsUsed.isEarliestDepartureTimeSet()) {
+      return null;
+    }
+    return transitSearchTimeZero
+      .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime())
+      .toInstant();
+  }
+
+  /**
+   * Calculate the search-window earliest-departure-time used in the transit search.
+   * This method returns {@code null} if no transit search is performed.
+   */
+  @Nullable
+  private Duration searchWindowUsed() {
+    return raptorSearchParamsUsed == null
+      ? null
+      : Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
   }
 
   private Void routeDirectStreet(
@@ -267,53 +272,19 @@ public class RoutingWorker {
     return null;
   }
 
-  private Duration calculateSearchWindowNextSearch(List<Itinerary> itineraries) {
-    // No transit search performed
-    if (raptorSearchParamsUsed == null) {
-      return null;
-    }
-
-    var sw = Duration.ofSeconds(raptorSearchParamsUsed.searchWindowInSeconds());
-
-    // SearchWindow cropped -> decrease search-window
-    if (firstRemovedItinerary != null) {
-      Instant swStartTime = searchStartTime()
-        .plusSeconds(raptorSearchParamsUsed.earliestDepartureTime());
-      boolean cropSWHead = request.doCropSearchWindowAtTail();
-      Instant rmItineraryStartTime = firstRemovedItinerary.startTime().toInstant();
-
-      return pagingSearchWindowAdjuster.decreaseSearchWindow(
-        sw,
-        swStartTime,
-        rmItineraryStartTime,
-        cropSWHead
-      );
-    }
-    // (num-of-itineraries found <= numItineraries)  ->  increase or keep search-window
-    else {
-      int nRequested = request.numItineraries();
-      int nFound = (int) itineraries
-        .stream()
-        .filter(it -> !it.isFlaggedForDeletion() && it.hasTransit())
-        .count();
-
-      return pagingSearchWindowAdjuster.increaseOrKeepSearchWindow(sw, nRequested, nFound);
-    }
-  }
-
   private Instant searchStartTime() {
     return transitSearchTimeZero.toInstant();
   }
 
-  private PagingSearchWindowAdjuster createPagingSearchWindowAdjuster(
-    TransitTuningParameters transitTuningParameters,
-    RaptorTuningParameters raptorTuningParameters
-  ) {
-    var c = raptorTuningParameters.dynamicSearchWindowCoefficients();
-    return new PagingSearchWindowAdjuster(
-      c.minWindow(),
-      c.maxWindow(),
-      transitTuningParameters.pagingSearchWindowAdjustments()
+  private PagingService createPagingService(List<Itinerary> itineraries) {
+    return PagingServiceFactory.createPagingService(
+      searchStartTime(),
+      serverContext.transitTuningParameters(),
+      serverContext.raptorTuningParameters(),
+      request,
+      raptorSearchParamsUsed,
+      numItinerariesFilterResults,
+      itineraries
     );
   }
 }

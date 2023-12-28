@@ -3,6 +3,7 @@ package org.opentripplanner.ext.fares.impl;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
+import static org.opentripplanner.transit.model.basic.Money.euros;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +21,8 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
+import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
@@ -72,25 +75,26 @@ public class HSLFareServiceTest implements PlanTestConstants {
     FareZone C = FareZone.of(new FeedScopedId(FEED_ID, "C")).build();
     FareZone D = FareZone.of(new FeedScopedId(FEED_ID, "D")).build();
 
-    Place A1 = PlanTestConstants.place("A1", 10.0, 12.0, A);
-    Place A2 = PlanTestConstants.place("A2", 10.0, 12.0, A);
+    var testModel = TransitModelForTest.of();
+    Place A1 = testModel.place("A1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(A));
+    Place A2 = testModel.place("A2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(A));
 
-    Place B1 = PlanTestConstants.place("B1", 10.0, 12.0, B);
-    Place B2 = PlanTestConstants.place("B2", 10.0, 12.0, B);
+    Place B1 = testModel.place("B1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(B));
+    Place B2 = testModel.place("B2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(B));
 
-    Place C1 = PlanTestConstants.place("C1", 10.0, 12.0, C);
-    Place C2 = PlanTestConstants.place("C2", 10.0, 12.0, C);
+    Place C1 = testModel.place("C1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(C));
+    Place C2 = testModel.place("C2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(C));
 
-    Place D1 = PlanTestConstants.place("D1", 10.0, 12.0, D);
-    Place D2 = PlanTestConstants.place("D2", 10.0, 12.0, D);
+    Place D1 = testModel.place("D1", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(D));
+    Place D2 = testModel.place("D2", sb -> sb.withCoordinate(10.0, 12.0).addFareZones(D));
 
-    float AB_PRICE = 2.80f;
-    float BC_PRICE = 2.80f;
-    float CD_PRICE = 3.20f;
-    float ABC_PRICE = 4.10f;
-    float BCD_PRICE = 4.10f;
-    float ABCD_PRICE = 5.70f;
-    float D_PRICE = 2.80f;
+    var AB_PRICE = euros(2.80f);
+    var BC_PRICE = euros(2.80f);
+    var CD_PRICE = euros(3.20f);
+    var ABC_PRICE = euros(4.10f);
+    var BCD_PRICE = euros(4.10f);
+    var ABCD_PRICE = euros(5.70f);
+    var D_PRICE = euros(2.80f);
 
     HSLFareService hslFareService = new HSLFareService();
     int fiveMinutes = 60 * 5;
@@ -99,28 +103,24 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
     FareAttribute fareAttributeAB = FareAttribute
       .of(new FeedScopedId(FEED_ID, "AB"))
-      .setCurrencyType("EUR")
       .setPrice(AB_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeBC = FareAttribute
       .of(new FeedScopedId(FEED_ID, "BC"))
-      .setCurrencyType("EUR")
       .setPrice(BC_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeCD = FareAttribute
       .of(new FeedScopedId(FEED_ID, "CD"))
-      .setCurrencyType("EUR")
       .setPrice(CD_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeD = FareAttribute
       .of(new FeedScopedId(FEED_ID, "D"))
-      .setCurrencyType("EUR")
       .setPrice(D_PRICE)
       .setTransferDuration(fiveMinutes)
       //.setAgency(agency1.getId().getId())
@@ -128,34 +128,31 @@ public class HSLFareServiceTest implements PlanTestConstants {
 
     FareAttribute fareAttributeABC = FareAttribute
       .of(new FeedScopedId(FEED_ID, "ABC"))
-      .setCurrencyType("EUR")
       .setPrice(ABC_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeBCD = FareAttribute
       .of(new FeedScopedId(FEED_ID, "BCD"))
-      .setCurrencyType("EUR")
       .setPrice(BCD_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeABCD = FareAttribute
       .of(new FeedScopedId(FEED_ID, "ABCD"))
-      .setCurrencyType("EUR")
       .setPrice(ABCD_PRICE)
       .setTransferDuration(fiveMinutes)
       .build();
 
     FareAttribute fareAttributeD2 = FareAttribute
       .of(new FeedScopedId(FEED_ID, "D2"))
-      .setCurrencyType("EUR")
+      .setPrice(Money.euros(0))
       .setAgency(agency2.getId())
       .build();
 
     FareAttribute fareAttributeAgency3 = FareAttribute
       .of(new FeedScopedId("FEED2", "attribute"))
-      .setCurrencyType("EUR")
+      .setPrice(Money.euros(0))
       .setAgency(agency3.getId())
       .build();
 
@@ -439,8 +436,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
   void unknownFare() {
     FareAttribute fareAttributeAB = FareAttribute
       .of(new FeedScopedId(FEED_ID, "AB"))
-      .setCurrencyType("EUR")
-      .setPrice(2.80f)
+      .setPrice(euros(2.80f))
       .setTransferDuration(60 * 5)
       .build();
 

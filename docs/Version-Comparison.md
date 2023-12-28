@@ -53,7 +53,7 @@ the EU profile, and generalization to the EU profile should be feasible once it 
 | Elevation data                                    | TIFF and NED                                                                                                | TIFF and NED                                                                                    |
 | One-to-many routing,<br> isochrones and scripting | yes                                                                                                         | no                                                                                              |
 | Isochrones                                        | yes                                                                                                         | yes                                                                                             |
-| Java version                                      | 8+                                                                                                          | 17+                                                                                             |
+| Java version                                      | 8+                                                                                                          | 21+                                                                                             |
 | Multiple regions per server                       | yes                                                                                                         | no                                                                                              |
 | Hot reloading of graphs                           | yes                                                                                                         | no                                                                                              |
 | Street (OSM) routing algorithm                    | Generalized cost A*                                                                                         | Generalized cost A*                                                                             |
@@ -139,10 +139,10 @@ Details of those two APIs are available at the following pages:
 
 - [GTFS GraphQL API](apis/GTFS-GraphQL-API.md) - HSL's GraphQL API used by the Digitransit
   project.
-- [Transmodel API](sandbox/TransmodelApi.md) - Entur´s Transmodel API
+- [Transmodel API](apis/TransmodelApi.md) - Entur's Transmodel API
 
 The plan is to merge the two APIs above, clean it up and make it the new official API. The HSL API
-uses GTFS terminology, while the Entur API is Transmodel(NeTEx) based. Both APIs are similar in
+uses GTFS terminology, while the Entur API is Transmodel (NeTEx) based. Both APIs are similar in
 semantics and structure, and provide the same functionality. 
 
 ## Additional characteristics added in OTP2

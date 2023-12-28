@@ -65,11 +65,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 17
+      - name: Set up JDK
         if: matrix.profile == 'core' || github.ref == 'refs/heads/dev-2.x'
         uses: actions/setup-java@v3
         with:
-          java-version: 17
+          java-version: 21
           distribution: temurin
         timeout-minutes: 5
 

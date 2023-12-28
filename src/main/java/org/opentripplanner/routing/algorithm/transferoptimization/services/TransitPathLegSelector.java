@@ -2,15 +2,16 @@ package org.opentripplanner.routing.algorithm.transferoptimization.services;
 
 import java.util.HashSet;
 import java.util.Set;
-import org.opentripplanner.framework.time.TimeUtils;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
 
 /**
  * This class takes a list of transit legs and returns the best leg based on the {@link
- * TransferOptimizedFilterFactory} and the earliest-boarding-time. The filter is used to pick the
- * best leg from the legs which can be boarded after the earliest-boarding-time.
+ * org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter} and
+ * the earliest-boarding-time. The filter is used to pick the best leg from the legs which can be
+ * boarded after the earliest-boarding-time.
  * <p>
  * HOW IT WORKS
  * <p>
@@ -28,38 +29,35 @@ import org.opentripplanner.routing.algorithm.transferoptimization.model.Optimize
  */
 class TransitPathLegSelector<T extends RaptorTripSchedule> {
 
-  private final MinCostFilterChain<OptimizedPathTail<T>> filter;
+  private final PathTailFilter<T> filter;
   private Set<OptimizedPathTail<T>> remindingLegs;
   private Set<OptimizedPathTail<T>> selectedLegs;
 
-  private int lastLimit = Integer.MAX_VALUE;
+  private int prevStopPosition = Integer.MAX_VALUE;
 
-  TransitPathLegSelector(
-    final MinCostFilterChain<OptimizedPathTail<T>> filter,
-    final Set<OptimizedPathTail<T>> legs
-  ) {
+  TransitPathLegSelector(final PathTailFilter<T> filter, final Set<OptimizedPathTail<T>> legs) {
     this.filter = filter;
     this.remindingLegs = Set.copyOf(legs);
     this.selectedLegs = new HashSet<>();
   }
 
-  Set<OptimizedPathTail<T>> next(final int earliestBoardingTime) {
-    if (earliestBoardingTime > lastLimit) {
+  Set<OptimizedPathTail<T>> next(final int fromStopPosition) {
+    if (fromStopPosition > prevStopPosition) {
       throw new IllegalStateException(
         "The next method must be called with decreasing time limits. " +
-        "minTimeLimit=" +
-        TimeUtils.timeToStrLong(earliestBoardingTime) +
-        ", lastLimit=" +
-        TimeUtils.timeToStrLong(lastLimit)
+        "fromStopPosition=" +
+        fromStopPosition +
+        ", previousStopPosition=" +
+        prevStopPosition
       );
     }
-    lastLimit = earliestBoardingTime;
+    prevStopPosition = fromStopPosition;
 
     Set<OptimizedPathTail<T>> candidates = new HashSet<>();
     Set<OptimizedPathTail<T>> rest = new HashSet<>();
 
     for (OptimizedPathTail<T> it : remindingLegs) {
-      if (earliestBoardingTime < it.latestPossibleBoardingTime()) {
+      if (fromStopPosition < it.head().toStopPos()) {
         candidates.add(it);
       } else {
         rest.add(it);
@@ -74,8 +72,19 @@ class TransitPathLegSelector<T extends RaptorTripSchedule> {
 
     // Set state
     remindingLegs = rest;
-    selectedLegs = filter.filter(candidates);
+    selectedLegs = filter.filterIntermediateResult(candidates, fromStopPosition);
 
     return selectedLegs;
+  }
+
+  @Override
+  public String toString() {
+    return ToStringBuilder
+      .of(TransitPathLegSelector.class)
+      .addObj("filter", filter)
+      .addCol("remindingLegs", remindingLegs)
+      .addCol("selectedLegs", selectedLegs)
+      .addNum("prevStopPosition", prevStopPosition)
+      .toString();
   }
 }

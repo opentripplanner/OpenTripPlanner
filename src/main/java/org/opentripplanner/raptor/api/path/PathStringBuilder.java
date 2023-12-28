@@ -3,11 +3,11 @@ package org.opentripplanner.raptor.api.path;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
-import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 
 /**
@@ -73,30 +73,32 @@ public class PathStringBuilder {
     return legSep().text(modeName).time(fromTime, toTime);
   }
 
-  public PathStringBuilder timeAndCostCentiSec(int fromTime, int toTime, int generalizedCost) {
-    return time(fromTime, toTime).generalizedCostSentiSec(generalizedCost);
-  }
-
-  /** Add generalizedCostCentiSec {@link #costCentiSec(int, int, String)} */
-  public PathStringBuilder generalizedCostSentiSec(int cost) {
-    return costCentiSec(cost, RaptorCostCalculator.ZERO_COST, null);
-  }
-
-  /**
-   * Add a cost to the string with an optional unit. Try to be consistent with unit naming, use
-   * lower-case:
-   * <ul>
-   *     <li>{@code null} - Generalized-cost (no unit used)</li>
-   *     <li>{@code "wtc"} - Wait-time cost</li>
-   *     <li>{@code "pri"} - Transfer priority cost</li>
-   * </ul>
-   */
-  public PathStringBuilder costCentiSec(int generalizedCostCents, int defaultValue, String unit) {
-    if (generalizedCostCents == defaultValue) {
+  public PathStringBuilder c1(int c1) {
+    if (c1 == RaptorCostCalculator.ZERO_COST) {
       return this;
     }
-    var costText = OtpNumberFormat.formatCostCenti(generalizedCostCents);
-    return (unit != null) ? text(costText + unit) : text(costText);
+    return text(RaptorValueFormatter.formatC1(c1));
+  }
+
+  public PathStringBuilder c2(int c2) {
+    if (c2 == RaptorConstants.NOT_SET) {
+      return this;
+    }
+    return text(RaptorValueFormatter.formatC2(c2));
+  }
+
+  public PathStringBuilder waitTimeCost(int wtc, int defaultValue) {
+    if (wtc == defaultValue) {
+      return this;
+    }
+    return text(RaptorValueFormatter.formatWaitTimeCost(wtc));
+  }
+
+  public PathStringBuilder transferPriority(int transferPriorityCost, int defaultValue) {
+    if (transferPriorityCost == defaultValue) {
+      return this;
+    }
+    return text(RaptorValueFormatter.formatTransferPriority(transferPriorityCost));
   }
 
   public PathStringBuilder duration(int duration) {
@@ -112,34 +114,34 @@ public class PathStringBuilder {
   }
 
   public PathStringBuilder numberOfTransfers(int nTransfers) {
-    return nTransfers != RaptorConstants.NOT_SET ? text(nTransfers + "tx") : this;
+    return nTransfers != RaptorConstants.NOT_SET
+      ? text(RaptorValueFormatter.formatNumOfTransfers(nTransfers))
+      : this;
   }
 
-  public PathStringBuilder summary(int generalizedCostCents) {
-    return summaryStart().generalizedCostSentiSec(generalizedCostCents).summaryEnd();
+  public PathStringBuilder summary(int c1, int c2) {
+    return summaryStart().c1(c1).c2(c2).summaryEnd();
   }
 
-  public PathStringBuilder summary(
-    int startTime,
-    int endTime,
-    int nTransfers,
-    int generalizedCostCents
-  ) {
-    return summary(startTime, endTime, nTransfers, generalizedCostCents, null);
+  public PathStringBuilder summary(int startTime, int endTime, int nTransfers, int c1, int c2) {
+    return summary(startTime, endTime, nTransfers, c1, c2, null);
   }
 
   public PathStringBuilder summary(
     int startTime,
     int endTime,
     int nTransfers,
-    int generalizedCostCents,
+    int c1,
+    int c2,
     @Nullable Consumer<PathStringBuilder> appendToSummary
   ) {
     summaryStart()
       .time(startTime, endTime)
       .duration(Math.abs(endTime - startTime))
       .numberOfTransfers(nTransfers)
-      .generalizedCostSentiSec(generalizedCostCents);
+      .c1(c1)
+      .c2(c2);
+
     if (appendToSummary != null) {
       appendToSummary.accept(this);
     }

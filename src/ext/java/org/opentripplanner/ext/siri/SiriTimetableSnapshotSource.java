@@ -4,28 +4,31 @@ import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NOT_MONITORED;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_FUZZY_TRIP_MATCH;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_START_DATE;
-import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.NO_TRIP_ID;
+import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.TRIP_NOT_FOUND_IN_PATTERN;
 import static org.opentripplanner.updater.spi.UpdateError.UpdateErrorType.UNKNOWN;
 
-import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.time.CountdownTimer;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.transit.model.framework.DataValidationException;
 import org.opentripplanner.transit.model.framework.Result;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 import org.opentripplanner.transit.service.DefaultTransitService;
 import org.opentripplanner.transit.service.TransitModel;
 import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.TimetableSnapshotSourceParameters;
+import org.opentripplanner.updater.spi.DataValidationExceptionMapper;
 import org.opentripplanner.updater.spi.UpdateError;
 import org.opentripplanner.updater.spi.UpdateResult;
 import org.opentripplanner.updater.spi.UpdateSuccess;
@@ -35,8 +38,8 @@ import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
 
 /**
- * This class should be used to create snapshots of lookup tables of realtime data. This is
- * necessary to provide planning threads a consistent constant view of a graph with realtime data at
+ * This class should be used to create snapshots of lookup tables of real-time data. This is
+ * necessary to provide planning threads a consistent constant view of a graph with real-time data at
  * a specific point in time.
  */
 public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
@@ -59,7 +62,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private final SiriTripPatternIdGenerator tripPatternIdGenerator = new SiriTripPatternIdGenerator();
   /**
-   * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime
+   * A synchronized cache of trip patterns that are added to the graph due to GTFS-real-time
    * messages.
    */
   private final SiriTripPatternCache tripPatternCache;
@@ -73,7 +76,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    * snapshot, just return the same one. Throttles the potentially resource-consuming task of
    * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
    */
-  private final Duration maxSnapshotFrequency;
+  protected CountdownTimer snapshotFrequencyThrottle;
 
   /**
    * The last committed snapshot that was handed off to a routing thread. This snapshot may be given
@@ -81,11 +84,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
    */
   private volatile TimetableSnapshot snapshot = null;
 
-  /** Should expired realtime data be purged from the graph. */
+  /** Should expired real-time data be purged from the graph. */
   private final boolean purgeExpiredData;
 
   protected LocalDate lastPurgeDate = null;
-  protected long lastSnapshotTime = -1;
 
   public SiriTimetableSnapshotSource(
     TimetableSnapshotSourceParameters parameters,
@@ -94,7 +96,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     this.transitModel = transitModel;
     this.transitService = new DefaultTransitService(transitModel);
     this.transitLayerUpdater = transitModel.getTransitLayerUpdater();
-    this.maxSnapshotFrequency = parameters.maxSnapshotFrequency();
+    this.snapshotFrequencyThrottle = new CountdownTimer(parameters.maxSnapshotFrequency());
     this.purgeExpiredData = parameters.purgeExpiredData();
     this.tripPatternCache =
       new SiriTripPatternCache(tripPatternIdGenerator, transitService::getPatternForTrip);
@@ -102,7 +104,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     transitModel.initTimetableSnapshotProvider(this);
 
     // Force commit so that snapshot initializes
-    getTimetableSnapshot(true);
+    commitTimetableSnapshot(true);
   }
 
   /**
@@ -118,17 +120,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     if (bufferLock.tryLock()) {
       // Make a new snapshot if necessary
       try {
-        snapshotToReturn = getTimetableSnapshot(false);
+        commitTimetableSnapshot(false);
+        return snapshot;
       } finally {
         bufferLock.unlock();
       }
-    } else {
-      // No lock could be obtained because there is either a snapshot commit busy or updates
-      // are applied at this moment, just return the current snapshot
-      snapshotToReturn = snapshot;
     }
-
-    return snapshotToReturn;
+    // No lock could be obtained because there is either a snapshot commit busy or updates
+    // are applied at this moment, just return the current snapshot
+    return snapshot;
   }
 
   /**
@@ -172,16 +172,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       }
 
       LOG.debug("message contains {} trip updates", updates.size());
-      LOG.debug("end of update message");
 
       // Make a snapshot after each message in anticipation of incoming requests
       // Purge data if necessary (and force new snapshot if anything was purged)
       // Make sure that the public (locking) getTimetableSnapshot function is not called.
       if (purgeExpiredData) {
         final boolean modified = purgeExpiredData();
-        getTimetableSnapshot(modified);
+        commitTimetableSnapshot(modified);
       } else {
-        getTimetableSnapshot(false);
+        commitTimetableSnapshot(false);
       }
     } finally {
       // Always release lock
@@ -219,6 +218,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
       /* commit */
       return addTripToGraphAndBuffer(result.successValue());
+    } catch (DataValidationException e) {
+      return DataValidationExceptionMapper.toResult(e);
     } catch (Exception e) {
       LOG.warn(
         "{} EstimatedJourney {} failed.",
@@ -246,20 +247,22 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     return entityResolver.resolveTrip(vehicleJourney) == null;
   }
 
-  private TimetableSnapshot getTimetableSnapshot(final boolean force) {
-    final long now = System.currentTimeMillis();
-    if (force || now - lastSnapshotTime > maxSnapshotFrequency.toMillis()) {
+  private void commitTimetableSnapshot(final boolean force) {
+    if (force || snapshotFrequencyThrottle.timeIsUp()) {
       if (force || buffer.isDirty()) {
         LOG.debug("Committing {}", buffer);
         snapshot = buffer.commit(transitLayerUpdater, force);
+
+        // We only reset the timer when the snapshot is updated. This will cause the first
+        // update to be committed after a silent period. This should not have any effect in
+        // a busy updater. It is however useful when manually testing the updater.
+        snapshotFrequencyThrottle.restart();
       } else {
         LOG.debug("Buffer was unchanged, keeping old snapshot.");
       }
-      lastSnapshotTime = System.currentTimeMillis();
     } else {
       LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
     }
-    return snapshot;
   }
 
   /**
@@ -322,7 +325,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       trip = tripAndPattern.trip();
       pattern = tripAndPattern.tripPattern();
     } else {
-      return UpdateError.result(null, NO_TRIP_ID);
+      return UpdateError.result(null, TRIP_NOT_FOUND);
     }
 
     Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
@@ -373,7 +376,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     // Add new trip times to the buffer and return success
     var result = buffer.update(pattern, tripUpdate.tripTimes(), serviceDate);
 
-    LOG.debug("Applied realtime data for trip {} on {}", trip, serviceDate);
+    LOG.debug("Applied real-time data for trip {} on {}", trip, serviceDate);
 
     return result;
   }
@@ -397,7 +400,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       if (tripTimes == null) {
         LOG.warn("Could not mark scheduled trip as deleted {}", trip.getId());
       } else {
-        final TripTimes newTripTimes = new TripTimes(tripTimes);
+        final RealTimeTripTimes newTripTimes = tripTimes.copyScheduledTimes();
         newTripTimes.deleteTrip();
         buffer.update(pattern, newTripTimes, serviceDate);
         success = true;
@@ -418,10 +421,8 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     final TripPattern pattern = buffer.getRealtimeAddedTripPattern(trip.getId(), serviceDate);
     if (pattern != null) {
-      /*
-              Remove the previous realtime-added TripPattern from buffer.
-              Only one version of the realtime-update should exist
-             */
+      // Remove the previous real-time-added TripPattern from buffer.
+      // Only one version of the real-time-update should exist
       buffer.removeLastAddedTripPattern(trip.getId(), serviceDate);
       buffer.removeRealtimeUpdatedTripTimes(pattern, trip.getId(), serviceDate);
       success = true;
@@ -438,7 +439,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
       return false;
     }
 
-    LOG.debug("purging expired realtime data");
+    LOG.debug("purging expired real-time data");
 
     lastPurgeDate = previously;
 

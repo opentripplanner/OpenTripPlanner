@@ -44,6 +44,7 @@ import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 /**
  * This is a helper class to allow unit-testing on Itineraries. The builder does not necessarily
@@ -475,44 +476,40 @@ public class TestItineraryBuilder implements PlanTestConstants {
       .withRoute(route)
       .withStopPattern(stopPattern)
       .build();
-    final TripTimes tripTimes = new TripTimes(trip, stopTimes, new Deduplicator());
+    final TripTimes tripTimes = TripTimesFactory.tripTimes(trip, stopTimes, new Deduplicator());
     tripPattern.add(tripTimes);
 
     ScheduledTransitLeg leg;
 
     if (headwaySecs != null) {
       leg =
-        new FrequencyTransitLeg(
-          tripTimes,
-          tripPattern,
-          fromStopIndex,
-          toStopIndex,
-          newTime(start),
-          newTime(end),
-          serviceDate != null ? serviceDate : SERVICE_DAY,
-          UTC,
-          transferFromPreviousLeg,
-          null,
-          legCost,
-          headwaySecs,
-          null
-        );
+        new FrequencyTransitLegBuilder()
+          .withTripTimes(tripTimes)
+          .withTripPattern(tripPattern)
+          .withBoardStopIndexInPattern(fromStopIndex)
+          .withAlightStopIndexInPattern(toStopIndex)
+          .withStartTime(newTime(start))
+          .withEndTime(newTime(end))
+          .withServiceDate(serviceDate != null ? serviceDate : SERVICE_DAY)
+          .withZoneId(UTC)
+          .withTransferFromPreviousLeg(transferFromPreviousLeg)
+          .withGeneralizedCost(legCost)
+          .withFrequencyHeadwayInSeconds(headwaySecs)
+          .build();
     } else {
       leg =
-        new ScheduledTransitLeg(
-          tripTimes,
-          tripPattern,
-          fromStopIndex,
-          toStopIndex,
-          newTime(start),
-          newTime(end),
-          serviceDate != null ? serviceDate : SERVICE_DAY,
-          UTC,
-          transferFromPreviousLeg,
-          null,
-          legCost,
-          null
-        );
+        new ScheduledTransitLegBuilder()
+          .withTripTimes(tripTimes)
+          .withTripPattern(tripPattern)
+          .withBoardStopIndexInPattern(fromStopIndex)
+          .withAlightStopIndexInPattern(toStopIndex)
+          .withStartTime(newTime(start))
+          .withEndTime(newTime(end))
+          .withServiceDate(serviceDate != null ? serviceDate : SERVICE_DAY)
+          .withZoneId(UTC)
+          .withTransferFromPreviousLeg(transferFromPreviousLeg)
+          .withGeneralizedCost(legCost)
+          .build();
     }
 
     leg.setDistanceMeters(speed(leg.getMode()) * (end - start));

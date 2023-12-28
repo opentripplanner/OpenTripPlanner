@@ -1,10 +1,13 @@
 package org.opentripplanner.model.plan;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -14,6 +17,7 @@ import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.fare.ItineraryFares;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.path.PathStringBuilder;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -22,7 +26,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
  */
-public class Itinerary {
+public class Itinerary implements ItinerarySortKey {
 
   public static final int UNKNOWN = -1;
 
@@ -40,6 +44,7 @@ public class Itinerary {
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
   private int generalizedCost = UNKNOWN;
+  private Integer generalizedCost2 = null;
   private TimeAndCost accessPenalty = null;
   private TimeAndCost egressPenalty = null;
   private int waitTimeOptimizedCost = UNKNOWN;
@@ -50,6 +55,8 @@ public class Itinerary {
 
   /* Sandbox experimental properties */
   private Float accessibilityScore;
+
+  private Emissions emissionsPerPerson;
 
   /* other properties */
 
@@ -83,10 +90,24 @@ public class Itinerary {
   }
 
   /**
+   * Time that the trip departs as a Java Instant type.
+   */
+  public Instant startTimeAsInstant() {
+    return firstLeg().getStartTime().toInstant();
+  }
+
+  /**
    * Time that the trip arrives.
    */
   public ZonedDateTime endTime() {
     return lastLeg().getEndTime();
+  }
+
+  /**
+   * Time that the trip arrives as a Java Instant type.
+   */
+  public Instant endTimeAsInstant() {
+    return lastLeg().getEndTime().toInstant();
   }
 
   /**
@@ -172,8 +193,8 @@ public class Itinerary {
   /**
    * Remove all deletion flags of this itinerary, in effect undeleting it from the result.
    */
-  public void removeDeletionFlags() {
-    systemNotices.clear();
+  public void removeDeletionFlags(Set<String> removeTags) {
+    systemNotices.removeIf(it -> removeTags.contains(it.tag()));
   }
 
   public boolean isFlaggedForDeletion() {
@@ -185,7 +206,7 @@ public class Itinerary {
    * given {@code tag}.
    */
   public boolean hasSystemNoticeTag(String tag) {
-    return systemNotices.stream().map(n -> n.tag).anyMatch(tag::equals);
+    return systemNotices.stream().map(SystemNotice::tag).anyMatch(tag::equals);
   }
 
   public Itinerary withTimeShiftToStartAt(ZonedDateTime afterTime) {
@@ -241,6 +262,7 @@ public class Itinerary {
       .addDuration("transitTime", transitDuration)
       .addDuration("waitingTime", waitingDuration)
       .addNum("generalizedCost", generalizedCost, UNKNOWN)
+      .addNum("generalizedCost2", generalizedCost2)
       .addNum("waitTimeOptimizedCost", waitTimeOptimizedCost, UNKNOWN)
       .addNum("transferPriorityCost", transferPriorityCost, UNKNOWN)
       .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
@@ -249,6 +271,7 @@ public class Itinerary {
       .addNum("elevationGained", elevationGained, 0.0)
       .addCol("legs", legs)
       .addObj("fare", fare)
+      .addObj("emissionsPerPerson", emissionsPerPerson)
       .toString();
   }
 
@@ -286,7 +309,12 @@ public class Itinerary {
       buf.stop(leg.getTo().name.toString());
     }
 
-    buf.summary(RaptorCostConverter.toRaptorCost(generalizedCost));
+    // The generalizedCost2 is printed as is, it is a special cost and the scale depends on the
+    // use-case.
+    buf.summary(
+      RaptorCostConverter.toRaptorCost(generalizedCost),
+      getGeneralizedCost2().orElse(RaptorConstants.NOT_SET)
+    );
 
     return buf.toString();
   }
@@ -354,6 +382,27 @@ public class Itinerary {
     return legs;
   }
 
+  /**
+   * Applies the transformation in {@code mapper} to all instances of {@link TransitLeg} in the
+   * legs of this Itinerary.
+   * <p>
+   * NOTE: The itinerary is mutable so the transformation is done in-place!
+   */
+  public Itinerary transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
+    legs =
+      legs
+        .stream()
+        .map(l -> {
+          if (l instanceof TransitLeg tl) {
+            return mapper.apply(tl);
+          } else {
+            return l;
+          }
+        })
+        .toList();
+    return this;
+  }
+
   public Stream<StreetLeg> getStreetLegs() {
     return legs.stream().filter(StreetLeg.class::isInstance).map(StreetLeg.class::cast);
   }
@@ -387,7 +436,7 @@ public class Itinerary {
    * accessible the itinerary is as a whole. This is not a very scientific method but just a rough
    * guidance that expresses certainty or uncertainty about the accessibility.
    * <p>
-   * An alternative to this is to use the `generalized-cost` and use that to indicate witch itineraries is the
+   * An alternative to this is to use the `generalized-cost` and use that to indicate which itineraries is the
    * best/most friendly with respect to making the journey in a wheelchair. The `generalized-cost` include, not
    * only a penalty for unknown and inaccessible boardings, but also a penalty for undesired uphill and downhill
    * street traversal.
@@ -452,6 +501,24 @@ public class Itinerary {
 
   public void setGeneralizedCost(int generalizedCost) {
     this.generalizedCost = generalizedCost;
+  }
+
+  /**
+   * The transit router allows the usage of a second generalized-cost parameter to be used in
+   * routing. In Raptor this is called c2, but in OTP it is generalized-cost-2. What this cost
+   * represents depends on the use-case and the unit and scale is also given by the use-case.
+   * <p>
+   * Currently, the pass-through search and the transit-priority uses this. This is relevant for
+   * anyone who wants to debug a search and tune the system.
+   * <p>
+   * {@link RaptorConstants#NOT_SET} indicate that the cost is not set/computed.
+   */
+  public Optional<Integer> getGeneralizedCost2() {
+    return Optional.ofNullable(generalizedCost2);
+  }
+
+  public void setGeneralizedCost2(Integer generalizedCost2) {
+    this.generalizedCost2 = generalizedCost2;
   }
 
   @Nullable
@@ -584,5 +651,17 @@ public class Itinerary {
       .filter(ScheduledTransitLeg.class::isInstance)
       .map(ScheduledTransitLeg.class::cast)
       .toList();
+  }
+
+  /**
+   * The emissions of this itinerary.
+   */
+  public void setEmissionsPerPerson(Emissions emissionsPerPerson) {
+    this.emissionsPerPerson = emissionsPerPerson;
+  }
+
+  @Nullable
+  public Emissions getEmissionsPerPerson() {
+    return this.emissionsPerPerson;
   }
 }

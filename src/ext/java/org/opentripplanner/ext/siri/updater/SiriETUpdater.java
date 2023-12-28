@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
 import uk.org.siri.siri20.ServiceDelivery;
-import uk.org.siri.siri20.Siri;
 
 /**
  * Update OTP stop timetables from some a Siri-ET HTTP sources.
@@ -40,7 +39,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
   protected WriteToGraphCallback saveResultOnGraph;
 
   /**
-   * The place where we'll record the incoming realtime timetables to make them available to the
+   * The place where we'll record the incoming real-time timetables to make them available to the
    * router in a thread safe way.
    */
   private final SiriTimetableSnapshotSource snapshotSource;
@@ -90,10 +89,10 @@ public class SiriETUpdater extends PollingGraphUpdater {
   public void runPolling() {
     boolean moreData = false;
     do {
-      Siri updates = updateSource.getUpdates();
-      if (updates != null) {
+      var updates = updateSource.getUpdates();
+      if (updates.isPresent()) {
         boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
-        ServiceDelivery serviceDelivery = updates.getServiceDelivery();
+        ServiceDelivery serviceDelivery = updates.get().getServiceDelivery();
         moreData = Boolean.TRUE.equals(serviceDelivery.isMoreData());
         // Mark this updater as primed after last page of updates. Copy moreData into a final
         // primitive, because the object moreData persists across iterations.
@@ -110,7 +109,9 @@ public class SiriETUpdater extends PollingGraphUpdater {
             );
             ResultLogger.logUpdateResult(feedId, "siri-et", result);
             recordMetrics.accept(result);
-            if (markPrimed) primed = true;
+            if (markPrimed) {
+              primed = true;
+            }
           });
         }
       }

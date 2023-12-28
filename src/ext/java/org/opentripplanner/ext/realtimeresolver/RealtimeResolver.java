@@ -5,12 +5,13 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
+import org.opentripplanner.model.plan.ScheduledTransitLegBuilder;
 import org.opentripplanner.transit.service.TransitService;
 
 public class RealtimeResolver {
 
   /**
-   * Loop through all itineraries and populate legs with realtime data using legReference from the original leg
+   * Loop through all itineraries and populate legs with real-time data using legReference from the original leg
    */
   public static void populateLegsWithRealtime(
     List<Itinerary> itineraries,
@@ -34,10 +35,10 @@ public class RealtimeResolver {
             return leg;
           }
 
-          var realtimeLeg = ref.getLeg(transitService);
-          if (realtimeLeg != null) {
+          var realTimeLeg = ref.getLeg(transitService);
+          if (realTimeLeg != null) {
             return combineReferenceWithOriginal(
-              realtimeLeg.asScheduledTransitLeg(),
+              realTimeLeg.asScheduledTransitLeg(),
               leg.asScheduledTransitLeg()
             );
           }
@@ -53,20 +54,12 @@ public class RealtimeResolver {
     ScheduledTransitLeg reference,
     ScheduledTransitLeg original
   ) {
-    var leg = new ScheduledTransitLeg(
-      reference.getTripTimes(),
-      reference.getTripPattern(),
-      reference.getBoardStopPosInPattern(),
-      reference.getAlightStopPosInPattern(),
-      reference.getStartTime(),
-      reference.getEndTime(),
-      reference.getServiceDate(),
-      reference.getZoneId(),
-      original.getTransferFromPrevLeg(),
-      original.getTransferToNextLeg(),
-      original.getGeneralizedCost(),
-      original.accessibilityScore()
-    );
+    var leg = new ScheduledTransitLegBuilder<>(reference)
+      .withTransferFromPreviousLeg(original.getTransferFromPrevLeg())
+      .withTransferToNextLeg(original.getTransferToNextLeg())
+      .withGeneralizedCost(original.getGeneralizedCost())
+      .withAccessibilityScore(original.accessibilityScore())
+      .build();
     reference.getTransitAlerts().forEach(leg::addAlert);
     return leg;
   }

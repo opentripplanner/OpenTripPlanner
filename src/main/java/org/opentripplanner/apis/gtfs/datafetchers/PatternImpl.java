@@ -241,11 +241,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   }
 
   private List<Object> getStops(DataFetchingEnvironment environment) {
-    return getSource(environment)
-      .getStops()
-      .stream()
-      .map(Object.class::cast)
-      .collect(Collectors.toList());
+    return getSource(environment).getStops().stream().map(Object.class::cast).toList();
   }
 
   private List<Trip> getTrips(DataFetchingEnvironment environment) {
@@ -253,7 +249,7 @@ public class PatternImpl implements GraphQLDataFetchers.GraphQLPattern {
   }
 
   private RealtimeVehicleService getRealtimeVehiclesService(DataFetchingEnvironment environment) {
-    return environment.<GraphQLRequestContext>getContext().realtimeVehicleService();
+    return environment.<GraphQLRequestContext>getContext().realTimeVehicleService();
   }
 
   private TransitService getTransitService(DataFetchingEnvironment environment) {

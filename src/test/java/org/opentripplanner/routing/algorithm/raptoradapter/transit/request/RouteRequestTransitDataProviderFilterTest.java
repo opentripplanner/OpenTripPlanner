@@ -14,7 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
+import org.opentripplanner.apis.transmodel.model.TransmodelTransportSubmode;
+import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.model.PickDrop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
@@ -39,22 +40,22 @@ import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.model.timetable.RealTimeTripTimes;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripBuilder;
 import org.opentripplanner.transit.model.timetable.TripTimes;
+import org.opentripplanner.transit.model.timetable.TripTimesFactory;
 
 class RouteRequestTransitDataProviderFilterTest {
+
+  private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   private static final Route ROUTE = TransitModelForTest.route("1").build();
 
   private static final FeedScopedId TRIP_ID = TransitModelForTest.id("T1");
 
-  private static final RegularStop STOP_FOR_TEST = TransitModelForTest.stopForTest(
-    "TEST:STOP",
-    0,
-    0
-  );
+  private static final RegularStop STOP_FOR_TEST = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
 
   private static final WheelchairPreferences DEFAULT_ACCESSIBILITY = WheelchairPreferences.DEFAULT;
 
@@ -86,8 +87,8 @@ class RouteRequestTransitDataProviderFilterTest {
   @ParameterizedTest
   @VariableSource("wheelchairCases")
   void testWheelchairAccess(Accessibility wheelchair, WheelchairPreferences accessibility) {
-    var firstStop = TransitModelForTest.stopForTest("TEST:START", wheelchair, 0.0, 0.0);
-    var lastStop = TransitModelForTest.stopForTest("TEST:END", wheelchair, 0.0, 0.0);
+    var firstStop = stopForTest("TEST:START", wheelchair, 0.0, 0.0);
+    var lastStop = stopForTest("TEST:END", wheelchair, 0.0, 0.0);
 
     var stopTimeStart = new StopTime();
     var stopTimeEnd = new StopTime();
@@ -513,7 +514,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
   @Test
   void keepRealTimeAccessibleTrip() {
-    TripTimes realTimeWheelchairAccessibleTrip = createTestTripTimes(
+    RealTimeTripTimes realTimeWheelchairAccessibleTrip = createTestTripTimes(
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
@@ -616,7 +617,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TripAlteration.PLANNED
     );
 
-    TripTimes tripTimesWithCancellation = createTestTripTimes(
+    RealTimeTripTimes tripTimesWithCancellation = createTestTripTimes(
       TRIP_ID,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
@@ -812,7 +813,7 @@ class RouteRequestTransitDataProviderFilterTest {
       .build()
       .getRoutingTripPattern();
 
-    TripTimes tripTimes = new TripTimes(
+    TripTimes tripTimes = TripTimesFactory.tripTimes(
       TransitModelForTest.trip("1").withRoute(route).build(),
       List.of(new StopTime()),
       new Deduplicator()
@@ -860,7 +861,7 @@ class RouteRequestTransitDataProviderFilterTest {
     );
   }
 
-  private TripTimes createTestTripTimes(
+  private RealTimeTripTimes createTestTripTimes(
     FeedScopedId tripId,
     Route route,
     BikeAccess bikeAccess,
@@ -885,7 +886,7 @@ class RouteRequestTransitDataProviderFilterTest {
     stopTime.setDepartureTime(60);
     stopTime.setStopSequence(0);
 
-    return new TripTimes(trip, List.of(stopTime), new Deduplicator());
+    return TripTimesFactory.tripTimes(trip, List.of(stopTime), new Deduplicator());
   }
 
   private TripTimes createTestTripTimesWithSubmode(String submode) {
@@ -900,9 +901,22 @@ class RouteRequestTransitDataProviderFilterTest {
     );
   }
 
+  public static RegularStop stopForTest(
+    String idAndName,
+    Accessibility wheelchair,
+    double lat,
+    double lon
+  ) {
+    return TEST_MODEL
+      .stop(idAndName)
+      .withCoordinate(new WgsCoordinate(lat, lon))
+      .withWheelchairAccessibility(wheelchair)
+      .build();
+  }
+
   private static StopTime getStopTime(String idAndName, PickDrop scheduled) {
     var stopTime1 = new StopTime();
-    stopTime1.setStop(TransitModelForTest.stopForTest(idAndName, 0.0, 0.0));
+    stopTime1.setStop(TEST_MODEL.stop(idAndName, 0.0, 0.0).build());
     stopTime1.setDropOffType(scheduled);
     stopTime1.setPickupType(scheduled);
     return stopTime1;

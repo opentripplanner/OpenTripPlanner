@@ -5,6 +5,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_2;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_3;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_4;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 import static org.opentripplanner.standalone.config.routerequest.ItineraryFiltersConfig.mapItineraryFilterParams;
 import static org.opentripplanner.standalone.config.routerequest.TransferConfig.mapTransferPreferences;
 import static org.opentripplanner.standalone.config.routerequest.VehicleRentalConfig.setVehicleRental;
@@ -17,16 +18,15 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
+import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.api.request.preference.CarPreferences;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.StreetPreferences;
 import org.opentripplanner.routing.api.request.preference.SystemPreferences;
 import org.opentripplanner.routing.api.request.preference.TransitPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.WalkPreferences;
-import org.opentripplanner.routing.api.request.request.VehicleParkingRequest;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilter.TagsFilter;
-import org.opentripplanner.routing.api.request.request.filter.VehicleParkingFilterRequest;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.sandbox.DataOverlayParametersMapper;
 import org.opentripplanner.transit.model.basic.TransitMode;
@@ -55,7 +55,6 @@ public class RouteRequestConfig {
     }
 
     RouteRequest request = dft.clone();
-    VehicleParkingRequest vehicleParking = request.journey().parking();
 
     // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
     // mapping or duplicate exist.
@@ -121,44 +120,6 @@ public class RouteRequestConfig {
         .asDuration(dft.searchWindow())
     );
 
-    vehicleParking.setUnpreferredCost(
-      c
-        .of("unpreferredVehicleParkingTagCost")
-        .since(V2_3)
-        .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
-        .description("See `preferredVehicleParkingTags`.")
-        .asInt(vehicleParking.unpreferredCost())
-    );
-
-    var bannedTags = c
-      .of("bannedVehicleParkingTags")
-      .since(V2_1)
-      .summary("Tags with which a vehicle parking will not be used. If empty, no tags are banned.")
-      .asStringSet(List.of());
-
-    var requiredTags = c
-      .of("requiredVehicleParkingTags")
-      .since(V2_1)
-      .summary(
-        "Tags without which a vehicle parking will not be used. If empty, no tags are required."
-      )
-      .asStringSet(List.of());
-    vehicleParking.setFilter(
-      new VehicleParkingFilterRequest(new TagsFilter(bannedTags), new TagsFilter(requiredTags))
-    );
-
-    var preferredTags = c
-      .of("preferredVehicleParkingTags")
-      .since(V2_3)
-      .summary(
-        "Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised."
-      )
-      .asStringSet(List.of());
-
-    vehicleParking.setPreferred(
-      new VehicleParkingFilterRequest(List.of(), List.of(new TagsFilter(preferredTags)))
-    );
-
     request.setWheelchair(WheelchairConfig.wheelchairEnabled(c, WHEELCHAIR_ACCESSIBILITY));
 
     NodeAdapter unpreferred = c
@@ -205,6 +166,8 @@ travel time `x` (in seconds).
           .description("How much cost is added is configured in `unpreferredCost`.")
           .asFeedScopedIds(request.journey().transit().unpreferredAgencies())
       );
+
+    TransitPriorityGroupConfig.mapTransitRequest(c, request.journey().transit());
 
     // Map preferences
     request.withPreferences(preferences -> mapPreferences(c, request, preferences));
@@ -298,7 +261,7 @@ ferries, where the check-in process needs to be done in good time before ride.
         c
           .of("ignoreRealtimeUpdates")
           .since(V2_0)
-          .summary("When true, realtime updates are ignored during this search.")
+          .summary("When true, real-time updates are ignored during this search.")
           .asBoolean(dft.ignoreRealtimeUpdates())
       )
       .setOtherThanPreferredRoutesPenalty(
@@ -332,14 +295,34 @@ ferries, where the check-in process needs to be done in good time before ride.
             """
           )
           .asCostLinearFunction(dft.unpreferredCost())
+      );
+
+    String relaxTransitPriorityGroupValue = c
+      .of("relaxTransitPriorityGroup")
+      .since(V2_5)
+      .summary("The relax function for transit-priority-groups")
+      .description(
+        """
+        A path is considered optimal if the generalized-cost is less than the 
+        generalized-cost of another path. If this parameter is set, the comparison is relaxed
+        further if they belong to different transit-priority-groups.
+        """
       )
-      .withRaptor(it ->
-        c
-          .of("relaxTransitSearchGeneralizedCostAtDestination")
-          .since(V2_3)
-          .summary("Whether non-optimal transit paths at the destination should be returned")
-          .description(
-            """
+      .asString(dft.relaxTransitPriorityGroup().toString());
+
+    if (relaxTransitPriorityGroupValue != null) {
+      builder.withTransitGroupPriorityGeneralizedCostSlack(
+        CostLinearFunction.of(relaxTransitPriorityGroupValue)
+      );
+    }
+
+    builder.withRaptor(it ->
+      c
+        .of("relaxTransitSearchGeneralizedCostAtDestination")
+        .since(V2_3)
+        .summary("Whether non-optimal transit paths at the destination should be returned")
+        .description(
+          """
                 Let c be the existing minimum pareto optimal generalized cost to beat. Then a trip
                 with cost c' is accepted if the following is true:
                 `c' < Math.round(c * relaxRaptorCostCriteria)`.
@@ -349,10 +332,10 @@ ferries, where the check-in process needs to be done in good time before ride.
                 Values equals or less than zero is not allowed. Values greater than 2.0 are not
                 supported, due to performance reasons.
                 """
-          )
-          .asDoubleOptional()
-          .ifPresent(it::withRelaxGeneralizedCostAtDestination)
-      );
+        )
+        .asDoubleOptional()
+        .ifPresent(it::withRelaxGeneralizedCostAtDestination)
+    );
   }
 
   private static void mapBikePreferences(NodeAdapter c, BikePreferences.Builder builder) {
@@ -384,12 +367,6 @@ ferries, where the check-in process needs to be done in good time before ride.
             "This is usually higher that walkBoardCost."
           )
           .asInt(dft.boardCost())
-      )
-      .withParkTime(
-        c.of("bikeParkTime").since(V2_0).summary("Time to park a bike.").asInt(dft.parkTime())
-      )
-      .withParkCost(
-        c.of("bikeParkCost").since(V2_0).summary("Cost to park a bike.").asInt(dft.parkCost())
       )
       .withWalkingSpeed(
         c
@@ -462,6 +439,75 @@ ferries, where the check-in process needs to be done in good time before ride.
             "How bad is it to walk the bicycle up/down a flight of stairs compared to taking a detour."
           )
           .asDouble(dft.stairsReluctance())
+      )
+      .withParking(it ->
+        it
+          .withUnpreferredVehicleParkingTagCost(
+            c
+              .of("unpreferredVehicleParkingTagCost")
+              .since(V2_3)
+              .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
+              .description("See `preferredVehicleParkingTags`.")
+              .asInt(
+                VehicleParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds()
+              )
+          )
+          .withBannedVehicleParkingTags(
+            c
+              .of("bannedVehicleParkingTags")
+              .since(V2_1)
+              .summary(
+                "Tags with which a vehicle parking will not be used. If empty, no tags are banned."
+              )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
+              )
+              .asStringSet(List.of())
+          )
+          .withRequiredVehicleParkingTags(
+            c
+              .of("requiredVehicleParkingTags")
+              .since(V2_1)
+              .summary(
+                "Tags without which a vehicle parking will not be used. If empty, no tags are required."
+              )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
+              )
+              .asStringSet(List.of())
+          )
+          .withParkTime(
+            c
+              .of("bikeParkTime")
+              .since(V2_0)
+              .summary("Time to park a bike.")
+              .asDuration(VehicleParkingPreferences.DEFAULT.parkTime())
+          )
+          .withParkCost(
+            c
+              .of("bikeParkCost")
+              .since(V2_0)
+              .summary("Cost to park a bike.")
+              .asInt(VehicleParkingPreferences.DEFAULT.parkCost().toSeconds())
+          )
+          .withPreferredVehicleParkingTags(
+            c
+              .of("preferredVehicleParkingTags")
+              .since(V2_3)
+              .summary(
+                "Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised."
+              )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
+              )
+              .asStringSet(List.of())
+          )
       );
   }
 
@@ -679,12 +725,6 @@ your users receive a timely response. You can also limit the max duration. There
           )
           .asInt(dft.dropoffTime())
       )
-      .withParkCost(
-        c.of("carParkCost").since(V2_1).summary("Cost of parking a car.").asInt(dft.parkCost())
-      )
-      .withParkTime(
-        c.of("carParkTime").since(V2_1).summary("Time to park a car").asInt(dft.parkTime())
-      )
       .withPickupCost(
         c
           .of("carPickupCost")
@@ -712,6 +752,75 @@ your users receive a timely response. You can also limit the max duration. There
           .since(V2_0)
           .summary("The deceleration speed of an automobile, in meters per second per second.")
           .asDouble(dft.decelerationSpeed())
+      )
+      .withParking(it ->
+        it
+          .withUnpreferredVehicleParkingTagCost(
+            c
+              .of("unpreferredVehicleParkingTagCost")
+              .since(V2_3)
+              .summary("What cost to add if a parking facility doesn't contain a preferred tag.")
+              .description("See `preferredVehicleParkingTags`.")
+              .asInt(
+                VehicleParkingPreferences.DEFAULT.unpreferredVehicleParkingTagCost().toSeconds()
+              )
+          )
+          .withBannedVehicleParkingTags(
+            c
+              .of("bannedVehicleParkingTags")
+              .since(V2_1)
+              .summary(
+                "Tags with which a vehicle parking will not be used. If empty, no tags are banned."
+              )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
+              )
+              .asStringSet(List.of())
+          )
+          .withRequiredVehicleParkingTags(
+            c
+              .of("requiredVehicleParkingTags")
+              .since(V2_1)
+              .summary(
+                "Tags without which a vehicle parking will not be used. If empty, no tags are required."
+              )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
+              )
+              .asStringSet(List.of())
+          )
+          .withParkCost(
+            c
+              .of("carParkCost")
+              .since(V2_1)
+              .summary("Cost of parking a car.")
+              .asInt(VehicleParkingPreferences.DEFAULT.parkCost().toSeconds())
+          )
+          .withParkTime(
+            c
+              .of("carParkTime")
+              .since(V2_1)
+              .summary("Time to park a car")
+              .asDuration(VehicleParkingPreferences.DEFAULT.parkTime())
+          )
+          .withPreferredVehicleParkingTags(
+            c
+              .of("preferredVehicleParkingTags")
+              .since(V2_3)
+              .summary(
+                "Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised."
+              )
+              .description(
+                """
+                Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+                """
+              )
+              .asStringSet(List.of())
+          )
       );
   }
 

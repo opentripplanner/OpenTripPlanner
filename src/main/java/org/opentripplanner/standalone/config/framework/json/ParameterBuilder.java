@@ -4,7 +4,6 @@ import static org.opentripplanner.standalone.config.framework.json.ConfigType.BO
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.COST_LINEAR_FUNCTION;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.DOUBLE;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.DURATION;
-import static org.opentripplanner.standalone.config.framework.json.ConfigType.ENUM;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.FEED_SCOPED_ID;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.INTEGER;
 import static org.opentripplanner.standalone.config.framework.json.ConfigType.LOCALE;
@@ -23,7 +22,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -89,6 +87,11 @@ public class ParameterBuilder {
   /** Add documentation detail description to a parameter. */
   public ParameterBuilder description(String description) {
     this.info.withDescription(description);
+    return this;
+  }
+
+  public ParameterBuilder experimentalFeature() {
+    this.info.withExperimentalFeature();
     return this;
   }
 

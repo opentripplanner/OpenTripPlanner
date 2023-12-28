@@ -5,9 +5,11 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.framework.collection.CollectionsView;
+import org.opentripplanner.framework.collection.MapUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
@@ -28,6 +30,7 @@ public class StopModel implements Serializable {
 
   private static final Logger LOG = LoggerFactory.getLogger(StopModel.class);
 
+  private final AtomicInteger stopIndexCounter;
   private final Map<FeedScopedId, RegularStop> regularStopById;
   private final Map<FeedScopedId, Station> stationById;
   private final Map<FeedScopedId, MultiModalStation> multiModalStationById;
@@ -38,16 +41,18 @@ public class StopModel implements Serializable {
 
   @Inject
   public StopModel() {
+    this.stopIndexCounter = new AtomicInteger(0);
     this.regularStopById = Map.of();
     this.stationById = Map.of();
     this.multiModalStationById = Map.of();
     this.groupOfStationsById = Map.of();
     this.areaStopById = Map.of();
     this.groupStopById = Map.of();
-    this.index = new StopModelIndex(List.of(), List.of(), List.of(), List.of());
+    this.index = createIndex();
   }
 
-  public StopModel(StopModelBuilder builder) {
+  StopModel(StopModelBuilder builder) {
+    this.stopIndexCounter = builder.stopIndexCounter();
     this.regularStopById = builder.regularStopsById().asImmutableMap();
     this.stationById = builder.stationById().asImmutableMap();
     this.multiModalStationById = builder.multiModalStationById().asImmutableMap();
@@ -57,12 +62,49 @@ public class StopModel implements Serializable {
     reindex();
   }
 
-  public static StopModelBuilder of() {
-    return new StopModelBuilder();
+  /**
+   * Merge child into main. The child model must be created using the {@code main.withContext()}
+   * method, if not this method will fail! If a duplicate key exist, then child value is kept -
+   * this feature is normally not allowed, but not enforced here.
+   */
+  private StopModel(StopModel main, StopModel child) {
+    this.stopIndexCounter = assertSameStopIndexCounterIsUsedToCreateBothModels(main, child);
+    this.areaStopById = MapUtils.combine(main.areaStopById, child.areaStopById);
+    this.regularStopById = MapUtils.combine(main.regularStopById, child.regularStopById);
+    this.groupOfStationsById =
+      MapUtils.combine(main.groupOfStationsById, child.groupOfStationsById);
+    this.groupStopById = MapUtils.combine(main.groupStopById, child.groupStopById);
+    this.multiModalStationById =
+      MapUtils.combine(main.multiModalStationById, child.multiModalStationById);
+    this.stationById = MapUtils.combine(main.stationById, child.stationById);
+    reindex();
   }
 
-  public StopModelBuilder copy() {
-    return new StopModelBuilder(this);
+  /**
+   * Create a new builder based on an empty model. This is useful in unit-tests, but should
+   * NOT be used in the main code. It is not possible to merge the result with another
+   * {@link StopModel}, because they do not share the same context(stopIndexCounter).
+   * <p>
+   * In the application code the correct way is to retrieve a model instance and then use the
+   * {@link #withContext()} method to create a builder.
+   */
+  public static StopModelBuilder of() {
+    return new StopModelBuilder(new AtomicInteger(0));
+  }
+
+  /**
+   * Create a new builder attached to the existing model. The entities of the existing model are
+   * NOT copied into the builder, but the builder has access to the model - allowing it to check
+   * for duplicates and injecting information from the model(indexing). The changes in the
+   * StopModelBuilder can then be merged into the original model - this is for now left to the
+   * caller.
+   * <p>
+   * USE THIS TO CREATE A SAFE BUILDER IN PRODUCTION CODE. You MAY use this method in unit-tests,
+   * the alternative is the {@link #of()} method. This method should be used if the test have a
+   * StopModel and the {@link #of()} method should be used if a stop-model in not needed.
+   */
+  public StopModelBuilder withContext() {
+    return new StopModelBuilder(this.stopIndexCounter);
   }
 
   /**
@@ -233,16 +275,24 @@ public class StopModel implements Serializable {
     reindex();
   }
 
+  public StopModel merge(StopModel child) {
+    return new StopModel(this, child);
+  }
+
   private void reindex() {
     LOG.info("Index stop model...");
-    index =
-      new StopModelIndex(
-        regularStopById.values(),
-        areaStopById.values(),
-        groupStopById.values(),
-        multiModalStationById.values()
-      );
+    index = createIndex();
     LOG.info("Index stop model complete.");
+  }
+
+  private StopModelIndex createIndex() {
+    return new StopModelIndex(
+      regularStopById.values(),
+      areaStopById.values(),
+      groupStopById.values(),
+      multiModalStationById.values(),
+      stopIndexCounter.get()
+    );
   }
 
   @Nullable
@@ -258,5 +308,23 @@ public class StopModel implements Serializable {
       }
     }
     return null;
+  }
+
+  /**
+   * The 'stopIndexCounter' must be the same instance, hence the '!=' operator.
+   */
+  @SuppressWarnings("NumberEquality")
+  private static AtomicInteger assertSameStopIndexCounterIsUsedToCreateBothModels(
+    StopModel main,
+    StopModel child
+  ) {
+    if (main.stopIndexCounter != child.stopIndexCounter) {
+      throw new IllegalArgumentException(
+        "Two Stop models can only be merged if they are created with the same stopIndexCounter. " +
+        "This is archived by using the 'StopModel.withContext()' method. We do this to avoid " +
+        "duplicates/gaps in the stopIndex."
+      );
+    }
+    return main.stopIndexCounter;
   }
 }

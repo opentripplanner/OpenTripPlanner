@@ -30,6 +30,11 @@ public enum OTPFeature {
   DebugClient(true, false, "Enable the debug web client located at the root of the web server."),
   FloatingBike(true, false, "Enable floating bike routing."),
   GtfsGraphQlApi(true, false, "Enable GTFS GraphQL API."),
+  GtfsGraphQlApiRentalStationFuzzyMatching(
+    false,
+    false,
+    "Does vehicleRentalStation query also allow ids that are not feed scoped."
+  ),
   /**
    * If this feature flag is switched on, then the minimum transfer time is not the minimum transfer
    * time, but the definitive transfer time. Use this to override what we think the transfer will
@@ -56,8 +61,9 @@ public enum OTPFeature {
   TransferConstraints(
     true,
     false,
-    "Enforce transfers to happen according to the _transfers.txt_(GTFS) and Interchanges(NeTEx). Turing this _off_ will increase the routing performance a little."
+    "Enforce transfers to happen according to the _transfers.txt_ (GTFS) and Interchanges (NeTEx). Turning this _off_ will increase the routing performance a little."
   ),
+  TransmodelGraphQlApi(true, true, "Enable Transmodel (NeTEx) GraphQL API."),
 
   /* Sandbox extension features - Must be turned OFF by default */
 
@@ -67,7 +73,7 @@ public enum OTPFeature {
     false,
     "Whether the @async annotation in the GraphQL schema should lead to the fetch being executed asynchronously. This allows batch or alias queries to run in parallel at the cost of consuming extra threads."
   ),
-
+  Co2Emissions(false, true, "Enable the emissions sandbox module."),
   DataOverlay(
     false,
     true,
@@ -79,7 +85,7 @@ public enum OTPFeature {
   RealtimeResolver(
     false,
     true,
-    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with realtime data"
+    "When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with real-time data"
   ),
   ReportApi(false, true, "Enable the report API."),
   RestAPIPassInDefaultConfigAsJson(
@@ -90,7 +96,6 @@ public enum OTPFeature {
   SandboxAPIGeocoder(false, true, "Enable the Geocoder API."),
   SandboxAPIMapboxVectorTilesApi(false, true, "Enable Mapbox vector tiles API."),
   SandboxAPIParkAndRideApi(false, true, "Enable park-and-ride endpoint."),
-  SandboxAPITransmodelApi(false, true, "Enable Entur Transmodel(NeTEx) GraphQL API."),
   SandboxAPITravelTime(false, true, "Enable the isochrone/travel time surface API."),
   TransferAnalyzer(false, true, "Analyze transfers during graph build."),
   VehicleToStopHeuristics(false, true, "Enable improved heuristic for park-and-ride queries.");

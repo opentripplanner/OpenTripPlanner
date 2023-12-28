@@ -9,7 +9,7 @@ public interface ArchComponent {
   /**
    * ArchUnit cached set of classes in OTP. It takes a bit of time to build the set of
    * classes, so it is nice to avoid this for every test. ArchUnit also support JUnit5
-   * with a @ArchTest annotation witch cache and inject the classes, but the test become
+   * with a @ArchTest annotation which cache and inject the classes, but the test become
    * slightly more complex by using it and chasing it here works fine.
    */
   JavaClasses OTP_CLASSES = new ClassFileImporter()

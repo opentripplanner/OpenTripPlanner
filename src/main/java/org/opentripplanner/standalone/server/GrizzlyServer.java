@@ -1,22 +1,22 @@
 package org.opentripplanner.standalone.server;
 
+import static org.opentripplanner.framework.application.ApplicationShutdownSupport.addShutdownHook;
+import static org.opentripplanner.framework.application.ApplicationShutdownSupport.removeShutdownHook;
+
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import jakarta.ws.rs.core.Application;
-import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.time.Duration;
+import java.util.Optional;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
-import org.glassfish.grizzly.ssl.SSLContextConfigurator;
-import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.jersey.server.ContainerFactory;
-import org.opentripplanner.framework.application.ApplicationShutdownSupport;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.slf4j.Logger;
@@ -58,18 +58,12 @@ public class GrizzlyServer {
    */
   public void run() {
     LOG.info(
-      "Starting OTP Grizzly server on ports {} (HTTP) and {} (HTTPS) of interface {}",
+      "Starting OTP Grizzly server on port {} of interface {}",
       params.port,
-      params.securePort,
       params.bindAddress
     );
     LOG.info("OTP server base directory is: {}", params.baseDirectory);
     HttpServer httpServer = new HttpServer();
-
-    /* Configure SSL FIXME OTP2 where will we store they keyfile? */
-    SSLContextConfigurator sslConfig = new SSLContextConfigurator();
-    sslConfig.setKeyStoreFile(new File(params.getBaseDirectory(), "keystore").getAbsolutePath());
-    sslConfig.setKeyStorePass("opentrip");
 
     // Set up a pool of threads to handle incoming HTTP requests.
     // According to the Grizzly docs, setting the core and max pool size equal with no queue limit
@@ -92,28 +86,14 @@ public class GrizzlyServer {
     );
     httpListener.setSecure(false);
 
-    /* HTTPS listener */
-    NetworkListener httpsListener = new NetworkListener(
-      "otp_secure",
-      params.bindAddress,
-      params.securePort
-    );
-    // Ideally we'd share the threads between HTTP and HTTPS.
-    httpsListener.setSecure(true);
-    httpsListener.setSSLEngineConfig(
-      new SSLEngineConfigurator(sslConfig).setClientMode(false).setNeedClientAuth(false)
-    );
-
-    // For both HTTP and HTTPS listeners: enable gzip compression, set thread pool, add listener to httpServer.
-    for (NetworkListener listener : new NetworkListener[] { httpListener, httpsListener }) {
-      CompressionConfig cc = listener.getCompressionConfig();
-      cc.setCompressionMode(CompressionConfig.CompressionMode.ON);
-      cc.setCompressionMinSize(50000); // the min number of bytes to compress
-      cc.setCompressableMimeTypes("application/json", "text/json"); // the mime types to compress
-      listener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
-      listener.setTransactionTimeout((int) httpTransactionTimeout.toSeconds());
-      httpServer.addListener(listener);
-    }
+    // For the HTTP listener: enable gzip compression, set thread pool, add listener to httpServer.
+    CompressionConfig cc = httpListener.getCompressionConfig();
+    cc.setCompressionMode(CompressionConfig.CompressionMode.ON);
+    cc.setCompressionMinSize(50000); // the min number of bytes to compress
+    cc.setCompressableMimeTypes("application/json", "text/json"); // the mime types to compress
+    httpListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
+    httpListener.setTransactionTimeout((int) httpTransactionTimeout.toSeconds());
+    httpServer.addListener(httpListener);
 
     /* Add a few handlers (~= servlets) to the Grizzly server. */
 
@@ -149,10 +129,11 @@ public class GrizzlyServer {
     // Graph graph = gs.getGraph();
     // httpServer.getServerConfiguration().addHttpHandler(new OTPHttpHandler(graph), "/test/*");
 
-    // Add shutdown hook to gracefully shut down Grizzly.
-    // Signal handling (sun.misc.Signal) is potentially not available on all JVMs.
-    Thread shutdownThread = new Thread(httpServer::shutdown, "grizzly-shutdown");
-    ApplicationShutdownSupport.addShutdownHook(shutdownThread, shutdownThread.getName());
+    // Add shutdown hook to gracefully shut down Grizzly. If no thread is returned then shutdown is already in progress.
+    Optional<Thread> shutdownThread = addShutdownHook("grizzly-shutdown", httpServer::shutdown);
+    if (!shutdownThread.isPresent()) {
+      return;
+    }
 
     /* RELINQUISH CONTROL TO THE SERVER THREAD */
     try {
@@ -167,8 +148,7 @@ public class GrizzlyServer {
       LOG.info("Interrupted, shutting down.");
     }
 
-    // Clean up graceful shutdown hook before shutting down Grizzly.
-    Runtime.getRuntime().removeShutdownHook(shutdownThread);
+    shutdownThread.ifPresent(thread -> removeShutdownHook(thread));
     httpServer.shutdown();
   }
 

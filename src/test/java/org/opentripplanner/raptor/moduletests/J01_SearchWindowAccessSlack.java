@@ -65,11 +65,11 @@ public class J01_SearchWindowAccessSlack implements RaptorTestConstants {
   }
 
   static List<RaptorModuleTestCase> testCases() {
-    var path = "Walk 1m ~ A ~ BUS R1 0:10 0:20 ~ B ~ Walk 30s [0:09 0:20:30 11m30s 0tx $1380]";
+    var path = "Walk 1m ~ A ~ BUS R1 0:10 0:20 ~ B ~ Walk 30s [0:09 0:20:30 11m30s Tₓ0 C₁1_380]";
     return RaptorModuleTestCase
       .of()
-      .add(TC_MIN_DURATION, "[0:09 0:20:30 11m30s 0tx]")
-      .add(TC_MIN_DURATION_REV, "[0:18:30 0:30 11m30s 0tx]")
+      .add(TC_MIN_DURATION, "[0:09 0:20:30 11m30s Tₓ0]")
+      .add(TC_MIN_DURATION_REV, "[0:18:30 0:30 11m30s Tₓ0]")
       .add(standard(), PathUtils.withoutCost(path))
       .add(multiCriteria(), path)
       .build();

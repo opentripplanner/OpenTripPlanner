@@ -7,7 +7,11 @@ import java.time.ZoneId;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.dataoverlay.EdgeUpdaterModule;
+import org.opentripplanner.ext.emissions.EmissionsDataModel;
+import org.opentripplanner.ext.emissions.EmissionsModule;
 import org.opentripplanner.ext.flex.AreaStopsToVerticesMapper;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationModule;
+import org.opentripplanner.ext.stopconsolidation.StopConsolidationRepository;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
@@ -20,7 +24,6 @@ import org.opentripplanner.graph_builder.module.TimeZoneAdjusterModule;
 import org.opentripplanner.graph_builder.module.TripPatternNamer;
 import org.opentripplanner.graph_builder.module.geometry.CalculateWorldEnvelopeModule;
 import org.opentripplanner.graph_builder.module.islandpruning.PruneIslands;
-import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.OsmModule;
 import org.opentripplanner.gtfs.graphbuilder.GtfsModule;
@@ -37,10 +40,10 @@ public interface GraphBuilderFactory {
   GraphBuilder graphBuilder();
   OsmModule osmModule();
   GtfsModule gtfsModule();
+  EmissionsModule emissionsModule();
   NetexModule netexModule();
   TimeZoneAdjusterModule timeZoneAdjusterModule();
   TripPatternNamer tripPatternNamer();
-  BusRouteStreetMatcher busRouteStreetMatcher();
   OsmBoardingLocationsModule osmBoardingLocationsModule();
   StreetLinkerModule streetLinkerModule();
   PruneIslands pruneIslands();
@@ -52,6 +55,12 @@ public interface GraphBuilderFactory {
   EdgeUpdaterModule dataOverlayFactory();
   DataImportIssueReporter dataImportIssueReporter();
   CalculateWorldEnvelopeModule calculateWorldEnvelopeModule();
+
+  @Nullable
+  StopConsolidationModule stopConsolidationModule();
+
+  @Nullable
+  StopConsolidationRepository stopConsolidationRepository();
 
   @Component.Builder
   interface Builder {
@@ -68,11 +77,19 @@ public interface GraphBuilderFactory {
     Builder worldEnvelopeRepository(WorldEnvelopeRepository worldEnvelopeRepository);
 
     @BindsInstance
+    Builder stopConsolidationRepository(
+      @Nullable StopConsolidationRepository stopConsolidationRepository
+    );
+
+    @BindsInstance
     Builder dataSources(GraphBuilderDataSources graphBuilderDataSources);
 
     @BindsInstance
     Builder timeZoneId(@Nullable ZoneId zoneId);
 
     GraphBuilderFactory build();
+
+    @BindsInstance
+    Builder emissionsDataModel(@Nullable EmissionsDataModel emissionsDataModel);
   }
 }

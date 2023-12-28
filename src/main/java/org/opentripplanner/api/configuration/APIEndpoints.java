@@ -10,8 +10,8 @@ import static org.opentripplanner.framework.application.OTPFeature.ReportApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIGeocoder;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIMapboxVectorTilesApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIParkAndRideApi;
-import static org.opentripplanner.framework.application.OTPFeature.SandboxAPITransmodelApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPITravelTime;
+import static org.opentripplanner.framework.application.OTPFeature.TransmodelGraphQlApi;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,11 +25,11 @@ import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLAPI;
+import org.opentripplanner.apis.transmodel.TransmodelAPI;
 import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.geocoder.GeocoderResource;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
 import org.opentripplanner.ext.reportapi.resource.ReportResource;
-import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.ext.traveltime.TravelTimeResource;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -51,16 +51,16 @@ public class APIEndpoints {
     // Add feature enabled APIs, these can be enabled by default, some is not.
     // See the OTPFeature enum for details.
     addIfEnabled(APIBikeRental, BikeRental.class);
-    addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);
     addIfEnabled(APIGraphInspectorTile, GraphInspectorVectorTileResource.class);
+    addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
+    addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.class);
+    addIfEnabled(TransmodelGraphQlApi, TransmodelAPI.class);
 
     // Sandbox extension APIs
     addIfEnabled(ActuatorAPI, ActuatorAPI.class);
     addIfEnabled(ReportApi, ReportResource.class);
-    addIfEnabled(SandboxAPITransmodelApi, TransmodelAPI.class);
-    addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.class);
     addIfEnabled(SandboxAPIMapboxVectorTilesApi, VectorTilesResource.class);
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
     addIfEnabled(SandboxAPIGeocoder, GeocoderResource.class);

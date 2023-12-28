@@ -238,6 +238,7 @@ public class GraphQLTypes {
     BIKE_PARK,
     CAR_PARK,
     DEPARTURE_ROW,
+    STATION,
     STOP,
     VEHICLE_RENT,
   }
@@ -373,6 +374,7 @@ public class GraphQLTypes {
     private List<String> bikeRentalStations;
     private List<String> carParks;
     private List<String> routes;
+    private List<String> stations;
     private List<String> stops;
 
     public GraphQLInputFiltersInput(Map<String, Object> args) {
@@ -381,6 +383,7 @@ public class GraphQLTypes {
         this.bikeRentalStations = (List<String>) args.get("bikeRentalStations");
         this.carParks = (List<String>) args.get("carParks");
         this.routes = (List<String>) args.get("routes");
+        this.stations = (List<String>) args.get("stations");
         this.stops = (List<String>) args.get("stops");
       }
     }
@@ -401,6 +404,10 @@ public class GraphQLTypes {
       return this.routes;
     }
 
+    public List<String> getGraphQLStations() {
+      return this.stations;
+    }
+
     public List<String> getGraphQLStops() {
       return this.stops;
     }
@@ -419,6 +426,10 @@ public class GraphQLTypes {
 
     public void setGraphQLRoutes(List<String> routes) {
       this.routes = routes;
+    }
+
+    public void setGraphQLStations(List<String> stations) {
+      this.stations = stations;
     }
 
     public void setGraphQLStops(List<String> stops) {

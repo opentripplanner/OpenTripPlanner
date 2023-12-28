@@ -34,9 +34,17 @@ public class ObjectUtils {
   }
 
   public static <T> T requireNotInitialized(T oldValue, T newValue) {
+    return requireNotInitialized(null, oldValue, newValue);
+  }
+
+  public static <T> T requireNotInitialized(@Nullable String name, T oldValue, T newValue) {
     if (oldValue != null) {
       throw new IllegalStateException(
-        "Field is already set! Old value: " + oldValue + ", new value: " + newValue
+        "Field%s is already set! Old value: %s, new value: %s.".formatted(
+            (name == null ? "" : " " + name),
+            oldValue,
+            newValue
+          )
       );
     }
     return newValue;

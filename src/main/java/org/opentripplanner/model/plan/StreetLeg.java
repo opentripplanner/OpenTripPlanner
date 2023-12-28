@@ -180,7 +180,10 @@ public class StreetLeg implements Leg {
   }
 
   /**
-   * Should be used for debug logging only
+   * Should be used for debug logging only.
+   * <p>
+   * The {@code legGeometry}, {@code elevationProfile}, and {@code walkSteps} are skipped to avoid
+   * spamming logs. Explicit access should be used if needed.
    */
   @Override
   public String toString() {
@@ -193,9 +196,6 @@ public class StreetLeg implements Leg {
       .addEnum("mode", mode)
       .addNum("distance", distanceMeters, "m")
       .addNum("cost", generalizedCost)
-      .addObj("legGeometry", legGeometry)
-      .addObj("legElevation", elevationProfile)
-      .addCol("walkSteps", walkSteps)
       .addCol("streetNotes", streetNotes)
       .addBool("walkingBike", walkingBike)
       .addBool("rentedVehicle", rentedVehicle)

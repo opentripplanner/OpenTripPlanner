@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
+import org.geotools.api.referencing.crs.CoordinateReferenceSystem;
 import org.geotools.referencing.CRS;
 import org.locationtech.jts.algorithm.ConvexHull;
 import org.locationtech.jts.geom.Coordinate;
@@ -27,7 +28,6 @@ import org.locationtech.jts.geom.impl.PackedCoordinateSequenceFactory;
 import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,9 +81,13 @@ public class GeometryUtils {
     return factory.createLineString(coordinates.toArray(new Coordinate[] {}));
   }
 
-  public static LineString makeLineString(Coordinate[] coordinates) {
+  public static LineString makeLineString(Coordinate... coordinates) {
     GeometryFactory factory = getGeometryFactory();
     return factory.createLineString(coordinates);
+  }
+
+  public static LineString makeLineString(WgsCoordinate... coordinates) {
+    return makeLineString(Arrays.stream(coordinates).map(WgsCoordinate::asJtsCoordinate).toList());
   }
 
   public static <T> LineString concatenateLineStrings(

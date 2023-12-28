@@ -6,7 +6,6 @@ import static org.opentripplanner.transit.model._data.TransitModelForTest.id;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -16,14 +15,16 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripPatternForDate;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.network.StopPattern;
 import org.opentripplanner.transit.model.network.TripPattern;
+import org.opentripplanner.transit.model.timetable.ScheduledTripTimes;
 import org.opentripplanner.transit.model.timetable.TripTimes;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
+
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   public static final FeedScopedId TP_ID_1 = id("1");
   public static final FeedScopedId TP_ID_2 = id("2");
@@ -63,7 +64,8 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(
       startOfTime,
       tripPatternsForDates,
-      new TestTransitDataProviderFilter()
+      new TestTransitDataProviderFilter(),
+      PriorityGroupConfigurator.empty()
     );
 
     // Get the results
@@ -95,27 +97,21 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
   }
 
   private TripTimes createTripTimesForTest() {
-    StopTime stopTime1 = new StopTime();
-    StopTime stopTime2 = new StopTime();
-
-    stopTime1.setDepartureTime(0);
-    stopTime2.setArrivalTime(7200);
-
-    return new TripTimes(
-      TransitModelForTest.trip("Test").build(),
-      Arrays.asList(stopTime1, stopTime2),
-      new Deduplicator()
-    );
+    return ScheduledTripTimes
+      .of()
+      .withTrip(TransitModelForTest.trip("Test").build())
+      .withDepartureTimes("00:00 02:00")
+      .build();
   }
 
   /**
-   * Utility function to create bare minimum of valid StopTime with no interesting attributes
+   * Utility function to create bare minimum of valid StopTime
    *
    * @return StopTime instance
    */
   private static StopTime createStopTime() {
     var st = new StopTime();
-    st.setStop(TransitModelForTest.stopForTest("Stop:1", 0.0, 0.0));
+    st.setStop(TEST_MODEL.stop("Stop:1", 0.0, 0.0).build());
     return st;
   }
 

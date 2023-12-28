@@ -21,6 +21,11 @@ public class ToStringBuilderTest {
   private static final ZoneId TIME_ZONE_ID_PARIS = ZoneIds.PARIS;
 
   @Test
+  public void ofName() {
+    assertEquals("Name{}", ToStringBuilder.of("Name").toString());
+  }
+
+  @Test
   public void addFieldIfTrue() {
     assertEquals("ToStringBuilderTest{x}", subject().addBoolIfTrue("x", true).toString());
     assertEquals("ToStringBuilderTest{}", subject().addBoolIfTrue("x", false).toString());
@@ -251,7 +256,10 @@ public class ToStringBuilderTest {
       LocalDateTime.of(2012, 1, 28, 23, 45, 12),
       TIME_ZONE_ID_PARIS
     );
-    assertEquals("ToStringBuilderTest{t: 23:45:12}", subject().addTime("t", c).toString());
+    assertEquals(
+      "ToStringBuilderTest{t: 2012-01-28T23:45:12}",
+      subject().addTime("t", c).toString()
+    );
   }
 
   @Test

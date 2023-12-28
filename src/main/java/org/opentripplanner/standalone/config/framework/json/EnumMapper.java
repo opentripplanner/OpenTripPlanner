@@ -31,7 +31,7 @@ public class EnumMapper {
   }
 
   /**
-   * Used to create a list of all values with description of each value witch can be included
+   * Used to create a list of all values with description of each value which can be included
    * in documentation. The list will look like this:
    * ```
    *  - `on` Turn on.

@@ -10,19 +10,19 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
+import org.opentripplanner.transit.service.StopModel;
 
 class GroupStopTest {
+
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
 
-  private static final StopLocation STOP_LOCATION = TransitModelForTest.stopForTest(
-    "1:stop",
-    1d,
-    1d
-  );
-  private static final GroupStop subject = GroupStop
-    .of(TransitModelForTest.id(ID))
+  private static final StopLocation STOP_LOCATION = TEST_MODEL.stop("1:stop", 1d, 1d).build();
+  private static final GroupStop subject = StopModel
+    .of()
+    .groupStop(TransitModelForTest.id(ID))
     .withName(NAME)
     .addLocation(STOP_LOCATION)
     .build();
@@ -55,7 +55,7 @@ class GroupStopTest {
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       subject.sameAs(
-        subject.copy().addLocation(TransitModelForTest.stopForTest("2:stop", 1d, 2d)).build()
+        subject.copy().addLocation(TransitModelForTest.of().stop("2:stop", 1d, 2d).build()).build()
       )
     );
   }

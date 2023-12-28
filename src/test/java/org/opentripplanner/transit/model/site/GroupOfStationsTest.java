@@ -13,17 +13,17 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 class GroupOfStationsTest {
 
+  private static TransitModelForTest TEST_MODEL = TransitModelForTest.of();
+
   private static final String ID = "1";
   private static final I18NString NAME = new NonLocalizedString("name");
 
-  private static final Station STATION = TransitModelForTest.station("1:station").build();
+  private static final Station STATION = TEST_MODEL.station("1:station").build();
 
-  private static final StopLocation STOP_LOCATION = TransitModelForTest.stopForTest(
-    "1:stop",
-    1d,
-    1d,
-    STATION
-  );
+  private static final StopLocation STOP_LOCATION = TEST_MODEL
+    .stop("1:stop", 1d, 1d)
+    .withParentStation(STATION)
+    .build();
 
   private static final GroupOfStations subject = GroupOfStations
     .of(TransitModelForTest.id(ID))
@@ -59,7 +59,7 @@ class GroupOfStationsTest {
     assertFalse(subject.sameAs(subject.copy().withName(new NonLocalizedString("X")).build()));
     assertFalse(
       subject.sameAs(
-        subject.copy().addChildStation(TransitModelForTest.station("2:station").build()).build()
+        subject.copy().addChildStation(TEST_MODEL.station("2:station").build()).build()
       )
     );
   }

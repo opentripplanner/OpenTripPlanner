@@ -82,7 +82,7 @@ public class E03_NotAllowedConstrainedTransferTest implements RaptorTestConstant
   static List<RaptorModuleTestCase> testCases() {
     var path =
       "Walk 30s ~ A ~ BUS R1 0:02 0:05 ~ B ~ BUS R3 0:15 0:20 ~ C ~ Walk 30s " +
-      "[0:01:30 0:20:30 19m 1tx $2500]";
+      "[0:01:30 0:20:30 19m Tₓ1 C₁2_500]";
     return RaptorModuleTestCase
       .of()
       .addMinDuration("9m", TX_1, T00_00, T00_30)

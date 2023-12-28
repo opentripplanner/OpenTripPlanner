@@ -18,8 +18,8 @@ import org.opentripplanner.street.model.vertex.SimpleVertex;
 import org.opentripplanner.test.support.VariableSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
+import org.opentripplanner.transit.service.StopModel;
 
 public class PlaceTest {
 
@@ -51,8 +51,9 @@ public class PlaceTest {
 
   @Test
   public void sameLocationBasedOnStopId() {
-    var s1 = TransitModelForTest.stop("1").withCoordinate(1.0, 1.0).build();
-    var s2 = TransitModelForTest.stop("2").withCoordinate(1.0, 2.0).build();
+    var testModel = TransitModelForTest.of();
+    var s1 = testModel.stop("1").withCoordinate(1.0, 1.0).build();
+    var s2 = testModel.stop("2").withCoordinate(1.0, 2.0).build();
 
     Place aPlace = place(s1);
     Place samePlace = place(s1);
@@ -76,8 +77,9 @@ public class PlaceTest {
   @ParameterizedTest(name = "Flex stop name of {0} should lead to a place name of {1}")
   @VariableSource("flexStopCases")
   public void flexStop(I18NString stopName, String expectedPlaceName) {
-    var stop = AreaStop
-      .of(new FeedScopedId("1", "stop_id"))
+    var stop = StopModel
+      .of()
+      .areaStop(new FeedScopedId("1", "stop_id"))
       .withGeometry(GEOMETRY)
       .withName(stopName)
       .build();

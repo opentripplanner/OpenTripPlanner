@@ -34,12 +34,14 @@ import org.opentripplanner.transit.service.TransitService;
 
 class RealtimeResolverTest {
 
+  private final TransitModelForTest testModel = TransitModelForTest.of();
+
   private final Route route1 = TransitModelForTest.route("route1").build();
   private final Route route2 = TransitModelForTest.route("route2").build();
 
-  private final RegularStop stop1 = TransitModelForTest.stopForTest("stop1", 1, 1);
-  private final RegularStop stop2 = TransitModelForTest.stopForTest("stop2", 2, 1);
-  private final RegularStop stop3 = TransitModelForTest.stopForTest("stop3", 3, 1);
+  private final RegularStop stop1 = testModel.stop("stop1", 1, 1).build();
+  private final RegularStop stop2 = testModel.stop("stop2", 2, 1).build();
+  private final RegularStop stop3 = testModel.stop("stop3", 3, 1).build();
 
   @Test
   void testPopulateLegsWithRealtime() {
@@ -135,7 +137,7 @@ class RealtimeResolverTest {
   }
 
   private static TripTimes delay(TripTimes tt, int seconds) {
-    var delayed = new TripTimes(tt);
+    var delayed = tt.copyScheduledTimes();
     IntStream
       .range(0, delayed.getNumStops())
       .forEach(i -> {

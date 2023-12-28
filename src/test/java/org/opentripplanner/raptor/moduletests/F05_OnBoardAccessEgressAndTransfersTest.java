@@ -25,7 +25,7 @@ import org.opentripplanner.raptor.moduletests.support.RaptorModuleTestCase;
  * FEATURE UNDER TEST
  * <p>
  * Raptor should be able to route Access arriving on-board and egress departing on-board connecting
- * to transit by transfers. Access and egress witch arrive/depart at/from the same stops by
+ * to transit by transfers. Access and egress which arrive/depart at/from the same stops by
  * walking should not be possible.
  */
 public class F05_OnBoardAccessEgressAndTransfersTest implements RaptorTestConstants {
@@ -57,7 +57,7 @@ public class F05_OnBoardAccessEgressAndTransfersTest implements RaptorTestConsta
 
   static List<RaptorModuleTestCase> testCases() {
     var path =
-      "Flex 5m 1x ~ A ~ Walk 10s ~ B ~ BUS R1 0:10 0:20 ~ C ~ Walk 10s ~ D ~ Flex 5m 1x [0:03:50 0:26:10 22m20s 2tx $2560]";
+      "Flex 5m 1x ~ A ~ Walk 10s ~ B ~ BUS R1 0:10 0:20 ~ C ~ Walk 10s ~ D ~ Flex 5m 1x [0:03:50 0:26:10 22m20s Tₓ2 C₁2_560]";
 
     return RaptorModuleTestCase
       .of()

@@ -9,6 +9,7 @@ import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
 import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
+import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
 import org.opentripplanner.raptor.rangeraptor.internalapi.PassThroughPointsService;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorker;
 import org.opentripplanner.raptor.rangeraptor.internalapi.RaptorWorkerState;
@@ -57,7 +58,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   /**
    * The PassThroughPointsService is injected into the transit-calculator, so it needs to be
-   * created before the context(witch create the calculator).So, to be able to do this, this
+   * created before the context(which create the calculator).So, to be able to do this, this
    * factory is static, and the service is passed back in when this config is instantiated.
    */
   public static PassThroughPointsService passThroughPointsService(
@@ -157,7 +158,8 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private DestinationArrivalPaths<T> createDestinationArrivalPaths() {
     if (paths == null) {
-      paths = pathConfig.createDestArrivalPaths(true, includeC2() ? dominanceFunctionC2() : null);
+      var c2Comp = includeC2() ? dominanceFunctionC2() : null;
+      paths = pathConfig.createDestArrivalPaths(resolveCostConfig(), c2Comp);
     }
     return paths;
   }
@@ -208,5 +210,18 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
   private boolean isTransitPriority() {
     return mcRequest().transitPriorityCalculator().isPresent();
+  }
+
+  private ParetoSetCost resolveCostConfig() {
+    if (isTransitPriority()) {
+      return ParetoSetCost.USE_C1_RELAXED_IF_C2_IS_OPTIMAL;
+    }
+    if (isPassThrough()) {
+      return ParetoSetCost.USE_C1_AND_C2;
+    }
+    if (context.multiCriteria().relaxCostAtDestination() != null) {
+      return ParetoSetCost.USE_C1_RELAX_DESTINATION;
+    }
+    return ParetoSetCost.USE_C1;
   }
 }

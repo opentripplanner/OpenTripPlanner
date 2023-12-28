@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
@@ -15,13 +14,13 @@ import org.opentripplanner.raptor._data.transit.TestAccessEgress;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.raptor.spi.BoardAndAlightTime;
 import org.opentripplanner.raptor.spi.DefaultSlackProvider;
 import org.opentripplanner.raptor.spi.RaptorCostCalculator;
 import org.opentripplanner.raptor.spi.RaptorSlackProvider;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.DefaultCostCalculator;
-import org.opentripplanner.routing.algorithm.transferoptimization.model.MinCostFilterChain;
 import org.opentripplanner.routing.algorithm.transferoptimization.model.OptimizedPathTail;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.PathTailFilter;
+import org.opentripplanner.routing.algorithm.transferoptimization.model.costfilter.MinCostPathTailFilterFactory;
 
 public class TransitPathLegSelectorTest implements RaptorTestConstants {
 
@@ -39,13 +38,17 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
     null
   );
 
-  public static final MinCostFilterChain<OptimizedPathTail<TestTripSchedule>> FILTER_CHAIN = new MinCostFilterChain<>(
-    List.of(OptimizedPathTail::generalizedCost)
+  public static final PathTailFilter<TestTripSchedule> FILTER_CHAIN = MinCostPathTailFilterFactory.ofCostFunction(
+    OptimizedPathTail::generalizedCost
   );
 
-  private final int T10_00 = TimeUtils.time("10:00");
-  private final int T10_20 = TimeUtils.time("10:20");
-  private final int T10_40 = TimeUtils.time("10:40");
+  private final int STOP_TIME_ONE = TimeUtils.time("10:00");
+  private final int STOP_TIME_TWO = TimeUtils.time("10:20");
+  private final int STOP_TIME_THREE = TimeUtils.time("10:40");
+
+  private final int STOP_POS_ONE = 0;
+  private final int STOP_POS_TWO = 1;
+  private final int STOP_POS_THREE = 2;
 
   private final OptimizedPathTail<TestTripSchedule> pathTail = new OptimizedPathTail<>(
     SLACK_PROVIDER,
@@ -60,10 +63,10 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
   private final TestTripSchedule TRIP = TestTripSchedule
     .schedule()
     .pattern("L1", STOP_A, STOP_C, STOP_E)
-    .times(T10_00, T10_20, T10_40)
+    .times(STOP_TIME_ONE, STOP_TIME_TWO, STOP_TIME_THREE)
     .build();
 
-  private final int EGRESS_START = T10_40 + D1m;
+  private final int EGRESS_START = STOP_TIME_THREE + D1m;
   private final int EGRESS_END = EGRESS_START + D5m;
 
   @Test
@@ -78,10 +81,10 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
 
     var subject = new TransitPathLegSelector<>(FILTER_CHAIN, Set.of(leg));
 
-    var result = subject.next(T10_40);
+    var result = subject.next(STOP_POS_THREE);
     assertTrue(result.isEmpty(), result.toString());
 
-    result = subject.next(T10_40 - 1);
+    result = subject.next(STOP_POS_TWO);
     assertFalse(result.isEmpty(), result.toString());
   }
 
@@ -92,25 +95,14 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
 
     var subject = new TransitPathLegSelector<>(FILTER_CHAIN, Set.of(leg1, leg2));
 
-    var result = subject.next(T10_40);
+    var result = subject.next(STOP_POS_THREE);
     assertTrue(result.isEmpty(), result.toString());
 
-    result = subject.next(T10_40 - 1);
+    result = subject.next(STOP_POS_TWO);
     assertEquals("BUS L1 10:00 10:40", firstRide(result));
     assertEquals(result.size(), 1);
 
-    // No change yet
-    result = subject.next(T10_20);
-    assertEquals("BUS L1 10:00 10:40", firstRide(result));
-    assertEquals(result.size(), 1);
-
-    // Get next
-    result = subject.next(T10_20 - 1);
-    assertEquals("BUS L1 10:00 10:20", firstRide(result));
-    assertEquals(result.size(), 1);
-
-    // Same as previous
-    result = subject.next(0);
+    result = subject.next(STOP_POS_ONE);
     assertEquals("BUS L1 10:00 10:20", firstRide(result));
     assertEquals(result.size(), 1);
   }
@@ -125,20 +117,14 @@ public class TransitPathLegSelectorTest implements RaptorTestConstants {
 
   private TransitPathLeg<TestTripSchedule> transitLeg(int egressStop) {
     TestAccessEgress walk = TestAccessEgress.walk(egressStop, EGRESS_END - EGRESS_START);
-    var egress = new EgressPathLeg<TestTripSchedule>(
-      walk,
-      EGRESS_START,
-      EGRESS_END,
-      walk.generalizedCost()
-    );
+    var egress = new EgressPathLeg<TestTripSchedule>(walk, EGRESS_START, EGRESS_END, walk.c1());
     int toTime = TRIP.arrival(TRIP.findArrivalStopPosition(Integer.MAX_VALUE, egressStop));
-    var times = BoardAndAlightTime.create(TRIP, STOP_A, T10_00, egressStop, toTime);
-    int cost = 100 * (T10_40 - T10_00);
+    int cost = 100 * (STOP_TIME_THREE - STOP_TIME_ONE);
     return new TransitPathLeg<>(
       TRIP,
-      T10_00,
+      STOP_TIME_ONE,
       toTime,
-      TRIP.findDepartureStopPosition(T10_00, STOP_A),
+      TRIP.findDepartureStopPosition(STOP_TIME_ONE, STOP_A),
       TRIP.findArrivalStopPosition(toTime, egressStop),
       null,
       cost,

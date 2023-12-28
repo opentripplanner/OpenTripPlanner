@@ -12,8 +12,6 @@ class CarPreferencesTest {
   private static final double EXPECTED_SPEED = 20.0;
   private static final double RELUCTANCE = 5.111;
   private static final double EXPECTED_RELUCTANCE = 5.1;
-  private static final int PARK_TIME = 300;
-  private static final int PARK_COST = 250;
   private static final int PICKUP_TIME = 600;
   private static final int PICKUP_COST = 500;
   private static final double ACCELERATION_SPEED = 3.1;
@@ -24,8 +22,6 @@ class CarPreferencesTest {
     .of()
     .withSpeed(SPEED)
     .withReluctance(RELUCTANCE)
-    .withParkTime(PARK_TIME)
-    .withParkCost(PARK_COST)
     .withPickupTime(PICKUP_TIME)
     .withPickupCost(PICKUP_COST)
     .withDropoffTime(DROPOFF_TIME)
@@ -41,16 +37,6 @@ class CarPreferencesTest {
   @Test
   void reluctance() {
     assertEquals(EXPECTED_RELUCTANCE, subject.reluctance());
-  }
-
-  @Test
-  void parkTime() {
-    assertEquals(PARK_TIME, subject.parkTime());
-  }
-
-  @Test
-  void parkCost() {
-    assertEquals(PARK_COST, subject.parkCost());
   }
 
   @Test
@@ -97,8 +83,6 @@ class CarPreferencesTest {
       "CarPreferences{" +
       "speed: 20.0, " +
       "reluctance: 5.1, " +
-      "parkTime: 300, " +
-      "parkCost: $250, " +
       "pickupTime: 600, " +
       "pickupCost: $500, " +
       "dropoffTime: 450, " +

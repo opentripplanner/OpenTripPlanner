@@ -129,9 +129,7 @@ public class DefaultFareService implements FareService {
 
         // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
         if (fareRules != null && !fareRules.isEmpty()) {
-          Currency currency = Currency.getInstance(
-            fareRules.iterator().next().getFareAttribute().getCurrencyType()
-          );
+          Currency currency = fareRules.iterator().next().getFareAttribute().getPrice().currency();
           boolean feedHasFare = populateFare(
             currentFare,
             currency,
@@ -359,7 +357,7 @@ public class DefaultFareService implements FareService {
           journeyTime
         )
       ) {
-        Money newFare = getFarePrice(attribute, fareType);
+        Money newFare = attribute.getPrice();
         if (bestFare == null || newFare.lessThan(bestFare)) {
           bestAttribute = attribute;
           bestFare = newFare;
@@ -371,22 +369,6 @@ public class DefaultFareService implements FareService {
     return Optional
       .ofNullable(bestAttribute)
       .map(attribute -> new FareAndId(finalBestFare, attribute.getId()));
-  }
-
-  protected Money getFarePrice(FareAttribute fare, FareType type) {
-    var currency = Currency.getInstance(fare.getCurrencyType());
-    return switch (type) {
-      case senior:
-        if (fare.getSeniorPrice() >= 0) {
-          yield Money.ofFractionalAmount(currency, fare.getSeniorPrice());
-        }
-      case youth:
-        if (fare.getYouthPrice() >= 0) {
-          yield Money.ofFractionalAmount(currency, fare.getYouthPrice());
-        }
-      default:
-        yield Money.ofFractionalAmount(currency, fare.getPrice());
-    };
   }
 
   /**
