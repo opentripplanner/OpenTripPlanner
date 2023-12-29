@@ -16,7 +16,6 @@ class CarPreferencesTest {
   private static final int PICKUP_COST = 500;
   private static final double ACCELERATION_SPEED = 3.1;
   private static final double DECELERATION_SPEED = 3.5;
-  public static final int DROPOFF_TIME = 450;
   public static final int RENTAL_PICKUP_TIME = 30;
   public static final int PARK_COST = 30;
 
@@ -26,7 +25,6 @@ class CarPreferencesTest {
     .withReluctance(RELUCTANCE)
     .withPickupTime(PICKUP_TIME)
     .withPickupCost(PICKUP_COST)
-    .withDropoffTime(DROPOFF_TIME)
     .withAccelerationSpeed(ACCELERATION_SPEED)
     .withDecelerationSpeed(DECELERATION_SPEED)
     .withRental(rental -> rental.withPickupTime(RENTAL_PICKUP_TIME).build())
@@ -51,11 +49,6 @@ class CarPreferencesTest {
   @Test
   void pickupCost() {
     assertEquals(PICKUP_COST, subject.pickupCost());
-  }
-
-  @Test
-  void dropoffTime() {
-    assertEquals(DROPOFF_TIME, subject.dropoffTime());
   }
 
   @Test
@@ -103,7 +96,6 @@ class CarPreferencesTest {
       "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
       "pickupTime: 600, " +
       "pickupCost: $500, " +
-      "dropoffTime: 450, " +
       "accelerationSpeed: 3.1, decelerationSpeed: 3.5" +
       "}",
       subject.toString()

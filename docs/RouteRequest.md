@@ -66,10 +66,10 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    rental                                                                                                    |        `object`        | Vehicle rental options                                                                                                                         | *Optional* |                  |  2.3  |
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                             | *Optional* | `30`             |  2.0  |
-|       dropOffTime                                                                                            |        `integer`       | Time to drop-off a rented vehicle.                                                                                                             | *Optional* | `30`             |  2.0  |
-|       keepingAtDestinationCost                                                                               |        `double`        | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                       | *Optional* | `0.0`            |  2.2  |
+|       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                             | *Optional* | `"PT30S"`        |  2.0  |
+|       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                       | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                        | *Optional* | `120`            |  2.0  |
-|       pickupTime                                                                                             |        `integer`       | Time to rent a vehicle.                                                                                                                        | *Optional* | `60`             |  2.0  |
+|       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                        | *Optional* | `"PT1M"`         |  2.0  |
 |       useAvailabilityInformation                                                                             |        `boolean`       | Whether or not vehicle rental availability information will be used to plan vehicle rental trips.                                              | *Optional* | `false`          |  2.0  |
 |       [allowedNetworks](#rd_bicycle_rental_allowedNetworks)                                                  |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                              | *Optional* |                  |  2.1  |
 |       [bannedNetworks](#rd_bicycle_rental_bannedNetworks)                                                    |       `string[]`       | The vehicle rental networks which may not be used. If empty, no networks are banned.                                                           | *Optional* |                  |  2.1  |
@@ -84,7 +84,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | car                                                                                                          |        `object`        | Car preferences.                                                                                                                               | *Optional* |                  |  2.5  |
 |    accelerationSpeed                                                                                         |        `double`        | The acceleration speed of an automobile, in meters per second per second.                                                                      | *Optional* | `2.9`            |  2.0  |
 |    decelerationSpeed                                                                                         |        `double`        | The deceleration speed of an automobile, in meters per second per second.                                                                      | *Optional* | `2.9`            |  2.0  |
-|    dropoffTime                                                                                               |        `integer`       | Time to park a car in a park and ride, w/o taking into account driving and walking cost.                                                       | *Optional* | `120`            |  2.0  |
 |    pickupCost                                                                                                |        `integer`       | Add a cost for car pickup changes when a pickup or drop off takes place                                                                        | *Optional* | `120`            |  2.1  |
 |    pickupTime                                                                                                |        `integer`       | Add a time for car pickup changes when a pickup or drop off takes place                                                                        | *Optional* | `60`             |  2.1  |
 |    reluctance                                                                                                |        `double`        | A multiplier for how bad driving is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`            |  2.0  |
@@ -93,10 +92,10 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    rental                                                                                                    |        `object`        | Vehicle rental options                                                                                                                         | *Optional* |                  |  2.3  |
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                             | *Optional* | `30`             |  2.0  |
-|       dropOffTime                                                                                            |        `integer`       | Time to drop-off a rented vehicle.                                                                                                             | *Optional* | `30`             |  2.0  |
-|       keepingAtDestinationCost                                                                               |        `double`        | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                       | *Optional* | `0.0`            |  2.2  |
+|       dropOffTime                                                                                            |       `duration`       | Time to drop-off a rented vehicle.                                                                                                             | *Optional* | `"PT30S"`        |  2.0  |
+|       keepingAtDestinationCost                                                                               |        `integer`       | The cost of arriving at the destination with the rented vehicle, to discourage doing so.                                                       | *Optional* | `0`              |  2.2  |
 |       pickupCost                                                                                             |        `integer`       | Cost to rent a vehicle.                                                                                                                        | *Optional* | `120`            |  2.0  |
-|       pickupTime                                                                                             |        `integer`       | Time to rent a vehicle.                                                                                                                        | *Optional* | `60`             |  2.0  |
+|       pickupTime                                                                                             |       `duration`       | Time to rent a vehicle.                                                                                                                        | *Optional* | `"PT1M"`         |  2.0  |
 |       useAvailabilityInformation                                                                             |        `boolean`       | Whether or not vehicle rental availability information will be used to plan vehicle rental trips.                                              | *Optional* | `false`          |  2.0  |
 |       [allowedNetworks](#rd_car_rental_allowedNetworks)                                                      |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                              | *Optional* |                  |  2.1  |
 |       [bannedNetworks](#rd_car_rental_bannedNetworks)                                                        |       `string[]`       | The vehicle rental networks which may not be used. If empty, no networks are banned.                                                           | *Optional* |                  |  2.1  |
@@ -998,7 +997,7 @@ include stairs as a last result.
       },
       "rental" : {
         "pickupCost" : 120,
-        "dropOffTime" : 30,
+        "dropOffTime" : "30s",
         "dropOffCost" : 30
       },
       "parking" : {
@@ -1009,12 +1008,11 @@ include stairs as a last result.
     "car" : {
       "speed" : 40,
       "reluctance" : 10,
-      "dropoffTime" : 120,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,
       "rental" : {
         "pickupCost" : 120,
-        "dropOffTime" : 30,
+        "dropOffTime" : "30s",
         "dropOffCost" : 30
       }
     },

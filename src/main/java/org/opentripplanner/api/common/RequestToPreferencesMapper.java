@@ -147,7 +147,7 @@ class RequestToPreferencesMapper {
 
     setIfNotNull(
       req.keepingRentedBicycleAtDestinationCost,
-      rental::withArrivingInRentalVehicleAtDestinationCost
+      cost -> rental.withArrivingInRentalVehicleAtDestinationCost((int) Math.round(cost))
     );
     rental.withUseAvailabilityInformation(isPlannedForNow);
   }

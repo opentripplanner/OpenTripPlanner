@@ -27,7 +27,6 @@ public final class CarPreferences implements Serializable {
   private final VehicleRentalPreferences rental;
   private final int pickupTime;
   private final Cost pickupCost;
-  private final int dropoffTime;
   private final double accelerationSpeed;
   private final double decelerationSpeed;
 
@@ -39,7 +38,6 @@ public final class CarPreferences implements Serializable {
     this.rental = VehicleRentalPreferences.DEFAULT;
     this.pickupTime = 60;
     this.pickupCost = Cost.costOfMinutes(2);
-    this.dropoffTime = 120;
     this.accelerationSpeed = 2.9;
     this.decelerationSpeed = 2.9;
   }
@@ -51,7 +49,6 @@ public final class CarPreferences implements Serializable {
     this.rental = builder.rental;
     this.pickupTime = Units.duration(builder.pickupTime);
     this.pickupCost = builder.pickupCost;
-    this.dropoffTime = Units.duration(builder.dropoffTime);
     this.accelerationSpeed = Units.acceleration(builder.accelerationSpeed);
     this.decelerationSpeed = Units.acceleration(builder.decelerationSpeed);
   }
@@ -98,14 +95,6 @@ public final class CarPreferences implements Serializable {
   }
 
   /**
-   * Time to park a car in a park and ride, w/o taking into account driving and walking cost (time
-   * to park, switch off, pick your stuff, lock the car, etc...)
-   */
-  public int dropoffTime() {
-    return dropoffTime;
-  }
-
-  /**
    * The acceleration speed of an automobile, in meters per second per second.
    * Default is 2.9 m/s^2 (0 mph to 65 mph in 10 seconds)
    */
@@ -133,7 +122,6 @@ public final class CarPreferences implements Serializable {
       rental.equals(that.rental) &&
       pickupTime == that.pickupTime &&
       pickupCost.equals(that.pickupCost) &&
-      dropoffTime == that.dropoffTime &&
       DoubleUtils.doubleEquals(that.accelerationSpeed, accelerationSpeed) &&
       DoubleUtils.doubleEquals(that.decelerationSpeed, decelerationSpeed)
     );
@@ -148,7 +136,6 @@ public final class CarPreferences implements Serializable {
       rental,
       pickupTime,
       pickupCost,
-      dropoffTime,
       accelerationSpeed,
       decelerationSpeed
     );
@@ -164,7 +151,6 @@ public final class CarPreferences implements Serializable {
       .addObj("rental", rental, DEFAULT.rental)
       .addNum("pickupTime", pickupTime, DEFAULT.pickupTime)
       .addObj("pickupCost", pickupCost, DEFAULT.pickupCost)
-      .addNum("dropoffTime", dropoffTime, DEFAULT.dropoffTime)
       .addNum("accelerationSpeed", accelerationSpeed, DEFAULT.accelerationSpeed)
       .addNum("decelerationSpeed", decelerationSpeed, DEFAULT.decelerationSpeed)
       .toString();
@@ -180,7 +166,6 @@ public final class CarPreferences implements Serializable {
     private VehicleRentalPreferences rental;
     private int pickupTime;
     private Cost pickupCost;
-    private int dropoffTime;
     private double accelerationSpeed;
     private double decelerationSpeed;
 
@@ -192,7 +177,6 @@ public final class CarPreferences implements Serializable {
       this.rental = original.rental;
       this.pickupTime = original.pickupTime;
       this.pickupCost = original.pickupCost;
-      this.dropoffTime = original.dropoffTime;
       this.accelerationSpeed = original.accelerationSpeed;
       this.decelerationSpeed = original.decelerationSpeed;
     }
@@ -228,11 +212,6 @@ public final class CarPreferences implements Serializable {
 
     public Builder withPickupCost(int pickupCost) {
       this.pickupCost = Cost.costOfSeconds(pickupCost);
-      return this;
-    }
-
-    public Builder withDropoffTime(int dropoffTime) {
-      this.dropoffTime = dropoffTime;
       return this;
     }
 

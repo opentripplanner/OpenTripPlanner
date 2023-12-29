@@ -13,25 +13,33 @@ public class VehicleRentalConfig {
   static void mapRentalPreferences(NodeAdapter c, VehicleRentalPreferences.Builder builder) {
     var dft = builder.original();
     builder
-      .withDropoffCost(
+      .withDropOffCost(
         c
           .of("dropOffCost")
           .since(V2_0)
           .summary("Cost to drop-off a rented vehicle.")
-          .asInt(dft.dropoffCost())
+          .asInt(dft.dropOffCost().toSeconds())
       )
-      .withDropoffTime(
+      .withDropOffTime(
         c
           .of("dropOffTime")
           .since(V2_0)
           .summary("Time to drop-off a rented vehicle.")
-          .asInt(dft.dropoffTime())
+          .asDuration(dft.dropOffTime())
       )
       .withPickupCost(
-        c.of("pickupCost").since(V2_0).summary("Cost to rent a vehicle.").asInt(dft.pickupCost())
+        c
+          .of("pickupCost")
+          .since(V2_0)
+          .summary("Cost to rent a vehicle.")
+          .asInt(dft.pickupCost().toSeconds())
       )
       .withPickupTime(
-        c.of("pickupTime").since(V2_0).summary("Time to rent a vehicle.").asInt(dft.pickupTime())
+        c
+          .of("pickupTime")
+          .since(V2_0)
+          .summary("Time to rent a vehicle.")
+          .asDuration(dft.pickupTime())
       )
       .withUseAvailabilityInformation(
         c
@@ -49,7 +57,7 @@ public class VehicleRentalConfig {
           .summary(
             "The cost of arriving at the destination with the rented vehicle, to discourage doing so."
           )
-          .asDouble(dft.arrivingInRentalVehicleAtDestinationCost())
+          .asInt(dft.arrivingInRentalVehicleAtDestinationCost().toSeconds())
       )
       .withAllowArrivingInRentedVehicleAtDestination(
         c

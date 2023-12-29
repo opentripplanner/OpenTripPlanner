@@ -184,7 +184,7 @@ public class DefaultRouteRequestType {
           .name("bikeRentalPickupTime")
           .description("Time to rent a bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.bike().rental().pickupTime())
+          .dataFetcher(env -> (int) preferences.bike().rental().pickupTime().toSeconds())
           .build()
       )
       .field(
@@ -193,7 +193,7 @@ public class DefaultRouteRequestType {
           .name("bikeRentalPickupCost")
           .description("Cost to rent a bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.bike().rental().pickupCost())
+          .dataFetcher(env -> preferences.bike().rental().pickupCost().toSeconds())
           .build()
       )
       .field(
@@ -202,7 +202,7 @@ public class DefaultRouteRequestType {
           .name("bikeRentalDropOffTime")
           .description("Time to drop-off a rented bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.bike().rental().dropoffTime())
+          .dataFetcher(env -> (int) preferences.bike().rental().dropOffTime().toSeconds())
           .build()
       )
       .field(
@@ -211,7 +211,7 @@ public class DefaultRouteRequestType {
           .name("bikeRentalDropOffCost")
           .description("Cost to drop-off a rented bike.")
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.bike().rental().dropoffCost())
+          .dataFetcher(env -> preferences.bike().rental().dropOffCost().toSeconds())
           .build()
       )
       .field(
@@ -240,7 +240,7 @@ public class DefaultRouteRequestType {
             "Time to park a car in a park and ride, w/o taking into account driving and walking cost."
           )
           .type(Scalars.GraphQLInt)
-          .dataFetcher(env -> preferences.car().dropoffTime())
+          .dataFetcher(env -> 0)
           .build()
       )
       .field(

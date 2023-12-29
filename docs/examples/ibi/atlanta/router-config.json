@@ -7,13 +7,13 @@
         "safety": 0.4
       },
       "rental": {
-        "pickupTime": 180,
+        "pickupTime": "3m",
         "pickupCost": 850
       }
     },
     "car": {
       "rental": {
-        "pickupTime": 180,
+        "pickupTime": "3m",
         "pickupCost": 850
       }
     },

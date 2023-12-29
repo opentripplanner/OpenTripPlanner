@@ -91,10 +91,6 @@ class BikePreferencesTest {
       "speed: 2.0, " +
       "reluctance: 1.2, " +
       "boardCost: $660, " +
-      "walkingSpeed: 1.15, " +
-      "walkingReluctance: 1.45, " +
-      "switchTime: 3m20s, " +
-      "switchCost: $450, " +
       "parking: VehicleParkingPreferences{parkCost: $30}, " +
       "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
       "optimizeType: TRIANGLE, " +

@@ -468,7 +468,7 @@ Used to group requests when monitoring OTP.
       },
       "rental" : {
         "pickupCost" : 120,
-        "dropOffTime" : 30,
+        "dropOffTime" : "30s",
         "dropOffCost" : 30
       },
       "parking" : {
@@ -479,12 +479,11 @@ Used to group requests when monitoring OTP.
     "car" : {
       "speed" : 40,
       "reluctance" : 10,
-      "dropoffTime" : 120,
       "decelerationSpeed" : 2.9,
       "accelerationSpeed" : 2.9,
       "rental" : {
         "pickupCost" : 120,
-        "dropOffTime" : 30,
+        "dropOffTime" : "30s",
         "dropOffCost" : 30
       }
     },

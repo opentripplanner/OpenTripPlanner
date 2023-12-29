@@ -586,15 +586,6 @@ your users receive a timely response. You can also limit the max duration. There
           )
           .asDouble(dft.reluctance())
       )
-      .withDropoffTime(
-        cc
-          .of("dropoffTime")
-          .since(V2_0)
-          .summary(
-            "Time to park a car in a park and ride, w/o taking into account driving and walking cost."
-          )
-          .asInt(dft.dropoffTime())
-      )
       .withPickupCost(
         cc
           .of("pickupCost")
