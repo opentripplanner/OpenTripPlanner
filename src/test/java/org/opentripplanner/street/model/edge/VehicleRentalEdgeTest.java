@@ -227,8 +227,8 @@ class VehicleRentalEdgeTest {
             .withCar(car ->
               car.withRental(rental -> rental.withUseAvailabilityInformation(useRealtime))
             )
-            .withBike(bik ->
-              bik.withRental(rental -> rental.withUseAvailabilityInformation(useRealtime))
+            .withBike(bike ->
+              bike.withRental(rental -> rental.withUseAvailabilityInformation(useRealtime))
             )
             .build()
         )
