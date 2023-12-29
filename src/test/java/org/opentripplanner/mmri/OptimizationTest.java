@@ -22,7 +22,7 @@ public class OptimizationTest extends GtfsTest {
 
     validateLeg(leg, 1388530860000L, 1388530920000L, "2a2", "2a1", null);
 
-    assertEquals("Stop 2a1 ~ BUS short 0:01 0:02 ~ Stop 2a2 [$90]", itinerary.toStr());
+    assertEquals("Stop 2a1 ~ BUS short 0:01 0:02 ~ Stop 2a2 [C₁90]", itinerary.toStr());
   }
 
   @Test
@@ -33,6 +33,6 @@ public class OptimizationTest extends GtfsTest {
 
     validateLeg(leg, 1388531100000L, 1388531160000L, "2a2", "2a1", null);
 
-    assertEquals("Stop 2a1 ~ BUS long 0:05 0:06 ~ Stop 2a2 [$90]", itinerary.toStr());
+    assertEquals("Stop 2a1 ~ BUS long 0:05 0:06 ~ Stop 2a2 [C₁90]", itinerary.toStr());
   }
 }

@@ -1,0 +1,17 @@
+{
+  "data" : {
+    "nearest" : {
+      "edges" : [
+        {
+          "node" : {
+            "place" : {
+              "id" : "U3RvcDpGOkE",
+              "gtfsId" : "F:A",
+              "parentStation" : null
+            }
+          }
+        }
+      ]
+    }
+  }
+}

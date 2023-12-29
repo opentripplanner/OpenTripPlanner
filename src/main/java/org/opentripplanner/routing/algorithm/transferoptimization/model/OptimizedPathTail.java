@@ -3,8 +3,10 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
 import org.opentripplanner.model.transfer.TransferConstraint;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTransfer;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
+import org.opentripplanner.raptor.api.model.RaptorValueFormatter;
 import org.opentripplanner.raptor.api.path.RaptorStopNameResolver;
 import org.opentripplanner.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.raptor.path.PathBuilder;
@@ -130,6 +132,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
       createPathLegs(costCalculator(), slackProvider()),
       iterationDepartureTime,
       generalizedCost,
+      c2(),
       transferPriorityCost,
       waitTimeOptimizedCost,
       breakTieCost()
@@ -138,15 +141,21 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
 
   @Override
   public String toString() {
-    return ValueObjectToStringBuilder
-      .of()
-      .addObj(super.toString())
-      .addText(" [")
-      .addCostCenti(generalizedCost())
-      .addCostCenti(transferPriorityCost, "pri")
-      .addCostCenti(generalizedCostWaitTimeOptimized(), "wtc")
-      .addText("]")
-      .toString();
+    var builder = ValueObjectToStringBuilder.of().addObj(super.toString()).addText(" [");
+
+    if (generalizedCost != RaptorCostCalculator.ZERO_COST) {
+      builder.addObj(RaptorValueFormatter.formatC1(generalizedCost()));
+    }
+    if (c2() != RaptorConstants.NOT_SET) {
+      builder.addObj(RaptorValueFormatter.formatC2(c2()));
+    }
+    if (transferPriorityCost != TransferConstraint.ZERO_COST) {
+      builder.addObj(RaptorValueFormatter.formatTransferPriority(transferPriorityCost));
+    }
+    if (waitTimeOptimizedCost != TransferWaitTimeCostCalculator.ZERO_COST) {
+      builder.addObj(RaptorValueFormatter.formatWaitTimeCost(generalizedCostWaitTimeOptimized()));
+    }
+    return builder.addText("]").toString();
   }
 
   @Override
@@ -203,7 +212,7 @@ public class OptimizedPathTail<T extends RaptorTripSchedule>
       return;
     }
     this.generalizedCost =
-      legsAsStream().mapToInt(it -> it.generalizedCost(costCalculator(), slackProvider())).sum();
+      legsAsStream().mapToInt(it -> it.c1(costCalculator(), slackProvider())).sum();
   }
 
   /*private methods */

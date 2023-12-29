@@ -59,16 +59,13 @@ class AlternativeLegsTest extends GtfsTest {
       alternativeLegs.stream().map(Leg.class::cast).map(List::of).map(Itinerary::new).toList()
     );
 
-    var expectd = String.join(
-      ", ",
-      List.of(
-        "B ~ BUS 2 0:20 0:30 ~ C [$-1]",
-        "B ~ BUS 1 0:10 0:20 ~ C [$-1]",
-        "B ~ BUS 1 8:20 8:30 ~ C [$-1]" // Previous day
-      )
-    );
+    var expected =
+      "B ~ BUS 2 0:20 0:30 ~ C [C₁-1], " +
+      "B ~ BUS 1 0:10 0:20 ~ C [C₁-1], " +
+      // Previous day
+      "B ~ BUS 1 8:20 8:30 ~ C [C₁-1]";
 
-    assertEquals(expectd, legs);
+    assertEquals(expected, legs);
   }
 
   @Test
@@ -98,16 +95,13 @@ class AlternativeLegsTest extends GtfsTest {
       alternativeLegs.stream().map(Leg.class::cast).map(List::of).map(Itinerary::new).toList()
     );
 
-    var expectd = String.join(
-      ", ",
-      List.of(
-        "B ~ BUS 3 1:00 1:10 ~ C [$-1]",
-        "B ~ BUS 1 8:20 8:30 ~ C [$-1]",
-        "B ~ BUS 1 0:10 0:20 ~ C [$-1]" // Next day
-      )
-    );
+    var expected =
+      "B ~ BUS 3 1:00 1:10 ~ C [C₁-1], " +
+      "B ~ BUS 1 8:20 8:30 ~ C [C₁-1], " +
+      // Next day
+      "B ~ BUS 1 0:10 0:20 ~ C [C₁-1]";
 
-    assertEquals(expectd, legs);
+    assertEquals(expected, legs);
   }
 
   @Test
@@ -136,12 +130,7 @@ class AlternativeLegsTest extends GtfsTest {
       alternativeLegs.stream().map(Leg.class::cast).map(List::of).map(Itinerary::new).toList()
     );
 
-    var expected = String.join(
-      ", ",
-      List.of("X ~ BUS 19 10:30 10:40 ~ Y [$-1]", "X ~ BUS 19 10:00 10:10 ~ Y [$-1]")
-    );
-
-    assertEquals(expected, legs);
+    assertEquals("X ~ BUS 19 10:30 10:40 ~ Y [C₁-1], X ~ BUS 19 10:00 10:10 ~ Y [C₁-1]", legs);
   }
 
   @Test
@@ -170,7 +159,7 @@ class AlternativeLegsTest extends GtfsTest {
       alternativeLegs.stream().map(Leg.class::cast).map(List::of).map(Itinerary::new).toList()
     );
 
-    var expected = String.join(", ", List.of("X ~ BUS 19 10:30 11:00 ~ B [$-1]"));
+    var expected = String.join(", ", List.of("X ~ BUS 19 10:30 11:00 ~ B [C₁-1]"));
     assertEquals(expected, legs);
   }
 }

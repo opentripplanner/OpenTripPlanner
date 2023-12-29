@@ -17,6 +17,8 @@ Any message posted there will be seen by most of the contributors, some of whom 
 time. It will also create a record of the discussion that will be useful to the larger community and
 often leads to issues being discussed at the twice-weekly development meetings.
 
+## Developer meetings
+
 OTP development meetings usually occur twice a week. These meetings are open to anyone who wants to
 join, even if you simply want to observe the process or ask a few questions. The most effective way
 to advance pull requests and collaborate is to participate directly in these meetings. The meeting

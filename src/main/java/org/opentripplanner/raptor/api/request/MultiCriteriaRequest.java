@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 
@@ -64,14 +63,6 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
     return relaxC1;
   }
 
-  @Deprecated
-  @Nullable
-  public RelaxFunction relaxC1AtDestination() {
-    return relaxC1.isNormal()
-      ? relaxCostAtDestination().map(GeneralizedCostRelaxFunction::of).orElse(RelaxFunction.NORMAL)
-      : relaxC1;
-  }
-
   public Optional<RaptorTransitPriorityGroupCalculator> transitPriorityCalculator() {
     return Optional.ofNullable(transitPriorityCalculator);
   }
@@ -85,8 +76,8 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Whether to accept non-optimal trips if they are close enough - if and only if they represent an
-   * optimal path for their given iteration. In other words this slack only relaxes the pareto
+   * Whether to accept non-optimal trips if they are close enough - if and only if they represent
+   * an optimal path for their given iteration. In other words this slack only relaxes the pareto
    * comparison at the destination.
    * <p>
    * Let {@code c} be the existing minimum pareto optimal cost to beat. Then a trip with cost
@@ -102,8 +93,9 @@ public class MultiCriteriaRequest<T extends RaptorTripSchedule> {
    * is replaced by {@link #relaxC1()}. This parameter is ignored if {@link #relaxC1()} exist.
    */
   @Deprecated
-  public Optional<Double> relaxCostAtDestination() {
-    return Optional.ofNullable(relaxCostAtDestination);
+  @Nullable
+  public Double relaxCostAtDestination() {
+    return relaxCostAtDestination;
   }
 
   @Override

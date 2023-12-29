@@ -59,7 +59,7 @@ public class K01_TransitPriorityTest {
     GROUP_A,
     GROUP_C
   );
-  private static final int COST_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
+  private static final int C1_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
 
   private final TestTransitData data = new TestTransitData();
   private final RaptorRequestBuilder<TestTripSchedule> requestBuilder = new RaptorRequestBuilder<>();
@@ -67,13 +67,20 @@ public class K01_TransitPriorityTest {
     RaptorConfig.defaultConfigForTest()
   );
 
+  /**
+   * Each pattern departs at the same time, but arrives at different times. They may belong to
+   * different groups. Line U1 is not optimal, because it slower than L1 and is in the same
+   * group as L1. Given a slack on the cost equals to ~90s makes both L1 and L2 optimal (since
+   * they are in different groups), but not L3 (which is in its own group, but its cost is
+   * outside the range allowed by the slack).
+   */
   @BeforeEach
   private void prepareRequest() {
-    // Each pattern depart at the same time, but arrive with 60s between them.
-    // Given a slack on the cost equals to ~90s make both L1 and L2 optimal, but no L3
     data.withRoutes(
       route(pattern("L1", STOP_B, STOP_C).withPriorityGroup(GROUP_A))
         .withTimetable(schedule("00:02 00:12")),
+      route(pattern("U1", STOP_B, STOP_C).withPriorityGroup(GROUP_A))
+        .withTimetable(schedule("00:02 00:12:01")),
       route(pattern("L2", STOP_B, STOP_C).withPriorityGroup(GROUP_B))
         .withTimetable(schedule("00:02 00:13")),
       route(pattern("L3", STOP_B, STOP_C).withPriorityGroup(GROUP_C))
@@ -96,7 +103,7 @@ public class K01_TransitPriorityTest {
     requestBuilder.withMultiCriteria(mc ->
       // Raptor cost 9000 ~= 90 seconds slack
       mc
-        .withRelaxC1(value -> value + COST_SLACK_90s)
+        .withRelaxC1(value -> value + C1_SLACK_90s)
         .withTransitPriorityCalculator(PRIORITY_GROUP_CALCULATOR)
     );
     // Add 1 second access/egress paths
@@ -109,8 +116,8 @@ public class K01_TransitPriorityTest {
     // We expect L1 & L2 but not L3, since the cost of L3 is > $90.00.
     assertEquals(
       """
-      Walk 1s ~ B ~ BUS L1 0:02 0:12 ~ C ~ Walk 1s [0:01:59 0:12:01 10m2s 0tx $1204]
-      Walk 1s ~ B ~ BUS L2 0:02 0:13 ~ C ~ Walk 1s [0:01:59 0:13:01 11m2s 0tx $1264]
+      Walk 1s ~ B ~ BUS L1 0:02 0:12 ~ C ~ Walk 1s [0:01:59 0:12:01 10m2s Tₓ0 C₁1_204 C₂1]
+      Walk 1s ~ B ~ BUS L2 0:02 0:13 ~ C ~ Walk 1s [0:01:59 0:13:01 11m2s Tₓ0 C₁1_264 C₂2]
       """.trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );

@@ -22,7 +22,7 @@ class TransferTest {
     Coordinates.BERLIN_BRANDENBURG_GATE
   );
   private static final IntersectionVertex BOSTON_V = intersectionVertex(Coordinates.BOSTON);
-  private static final int MAX_RAPTOR_TRANSFER_COST = RaptorCostConverter.toRaptorCost(
+  private static final int MAX_RAPTOR_TRANSFER_C1 = RaptorCostConverter.toRaptorCost(
     Transfer.MAX_TRANSFER_COST
   );
 
@@ -87,10 +87,10 @@ class TransferTest {
   }
 
   private static void assertMaxCost(RaptorTransfer transfer) {
-    assertEquals(MAX_RAPTOR_TRANSFER_COST, transfer.generalizedCost());
+    assertEquals(MAX_RAPTOR_TRANSFER_C1, transfer.c1());
   }
 
   private static void assertBelowMaxCost(RaptorTransfer transfer) {
-    assertTrue(MAX_RAPTOR_TRANSFER_COST > transfer.generalizedCost());
+    assertTrue(MAX_RAPTOR_TRANSFER_C1 > transfer.c1());
   }
 }

@@ -61,16 +61,16 @@ public class G04_EgressWithOpeningHoursMultipleOptionsTest implements RaptorTest
 
   static List<RaptorModuleTestCase> openInWholeSearchIntervalTestCases() {
     var expA =
-      "Walk 2m 0:03 0:05 $240 ~ B 0s " +
-      "~ BUS R1 0:05 0:15 10m $1200 ~ C 2m " +
-      "~ Walk 1m Open(0:17 0:19) 0:17 0:18 $240 " +
-      "[0:03 0:18 15m 0tx $1680]";
+      "Walk 2m 0:03 0:05 C₁240 ~ B 0s " +
+      "~ BUS R1 0:05 0:15 10m C₁1_200 ~ C 2m " +
+      "~ Walk 1m Open(0:17 0:19) 0:17 0:18 C₁240 " +
+      "[0:03 0:18 15m Tₓ0 C₁1_680]";
 
     var expB =
-      "Walk 2m 0:08 0:10 $240 ~ B 0s " +
-      "~ BUS R1 0:10 0:20 10m $1200 ~ C 2m " +
-      "~ Walk 1m Open(0:22 0:24) 0:22 0:23 $240 " +
-      "[0:08 0:23 15m 0tx $1680]";
+      "Walk 2m 0:08 0:10 C₁240 ~ B 0s " +
+      "~ BUS R1 0:10 0:20 10m C₁1_200 ~ C 2m " +
+      "~ Walk 1m Open(0:22 0:24) 0:22 0:23 C₁240 " +
+      "[0:08 0:23 15m Tₓ0 C₁1_680]";
 
     return RaptorModuleTestCase
       .of()

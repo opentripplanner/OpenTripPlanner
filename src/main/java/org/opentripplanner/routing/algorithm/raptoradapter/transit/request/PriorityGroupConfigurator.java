@@ -23,10 +23,30 @@ import org.opentripplanner.transit.model.network.RoutingTripPattern;
  */
 public class PriorityGroupConfigurator {
 
-  private static final int BASE_GROUP_ID = TransitPriorityGroup32n.groupId(0);
-  private int groupIndexCounter = 0;
+  /**
+   * There are two ways we can treat the base (local-traffic) transit priority group:
+   * <ol>
+   *   <li> We can assign group id 1 (one) to the base group and it will be treated as any other group.
+   *   <li> We can assign group id 0 (zero) to the base and it will not be added to the set of groups
+   *   a given path has.
+   * </ol>
+   * When we compare paths we compare sets of group ids. A set is dominating another set if it is
+   * a smaller subset or different from the other set.
+   * <p>
+   * <b>Example - base-group-id = 0 (zero)</b>
+   * <p>
+   * Let B be the base and G be concrete group. Then: (B) dominates (G), (G) dominates (B), (B)
+   * dominates (BG), but (G) does not dominate (BG). In other words, paths with only agency
+   * X (group G) is not given an advantage in the routing over paths with a combination of agency
+   * X (group G) and local traffic (group B).
+   * <p>
+   * TODO: Experiment with base-group-id=0 and make it configurable.
+   */
+  private static final int GROUP_INDEX_COUNTER_START = 1;
+
+  private final int baseGroupId = TransitPriorityGroup32n.groupId(GROUP_INDEX_COUNTER_START);
+  private int groupIndexCounter = GROUP_INDEX_COUNTER_START;
   private final boolean enabled;
-  private final PriorityGroupMatcher[] baseMatchers;
   private final PriorityGroupMatcher[] agencyMatchers;
   private final PriorityGroupMatcher[] globalMatchers;
 
@@ -36,7 +56,6 @@ public class PriorityGroupConfigurator {
 
   private PriorityGroupConfigurator() {
     this.enabled = false;
-    this.baseMatchers = null;
     this.agencyMatchers = null;
     this.globalMatchers = null;
     this.agencyMatchersIds = List.of();
@@ -44,15 +63,12 @@ public class PriorityGroupConfigurator {
   }
 
   private PriorityGroupConfigurator(
-    Collection<TransitPriorityGroupSelect> base,
     Collection<TransitPriorityGroupSelect> byAgency,
     Collection<TransitPriorityGroupSelect> global
   ) {
-    this.baseMatchers = PriorityGroupMatcher.of(base);
     this.agencyMatchers = PriorityGroupMatcher.of(byAgency);
     this.globalMatchers = PriorityGroupMatcher.of(global);
-    this.enabled =
-      Stream.of(baseMatchers, agencyMatchers, globalMatchers).anyMatch(ArrayUtils::hasContent);
+    this.enabled = Stream.of(agencyMatchers, globalMatchers).anyMatch(ArrayUtils::hasContent);
     this.globalMatchersIds =
       Arrays.stream(globalMatchers).map(m -> new MatcherAndId(m, nextGroupId())).toList();
     // We need to populate this dynamically
@@ -64,14 +80,13 @@ public class PriorityGroupConfigurator {
   }
 
   public static PriorityGroupConfigurator of(
-    Collection<TransitPriorityGroupSelect> base,
     Collection<TransitPriorityGroupSelect> byAgency,
     Collection<TransitPriorityGroupSelect> global
   ) {
-    if (Stream.of(base, byAgency, global).allMatch(Collection::isEmpty)) {
+    if (Stream.of(byAgency, global).allMatch(Collection::isEmpty)) {
       return empty();
     }
-    return new PriorityGroupConfigurator(base, byAgency, global);
+    return new PriorityGroupConfigurator(byAgency, global);
   }
 
   /**
@@ -81,16 +96,11 @@ public class PriorityGroupConfigurator {
    */
   public int lookupTransitPriorityGroupId(RoutingTripPattern tripPattern) {
     if (!enabled || tripPattern == null) {
-      return BASE_GROUP_ID;
+      return baseGroupId;
     }
 
     var p = tripPattern.getPattern();
 
-    for (PriorityGroupMatcher m : baseMatchers) {
-      if (m.match(p)) {
-        return BASE_GROUP_ID;
-      }
-    }
     for (var it : agencyMatchersIds) {
       if (it.matcher().match(p)) {
         var agencyId = p.getRoute().getAgency().getId();
@@ -110,7 +120,11 @@ public class PriorityGroupConfigurator {
       }
     }
     // Fallback to base-group-id
-    return BASE_GROUP_ID;
+    return baseGroupId;
+  }
+
+  public int baseGroupId() {
+    return baseGroupId;
   }
 
   private int nextGroupId() {

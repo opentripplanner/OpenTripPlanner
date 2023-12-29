@@ -1,5 +1,7 @@
 import { TripQueryVariables } from '../../gql/graphql.ts';
 import { Marker } from 'react-map-gl';
+import markerFlagStart from '../../static/img/marker-flag-start-shadowed.png';
+import markerFlagEnd from '../../static/img/marker-flag-end-shadowed.png';
 
 export function NavigationMarkers({
   tripQueryVariables,
@@ -27,7 +29,7 @@ export function NavigationMarkers({
           }}
           anchor="bottom-right"
         >
-          <img alt="" src="/debug-client-preview/img/marker-flag-start-shadowed.png" height={48} width={49} />
+          <img alt="" src={markerFlagStart} height={48} width={49} />
         </Marker>
       )}
       {tripQueryVariables.to.coordinates && (
@@ -45,7 +47,7 @@ export function NavigationMarkers({
           }}
           anchor="bottom-right"
         >
-          <img alt="" src="/debug-client-preview/img/marker-flag-end-shadowed.png" height={48} width={49} />
+          <img alt="" src={markerFlagEnd} height={48} width={49} />
         </Marker>
       )}
     </>

@@ -3,16 +3,15 @@ package org.opentripplanner.routing.algorithm.transferoptimization.model.passthr
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestCase.testCase;
+import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.domainService;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.pathBuilder;
-import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.pathFocus;
-import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.subject;
 import static org.opentripplanner.routing.algorithm.transferoptimization.model.passthrough.TestUtils.tx;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.raptor._data.RaptorTestConstants;
+import org.opentripplanner.raptor._data.api.PathUtils;
 import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.path.RaptorPath;
 
@@ -195,7 +194,7 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
 
     RaptorPath<TestTripSchedule> expectedPath;
     {
-      var b = pathBuilder().access(ITERATION_START_TIME, STOP_B, D1s);
+      var b = pathBuilder().c2(tc.points().size()).access(ITERATION_START_TIME, STOP_B, D1s);
 
       if (tc.stopIndexA() == STOP_C) {
         b.bus(trip1, STOP_C).walk(costCG, STOP_G);
@@ -219,21 +218,17 @@ public class PassThroughTwoTransfersTest implements RaptorTestConstants {
       tx(trip2, STOP_J, trip3, STOP_L, costJL)
     );
 
-    var subject = subject(tc.points(), firstTransfers, secondTransfers);
+    var subject = domainService(tc.points(), firstTransfers, secondTransfers);
 
     // When
 
     var result = subject.findBestTransitPath(originalPath);
 
     // Then expect a set containing the expected path only
-    var resultAsString = result
-      .stream()
-      .map(it -> it.toString(this::stopIndexToName))
-      .collect(Collectors.joining(", "));
     assertEquals(
-      pathFocus(expectedPath.toString(this::stopIndexToName)),
-      pathFocus(resultAsString),
-      resultAsString
+      expectedPath.toString(this::stopIndexToName),
+      // Remove transferPriority cost
+      PathUtils.pathsToString(result).replace(" Tₚ6_600", "")
     );
   }
 }

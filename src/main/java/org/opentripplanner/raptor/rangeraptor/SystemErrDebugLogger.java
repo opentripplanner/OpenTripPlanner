@@ -219,7 +219,7 @@ public class SystemErrDebugLogger implements DebugLogger {
   }
 
   private String path(ArrivalView<?> a) {
-    return path(a, new PathStringBuilder(null)).summary(a.c1()).toString();
+    return path(a, new PathStringBuilder(null)).summary(a.c1(), a.c2()).toString();
   }
 
   private PathStringBuilder path(ArrivalView<?> a, PathStringBuilder buf) {

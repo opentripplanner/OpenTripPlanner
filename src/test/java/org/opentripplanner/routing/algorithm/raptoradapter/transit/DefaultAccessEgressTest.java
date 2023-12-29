@@ -46,8 +46,8 @@ class DefaultAccessEgressTest {
   void generalizedCost() {
     // TODO - The value is ?
     int expected = 23642959;
-    assertEquals(expected, subject.generalizedCost());
-    assertEquals(expected + COST_PENALTY.toCentiSeconds(), subjectWithPenalty.generalizedCost());
+    assertEquals(expected, subject.c1());
+    assertEquals(expected + COST_PENALTY.toCentiSeconds(), subjectWithPenalty.c1());
   }
 
   @Test
@@ -129,8 +129,8 @@ class DefaultAccessEgressTest {
 
   @Test
   void testToString() {
-    assertEquals("Walk 1d8h50m15s $236429 ~ 5", subject.toString());
-    assertEquals("Walk 1d8h50m16s $236440 w/penalty(1s $11) ~ 5", subjectWithPenalty.toString());
+    assertEquals("Walk 1d8h50m15s C₁236_429 ~ 5", subject.toString());
+    assertEquals("Walk 1d8h50m16s C₁236_440 w/penalty(1s $11) ~ 5", subjectWithPenalty.toString());
   }
 
   @Test

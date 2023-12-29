@@ -343,8 +343,7 @@ public class TransitRouter {
    * origin and destination.
    */
   private void checkIfTransitConnectionExists(RaptorResponse<TripSchedule> response) {
-    int searchWindowUsed = response.requestUsed().searchParams().searchWindowInSeconds();
-    if (searchWindowUsed <= 0 && response.paths().isEmpty()) {
+    if (response.noConnectionFound()) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, null))
       );

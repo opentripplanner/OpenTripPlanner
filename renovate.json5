@@ -25,13 +25,23 @@
         "com.microsoft.azure:azure-servicebus",
         "com.azure.resourcemanager:azure-resourcemanager-servicebus",
         "com.azure:azure-core",
-        "com.azure:azure-messaging-servicebus"
+        "com.azure:azure-messaging-servicebus",
+        "io.netty:netty-bom"
       ],
       "enabled": false
     },
     {
       "matchFiles": ["client-next/package.json"],
       "enabled": false
+    },
+    // gbfs-java-model patch releases are automatic dependency upgrades so we automerge
+    {
+      "matchPackageNames": [
+        "org.entur.gbfs:gbfs-java-model"
+      ],
+      "matchUpdateTypes": ["patch"],
+      "schedule": "on the 18th day of the month",
+      "automerge": true
     },
     {
       // https://github.com/graphql-java-kickstart/renovate-config/blob/main/default.json
@@ -53,8 +63,7 @@
         "@graphql-codegen/java-resolvers",
         "graphql",
         "io.micrometer:micrometer-registry-prometheus",
-        "io.micrometer:micrometer-registry-influx",
-        "org.entur.gbfs:gbfs-java-model"
+        "io.micrometer:micrometer-registry-influx"
       ],
       // we don't use the 'monthly' preset because that only fires on the first day of the month
       // when there might already other PRs open
@@ -64,7 +73,6 @@
       "description": "in order to keep review burden low, don't update these quite so frequently",
       "matchPackagePrefixes": [
         "org.apache.lucene:",
-        "io.netty:"
       ],
       "extends": [
         "schedule:quarterly"
@@ -97,7 +105,8 @@
         "io.github.git-commit-id:git-commit-id-maven-plugin",
         "com.hubspot.maven.plugins:prettier-maven-plugin",
         "com.google.cloud.tools:jib-maven-plugin",
-        "org.apache.maven.plugins:maven-shade-plugin"
+        "org.apache.maven.plugins:maven-shade-plugin",
+        "org.apache.maven.plugins:maven-compiler-plugin"
       ],
       "matchPackagePrefixes": [
         "org.junit.jupiter:",

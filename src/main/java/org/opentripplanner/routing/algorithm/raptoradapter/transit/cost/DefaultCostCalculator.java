@@ -134,15 +134,15 @@ public final class DefaultCostCalculator<T extends DefaultTripSchedule>
   @Override
   public int costEgress(RaptorAccessEgress egress) {
     if (egress.hasRides()) {
-      return egress.generalizedCost() + transferCostOnly;
+      return egress.c1() + transferCostOnly;
     } else if (stopTransferCost != null) {
       // Remove cost that was added during alighting.
       // We do not want to add this cost on last alighting since it should only be applied on transfers
       // It has to be done here because during alighting we do not know yet if it will be
       // a transfer or not.
-      return egress.generalizedCost() - stopTransferCost[egress.stop()];
+      return egress.c1() - stopTransferCost[egress.stop()];
     } else {
-      return egress.generalizedCost();
+      return egress.c1();
     }
   }
 
