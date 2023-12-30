@@ -29,8 +29,7 @@ import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
-import org.opentripplanner.inspector.vector.stop.AreaStopsLayerBuilder;
-import org.opentripplanner.inspector.vector.stop.RegularStopsLayerBuilder;
+import org.opentripplanner.inspector.vector.stop.StopLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
@@ -152,12 +151,16 @@ public class GraphInspectorVectorTileResource {
     OtpServerRequestContext context
   ) {
     return switch (layerParameters.type()) {
-      case RegularStop -> new RegularStopsLayerBuilder(
-        context.transitService(),
+      case RegularStop -> new StopLayerBuilder<>(
         layerParameters,
-        locale
+        locale,
+        e -> context.transitService().findRegularStop(e)
       );
-      case AreaStop -> new AreaStopsLayerBuilder(context.transitService(), layerParameters, locale);
+      case AreaStop -> new StopLayerBuilder<>(
+        layerParameters,
+        locale,
+        e -> context.transitService().findAreaStops(e)
+      );
       case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
     };
   }

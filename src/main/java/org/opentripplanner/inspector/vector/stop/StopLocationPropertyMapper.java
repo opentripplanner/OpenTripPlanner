@@ -1,5 +1,7 @@
 package org.opentripplanner.inspector.vector.stop;
 
+import static org.opentripplanner.inspector.vector.KeyValue.kv;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -7,7 +9,6 @@ import org.opentripplanner.api.mapping.I18NStringMapper;
 import org.opentripplanner.api.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitService;
 
 /**
  * A {@link PropertyMapper} for the {@link AreaStopsLayerBuilder} for the OTP debug client.
@@ -20,15 +21,12 @@ public class StopLocationPropertyMapper extends PropertyMapper<StopLocation> {
     this.i18NStringMapper = new I18NStringMapper(locale);
   }
 
-  public static PropertyMapper<StopLocation> create(TransitService ignored, Locale locale) {
-    return new StopLocationPropertyMapper(locale);
-  }
-
   @Override
-  protected Collection<KeyValue> map(StopLocation input) {
+  protected Collection<KeyValue> map(StopLocation stop) {
     return List.of(
-      new KeyValue("id", input.getId().toString()),
-      new KeyValue("name", i18NStringMapper.mapToApi(input.getName()))
+      kv("name", i18NStringMapper.mapToApi(stop.getName())),
+      kv("id", stop.getId().toString()),
+      kv("parentId", stop.isPartOfStation() ? stop.getParentStation().getId().toString() : null)
     );
   }
 }

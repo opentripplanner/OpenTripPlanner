@@ -86,12 +86,14 @@ export function MapView({
             closeButton={true}
             onClose={() => setShowPropsPopup(null)}
           >
-            <Table striped bordered hover>
+            <Table bordered>
               {Object.entries(showPropsPopup.feature.properties).map(([key, value]) => (
-                <tr>
-                  <td>{key}</td>
-                  <td>{value}</td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <th scope="row">{key}</th>
+                    <td>{value}</td>
+                  </tr>
+                </tbody>
               ))}
             </Table>
           </Popup>

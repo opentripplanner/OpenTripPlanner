@@ -7,6 +7,10 @@ import org.opentripplanner.apis.vectortiles.model.TileSource;
 import org.opentripplanner.apis.vectortiles.model.TileSource.RasterSource;
 import org.opentripplanner.apis.vectortiles.model.TileSource.VectorSource;
 
+/**
+ *  A Mapbox/Mapblibre style specification for rendering debug information about transit and
+ *  street data.
+ */
 public class DebugStyleSpec {
 
   private static final RasterSource BACKGROUND_SOURCE = new RasterSource(
@@ -33,7 +37,7 @@ public class DebugStyleSpec {
           .ofId("regular-stop")
           .typeCircle()
           .vectorSourceLayer(regularStops)
-          .circleStroke("#140d0e", 1)
+          .circleStroke("#140d0e", 2)
           .circleColor("#fcf9fa")
           .minZoom(13)
           .maxZoom(22)

@@ -8,38 +8,37 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
-import org.opentripplanner.transit.model.site.AreaStop;
+import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
-import org.opentripplanner.transit.service.TransitService;
 
 /**
- * A vector tile layer containing all {@link AreaStop}s inside the vector tile bounds.
+ * A vector tile layer containing all {@link RegularStop}s inside the vector tile bounds.
  */
-public class AreaStopsLayerBuilder extends LayerBuilder<StopLocation> {
+public class StopLayerBuilder<T extends StopLocation> extends LayerBuilder<StopLocation> {
 
-  private final Function<Envelope, Collection<AreaStop>> findAreaStops;
+  private final Function<Envelope, Collection<T>> findStops;
 
-  public AreaStopsLayerBuilder(
-    TransitService transitService,
+  public StopLayerBuilder(
     LayerParameters layerParameters,
-    Locale locale
+    Locale locale,
+    Function<Envelope, Collection<T>> findStops
   ) {
     super(
       new StopLocationPropertyMapper(locale),
       layerParameters.name(),
       layerParameters.expansionFactor()
     );
-    this.findAreaStops = transitService::findAreaStops;
+    this.findStops = findStops;
   }
 
   @Override
   protected List<Geometry> getGeometries(Envelope query) {
-    return findAreaStops
+    return findStops
       .apply(query)
       .stream()
-      .map(areaStop -> {
-        Geometry geometry = areaStop.getGeometry().copy();
-        geometry.setUserData(areaStop);
+      .map(stop -> {
+        Geometry geometry = stop.getGeometry().copy();
+        geometry.setUserData(stop);
         return geometry;
       })
       .toList();
