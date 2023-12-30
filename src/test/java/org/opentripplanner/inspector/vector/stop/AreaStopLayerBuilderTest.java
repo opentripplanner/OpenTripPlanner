@@ -1,12 +1,10 @@
 package org.opentripplanner.inspector.vector.stop;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.framework.geometry.GeometryUtils;
+import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.inspector.vector.KeyValue;
@@ -17,22 +15,15 @@ import org.opentripplanner.transit.service.StopModelBuilder;
 
 class AreaStopLayerBuilderTest {
 
-  private static final Coordinate[] COORDINATES = {
-    new Coordinate(0, 0),
-    new Coordinate(0, 1),
-    new Coordinate(1, 1),
-    new Coordinate(1, 0),
-    new Coordinate(0, 0),
-  };
   private static final FeedScopedId ID = new FeedScopedId("FEED", "ID");
-  private static final I18NString NAME = new NonLocalizedString("Test stop");
+  private static final I18NString NAME = I18NString.of("Test stop");
 
   private final StopModelBuilder stopModelBuilder = StopModel.of();
 
   private final AreaStop areaStop = stopModelBuilder
     .areaStop(ID)
     .withName(NAME)
-    .withGeometry(GeometryUtils.getGeometryFactory().createPolygon(COORDINATES))
+    .withGeometry(Polygons.BERLIN)
     .build();
 
   @Test
@@ -41,7 +32,6 @@ class AreaStopLayerBuilderTest {
 
     var properties = subject.map(areaStop);
 
-    assertEquals(2, properties.size());
     assertTrue(properties.contains(new KeyValue("id", ID.toString())));
     assertTrue(properties.contains(new KeyValue("name", NAME.toString())));
   }

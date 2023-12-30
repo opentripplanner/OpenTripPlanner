@@ -27,8 +27,7 @@ public class LayerStyleBuilder {
 
   public LayerStyleBuilder vectorSourceLayer(VectorSourceLayer source) {
     source(source.vectorSource());
-    sourceLayer(source.vectorLayer());
-    return this;
+    return sourceLayer(source.vectorLayer());
   }
 
   public enum LayerType {
