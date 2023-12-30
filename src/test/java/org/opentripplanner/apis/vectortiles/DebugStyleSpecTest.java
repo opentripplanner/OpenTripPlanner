@@ -18,7 +18,7 @@ class DebugStyleSpecTest {
     var regularStops = new VectorSourceLayer(vectorSource, "regularStops");
     var spec = DebugStyleSpec.build(vectorSource, regularStops);
 
-    var json = ObjectMappers.ignoringExtraFields().valueToTree(spec).toPrettyString();
+    var json = ObjectMappers.ignoringExtraFields().valueToTree(spec);
     var expectation = RES.fileToString("style.json");
     assertEqualJson(expectation, json);
   }
