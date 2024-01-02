@@ -5544,7 +5544,7 @@ input BicycleWalkPreferencesCostInput {
     bicycle walking. However, this cost is not applied when getting on a rented bicycle
     for the first time or when getting off the bicycle when returning the bicycle.
     """
-    hopOnOrOffCost: Cost
+    hopCost: Cost
 
     """
     A cost multiplier of bicycle walking travel time. The multiplier is for how bad
@@ -5562,7 +5562,7 @@ input ScooterWalkPreferencesCostInput {
     scooter walking. However, this cost is not applied when getting on a rented scooter
     for the first time or when getting off the scooter when returning the scooter.
     """
-    hopOnOrOffCost: Cost
+    hopCost: Cost
 
     """
     A cost multiplier of scooter walking travel time. The multiplier is for how bad
