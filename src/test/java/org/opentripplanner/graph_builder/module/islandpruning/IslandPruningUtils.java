@@ -9,7 +9,7 @@ import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.service.StopModel;
 import org.opentripplanner.transit.service.TransitModel;
 
-public class IslandPruningUtils {
+class IslandPruningUtils {
 
   static Graph buildOsmGraph(File osmFile) {
     try {
