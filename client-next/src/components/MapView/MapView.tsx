@@ -53,8 +53,10 @@ export function MapView({
         }}
         interactiveLayerIds={['regular-stop']}
         onClick={(e) => {
-          const props = e.features[0];
-          setShowPropsPopup(new PopupData(e.lngLat, props));
+          if (e.features) {
+            const props = e.features[0];
+            setShowPropsPopup(new PopupData(e.lngLat, props));
+          }
         }}
         // put lat/long in URL and pan to it on page reload
         hash={true}
@@ -79,7 +81,7 @@ export function MapView({
             onClose={() => setShowContextPopup(null)}
           />
         )}
-        {showPropsPopup && (
+        {showPropsPopup && showPropsPopup.feature && showPropsPopup.feature.properties && (
           <Popup
             latitude={showPropsPopup.coordinates.lat}
             longitude={showPropsPopup.coordinates.lng}
