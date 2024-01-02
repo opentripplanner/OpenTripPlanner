@@ -22,7 +22,7 @@ public sealed interface TileSource {
   /**
    * Represents a raster-based source for map tiles.
    */
-  record RasterSource(String id, List<String> tiles, int tileSize) implements TileSource {
+  record RasterSource(String id, List<String> tiles, int tileSize, String attribution) implements TileSource {
     @Override
     public String type() {
       return "raster";

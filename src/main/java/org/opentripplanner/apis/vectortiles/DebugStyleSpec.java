@@ -16,7 +16,8 @@ public class DebugStyleSpec {
   private static final RasterSource BACKGROUND_SOURCE = new RasterSource(
     "background",
     List.of("https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"),
-    256
+    256,
+    "&copy; OpenStreetMap Contributors"
   );
 
   public record VectorSourceLayer(VectorSource vectorSource, String vectorLayer) {}
