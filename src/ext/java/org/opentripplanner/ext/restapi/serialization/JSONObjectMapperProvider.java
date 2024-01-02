@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.common.json;
+package org.opentripplanner.ext.restapi.serialization;
 
 import com.bedatadriven.jackson.datatype.jts.JtsModule;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

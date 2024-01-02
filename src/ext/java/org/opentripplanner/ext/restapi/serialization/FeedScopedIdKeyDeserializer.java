@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.common.json;
+package org.opentripplanner.ext.restapi.serialization;
 
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.KeyDeserializer;

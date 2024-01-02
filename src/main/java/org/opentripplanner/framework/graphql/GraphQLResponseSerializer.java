@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import org.opentripplanner.apis.common.json.JSONObjectMapperProvider;
+import org.opentripplanner.ext.restapi.serialization.JSONObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

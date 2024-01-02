@@ -18,7 +18,7 @@ import org.glassfish.jersey.internal.inject.Binder;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.apis.APIEndpoints;
-import org.opentripplanner.apis.common.json.JSONObjectMapperProvider;
+import org.opentripplanner.ext.restapi.serialization.JSONObjectMapperProvider;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.bridge.SLF4JBridgeHandler;
