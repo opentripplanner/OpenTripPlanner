@@ -74,6 +74,9 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       [allowedNetworks](#rd_bicycle_rental_allowedNetworks)                                                  |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                              | *Optional* |                  |  2.1  |
 |       [bannedNetworks](#rd_bicycle_rental_bannedNetworks)                                                    |       `string[]`       | The vehicle rental networks which may not be used. If empty, no networks are banned.                                                           | *Optional* |                  |  2.1  |
 |    triangle                                                                                                  |        `object`        | Triangle optimization criteria.                                                                                                                | *Optional* |                  |  2.5  |
+|       flatness                                                                                               |        `double`        | Relative importance of flat terrain (range 0-1).                                                                                               | *Optional* | `0.0`            |  2.0  |
+|       [safety](#rd_bicycle_triangle_safety)                                                                  |        `double`        | Relative importance of safety (range 0-1).                                                                                                     | *Optional* | `0.0`            |  2.0  |
+|       time                                                                                                   |        `double`        | Relative importance of duration of travel (range 0-1).                                                                                         | *Optional* | `0.0`            |  2.0  |
 |    walk                                                                                                      |        `object`        | Preferences for walking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
 |       [hopCost](#rd_bicycle_walk_hopCost)                                                                    |        `integer`       | The cost of hopping on or off a vehicle.                                                                                                       | *Optional* | `0`              |  2.0  |
 |       [hopTime](#rd_bicycle_walk_hopTime)                                                                    |       `duration`       | The time it takes the user to hop on or off a vehicle in seconds.                                                                              | *Optional* | `"PT0S"`         |  2.0  |
@@ -499,6 +502,17 @@ The vehicle rental networks which may be used. If empty all networks may be used
 **Path:** /routingDefaults/bicycle/rental 
 
 The vehicle rental networks which may not be used. If empty, no networks are banned.
+
+<h3 id="rd_bicycle_triangle_safety">safety</h3>
+
+**Since version:** `2.0` ∙ **Type:** `double` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0.0`   
+**Path:** /routingDefaults/bicycle/triangle 
+
+Relative importance of safety (range 0-1).
+
+This factor can also include other concerns such as convenience and general cyclist
+preferences by taking into account road surface etc.
+
 
 <h3 id="rd_bicycle_walk_hopCost">hopCost</h3>
 
@@ -1048,6 +1062,11 @@ include stairs as a last result.
       "parking" : {
         "parkTime" : "1m",
         "parkCost" : 120
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
       }
     },
     "car" : {

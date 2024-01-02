@@ -474,6 +474,11 @@ Used to group requests when monitoring OTP.
       "parking" : {
         "parkTime" : "1m",
         "parkCost" : 120
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
       }
     },
     "car" : {
