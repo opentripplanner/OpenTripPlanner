@@ -101,9 +101,9 @@ public final class VehicleRentalPreferences implements Serializable {
     VehicleRentalPreferences that = (VehicleRentalPreferences) o;
     return (
       pickupTime == that.pickupTime &&
-      pickupCost == that.pickupCost &&
+      Objects.equals(pickupCost, that.pickupCost) &&
       dropoffTime == that.dropoffTime &&
-      dropoffCost == that.dropoffCost &&
+      Objects.equals(dropoffCost, that.dropoffCost) &&
       useAvailabilityInformation == that.useAvailabilityInformation &&
       Double.compare(
         that.arrivingInRentalVehicleAtDestinationCost,

@@ -192,6 +192,7 @@ public final class BikePreferences implements Serializable {
       .addObj("parking", parking, DEFAULT.parking)
       .addEnum("optimizeType", optimizeType, DEFAULT.optimizeType)
       .addObj("optimizeTriangle", optimizeTriangle, DEFAULT.optimizeTriangle)
+      .addNum("stairsReluctance", stairsReluctance, DEFAULT.stairsReluctance)
       .toString();
   }
 
