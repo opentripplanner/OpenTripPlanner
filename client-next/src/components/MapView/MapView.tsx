@@ -87,14 +87,14 @@ export function MapView({
             onClose={() => setShowPropsPopup(null)}
           >
             <Table bordered>
-              {Object.entries(showPropsPopup.feature.properties).map(([key, value]) => (
-                <tbody>
-                  <tr>
+              <tbody>
+                {Object.entries(showPropsPopup.feature.properties).map(([key, value]) => (
+                  <tr key={key}>
                     <th scope="row">{key}</th>
                     <td>{value}</td>
                   </tr>
-                </tbody>
-              ))}
+                ))}
+              </tbody>
             </Table>
           </Popup>
         )}

@@ -9,6 +9,8 @@ import java.util.Map;
 /**
  * Represents a style specification for Maplibre/Mapbox vector tile layers.
  * https://maplibre.org/maplibre-style-spec/root/
+ * <p>
+ * Maplibre uses these to render vector maps in the browser.
  */
 public final class StyleSpec {
 
