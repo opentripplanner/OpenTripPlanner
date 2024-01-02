@@ -2,6 +2,7 @@ package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.opentripplanner.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByStop;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForMcRaptor;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForStandardRaptor;
 
 import gnu.trove.map.TIntObjectMap;
@@ -31,7 +32,9 @@ public class EgressPaths {
    * This method is static and package local to enable unit-testing.
    */
   public static EgressPaths create(Collection<RaptorAccessEgress> paths, RaptorProfile profile) {
-    if (!MULTI_CRITERIA.is(profile)) {
+    if (MULTI_CRITERIA.is(profile)) {
+      paths = removeNoneOptimalPathsForMcRaptor(paths);
+    } else {
       paths = removeNoneOptimalPathsForStandardRaptor(paths);
     }
     return new EgressPaths(groupByStop(paths));
