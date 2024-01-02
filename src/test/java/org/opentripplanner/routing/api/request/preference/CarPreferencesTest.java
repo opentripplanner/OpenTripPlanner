@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
 
 class CarPreferencesTest {
 
@@ -23,7 +25,7 @@ class CarPreferencesTest {
     .of()
     .withSpeed(SPEED)
     .withReluctance(RELUCTANCE)
-    .withPickupTime(PICKUP_TIME)
+    .withPickupTime(Duration.ofSeconds(PICKUP_TIME))
     .withPickupCost(PICKUP_COST)
     .withAccelerationSpeed(ACCELERATION_SPEED)
     .withDecelerationSpeed(DECELERATION_SPEED)
@@ -43,12 +45,12 @@ class CarPreferencesTest {
 
   @Test
   void pickupTime() {
-    assertEquals(PICKUP_TIME, subject.pickupTime());
+    assertEquals(Duration.ofSeconds(PICKUP_TIME), subject.pickupTime());
   }
 
   @Test
   void pickupCost() {
-    assertEquals(PICKUP_COST, subject.pickupCost());
+    assertEquals(Cost.costOfSeconds(PICKUP_COST), subject.pickupCost());
   }
 
   @Test
@@ -94,7 +96,7 @@ class CarPreferencesTest {
       "reluctance: 5.1, " +
       "parking: VehicleParkingPreferences{parkCost: $30}, " +
       "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
-      "pickupTime: 600, " +
+      "pickupTime: PT10M, " +
       "pickupCost: $500, " +
       "accelerationSpeed: 3.1, decelerationSpeed: 3.5" +
       "}",

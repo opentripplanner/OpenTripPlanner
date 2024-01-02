@@ -591,14 +591,14 @@ your users receive a timely response. You can also limit the max duration. There
           .of("pickupCost")
           .since(V2_1)
           .summary("Add a cost for car pickup changes when a pickup or drop off takes place")
-          .asInt(dft.pickupCost())
+          .asInt(dft.pickupCost().toSeconds())
       )
       .withPickupTime(
         cc
           .of("pickupTime")
           .since(V2_1)
           .summary("Add a time for car pickup changes when a pickup or drop off takes place")
-          .asInt(dft.pickupTime())
+          .asDuration(dft.pickupTime())
       )
       .withAccelerationSpeed(
         cc
