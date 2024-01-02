@@ -485,6 +485,10 @@ Used to group requests when monitoring OTP.
         "pickupCost" : 120,
         "dropOffTime" : "30s",
         "dropOffCost" : 30
+      },
+      "parking" : {
+        "parkTime" : "5m",
+        "parkCost" : 600
       }
     },
     "walk" : {

@@ -89,6 +89,12 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    reluctance                                                                                                |        `double`        | A multiplier for how bad driving is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`            |  2.0  |
 |    speed                                                                                                     |        `double`        | Max car speed along streets, in meters per second                                                                                              | *Optional* | `40.0`           |  2.0  |
 |    parking                                                                                                   |        `object`        | Preferences for parking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
+|       parkCost                                                                                               |        `integer`       | Cost to park a vehicle.                                                                                                                        | *Optional* | `120`            |  2.0  |
+|       parkTime                                                                                               |       `duration`       | Time to park a vehicle.                                                                                                                        | *Optional* | `"PT1M"`         |  2.0  |
+|       [unpreferredVehicleParkingTagCost](#rd_car_parking_unpreferredVehicleParkingTagCost)                   |        `integer`       | What cost to add if a parking facility doesn't contain a preferred tag.                                                                        | *Optional* | `300`            |  2.3  |
+|       [bannedVehicleParkingTags](#rd_car_parking_bannedVehicleParkingTags)                                   |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned.                                                              | *Optional* |                  |  2.1  |
+|       [preferredVehicleParkingTags](#rd_car_parking_preferredVehicleParkingTags)                             |       `string[]`       | Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.                       | *Optional* |                  |  2.3  |
+|       [requiredVehicleParkingTags](#rd_car_parking_requiredVehicleParkingTags)                               |       `string[]`       | Tags without which a vehicle parking will not be used. If empty, no tags are required.                                                         | *Optional* |                  |  2.1  |
 |    rental                                                                                                    |        `object`        | Vehicle rental options                                                                                                                         | *Optional* |                  |  2.3  |
 |       allowKeepingAtDestination                                                                              |        `boolean`       | If a vehicle should be allowed to be kept at the end of a station-based rental.                                                                | *Optional* | `false`          |  2.2  |
 |       dropOffCost                                                                                            |        `integer`       | Cost to drop-off a rented vehicle.                                                                                                             | *Optional* | `30`             |  2.0  |
@@ -526,6 +532,45 @@ How much extra time should be given when boarding a vehicle for each given mode.
 
 Sometimes there is a need to configure a board times for specific modes, such as airplanes or
 ferries, where the check-in process needs to be done in good time before ride.
+
+
+<h3 id="rd_car_parking_unpreferredVehicleParkingTagCost">unpreferredVehicleParkingTagCost</h3>
+
+**Since version:** `2.3` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `300`   
+**Path:** /routingDefaults/car/parking 
+
+What cost to add if a parking facility doesn't contain a preferred tag.
+
+See `preferredVehicleParkingTags`.
+
+<h3 id="rd_car_parking_bannedVehicleParkingTags">bannedVehicleParkingTags</h3>
+
+**Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/car/parking 
+
+Tags with which a vehicle parking will not be used. If empty, no tags are banned.
+
+Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+
+
+<h3 id="rd_car_parking_preferredVehicleParkingTags">preferredVehicleParkingTags</h3>
+
+**Since version:** `2.3` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/car/parking 
+
+Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.
+
+Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
+
+
+<h3 id="rd_car_parking_requiredVehicleParkingTags">requiredVehicleParkingTags</h3>
+
+**Since version:** `2.1` ∙ **Type:** `string[]` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/car/parking 
+
+Tags without which a vehicle parking will not be used. If empty, no tags are required.
+
+Vehicle parking tags can originate from different places depending on the origin of the parking(OSM or RT feed).
 
 
 <h3 id="rd_car_rental_allowedNetworks">allowedNetworks</h3>
@@ -1014,6 +1059,10 @@ include stairs as a last result.
         "pickupCost" : 120,
         "dropOffTime" : "30s",
         "dropOffCost" : 30
+      },
+      "parking" : {
+        "parkTime" : "5m",
+        "parkCost" : 600
       }
     },
     "walk" : {
