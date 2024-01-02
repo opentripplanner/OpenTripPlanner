@@ -15,12 +15,7 @@ const initialViewState = {
   zoom: 4,
 };
 
-class PopupData {
-  constructor(
-    public coordinates: LngLat,
-    public feature: MapboxGeoJSONFeature,
-  ) {}
-}
+type PopupData = { coordinates: LngLat; feature: MapboxGeoJSONFeature };
 
 export function MapView({
   tripQueryVariables,
@@ -55,7 +50,7 @@ export function MapView({
         onClick={(e) => {
           if (e.features) {
             const props = e.features[0];
-            setShowPropsPopup(new PopupData(e.lngLat, props));
+            setShowPropsPopup({ coordinates: e.lngLat, feature: props });
           }
         }}
         // put lat/long in URL and pan to it on page reload
