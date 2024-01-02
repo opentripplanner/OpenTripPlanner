@@ -76,7 +76,7 @@ export function MapView({
             onClose={() => setShowContextPopup(null)}
           />
         )}
-        {showPropsPopup && showPropsPopup.feature && showPropsPopup.feature.properties && (
+        {showPropsPopup?.feature?.properties && (
           <Popup
             latitude={showPropsPopup.coordinates.lat}
             longitude={showPropsPopup.coordinates.lng}
