@@ -1,11 +1,10 @@
-package org.opentripplanner.ext.interactivelauncher.views;
+package org.opentripplanner.ext.interactivelauncher.startup;
 
 import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.GridBagConstraints.CENTER;
-import static java.awt.GridBagConstraints.NONE;
-import static java.awt.GridBagConstraints.NORTH;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.BACKGROUND;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.debugLayout;
+import static java.awt.GridBagConstraints.HORIZONTAL;
+import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.BACKGROUND;
+import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.debugLayout;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -18,101 +17,32 @@ import org.opentripplanner.ext.interactivelauncher.Model;
 
 public class MainView {
 
-  /** Margins between components (IN) */
   private static final int M_IN = 10;
-
-  /** Margins around frame boarder (OUT) */
   private static final int M_OUT = 2 * M_IN;
+  private static final Insets DEFAULT_INSETS = new Insets(M_OUT, M_OUT, M_IN, M_OUT);
+  private static final Insets SMALL_INSETS = new Insets(M_OUT, M_OUT, M_IN, M_OUT);
+  private static int Y = 0;
 
   /*
-   The application have the following 4 panels:
+   The application have the following panels:
    +-----------------------------------+
-   |  Root dir [Open]                  |
-   +-------------------+---------------+
-   |                   |               |
-   | Config Dirs Panel | Options Panel |
-   |                   |               |
-   +-------------------+---------------+
-   |       Start OTP Main Panel        |
+   |  Root dir                 [Open]  |
+   +-----------------------------------+
+   |         Config Dirs Panel         |
+   +-----------------------------------+
+   |          Options Panel            |
+   +-----------------------------------+
+   |           [ Start OTP ]           |
    +-----------------------------------+
    |            Status Bar             |
    +-----------------------------------+
   */
 
-  // Root dir view
-  private static final GridBagConstraints CONFIG_SOURCE_DIR_PANEL_CONSTRAINTS = new GridBagConstraints(
-    0,
-    0,
-    2,
-    1,
-    1.0,
-    0.0,
-    NORTH,
-    BOTH,
-    new Insets(M_OUT, M_OUT, M_IN, M_IN),
-    0,
-    0
-  );
-
-  // List of locations
-  private static final GridBagConstraints CONFIG_DIRS_PANEL_CONSTRAINTS = new GridBagConstraints(
-    0,
-    1,
-    1,
-    1,
-    1.0,
-    1.0,
-    NORTH,
-    NONE,
-    new Insets(M_OUT, M_OUT, M_IN, M_IN),
-    0,
-    0
-  );
-
-  // Options panel
-  private static final GridBagConstraints OPTIONS_PANEL_CONSTRAINTS = new GridBagConstraints(
-    1,
-    1,
-    1,
-    1,
-    1.0,
-    1.0,
-    NORTH,
-    NONE,
-    new Insets(M_OUT, M_IN, M_IN, M_OUT),
-    0,
-    0
-  );
-
-  // Run btn and status
-  private static final GridBagConstraints START_OTP_BUTTON_PANEL_CONSTRAINTS = new GridBagConstraints(
-    0,
-    2,
-    2,
-    1,
-    1.0,
-    1.0,
-    CENTER,
-    BOTH,
-    new Insets(M_IN, M_OUT, M_IN, M_OUT),
-    0,
-    0
-  );
-
-  // Run btn and status
-  private static final GridBagConstraints STATUS_BAR_CONSTRAINTS = new GridBagConstraints(
-    0,
-    3,
-    2,
-    1,
-    1.0,
-    0.0,
-    CENTER,
-    BOTH,
-    new Insets(M_IN, 0, 0, 0),
-    40,
-    0
-  );
+  private static final GridBagConstraints DATA_SOURCE_ROOT_PANEL_CONSTRAINTS = gbc(0f);
+  private static final GridBagConstraints DATA_SOURCE_LIST_PANEL_CONSTRAINTS = gbc(1f);
+  private static final GridBagConstraints OPTIONS_PANEL_CONSTRAINTS = gbc(1f);
+  private static final GridBagConstraints START_BUTTON_PANEL_CONSTRAINTS = gbc(0f);
+  private static final GridBagConstraints STATUS_BAR_CONSTRAINTS = gbc(0f, SMALL_INSETS, 40);
 
   private final JFrame mainFrame = new JFrame("Setup and Run OTP Main");
 
@@ -134,7 +64,7 @@ public class MainView {
     innerPanel.setLayout(layout);
     innerPanel.setBackground(BACKGROUND);
 
-    var sourceDirectoryView = new SearchDirectoryView(
+    var sourceDirectoryView = new DataSourceRootView(
       model.getRootDirectory(),
       this::onRootDirChanged
     );
@@ -142,16 +72,17 @@ public class MainView {
     this.optionsView = new OptionsView(model);
     this.startOtpButtonView = new StartOtpButtonView();
 
-    innerPanel.add(sourceDirectoryView.panel(), CONFIG_SOURCE_DIR_PANEL_CONSTRAINTS);
-    innerPanel.add(dataSourcesView.panel(), CONFIG_DIRS_PANEL_CONSTRAINTS);
+    innerPanel.add(sourceDirectoryView.panel(), DATA_SOURCE_ROOT_PANEL_CONSTRAINTS);
+    innerPanel.add(dataSourcesView.panel(), DATA_SOURCE_LIST_PANEL_CONSTRAINTS);
     innerPanel.add(optionsView.panel(), OPTIONS_PANEL_CONSTRAINTS);
-    innerPanel.add(startOtpButtonView.panel(), START_OTP_BUTTON_PANEL_CONSTRAINTS);
+    innerPanel.add(startOtpButtonView.panel(), START_BUTTON_PANEL_CONSTRAINTS);
     innerPanel.add(statusBarTxt, STATUS_BAR_CONSTRAINTS);
 
     // Setup action listeners
     startOtpButtonView.addActionListener(e -> startOtp());
 
     debugLayout(
+      sourceDirectoryView.panel(),
       dataSourcesView.panel(),
       optionsView.panel(),
       startOtpButtonView.panel(),
@@ -185,5 +116,13 @@ public class MainView {
     mainFrame.setVisible(false);
     mainFrame.dispose();
     otpStarter.run();
+  }
+
+  private static GridBagConstraints gbc(float weighty) {
+    return gbc(weighty, DEFAULT_INSETS, 0);
+  }
+
+  private static GridBagConstraints gbc(float weighty, Insets insets, int ipadx) {
+    return new GridBagConstraints(0, Y++, 1, 1, 1.0, weighty, CENTER, HORIZONTAL, insets, ipadx, 0);
   }
 }

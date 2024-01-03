@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.interactivelauncher;
+package org.opentripplanner.ext.interactivelauncher.support;
 
 import java.io.File;
 import java.util.Arrays;
@@ -10,17 +10,17 @@ import org.opentripplanner.framework.application.OtpFileNames;
 
 /**
  * Search for directories containing OTP configuration files. The search is recursive and searches
- * sub-directories 10 levels deep.
+ * subdirectories 10 levels deep.
  */
-class SearchForOtpConfig {
+public class SearchForOtpConfig {
 
   private static final int DEPTH_LIMIT = 10;
   private static final Pattern EXCLUDE_DIR = Pattern.compile(
     "(otp1|archive|\\..*|te?mp|target|docs?|src|source|resource)"
   );
 
-  static List<File> search(File rootDir) {
-    return recursiveSearch(rootDir, DEPTH_LIMIT).collect(Collectors.toUnmodifiableList());
+  public static List<File> search(File rootDir) {
+    return recursiveSearch(rootDir, DEPTH_LIMIT).toList();
   }
 
   @SuppressWarnings("ConstantConditions")

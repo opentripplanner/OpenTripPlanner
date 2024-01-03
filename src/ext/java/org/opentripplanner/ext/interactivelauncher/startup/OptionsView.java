@@ -1,20 +1,18 @@
-package org.opentripplanner.ext.interactivelauncher.views;
+package org.opentripplanner.ext.interactivelauncher.startup;
 
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addComp;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionDoubleSpace;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.addSectionSpace;
+import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.addComp;
+import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.addVerticalSectionSpace;
 
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import org.opentripplanner.ext.interactivelauncher.Model;
 
 class OptionsView {
 
-  private final Box panel = Box.createVerticalBox();
+  private final Box panel = Box.createHorizontalBox();
   private final JCheckBox buildStreetGraphChk;
   private final JCheckBox buildTransitGraphChk;
   private final JCheckBox saveGraphChk;
@@ -30,26 +28,39 @@ class OptionsView {
     this.startOptServerChk = new JCheckBox("Serve graph", model.isServeGraph());
     this.startOptVisualizerChk = new JCheckBox("Visualizer", model.isVisualizer());
 
-    addComp(new JLabel("Build graph"), panel);
-    addSectionSpace(panel);
-    addComp(buildStreetGraphChk, panel);
-    addComp(buildTransitGraphChk, panel);
-    addSectionDoubleSpace(panel);
+    panel.add(Box.createGlue());
+    addComp(createBuildBox(), panel);
+    panel.add(Box.createGlue());
+    addComp(createActionBox(), panel);
+    panel.add(Box.createGlue());
 
     // Toggle [ ] save on/off
     buildStreetGraphChk.addActionListener(e -> onBuildGraphChkChanged());
     buildTransitGraphChk.addActionListener(e -> onBuildGraphChkChanged());
     startOptServerChk.addActionListener(e -> onStartOptServerChkChanged());
 
-    addComp(new JLabel("Actions"), panel);
-    addSectionSpace(panel);
-    addComp(saveGraphChk, panel);
-    addComp(startOptServerChk, panel);
-    addComp(startOptVisualizerChk, panel);
-
-    addDebugCheckBoxes(model);
-    addSectionDoubleSpace(panel);
+    //addSectionDoubleSpace(panel);
     bindCheckBoxesToModel();
+  }
+
+  private JComponent createBuildBox() {
+    var buildBox = Box.createVerticalBox();
+    addComp(new JLabel("Build graph"), buildBox);
+    addVerticalSectionSpace(buildBox);
+    addComp(buildStreetGraphChk, buildBox);
+    addComp(buildTransitGraphChk, buildBox);
+    buildBox.add(Box.createVerticalGlue());
+    return buildBox;
+  }
+
+  private JComponent createActionBox() {
+    var actionBox = Box.createVerticalBox();
+    addComp(new JLabel("Actions"), actionBox);
+    addVerticalSectionSpace(actionBox);
+    addComp(saveGraphChk, actionBox);
+    addComp(startOptServerChk, actionBox);
+    addComp(startOptVisualizerChk, actionBox);
+    return actionBox;
   }
 
   Box panel() {
@@ -62,19 +73,6 @@ class OptionsView {
 
   void bind(JCheckBox box, Consumer<Boolean> modelUpdate) {
     box.addActionListener(l -> modelUpdate.accept(box.isSelected() && box.isEnabled()));
-  }
-
-  private void addDebugCheckBoxes(Model model) {
-    addSectionSpace(panel);
-    addComp(new JLabel("Debug logging"), panel);
-    addSectionSpace(panel);
-    var entries = model.getDebugLogging();
-    List<String> keys = entries.keySet().stream().sorted().collect(Collectors.toList());
-    for (String name : keys) {
-      JCheckBox box = new JCheckBox(name, entries.get(name));
-      box.addActionListener(l -> model.getDebugLogging().put(name, box.isSelected()));
-      addComp(box, panel);
-    }
   }
 
   private void bindCheckBoxesToModel() {

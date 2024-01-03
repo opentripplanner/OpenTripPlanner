@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.interactivelauncher;
+package org.opentripplanner.ext.interactivelauncher.logging;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -10,13 +10,13 @@ import java.util.regex.Pattern;
 import org.slf4j.LoggerFactory;
 
 /**
- * Responsible for integration with the OTP Debug log configuraton, reading loggers from the slf4j
+ * Responsible for integration with the OTP Debug log configuration, reading loggers from the slf4j
  * context and setting DEBUG level on selected loggers back.
  * <p>
- * The log names are transformed to be more human readable:
+ * The log names are transformed to be more human-readable:
  * <pre>org.opentripplanner.routing.algorithm  -->  o.o.routing.algorithm</pre>
  */
-public class DebugLoggingSupport {
+class DebugLoggingSupport {
 
   private static final String OTP = Pattern.quote("org.opentripplanner.") + ".*";
   private static final String GRAPHQL = Pattern.quote("fea");
@@ -26,29 +26,26 @@ public class DebugLoggingSupport {
     "(" + OTP + "|" + GRAPHQL + "|" + NAMED_LOGGERS + ")"
   );
 
-  public static List<String> getLogs() {
+  static List<String> getDebugLoggers() {
     List<String> result = new ArrayList<>();
     LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
     for (Logger log : context.getLoggerList()) {
       var name = log.getName();
-      if (!name.equals("ROOT") && LOG_MATCHER_PATTERN.matcher(name).matches()) {
-        result.add(logDisplayName(name));
+      if (name.equals("ROOT") || log.getLevel() == null) {
+        continue;
+      }
+      if (log.getLevel().toInt() <= Level.DEBUG.toInt()) {
+        if (LOG_MATCHER_PATTERN.matcher(name).matches()) {
+          result.add(name);
+        }
       }
     }
     return result;
   }
 
-  public static void configureDebugLogging(Map<String, Boolean> loggers) {
+  static void configureDebugLogging(String logger, boolean debug) {
     LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-    for (Logger log : context.getLoggerList()) {
-      var name = logDisplayName(log.getName());
-      if (loggers.getOrDefault(name, false)) {
-        log.setLevel(Level.DEBUG);
-      }
-    }
-  }
-
-  private static String logDisplayName(String name) {
-    return name.replace("org.opentripplanner.", "o.o.");
+    var log = context.getLogger(logger);
+    log.setLevel(debug ? Level.DEBUG : Level.INFO);
   }
 }

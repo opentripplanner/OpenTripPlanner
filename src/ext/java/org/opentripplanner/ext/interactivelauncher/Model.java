@@ -6,11 +6,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.function.Consumer;
+import org.opentripplanner.ext.interactivelauncher.logging.LogModel;
+import org.opentripplanner.ext.interactivelauncher.support.SearchForOtpConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +18,6 @@ public class Model implements Serializable {
   private static final Logger LOG = LoggerFactory.getLogger(Model.class);
 
   private static final File MODEL_FILE = new File("interactive_otp_main.json");
-
-  private final Map<String, Boolean> debugLogging = new HashMap<>();
 
   @JsonIgnore
   private transient Consumer<String> commandLineChange;
@@ -32,13 +29,16 @@ public class Model implements Serializable {
   private boolean saveGraph = false;
   private boolean serveGraph = true;
   private boolean visualizer = false;
+  private LogModel logModel;
 
-  public Model() {
-    setupListOfDebugLoggers();
-  }
+  public Model() {}
 
   public static Model load() {
-    return MODEL_FILE.exists() ? readFromFile() : new Model();
+    var model = MODEL_FILE.exists() ? readFromFile() : createNew();
+    // Setup callbacks
+    model.logModel.init(model::save);
+
+    return model;
   }
 
   public void subscribeCmdLineUpdates(Consumer<String> commandLineChange) {
@@ -134,19 +134,6 @@ public class Model implements Serializable {
     notifyChangeListener();
   }
 
-  public Map<String, Boolean> getDebugLogging() {
-    return debugLogging;
-  }
-
-  public void setDebugLogging(Map<String, Boolean> map) {
-    for (Entry<String, Boolean> e : map.entrySet()) {
-      // Only keep entries that exist in the log config
-      if (debugLogging.containsKey(e.getKey())) {
-        debugLogging.put(e.getKey(), e.getValue());
-      }
-    }
-  }
-
   @Override
   public String toString() {
     return (
@@ -172,6 +159,10 @@ public class Model implements Serializable {
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
+  }
+
+  public LogModel getLogModel() {
+    return logModel;
   }
 
   @JsonIgnore
@@ -210,16 +201,26 @@ public class Model implements Serializable {
     return args.toArray(new String[0]);
   }
 
+  private static Model createNew() {
+    var model = new Model();
+    model.logModel = new LogModel();
+    model.logModel.initFromConfig();
+    model.setupCallbacks();
+    return model;
+  }
+
   private static Model readFromFile() {
     try {
-      return new ObjectMapper().readValue(MODEL_FILE, Model.class);
+      var model = new ObjectMapper().readValue(MODEL_FILE, Model.class);
+      model.setupCallbacks();
+      return model;
     } catch (IOException e) {
       System.err.println(
         "Unable to read the InteractiveOtpMain state cache. If the model changed this " +
         "is expected, and it will work next time. Cause: " +
         e.getMessage()
       );
-      return new Model();
+      return createNew();
     }
   }
 
@@ -237,9 +238,7 @@ public class Model implements Serializable {
     return buildStreet && !buildTransit;
   }
 
-  private void setupListOfDebugLoggers() {
-    for (String log : DebugLoggingSupport.getLogs()) {
-      debugLogging.put(log, Boolean.FALSE);
-    }
+  private void setupCallbacks() {
+    logModel.init(this::save);
   }
 }
