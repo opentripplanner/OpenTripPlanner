@@ -12,7 +12,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
-import org.opentripplanner.ext.interactivelauncher.Model;
 import org.opentripplanner.ext.interactivelauncher.support.ViewUtils;
 
 class DataSourcesView {
@@ -28,9 +27,9 @@ class DataSourcesView {
 
   private final Box mainPanel = Box.createVerticalBox();
   private final Box listPanel = Box.createHorizontalBox();
-  private final Model model;
+  private final StartupModel model;
 
-  public DataSourcesView(Model model) {
+  public DataSourcesView(StartupModel model) {
     this.model = model;
     setupDataSources();
 

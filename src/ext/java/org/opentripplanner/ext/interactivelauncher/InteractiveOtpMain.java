@@ -24,16 +24,14 @@ public class InteractiveOtpMain {
 
   private void run() {
     this.model = Model.load();
-    MainView frame = new MainView(new Thread(this::startOtp)::start, model);
+    MainView frame = new MainView(new Thread(this::startOtp)::start, model.getStartupModel());
     frame.start();
   }
 
   private void startOtp() {
     model.save();
 
-    new OtpDebugController(model).start();
-
     System.out.println("Start OTP: " + model + "\n");
-    OTPMain.main(model.asOtpArgs());
+    OTPMain.main(model.getStartupModel().asOtpArgs());
   }
 }

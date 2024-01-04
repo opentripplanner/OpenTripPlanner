@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.interactivelauncher.startup;
 
-import static java.awt.GridBagConstraints.BOTH;
 import static java.awt.GridBagConstraints.CENTER;
 import static java.awt.GridBagConstraints.HORIZONTAL;
 import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.BACKGROUND;
@@ -13,7 +12,6 @@ import java.awt.Insets;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import org.opentripplanner.ext.interactivelauncher.Model;
 
 public class MainView {
 
@@ -50,9 +48,9 @@ public class MainView {
   private final OptionsView optionsView;
   private final StartOtpButtonView startOtpButtonView;
   private final Runnable otpStarter;
-  private final Model model;
+  private final StartupModel model;
 
-  public MainView(Runnable otpStarter, Model model) throws HeadlessException {
+  public MainView(Runnable otpStarter, StartupModel model) throws HeadlessException {
     var innerPanel = new JPanel();
     var statusBarTxt = new StatusBar();
 

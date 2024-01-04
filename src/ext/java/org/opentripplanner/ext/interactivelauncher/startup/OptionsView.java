@@ -8,7 +8,6 @@ import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import org.opentripplanner.ext.interactivelauncher.Model;
 
 class OptionsView {
 
@@ -18,9 +17,9 @@ class OptionsView {
   private final JCheckBox saveGraphChk;
   private final JCheckBox startOptServerChk;
   private final JCheckBox startOptVisualizerChk;
-  private final Model model;
+  private final StartupModel model;
 
-  OptionsView(Model model) {
+  OptionsView(StartupModel model) {
     this.model = model;
     this.buildStreetGraphChk = new JCheckBox("Street graph", model.isBuildStreet());
     this.buildTransitGraphChk = new JCheckBox("Transit graph", model.isBuildTransit());
