@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.interactivelauncher;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -17,11 +19,7 @@ public class Model implements Serializable {
   public Model() {}
 
   public static Model load() {
-    var model = MODEL_FILE.exists() ? readFromFile() : createNew();
-    // Setup callbacks
-    model.logModel.init(model::save);
-
-    return model;
+    return MODEL_FILE.exists() ? readFromFile() : createNew();
   }
 
   public StartupModel getStartupModel() {
@@ -34,25 +32,22 @@ public class Model implements Serializable {
 
   public void save() {
     try {
-      new ObjectMapper().writeValue(MODEL_FILE, this);
+      var mapper = new ObjectMapper().configure(SerializationFeature.INDENT_OUTPUT, true);
+      mapper.writeValue(MODEL_FILE, this);
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
 
   private static Model createNew() {
-    var model = new Model();
-    model.logModel = new LogModel();
-    model.logModel.initFromConfig();
-    model.setupCallbacks();
-    return model;
+    return new Model().initSubModels();
   }
 
   private static Model readFromFile() {
     try {
-      var model = new ObjectMapper().readValue(MODEL_FILE, Model.class);
-      model.setupCallbacks();
-      return model;
+      var mapper = new ObjectMapper()
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      return mapper.readValue(MODEL_FILE, Model.class).initSubModels();
     } catch (IOException e) {
       System.err.println(
         "Unable to read the InteractiveOtpMain state cache. If the model changed this " +
@@ -63,7 +58,14 @@ public class Model implements Serializable {
     }
   }
 
-  private void setupCallbacks() {
+  private Model initSubModels() {
+    if (startupModel == null) {
+      startupModel = new StartupModel();
+    }
+    if (logModel == null) {
+      logModel = LogModel.createFromConfig();
+    }
     logModel.init(this::save);
+    return this;
   }
 }

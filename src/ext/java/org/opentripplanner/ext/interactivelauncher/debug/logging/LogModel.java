@@ -20,6 +20,12 @@ public class LogModel implements Serializable {
 
   public LogModel() {}
 
+  public static LogModel createFromConfig() {
+    var model = new LogModel();
+    model.initFromConfig();
+    return model;
+  }
+
   /** Need to set this manually to support JSON serialization. */
   public void init(Runnable saveCallback) {
     this.saveCallback = saveCallback;
@@ -36,10 +42,6 @@ public class LogModel implements Serializable {
     this.activeLoggers.addAll(loggers);
   }
 
-  public void initFromConfig() {
-    activeLoggers.addAll(DebugLoggingSupport.getDebugLoggers());
-  }
-
   boolean isLoggerEnabled(String name) {
     return activeLoggers.contains(name);
   }
@@ -52,5 +54,9 @@ public class LogModel implements Serializable {
     }
     DebugLoggingSupport.configureDebugLogging(name, enable);
     saveCallback.run();
+  }
+
+  private void initFromConfig() {
+    activeLoggers.addAll(DebugLoggingSupport.getDebugLoggers());
   }
 }
