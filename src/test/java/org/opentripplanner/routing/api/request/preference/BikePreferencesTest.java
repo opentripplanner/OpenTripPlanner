@@ -99,4 +99,27 @@ class BikePreferencesTest {
       subject.toString()
     );
   }
+
+  @Test
+  void testForcedTriangleOptimization() {
+    var trianglePreferences = BikePreferences
+      .of()
+      .withForcedOptimizeTriangle(it -> it.withSlope(1).build())
+      .build();
+    assertEquals(BicycleOptimizeType.TRIANGLE, trianglePreferences.optimizeType());
+
+    var conflictingPreferences = BikePreferences
+      .of()
+      .withOptimizeType(BicycleOptimizeType.SAFE_STREETS)
+      .withForcedOptimizeTriangle(it -> it.withSlope(1).build())
+      .build();
+    assertEquals(BicycleOptimizeType.TRIANGLE, conflictingPreferences.optimizeType());
+
+    var emptyTrianglePreferences = BikePreferences
+      .of()
+      .withOptimizeType(BicycleOptimizeType.SAFE_STREETS)
+      .withForcedOptimizeTriangle(it -> it.build())
+      .build();
+    assertEquals(BicycleOptimizeType.SAFE_STREETS, emptyTrianglePreferences.optimizeType());
+  }
 }

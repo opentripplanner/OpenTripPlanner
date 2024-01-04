@@ -16,6 +16,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -71,7 +72,11 @@ public class RouteRequestMapper {
         callWith.argument("bikeBoardCost", bike::withBoardCost);
 
         if (environment.getArgument("optimize") != null) {
-          bike.withOptimizeType(BicycleOptimizeType.valueOf(environment.getArgument("optimize")));
+          bike.withOptimizeType(
+            OptimizationTypeMapper.map(
+              GraphQLTypes.GraphQLOptimizeType.valueOf(environment.getArgument("optimize"))
+            )
+          );
         }
         if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
           bike.withOptimizeTriangle(triangle -> {

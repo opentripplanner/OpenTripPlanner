@@ -47,6 +47,7 @@ public class TriangleOptimizationConfig {
       .of("triangle")
       .since(V2_5)
       .summary("Triangle optimization criteria.")
+      .description("Optimization type doesn't need to be defined if these values are defined.")
       .asObject();
     mapTriangleParameters(optimizationTriangle, preferences);
   }

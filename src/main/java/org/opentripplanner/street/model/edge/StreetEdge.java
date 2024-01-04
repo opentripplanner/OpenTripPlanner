@@ -51,7 +51,7 @@ public class StreetEdge
 
   private static final Logger LOG = LoggerFactory.getLogger(StreetEdge.class);
 
-  private static final double GREENWAY_SAFETY_FACTOR = 0.1;
+  private static final double SAFEST_STREETS_SAFETY_FACTOR = 0.1;
 
   /** If you have more than 16 flags, increase flags to short or int */
   static final int BACK_FLAG_INDEX = 0;
@@ -1217,17 +1217,17 @@ public class StreetEdge
     double time = getEffectiveBikeDistance() / speed;
     double weight;
     switch (pref.bike().optimizeType()) {
-      case GREENWAYS -> {
+      case SAFEST_STREETS -> {
         weight = bicycleSafetyFactor * getDistanceMeters() / speed;
-        if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
-          // greenways are treated as even safer than they really are
+        if (bicycleSafetyFactor <= SAFEST_STREETS_SAFETY_FACTOR) {
+          // safest streets are treated as even safer than they really are
           weight *= 0.66;
         }
       }
-      case SAFE -> weight = getEffectiveBicycleSafetyDistance() / speed;
-      case FLAT -> /* see notes in StreetVertex on speed overhead */weight =
+      case SAFE_STREETS -> weight = getEffectiveBicycleSafetyDistance() / speed;
+      case FLAT_STREETS -> /* see notes in StreetVertex on speed overhead */weight =
         getEffectiveBikeDistanceForWorkCost() / speed;
-      case QUICK -> weight = getEffectiveBikeDistance() / speed;
+      case SHORTEST_DURATION -> weight = getEffectiveBikeDistance() / speed;
       case TRIANGLE -> {
         double quick = getEffectiveBikeDistance();
         double safety = getEffectiveBicycleSafetyDistance();

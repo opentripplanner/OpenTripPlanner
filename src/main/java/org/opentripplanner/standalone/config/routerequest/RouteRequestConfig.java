@@ -372,9 +372,13 @@ ferries, where the check-in process needs to be done in good time before ride.
           .of("optimization")
           .since(V2_0)
           .summary("The set of characteristics that the user wants to optimize for.")
+          .description(
+            "If the triangle optimization is used, it's enough to just define the triangle parameters"
+          )
           .asEnum(dft.optimizeType())
       )
-      .withOptimizeTriangle(it -> mapOptimizationTriangle(cb, it))
+      // triangle overrides the optimization type if defined
+      .withForcedOptimizeTriangle(it -> mapOptimizationTriangle(cb, it))
       .withWalking(it -> mapVehicleWalking(cb, it))
       .withParking(it -> mapParking(cb, it))
       .withRental(it -> mapRental(cb, it));

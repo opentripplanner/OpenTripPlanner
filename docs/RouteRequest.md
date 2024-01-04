@@ -53,7 +53,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 | [alightSlackForMode](#rd_alightSlackForMode)                                                                 | `enum map of duration` | How much extra time should be given when alighting a vehicle for each given mode.                                                              | *Optional* |                  |  2.0  |
 | bicycle                                                                                                      |        `object`        | Bicycle preferences.                                                                                                                           | *Optional* |                  |  2.5  |
 |    [boardCost](#rd_bicycle_boardCost)                                                                        |        `integer`       | Prevents unnecessary transfers by adding a cost for boarding a transit vehicle.                                                                | *Optional* | `600`            |  2.0  |
-|    [optimization](#rd_bicycle_optimization)                                                                  |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                                | *Optional* | `"safe"`         |  2.0  |
+|    [optimization](#rd_bicycle_optimization)                                                                  |         `enum`         | The set of characteristics that the user wants to optimize for.                                                                                | *Optional* | `"safe-streets"` |  2.0  |
 |    reluctance                                                                                                |        `double`        | A multiplier for how bad cycling is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`            |  2.0  |
 |    speed                                                                                                     |        `double`        | Max bicycle speed along streets, in meters per second                                                                                          | *Optional* | `5.0`            |  2.0  |
 |    parking                                                                                                   |        `object`        | Preferences for parking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
@@ -73,7 +73,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       useAvailabilityInformation                                                                             |        `boolean`       | Whether or not vehicle rental availability information will be used to plan vehicle rental trips.                                              | *Optional* | `false`          |  2.0  |
 |       [allowedNetworks](#rd_bicycle_rental_allowedNetworks)                                                  |       `string[]`       | The vehicle rental networks which may be used. If empty all networks may be used.                                                              | *Optional* |                  |  2.1  |
 |       [bannedNetworks](#rd_bicycle_rental_bannedNetworks)                                                    |       `string[]`       | The vehicle rental networks which may not be used. If empty, no networks are banned.                                                           | *Optional* |                  |  2.1  |
-|    triangle                                                                                                  |        `object`        | Triangle optimization criteria.                                                                                                                | *Optional* |                  |  2.5  |
+|    [triangle](#rd_bicycle_triangle)                                                                          |        `object`        | Triangle optimization criteria.                                                                                                                | *Optional* |                  |  2.5  |
 |       flatness                                                                                               |        `double`        | Relative importance of flat terrain (range 0-1).                                                                                               | *Optional* | `0.0`            |  2.0  |
 |       [safety](#rd_bicycle_triangle_safety)                                                                  |        `double`        | Relative importance of safety (range 0-1).                                                                                                     | *Optional* | `0.0`            |  2.0  |
 |       time                                                                                                   |        `double`        | Relative importance of duration of travel (range 0-1).                                                                                         | *Optional* | `0.0`            |  2.0  |
@@ -444,11 +444,13 @@ This is the cost that is used when boarding while cycling.This is usually higher
 
 <h3 id="rd_bicycle_optimization">optimization</h3>
 
-**Since version:** `2.0` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe"`   
+**Since version:** `2.0` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"safe-streets"`   
 **Path:** /routingDefaults/bicycle   
-**Enum values:** `quick` | `safe` | `flat` | `greenways` | `triangle`
+**Enum values:** `shortest-duration` | `safe-streets` | `flat-streets` | `safest-streets` | `triangle`
 
 The set of characteristics that the user wants to optimize for.
+
+If the triangle optimization is used, it's enough to just define the triangle parameters
 
 <h3 id="rd_bicycle_parking_unpreferredVehicleParkingTagCost">unpreferredVehicleParkingTagCost</h3>
 
@@ -502,6 +504,15 @@ The vehicle rental networks which may be used. If empty all networks may be used
 **Path:** /routingDefaults/bicycle/rental 
 
 The vehicle rental networks which may not be used. If empty, no networks are banned.
+
+<h3 id="rd_bicycle_triangle">triangle</h3>
+
+**Since version:** `2.5` ∙ **Type:** `object` ∙ **Cardinality:** `Optional`   
+**Path:** /routingDefaults/bicycle 
+
+Triangle optimization criteria.
+
+Optimization type doesn't need to be defined if these values are defined.
 
 <h3 id="rd_bicycle_triangle_safety">safety</h3>
 

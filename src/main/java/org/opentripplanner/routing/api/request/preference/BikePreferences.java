@@ -2,6 +2,8 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
+import static org.opentripplanner.routing.core.BicycleOptimizeType.SAFE_STREETS;
+import static org.opentripplanner.routing.core.BicycleOptimizeType.TRIANGLE;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -37,7 +39,7 @@ public final class BikePreferences implements Serializable {
     this.boardCost = Cost.costOfMinutes(10);
     this.parking = VehicleParkingPreferences.DEFAULT;
     this.rental = VehicleRentalPreferences.DEFAULT;
-    this.optimizeType = BicycleOptimizeType.SAFE;
+    this.optimizeType = SAFE_STREETS;
     this.optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
     this.walking = VehicleWalkingPreferences.DEFAULT;
   }
@@ -92,7 +94,7 @@ public final class BikePreferences implements Serializable {
   }
 
   /**
-   * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
+   * The set of characteristics that the user wants to optimize for -- defaults to SAFE_STREETS.
    */
   public BicycleOptimizeType optimizeType() {
     return optimizeType;
@@ -231,6 +233,17 @@ public final class BikePreferences implements Serializable {
 
     public TimeSlopeSafetyTriangle optimizeTriangle() {
       return optimizeTriangle;
+    }
+
+    /** This also sets the optimization type as TRIANGLE if triangle parameters are defined */
+    public Builder withForcedOptimizeTriangle(Consumer<TimeSlopeSafetyTriangle.Builder> body) {
+      var builder = TimeSlopeSafetyTriangle.of();
+      body.accept(builder);
+      this.optimizeTriangle = builder.buildOrDefault(this.optimizeTriangle);
+      if (!builder.isEmpty()) {
+        this.optimizeType = TRIANGLE;
+      }
+      return this;
     }
 
     public Builder withOptimizeTriangle(Consumer<TimeSlopeSafetyTriangle.Builder> body) {

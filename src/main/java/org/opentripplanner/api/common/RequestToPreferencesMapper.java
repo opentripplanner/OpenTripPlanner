@@ -2,6 +2,7 @@ package org.opentripplanner.api.common;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.function.Consumer;
+import org.opentripplanner.api.mapping.LegacyBicycleOptimizeType;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
@@ -10,7 +11,6 @@ import org.opentripplanner.routing.api.request.preference.Relax;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 class RequestToPreferencesMapper {
 
@@ -67,9 +67,12 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.bikeSpeed, bike::withSpeed);
       setIfNotNull(req.bikeReluctance, bike::withReluctance);
       setIfNotNull(req.bikeBoardCost, bike::withBoardCost);
-      setIfNotNull(req.bikeOptimizeType, bike::withOptimizeType);
+      setIfNotNull(
+        req.bikeOptimizeType,
+        optimizeType -> bike.withOptimizeType(LegacyBicycleOptimizeType.map(optimizeType))
+      );
 
-      if (req.bikeOptimizeType == BicycleOptimizeType.TRIANGLE) {
+      if (req.bikeOptimizeType == LegacyBicycleOptimizeType.TRIANGLE) {
         bike.withOptimizeTriangle(triangle -> {
           setIfNotNull(req.triangleTimeFactor, triangle::withTime);
           setIfNotNull(req.triangleSlopeFactor, triangle::withSlope);
