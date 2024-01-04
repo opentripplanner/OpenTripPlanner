@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.interactivelauncher.startup;
 
 import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.addComp;
+import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.addLabel;
 import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.addVerticalSectionSpace;
 
 import java.util.function.Consumer;
 import javax.swing.Box;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 
 class OptionsView {
 
@@ -44,7 +44,7 @@ class OptionsView {
 
   private JComponent createBuildBox() {
     var buildBox = Box.createVerticalBox();
-    addComp(new JLabel("Build graph"), buildBox);
+    addLabel("Build graph", buildBox);
     addVerticalSectionSpace(buildBox);
     addComp(buildStreetGraphChk, buildBox);
     addComp(buildTransitGraphChk, buildBox);
@@ -54,7 +54,7 @@ class OptionsView {
 
   private JComponent createActionBox() {
     var actionBox = Box.createVerticalBox();
-    addComp(new JLabel("Actions"), actionBox);
+    addLabel("Actions", actionBox);
     addVerticalSectionSpace(actionBox);
     addComp(saveGraphChk, actionBox);
     addComp(startOptServerChk, actionBox);

@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 
 public final class ViewUtils {
 
@@ -21,6 +22,10 @@ public final class ViewUtils {
 
   public static void addHorizontalGlue(Box box) {
     box.add(Box.createHorizontalGlue());
+  }
+
+  public static void addLabel(String label, Container panel) {
+    addComp(new JLabel(label), panel);
   }
 
   public static void addComp(JComponent c, Container panel) {

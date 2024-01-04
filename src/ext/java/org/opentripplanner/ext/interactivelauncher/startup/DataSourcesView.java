@@ -2,6 +2,7 @@ package org.opentripplanner.ext.interactivelauncher.startup;
 
 import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.addComp;
 import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.addHorizontalGlue;
+import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.addLabel;
 import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.addVerticalSectionSpace;
 
 import java.awt.Component;
@@ -33,12 +34,10 @@ class DataSourcesView {
     this.model = model;
     setupDataSources();
 
-    JLabel label = new JLabel("Select data source");
+    addLabel("Select data source", mainPanel);
+    addVerticalSectionSpace(mainPanel);
 
     listPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-    addComp(label, mainPanel);
-    addVerticalSectionSpace(mainPanel);
     addComp(listPanel, mainPanel);
   }
 
@@ -62,7 +61,7 @@ class DataSourcesView {
 
     if (values.isEmpty()) {
       model.setDataSource(null);
-      JLabel label = new JLabel("<No otp configuration files found>");
+      var label = new JLabel("<No otp configuration files found>");
       label.setBackground(ViewUtils.BG_STATUS_BAR);
       label.setForeground(ViewUtils.FG_STATUS_BAR);
       addComp(label, listPanel);
