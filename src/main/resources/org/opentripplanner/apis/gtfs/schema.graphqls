@@ -2615,13 +2615,6 @@ enum PlanAccessMode {
     FLEX
 
     """
-    Riding a scooter to a stop and boarding a vehicle with the scooter.
-    Note, this can include walking when it's needed to walk the scooter. Access
-    can use scooter only if the mode used for transfers and egress is also `SCOOTER`.
-    """
-    SCOOTER
-
-    """
     Scooter rental can use either station based systems or "floating"
     vehicles which are not linked to a rental station. Note, if there are no
     rental options available, access will include only walking. Also, this
@@ -2690,12 +2683,6 @@ enum PlanDirectMode {
     FLEX
 
     """
-    Riding a scooter from the origin to the destination. Note, this can include walking
-    when it's needed to walk the scooter.
-    """
-    SCOOTER
-
-    """
     Scooter rental can use either station based systems or "floating"
     vehicles which are not linked to a rental station. Note, if there are no
     rental options available, itinerary will include only walking. Also, this
@@ -2754,13 +2741,6 @@ enum PlanEgressMode {
     FLEX
 
     """
-    Riding a scooter from a stop to the destination. Note, this can include walking
-    when it's needed to walk the scooter. Egress can use scooter only if the mode
-    used for transfers and egress is also `SCOOTER`.
-    """
-    SCOOTER
-
-    """
     Scooter rental can use either station based systems or "floating"
     vehicles which are not linked to a rental station. Note, if there are no
     rental options available, egress will include only walking. Also, this
@@ -2782,13 +2762,6 @@ enum PlanTransferMode {
     cycling if the mode used for access and egress is also `BICYCLE`.
     """
     BICYCLE
-
-    """
-    Riding a scooter between transit vehicles (typically between stops). Note, this can
-    include walking when it's needed to walk the scooter. Transfers can only use
-    scooter if the mode used for access and egress is also `SCOOTER`.
-    """
-    SCOOTER
 
     """
     Walking between transit vehicles (typically between stops).
