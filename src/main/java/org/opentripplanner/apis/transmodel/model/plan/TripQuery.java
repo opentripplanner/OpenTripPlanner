@@ -20,7 +20,7 @@ import org.opentripplanner.apis.transmodel.model.framework.PassThroughPointInput
 import org.opentripplanner.apis.transmodel.model.framework.PenaltyForStreetModeType;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 
 public class TripQuery {
 
@@ -371,7 +371,10 @@ public class TripQuery {
             "When setting the " +
             EnumTypes.BICYCLE_OPTIMISATION_METHOD.getName() +
             " to '" +
-            enumValAsString(EnumTypes.BICYCLE_OPTIMISATION_METHOD, BicycleOptimizeType.TRIANGLE) +
+            enumValAsString(
+              EnumTypes.BICYCLE_OPTIMISATION_METHOD,
+              VehicleRoutingOptimizeType.TRIANGLE
+            ) +
             "', use these values to tell the routing engine how important each of the factors is compared to the others. All values should add up to 1."
           )
           .type(TriangleFactorsInputType.INPUT_TYPE)

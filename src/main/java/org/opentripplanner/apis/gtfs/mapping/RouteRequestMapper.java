@@ -28,7 +28,7 @@ import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferenc
 import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
@@ -79,7 +79,7 @@ public class RouteRequestMapper {
             )
           );
         }
-        if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
+        if (bike.optimizeType() == VehicleRoutingOptimizeType.TRIANGLE) {
           bike.withOptimizeTriangle(triangle -> {
             callWith.argument("triangle.timeFactor", triangle::withTime);
             callWith.argument("triangle.slopeFactor", triangle::withSlope);

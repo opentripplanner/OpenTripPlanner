@@ -2,7 +2,7 @@ package org.opentripplanner.ext.restapi.resources;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.restapi.mapping.LegacyBicycleOptimizeType;
+import org.opentripplanner.api.mapping.LegacyVehicleRoutingOptimizeType;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
@@ -69,9 +69,10 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.bikeBoardCost, bike::withBoardCost);
       setIfNotNull(
         req.bikeOptimizeType,
-        optimizeType -> bike.withOptimizeType(LegacyBicycleOptimizeType.map(optimizeType))
+        optimizeType -> bike.withOptimizeType(LegacyVehicleRoutingOptimizeType.map(optimizeType))
+      );
 
-      if (req.bikeOptimizeType == LegacyBicycleOptimizeType.TRIANGLE) {
+      if (req.bikeOptimizeType == LegacyVehicleRoutingOptimizeType.TRIANGLE) {
         bike.withOptimizeTriangle(triangle -> {
           setIfNotNull(req.triangleTimeFactor, triangle::withTime);
           setIfNotNull(req.triangleSlopeFactor, triangle::withSlope);
