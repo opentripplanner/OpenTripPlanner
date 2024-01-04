@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.buildOsmGraph;
 
 import java.util.stream.Collectors;
@@ -9,12 +10,12 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 
-/* Test data consists of one bigger graph and two small sub graphs. These are totally disconnected.
-   One small graphs is only at 5 meter distance from the big graph and another one 30 m away.
-   Adaptive pruning retains the distant island but removes the closer one which appears to be
-   disconnected part of the main graph.
+/**
+ * Test data consists of one bigger graph and two small sub graphs. These are totally disconnected.
+ * One small graphs is only at 5 meter distance from the big graph and another one 30 m away.
+ * Adaptive pruning retains the distant island but removes the closer one which appears to be
+ * disconnected part of the main graph.
  */
-
 public class AdaptivePruningTest {
 
   private static Graph graph;
@@ -33,7 +34,7 @@ public class AdaptivePruningTest {
 
   @Test
   public void distantIslandIsRetained() {
-    Assertions.assertTrue(
+    assertTrue(
       graph
         .getStreetEdges()
         .stream()
@@ -57,7 +58,7 @@ public class AdaptivePruningTest {
 
   @Test
   public void mainGraphIsNotRemoved() {
-    Assertions.assertTrue(
+    assertTrue(
       graph
         .getStreetEdges()
         .stream()

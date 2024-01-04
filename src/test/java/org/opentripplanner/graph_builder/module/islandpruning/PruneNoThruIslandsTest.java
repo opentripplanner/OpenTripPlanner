@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.buildOsmGraph;
 
 import java.util.Set;
@@ -31,7 +32,7 @@ public class PruneNoThruIslandsTest {
 
   @Test
   public void bicycleIslandsBecomeNoThru() {
-    Assertions.assertTrue(
+    assertTrue(
       graph
         .getStreetEdges()
         .stream()
@@ -44,7 +45,7 @@ public class PruneNoThruIslandsTest {
 
   @Test
   public void carIslandsBecomeNoThru() {
-    Assertions.assertTrue(
+    assertTrue(
       graph
         .getStreetEdges()
         .stream()

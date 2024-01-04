@@ -1,20 +1,18 @@
 package org.opentripplanner.graph_builder.module.islandpruning;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.graph_builder.module.islandpruning.IslandPruningUtils.buildOsmGraph;
 
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.test.support.ResourceLoader;
 
 public class EscalatorPruningTest {
 
-  private static Graph graph;
 
   @Test
   public void streetEdgesBetweenEscalatorEdgesRetained() {
-    graph =
+    var graph =
       buildOsmGraph(
         ResourceLoader.of(EscalatorPruningTest.class).file("matinkyla-escalator.pbf"),
         10,
@@ -22,7 +20,7 @@ public class EscalatorPruningTest {
         50,
         250
       );
-    Assertions.assertTrue(
+    assertTrue(
       graph
         .getStreetEdges()
         .stream()
