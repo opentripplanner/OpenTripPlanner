@@ -14,14 +14,14 @@ public class LogView {
 
   public LogView(LogModel model) {
     this.model = model;
-    OTPDebugLoggers.list().forEach(this::add);
+    DebugLoggers.list().forEach(this::add);
   }
 
   public JComponent panel() {
     return panel;
   }
 
-  private void add(OTPDebugLoggers logger) {
+  private void add(DebugLoggers logger) {
     var box = new JCheckBox(logger.label());
     box.setSelected(model.isLoggerEnabled(logger.logger()));
     box.addActionListener(e -> selectLogger(logger.logger(), box.isSelected()));

@@ -2,8 +2,8 @@ package org.opentripplanner.ext.interactivelauncher.debug.logging;
 
 import java.util.List;
 
-record OTPDebugLoggers(String label, String logger) {
-  static List<OTPDebugLoggers> list() {
+record DebugLoggers(String label, String logger) {
+  static List<DebugLoggers> list() {
     return List.of(
       of("Data import issues", "DATA_IMPORT_ISSUES"),
       of("All OTP debuggers", "org.opentripplanner"),
@@ -13,7 +13,7 @@ record OTPDebugLoggers(String label, String logger) {
     );
   }
 
-  private static OTPDebugLoggers of(String label, String logger) {
-    return new OTPDebugLoggers(label, logger);
+  private static DebugLoggers of(String label, String logger) {
+    return new DebugLoggers(label, logger);
   }
 }
