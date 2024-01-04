@@ -21,10 +21,10 @@ public class LogView {
     return panel;
   }
 
-  private void add(DebugLoggers logger) {
-    var box = new JCheckBox(logger.label());
-    box.setSelected(model.isLoggerEnabled(logger.logger()));
-    box.addActionListener(e -> selectLogger(logger.logger(), box.isSelected()));
+  private void add(DebugLoggers.Entry entry) {
+    var box = new JCheckBox(entry.label());
+    box.setSelected(model.isLoggerEnabled(entry.logger()));
+    box.addActionListener(e -> selectLogger(entry.logger(), box.isSelected()));
     panel.add(box);
   }
 

@@ -25,7 +25,7 @@ class DebugLoggingSupport {
     "(" + OTP + "|" + GRAPHQL + "|" + NAMED_LOGGERS + ")"
   );
 
-  static List<String> getDebugLoggers() {
+  static List<String> listConfiguredDebugLoggers() {
     List<String> result = new ArrayList<>();
     LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
     for (Logger log : context.getLoggerList()) {

@@ -31,15 +31,18 @@ public class LogModel implements Serializable {
     this.saveCallback = saveCallback;
   }
 
-  /** Needed to do JSON serialization. */
+  /** Used by JSON serialization. */
   public Collection<String> getActiveLoggers() {
     return List.copyOf(activeLoggers);
   }
 
-  /** Needed to do JSON serialization. */
+  /** Used by JSON deserialization. */
   public void setActiveLoggers(Collection<String> loggers) {
     this.activeLoggers.clear();
     this.activeLoggers.addAll(loggers);
+    for (var logger : activeLoggers) {
+      DebugLoggingSupport.configureDebugLogging(logger, true);
+    }
   }
 
   boolean isLoggerEnabled(String name) {
@@ -48,15 +51,32 @@ public class LogModel implements Serializable {
 
   void turnLoggerOnOff(String name, boolean enable) {
     if (enable) {
-      activeLoggers.add(name);
+      if (!activeLoggers.contains(name)) {
+        activeLoggers.add(name);
+        DebugLoggingSupport.configureDebugLogging(name, enable);
+        save();
+      }
     } else {
-      activeLoggers.remove(name);
+      if (activeLoggers.contains(name)) {
+        activeLoggers.remove(name);
+        DebugLoggingSupport.configureDebugLogging(name, enable);
+        save();
+      }
     }
-    DebugLoggingSupport.configureDebugLogging(name, enable);
-    saveCallback.run();
   }
 
   private void initFromConfig() {
-    activeLoggers.addAll(DebugLoggingSupport.getDebugLoggers());
+    var debugLoggers = DebugLoggers.listLoggers();
+    for (var logger : DebugLoggingSupport.listConfiguredDebugLoggers()) {
+      if (debugLoggers.contains(logger)) {
+        activeLoggers.add(logger);
+      }
+    }
+  }
+
+  private void save() {
+    if (saveCallback != null) {
+      saveCallback.run();
+    }
   }
 }
