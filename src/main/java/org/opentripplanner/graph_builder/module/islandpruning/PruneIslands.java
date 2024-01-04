@@ -340,17 +340,6 @@ public class PruneIslands implements GraphBuilderModule {
       State s0 = new State(gv, request);
       for (Edge e : gv.getOutgoing()) {
         if (
-          !(
-            e instanceof StreetEdge ||
-            e instanceof ElevatorEdge ||
-            e instanceof FreeEdge ||
-            e instanceof StreetTransitEntityLink ||
-            e instanceof EscalatorEdge
-          )
-        ) {
-          continue;
-        }
-        if (
           e instanceof StreetEdge &&
           shouldMatchNoThruType != ((StreetEdge) e).isNoThruTraffic(traverseMode)
         ) {
