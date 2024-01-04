@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import org.opentripplanner.ext.interactivelauncher.logging.LogModel;
+import org.opentripplanner.ext.interactivelauncher.debug.logging.LogModel;
 import org.opentripplanner.ext.interactivelauncher.startup.StartupModel;
 
 public class Model implements Serializable {

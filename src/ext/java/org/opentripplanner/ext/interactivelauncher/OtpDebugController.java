@@ -6,8 +6,8 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
-import org.opentripplanner.ext.interactivelauncher.logging.LogModel;
-import org.opentripplanner.ext.interactivelauncher.logging.LogView;
+import org.opentripplanner.ext.interactivelauncher.debug.logging.LogModel;
+import org.opentripplanner.ext.interactivelauncher.debug.logging.LogView;
 
 public class OtpDebugController {
 

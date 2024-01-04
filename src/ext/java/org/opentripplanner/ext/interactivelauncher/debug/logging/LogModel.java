@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.interactivelauncher.logging;
+package org.opentripplanner.ext.interactivelauncher.debug.logging;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;

@@ -1,11 +1,10 @@
-package org.opentripplanner.ext.interactivelauncher.logging;
+package org.opentripplanner.ext.interactivelauncher.debug.logging;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import org.slf4j.LoggerFactory;
 
