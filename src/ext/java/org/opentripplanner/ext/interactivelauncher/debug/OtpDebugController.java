@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.interactivelauncher;
+package org.opentripplanner.ext.interactivelauncher.debug;
 
 import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.BACKGROUND;
 
@@ -6,6 +6,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
+import org.opentripplanner.ext.interactivelauncher.Model;
 import org.opentripplanner.ext.interactivelauncher.debug.logging.LogModel;
 import org.opentripplanner.ext.interactivelauncher.debug.logging.LogView;
 
