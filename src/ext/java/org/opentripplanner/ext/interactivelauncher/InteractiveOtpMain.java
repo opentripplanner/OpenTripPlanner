@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.interactivelauncher;
 
+import org.opentripplanner.ext.interactivelauncher.configuration.InteractiveLauncherModule;
+import org.opentripplanner.ext.interactivelauncher.debug.OtpDebugController;
 import org.opentripplanner.ext.interactivelauncher.startup.MainView;
 import org.opentripplanner.standalone.OTPMain;
 
@@ -29,9 +31,14 @@ public class InteractiveOtpMain {
   }
 
   private void startOtp() {
-    model.save();
+    startDebugControllerAndSetupRequestInterceptor();
 
     System.out.println("Start OTP: " + model + "\n");
     OTPMain.main(model.getStartupModel().asOtpArgs());
+  }
+
+  private void startDebugControllerAndSetupRequestInterceptor() {
+    new OtpDebugController(model).start();
+    InteractiveLauncherModule.setRequestInterceptor(model.getRaptorDebugModel());
   }
 }

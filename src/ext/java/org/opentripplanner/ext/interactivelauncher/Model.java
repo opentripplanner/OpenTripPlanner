@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import org.opentripplanner.ext.interactivelauncher.debug.logging.LogModel;
+import org.opentripplanner.ext.interactivelauncher.debug.raptor.RaptorDebugModel;
 import org.opentripplanner.ext.interactivelauncher.startup.StartupModel;
 
 public class Model implements Serializable {
@@ -15,6 +16,7 @@ public class Model implements Serializable {
 
   private StartupModel startupModel;
   private LogModel logModel;
+  private RaptorDebugModel raptorDebugModel;
 
   public Model() {}
 
@@ -30,13 +32,8 @@ public class Model implements Serializable {
     return logModel;
   }
 
-  public void save() {
-    try {
-      var mapper = new ObjectMapper().configure(SerializationFeature.INDENT_OUTPUT, true);
-      mapper.writeValue(MODEL_FILE, this);
-    } catch (IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
+  public RaptorDebugModel getRaptorDebugModel() {
+    return raptorDebugModel;
   }
 
   private static Model createNew() {
@@ -58,6 +55,15 @@ public class Model implements Serializable {
     }
   }
 
+  private void save() {
+    try {
+      var mapper = new ObjectMapper().configure(SerializationFeature.INDENT_OUTPUT, true);
+      mapper.writeValue(MODEL_FILE, this);
+    } catch (IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+
   private Model initSubModels() {
     if (startupModel == null) {
       startupModel = new StartupModel();
@@ -65,7 +71,11 @@ public class Model implements Serializable {
     if (logModel == null) {
       logModel = LogModel.createFromConfig();
     }
+    if (raptorDebugModel == null) {
+      raptorDebugModel = new RaptorDebugModel();
+    }
     logModel.init(this::save);
+    raptorDebugModel.init(this::save);
     return this;
   }
 }
