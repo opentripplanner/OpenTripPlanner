@@ -40,8 +40,8 @@ class IslandPruningUtils {
       );
       pruneIslands.setPruningThresholdIslandWithoutStops(thresholdIslandWithoutStops);
       pruneIslands.setPruningThresholdIslandWithStops(thresholdIslandWithStops);
-      pruneIslands.setAdaptivePruningFactor(adaptivePruningFactor/*50*/);
-      pruneIslands.setAdaptivePruningDistance(adaptivePruningDistance/*250*/);
+      pruneIslands.setAdaptivePruningFactor(adaptivePruningFactor);
+      pruneIslands.setAdaptivePruningDistance(adaptivePruningDistance);
       pruneIslands.buildGraph();
 
       return graph;
