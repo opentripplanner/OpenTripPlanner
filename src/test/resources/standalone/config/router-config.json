@@ -295,11 +295,6 @@
       "fuzzyTripMatching": false,
       "features": ["position"]
     },
-    // Streaming differential GTFS-RT TripUpdates over websockets
-    {
-      "type": "websocket-gtfs-rt-updater",
-      "feedId": "ov"
-    },
     // Siri-ET over HTTP
     {
       "type": "siri-et-updater",

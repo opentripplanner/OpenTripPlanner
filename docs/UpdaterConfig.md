@@ -165,56 +165,6 @@ HTTP headers to add to the request. Any header key, value can be inserted.
 <!-- stop-time-updater END -->
 
 
-### TripUpdates via WebSocket
-
-This updater doesn't poll a data source but opens a persistent connection to the GTFS-RT provider, 
-which then sends incremental updates immediately as they become available.
-
-The [OneBusAway GTFS-realtime exporter project](https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter)
-provides this kind of streaming, incremental updates over a websocket rather than a single large
-file.
-
-<!-- websocket-gtfs-rt-updater BEGIN -->
-<!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
-
-| Config Parameter                                                      |    Type   | Summary                  |  Req./Opt. | Default Value        | Since |
-|-----------------------------------------------------------------------|:---------:|--------------------------|:----------:|----------------------|:-----:|
-| type = "websocket-gtfs-rt-updater"                                    |   `enum`  | The type of the updater. | *Required* |                      |  1.5  |
-| [backwardsDelayPropagationType](#u__7__backwardsDelayPropagationType) |   `enum`  | TODO                     | *Optional* | `"required-no-data"` |  1.5  |
-| feedId                                                                |  `string` | TODO                     | *Required* |                      |  1.5  |
-| reconnectPeriodSec                                                    | `integer` | TODO                     | *Optional* | `60`                 |  1.5  |
-| url                                                                   |  `string` | TODO                     | *Optional* |                      |  1.5  |
-
-
-##### Parameter details
-
-<h4 id="u__7__backwardsDelayPropagationType">backwardsDelayPropagationType</h4>
-
-**Since version:** `1.5` ∙ **Type:** `enum` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"required-no-data"`   
-**Path:** /updaters/[7]   
-**Enum values:** `required-no-data` | `required` | `always`
-
-TODO
-
-
-
-##### Example configuration
-
-```JSON
-// router-config.json
-{
-  "updaters" : [
-    {
-      "type" : "websocket-gtfs-rt-updater",
-      "feedId" : "ov"
-    }
-  ]
-}
-```
-
-<!-- websocket-gtfs-rt-updater END -->
-
-
 ### Vehicle Positions
 
 VehiclePositions give the location of some or all vehicles currently in service, in terms of 
