@@ -66,7 +66,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Report NO_TRANSIT_CONNECTION when search-window is set. [#5570](https://github.com/opentripplanner/OpenTripPlanner/pull/5570)
 - Transit priority  - part 3 [#5583](https://github.com/opentripplanner/OpenTripPlanner/pull/5583)
 - Fix preference cost comparisons [#5586](https://github.com/opentripplanner/OpenTripPlanner/pull/5586)
--  Report and throw away trip-times which fail sanity check [#5587](https://github.com/opentripplanner/OpenTripPlanner/pull/5587)
+- Report and throw away trip-times which fail sanity check [#5587](https://github.com/opentripplanner/OpenTripPlanner/pull/5587)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
