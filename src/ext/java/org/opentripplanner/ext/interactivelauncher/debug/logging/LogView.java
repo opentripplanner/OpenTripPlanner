@@ -23,6 +23,7 @@ public class LogView {
 
   private void add(DebugLoggers.Entry entry) {
     var box = new JCheckBox(entry.label());
+    box.setToolTipText("Logger: " + entry.logger());
     box.setSelected(model.isLoggerEnabled(entry.logger()));
     box.addActionListener(e -> selectLogger(entry.logger(), box.isSelected()));
     panel.add(box);
