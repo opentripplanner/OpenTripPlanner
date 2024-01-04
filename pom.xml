@@ -551,20 +551,6 @@
                 <scope>import</scope>
             </dependency>
 
-            <!--
-                this is necessary because async-http-client uses an old netty version that can crash the
-                Java 21 JVM: https://github.com/netty/netty/pull/13640
-
-                when ACH has been upgraded to the (as of now unreleased) version 3, this can be removed again.
-            -->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-bom</artifactId>
-                <version>4.1.100.Final</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -842,13 +828,6 @@
             <artifactId>protobuf-java</artifactId>
         </dependency>
 
-        <!-- Asynchronous Websocket-capable client, for message-driven incremental GTFS-RT -->
-        <!-- AsyncHttpClient Websockets need a newer version of Grizzly than Jersey does. -->
-        <dependency>
-            <groupId>org.asynchttpclient</groupId>
-            <artifactId>async-http-client</artifactId>
-            <version>2.12.3</version>
-        </dependency>
         <!-- OBA GTFS loader -->
         <dependency>
             <groupId>org.onebusaway</groupId>
