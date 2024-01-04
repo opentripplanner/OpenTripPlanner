@@ -9,7 +9,7 @@ public class InteractiveLauncherModule {
 
   static LauncherRequestDecorator decorator = request -> request;
 
-  static void enable(LauncherRequestDecorator decorator) {
+  public static void setRequestInterceptor(LauncherRequestDecorator decorator) {
     InteractiveLauncherModule.decorator = decorator;
   }
 
