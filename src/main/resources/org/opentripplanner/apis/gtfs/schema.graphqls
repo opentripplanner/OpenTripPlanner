@@ -4676,11 +4676,6 @@ input ScooterPreferencesInput {
     optimization: ScooterOptimizationInput
 
     """
-    Cost of boarding a vehicle with a scooter.
-    """
-    boardCost: Cost
-
-    """
     Scooter rental related preferences.
     """
     rental: ScooterRentalPreferencesInput
