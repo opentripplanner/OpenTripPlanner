@@ -2035,7 +2035,7 @@ the default. We can express the RelaxCost as a function `f(t) = constant + ratio
 `f(t)=t` is the NORMAL function.
 """
 input RelaxCostInput {
-  "The constant value to add to the limit. Must be a positive number. The value isequivalent to transit-cost-seconds. Integers is treated as seconds, but you may use the duration format. Example: '3665 = 'DT1h1m5s' = '1h1m5s'."
+  "The constant value to add to the limit. Must be a positive number. The value is equivalent to transit-cost-seconds. Integers are treated as seconds, but you may use the duration format. Example: '3665 = 'DT1h1m5s' = '1h1m5s'."
   constant: Cost = "0s"
   "The factor to multiply with the 'other cost'. Minimum value is 1.0."
   ratio: Float = 1.0

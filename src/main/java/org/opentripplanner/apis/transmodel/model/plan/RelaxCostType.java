@@ -46,8 +46,8 @@ public class RelaxCostType {
         .newInputObjectField()
         .name(CONSTANT)
         .description(
-          "The constant value to add to the limit. Must be a positive number. The value is" +
-          "equivalent to transit-cost-seconds. Integers is treated as seconds, but you may use " +
+          "The constant value to add to the limit. Must be a positive number. The value is " +
+          "equivalent to transit-cost-seconds. Integers are treated as seconds, but you may use " +
           "the duration format. Example: '3665 = 'DT1h1m5s' = '1h1m5s'."
         )
         .defaultValueProgrammatic("0s")
@@ -66,8 +66,8 @@ public class RelaxCostType {
         ObjectField
           .newObjectField()
           .name(CONSTANT)
-          // We only use this to display default value (this is an input type), so using the
-          // lenient OTP version of duration is ok - it is slightly more readable.
+          // We only use this to display the default value (this is an input type), so using
+          // the lenient OTP version of duration is ok - it is slightly more readable.
           .value(StringValue.of(DurationUtils.durationToStr(value.constant().asDuration())))
           .build()
       )
