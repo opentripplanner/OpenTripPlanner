@@ -11,7 +11,13 @@ import org.opentripplanner.transit.service.TransitModel;
 
 class IslandPruningUtils {
 
-  static Graph buildOsmGraph(File osmFile) {
+  static Graph buildOsmGraph(
+    File osmFile,
+    int thresholdIslandWithoutStops,
+    int thresholdIslandWithStops,
+    double adaptivePruningFactor,
+    int adaptivePruningDistance
+  ) {
     try {
       var deduplicator = new Deduplicator();
       var graph = new Graph(deduplicator);
@@ -32,10 +38,10 @@ class IslandPruningUtils {
         DataImportIssueStore.NOOP,
         null
       );
-      pruneIslands.setPruningThresholdIslandWithoutStops(10);
-      pruneIslands.setPruningThresholdIslandWithStops(2);
-      pruneIslands.setAdaptivePruningFactor(50);
-      pruneIslands.setAdaptivePruningDistance(250);
+      pruneIslands.setPruningThresholdIslandWithoutStops(thresholdIslandWithoutStops);
+      pruneIslands.setPruningThresholdIslandWithStops(thresholdIslandWithStops);
+      pruneIslands.setAdaptivePruningFactor(adaptivePruningFactor/*50*/);
+      pruneIslands.setAdaptivePruningDistance(adaptivePruningDistance/*250*/);
       pruneIslands.buildGraph();
 
       return graph;
