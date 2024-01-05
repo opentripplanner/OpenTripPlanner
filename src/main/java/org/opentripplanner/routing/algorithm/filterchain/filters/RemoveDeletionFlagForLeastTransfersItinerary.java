@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filter;
+package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import static org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator.numberOfTransfersComparator;
 

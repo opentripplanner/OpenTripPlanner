@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filter;
+package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.BUS_ROUTE;

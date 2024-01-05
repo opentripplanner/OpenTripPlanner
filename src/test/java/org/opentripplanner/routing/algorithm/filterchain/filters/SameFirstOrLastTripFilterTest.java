@@ -1,7 +1,7 @@
-package org.opentripplanner.routing.algorithm.filterchain.filter;
+package org.opentripplanner.routing.algorithm.filterchain.filters;
 
+import static org.ejml.UtilEjml.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
