@@ -39,6 +39,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGenerali
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.RemoveFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filterchain.DeleteResultHandler;
 import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByDistance;
 import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupBySameRoutesAndStops;

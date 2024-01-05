@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain;
+package org.opentripplanner.routing.algorithm.filterchain.framework.filterchain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
@@ -9,7 +9,6 @@ import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
-import org.opentripplanner.routing.algorithm.filterchain.framework.errorhandling.RoutingErrorsAttacher;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 
 class RoutingErrorsAttacherTest implements PlanTestConstants {

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.framework.errorhandling;
+package org.opentripplanner.routing.algorithm.filterchain.framework.filterchain;
 
 import static org.opentripplanner.routing.api.response.InputField.DATE_TIME;
 import static org.opentripplanner.routing.api.response.RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW;

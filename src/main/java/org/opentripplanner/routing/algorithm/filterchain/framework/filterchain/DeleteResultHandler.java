@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain;
+package org.opentripplanner.routing.algorithm.filterchain.framework.filterchain;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -11,7 +11,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugPr
  * This class will remove itineraries from the list which are flagged for deletion by the
  * filters.
  */
-class DeleteResultHandler {
+public class DeleteResultHandler {
 
   private final ItineraryFilterDebugProfile debug;
   private final int numOfItineraries;
