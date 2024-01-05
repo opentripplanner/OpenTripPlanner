@@ -20,7 +20,6 @@ import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
-import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtherThanSameLegsMaxGeneralizedCostFilter;
@@ -37,6 +36,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.SameFirstOrLast
 import org.opentripplanner.routing.algorithm.filterchain.filters.TransitAlertFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.RemoveFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filterchain.DeleteResultHandler;
