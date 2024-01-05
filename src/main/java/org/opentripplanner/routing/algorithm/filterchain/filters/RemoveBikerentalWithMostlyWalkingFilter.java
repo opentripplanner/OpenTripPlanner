@@ -28,10 +28,9 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements RemoveItineraryF
   @Override
   public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return itinerary -> {
-      var containsTransit = itinerary
-        .getLegs()
-        .stream()
-        .anyMatch(l -> l != null && l.isTransitLeg());
+      if(itinerary.hasTransit()) {
+        return false;
+      }
 
       double bikeRentalDistance = itinerary
         .getLegs()
@@ -39,11 +38,10 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements RemoveItineraryF
         .filter(l -> l.getRentedVehicle() != null && l.getRentedVehicle())
         .mapToDouble(Leg::getDistanceMeters)
         .sum();
-      double totalDistance = itinerary.distanceMeters();
 
+      double totalDistance = itinerary.distanceMeters();
       return (
         bikeRentalDistance != 0 &&
-        !containsTransit &&
         (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio
       );
     };
