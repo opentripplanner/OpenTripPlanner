@@ -12,7 +12,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilterResults;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;

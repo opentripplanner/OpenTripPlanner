@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
+package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;

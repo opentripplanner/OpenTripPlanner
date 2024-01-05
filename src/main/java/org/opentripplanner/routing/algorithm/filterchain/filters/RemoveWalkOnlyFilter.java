@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
+package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;

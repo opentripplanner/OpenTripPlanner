@@ -19,7 +19,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;

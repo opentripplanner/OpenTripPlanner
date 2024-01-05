@@ -12,7 +12,7 @@ import org.opentripplanner.model.plan.paging.PagingSearchWindowAdjuster;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorFactory;
 import org.opentripplanner.model.plan.paging.cursor.PageType;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilterResults;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 
 public class PagingService {

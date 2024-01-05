@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfWalkingIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.OutsideSearchWindowFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfWalkingIsBetterFilter;
 import org.opentripplanner.routing.api.response.RoutingError;
 
 /**

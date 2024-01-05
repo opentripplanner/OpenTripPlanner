@@ -6,7 +6,7 @@ import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.service.paging.PagingService;

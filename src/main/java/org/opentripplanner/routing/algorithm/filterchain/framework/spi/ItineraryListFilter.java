@@ -13,7 +13,7 @@ import org.opentripplanner.model.plan.Itinerary;
  * chain.
  * <p>
  * This allows decoration of each filter and makes it easier to reuse logic. Like the {@link
- * org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter} is reused in
+ * org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter} is reused in
  * several places.
  */
 public interface ItineraryListFilter {

@@ -9,7 +9,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.DeletionFlaggingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.SortingFilter;

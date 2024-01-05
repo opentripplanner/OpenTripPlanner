@@ -11,10 +11,10 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.OutsideSearchWindowFilter;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.PagingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.filters.OutsideSearchWindowFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.PagingFilter;
 
 /**
  * This class simulate/mock the context the paging is operating in.
