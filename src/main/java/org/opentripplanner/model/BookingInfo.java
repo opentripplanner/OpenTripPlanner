@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.EnumSet;
+import java.util.function.IntUnaryOperator;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 
@@ -84,27 +85,31 @@ public class BookingInfo implements Serializable {
     }
   }
 
-  public int earliestDepartureTime(int requestedDepartureTime, int earliestBookingTime) {
+  public int  earliestDepartureTime(int requestedDepartureTime, int earliestBookingTime, IntUnaryOperator getEarliestDepartureTime) {
+    int edt = getEarliestDepartureTime.applyAsInt(requestedDepartureTime);
+    if(edt == RaptorConstants.TIME_NOT_SET) {
+      return RaptorConstants.TIME_NOT_SET;
+    }
     if (latestBookingTime != null) {
       int otpLatestBookingTime = calculateOtpTime(
         latestBookingTime.getTime(),
         -latestBookingTime.getDaysPrior()
       );
       if (earliestBookingTime <= otpLatestBookingTime) {
-        return requestedDepartureTime;
+        return edt;
       } else {
         return RaptorConstants.TIME_NOT_SET;
       }
     }
     if (minimumBookingNotice != null) {
-      if (requestedDepartureTime >= earliestBookingTime + minimumBookingNotice.toSeconds()) {
-        return requestedDepartureTime;
+      if (edt >= earliestBookingTime + minimumBookingNotice.toSeconds()) {
+        return edt;
       } else {
-        return earliestBookingTime + (int) minimumBookingNotice.toSeconds();
+        return getEarliestDepartureTime.applyAsInt(earliestBookingTime + (int) minimumBookingNotice.toSeconds());
       }
     }
     // missing booking info
-    return requestedDepartureTime;
+    return edt;
   }
 
   static int calculateOtpTime(LocalTime time, int dayOffset) {

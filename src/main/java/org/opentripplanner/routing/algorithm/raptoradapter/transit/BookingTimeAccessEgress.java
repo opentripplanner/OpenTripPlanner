@@ -4,10 +4,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.model.TimeAndCost;
 import org.opentripplanner.model.BookingInfo;
-import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.street.search.state.State;
 
 public class BookingTimeAccessEgress implements RoutingAccessEgress {
@@ -51,14 +49,10 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
 
   @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
-    int edt = delegate.earliestDepartureTime(requestedDepartureTime);
-    if (edt == RaptorConstants.TIME_NOT_SET) {
-      return edt;
-    }
     if (pickupBookingInfo != null) {
-      return pickupBookingInfo.earliestDepartureTime(edt, earliestBookingTime);
+      return pickupBookingInfo.earliestDepartureTime(requestedDepartureTime, earliestBookingTime, delegate::earliestDepartureTime);
     }
-    return edt;
+    return delegate.earliestDepartureTime(requestedDepartureTime);
   }
 
   private int calculateOtpTime(Instant dateTime, Instant earliestBookingTime, ZoneId timeZone) {
