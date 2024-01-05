@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit.group;
 
 import java.util.List;
 import java.util.OptionalInt;
@@ -7,24 +7,25 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
- * This filter marks itineraries, which use same trips for most of their legs, but where some
- * itineraries have a much higher cost for the other legs, for deletion. This is similar to {@link
+ * This filter remove itineraries, which use the same trips for most of their legs, but where some
+ * itineraries have a much higher cost for the other legs. This is similar to {@link
  * TransitGeneralizedCostFilter}, but is used together with {@link GroupByFilter} to filter within
  * the groups.
  */
-public class OtherThanSameLegsMaxGeneralizedCostFilter implements RemoveItineraryFlagger {
+public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItineraryFlagger {
 
   /**
-   * How much higher cost do we allow for the non-shared legs before we filter out the itinerary.
+   * How much higher cost do we allow for the non-shared legs before we filter out the itinerary?
    */
   private final double maxCostOtherLegsFactor;
 
-  public OtherThanSameLegsMaxGeneralizedCostFilter(double maxCostOtherLegsFactor) {
+  public RemoveOtherThanSameLegsMaxGeneralizedCost(double maxCostOtherLegsFactor) {
     this.maxCostOtherLegsFactor = maxCostOtherLegsFactor;
   }
 

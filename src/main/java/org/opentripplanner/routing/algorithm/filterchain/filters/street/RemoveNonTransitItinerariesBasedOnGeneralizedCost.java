@@ -1,30 +1,35 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.street;
 
 import java.util.List;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
 /**
+ * This filter remove none-transit itineraries with generalized-cost higher than the max-limit.
+ * The max-limit is computed based on the overall min-generalized-cost using the provided cost
+ * function.
+ * <p>
  * This filter is similar to {@link TransitGeneralizedCostFilter}. There are some important
  * differences, however. It will only remove non-transit results, but ALL results can be used as a
  * basis for computing the cost limit.
  * <p>
- * This is needed so that we do not for example get walk legs that last several hours, when transit
- * can take you to the destination much quicker.
+ * This will, for example, remove walk legs which last several hours, when transit can take you to
+ * the destination much quicker.
  * <p>
  *
  * @see ItineraryFilterPreferences#nonTransitGeneralizedCostLimit()
  */
-public class NonTransitGeneralizedCostFilter implements RemoveItineraryFlagger {
+public class RemoveNonTransitItinerariesBasedOnGeneralizedCost implements RemoveItineraryFlagger {
 
   private final CostLinearFunction costLimitFunction;
 
-  public NonTransitGeneralizedCostFilter(CostLinearFunction costLimitFunction) {
+  public RemoveNonTransitItinerariesBasedOnGeneralizedCost(CostLinearFunction costLimitFunction) {
     this.costLimitFunction = costLimitFunction;
   }
 

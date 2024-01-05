@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
@@ -12,7 +12,7 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
-public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestConstants {
+public class RemoveTransitIfStreetOnlyIsBetterTest implements PlanTestConstants {
 
   @Test
   public void filterAwayNothingIfNoWalking() {
@@ -21,7 +21,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
     Itinerary i2 = newItinerary(A).rail(110, 6, 9, E).build();
 
     // When:
-    RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetterFilter(
+    RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetter(
       CostLinearFunction.of(Duration.ofSeconds(200), 1.2)
     );
     List<Itinerary> result = flagger.removeMatchesForTest(List.of(i1, i2));
@@ -49,7 +49,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
     i2.setGeneralizedCost(360);
 
     // When:
-    RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetterFilter(
+    RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetter(
       CostLinearFunction.of(Duration.ofSeconds(60), 1.2)
     );
     List<Itinerary> result = flagger.removeMatchesForTest(List.of(i2, bicycle, walk, i1));

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
@@ -18,7 +18,7 @@ public class RemoveTransitIfWalkingIsBetterTest implements PlanTestConstants {
     Itinerary i2 = newItinerary(A).rail(110, 6, 9, E).build();
 
     // When:
-    List<Itinerary> result = new RemoveTransitIfWalkingIsBetterFilter()
+    List<Itinerary> result = new RemoveTransitIfWalkingIsBetter()
       .removeMatchesForTest(List.of(i1, i2));
 
     // Then:
@@ -39,7 +39,7 @@ public class RemoveTransitIfWalkingIsBetterTest implements PlanTestConstants {
     // transit which has less walking than plain walk should be kept
     Itinerary i2 = newItinerary(A, 6).walk(D1m, B).bus(2, 7, 10, E).build();
 
-    List<Itinerary> result = new RemoveTransitIfWalkingIsBetterFilter()
+    List<Itinerary> result = new RemoveTransitIfWalkingIsBetter()
       .removeMatchesForTest(List.of(i1, i2, bicycle, walk));
 
     assertEquals(toStr(List.of(i2, bicycle, walk)), toStr(result));

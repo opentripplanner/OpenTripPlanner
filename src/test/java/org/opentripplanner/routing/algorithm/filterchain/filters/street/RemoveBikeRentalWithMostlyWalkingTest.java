@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.street;
 
 import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
@@ -20,7 +20,7 @@ public class RemoveBikeRentalWithMostlyWalkingTest {
   private static final int T10_10 = TimeUtils.hm2time(10, 10);
   private static final int T10_20 = TimeUtils.hm2time(10, 20);
 
-  private final RemoveBikerentalWithMostlyWalkingFilter subject = new RemoveBikerentalWithMostlyWalkingFilter(
+  private final RemoveBikeRentalWithMostlyWalking subject = new RemoveBikeRentalWithMostlyWalking(
     0.3
   );
 

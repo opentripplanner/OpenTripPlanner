@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.street;
 
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;

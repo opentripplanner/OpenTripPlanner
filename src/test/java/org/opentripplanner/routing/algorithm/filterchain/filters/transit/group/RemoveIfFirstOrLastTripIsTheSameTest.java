@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit.group;
 
 import static org.ejml.UtilEjml.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -9,10 +9,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
-public class SameFirstOrLastTripFilterTest implements PlanTestConstants {
+public class RemoveIfFirstOrLastTripIsTheSameTest implements PlanTestConstants {
 
   /**
-   * This test ensures that filter work as intended regarding comparison order and exclusion logic
+   * This test ensures that the filter works as intended regarding comparison order and exclusion
+   * logic.
    */
   @Test
   public void testMatchOrderOnFirstStation() {
@@ -34,7 +35,7 @@ public class SameFirstOrLastTripFilterTest implements PlanTestConstants {
 
     List<Itinerary> input = List.of(i1, i2, i3, i4, i5);
 
-    final SameFirstOrLastTripFilter filter = new SameFirstOrLastTripFilter();
+    final RemoveIfFirstOrLastTripIsTheSame filter = new RemoveIfFirstOrLastTripIsTheSame();
     var flagged = filter.flagForRemoval(input);
 
     // First journey should always be included

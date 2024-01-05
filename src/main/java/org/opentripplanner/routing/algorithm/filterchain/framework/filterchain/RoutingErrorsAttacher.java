@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfWalkingIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter;
 import org.opentripplanner.routing.api.response.RoutingError;
 
 /**
@@ -50,12 +50,12 @@ public class RoutingErrorsAttacher {
         it
           .getSystemNotices()
           .stream()
-          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfStreetOnlyIsBetterFilter.TAG));
+          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfStreetOnlyIsBetter.TAG));
       Predicate<Itinerary> isWorseThanWalking = it ->
         it
           .getSystemNotices()
           .stream()
-          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfWalkingIsBetterFilter.TAG));
+          .anyMatch(notice -> notice.tag().equals(RemoveTransitIfWalkingIsBetter.TAG));
       if (
         filteredItineraries
           .stream()

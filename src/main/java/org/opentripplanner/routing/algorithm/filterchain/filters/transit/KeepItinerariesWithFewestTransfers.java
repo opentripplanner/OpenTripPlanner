@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import static org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator.numberOfTransfersComparator;
 
@@ -10,16 +10,16 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 
 /**
- * This filter makes sure that the itinerary with the least amount of transfers is not marked for
- * deletion. It iterates over the itineraries and removes the SystemNotice if it contains
- * the provided set of {@code filterKeys}. The itinerary must match all {@code filterKeys}, and
- * if so the given keys are removed. Other system-notices are ignored.
+ * This filter makes sure that the itinerary with the fewest transfers is not removed.
+ * It iterates over the itineraries and removes the SystemNotice if it contains the provided set
+ * of {@code filterKeys}. The itinerary must match all {@code filterKeys}, and if so the given
+ * keys are removed. Itineraries with other system notices are ignored.
  */
-public class RemoveDeletionFlagForLeastTransfersItinerary implements ItineraryListFilter {
+public class KeepItinerariesWithFewestTransfers implements ItineraryListFilter {
 
   private final Set<String> filterKeys;
 
-  public RemoveDeletionFlagForLeastTransfersItinerary(List<String> filterKeys) {
+  public KeepItinerariesWithFewestTransfers(List<String> filterKeys) {
     this.filterKeys = new HashSet<>(filterKeys);
   }
 

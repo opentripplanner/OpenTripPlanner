@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.street;
 
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
@@ -12,11 +12,11 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  * <p>
  * This filter is turned off by default (bikeRentalDistanceRatio == 0)
  */
-public class RemoveBikerentalWithMostlyWalkingFilter implements RemoveItineraryFlagger {
+public class RemoveBikeRentalWithMostlyWalking implements RemoveItineraryFlagger {
 
   private final double bikeRentalDistanceRatio;
 
-  public RemoveBikerentalWithMostlyWalkingFilter(double bikeRentalDistanceRatio) {
+  public RemoveBikeRentalWithMostlyWalking(double bikeRentalDistanceRatio) {
     this.bikeRentalDistanceRatio = bikeRentalDistanceRatio;
   }
 
@@ -28,7 +28,7 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements RemoveItineraryF
   @Override
   public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return itinerary -> {
-      if(itinerary.hasTransit()) {
+      if (itinerary.hasTransit()) {
         return false;
       }
 
@@ -41,8 +41,7 @@ public class RemoveBikerentalWithMostlyWalkingFilter implements RemoveItineraryF
 
       double totalDistance = itinerary.distanceMeters();
       return (
-        bikeRentalDistance != 0 &&
-        (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio
+        bikeRentalDistance != 0 && (bikeRentalDistance / totalDistance) <= bikeRentalDistanceRatio
       );
     };
   }

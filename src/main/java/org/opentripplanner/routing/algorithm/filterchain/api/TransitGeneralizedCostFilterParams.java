@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain.api;
 
 import org.opentripplanner.framework.lang.DoubleUtils;
-import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGeneralizedCostFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**

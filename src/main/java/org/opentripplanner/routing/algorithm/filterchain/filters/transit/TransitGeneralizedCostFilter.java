@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
@@ -11,7 +11,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
- * This filter remove all transit results which have a generalized-cost higher than the max-limit
+ * This filter removes all transit results that have a generalized-cost higher than the max-limit
  * computed by the {@link #costLimitFunction} plus the wait cost given by
  * {@link TransitGeneralizedCostFilter#getWaitTimeCost}.
  */
@@ -41,11 +41,11 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
 
     return transitItineraries
       .stream()
-      .filter(it -> transitItineraries.stream().anyMatch(t -> acceptGeneralizedCost(it, t)))
+      .filter(it -> transitItineraries.stream().anyMatch(t -> generalizedCostExceedsLimit(it, t)))
       .collect(Collectors.toList());
   }
 
-  private boolean acceptGeneralizedCost(Itinerary subject, Itinerary transitItinerary) {
+  private boolean generalizedCostExceedsLimit(Itinerary subject, Itinerary transitItinerary) {
     return subject.getGeneralizedCost() > calculateLimit(subject, transitItinerary);
   }
 

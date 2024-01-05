@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit.group;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 
-class OtherThanSameLegsMaxGeneralizedCostFilterTest implements PlanTestConstants {
+class RemoveOtherThanSameLegsMaxGeneralizedCostTest implements PlanTestConstants {
 
   @Test
   public void testFilter() {
@@ -19,7 +19,7 @@ class OtherThanSameLegsMaxGeneralizedCostFilterTest implements PlanTestConstants
 
     Itinerary second = newItinerary(A).rail(20, T11_05, T11_14, B).walk(D10m, C).build();
 
-    var subject = new OtherThanSameLegsMaxGeneralizedCostFilter(2.0);
+    var subject = new RemoveOtherThanSameLegsMaxGeneralizedCost(2.0);
     assertEquals(List.of(second), subject.flagForRemoval(List.of(first, second)));
   }
 }

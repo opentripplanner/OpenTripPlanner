@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit.group;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,13 +7,12 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.Grou
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
- * This filter ensures that no more than one itinerary begins or ends with same trip.
+ * This filter ensures that no more than one itinerary begins or ends with the same trip.
  * It loops through itineraries from top to bottom. If itinerary matches with any other itinerary
  * from above, it is removed from list.
  * Uses {@link GroupBySameFirstOrLastTrip}.
- * for matching itineraries.
  */
-public class SameFirstOrLastTripFilter implements RemoveItineraryFlagger {
+public class RemoveIfFirstOrLastTripIsTheSame implements RemoveItineraryFlagger {
 
   @Override
   public String name() {

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import java.util.List;
 import java.util.OptionalInt;
@@ -9,15 +9,15 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
- * Filter itineraries based on generalizedCost, compared with a on-street-all-the-way itinerary(if
- * it exist). If an itinerary cost exceeds the limit computed from the best all-the-way-on-street itinerary, then the
- * transit itinerary is removed.
+ * Filter itineraries based on generalizedCost, compared with an on-street-all-the-way itinerary
+ * (if it exists). If an itinerary cost exceeds the limit computed from the best
+ * all-the-way-on-street itinerary, then the transit itinerary is removed.
  */
-public class RemoveTransitIfStreetOnlyIsBetterFilter implements RemoveItineraryFlagger {
+public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger {
 
   private final CostLinearFunction costLimitFunction;
 
-  public RemoveTransitIfStreetOnlyIsBetterFilter(CostLinearFunction costLimitFunction) {
+  public RemoveTransitIfStreetOnlyIsBetter(CostLinearFunction costLimitFunction) {
     this.costLimitFunction = costLimitFunction;
   }
 

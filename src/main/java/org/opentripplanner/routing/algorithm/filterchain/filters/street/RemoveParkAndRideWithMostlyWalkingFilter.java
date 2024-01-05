@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.street;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -31,10 +31,9 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements RemoveItinerary
   @Override
   public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
     return itinerary -> {
-      var containsTransit = itinerary
-        .getLegs()
-        .stream()
-        .anyMatch(l -> l != null && l.isTransitLeg());
+      if (itinerary.hasTransit()) {
+        return false;
+      }
 
       double carDuration = itinerary
         .getLegs()
@@ -46,11 +45,7 @@ public class RemoveParkAndRideWithMostlyWalkingFilter implements RemoveItinerary
         .sum();
       double totalDuration = itinerary.getDuration().toSeconds();
 
-      return (
-        !containsTransit &&
-        carDuration != 0 &&
-        (carDuration / totalDuration) <= parkAndRideDurationRatio
-      );
+      return (carDuration != 0 && (carDuration / totalDuration) <= parkAndRideDurationRatio);
     };
   }
 

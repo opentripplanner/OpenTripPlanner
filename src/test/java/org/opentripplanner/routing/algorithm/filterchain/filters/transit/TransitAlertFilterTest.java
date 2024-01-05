@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.BUS_ROUTE;
@@ -32,7 +32,7 @@ class TransitAlertFilterTest implements PlanTestConstants {
       )
     );
 
-    TransitAlertFilter filter = new TransitAlertFilter(transitAlertService, ignore -> null);
+    DecorateTransitAlert filter = new DecorateTransitAlert(transitAlertService, ignore -> null);
 
     // Expect filter to no fail on an empty list
     assertEquals(List.of(), filter.filter(List.of()));

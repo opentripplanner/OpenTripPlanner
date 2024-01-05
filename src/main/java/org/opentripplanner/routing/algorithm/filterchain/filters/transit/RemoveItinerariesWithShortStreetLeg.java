@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
@@ -10,6 +10,11 @@ import org.opentripplanner.street.search.TraverseMode;
  * This filter is useful if you want to remove those results where there is a short bicycle
  * leg followed by parking the bike and taking transit. In such a case you would not need a bike
  * could just walk to the stop instead.
+ * <p>
+ * TODO: This filter build on assumptions that is more or less an implementation detail. The
+ *       filter should compare itineraries and remove them if a condition is meet, not just
+ *       assume that a better option exist. Perhaps the access and egress should be filtered
+ *       instead of filtering the transit itineraries?
  */
 public class RemoveItinerariesWithShortStreetLeg implements ItineraryListFilter {
 

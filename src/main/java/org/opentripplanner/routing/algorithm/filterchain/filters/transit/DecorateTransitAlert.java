@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
 import java.util.List;
 import java.util.function.Function;
@@ -10,11 +10,11 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.MultiModalStation;
 import org.opentripplanner.transit.model.site.Station;
 
-public class TransitAlertFilter implements ItineraryListFilter {
+public class DecorateTransitAlert implements ItineraryListFilter {
 
   private final AlertToLegMapper alertToLegMapper;
 
-  public TransitAlertFilter(
+  public DecorateTransitAlert(
     TransitAlertService transitAlertService,
     Function<Station, MultiModalStation> getMultiModalStation
   ) {
