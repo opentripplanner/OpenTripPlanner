@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
-import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.numberOfTransfersComparator;
+import static org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator.numberOfTransfersComparator;
 
 import java.util.HashSet;
 import java.util.List;

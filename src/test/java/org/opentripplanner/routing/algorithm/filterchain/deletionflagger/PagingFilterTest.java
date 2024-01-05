@@ -19,7 +19,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 public class PagingFilterTest implements PlanTestConstants {

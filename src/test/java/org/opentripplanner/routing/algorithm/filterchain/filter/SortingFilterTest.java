@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.generalizedCostComparator;
+import static org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator.generalizedCostComparator;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;

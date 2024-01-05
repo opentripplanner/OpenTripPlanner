@@ -1,9 +1,9 @@
-package org.opentripplanner.routing.algorithm.filterchain.comparator;
+package org.opentripplanner.routing.algorithm.filterchain.sort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.defaultComparatorArriveBy;
-import static org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator.defaultComparatorDepartAfter;
+import static org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator.defaultComparatorArriveBy;
+import static org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator.defaultComparatorDepartAfter;
 
 import java.util.Arrays;
 import java.util.List;

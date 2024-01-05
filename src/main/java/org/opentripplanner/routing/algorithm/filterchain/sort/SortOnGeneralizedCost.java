@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.comparator;
+package org.opentripplanner.routing.algorithm.filterchain.sort;
 
 import org.opentripplanner.framework.collection.CompositeComparator;
 import org.opentripplanner.model.plan.ItinerarySortKey;

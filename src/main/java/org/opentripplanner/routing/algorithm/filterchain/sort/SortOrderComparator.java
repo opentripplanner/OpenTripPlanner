@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.comparator;
+package org.opentripplanner.routing.algorithm.filterchain.sort;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
