@@ -25,10 +25,7 @@ import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.AreaEdgeList;
 import org.opentripplanner.street.model.edge.Edge;
-import org.opentripplanner.street.model.edge.ElevatorEdge;
-import org.opentripplanner.street.model.edge.FreeEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
-import org.opentripplanner.street.model.edge.StreetTransitEntityLink;
 import org.opentripplanner.street.model.vertex.StreetVertex;
 import org.opentripplanner.street.model.vertex.TransitStopVertex;
 import org.opentripplanner.street.model.vertex.Vertex;
@@ -338,16 +335,6 @@ public class PruneIslands implements GraphBuilderModule {
       }
       State s0 = new State(gv, request);
       for (Edge e : gv.getOutgoing()) {
-        if (
-          !(
-            e instanceof StreetEdge ||
-            e instanceof ElevatorEdge ||
-            e instanceof FreeEdge ||
-            e instanceof StreetTransitEntityLink
-          )
-        ) {
-          continue;
-        }
         if (
           e instanceof StreetEdge &&
           shouldMatchNoThruType != ((StreetEdge) e).isNoThruTraffic(traverseMode)
