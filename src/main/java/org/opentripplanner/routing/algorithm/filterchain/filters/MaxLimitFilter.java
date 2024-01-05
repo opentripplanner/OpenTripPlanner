@@ -2,13 +2,13 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
  * Flags the itineraries at the end of the list for removal. The list should be sorted on the
  * desired key before this filter is applied.
  */
-public class MaxLimitFilter implements ItineraryDeletionFlagger {
+public class MaxLimitFilter implements RemoveItineraryFlagger {
 
   private final String name;
   private final int maxLimit;

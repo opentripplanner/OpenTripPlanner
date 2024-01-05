@@ -16,7 +16,7 @@ import org.opentripplanner.model.plan.Itinerary;
  *  <li>{@link #flagForRemoval(List)}}) - If you need more than one itinerary to decide which to delete.</li>
  * </ul>
  */
-public interface ItineraryDeletionFlagger {
+public interface RemoveItineraryFlagger {
   /**
    * A name used for debugging the itinerary list filter chain.
    * <p>
@@ -47,7 +47,7 @@ public interface ItineraryDeletionFlagger {
 
   /**
    * Should itineraries already marked for deletion by previous deletionflagger be removed from the
-   * list passed to {@link ItineraryDeletionFlagger#flagForRemoval(List)}. The default value
+   * list passed to {@link RemoveItineraryFlagger#flagForRemoval(List)}. The default value
    * is true, as usually the already removed itineraries are not needed further in the filter
    * chain.
    */

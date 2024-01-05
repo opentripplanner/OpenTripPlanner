@@ -5,19 +5,19 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
  * This class is responsible for flagging itineraries for deletion based on a predicate in the
  * supplied ItineraryDeletionFlagger. The itineraries are not actually deleted at this point, just
  * flagged. They are typically deleted later if debug mode is disabled.
  */
-public class DeletionFlaggingFilter implements ItineraryListFilter {
+public class RemoveFilter implements ItineraryListFilter {
 
-  private final ItineraryDeletionFlagger flagger;
+  private final RemoveItineraryFlagger flagger;
 
-  public DeletionFlaggingFilter(ItineraryDeletionFlagger flagger) {
+  public RemoveFilter(RemoveItineraryFlagger flagger) {
     this.flagger = flagger;
   }
 

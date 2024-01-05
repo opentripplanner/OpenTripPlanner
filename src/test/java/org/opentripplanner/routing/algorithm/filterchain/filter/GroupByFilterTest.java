@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
-import org.opentripplanner.routing.algorithm.filterchain.framework.filter.DeletionFlaggingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.RemoveFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
@@ -41,7 +41,7 @@ public class GroupByFilterTest implements PlanTestConstants {
     assertFalse(i2a.isFlaggedForDeletion());
     assertTrue(i2b.isFlaggedForDeletion());
 
-    // Remove an none existing set of tags
+    // Remove a none existing set of tags
     i2b.removeDeletionFlags(Set.of("ANY_TAG"));
     assertTrue(i2b.isFlaggedForDeletion());
 
@@ -101,9 +101,7 @@ public class GroupByFilterTest implements PlanTestConstants {
       i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
       List.of(
         new SortingFilter(SortOrderComparator.defaultComparatorDepartAfter()),
-        new DeletionFlaggingFilter(
-          new MaxLimitFilter(TEST_FILTER_TAG, maxNumberOfItinerariesPrGroup)
-        )
+        new RemoveFilter(new MaxLimitFilter(TEST_FILTER_TAG, maxNumberOfItinerariesPrGroup))
       )
     );
   }

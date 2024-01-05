@@ -8,7 +8,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
  * This class is used to enforce the cut/limit between two pages. It removes potential duplicates
@@ -20,7 +20,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
  * potential duplicates will appear at the bottom of the list. If the previous results were cropped
  * at the bottom, then the potential duplicates will appear at the top of the list.
  */
-public class PagingFilter implements ItineraryDeletionFlagger {
+public class PagingFilter implements RemoveItineraryFlagger {
 
   public static final String TAG = "paging-filter";
 

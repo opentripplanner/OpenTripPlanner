@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
  * Flag all itineraries after the provided limit. This flags the itineraries at the end of the list
@@ -12,7 +12,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
  * <p>
  * This filter reports information about the removed itineraries in the results consumer.
  */
-public class NumItinerariesFilter implements ItineraryDeletionFlagger {
+public class NumItinerariesFilter implements RemoveItineraryFlagger {
 
   public static final String TAG = "number-of-itineraries-filter";
 

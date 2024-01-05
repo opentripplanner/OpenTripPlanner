@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.transit.model.timetable.Trip;
 
 /**
@@ -17,7 +17,7 @@ import org.opentripplanner.transit.model.timetable.Trip;
  * TransitGeneralizedCostFilter}, but is used together with {@link GroupByFilter} to filter within
  * the groups.
  */
-public class OtherThanSameLegsMaxGeneralizedCostFilter implements ItineraryDeletionFlagger {
+public class OtherThanSameLegsMaxGeneralizedCostFilter implements RemoveItineraryFlagger {
 
   /**
    * How much higher cost do we allow for the non-shared legs before we filter out the itinerary.

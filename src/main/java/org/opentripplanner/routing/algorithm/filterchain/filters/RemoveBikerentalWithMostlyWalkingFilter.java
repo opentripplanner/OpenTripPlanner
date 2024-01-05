@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
  * This is used to filter out bike rental itineraries that contain mostly walking. The value
@@ -12,7 +12,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
  * <p>
  * This filter is turned off by default (bikeRentalDistanceRatio == 0)
  */
-public class RemoveBikerentalWithMostlyWalkingFilter implements ItineraryDeletionFlagger {
+public class RemoveBikerentalWithMostlyWalkingFilter implements RemoveItineraryFlagger {
 
   private final double bikeRentalDistanceRatio;
 

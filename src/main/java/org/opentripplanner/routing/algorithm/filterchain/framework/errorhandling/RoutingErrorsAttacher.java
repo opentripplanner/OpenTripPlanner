@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain;
+package org.opentripplanner.routing.algorithm.filterchain.framework.errorhandling;
 
 import static org.opentripplanner.routing.api.response.InputField.DATE_TIME;
 import static org.opentripplanner.routing.api.response.RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW;
@@ -18,7 +18,7 @@ import org.opentripplanner.routing.api.response.RoutingError;
  * Computes {@link org.opentripplanner.routing.api.response.RoutingError} instances from itinerary
  * before and after they have been through the filter chain.
  */
-class RoutingErrorsAttacher {
+public class RoutingErrorsAttacher {
 
   /**
    * Computes error codes from the itineraries.
@@ -28,7 +28,7 @@ class RoutingErrorsAttacher {
    *                            have the {@link org.opentripplanner.model.SystemNotice}s to look up
    *                            the error from.
    */
-  static List<RoutingError> computeErrors(
+  public static List<RoutingError> computeErrors(
     List<Itinerary> originalItineraries,
     List<Itinerary> filteredItineraries
   ) {

@@ -17,6 +17,7 @@ import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastTripFilter;
@@ -35,15 +36,15 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIf
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfWalkingIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.framework.filter.DeletionFlaggingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.RemoveFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByDistance;
 import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupBySameRoutesAndStops;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.services.TransitAlertService;
@@ -516,7 +517,7 @@ public class ItineraryListFilterChainBuilder {
         GroupBySameRoutesAndStops::new,
         List.of(
           new SortingFilter(SortOrderComparator.comparator(sortOrder)),
-          new DeletionFlaggingFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
+          new RemoveFilter(new MaxLimitFilter(GroupBySameRoutesAndStops.TAG, 1))
         )
       )
     );
@@ -560,7 +561,7 @@ public class ItineraryListFilterChainBuilder {
             GroupByAllSameStations::new,
             List.of(
               new SortingFilter(generalizedCostComparator()),
-              new DeletionFlaggingFilter(new MaxLimitFilter(innerGroupName, 1))
+              new RemoveFilter(new MaxLimitFilter(innerGroupName, 1))
             )
           )
         );
@@ -592,8 +593,8 @@ public class ItineraryListFilterChainBuilder {
 
   private static void addRmFilter(
     List<ItineraryListFilter> filters,
-    ItineraryDeletionFlagger removeFilter
+    RemoveItineraryFlagger removeFilter
   ) {
-    filters.add(new DeletionFlaggingFilter(removeFilter));
+    filters.add(new RemoveFilter(removeFilter));
   }
 }

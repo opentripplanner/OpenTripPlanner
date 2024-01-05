@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
@@ -15,7 +15,7 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
  * computed by the {@link #costLimitFunction} plus the wait cost given by
  * {@link TransitGeneralizedCostFilter#getWaitTimeCost}.
  */
-public class TransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
+public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
 
   private final CostLinearFunction costLimitFunction;
 

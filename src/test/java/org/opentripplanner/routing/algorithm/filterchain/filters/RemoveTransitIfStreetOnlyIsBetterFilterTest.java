@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestConstants {
@@ -21,7 +21,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
     Itinerary i2 = newItinerary(A).rail(110, 6, 9, E).build();
 
     // When:
-    ItineraryDeletionFlagger flagger = new RemoveTransitIfStreetOnlyIsBetterFilter(
+    RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetterFilter(
       CostLinearFunction.of(Duration.ofSeconds(200), 1.2)
     );
     List<Itinerary> result = flagger.removeMatchesForTest(List.of(i1, i2));
@@ -49,7 +49,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest implements PlanTestCons
     i2.setGeneralizedCost(360);
 
     // When:
-    ItineraryDeletionFlagger flagger = new RemoveTransitIfStreetOnlyIsBetterFilter(
+    RemoveItineraryFlagger flagger = new RemoveTransitIfStreetOnlyIsBetterFilter(
       CostLinearFunction.of(Duration.ofSeconds(60), 1.2)
     );
     List<Itinerary> result = flagger.removeMatchesForTest(List.of(i2, bicycle, walk, i1));

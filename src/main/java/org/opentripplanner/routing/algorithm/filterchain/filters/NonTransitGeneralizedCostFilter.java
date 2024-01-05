@@ -5,7 +5,7 @@ import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 
@@ -20,7 +20,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
  *
  * @see ItineraryFilterPreferences#nonTransitGeneralizedCostLimit()
  */
-public class NonTransitGeneralizedCostFilter implements ItineraryDeletionFlagger {
+public class NonTransitGeneralizedCostFilter implements RemoveItineraryFlagger {
 
   private final CostLinearFunction costLimitFunction;
 

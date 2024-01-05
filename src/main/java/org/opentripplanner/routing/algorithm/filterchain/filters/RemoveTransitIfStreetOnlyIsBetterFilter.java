@@ -5,7 +5,7 @@ import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**
@@ -13,7 +13,7 @@ import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
  * it exist). If an itinerary cost exceeds the limit computed from the best all-the-way-on-street itinerary, then the
  * transit itinerary is removed.
  */
-public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryDeletionFlagger {
+public class RemoveTransitIfStreetOnlyIsBetterFilter implements RemoveItineraryFlagger {
 
   private final CostLinearFunction costLimitFunction;
 

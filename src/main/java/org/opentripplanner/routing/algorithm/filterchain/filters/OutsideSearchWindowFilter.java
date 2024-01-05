@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
  * This filter will remove all itineraries that are outside the search-window. In some
@@ -15,7 +15,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
  * Itineraries matching the start(earliest-departure-time) are included and itineraries matching
  * the end(latest-departure-time) are not. The filter is {@code [inclusive, exclusive]}.
  */
-public class OutsideSearchWindowFilter implements ItineraryDeletionFlagger {
+public class OutsideSearchWindowFilter implements RemoveItineraryFlagger {
 
   public static final String TAG = "outside-search-window";
 

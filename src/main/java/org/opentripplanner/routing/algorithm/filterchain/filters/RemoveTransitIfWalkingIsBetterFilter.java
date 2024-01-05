@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
  * Filter itineraries which have a higher generalized-cost than a pure walk itinerary.
  */
-public class RemoveTransitIfWalkingIsBetterFilter implements ItineraryDeletionFlagger {
+public class RemoveTransitIfWalkingIsBetterFilter implements RemoveItineraryFlagger {
 
   /**
    * Required for {@link org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain},
