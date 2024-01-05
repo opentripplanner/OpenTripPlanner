@@ -9,17 +9,15 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 public class EscalatorPruningTest {
 
-
   @Test
   public void streetEdgesBetweenEscalatorEdgesRetained() {
-    var graph =
-      buildOsmGraph(
-        ResourceLoader.of(EscalatorPruningTest.class).file("matinkyla-escalator.pbf"),
-        10,
-        2,
-        50,
-        250
-      );
+    var graph = buildOsmGraph(
+      ResourceLoader.of(EscalatorPruningTest.class).file("matinkyla-escalator.pbf"),
+      10,
+      2,
+      50,
+      250
+    );
     assertTrue(
       graph
         .getStreetEdges()
