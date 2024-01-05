@@ -12,7 +12,7 @@ class MaxCountSkipEdgeStrategyTest {
   @Test
   void countStops() {
     var state = TestStateBuilder.ofWalking().stop().build();
-    var strategy = new MaxCountSkipEdgeStrategy<>(1, NearbyStopFinder::hasFoundStop);
+    var strategy = new MaxCountSkipEdgeStrategy<>(1, NearbyStopFinder::hasReachedStop);
     assertFalse(strategy.shouldSkipEdge(state, null));
     assertTrue(strategy.shouldSkipEdge(state, null));
   }
@@ -20,7 +20,7 @@ class MaxCountSkipEdgeStrategyTest {
   @Test
   void doNotCountStop() {
     var state = TestStateBuilder.ofWalking().build();
-    var strategy = new MaxCountSkipEdgeStrategy<>(1, NearbyStopFinder::hasFoundStop);
+    var strategy = new MaxCountSkipEdgeStrategy<>(1, NearbyStopFinder::hasReachedStop);
     assertFalse(strategy.shouldSkipEdge(state, null));
     assertFalse(strategy.shouldSkipEdge(state, null));
     assertFalse(strategy.shouldSkipEdge(state, null));
@@ -30,7 +30,7 @@ class MaxCountSkipEdgeStrategyTest {
   void nonFinalState() {
     var state = TestStateBuilder.ofScooterRentalArriveBy().stop().build();
     assertFalse(state.isFinal());
-    var strategy = new MaxCountSkipEdgeStrategy<>(1, NearbyStopFinder::hasFoundStop);
+    var strategy = new MaxCountSkipEdgeStrategy<>(1, NearbyStopFinder::hasReachedStop);
     assertFalse(strategy.shouldSkipEdge(state, null));
   }
 }
