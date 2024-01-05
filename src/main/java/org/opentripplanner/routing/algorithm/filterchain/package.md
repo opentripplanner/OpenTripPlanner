@@ -7,7 +7,7 @@ chain is also responsible for creating routing errors, if no itineraries remain 
 Itineraries are flagged for deletion, but not actually deleted when debugging is turned on. When
 debugging is off, the chain actually removes those itineraries that were flagged for deletion.
 
-![Architecture diagram](ItineraryListFilterChain.svg)
+![Architecture diagram](images/ItineraryListFilterChain.svg)
 
 There are four types of filters, which can be included in the filter chain. The same type of filter
 can appear multiple times.
