@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import org.opentripplanner.apis.support.mapping.StreetNoteMapper;
 import org.opentripplanner.ext.restapi.model.ApiAlert;
 import org.opentripplanner.ext.restapi.model.ApiLeg;
 import org.opentripplanner.framework.geometry.EncodedPolyline;
@@ -19,7 +20,7 @@ import org.opentripplanner.model.plan.TransitLeg;
 public class LegMapper {
 
   private final WalkStepMapper walkStepMapper;
-  private final StreetNoteMaperMapper streetNoteMaperMapper;
+  private final StreetNoteMapper streetNoteMaperMapper;
   private final AlertMapper alertMapper;
   private final PlaceMapper placeMapper;
   private final boolean addIntermediateStops;
@@ -28,7 +29,7 @@ public class LegMapper {
 
   public LegMapper(Locale locale, boolean addIntermediateStops) {
     this.walkStepMapper = new WalkStepMapper(locale);
-    this.streetNoteMaperMapper = new StreetNoteMaperMapper(locale);
+    this.streetNoteMaperMapper = new StreetNoteMapper(locale);
     this.alertMapper = new AlertMapper(locale);
     this.placeMapper = new PlaceMapper(locale);
     this.addIntermediateStops = addIntermediateStops;

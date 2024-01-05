@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.restapi.mapping;
+package org.opentripplanner.apis.support.mapping;
 
 import java.util.List;
 import java.util.Locale;
@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.restapi.model.ApiAlert;
 import org.opentripplanner.street.model.note.StreetNote;
 
-public class StreetNoteMaperMapper {
+public class StreetNoteMapper {
 
   private final Locale locale;
 
-  public StreetNoteMaperMapper(Locale locale) {
+  public StreetNoteMapper(Locale locale) {
     this.locale = locale;
   }
 
