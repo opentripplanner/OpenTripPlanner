@@ -17,6 +17,7 @@ import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
@@ -25,7 +26,6 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilt
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.NonTransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtherThanSameLegsMaxGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.PagingFilter;
@@ -72,7 +72,7 @@ public class ItineraryListFilterChainBuilder {
   private double bikeRentalDistanceRatio;
   private double parkAndRideDurationRatio;
   private CostLinearFunction nonTransitGeneralizedCostLimit;
-  private Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsConsumer;
+  private Consumer<PageCursorInput> pageCursorInputSubscriber;
   private Instant earliestDepartureTime = null;
   private Duration searchWindow = null;
   private boolean accessibilityScore;
@@ -264,18 +264,15 @@ public class ItineraryListFilterChainBuilder {
   }
 
   /**
-   * If the maximum number of itineraries is exceeded, then the excess itineraries are removed. To
-   * get notified about this a consumer can be added. The 'maxLimit' check is the last thing
-   * happening in the filter-chain after the final sort. So, if another filter removes an itinerary,
-   * the itinerary is not considered with respect to the {@link #withMaxNumberOfItineraries(int)}
-   * limit.
-   *
-   * @param numItinerariesFilterResultsConsumer the consumer to notify when elements are removed.
+   * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
+   * The paging service needs this information to adjust the paging cursor. The 'maxLimit' check is
+   * the last thing* happening in the filter-chain after the final sort. So, if another filter
+   * removes an itinerary, the itinerary is not considered with respect to this limit.
    */
-  public ItineraryListFilterChainBuilder withNumItinerariesFilterResultsConsumer(
-    Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsConsumer
+  public ItineraryListFilterChainBuilder withPageCursorInputSubscriber(
+    Consumer<PageCursorInput> pageCursorInputSubscriber
   ) {
-    this.numItinerariesFilterResultsConsumer = numItinerariesFilterResultsConsumer;
+    this.pageCursorInputSubscriber = pageCursorInputSubscriber;
     return this;
   }
 
@@ -469,7 +466,7 @@ public class ItineraryListFilterChainBuilder {
           new NumItinerariesFilter(
             maxNumberOfItineraries,
             maxNumberOfItinerariesCropSection,
-            numItinerariesFilterResultsConsumer
+            pageCursorInputSubscriber
           )
         );
       }

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 
 /**
@@ -16,23 +17,21 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
 
   public static final String TAG = "number-of-itineraries-filter";
 
-  private static final Consumer<NumItinerariesFilterResults> IGNORE_SUBSCRIBER = i -> {};
+  private static final Consumer<PageCursorInput> IGNORE_SUBSCRIBER = i -> {};
 
   private final int maxLimit;
   private final ListSection cropSection;
-  private final Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsConsumer;
+  private final Consumer<PageCursorInput> pageCursorInputSubscriber;
 
   public NumItinerariesFilter(
     int maxLimit,
     ListSection cropSection,
-    Consumer<NumItinerariesFilterResults> numItinerariesFilterResultsConsumer
+    Consumer<PageCursorInput> pageCursorInputSubscriber
   ) {
     this.maxLimit = maxLimit;
     this.cropSection = cropSection;
-    this.numItinerariesFilterResultsConsumer =
-      numItinerariesFilterResultsConsumer == null
-        ? IGNORE_SUBSCRIBER
-        : numItinerariesFilterResultsConsumer;
+    this.pageCursorInputSubscriber =
+      pageCursorInputSubscriber == null ? IGNORE_SUBSCRIBER : pageCursorInputSubscriber;
   }
 
   @Override
@@ -59,7 +58,7 @@ public class NumItinerariesFilter implements RemoveItineraryFlagger {
       itinerariesToKeep = itineraries.subList(0, maxLimit);
     }
 
-    numItinerariesFilterResultsConsumer.accept(
+    pageCursorInputSubscriber.accept(
       new NumItinerariesFilterResults(itinerariesToKeep, itinerariesToRemove, cropSection)
     );
 
