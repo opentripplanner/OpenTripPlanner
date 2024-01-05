@@ -42,7 +42,7 @@ public class FaresFilterTest implements PlanTestConstants {
     var fp = new FareProduct(id("fp"), "fare product", Money.euros(10.00f), null, null, null);
     fares.addFareProduct(leg, fp);
 
-    var filter = new FaresFilter((FareService) itinerary -> fares);
+    var filter = new DecorateWithFare((FareService) itinerary -> fares);
     var filtered = filter.filter(input);
 
     filtered.forEach(i -> assertEquals(fares, i.getFares()));

@@ -16,7 +16,7 @@ import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.transit.model.basic.Money;
 
-class RideHailingFilterTest implements PlanTestConstants {
+class DecorateWithRideHailingTest implements PlanTestConstants {
 
   public static final RideEstimate RIDE_ESTIMATE = new RideEstimate(
     UBER,
@@ -39,7 +39,7 @@ class RideHailingFilterTest implements PlanTestConstants {
 
   @Test
   void noServices() {
-    var filter = new RideHailingFilter(List.of(), false);
+    var filter = new DecorateWithRideHailing(List.of(), false);
 
     var filtered = filter.filter(List.of(i));
 
@@ -48,7 +48,7 @@ class RideHailingFilterTest implements PlanTestConstants {
 
   @Test
   void addRideHailingInformation() {
-    var filter = new RideHailingFilter(List.of(mockService), false);
+    var filter = new DecorateWithRideHailing(List.of(mockService), false);
 
     var filtered = filter.filter(List.of(i));
 
@@ -63,7 +63,7 @@ class RideHailingFilterTest implements PlanTestConstants {
 
   @Test
   void failingService() {
-    var filter = new RideHailingFilter(List.of(failingService), false);
+    var filter = new DecorateWithRideHailing(List.of(failingService), false);
 
     var filtered = filter.filter(List.of(i));
 

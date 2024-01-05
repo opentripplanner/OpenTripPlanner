@@ -4,10 +4,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.emissions.EmissionsFilter;
-import org.opentripplanner.ext.fares.FaresFilter;
-import org.opentripplanner.ext.ridehailing.RideHailingFilter;
-import org.opentripplanner.ext.stopconsolidation.ConsolidatedStopNameFilter;
+import org.opentripplanner.ext.emissions.DecorateWithEmission;
+import org.opentripplanner.ext.fares.DecorateWithFare;
+import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
+import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
@@ -96,22 +96,22 @@ public class RouteRequestToFilterChainMapper {
 
     var fareService = context.graph().getFareService();
     if (fareService != null) {
-      builder.withFaresFilter(new FaresFilter(fareService));
+      builder.withFareDecorator(new DecorateWithFare(fareService));
     }
 
     if (!context.rideHailingServices().isEmpty()) {
-      builder.withRideHailingFilter(
-        new RideHailingFilter(context.rideHailingServices(), request.wheelchair())
+      builder.withRideHailingDecorator(
+        new DecorateWithRideHailing(context.rideHailingServices(), request.wheelchair())
       );
     }
 
     if (OTPFeature.Co2Emissions.isOn() && context.emissionsService() != null) {
-      builder.withEmissions(new EmissionsFilter(context.emissionsService()));
+      builder.withEmissions(new DecorateWithEmission(context.emissionsService()));
     }
 
     if (context.stopConsolidationService() != null) {
-      builder.withStopConsolidationFilter(
-        new ConsolidatedStopNameFilter(context.stopConsolidationService())
+      builder.withConsolidatedStopNamesDecorator(
+        new DecorateConsolidatedStopNames(context.stopConsolidationService())
       );
     }
 

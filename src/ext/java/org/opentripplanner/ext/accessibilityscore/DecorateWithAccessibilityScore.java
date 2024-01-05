@@ -25,7 +25,8 @@ import org.opentripplanner.transit.model.basic.Accessibility;
  * calculating them on the backend makes life a little easier and changes are automatically applied
  * to all frontends.
  */
-public record AccessibilityScoreFilter(double wheelchairMaxSlope) implements ItineraryListFilter {
+public record DecorateWithAccessibilityScore(double wheelchairMaxSlope)
+  implements ItineraryListFilter {
   public static Float compute(List<Leg> legs) {
     return legs
       .stream()
@@ -43,7 +44,7 @@ public record AccessibilityScoreFilter(double wheelchairMaxSlope) implements Iti
     var values = List.of(trip, fromStop, toStop);
     var sum = (float) values
       .stream()
-      .mapToDouble(AccessibilityScoreFilter::accessibilityScore)
+      .mapToDouble(DecorateWithAccessibilityScore::accessibilityScore)
       .sum();
     return sum / values.size();
   }

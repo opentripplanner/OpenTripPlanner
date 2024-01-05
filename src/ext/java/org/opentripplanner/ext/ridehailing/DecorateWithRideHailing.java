@@ -15,15 +15,15 @@ import org.slf4j.LoggerFactory;
  * This filter decorates car dropoff/pickup legs with information from ride hailing services and
  * adds information about price and arrival time of the vehicle.
  */
-public class RideHailingFilter implements ItineraryListFilter {
+public class DecorateWithRideHailing implements ItineraryListFilter {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RideHailingFilter.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DecorateWithRideHailing.class);
 
   public static final String NO_RIDE_HAILING_AVAILABLE = "no-ride-hailing-available";
   private final List<RideHailingService> rideHailingServices;
   private final boolean wheelchairAccessible;
 
-  public RideHailingFilter(
+  public DecorateWithRideHailing(
     List<RideHailingService> rideHailingServices,
     boolean wheelchairAccessible
   ) {

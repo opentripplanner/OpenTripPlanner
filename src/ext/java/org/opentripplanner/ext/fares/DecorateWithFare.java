@@ -8,8 +8,10 @@ import org.opentripplanner.routing.fares.FareService;
 
 /**
  * Computes the fares of an itinerary and adds them.
+ * <p>
+ * TODO: Convert to a class - exposing a service in a DTO is a risk.
  */
-public record FaresFilter(FareService fareService) implements ItineraryListFilter {
+public record DecorateWithFare(FareService fareService) implements ItineraryListFilter {
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
     return itineraries

@@ -12,11 +12,11 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.Itinerary
  * then replaces it with the secondary, agency-specific stop name. This is so that the in-vehicle
  * display matches what OTP returns as a board/alight stop name.
  */
-public class ConsolidatedStopNameFilter implements ItineraryListFilter {
+public class DecorateConsolidatedStopNames implements ItineraryListFilter {
 
   private final StopConsolidationService service;
 
-  public ConsolidatedStopNameFilter(StopConsolidationService service) {
+  public DecorateConsolidatedStopNames(StopConsolidationService service) {
     this.service = Objects.requireNonNull(service);
   }
 

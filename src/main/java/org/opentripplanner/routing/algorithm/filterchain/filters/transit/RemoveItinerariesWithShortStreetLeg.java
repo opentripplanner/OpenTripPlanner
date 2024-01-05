@@ -11,6 +11,9 @@ import org.opentripplanner.street.search.TraverseMode;
  * leg followed by parking the bike and taking transit. In such a case you would not need a bike
  * could just walk to the stop instead.
  * <p>
+ * TODO: THIS FILTER DOES NOT FOLLOW THE ITINERARY FILTER FRAMEWORK. This filter should implement the
+ *       {@link org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger}.
+ *
  * TODO: This filter build on assumptions that is more or less an implementation detail. The
  *       filter should compare itineraries and remove them if a condition is meet, not just
  *       assume that a better option exist. Perhaps the access and egress should be filtered

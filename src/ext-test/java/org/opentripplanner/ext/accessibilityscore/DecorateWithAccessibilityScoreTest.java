@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.preference.WheelchairPreferences;
 
-public class AccessibilityScoreFilterTest implements PlanTestConstants {
+public class DecorateWithAccessibilityScoreTest implements PlanTestConstants {
 
   @Test
   public void shouldAddAccessibilityScore() {
@@ -37,7 +37,7 @@ public class AccessibilityScoreFilterTest implements PlanTestConstants {
 
     input.forEach(i -> assertNull(i.getAccessibilityScore()));
 
-    var filter = new AccessibilityScoreFilter(WheelchairPreferences.DEFAULT.maxSlope());
+    var filter = new DecorateWithAccessibilityScore(WheelchairPreferences.DEFAULT.maxSlope());
     var filtered = filter.filter(input);
 
     filtered.forEach(i -> {

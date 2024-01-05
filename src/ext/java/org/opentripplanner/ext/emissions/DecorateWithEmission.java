@@ -19,7 +19,8 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  * @param emissionsService
  */
 @Sandbox
-public record EmissionsFilter(EmissionsService emissionsService) implements ItineraryListFilter {
+public record DecorateWithEmission(EmissionsService emissionsService)
+  implements ItineraryListFilter {
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
     for (Itinerary itinerary : itineraries) {

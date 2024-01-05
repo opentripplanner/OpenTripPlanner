@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
-import org.opentripplanner.ext.accessibilityscore.AccessibilityScoreFilter;
+import org.opentripplanner.ext.accessibilityscore.DecorateWithAccessibilityScore;
 import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.model.plan.Itinerary;
@@ -89,16 +89,16 @@ public class ItineraryListFilterChainBuilder {
    */
 
   @Sandbox
-  private ItineraryListFilter emissionsFilter;
+  private ItineraryListFilter emissionDecorator;
 
   @Sandbox
-  private ItineraryListFilter faresFilter;
+  private ItineraryListFilter fareDecorator;
 
   @Sandbox
-  private ItineraryListFilter rideHailingFilter;
+  private ItineraryListFilter rideHailingDecorator;
 
   @Sandbox
-  private ItineraryListFilter stopConsolidationFilter;
+  private ItineraryListFilter stopConsolidationDecorator;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -317,13 +317,13 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withFaresFilter(ItineraryListFilter filter) {
-    this.faresFilter = filter;
+  public ItineraryListFilterChainBuilder withFareDecorator(ItineraryListFilter decorator) {
+    this.fareDecorator = decorator;
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withEmissions(ItineraryListFilter emissionsFilter) {
-    this.emissionsFilter = emissionsFilter;
+  public ItineraryListFilterChainBuilder withEmissions(ItineraryListFilter emissionDecorator) {
+    this.emissionDecorator = emissionDecorator;
     return this;
   }
 
@@ -339,15 +339,25 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withRideHailingFilter(ItineraryListFilter filter) {
-    this.rideHailingFilter = filter;
+  public ItineraryListFilterChainBuilder withRideHailingDecorator(ItineraryListFilter decorator) {
+    this.rideHailingDecorator = decorator;
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withStopConsolidationFilter(
-    @Nullable ItineraryListFilter filter
+  public ItineraryListFilterChainBuilder withConsolidatedStopNamesDecorator(
+    @Nullable ItineraryListFilter decorator
   ) {
-    this.stopConsolidationFilter = filter;
+    this.stopConsolidationDecorator = decorator;
+    return this;
+  }
+
+  public ItineraryListFilterChainBuilder withTransitAlerts(
+    TransitAlertService transitAlertService,
+    Function<Station, MultiModalStation> getMultiModalStation
+  ) {
+    this.transitAlertService = transitAlertService;
+    this.getMultiModalStation = getMultiModalStation;
+
     return this;
   }
 
@@ -366,25 +376,10 @@ public class ItineraryListFilterChainBuilder {
     }
 
     if (minBikeParkingDistance > 0) {
+      // TODO: use addRmFilter() here
       filters.add(
         new RemoveItinerariesWithShortStreetLeg(minBikeParkingDistance, TraverseMode.BICYCLE)
       );
-    }
-
-    if (accessibilityScore) {
-      filters.add(new AccessibilityScoreFilter(wheelchairMaxSlope));
-    }
-
-    if (faresFilter != null) {
-      filters.add(faresFilter);
-    }
-
-    if (emissionsFilter != null) {
-      filters.add(emissionsFilter);
-    }
-
-    if (transitAlertService != null) {
-      filters.add(new DecorateTransitAlert(transitAlertService, getMultiModalStation));
     }
 
     // Filter transit itineraries on generalized-cost
@@ -445,9 +440,9 @@ public class ItineraryListFilterChainBuilder {
     }
 
     // Paging related filters - these filters are run after group-by filters to allow a result
-    // outside the page to also take effect inside the window. This is debatable but lead to less
-    // noise, however it is not deterministic because the result depends on the size of the search-window and
-    // where the "cut" between each page is located.
+    // outside the page to also take effect inside the window. This is debatable, but leads to less
+    // noise; However, it is not deterministic because the result depends on the size of the
+    // search-window and where the "cut" between each page is located.
     {
       // Limit to search-window
       if (earliestDepartureTime != null) {
@@ -476,33 +471,39 @@ public class ItineraryListFilterChainBuilder {
     // Do the final itineraries sort
     filters.add(new SortingFilter(SortOrderComparator.comparator(sortOrder)));
 
-    // Sandbox filters to decorate itineraries
+    // Decorate itineraries
+    {
+      if (transitAlertService != null) {
+        filters.add(new DecorateTransitAlert(transitAlertService, getMultiModalStation));
+      }
 
-    if (faresFilter != null) {
-      filters.add(faresFilter);
-    }
+      // Sandbox filters to decorate itineraries
 
-    if (rideHailingFilter != null) {
-      filters.add(rideHailingFilter);
-    }
+      if (accessibilityScore) {
+        // TODO: This should be injected to avoid circular dependencies (dep. on sandbox here)
+        filters.add(new DecorateWithAccessibilityScore(wheelchairMaxSlope));
+      }
 
-    if (stopConsolidationFilter != null) {
-      filters.add(stopConsolidationFilter);
+      if (emissionDecorator != null) {
+        filters.add(emissionDecorator);
+      }
+
+      if (fareDecorator != null) {
+        filters.add(fareDecorator);
+      }
+
+      if (rideHailingDecorator != null) {
+        filters.add(rideHailingDecorator);
+      }
+
+      if (stopConsolidationDecorator != null) {
+        filters.add(stopConsolidationDecorator);
+      }
     }
 
     var debugHandler = new DeleteResultHandler(debug, maxNumberOfItineraries);
 
     return new ItineraryListFilterChain(filters, debugHandler);
-  }
-
-  public ItineraryListFilterChainBuilder withTransitAlerts(
-    TransitAlertService transitAlertService,
-    Function<Station, MultiModalStation> getMultiModalStation
-  ) {
-    this.transitAlertService = transitAlertService;
-    this.getMultiModalStation = getMultiModalStation;
-
-    return this;
   }
 
   /**

@@ -16,7 +16,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 
-class ConsolidatedStopNameFilterTest {
+class DecorateConsolidatedStopNamesTest {
 
   @Test
   void changeNames() {
@@ -27,7 +27,7 @@ class ConsolidatedStopNameFilterTest {
     repo.addGroups(groups);
 
     var service = new DefaultStopConsolidationService(repo, transitModel);
-    var filter = new ConsolidatedStopNameFilter(service);
+    var filter = new DecorateConsolidatedStopNames(service);
 
     var itinerary = TestItineraryBuilder
       .newItinerary(Place.forStop(STOP_C))

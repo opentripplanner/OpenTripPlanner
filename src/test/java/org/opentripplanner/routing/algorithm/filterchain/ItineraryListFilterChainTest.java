@@ -20,9 +20,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.opentripplanner.ext.emissions.DecorateWithEmission;
 import org.opentripplanner.ext.emissions.DefaultEmissionsService;
 import org.opentripplanner.ext.emissions.EmissionsDataModel;
-import org.opentripplanner.ext.emissions.EmissionsFilter;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
@@ -365,7 +365,9 @@ public class ItineraryListFilterChainTest implements PlanTestConstants {
 
     @Test
     public void emissionsTest() {
-      ItineraryListFilterChain chain = builder.withEmissions(new EmissionsFilter(eService)).build();
+      ItineraryListFilterChain chain = builder
+        .withEmissions(new DecorateWithEmission(eService))
+        .build();
       List<Itinerary> itineraries = chain.filter(List.of(bus, car));
       assertFalse(itineraries.stream().anyMatch(i -> i.getEmissionsPerPerson().getCo2() == null));
     }
