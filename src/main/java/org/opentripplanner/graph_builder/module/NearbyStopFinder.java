@@ -228,14 +228,11 @@ public class NearbyStopFinder {
         Vertex targetVertex = state.getVertex();
         if (originVertices.contains(targetVertex)) continue;
         if (targetVertex instanceof TransitStopVertex tsv && state.isFinal()) {
-          stopsFound.add(
-            NearbyStop.nearbyStopForState(state, tsv.getStop())
-          );
+          stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getStop()));
         }
         if (
           OTPFeature.FlexRouting.isOn() &&
-          targetVertex instanceof StreetVertex streetVertex &&
-          !streetVertex.areaStops().isEmpty()
+          targetVertex instanceof StreetVertex streetVertex && !streetVertex.areaStops().isEmpty()
         ) {
           for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops()) {
             // This is for a simplification, so that we only return one vertex from each
@@ -312,10 +309,7 @@ public class NearbyStopFinder {
       return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else {
       if (maxStopCount > 0) {
-        var strategy = new MaxCountSkipEdgeStrategy<>(
-          maxStopCount,
-          NearbyStopFinder::isTransitVertex
-        );
+        var strategy = new MaxCountSkipEdgeStrategy<>(maxStopCount, NearbyStopFinder::hasFoundStop);
         return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
       }
       return durationSkipEdgeStrategy;
@@ -368,7 +362,7 @@ public class NearbyStopFinder {
   /**
    * Checks if the {@code state} as at a transit vertex.
    */
-  public static boolean isTransitVertex(State state) {
-    return state.getVertex() instanceof TransitStopVertex;
+  public static boolean hasFoundStop(State state) {
+    return state.getVertex() instanceof TransitStopVertex && state.isFinal();
   }
 }

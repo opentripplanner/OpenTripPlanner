@@ -1,7 +1,6 @@
 package org.opentripplanner.astar.model;
 
 import java.util.Arrays;
-import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 public class BinHeap<T> {
 
@@ -80,14 +79,6 @@ public class BinHeap<T> {
     prio[i] = p;
   }
 
-  public void dump() {
-    for (int i = 0; i <= capacity; i++) {
-      String topMarker = (i > size) ? "(UNUSED)" : "";
-      System.out.printf("%d\t%f\t%s\t%s\n", i, prio[i], elem[i], topMarker);
-    }
-    System.out.printf("-----------------------\n");
-  }
-
   public void reset() {
     // empties the queue in one operation
     size = 0;
@@ -135,10 +126,5 @@ public class BinHeap<T> {
     this.capacity = capacity;
     prio = Arrays.copyOf(prio, capacity + 1);
     elem = Arrays.copyOf(elem, capacity + 1);
-  }
-
-  @Override
-  public String toString() {
-    return ToStringBuilder.of().addNum("size", size).toString();
   }
 }

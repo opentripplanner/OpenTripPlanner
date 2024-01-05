@@ -26,7 +26,7 @@ public class MaxCountSkipEdgeStrategy<
 
   @Override
   public boolean shouldSkipEdge(State current, Edge edge) {
-    if (current.isFinal() && shouldIncreaseCount.test(current)) {
+    if (shouldIncreaseCount.test(current)) {
       visited++;
     }
     return visited > maxCount;
