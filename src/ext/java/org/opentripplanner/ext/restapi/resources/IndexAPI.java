@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.apis.common.SemanticHash;
+import org.opentripplanner.apis.support.SemanticHash;
 import org.opentripplanner.ext.restapi.mapping.AgencyMapper;
 import org.opentripplanner.ext.restapi.mapping.AlertMapper;
 import org.opentripplanner.ext.restapi.mapping.FeedInfoMapper;

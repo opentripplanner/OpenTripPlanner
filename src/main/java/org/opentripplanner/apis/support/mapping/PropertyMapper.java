@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.common.mapping;
+package org.opentripplanner.apis.support.mapping;
 
 import edu.colorado.cires.cmg.mvt.VectorTile;
 import edu.colorado.cires.cmg.mvt.adapt.jts.IUserDataConverter;

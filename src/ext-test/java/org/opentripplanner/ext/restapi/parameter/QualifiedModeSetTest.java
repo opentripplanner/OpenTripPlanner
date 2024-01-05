@@ -1,4 +1,4 @@
-package org.opentripplanner.api.parameter;
+package org.opentripplanner.ext.restapi.parameter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,6 +26,8 @@ import static org.opentripplanner.transit.model.basic.TransitMode.TROLLEYBUS;
 import jakarta.ws.rs.BadRequestException;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.api.parameter.QualifiedMode;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestModes;
 import org.opentripplanner.transit.model.basic.TransitMode;
 

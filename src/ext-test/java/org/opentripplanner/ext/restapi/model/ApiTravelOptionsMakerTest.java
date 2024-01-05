@@ -1,4 +1,4 @@
-package org.opentripplanner.api.model;
+package org.opentripplanner.ext.restapi.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -6,14 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.restapi.model.ApiTravelOption;
-import org.opentripplanner.ext.restapi.model.ApiTravelOptionsMaker;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
 /**
  * Created by mabu on 28.7.2015.
  */
-public class ApiApiTravelOptionsMakerTest {
+public class ApiTravelOptionsMakerTest {
 
   @Test
   public void testMakeOptions() throws Exception {

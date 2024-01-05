@@ -1,10 +1,9 @@
-package org.opentripplanner.api.model;
+package org.opentripplanner.ext.restapi.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.restapi.model.ApiWalkStep;
 
 public class ApiWalkStepTest {
 

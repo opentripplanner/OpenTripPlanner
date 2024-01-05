@@ -1,6 +1,6 @@
 package org.opentripplanner.inspector.vector;
 
-import org.opentripplanner.apis.common.mapping.PropertyMapper;
+import org.opentripplanner.apis.support.mapping.PropertyMapper;
 
 /**
  * Configuration options for a single vector tile layer.

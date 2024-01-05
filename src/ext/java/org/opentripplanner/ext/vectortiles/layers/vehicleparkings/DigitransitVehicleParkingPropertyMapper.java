@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import javax.annotation.Nonnull;
-import org.opentripplanner.apis.common.mapping.PropertyMapper;
+import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;

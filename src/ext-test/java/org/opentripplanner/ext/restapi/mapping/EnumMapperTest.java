@@ -1,4 +1,4 @@
-package org.opentripplanner.api.mapping;
+package org.opentripplanner.ext.restapi.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.restapi.mapping.AbsoluteDirectionMapper;
-import org.opentripplanner.ext.restapi.mapping.RelativeDirectionMapper;
-import org.opentripplanner.ext.restapi.mapping.VertexTypeMapper;
 import org.opentripplanner.ext.restapi.model.ApiAbsoluteDirection;
 import org.opentripplanner.ext.restapi.model.ApiRelativeDirection;
 import org.opentripplanner.ext.restapi.model.ApiVertexType;

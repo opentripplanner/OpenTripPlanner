@@ -1,4 +1,4 @@
-package org.opentripplanner.api.mapping;
+package org.opentripplanner.ext.restapi.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
@@ -6,7 +6,6 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.ext.restapi.mapping.FareMapper;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;

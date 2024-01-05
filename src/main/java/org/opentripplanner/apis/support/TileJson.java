@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.common;
+package org.opentripplanner.apis.support;
 
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.UriInfo;

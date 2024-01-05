@@ -1,4 +1,4 @@
-package org.opentripplanner.apis.common.mapping;
+package org.opentripplanner.apis.support.mapping;
 
 import java.util.List;
 import org.opentripplanner.api.common.Message;
