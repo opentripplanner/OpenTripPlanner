@@ -67,6 +67,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Transit priority  - part 3 [#5583](https://github.com/opentripplanner/OpenTripPlanner/pull/5583)
 - Fix preference cost comparisons [#5586](https://github.com/opentripplanner/OpenTripPlanner/pull/5586)
 - Report and throw away trip-times which fail sanity check [#5587](https://github.com/opentripplanner/OpenTripPlanner/pull/5587)
+- Consider escalator edges in island pruning [#5591](https://github.com/opentripplanner/OpenTripPlanner/pull/5591)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
