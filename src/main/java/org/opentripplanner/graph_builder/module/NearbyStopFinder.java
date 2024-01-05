@@ -227,15 +227,15 @@ public class NearbyStopFinder {
       for (State state : spt.getAllStates()) {
         Vertex targetVertex = state.getVertex();
         if (originVertices.contains(targetVertex)) continue;
-        if (targetVertex instanceof TransitStopVertex && state.isFinal()) {
+        if (targetVertex instanceof TransitStopVertex tsv && state.isFinal()) {
           stopsFound.add(
-            NearbyStop.nearbyStopForState(state, ((TransitStopVertex) targetVertex).getStop())
+            NearbyStop.nearbyStopForState(state, tsv.getStop())
           );
         }
         if (
           OTPFeature.FlexRouting.isOn() &&
-          targetVertex instanceof StreetVertex &&
-          !((StreetVertex) targetVertex).areaStops().isEmpty()
+          targetVertex instanceof StreetVertex streetVertex &&
+          !streetVertex.areaStops().isEmpty()
         ) {
           for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops()) {
             // This is for a simplification, so that we only return one vertex from each

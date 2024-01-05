@@ -1,6 +1,7 @@
 package org.opentripplanner.astar.model;
 
 import java.util.Arrays;
+import org.opentripplanner.framework.tostring.ToStringBuilder;
 
 public class BinHeap<T> {
 
@@ -136,7 +137,8 @@ public class BinHeap<T> {
     elem = Arrays.copyOf(elem, capacity + 1);
   }
 
-  public int getCapacity() {
-    return capacity;
+  @Override
+  public String toString() {
+    return ToStringBuilder.of().addNum("size", size).toString();
   }
 }
