@@ -121,6 +121,12 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     return creationTime;
   }
 
+  /**
+   * Note: Only supported for TransitAlerts created from SIRI-SX messages
+   *
+   * @return Version as provided, or <code>null</code>
+   */
+  @Nullable
   public Integer version() {
     return version;
   }
