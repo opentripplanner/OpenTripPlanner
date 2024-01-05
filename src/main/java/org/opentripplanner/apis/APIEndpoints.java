@@ -46,11 +46,6 @@ public class APIEndpoints {
   private APIEndpoints() {
     // Add feature enabled APIs, these can be enabled by default, some is not.
     // See the OTPFeature enum for details.
-    addIfEnabled(LegacyRestApi, Routers.class);
-    addIfEnabled(LegacyRestApi, PlannerResource.class);
-    addIfEnabled(LegacyRestApi, IndexAPI.class);
-
-    addIfEnabled(APIBikeRental, BikeRental.class);
     addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);
     addIfEnabled(APIGraphInspectorTile, GraphInspectorVectorTileResource.class);
     addIfEnabled(APIServerInfo, ServerInfo.class);
@@ -65,6 +60,12 @@ public class APIEndpoints {
     addIfEnabled(SandboxAPIParkAndRideApi, ParkAndRideResource.class);
     addIfEnabled(SandboxAPIGeocoder, GeocoderResource.class);
     addIfEnabled(SandboxAPITravelTime, TravelTimeResource.class);
+
+    // scheduled to be removed
+    addIfEnabled(APIBikeRental, BikeRental.class);
+    addIfEnabled(LegacyRestApi, Routers.class);
+    addIfEnabled(LegacyRestApi, PlannerResource.class);
+    addIfEnabled(LegacyRestApi, IndexAPI.class);
   }
 
   /**
