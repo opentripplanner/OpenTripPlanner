@@ -43,6 +43,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilt
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.services.TransitAlertService;

@@ -7,7 +7,7 @@ import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

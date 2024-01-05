@@ -5,8 +5,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
 
 /**
  * This class is responsible for flagging itineraries for deletion based on a predicate in the

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.groupids;
+package org.opentripplanner.routing.algorithm.filterchain.spi;
 
 /**
  * A group-id identify a group of elements(itineraries). Group-ids can be arranged in a hierarchy

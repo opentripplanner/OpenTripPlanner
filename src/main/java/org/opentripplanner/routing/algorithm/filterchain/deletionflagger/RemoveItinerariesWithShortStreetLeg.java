@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
 import org.opentripplanner.street.search.TraverseMode;
 
 /**

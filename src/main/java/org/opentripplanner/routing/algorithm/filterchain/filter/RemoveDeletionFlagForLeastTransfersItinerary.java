@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
 
 /**
  * This filter makes sure that the itinerary with the least amount of transfers is not marked for

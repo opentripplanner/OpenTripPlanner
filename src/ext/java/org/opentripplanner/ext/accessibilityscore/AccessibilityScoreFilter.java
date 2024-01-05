@@ -8,7 +8,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.WheelchairTraversalInformation;
 import org.opentripplanner.transit.model.basic.Accessibility;

@@ -5,7 +5,7 @@ import java.util.Objects;
 import org.opentripplanner.ext.stopconsolidation.model.ConsolidatedStopLeg;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
 
 /**
  * A decorating filter that checks if a transit leg contains any primary stops and if it does,

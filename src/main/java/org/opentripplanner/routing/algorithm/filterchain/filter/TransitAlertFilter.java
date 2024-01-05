@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Function;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.mapping.AlertToLegMapper;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.transit.model.site.MultiModalStation;

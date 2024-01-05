@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.filterchain.spi.GroupId;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**

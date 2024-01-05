@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
 
 /**
  * This is a filter to sort itineraries. To create a filter, provide a comparator as a constructor
