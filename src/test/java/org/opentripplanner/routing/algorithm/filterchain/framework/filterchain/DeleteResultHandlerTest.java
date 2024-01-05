@@ -21,8 +21,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.OutsideSearchWindowFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 
 class DeleteResultHandlerTest {
 

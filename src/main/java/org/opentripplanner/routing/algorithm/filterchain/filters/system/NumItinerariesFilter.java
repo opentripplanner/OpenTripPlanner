@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
 import java.util.List;
 import java.util.function.Consumer;

@@ -12,9 +12,9 @@ import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
-import org.opentripplanner.routing.algorithm.filterchain.filters.NumItinerariesFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.OutsideSearchWindowFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.PagingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.NumItinerariesFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.PagingFilter;
 
 /**
  * This class simulate/mock the context the paging is operating in.

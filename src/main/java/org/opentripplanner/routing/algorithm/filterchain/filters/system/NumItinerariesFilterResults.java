@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filters;
+package org.opentripplanner.routing.algorithm.filterchain.filters.system;
 
 import java.time.Instant;
 import java.util.List;
@@ -9,20 +9,19 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 
-public class NumItinerariesFilterResults implements PageCursorInput {
+/**
+ * The NumItinerariesFilter removes itineraries from a list of itineraries based on the number to
+ * keep and whether it should crop at the head or the tail of the list. The results class keeps
+ * the extreme endpoints of the sets of itineraries that were kept and removed, as well as more
+ * details about the first itinerary removed (bottom of the head, or top of the tail) and whether
+ * itineraries were cropped at the head or the tail.
+ */
+class NumItinerariesFilterResults implements PageCursorInput {
 
   private final Instant earliestRemovedDeparture;
   private final Instant latestRemovedDeparture;
   private final ItinerarySortKey pageCut;
-  private final ListSection cropSection;
 
-  /**
-   * The NumItinerariesFilter removes itineraries from a list of itineraries based on the number to
-   * keep and whether it should crop at the head or the tail of the list. The results class keeps
-   * the extreme endpoints of the sets of itineraries that were kept and removed, as well as more
-   * details about the first itinerary removed (bottom of the head, or top of the tail) and whether
-   * itineraries were cropped at the head or the tail.
-   */
   public NumItinerariesFilterResults(
     List<Itinerary> keptItineraries,
     List<Itinerary> removedItineraries,
@@ -40,7 +39,6 @@ public class NumItinerariesFilterResults implements PageCursorInput {
     } else {
       pageCut = ListUtils.last(keptItineraries);
     }
-    this.cropSection = cropSection;
   }
 
   @Override
@@ -65,7 +63,6 @@ public class NumItinerariesFilterResults implements PageCursorInput {
       .addDateTime("earliestRemovedDeparture", earliestRemovedDeparture)
       .addDateTime("latestRemovedDeparture", latestRemovedDeparture)
       .addObjOp("pageCut", pageCut, ItinerarySortKey::keyAsString)
-      .addEnum("cropSection", cropSection)
       .toString();
   }
 }

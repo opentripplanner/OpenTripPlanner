@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.filters.OutsideSearchWindowFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.system.OutsideSearchWindowFilter;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 
 /**
