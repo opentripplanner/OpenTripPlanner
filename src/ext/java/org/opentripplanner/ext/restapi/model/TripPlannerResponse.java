@@ -4,7 +4,7 @@ import jakarta.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import org.opentripplanner.api.model.error.PlannerError;
+import org.opentripplanner.api.error.PlannerError;
 import org.opentripplanner.api.resource.DebugOutput;
 
 /** Represents a trip planner response, will be serialized into XML or JSON by Jersey */

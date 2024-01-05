@@ -10,7 +10,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.common.Message;
-import org.opentripplanner.api.model.error.PlannerError;
+import org.opentripplanner.api.error.PlannerError;
 import org.opentripplanner.apis.support.mapping.PlannerErrorMapper;
 import org.opentripplanner.ext.restapi.mapping.TripPlanMapper;
 import org.opentripplanner.ext.restapi.mapping.TripSearchMetadataMapper;

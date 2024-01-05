@@ -2,7 +2,7 @@ package org.opentripplanner.apis.support.mapping;
 
 import java.util.List;
 import org.opentripplanner.api.common.Message;
-import org.opentripplanner.api.model.error.PlannerError;
+import org.opentripplanner.api.error.PlannerError;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 

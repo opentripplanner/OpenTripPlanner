@@ -1,4 +1,4 @@
-package org.opentripplanner.api.model.error;
+package org.opentripplanner.api.error;
 
 import java.util.List;
 import org.opentripplanner.api.common.Message;
