@@ -93,5 +93,4 @@ public class StreetModelForTest {
   ) {
     return streetEdge(from, to, 1, permissions);
   }
-
 }

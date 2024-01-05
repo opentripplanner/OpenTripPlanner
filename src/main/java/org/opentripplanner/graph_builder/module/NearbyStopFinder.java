@@ -305,7 +305,10 @@ public class NearbyStopFinder {
       return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     } else {
       if (maxStopCount > 0) {
-        var strategy = new MaxCountSkipEdgeStrategy<>(maxStopCount, NearbyStopFinder::hasReachedStop);
+        var strategy = new MaxCountSkipEdgeStrategy<>(
+          maxStopCount,
+          NearbyStopFinder::hasReachedStop
+        );
         return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
       }
       return durationSkipEdgeStrategy;
@@ -350,9 +353,7 @@ public class NearbyStopFinder {
 
     return edges
       .stream()
-      .anyMatch(e ->
-        e instanceof StreetEdge se && se.getPermission().allows(TraverseMode.CAR)
-      );
+      .anyMatch(e -> e instanceof StreetEdge se && se.getPermission().allows(TraverseMode.CAR));
   }
 
   /**
