@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
-import static org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator.generalizedCostComparator;
+import static org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator.generalizedCostComparator;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -32,18 +32,18 @@ import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveT
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfWalkingIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveWalkOnlyFilter;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.TransitGeneralizedCostFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.DeletionFlaggingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.RemoveDeletionFlagForLeastTransfersItinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filter.SameFirstOrLastTripFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filter.TransitAlertFilter;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByAllSameStations;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameRoutesAndStops;
-import org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator;
-import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryDeletionFlagger;
-import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.DeletionFlaggingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByAllSameStations;
+import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByDistance;
+import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupBySameRoutesAndStops;
+import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.services.TransitAlertService;

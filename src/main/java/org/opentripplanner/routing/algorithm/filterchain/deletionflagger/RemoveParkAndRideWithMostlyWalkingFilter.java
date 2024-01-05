@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StreetLeg;
-import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
 import org.opentripplanner.street.search.TraverseMode;
 
 /**

@@ -4,7 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
 
 /**
  * This filter will remove all itineraries that are outside the search-window. In some

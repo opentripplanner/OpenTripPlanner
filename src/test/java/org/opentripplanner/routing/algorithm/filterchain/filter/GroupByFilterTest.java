@@ -10,8 +10,11 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.MaxLimitFilter;
-import org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator;
-import org.opentripplanner.routing.algorithm.filterchain.spi.GroupId;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.DeletionFlaggingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
 
 public class GroupByFilterTest implements PlanTestConstants {
 

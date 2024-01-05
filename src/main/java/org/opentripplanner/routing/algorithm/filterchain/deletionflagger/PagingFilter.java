@@ -7,8 +7,8 @@ import org.opentripplanner.framework.collection.ListSection;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ItinerarySortKey;
 import org.opentripplanner.model.plan.SortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator;
-import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
 
 /**
  * This class is used to enforce the cut/limit between two pages. It removes potential duplicates

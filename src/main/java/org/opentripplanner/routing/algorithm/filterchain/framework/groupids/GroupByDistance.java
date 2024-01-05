@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.groupids;
+package org.opentripplanner.routing.algorithm.filterchain.framework.groupids;
 
 import java.util.Comparator;
 import java.util.List;
@@ -7,7 +7,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.routing.algorithm.filterchain.spi.GroupId;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
 
 /**
  * This class create a group identifier for an itinerary based on the longest legs which together

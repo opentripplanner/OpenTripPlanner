@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.algorithm.filterchain.filter;
 
-import static org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator.numberOfTransfersComparator;
+import static org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator.numberOfTransfersComparator;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 
 /**
  * This filter makes sure that the itinerary with the least amount of transfers is not marked for

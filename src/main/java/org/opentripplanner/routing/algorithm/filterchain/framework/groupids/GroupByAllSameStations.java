@@ -1,10 +1,10 @@
-package org.opentripplanner.routing.algorithm.filterchain.groupids;
+package org.opentripplanner.routing.algorithm.filterchain.framework.groupids;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.spi.GroupId;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryDeletionFlagger;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDeletionFlagger;
 
 /**
  * Flags the itineraries at the end of the list for removal. The list should be sorted on the

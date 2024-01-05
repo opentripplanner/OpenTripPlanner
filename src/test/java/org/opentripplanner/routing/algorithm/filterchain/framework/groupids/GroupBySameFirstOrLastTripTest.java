@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.groupids;
+package org.opentripplanner.routing.algorithm.filterchain.framework.groupids;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

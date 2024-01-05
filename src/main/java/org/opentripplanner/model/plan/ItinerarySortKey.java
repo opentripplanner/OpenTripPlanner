@@ -2,8 +2,8 @@ package org.opentripplanner.model.plan;
 
 import java.time.Instant;
 import org.opentripplanner.framework.tostring.ValueObjectToStringBuilder;
-import org.opentripplanner.routing.algorithm.filterchain.filter.SortingFilter;
-import org.opentripplanner.routing.algorithm.filterchain.sort.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.SortingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
 
 /**
  * This interface is used to sort itineraries and other instances that we might want to sort among

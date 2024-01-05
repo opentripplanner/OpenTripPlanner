@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.spi;
+package org.opentripplanner.routing.algorithm.filterchain.framework.spi;
 
 import java.util.ArrayList;
 import java.util.List;

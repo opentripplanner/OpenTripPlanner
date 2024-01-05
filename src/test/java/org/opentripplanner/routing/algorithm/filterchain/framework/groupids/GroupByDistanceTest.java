@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.groupids;
+package org.opentripplanner.routing.algorithm.filterchain.framework.groupids;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance.calculateTotalDistance;
-import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByDistance.createKeySetOfLegsByLimit;
+import static org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByDistance.calculateTotalDistance;
+import static org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByDistance.createKeySetOfLegsByLimit;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
