@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.filter;
+package org.opentripplanner.routing.algorithm.filterchain.framework.filter;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,9 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
-import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
-import org.opentripplanner.routing.algorithm.filterchain.framework.filter.RemoveFilter;
-import org.opentripplanner.routing.algorithm.filterchain.framework.filter.SortingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.GroupId;
 
