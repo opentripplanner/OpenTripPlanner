@@ -1,13 +1,11 @@
 package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.stream.Collectors;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryDeletionFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**

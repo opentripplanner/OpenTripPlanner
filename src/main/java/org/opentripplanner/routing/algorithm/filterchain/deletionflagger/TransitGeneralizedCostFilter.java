@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryDeletionFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 
 /**

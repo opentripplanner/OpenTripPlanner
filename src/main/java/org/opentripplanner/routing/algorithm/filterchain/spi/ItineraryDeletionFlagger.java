@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
+package org.opentripplanner.routing.algorithm.filterchain.spi;
 
 import java.util.ArrayList;
 import java.util.List;

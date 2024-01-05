@@ -3,8 +3,8 @@ package org.opentripplanner.routing.algorithm.filterchain.filter;
 import java.util.ArrayList;
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.ItineraryDeletionFlagger;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupBySameFirstOrLastTrip;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryDeletionFlagger;
 
 /**
  * This filter ensures that no more than one itinerary begins or ends with same trip.

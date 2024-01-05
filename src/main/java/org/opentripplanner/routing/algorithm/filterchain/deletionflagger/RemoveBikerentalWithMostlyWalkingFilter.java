@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.filterchain.deletionflagger;
 import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.filterchain.spi.ItineraryDeletionFlagger;
 
 /**
  * This is used to filter out bike rental itineraries that contain mostly walking. The value
