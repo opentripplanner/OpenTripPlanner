@@ -1621,6 +1621,8 @@ type Money {
 
 """"
 An ISO-8601-formatted duration, i.e. `PT2H30M` for 2 hours and 30 minutes.
+
+Negative durations are formatted like `PT-10M`.
 """
 scalar Duration
 
@@ -1648,6 +1650,11 @@ scalar OffsetDateTime
 type LegTimes {
     scheduled: OffsetDateTime
     actual: OffsetDateTime
+    """
+    The delay of the vehicle at a certain place.
+
+    If the vehicle is early then this is a negative duration.
+    """
     delay: Duration
 }
 

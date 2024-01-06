@@ -1,22 +1,36 @@
 package org.opentripplanner.apis.gtfs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.params.provider.Arguments.of;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import graphql.schema.CoercingSerializeException;
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.framework.json.ObjectMappers;
 
 class GraphQLScalarsTest {
 
-  @Test
-  void duration() {
-    var string = GraphQLScalars.durationScalar.getCoercing().serialize(Duration.ofMinutes(30));
-    assertEquals("PT30M", string);
+  static List<Arguments> durationCases() {
+    return List.of(
+      of(Duration.ofMinutes(30), "PT30M"),
+      of(Duration.ofHours(23), "PT23H"),
+      of(Duration.ofMinutes(-10), "PT-10M")
+    );
+  }
+
+  @ParameterizedTest
+  @MethodSource("durationCases")
+  void duration(Duration duration, String expected) {
+    var string = GraphQLScalars.durationScalar.getCoercing().serialize(duration);
+    assertEquals(expected, string);
   }
 
   @Test
