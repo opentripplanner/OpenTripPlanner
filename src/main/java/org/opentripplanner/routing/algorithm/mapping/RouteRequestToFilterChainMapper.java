@@ -100,7 +100,7 @@ public class RouteRequestToFilterChainMapper {
     }
 
     if (!context.rideHailingServices().isEmpty()) {
-      builder.withRideHailingDecorator(
+      builder.withRideHailingDecoratingFilter(
         new DecorateWithRideHailing(context.rideHailingServices(), request.wheelchair())
       );
     }

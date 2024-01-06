@@ -10,7 +10,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.TransitLeg;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.street.search.TraverseMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
@@ -20,42 +20,39 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 @Sandbox
 public record DecorateWithEmission(EmissionsService emissionsService)
-  implements ItineraryListFilter {
+  implements ItineraryDecorator {
   @Override
-  public List<Itinerary> filter(List<Itinerary> itineraries) {
-    for (Itinerary itinerary : itineraries) {
-      List<TransitLeg> transitLegs = itinerary
-        .getLegs()
-        .stream()
-        .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
-        .map(TransitLeg.class::cast)
-        .toList();
+  public void decorate(Itinerary itinerary) {
+    List<TransitLeg> transitLegs = itinerary
+      .getLegs()
+      .stream()
+      .filter(l -> l instanceof ScheduledTransitLeg || l instanceof FlexibleTransitLeg)
+      .map(TransitLeg.class::cast)
+      .toList();
 
-      Optional<Grams> co2ForTransit = calculateCo2EmissionsForTransit(transitLegs);
+    Optional<Grams> co2ForTransit = calculateCo2EmissionsForTransit(transitLegs);
 
-      if (!transitLegs.isEmpty() && co2ForTransit.isEmpty()) {
-        continue;
-      }
-
-      List<StreetLeg> carLegs = itinerary
-        .getLegs()
-        .stream()
-        .filter(l -> l instanceof StreetLeg)
-        .map(StreetLeg.class::cast)
-        .filter(leg -> leg.getMode() == TraverseMode.CAR)
-        .toList();
-
-      Optional<Grams> co2ForCar = calculateCo2EmissionsForCar(carLegs);
-
-      if (co2ForTransit.isPresent() && co2ForCar.isPresent()) {
-        itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get().plus(co2ForCar.get())));
-      } else if (co2ForTransit.isPresent()) {
-        itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get()));
-      } else if (co2ForCar.isPresent()) {
-        itinerary.setEmissionsPerPerson(new Emissions(co2ForCar.get()));
-      }
+    if (!transitLegs.isEmpty() && co2ForTransit.isEmpty()) {
+      return;
     }
-    return itineraries;
+
+    List<StreetLeg> carLegs = itinerary
+      .getLegs()
+      .stream()
+      .filter(l -> l instanceof StreetLeg)
+      .map(StreetLeg.class::cast)
+      .filter(leg -> leg.getMode() == TraverseMode.CAR)
+      .toList();
+
+    Optional<Grams> co2ForCar = calculateCo2EmissionsForCar(carLegs);
+
+    if (co2ForTransit.isPresent() && co2ForCar.isPresent()) {
+      itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get().plus(co2ForCar.get())));
+    } else if (co2ForTransit.isPresent()) {
+      itinerary.setEmissionsPerPerson(new Emissions(co2ForTransit.get()));
+    } else if (co2ForCar.isPresent()) {
+      itinerary.setEmissionsPerPerson(new Emissions(co2ForCar.get()));
+    }
   }
 
   private Optional<Grams> calculateCo2EmissionsForTransit(List<TransitLeg> transitLegs) {

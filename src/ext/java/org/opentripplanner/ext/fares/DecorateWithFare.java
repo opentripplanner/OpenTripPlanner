@@ -1,9 +1,7 @@
 package org.opentripplanner.ext.fares;
 
-import java.util.List;
-import java.util.Objects;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.fares.FareService;
 
 /**
@@ -11,18 +9,13 @@ import org.opentripplanner.routing.fares.FareService;
  * <p>
  * TODO: Convert to a class - exposing a service in a DTO is a risk.
  */
-public record DecorateWithFare(FareService fareService) implements ItineraryListFilter {
+public record DecorateWithFare(FareService fareService) implements ItineraryDecorator {
   @Override
-  public List<Itinerary> filter(List<Itinerary> itineraries) {
-    return itineraries
-      .stream()
-      .peek(i -> {
-        var fare = fareService.calculateFares(i);
-        if (Objects.nonNull(fare)) {
-          i.setFare(fare);
-          FaresToItineraryMapper.addFaresToLegs(fare, i);
-        }
-      })
-      .toList();
+  public void decorate(Itinerary itinerary) {
+    var fare = fareService.calculateFares(itinerary);
+    if (fare != null) {
+      itinerary.setFare(fare);
+      FaresToItineraryMapper.addFaresToLegs(fare, itinerary);
+    }
   }
 }

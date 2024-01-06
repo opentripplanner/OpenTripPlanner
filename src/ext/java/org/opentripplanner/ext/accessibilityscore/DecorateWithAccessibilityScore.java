@@ -8,7 +8,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
 import org.opentripplanner.model.plan.StreetLeg;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.WheelchairTraversalInformation;
 import org.opentripplanner.transit.model.basic.Accessibility;
@@ -26,7 +26,7 @@ import org.opentripplanner.transit.model.basic.Accessibility;
  * to all frontends.
  */
 public record DecorateWithAccessibilityScore(double wheelchairMaxSlope)
-  implements ItineraryListFilter {
+  implements ItineraryDecorator {
   public static Float compute(List<Leg> legs) {
     return legs
       .stream()
@@ -50,8 +50,8 @@ public record DecorateWithAccessibilityScore(double wheelchairMaxSlope)
   }
 
   @Override
-  public List<Itinerary> filter(List<Itinerary> itineraries) {
-    return itineraries.stream().map(this::addAccessibilityScore).toList();
+  public void decorate(Itinerary itinerary) {
+    addAccessibilityScore(itinerary);
   }
 
   private static double accessibilityScore(Accessibility wheelchair) {

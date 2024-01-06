@@ -146,7 +146,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
     var filter = new DecorateWithFare(graph.getFareService());
 
-    var itineraries = filter.filter(router.createFlexOnlyItineraries().stream().toList());
+    var itineraries = router.createFlexOnlyItineraries().stream().peek(filter::decorate).toList();
 
     var itinerary = itineraries.iterator().next();
     assertFalse(itinerary.getFares().getFareTypes().isEmpty());

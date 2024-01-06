@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.stopconsolidation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_C;
 import static org.opentripplanner.ext.stopconsolidation.TestStopConsolidationModel.STOP_D;
 import static org.opentripplanner.model.plan.PlanTestConstants.T11_05;
@@ -36,10 +35,9 @@ class DecorateConsolidatedStopNamesTest {
       .bus(1, T11_05, T11_12, PlanTestConstants.F)
       .build();
 
-    var filtered = filter.filter(List.of(itinerary));
-    assertFalse(filtered.isEmpty());
+    filter.decorate(itinerary);
 
-    var updatedLeg = filtered.get(0).getLegs().get(0);
+    var updatedLeg = itinerary.getLegs().get(0);
     assertEquals(STOP_D.getName(), updatedLeg.getFrom().name);
     assertEquals(STOP_D.getName(), updatedLeg.getTo().name);
   }

@@ -6,7 +6,6 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
@@ -32,23 +31,19 @@ class TransitAlertFilterTest implements PlanTestConstants {
       )
     );
 
-    DecorateTransitAlert filter = new DecorateTransitAlert(transitAlertService, ignore -> null);
-
-    // Expect filter to no fail on an empty list
-    assertEquals(List.of(), filter.filter(List.of()));
+    var decorator = new DecorateTransitAlert(transitAlertService, ignore -> null);
 
     // Given a list with one itinerary
-    List<Itinerary> list = List.of(
-      newItinerary(A).bus(31, 0, 30, E).build(),
-      newItinerary(B).rail(21, 0, 30, E).build()
-    );
-
-    list = filter.filter(list);
+    var i1 = newItinerary(A).bus(31, 0, 30, E).build();
+    decorator.decorate(i1);
 
     // Then: expect correct alerts to be added
-    Itinerary first = list.get(0);
-    assertEquals(1, first.getLegs().get(0).getTransitAlerts().size());
-    assertEquals(ID, first.getLegs().get(0).getTransitAlerts().iterator().next().getId());
-    assertEquals(0, list.get(1).getLegs().get(0).getTransitAlerts().size());
+    assertEquals(1, i1.getLegs().get(0).getTransitAlerts().size());
+    assertEquals(ID, i1.getLegs().get(0).getTransitAlerts().iterator().next().getId());
+
+    var i2 = newItinerary(B).rail(21, 0, 30, E).build();
+    decorator.decorate(i2);
+
+    assertEquals(0, i2.getLegs().get(0).getTransitAlerts().size());
   }
 }

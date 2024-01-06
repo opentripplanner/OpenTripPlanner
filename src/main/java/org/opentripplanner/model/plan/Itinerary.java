@@ -388,7 +388,7 @@ public class Itinerary implements ItinerarySortKey {
    * <p>
    * NOTE: The itinerary is mutable so the transformation is done in-place!
    */
-  public Itinerary transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
+  public void transformTransitLegs(Function<TransitLeg, TransitLeg> mapper) {
     legs =
       legs
         .stream()
@@ -400,7 +400,6 @@ public class Itinerary implements ItinerarySortKey {
           }
         })
         .toList();
-    return this;
   }
 
   public Stream<StreetLeg> getStreetLegs() {

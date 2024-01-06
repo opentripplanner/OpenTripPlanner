@@ -31,9 +31,7 @@ public class FaresFilterTest implements PlanTestConstants {
       .bus(ID, 52, 100, C)
       .build();
 
-    List<Itinerary> input = List.of(i1, i1, i1);
-
-    input.forEach(i -> assertEquals(ItineraryFares.empty(), i.getFares()));
+    assertEquals(ItineraryFares.empty(), i1.getFares());
 
     var fares = new ItineraryFares();
     fares.addFare(FareType.regular, Money.euros(2.80f));
@@ -43,11 +41,12 @@ public class FaresFilterTest implements PlanTestConstants {
     fares.addFareProduct(leg, fp);
 
     var filter = new DecorateWithFare((FareService) itinerary -> fares);
-    var filtered = filter.filter(input);
 
-    filtered.forEach(i -> assertEquals(fares, i.getFares()));
+    filter.decorate(i1);
 
-    var busLeg = filtered.get(0).getTransitLeg(1);
+    assertEquals(fares, i1.getFares());
+
+    var busLeg = i1.getTransitLeg(1);
 
     assertEquals(
       List.of(new FareProductUse("c1a04702-1fb6-32d4-ba02-483bf68111ed", fp)),

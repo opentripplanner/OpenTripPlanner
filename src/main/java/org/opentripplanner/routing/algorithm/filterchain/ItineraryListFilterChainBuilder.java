@@ -35,6 +35,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveT
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.group.RemoveIfFirstOrLastTripIsTheSame;
 import org.opentripplanner.routing.algorithm.filterchain.filters.transit.group.RemoveOtherThanSameLegsMaxGeneralizedCost;
+import org.opentripplanner.routing.algorithm.filterchain.framework.filter.DecorateFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.RemoveFilter;
@@ -44,6 +45,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.Grou
 import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupByDistance;
 import org.opentripplanner.routing.algorithm.filterchain.framework.groupids.GroupBySameRoutesAndStops;
 import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryDecorator;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
@@ -56,6 +58,7 @@ import org.opentripplanner.transit.model.site.Station;
 /**
  * Create a filter chain based on the given config.
  */
+@SuppressWarnings("UnusedReturnValue")
 public class ItineraryListFilterChainBuilder {
 
   private static final int NOT_SET = -1;
@@ -89,16 +92,16 @@ public class ItineraryListFilterChainBuilder {
    */
 
   @Sandbox
-  private ItineraryListFilter emissionDecorator;
+  private ItineraryDecorator emissionDecorator;
 
   @Sandbox
-  private ItineraryListFilter fareDecorator;
+  private ItineraryDecorator fareDecorator;
 
   @Sandbox
   private ItineraryListFilter rideHailingDecorator;
 
   @Sandbox
-  private ItineraryListFilter stopConsolidationDecorator;
+  private ItineraryDecorator stopConsolidationDecorator;
 
   public ItineraryListFilterChainBuilder(SortOrder sortOrder) {
     this.sortOrder = sortOrder;
@@ -317,12 +320,12 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withFareDecorator(ItineraryListFilter decorator) {
+  public ItineraryListFilterChainBuilder withFareDecorator(ItineraryDecorator decorator) {
     this.fareDecorator = decorator;
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withEmissions(ItineraryListFilter emissionDecorator) {
+  public ItineraryListFilterChainBuilder withEmissions(ItineraryDecorator emissionDecorator) {
     this.emissionDecorator = emissionDecorator;
     return this;
   }
@@ -339,13 +342,15 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
-  public ItineraryListFilterChainBuilder withRideHailingDecorator(ItineraryListFilter decorator) {
-    this.rideHailingDecorator = decorator;
+  public ItineraryListFilterChainBuilder withRideHailingDecoratingFilter(
+    ItineraryListFilter decoratorFilter
+  ) {
+    this.rideHailingDecorator = decoratorFilter;
     return this;
   }
 
   public ItineraryListFilterChainBuilder withConsolidatedStopNamesDecorator(
-    @Nullable ItineraryListFilter decorator
+    @Nullable ItineraryDecorator decorator
   ) {
     this.stopConsolidationDecorator = decorator;
     return this;
@@ -361,6 +366,7 @@ public class ItineraryListFilterChainBuilder {
     return this;
   }
 
+  @SuppressWarnings("CollectionAddAllCanBeReplacedWithConstructor")
   public ItineraryListFilterChain build() {
     List<ItineraryListFilter> filters = new ArrayList<>();
 
@@ -474,22 +480,22 @@ public class ItineraryListFilterChainBuilder {
     // Decorate itineraries
     {
       if (transitAlertService != null) {
-        filters.add(new DecorateTransitAlert(transitAlertService, getMultiModalStation));
+        addDecorator(filters, new DecorateTransitAlert(transitAlertService, getMultiModalStation));
       }
 
       // Sandbox filters to decorate itineraries
 
       if (accessibilityScore) {
         // TODO: This should be injected to avoid circular dependencies (dep. on sandbox here)
-        filters.add(new DecorateWithAccessibilityScore(wheelchairMaxSlope));
+        addDecorator(filters, new DecorateWithAccessibilityScore(wheelchairMaxSlope));
       }
 
       if (emissionDecorator != null) {
-        filters.add(emissionDecorator);
+        addDecorator(filters, emissionDecorator);
       }
 
       if (fareDecorator != null) {
-        filters.add(fareDecorator);
+        addDecorator(filters, fareDecorator);
       }
 
       if (rideHailingDecorator != null) {
@@ -497,7 +503,7 @@ public class ItineraryListFilterChainBuilder {
       }
 
       if (stopConsolidationDecorator != null) {
-        filters.add(stopConsolidationDecorator);
+        addDecorator(filters, stopConsolidationDecorator);
       }
     }
 
@@ -596,5 +602,12 @@ public class ItineraryListFilterChainBuilder {
     RemoveItineraryFlagger removeFilter
   ) {
     filters.add(new RemoveFilter(removeFilter));
+  }
+
+  private static void addDecorator(
+    List<ItineraryListFilter> filters,
+    ItineraryDecorator decorator
+  ) {
+    filters.add(new DecorateFilter(decorator));
   }
 }
