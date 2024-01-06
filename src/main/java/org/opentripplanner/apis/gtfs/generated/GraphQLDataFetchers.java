@@ -399,6 +399,8 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Double> elevationLost();
 
+    public DataFetcher<Emissions> emissionsPerPerson();
+
     public DataFetcher<java.time.OffsetDateTime> end();
 
     public DataFetcher<Long> endTime();
@@ -409,9 +411,9 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Iterable<Leg>> legs();
 
-    public DataFetcher<java.time.OffsetDateTime> start();
-
     public DataFetcher<Integer> numberOfTransfers();
+
+    public DataFetcher<java.time.OffsetDateTime> start();
 
     public DataFetcher<Long> startTime();
 
