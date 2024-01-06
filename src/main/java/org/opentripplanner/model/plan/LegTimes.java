@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 import java.time.Duration;
 import java.time.ZonedDateTime;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -10,6 +11,9 @@ public record LegTimes(
   @Nullable ZonedDateTime actual,
   @Nullable Duration delay
 ) {
+  public LegTimes {
+    Objects.requireNonNull(scheduled);
+  }
   @Nonnull
   public static LegTimes of(ZonedDateTime realtime, int delaySecs) {
     var delay = Duration.ofSeconds(delaySecs);
