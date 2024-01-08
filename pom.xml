@@ -944,7 +944,7 @@
         <dependency>
             <groupId>ch.poole</groupId>
             <artifactId>OpeningHoursParser</artifactId>
-            <version>0.28.0</version>
+            <version>0.28.1</version>
         </dependency>
 
         <!-- create zip test files-->
