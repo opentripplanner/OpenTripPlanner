@@ -2,20 +2,15 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.time.Instant;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.model.TimeAndCost;
-import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.street.search.state.State;
 
 public class BookingTimeAccessEgress implements RoutingAccessEgress {
 
-  private static final int DAY_IN_SECONDS = 3600 * 24;
-
   private final RoutingAccessEgress delegate;
 
-  private final BookingInfo pickupBookingInfo;
-  private final int earliestBookingTime;
+  private final OpeningHoursAdjuster openingHoursAdjuster;
 
   public BookingTimeAccessEgress(
     RoutingAccessEgress delegate,
@@ -24,11 +19,17 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
     ZoneId timeZone
   ) {
     this.delegate = delegate;
-    this.earliestBookingTime = calculateOtpTime(dateTime, earliestBookingTime, timeZone);
     if (delegate instanceof FlexAccessEgressAdapter flexAccessEgressAdapter) {
-      pickupBookingInfo = flexAccessEgressAdapter.getFlexTrip().getPickupBookingInfo(0);
+      openingHoursAdjuster =
+        new OpeningHoursAdjuster(
+          flexAccessEgressAdapter.getFlexTrip().getPickupBookingInfo(0),
+          delegate,
+          earliestBookingTime,
+          dateTime,
+          timeZone
+        );
     } else {
-      pickupBookingInfo = null;
+      openingHoursAdjuster = null;
     }
   }
 
@@ -49,17 +50,10 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
 
   @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
-    if (pickupBookingInfo != null) {
-      return pickupBookingInfo.earliestDepartureTime(requestedDepartureTime, earliestBookingTime, delegate::earliestDepartureTime);
+    if (openingHoursAdjuster != null) {
+      return openingHoursAdjuster.earliestDepartureTime(requestedDepartureTime);
     }
     return delegate.earliestDepartureTime(requestedDepartureTime);
-  }
-
-  private int calculateOtpTime(Instant dateTime, Instant earliestBookingTime, ZoneId timeZone) {
-    ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(dateTime, timeZone);
-    ZonedDateTime zonedEarliestBookingTime = ZonedDateTime.ofInstant(earliestBookingTime, timeZone);
-    int days = zonedDateTime.toLocalDate().until(zonedEarliestBookingTime.toLocalDate()).getDays();
-    return zonedEarliestBookingTime.toLocalTime().toSecondOfDay() + days * DAY_IN_SECONDS;
   }
 
   @Override

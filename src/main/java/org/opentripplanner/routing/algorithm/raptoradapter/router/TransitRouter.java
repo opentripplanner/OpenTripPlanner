@@ -277,11 +277,15 @@ public class TransitRouter {
     }
 
     if (request.earliestBookingTime() != null) {
-
       return results
         .stream()
         .map(routingAccessEgress ->
-          new BookingTimeAccessEgress(routingAccessEgress, request.dateTime(), request.earliestBookingTime(), serverContext.transitService().getTimeZone())
+          new BookingTimeAccessEgress(
+            routingAccessEgress,
+            request.dateTime(),
+            request.earliestBookingTime(),
+            serverContext.transitService().getTimeZone()
+          )
         )
         .toList();
     }
