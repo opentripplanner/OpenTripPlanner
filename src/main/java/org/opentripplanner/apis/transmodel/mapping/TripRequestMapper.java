@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import org.opentripplanner.apis.transmodel.TransmodelRequestContext;
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
@@ -83,16 +82,6 @@ public class TripRequestMapper {
       "unpreferred.lines",
       (List<String> lines) ->
         request.journey().transit().setUnpreferredRoutes(mapIDsToDomainNullSafe(lines))
-    );
-
-    callWith.argument(
-      "whiteListed.rentalNetworks",
-      (List<String> networks) -> request.journey().rental().setAllowedNetworks(Set.copyOf(networks))
-    );
-
-    callWith.argument(
-      "banned.rentalNetworks",
-      (List<String> networks) -> request.journey().rental().setBannedNetworks(Set.copyOf(networks))
     );
 
     if (GqlUtil.hasArgument(environment, "modes")) {

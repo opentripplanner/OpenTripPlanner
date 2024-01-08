@@ -2,12 +2,12 @@ package org.opentripplanner.routing.api.request.preference;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import org.opentripplanner.framework.lang.DoubleUtils;
 import org.opentripplanner.framework.model.Cost;
 import org.opentripplanner.framework.model.Units;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
-import org.opentripplanner.routing.api.request.request.VehicleRentalRequest;
 
 /**
  * Preferences for renting a Bike, Car or other type of vehicle.
@@ -24,6 +24,10 @@ public final class VehicleRentalPreferences implements Serializable {
 
   private final boolean useAvailabilityInformation;
   private final double arrivingInRentalVehicleAtDestinationCost;
+  private final boolean allowArrivingInRentedVehicleAtDestination;
+
+  private final Set<String> allowedNetworks;
+  private final Set<String> bannedNetworks;
 
   private VehicleRentalPreferences() {
     this.pickupTime = 60;
@@ -32,6 +36,9 @@ public final class VehicleRentalPreferences implements Serializable {
     this.dropoffCost = Cost.costOfSeconds(30);
     this.useAvailabilityInformation = false;
     this.arrivingInRentalVehicleAtDestinationCost = 0;
+    this.allowArrivingInRentedVehicleAtDestination = false;
+    this.allowedNetworks = Set.of();
+    this.bannedNetworks = Set.of();
   }
 
   private VehicleRentalPreferences(Builder builder) {
@@ -42,6 +49,10 @@ public final class VehicleRentalPreferences implements Serializable {
     this.useAvailabilityInformation = builder.useAvailabilityInformation;
     this.arrivingInRentalVehicleAtDestinationCost =
       DoubleUtils.roundTo1Decimal(builder.arrivingInRentalVehicleAtDestinationCost);
+    this.allowArrivingInRentedVehicleAtDestination =
+      builder.allowArrivingInRentedVehicleAtDestination;
+    this.allowedNetworks = builder.allowedNetworks;
+    this.bannedNetworks = builder.bannedNetworks;
   }
 
   public static Builder of() {
@@ -78,8 +89,6 @@ public final class VehicleRentalPreferences implements Serializable {
   /**
    * Whether or not vehicle rental availability information will be used to plan vehicle rental
    * trips
-   *
-   * TODO: This belong in the request?
    */
   public boolean useAvailabilityInformation() {
     return useAvailabilityInformation;
@@ -87,11 +96,29 @@ public final class VehicleRentalPreferences implements Serializable {
 
   /**
    * The cost of arriving at the destination with the rented vehicle, to discourage doing so.
-   *
-   * @see VehicleRentalRequest#allowArrivingInRentedVehicleAtDestination()
    */
   public double arrivingInRentalVehicleAtDestinationCost() {
     return arrivingInRentalVehicleAtDestinationCost;
+  }
+
+  /**
+   * Whether arriving at the destination with a rented (station) vehicle is allowed without dropping
+   * it off.
+   *
+   * @see VehicleRentalPreferences#arrivingInRentalVehicleAtDestinationCost()
+   */
+  public boolean allowArrivingInRentedVehicleAtDestination() {
+    return allowArrivingInRentedVehicleAtDestination;
+  }
+
+  /** The vehicle rental networks which may be used. If empty all networks may be used. */
+  public Set<String> allowedNetworks() {
+    return allowedNetworks;
+  }
+
+  /** The vehicle rental networks which may not be used. If empty, no networks are banned. */
+  public Set<String> bannedNetworks() {
+    return bannedNetworks;
   }
 
   @Override
@@ -109,7 +136,10 @@ public final class VehicleRentalPreferences implements Serializable {
         that.arrivingInRentalVehicleAtDestinationCost,
         arrivingInRentalVehicleAtDestinationCost
       ) ==
-      0
+      0 &&
+      allowArrivingInRentedVehicleAtDestination == that.allowArrivingInRentedVehicleAtDestination &&
+      allowedNetworks.equals(that.allowedNetworks) &&
+      bannedNetworks.equals(that.bannedNetworks)
     );
   }
 
@@ -121,7 +151,10 @@ public final class VehicleRentalPreferences implements Serializable {
       dropoffTime,
       dropoffCost,
       useAvailabilityInformation,
-      arrivingInRentalVehicleAtDestinationCost
+      arrivingInRentalVehicleAtDestinationCost,
+      allowArrivingInRentedVehicleAtDestination,
+      allowedNetworks,
+      bannedNetworks
     );
   }
 
@@ -139,6 +172,12 @@ public final class VehicleRentalPreferences implements Serializable {
         arrivingInRentalVehicleAtDestinationCost,
         DEFAULT.arrivingInRentalVehicleAtDestinationCost
       )
+      .addBoolIfTrue(
+        "allowArrivingInRentedVehicleAtDestination",
+        allowArrivingInRentedVehicleAtDestination
+      )
+      .addCol("allowedNetworks", allowedNetworks, DEFAULT.allowedNetworks)
+      .addCol("bannedNetworks", bannedNetworks, DEFAULT.bannedNetworks)
       .toString();
   }
 
@@ -151,6 +190,9 @@ public final class VehicleRentalPreferences implements Serializable {
     private Cost dropoffCost;
     private boolean useAvailabilityInformation;
     private double arrivingInRentalVehicleAtDestinationCost;
+    private boolean allowArrivingInRentedVehicleAtDestination;
+    private Set<String> allowedNetworks;
+    private Set<String> bannedNetworks;
 
     private Builder(VehicleRentalPreferences original) {
       this.original = original;
@@ -161,6 +203,10 @@ public final class VehicleRentalPreferences implements Serializable {
       this.useAvailabilityInformation = original.useAvailabilityInformation;
       this.arrivingInRentalVehicleAtDestinationCost =
         original.arrivingInRentalVehicleAtDestinationCost;
+      this.allowArrivingInRentedVehicleAtDestination =
+        original.allowArrivingInRentedVehicleAtDestination;
+      this.allowedNetworks = original.allowedNetworks;
+      this.bannedNetworks = original.bannedNetworks;
     }
 
     public VehicleRentalPreferences original() {
@@ -196,6 +242,23 @@ public final class VehicleRentalPreferences implements Serializable {
       double arrivingInRentalVehicleAtDestinationCost
     ) {
       this.arrivingInRentalVehicleAtDestinationCost = arrivingInRentalVehicleAtDestinationCost;
+      return this;
+    }
+
+    public Builder withAllowArrivingInRentedVehicleAtDestination(
+      boolean allowArrivingInRentedVehicleAtDestination
+    ) {
+      this.allowArrivingInRentedVehicleAtDestination = allowArrivingInRentedVehicleAtDestination;
+      return this;
+    }
+
+    public Builder withAllowedNetworks(Set<String> allowedNetworks) {
+      this.allowedNetworks = allowedNetworks;
+      return this;
+    }
+
+    public Builder withBannedNetworks(Set<String> bannedNetworks) {
+      this.bannedNetworks = bannedNetworks;
       return this;
     }
 

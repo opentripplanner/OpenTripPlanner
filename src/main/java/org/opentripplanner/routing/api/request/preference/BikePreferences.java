@@ -30,6 +30,7 @@ public final class BikePreferences implements Serializable {
   private final int switchTime;
   private final Cost switchCost;
   private final VehicleParkingPreferences parking;
+  private final VehicleRentalPreferences rental;
   private final double stairsReluctance;
   private final BicycleOptimizeType optimizeType;
   private final TimeSlopeSafetyTriangle optimizeTriangle;
@@ -43,6 +44,7 @@ public final class BikePreferences implements Serializable {
     this.switchTime = 0;
     this.switchCost = Cost.ZERO;
     this.parking = VehicleParkingPreferences.DEFAULT;
+    this.rental = VehicleRentalPreferences.DEFAULT;
     this.optimizeType = BicycleOptimizeType.SAFE;
     this.optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
     // very high reluctance to carry the bike up/down a flight of stairs
@@ -58,6 +60,7 @@ public final class BikePreferences implements Serializable {
     this.switchTime = Units.duration(builder.switchTime);
     this.switchCost = builder.switchCost;
     this.parking = builder.parking;
+    this.rental = builder.rental;
     this.optimizeType = Objects.requireNonNull(builder.optimizeType);
     this.optimizeTriangle = Objects.requireNonNull(builder.optimizeTriangle);
     this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
@@ -126,6 +129,11 @@ public final class BikePreferences implements Serializable {
     return parking;
   }
 
+  /** Rental preferences that can be different per request */
+  public VehicleRentalPreferences rental() {
+    return rental;
+  }
+
   /**
    * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
    */
@@ -155,6 +163,7 @@ public final class BikePreferences implements Serializable {
       switchTime == that.switchTime &&
       switchCost.equals(that.switchCost) &&
       parking.equals(that.parking) &&
+      rental.equals(that.rental) &&
       optimizeType == that.optimizeType &&
       optimizeTriangle.equals(that.optimizeTriangle) &&
       doubleEquals(stairsReluctance, that.stairsReluctance)
@@ -172,6 +181,7 @@ public final class BikePreferences implements Serializable {
       switchTime,
       switchCost,
       parking,
+      rental,
       optimizeType,
       optimizeTriangle,
       stairsReluctance
@@ -190,6 +200,7 @@ public final class BikePreferences implements Serializable {
       .addDurationSec("switchTime", switchTime, DEFAULT.switchTime)
       .addObj("switchCost", switchCost, DEFAULT.switchCost)
       .addObj("parking", parking, DEFAULT.parking)
+      .addObj("rental", rental, DEFAULT.rental)
       .addEnum("optimizeType", optimizeType, DEFAULT.optimizeType)
       .addObj("optimizeTriangle", optimizeTriangle, DEFAULT.optimizeTriangle)
       .addNum("stairsReluctance", stairsReluctance, DEFAULT.stairsReluctance)
@@ -208,6 +219,7 @@ public final class BikePreferences implements Serializable {
     private int switchTime;
     private Cost switchCost;
     private VehicleParkingPreferences parking;
+    private VehicleRentalPreferences rental;
     private BicycleOptimizeType optimizeType;
     private TimeSlopeSafetyTriangle optimizeTriangle;
 
@@ -223,6 +235,7 @@ public final class BikePreferences implements Serializable {
       this.switchTime = original.switchTime;
       this.switchCost = original.switchCost;
       this.parking = original.parking;
+      this.rental = original.rental;
       this.optimizeType = original.optimizeType;
       this.optimizeTriangle = original.optimizeTriangle;
       this.stairsReluctance = original.stairsReluctance;
@@ -297,6 +310,11 @@ public final class BikePreferences implements Serializable {
 
     public Builder withParking(Consumer<VehicleParkingPreferences.Builder> body) {
       this.parking = ifNotNull(this.parking, original.parking).copyOf().apply(body).build();
+      return this;
+    }
+
+    public Builder withRental(Consumer<VehicleRentalPreferences.Builder> body) {
+      this.rental = ifNotNull(this.rental, original.rental).copyOf().apply(body).build();
       return this;
     }
 
