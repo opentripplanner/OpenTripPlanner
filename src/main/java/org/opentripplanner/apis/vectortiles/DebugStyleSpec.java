@@ -17,7 +17,7 @@ public class DebugStyleSpec {
     "background",
     List.of("https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"),
     256,
-    "&copy; OpenStreetMap Contributors"
+    "© OpenStreetMap Contributors"
   );
 
   public record VectorSourceLayer(VectorSource vectorSource, String vectorLayer) {}
