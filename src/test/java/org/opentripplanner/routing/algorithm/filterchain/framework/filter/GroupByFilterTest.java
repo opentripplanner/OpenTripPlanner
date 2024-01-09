@@ -97,7 +97,7 @@ public class GroupByFilterTest implements PlanTestConstants {
       i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
       List.of(
         new SortingFilter(SortOrderComparator.defaultComparatorDepartAfter()),
-        new RemoveFilter(new MaxLimitFilter(TEST_FILTER_TAG, maxNumberOfItinerariesPrGroup))
+        new RemoveFilter(new MaxLimit(TEST_FILTER_TAG, maxNumberOfItinerariesPrGroup))
       )
     );
   }

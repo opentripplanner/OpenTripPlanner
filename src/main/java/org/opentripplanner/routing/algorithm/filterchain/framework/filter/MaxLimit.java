@@ -8,12 +8,12 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
  * Flags the itineraries at the end of the list for removal. The list should be sorted on the
  * desired key before this filter is applied.
  */
-public class MaxLimitFilter implements RemoveItineraryFlagger {
+public class MaxLimit implements RemoveItineraryFlagger {
 
   private final String name;
   private final int maxLimit;
 
-  public MaxLimitFilter(String name, int maxLimit) {
+  public MaxLimit(String name, int maxLimit) {
     this.name = name;
     this.maxLimit = maxLimit;
   }
