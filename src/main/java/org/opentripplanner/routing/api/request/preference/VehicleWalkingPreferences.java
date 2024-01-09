@@ -33,7 +33,7 @@ public class VehicleWalkingPreferences implements Serializable {
   }
 
   /**
-   * Sets the vehicle walking preferences and does some input value validation and rounds
+   * Sets the vehicle walking preferences, does some input value validation and rounds
    * reluctances and speed to not have too many decimals.
    */
   private VehicleWalkingPreferences(Builder builder) {
