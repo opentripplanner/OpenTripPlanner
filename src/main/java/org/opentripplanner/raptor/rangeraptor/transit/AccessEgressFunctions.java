@@ -81,10 +81,10 @@ public final class AccessEgressFunctions {
    * Filter non-optimal paths away for the standard search. This method does not
    * look at the c1 value.
    */
-  static Collection<RaptorAccessEgress> removeNoneOptimalPathsForStandardRaptor(
+  static Collection<RaptorAccessEgress> removeNonOptimalPathsForStandardRaptor(
     Collection<RaptorAccessEgress> paths
   ) {
-    return removeNoneOptimalPaths(paths, STANDARD_COMPARATOR);
+    return removeNonOptimalPaths(paths, STANDARD_COMPARATOR);
   }
 
   /**
@@ -92,10 +92,10 @@ public final class AccessEgressFunctions {
    * not remove any paths since the caller should not pass in duplicates, but it turns out that
    * this happens, so we do it.
    */
-  static Collection<RaptorAccessEgress> removeNoneOptimalPathsForMcRaptor(
+  static Collection<RaptorAccessEgress> removeNonOptimalPathsForMcRaptor(
     Collection<RaptorAccessEgress> paths
   ) {
-    var result = removeNoneOptimalPaths(paths, MC_COMPARATOR);
+    var result = removeNonOptimalPaths(paths, MC_COMPARATOR);
     if (LOG.isDebugEnabled() && result.size() < paths.size()) {
       var duplicates = new ArrayList<>(paths);
       duplicates.removeAll(result);
@@ -137,7 +137,7 @@ public final class AccessEgressFunctions {
    * Remove relevant access/egress paths. The given set of paths are grouped by stop and
    * the filtered based on the given pareto comparator.
    */
-  static Collection<RaptorAccessEgress> removeNoneOptimalPaths(
+  static Collection<RaptorAccessEgress> removeNonOptimalPaths(
     Collection<RaptorAccessEgress> paths,
     ParetoComparator<RaptorAccessEgress> comparator
   ) {

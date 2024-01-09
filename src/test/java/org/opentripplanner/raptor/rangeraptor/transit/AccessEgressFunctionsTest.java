@@ -6,8 +6,8 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flex;
 import static org.opentripplanner.raptor._data.transit.TestAccessEgress.flexAndWalk;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByRound;
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByStop;
-import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForMcRaptor;
-import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForStandardRaptor;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForMcRaptor;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForStandardRaptor;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -48,127 +48,127 @@ class AccessEgressFunctionsTest implements RaptorTestConstants {
     .openingHours(T00_10, T01_00);
 
   @Test
-  void removeNoneOptimalPathsForStandardRaptorTest() {
+  void removeNonOptimalPathsForStandardRaptorTest() {
     // Empty set
-    assertElements(List.of(), removeNoneOptimalPathsForStandardRaptor(List.of()));
+    assertElements(List.of(), removeNonOptimalPathsForStandardRaptor(List.of()));
 
     // One element
-    assertElements(List.of(WALK_8m), removeNoneOptimalPathsForStandardRaptor(List.of(WALK_8m)));
+    assertElements(List.of(WALK_8m), removeNonOptimalPathsForStandardRaptor(List.of(WALK_8m)));
 
     // Shortest duration
     assertElements(
       List.of(WALK_8m),
-      removeNoneOptimalPathsForStandardRaptor(List.of(WALK_8m, WALK_10m))
+      removeNonOptimalPathsForStandardRaptor(List.of(WALK_8m, WALK_10m))
     );
 
     // Fewest rides
     assertElements(
       List.of(FLEX_1x_8m),
-      removeNoneOptimalPathsForStandardRaptor(List.of(FLEX_1x_8m, FLEX_2x_8m))
+      removeNonOptimalPathsForStandardRaptor(List.of(FLEX_1x_8m, FLEX_2x_8m))
     );
 
     // Arriving at the stop on-board, and by-foot.
     // OnBoard is better because we can do a transfer walk to nearby stops.
     assertElements(
       List.of(FLEX_1x_8m),
-      removeNoneOptimalPathsForStandardRaptor(List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_8m))
+      removeNonOptimalPathsForStandardRaptor(List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_8m))
     );
 
     // Flex+walk is faster, flex arrive on-board, both is optimal
     assertElements(
       List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_10m),
-      removeNoneOptimalPathsForStandardRaptor(List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_10m))
+      removeNonOptimalPathsForStandardRaptor(List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_10m))
     );
 
     // Walk has few rides, and Flex is faster - both is optimal
     assertElements(
       List.of(WALK_10m, FLEX_1x_8m),
-      removeNoneOptimalPathsForStandardRaptor(List.of(WALK_10m, FLEX_1x_8m))
+      removeNonOptimalPathsForStandardRaptor(List.of(WALK_10m, FLEX_1x_8m))
     );
 
     // Walk without opening hours is better than with, because it can be time-shifted without
     // any constraints
     assertElements(
       List.of(WALK_8m),
-      removeNoneOptimalPathsForStandardRaptor(List.of(WALK_8m, WALK_W_OPENING_HOURS_8m))
+      removeNonOptimalPathsForStandardRaptor(List.of(WALK_8m, WALK_W_OPENING_HOURS_8m))
     );
 
     // Walk with opening hours can NOT dominate another access/egress without - even if it is
     // faster. The reason is that it may not be allowed to time-shift it to the desired time.
     assertElements(
       List.of(WALK_10m, WALK_W_OPENING_HOURS_8m),
-      removeNoneOptimalPathsForStandardRaptor(List.of(WALK_10m, WALK_W_OPENING_HOURS_8m))
+      removeNonOptimalPathsForStandardRaptor(List.of(WALK_10m, WALK_W_OPENING_HOURS_8m))
     );
 
     // If two paths both have opening hours, both should be accepted.
     assertElements(
       List.of(WALK_W_OPENING_HOURS_8m, WALK_W_OPENING_HOURS_8m_OTHER),
-      removeNoneOptimalPathsForStandardRaptor(
+      removeNonOptimalPathsForStandardRaptor(
         List.of(WALK_W_OPENING_HOURS_8m, WALK_W_OPENING_HOURS_8m_OTHER)
       )
     );
   }
 
   @Test
-  void removeNoneOptimalPathsForMcRaptorTest() {
+  void removeNonOptimalPathsForMcRaptorTest() {
     // Empty set
-    assertElements(List.of(), removeNoneOptimalPathsForMcRaptor(List.of()));
+    assertElements(List.of(), removeNonOptimalPathsForMcRaptor(List.of()));
 
     // One element
-    assertElements(List.of(WALK_8m), removeNoneOptimalPathsForMcRaptor(List.of(WALK_8m)));
+    assertElements(List.of(WALK_8m), removeNonOptimalPathsForMcRaptor(List.of(WALK_8m)));
 
     // Lowest cost
     assertElements(
       List.of(WALK_10m_C1_LOW),
-      removeNoneOptimalPathsForMcRaptor(List.of(WALK_10m, WALK_10m_C1_LOW))
+      removeNonOptimalPathsForMcRaptor(List.of(WALK_10m, WALK_10m_C1_LOW))
     );
 
     // Shortest duration
-    assertElements(List.of(WALK_8m), removeNoneOptimalPathsForMcRaptor(List.of(WALK_8m, WALK_10m)));
+    assertElements(List.of(WALK_8m), removeNonOptimalPathsForMcRaptor(List.of(WALK_8m, WALK_10m)));
 
     // Fewest rides
     assertElements(
       List.of(FLEX_1x_8m),
-      removeNoneOptimalPathsForMcRaptor(List.of(FLEX_1x_8m, FLEX_2x_8m))
+      removeNonOptimalPathsForMcRaptor(List.of(FLEX_1x_8m, FLEX_2x_8m))
     );
 
     // Arriving at the stop on-board, and by-foot.
     // OnBoard is better because we can do a transfer walk to nearby stops.
     assertElements(
       List.of(FLEX_1x_8m),
-      removeNoneOptimalPathsForMcRaptor(List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_8m))
+      removeNonOptimalPathsForMcRaptor(List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_8m))
     );
 
     // Flex+walk is faster, flex arrive on-board, both is optimal
     assertElements(
       List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_10m),
-      removeNoneOptimalPathsForStandardRaptor(List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_10m))
+      removeNonOptimalPathsForStandardRaptor(List.of(FLEX_AND_WALK_1x_8m, FLEX_1x_10m))
     );
 
     // Walk has few rides, and Flex is faster - both is optimal
     assertElements(
       List.of(WALK_10m, FLEX_1x_8m),
-      removeNoneOptimalPathsForMcRaptor(List.of(WALK_10m, FLEX_1x_8m))
+      removeNonOptimalPathsForMcRaptor(List.of(WALK_10m, FLEX_1x_8m))
     );
 
     // Walk without opening hours is better than with, because it can be time-shifted without
     // any constraints
     assertElements(
       List.of(WALK_8m),
-      removeNoneOptimalPathsForMcRaptor(List.of(WALK_8m, WALK_W_OPENING_HOURS_8m))
+      removeNonOptimalPathsForMcRaptor(List.of(WALK_8m, WALK_W_OPENING_HOURS_8m))
     );
 
     // Walk with opening hours can NOT dominate another access/egress without - even if it is
     // faster. The reason is that it may not be allowed to time-shift it to the desired time.
     assertElements(
       List.of(WALK_10m, WALK_W_OPENING_HOURS_8m),
-      removeNoneOptimalPathsForMcRaptor(List.of(WALK_10m, WALK_W_OPENING_HOURS_8m))
+      removeNonOptimalPathsForMcRaptor(List.of(WALK_10m, WALK_W_OPENING_HOURS_8m))
     );
 
     // If two paths both have opening hours, both should be accepted.
     assertElements(
       List.of(WALK_W_OPENING_HOURS_8m, WALK_W_OPENING_HOURS_8m_OTHER),
-      removeNoneOptimalPathsForMcRaptor(
+      removeNonOptimalPathsForMcRaptor(
         List.of(WALK_W_OPENING_HOURS_8m, WALK_W_OPENING_HOURS_8m_OTHER)
       )
     );
