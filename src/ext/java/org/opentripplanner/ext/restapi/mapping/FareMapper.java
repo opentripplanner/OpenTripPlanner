@@ -24,7 +24,6 @@ import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.fare.RiderCategory;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.transit.model.basic.Money;
 
 public class FareMapper {
@@ -106,14 +105,7 @@ public class FareMapper {
   }
 
   private Map<String, List<ApiFareComponent>> toApiFareComponents(ItineraryFares fare) {
-    return fare
-      .getFareTypes()
-      .stream()
-      .map(key -> {
-        var money = fare.getComponents(key).stream().map(this::toApiFareComponent).toList();
-        return new SimpleEntry<>(key, money);
-      })
-      .collect(Collectors.toMap(e -> e.getKey().name(), Entry::getValue));
+    return Map.of();
   }
 
   private Map<String, ApiMoney> toApiMoneys(ItineraryFares fare) {
@@ -138,9 +130,5 @@ public class FareMapper {
         c.getSymbol(locale)
       )
     );
-  }
-
-  private ApiFareComponent toApiFareComponent(FareComponent m) {
-    return new ApiFareComponent(m.fareId(), null, toApiMoney(m.price()), m.routes());
   }
 }

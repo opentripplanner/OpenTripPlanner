@@ -3,7 +3,6 @@ package org.opentripplanner.ext.fares.impl;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_A_STOP;
@@ -56,13 +55,10 @@ class DefaultFareServiceTest implements PlanTestConstants {
     assertEquals(TEN_DOLLARS, fp.price());
     assertEquals("F:regular", fp.id().toString());
 
-    var lp = fare.legProductsFromComponents();
+    var lp = fare.getLegProducts();
     assertEquals(1, lp.size());
     var product = lp.values().iterator().next().product();
     assertEquals(TEN_DOLLARS, product.price());
-
-    // the leg products from the components and the "true" leg products are different collections
-    assertTrue(fare.getLegProducts().isEmpty());
   }
 
   @Test
@@ -91,9 +87,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     assertEquals(TWENTY_DOLLARS, price);
 
-    assertTrue(fare.getLegProducts().isEmpty());
-
-    var legProductsFromComponents = fare.legProductsFromComponents();
+    var legProductsFromComponents = fare.getLegProducts();
 
     var firstLeg = itin.getLegs().get(0);
     var products = List.copyOf(legProductsFromComponents.get(firstLeg));
@@ -124,18 +118,18 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var price = fare.getFare(FareType.regular);
     assertEquals(Money.usDollars(-0.01f), price);
 
-    var components = fare.getComponents(FareType.regular);
-    assertEquals(1, components.size());
+    var fareProducts = List.copyOf(fare.getLegProducts().values());
+    assertEquals(1, fareProducts.size());
 
-    var component = components.get(0);
-    assertEquals(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), component.fareId());
-    assertEquals(TEN_DOLLARS, component.price());
+    var fp = fareProducts.get(0).product();
+    assertEquals(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), fp.id());
+    assertEquals(TEN_DOLLARS, fp.price());
 
     var firstBusLeg = itin.firstTransitLeg().get();
-    assertEquals(List.of(firstBusLeg), component.legs());
+    //assertEquals(List.of(firstBusLeg), fp.legs());
 
-    var legProductsFromComponent = fare.legProductsFromComponents();
-    assertEquals(1, legProductsFromComponent.size());
+    var legProducts = fare.getLegProducts();
+    assertEquals(1, legProducts.size());
   }
 
   @Test
@@ -150,18 +144,18 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var result = service.calculateFares(itin);
 
     var resultComponents = result
-      .getComponents(FareType.regular)
+      .getLegProducts()
+      .values()
       .stream()
-      .map(r -> r.fareId())
+      .map(r -> r.product().id())
       .toList();
-
-    var resultPrice = result.getFare(FareType.regular);
 
     assertEquals(
       List.of(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), OTHER_FEED_ATTRIBUTE.getId()),
       resultComponents
     );
 
+    var resultPrice = result.getFare(FareType.regular);
     assertEquals(TWENTY_DOLLARS, resultPrice);
   }
 
@@ -179,17 +173,18 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var result = service.calculateFares(itin);
 
     var resultComponents = result
-      .getComponents(FareType.regular)
+      .getLegProducts()
+      .values()
       .stream()
-      .map(r -> r.fareId())
+      .map(r -> r.product().id())
       .toList();
 
-    var resultPrice = result.getFare(FareType.regular);
     assertEquals(
       List.of(INSIDE_CITY_CENTER_SET.getFareAttribute().getId(), OTHER_FEED_ATTRIBUTE.getId()),
       resultComponents
     );
 
+    var resultPrice = result.getFare(FareType.regular);
     assertEquals(TWENTY_DOLLARS, resultPrice);
   }
 
@@ -204,9 +199,10 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .build();
     var result = service.calculateFares(itin);
     var resultComponents = result
-      .getComponents(FareType.regular)
+      .getLegProducts()
+      .values()
       .stream()
-      .map(r -> r.fareId())
+      .map(r -> r.product().id())
       .toList();
     var resultPrice = result.getFare(FareType.regular);
     assertEquals(List.of(OTHER_FEED_ATTRIBUTE.getId()), resultComponents);

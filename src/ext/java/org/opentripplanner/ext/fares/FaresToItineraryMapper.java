@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.fares;
 
-import com.google.common.collect.Multimap;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFares;
