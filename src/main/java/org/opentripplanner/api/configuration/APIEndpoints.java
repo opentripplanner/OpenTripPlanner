@@ -1,10 +1,10 @@
 package org.opentripplanner.api.configuration;
 
 import static org.opentripplanner.framework.application.OTPFeature.APIBikeRental;
-import static org.opentripplanner.framework.application.OTPFeature.APIGraphInspectorTile;
 import static org.opentripplanner.framework.application.OTPFeature.APIServerInfo;
 import static org.opentripplanner.framework.application.OTPFeature.APIUpdaterStatus;
 import static org.opentripplanner.framework.application.OTPFeature.ActuatorAPI;
+import static org.opentripplanner.framework.application.OTPFeature.DebugUi;
 import static org.opentripplanner.framework.application.OTPFeature.GtfsGraphQlApi;
 import static org.opentripplanner.framework.application.OTPFeature.ReportApi;
 import static org.opentripplanner.framework.application.OTPFeature.SandboxAPIGeocoder;
@@ -51,10 +51,10 @@ public class APIEndpoints {
     // Add feature enabled APIs, these can be enabled by default, some is not.
     // See the OTPFeature enum for details.
     addIfEnabled(APIBikeRental, BikeRental.class);
-    addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);
-    addIfEnabled(APIGraphInspectorTile, GraphInspectorVectorTileResource.class);
     addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
+    addIfEnabled(DebugUi, GraphInspectorTileResource.class);
+    addIfEnabled(DebugUi, GraphInspectorVectorTileResource.class);
     addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.class);
     addIfEnabled(TransmodelGraphQlApi, TransmodelAPI.class);
 
