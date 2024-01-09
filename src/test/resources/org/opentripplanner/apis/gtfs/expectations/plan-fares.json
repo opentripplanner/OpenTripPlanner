@@ -69,23 +69,6 @@
                   }
                 },
                 {
-                  "id" : "6bd27c98-c0ee-3f62-b606-bbacf2e1f41b",
-                  "product" : {
-                    "id" : "F:AB",
-                    "name" : "regular",
-                    "__typename" : "DefaultFareProduct",
-                    "price" : {
-                      "currency" : {
-                        "digits" : 2,
-                        "code" : "EUR"
-                      },
-                      "amount" : 3.1
-                    },
-                    "riderCategory" : null,
-                    "medium" : null
-                  }
-                },
-                {
                   "id" : "09bb5f2b-6af9-3355-8b5d-5e93a27ce280",
                   "product" : {
                     "id" : "F:single-ticket",
@@ -205,18 +188,7 @@
               "type" : "regular",
               "cents" : 310,
               "currency" : "EUR",
-              "components" : [
-                {
-                  "currency" : "EUR",
-                  "cents" : 310,
-                  "fareId" : "F:AB",
-                  "routes" : [
-                    {
-                      "gtfsId" : "F:BUS"
-                    }
-                  ]
-                }
-              ]
+              "components" : []
             }
           ]
         }
