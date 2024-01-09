@@ -46,8 +46,8 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.carReluctance, car::withReluctance);
       car.withParking(parking -> {
         mapParking(parking);
-        setIfNotNull(req.carParkCost, parking::withParkCost);
-        setIfNotNull(req.carParkTime, parking::withParkTime);
+        setIfNotNull(req.carParkCost, parking::withCost);
+        setIfNotNull(req.carParkTime, parking::withTime);
       });
       car.withRental(this::mapRental);
     });
@@ -82,8 +82,8 @@ class RequestToPreferencesMapper {
 
       bike.withParking(parking -> {
         mapParking(parking);
-        setIfNotNull(req.bikeParkCost, parking::withParkCost);
-        setIfNotNull(req.bikeParkTime, parking::withParkTime);
+        setIfNotNull(req.bikeParkCost, parking::withCost);
+        setIfNotNull(req.bikeParkTime, parking::withTime);
       });
       bike.withRental(this::mapRental);
       bike.withWalking(walk -> {

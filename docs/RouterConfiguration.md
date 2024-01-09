@@ -472,8 +472,8 @@ Used to group requests when monitoring OTP.
         "dropOffCost" : 30
       },
       "parking" : {
-        "parkTime" : "1m",
-        "parkCost" : 120
+        "time" : "1m",
+        "cost" : 120
       },
       "triangle" : {
         "safety" : 0.4,
@@ -492,8 +492,8 @@ Used to group requests when monitoring OTP.
         "dropOffCost" : 30
       },
       "parking" : {
-        "parkTime" : "5m",
-        "parkCost" : 600
+        "time" : "5m",
+        "cost" : 600
       }
     },
     "walk" : {

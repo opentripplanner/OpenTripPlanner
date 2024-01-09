@@ -57,8 +57,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    reluctance                                                                                                |        `double`        | A multiplier for how bad cycling is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`            |  2.0  |
 |    speed                                                                                                     |        `double`        | Max bicycle speed along streets, in meters per second                                                                                          | *Optional* | `5.0`            |  2.0  |
 |    parking                                                                                                   |        `object`        | Preferences for parking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
-|       parkCost                                                                                               |        `integer`       | Cost to park a vehicle.                                                                                                                        | *Optional* | `120`            |  2.0  |
-|       parkTime                                                                                               |       `duration`       | Time to park a vehicle.                                                                                                                        | *Optional* | `"PT1M"`         |  2.0  |
+|       cost                                                                                                   |        `integer`       | Cost to park a vehicle.                                                                                                                        | *Optional* | `120`            |  2.0  |
+|       time                                                                                                   |       `duration`       | Time to park a vehicle.                                                                                                                        | *Optional* | `"PT1M"`         |  2.0  |
 |       [unpreferredVehicleParkingTagCost](#rd_bicycle_parking_unpreferredVehicleParkingTagCost)               |        `integer`       | What cost to add if a parking facility doesn't contain a preferred tag.                                                                        | *Optional* | `300`            |  2.3  |
 |       [bannedVehicleParkingTags](#rd_bicycle_parking_bannedVehicleParkingTags)                               |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned.                                                              | *Optional* |                  |  2.1  |
 |       [preferredVehicleParkingTags](#rd_bicycle_parking_preferredVehicleParkingTags)                         |       `string[]`       | Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.                       | *Optional* |                  |  2.3  |
@@ -92,8 +92,8 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |    reluctance                                                                                                |        `double`        | A multiplier for how bad driving is, compared to being in transit for equal lengths of time.                                                   | *Optional* | `2.0`            |  2.0  |
 |    speed                                                                                                     |        `double`        | Max car speed along streets, in meters per second                                                                                              | *Optional* | `40.0`           |  2.0  |
 |    parking                                                                                                   |        `object`        | Preferences for parking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
-|       parkCost                                                                                               |        `integer`       | Cost to park a vehicle.                                                                                                                        | *Optional* | `120`            |  2.0  |
-|       parkTime                                                                                               |       `duration`       | Time to park a vehicle.                                                                                                                        | *Optional* | `"PT1M"`         |  2.0  |
+|       cost                                                                                                   |        `integer`       | Cost to park a vehicle.                                                                                                                        | *Optional* | `120`            |  2.0  |
+|       time                                                                                                   |       `duration`       | Time to park a vehicle.                                                                                                                        | *Optional* | `"PT1M"`         |  2.0  |
 |       [unpreferredVehicleParkingTagCost](#rd_car_parking_unpreferredVehicleParkingTagCost)                   |        `integer`       | What cost to add if a parking facility doesn't contain a preferred tag.                                                                        | *Optional* | `300`            |  2.3  |
 |       [bannedVehicleParkingTags](#rd_car_parking_bannedVehicleParkingTags)                                   |       `string[]`       | Tags with which a vehicle parking will not be used. If empty, no tags are banned.                                                              | *Optional* |                  |  2.1  |
 |       [preferredVehicleParkingTags](#rd_car_parking_preferredVehicleParkingTags)                             |       `string[]`       | Vehicle parking facilities that don't have one of these tags will receive an extra cost and will therefore be penalised.                       | *Optional* |                  |  2.3  |
@@ -1071,8 +1071,8 @@ include stairs as a last result.
         "dropOffCost" : 30
       },
       "parking" : {
-        "parkTime" : "1m",
-        "parkCost" : 120
+        "time" : "1m",
+        "cost" : 120
       },
       "triangle" : {
         "safety" : 0.4,
@@ -1091,8 +1091,8 @@ include stairs as a last result.
         "dropOffCost" : 30
       },
       "parking" : {
-        "parkTime" : "5m",
-        "parkCost" : 600
+        "time" : "5m",
+        "cost" : 600
       }
     },
     "walk" : {

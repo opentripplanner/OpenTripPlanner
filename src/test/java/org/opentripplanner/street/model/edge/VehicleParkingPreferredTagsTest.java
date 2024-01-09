@@ -88,7 +88,7 @@ class VehicleParkingPreferredTagsTest {
         bike.withParking(parkingPreferences -> {
           parkingPreferences.withUnpreferredVehicleParkingTagCost(EXTRA_COST);
           parkingPreferences.withPreferredVehicleParkingTags(preferredTags);
-          parkingPreferences.withParkCost(0);
+          parkingPreferences.withCost(0);
         });
       })
     );

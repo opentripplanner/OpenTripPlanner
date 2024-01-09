@@ -21,8 +21,8 @@
         "dropOffCost": 30
       },
       "parking": {
-        "parkTime": "1m",
-        "parkCost": 120
+        "time": "1m",
+        "cost": 120
       }
     },
     "car": {

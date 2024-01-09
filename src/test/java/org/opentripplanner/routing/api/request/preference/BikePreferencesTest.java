@@ -27,7 +27,7 @@ class BikePreferencesTest {
     .withBoardCost(BOARD_COST)
     .withOptimizeType(OPTIMIZE_TYPE)
     .withRental(rental -> rental.withPickupTime(RENTAL_PICKUP_TIME).build())
-    .withParking(parking -> parking.withParkCost(PARK_COST).build())
+    .withParking(parking -> parking.withCost(PARK_COST).build())
     .withOptimizeTriangle(it -> it.withSlope(1).build())
     .build();
 
@@ -64,7 +64,7 @@ class BikePreferencesTest {
 
   @Test
   void parking() {
-    var vehicleParking = VehicleParkingPreferences.of().withParkCost(PARK_COST).build();
+    var vehicleParking = VehicleParkingPreferences.of().withCost(PARK_COST).build();
     assertEquals(vehicleParking, subject.parking());
   }
 
@@ -91,7 +91,7 @@ class BikePreferencesTest {
       "speed: 2.0, " +
       "reluctance: 1.2, " +
       "boardCost: $660, " +
-      "parking: VehicleParkingPreferences{parkCost: $30}, " +
+      "parking: VehicleParkingPreferences{cost: $30}, " +
       "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
       "optimizeType: TRIANGLE, " +
       "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +

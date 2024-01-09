@@ -52,19 +52,19 @@ public class VehicleParkingConfig {
           )
           .asStringSet(List.of())
       )
-      .withParkTime(
+      .withTime(
         c
-          .of("parkTime")
+          .of("time")
           .since(V2_0)
           .summary("Time to park a vehicle.")
-          .asDuration(VehicleParkingPreferences.DEFAULT.parkTime())
+          .asDuration(VehicleParkingPreferences.DEFAULT.time())
       )
-      .withParkCost(
+      .withCost(
         c
-          .of("parkCost")
+          .of("cost")
           .since(V2_0)
           .summary("Cost to park a vehicle.")
-          .asInt(VehicleParkingPreferences.DEFAULT.parkCost().toSeconds())
+          .asInt(VehicleParkingPreferences.DEFAULT.cost().toSeconds())
       )
       .withPreferredVehicleParkingTags(
         c

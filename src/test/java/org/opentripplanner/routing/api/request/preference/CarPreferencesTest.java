@@ -30,7 +30,7 @@ class CarPreferencesTest {
     .withAccelerationSpeed(ACCELERATION_SPEED)
     .withDecelerationSpeed(DECELERATION_SPEED)
     .withRental(rental -> rental.withPickupTime(RENTAL_PICKUP_TIME).build())
-    .withParking(parking -> parking.withParkCost(PARK_COST).build())
+    .withParking(parking -> parking.withCost(PARK_COST).build())
     .build();
 
   @Test
@@ -71,7 +71,7 @@ class CarPreferencesTest {
 
   @Test
   void parking() {
-    var vehicleParking = VehicleParkingPreferences.of().withParkCost(PARK_COST).build();
+    var vehicleParking = VehicleParkingPreferences.of().withCost(PARK_COST).build();
     assertEquals(vehicleParking, subject.parking());
   }
 
@@ -94,7 +94,7 @@ class CarPreferencesTest {
       "CarPreferences{" +
       "speed: 20.0, " +
       "reluctance: 5.1, " +
-      "parking: VehicleParkingPreferences{parkCost: $30}, " +
+      "parking: VehicleParkingPreferences{cost: $30}, " +
       "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
       "pickupTime: PT10M, " +
       "pickupCost: $500, " +
