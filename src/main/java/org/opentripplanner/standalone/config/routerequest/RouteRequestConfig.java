@@ -362,7 +362,7 @@ ferries, where the check-in process needs to be done in good time before ride.
             "Prevents unnecessary transfers by adding a cost for boarding a transit vehicle."
           )
           .description(
-            "This is the cost that is used when boarding while cycling." +
+            "This is the cost that is used when boarding while cycling. " +
             "This is usually higher that walkBoardCost."
           )
           .asInt(dft.boardCost())

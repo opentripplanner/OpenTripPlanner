@@ -79,7 +79,7 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       time                                                                                                   |        `double`        | Relative importance of duration of travel (range 0-1).                                                                                         | *Optional* | `0.0`            |  2.0  |
 |    walk                                                                                                      |        `object`        | Preferences for walking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
 |       [hopCost](#rd_bicycle_walk_hopCost)                                                                    |        `integer`       | The cost of hopping on or off a vehicle.                                                                                                       | *Optional* | `0`              |  2.0  |
-|       [hopTime](#rd_bicycle_walk_hopTime)                                                                    |       `duration`       | The time it takes the user to hop on or off a vehicle in seconds.                                                                              | *Optional* | `"PT0S"`         |  2.0  |
+|       [hopTime](#rd_bicycle_walk_hopTime)                                                                    |       `duration`       | The time it takes the user to hop on or off a vehicle.                                                                                         | *Optional* | `"PT0S"`         |  2.0  |
 |       reluctance                                                                                             |        `double`        | A multiplier for how bad walking with a vehicle is, compared to being in transit for equal lengths of time.                                    | *Optional* | `5.0`            |  2.1  |
 |       speed                                                                                                  |        `double`        | The user's vehicle walking speed in meters/second. Defaults to approximately 3 MPH.                                                            | *Optional* | `1.33`           |  2.1  |
 |       stairsReluctance                                                                                       |        `double`        | How bad is it to walk the vehicle up/down a flight of stairs compared to taking a detour.                                                      | *Optional* | `10.0`           |  2.3  |
@@ -440,7 +440,7 @@ Sometimes there is a need to configure a longer alighting times for specific mod
 
 Prevents unnecessary transfers by adding a cost for boarding a transit vehicle.
 
-This is the cost that is used when boarding while cycling.This is usually higher that walkBoardCost.
+This is the cost that is used when boarding while cycling. This is usually higher that walkBoardCost.
 
 <h3 id="rd_bicycle_optimization">optimization</h3>
 
@@ -541,7 +541,7 @@ not meant for controlling the cost of those events.
 **Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
 **Path:** /routingDefaults/bicycle/walk 
 
-The time it takes the user to hop on or off a vehicle in seconds.
+The time it takes the user to hop on or off a vehicle.
 
 Time it takes to rent or park a vehicle have their own parameters and this is not meant
 for controlling the duration of those events.

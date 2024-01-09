@@ -38,7 +38,7 @@ public class VehicleWalkingConfig {
         c
           .of("hopTime")
           .since(V2_0)
-          .summary("The time it takes the user to hop on or off a vehicle in seconds.")
+          .summary("The time it takes the user to hop on or off a vehicle.")
           .description(
             """
             Time it takes to rent or park a vehicle have their own parameters and this is not meant
