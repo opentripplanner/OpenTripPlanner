@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
@@ -7,7 +8,6 @@ import static org.opentripplanner.transit.model.basic.Money.euros;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -38,7 +38,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
     Itinerary i,
     List<String> expectedFareIds
   ) {
-    Assertions.assertArrayEquals(
+    assertArrayEquals(
       expectedFareIds.toArray(),
       fareService
         .calculateFares(i)

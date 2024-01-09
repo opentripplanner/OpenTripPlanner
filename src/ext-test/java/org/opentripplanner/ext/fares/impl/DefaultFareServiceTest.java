@@ -172,16 +172,11 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .build();
     var result = service.calculateFares(itin);
 
-    var resultComponents = result
-      .getLegProducts()
-      .values()
-      .stream()
-      .map(r -> r.product().id())
-      .toList();
+    var legProducts = result.getLegProducts().values().stream().map(r -> r.product().id()).toList();
 
     assertEquals(
       List.of(INSIDE_CITY_CENTER_SET.getFareAttribute().getId(), OTHER_FEED_ATTRIBUTE.getId()),
-      resultComponents
+      legProducts
     );
 
     var resultPrice = result.getFare(FareType.regular);
