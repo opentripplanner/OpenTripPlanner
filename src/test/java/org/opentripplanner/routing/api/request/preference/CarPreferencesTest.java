@@ -17,6 +17,8 @@ class CarPreferencesTest {
   private static final double ACCELERATION_SPEED = 3.1;
   private static final double DECELERATION_SPEED = 3.5;
   public static final int DROPOFF_TIME = 450;
+  public static final int RENTAL_PICKUP_TIME = 30;
+  public static final int PARK_COST = 30;
 
   private final CarPreferences subject = CarPreferences
     .of()
@@ -27,6 +29,8 @@ class CarPreferencesTest {
     .withDropoffTime(DROPOFF_TIME)
     .withAccelerationSpeed(ACCELERATION_SPEED)
     .withDecelerationSpeed(DECELERATION_SPEED)
+    .withRental(rental -> rental.withPickupTime(RENTAL_PICKUP_TIME).build())
+    .withParking(parking -> parking.withParkCost(PARK_COST).build())
     .build();
 
   @Test
@@ -65,6 +69,18 @@ class CarPreferencesTest {
   }
 
   @Test
+  void rental() {
+    var vehicleRental = VehicleRentalPreferences.of().withPickupTime(RENTAL_PICKUP_TIME).build();
+    assertEquals(vehicleRental, subject.rental());
+  }
+
+  @Test
+  void parking() {
+    var vehicleParking = VehicleParkingPreferences.of().withParkCost(PARK_COST).build();
+    assertEquals(vehicleParking, subject.parking());
+  }
+
+  @Test
   void testCopyOfEqualsAndHashCode() {
     // Return same object if no value is set
     assertSame(CarPreferences.DEFAULT, CarPreferences.of().build());
@@ -83,6 +99,8 @@ class CarPreferencesTest {
       "CarPreferences{" +
       "speed: 20.0, " +
       "reluctance: 5.1, " +
+      "parking: VehicleParkingPreferences{parkCost: $30}, " +
+      "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
       "pickupTime: 600, " +
       "pickupCost: $500, " +
       "dropoffTime: 450, " +
