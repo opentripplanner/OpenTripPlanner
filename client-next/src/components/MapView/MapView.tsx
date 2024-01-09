@@ -15,6 +15,8 @@ const initialViewState = {
   zoom: 4,
 };
 
+const styleUrl = import.meta.env.VITE_DEBUG_STYLE_URL;
+
 type PopupData = { coordinates: LngLat; feature: MapboxGeoJSONFeature };
 
 export function MapView({
@@ -40,7 +42,7 @@ export function MapView({
         // @ts-ignore
         mapLib={import('maplibre-gl')}
         // @ts-ignore
-        mapStyle="http://localhost:8080/otp/routers/default/inspector/vectortile/style.json"
+        mapStyle={styleUrl}
         initialViewState={initialViewState}
         onDblClick={onMapDoubleClick}
         onContextMenu={(e) => {
