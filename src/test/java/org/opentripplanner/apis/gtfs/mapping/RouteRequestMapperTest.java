@@ -2,6 +2,7 @@ package org.opentripplanner.apis.gtfs.mapping;
 
 import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.params.provider.Arguments.of;
 import static org.opentripplanner.routing.core.BicycleOptimizeType.SAFE_STREETS;
@@ -193,6 +194,18 @@ class RouteRequestMapperTest implements PlanTestConstants {
       TimeSlopeSafetyTriangle.DEFAULT,
       routeRequest.preferences().bike().optimizeTriangle()
     );
+  }
+
+  @Test
+  void walkReluctance() {
+    var reluctance = 119d;
+    Map<String, Object> arguments = Map.of("walkReluctance", reluctance);
+
+    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    assertEquals(reluctance, routeRequest.preferences().walk().reluctance());
+
+    var noParamsRequest = RouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
+    assertNotEquals(reluctance, noParamsRequest.preferences().walk().reluctance());
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {
