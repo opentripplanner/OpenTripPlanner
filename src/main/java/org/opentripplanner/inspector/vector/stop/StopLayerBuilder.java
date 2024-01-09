@@ -8,11 +8,14 @@ import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
+import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * A vector tile layer containing all {@link RegularStop}s inside the vector tile bounds.
+ * A vector tile layer for {@link StopLocation}s inside the vector tile bounds. These can be further
+ * filtered to get only a subset of stop implementations like {@link RegularStop}
+ * or {@link AreaStop}.
  */
 public class StopLayerBuilder<T extends StopLocation> extends LayerBuilder<StopLocation> {
 
