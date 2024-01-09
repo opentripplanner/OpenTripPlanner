@@ -745,16 +745,6 @@ public abstract class RoutingResource {
         journey.setModes(modes.getRequestModes());
       }
 
-      {
-        var rental = journey.rental();
-        setIfNotNull(
-          allowKeepingRentedBicycleAtDestination,
-          rental::setAllowArrivingInRentedVehicleAtDestination
-        );
-        setIfNotNull(allowedVehicleRentalNetworks, rental::setAllowedNetworks);
-        setIfNotNull(bannedVehicleRentalNetworks, rental::setBannedNetworks);
-      }
-
       setIfNotNull(arriveBy, request::setArriveBy);
 
       {
