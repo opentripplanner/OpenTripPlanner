@@ -29,7 +29,7 @@ public final class AccessEgressFunctions {
   private static final Logger LOG = LoggerFactory.getLogger(AccessEgressFunctions.class);
 
   /**
-   * Filter standard(not multi-criteria) Raptor access and egress paths. A path is pareto optimal
+   * Filter standard (not multi-criteria) Raptor access and egress paths. A path is pareto optimal
    * for a given stop if
    * <ol>
    *     <li>
@@ -53,8 +53,7 @@ public final class AccessEgressFunctions {
    */
   private static final ParetoComparator<RaptorAccessEgress> STANDARD_COMPARATOR = (l, r) ->
     (
-      l.stopReachedOnBoard() &&
-      !r.stopReachedOnBoard() ||
+      (l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
       r.hasOpeningHours() ||
       l.numberOfRides() < r.numberOfRides() ||
       l.durationInSeconds() < r.durationInSeconds()
@@ -66,13 +65,7 @@ public final class AccessEgressFunctions {
    * Raptor - it is a bug.
    */
   private static final ParetoComparator<RaptorAccessEgress> MC_COMPARATOR = (l, r) ->
-    (
-      (l.stopReachedOnBoard() && !r.stopReachedOnBoard()) ||
-      r.hasOpeningHours() ||
-      l.numberOfRides() < r.numberOfRides() ||
-      l.durationInSeconds() < r.durationInSeconds() ||
-      l.c1() < r.c1()
-    );
+    STANDARD_COMPARATOR.leftDominanceExist(l, r) || l.c1() < r.c1();
 
   /** private constructor to prevent instantiation of utils class. */
   private AccessEgressFunctions() {}
