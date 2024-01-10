@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.restapi.model.ApiCurrency;
-import org.opentripplanner.ext.restapi.model.ApiFareComponent;
 import org.opentripplanner.ext.restapi.model.ApiFareProduct;
 import org.opentripplanner.ext.restapi.model.ApiFareQualifier;
 import org.opentripplanner.ext.restapi.model.ApiItineraryFares;
@@ -37,11 +36,10 @@ public class FareMapper {
   public ApiItineraryFares mapFare(Itinerary itinerary) {
     var fares = itinerary.getFares();
     Map<String, ApiMoney> apiFare = toApiMoneys(fares);
-    Map<String, List<ApiFareComponent>> apiComponent = toApiFareComponents(fares);
 
     return new ApiItineraryFares(
       apiFare,
-      apiComponent,
+      Map.of(),
       toApiFareProducts(fares.getItineraryProducts()),
       toApiLegProducts(itinerary, fares.getLegProducts())
     );
@@ -102,10 +100,6 @@ public class FareMapper {
         )
         .toList();
     }
-  }
-
-  private Map<String, List<ApiFareComponent>> toApiFareComponents(ItineraryFares fare) {
-    return Map.of();
   }
 
   private Map<String, ApiMoney> toApiMoneys(ItineraryFares fare) {
