@@ -149,7 +149,7 @@ public class ItineraryFares {
   }
 
   public void addFareProducts(Multimap<Leg, FareProduct> fareProducts) {
-    fareProducts.forEach((leg, fp) -> addFareProduct(leg, fp));
+    fareProducts.forEach(this::addFareProduct);
   }
 
   public void addFareProductUses(Multimap<Leg, FareProductUse> fareProducts) {

@@ -148,11 +148,6 @@ public class DefaultFareService implements FareService {
           fareProducts.putAll(currentFare.getLegProducts());
           fare.addFare(fareType, currentFare.getFare(fareType));
 
-          currentFare
-            .getLegProducts()
-            .entries()
-            .forEach(entry -> fare.addFareProduct(entry.getKey(), entry.getValue().product()));
-
           fares.add(currentFare.getFare(fareType));
 
           // If all the legs are from one feed, consider itinerary products
@@ -246,7 +241,7 @@ public class DefaultFareService implements FareService {
   ) {
     FareSearch r = performSearch(fareType, legs, fareRules);
 
-    Multimap<Leg, FareProduct> legProducts = LinkedHashMultimap.create();
+    Multimap<Leg, FareProductUse> fareProductUses = LinkedHashMultimap.create();
     int count = 0;
     int start = 0;
     int end = legs.size() - 1;
@@ -263,26 +258,24 @@ public class DefaultFareService implements FareService {
       int via = r.next[start][r.endOfComponent[start]];
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
+      var product = FareProduct
+        .of(fareId, fareId.toString(), Money.ofFractionalAmount(currency, cost))
+        .build();
 
-      var componentLegs = new ArrayList<Leg>();
       for (int i = start; i <= via; ++i) {
         final var leg = legs.get(i);
+        final var use = new FareProductUse(product.uniqueInstanceId(leg.getStartTime()), product);
         // if we have a leg that is combined for the purpose of fare calculation we need to
         // retrieve the original legs so that the fare products are assigned back to the original
         // legs that the combined one originally consisted of.
         // (remember that the combined leg only exists during fare calculation and is thrown away
         // afterwards to associating fare products with it will result in the API not showing any.)
         if (leg instanceof CombinedInterlinedTransitLeg combinedLeg) {
-          componentLegs.addAll(combinedLeg.originalLegs());
+          combinedLeg.originalLegs().forEach(l -> fareProductUses.put(l, use));
         } else {
-          componentLegs.add(leg);
+          fareProductUses.put(leg, use);
         }
       }
-
-      var product = FareProduct
-        .of(fareId, fareId.toString(), Money.ofFractionalAmount(currency, cost))
-        .build();
-      componentLegs.forEach(l -> legProducts.put(l, product));
 
       ++count;
       start = via + 1;
@@ -290,7 +283,7 @@ public class DefaultFareService implements FareService {
 
     var amount = r.resultTable[0][legs.size() - 1];
     fare.addFare(fareType, Money.ofFractionalAmount(currency, amount));
-    fare.addFareProducts(legProducts);
+    fare.addFareProductUses(fareProductUses);
     return count > 0;
   }
 
