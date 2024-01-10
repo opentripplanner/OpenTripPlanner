@@ -13,24 +13,20 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
   private final OpeningHoursAdjuster openingHoursAdjuster;
 
   public BookingTimeAccessEgress(
-    RoutingAccessEgress delegate,
+    FlexAccessEgressAdapter delegate,
     Instant dateTime,
     Instant earliestBookingTime,
     ZoneId timeZone
   ) {
     this.delegate = delegate;
-    if (delegate instanceof FlexAccessEgressAdapter flexAccessEgressAdapter) {
-      openingHoursAdjuster =
-        new OpeningHoursAdjuster(
-          flexAccessEgressAdapter.getFlexTrip().getPickupBookingInfo(0),
-          delegate,
-          earliestBookingTime,
-          dateTime,
-          timeZone
-        );
-    } else {
-      openingHoursAdjuster = null;
-    }
+    openingHoursAdjuster =
+      new OpeningHoursAdjuster(
+        delegate.getFlexTrip().getPickupBookingInfo(0),
+        delegate,
+        earliestBookingTime,
+        dateTime,
+        timeZone
+      );
   }
 
   @Override
@@ -50,10 +46,7 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
 
   @Override
   public int earliestDepartureTime(int requestedDepartureTime) {
-    if (openingHoursAdjuster != null) {
-      return openingHoursAdjuster.earliestDepartureTime(requestedDepartureTime);
-    }
-    return delegate.earliestDepartureTime(requestedDepartureTime);
+    return openingHoursAdjuster.earliestDepartureTime(requestedDepartureTime);
   }
 
   @Override

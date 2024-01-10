@@ -8,12 +8,16 @@ import java.time.ZonedDateTime;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Adjust the opening hours for a given flex access/egress by taking into account the latest booking
  * time or minimum booking period for the corresponding flex trip.
  */
 public class OpeningHoursAdjuster {
+
+  private static final Logger LOG = LoggerFactory.getLogger(OpeningHoursAdjuster.class);
 
   private static final int DAY_IN_SECONDS = 3600 * 24;
 
@@ -25,7 +29,7 @@ public class OpeningHoursAdjuster {
   /**
    * The original access/egress.
    */
-  private final RoutingAccessEgress delegate;
+  private final FlexAccessEgressAdapter delegate;
 
   /**
    * The earliest time the passenger can book the trip.
@@ -34,7 +38,7 @@ public class OpeningHoursAdjuster {
 
   public OpeningHoursAdjuster(
     BookingInfo boardingBookingInfo,
-    RoutingAccessEgress delegate,
+    FlexAccessEgressAdapter delegate,
     Instant earliestBookingTime,
     Instant dateTime,
     ZoneId timeZone
@@ -61,32 +65,42 @@ public class OpeningHoursAdjuster {
     }
     BookingTime latestBookingTime = boardingBookingInfo.getLatestBookingTime();
     if (latestBookingTime != null) {
-      int otpLatestBookingTime = convertBookingTimeToOtpTime(
-        latestBookingTime.getTime(),
-        -latestBookingTime.getDaysPrior()
-      );
-      if (earliestBookingTime <= otpLatestBookingTime) {
-        return edt;
-      } else {
-        return RaptorConstants.TIME_NOT_SET;
-      }
+      return adjustDepartureTimeWithLatestBookingTime(edt, latestBookingTime);
     }
     Duration minimumBookingNotice = boardingBookingInfo.getMinimumBookingNotice();
     if (minimumBookingNotice != null) {
-      if (edt >= earliestBookingTime + minimumBookingNotice.toSeconds()) {
-        return edt;
-      } else {
-        // Calculate again the earliest departure time shifted by the minimum booking period.
-        // This may result in a requested departure time outside the opening hours
-        // in which case RaptorConstants.TIME_NOT_SET is returned.
-        return delegate.earliestDepartureTime(
-          earliestBookingTime + (int) minimumBookingNotice.toSeconds()
-        );
-      }
+      return adjustDepartureTimeWithMinimumBookingNotice(edt, minimumBookingNotice);
     }
-    // if both latest booking time and minimum booking notice are missing (invalid data)
-    // fall back to the default earliest departure time
+    LOG.warn(
+      "Missing both latest booking time and minimum booking notice on trip {}. Falling back to default earliest booking time",
+      delegate.getFlexTrip().getTrip().getId()
+    );
     return edt;
+  }
+
+  private int adjustDepartureTimeWithLatestBookingTime(int edt, BookingTime latestBookingTime) {
+    int otpLatestBookingTime = convertBookingTimeToOtpTime(
+      latestBookingTime.getTime(),
+      -latestBookingTime.getDaysPrior()
+    );
+    if (earliestBookingTime <= otpLatestBookingTime) {
+      return edt;
+    } else {
+      return RaptorConstants.TIME_NOT_SET;
+    }
+  }
+
+  private int adjustDepartureTimeWithMinimumBookingNotice(int edt, Duration minimumBookingNotice) {
+    if (edt >= earliestBookingTime + minimumBookingNotice.toSeconds()) {
+      return edt;
+    } else {
+      // Calculate again the earliest departure time shifted by the minimum booking period.
+      // This may result in a requested departure time outside the opening hours
+      // in which case RaptorConstants.TIME_NOT_SET is returned.
+      return delegate.earliestDepartureTime(
+        earliestBookingTime + (int) minimumBookingNotice.toSeconds()
+      );
+    }
   }
 
   /**

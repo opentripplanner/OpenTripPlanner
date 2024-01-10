@@ -24,6 +24,7 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessE
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgresses;
 import org.opentripplanner.routing.algorithm.raptoradapter.router.street.FlexAccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.BookingTimeAccessEgress;
+import org.opentripplanner.routing.algorithm.raptoradapter.transit.FlexAccessEgressAdapter;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.RoutingAccessEgress;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.TripSchedule;
@@ -279,14 +280,18 @@ public class TransitRouter {
     if (request.earliestBookingTime() != null) {
       return results
         .stream()
-        .map(routingAccessEgress ->
-          new BookingTimeAccessEgress(
-            routingAccessEgress,
-            request.dateTime(),
-            request.earliestBookingTime(),
-            serverContext.transitService().getTimeZone()
-          )
-        )
+        .map(routingAccessEgress -> {
+          if (routingAccessEgress instanceof FlexAccessEgressAdapter flexAccessEgressAdapter) {
+            return new BookingTimeAccessEgress(
+              flexAccessEgressAdapter,
+              request.dateTime(),
+              request.earliestBookingTime(),
+              serverContext.transitService().getTimeZone()
+            );
+          } else {
+            return routingAccessEgress;
+          }
+        })
         .toList();
     }
 
