@@ -62,4 +62,4 @@ or add it to a new `.env.development.local` file (this file will be ignored by g
 
 In production mode, the default is to access OTP via the same origin as the client (see `.env`).
 This behavior can also be modified by changing the previously mentioned environment variable at
-build-time..
+build-time.
