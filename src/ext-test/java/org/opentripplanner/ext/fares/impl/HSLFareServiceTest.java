@@ -382,7 +382,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
         "Bus ride within zone A, then another one outside of HSL's area",
         hslFareService,
         A1_A2_F,
-        List.of(fareAttributeAB.getId())
+        List.of(fareAttributeAB.getId(), fareAttributeAB.getId())
       )
     );
 
