@@ -87,15 +87,15 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     assertEquals(TWENTY_DOLLARS, price);
 
-    var legProductsFromComponents = fare.getLegProducts();
+    var legProducts = fare.getLegProducts();
 
     var firstLeg = itin.getLegs().get(0);
-    var products = List.copyOf(legProductsFromComponents.get(firstLeg));
+    var products = List.copyOf(legProducts.get(firstLeg));
 
     assertEquals(TEN_DOLLARS, products.get(0).product().price());
 
     var secondLeg = itin.getLegs().get(1);
-    products = List.copyOf(legProductsFromComponents.get(secondLeg));
+    products = List.copyOf(legProducts.get(secondLeg));
     assertEquals(TEN_DOLLARS, products.get(0).product().price());
 
     assertEquals(1, fare.getItineraryProducts().size());
@@ -143,7 +143,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .build();
     var result = service.calculateFares(itin);
 
-    var resultComponents = result
+    var fareProductIds = result
       .getLegProducts()
       .values()
       .stream()
@@ -152,7 +152,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     assertEquals(
       List.of(AIRPORT_TO_CITY_CENTER_SET.getFareAttribute().getId(), OTHER_FEED_ATTRIBUTE.getId()),
-      resultComponents
+      fareProductIds
     );
 
     var resultPrice = result.getFare(FareType.regular);
@@ -205,14 +205,14 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .bus(OTHER_FEED_ROUTE, 2, T11_20, T11_32, Place.forStop(OTHER_FEED_STOP))
       .build();
     var result = service.calculateFares(itin);
-    var resultComponents = result
+    var resultProductIds = result
       .getLegProducts()
       .values()
       .stream()
       .map(r -> r.product().id())
       .toList();
     var resultPrice = result.getFare(FareType.regular);
-    assertEquals(List.of(OTHER_FEED_ATTRIBUTE.getId()), resultComponents);
+    assertEquals(List.of(OTHER_FEED_ATTRIBUTE.getId()), resultProductIds);
     assertEquals(Money.usDollars(-0.01f), resultPrice);
   }
 }
