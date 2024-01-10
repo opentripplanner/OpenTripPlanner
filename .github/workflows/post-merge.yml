@@ -5,6 +5,10 @@ on:
       - dev-2.x
     types: [closed]
 
+# to avoid conflicts, make sure that only one workflow pushes to Github at the same time
+concurrency:
+  group: github-push
+
 jobs:
   changelog-entry:
     if: github.event.pull_request.merged && github.repository_owner == 'opentripplanner' && !contains(github.event.pull_request.labels.*.name, 'skip changelog')

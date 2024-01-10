@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   base: '/debug-client-preview/',
   build: {
-    outDir: '../src/client/debug-client-preview',
+    outDir: 'output',
     emptyOutDir: true,
   },
 });

@@ -9,6 +9,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterPrefere
 import org.opentripplanner.routing.api.request.preference.Relax;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 class RequestToPreferencesMapper {
@@ -36,7 +37,6 @@ class RequestToPreferencesMapper {
 
     mapTransfer(boardAndAlightSlack);
 
-    maptRental();
     mapItineraryFilter();
     mapSystem();
   }
@@ -49,6 +49,7 @@ class RequestToPreferencesMapper {
         setIfNotNull(req.carParkCost, parking::withParkCost);
         setIfNotNull(req.carParkTime, parking::withParkTime);
       });
+      car.withRental(this::mapRental);
     });
   }
 
@@ -85,6 +86,7 @@ class RequestToPreferencesMapper {
         setIfNotNull(req.bikeParkCost, parking::withParkCost);
         setIfNotNull(req.bikeParkTime, parking::withParkTime);
       });
+      bike.withRental(this::mapRental);
     });
   }
 
@@ -133,14 +135,19 @@ class RequestToPreferencesMapper {
     });
   }
 
-  private void maptRental() {
-    preferences.withRental(rental -> {
-      setIfNotNull(
-        req.keepingRentedBicycleAtDestinationCost,
-        rental::withArrivingInRentalVehicleAtDestinationCost
-      );
-      rental.withUseAvailabilityInformation(isPlannedForNow);
-    });
+  private void mapRental(VehicleRentalPreferences.Builder rental) {
+    setIfNotNull(
+      req.allowKeepingRentedBicycleAtDestination,
+      rental::withAllowArrivingInRentedVehicleAtDestination
+    );
+    setIfNotNull(req.allowedVehicleRentalNetworks, rental::withAllowedNetworks);
+    setIfNotNull(req.bannedVehicleRentalNetworks, rental::withBannedNetworks);
+
+    setIfNotNull(
+      req.keepingRentedBicycleAtDestinationCost,
+      rental::withArrivingInRentalVehicleAtDestinationCost
+    );
+    rental.withUseAvailabilityInformation(isPlannedForNow);
   }
 
   private void mapItineraryFilter() {

@@ -386,7 +386,7 @@ public class TripQuery {
             "rental trips."
           )
           .type(Scalars.GraphQLBoolean)
-          .defaultValue(preferences.rental().useAvailabilityInformation())
+          .defaultValue(preferences.bike().rental().useAvailabilityInformation())
           .build()
       )
       .argument(

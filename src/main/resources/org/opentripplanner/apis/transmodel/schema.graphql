@@ -549,6 +549,8 @@ type PtSituationElement {
   summary: [MultilingualString!]!
   "Period this situation is in effect"
   validityPeriod: ValidityPeriod
+  "Operator's version number for the situation element."
+  version: Int
   "Timestamp when the situation element was updated."
   versionedAtTime: DateTime
 }

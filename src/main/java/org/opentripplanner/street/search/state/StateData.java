@@ -83,10 +83,11 @@ public class StateData implements Cloneable {
     StreetSearchRequest request,
     Function<StreetMode, StateData> stateDataConstructor
   ) {
+    var rentalPreferences = request.preferences().rental(request.mode());
     return getInitialStateDatas(
       request.mode(),
       request.arriveBy(),
-      request.rental().allowArrivingInRentedVehicleAtDestination(),
+      rentalPreferences.allowArrivingInRentedVehicleAtDestination(),
       stateDataConstructor
     );
   }
@@ -97,10 +98,11 @@ public class StateData implements Cloneable {
    * the given {@code request}.
    */
   public static StateData getBaseCaseStateData(StreetSearchRequest request) {
+    var rentalPreferences = request.preferences().rental(request.mode());
     var stateDatas = getInitialStateDatas(
       request.mode(),
       request.arriveBy(),
-      request.rental().allowArrivingInRentedVehicleAtDestination(),
+      rentalPreferences.allowArrivingInRentedVehicleAtDestination(),
       StateData::new
     );
 
