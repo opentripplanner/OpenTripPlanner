@@ -172,11 +172,23 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .build();
     var result = service.calculateFares(itin);
 
-    var legProducts = result.getLegProducts().values().stream().map(r -> r.product().id()).toList();
+    var legProducts = result.getLegProducts();
+
+    var firstBusLeg = itin.getTransitLeg(0);
+    var secondBusLeg = itin.getTransitLeg(2);
+    var finalBusLeg = itin.getTransitLeg(4);
 
     assertEquals(
-      List.of(INSIDE_CITY_CENTER_SET.getFareAttribute().getId(), OTHER_FEED_ATTRIBUTE.getId()),
-      legProducts
+      "[FareProductUse[id=5d0d58f4-b97a-38db-921c-8b5fc6392b54, product=FareProduct{id: 'F2:other-feed-attribute', amount: $10.00}]]",
+      legProducts.get(firstBusLeg).toString()
+    );
+    assertEquals(
+      "[FareProductUse[id=1d270201-412b-3b86-80f6-92ab144fa2e5, product=FareProduct{id: 'F:airport-to-city-center', amount: $10.00}]]",
+      legProducts.get(secondBusLeg).toString()
+    );
+    assertEquals(
+      "[FareProductUse[id=678d201c-e839-35c3-ae7b-1bc3834da5e5, product=FareProduct{id: 'F2:other-feed-attribute', amount: $10.00}]]",
+      legProducts.get(finalBusLeg).toString()
     );
 
     var resultPrice = result.getFare(FareType.regular);
