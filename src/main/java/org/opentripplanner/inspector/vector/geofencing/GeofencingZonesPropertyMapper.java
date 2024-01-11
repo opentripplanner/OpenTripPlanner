@@ -6,7 +6,7 @@ import static org.opentripplanner.street.model.RentalRestrictionExtension.Restri
 
 import java.util.Collection;
 import java.util.List;
-import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.street.model.vertex.Vertex;
 

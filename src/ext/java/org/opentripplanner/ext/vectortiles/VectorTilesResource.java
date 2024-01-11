@@ -17,7 +17,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Predicate;
 import org.glassfish.grizzly.http.server.Request;
-import org.opentripplanner.api.model.TileJson;
+import org.opentripplanner.apis.support.TileJson;
 import org.opentripplanner.ext.vectortiles.layers.stations.StationsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.stops.StopsLayerBuilder;
 import org.opentripplanner.ext.vectortiles.layers.vehicleparkings.VehicleParkingGroupsLayerBuilder;

@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import org.glassfish.grizzly.http.server.Request;
-import org.opentripplanner.api.model.TileJson;
+import org.opentripplanner.apis.support.TileJson;
 import org.opentripplanner.apis.vectortiles.model.LayerParams;
 import org.opentripplanner.apis.vectortiles.model.LayerType;
 import org.opentripplanner.apis.vectortiles.model.StyleSpec;
