@@ -93,7 +93,7 @@ public class TestStateBuilder {
   }
 
   /**
-   * Creates a state starts the scooter rental but in arriveBy mode, so therefore starting with
+   * Creates a state that starts the scooter rental in arriveBy mode, so starting with
    * a rental scooter and going backwards until it finds a rental vertex where to drop it.
    */
   public static TestStateBuilder ofScooterRentalArriveBy() {
