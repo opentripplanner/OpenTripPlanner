@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.BookingInfoBuilder;
 import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.transit.model.organization.ContactInfo;
@@ -45,14 +46,14 @@ public class BookingInfoMapper {
     ServiceJourney serviceJourney,
     FlexibleLine flexibleLine
   ) {
-    return new BookingInfoBuilder()
+    return new NetexBookingInfoBuilder()
       .withFlexibleLine(flexibleLine)
       .withServiceJourney(serviceJourney)
       .withStopPoint(stopPoint)
       .build();
   }
 
-  private class BookingInfoBuilder {
+  private class NetexBookingInfoBuilder {
 
     private ContactStructure bookingContact;
     private List<BookingMethodEnumeration> bookingMethods = new ArrayList<>();
@@ -65,7 +66,7 @@ public class BookingInfoMapper {
     private String serviceJourneyRef;
     private String stopPointRef;
 
-    private BookingInfoBuilder withFlexibleLine(FlexibleLine flexibleLine) {
+    private NetexBookingInfoBuilder withFlexibleLine(FlexibleLine flexibleLine) {
       if (flexibleLine != null) {
         this.hasBookingInfo = true;
         this.flexibleLineRef = ref("FlexibleLine", flexibleLine);
@@ -81,7 +82,7 @@ public class BookingInfoMapper {
       return this;
     }
 
-    private BookingInfoBuilder withServiceJourney(ServiceJourney serviceJourney) {
+    private NetexBookingInfoBuilder withServiceJourney(ServiceJourney serviceJourney) {
       if (serviceJourney != null && serviceJourney.getFlexibleServiceProperties() != null) {
         this.hasBookingInfo = true;
         this.serviceJourneyRef = ref("ServiceJourney", serviceJourney);
@@ -98,7 +99,7 @@ public class BookingInfoMapper {
       return this;
     }
 
-    private BookingInfoBuilder withStopPoint(StopPointInJourneyPattern stopPoint) {
+    private NetexBookingInfoBuilder withStopPoint(StopPointInJourneyPattern stopPoint) {
       BookingArrangementsStructure bookingArrangements = stopPoint.getBookingArrangements();
       if (bookingArrangements != null) {
         this.hasBookingInfo = true;
@@ -220,17 +221,15 @@ public class BookingInfoMapper {
       }
 
       String bookingInfoMessage = bookingNote != null ? bookingNote.getValue() : null;
-      return new BookingInfo(
-        contactInfo,
-        filteredBookingMethods,
-        otpEarliestBookingTime,
-        otpLatestBookingTime,
-        minimumBookingNotice,
-        Duration.ZERO,
-        bookingInfoMessage,
-        null,
-        null
-      );
+      return new BookingInfoBuilder()
+        .withContactInfo(contactInfo)
+        .withBookingMethods(filteredBookingMethods)
+        .withEarliestBookingTime(otpEarliestBookingTime)
+        .withLatestBookingTime(otpLatestBookingTime)
+        .withMinimumBookingNotice(minimumBookingNotice)
+        .withMaximumBookingNotice(Duration.ZERO)
+        .withMessage(bookingInfoMessage)
+        .build();
     }
 
     private void setIfNotEmpty(

@@ -64,7 +64,7 @@ public class FlexAccessEgressAdapter extends DefaultAccessEgress {
     return new FlexAccessEgressAdapter(this, penalty);
   }
 
-  public FlexTrip getFlexTrip() {
+  FlexTrip getFlexTrip() {
     return flexAccessEgress.trip();
   }
 

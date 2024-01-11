@@ -8,6 +8,7 @@ import java.util.Map;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.BookingRule;
 import org.opentripplanner.model.BookingInfo;
+import org.opentripplanner.model.BookingInfoBuilder;
 import org.opentripplanner.model.BookingMethod;
 import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.transit.model.organization.ContactInfo;
@@ -26,17 +27,17 @@ class BookingRuleMapper {
     return cachedBookingInfos.computeIfAbsent(
       rule.getId(),
       k ->
-        new BookingInfo(
-          contactInfo(rule),
-          bookingMethods(),
-          earliestBookingTime(rule),
-          latestBookingTime(rule),
-          minimumBookingNotice(rule),
-          maximumBookingNotice(rule),
-          message(rule),
-          pickupMessage(rule),
-          dropOffMessage(rule)
-        )
+        new BookingInfoBuilder()
+          .withContactInfo(contactInfo(rule))
+          .withBookingMethods(bookingMethods())
+          .withEarliestBookingTime(earliestBookingTime(rule))
+          .withLatestBookingTime(latestBookingTime(rule))
+          .withMinimumBookingNotice(minimumBookingNotice(rule))
+          .withMaximumBookingNotice(maximumBookingNotice(rule))
+          .withMessage(message(rule))
+          .withPickupMessage(pickupMessage(rule))
+          .withDropOffMessage(dropOffMessage(rule))
+          .build()
     );
   }
 

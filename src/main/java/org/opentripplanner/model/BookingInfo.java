@@ -43,7 +43,7 @@ public class BookingInfo implements Serializable {
 
   private final String dropOffMessage;
 
-  public BookingInfo(
+  BookingInfo(
     ContactInfo contactInfo,
     EnumSet<BookingMethod> bookingMethods,
     BookingTime earliestBookingTime,
