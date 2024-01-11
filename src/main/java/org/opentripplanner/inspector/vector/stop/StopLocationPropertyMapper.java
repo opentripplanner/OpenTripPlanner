@@ -5,13 +5,13 @@ import static org.opentripplanner.inspector.vector.KeyValue.kv;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import org.opentripplanner.api.mapping.I18NStringMapper;
-import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.apis.support.mapping.PropertyMapper;
+import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.transit.model.site.StopLocation;
 
 /**
- * A {@link PropertyMapper} for the {@link AreaStopsLayerBuilder} for the OTP debug client.
+ * A {@link PropertyMapper} for the {@link StopLocationPropertyMapper} for the OTP debug client.
  */
 public class StopLocationPropertyMapper extends PropertyMapper<StopLocation> {
 
