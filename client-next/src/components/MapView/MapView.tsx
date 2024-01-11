@@ -1,4 +1,4 @@
-import { LngLat, Map, MapboxGeoJSONFeature, NavigationControl, Popup } from 'react-map-gl';
+import { LngLat, Map, MapboxGeoJSONFeature, NavigationControl } from 'react-map-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
@@ -6,7 +6,7 @@ import { LegLines } from './LegLines.tsx';
 import { useMapDoubleClick } from './useMapDoubleClick.ts';
 import { useState } from 'react';
 import { ContextMenuPopup } from './ContextMenuPopup.tsx';
-import { Table } from 'react-bootstrap';
+import { GeometryPropertyPopup } from './GeometryPropertyPopup.tsx';
 
 // TODO: this should be configurable
 const initialViewState = {
@@ -35,6 +35,20 @@ export function MapView({
   const onMapDoubleClick = useMapDoubleClick({ tripQueryVariables, setTripQueryVariables });
   const [showContextPopup, setShowContextPopup] = useState<LngLat | null>(null);
   const [showPropsPopup, setShowPropsPopup] = useState<PopupData | null>(null);
+  const showFeaturePropPopup = (
+    e: mapboxgl.MapMouseEvent & {
+      features?: mapboxgl.MapboxGeoJSONFeature[] | undefined;
+    },
+    setShowPropsPopup: (value: ((prevState: PopupData | null) => PopupData | null) | PopupData | null) => void,
+  ) => {
+    if (e.features) {
+      // if you click on a cluster of map features it's possible that there are multiple
+      // to select from. we are using the first one instead of presenting a selection UI.
+      // you can always zoom in closer if you want to make a more specific click.
+      const feature = e.features[0];
+      setShowPropsPopup({ coordinates: e.lngLat, feature: feature });
+    }
+  };
 
   return (
     <div className="map-container below-content">
@@ -50,10 +64,7 @@ export function MapView({
         }}
         interactiveLayerIds={['regular-stop']}
         onClick={(e) => {
-          if (e.features) {
-            const props = e.features[0];
-            setShowPropsPopup({ coordinates: e.lngLat, feature: props });
-          }
+          showFeaturePropPopup(e, setShowPropsPopup);
         }}
         // put lat/long in URL and pan to it on page reload
         hash={true}
@@ -79,23 +90,11 @@ export function MapView({
           />
         )}
         {showPropsPopup?.feature?.properties && (
-          <Popup
-            latitude={showPropsPopup.coordinates.lat}
-            longitude={showPropsPopup.coordinates.lng}
-            closeButton={true}
+          <GeometryPropertyPopup
+            coordinates={showPropsPopup?.coordinates}
+            properties={showPropsPopup?.feature?.properties}
             onClose={() => setShowPropsPopup(null)}
-          >
-            <Table bordered>
-              <tbody>
-                {Object.entries(showPropsPopup.feature.properties).map(([key, value]) => (
-                  <tr key={key}>
-                    <th scope="row">{key}</th>
-                    <td>{value}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </Popup>
+          />
         )}
       </Map>
     </div>
