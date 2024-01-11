@@ -72,6 +72,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Adding situation-version to TransmodelGraphQL API [#5592](https://github.com/opentripplanner/OpenTripPlanner/pull/5592)
 - Move REST API into sandbox [#5580](https://github.com/opentripplanner/OpenTripPlanner/pull/5580)
 - Fix high walk reluctance leading to zero egress results for rental searches [#5605](https://github.com/opentripplanner/OpenTripPlanner/pull/5605)
+- Remove GTFS-RT websocket updater [#5604](https://github.com/opentripplanner/OpenTripPlanner/pull/5604)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
