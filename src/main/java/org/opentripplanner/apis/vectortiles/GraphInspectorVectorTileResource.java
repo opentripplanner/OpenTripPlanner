@@ -1,5 +1,8 @@
 package org.opentripplanner.apis.vectortiles;
 
+import static org.opentripplanner.apis.vectortiles.model.LayerType.Edges;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.GeofencingZones;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.RegularStop;
 import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
 
 import jakarta.ws.rs.GET;
@@ -28,6 +31,7 @@ import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
+import org.opentripplanner.inspector.vector.edges.EdgeLayerBuilder;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.inspector.vector.stop.StopLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
@@ -40,19 +44,18 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 @Path("/routers/{ignoreRouterId}/inspector/vectortile")
 public class GraphInspectorVectorTileResource {
 
-  private static final LayerParams REGULAR_STOPS = new LayerParams(
-    "regularStops",
-    LayerType.RegularStop
-  );
+  private static final LayerParams REGULAR_STOPS = new LayerParams("regularStops", RegularStop);
   private static final LayerParams AREA_STOPS = new LayerParams("areaStops", LayerType.AreaStop);
   private static final LayerParams GEOFENCING_ZONES = new LayerParams(
     "geofencingZones",
-    LayerType.GeofencingZones
+    GeofencingZones
   );
+  private static final LayerParams EDGES = new LayerParams("edges", Edges);
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
     REGULAR_STOPS,
     AREA_STOPS,
-    GEOFENCING_ZONES
+    GEOFENCING_ZONES,
+    EDGES
   );
 
   private final OtpServerRequestContext serverContext;
@@ -131,7 +134,11 @@ public class GraphInspectorVectorTileResource {
         );
 
     var vectorSource = new VectorSource("debug", url);
-    return DebugStyleSpec.build(vectorSource, REGULAR_STOPS.toVectorSourceLayer(vectorSource));
+    return DebugStyleSpec.build(
+      vectorSource,
+      REGULAR_STOPS.toVectorSourceLayer(vectorSource),
+      EDGES.toVectorSourceLayer(vectorSource)
+    );
   }
 
   @Nonnull
@@ -162,6 +169,7 @@ public class GraphInspectorVectorTileResource {
         e -> context.transitService().findAreaStops(e)
       );
       case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
+      case Edges -> new EdgeLayerBuilder(context.graph(), layerParameters);
     };
   }
 }

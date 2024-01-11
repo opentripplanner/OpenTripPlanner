@@ -4,4 +4,5 @@ public enum LayerType {
   RegularStop,
   AreaStop,
   GeofencingZones,
+  Edges,
 }

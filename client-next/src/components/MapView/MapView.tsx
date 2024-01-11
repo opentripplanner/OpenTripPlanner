@@ -1,12 +1,12 @@
-import { LngLat, Map, MapboxGeoJSONFeature, NavigationControl } from 'react-map-gl';
+import {LngLat, Map, MapboxGeoJSONFeature, NavigationControl} from 'react-map-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
-import { NavigationMarkers } from './NavigationMarkers.tsx';
-import { LegLines } from './LegLines.tsx';
-import { useMapDoubleClick } from './useMapDoubleClick.ts';
-import { useState } from 'react';
-import { ContextMenuPopup } from './ContextMenuPopup.tsx';
-import { GeometryPropertyPopup } from './GeometryPropertyPopup.tsx';
+import {TripPattern, TripQuery, TripQueryVariables} from '../../gql/graphql.ts';
+import {NavigationMarkers} from './NavigationMarkers.tsx';
+import {LegLines} from './LegLines.tsx';
+import {useMapDoubleClick} from './useMapDoubleClick.ts';
+import {useState} from 'react';
+import {ContextMenuPopup} from './ContextMenuPopup.tsx';
+import {GeometryPropertyPopup} from './GeometryPropertyPopup.tsx';
 
 // TODO: this should be configurable
 const initialViewState = {
@@ -61,7 +61,7 @@ export function MapView({
         onContextMenu={(e) => {
           setShowContextPopup(e.lngLat);
         }}
-        interactiveLayerIds={['regular-stop']}
+        interactiveLayerIds={['regular-stop', 'edge-fallback', 'edge', 'link']}
         onClick={showFeaturePropPopup}
         // put lat/long in URL and pan to it on page reload
         hash={true}

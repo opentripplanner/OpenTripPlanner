@@ -2,12 +2,16 @@ package org.opentripplanner.apis.vectortiles.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.opentripplanner.apis.vectortiles.DebugStyleSpec.VectorSourceLayer;
+import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.json.ObjectMappers;
+import org.opentripplanner.street.model.edge.Edge;
 
 /**
  * Builds a Maplibre/Mapbox <a href="https://maplibre.org/maplibre-style-spec/layers/">vector tile
@@ -20,6 +24,7 @@ public class LayerStyleBuilder {
   private static final String SOURCE_LAYER = "source-layer";
   private final Map<String, Object> props = new HashMap<>();
   private final Map<String, Object> paint = new HashMap<>();
+  private List<String> filter = List.of();
 
   public static LayerStyleBuilder ofId(String id) {
     return new LayerStyleBuilder(id);
@@ -32,6 +37,7 @@ public class LayerStyleBuilder {
 
   public enum LayerType {
     Circle,
+    Line,
     Raster,
   }
 
@@ -75,6 +81,10 @@ public class LayerStyleBuilder {
     return type(LayerType.Circle);
   }
 
+  public LayerStyleBuilder typeLine() {
+    return type(LayerType.Line);
+  }
+
   private LayerStyleBuilder type(LayerType type) {
     props.put(TYPE, type.name().toLowerCase());
     return this;
@@ -91,12 +101,35 @@ public class LayerStyleBuilder {
     return this;
   }
 
+  // Line styling
+
+  public LayerStyleBuilder lineColor(String color) {
+    paint.put("line-color", validateColor(color));
+    return this;
+  }
+
+  public LayerStyleBuilder lineWidth(float width) {
+    paint.put("line-width", width);
+    return this;
+  }
+
+  // filtering edge
+  @SafeVarargs
+  public final LayerStyleBuilder edgeFilter(Class<? extends Edge>... classToFilter) {
+    var clazzes = Arrays.stream(classToFilter).map(Class::getSimpleName).toList();
+    filter = ListUtils.combine(List.of("in", "class"), clazzes);
+    return this;
+  }
+
   public JsonNode toJson() {
     validate();
 
     var copy = new HashMap<>(props);
     if (!paint.isEmpty()) {
       copy.put("paint", paint);
+    }
+    if (!filter.isEmpty()) {
+      copy.put("filter", filter);
     }
     return OBJECT_MAPPER.valueToTree(copy);
   }
