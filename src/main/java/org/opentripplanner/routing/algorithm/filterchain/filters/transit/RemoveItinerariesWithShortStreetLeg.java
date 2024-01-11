@@ -11,13 +11,15 @@ import org.opentripplanner.street.search.TraverseMode;
  * leg followed by parking the bike and taking transit. In such a case you would not need a bike
  * could just walk to the stop instead.
  * <p>
- * TODO: THIS FILTER DOES NOT FOLLOW THE ITINERARY FILTER FRAMEWORK. This filter should implement the
- *       {@link org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger}.
- *
- * TODO: This filter build on assumptions that is more or less an implementation detail. The
- *       filter should compare itineraries and remove them if a condition is meet, not just
- *       assume that a better option exist. Perhaps the access and egress should be filtered
- *       instead of filtering the transit itineraries?
+ * This filter does not follow the regular filter framework as it is intended only for use cases where
+ * several queries are combined in the frontend.
+ * <p>
+ * Example: you have two queries for bike+transit and walk+transit each. Both give you very short legs
+ * to reach a train station. A user would not expect to see a bike+transit shorted than 200m leg when it's
+ * presented right next to a walk+transit leg of the same length.
+ * <p>
+ * In other words, this offloads the comparison part of the filter chain to a system outside of OTP and 
+ * that is the reason for this non-standard approach.
  */
 public class RemoveItinerariesWithShortStreetLeg implements ItineraryListFilter {
 
