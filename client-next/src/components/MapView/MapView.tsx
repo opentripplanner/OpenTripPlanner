@@ -62,9 +62,7 @@ export function MapView({
           setShowContextPopup(e.lngLat);
         }}
         interactiveLayerIds={['regular-stop']}
-        onClick={(e) => {
-          showFeaturePropPopup(e);
-        }}
+        onClick={showFeaturePropPopup}
         // put lat/long in URL and pan to it on page reload
         hash={true}
         // disable pitching and rotating the map
