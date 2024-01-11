@@ -1,5 +1,7 @@
 package org.opentripplanner.apis.transmodel.mapping.preferences;
 
+import static org.opentripplanner.apis.transmodel.mapping.preferences.RentalPreferencesMapper.mapRentalPreferences;
+
 import org.opentripplanner.apis.transmodel.support.DataFetcherDecorator;
 import org.opentripplanner.routing.api.request.preference.BikePreferences;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -42,5 +44,7 @@ public class BikePreferencesMapper {
         callWith.argument("triangleFactors.safety", triangle::withSafety);
       });
     }
+
+    bike.withRental(rental -> mapRentalPreferences(rental, callWith));
   }
 }

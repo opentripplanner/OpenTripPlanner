@@ -56,18 +56,18 @@
 
 
     <properties>
-        <otp.serialization.version.id>134</otp.serialization.version.id>
+        <otp.serialization.version.id>135</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>30.1</geotools.version>
-        <google.dagger.version>2.49</google.dagger.version>
-        <jackson.version>2.16.0</jackson.version>
+        <google.dagger.version>2.50</google.dagger.version>
+        <jackson.version>2.16.1</jackson.version>
         <jersey.version>3.1.5</jersey.version>
         <junit.version>5.10.1</junit.version>
-        <micrometer.version>1.11.5</micrometer.version>
+        <micrometer.version>1.12.1</micrometer.version>
         <netcdf4.version>5.5.3</netcdf4.version>
         <logback.version>1.4.14</logback.version>
-        <lucene.version>9.8.0</lucene.version>
-        <slf4j.version>2.0.9</slf4j.version>
+        <lucene.version>9.9.1</lucene.version>
+        <slf4j.version>2.0.11</slf4j.version>
         <netex-java-model.version>2.0.15</netex-java-model.version>
         <siri-java-model.version>1.26</siri-java-model.version>
         <jaxb-runtime.version>4.0.4</jaxb-runtime.version>
@@ -142,7 +142,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.12.0</version>
+                <version>3.12.1</version>
                 <configuration>
                     <!-- Target Java version -->
                     <release>21</release>
@@ -242,7 +242,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.2.3</version>
+                <version>3.2.5</version>
                 <dependencies>
                     <dependency>
                         <groupId>me.fabriciorby</groupId>
@@ -282,7 +282,6 @@
                         --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.util=ALL-UNNAMED
-                        --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
                         --add-opens java.base/jdk.internal.module=ALL-UNNAMED
                         --add-opens java.base/sun.net.www.protocol.http=ALL-UNNAMED
                         --add-opens java.base/sun.net.www.protocol.jar=ALL-UNNAMED
@@ -944,7 +943,7 @@
         <dependency>
             <groupId>ch.poole</groupId>
             <artifactId>OpeningHoursParser</artifactId>
-            <version>0.27.1</version>
+            <version>0.28.1</version>
         </dependency>
 
         <!-- create zip test files-->

@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Locale;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.opentripplanner.api.mapping.I18NStringMapper;
-import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.apis.support.mapping.PropertyMapper;
+import org.opentripplanner.framework.i18n.I18NStringMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 
 public class DigitransitVehicleParkingGroupPropertyMapper

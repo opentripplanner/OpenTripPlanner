@@ -174,7 +174,7 @@ public final class TransitPreferences implements Serializable {
       boardSlack.equals(that.boardSlack) &&
       alightSlack.equals(that.alightSlack) &&
       reluctanceForMode.equals(that.reluctanceForMode) &&
-      otherThanPreferredRoutesPenalty == that.otherThanPreferredRoutesPenalty &&
+      Objects.equals(otherThanPreferredRoutesPenalty, that.otherThanPreferredRoutesPenalty) &&
       unpreferredCost.equals(that.unpreferredCost) &&
       Objects.equals(relaxTransitGroupPriority, that.relaxTransitGroupPriority) &&
       ignoreRealtimeUpdates == that.ignoreRealtimeUpdates &&

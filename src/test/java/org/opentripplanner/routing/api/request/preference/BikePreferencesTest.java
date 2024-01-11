@@ -21,6 +21,8 @@ class BikePreferencesTest {
     .withSlope(1)
     .build();
   public static final BicycleOptimizeType OPTIMIZE_TYPE = BicycleOptimizeType.TRIANGLE;
+  public static final int RENTAL_PICKUP_TIME = 30;
+  public static final int PARK_COST = 30;
 
   private final BikePreferences subject = BikePreferences
     .of()
@@ -32,6 +34,8 @@ class BikePreferencesTest {
     .withSwitchTime(SWITCH_TIME)
     .withSwitchCost(SWITCH_COST)
     .withOptimizeType(OPTIMIZE_TYPE)
+    .withRental(rental -> rental.withPickupTime(RENTAL_PICKUP_TIME).build())
+    .withParking(parking -> parking.withParkCost(PARK_COST).build())
     .withOptimizeTriangle(it -> it.withSlope(1).build())
     .build();
 
@@ -81,6 +85,18 @@ class BikePreferencesTest {
   }
 
   @Test
+  void rental() {
+    var vehicleRental = VehicleRentalPreferences.of().withPickupTime(RENTAL_PICKUP_TIME).build();
+    assertEquals(vehicleRental, subject.rental());
+  }
+
+  @Test
+  void parking() {
+    var vehicleParking = VehicleParkingPreferences.of().withParkCost(PARK_COST).build();
+    assertEquals(vehicleParking, subject.parking());
+  }
+
+  @Test
   void testOfAndCopyOf() {
     // Return same object if no value is set
     assertSame(BikePreferences.DEFAULT, BikePreferences.of().build());
@@ -107,6 +123,8 @@ class BikePreferencesTest {
       "walkingReluctance: 1.45, " +
       "switchTime: 3m20s, " +
       "switchCost: $450, " +
+      "parking: VehicleParkingPreferences{parkCost: $30}, " +
+      "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
       "optimizeType: TRIANGLE, " +
       "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
       "}",

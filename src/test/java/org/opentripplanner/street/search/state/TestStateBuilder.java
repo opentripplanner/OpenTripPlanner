@@ -1,6 +1,7 @@
 package org.opentripplanner.street.search.state;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType.EGRESS;
 import static org.opentripplanner.transit.model.site.PathwayMode.WALKWAY;
 
 import java.time.Instant;
@@ -10,6 +11,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
+import org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressType;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.service.vehiclerental.model.TestFreeFloatingRentalVehicleBuilder;
 import org.opentripplanner.service.vehiclerental.model.TestVehicleRentalStationBuilder;
@@ -20,6 +22,7 @@ import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex
 import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model._data.StreetModelForTest;
+import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.edge.ElevatorAlightEdge;
 import org.opentripplanner.street.model.edge.ElevatorBoardEdge;
 import org.opentripplanner.street.model.edge.ElevatorHopEdge;
@@ -51,10 +54,19 @@ public class TestStateBuilder {
   private State currentState;
 
   private TestStateBuilder(StreetMode mode) {
+    this(mode, AccessEgressType.ACCESS);
+  }
+
+  private TestStateBuilder(StreetMode mode, AccessEgressType type) {
     currentState =
       new State(
         StreetModelForTest.intersectionVertex(count, count),
-        StreetSearchRequest.of().withMode(mode).withStartTime(DEFAULT_START_TIME).build()
+        StreetSearchRequest
+          .of()
+          .withArriveBy(type.isEgress())
+          .withMode(mode)
+          .withStartTime(DEFAULT_START_TIME)
+          .build()
       );
   }
 
@@ -78,6 +90,14 @@ public class TestStateBuilder {
 
   public static TestStateBuilder ofScooterRental() {
     return new TestStateBuilder(StreetMode.SCOOTER_RENTAL);
+  }
+
+  /**
+   * Creates a state that starts the scooter rental in arriveBy mode, so starting with
+   * a rental scooter and going backwards until it finds a rental vertex where to drop it.
+   */
+  public static TestStateBuilder ofScooterRentalArriveBy() {
+    return new TestStateBuilder(StreetMode.SCOOTER_RENTAL, EGRESS);
   }
 
   public static TestStateBuilder ofBikeRental() {
@@ -248,7 +268,12 @@ public class TestStateBuilder {
     var from = (StreetVertex) currentState.vertex;
     var to = new TransitStopVertexBuilder().withStop(stop).build();
 
-    var edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);
+    Edge edge;
+    if (currentState.getRequest().arriveBy()) {
+      edge = StreetTransitStopLink.createStreetTransitStopLink(to, from);
+    } else {
+      edge = StreetTransitStopLink.createStreetTransitStopLink(from, to);
+    }
     var states = edge.traverse(currentState);
     if (states.length != 1) {
       throw new IllegalStateException("Only single state transitions are supported.");

@@ -170,22 +170,17 @@ travel time `x` (in seconds).
     TransitGroupPriorityConfig.mapTransitRequest(c, request.journey().transit());
 
     // Map preferences
-    request.withPreferences(preferences -> mapPreferences(c, request, preferences));
+    request.withPreferences(preferences -> mapPreferences(c, preferences));
 
     return request;
   }
 
-  private static void mapPreferences(
-    NodeAdapter c,
-    RouteRequest request,
-    RoutingPreferences.Builder preferences
-  ) {
+  private static void mapPreferences(NodeAdapter c, RoutingPreferences.Builder preferences) {
     preferences.withTransit(it -> mapTransitPreferences(c, it));
     preferences.withBike(it -> mapBikePreferences(c, it));
     preferences.withStreet(it -> mapStreetPreferences(c, it));
     preferences.withCar(it -> mapCarPreferences(c, it));
     preferences.withSystem(it -> mapSystemPreferences(c, it));
-    preferences.withRental(it -> setVehicleRental(c, request, it));
     preferences.withTransfer(it -> mapTransferPreferences(c, it));
     preferences.withWalk(it -> mapWalkPreferences(c, it));
     preferences.withWheelchair(it -> mapWheelchairPreferences(c, it, WHEELCHAIR_ACCESSIBILITY));
@@ -507,7 +502,8 @@ ferries, where the check-in process needs to be done in good time before ride.
               )
               .asStringSet(List.of())
           )
-      );
+      )
+      .withRental(it -> setVehicleRental(c, it));
   }
 
   private static void mapStreetPreferences(NodeAdapter c, StreetPreferences.Builder builder) {
@@ -820,7 +816,8 @@ your users receive a timely response. You can also limit the max duration. There
               )
               .asStringSet(List.of())
           )
-      );
+      )
+      .withRental(it -> setVehicleRental(c, it));
   }
 
   private static void mapSystemPreferences(NodeAdapter c, SystemPreferences.Builder builder) {

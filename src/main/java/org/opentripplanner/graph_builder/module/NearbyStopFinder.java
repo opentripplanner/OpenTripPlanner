@@ -47,14 +47,8 @@ import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * These library functions are used by the streetless and streetful stop linkers, and in profile
- * transfer generation.
- * TODO OTP2 Fold these into org.opentripplanner.routing.graphfinder.StreetGraphFinder
- *           These are not library functions, this is instantiated as an object. Define lifecycle of the object (reuse?).
- *           Because AStar instances should only be used once, NearbyStopFinder should only be used once.
- * Ideally they could also be used in long distance mode and profile routing for the street segments.
- * For each stop, it finds the closest stops on all other patterns. This reduces the number of transfer edges
- * significantly compared to simple radius-constrained all-to-all stop linkage.
+ * This class contains code for finding nearby stops from a given vertex. It is being used by access
+ * and egress searches as well as transfer generation.
  */
 public class NearbyStopFinder {
 
@@ -100,6 +94,8 @@ public class NearbyStopFinder {
    * that the result will include the origin vertex if it is an instance of StopVertex. This is
    * intentional: we don't want to return the next stop down the line for trip patterns that pass
    * through the origin vertex.
+   * Taking the patterns into account reduces the number of transfers significantly compared to
+   * simple traverse-duration-constrained all-to-all stop linkage.
    */
   public Set<NearbyStop> findNearbyStopsConsideringPatterns(
     Vertex vertex,
@@ -227,15 +223,12 @@ public class NearbyStopFinder {
       for (State state : spt.getAllStates()) {
         Vertex targetVertex = state.getVertex();
         if (originVertices.contains(targetVertex)) continue;
-        if (targetVertex instanceof TransitStopVertex && state.isFinal()) {
-          stopsFound.add(
-            NearbyStop.nearbyStopForState(state, ((TransitStopVertex) targetVertex).getStop())
-          );
+        if (targetVertex instanceof TransitStopVertex tsv && state.isFinal()) {
+          stopsFound.add(NearbyStop.nearbyStopForState(state, tsv.getStop()));
         }
         if (
           OTPFeature.FlexRouting.isOn() &&
-          targetVertex instanceof StreetVertex &&
-          !((StreetVertex) targetVertex).areaStops().isEmpty()
+          targetVertex instanceof StreetVertex streetVertex && !streetVertex.areaStops().isEmpty()
         ) {
           for (AreaStop areaStop : ((StreetVertex) targetVertex).areaStops()) {
             // This is for a simplification, so that we only return one vertex from each
@@ -314,7 +307,7 @@ public class NearbyStopFinder {
       if (maxStopCount > 0) {
         var strategy = new MaxCountSkipEdgeStrategy<>(
           maxStopCount,
-          NearbyStopFinder::isTransitVertex
+          NearbyStopFinder::hasReachedStop
         );
         return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
       }
@@ -360,15 +353,23 @@ public class NearbyStopFinder {
 
     return edges
       .stream()
-      .anyMatch(e ->
-        e instanceof StreetEdge && ((StreetEdge) e).getPermission().allows(TraverseMode.CAR)
-      );
+      .anyMatch(e -> e instanceof StreetEdge se && se.getPermission().allows(TraverseMode.CAR));
   }
 
   /**
-   * Checks if the {@code state} as at a transit vertex.
+   * Checks if the {@code state} is at a transit vertex and if it's final, which means that the state
+   * can actually board a vehicle.
+   * <p>
+   * This is important because there can be cases where states that cannot actually board the vehicle
+   * can dominate those that can thereby leading to zero found stops when this predicate is used with
+   * the {@link MaxCountSkipEdgeStrategy}.
+   * <p>
+   * An example of this would be an egress/reverse search with a very high walk reluctance where
+   * the states that speculatively rent a vehicle move the walk states down the A* priority queue
+   * until the required number of stops are reached to abort the search, leading to zero egress
+   * results.
    */
-  public static boolean isTransitVertex(State state) {
-    return state.getVertex() instanceof TransitStopVertex;
+  public static boolean hasReachedStop(State state) {
+    return state.getVertex() instanceof TransitStopVertex && state.isFinal();
   }
 }

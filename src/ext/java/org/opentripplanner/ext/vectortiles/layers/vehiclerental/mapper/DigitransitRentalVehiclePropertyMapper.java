@@ -4,7 +4,7 @@ import static org.opentripplanner.ext.vectortiles.layers.vehiclerental.mapper.Di
 
 import java.util.ArrayList;
 import java.util.Collection;
-import org.opentripplanner.api.mapping.PropertyMapper;
+import org.opentripplanner.apis.support.mapping.PropertyMapper;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
 
