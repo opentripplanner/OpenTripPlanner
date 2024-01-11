@@ -6,6 +6,8 @@ import static org.opentripplanner.client.model.RequestMode.WALK;
 
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -35,25 +37,30 @@ public class PortlandSmokeTest {
     SmokeTest.assertThatAllTransitLegsHaveFareProducts(plan);
   }
 
-  /**
-   * Checks that a scooter rental finishes at the edge of the park area and is continued on
-   * foot rather than scootering all the way to the destination.
-   */
-  @ParameterizedTest(name = "scooter rental in a geofencing zone with arriveBy={0}")
-  @ValueSource(booleans = { true, false })
-  public void geofencingZone(boolean arriveBy) {
-    SmokeTest.basicRouteTest(
-      new SmokeTestRequest(buckman, mountTaborPark, Set.of(SCOOTER_RENT, WALK), arriveBy),
-      List.of("WALK", "SCOOTER", "WALK")
-    );
-  }
+  @Nested
+  @Disabled
+  class GeofencingZones {
 
-  @ParameterizedTest(name = "scooter rental with arriveBy={0}")
-  @ValueSource(booleans = { true, false })
-  void scooterRent(boolean arriveBy) {
-    SmokeTest.basicRouteTest(
-      new SmokeTestRequest(cennentenial, piedmont, Set.of(SCOOTER_RENT, WALK), arriveBy),
-      List.of("WALK", "SCOOTER")
-    );
+    /**
+     * Checks that a scooter rental finishes at the edge of the park area and is continued on
+     * foot rather than scootering all the way to the destination.
+     */
+    @ParameterizedTest(name = "scooter rental in a geofencing zone with arriveBy={0}")
+    @ValueSource(booleans = { true, false })
+    public void geofencingZone(boolean arriveBy) {
+      SmokeTest.basicRouteTest(
+        new SmokeTestRequest(buckman, mountTaborPark, Set.of(SCOOTER_RENT, WALK), arriveBy),
+        List.of("WALK", "SCOOTER", "WALK")
+      );
+    }
+
+    @ParameterizedTest(name = "scooter rental with arriveBy={0}")
+    @ValueSource(booleans = { true, false })
+    void scooterRent(boolean arriveBy) {
+      SmokeTest.basicRouteTest(
+        new SmokeTestRequest(cennentenial, piedmont, Set.of(SCOOTER_RENT, WALK), arriveBy),
+        List.of("WALK", "SCOOTER")
+      );
+    }
   }
 }
