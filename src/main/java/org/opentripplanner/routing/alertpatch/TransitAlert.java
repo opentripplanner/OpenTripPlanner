@@ -33,6 +33,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
   //null means unknown
   private final Integer priority;
   private final ZonedDateTime creationTime;
+  private final Integer version;
   private final ZonedDateTime updatedTime;
   private final String siriCodespace;
   private final Set<EntitySelector> entities;
@@ -52,6 +53,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
     this.effect = builder.effect();
     this.priority = builder.priority();
     this.creationTime = builder.creationTime();
+    this.version = builder.version();
     this.updatedTime = builder.updatedTime();
     this.siriCodespace = builder.siriCodespace();
     this.entities = Set.copyOf(builder.entities());
@@ -117,6 +119,16 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
 
   public ZonedDateTime creationTime() {
     return creationTime;
+  }
+
+  /**
+   * Note: Only supported for TransitAlerts created from SIRI-SX messages
+   *
+   * @return Version as provided, or <code>null</code>
+   */
+  @Nullable
+  public Integer version() {
+    return version;
   }
 
   public ZonedDateTime updatedTime() {
@@ -195,6 +207,7 @@ public class TransitAlert extends AbstractTransitEntity<TransitAlert, TransitAle
       Objects.equals(effect, other.effect) &&
       Objects.equals(priority, other.priority) &&
       Objects.equals(creationTime, other.creationTime) &&
+      Objects.equals(version, other.version) &&
       Objects.equals(updatedTime, other.updatedTime) &&
       Objects.equals(siriCodespace, other.siriCodespace) &&
       Objects.equals(entities, other.entities) &&

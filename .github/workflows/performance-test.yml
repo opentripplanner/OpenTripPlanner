@@ -7,7 +7,7 @@ on:
 
 jobs:
   perf-test:
-    if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,'Bump serialization version id for')
+    if: github.repository_owner == 'opentripplanner' && !startsWith(github.event.head_commit.message ,'Bump serialization version id for') && !startsWith(github.event.head_commit.message ,'Upgrade debug client to version')
     runs-on: performance-test
     strategy:
       fail-fast: false

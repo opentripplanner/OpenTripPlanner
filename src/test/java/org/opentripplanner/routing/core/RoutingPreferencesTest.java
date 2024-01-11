@@ -24,7 +24,6 @@ public class RoutingPreferencesTest {
     assertSame(pref.wheelchair(), copy.wheelchair());
     assertSame(pref.transit(), copy.transit());
     assertSame(pref.street(), copy.street());
-    assertSame(pref.rental(), copy.rental());
     assertSame(pref.itineraryFilter(), copy.itineraryFilter());
     assertSame(pref.system(), copy.system());
   }
@@ -108,16 +107,6 @@ public class RoutingPreferencesTest {
 
     assertNotSame(pref, copy);
     assertNotSame(pref.street(), copy.street());
-  }
-
-  @Test
-  public void copyOfWithRentalChanges() {
-    var pref = new RoutingPreferences();
-    var copy = pref.copyOf().withRental(r -> r.withDropoffCost(2)).build();
-
-    assertNotSame(pref, copy);
-    assertNotSame(pref.rental(), copy.rental());
-    assertSame(pref.itineraryFilter(), copy.itineraryFilter());
   }
 
   @Test

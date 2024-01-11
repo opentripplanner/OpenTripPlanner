@@ -182,6 +182,10 @@ public abstract class PathBuilder<T extends RaptorTripSchedule> {
     return tail.isC2Set() ? tail.c2() : c2;
   }
 
+  public boolean isC2Set() {
+    return tail.isC2Set() || c2 != RaptorConstants.NOT_SET;
+  }
+
   public RaptorPath<T> build() {
     updateAggregatedFields();
     var pathLegs = createPathLegs(costCalculator, slackProvider);

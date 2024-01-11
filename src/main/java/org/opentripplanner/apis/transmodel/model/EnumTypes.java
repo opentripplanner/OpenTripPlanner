@@ -291,7 +291,7 @@ public class EnumTypes {
     .value(
       "noTransitConnectionInSearchWindow",
       RoutingErrorCode.NO_TRANSIT_CONNECTION_IN_SEARCH_WINDOW,
-      "Transit connection was found, but it was outside the search window, see metadata for the next search window"
+      "A transit connection was found, but it was outside the search window. Use paging to navigate to a result."
     )
     .value(
       "outsideBounds",

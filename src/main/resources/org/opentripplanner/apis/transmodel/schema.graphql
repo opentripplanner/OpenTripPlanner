@@ -549,6 +549,8 @@ type PtSituationElement {
   summary: [MultilingualString!]!
   "Period this situation is in effect"
   validityPeriod: ValidityPeriod
+  "Operator's version number for the situation element."
+  version: Int
   "Timestamp when the situation element was updated."
   versionedAtTime: DateTime
 }
@@ -1286,6 +1288,8 @@ type TripPattern {
   expectedStartTime: DateTime!
   "Generalized cost or weight of the itinerary. Used for debugging."
   generalizedCost: Int
+  "A second cost or weight of the itinerary. Some use-cases like pass-through and transit-priority-groups use a second cost during routing. This is used for debugging."
+  generalizedCost2: Int
   "A list of legs. Each leg is either a walking (cycling, car) portion of the trip, or a ride leg on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6, then walks to their destination, has four legs."
   legs: [Leg!]!
   "Time that the trip departs."
@@ -1644,7 +1648,7 @@ enum RoutingErrorCode {
   noStopsInRange
   "No transit connection was found between the origin and destination withing the operating day or the next day"
   noTransitConnection
-  "Transit connection was found, but it was outside the search window, see metadata for the next search window"
+  "A transit connection was found, but it was outside the search window. Use paging to navigate to a result."
   noTransitConnectionInSearchWindow
   "The coordinates are outside the bounds of the data currently loaded into the system"
   outsideBounds

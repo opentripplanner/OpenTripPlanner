@@ -1,6 +1,7 @@
 package org.opentripplanner.raptor._data.api;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.framework.time.DurationUtils.durationInSeconds;
 import static org.opentripplanner.framework.time.TimeUtils.time;
 import static org.opentripplanner.model.transfer.TransferConstraint.REGULAR_TRANSFER;
@@ -84,14 +85,12 @@ public class TestPathBuilderTestRaptor implements RaptorTestConstants {
       )
       .egress(BasicPathTestCase.EGRESS_DURATION);
 
-    Assertions.assertEquals(
-      BasicPathTestCase.BASIC_PATH_AS_STRING,
-      path.toString(this::stopIndexToName)
-    );
-    Assertions.assertEquals(
+    assertEquals(BasicPathTestCase.BASIC_PATH_AS_STRING, path.toString(this::stopIndexToName));
+    assertEquals(
       BasicPathTestCase.BASIC_PATH_AS_DETAILED_STRING,
       path.toStringDetailed(this::stopIndexToName)
     );
-    Assertions.assertEquals(BasicPathTestCase.TOTAL_C1, path.c1());
+    assertEquals(BasicPathTestCase.TOTAL_C1, path.c1());
+    assertTrue(path.isC2Set());
   }
 }

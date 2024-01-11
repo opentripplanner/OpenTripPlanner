@@ -71,7 +71,7 @@ public class PathStringBuilderTest {
 
   @Test
   public void summaryGeneralizedCostOnly() {
-    assertEquals("[C₁0.01]", subject.summary(1).toString());
+    assertEquals("[C₁0.01 C₂7]", subject.summary(1, 7).toString());
   }
 
   @Test
