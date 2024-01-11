@@ -3,6 +3,7 @@ package org.opentripplanner.raptor.api.path;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 
@@ -56,7 +57,14 @@ public interface RaptorPath<T extends RaptorTripSchedule> extends Comparable<Rap
    */
   int c1();
 
+  /**
+   * Raptor second criteria - use-case specific, used by pass-through and transit-priority-groups.
+   */
   int c2();
+
+  default boolean isC2Set() {
+    return c2() != RaptorConstants.NOT_SET;
+  }
 
   /**
    * The first leg/path of this journey - which is linked to the next and so on. The leg can contain

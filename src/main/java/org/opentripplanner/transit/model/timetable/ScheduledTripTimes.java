@@ -11,9 +11,11 @@ import java.util.Objects;
 import java.util.OptionalInt;
 import java.util.function.Supplier;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.error.OtpError;
 import org.opentripplanner.framework.i18n.I18NString;
 import org.opentripplanner.framework.lang.IntUtils;
 import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.TimeUtils;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.framework.DataValidationException;
@@ -134,7 +136,7 @@ public final class ScheduledTripTimes implements TripTimes {
 
   @Override
   public int getScheduledArrivalTime(final int stop) {
-    return arrivalTimes[stop] + timeShift;
+    return timeShifted(arrivalTimes[stop]);
   }
 
   @Override
@@ -144,12 +146,12 @@ public final class ScheduledTripTimes implements TripTimes {
 
   @Override
   public int getArrivalDelay(final int stop) {
-    return getArrivalTime(stop) - (arrivalTimes[stop] + timeShift);
+    return getArrivalTime(stop) - timeShifted(arrivalTimes[stop]);
   }
 
   @Override
   public int getScheduledDepartureTime(final int stop) {
-    return departureTimes[stop] + timeShift;
+    return timeShifted(departureTimes[stop]);
   }
 
   @Override
@@ -159,7 +161,7 @@ public final class ScheduledTripTimes implements TripTimes {
 
   @Override
   public int getDepartureDelay(final int stop) {
-    return getDepartureTime(stop) - (departureTimes[stop] + timeShift);
+    return getDepartureTime(stop) - timeShifted(departureTimes[stop]);
   }
 
   @Override
@@ -314,9 +316,9 @@ public final class ScheduledTripTimes implements TripTimes {
   /* private methods */
 
   private void validate() {
-    int lastStop = departureTimes.length - 1;
-    IntUtils.requireInRange(departureTimes[0], MIN_TIME, MAX_TIME);
-    IntUtils.requireInRange(arrivalTimes[lastStop], MIN_TIME, MAX_TIME);
+    // Validate first departure time and last arrival time
+    validateTimeInRange("departureTime", departureTimes, 0);
+    validateTimeInRange("arrivalTime", arrivalTimes, arrivalTimes.length - 1);
     // TODO: This class is used by FLEX, so we can not validate increasing TripTimes
     // validateNonIncreasingTimes();
   }
@@ -354,6 +356,29 @@ public final class ScheduledTripTimes implements TripTimes {
         );
       }
       prevDep = dep;
+    }
+  }
+
+  private int timeShifted(int time) {
+    return timeShift + time;
+  }
+
+  private void validateTimeInRange(String field, int[] times, int stopPos) {
+    int t = timeShifted(times[stopPos]);
+
+    if (t < MIN_TIME || t > MAX_TIME) {
+      throw new DataValidationException(
+        OtpError.of(
+          "TripTimeOutOfRange",
+          "The %s is not in range[%s, %s]. Time: %s, stop-pos: %d, trip: %s.",
+          field,
+          DurationUtils.durationToStr(MIN_TIME),
+          DurationUtils.durationToStr(MAX_TIME),
+          TimeUtils.timeToStrLong(t),
+          stopPos,
+          trip.getId()
+        )
+      );
     }
   }
 }

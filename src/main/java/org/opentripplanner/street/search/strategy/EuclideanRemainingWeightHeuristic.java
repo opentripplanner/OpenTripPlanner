@@ -26,7 +26,6 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
   //      not work correctly.
   public void initialize(
     StreetMode streetMode,
-    Set<Vertex> fromVertices,
     Set<Vertex> toVertices,
     boolean arriveBy,
     RoutingPreferences preferences

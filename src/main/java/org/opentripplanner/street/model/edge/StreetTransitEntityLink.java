@@ -98,7 +98,11 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
           s0.isRentingVehicleFromStation() &&
           !(
             s0.mayKeepRentedVehicleAtDestination() &&
-            s0.getRequest().rental().allowArrivingInRentedVehicleAtDestination()
+            s0
+              .getRequest()
+              .preferences()
+              .rental(s0.getRequest().mode())
+              .allowArrivingInRentedVehicleAtDestination()
           )
         ) {
           yield State.empty();
@@ -133,12 +137,13 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
 
   @Nonnull
   private State[] buildState(State s0, StateEditor s1, RoutingPreferences pref) {
+    var rentalPreferences = s0.getRequest().preferences().rental(s0.getRequest().mode());
     if (
       s0.isRentingVehicleFromStation() &&
       s0.mayKeepRentedVehicleAtDestination() &&
-      s0.getRequest().rental().allowArrivingInRentedVehicleAtDestination()
+      rentalPreferences.allowArrivingInRentedVehicleAtDestination()
     ) {
-      s1.incrementWeight(pref.rental().arrivingInRentalVehicleAtDestinationCost());
+      s1.incrementWeight(rentalPreferences.arrivingInRentalVehicleAtDestinationCost());
     }
 
     s1.setBackMode(null);

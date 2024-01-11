@@ -229,7 +229,10 @@ public class TransitRouter {
     RouteRequest accessRequest = request.clone();
 
     if (type.isAccess()) {
-      accessRequest.journey().rental().setAllowArrivingInRentedVehicleAtDestination(false);
+      accessRequest.withPreferences(p -> {
+        p.withBike(b -> b.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
+        p.withCar(c -> c.withRental(r -> r.withAllowArrivingInRentedVehicleAtDestination(false)));
+      });
     }
 
     Duration durationLimit = accessRequest
@@ -340,8 +343,7 @@ public class TransitRouter {
    * origin and destination.
    */
   private void checkIfTransitConnectionExists(RaptorResponse<TripSchedule> response) {
-    int searchWindowUsed = response.requestUsed().searchParams().searchWindowInSeconds();
-    if (searchWindowUsed <= 0 && response.paths().isEmpty()) {
+    if (response.noConnectionFound()) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, null))
       );

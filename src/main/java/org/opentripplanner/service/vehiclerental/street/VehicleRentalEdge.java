@@ -49,10 +49,10 @@ public class VehicleRentalEdge extends Edge {
     VehicleRentalPlaceVertex stationVertex = (VehicleRentalPlaceVertex) tov;
     VehicleRentalPlace station = stationVertex.getStation();
     String network = station.getNetwork();
-    var preferences = s0.getPreferences();
-    boolean realtimeAvailability = preferences.rental().useAvailabilityInformation();
+    var preferences = s0.getPreferences().rental(formFactor.traverseMode);
+    boolean realtimeAvailability = preferences.useAvailabilityInformation();
 
-    if (station.networkIsNotAllowed(s0.getRequest().rental())) {
+    if (station.networkIsNotAllowed(preferences)) {
       return State.empty();
     }
 
@@ -128,7 +128,7 @@ public class VehicleRentalEdge extends Edge {
             s1.beginFloatingVehicleRenting(formFactor, network, false);
           } else {
             boolean mayKeep =
-              s0.getRequest().rental().allowArrivingInRentedVehicleAtDestination() &&
+              preferences.allowArrivingInRentedVehicleAtDestination() &&
               station.isArrivingInRentalVehicleAtDestinationAllowed();
             s1.beginVehicleRentingAtStation(formFactor, network, mayKeep, false);
           }
@@ -161,12 +161,8 @@ public class VehicleRentalEdge extends Edge {
       }
     }
 
-    s1.incrementWeight(
-      pickedUp ? preferences.rental().pickupCost() : preferences.rental().dropoffCost()
-    );
-    s1.incrementTimeInSeconds(
-      pickedUp ? preferences.rental().pickupTime() : preferences.rental().dropoffTime()
-    );
+    s1.incrementWeight(pickedUp ? preferences.pickupCost() : preferences.dropoffCost());
+    s1.incrementTimeInSeconds(pickedUp ? preferences.pickupTime() : preferences.dropoffTime());
     s1.setBackMode(null);
     return s1.makeStateArray();
   }

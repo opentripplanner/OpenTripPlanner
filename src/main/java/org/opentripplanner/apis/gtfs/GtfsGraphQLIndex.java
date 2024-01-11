@@ -26,7 +26,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.opentripplanner.api.json.GraphQLResponseSerializer;
 import org.opentripplanner.apis.gtfs.datafetchers.AgencyImpl;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertEntityTypeResolver;
 import org.opentripplanner.apis.gtfs.datafetchers.AlertImpl;
@@ -88,6 +87,7 @@ import org.opentripplanner.apis.gtfs.model.StopPosition;
 import org.opentripplanner.ext.actuator.MicrometerGraphQLInstrumentation;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
+import org.opentripplanner.framework.graphql.GraphQLResponseSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

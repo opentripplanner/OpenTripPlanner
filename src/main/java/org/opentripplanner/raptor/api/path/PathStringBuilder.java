@@ -119,8 +119,8 @@ public class PathStringBuilder {
       : this;
   }
 
-  public PathStringBuilder summary(int c1) {
-    return summaryStart().c1(c1).summaryEnd();
+  public PathStringBuilder summary(int c1, int c2) {
+    return summaryStart().c1(c1).c2(c2).summaryEnd();
   }
 
   public PathStringBuilder summary(int startTime, int endTime, int nTransfers, int c1, int c2) {

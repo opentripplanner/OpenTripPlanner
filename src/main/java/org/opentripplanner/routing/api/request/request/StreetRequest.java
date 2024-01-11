@@ -4,7 +4,6 @@ import java.io.Serializable;
 import org.opentripplanner.routing.api.request.StreetMode;
 
 // TODO VIA: Javadoc
-// TODO VIA (Hannes): Missing VehicleRentalRequest and VehicleParkingRequest
 public class StreetRequest implements Cloneable, Serializable {
 
   private StreetMode mode;

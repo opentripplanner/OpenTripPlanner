@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptoradapter.transit.request;
 
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.BinarySetOperator.AND;
+import static org.opentripplanner.routing.algorithm.raptoradapter.transit.request.BinarySetOperator.OR;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -59,7 +62,7 @@ public abstract class PriorityGroupMatcher {
     if (!select.routeIds().isEmpty()) {
       list.add(new IdMatcher("Route", select.routeIds(), p -> p.getRoute().getId()));
     }
-    return compositeOf(list);
+    return andOf(list);
   }
 
   static PriorityGroupMatcher[] of(Collection<TransitPriorityGroupSelect> selectors) {
@@ -70,15 +73,15 @@ public abstract class PriorityGroupMatcher {
       .toArray(PriorityGroupMatcher[]::new);
   }
 
-  private static <T> String arrayToString(T[] values) {
-    return colToString(Arrays.asList(values));
+  private static <T> String arrayToString(BinarySetOperator op, T[] values) {
+    return colToString(op, Arrays.asList(values));
   }
 
-  private static <T> String colToString(Collection<T> values) {
-    return values.stream().map(Objects::toString).collect(Collectors.joining(" | "));
+  private static <T> String colToString(BinarySetOperator op, Collection<T> values) {
+    return values.stream().map(Objects::toString).collect(Collectors.joining(" " + op + " "));
   }
 
-  private static PriorityGroupMatcher compositeOf(List<PriorityGroupMatcher> list) {
+  private static PriorityGroupMatcher andOf(List<PriorityGroupMatcher> list) {
     // Remove empty/noop matchers
     list = list.stream().filter(Predicate.not(PriorityGroupMatcher::isEmpty)).toList();
 
@@ -88,7 +91,7 @@ public abstract class PriorityGroupMatcher {
     if (list.size() == 1) {
       return list.get(0);
     }
-    return new CompositeMatcher(list);
+    return new AndMatcher(list);
   }
 
   abstract boolean match(TripPattern pattern);
@@ -112,7 +115,7 @@ public abstract class PriorityGroupMatcher {
 
     @Override
     public String toString() {
-      return "Mode(" + colToString(modes) + ')';
+      return "Mode(" + colToString(OR, modes) + ')';
     }
   }
 
@@ -145,7 +148,7 @@ public abstract class PriorityGroupMatcher {
 
     @Override
     public String toString() {
-      return typeName + "Regexp(" + arrayToString(subModeRegexp) + ')';
+      return typeName + "Regexp(" + arrayToString(OR, subModeRegexp) + ')';
     }
   }
 
@@ -172,35 +175,35 @@ public abstract class PriorityGroupMatcher {
 
     @Override
     public String toString() {
-      return typeName + "Id(" + colToString(ids) + ')';
+      return typeName + "Id(" + colToString(OR, ids) + ')';
     }
   }
 
   /**
-   * Take a list of matchers and provide a single interface. At least one matcher in the
-   * list must match for the composite matcher to return a match.
+   * Takes a list of matchers and provide a single interface. All matchers in the list must match
+   * for the composite matcher to return a match.
    */
-  private static final class CompositeMatcher extends PriorityGroupMatcher {
+  private static final class AndMatcher extends PriorityGroupMatcher {
 
     private final PriorityGroupMatcher[] matchers;
 
-    public CompositeMatcher(List<PriorityGroupMatcher> matchers) {
+    public AndMatcher(List<PriorityGroupMatcher> matchers) {
       this.matchers = matchers.toArray(PriorityGroupMatcher[]::new);
     }
 
     @Override
     boolean match(TripPattern pattern) {
       for (var m : matchers) {
-        if (m.match(pattern)) {
-          return true;
+        if (!m.match(pattern)) {
+          return false;
         }
       }
-      return false;
+      return true;
     }
 
     @Override
     public String toString() {
-      return "(" + arrayToString(matchers) + ')';
+      return "(" + arrayToString(AND, matchers) + ')';
     }
   }
 }

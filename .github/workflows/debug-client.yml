@@ -1,0 +1,87 @@
+name: Debug client
+
+on:
+  push:
+    paths:
+      - 'client-next/**'
+  pull_request:
+    paths:
+      - 'client-next/**'
+
+# to avoid conflicts, make sure that only one workflow pushes to Github at the same time
+concurrency:
+  group: github-push
+
+jobs:
+  debug-client:
+    if: github.repository_owner == 'opentripplanner'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # this is necessary so that the correct credentials are put into the git configuration
+      # when we push to dev-2.x and push the compiled output to the git repo
+      - uses: actions/checkout@v4
+        if: github.event_name == 'push'
+        with:
+          token: ${{ secrets.CHANGELOG_TOKEN }}
+          fetch-depth: 0
+
+      # for a simple PR where we don't push, we don't need any credentials
+      - uses: actions/checkout@v4
+        if: github.event_name == 'pull_request'
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Set version
+        run: echo "VERSION=`date +%Y/%m/%Y-%m-%dT%H:%M`" >> $GITHUB_ENV
+
+      - name: Build debug client
+        working-directory: client-next
+        run: |
+          npm install
+          npm run build -- --base https://cdn.jsdelivr.net/gh/opentripplanner/debug-client-assets@main/${VERSION}/
+
+      - name: Deploy compiled assets to repo
+        if: github.event_name == 'push' && github.ref == 'refs/heads/dev-2.x'
+        env:
+          REMOTE: debug-client
+          LOCAL_BRANCH: local-assets
+          REMOTE_BRANCH: main
+          TOKEN: ${{ secrets.CHANGELOG_TOKEN }}
+        run: |
+          # Configure git user
+          git config --global user.name 'OTP Bot'
+          git config --global user.email 'bot@opentripplanner.org'
+          
+          # Fetch the assets repo
+          git remote add $REMOTE https://$TOKEN@github.com/opentripplanner/debug-client-assets.git 
+          git fetch --depth=1 $REMOTE $REMOTE_BRANCH:$LOCAL_BRANCH
+
+          git checkout $LOCAL_BRANCH
+          
+          
+          # Copy the compiled output to a versioned folder
+          mkdir -p $VERSION
+          rsync -r client-next/output/* ./$VERSION/
+          git add $VERSION
+          git commit -am "Add version ${VERSION} of debug client"
+          
+          # Push to assets repo https://github.com/opentripplanner/debug-client-assets
+          git push $REMOTE $LOCAL_BRANCH:$REMOTE_BRANCH
+          
+          # Switch back to the OTP code
+          git checkout dev-2.x
+          git pull --rebase
+          
+          CLIENT_HTML_OUTPUT=src/client/debug-client-preview/index.html
+          mkdir -p src/client/debug-client-preview/
+          cp client-next/output/index.html ${CLIENT_HTML_OUTPUT}
+          
+          # just to debug
+          cat ${CLIENT_HTML_OUTPUT}
+          
+          git add -f ${CLIENT_HTML_OUTPUT}
+          git commit -m "Upgrade debug client to version ${VERSION}"
+          git push ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git HEAD:dev-2.x
