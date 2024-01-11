@@ -741,10 +741,6 @@ Used to group requests when monitoring OTP.
       ]
     },
     {
-      "type" : "websocket-gtfs-rt-updater",
-      "feedId" : "ov"
-    },
-    {
       "type" : "siri-et-updater",
       "url" : "https://example.com/some/path",
       "feedId" : "feed_id",
