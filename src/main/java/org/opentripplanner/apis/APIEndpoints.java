@@ -1,10 +1,10 @@
 package org.opentripplanner.apis;
 
 import static org.opentripplanner.framework.application.OTPFeature.APIBikeRental;
-import static org.opentripplanner.framework.application.OTPFeature.APIGraphInspectorTile;
 import static org.opentripplanner.framework.application.OTPFeature.APIServerInfo;
 import static org.opentripplanner.framework.application.OTPFeature.APIUpdaterStatus;
 import static org.opentripplanner.framework.application.OTPFeature.ActuatorAPI;
+import static org.opentripplanner.framework.application.OTPFeature.DebugUi;
 import static org.opentripplanner.framework.application.OTPFeature.GtfsGraphQlApi;
 import static org.opentripplanner.framework.application.OTPFeature.LegacyRestApi;
 import static org.opentripplanner.framework.application.OTPFeature.ReportApi;
@@ -19,11 +19,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
-import org.opentripplanner.api.resource.GraphInspectorVectorTileResource;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.apis.gtfs.GtfsGraphQLAPI;
 import org.opentripplanner.apis.transmodel.TransmodelAPI;
+import org.opentripplanner.apis.vectortiles.GraphInspectorVectorTileResource;
 import org.opentripplanner.ext.actuator.ActuatorAPI;
 import org.opentripplanner.ext.geocoder.GeocoderResource;
 import org.opentripplanner.ext.parkAndRideApi.ParkAndRideResource;
@@ -46,10 +46,10 @@ public class APIEndpoints {
   private APIEndpoints() {
     // Add feature enabled APIs, these can be enabled by default, some is not.
     // See the OTPFeature enum for details.
-    addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);
-    addIfEnabled(APIGraphInspectorTile, GraphInspectorVectorTileResource.class);
     addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
+    addIfEnabled(DebugUi, GraphInspectorTileResource.class);
+    addIfEnabled(DebugUi, GraphInspectorVectorTileResource.class);
     addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.class);
     addIfEnabled(TransmodelGraphQlApi, TransmodelAPI.class);
 
