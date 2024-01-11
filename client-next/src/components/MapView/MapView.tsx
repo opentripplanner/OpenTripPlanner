@@ -39,7 +39,6 @@ export function MapView({
     e: mapboxgl.MapMouseEvent & {
       features?: mapboxgl.MapboxGeoJSONFeature[] | undefined;
     },
-    setShowPropsPopup: (value: ((prevState: PopupData | null) => PopupData | null) | PopupData | null) => void,
   ) => {
     if (e.features) {
       // if you click on a cluster of map features it's possible that there are multiple
@@ -64,7 +63,7 @@ export function MapView({
         }}
         interactiveLayerIds={['regular-stop']}
         onClick={(e) => {
-          showFeaturePropPopup(e, setShowPropsPopup);
+          showFeaturePropPopup(e);
         }}
         // put lat/long in URL and pan to it on page reload
         hash={true}
