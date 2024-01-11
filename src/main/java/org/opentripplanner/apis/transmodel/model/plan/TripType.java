@@ -8,7 +8,7 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import java.util.stream.Collectors;
-import org.opentripplanner.api.mapping.PlannerErrorMapper;
+import org.opentripplanner.apis.support.mapping.PlannerErrorMapper;
 import org.opentripplanner.apis.transmodel.model.PlanResponse;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.framework.graphql.GraphQLUtils;

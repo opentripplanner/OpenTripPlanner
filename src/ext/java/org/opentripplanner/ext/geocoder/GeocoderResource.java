@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import org.opentripplanner.api.mapping.FeedScopedIdMapper;
+import org.opentripplanner.ext.restapi.mapping.FeedScopedIdMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.site.StopLocation;
 
