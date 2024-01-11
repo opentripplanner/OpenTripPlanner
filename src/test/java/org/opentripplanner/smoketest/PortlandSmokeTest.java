@@ -25,11 +25,11 @@ import org.opentripplanner.smoketest.util.SmokeTestRequest;
 @Tag("portland")
 public class PortlandSmokeTest {
 
-  final static Coordinate cennentenial = new Coordinate(45.504602, -122.4968719);
-  final static Coordinate buckman = new Coordinate(45.51720, -122.652289867);
-  final static Coordinate hazelwood = new Coordinate(45.52463, -122.5583);
-  final static Coordinate piedmont = new Coordinate(45.5746, -122.6697);
-  final static Coordinate mountTaborPark = new Coordinate(45.511399, -122.594203);
+  static final Coordinate cennentenial = new Coordinate(45.504602, -122.4968719);
+  static final Coordinate buckman = new Coordinate(45.51720, -122.652289867);
+  static final Coordinate hazelwood = new Coordinate(45.52463, -122.5583);
+  static final Coordinate piedmont = new Coordinate(45.5746, -122.6697);
+  static final Coordinate mountTaborPark = new Coordinate(45.511399, -122.594203);
 
   @Test
   public void railTrip() {
