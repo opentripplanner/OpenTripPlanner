@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.filterchain.filters.transit;
 
-import java.util.List;
+import java.util.function.Predicate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.framework.spi.ItineraryListFilter;
+import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.street.search.TraverseMode;
 
 /**
@@ -18,10 +18,10 @@ import org.opentripplanner.street.search.TraverseMode;
  * to reach a train station. A user would not expect to see a bike+transit shorted than 200m leg when it's
  * presented right next to a walk+transit leg of the same length.
  * <p>
- * In other words, this offloads the comparison part of the filter chain to a system outside of OTP and 
+ * In other words, this offloads the comparison part of the filter chain to a system outside of OTP and
  * that is the reason for this non-standard approach.
  */
-public class RemoveItinerariesWithShortStreetLeg implements ItineraryListFilter {
+public class RemoveItinerariesWithShortStreetLeg implements RemoveItineraryFlagger {
 
   private final double minDistance;
   private final TraverseMode traverseMode;
@@ -32,11 +32,16 @@ public class RemoveItinerariesWithShortStreetLeg implements ItineraryListFilter 
   }
 
   @Override
-  public List<Itinerary> filter(List<Itinerary> itineraries) {
-    return itineraries.stream().filter(this::filterItinerariesWithShortStreetLeg).toList();
+  public String name() {
+    return "remove-itineraries-with-short-street-leg";
   }
 
-  private boolean filterItinerariesWithShortStreetLeg(Itinerary itinerary) {
+  @Override
+  public Predicate<Itinerary> shouldBeFlaggedForRemoval() {
+    return this::removeItineraryWithShortStreetLeg;
+  }
+
+  private boolean removeItineraryWithShortStreetLeg(Itinerary itinerary) {
     var hasLegsOfMode = itinerary.getStreetLegs().anyMatch(l -> l.getMode().equals(traverseMode));
     if (hasLegsOfMode && itinerary.hasTransit()) {
       var distance = itinerary
@@ -45,9 +50,9 @@ public class RemoveItinerariesWithShortStreetLeg implements ItineraryListFilter 
         .mapToDouble(Leg::getDistanceMeters)
         .sum();
 
-      return distance > minDistance;
+      return distance <= minDistance;
     } else {
-      return true;
+      return false;
     }
   }
 }
