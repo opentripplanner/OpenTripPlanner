@@ -7,7 +7,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.api.mapping.PlannerErrorMapper;
+import org.opentripplanner.apis.support.mapping.PlannerErrorMapper;
 
 public class RoutingErrorType {
 

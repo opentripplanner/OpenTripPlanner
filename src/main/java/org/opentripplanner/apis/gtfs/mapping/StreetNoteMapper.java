@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.gtfs.mapping;
 
-import org.opentripplanner.api.mapping.StreetNoteMaperMapper;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -11,7 +10,7 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
 public class StreetNoteMapper {
 
   /**
-   * Similar to {@link StreetNoteMaperMapper ::mapToApi}.
+   * Similar to {@link org.opentripplanner.apis.support.mapping.StreetNoteMapper ::mapToApi}.
    */
   public static TransitAlert mapStreetNoteToAlert(StreetNote note) {
     // TODO: The ID is used only in the mapping, we should instead have two mappers for the fields

@@ -11,7 +11,6 @@ public class StreetSearchRequestMapper {
       .withStartTime(opt.dateTime())
       .withPreferences(opt.preferences())
       .withWheelchair(opt.wheelchair())
-      .withRental(opt.journey().rental())
       .withFrom(opt.from())
       .withTo(opt.to());
   }
@@ -22,7 +21,6 @@ public class StreetSearchRequestMapper {
       .withStartTime(Instant.ofEpochSecond(0))
       .withPreferences(opt.preferences())
       .withWheelchair(opt.wheelchair())
-      .withRental(opt.journey().rental())
       .withMode(opt.journey().transfer().mode());
   }
 }
