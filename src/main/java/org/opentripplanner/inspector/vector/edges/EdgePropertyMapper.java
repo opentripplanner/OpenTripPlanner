@@ -1,5 +1,6 @@
 package org.opentripplanner.inspector.vector.edges;
 
+import static org.opentripplanner.framework.lang.DoubleUtils.roundTo2Decimals;
 import static org.opentripplanner.inspector.vector.KeyValue.kv;
 
 import java.util.Collection;
@@ -20,7 +21,7 @@ public class EdgePropertyMapper extends PropertyMapper<Edge> {
       switch (input) {
         case StreetEdge e -> List.of(
           kv("permission", e.getPermission().toString()),
-          kv("bicycleSafetyFactor", e.getBicycleSafetyFactor())
+          kv("bicycleSafetyFactor", roundTo2Decimals(e.getBicycleSafetyFactor()))
         );
         case EscalatorEdge e -> List.of(kv("distance", e.getDistanceMeters()));
         default -> List.of();

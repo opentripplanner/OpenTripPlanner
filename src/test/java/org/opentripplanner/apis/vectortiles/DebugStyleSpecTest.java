@@ -10,7 +10,7 @@ import org.opentripplanner.test.support.ResourceLoader;
 
 class DebugStyleSpecTest {
 
-  private final ResourceLoader RES = ResourceLoader.of(this);
+  private final ResourceLoader RESOURCES = ResourceLoader.of(this);
 
   @Test
   void spec() {
@@ -20,7 +20,7 @@ class DebugStyleSpecTest {
     var spec = DebugStyleSpec.build(vectorSource, regularStops, edges);
 
     var json = ObjectMappers.ignoringExtraFields().valueToTree(spec);
-    var expectation = RES.fileToString("style.json");
+    var expectation = RESOURCES.fileToString("style.json");
     assertEqualJson(expectation, json);
   }
 }

@@ -3,7 +3,7 @@ package org.opentripplanner.apis.vectortiles.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -22,8 +22,8 @@ public class LayerStyleBuilder {
   private static final ObjectMapper OBJECT_MAPPER = ObjectMappers.ignoringExtraFields();
   private static final String TYPE = "type";
   private static final String SOURCE_LAYER = "source-layer";
-  private final Map<String, Object> props = new HashMap<>();
-  private final Map<String, Object> paint = new HashMap<>();
+  private final Map<String, Object> props = new LinkedHashMap<>();
+  private final Map<String, Object> paint = new LinkedHashMap<>();
   private List<String> filter = List.of();
 
   public static LayerStyleBuilder ofId(String id) {
@@ -113,6 +113,11 @@ public class LayerStyleBuilder {
     return this;
   }
 
+  public LayerStyleBuilder lineWidth(ZoomDependentNumber zoomStops) {
+    paint.put("line-width", zoomStops.toJson());
+    return this;
+  }
+
   // filtering edge
   @SafeVarargs
   public final LayerStyleBuilder edgeFilter(Class<? extends Edge>... classToFilter) {
@@ -124,7 +129,7 @@ public class LayerStyleBuilder {
   public JsonNode toJson() {
     validate();
 
-    var copy = new HashMap<>(props);
+    var copy = new LinkedHashMap<>(props);
     if (!paint.isEmpty()) {
       copy.put("paint", paint);
     }
@@ -145,5 +150,21 @@ public class LayerStyleBuilder {
     Stream
       .of(TYPE)
       .forEach(p -> Objects.requireNonNull(props.get(p), "%s must be set".formatted(p)));
+  }
+
+  public record ZoomStop(int zoom, float value) {
+    public List<Number> toList() {
+      return List.of(zoom, value);
+    }
+  }
+
+  public record ZoomDependentNumber(float base, List<ZoomStop> stops) {
+    public JsonNode toJson() {
+      var props = new LinkedHashMap<>();
+      props.put("base", base);
+      var vals = stops.stream().map(ZoomStop::toList).toList();
+      props.put("stops", vals);
+      return OBJECT_MAPPER.valueToTree(props);
+    }
   }
 }
