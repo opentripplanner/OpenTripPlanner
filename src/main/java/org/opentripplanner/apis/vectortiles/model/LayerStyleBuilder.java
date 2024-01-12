@@ -24,6 +24,8 @@ public class LayerStyleBuilder {
   private static final String SOURCE_LAYER = "source-layer";
   private final Map<String, Object> props = new LinkedHashMap<>();
   private final Map<String, Object> paint = new LinkedHashMap<>();
+  private final Map<String, Object> layout = new LinkedHashMap<>();
+  private final Map<String, Object> line = new LinkedHashMap<>();
   private List<String> filter = List.of();
 
   public static LayerStyleBuilder ofId(String id) {
@@ -34,6 +36,8 @@ public class LayerStyleBuilder {
     source(source.vectorSource());
     return sourceLayer(source.vectorLayer());
   }
+
+
 
   public enum LayerType {
     Circle,
@@ -82,7 +86,9 @@ public class LayerStyleBuilder {
   }
 
   public LayerStyleBuilder typeLine() {
-    return type(LayerType.Line);
+    type(LayerType.Line);
+    line.put("line-cap", "round");
+    return this;
   }
 
   private LayerStyleBuilder type(LayerType type) {
@@ -98,6 +104,11 @@ public class LayerStyleBuilder {
   public LayerStyleBuilder circleStroke(String color, int width) {
     paint.put("circle-stroke-color", validateColor(color));
     paint.put("circle-stroke-width", width);
+    return this;
+  }
+
+  public LayerStyleBuilder circleRadius(ZoomDependentNumber radius) {
+    paint.put("circle-radius", radius.toJson());
     return this;
   }
 
@@ -118,6 +129,11 @@ public class LayerStyleBuilder {
     return this;
   }
 
+  public LayerStyleBuilder intiallyHidden() {
+    layout.put("visibility", "none");
+    return this;
+  }
+
   // filtering edge
   @SafeVarargs
   public final LayerStyleBuilder edgeFilter(Class<? extends Edge>... classToFilter) {
@@ -135,6 +151,12 @@ public class LayerStyleBuilder {
     }
     if (!filter.isEmpty()) {
       copy.put("filter", filter);
+    }
+    if (!layout.isEmpty()) {
+      copy.put("layout", layout);
+    }
+    if (!line.isEmpty()) {
+      copy.put("line", line);
     }
     return OBJECT_MAPPER.valueToTree(copy);
   }

@@ -37,7 +37,7 @@ public class DebugStyleSpec {
   private static final int MAX_ZOOM = 23;
   private static final ZoomDependentNumber LINE_WIDTH = new ZoomDependentNumber(
     1.3f,
-    List.of(new ZoomStop(13, 1), new ZoomStop(MAX_ZOOM, 10))
+    List.of(new ZoomStop(13, 0.5f), new ZoomStop(MAX_ZOOM, 10))
   );
 
   public record VectorSourceLayer(VectorSource vectorSource, String vectorLayer) {}
@@ -96,6 +96,7 @@ public class DebugStyleSpec {
           .typeCircle()
           .vectorSourceLayer(regularStops)
           .circleStroke("#140d0e", 2)
+          .circleRadius(new ZoomDependentNumber(1, List.of(new ZoomStop(11,1), new ZoomStop(MAX_ZOOM, 10))))
           .circleColor("#fcf9fa")
           .minZoom(11)
           .maxZoom(MAX_ZOOM)

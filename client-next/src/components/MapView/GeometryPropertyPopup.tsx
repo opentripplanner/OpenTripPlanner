@@ -11,7 +11,13 @@ export function GeometryPropertyPopup({
   onClose: () => void;
 }) {
   return (
-    <Popup latitude={coordinates.lat} longitude={coordinates.lng} closeButton={true} onClose={() => onClose()}>
+    <Popup
+      latitude={coordinates.lat}
+      longitude={coordinates.lng}
+      closeButton={true}
+      onClose={() => onClose()}
+      maxWidth="350px"
+    >
       <Table bordered>
         <tbody>
           {Object.entries(properties).map(([key, value]) => (
