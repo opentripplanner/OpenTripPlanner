@@ -24,16 +24,16 @@ public final class HttpUtils {
   public static String getBaseAddress(UriInfo uri, HttpHeaders headers) {
     String protocol;
     if (headers.getRequestHeader(HEADER_X_FORWARDED_PROTO) != null) {
-      protocol = headers.getRequestHeader(HEADER_X_FORWARDED_PROTO).get(0);
+      protocol = headers.getRequestHeader(HEADER_X_FORWARDED_PROTO).getFirst();
     } else {
       protocol = uri.getRequestUri().getScheme();
     }
 
     String host;
     if (headers.getRequestHeader(HEADER_X_FORWARDED_HOST) != null) {
-      host = headers.getRequestHeader(HEADER_X_FORWARDED_HOST).get(0);
+      host = headers.getRequestHeader(HEADER_X_FORWARDED_HOST).getFirst();
     } else if (headers.getRequestHeader(HEADER_HOST) != null) {
-      host = headers.getRequestHeader(HEADER_HOST).get(0);
+      host = headers.getRequestHeader(HEADER_HOST).getFirst();
     } else {
       host = uri.getBaseUri().getHost() + ":" + uri.getBaseUri().getPort();
     }

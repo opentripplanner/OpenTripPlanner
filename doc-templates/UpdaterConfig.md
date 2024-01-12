@@ -45,18 +45,6 @@ The information is downloaded in a single HTTP request and polled regularly.
 <!-- INSERT: stop-time-updater -->
 
 
-### TripUpdates via WebSocket
-
-This updater doesn't poll a data source but opens a persistent connection to the GTFS-RT provider, 
-which then sends incremental updates immediately as they become available.
-
-The [OneBusAway GTFS-realtime exporter project](https://github.com/OneBusAway/onebusaway-gtfs-realtime-exporter)
-provides this kind of streaming, incremental updates over a websocket rather than a single large
-file.
-
-<!-- INSERT: websocket-gtfs-rt-updater -->
-
-
 ### Vehicle Positions
 
 VehiclePositions give the location of some or all vehicles currently in service, in terms of 

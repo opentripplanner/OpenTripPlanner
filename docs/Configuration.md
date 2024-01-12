@@ -203,7 +203,7 @@ The result will look like this:
 } 
 ``` 
 
-# System-wide Configuration
+## System-wide Configuration
 
 Using the file `otp-config.json` you can enable or disable different APIs and experimental
 [Sandbox Extensions](SandboxExtension.md). By default, all supported APIs are enabled and all
@@ -212,45 +212,45 @@ Features that can be toggled in this file are generally only affect the routing 
 but for consistency all such "feature flags", even those that would affect graph building, are
 managed in this one file. 
 
-## OTP Features
+### OTP Features
 
 Here is a list of all features which can be toggled on/off and their default values.
 
 <!-- OTP-FEATURE-TABLE BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
-| Feature                                    | Description                                                                                                                                                                                               | Enabled by default | Sandbox |
-|--------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------:|:-------:|
-| `APIBikeRental`                            | Enable the bike rental endpoint.                                                                                                                                                                          |         ✓️         |         |
-| `APIServerInfo`                            | Enable the server info endpoint.                                                                                                                                                                          |         ✓️         |         |
-| `APIGraphInspectorTile`                    | Enable the inspector  endpoint for graph information for inspection/debugging purpose.                                                                                                                    |         ✓️         |         |
-| `APIUpdaterStatus`                         | Enable endpoint for graph updaters status.                                                                                                                                                                |         ✓️         |         |
-| `ConsiderPatternsForDirectTransfers`       | Enable limiting transfers so that there is only a single transfer to each pattern.                                                                                                                        |         ✓️         |         |
-| `DebugClient`                              | Enable the debug web client located at the root of the web server.                                                                                                                                        |         ✓️         |         |
-| `FloatingBike`                             | Enable floating bike routing.                                                                                                                                                                             |         ✓️         |         |
-| `GtfsGraphQlApi`                           | Enable GTFS GraphQL API.                                                                                                                                                                                  |         ✓️         |         |
-| `GtfsGraphQlApiRentalStationFuzzyMatching` | Does vehicleRentalStation query also allow ids that are not feed scoped.                                                                                                                                  |                    |         |
-| `MinimumTransferTimeIsDefinitive`          | If the minimum transfer time is a lower bound (default) or the definitive time for the transfer. Set this to `true` if you want to set a transfer time lower than what OTP derives from OSM data.         |                    |         |
-| `OptimizeTransfers`                        | OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account.                                 |         ✓️         |         |
-| `ParallelRouting`                          | Enable performing parts of the trip planning in parallel.                                                                                                                                                 |                    |         |
-| `TransferConstraints`                      | Enforce transfers to happen according to the _transfers.txt_ (GTFS) and Interchanges (NeTEx). Turning this _off_ will increase the routing performance a little.                                          |         ✓️         |         |
-| `TransmodelGraphQlApi`                     | Enable Transmodel (NeTEx) GraphQL API.                                                                                                                                                                    |         ✓️         |    ✓️   |
-| `ActuatorAPI`                              | Endpoint for actuators (service health status).                                                                                                                                                           |                    |    ✓️   |
-| `AsyncGraphQLFetchers`                     | Whether the @async annotation in the GraphQL schema should lead to the fetch being executed asynchronously. This allows batch or alias queries to run in parallel at the cost of consuming extra threads. |                    |         |
-| `Co2Emissions`                             | Enable the emissions sandbox module.                                                                                                                                                                      |                    |    ✓️   |
-| `DataOverlay`                              | Enable usage of data overlay when calculating costs for the street network.                                                                                                                               |                    |    ✓️   |
-| `FaresV2`                                  | Enable import of GTFS-Fares v2 data.                                                                                                                                                                      |                    |    ✓️   |
-| `FlexRouting`                              | Enable FLEX routing.                                                                                                                                                                                      |                    |    ✓️   |
-| `GoogleCloudStorage`                       | Enable Google Cloud Storage integration.                                                                                                                                                                  |                    |    ✓️   |
-| `RealtimeResolver`                         | When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with real-time data                                                                                               |                    |    ✓️   |
-| `ReportApi`                                | Enable the report API.                                                                                                                                                                                    |                    |    ✓️   |
-| `RestAPIPassInDefaultConfigAsJson`         | Enable a default RouteRequest to be passed in as JSON on the REST API - FOR DEBUGGING ONLY!                                                                                                               |                    |         |
-| `SandboxAPIGeocoder`                       | Enable the Geocoder API.                                                                                                                                                                                  |                    |    ✓️   |
-| `SandboxAPIMapboxVectorTilesApi`           | Enable Mapbox vector tiles API.                                                                                                                                                                           |                    |    ✓️   |
-| `SandboxAPIParkAndRideApi`                 | Enable park-and-ride endpoint.                                                                                                                                                                            |                    |    ✓️   |
-| `SandboxAPITravelTime`                     | Enable the isochrone/travel time surface API.                                                                                                                                                             |                    |    ✓️   |
-| `TransferAnalyzer`                         | Analyze transfers during graph build.                                                                                                                                                                     |                    |    ✓️   |
-| `VehicleToStopHeuristics`                  | Enable improved heuristic for park-and-ride queries.                                                                                                                                                      |                    |    ✓️   |
+| Feature                                    | Description                                                                                                                                                                                                                                                                                                      | Enabled by default | Sandbox |
+|--------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:------------------:|:-------:|
+| `APIBikeRental`                            | Enable the bike rental endpoint.                                                                                                                                                                                                                                                                                 |         ✓️         |         |
+| `APIServerInfo`                            | Enable the server info endpoint.                                                                                                                                                                                                                                                                                 |         ✓️         |         |
+| `APIUpdaterStatus`                         | Enable endpoint for graph updaters status.                                                                                                                                                                                                                                                                       |         ✓️         |         |
+| `ConsiderPatternsForDirectTransfers`       | Enable limiting transfers so that there is only a single transfer to each pattern.                                                                                                                                                                                                                               |         ✓️         |         |
+| `DebugUi`                                  | Enable the debug GraphQL client and web UI and located at the root of the web server as well as the debug map tiles it uses. Be aware that the map tiles are not a stable API and can change without notice. Use the [vector tiles feature if](sandbox/MapboxVectorTilesApi.md) you want a stable map tiles API. |         ✓️         |         |
+| `FloatingBike`                             | Enable floating bike routing.                                                                                                                                                                                                                                                                                    |         ✓️         |         |
+| `GtfsGraphQlApi`                           | Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md).                                                                                                                                                                                                                                                         |         ✓️         |         |
+| `GtfsGraphQlApiRentalStationFuzzyMatching` | Does vehicleRentalStation query also allow ids that are not feed scoped.                                                                                                                                                                                                                                         |                    |         |
+| `MinimumTransferTimeIsDefinitive`          | If the minimum transfer time is a lower bound (default) or the definitive time for the transfer. Set this to `true` if you want to set a transfer time lower than what OTP derives from OSM data.                                                                                                                |                    |         |
+| `OptimizeTransfers`                        | OTP will inspect all itineraries found and optimize where (which stops) the transfer will happen. Waiting time, priority and guaranteed transfers are taken into account.                                                                                                                                        |         ✓️         |         |
+| `ParallelRouting`                          | Enable performing parts of the trip planning in parallel.                                                                                                                                                                                                                                                        |                    |         |
+| `TransferConstraints`                      | Enforce transfers to happen according to the _transfers.txt_ (GTFS) and Interchanges (NeTEx). Turning this _off_ will increase the routing performance a little.                                                                                                                                                 |         ✓️         |         |
+| `TransmodelGraphQlApi`                     | Enable the [Transmodel (NeTEx) GraphQL API](apis/TransmodelApi.md).                                                                                                                                                                                                                                              |         ✓️         |    ✓️   |
+| `ActuatorAPI`                              | Endpoint for actuators (service health status).                                                                                                                                                                                                                                                                  |                    |    ✓️   |
+| `AsyncGraphQLFetchers`                     | Whether the @async annotation in the GraphQL schema should lead to the fetch being executed asynchronously. This allows batch or alias queries to run in parallel at the cost of consuming extra threads.                                                                                                        |                    |         |
+| `Co2Emissions`                             | Enable the emissions sandbox module.                                                                                                                                                                                                                                                                             |                    |    ✓️   |
+| `DataOverlay`                              | Enable usage of data overlay when calculating costs for the street network.                                                                                                                                                                                                                                      |                    |    ✓️   |
+| `FaresV2`                                  | Enable import of GTFS-Fares v2 data.                                                                                                                                                                                                                                                                             |                    |    ✓️   |
+| `FlexRouting`                              | Enable FLEX routing.                                                                                                                                                                                                                                                                                             |                    |    ✓️   |
+| `GoogleCloudStorage`                       | Enable Google Cloud Storage integration.                                                                                                                                                                                                                                                                         |                    |    ✓️   |
+| `LegacyRestApi`                            | Enable legacy REST API. This API will be removed in the future.                                                                                                                                                                                                                                                  |         ✓️         |    ✓️   |
+| `RealtimeResolver`                         | When routing with ignoreRealtimeUpdates=true, add an extra step which populates results with real-time data                                                                                                                                                                                                      |                    |    ✓️   |
+| `ReportApi`                                | Enable the report API.                                                                                                                                                                                                                                                                                           |                    |    ✓️   |
+| `RestAPIPassInDefaultConfigAsJson`         | Enable a default RouteRequest to be passed in as JSON on the REST API - FOR DEBUGGING ONLY!                                                                                                                                                                                                                      |                    |         |
+| `SandboxAPIGeocoder`                       | Enable the Geocoder API.                                                                                                                                                                                                                                                                                         |                    |    ✓️   |
+| `SandboxAPIMapboxVectorTilesApi`           | Enable Mapbox vector tiles API.                                                                                                                                                                                                                                                                                  |                    |    ✓️   |
+| `SandboxAPIParkAndRideApi`                 | Enable park-and-ride endpoint.                                                                                                                                                                                                                                                                                   |                    |    ✓️   |
+| `SandboxAPITravelTime`                     | Enable the isochrone/travel time surface API.                                                                                                                                                                                                                                                                    |                    |    ✓️   |
+| `TransferAnalyzer`                         | Analyze transfers during graph build.                                                                                                                                                                                                                                                                            |                    |    ✓️   |
+| `VehicleToStopHeuristics`                  | Enable improved heuristic for park-and-ride queries.                                                                                                                                                                                                                                                             |                    |    ✓️   |
 
 <!-- OTP-FEATURE-TABLE END -->
 
@@ -268,7 +268,7 @@ Here is a list of all features which can be toggled on/off and their default val
 ```
 
 
-# JVM configuration
+## JVM configuration
 
 This section contains general recommendations for tuning the JVM in a production environment.  
 It focuses mainly on garbage collection configuration and memory settings.  
@@ -276,19 +276,19 @@ See [Garbage Collector Tuning](https://docs.oracle.com/en/java/javase/17/gctunin
 See [Large Pages in Java](https://kstefanj.github.io/2021/05/19/large-pages-and-java.html) and  [Transparent Huge Pages](https://shipilev.net/jvm/anatomy-quarks/2-transparent-huge-pages) for general information on large memory pages.
 
 
-## OTP server
+### OTP server
 
 The OTP server processes concurrent routing requests in real time.  
 The main optimization goal for the OTP server is minimizing response time.
 
 
-### Garbage collector
+#### Garbage collector
  
 - The G1 garbage collector (default since Java 9) offers a good compromise between low latency (i.e. low GC pause time) and GC overhead.
 - If latency spikes are an issue, the ZGC garbage collector is an alternative. It produces in general more overhead than G1.  
 
 
-### Memory settings 
+#### Memory settings 
  
 - Using Large Memory Pages can reduce pressure on the TLB cache and increase performance.  
 - It is in general not recommended to use large memory page in _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`) for latency-sensitive applications, since memory is allocated on-demand and this can induce latency spikes if the memory is fragmented.  
@@ -298,20 +298,20 @@ The physical memory can be committed upfront, at JVM startup time. This can be d
 Example: `-Xms18g -Xmx18g -XX:+UseTransparentHugePages -XX:+AlwaysPreTouch`  
 
 
-## Graph Builder
+### Graph Builder
 
 The Graph Builder is the non-interactive mode used to build street graphs and transit graphs.     
 The main optimization goal for the Graph Builder is minimizing total build time.  
 
 
-### Garbage collector
+#### Garbage collector
  
 - In theory, the Parallel garbage collector offers the best throughput.  
 In practice, it can be challenging to optimize the Parallel GC to build both a street graph and a transit graph, the memory usage patterns being different. 
 - The G1 garbage collector provides in general a good compromise.  
 
 
-### Memory settings 
+#### Memory settings 
  
 - Using Large Memory Pages can reduce pressure on the TLB cache and increase performance.  
 - Since latency is not an issue, Large Memory Pages can be used indifferently in _TLBFS_ mode (`-XX:+UseHugeTLBFS`) or _Transparent Huge Page_ mode (`-XX:+UseTransparentHugePages`)
