@@ -37,8 +37,6 @@ public class LayerStyleBuilder {
     return sourceLayer(source.vectorLayer());
   }
 
-
-
   public enum LayerType {
     Circle,
     Line,

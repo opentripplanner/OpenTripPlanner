@@ -80,7 +80,8 @@ public class DebugStyleSpec {
           )
           .lineWidth(LINE_WIDTH)
           .minZoom(13)
-          .maxZoom(MAX_ZOOM).intiallyHidden(),
+          .maxZoom(MAX_ZOOM)
+          .intiallyHidden(),
         LayerStyleBuilder
           .ofId("link")
           .typeLine()
@@ -95,13 +96,16 @@ public class DebugStyleSpec {
           )
           .lineWidth(LINE_WIDTH)
           .minZoom(13)
-          .maxZoom(MAX_ZOOM).intiallyHidden(),
+          .maxZoom(MAX_ZOOM)
+          .intiallyHidden(),
         LayerStyleBuilder
           .ofId("regular-stop")
           .typeCircle()
           .vectorSourceLayer(regularStops)
           .circleStroke("#140d0e", 2)
-          .circleRadius(new ZoomDependentNumber(1, List.of(new ZoomStop(11,1), new ZoomStop(MAX_ZOOM, 10))))
+          .circleRadius(
+            new ZoomDependentNumber(1, List.of(new ZoomStop(11, 1), new ZoomStop(MAX_ZOOM, 10)))
+          )
           .circleColor("#fcf9fa")
           .minZoom(11)
           .maxZoom(MAX_ZOOM)
