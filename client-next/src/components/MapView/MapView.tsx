@@ -1,4 +1,4 @@
-import { LngLat, Map, MapboxGeoJSONFeature, NavigationControl } from 'react-map-gl';
+import { LngLat, Map, MapGeoJSONFeature, MapMouseEvent, NavigationControl } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
@@ -7,6 +7,7 @@ import { useMapDoubleClick } from './useMapDoubleClick.ts';
 import { useState } from 'react';
 import { ContextMenuPopup } from './ContextMenuPopup.tsx';
 import { GeometryPropertyPopup } from './GeometryPropertyPopup.tsx';
+import LayerListControl from './LayerControl.tsx';
 
 // TODO: this should be configurable
 const initialViewState = {
@@ -17,7 +18,7 @@ const initialViewState = {
 
 const styleUrl = import.meta.env.VITE_DEBUG_STYLE_URL;
 
-type PopupData = { coordinates: LngLat; feature: MapboxGeoJSONFeature };
+type PopupData = { coordinates: LngLat; feature: MapGeoJSONFeature };
 
 export function MapView({
   tripQueryVariables,
@@ -36,8 +37,8 @@ export function MapView({
   const [showContextPopup, setShowContextPopup] = useState<LngLat | null>(null);
   const [showPropsPopup, setShowPropsPopup] = useState<PopupData | null>(null);
   const showFeaturePropPopup = (
-    e: mapboxgl.MapMouseEvent & {
-      features?: mapboxgl.MapboxGeoJSONFeature[] | undefined;
+    e: MapMouseEvent & {
+      features?: MapGeoJSONFeature[] | undefined;
     },
   ) => {
     if (e.features) {
@@ -75,6 +76,7 @@ export function MapView({
           setTripQueryVariables={setTripQueryVariables}
           loading={loading}
         />
+        <LayerListControl />
         {tripQueryResult?.trip.tripPatterns.length && (
           <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
         )}

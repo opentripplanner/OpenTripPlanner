@@ -1,4 +1,4 @@
-import { LngLat, Popup } from 'react-map-gl';
+import { LngLat, Popup } from 'react-map-gl/maplibre';
 import { Table } from 'react-bootstrap';
 
 export function GeometryPropertyPopup({

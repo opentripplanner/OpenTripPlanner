@@ -11,7 +11,9 @@ import org.opentripplanner.apis.vectortiles.model.TileSource.VectorSource;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
+import org.opentripplanner.street.model.edge.ElevatorHopEdge;
 import org.opentripplanner.street.model.edge.EscalatorEdge;
+import org.opentripplanner.street.model.edge.PathwayEdge;
 import org.opentripplanner.street.model.edge.StreetEdge;
 import org.opentripplanner.street.model.edge.StreetTransitEntranceLink;
 import org.opentripplanner.street.model.edge.StreetTransitStopLink;
@@ -60,7 +62,8 @@ public class DebugStyleSpec {
           .lineColor(GREY)
           .lineWidth(LINE_WIDTH)
           .minZoom(15)
-          .maxZoom(MAX_ZOOM),
+          .maxZoom(MAX_ZOOM)
+          .intiallyHidden(),
         LayerStyleBuilder
           .ofId("edge")
           .typeLine()
@@ -70,12 +73,14 @@ public class DebugStyleSpec {
             StreetEdge.class,
             AreaEdge.class,
             EscalatorEdge.class,
+            PathwayEdge.class,
+            ElevatorHopEdge.class,
             TemporaryPartialStreetEdge.class,
             TemporaryFreeEdge.class
           )
           .lineWidth(LINE_WIDTH)
           .minZoom(13)
-          .maxZoom(MAX_ZOOM),
+          .maxZoom(MAX_ZOOM).intiallyHidden(),
         LayerStyleBuilder
           .ofId("link")
           .typeLine()
@@ -90,7 +95,7 @@ public class DebugStyleSpec {
           )
           .lineWidth(LINE_WIDTH)
           .minZoom(13)
-          .maxZoom(MAX_ZOOM),
+          .maxZoom(MAX_ZOOM).intiallyHidden(),
         LayerStyleBuilder
           .ofId("regular-stop")
           .typeCircle()
