@@ -76,7 +76,7 @@ export function MapView({
           setTripQueryVariables={setTripQueryVariables}
           loading={loading}
         />
-        <LayerListControl />
+        <LayerListControl position="top-right" />
         {tripQueryResult?.trip.tripPatterns.length && (
           <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
         )}
