@@ -1,17 +1,15 @@
 import type { ControlPosition } from 'react-map-gl';
 import { useControl } from 'react-map-gl';
-import { Map } from 'maplibre-gl';
+import { IControl, Map} from 'maplibre-gl';
 
 type LayerControlProps = {
   position: ControlPosition;
 };
 
-class LayerList {
-  private map: Map | null = null;
+class LayerList implements IControl {
   private readonly container: HTMLDivElement = document.createElement('div');
 
   onAdd(map: Map) {
-    this.map = map;
     this.container.className = 'maplibregl-ctrl maplibregl-ctrl-group layer-select';
 
     map.on('load', () => {
@@ -34,20 +32,22 @@ class LayerList {
             const div = document.createElement('div');
             const input = document.createElement('input');
             input.type = 'checkbox';
-            input.value = layer?.id;
+            input.value = layer.id;
+            input.id = layer.id;
             input.onchange = (e) => {
               e.preventDefault();
               e.stopPropagation();
 
-              if (this.layerVisible(layer)) {
+              if (this.layerVisible(map, layer)) {
                 map.setLayoutProperty(layer.id, 'visibility', 'none');
               } else {
                 map.setLayoutProperty(layer.id, 'visibility', 'visible');
               }
             };
-            input.checked = this.layerVisible(layer);
+            input.checked = this.layerVisible(map, layer);
             const label = document.createElement('label');
             label.textContent = layer.id;
+            label.htmlFor = layer.id;
             div.appendChild(input);
             div.appendChild(label);
             this.container.appendChild(div);
@@ -58,15 +58,12 @@ class LayerList {
     return this.container;
   }
 
-  private layerVisible(layer: { id: string }) {
-    return this.map?.getLayoutProperty(layer.id, 'visibility') !== 'none';
+  private layerVisible(map: Map, layer: { id: string }) {
+    return map.getLayoutProperty(layer.id, 'visibility') !== 'none';
   }
-
-  onCreate() {}
 
   onRemove() {
     this.container.parentNode?.removeChild(this.container);
-    this.map = null;
   }
 }
 

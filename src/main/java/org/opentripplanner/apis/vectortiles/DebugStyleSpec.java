@@ -56,15 +56,6 @@ public class DebugStyleSpec {
       List.of(
         LayerStyleBuilder.ofId("background").typeRaster().source(BACKGROUND_SOURCE).minZoom(0),
         LayerStyleBuilder
-          .ofId("edge-fallback")
-          .typeLine()
-          .vectorSourceLayer(edges)
-          .lineColor(GREY)
-          .lineWidth(LINE_WIDTH)
-          .minZoom(15)
-          .maxZoom(MAX_ZOOM)
-          .intiallyHidden(),
-        LayerStyleBuilder
           .ofId("edge")
           .typeLine()
           .vectorSourceLayer(edges)
@@ -107,7 +98,7 @@ public class DebugStyleSpec {
             new ZoomDependentNumber(1, List.of(new ZoomStop(11, 1), new ZoomStop(MAX_ZOOM, 10)))
           )
           .circleColor("#fcf9fa")
-          .minZoom(11)
+          .minZoom(10)
           .maxZoom(MAX_ZOOM)
       )
     );
