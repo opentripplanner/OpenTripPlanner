@@ -23,14 +23,11 @@ import org.opentripplanner.updater.spi.GraphUpdater;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.trip.PollingTripUpdater;
 import org.opentripplanner.updater.trip.TimetableSnapshotSource;
-import org.opentripplanner.updater.trip.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingDataSourceFactory;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdater;
 import org.opentripplanner.updater.vehicle_position.PollingVehiclePositionUpdater;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdater;
 import org.opentripplanner.updater.vehicle_rental.datasources.VehicleRentalDataSourceFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Sets up and starts all the graph updaters.
@@ -40,8 +37,6 @@ import org.slf4j.LoggerFactory;
  * GraphUpdaterManager.
  */
 public class UpdaterConfigurator {
-
-  private static final Logger LOG = LoggerFactory.getLogger(UpdaterConfigurator.class);
 
   private final Graph graph;
   private final TransitModel transitModel;
@@ -176,11 +171,6 @@ public class UpdaterConfigurator {
     }
     for (var configItem : updatersParameters.getSiriSXUpdaterParameters()) {
       updaters.add(new SiriSXUpdater(configItem, transitModel));
-    }
-    for (var configItem : updatersParameters.getWebsocketGtfsRealtimeUpdaterParameters()) {
-      updaters.add(
-        new WebsocketGtfsRealtimeUpdater(configItem, provideGtfsTimetableSnapshot(), transitModel)
-      );
     }
     for (var configItem : updatersParameters.getMqttGtfsRealtimeUpdaterParameters()) {
       updaters.add(
