@@ -54,7 +54,7 @@ export function MapView({
     const map = e.target;
     // if we are really far zoomed out and show the entire world it means that we are not starting
     // in a location selected from the URL hash.
-    // in such a case we pan to the area that is specified in the stop's tile bounds, which is
+    // in such a case we pan to the area that is specified in the tile bounds, which is
     // provided by the WorldEnvelopeService
     if (map.getZoom() < 2) {
       const source = map.getSource('stops') as VectorTileSource;
@@ -73,6 +73,8 @@ export function MapView({
         onContextMenu={(e) => {
           setShowContextPopup(e.lngLat);
         }}
+        // it's unfortunate that you have to list these layers here.
+        // maybe there is a way around it: https://github.com/visgl/react-map-gl/discussions/2343
         interactiveLayerIds={['regular-stop', 'edge-fallback', 'edge', 'link']}
         onClick={showFeaturePropPopup}
         // put lat/long in URL and pan to it on page reload

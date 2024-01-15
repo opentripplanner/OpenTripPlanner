@@ -1,4 +1,4 @@
-package org.opentripplanner.inspector.vector.edges;
+package org.opentripplanner.inspector.vector.edge;
 
 import java.util.List;
 import org.locationtech.jts.geom.Envelope;
@@ -9,6 +9,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.index.StreetIndex;
 import org.opentripplanner.street.model.edge.Edge;
 
+/**
+ * Selects all edges to be displayed for debugging.
+ */
 public class EdgeLayerBuilder extends LayerBuilder<Edge> {
 
   private final StreetIndex streetIndex;

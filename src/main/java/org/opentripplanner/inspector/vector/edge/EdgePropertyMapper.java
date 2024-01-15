@@ -1,4 +1,4 @@
-package org.opentripplanner.inspector.vector.edges;
+package org.opentripplanner.inspector.vector.edge;
 
 import static org.opentripplanner.framework.lang.DoubleUtils.roundTo2Decimals;
 import static org.opentripplanner.inspector.vector.KeyValue.kv;

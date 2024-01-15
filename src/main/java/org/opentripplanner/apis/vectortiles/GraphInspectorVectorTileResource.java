@@ -31,7 +31,7 @@ import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
-import org.opentripplanner.inspector.vector.edges.EdgeLayerBuilder;
+import org.opentripplanner.inspector.vector.edge.EdgeLayerBuilder;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.inspector.vector.stop.StopLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
