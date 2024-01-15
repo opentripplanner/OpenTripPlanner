@@ -34,6 +34,7 @@ import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
 import org.opentripplanner.inspector.vector.edge.EdgeLayerBuilder;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.inspector.vector.stop.StopLayerBuilder;
+import org.opentripplanner.inspector.vector.vertex.VertexLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
@@ -51,6 +52,7 @@ public class GraphInspectorVectorTileResource {
     GeofencingZones
   );
   private static final LayerParams EDGES = new LayerParams("edges", Edges);
+  private static final LayerParams VERTICES = new LayerParams("vertices", Edges);
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
     REGULAR_STOPS,
     AREA_STOPS,
@@ -181,6 +183,7 @@ public class GraphInspectorVectorTileResource {
       );
       case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
       case Edges -> new EdgeLayerBuilder(context.graph(), layerParameters);
+      case Vertices -> new VertexLayerBuilder(context.graph(), layerParameters);
     };
   }
 }
