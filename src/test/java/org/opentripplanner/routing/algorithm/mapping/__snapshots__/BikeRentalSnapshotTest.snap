@@ -51,7 +51,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -537,7 +537,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -981,7 +981,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -1321,7 +1321,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -1807,7 +1807,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -2293,7 +2293,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -3308,7 +3308,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -3846,7 +3846,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -4264,7 +4264,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -4656,7 +4656,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -5194,7 +5194,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -5612,7 +5612,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }

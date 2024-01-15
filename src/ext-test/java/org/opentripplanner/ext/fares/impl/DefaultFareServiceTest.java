@@ -7,6 +7,8 @@ import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_A_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_B_STOP;
+import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_C_STOP;
+import static org.opentripplanner.ext.fares.impl.FareModelForTest.FREE_TRANSFERS_IN_CITY_SET;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.INSIDE_CITY_CENTER_SET;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_ATTRIBUTE;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.OTHER_FEED_ROUTE;
@@ -62,6 +64,34 @@ class DefaultFareServiceTest implements PlanTestConstants {
   }
 
   @Test
+  void applyToSeveralLegs() {
+    var service = new DefaultFareService();
+    service.addFareRules(FareType.regular, List.of(FREE_TRANSFERS_IN_CITY_SET));
+    var itin = newItinerary(Place.forStop(CITY_CENTER_A_STOP), T11_00)
+      .bus(1, T11_00, T11_12, Place.forStop(CITY_CENTER_B_STOP))
+      .bus(1, T11_16, T11_20, Place.forStop(CITY_CENTER_C_STOP))
+      .build();
+
+    var fare = service.calculateFares(itin);
+    assertNotNull(fare);
+
+    var legProducts = fare.getLegProducts();
+
+    var firstLeg = itin.getTransitLeg(0);
+    var secondLeg = itin.getTransitLeg(1);
+
+    var firstProducts = legProducts.get(firstLeg);
+    var secondProducts = legProducts.get(secondLeg);
+
+    assertEquals(firstProducts, secondProducts);
+
+    assertEquals(
+      "[FareProductUse[id=ddbf1572-18bc-3724-8b64-e1c7d5c8b6c6, product=FareProduct{id: 'F:free-transfers', amount: $20.00}]]",
+      firstProducts.toString()
+    );
+  }
+
+  @Test
   void shouldNotCombineInterlinedLegs() {
     var service = new DefaultFareService();
     service.addFareRules(
@@ -89,17 +119,17 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var legProducts = fare.getLegProducts();
 
-    var firstLeg = itin.getLegs().get(0);
+    var firstLeg = itin.getLegs().getFirst();
     var products = List.copyOf(legProducts.get(firstLeg));
 
-    assertEquals(TEN_DOLLARS, products.get(0).product().price());
+    assertEquals(TEN_DOLLARS, products.getFirst().product().price());
 
     var secondLeg = itin.getLegs().get(1);
     products = List.copyOf(legProducts.get(secondLeg));
-    assertEquals(TEN_DOLLARS, products.get(0).product().price());
+    assertEquals(TEN_DOLLARS, products.getFirst().product().price());
 
     assertEquals(1, fare.getItineraryProducts().size());
-    assertEquals(TWENTY_DOLLARS, fare.getItineraryProducts().get(0).price());
+    assertEquals(TWENTY_DOLLARS, fare.getItineraryProducts().getFirst().price());
   }
 
   @Test
@@ -187,7 +217,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
       legProducts.get(secondBusLeg).toString()
     );
     assertEquals(
-      "[FareProductUse[id=678d201c-e839-35c3-ae7b-1bc3834da5e5, product=FareProduct{id: 'F2:other-feed-attribute', amount: $10.00}]]",
+      "[FareProductUse[id=5d0d58f4-b97a-38db-921c-8b5fc6392b54, product=FareProduct{id: 'F2:other-feed-attribute', amount: $10.00}]]",
       legProducts.get(finalBusLeg).toString()
     );
 

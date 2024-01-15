@@ -94,6 +94,7 @@ public class ItineraryFares {
    * instead.
    */
   @Nullable
+  @Deprecated
   public Money getFare(FareType type) {
     return fares.get(type);
   }

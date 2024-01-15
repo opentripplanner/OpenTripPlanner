@@ -279,7 +279,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -762,7 +762,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -1310,7 +1310,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -1793,7 +1793,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -2341,7 +2341,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           },
@@ -2361,7 +2361,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -3088,7 +3088,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -3574,7 +3574,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -4060,7 +4060,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -4546,7 +4546,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           },
@@ -4566,7 +4566,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -5072,7 +5072,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           },
@@ -5092,7 +5092,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }

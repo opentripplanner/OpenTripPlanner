@@ -579,7 +579,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -973,7 +973,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -1393,7 +1393,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -1787,7 +1787,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -2259,7 +2259,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }
@@ -2653,7 +2653,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
                   }
                 },
                 "id" : "prt:8",
-                "name" : "prt:8"
+                "name" : "regular"
               }
             ]
           }

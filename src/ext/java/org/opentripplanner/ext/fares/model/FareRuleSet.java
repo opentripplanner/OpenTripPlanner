@@ -15,7 +15,6 @@ public class FareRuleSet implements Serializable {
   private final Set<RouteOriginDestination> routeOriginDestinations;
   private final Set<String> contains;
   private final FareAttribute fareAttribute;
-  private final Set<FeedScopedId> trips;
 
   public FareRuleSet(FareAttribute fareAttribute) {
     this.fareAttribute = fareAttribute;
@@ -23,7 +22,6 @@ public class FareRuleSet implements Serializable {
     originDestinations = new HashSet<>();
     routeOriginDestinations = new HashSet<>();
     contains = new HashSet<>();
-    trips = new HashSet<>();
   }
 
   public void addOriginDestination(String origin, String destination) {
@@ -62,14 +60,6 @@ public class FareRuleSet implements Serializable {
     return fareAttribute;
   }
 
-  public void addTrip(FeedScopedId trip) {
-    trips.add(trip);
-  }
-
-  public Set<FeedScopedId> getTrips() {
-    return trips;
-  }
-
   public boolean matches(
     String startZone,
     String endZone,
@@ -81,7 +71,7 @@ public class FareRuleSet implements Serializable {
     Duration journeyTime
   ) {
     //check for matching origin/destination, if this ruleset has any origin/destination restrictions
-    if (originDestinations.size() > 0) {
+    if (!originDestinations.isEmpty()) {
       var od = new OriginDestination(startZone, endZone);
       if (!originDestinations.contains(od)) {
         var od2 = new OriginDestination(od.origin, null);
@@ -95,25 +85,19 @@ public class FareRuleSet implements Serializable {
     }
 
     //check for matching contains, if this ruleset has any containment restrictions
-    if (contains.size() > 0) {
+    if (!contains.isEmpty()) {
       if (!zonesVisited.equals(contains)) {
         return false;
       }
     }
 
     //check for matching routes
-    if (routes.size() != 0) {
+    if (!routes.isEmpty()) {
       if (!routes.containsAll(routesVisited)) {
         return false;
       }
     }
 
-    //check for matching trips
-    if (trips.size() != 0) {
-      if (!trips.containsAll(tripsVisited)) {
-        return false;
-      }
-    }
     if (fareAttribute.isTransfersSet() && fareAttribute.getTransfers() < transfersUsed) {
       return false;
     }

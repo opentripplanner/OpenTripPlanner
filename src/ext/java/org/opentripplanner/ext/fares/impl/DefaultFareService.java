@@ -259,22 +259,32 @@ public class DefaultFareService implements FareService {
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
       var product = FareProduct
-        .of(fareId, fareId.toString(), Money.ofFractionalAmount(currency, cost))
+        .of(fareId, fareType.name(), Money.ofFractionalAmount(currency, cost))
         .build();
 
+      List<Leg> applicableLegs = new ArrayList<>();
       for (int i = start; i <= via; ++i) {
         final var leg = legs.get(i);
-        final var use = new FareProductUse(product.uniqueInstanceId(leg.getStartTime()), product);
         // if we have a leg that is combined for the purpose of fare calculation we need to
         // retrieve the original legs so that the fare products are assigned back to the original
         // legs that the combined one originally consisted of.
         // (remember that the combined leg only exists during fare calculation and is thrown away
         // afterwards to associating fare products with it will result in the API not showing any.)
         if (leg instanceof CombinedInterlinedTransitLeg combinedLeg) {
-          combinedLeg.originalLegs().forEach(l -> fareProductUses.put(l, use));
+          applicableLegs.addAll(combinedLeg.originalLegs());
         } else {
-          fareProductUses.put(leg, use);
+          applicableLegs.add(leg);
         }
+      }
+
+      if (!applicableLegs.isEmpty()) {
+        final var use = new FareProductUse(
+          product.uniqueInstanceId(applicableLegs.getFirst().getStartTime()),
+          product
+        );
+        applicableLegs.forEach(leg -> {
+          fareProductUses.put(leg, use);
+        });
       }
 
       ++count;
