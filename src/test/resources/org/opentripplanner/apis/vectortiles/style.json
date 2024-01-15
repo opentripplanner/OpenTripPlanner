@@ -1,4 +1,5 @@
 {
+
   "name" : "OTP Debug Tiles",
   "sources" : {
     "background" : {
@@ -6,6 +7,7 @@
       "tiles" : [
         "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
       ],
+      "maxzoom" : 19,
       "tileSize" : 256,
       "attribution" : "© OpenStreetMap Contributors",
       "type" : "raster"
@@ -24,30 +26,6 @@
       "minzoom" : 0
     },
     {
-      "id" : "edge-fallback",
-      "type" : "line",
-      "source" : "vectorSource",
-      "source-layer" : "edges",
-      "minzoom" : 15,
-      "maxzoom" : 23,
-      "paint" : {
-        "line-color" : "#8e8e89",
-        "line-width" : {
-          "base" : 1.3,
-          "stops" : [
-            [
-              13,
-              2.0
-            ],
-            [
-              23,
-              10.0
-            ]
-          ]
-        }
-      }
-    },
-    {
       "id" : "edge",
       "type" : "line",
       "source" : "vectorSource",
@@ -61,7 +39,7 @@
           "stops" : [
             [
               13,
-              2.0
+              0.5
             ],
             [
               23,
@@ -76,9 +54,15 @@
         "StreetEdge",
         "AreaEdge",
         "EscalatorEdge",
+        "PathwayEdge",
+        "ElevatorHopEdge",
         "TemporaryPartialStreetEdge",
         "TemporaryFreeEdge"
-      ]
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      }
     },
     {
       "id" : "link",
@@ -88,13 +72,13 @@
       "minzoom" : 13,
       "maxzoom" : 23,
       "paint" : {
-        "line-color" : "#e2d40d",
+        "line-color" : "#22DD9E",
         "line-width" : {
           "base" : 1.3,
           "stops" : [
             [
               13,
-              2.0
+              0.5
             ],
             [
               23,
@@ -111,18 +95,35 @@
         "BoardingLocationToStopLink",
         "StreetVehicleRentalLink",
         "StreetVehicleParkingLink"
-      ]
+      ],
+      "layout" : {
+        "line-cap" : "round",
+        "visibility" : "none"
+      }
     },
     {
       "id" : "regular-stop",
       "type" : "circle",
       "source" : "vectorSource",
-      "source-layer" : "regularStops",
-      "minzoom" : 11,
+      "source-layer" : "stops",
+      "minzoom" : 10,
       "maxzoom" : 23,
       "paint" : {
         "circle-stroke-color" : "#140d0e",
         "circle-stroke-width" : 2,
+        "circle-radius" : {
+          "base" : 1.0,
+          "stops" : [
+            [
+              11,
+              1.0
+            ],
+            [
+              23,
+              10.0
+            ]
+          ]
+        },
         "circle-color" : "#fcf9fa"
       }
     }

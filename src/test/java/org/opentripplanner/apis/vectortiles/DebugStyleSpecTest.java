@@ -3,8 +3,8 @@ package org.opentripplanner.apis.vectortiles;
 import static org.opentripplanner.test.support.JsonAssertions.assertEqualJson;
 
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.apis.vectortiles.DebugStyleSpec.VectorSourceLayer;
 import org.opentripplanner.apis.vectortiles.model.TileSource.VectorSource;
+import org.opentripplanner.apis.vectortiles.model.VectorSourceLayer;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.test.support.ResourceLoader;
 
@@ -15,9 +15,9 @@ class DebugStyleSpecTest {
   @Test
   void spec() {
     var vectorSource = new VectorSource("vectorSource", "https://example.com");
-    var regularStops = new VectorSourceLayer(vectorSource, "regularStops");
+    var stops = new VectorSourceLayer(vectorSource, "stops");
     var edges = new VectorSourceLayer(vectorSource, "edges");
-    var spec = DebugStyleSpec.build(vectorSource, regularStops, edges);
+    var spec = DebugStyleSpec.build(stops, edges);
 
     var json = ObjectMappers.ignoringExtraFields().valueToTree(spec);
     var expectation = RESOURCES.fileToString("style.json");

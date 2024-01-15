@@ -122,23 +122,34 @@ public class GraphInspectorVectorTileResource {
   @Produces(MediaType.APPLICATION_JSON)
   public StyleSpec getTileJson(@Context UriInfo uri, @Context HttpHeaders headers) {
     var base = HttpUtils.getBaseAddress(uri, headers);
-    final String allLayers = DEBUG_LAYERS
+
+    // these two could also be loaded together but are put into separate sources because
+    // the stops are fast and the edges are relatively slow
+    var stopsSource = new VectorSource(
+      "stops",
+      tileJsonUrl(base, List.of(REGULAR_STOPS, AREA_STOPS))
+    );
+    var streetSource = new VectorSource(
+      "street",
+      tileJsonUrl(base, List.of(EDGES, GEOFENCING_ZONES))
+    );
+
+    return DebugStyleSpec.build(
+      REGULAR_STOPS.toVectorSourceLayer(stopsSource),
+      EDGES.toVectorSourceLayer(streetSource)
+    );
+  }
+
+  private String tileJsonUrl(String base, List<LayerParameters<LayerType>> layers) {
+    final String allLayers = layers
       .stream()
       .map(LayerParameters::name)
       .collect(Collectors.joining(","));
-    var url =
-      "%s/otp/routers/%s/inspector/vectortile/%s/tilejson.json".formatted(
-          base,
-          ignoreRouterId,
-          allLayers
-        );
-
-    var vectorSource = new VectorSource("debug", url);
-    return DebugStyleSpec.build(
-      vectorSource,
-      REGULAR_STOPS.toVectorSourceLayer(vectorSource),
-      EDGES.toVectorSourceLayer(vectorSource)
-    );
+    return "%s/otp/routers/%s/inspector/vectortile/%s/tilejson.json".formatted(
+        base,
+        ignoreRouterId,
+        allLayers
+      );
   }
 
   @Nonnull

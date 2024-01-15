@@ -1,13 +1,15 @@
 package org.opentripplanner.apis.vectortiles;
 
 import java.util.List;
-import org.opentripplanner.apis.vectortiles.model.LayerStyleBuilder;
-import org.opentripplanner.apis.vectortiles.model.LayerStyleBuilder.ZoomDependentNumber;
-import org.opentripplanner.apis.vectortiles.model.LayerStyleBuilder.ZoomStop;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.opentripplanner.apis.vectortiles.model.StyleBuilder;
 import org.opentripplanner.apis.vectortiles.model.StyleSpec;
 import org.opentripplanner.apis.vectortiles.model.TileSource;
 import org.opentripplanner.apis.vectortiles.model.TileSource.RasterSource;
-import org.opentripplanner.apis.vectortiles.model.TileSource.VectorSource;
+import org.opentripplanner.apis.vectortiles.model.VectorSourceLayer;
+import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber;
+import org.opentripplanner.apis.vectortiles.model.ZoomDependentNumber.ZoomStop;
 import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
 import org.opentripplanner.street.model.edge.AreaEdge;
 import org.opentripplanner.street.model.edge.BoardingLocationToStopLink;
@@ -27,35 +29,32 @@ import org.opentripplanner.street.model.edge.TemporaryPartialStreetEdge;
  */
 public class DebugStyleSpec {
 
-  private static final RasterSource BACKGROUND_SOURCE = new RasterSource(
+  private static final TileSource BACKGROUND_SOURCE = new RasterSource(
     "background",
     List.of("https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"),
+    19,
     256,
     "© OpenStreetMap Contributors"
   );
   private static final String MAGENTA = "#f21d52";
-  private static final String YELLOW = "#e2d40d";
-  private static final String GREY = "#8e8e89";
+  private static final String GREEN = "#22DD9E";
   private static final int MAX_ZOOM = 23;
   private static final ZoomDependentNumber LINE_WIDTH = new ZoomDependentNumber(
     1.3f,
     List.of(new ZoomStop(13, 0.5f), new ZoomStop(MAX_ZOOM, 10))
   );
 
-  public record VectorSourceLayer(VectorSource vectorSource, String vectorLayer) {}
-
-  static StyleSpec build(
-    VectorSource debugSource,
-    VectorSourceLayer regularStops,
-    VectorSourceLayer edges
-  ) {
-    List<TileSource> sources = List.of(BACKGROUND_SOURCE, debugSource);
+  static StyleSpec build(VectorSourceLayer regularStops, VectorSourceLayer edges) {
+    var vectorSources = Stream.of(regularStops, edges).map(VectorSourceLayer::vectorSource);
+    var allSources = Stream
+      .concat(Stream.of(BACKGROUND_SOURCE), vectorSources)
+      .collect(Collectors.toSet());
     return new StyleSpec(
       "OTP Debug Tiles",
-      sources,
+      allSources,
       List.of(
-        LayerStyleBuilder.ofId("background").typeRaster().source(BACKGROUND_SOURCE).minZoom(0),
-        LayerStyleBuilder
+        StyleBuilder.ofId("background").typeRaster().source(BACKGROUND_SOURCE).minZoom(0),
+        StyleBuilder
           .ofId("edge")
           .typeLine()
           .vectorSourceLayer(edges)
@@ -73,11 +72,11 @@ public class DebugStyleSpec {
           .minZoom(13)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
-        LayerStyleBuilder
+        StyleBuilder
           .ofId("link")
           .typeLine()
           .vectorSourceLayer(edges)
-          .lineColor(YELLOW)
+          .lineColor(GREEN)
           .edgeFilter(
             StreetTransitStopLink.class,
             StreetTransitEntranceLink.class,
@@ -89,7 +88,7 @@ public class DebugStyleSpec {
           .minZoom(13)
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
-        LayerStyleBuilder
+        StyleBuilder
           .ofId("regular-stop")
           .typeCircle()
           .vectorSourceLayer(regularStops)

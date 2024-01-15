@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
-import org.opentripplanner.apis.vectortiles.DebugStyleSpec.VectorSourceLayer;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.json.ObjectMappers;
 import org.opentripplanner.street.model.edge.Edge;
@@ -17,7 +16,7 @@ import org.opentripplanner.street.model.edge.Edge;
  * Builds a Maplibre/Mapbox <a href="https://maplibre.org/maplibre-style-spec/layers/">vector tile
  * layer style</a>.
  */
-public class LayerStyleBuilder {
+public class StyleBuilder {
 
   private static final ObjectMapper OBJECT_MAPPER = ObjectMappers.ignoringExtraFields();
   private static final String TYPE = "type";
@@ -28,11 +27,11 @@ public class LayerStyleBuilder {
   private final Map<String, Object> line = new LinkedHashMap<>();
   private List<String> filter = List.of();
 
-  public static LayerStyleBuilder ofId(String id) {
-    return new LayerStyleBuilder(id);
+  public static StyleBuilder ofId(String id) {
+    return new StyleBuilder(id);
   }
 
-  public LayerStyleBuilder vectorSourceLayer(VectorSourceLayer source) {
+  public StyleBuilder vectorSourceLayer(VectorSourceLayer source) {
     source(source.vectorSource());
     return sourceLayer(source.vectorLayer());
   }
@@ -43,16 +42,16 @@ public class LayerStyleBuilder {
     Raster,
   }
 
-  private LayerStyleBuilder(String id) {
+  private StyleBuilder(String id) {
     props.put("id", id);
   }
 
-  public LayerStyleBuilder minZoom(int i) {
+  public StyleBuilder minZoom(int i) {
     props.put("minzoom", i);
     return this;
   }
 
-  public LayerStyleBuilder maxZoom(int i) {
+  public StyleBuilder maxZoom(int i) {
     props.put("maxzoom", i);
     return this;
   }
@@ -60,7 +59,7 @@ public class LayerStyleBuilder {
   /**
    * Which vector tile source this should apply to.
    */
-  public LayerStyleBuilder source(TileSource source) {
+  public StyleBuilder source(TileSource source) {
     props.put("source", source.id());
     return this;
   }
@@ -70,71 +69,76 @@ public class LayerStyleBuilder {
    * There is an unfortunate collision in the name "layer" as it can both refer to a styling layer
    * and the layer inside the vector tile.
    */
-  public LayerStyleBuilder sourceLayer(String source) {
+  public StyleBuilder sourceLayer(String source) {
     props.put(SOURCE_LAYER, source);
     return this;
   }
 
-  public LayerStyleBuilder typeRaster() {
+  public StyleBuilder typeRaster() {
     return type(LayerType.Raster);
   }
 
-  public LayerStyleBuilder typeCircle() {
+  public StyleBuilder typeCircle() {
     return type(LayerType.Circle);
   }
 
-  public LayerStyleBuilder typeLine() {
+  public StyleBuilder typeLine() {
     type(LayerType.Line);
-    line.put("line-cap", "round");
+    layout.put("line-cap", "round");
     return this;
   }
 
-  private LayerStyleBuilder type(LayerType type) {
+  private StyleBuilder type(LayerType type) {
     props.put(TYPE, type.name().toLowerCase());
     return this;
   }
 
-  public LayerStyleBuilder circleColor(String color) {
+  public StyleBuilder circleColor(String color) {
     paint.put("circle-color", validateColor(color));
     return this;
   }
 
-  public LayerStyleBuilder circleStroke(String color, int width) {
+  public StyleBuilder circleStroke(String color, int width) {
     paint.put("circle-stroke-color", validateColor(color));
     paint.put("circle-stroke-width", width);
     return this;
   }
 
-  public LayerStyleBuilder circleRadius(ZoomDependentNumber radius) {
+  public StyleBuilder circleRadius(ZoomDependentNumber radius) {
     paint.put("circle-radius", radius.toJson());
     return this;
   }
 
   // Line styling
 
-  public LayerStyleBuilder lineColor(String color) {
+  public StyleBuilder lineColor(String color) {
     paint.put("line-color", validateColor(color));
     return this;
   }
 
-  public LayerStyleBuilder lineWidth(float width) {
+  public StyleBuilder lineWidth(float width) {
     paint.put("line-width", width);
     return this;
   }
 
-  public LayerStyleBuilder lineWidth(ZoomDependentNumber zoomStops) {
+  public StyleBuilder lineWidth(ZoomDependentNumber zoomStops) {
     paint.put("line-width", zoomStops.toJson());
     return this;
   }
 
-  public LayerStyleBuilder intiallyHidden() {
+  /**
+   * Hide this layer when the debug client starts. It can be made visible in the UI later.
+   */
+  public StyleBuilder intiallyHidden() {
     layout.put("visibility", "none");
     return this;
   }
 
-  // filtering edge
+  /**
+   * Only apply the style to the given edges.
+   */
   @SafeVarargs
-  public final LayerStyleBuilder edgeFilter(Class<? extends Edge>... classToFilter) {
+  public final StyleBuilder edgeFilter(Class<? extends Edge>... classToFilter) {
     var clazzes = Arrays.stream(classToFilter).map(Class::getSimpleName).toList();
     filter = ListUtils.combine(List.of("in", "class"), clazzes);
     return this;
@@ -170,21 +174,5 @@ public class LayerStyleBuilder {
     Stream
       .of(TYPE)
       .forEach(p -> Objects.requireNonNull(props.get(p), "%s must be set".formatted(p)));
-  }
-
-  public record ZoomStop(int zoom, float value) {
-    public List<Number> toList() {
-      return List.of(zoom, value);
-    }
-  }
-
-  public record ZoomDependentNumber(float base, List<ZoomStop> stops) {
-    public JsonNode toJson() {
-      var props = new LinkedHashMap<>();
-      props.put("base", base);
-      var vals = stops.stream().map(ZoomStop::toList).toList();
-      props.put("stops", vals);
-      return OBJECT_MAPPER.valueToTree(props);
-    }
   }
 }
