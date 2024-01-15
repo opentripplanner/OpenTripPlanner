@@ -1,12 +1,18 @@
 import type { ControlPosition } from 'react-map-gl';
 import { useControl } from 'react-map-gl';
-import { IControl, Map} from 'maplibre-gl';
+import { IControl, Map } from 'maplibre-gl';
 
 type LayerControlProps = {
   position: ControlPosition;
 };
 
-class LayerList implements IControl {
+/**
+ * A maplibre control that allows you to switch vector tile layers on and off.
+ *
+ * It appears that you cannot use React elements but have to drop down to raw DOM. Please correct
+ * me if I'm wrong.
+ */
+class LayerControl implements IControl {
   private readonly container: HTMLDivElement = document.createElement('div');
 
   onAdd(map: Map) {
@@ -67,8 +73,8 @@ class LayerList implements IControl {
   }
 }
 
-export default function LayerListControl(props: LayerControlProps) {
-  useControl(() => new LayerList(), {
+export default function DebugLayerControl(props: LayerControlProps) {
+  useControl(() => new LayerControl(), {
     position: props.position,
   });
 

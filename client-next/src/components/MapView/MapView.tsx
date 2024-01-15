@@ -7,7 +7,7 @@ import { useMapDoubleClick } from './useMapDoubleClick.ts';
 import { useState } from 'react';
 import { ContextMenuPopup } from './ContextMenuPopup.tsx';
 import { GeometryPropertyPopup } from './GeometryPropertyPopup.tsx';
-import LayerListControl from './LayerControl.tsx';
+import DebugLayerControl from './LayerControl.tsx';
 
 // TODO: this should be configurable
 const initialViewState = {
@@ -76,7 +76,7 @@ export function MapView({
           setTripQueryVariables={setTripQueryVariables}
           loading={loading}
         />
-        <LayerListControl position="top-right" />
+        <DebugLayerControl position="top-right" />
         {tripQueryResult?.trip.tripPatterns.length && (
           <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
         )}
