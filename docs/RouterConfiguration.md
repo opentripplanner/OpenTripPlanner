@@ -728,6 +728,13 @@ Used to group requests when monitoring OTP.
       }
     },
     {
+      "type" : "mqtt-gtfs-rt-updater",
+      "url" : "tcp://pred.rt.hsl.fi",
+      "topic" : "gtfsrt/v2/fi/hsl/tu",
+      "feedId" : "HSL",
+      "fuzzyTripMatching" : true
+    },
+    {
       "type" : "vehicle-positions",
       "url" : "https://s3.amazonaws.com/kcm-alerts-realtime-prod/vehiclepositions.pb",
       "feedId" : "1",

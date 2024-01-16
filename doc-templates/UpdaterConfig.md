@@ -8,8 +8,8 @@
 
 # Updater configuration
 
-This section covers all options that can be set in the *router-config.json* in the 
-[updaters](RouterConfiguration.md) section.
+This section covers options that can be set in the updaters section of `router-config.json`. 
+See the parameter summary and examples in the router configuration documentation
 
 Real-time data are those that are not added to OTP during the graph build phase but during runtime.
 
@@ -44,6 +44,15 @@ The information is downloaded in a single HTTP request and polled regularly.
 
 <!-- INSERT: stop-time-updater -->
 
+### Streaming TripUpdates via MQTT
+
+This updater connects to an MQTT broker and processes TripUpdates in a streaming fashion. This means
+that they will be applied individually in near-realtime rather than in batches at a certain interval.
+
+This system powers the realtime updates in Helsinki and more information can be found 
+[on Github](https://github.com/HSLdevcom/transitdata).
+
+<!-- INSERT: mqtt-gtfs-rt-updater -->
 
 ### Vehicle Positions
 
