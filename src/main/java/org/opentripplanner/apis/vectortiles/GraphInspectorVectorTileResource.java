@@ -1,8 +1,9 @@
 package org.opentripplanner.apis.vectortiles;
 
-import static org.opentripplanner.apis.vectortiles.model.LayerType.Edges;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.Edge;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.GeofencingZones;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.RegularStop;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.Vertex;
 import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
 
 import jakarta.ws.rs.GET;
@@ -51,13 +52,14 @@ public class GraphInspectorVectorTileResource {
     "geofencingZones",
     GeofencingZones
   );
-  private static final LayerParams EDGES = new LayerParams("edges", Edges);
-  private static final LayerParams VERTICES = new LayerParams("vertices", Edges);
+  private static final LayerParams EDGES = new LayerParams("edges", Edge);
+  private static final LayerParams VERTICES = new LayerParams("vertices", Vertex);
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
     REGULAR_STOPS,
     AREA_STOPS,
     GEOFENCING_ZONES,
-    EDGES
+    EDGES,
+    VERTICES
   );
 
   private final OtpServerRequestContext serverContext;
@@ -133,12 +135,13 @@ public class GraphInspectorVectorTileResource {
     );
     var streetSource = new VectorSource(
       "street",
-      tileJsonUrl(base, List.of(EDGES, GEOFENCING_ZONES))
+      tileJsonUrl(base, List.of(EDGES, GEOFENCING_ZONES, VERTICES))
     );
 
     return DebugStyleSpec.build(
       REGULAR_STOPS.toVectorSourceLayer(stopsSource),
-      EDGES.toVectorSourceLayer(streetSource)
+      EDGES.toVectorSourceLayer(streetSource),
+      VERTICES.toVectorSourceLayer(streetSource)
     );
   }
 
@@ -182,8 +185,8 @@ public class GraphInspectorVectorTileResource {
         e -> context.transitService().findAreaStops(e)
       );
       case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
-      case Edges -> new EdgeLayerBuilder(context.graph(), layerParameters);
-      case Vertices -> new VertexLayerBuilder(context.graph(), layerParameters);
+      case Edge -> new EdgeLayerBuilder(context.graph(), layerParameters);
+      case Vertex -> new VertexLayerBuilder(context.graph(), layerParameters);
     };
   }
 }

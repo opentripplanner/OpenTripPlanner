@@ -58,7 +58,7 @@ export function MapView({
     // provided by the WorldEnvelopeService
     if (map.getZoom() < 2) {
       const source = map.getSource('stops') as VectorTileSource;
-      map.fitBounds(source.bounds, { maxDuration: 50, linear: true });
+      map.fitBounds(source.bounds, { maxDuration: 50, linear: true});
     }
   };
 
@@ -75,7 +75,7 @@ export function MapView({
         }}
         // it's unfortunate that you have to list these layers here.
         // maybe there is a way around it: https://github.com/visgl/react-map-gl/discussions/2343
-        interactiveLayerIds={['regular-stop', 'edge-fallback', 'edge', 'link']}
+        interactiveLayerIds={['regular-stop', 'vertex', 'edge', 'link']}
         onClick={showFeaturePropPopup}
         // put lat/long in URL and pan to it on page reload
         hash={true}

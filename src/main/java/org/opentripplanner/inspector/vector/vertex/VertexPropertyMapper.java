@@ -15,12 +15,13 @@ public class VertexPropertyMapper extends PropertyMapper<Vertex> {
 
   @Override
   protected Collection<KeyValue> map(Vertex input) {
-    List<KeyValue> baseProps = List.of(kv("class", input.getClass().getSimpleName()));
+    List<KeyValue> baseProps = List.of(
+      kv("class", input.getClass().getSimpleName()),
+      kv("label", input.getLabel().toString())
+    );
     List<KeyValue> properties =
       switch (input) {
-        case BarrierVertex v -> List.of(
-          kv("permission", v.getBarrierPermissions().toString())
-        );
+        case BarrierVertex v -> List.of(kv("permission", v.getBarrierPermissions().toString()));
         case VehicleRentalPlaceVertex v -> List.of(kv("rentalId", v.getStation().getId()));
         default -> List.of();
       };

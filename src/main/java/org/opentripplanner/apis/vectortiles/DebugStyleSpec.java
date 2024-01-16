@@ -38,14 +38,22 @@ public class DebugStyleSpec {
   );
   private static final String MAGENTA = "#f21d52";
   private static final String GREEN = "#22DD9E";
+  private static final String PURPLE = "#BC55F2";
   private static final int MAX_ZOOM = 23;
   private static final ZoomDependentNumber LINE_WIDTH = new ZoomDependentNumber(
     1.3f,
     List.of(new ZoomStop(13, 0.5f), new ZoomStop(MAX_ZOOM, 10))
   );
+  private static final String BLACK = "#140d0e";
 
-  static StyleSpec build(VectorSourceLayer regularStops, VectorSourceLayer edges) {
-    var vectorSources = Stream.of(regularStops, edges).map(VectorSourceLayer::vectorSource);
+  static StyleSpec build(
+    VectorSourceLayer regularStops,
+    VectorSourceLayer edges,
+    VectorSourceLayer vertices
+  ) {
+    var vectorSources = Stream
+      .of(regularStops, edges, vertices)
+      .map(VectorSourceLayer::vectorSource);
     var allSources = Stream
       .concat(Stream.of(BACKGROUND_SOURCE), vectorSources)
       .collect(Collectors.toSet());
@@ -89,10 +97,21 @@ public class DebugStyleSpec {
           .maxZoom(MAX_ZOOM)
           .intiallyHidden(),
         StyleBuilder
+          .ofId("vertex")
+          .typeCircle()
+          .vectorSourceLayer(vertices)
+          .circleStroke(BLACK, 2)
+          .circleRadius(
+            new ZoomDependentNumber(1, List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 5)))
+          )
+          .circleColor(PURPLE)
+          .minZoom(15)
+          .maxZoom(MAX_ZOOM),
+        StyleBuilder
           .ofId("regular-stop")
           .typeCircle()
           .vectorSourceLayer(regularStops)
-          .circleStroke("#140d0e", 2)
+          .circleStroke(BLACK, 2)
           .circleRadius(
             new ZoomDependentNumber(1, List.of(new ZoomStop(11, 1), new ZoomStop(MAX_ZOOM, 10)))
           )
