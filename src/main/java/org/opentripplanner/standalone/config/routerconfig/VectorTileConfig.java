@@ -5,22 +5,32 @@ import static org.opentripplanner.inspector.vector.LayerParameters.EXPANSION_FAC
 import static org.opentripplanner.inspector.vector.LayerParameters.MAX_ZOOM;
 import static org.opentripplanner.inspector.vector.LayerParameters.MIN_ZOOM;
 import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_0;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_1;
+import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2_5;
 
 import java.util.Collection;
 import java.util.List;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.standalone.config.framework.json.ParameterBuilder;
 
 public class VectorTileConfig
   implements VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> {
 
-  List<LayerParameters<VectorTilesResource.LayerType>> layers;
+  public static final VectorTileConfig DEFAULT = new VectorTileConfig(List.of(), null);
+  private final List<LayerParameters<VectorTilesResource.LayerType>> layers;
 
-  public VectorTileConfig(
-    Collection<? extends LayerParameters<VectorTilesResource.LayerType>> layers
+  @Nullable
+  private final String basePath;
+
+  VectorTileConfig(
+    Collection<? extends LayerParameters<VectorTilesResource.LayerType>> layers,
+    @Nullable String basePath
   ) {
     this.layers = List.copyOf(layers);
+    this.basePath = basePath;
   }
 
   @Override
@@ -28,16 +38,20 @@ public class VectorTileConfig
     return layers;
   }
 
-  public static VectorTileConfig mapVectorTilesParameters(
-    NodeAdapter root,
-    String vectorTileLayers
-  ) {
+  @Nullable
+  public String basePath() {
+    return basePath;
+  }
+
+  public static VectorTileConfig mapVectorTilesParameters(NodeAdapter node, String paramName) {
+    var root = node.of(paramName).asObject();
     return new VectorTileConfig(
       root
-        .of(vectorTileLayers)
+        .of("layers")
         .since(V2_0)
         .summary("Configuration of the individual layers for the Mapbox vector tiles.")
-        .asObjects(VectorTileConfig::mapLayer)
+        .asObjects(VectorTileConfig::mapLayer),
+      root.of("basePath").since(V2_5).asString(null)
     );
   }
 

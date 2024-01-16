@@ -33,7 +33,7 @@ public class RouterConfigurationDocTest {
     .skip("flex", "sandbox/Flex.md")
     .skip("routingDefaults", "RouteRequest.md")
     .skip("updaters", "UpdaterConfig.md")
-    .skip("vectorTileLayers", "sandbox/MapboxVectorTilesApi.md")
+    .skip("vectorTiles", "sandbox/MapboxVectorTilesApi.md")
     .skipNestedElements("transferCacheRequests", "RouteRequest.md")
     .skip("rideHailingServices", "sandbox/RideHailing.md")
     .skip("vehicleRentalServiceDirectory", "sandbox/VehicleRentalServiceDirectory.md")

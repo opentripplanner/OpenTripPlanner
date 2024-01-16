@@ -42,7 +42,7 @@ public class TestServerContext {
       graph,
       new DefaultTransitService(transitModel),
       Metrics.globalRegistry,
-      routerConfig.vectorTileLayers(),
+      routerConfig.vectorTileConfig(),
       createWorldEnvelopeService(),
       createRealtimeVehicleService(transitService),
       createVehicleRentalService(),

@@ -35,93 +35,95 @@ The feature must be configured in `router-config.json` as follows
 
 ```JSON
 {
-  "vectorTileLayers": [
-    {
-      "name": "stops",
-      "type": "Stop",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 600
-    },
-    {
-      "name": "stations",
-      "type": "Station",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 12,
-      "cacheMaxSeconds": 600
-    },
-    // all rental places: stations and free-floating vehicles
-    {
-      "name": "citybikes",
-      "type": "VehicleRental",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 60,
-      "expansionFactor": 0.25
-    },
-    // just free-floating vehicles
-    {
-      "name": "rentalVehicles",
-      "type": "VehicleRentalVehicle",
-      "mapper": "DigitransitRealtime",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 60
-    },
-    // just rental stations
-    {
-      "name": "rentalStations",
-      "type": "VehicleRentalStation",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 600
-    },
-    // Contains just stations and real-time information for them
-    {
-      "name": "realtimeRentalStations",
-      "type": "VehicleRentalStation",
-      "mapper": "DigitransitRealtime",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 60
-    },
-    // This exists for backwards compatibility. At some point, we might want
-    // to add a new real-time parking mapper with better translation support
-    // and less unnecessary fields.
-    {
-      "name": "stadtnaviVehicleParking",
-      "type": "VehicleParking",
-      "mapper": "Stadtnavi",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 60,
-      "expansionFactor": 0.25
-    },
-    // no real-time, translatable fields are translated based on accept-language header
-    // and contains less fields than the Stadtnavi mapper
-    {
-      "name": "vehicleParking",
-      "type": "VehicleParking",
-      "mapper": "Digitransit",
-      "maxZoom": 20,
-      "minZoom": 14,
-      "cacheMaxSeconds": 600,
-      "expansionFactor": 0.25
-    },
-    {
-      "name": "vehicleParkingGroups",
-      "type": "VehicleParkingGroup",
-      "mapper": "Digitransit",
-      "maxZoom": 17,
-      "minZoom": 14,
-      "cacheMaxSeconds": 600,
-      "expansionFactor": 0.25
-    }
-  ]
+  "vectorTiles": 
+    "layers": [
+      {
+        "name": "stops",
+        "type": "Stop",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600
+      },
+      {
+        "name": "stations",
+        "type": "Station",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 12,
+        "cacheMaxSeconds": 600
+      },
+      // all rental places: stations and free-floating vehicles
+      {
+        "name": "citybikes",
+        "type": "VehicleRental",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 60,
+        "expansionFactor": 0.25
+      },
+      // just free-floating vehicles
+      {
+        "name": "rentalVehicles",
+        "type": "VehicleRentalVehicle",
+        "mapper": "DigitransitRealtime",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 60
+      },
+      // just rental stations
+      {
+        "name": "rentalStations",
+        "type": "VehicleRentalStation",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600
+      },
+      // Contains just stations and real-time information for them
+      {
+        "name": "realtimeRentalStations",
+        "type": "VehicleRentalStation",
+        "mapper": "DigitransitRealtime",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 60
+      },
+      // This exists for backwards compatibility. At some point, we might want
+      // to add a new real-time parking mapper with better translation support
+      // and less unnecessary fields.
+      {
+        "name": "stadtnaviVehicleParking",
+        "type": "VehicleParking",
+        "mapper": "Stadtnavi",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 60,
+        "expansionFactor": 0.25
+      },
+      // no real-time, translatable fields are translated based on accept-language header
+      // and contains less fields than the Stadtnavi mapper
+      {
+        "name": "vehicleParking",
+        "type": "VehicleParking",
+        "mapper": "Digitransit",
+        "maxZoom": 20,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600,
+        "expansionFactor": 0.25
+      },
+      {
+        "name": "vehicleParkingGroups",
+        "type": "VehicleParkingGroup",
+        "mapper": "Digitransit",
+        "maxZoom": 17,
+        "minZoom": 14,
+        "cacheMaxSeconds": 600,
+        "expansionFactor": 0.25
+      }
+    ] 
+  }
 }
 ```
 
