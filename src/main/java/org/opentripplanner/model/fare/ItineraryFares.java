@@ -38,14 +38,6 @@ public class ItineraryFares {
    */
   private final Multimap<Leg, FareProductUse> legProducts = LinkedHashMultimap.create();
 
-  /**
-   * Holds the "fares" for the entire itinerary. The definition of a fare is not clear so
-   * this is deprecated.
-   * @deprecated Exists only for backwards compatibility and will be removed in the future.
-   */
-  @Deprecated
-  private final Map<FareType, Money> fares = new HashMap<>();
-
   public static ItineraryFares empty() {
     return new ItineraryFares();
   }
@@ -74,7 +66,6 @@ public class ItineraryFares {
    */
   @Deprecated
   public void addFare(FareType fareType, Money money) {
-    fares.put(fareType, money);
   }
 
   /**
@@ -97,14 +88,6 @@ public class ItineraryFares {
   @Deprecated
   public Money getFare(FareType type) {
     return fares.get(type);
-  }
-
-  /**
-   * Return the set of {@link FareType}s that are contained in this instance.
-   */
-  @Deprecated
-  public Set<FareType> getFareTypes() {
-    return fares.keySet();
   }
 
   @Override

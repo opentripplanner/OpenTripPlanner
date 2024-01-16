@@ -149,7 +149,7 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var itineraries = router.createFlexOnlyItineraries().stream().peek(filter::decorate).toList();
 
     var itinerary = itineraries.iterator().next();
-    assertFalse(itinerary.getFares().getFareTypes().isEmpty());
+    assertFalse(itinerary.getFares().getItineraryProducts().isEmpty());
 
     assertEquals(Money.usDollars(2.5f), itinerary.getFares().getFare(FareType.regular));
 

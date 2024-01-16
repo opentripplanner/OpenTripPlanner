@@ -183,7 +183,6 @@ class GraphQLIntegrationTest {
     var railLeg = (ScheduledTransitLeg) i1.getTransitLeg(2);
 
     var fares = new ItineraryFares();
-    fares.addFare(FareType.regular, Money.euros(3.1f));
 
     var dayPass = fareProduct("day-pass");
     fares.addItineraryProducts(List.of(dayPass));
