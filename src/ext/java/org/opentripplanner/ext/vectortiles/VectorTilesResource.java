@@ -66,7 +66,7 @@ public class VectorTilesResource {
       z,
       locale,
       Arrays.asList(requestedLayers.split(",")),
-      serverContext.vectorTileLayers().layers(),
+      serverContext.vectorTileConfig().layers(),
       VectorTilesResource::crateLayerBuilder,
       serverContext
     );
@@ -89,15 +89,14 @@ public class VectorTilesResource {
       .filter(Predicate.not(Objects::isNull))
       .toList();
 
-    return new TileJson(
+    var url = TileJson.tileUrl(
       uri,
       headers,
       requestedLayers,
       ignoreRouterId,
-      "vectorTiles",
-      envelope,
-      feedInfos
+      "vectorTiles"
     );
+    return new TileJson(url, envelope, feedInfos);
   }
 
   private static LayerBuilder<?> crateLayerBuilder(

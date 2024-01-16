@@ -8,7 +8,6 @@ import org.opentripplanner.astar.spi.TraverseVisitor;
 import org.opentripplanner.ext.emissions.EmissionsService;
 import org.opentripplanner.ext.ridehailing.RideHailingService;
 import org.opentripplanner.ext.stopconsolidation.StopConsolidationService;
-import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.raster.TileRendererManager;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.configure.RaptorConfig;
@@ -221,7 +220,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
   }
 
   @Override
-  public VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> vectorTileLayers() {
+  public VectorTileConfig vectorTileConfig() {
     return vectorTileConfig;
   }
 

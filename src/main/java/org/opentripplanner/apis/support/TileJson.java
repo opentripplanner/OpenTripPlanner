@@ -5,6 +5,7 @@ import jakarta.ws.rs.core.UriInfo;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
@@ -35,11 +36,7 @@ public class TileJson implements Serializable {
   public final double[] center;
 
   public TileJson(
-    UriInfo uri,
-    HttpHeaders headers,
-    String layers,
-    String ignoreRouterId,
-    String path,
+    String tileUrl,
     WorldEnvelope envelope,
     Collection<FeedInfo> feedInfos
   ) {
@@ -53,12 +50,7 @@ public class TileJson implements Serializable {
 
     tiles =
       new String[] {
-        "%s/otp/routers/%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
-            HttpUtils.getBaseAddress(uri, headers),
-            ignoreRouterId,
-            path,
-            layers
-          ),
+       tileUrl
       };
 
     bounds =
@@ -71,5 +63,33 @@ public class TileJson implements Serializable {
 
     var c = envelope.center();
     center = new double[] { c.longitude(), c.latitude(), 9 };
+  }
+
+  public static String tileUrl(
+    UriInfo uri,
+    HttpHeaders headers,
+    String layers,
+    String ignoreRouterId,
+    String path
+  ) {
+    return "%s/otp/routers/%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
+      HttpUtils.getBaseAddress(uri, headers),
+      ignoreRouterId,
+      path,
+      layers
+    );
+  }
+  public static String tileUrl(
+    UriInfo uri,
+    HttpHeaders headers,
+    String overridePath,
+    String layers
+  ) {
+    var strippedPath = StringUtils.stripStart(overridePath, "/");
+    return "%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
+      HttpUtils.getBaseAddress(uri, headers),
+      strippedPath,
+      layers
+    );
   }
 }

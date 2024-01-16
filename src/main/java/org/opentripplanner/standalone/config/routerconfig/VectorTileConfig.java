@@ -10,6 +10,7 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.vector.LayerParameters;
@@ -38,9 +39,8 @@ public class VectorTileConfig
     return layers;
   }
 
-  @Nullable
-  public String basePath() {
-    return basePath;
+  public Optional<String> basePath() {
+    return Optional.ofNullable(basePath);
   }
 
   public static VectorTileConfig mapVectorTilesParameters(NodeAdapter node, String paramName) {
