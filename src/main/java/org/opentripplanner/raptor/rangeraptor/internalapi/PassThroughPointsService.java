@@ -54,7 +54,7 @@ public interface PassThroughPointsService {
   void updateC2Value(int currentPathC2, IntConsumer update);
 
   /**
-   * This is the dominance function to use for comparing transit-priority-groupIds.
+   * This is the dominance function to use for comparing transit-group-priorityIds.
    * It is critical that the implementation is "static" so it can be inlined, since it
    * is run in the innermost loop of Raptor.
    */

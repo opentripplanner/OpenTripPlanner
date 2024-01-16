@@ -658,8 +658,8 @@ public abstract class RoutingResource {
   @QueryParam("useVehicleParkingAvailabilityInformation")
   protected Boolean useVehicleParkingAvailabilityInformation;
 
-  @QueryParam("relaxTransitPriorityGroup")
-  protected String relaxTransitPriorityGroup;
+  @QueryParam("relaxTransitGroupPriority")
+  protected String relaxTransitGroupPriority;
 
   /**
    * Whether non-optimal transit paths at the destination should be returned.

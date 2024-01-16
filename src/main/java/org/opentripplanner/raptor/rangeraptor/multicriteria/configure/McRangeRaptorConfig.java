@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.request.MultiCriteriaRequest;
-import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
+import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
 import org.opentripplanner.raptor.rangeraptor.context.SearchContext;
 import org.opentripplanner.raptor.rangeraptor.internalapi.Heuristics;
 import org.opentripplanner.raptor.rangeraptor.internalapi.ParetoSetCost;
@@ -29,7 +29,7 @@ import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.PatternRideFact
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c1.PatternRideC1;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.PassThroughRideFactory;
 import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.PatternRideC2;
-import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.TransitPriorityGroupRideFactory;
+import org.opentripplanner.raptor.rangeraptor.multicriteria.ride.c2.TransitGroupPriorityRideFactory;
 import org.opentripplanner.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.raptor.rangeraptor.path.configure.PathConfig;
 import org.opentripplanner.raptor.util.paretoset.ParetoComparator;
@@ -173,7 +173,8 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
   }
 
   /**
-   * Currently "transit-priority-groups" is the only feature using two multi-criteria(c2).
+   * Use c2 in the search, this is use-case specific. For example the pass-through or
+   * transit-group-priority features uses the c2 value.
    */
   private boolean includeC2() {
     return mcRequest().includeC2();
@@ -184,7 +185,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
       return new PassThroughRideFactory<>(passThroughPointsService);
     }
     if (isTransitPriority()) {
-      return new TransitPriorityGroupRideFactory<>(getTransitPriorityGroupCalculator());
+      return new TransitGroupPriorityRideFactory<>(getTransitGroupPriorityCalculator());
     }
     throw new IllegalStateException("Only pass-through and transit-priority uses c2.");
   }
@@ -195,12 +196,12 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
       return passThroughPointsService.dominanceFunction();
     }
     if (isTransitPriority()) {
-      return getTransitPriorityGroupCalculator().dominanceFunction();
+      return getTransitGroupPriorityCalculator().dominanceFunction();
     }
     return null;
   }
 
-  private RaptorTransitPriorityGroupCalculator getTransitPriorityGroupCalculator() {
+  private RaptorTransitGroupCalculator getTransitGroupPriorityCalculator() {
     return mcRequest().transitPriorityCalculator().orElseThrow();
   }
 

@@ -6,36 +6,36 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import java.util.Collection;
 import java.util.List;
 import org.opentripplanner.routing.api.request.request.TransitRequest;
-import org.opentripplanner.routing.api.request.request.filter.TransitPriorityGroupSelect;
+import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.framework.json.OtpVersion;
 import org.opentripplanner.transit.model.basic.TransitMode;
 
-public class TransitPriorityGroupConfig {
+public class TransitGroupPriorityConfig {
 
   public static void mapTransitRequest(NodeAdapter root, TransitRequest transit) {
     var c = root
-      .of("transitPriorityGroups")
+      .of("transitGroupPriority")
       .since(OtpVersion.V2_5)
-      .summary("Transit priority groups configuration")
+      .summary(
+        "Group transit patterns and give each group a mutual advantage in the Raptor search."
+      )
       .description(
         """
         Use this to separate transit patterns into groups. Each group will be given a group-id. A
         path (multiple legs) will then have a set of group-ids based on the group-id from each leg.
         Hence, two paths with a different set of group-ids will BOTH be optimal unless the cost is
-        worse than the relaxation specified in the `relaxTransitPriorityGroup` parameter. This is 
+        worse than the relaxation specified in the `relaxTransitGroupPriority` parameter. This is
         only available in the TransmodelAPI for now.
         
-        Unmatched patterns are put in the BASE priority-group (group id: 0). This group is special.
-        If a path only have legs in the base group, then that path dominates other paths, but other
-        paths must be better to make it. 
+        Unmatched patterns are put in the BASE priority-group.
         """
       )
       .experimentalFeature()
       .asObject();
 
     transit.addPriorityGroupsByAgency(
-      TransitPriorityGroupConfig.mapList(
+      TransitGroupPriorityConfig.mapList(
         c,
         "byAgency",
         "All groups here are split by agency. For example if you list mode " +
@@ -44,7 +44,7 @@ public class TransitPriorityGroupConfig {
       )
     );
     transit.addPriorityGroupsGlobal(
-      TransitPriorityGroupConfig.mapList(
+      TransitGroupPriorityConfig.mapList(
         c,
         "global",
         "All services matching a 'global' group will get the same group-id. Use this " +
@@ -53,7 +53,7 @@ public class TransitPriorityGroupConfig {
     );
   }
 
-  private static Collection<TransitPriorityGroupSelect> mapList(
+  private static Collection<TransitGroupSelect> mapList(
     NodeAdapter root,
     String parameterName,
     String description
@@ -61,13 +61,13 @@ public class TransitPriorityGroupConfig {
     return root
       .of(parameterName)
       .since(V2_5)
-      .summary("Configuration for transit priority groups.")
+      .summary("List of transit groups.")
       .description(description + " The max total number of group-ids are 32, so be careful.")
-      .asObjects(TransitPriorityGroupConfig::mapTransitGroupSelect);
+      .asObjects(TransitGroupPriorityConfig::mapTransitGroupSelect);
   }
 
-  private static TransitPriorityGroupSelect mapTransitGroupSelect(NodeAdapter c) {
-    return TransitPriorityGroupSelect
+  private static TransitGroupSelect mapTransitGroupSelect(NodeAdapter c) {
+    return TransitGroupSelect
       .of()
       .addModes(
         c

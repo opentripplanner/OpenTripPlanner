@@ -8,7 +8,6 @@ import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_C;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_D;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_E;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_F;
-import static org.opentripplanner.raptor._data.RaptorTestConstants.STOP_G;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T00_00;
 import static org.opentripplanner.raptor._data.RaptorTestConstants.T01_00;
 import static org.opentripplanner.raptor._data.api.PathUtils.pathsToString;
@@ -16,6 +15,9 @@ import static org.opentripplanner.raptor._data.transit.TestAccessEgress.walk;
 import static org.opentripplanner.raptor._data.transit.TestRoute.route;
 import static org.opentripplanner.raptor._data.transit.TestTripPattern.pattern;
 import static org.opentripplanner.raptor._data.transit.TestTripSchedule.schedule;
+import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_A;
+import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_B;
+import static org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator.GROUP_C;
 
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,8 +28,9 @@ import org.opentripplanner.raptor._data.transit.TestTripSchedule;
 import org.opentripplanner.raptor.api.model.DominanceFunction;
 import org.opentripplanner.raptor.api.request.RaptorProfile;
 import org.opentripplanner.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.raptor.api.request.RaptorTransitPriorityGroupCalculator;
+import org.opentripplanner.raptor.api.request.RaptorTransitGroupCalculator;
 import org.opentripplanner.raptor.configure.RaptorConfig;
+import org.opentripplanner.raptor.moduletests.support.TestGroupPriorityCalculator;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCostConverter;
 
 /**
@@ -37,32 +40,8 @@ import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.RaptorCo
  */
 public class K02_TransitPriorityDestinationTest {
 
-  private static final RaptorTransitPriorityGroupCalculator PRIORITY_GROUP_CALCULATOR = new RaptorTransitPriorityGroupCalculator() {
-    @Override
-    public int mergeTransitPriorityGroupIds(int currentGroupIds, int boardingGroupId) {
-      return currentGroupIds | boardingGroupId;
-    }
-
-    /**
-     * Left dominate right, if right has at least one priority group not in left.
-     */
-    @Override
-    public DominanceFunction dominanceFunction() {
-      return (l, r) -> ((l ^ r) & r) != 0;
-    }
-  };
-
-  private static final int GROUP_A = 0x01;
-  private static final int GROUP_B = 0x02;
-  private static final int GROUP_C = 0x04;
-  private static final int GROUP_AB = PRIORITY_GROUP_CALCULATOR.mergeTransitPriorityGroupIds(
-    GROUP_A,
-    GROUP_B
-  );
-  private static final int GROUP_AC = PRIORITY_GROUP_CALCULATOR.mergeTransitPriorityGroupIds(
-    GROUP_A,
-    GROUP_C
-  );
+  private static final RaptorTransitGroupCalculator PRIORITY_GROUP_CALCULATOR =
+    TestGroupPriorityCalculator.PRIORITY_CALCULATOR;
   private static final int C1_SLACK_90s = RaptorCostConverter.toRaptorCost(90);
 
   private final TestTransitData data = new TestTransitData();
@@ -117,7 +96,6 @@ public class K02_TransitPriorityDestinationTest {
       .addEgressPaths(walk(STOP_D, 1))
       .addEgressPaths(walk(STOP_E, 1))
       .addEgressPaths(walk(STOP_F, 1));
-    assetGroupCalculatorIsSetupCorrect();
   }
 
   @Test
@@ -130,22 +108,5 @@ public class K02_TransitPriorityDestinationTest {
       """.trim(),
       pathsToString(raptorService.route(requestBuilder.build(), data))
     );
-  }
-
-  /**
-   * Make sure the calculator and group setup is done correct.
-   */
-  void assetGroupCalculatorIsSetupCorrect() {
-    var d = PRIORITY_GROUP_CALCULATOR.dominanceFunction();
-
-    assertTrue(d.leftDominateRight(GROUP_A, GROUP_B));
-    assertTrue(d.leftDominateRight(GROUP_B, GROUP_A));
-    assertFalse(d.leftDominateRight(GROUP_A, GROUP_A));
-    // 3 = 1&2, 5 = 1&4
-    assertTrue(d.leftDominateRight(GROUP_A, GROUP_AB));
-    assertFalse(d.leftDominateRight(GROUP_AB, GROUP_A));
-    assertFalse(d.leftDominateRight(GROUP_AB, GROUP_AB));
-    assertTrue(d.leftDominateRight(GROUP_AB, GROUP_AC));
-    assertTrue(d.leftDominateRight(GROUP_AC, GROUP_AB));
   }
 }

@@ -26,7 +26,7 @@ public final class TransitPreferences implements Serializable {
   private final Map<TransitMode, Double> reluctanceForMode;
   private final Cost otherThanPreferredRoutesPenalty;
   private final CostLinearFunction unpreferredCost;
-  private final CostLinearFunction relaxTransitPriorityGroup;
+  private final CostLinearFunction relaxTransitGroupPriority;
   private final boolean ignoreRealtimeUpdates;
   private final boolean includePlannedCancellations;
   private final boolean includeRealtimeCancellations;
@@ -37,7 +37,7 @@ public final class TransitPreferences implements Serializable {
     this.reluctanceForMode = Map.of();
     this.otherThanPreferredRoutesPenalty = Cost.costOfMinutes(5);
     this.unpreferredCost = CostLinearFunction.NORMAL;
-    this.relaxTransitPriorityGroup = CostLinearFunction.NORMAL;
+    this.relaxTransitGroupPriority = CostLinearFunction.NORMAL;
     this.ignoreRealtimeUpdates = false;
     this.includePlannedCancellations = false;
     this.includeRealtimeCancellations = false;
@@ -50,7 +50,7 @@ public final class TransitPreferences implements Serializable {
     this.reluctanceForMode = Map.copyOf(requireNonNull(builder.reluctanceForMode));
     this.otherThanPreferredRoutesPenalty = builder.otherThanPreferredRoutesPenalty;
     this.unpreferredCost = requireNonNull(builder.unpreferredCost);
-    this.relaxTransitPriorityGroup = Objects.requireNonNull(builder.relaxTransitPriorityGroup);
+    this.relaxTransitGroupPriority = Objects.requireNonNull(builder.relaxTransitGroupPriority);
     this.ignoreRealtimeUpdates = builder.ignoreRealtimeUpdates;
     this.includePlannedCancellations = builder.includePlannedCancellations;
     this.includeRealtimeCancellations = builder.includeRealtimeCancellations;
@@ -128,13 +128,13 @@ public final class TransitPreferences implements Serializable {
   }
 
   /**
-   * This is used to relax the cost when comparing transit-priority-groups. The default is the
-   * NORMAL function({@code f(x) = x}. This is the same as not using priority-groups. The
+   * This is used to relax the cost when comparing transit-groups. The default is the
+   * NORMAL function({@code f(t) = t}. This is the same as not using priority-groups. The
    * coefficient must be in range {@code [1.0 to 4.0]} and the constant must be in range
    * {@code [$0 to $1440(4h)]}.
    */
-  public CostLinearFunction relaxTransitPriorityGroup() {
-    return relaxTransitPriorityGroup;
+  public CostLinearFunction relaxTransitGroupPriority() {
+    return relaxTransitGroupPriority;
   }
 
   /**
@@ -176,7 +176,7 @@ public final class TransitPreferences implements Serializable {
       reluctanceForMode.equals(that.reluctanceForMode) &&
       Objects.equals(otherThanPreferredRoutesPenalty, that.otherThanPreferredRoutesPenalty) &&
       unpreferredCost.equals(that.unpreferredCost) &&
-      Objects.equals(relaxTransitPriorityGroup, that.relaxTransitPriorityGroup) &&
+      Objects.equals(relaxTransitGroupPriority, that.relaxTransitGroupPriority) &&
       ignoreRealtimeUpdates == that.ignoreRealtimeUpdates &&
       includePlannedCancellations == that.includePlannedCancellations &&
       includeRealtimeCancellations == that.includeRealtimeCancellations &&
@@ -192,7 +192,7 @@ public final class TransitPreferences implements Serializable {
       reluctanceForMode,
       otherThanPreferredRoutesPenalty,
       unpreferredCost,
-      relaxTransitPriorityGroup,
+      relaxTransitGroupPriority,
       ignoreRealtimeUpdates,
       includePlannedCancellations,
       includeRealtimeCancellations,
@@ -213,7 +213,7 @@ public final class TransitPreferences implements Serializable {
         DEFAULT.otherThanPreferredRoutesPenalty
       )
       .addObj("unpreferredCost", unpreferredCost, DEFAULT.unpreferredCost)
-      .addObj("relaxTransitPriorityGroup", relaxTransitPriorityGroup, CostLinearFunction.NORMAL)
+      .addObj("relaxTransitGroupPriority", relaxTransitGroupPriority, CostLinearFunction.NORMAL)
       .addBoolIfTrue(
         "ignoreRealtimeUpdates",
         ignoreRealtimeUpdates != DEFAULT.ignoreRealtimeUpdates
@@ -240,7 +240,7 @@ public final class TransitPreferences implements Serializable {
     private Map<TransitMode, Double> reluctanceForMode;
     private Cost otherThanPreferredRoutesPenalty;
     private CostLinearFunction unpreferredCost;
-    private CostLinearFunction relaxTransitPriorityGroup;
+    private CostLinearFunction relaxTransitGroupPriority;
     private boolean ignoreRealtimeUpdates;
     private boolean includePlannedCancellations;
     private boolean includeRealtimeCancellations;
@@ -253,7 +253,7 @@ public final class TransitPreferences implements Serializable {
       this.reluctanceForMode = original.reluctanceForMode;
       this.otherThanPreferredRoutesPenalty = original.otherThanPreferredRoutesPenalty;
       this.unpreferredCost = original.unpreferredCost;
-      this.relaxTransitPriorityGroup = original.relaxTransitPriorityGroup;
+      this.relaxTransitGroupPriority = original.relaxTransitGroupPriority;
       this.ignoreRealtimeUpdates = original.ignoreRealtimeUpdates;
       this.includePlannedCancellations = original.includePlannedCancellations;
       this.includeRealtimeCancellations = original.includeRealtimeCancellations;
@@ -302,8 +302,8 @@ public final class TransitPreferences implements Serializable {
       return setUnpreferredCost(CostLinearFunction.of(constFunction));
     }
 
-    public Builder withTransitGroupPriorityGeneralizedCostSlack(CostLinearFunction value) {
-      this.relaxTransitPriorityGroup = value;
+    public Builder withRelaxTransitGroupPriority(CostLinearFunction value) {
+      this.relaxTransitGroupPriority = value;
       return this;
     }
 

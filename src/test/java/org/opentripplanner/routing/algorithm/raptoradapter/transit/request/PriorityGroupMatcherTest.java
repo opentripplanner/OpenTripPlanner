@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.request.filter.TransitPriorityGroupSelect;
+import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
@@ -35,7 +35,7 @@ class PriorityGroupMatcherTest {
   @Test
   void testMode() {
     var m = PriorityGroupMatcher.of(
-      TransitPriorityGroupSelect.of().addModes(List.of(TransitMode.BUS, TransitMode.TRAM)).build()
+      TransitGroupSelect.of().addModes(List.of(TransitMode.BUS, TransitMode.TRAM)).build()
     );
     assertEquals("Mode(BUS | TRAM)", m.toString());
     assertFalse(m.isEmpty());
@@ -47,10 +47,10 @@ class PriorityGroupMatcherTest {
   @Test
   void testAgencyIds() {
     var m1 = PriorityGroupMatcher.of(
-      TransitPriorityGroupSelect.of().addAgencyIds(List.of(r1agencyId)).build()
+      TransitGroupSelect.of().addAgencyIds(List.of(r1agencyId)).build()
     );
     var m2 = PriorityGroupMatcher.of(
-      TransitPriorityGroupSelect.of().addAgencyIds(List.of(r1agencyId, anyId)).build()
+      TransitGroupSelect.of().addAgencyIds(List.of(r1agencyId, anyId)).build()
     );
     var matchers = List.of(m1, m2);
 
@@ -68,10 +68,10 @@ class PriorityGroupMatcherTest {
   @Test
   void routeIds() {
     var m1 = PriorityGroupMatcher.of(
-      TransitPriorityGroupSelect.of().addRouteIds(List.of(r1routeId)).build()
+      TransitGroupSelect.of().addRouteIds(List.of(r1routeId)).build()
     );
     var m2 = PriorityGroupMatcher.of(
-      TransitPriorityGroupSelect.of().addRouteIds(List.of(r1routeId, anyId)).build()
+      TransitGroupSelect.of().addRouteIds(List.of(r1routeId, anyId)).build()
     );
     var matchers = List.of(m1, m2);
 
@@ -89,7 +89,7 @@ class PriorityGroupMatcherTest {
   @Test
   void testSubMode() {
     var subject = PriorityGroupMatcher.of(
-      TransitPriorityGroupSelect.of().addSubModeRegexp(List.of(".*local.*")).build()
+      TransitGroupSelect.of().addSubModeRegexp(List.of(".*local.*")).build()
     );
 
     assertEquals("SubModeRegexp(.*local.*)", subject.toString());
@@ -103,7 +103,7 @@ class PriorityGroupMatcherTest {
   @Test
   void testAnd() {
     var subject = PriorityGroupMatcher.of(
-      TransitPriorityGroupSelect
+      TransitGroupSelect
         .of()
         .addSubModeRegexp(List.of("express"))
         .addRouteIds(List.of(r1routeId))
@@ -125,7 +125,7 @@ class PriorityGroupMatcherTest {
   @Test
   void testToString() {
     var subject = PriorityGroupMatcher.of(
-      TransitPriorityGroupSelect
+      TransitGroupSelect
         .of()
         .addModes(List.of(TransitMode.BUS, TransitMode.TRAM))
         .addAgencyIds(List.of(anyId, r1agencyId))

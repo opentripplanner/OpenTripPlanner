@@ -7,7 +7,7 @@ import static org.opentripplanner.routing.algorithm.raptoradapter.transit.reques
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.routing.api.request.request.filter.TransitPriorityGroupSelect;
+import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.RoutingTripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
@@ -69,14 +69,14 @@ class PriorityGroupConfiguratorTest {
   @Test
   void emptyConfigurationShouldReturnGroupZero() {
     var subject = PriorityGroupConfigurator.of(List.of(), List.of());
-    assertEquals(subject.baseGroupId(), subject.lookupTransitPriorityGroupId(railR1));
-    assertEquals(subject.baseGroupId(), subject.lookupTransitPriorityGroupId(busB2));
-    assertEquals(subject.baseGroupId(), subject.lookupTransitPriorityGroupId(null));
+    assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(railR1));
+    assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(busB2));
+    assertEquals(subject.baseGroupId(), subject.lookupTransitGroupPriorityId(null));
   }
 
   @Test
-  void lookupTransitPriorityGroupIdByAgency() {
-    var select = TransitPriorityGroupSelect
+  void lookupTransitGroupIdByAgency() {
+    var select = TransitGroupSelect
       .of()
       .addModes(List.of(TransitMode.BUS, TransitMode.RAIL))
       .build();
@@ -85,12 +85,12 @@ class PriorityGroupConfiguratorTest {
     var subject = PriorityGroupConfigurator.of(List.of(select), List.of());
 
     // Agency groups are indexed (group-id set) at request time
-    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitPriorityGroupId(null));
-    assertEquals(EXP_GROUP_1, subject.lookupTransitPriorityGroupId(busB2));
-    assertEquals(EXP_GROUP_2, subject.lookupTransitPriorityGroupId(railR3));
-    assertEquals(EXP_GROUP_3, subject.lookupTransitPriorityGroupId(railR1));
-    assertEquals(EXP_GROUP_2, subject.lookupTransitPriorityGroupId(busB3));
-    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitPriorityGroupId(ferryF3));
+    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(null));
+    assertEquals(EXP_GROUP_1, subject.lookupTransitGroupPriorityId(busB2));
+    assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR3));
+    assertEquals(EXP_GROUP_3, subject.lookupTransitGroupPriorityId(railR1));
+    assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(busB3));
+    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(ferryF3));
   }
 
   @Test
@@ -99,17 +99,17 @@ class PriorityGroupConfiguratorTest {
     var subject = PriorityGroupConfigurator.of(
       List.of(),
       List.of(
-        TransitPriorityGroupSelect.of().addModes(List.of(TransitMode.BUS)).build(),
-        TransitPriorityGroupSelect.of().addModes(List.of(TransitMode.RAIL)).build()
+        TransitGroupSelect.of().addModes(List.of(TransitMode.BUS)).build(),
+        TransitGroupSelect.of().addModes(List.of(TransitMode.RAIL)).build()
       )
     );
 
-    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitPriorityGroupId(null));
-    assertEquals(EXP_GROUP_2, subject.lookupTransitPriorityGroupId(railR1));
-    assertEquals(EXP_GROUP_1, subject.lookupTransitPriorityGroupId(busB2));
-    assertEquals(EXP_GROUP_2, subject.lookupTransitPriorityGroupId(railR3));
-    assertEquals(EXP_GROUP_1, subject.lookupTransitPriorityGroupId(busB3));
-    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitPriorityGroupId(ferryF3));
+    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(null));
+    assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR1));
+    assertEquals(EXP_GROUP_1, subject.lookupTransitGroupPriorityId(busB2));
+    assertEquals(EXP_GROUP_2, subject.lookupTransitGroupPriorityId(railR3));
+    assertEquals(EXP_GROUP_1, subject.lookupTransitGroupPriorityId(busB3));
+    assertEquals(EXP_GROUP_ID_BASE, subject.lookupTransitGroupPriorityId(ferryF3));
   }
 
   private static TestRouteData route(
