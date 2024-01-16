@@ -98,7 +98,7 @@ public class VehicleParkingGroupsLayerTest {
       """
       {
         "vectorTiles": {
-         "layers" :[
+          "layers" :[
             {
               "name": "vehicleParkingGroups",
               "type": "VehicleParkingGroup",
