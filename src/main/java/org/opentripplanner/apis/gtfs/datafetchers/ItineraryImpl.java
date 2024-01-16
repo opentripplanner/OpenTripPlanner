@@ -48,17 +48,7 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
       if (fare == null) {
         return null;
       }
-      return fare
-        .getFareTypes()
-        .stream()
-        .map(fareKey -> {
-          Map<String, Object> result = new HashMap<>();
-          result.put("name", fareKey);
-          result.put("fare", fare.getFare(fareKey));
-          result.put("details", List.of());
-          return result;
-        })
-        .collect(Collectors.toList());
+      return List.of();
     };
   }
 

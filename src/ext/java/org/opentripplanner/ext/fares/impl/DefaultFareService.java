@@ -122,9 +122,7 @@ public class DefaultFareService implements FareService {
     boolean hasFare = false;
     for (FareType fareType : fareRulesPerType.keySet()) {
       final Multimap<Leg, FareProductUse> fareProducts = LinkedHashMultimap.create();
-      List<Money> fares = new ArrayList<>();
-      boolean legWithoutRulesFound = false;
-      boolean legsWithoutMatchingRulesFound = false;
+      List<FareProduct> itineraryProducts = new ArrayList<>();
       for (String feedId : fareLegsByFeed.keySet()) {
         ItineraryFares currentFare = ItineraryFares.empty();
         var fareRules = fareRulesForFeed(fareType, feedId);
@@ -140,57 +138,23 @@ public class DefaultFareService implements FareService {
             fareRules
           );
 
-          if (!feedHasFare) {
-            legsWithoutMatchingRulesFound = true;
-          }
           hasFare = feedHasFare || hasFare; // Other feeds might still have fare for some legs
 
           fareProducts.putAll(currentFare.getLegProducts());
-          fare.addFare(fareType, currentFare.getFare(fareType));
+          itineraryProducts.addAll(currentFare.getItineraryProducts());
 
-          fares.add(currentFare.getFare(fareType));
-
-          // If all the legs are from one feed, consider itinerary products
-          if (fareLegs.equals(fareLegsByFeed.get(feedId))) {
-            currentFare
-              .getFareTypes()
-              .forEach(type -> {
-                var money = currentFare.getFare(type);
-                var fareProduct = FareProduct
-                  .of(new FeedScopedId(feedId, type.name()), type.name(), money)
-                  .build();
-                fare.addItineraryProducts(List.of(fareProduct));
-              });
-          }
         } else {
-          legWithoutRulesFound = true;
         }
       }
 
       fare.addFareProductUses(fareProducts);
+      fare.addItineraryProducts(itineraryProducts);
 
       // No fares will be discovered after this point
       if (!hasFare) {
         continue;
       }
 
-      // Accumulate the final price of the fare or indicate that no final fare could be found
-      if (legWithoutRulesFound || legsWithoutMatchingRulesFound) {
-        fare.addFare(
-          fareType,
-          Money.ofFractionalAmount(fares.get(0).currency(), UNKNOWN_FARE_PRICE)
-        );
-      } else {
-        fare.addFare(
-          fareType,
-          fares
-            .stream()
-            .reduce(
-              Money.ofFractionalAmount(fare.getFare(fareType).currency(), 0),
-              (r1, r2) -> r1.plus(r2)
-            )
-        );
-      }
     }
     return hasFare ? fare : null;
   }
@@ -292,7 +256,6 @@ public class DefaultFareService implements FareService {
     }
 
     var amount = r.resultTable[0][legs.size() - 1];
-    fare.addFare(fareType, Money.ofFractionalAmount(currency, amount));
     fare.addFareProductUses(fareProductUses);
     return count > 0;
   }

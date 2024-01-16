@@ -85,7 +85,6 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       currentTransferWindowCost = Money.max(currentTransferWindowCost, rideCost.orElse(zero));
     }
     cost = cost.plus(currentTransferWindowCost);
-    fare.addFare(fareType, cost);
     var fp = new FareProduct(
       new FeedScopedId("fares", fareType.name()),
       fareType.name(),
@@ -95,7 +94,6 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       null
     );
     fare.addItineraryProducts(List.of(fp));
-    fare.addFare(fareType, cost);
     return cost.greaterThan(zero);
   }
 
