@@ -27,6 +27,7 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
   private ZonedDateTime creationTime;
   private ZonedDateTime updatedTime;
   private String siriCodespace;
+  private Integer version;
   private final Set<EntitySelector> entities = new HashSet<>();
   private final List<TimePeriod> timePeriods = new ArrayList<>();
 
@@ -164,6 +165,15 @@ public class TransitAlertBuilder extends AbstractEntityBuilder<TransitAlert, Tra
 
   public TransitAlertBuilder withCreationTime(ZonedDateTime creationTime) {
     this.creationTime = creationTime;
+    return this;
+  }
+
+  public Integer version() {
+    return version;
+  }
+
+  public TransitAlertBuilder withVersion(Integer version) {
+    this.version = version;
     return this;
   }
 

@@ -22,6 +22,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -84,11 +85,13 @@ public class RouteRequestMapper {
         }
 
         bike.withParking(parking -> setParkingPreferences(callWith, parking));
+        bike.withRental(rental -> setRentalPreferences(callWith, request, rental));
       });
 
       preferences.withCar(car -> {
         callWith.argument("carReluctance", car::withReluctance);
         car.withParking(parking -> setParkingPreferences(callWith, parking));
+        car.withRental(rental -> setRentalPreferences(callWith, request, rental));
       });
 
       preferences.withWalk(b -> {
@@ -96,13 +99,6 @@ public class RouteRequestMapper {
         callWith.argument("walkSpeed", b::withSpeed);
         callWith.argument("walkBoardCost", b::withBoardCost);
         callWith.argument("walkSafetyFactor", b::withSafetyFactor);
-      });
-      preferences.withRental(rental -> {
-        callWith.argument(
-          "keepingRentedBicycleAtDestinationCost",
-          rental::withArrivingInRentalVehicleAtDestinationCost
-        );
-        rental.withUseAvailabilityInformation(request.isTripPlannedForNow());
       });
       // TODO Add support for all debug filter variants
       callWith.argument(
@@ -148,10 +144,6 @@ public class RouteRequestMapper {
       });
     });
 
-    callWith.argument(
-      "allowKeepingRentedBicycleAtDestination",
-      request.journey().rental()::setAllowArrivingInRentedVehicleAtDestination
-    );
     callWith.argument("arriveBy", request::setArriveBy);
 
     callWith.argument(
@@ -231,22 +223,6 @@ public class RouteRequestMapper {
       // ((List<String>)environment.getArgument("allowedTicketTypes")).forEach(ticketType -> request.allowedFares.add(ticketType.replaceFirst("_", ":")));
     }
 
-    var vehicleRental = request.journey().rental();
-
-    // Deprecated, the next one will override this, if both are set
-    callWith.argument(
-      "allowedBikeRentalNetworks",
-      (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))
-    );
-    callWith.argument(
-      "allowedVehicleRentalNetworks",
-      (Collection<String> v) -> vehicleRental.setAllowedNetworks(new HashSet<>(v))
-    );
-    callWith.argument(
-      "bannedVehicleRentalNetworks",
-      (Collection<String> v) -> vehicleRental.setBannedNetworks(new HashSet<>(v))
-    );
-
     callWith.argument(
       "locale",
       (String v) -> request.setLocale(GraphQLUtils.getLocale(environment, v))
@@ -321,6 +297,36 @@ public class RouteRequestMapper {
         parking.withPreferredVehicleParkingTags(parseSelectFilters(preferred));
         parking.withNotPreferredVehicleParkingTags(parseNotFilters(preferred));
       }
+    );
+  }
+
+  private static void setRentalPreferences(
+    CallerWithEnvironment callWith,
+    RouteRequest request,
+    VehicleRentalPreferences.Builder rental
+  ) {
+    callWith.argument(
+      "keepingRentedBicycleAtDestinationCost",
+      rental::withArrivingInRentalVehicleAtDestinationCost
+    );
+    rental.withUseAvailabilityInformation(request.isTripPlannedForNow());
+    callWith.argument(
+      "allowKeepingRentedBicycleAtDestination",
+      rental::withAllowArrivingInRentedVehicleAtDestination
+    );
+
+    // Deprecated, the next one will override this, if both are set
+    callWith.argument(
+      "allowedBikeRentalNetworks",
+      (Collection<String> v) -> rental.withAllowedNetworks(new HashSet<>(v))
+    );
+    callWith.argument(
+      "allowedVehicleRentalNetworks",
+      (Collection<String> v) -> rental.withAllowedNetworks(new HashSet<>(v))
+    );
+    callWith.argument(
+      "bannedVehicleRentalNetworks",
+      (Collection<String> v) -> rental.withBannedNetworks(new HashSet<>(v))
     );
   }
 

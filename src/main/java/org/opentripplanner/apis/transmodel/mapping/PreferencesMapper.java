@@ -3,7 +3,6 @@ package org.opentripplanner.apis.transmodel.mapping;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.BikePreferencesMapper.mapBikePreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.CarPreferencesMapper.mapCarPreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.ItineraryFilterPreferencesMapper.mapItineraryFilterPreferences;
-import static org.opentripplanner.apis.transmodel.mapping.preferences.ItineraryFilterPreferencesMapper.mapRentalPreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.StreetPreferencesMapper.mapStreetPreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.TransferPreferencesMapper.mapTransferPreferences;
 import static org.opentripplanner.apis.transmodel.mapping.preferences.TransitPreferencesMapper.mapTransitPreferences;
@@ -30,6 +29,5 @@ class PreferencesMapper {
     preferences.withItineraryFilter(itineraryFilter ->
       mapItineraryFilterPreferences(itineraryFilter, environment, callWith)
     );
-    preferences.withRental(rental -> mapRentalPreferences(rental, environment, callWith));
   }
 }

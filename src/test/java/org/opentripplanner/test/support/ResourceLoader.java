@@ -56,6 +56,17 @@ public class ResourceLoader {
   }
 
   /**
+   * Returns the string content of a file.
+   */
+  public String fileToString(String p) {
+    try {
+      return Files.readString(file(p).toPath());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  /**
    * Return a URL for the given resource.
    */
   public URL url(String name) {

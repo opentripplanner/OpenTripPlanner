@@ -64,6 +64,8 @@ states, from which you can prepare your own smaller bounding-box extracts
 using [Osmosis](http://wiki.openstreetmap.org/wiki/Osmosis#Extracting_bounding_boxes)
 , [osmconvert](http://wiki.openstreetmap.org/wiki/Osmconvert#Applying_Geographical_Borders), or (our
 favorite) [Osmium-Tool](https://osmcode.org/osmium-tool/manual.html#creating-geographic-extracts).
+There is also [Protomaps](https://app.protomaps.com/) which can create custom extracts 
+for any region of the world with an easy to use drag and drop interface.
 OSM data can be delivered as XML or in the more compact binary PBF format. OpenTripPlanner consumes
 only PBF because it's smaller and more efficient.
 

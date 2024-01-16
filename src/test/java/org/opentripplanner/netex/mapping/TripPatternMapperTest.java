@@ -1,9 +1,11 @@
 package org.opentripplanner.netex.mapping;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.ArrayListMultimap;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.netex.index.hierarchy.HierarchicalMap;
@@ -12,7 +14,6 @@ import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.framework.Deduplicator;
 import org.opentripplanner.transit.model.framework.DefaultEntityById;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.timetable.Trip;
 import org.opentripplanner.transit.model.timetable.TripAlteration;
 import org.opentripplanner.transit.model.timetable.TripOnServiceDate;
@@ -55,26 +56,28 @@ public class TripPatternMapperTest {
       150
     );
 
-    TripPatternMapperResult r = tripPatternMapper.mapTripPattern(sample.getJourneyPattern());
+    Optional<TripPatternMapperResult> res = tripPatternMapper.mapTripPattern(
+      sample.getJourneyPattern()
+    );
 
-    assertEquals(1, r.tripPatterns.size());
+    assertTrue(res.isPresent());
 
-    TripPattern tripPattern = r.tripPatterns.values().stream().findFirst().orElseThrow();
+    TripPatternMapperResult r = res.get();
 
-    assertEquals(4, tripPattern.numberOfStops());
-    assertEquals(1, tripPattern.scheduledTripsAsStream().count());
+    assertEquals(4, r.tripPattern().numberOfStops());
+    assertEquals(1, r.tripPattern().scheduledTripsAsStream().count());
 
-    Trip trip = tripPattern.scheduledTripsAsStream().findFirst().get();
+    Trip trip = r.tripPattern().scheduledTripsAsStream().findFirst().get();
 
     assertEquals("RUT:ServiceJourney:1", trip.getId().getId());
-    assertEquals("NSR:Quay:1", tripPattern.getStop(0).getId().getId());
-    assertEquals("NSR:Quay:2", tripPattern.getStop(1).getId().getId());
-    assertEquals("NSR:Quay:3", tripPattern.getStop(2).getId().getId());
-    assertEquals("NSR:Quay:4", tripPattern.getStop(3).getId().getId());
+    assertEquals("NSR:Quay:1", r.tripPattern().getStop(0).getId().getId());
+    assertEquals("NSR:Quay:2", r.tripPattern().getStop(1).getId().getId());
+    assertEquals("NSR:Quay:3", r.tripPattern().getStop(2).getId().getId());
+    assertEquals("NSR:Quay:4", r.tripPattern().getStop(3).getId().getId());
 
-    assertEquals(1, tripPattern.getScheduledTimetable().getTripTimes().size());
+    assertEquals(1, r.tripPattern().getScheduledTimetable().getTripTimes().size());
 
-    TripTimes tripTimes = tripPattern.getScheduledTimetable().getTripTimes().get(0);
+    TripTimes tripTimes = r.tripPattern().getScheduledTimetable().getTripTimes().get(0);
 
     assertEquals(4, tripTimes.getNumStops());
 
@@ -115,15 +118,19 @@ public class TripPatternMapperTest {
       150
     );
 
-    TripPatternMapperResult r = tripPatternMapper.mapTripPattern(sample.getJourneyPattern());
+    Optional<TripPatternMapperResult> res = tripPatternMapper.mapTripPattern(
+      sample.getJourneyPattern()
+    );
 
-    assertEquals(1, r.tripPatterns.size());
-    assertEquals(2, r.tripOnServiceDates.size());
+    assertTrue(res.isPresent());
 
-    TripPattern tripPattern = r.tripPatterns.values().stream().findFirst().orElseThrow();
-    Trip trip = tripPattern.scheduledTripsAsStream().findFirst().get();
+    var r = res.get();
 
-    for (TripOnServiceDate tripOnServiceDate : r.tripOnServiceDates) {
+    assertEquals(2, r.tripOnServiceDates().size());
+
+    Trip trip = r.tripPattern().scheduledTripsAsStream().findFirst().get();
+
+    for (TripOnServiceDate tripOnServiceDate : r.tripOnServiceDates()) {
       assertEquals(trip, tripOnServiceDate.getTrip());
       assertEquals(TripAlteration.PLANNED, tripOnServiceDate.getTripAlteration());
       assertEquals(

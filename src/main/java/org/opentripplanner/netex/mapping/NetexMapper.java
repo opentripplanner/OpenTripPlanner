@@ -460,19 +460,36 @@ public class NetexMapper {
     for (JourneyPattern_VersionStructure journeyPattern : currentNetexIndex
       .getJourneyPatternsById()
       .localValues()) {
-      TripPatternMapperResult result = tripPatternMapper.mapTripPattern(journeyPattern);
-
-      for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes.entrySet()) {
-        transitBuilder.getStopTimesSortedByTrip().put(it.getKey(), it.getValue());
-        transitBuilder.getTripsById().add(it.getKey());
-      }
-      for (var it : result.tripPatterns.entries()) {
-        transitBuilder.getTripPatterns().put(it.getKey(), it.getValue());
-      }
-      currentMapperIndexes.addStopTimesByNetexId(result.stopTimeByNetexId);
-      groupMapper.scheduledStopPointsIndex.putAll(Multimaps.asMap(result.scheduledStopPointsIndex));
-      transitBuilder.getTripOnServiceDates().addAll(result.tripOnServiceDates);
+      tripPatternMapper
+        .mapTripPattern(journeyPattern)
+        .ifPresent(this::applyTripPatternMapperResult);
     }
+  }
+
+  private void applyTripPatternMapperResult(TripPatternMapperResult result) {
+    var stopPattern = result.tripPattern().getStopPattern();
+    var journeyPatternExists = transitBuilder
+      .getTripPatterns()
+      .get(stopPattern)
+      .stream()
+      .anyMatch(tripPattern -> result.tripPattern().getId().equals(tripPattern.getId()));
+    if (journeyPatternExists) {
+      issueStore.add(
+        "DuplicateJourneyPattern",
+        "Duplicate of JourneyPattern %s found",
+        result.tripPattern().getId().getId()
+      );
+    }
+
+    for (Map.Entry<Trip, List<StopTime>> it : result.tripStopTimes().entrySet()) {
+      transitBuilder.getStopTimesSortedByTrip().put(it.getKey(), it.getValue());
+      transitBuilder.getTripsById().add(it.getKey());
+    }
+
+    transitBuilder.getTripPatterns().put(stopPattern, result.tripPattern());
+    currentMapperIndexes.addStopTimesByNetexId(result.stopTimeByNetexId());
+    groupMapper.scheduledStopPointsIndex.putAll(Multimaps.asMap(result.scheduledStopPointsIndex()));
+    transitBuilder.getTripOnServiceDates().addAll(result.tripOnServiceDates());
   }
 
   private void mapNoticeAssignments() {

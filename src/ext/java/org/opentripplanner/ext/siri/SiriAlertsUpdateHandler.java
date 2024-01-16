@@ -141,6 +141,9 @@ public class SiriAlertsUpdateHandler {
     if (situation.getVersionedAtTime() != null) {
       alert.withUpdatedTime(situation.getVersionedAtTime());
     }
+    if (situation.getVersion() != null && situation.getVersion().getValue() != null) {
+      alert.withVersion(situation.getVersion().getValue().intValue());
+    }
 
     ArrayList<TimePeriod> periods = new ArrayList<>();
     if (situation.getValidityPeriods().size() > 0) {
