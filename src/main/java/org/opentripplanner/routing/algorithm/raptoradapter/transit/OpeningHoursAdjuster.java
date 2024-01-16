@@ -2,9 +2,12 @@ package org.opentripplanner.routing.algorithm.raptoradapter.transit;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
@@ -112,16 +115,15 @@ public class OpeningHoursAdjuster {
 
   /**
    * Convert the earliest booking time to OTP time.
-   * The OTP time starts at midnight the day of the requested dateTime for the requested time zone.
+   * The OTP time starts 12 hours before noon the day of the requested dateTime for the requested time zone.
    */
-  private static int convertEarliestBookingTimeToOtpTime(
+  static int convertEarliestBookingTimeToOtpTime(
     Instant earliestBookingTime,
     Instant dateTime,
     ZoneId timeZone
   ) {
-    ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(dateTime, timeZone);
-    ZonedDateTime zonedEarliestBookingTime = ZonedDateTime.ofInstant(earliestBookingTime, timeZone);
-    int days = zonedDateTime.toLocalDate().until(zonedEarliestBookingTime.toLocalDate()).getDays();
-    return zonedEarliestBookingTime.toLocalTime().toSecondOfDay() + days * DAY_IN_SECONDS;
+    LocalDate serviceDate = LocalDate.ofInstant(dateTime, timeZone);
+    ZonedDateTime startOfService = ServiceDateUtils.asStartOfService(serviceDate, timeZone);
+    return ServiceDateUtils.secondsSinceStartOfTime(startOfService, earliestBookingTime);
   }
 }
