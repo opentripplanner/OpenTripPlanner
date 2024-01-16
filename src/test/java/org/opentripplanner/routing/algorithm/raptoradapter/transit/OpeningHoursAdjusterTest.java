@@ -65,7 +65,7 @@ class OpeningHoursAdjusterTest {
   private static final BookingInfo BOOK_ONE_HOUR_BEFORE = new BookingInfoBuilder()
     .withMinimumBookingNotice(Duration.ofHours(1))
     .build();
-  public static final int SECONDS_IN_TWELVE_HOURS = 12 * 60 * 60;
+  private static final int SECONDS_IN_TWELVE_HOURS = 12 * 60 * 60;
 
   private FlexAccessEgressAdapter accessEgress;
   private int defaultPickupTime;
@@ -265,7 +265,7 @@ class OpeningHoursAdjusterTest {
   void testConvertEarliestBookingTimeToOtpTimeOnDSTBackward() {
     // 12:00:00 on 2024-10-27 in Oslo occurs 13 hours after 00:00:00
     // OTP time starts at 01:00:00 on 2024-10-27
-    Instant earliestBookingTime = REQUEST_DATE_DST_FORWARD
+    Instant earliestBookingTime = REQUEST_DATE_DST_BACKWARD
       .atTime(12, 0, 0)
       .atZone(ZoneIds.OSLO)
       .toInstant();
@@ -273,7 +273,7 @@ class OpeningHoursAdjusterTest {
       SECONDS_IN_TWELVE_HOURS,
       OpeningHoursAdjuster.convertEarliestBookingTimeToOtpTime(
         earliestBookingTime,
-        REQUEST_INSTANT_DST_FORWARD,
+        REQUEST_INSTANT_DST_BACKWARD,
         ZoneIds.OSLO
       )
     );
