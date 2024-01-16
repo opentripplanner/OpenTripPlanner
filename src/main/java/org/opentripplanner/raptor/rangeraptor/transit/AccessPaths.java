@@ -1,7 +1,8 @@
 package org.opentripplanner.raptor.rangeraptor.transit;
 
 import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.groupByRound;
-import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNoneOptimalPathsForStandardRaptor;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForMcRaptor;
+import static org.opentripplanner.raptor.rangeraptor.transit.AccessEgressFunctions.removeNonOptimalPathsForStandardRaptor;
 
 import gnu.trove.map.TIntObjectMap;
 import java.util.Arrays;
@@ -57,8 +58,10 @@ public class AccessPaths {
    * This method is static and package local to enable unit-testing.
    */
   public static AccessPaths create(Collection<RaptorAccessEgress> paths, RaptorProfile profile) {
-    if (!profile.is(RaptorProfile.MULTI_CRITERIA)) {
-      paths = removeNoneOptimalPathsForStandardRaptor(paths);
+    if (profile.is(RaptorProfile.MULTI_CRITERIA)) {
+      paths = removeNonOptimalPathsForMcRaptor(paths);
+    } else {
+      paths = removeNonOptimalPathsForStandardRaptor(paths);
     }
     return new AccessPaths(
       groupByRound(paths, RaptorAccessEgress::stopReachedByWalking),

@@ -1,6 +1,6 @@
 package org.opentripplanner.apis.transmodel.model.plan;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.opentripplanner.apis.transmodel.model.plan.RelaxCostType.CONSTANT;
 import static org.opentripplanner.apis.transmodel.model.plan.RelaxCostType.RATIO;
 

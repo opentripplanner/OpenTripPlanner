@@ -1,7 +1,7 @@
-package org.opentripplanner.ext.interactivelauncher.views;
+package org.opentripplanner.ext.interactivelauncher.startup;
 
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.BG_STATUS_BAR;
-import static org.opentripplanner.ext.interactivelauncher.views.ViewUtils.FG_STATUS_BAR;
+import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.BG_STATUS_BAR;
+import static org.opentripplanner.ext.interactivelauncher.support.ViewUtils.FG_STATUS_BAR;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -9,18 +9,20 @@ import java.io.File;
 import java.util.function.Consumer;
 import javax.swing.Box;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import org.opentripplanner.ext.interactivelauncher.support.ViewUtils;
 
-public class SearchDirectoryView {
+class DataSourceRootView {
 
   private final Box panel;
   private final JTextField fileTxt = new JTextField();
   private final JButton searchBtn = new JButton("Open");
   private final Consumer<String> rootDirChangedListener;
 
-  public SearchDirectoryView(String dir, Consumer<String> rootDirChangedListener) {
+  DataSourceRootView(String dir, Consumer<String> rootDirChangedListener) {
     this.fileTxt.setText(dir);
     this.rootDirChangedListener = rootDirChangedListener;
 
@@ -35,9 +37,6 @@ public class SearchDirectoryView {
     fileTxt.setEditable(false);
     fileTxt.setBackground(BG_STATUS_BAR);
     fileTxt.setForeground(FG_STATUS_BAR);
-    //var d = minWidth(fileTxt.getPreferredSize(), 460);
-    //fileTxt.setMinimumSize(d);
-    //fileTxt.setPreferredSize(d);
 
     // Add text field and open button
     Box box = Box.createHorizontalBox();
@@ -48,7 +47,7 @@ public class SearchDirectoryView {
     panel.add(box);
   }
 
-  public Box panel() {
+  public JComponent panel() {
     return panel;
   }
 

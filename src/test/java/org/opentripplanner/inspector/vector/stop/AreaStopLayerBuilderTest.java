@@ -6,7 +6,6 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner._support.geometry.Polygons;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.inspector.vector.KeyValue;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
