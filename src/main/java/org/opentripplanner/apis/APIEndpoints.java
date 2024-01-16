@@ -51,6 +51,8 @@ public class APIEndpoints {
     addIfEnabled(APIServerInfo, ServerInfo.class);
     addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
     addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.class);
+    // scheduled to be removed and only here for backwards compatibility
+    addIfEnabled(GtfsGraphQlApi, GtfsGraphQLAPI.GtfsGraphQLAPIOldPath.class);
     addIfEnabled(TransmodelGraphQlApi, TransmodelAPI.class);
 
     // Sandbox extension APIs
