@@ -1,5 +1,4 @@
 {
-
   "name" : "OTP Debug Tiles",
   "sources" : {
     "background" : {
@@ -98,6 +97,47 @@
       ],
       "layout" : {
         "line-cap" : "round",
+        "visibility" : "none"
+      }
+    },
+    {
+      "id" : "vertex",
+      "type" : "circle",
+      "source" : "vectorSource",
+      "source-layer" : "vertices",
+      "minzoom" : 15,
+      "maxzoom" : 23,
+      "paint" : {
+        "circle-stroke-color" : "#140d0e",
+        "circle-stroke-width" : {
+          "base" : 1.0,
+          "stops" : [
+            [
+              15,
+              0.2
+            ],
+            [
+              23,
+              3.0
+            ]
+          ]
+        },
+        "circle-radius" : {
+          "base" : 1.0,
+          "stops" : [
+            [
+              15,
+              1.0
+            ],
+            [
+              23,
+              7.0
+            ]
+          ]
+        },
+        "circle-color" : "#BC55F2"
+      },
+      "layout" : {
         "visibility" : "none"
       }
     },

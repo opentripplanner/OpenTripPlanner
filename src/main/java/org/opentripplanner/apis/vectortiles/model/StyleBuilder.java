@@ -104,6 +104,12 @@ public class StyleBuilder {
     return this;
   }
 
+  public StyleBuilder circleStroke(String color, ZoomDependentNumber width) {
+    paint.put("circle-stroke-color", validateColor(color));
+    paint.put("circle-stroke-width", width.toJson());
+    return this;
+  }
+
   public StyleBuilder circleRadius(ZoomDependentNumber radius) {
     paint.put("circle-radius", radius.toJson());
     return this;

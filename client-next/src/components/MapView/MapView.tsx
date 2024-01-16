@@ -58,7 +58,7 @@ export function MapView({
     // provided by the WorldEnvelopeService
     if (map.getZoom() < 2) {
       const source = map.getSource('stops') as VectorTileSource;
-      map.fitBounds(source.bounds, { maxDuration: 50, linear: true});
+      map.fitBounds(source.bounds, { maxDuration: 50, linear: true });
     }
   };
 

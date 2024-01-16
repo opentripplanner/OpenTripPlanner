@@ -39,12 +39,16 @@ public class DebugStyleSpec {
   private static final String MAGENTA = "#f21d52";
   private static final String GREEN = "#22DD9E";
   private static final String PURPLE = "#BC55F2";
+  private static final String BLACK = "#140d0e";
   private static final int MAX_ZOOM = 23;
   private static final ZoomDependentNumber LINE_WIDTH = new ZoomDependentNumber(
     1.3f,
     List.of(new ZoomStop(13, 0.5f), new ZoomStop(MAX_ZOOM, 10))
   );
-  private static final String BLACK = "#140d0e";
+  private static final ZoomDependentNumber CIRCLE_STROKE = new ZoomDependentNumber(
+    1,
+    List.of(new ZoomStop(15, 0.2f), new ZoomStop(MAX_ZOOM, 3))
+  );
 
   static StyleSpec build(
     VectorSourceLayer regularStops,
@@ -100,13 +104,14 @@ public class DebugStyleSpec {
           .ofId("vertex")
           .typeCircle()
           .vectorSourceLayer(vertices)
-          .circleStroke(BLACK, 2)
+          .circleStroke(BLACK, CIRCLE_STROKE)
           .circleRadius(
-            new ZoomDependentNumber(1, List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 5)))
+            new ZoomDependentNumber(1, List.of(new ZoomStop(15, 1), new ZoomStop(MAX_ZOOM, 7)))
           )
           .circleColor(PURPLE)
           .minZoom(15)
-          .maxZoom(MAX_ZOOM),
+          .maxZoom(MAX_ZOOM)
+          .intiallyHidden(),
         StyleBuilder
           .ofId("regular-stop")
           .typeCircle()
