@@ -179,11 +179,11 @@ This system powers the realtime updates in Helsinki and more information can be 
 |-----------------------------------------------------------------------|:---------:|----------------------------------------------|:----------:|----------------------|:-----:|
 | type = "mqtt-gtfs-rt-updater"                                         |   `enum`  | The type of the updater.                     | *Required* |                      |  1.5  |
 | [backwardsDelayPropagationType](#u__6__backwardsDelayPropagationType) |   `enum`  | How backwards propagation should be handled. | *Optional* | `"required-no-data"` |  2.2  |
-| feedId                                                                |  `string` | The feed id to apply the updates to.         | *Required* |                      |   na  |
-| fuzzyTripMatching                                                     | `boolean` | Whether to match trips fuzzily.              | *Optional* | `false`              |   na  |
-| qos                                                                   | `integer` | QOS level.                                   | *Optional* | `0`                  |   na  |
-| topic                                                                 |  `string` | The topic to subscribe to.                   | *Required* |                      |   na  |
-| url                                                                   |  `string` | URL of the MQTT broker.                      | *Required* |                      |   na  |
+| feedId                                                                |  `string` | The feed id to apply the updates to.         | *Required* |                      |  2.0  |
+| fuzzyTripMatching                                                     | `boolean` | Whether to match trips fuzzily.              | *Optional* | `false`              |  2.0  |
+| qos                                                                   | `integer` | QOS level.                                   | *Optional* | `0`                  |  2.0  |
+| topic                                                                 |  `string` | The topic to subscribe to.                   | *Required* |                      |  2.0  |
+| url                                                                   |  `string` | URL of the MQTT broker.                      | *Required* |                      |  2.0  |
 
 
 ##### Parameter details
