@@ -11,6 +11,15 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class VehicleParkingConfig {
 
+  static void mapParking(NodeAdapter c, VehicleParkingPreferences.Builder preferences) {
+    var vehicleParking = c
+      .of("parking")
+      .since(V2_5)
+      .summary("Preferences for parking a vehicle.")
+      .asObject();
+    mapParkingPreferences(vehicleParking, preferences);
+  }
+
   private static void mapParkingPreferences(
     NodeAdapter c,
     VehicleParkingPreferences.Builder builder
@@ -80,14 +89,5 @@ public class VehicleParkingConfig {
           )
           .asStringSet(List.of())
       );
-  }
-
-  static void mapParking(NodeAdapter c, VehicleParkingPreferences.Builder preferences) {
-    var vehicleParking = c
-      .of("parking")
-      .since(V2_5)
-      .summary("Preferences for parking a vehicle.")
-      .asObject();
-    mapParkingPreferences(vehicleParking, preferences);
   }
 }

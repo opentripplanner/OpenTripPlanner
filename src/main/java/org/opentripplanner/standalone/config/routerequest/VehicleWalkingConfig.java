@@ -10,6 +10,15 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class VehicleWalkingConfig {
 
+  static void mapVehicleWalking(NodeAdapter c, VehicleWalkingPreferences.Builder preferences) {
+    var vehicleWalking = c
+      .of("walk")
+      .since(V2_5)
+      .summary("Preferences for walking a vehicle.")
+      .asObject();
+    mapVehicleWalkingPreferences(vehicleWalking, preferences);
+  }
+
   private static void mapVehicleWalkingPreferences(
     NodeAdapter c,
     VehicleWalkingPreferences.Builder builder
@@ -69,14 +78,5 @@ public class VehicleWalkingConfig {
           )
           .asDouble(dft.stairsReluctance())
       );
-  }
-
-  static void mapVehicleWalking(NodeAdapter c, VehicleWalkingPreferences.Builder preferences) {
-    var vehicleWalking = c
-      .of("walk")
-      .since(V2_5)
-      .summary("Preferences for walking a vehicle.")
-      .asObject();
-    mapVehicleWalkingPreferences(vehicleWalking, preferences);
   }
 }

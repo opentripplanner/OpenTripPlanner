@@ -10,7 +10,15 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class VehicleRentalConfig {
 
-  static void mapRentalPreferences(NodeAdapter c, VehicleRentalPreferences.Builder builder) {
+  static void mapRental(NodeAdapter c, VehicleRentalPreferences.Builder preferences) {
+    var vehicleRental = c.of("rental").since(V2_3).summary("Vehicle rental options").asObject();
+    mapRentalPreferences(vehicleRental, preferences);
+  }
+
+  private static void mapRentalPreferences(
+    NodeAdapter c,
+    VehicleRentalPreferences.Builder builder
+  ) {
     var dft = builder.original();
     builder
       .withDropOffCost(
@@ -86,10 +94,5 @@ public class VehicleRentalConfig {
           )
           .asStringSet(dft.bannedNetworks())
       );
-  }
-
-  static void mapRental(NodeAdapter c, VehicleRentalPreferences.Builder preferences) {
-    var vehicleRental = c.of("rental").since(V2_3).summary("Vehicle rental options").asObject();
-    mapRentalPreferences(vehicleRental, preferences);
   }
 }

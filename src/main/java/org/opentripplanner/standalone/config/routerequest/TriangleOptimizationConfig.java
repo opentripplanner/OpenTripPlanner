@@ -8,6 +8,16 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 
 public class TriangleOptimizationConfig {
 
+  static void mapOptimizationTriangle(NodeAdapter c, TimeSlopeSafetyTriangle.Builder preferences) {
+    var optimizationTriangle = c
+      .of("triangle")
+      .since(V2_5)
+      .summary("Triangle optimization criteria.")
+      .description("Optimization type doesn't need to be defined if these values are defined.")
+      .asObject();
+    mapTriangleParameters(optimizationTriangle, preferences);
+  }
+
   private static void mapTriangleParameters(
     NodeAdapter c,
     TimeSlopeSafetyTriangle.Builder builder
@@ -40,15 +50,5 @@ public class TriangleOptimizationConfig {
           )
           .asDouble(builder.safety())
       );
-  }
-
-  static void mapOptimizationTriangle(NodeAdapter c, TimeSlopeSafetyTriangle.Builder preferences) {
-    var optimizationTriangle = c
-      .of("triangle")
-      .since(V2_5)
-      .summary("Triangle optimization criteria.")
-      .description("Optimization type doesn't need to be defined if these values are defined.")
-      .asObject();
-    mapTriangleParameters(optimizationTriangle, preferences);
   }
 }
