@@ -77,11 +77,17 @@ public class GroupStop
     return centroid;
   }
 
+  /**
+   * Returns the geometry of all stops and areas belonging to this location group.
+   */
   @Override
   public Geometry getGeometry() {
     return geometry;
   }
 
+  /**
+   * Returns the geometry of the area that encompasses the bounds of this location group.
+   */
   public Geometry getEncompassingAreaGeometry() {
     return encompassingAreaGeometry;
   }
