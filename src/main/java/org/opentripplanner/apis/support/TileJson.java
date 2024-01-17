@@ -35,11 +35,7 @@ public class TileJson implements Serializable {
   public final double[] bounds;
   public final double[] center;
 
-  public TileJson(
-    String tileUrl,
-    WorldEnvelope envelope,
-    Collection<FeedInfo> feedInfos
-  ) {
+  public TileJson(String tileUrl, WorldEnvelope envelope, Collection<FeedInfo> feedInfos) {
     attribution =
       feedInfos
         .stream()
@@ -48,10 +44,7 @@ public class TileJson implements Serializable {
         )
         .collect(Collectors.joining(", "));
 
-    tiles =
-      new String[] {
-       tileUrl
-      };
+    tiles = new String[] { tileUrl };
 
     bounds =
       new double[] {
@@ -73,12 +66,13 @@ public class TileJson implements Serializable {
     String path
   ) {
     return "%s/otp/routers/%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
-      HttpUtils.getBaseAddress(uri, headers),
-      ignoreRouterId,
-      path,
-      layers
-    );
+        HttpUtils.getBaseAddress(uri, headers),
+        ignoreRouterId,
+        path,
+        layers
+      );
   }
+
   public static String tileUrl(
     UriInfo uri,
     HttpHeaders headers,
@@ -87,9 +81,9 @@ public class TileJson implements Serializable {
   ) {
     var strippedPath = StringUtils.stripStart(overridePath, "/");
     return "%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
-      HttpUtils.getBaseAddress(uri, headers),
-      strippedPath,
-      layers
-    );
+        HttpUtils.getBaseAddress(uri, headers),
+        strippedPath,
+        layers
+      );
   }
 }

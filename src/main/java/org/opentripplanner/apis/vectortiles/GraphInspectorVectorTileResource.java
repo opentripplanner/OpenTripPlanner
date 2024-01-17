@@ -108,7 +108,7 @@ public class GraphInspectorVectorTileResource {
       headers,
       requestedLayers,
       ignoreRouterId,
-     "inspector/vectortile"
+      "inspector/vectortile"
     );
     return new TileJson(url, envelope, feedInfos);
   }

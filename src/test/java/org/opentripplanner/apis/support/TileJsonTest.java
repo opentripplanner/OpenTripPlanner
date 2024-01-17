@@ -13,11 +13,9 @@ class TileJsonTest {
 
   @Test
   void url() throws URISyntaxException {
-
-    var uri= new URI("https://localhost:8080");
+    var uri = new URI("https://localhost:8080");
     var header = new ContainerRequest(uri, uri, "GET", null, new MapPropertiesDelegate(), null);
-    var uriInfo =new UriRoutingContext(header);
-    assertEquals("", TileJson.tileUrl(uriInfo, header,  "/OTP_CT/some/config/path/", "foo,bar"));
+    var uriInfo = new UriRoutingContext(header);
+    assertEquals("", TileJson.tileUrl(uriInfo, header, "/OTP_CT/some/config/path/", "foo,bar"));
   }
-
 }

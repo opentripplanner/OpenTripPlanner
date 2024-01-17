@@ -89,13 +89,7 @@ public class VectorTilesResource {
       .filter(Predicate.not(Objects::isNull))
       .toList();
 
-    var url = TileJson.tileUrl(
-      uri,
-      headers,
-      requestedLayers,
-      ignoreRouterId,
-      "vectorTiles"
-    );
+    var url = TileJson.tileUrl(uri, headers, requestedLayers, ignoreRouterId, "vectorTiles");
     return new TileJson(url, envelope, feedInfos);
   }
 
