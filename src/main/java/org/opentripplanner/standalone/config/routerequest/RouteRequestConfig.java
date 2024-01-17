@@ -334,19 +334,19 @@ ferries, where the check-in process needs to be done in good time before ride.
     );
   }
 
-  private static void mapBikePreferences(NodeAdapter c, BikePreferences.Builder builder) {
+  private static void mapBikePreferences(NodeAdapter root, BikePreferences.Builder builder) {
     var dft = builder.original();
-    NodeAdapter cb = c.of("bicycle").since(V2_5).summary("Bicycle preferences.").asObject();
+    NodeAdapter c = root.of("bicycle").since(V2_5).summary("Bicycle preferences.").asObject();
     builder
       .withSpeed(
-        cb
+        c
           .of("speed")
           .since(V2_0)
           .summary("Max bicycle speed along streets, in meters per second")
           .asDouble(dft.speed())
       )
       .withReluctance(
-        cb
+        c
           .of("reluctance")
           .since(V2_0)
           .summary(
@@ -355,7 +355,7 @@ ferries, where the check-in process needs to be done in good time before ride.
           .asDouble(dft.reluctance())
       )
       .withBoardCost(
-        cb
+        c
           .of("boardCost")
           .since(V2_0)
           .summary(
@@ -368,7 +368,7 @@ ferries, where the check-in process needs to be done in good time before ride.
           .asInt(dft.boardCost())
       )
       .withOptimizeType(
-        cb
+        c
           .of("optimization")
           .since(V2_0)
           .summary("The set of characteristics that the user wants to optimize for.")
@@ -378,10 +378,10 @@ ferries, where the check-in process needs to be done in good time before ride.
           .asEnum(dft.optimizeType())
       )
       // triangle overrides the optimization type if defined
-      .withForcedOptimizeTriangle(it -> mapOptimizationTriangle(cb, it))
-      .withWalking(it -> mapVehicleWalking(cb, it))
-      .withParking(it -> mapParking(cb, it))
-      .withRental(it -> mapRental(cb, it));
+      .withForcedOptimizeTriangle(it -> mapOptimizationTriangle(c, it))
+      .withWalking(it -> mapVehicleWalking(c, it))
+      .withParking(it -> mapParking(c, it))
+      .withRental(it -> mapRental(c, it));
   }
 
   private static void mapStreetPreferences(NodeAdapter c, StreetPreferences.Builder builder) {
@@ -570,19 +570,19 @@ your users receive a timely response. You can also limit the max duration. There
       );
   }
 
-  private static void mapCarPreferences(NodeAdapter c, CarPreferences.Builder builder) {
+  private static void mapCarPreferences(NodeAdapter root, CarPreferences.Builder builder) {
     var dft = builder.original();
-    NodeAdapter cc = c.of("car").since(V2_5).summary("Car preferences.").asObject();
+    NodeAdapter c = root.of("car").since(V2_5).summary("Car preferences.").asObject();
     builder
       .withSpeed(
-        cc
+        c
           .of("speed")
           .since(V2_0)
           .summary("Max car speed along streets, in meters per second")
           .asDouble(dft.speed())
       )
       .withReluctance(
-        cc
+        c
           .of("reluctance")
           .since(V2_0)
           .summary(
@@ -591,35 +591,35 @@ your users receive a timely response. You can also limit the max duration. There
           .asDouble(dft.reluctance())
       )
       .withPickupCost(
-        cc
+        c
           .of("pickupCost")
           .since(V2_1)
           .summary("Add a cost for car pickup changes when a pickup or drop off takes place")
           .asInt(dft.pickupCost().toSeconds())
       )
       .withPickupTime(
-        cc
+        c
           .of("pickupTime")
           .since(V2_1)
           .summary("Add a time for car pickup changes when a pickup or drop off takes place")
           .asDuration(dft.pickupTime())
       )
       .withAccelerationSpeed(
-        cc
+        c
           .of("accelerationSpeed")
           .since(V2_0)
           .summary("The acceleration speed of an automobile, in meters per second per second.")
           .asDouble(dft.accelerationSpeed())
       )
       .withDecelerationSpeed(
-        cc
+        c
           .of("decelerationSpeed")
           .since(V2_0)
           .summary("The deceleration speed of an automobile, in meters per second per second.")
           .asDouble(dft.decelerationSpeed())
       )
-      .withParking(it -> mapParking(cc, it))
-      .withRental(it -> mapRental(cc, it));
+      .withParking(it -> mapParking(c, it))
+      .withRental(it -> mapRental(c, it));
   }
 
   private static void mapSystemPreferences(NodeAdapter c, SystemPreferences.Builder builder) {
@@ -670,19 +670,19 @@ search, hence, making it a bit slower. Recommended values would be from 12 hours
     }
   }
 
-  private static void mapWalkPreferences(NodeAdapter c, WalkPreferences.Builder walk) {
+  private static void mapWalkPreferences(NodeAdapter root, WalkPreferences.Builder walk) {
     var dft = walk.original();
-    NodeAdapter cw = c.of("walk").since(V2_5).summary("Walking preferences.").asObject();
+    NodeAdapter c = root.of("walk").since(V2_5).summary("Walking preferences.").asObject();
     walk
       .withSpeed(
-        cw
+        c
           .of("speed")
           .since(V2_0)
           .summary("The user's walking speed in meters/second.")
           .asDouble(dft.speed())
       )
       .withReluctance(
-        cw
+        c
           .of("reluctance")
           .since(V2_0)
           .summary(
@@ -700,7 +700,7 @@ high values.
           .asDouble(dft.reluctance())
       )
       .withBoardCost(
-        cw
+        c
           .of("boardCost")
           .since(V2_0)
           .summary(
@@ -712,14 +712,14 @@ high values.
           .asInt(dft.boardCost())
       )
       .withStairsReluctance(
-        cw
+        c
           .of("stairsReluctance")
           .since(V2_0)
           .summary("Used instead of walkReluctance for stairs.")
           .asDouble(dft.stairsReluctance())
       )
       .withStairsTimeFactor(
-        cw
+        c
           .of("stairsTimeFactor")
           .since(V2_1)
           .summary(
@@ -734,7 +734,7 @@ high values.
           .asDouble(dft.stairsTimeFactor())
       )
       .withSafetyFactor(
-        cw
+        c
           .of("safetyFactor")
           .since(V2_2)
           .summary("Factor for how much the walk safety is considered in routing.")
@@ -744,7 +744,7 @@ high values.
           .asDouble(dft.safetyFactor())
       )
       .withEscalatorReluctance(
-        cw
+        c
           .of("escalatorReluctance")
           .since(V2_4)
           .summary(
