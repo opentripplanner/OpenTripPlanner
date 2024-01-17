@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.vectortiles;
 
-import static org.opentripplanner.framework.application.OtpFileNames.ROUTER_CONFIG_FILENAME;
 import static org.opentripplanner.framework.io.FileUtils.assertFileEquals;
 import static org.opentripplanner.framework.io.FileUtils.readFile;
 import static org.opentripplanner.framework.io.FileUtils.writeFile;
@@ -8,7 +7,7 @@ import static org.opentripplanner.framework.text.MarkdownFormatter.HEADER_4;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.DOCS_ROOT;
 import static org.opentripplanner.generate.doc.framework.DocsTestConstants.TEMPLATE_ROOT;
 import static org.opentripplanner.generate.doc.framework.TemplateUtil.replaceSection;
-import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromResource;
+import static org.opentripplanner.standalone.config.framework.json.JsonSupport.jsonNodeFromPath;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
@@ -19,6 +18,7 @@ import org.opentripplanner.generate.doc.framework.ParameterSummaryTable;
 import org.opentripplanner.generate.doc.framework.SkipNodes;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
+import org.opentripplanner.test.support.ResourceLoader;
 
 @GeneratesDocumentation
 public class VectorTilesConfigDocTest {
@@ -27,7 +27,6 @@ public class VectorTilesConfigDocTest {
   private static final File TEMPLATE = new File(TEMPLATE_ROOT, DOCUMENT);
   private static final File OUT_FILE = new File(DOCS_ROOT, DOCUMENT);
   private static final SkipNodes SKIP_NODES = SkipNodes.of().build();
-  private static final String ROUTER_CONFIG_PATH = "standalone/config/" + ROUTER_CONFIG_FILENAME;
 
   @Test
   public void updateDoc() {
@@ -37,23 +36,23 @@ public class VectorTilesConfigDocTest {
     String template = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 
-    template = replaceSection(template, "parameters", updaterDoc(node));
+    template = replaceSection(template, "parameters", vectorTilesDoc(node));
 
     writeFile(OUT_FILE, template);
     assertFileEquals(original, OUT_FILE);
   }
 
   private NodeAdapter readVectorTiles() {
-    var json = jsonNodeFromResource(ROUTER_CONFIG_PATH);
-    var conf = new RouterConfig(json, ROUTER_CONFIG_PATH, false);
+    var path = ResourceLoader.of(this).file("router-config.json").toPath();
+    var json = jsonNodeFromPath(path);
+    var conf = new RouterConfig(json, path.toString(), false);
     return conf.asNodeAdapter().child("vectorTiles");
   }
 
-  private String updaterDoc(NodeAdapter node) {
+  private String vectorTilesDoc(NodeAdapter node) {
     DocBuilder buf = new DocBuilder();
     addParameterSummaryTable(buf, node);
     addDetailsSection(buf, node);
-    addExample(buf, node);
     return buf.toString();
   }
 
@@ -73,8 +72,4 @@ public class VectorTilesConfigDocTest {
     return ParameterDetailsList.listParametersWithDetails(node, SKIP_NODES, HEADER_4);
   }
 
-  private void addExample(DocBuilder buf, NodeAdapter node) {
-    buf.addSection("##### Example configuration");
-    buf.addUpdaterExample(ROUTER_CONFIG_FILENAME, node.rawNode());
-  }
 }

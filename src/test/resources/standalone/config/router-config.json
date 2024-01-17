@@ -166,6 +166,7 @@
     "hideFeedId": true
   },
   "vectorTiles": {
+    "basePath": "/otp_ct/vectorTiles",
     "layers": [
       {
         "name": "stops",
