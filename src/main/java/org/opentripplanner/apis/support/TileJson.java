@@ -58,7 +58,7 @@ public class TileJson implements Serializable {
     center = new double[] { c.longitude(), c.latitude(), 9 };
   }
 
-  public static String tileUrl(
+  public static String defaultBasePath(
     UriInfo uri,
     HttpHeaders headers,
     String layers,
@@ -73,13 +73,14 @@ public class TileJson implements Serializable {
       );
   }
 
-  public static String tileUrl(
+  public static String overrideBasePath(
     UriInfo uri,
     HttpHeaders headers,
     String overridePath,
     String layers
   ) {
     var strippedPath = StringUtils.stripStart(overridePath, "/");
+    strippedPath = StringUtils.stripEnd(strippedPath, "/");
     return "%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
         HttpUtils.getBaseAddress(uri, headers),
         strippedPath,

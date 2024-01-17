@@ -10,6 +10,8 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import javax.annotation.Nullable;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -17,20 +19,18 @@ import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 public class VectorTileConfig
   implements VectorTilesResource.LayersParameters<VectorTilesResource.LayerType> {
 
-  public static final VectorTileConfig DEFAULT = new VectorTileConfig(
-    List.of(),
-    "/otp/routers/default/vectorTiles"
-  );
+  public static final VectorTileConfig DEFAULT = new VectorTileConfig(List.of(), null);
   private final List<LayerParameters<VectorTilesResource.LayerType>> layers;
 
+  @Nullable
   private final String basePath;
 
   VectorTileConfig(
     Collection<? extends LayerParameters<VectorTilesResource.LayerType>> layers,
-    String basePath
+    @Nullable String basePath
   ) {
     this.layers = List.copyOf(layers);
-    this.basePath = Objects.requireNonNull(basePath);
+    this.basePath = basePath;
   }
 
   @Override
@@ -38,8 +38,8 @@ public class VectorTileConfig
     return layers;
   }
 
-  public String basePath() {
-    return basePath;
+  public Optional<String> basePath() {
+    return Optional.ofNullable(basePath);
   }
 
   public static VectorTileConfig mapVectorTilesParameters(NodeAdapter node, String paramName) {
