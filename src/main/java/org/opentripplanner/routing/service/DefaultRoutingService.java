@@ -2,6 +2,7 @@ package org.opentripplanner.routing.service;
 
 import java.time.ZoneId;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
+import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.framework.tostring.MultiLineToStringBuilder;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
@@ -30,7 +31,7 @@ public class DefaultRoutingService implements RoutingService {
 
   public DefaultRoutingService(OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
-    this.timeZone = serverContext.transitService().getTimeZone();
+    this.timeZone = ZoneIdFallback.zoneId(serverContext.transitService().getTimeZone());
   }
 
   @Override
