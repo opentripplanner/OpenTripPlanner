@@ -75,6 +75,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Remove GTFS-RT websocket updater [#5604](https://github.com/opentripplanner/OpenTripPlanner/pull/5604)
 - Add stop layer to new Debug UI [#5602](https://github.com/opentripplanner/OpenTripPlanner/pull/5602)
 - Use fallback timezone if no transit data is loaded [#4652](https://github.com/opentripplanner/OpenTripPlanner/pull/4652)
+- Add new path for GTFS GraphQL API, remove batch feature [#5581](https://github.com/opentripplanner/OpenTripPlanner/pull/5581)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
