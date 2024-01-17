@@ -58,7 +58,7 @@ public class TileJson implements Serializable {
     center = new double[] { c.longitude(), c.latitude(), 9 };
   }
 
-  public static String defaultBasePath(
+  public static String defaultPath(
     UriInfo uri,
     HttpHeaders headers,
     String layers,

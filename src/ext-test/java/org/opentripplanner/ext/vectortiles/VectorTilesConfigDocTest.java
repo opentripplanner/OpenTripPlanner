@@ -71,5 +71,4 @@ public class VectorTilesConfigDocTest {
   private String getParameterDetailsTable(NodeAdapter node) {
     return ParameterDetailsList.listParametersWithDetails(node, SKIP_NODES, HEADER_4);
   }
-
 }

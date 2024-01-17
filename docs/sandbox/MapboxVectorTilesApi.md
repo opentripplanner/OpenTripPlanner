@@ -3,8 +3,7 @@
 ## Contact Info
 
 - HSL, Finland
-- Kyyti Group Oy, Finland
-- Hannes Junnila
+- IBI Arcardis, US
 
 ## Documentation
 

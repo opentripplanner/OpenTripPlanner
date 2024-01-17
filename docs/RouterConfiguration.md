@@ -603,6 +603,7 @@ Used to group requests when monitoring OTP.
     "hideFeedId" : true
   },
   "vectorTiles" : {
+    "basePath" : "/otp_ct/vectorTiles",
     "layers" : [
       {
         "name" : "stops",
