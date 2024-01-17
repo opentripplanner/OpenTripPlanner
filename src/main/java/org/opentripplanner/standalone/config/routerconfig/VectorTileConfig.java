@@ -9,7 +9,6 @@ import static org.opentripplanner.standalone.config.framework.json.OtpVersion.V2
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import org.opentripplanner.ext.vectortiles.VectorTilesResource;
@@ -50,7 +49,24 @@ public class VectorTileConfig
         .since(V2_0)
         .summary("Configuration of the individual layers for the Mapbox vector tiles.")
         .asObjects(VectorTileConfig::mapLayer),
-      root.of("basePath").since(V2_5).asString(DEFAULT.basePath)
+      root
+        .of("basePath")
+        .since(V2_5)
+        .summary("The path of the vector tile source URLs in `tilejson.json`.")
+        .description(
+          """
+          This is useful if you have a proxy setup and rewrite the path that is passed to OTP.
+          
+          If you don't configure this optional value then the path returned in `tilejson.json` is
+          `/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{x}.pbf`. If you set a value of
+          `/otp_test/tiles` then the returned path changes to `/otp_test/tiles/layer1,layer2/{z}/{x}/{x}.pbf`.
+          
+          The protocol and host are read from the incoming HTTP request. If you run OTP behind a proxy
+          then make sure to set the headers `X-Forwarded-Proto` and `X-Forwarded-Host` to make OTP
+          return the protocol and host for the original request and not the proxied one.
+          """
+        )
+        .asString(DEFAULT.basePath)
     );
   }
 

@@ -14,6 +14,9 @@ public transit entities on the map.
 The tiles can be fetched from `/otp/routers/{routerId}/vectorTiles/{layers}/{z}/{x}/{y}.pbf`,
 where `layers` is a comma separated list of layer names from the configuration.
 
+Maplibre/Mapbox GL JS also require a tilejson.json endpoint which is available at
+`/otp/routers/{routerId}/vectorTiles/{layers}/tilejson.json`.
+
 Translatable fields in the tiles are translated based on the `accept-language` header in requests.
 Currently, only the language with the highest priority from the header is used.
 
@@ -137,14 +140,8 @@ For each layer, the configuration includes:
     - `VehicleRentalStation`: rental stations
     - `VehicleParking`
     - `VehicleParkingGroup`
-- `mapper` which describes the mapper converting the properties from the OTP model entities to the
-  vector tile properties. Currently `Digitransit` is supported for all layer types.
-- `minZoom` and `maxZoom` which describe the zoom levels the layer is active for.
-- `cacheMaxSeconds` which sets the cache header in the response. The lowest value of the layers
-  included is selected.
-- `expansionFactor` How far outside its boundaries should the tile contain information. The value is
-  a fraction of the tile size. If you are having problem with icons and shapes being clipped at tile
-  edges, then increase this number.
+
+<!-- INSERT: parameters -->
 
 ### Extending
 
@@ -162,9 +159,6 @@ new `LayerType` enum as the key, and the class constructor as the value.
 
 A new mapper needs to be added every time a new layer is added. See below for information.
 
-
-<!-- INSERT: parameters -->
-
 #### Creating a new mapper
 
 The mapping contains information of what data to include in the vector tiles. The mappers are
@@ -172,7 +166,7 @@ defined per layer.
 
 In order to create a new mapper for a layer, you need to create a new class
 extending `PropertyMapper<T>`. In that class, you need to implement the
-method `Collection<T2<String, Object>> map(T input)`. The type T is dependent on the layer for which
+method `Collection<KeyValue<String, Object>> map(T input)`. The type T is dependent on the layer for which
 you implement the mapper for. It needs to return a list of attributes, as key-value pairs which will
 be written into the vector tile.
 

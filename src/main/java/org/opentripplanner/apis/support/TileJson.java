@@ -58,6 +58,10 @@ public class TileJson implements Serializable {
     center = new double[] { c.longitude(), c.latitude(), 9 };
   }
 
+  /**
+   * Creates a vector source layer URL from a hard-coded path plus information from the incoming
+   * HTTP request.
+   */
   public static String defaultPath(
     UriInfo uri,
     HttpHeaders headers,
@@ -73,6 +77,10 @@ public class TileJson implements Serializable {
       );
   }
 
+  /**
+   * Creates a vector source layer URL from a configured base path plus information from the incoming
+   * HTTP request.
+   */
   public static String overrideBasePath(
     UriInfo uri,
     HttpHeaders headers,

@@ -14,6 +14,9 @@ public transit entities on the map.
 The tiles can be fetched from `/otp/routers/{routerId}/vectorTiles/{layers}/{z}/{x}/{y}.pbf`,
 where `layers` is a comma separated list of layer names from the configuration.
 
+Maplibre/Mapbox GL JS also require a tilejson.json endpoint which is available at
+`/otp/routers/{routerId}/vectorTiles/{layers}/tilejson.json`.
+
 Translatable fields in the tiles are translated based on the `accept-language` header in requests.
 Currently, only the language with the highest priority from the header is used.
 
@@ -137,38 +140,13 @@ For each layer, the configuration includes:
     - `VehicleRentalStation`: rental stations
     - `VehicleParking`
     - `VehicleParkingGroup`
-- `mapper` which describes the mapper converting the properties from the OTP model entities to the
-  vector tile properties. Currently `Digitransit` is supported for all layer types.
-- `minZoom` and `maxZoom` which describe the zoom levels the layer is active for.
-- `cacheMaxSeconds` which sets the cache header in the response. The lowest value of the layers
-  included is selected.
-- `expansionFactor` How far outside its boundaries should the tile contain information. The value is
-  a fraction of the tile size. If you are having problem with icons and shapes being clipped at tile
-  edges, then increase this number.
-
-### Extending
-
-If more generic layers are created for this API, it should be moved out from the sandbox, into the
-core code, with potentially leaving specific property mappers in place.
-
-#### Creating a new layer
-
-In order to create a new type of layer, you need to create a new class extending `LayerBuilder<T>`.
-You need to implement two methods, `List<Geometry> getGeometries(Envelope query)`, which returns a
-list of geometries, with an object of type `T` as their userData in the geometry,
-and `double getExpansionFactor()`, which describes how much information outside the tile bounds
-should be included. This layer then needs to be added into `VectorTilesResource.layers`, with a
-new `LayerType` enum as the key, and the class constructor as the value.
-
-A new mapper needs to be added every time a new layer is added. See below for information.
-
 
 <!-- parameters BEGIN -->
 <!-- NOTE! This section is auto-generated. Do not change, change doc in code instead. -->
 
 | Config Parameter                                               |    Type    | Summary                                                                                    |  Req./Opt. | Default Value | Since |
 |----------------------------------------------------------------|:----------:|--------------------------------------------------------------------------------------------|:----------:|---------------|:-----:|
-| basePath                                                       |  `string`  | TODO: Add short summary.                                                                   | *Optional* |               |  2.5  |
+| [basePath](#vectorTiles_basePath)                              |  `string`  | The path of the vector tile source URLs in `tilejson.json`.                                | *Optional* |               |  2.5  |
 | [layers](#vectorTiles_layers)                                  | `object[]` | Configuration of the individual layers for the Mapbox vector tiles.                        | *Optional* |               |  2.0  |
 |       type = "stop"                                            |   `enum`   | Type of the layer.                                                                         | *Required* |               |  2.0  |
 |       [cacheMaxSeconds](#vectorTiles_layers_0_cacheMaxSeconds) |  `integer` | Sets the cache header in the response.                                                     | *Optional* | `-1`          |  2.0  |
@@ -180,6 +158,24 @@ A new mapper needs to be added every time a new layer is added. See below for in
 
 
 #### Details
+
+<h4 id="vectorTiles_basePath">basePath</h4>
+
+**Since version:** `2.5` ∙ **Type:** `string` ∙ **Cardinality:** `Optional`   
+**Path:** /vectorTiles 
+
+The path of the vector tile source URLs in `tilejson.json`.
+
+This is useful if you have a proxy setup and rewrite the path that is passed to OTP.
+
+If you don't configure this optional value then the path returned in `tilejson.json` is
+`/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{x}.pbf`. If you set a value of
+`/otp_test/tiles` then the returned path changes to `/otp_test/tiles/layer1,layer2/{z}/{x}/{x}.pbf`.
+
+The protocol and host are read from the incoming HTTP request. If you run OTP behind a proxy
+then make sure to set the headers `X-Forwarded-Proto` and `X-Forwarded-Host` to make OTP
+return the protocol and host for the original request and not the proxied one.
+
 
 <h4 id="vectorTiles_layers">layers</h4>
 
@@ -220,6 +216,22 @@ Currently `Digitransit` is supported for all layer types.
 
 <!-- parameters END -->
 
+### Extending
+
+If more generic layers are created for this API, it should be moved out from the sandbox, into the
+core code, with potentially leaving specific property mappers in place.
+
+#### Creating a new layer
+
+In order to create a new type of layer, you need to create a new class extending `LayerBuilder<T>`.
+You need to implement two methods, `List<Geometry> getGeometries(Envelope query)`, which returns a
+list of geometries, with an object of type `T` as their userData in the geometry,
+and `double getExpansionFactor()`, which describes how much information outside the tile bounds
+should be included. This layer then needs to be added into `VectorTilesResource.layers`, with a
+new `LayerType` enum as the key, and the class constructor as the value.
+
+A new mapper needs to be added every time a new layer is added. See below for information.
+
 #### Creating a new mapper
 
 The mapping contains information of what data to include in the vector tiles. The mappers are
@@ -227,7 +239,7 @@ defined per layer.
 
 In order to create a new mapper for a layer, you need to create a new class
 extending `PropertyMapper<T>`. In that class, you need to implement the
-method `Collection<T2<String, Object>> map(T input)`. The type T is dependent on the layer for which
+method `Collection<KeyValue<String, Object>> map(T input)`. The type T is dependent on the layer for which
 you implement the mapper for. It needs to return a list of attributes, as key-value pairs which will
 be written into the vector tile.
 
