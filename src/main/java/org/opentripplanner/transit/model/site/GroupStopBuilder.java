@@ -27,10 +27,7 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
     GeometryUtils.getGeometryFactory()
   );
 
-  private GeometryCollection encompassingAreaGeometry = new GeometryCollection(
-    null,
-    GeometryUtils.getGeometryFactory()
-  );
+  private GeometryCollection encompassingAreaGeometry = null;
 
   private WgsCoordinate centroid;
 
