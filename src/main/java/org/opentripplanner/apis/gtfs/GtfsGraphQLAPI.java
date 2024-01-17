@@ -1,7 +1,6 @@
 package org.opentripplanner.apis.gtfs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import graphql.ExecutionResult;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.HeaderParam;
@@ -14,37 +13,38 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import org.opentripplanner.framework.graphql.GraphQLResponseSerializer;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("/routers/{ignoreRouterId}/index/graphql")
-@Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
+@Path("/gtfs/v1/")
+@Produces(MediaType.APPLICATION_JSON)
 public class GtfsGraphQLAPI {
 
-  @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(GtfsGraphQLAPI.class);
 
   private final OtpServerRequestContext serverContext;
   private final ObjectMapper deserializer = new ObjectMapper();
 
-  public GtfsGraphQLAPI(
-    @Context OtpServerRequestContext serverContext,
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
-  ) {
+  public GtfsGraphQLAPI(@Context OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
+  }
+
+  /**
+   * This class is only here for backwards-compatibility. It will be removed in the future.
+   */
+  @Path("/routers/{ignoreRouterId}/index/graphql")
+  public static class GtfsGraphQLAPIOldPath extends GtfsGraphQLAPI {
+
+    public GtfsGraphQLAPIOldPath(
+      @Context OtpServerRequestContext serverContext,
+      @PathParam("ignoreRouterId") String ignore
+    ) {
+      super(serverContext);
+    }
   }
 
   @POST
@@ -119,65 +119,5 @@ public class GtfsGraphQLAPI {
       locale,
       GraphQLRequestContext.ofServerContext(serverContext)
     );
-  }
-
-  @POST
-  @Path("/batch")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response getGraphQLBatch(
-    List<HashMap<String, Object>> queries,
-    @HeaderParam("OTPTimeout") @DefaultValue("30000") int timeout,
-    @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
-    @Context HttpHeaders headers
-  ) {
-    List<Callable<ExecutionResult>> futures = new ArrayList<>();
-    Locale locale = headers.getAcceptableLanguages().size() > 0
-      ? headers.getAcceptableLanguages().get(0)
-      : serverContext.defaultLocale();
-
-    for (HashMap<String, Object> query : queries) {
-      Map<String, Object> variables;
-      if (query.get("variables") instanceof Map) {
-        variables = (Map) query.get("variables");
-      } else if (
-        query.get("variables") instanceof String && ((String) query.get("variables")).length() > 0
-      ) {
-        try {
-          variables = deserializer.readValue((String) query.get("variables"), Map.class);
-        } catch (IOException e) {
-          return Response
-            .status(Response.Status.BAD_REQUEST)
-            .type(MediaType.TEXT_PLAIN_TYPE)
-            .entity("Variables must be a valid json object")
-            .build();
-        }
-      } else {
-        variables = null;
-      }
-      String operationName = (String) query.getOrDefault("operationName", null);
-
-      futures.add(() ->
-        GtfsGraphQLIndex.getGraphQLExecutionResult(
-          (String) query.get("query"),
-          variables,
-          operationName,
-          maxResolves,
-          timeout,
-          locale,
-          GraphQLRequestContext.ofServerContext(serverContext)
-        )
-      );
-    }
-
-    try {
-      List<Future<ExecutionResult>> results = GtfsGraphQLIndex.threadPool.invokeAll(futures);
-      return Response
-        .status(Response.Status.OK)
-        .entity(GraphQLResponseSerializer.serializeBatch(queries, results))
-        .build();
-    } catch (InterruptedException e) {
-      LOG.error("Batch query interrupted", e);
-      throw new RuntimeException(e);
-    }
   }
 }
