@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.basic.TransitMode;
-import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 import org.opentripplanner.transit.model.site.RegularStop;
 
 class PriorityGroupConfiguratorTest {
@@ -60,11 +60,11 @@ class PriorityGroupConfiguratorTest {
     "10:00 10:10"
   );
 
-  private final RoutingTripPattern railR1 = routeR1.getTripPattern().getRoutingTripPattern();
-  private final RoutingTripPattern busB2 = routeB2.getTripPattern().getRoutingTripPattern();
-  private final RoutingTripPattern railR3 = routeR3.getTripPattern().getRoutingTripPattern();
-  private final RoutingTripPattern ferryF3 = routeF3.getTripPattern().getRoutingTripPattern();
-  private final RoutingTripPattern busB3 = routeB3.getTripPattern().getRoutingTripPattern();
+  private final TripPattern railR1 = routeR1.getTripPattern();
+  private final TripPattern busB2 = routeB2.getTripPattern();
+  private final TripPattern railR3 = routeR3.getTripPattern();
+  private final TripPattern ferryF3 = routeF3.getTripPattern();
+  private final TripPattern busB3 = routeB3.getTripPattern();
 
   @Test
   void emptyConfigurationShouldReturnGroupZero() {
