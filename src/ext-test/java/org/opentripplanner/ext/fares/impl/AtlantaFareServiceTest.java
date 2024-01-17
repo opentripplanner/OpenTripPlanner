@@ -228,7 +228,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
   private static void calculateFare(List<Leg> rides, Money expectedFare) {
     ItineraryFares fare = new ItineraryFares();
     atlFareService.populateFare(fare, USD, FareType.electronicRegular, rides, null);
-    assertEquals(expectedFare, fare.getFare(FareType.electronicRegular));
+    assertEquals(expectedFare, fare.getItineraryProducts().stream().filter(fp -> fp.name().equals(FareType.electronicRegular.name())).findFirst().get().price();
 
     var fareProducts = fare
       .getItineraryProducts()

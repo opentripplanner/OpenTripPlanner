@@ -480,7 +480,8 @@ public class OrcaFareService extends DefaultFareService {
     }
     cost = cost.plus(orcaFareDiscount);
     if (cost.fractionalAmount().floatValue() < Float.MAX_VALUE) {
-      fare.addFare(fareType, cost);
+      var fp = FareProduct.of(new FeedScopedId(FEED_ID, fareType.name()), fareType.name(), cost).build();
+      fare.addItineraryProducts(List.of(fp));
       return true;
     } else {
       return false;

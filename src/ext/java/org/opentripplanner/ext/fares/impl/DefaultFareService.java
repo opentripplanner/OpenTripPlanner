@@ -142,9 +142,7 @@ public class DefaultFareService implements FareService {
 
           fareProducts.putAll(currentFare.getLegProducts());
           itineraryProducts.addAll(currentFare.getItineraryProducts());
-
-        } else {
-        }
+        } else {}
       }
 
       fare.addFareProductUses(fareProducts);
@@ -154,7 +152,6 @@ public class DefaultFareService implements FareService {
       if (!hasFare) {
         continue;
       }
-
     }
     return hasFare ? fare : null;
   }

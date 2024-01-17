@@ -160,8 +160,7 @@ public class AtlantaFareService extends DefaultFareService {
     }
 
     public Money getTotal() {
-        return fares.get(fareType).stream().reduce(ZERO_USD, Money::plus);
-
+      return fares.get(fareType).stream().reduce(ZERO_USD, Money::plus);
     }
   }
 

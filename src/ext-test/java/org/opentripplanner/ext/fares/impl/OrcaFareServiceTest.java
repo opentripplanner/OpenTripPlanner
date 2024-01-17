@@ -81,7 +81,7 @@ public class OrcaFareServiceTest {
   private static void calculateFare(List<Leg> legs, FareType fareType, Money expectedPrice) {
     var itinerary = new Itinerary(legs);
     var itineraryFares = orcaFareService.calculateFares(itinerary);
-    assertEquals(expectedPrice, itineraryFares.getFare(fareType));
+    assertEquals(expectedPrice, itineraryFares.getItineraryProducts().stream().filter(fareProduct -> fareProduct.name().equals(fareType.name())));
   }
 
   private static void assertLegFareEquals(

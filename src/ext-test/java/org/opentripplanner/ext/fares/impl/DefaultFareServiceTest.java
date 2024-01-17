@@ -113,10 +113,6 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var fare = service.calculateFares(itin);
     assertNotNull(fare);
 
-    var price = fare.getFare(FareType.regular);
-
-    assertEquals(TWENTY_DOLLARS, price);
-
     var legProducts = fare.getLegProducts();
 
     var firstLeg = itin.getLegs().getFirst();
@@ -144,9 +140,6 @@ class DefaultFareServiceTest implements PlanTestConstants {
 
     var fare = service.calculateFares(itin);
     assertNotNull(fare);
-
-    var price = fare.getFare(FareType.regular);
-    assertEquals(Money.usDollars(-0.01f), price);
 
     var fareProducts = List.copyOf(fare.getLegProducts().values());
     assertEquals(1, fareProducts.size());
@@ -220,9 +213,6 @@ class DefaultFareServiceTest implements PlanTestConstants {
       "[FareProductUse[id=5d0d58f4-b97a-38db-921c-8b5fc6392b54, product=FareProduct{id: 'F2:other-feed-attribute', amount: $10.00}]]",
       legProducts.get(finalBusLeg).toString()
     );
-
-    var resultPrice = result.getFare(FareType.regular);
-    assertEquals(TWENTY_DOLLARS, resultPrice);
   }
 
   @Test
@@ -241,8 +231,6 @@ class DefaultFareServiceTest implements PlanTestConstants {
       .stream()
       .map(r -> r.product().id())
       .toList();
-    var resultPrice = result.getFare(FareType.regular);
     assertEquals(List.of(OTHER_FEED_ATTRIBUTE.getId()), resultProductIds);
-    assertEquals(Money.usDollars(-0.01f), resultPrice);
   }
 }

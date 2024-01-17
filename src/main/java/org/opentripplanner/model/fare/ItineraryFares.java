@@ -4,18 +4,13 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.Nullable;
 import org.opentripplanner.framework.lang.Sandbox;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.core.FareType;
-import org.opentripplanner.transit.model.basic.Money;
 
 /**
  *
@@ -57,37 +52,10 @@ public class ItineraryFares {
   }
 
   /**
-   * Add a "fare". This is an ill-defined concept (is it for the entire itinerary or only some
-   * legs?) from the early days of OTP which will be removed in the future.
-   * <p>
-   * @deprecated It only exists for backwards-compatibility.
-   * Use {@link ItineraryFares#addFareProduct(Leg, FareProduct)},
-   * {@link ItineraryFares#addItineraryProducts(Collection)} instead.
-   */
-  @Deprecated
-  public void addFare(FareType fareType, Money money) {
-  }
-
-  /**
    * Add fare products that cover the entire itinerary, i.e. are valid for all legs.
    */
   public void addItineraryProducts(Collection<FareProduct> products) {
     itineraryProducts.addAll(products);
-  }
-
-  /**
-   *
-   * Get the "fare" for a specific fare type.
-   * <p>
-   * It is ill-defined what this actually means (entire itinerary?, some legs?).
-   * <p>
-   * Use {@link ItineraryFares#getItineraryProducts()} or {@link ItineraryFares#getLegProducts()}
-   * instead.
-   */
-  @Nullable
-  @Deprecated
-  public Money getFare(FareType type) {
-    return fares.get(type);
   }
 
   @Override
