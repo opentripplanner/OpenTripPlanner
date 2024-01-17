@@ -26,7 +26,7 @@ class TileJsonTest {
     var uriInfo = new UriRoutingContext(req);
     assertEquals(
       "https://localhost:8080/otp_ct/vectorTiles/stops,rentalVehicles/{z}/{x}/{y}.pbf",
-      TileJson.overrideBasePath(uriInfo, req, basePath, LAYERS)
+      TileJson.urlFromOverriddenBasePath(uriInfo, req, basePath, LAYERS)
     );
   }
 
@@ -36,7 +36,7 @@ class TileJsonTest {
     var uriInfo = new UriRoutingContext(req);
     assertEquals(
       "https://localhost:8080/otp/routers/default/vectorTiles/stops,rentalVehicles/{z}/{x}/{y}.pbf",
-      TileJson.defaultPath(uriInfo, req, LAYERS, "default", "vectorTiles")
+      TileJson.urlWithDefaultPath(uriInfo, req, LAYERS, "default", "vectorTiles")
     );
   }
 }

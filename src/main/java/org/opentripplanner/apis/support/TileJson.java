@@ -62,7 +62,7 @@ public class TileJson implements Serializable {
    * Creates a vector source layer URL from a hard-coded path plus information from the incoming
    * HTTP request.
    */
-  public static String defaultPath(
+  public static String urlWithDefaultPath(
     UriInfo uri,
     HttpHeaders headers,
     String layers,
@@ -81,7 +81,7 @@ public class TileJson implements Serializable {
    * Creates a vector source layer URL from a configured base path plus information from the incoming
    * HTTP request.
    */
-  public static String overrideBasePath(
+  public static String urlFromOverriddenBasePath(
     UriInfo uri,
     HttpHeaders headers,
     String overridePath,

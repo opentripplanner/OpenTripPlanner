@@ -93,10 +93,10 @@ public class VectorTilesResource {
       .vectorTileConfig()
       .basePath()
       .map(overrideBasePath ->
-        TileJson.overrideBasePath(uri, headers, overrideBasePath, requestedLayers)
+        TileJson.urlFromOverriddenBasePath(uri, headers, overrideBasePath, requestedLayers)
       )
       .orElseGet(() ->
-        TileJson.defaultPath(uri, headers, requestedLayers, ignoreRouterId, "vectorTiles")
+        TileJson.urlWithDefaultPath(uri, headers, requestedLayers, ignoreRouterId, "vectorTiles")
       );
 
     return new TileJson(url, envelope, feedInfos);

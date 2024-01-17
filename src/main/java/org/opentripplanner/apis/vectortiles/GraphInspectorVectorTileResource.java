@@ -103,7 +103,7 @@ public class GraphInspectorVectorTileResource {
     var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
     List<FeedInfo> feedInfos = feedInfos();
 
-    var url = TileJson.defaultPath(
+    var url = TileJson.urlWithDefaultPath(
       uri,
       headers,
       requestedLayers,
