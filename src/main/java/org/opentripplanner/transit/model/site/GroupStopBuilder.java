@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
@@ -22,6 +23,11 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
   private Set<StopLocation> stopLocations = new HashSet<>();
 
   private GeometryCollection geometry = new GeometryCollection(
+    null,
+    GeometryUtils.getGeometryFactory()
+  );
+
+  private GeometryCollection encompassingAreaGeometry = new GeometryCollection(
     null,
     GeometryUtils.getGeometryFactory()
   );
@@ -50,6 +56,15 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
 
   public GroupStopBuilder withName(I18NString name) {
     this.name = name;
+    return this;
+  }
+
+  public GroupStopBuilder withEncompassingAreaGeometries(List<Geometry> geometries) {
+    this.encompassingAreaGeometry =
+      new GeometryCollection(
+        geometries.toArray(new Geometry[0]),
+        GeometryUtils.getGeometryFactory()
+      );
     return this;
   }
 
@@ -88,6 +103,10 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
 
   public GeometryCollection geometry() {
     return geometry;
+  }
+
+  public GeometryCollection encompassingAreaGeometry() {
+    return encompassingAreaGeometry;
   }
 
   public WgsCoordinate centroid() {

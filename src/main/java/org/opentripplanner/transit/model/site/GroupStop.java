@@ -24,6 +24,8 @@ public class GroupStop
   private final I18NString name;
   private final GeometryCollection geometry;
 
+  private final GeometryCollection encompassingAreaGeometry;
+
   private final WgsCoordinate centroid;
 
   GroupStop(GroupStopBuilder builder) {
@@ -33,6 +35,7 @@ public class GroupStop
     this.geometry = builder.geometry();
     this.centroid = Objects.requireNonNull(builder.centroid());
     this.stopLocations = builder.stopLocations();
+    this.encompassingAreaGeometry = builder.encompassingAreaGeometry();
   }
 
   public static GroupStopBuilder of(FeedScopedId id, IntSupplier indexCounter) {
@@ -77,6 +80,10 @@ public class GroupStop
   @Override
   public Geometry getGeometry() {
     return geometry;
+  }
+
+  public Geometry getEncompassingAreaGeometry() {
+    return encompassingAreaGeometry;
   }
 
   @Override
