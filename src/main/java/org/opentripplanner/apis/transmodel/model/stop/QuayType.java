@@ -380,20 +380,21 @@ public class QuayType {
           .name("flexibleArea")
           .description("Geometry for flexible area.")
           .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
-          .dataFetcher(environment ->
-            (
-              environment.getSource() instanceof AreaStop areaStop
-                ? areaStop.getGeometry().getCoordinates()
-                : null
-            )
-          )
+          .dataFetcher(environment -> {
+            if (environment.getSource() instanceof AreaStop areaStop) {
+              return areaStop.getGeometry().getCoordinates();
+            } else if (environment.getSource() instanceof GroupStop groupStop) {
+              return groupStop.getEncompassingAreaGeometry().getCoordinates();
+            }
+            return null;
+          })
           .build()
       )
       .field(
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("flexibleGroup")
-          .description("the Quays part of an flexible group.")
+          .description("the Quays part of a flexible group.")
           .type(GraphQLList.list(REF))
           .dataFetcher(environment ->
             (
