@@ -161,8 +161,14 @@ public class VehicleRentalEdge extends Edge {
       }
     }
 
-    s1.incrementWeight(pickedUp ? preferences.pickupCost() : preferences.dropoffCost());
-    s1.incrementTimeInSeconds(pickedUp ? preferences.pickupTime() : preferences.dropoffTime());
+    s1.incrementWeight(
+      pickedUp ? preferences.pickupCost().toSeconds() : preferences.dropOffCost().toSeconds()
+    );
+    s1.incrementTimeInSeconds(
+      pickedUp
+        ? (int) preferences.pickupTime().toSeconds()
+        : (int) preferences.dropOffTime().toSeconds()
+    );
     s1.setBackMode(null);
     return s1.makeStateArray();
   }

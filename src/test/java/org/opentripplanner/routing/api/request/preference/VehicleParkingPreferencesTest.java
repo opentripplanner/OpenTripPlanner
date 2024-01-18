@@ -38,20 +38,20 @@ class VehicleParkingPreferencesTest {
   }
 
   @Test
-  void parkCost() {
-    assertEquals(PARKING_COST, subject.parkCost());
+  void cost() {
+    assertEquals(PARKING_COST, subject.cost());
   }
 
   @Test
-  void parkTime() {
-    assertEquals(PARKING_TIME, subject.parkTime());
+  void time() {
+    assertEquals(PARKING_TIME, subject.time());
   }
 
   @Test
   void testCopyOfEqualsAndHashCode() {
     // Create a copy, make a change and set it back again to force creating a new object
-    var other = subject.copyOf().withParkCost(10).build();
-    var same = other.copyOf().withParkCost(PARKING_COST.toSeconds()).build();
+    var other = subject.copyOf().withCost(10).build();
+    var same = other.copyOf().withCost(PARKING_COST.toSeconds()).build();
     assertEqualsAndHashCode(subject, other, same);
   }
 
@@ -63,8 +63,8 @@ class VehicleParkingPreferencesTest {
       "unpreferredVehicleParkingTagCost: $360, " +
       "filter: VehicleParkingFilter{not: [tags=[not]], select: [tags=[bar]]}, " +
       "preferred: VehicleParkingFilter{not: [tags=[bar]], select: [tags=[foo]]}, " +
-      "parkCost: $240, " +
-      "parkTime: PT2M}",
+      "cost: $240, " +
+      "time: PT2M}",
       subject.toString()
     );
   }
@@ -81,8 +81,8 @@ class VehicleParkingPreferencesTest {
       .withUnpreferredVehicleParkingTagCost(UNPREFERRED_COST)
       .withRequiredVehicleParkingTags(REQUIRED_TAGS)
       .withBannedVehicleParkingTags(BANNED_TAGS)
-      .withParkCost(PARKING_COST.toSeconds())
-      .withParkTime(PARKING_TIME)
+      .withCost(PARKING_COST.toSeconds())
+      .withTime(PARKING_TIME)
       .build();
   }
 }

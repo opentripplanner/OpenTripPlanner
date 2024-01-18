@@ -549,18 +549,18 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
   BicycleOptimizeType getSelectedOptimizeType() {
     if (opQuick.isSelected()) {
-      return BicycleOptimizeType.QUICK;
+      return BicycleOptimizeType.SHORTEST_DURATION;
     }
     if (opSafe.isSelected()) {
-      return BicycleOptimizeType.SAFE;
+      return BicycleOptimizeType.SAFE_STREETS;
     }
     if (opFlat.isSelected()) {
-      return BicycleOptimizeType.FLAT;
+      return BicycleOptimizeType.FLAT_STREETS;
     }
     if (opGreenways.isSelected()) {
-      return BicycleOptimizeType.GREENWAYS;
+      return BicycleOptimizeType.SAFEST_STREETS;
     }
-    return BicycleOptimizeType.QUICK;
+    return BicycleOptimizeType.SHORTEST_DURATION;
   }
 
   private Container makeDiffTab() {
