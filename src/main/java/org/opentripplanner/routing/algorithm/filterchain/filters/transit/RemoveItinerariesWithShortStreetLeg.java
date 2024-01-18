@@ -15,7 +15,7 @@ import org.opentripplanner.street.search.TraverseMode;
  * several queries are combined in the frontend.
  * <p>
  * Example: you have two queries for bike+transit and walk+transit each. Both give you very short legs
- * to reach a train station. A user would not expect to see a bike+transit shorted than 200m leg when it's
+ * to reach a train station. A user would not expect to see a bike+transit shorter than 200m leg when it's
  * presented right next to a walk+transit leg of the same length.
  * <p>
  * In other words, this offloads the comparison part of the filter chain to a system outside of OTP and

@@ -51,15 +51,15 @@ Here is an overview of the packages and their responsibilities.
 ```
 filterchain
 ├── api              Request parameters passed into the filter chain
-├── filters          Concreate filter implementations  
+├── filters          Concrete filter implementations  
 │   ├── street       For decorating/filtering street itineraries  
 │   ├── system       Mainly support for otp features like paging and search-window crop
 │   └── transit      For decorating/filtering itineraries with transit
 │       └── group    Transit group filters
 ├── framework        Generic filter chain implementation
 │   ├── filter       Filter implementation
-│   ├── filterchain  Domain logic used by the `FilterChain` (agreagate root).
-│   ├── groupids     Generic groupId implementations. These can be used to as lego to build specific group-by filters.
+│   ├── filterchain  Domain logic used by the `FilterChain` (aggregate root).
+│   ├── groupids     Generic groupId implementations. These can be used as lego to build specific group-by filters.
 │   ├── sort         Sorting implementation
 │   └── spi          The interfaces to extend to plug into the filter-chain
 └── images           Images used in the doc

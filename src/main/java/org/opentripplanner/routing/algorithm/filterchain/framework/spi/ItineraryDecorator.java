@@ -7,7 +7,7 @@ import org.opentripplanner.model.plan.Itinerary;
  */
 public interface ItineraryDecorator {
   /**
-   * Implement this do decorate each itinerary in the result.
+   * Implement this to decorate each itinerary in the result.
    */
   void decorate(Itinerary itinerary);
 }

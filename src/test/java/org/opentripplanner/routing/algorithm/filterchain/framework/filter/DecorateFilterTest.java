@@ -38,7 +38,7 @@ class DecorateFilterTest implements ItineraryDecorator, PlanTestConstants {
 
   @Test
   void filterEmptyList() {
-    // Make sure the filter does nothing and do not crash on empty lists
+    // Make sure the filter does nothing and does not crash on empty lists
     new DecorateFilter(this).filter(List.of());
   }
 

@@ -10,7 +10,7 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveIti
 
 /**
  * This class is responsible for flagging itineraries for deletion based on a predicate in the
- * supplied ItineraryDeletionFlagger. The itineraries are not actually deleted at this point, just
+ * supplied RemoveItineraryFlagger. The itineraries are not actually deleted at this point, just
  * flagged. They are typically deleted later if debug mode is disabled.
  */
 public class RemoveFilter implements ItineraryListFilter {
