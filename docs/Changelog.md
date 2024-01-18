@@ -77,6 +77,7 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Use fallback timezone if no transit data is loaded [#4652](https://github.com/opentripplanner/OpenTripPlanner/pull/4652)
 - Add new path for GTFS GraphQL API, remove batch feature [#5581](https://github.com/opentripplanner/OpenTripPlanner/pull/5581)
 - Restructure walk/bicycle/car preferences in router-config.json [#5582](https://github.com/opentripplanner/OpenTripPlanner/pull/5582)
+- Revert REST API spelling change of real-time [#5629](https://github.com/opentripplanner/OpenTripPlanner/pull/5629)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)
