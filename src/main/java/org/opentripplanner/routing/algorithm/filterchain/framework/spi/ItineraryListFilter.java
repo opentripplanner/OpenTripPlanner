@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.filterchain.framework.spi;
 
 import java.util.List;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.framework.filter.MaxLimit;
 
 /**
  * Filter, sort or decorate itineraries. A filter can modify the elements in the list, but not the
@@ -13,9 +12,9 @@ import org.opentripplanner.routing.algorithm.filterchain.framework.filter.MaxLim
  * in the same filter. Instead, create two filters and insert them after each other in the filter
  * chain.
  * <p>
- * This allows decoration of each filter and makes it easier to reuse logic. Like the {@link
- * MaxLimit} is reused in
- * several places.
+ * This allows decoration of each filter and makes it easier to reuse logic. Like the
+ * {@link org.opentripplanner.routing.algorithm.filterchain.framework.filter.MaxLimit} is reused
+ * in several places.
  */
 public interface ItineraryListFilter {
   /**

@@ -7,7 +7,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.filter.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.framework.spi.RemoveItineraryFlagger;
 import org.opentripplanner.transit.model.timetable.Trip;
@@ -15,8 +14,8 @@ import org.opentripplanner.transit.model.timetable.Trip;
 /**
  * This filter remove itineraries, which use the same trips for most of their legs, but where some
  * itineraries have a much higher cost for the other legs. This is similar to {@link
- * TransitGeneralizedCostFilter}, but is used together with {@link GroupByFilter} to filter within
- * the groups.
+ * org.opentripplanner.routing.algorithm.filterchain.filters.transit.TransitGeneralizedCostFilter},
+ * but is used together with {@link GroupByFilter} to filter within the groups.
  */
 public class RemoveOtherThanSameLegsMaxGeneralizedCost implements RemoveItineraryFlagger {
 
