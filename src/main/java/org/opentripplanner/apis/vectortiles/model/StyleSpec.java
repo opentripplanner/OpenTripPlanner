@@ -2,6 +2,7 @@ package org.opentripplanner.apis.vectortiles.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,13 +16,13 @@ import java.util.Map;
 public final class StyleSpec {
 
   private final String name;
-  private final List<TileSource> sources;
+  private final Collection<TileSource> sources;
   private final List<JsonNode> layers;
 
-  public StyleSpec(String name, List<TileSource> sources, List<LayerStyleBuilder> layers) {
+  public StyleSpec(String name, Collection<TileSource> sources, List<StyleBuilder> layers) {
     this.name = name;
     this.sources = sources;
-    this.layers = layers.stream().map(LayerStyleBuilder::toJson).toList();
+    this.layers = layers.stream().map(StyleBuilder::toJson).toList();
   }
 
   @JsonSerialize
