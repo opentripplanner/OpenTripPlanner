@@ -8,8 +8,6 @@ import org.opentripplanner.transit.model.organization.ContactInfo;
 /**
  * Info about how a trip might be booked at a particular stop. All of this is pass-through
  * information, except information about booking time and booking notice.
- * <p>
- * // TODO Make the routing take into account booking time and booking notice.
  */
 public class BookingInfo implements Serializable {
 
