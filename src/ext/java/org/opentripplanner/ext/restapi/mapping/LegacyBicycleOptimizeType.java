@@ -1,4 +1,4 @@
-package org.opentripplanner.api.mapping;
+package org.opentripplanner.ext.restapi.mapping;
 
 import org.opentripplanner.routing.core.BicycleOptimizeType;
 
