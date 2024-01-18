@@ -283,6 +283,14 @@
         "Authorization": "A-Token"
       }
     },
+    // Streaming GTFS-RT TripUpdates through an MQTT broker
+    {
+      "type": "mqtt-gtfs-rt-updater",
+      "url": "tcp://pred.rt.hsl.fi",
+      "topic": "gtfsrt/v2/fi/hsl/tu",
+      "feedId": "HSL",
+      "fuzzyTripMatching": true
+    },
     // Polling for GTFS-RT Vehicle Positions - output can be fetched via trip pattern GraphQL API
     {
       "type": "vehicle-positions",
@@ -294,11 +302,6 @@
       },
       "fuzzyTripMatching": false,
       "features": ["position"]
-    },
-    // Streaming differential GTFS-RT TripUpdates over websockets
-    {
-      "type": "websocket-gtfs-rt-updater",
-      "feedId": "ov"
     },
     // Siri-ET over HTTP
     {

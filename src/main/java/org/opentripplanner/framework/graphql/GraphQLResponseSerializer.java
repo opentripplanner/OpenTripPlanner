@@ -33,30 +33,4 @@ public class GraphQLResponseSerializer {
       throw new RuntimeException(e);
     }
   }
-
-  public static String serializeBatch(
-    List<HashMap<String, Object>> queries,
-    List<Future<ExecutionResult>> futures
-  ) {
-    List<Map<String, Object>> responses = new LinkedList<>();
-    for (int i = 0; i < queries.size(); i++) {
-      ExecutionResult executionResult;
-      // Try each request separately, returning both completed and failed responses is ok
-      try {
-        executionResult = futures.get(i).get();
-      } catch (InterruptedException | ExecutionException e) {
-        executionResult = new AbortExecutionException(e).toExecutionResult();
-      }
-      responses.add(
-        Map.of("id", queries.get(i).get("id"), "payload", executionResult.toSpecification())
-      );
-    }
-
-    try {
-      return objectMapper.writeValueAsString(responses);
-    } catch (JsonProcessingException e) {
-      LOG.error("Unable to serialize response", e);
-      throw new RuntimeException(e);
-    }
-  }
 }

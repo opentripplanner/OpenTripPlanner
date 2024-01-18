@@ -23,6 +23,7 @@ import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.DurationUtils;
+import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
@@ -658,8 +659,8 @@ public abstract class RoutingResource {
   @QueryParam("useVehicleParkingAvailabilityInformation")
   protected Boolean useVehicleParkingAvailabilityInformation;
 
-  @QueryParam("relaxTransitPriorityGroup")
-  protected String relaxTransitPriorityGroup;
+  @QueryParam("relaxTransitGroupPriority")
+  protected String relaxTransitGroupPriority;
 
   /**
    * Whether non-optimal transit paths at the destination should be returned.
@@ -711,7 +712,7 @@ public abstract class RoutingResource {
 
     {
       //FIXME: move into setter method on routing request
-      ZoneId tz = serverContext.transitService().getTimeZone();
+      ZoneId tz = ZoneIdFallback.zoneId(serverContext.transitService().getTimeZone());
       if (date == null && time != null) { // Time was provided but not date
         LOG.debug("parsing ISO datetime {}", time);
         try {

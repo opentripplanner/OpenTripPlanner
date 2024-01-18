@@ -18,6 +18,7 @@ import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.geometry.GeometryUtils;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.plan.ElevationProfile;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -58,7 +59,7 @@ public class GraphPathToItineraryMapper {
     StreetNotesService streetNotesService,
     double ellipsoidToGeoidDifference
   ) {
-    this.timeZone = timeZone;
+    this.timeZone = ZoneIdFallback.zoneId(timeZone);
     this.streetNotesService = streetNotesService;
     this.ellipsoidToGeoidDifference = ellipsoidToGeoidDifference;
   }

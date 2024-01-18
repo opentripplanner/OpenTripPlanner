@@ -10,7 +10,6 @@ import org.opentripplanner.ext.vehiclerentalservicedirectory.api.VehicleRentalSe
 import org.opentripplanner.updater.alert.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.trip.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.trip.PollingTripUpdaterParameters;
-import org.opentripplanner.updater.trip.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.vehicle_parking.VehicleParkingUpdaterParameters;
 import org.opentripplanner.updater.vehicle_position.VehiclePositionsUpdaterParameters;
 import org.opentripplanner.updater.vehicle_rental.VehicleRentalUpdaterParameters;
@@ -33,8 +32,6 @@ public interface UpdatersParameters {
   List<SiriETGooglePubsubUpdaterParameters> getSiriETGooglePubsubUpdaterParameters();
 
   List<SiriSXUpdaterParameters> getSiriSXUpdaterParameters();
-
-  List<WebsocketGtfsRealtimeUpdaterParameters> getWebsocketGtfsRealtimeUpdaterParameters();
 
   List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters();
 

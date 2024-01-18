@@ -17,7 +17,7 @@ export default {
 This is the static documentation of the OTP GraphQL GTFS API.
 
 The GraphQL endpoint of your instance, which you should point your tooling to, is 
-\`http://localhost:8080/otp/routers/default/index/graphql\`
+\`http://localhost:8080/otp/gtfs/v1\`
 
 Please also check out the interactive API explorer built into every instance and available
 at http://localhost:8080/graphiql 
