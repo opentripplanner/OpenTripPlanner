@@ -56,7 +56,7 @@ public class SeptaSmokeTest {
 
     LOG.info("Received fare products {}", products);
 
-    assertTrue(prices.contains(2.5d));
+    assertTrue(prices.contains(6.75d));
 
     SmokeTest.assertThatAllTransitLegsHaveFareProducts(plan);
   }
