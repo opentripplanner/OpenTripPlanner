@@ -166,8 +166,7 @@ public final class BikePreferences implements Serializable {
     private VehicleRentalPreferences rental;
     private BicycleOptimizeType optimizeType;
     private TimeSlopeSafetyTriangle optimizeTriangle;
-
-    public VehicleWalkingPreferences walking;
+    private VehicleWalkingPreferences walking;
 
     public Builder(BikePreferences original) {
       this.original = original;
