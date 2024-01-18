@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
+import java.time.Duration;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
 
 class VehicleRentalPreferencesTest {
 
@@ -23,8 +25,8 @@ class VehicleRentalPreferencesTest {
     .of()
     .withPickupTime(PICKUP_TIME)
     .withPickupCost(PICKUP_COST)
-    .withDropoffTime(DROPOFF_TIME)
-    .withDropoffCost(DROPOFF_COST)
+    .withDropOffTime(DROPOFF_TIME)
+    .withDropOffCost(DROPOFF_COST)
     .withArrivingInRentalVehicleAtDestinationCost(ARRIVE_IN_RENTAL_COST)
     .withUseAvailabilityInformation(USE_AVAILABILITY_INFORMATION)
     .withAllowArrivingInRentedVehicleAtDestination(ALLOW_ARRIVING_IN_RENTED_VEHICLE)
@@ -34,22 +36,22 @@ class VehicleRentalPreferencesTest {
 
   @Test
   void pickupTime() {
-    assertEquals(PICKUP_TIME, subject.pickupTime());
+    assertEquals(Duration.ofSeconds(PICKUP_TIME), subject.pickupTime());
   }
 
   @Test
   void pickupCost() {
-    assertEquals(PICKUP_COST, subject.pickupCost());
+    assertEquals(Cost.costOfSeconds(PICKUP_COST), subject.pickupCost());
   }
 
   @Test
   void dropoffTime() {
-    assertEquals(DROPOFF_TIME, subject.dropoffTime());
+    assertEquals(Duration.ofSeconds(DROPOFF_TIME), subject.dropOffTime());
   }
 
   @Test
   void dropoffCost() {
-    assertEquals(DROPOFF_COST, subject.dropoffCost());
+    assertEquals(Cost.costOfSeconds(DROPOFF_COST), subject.dropOffCost());
   }
 
   @Test
@@ -59,7 +61,10 @@ class VehicleRentalPreferencesTest {
 
   @Test
   void arrivingInRentalVehicleAtDestinationCost() {
-    assertEquals(ARRIVE_IN_RENTAL_COST, subject.arrivingInRentalVehicleAtDestinationCost());
+    assertEquals(
+      Cost.costOfSeconds(ARRIVE_IN_RENTAL_COST),
+      subject.arrivingInRentalVehicleAtDestinationCost()
+    );
   }
 
   @Test
@@ -102,10 +107,10 @@ class VehicleRentalPreferencesTest {
       "VehicleRentalPreferences{" +
       "pickupTime: 25s, " +
       "pickupCost: $250, " +
-      "dropoffTime: 45s, " +
-      "dropoffCost: $450, " +
+      "dropOffTime: 45s, " +
+      "dropOffCost: $450, " +
       "useAvailabilityInformation, " +
-      "arrivingInRentalVehicleAtDestinationCost: 500.0, " +
+      "arrivingInRentalVehicleAtDestinationCost: $500, " +
       "allowArrivingInRentedVehicleAtDestination, " +
       "allowedNetworks: [foo], " +
       "bannedNetworks: [bar]" +

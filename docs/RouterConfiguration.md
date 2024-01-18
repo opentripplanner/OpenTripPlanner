@@ -451,34 +451,59 @@ Used to group requests when monitoring OTP.
     ]
   },
   "routingDefaults" : {
-    "walkSpeed" : 1.3,
-    "bikeSpeed" : 5,
-    "carSpeed" : 40,
     "numItineraries" : 12,
     "transferPenalty" : 0,
-    "walkReluctance" : 4.0,
-    "bikeReluctance" : 5.0,
-    "bikeWalkingReluctance" : 10.0,
-    "bikeStairsReluctance" : 150.0,
-    "carReluctance" : 10.0,
-    "stairsReluctance" : 1.65,
     "turnReluctance" : 1.0,
     "elevatorBoardTime" : 90,
     "elevatorBoardCost" : 90,
     "elevatorHopTime" : 20,
     "elevatorHopCost" : 20,
-    "escalatorReluctance" : 1.5,
-    "vehicleRental" : {
-      "pickupCost" : 120,
-      "dropOffTime" : 30,
-      "dropOffCost" : 30
+    "bicycle" : {
+      "speed" : 5,
+      "reluctance" : 5.0,
+      "boardCost" : 600,
+      "walk" : {
+        "reluctance" : 10.0,
+        "stairsReluctance" : 150.0
+      },
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "parking" : {
+        "time" : "1m",
+        "cost" : 120
+      },
+      "triangle" : {
+        "safety" : 0.4,
+        "flatness" : 0.3,
+        "time" : 0.3
+      }
     },
-    "bikeParkTime" : "1m",
-    "bikeParkCost" : 120,
-    "carDropoffTime" : 120,
+    "car" : {
+      "speed" : 40,
+      "reluctance" : 10,
+      "decelerationSpeed" : 2.9,
+      "accelerationSpeed" : 2.9,
+      "rental" : {
+        "pickupCost" : 120,
+        "dropOffTime" : "30s",
+        "dropOffCost" : 30
+      },
+      "parking" : {
+        "time" : "5m",
+        "cost" : 600
+      }
+    },
+    "walk" : {
+      "speed" : 1.3,
+      "reluctance" : 4.0,
+      "stairsReluctance" : 1.65,
+      "boardCost" : 600,
+      "escalatorReluctance" : 1.5
+    },
     "waitReluctance" : 1.0,
-    "walkBoardCost" : 600,
-    "bikeBoardCost" : 600,
     "otherThanPreferredRoutesPenalty" : 300,
     "transferSlack" : 120,
     "boardSlackForMode" : {
@@ -515,8 +540,6 @@ Used to group requests when monitoring OTP.
       "minBikeParkingDistance" : 300,
       "debug" : "limit-to-search-window"
     },
-    "carDecelerationSpeed" : 2.9,
-    "carAccelerationSpeed" : 2.9,
     "ignoreRealtimeUpdates" : false,
     "geoidElevation" : false,
     "maxJourneyDuration" : "36h",

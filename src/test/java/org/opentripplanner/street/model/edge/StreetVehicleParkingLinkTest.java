@@ -64,7 +64,7 @@ class StreetVehicleParkingLinkTest {
         bike.withParking(parkingPreferences -> {
           parkingPreferences.withRequiredVehicleParkingTags(select);
           parkingPreferences.withBannedVehicleParkingTags(not);
-          parkingPreferences.withParkCost(0);
+          parkingPreferences.withCost(0);
         });
       })
     );

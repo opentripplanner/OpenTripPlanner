@@ -2,15 +2,17 @@ package org.opentripplanner.apis.gtfs.mapping;
 
 import static graphql.execution.ExecutionContextBuilder.newExecutionContextBuilder;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.params.provider.Arguments.of;
-import static org.opentripplanner.routing.core.BicycleOptimizeType.SAFE;
+import static org.opentripplanner.routing.core.BicycleOptimizeType.SAFE_STREETS;
 import static org.opentripplanner.routing.core.BicycleOptimizeType.TRIANGLE;
 
 import graphql.ExecutionInput;
 import graphql.execution.ExecutionId;
 import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.DataFetchingEnvironmentImpl;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -21,12 +23,12 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
 import org.opentripplanner.apis.gtfs.TestRoutingService;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.ext.fares.impl.DefaultFareService;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.TimeSlopeSafetyTriangle;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.service.realtimevehicles.internal.DefaultRealtimeVehicleService;
@@ -149,7 +151,7 @@ class RouteRequestMapperTest implements PlanTestConstants {
   void defaultBikeOptimize() {
     Map<String, Object> arguments = Map.of();
     var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
-    assertEquals(SAFE, routeRequest.preferences().bike().optimizeType());
+    assertEquals(SAFE_STREETS, routeRequest.preferences().bike().optimizeType());
   }
 
   @Test
@@ -170,14 +172,14 @@ class RouteRequestMapperTest implements PlanTestConstants {
     );
   }
 
-  static Stream<Arguments> noTriangleCases = BicycleOptimizeType
-    .nonTriangleValues()
-    .stream()
+  static Stream<Arguments> noTriangleCases = Arrays
+    .stream(GraphQLTypes.GraphQLOptimizeType.values())
+    .filter(value -> value != GraphQLTypes.GraphQLOptimizeType.TRIANGLE)
     .map(Arguments::of);
 
   @ParameterizedTest
   @VariableSource("noTriangleCases")
-  void noTriangle(BicycleOptimizeType bot) {
+  void noTriangle(GraphQLTypes.GraphQLOptimizeType bot) {
     Map<String, Object> arguments = Map.of(
       "optimize",
       bot.name(),
@@ -187,11 +189,23 @@ class RouteRequestMapperTest implements PlanTestConstants {
 
     var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
 
-    assertEquals(bot, routeRequest.preferences().bike().optimizeType());
+    assertEquals(OptimizationTypeMapper.map(bot), routeRequest.preferences().bike().optimizeType());
     assertEquals(
       TimeSlopeSafetyTriangle.DEFAULT,
       routeRequest.preferences().bike().optimizeTriangle()
     );
+  }
+
+  @Test
+  void walkReluctance() {
+    var reluctance = 119d;
+    Map<String, Object> arguments = Map.of("walkReluctance", reluctance);
+
+    var routeRequest = RouteRequestMapper.toRouteRequest(executionContext(arguments), context);
+    assertEquals(reluctance, routeRequest.preferences().walk().reluctance());
+
+    var noParamsRequest = RouteRequestMapper.toRouteRequest(executionContext(Map.of()), context);
+    assertNotEquals(reluctance, noParamsRequest.preferences().walk().reluctance());
   }
 
   private DataFetchingEnvironment executionContext(Map<String, Object> arguments) {

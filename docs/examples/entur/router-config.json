@@ -1,32 +1,48 @@
 {
   "configVersion" : "{{ Entur CI config build number inserted here }}",
   "routingDefaults": {
-    "walkSpeed": 1.3,
-    "bikeSpeed": 5,
-    "carSpeed": 40,
     "numItineraries": 12,
     "transferPenalty": 0,
-    "walkReluctance": 4.0,
-    "bikeReluctance": 5.0,
-    "bikeWalkingReluctance": 10.0,
-    "carReluctance": 10.0,
-    "stairsReluctance": 1.65,
     "turnReluctance": 1.0,
     "elevatorBoardTime": 90,
     "elevatorBoardCost": 90,
     "elevatorHopTime": 20,
     "elevatorHopCost": 20,
-    "vehicleRental": {
-      "pickupCost": 120,
-      "dropOffTime": 30,
-      "dropOffCost": 30
+    "bicycle": {
+      "speed": 5,
+      "reluctance": 5.0,
+      "boardCost": 600,
+      "walk": {
+        "reluctance": 10.0
+      },
+      "rental": {
+        "pickupCost": 120,
+        "dropOffTime": "30s",
+        "dropOffCost": 30
+      },
+      "parking": {
+        "time": "1m",
+        "cost": 120
+      }
     },
-    "bikeParkTime": "1m",
-    "bikeParkCost": 120,
-    "carDropoffTime": 120,
+    "car": {
+      "speed": 40,
+      "reluctance": 4.0,
+      "decelerationSpeed": 2.9,
+      "accelerationSpeed": 2.9,
+      "rental": {
+        "pickupCost": 120,
+        "dropOffTime": "30s",
+        "dropOffCost": 30
+      }
+    },
+    "walk": {
+      "speed": 1.3,
+      "reluctance": 4.0,
+      "stairsReluctance": 1.65,
+      "boardCost": 600
+    },
     "waitReluctance": 1.0,
-    "walkBoardCost": 600,
-    "bikeBoardCost": 600,
     "otherThanPreferredRoutesPenalty": 300,
     "transferSlack": 120,
     // Default slack for any mode is 0 (zero)
@@ -41,15 +57,13 @@
     },
     "accessEgress": {
       "maxDurationForMode": {
-	"BIKE_RENTAL": "20m"
+	      "BIKE_RENTAL": "20m"
       }
     },
     "itineraryFilters" : {
       "transitGeneralizedCostLimit" : "1h + 2.5 x",
       "bikeRentalDistanceRatio": 0.3
     },
-    "carDecelerationSpeed": 2.9,
-    "carAccelerationSpeed": 2.9,
     "ignoreRealtimeUpdates": false,
     "geoidElevation": false,
     "maxJourneyDuration": "36h",

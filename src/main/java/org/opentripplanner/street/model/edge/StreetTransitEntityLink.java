@@ -143,7 +143,7 @@ public abstract class StreetTransitEntityLink<T extends Vertex>
       s0.mayKeepRentedVehicleAtDestination() &&
       rentalPreferences.allowArrivingInRentedVehicleAtDestination()
     ) {
-      s1.incrementWeight(rentalPreferences.arrivingInRentalVehicleAtDestinationCost());
+      s1.incrementWeight(rentalPreferences.arrivingInRentalVehicleAtDestinationCost().toSeconds());
     }
 
     s1.setBackMode(null);

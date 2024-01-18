@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.opentripplanner.routing.api.request.preference.ImmutablePreferencesAsserts.assertEqualsAndHashCode;
 
+import java.time.Duration;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.framework.model.Cost;
 
 class CarPreferencesTest {
 
@@ -16,7 +18,6 @@ class CarPreferencesTest {
   private static final int PICKUP_COST = 500;
   private static final double ACCELERATION_SPEED = 3.1;
   private static final double DECELERATION_SPEED = 3.5;
-  public static final int DROPOFF_TIME = 450;
   public static final int RENTAL_PICKUP_TIME = 30;
   public static final int PARK_COST = 30;
 
@@ -24,13 +25,12 @@ class CarPreferencesTest {
     .of()
     .withSpeed(SPEED)
     .withReluctance(RELUCTANCE)
-    .withPickupTime(PICKUP_TIME)
+    .withPickupTime(Duration.ofSeconds(PICKUP_TIME))
     .withPickupCost(PICKUP_COST)
-    .withDropoffTime(DROPOFF_TIME)
     .withAccelerationSpeed(ACCELERATION_SPEED)
     .withDecelerationSpeed(DECELERATION_SPEED)
     .withRental(rental -> rental.withPickupTime(RENTAL_PICKUP_TIME).build())
-    .withParking(parking -> parking.withParkCost(PARK_COST).build())
+    .withParking(parking -> parking.withCost(PARK_COST).build())
     .build();
 
   @Test
@@ -45,17 +45,12 @@ class CarPreferencesTest {
 
   @Test
   void pickupTime() {
-    assertEquals(PICKUP_TIME, subject.pickupTime());
+    assertEquals(Duration.ofSeconds(PICKUP_TIME), subject.pickupTime());
   }
 
   @Test
   void pickupCost() {
-    assertEquals(PICKUP_COST, subject.pickupCost());
-  }
-
-  @Test
-  void dropoffTime() {
-    assertEquals(DROPOFF_TIME, subject.dropoffTime());
+    assertEquals(Cost.costOfSeconds(PICKUP_COST), subject.pickupCost());
   }
 
   @Test
@@ -76,7 +71,7 @@ class CarPreferencesTest {
 
   @Test
   void parking() {
-    var vehicleParking = VehicleParkingPreferences.of().withParkCost(PARK_COST).build();
+    var vehicleParking = VehicleParkingPreferences.of().withCost(PARK_COST).build();
     assertEquals(vehicleParking, subject.parking());
   }
 
@@ -99,11 +94,10 @@ class CarPreferencesTest {
       "CarPreferences{" +
       "speed: 20.0, " +
       "reluctance: 5.1, " +
-      "parking: VehicleParkingPreferences{parkCost: $30}, " +
+      "parking: VehicleParkingPreferences{cost: $30}, " +
       "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
-      "pickupTime: 600, " +
+      "pickupTime: PT10M, " +
       "pickupCost: $500, " +
-      "dropoffTime: 450, " +
       "accelerationSpeed: 3.1, decelerationSpeed: 3.5" +
       "}",
       subject.toString()
