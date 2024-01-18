@@ -55,6 +55,9 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     if (streetMode.includesBiking()) {
       return preferences.bike().speed();
     }
+    if (streetMode.includesScooter()) {
+      return preferences.scooter().speed();
+    }
     return preferences.walk().speed();
   }
 
