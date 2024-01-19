@@ -30,7 +30,6 @@ public final class ScooterPreferences implements Serializable {
   private final VehicleRentalPreferences rental;
   private final VehicleRoutingOptimizeType optimizeType;
   private final TimeSlopeSafetyTriangle optimizeTriangle;
-  private final VehicleWalkingPreferences walking;
 
   private ScooterPreferences() {
     this.speed = 5;
@@ -38,7 +37,6 @@ public final class ScooterPreferences implements Serializable {
     this.rental = VehicleRentalPreferences.DEFAULT;
     this.optimizeType = SAFE_STREETS;
     this.optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
-    this.walking = VehicleWalkingPreferences.DEFAULT;
   }
 
   private ScooterPreferences(Builder builder) {
@@ -47,7 +45,6 @@ public final class ScooterPreferences implements Serializable {
     this.rental = builder.rental;
     this.optimizeType = Objects.requireNonNull(builder.optimizeType);
     this.optimizeTriangle = Objects.requireNonNull(builder.optimizeTriangle);
-    this.walking = builder.walking;
   }
 
   public static ScooterPreferences.Builder of() {
@@ -85,11 +82,6 @@ public final class ScooterPreferences implements Serializable {
     return optimizeTriangle;
   }
 
-  /** Scooter walking preferences that can be different per request */
-  public VehicleWalkingPreferences walking() {
-    return walking;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -100,14 +92,13 @@ public final class ScooterPreferences implements Serializable {
       doubleEquals(that.reluctance, reluctance) &&
       Objects.equals(rental, that.rental) &&
       optimizeType == that.optimizeType &&
-      optimizeTriangle.equals(that.optimizeTriangle) &&
-      Objects.equals(walking, that.walking)
+      optimizeTriangle.equals(that.optimizeTriangle)
     );
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(speed, reluctance, rental, optimizeType, optimizeTriangle, walking);
+    return Objects.hash(speed, reluctance, rental, optimizeType, optimizeTriangle);
   }
 
   @Override
@@ -119,7 +110,6 @@ public final class ScooterPreferences implements Serializable {
       .addObj("rental", rental, DEFAULT.rental)
       .addEnum("optimizeType", optimizeType, DEFAULT.optimizeType)
       .addObj("optimizeTriangle", optimizeTriangle, DEFAULT.optimizeTriangle)
-      .addObj("walking", walking, DEFAULT.walking)
       .toString();
   }
 
@@ -133,8 +123,6 @@ public final class ScooterPreferences implements Serializable {
     private VehicleRoutingOptimizeType optimizeType;
     private TimeSlopeSafetyTriangle optimizeTriangle;
 
-    public VehicleWalkingPreferences walking;
-
     public Builder(ScooterPreferences original) {
       this.original = original;
       this.speed = original.speed;
@@ -142,7 +130,6 @@ public final class ScooterPreferences implements Serializable {
       this.rental = original.rental;
       this.optimizeType = original.optimizeType;
       this.optimizeTriangle = original.optimizeTriangle;
-      this.walking = original.walking;
     }
 
     public ScooterPreferences original() {
@@ -200,11 +187,6 @@ public final class ScooterPreferences implements Serializable {
       var builder = TimeSlopeSafetyTriangle.of();
       body.accept(builder);
       this.optimizeTriangle = builder.buildOrDefault(this.optimizeTriangle);
-      return this;
-    }
-
-    public Builder withWalking(Consumer<VehicleWalkingPreferences.Builder> body) {
-      this.walking = ifNotNull(this.walking, original.walking).copyOf().apply(body).build();
       return this;
     }
 

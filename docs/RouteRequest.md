@@ -143,12 +143,6 @@ and in the [transferRequests in build-config.json](BuildConfiguration.md#transfe
 |       flatness                                                                                               |        `double`        | Relative importance of flat terrain (range 0-1).                                                                                               | *Optional* | `0.0`            |  2.0  |
 |       [safety](#rd_scooter_triangle_safety)                                                                  |        `double`        | Relative importance of safety (range 0-1).                                                                                                     | *Optional* | `0.0`            |  2.0  |
 |       time                                                                                                   |        `double`        | Relative importance of duration of travel (range 0-1).                                                                                         | *Optional* | `0.0`            |  2.0  |
-|    walk                                                                                                      |        `object`        | Preferences for walking a vehicle.                                                                                                             | *Optional* |                  |  2.5  |
-|       [hopCost](#rd_scooter_walk_hopCost)                                                                    |        `integer`       | The cost of hopping on or off a vehicle.                                                                                                       | *Optional* | `0`              |  2.0  |
-|       [hopTime](#rd_scooter_walk_hopTime)                                                                    |       `duration`       | The time it takes the user to hop on or off a vehicle in seconds.                                                                              | *Optional* | `"PT0S"`         |  2.0  |
-|       reluctance                                                                                             |        `double`        | A multiplier for how bad walking with a vehicle is, compared to being in transit for equal lengths of time.                                    | *Optional* | `5.0`            |  2.1  |
-|       speed                                                                                                  |        `double`        | The user's vehicle walking speed in meters/second. Defaults to approximately 3 MPH.                                                            | *Optional* | `1.33`           |  2.1  |
-|       stairsReluctance                                                                                       |        `double`        | How bad is it to walk the vehicle up/down a flight of stairs compared to taking a detour.                                                      | *Optional* | `10.0`           |  2.3  |
 | [transferOptimization](#rd_transferOptimization)                                                             |        `object`        | Optimize where a transfer between to trip happens.                                                                                             | *Optional* |                  |  2.1  |
 |    [backTravelWaitTimeFactor](#rd_to_backTravelWaitTimeFactor)                                               |        `double`        | To reduce back-travel we favor waiting, this reduces the cost of waiting.                                                                      | *Optional* | `1.0`            |  2.1  |
 |    [extraStopBoardAlightCostsFactor](#rd_to_extraStopBoardAlightCostsFactor)                                 |        `double`        | Add an extra board- and alight-cost for prioritized stops.                                                                                     | *Optional* | `0.0`            |  2.1  |
@@ -893,28 +887,6 @@ Relative importance of safety (range 0-1).
 
 This factor can also include other concerns such as convenience and general cyclist
 preferences by taking into account road surface etc.
-
-
-<h3 id="rd_scooter_walk_hopCost">hopCost</h3>
-
-**Since version:** `2.0` ∙ **Type:** `integer` ∙ **Cardinality:** `Optional` ∙ **Default value:** `0`   
-**Path:** /routingDefaults/scooter/walk 
-
-The cost of hopping on or off a vehicle.
-
-There are different parameters for the cost of renting or parking a vehicle and this is
-not meant for controlling the cost of those events.
-
-
-<h3 id="rd_scooter_walk_hopTime">hopTime</h3>
-
-**Since version:** `2.0` ∙ **Type:** `duration` ∙ **Cardinality:** `Optional` ∙ **Default value:** `"PT0S"`   
-**Path:** /routingDefaults/scooter/walk 
-
-The time it takes the user to hop on or off a vehicle in seconds.
-
-Time it takes to rent or park a vehicle have their own parameters and this is not meant
-for controlling the duration of those events.
 
 
 <h3 id="rd_transferOptimization">transferOptimization</h3>

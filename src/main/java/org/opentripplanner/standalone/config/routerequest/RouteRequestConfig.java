@@ -655,7 +655,6 @@ your users receive a timely response. You can also limit the max duration. There
       )
       // triangle overrides the optimization type if defined
       .withForcedOptimizeTriangle(it -> mapOptimizationTriangle(c, it))
-      .withWalking(it -> mapVehicleWalking(c, it))
       .withRental(it -> mapRental(c, it));
   }
 
