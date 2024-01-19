@@ -32,6 +32,7 @@ class RequestToPreferencesMapper {
     mapCar();
     mapWalk();
     mapBike();
+    mapScooter();
 
     var boardAndAlightSlack = mapTransit();
 
@@ -92,6 +93,27 @@ class RequestToPreferencesMapper {
         setIfNotNull(req.bikeSwitchTime, walk::withHopTime);
         setIfNotNull(req.bikeSwitchCost, walk::withHopCost);
       });
+    });
+  }
+
+  private void mapScooter() {
+    preferences.withScooter(scooter -> {
+      setIfNotNull(req.bikeSpeed, scooter::withSpeed);
+      setIfNotNull(req.bikeReluctance, scooter::withReluctance);
+      setIfNotNull(
+        req.bikeOptimizeType,
+        optimizeType -> scooter.withOptimizeType(LegacyVehicleRoutingOptimizeType.map(optimizeType))
+      );
+
+      if (req.bikeOptimizeType == LegacyVehicleRoutingOptimizeType.TRIANGLE) {
+        scooter.withOptimizeTriangle(triangle -> {
+          setIfNotNull(req.triangleTimeFactor, triangle::withTime);
+          setIfNotNull(req.triangleSlopeFactor, triangle::withSlope);
+          setIfNotNull(req.triangleSafetyFactor, triangle::withSafety);
+        });
+      }
+
+      scooter.withRental(this::mapRental);
     });
   }
 

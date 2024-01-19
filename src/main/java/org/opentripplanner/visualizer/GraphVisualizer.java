@@ -490,6 +490,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
           // there should be a ui element for walk distance and optimize type
           .withOptimizeType(getSelectedOptimizeType())
       );
+      preferences.withScooter(scooter ->
+        scooter
+          .withSpeed(Float.parseFloat(bikeSpeed.getText()))
+          // there should be a ui element for walk distance and optimize type
+          .withOptimizeType(getSelectedOptimizeType())
+      );
     });
 
     System.out.println("--------");

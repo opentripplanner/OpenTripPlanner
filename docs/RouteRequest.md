@@ -1158,10 +1158,6 @@ include stairs as a last result.
     "scooter" : {
       "speed" : 5,
       "reluctance" : 5.0,
-      "walk" : {
-        "reluctance" : 10.0,
-        "stairsReluctance" : 150.0
-      },
       "rental" : {
         "pickupCost" : 120,
         "dropOffTime" : "30s",

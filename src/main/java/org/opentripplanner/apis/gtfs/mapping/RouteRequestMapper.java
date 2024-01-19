@@ -98,6 +98,28 @@ public class RouteRequestMapper {
         car.withRental(rental -> setRentalPreferences(callWith, request, rental));
       });
 
+      preferences.withScooter(scooter -> {
+        callWith.argument("bikeReluctance", scooter::withReluctance);
+        callWith.argument("bikeSpeed", scooter::withSpeed);
+
+        if (environment.getArgument("optimize") != null) {
+          scooter.withOptimizeType(
+            OptimizationTypeMapper.map(
+              GraphQLTypes.GraphQLOptimizeType.valueOf(environment.getArgument("optimize"))
+            )
+          );
+        }
+        if (scooter.optimizeType() == VehicleRoutingOptimizeType.TRIANGLE) {
+          scooter.withOptimizeTriangle(triangle -> {
+            callWith.argument("triangle.timeFactor", triangle::withTime);
+            callWith.argument("triangle.slopeFactor", triangle::withSlope);
+            callWith.argument("triangle.safetyFactor", triangle::withSafety);
+          });
+        }
+
+        scooter.withRental(rental -> setRentalPreferences(callWith, request, rental));
+      });
+
       preferences.withWalk(b -> {
         callWith.argument("walkReluctance", b::withReluctance);
         callWith.argument("walkSpeed", b::withSpeed);
