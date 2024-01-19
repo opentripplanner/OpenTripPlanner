@@ -2619,7 +2619,7 @@ enum PlanAccessMode {
     vehicles which are not linked to a rental station. Note, if there are no
     rental options available, access will include only walking. Also, this
     can include walking before picking up or after dropping off the
-    scooter or when it's needed to walk the scooter.
+    scooter.
     """
     SCOOTER_RENTAL
 
@@ -2687,7 +2687,7 @@ enum PlanDirectMode {
     vehicles which are not linked to a rental station. Note, if there are no
     rental options available, itinerary will include only walking. Also, this
     can include walking before picking up or after dropping off the
-    scooter or when it's needed to walk the scooter.
+    scooter.
     """
     SCOOTER_RENTAL
 
@@ -2745,7 +2745,7 @@ enum PlanEgressMode {
     vehicles which are not linked to a rental station. Note, if there are no
     rental options available, egress will include only walking. Also, this
     can include walking before picking up or after dropping off the
-    scooter or when it's needed to walk the scooter.
+    scooter.
     """
     SCOOTER_RENTAL
 
@@ -4632,11 +4632,6 @@ input ScooterPreferencesInput {
     reluctance: Reluctance
 
     """
-    Walking preferences when walking a scooter.
-    """
-    walk: ScooterWalkPreferencesInput
-
-    """
     Maximum speed on flat ground while riding a scooter. Note, this speed is higher than
     the average speed will be in itineraries as this is the maximum speed but there are
     factors that slow down the travel such as crossings, intersections and elevation changes.
@@ -5475,30 +5470,6 @@ input BicycleWalkPreferencesInput {
     How long it takes to hop on or off a bicycle when switching to walking the bicycle
     or when getting on the bicycle again. However, this is not applied when getting
     on a rented bicycle for the first time or off the bicycle when returning the bicycle.
-    """
-    hopTime: Duration
-}
-
-"""
-Preferences for walking a scooter.
-"""
-input ScooterWalkPreferencesInput {
-    """
-    Maximum walk speed on flat ground. Note, this speed is higher than the average speed
-    will be in itineraries as this is the maximum speed but there are
-    factors that slow down walking such as crossings, intersections and elevation changes.
-    """
-    speed: Speed
-
-    """
-    Costs related to walking a scooter.
-    """
-    cost: ScooterWalkPreferencesCostInput
-
-    """"
-    How long it takes to hop on or off a scooter when switching to walking the scooter
-    or when getting on the scooter again. However, this is not applied when getting
-    on a rented scooter for the first time or off the scooter when returning the scooter.
     """
     hopTime: Duration
 }
