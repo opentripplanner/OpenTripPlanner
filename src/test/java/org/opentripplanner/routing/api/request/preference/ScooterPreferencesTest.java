@@ -17,12 +17,14 @@ class ScooterPreferencesTest {
     .build();
   public static final VehicleRoutingOptimizeType OPTIMIZE_TYPE =
     VehicleRoutingOptimizeType.TRIANGLE;
+  public static final int RENTAL_PICKUP_TIME = 30;
 
   private final ScooterPreferences subject = ScooterPreferences
     .of()
     .withSpeed(SPEED)
     .withReluctance(RELUCTANCE)
     .withOptimizeType(OPTIMIZE_TYPE)
+    .withRental(rental -> rental.withPickupTime(RENTAL_PICKUP_TIME).build())
     .withOptimizeTriangle(it -> it.withSlope(1).build())
     .build();
 
@@ -47,6 +49,12 @@ class ScooterPreferencesTest {
   }
 
   @Test
+  void rental() {
+    var vehicleRental = VehicleRentalPreferences.of().withPickupTime(RENTAL_PICKUP_TIME).build();
+    assertEquals(vehicleRental, subject.rental());
+  }
+
+  @Test
   void testOfAndCopyOf() {
     // Return same object if no value is set
     assertSame(ScooterPreferences.DEFAULT, ScooterPreferences.of().build());
@@ -68,6 +76,7 @@ class ScooterPreferencesTest {
       "ScooterPreferences{" +
       "speed: 2.0, " +
       "reluctance: 1.2, " +
+      "rental: VehicleRentalPreferences{pickupTime: 30s}, " +
       "optimizeType: TRIANGLE, " +
       "optimizeTriangle: TimeSlopeSafetyTriangle[time=0.0, slope=1.0, safety=0.0]" +
       "}",
