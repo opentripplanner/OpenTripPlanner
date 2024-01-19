@@ -33,7 +33,7 @@ public class FlexIndex {
       tripById.put(flexTrip.getTrip().getId(), flexTrip);
       for (StopLocation stop : flexTrip.getStops()) {
         if (stop instanceof GroupStop groupStop) {
-          for (StopLocation stopElement : groupStop.getLocations()) {
+          for (StopLocation stopElement : groupStop.getChildLocations()) {
             flexTripsByStop.put(stopElement, flexTrip);
           }
         } else {

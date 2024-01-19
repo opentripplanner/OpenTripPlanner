@@ -248,7 +248,7 @@ public class ScheduledDeviatedTrip
 
   private Collection<StopLocation> expandStops(StopLocation stop) {
     return stop instanceof GroupStop groupStop
-      ? groupStop.getLocations()
+      ? groupStop.getChildLocations()
       : Collections.singleton(stop);
   }
 
@@ -259,7 +259,7 @@ public class ScheduledDeviatedTrip
       }
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof GroupStop groupStop) {
-        if (groupStop.getLocations().contains(accessEgress.stop)) {
+        if (groupStop.getChildLocations().contains(accessEgress.stop)) {
           return i;
         }
       } else {
@@ -278,7 +278,7 @@ public class ScheduledDeviatedTrip
       }
       StopLocation stop = stopTimes[i].stop;
       if (stop instanceof GroupStop groupStop) {
-        if (groupStop.getLocations().contains(accessEgress.stop)) {
+        if (groupStop.getChildLocations().contains(accessEgress.stop)) {
           return i;
         }
       } else {

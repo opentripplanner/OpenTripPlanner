@@ -41,7 +41,7 @@ public class GroupStopBuilder extends AbstractEntityBuilder<GroupStop, GroupStop
     this.indexCounter = original::getIndex;
     // Optional fields
     this.name = original.getName();
-    this.stopLocations = new HashSet<>(original.getLocations());
+    this.stopLocations = new HashSet<>(original.getChildLocations());
     this.geometry = (GeometryCollection) original.getGeometry();
     this.centroid = original.getCoordinate();
   }

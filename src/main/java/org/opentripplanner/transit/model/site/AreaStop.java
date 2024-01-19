@@ -84,6 +84,12 @@ public class AreaStop
     return url;
   }
 
+  @Nonnull
+  @Override
+  public String getStopType() {
+    return "flexible_area";
+  }
+
   @Override
   public String getFirstZoneAsString() {
     return zoneId;
@@ -100,6 +106,14 @@ public class AreaStop
    */
   @Override
   public Geometry getGeometry() {
+    return geometry;
+  }
+
+  /**
+   * Returns the geometry of area that defines the stop, in this case the same as getGeometry.
+   */
+  @Override
+  public Geometry getEncompassingAreaGeometry() {
     return geometry;
   }
 

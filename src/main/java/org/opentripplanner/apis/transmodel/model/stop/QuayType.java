@@ -25,9 +25,6 @@ import org.opentripplanner.routing.stoptimes.ArrivalDeparture;
 import org.opentripplanner.transit.model.basic.Accessibility;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.network.TripPattern;
-import org.opentripplanner.transit.model.site.AreaStop;
-import org.opentripplanner.transit.model.site.GroupStop;
-import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
 
@@ -80,11 +77,8 @@ public class QuayType {
               .type(Scalars.GraphQLString)
               .build()
           )
-          .dataFetcher(environment ->
-            (
-              ((StopLocation) environment.getSource()).getName()
-                .toString(GqlUtil.getLocale(environment))
-            )
+          .dataFetcher(env ->
+            (((StopLocation) env.getSource()).getName().toString(GqlUtil.getLocale(env)))
           )
           .build()
       )
@@ -93,7 +87,7 @@ public class QuayType {
           .newFieldDefinition()
           .name("latitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment -> (((StopLocation) environment.getSource()).getLat()))
+          .dataFetcher(env -> (((StopLocation) env.getSource()).getLat()))
           .build()
       )
       .field(
@@ -101,7 +95,7 @@ public class QuayType {
           .newFieldDefinition()
           .name("longitude")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(environment -> (((StopLocation) environment.getSource()).getLon()))
+          .dataFetcher(env -> (((StopLocation) env.getSource()).getLon()))
           .build()
       )
       .field(
@@ -109,11 +103,8 @@ public class QuayType {
           .newFieldDefinition()
           .name("description")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment ->
-            GraphQLUtils.getTranslation(
-              ((StopLocation) environment.getSource()).getDescription(),
-              environment
-            )
+          .dataFetcher(env ->
+            GraphQLUtils.getTranslation(((StopLocation) env.getSource()).getDescription(), env)
           )
           .build()
       )
@@ -123,12 +114,12 @@ public class QuayType {
           .name("stopPlace")
           .description("The stop place to which this quay belongs to.")
           .type(stopPlaceType)
-          .dataFetcher(environment -> {
-            Station station = ((StopLocation) environment.getSource()).getParentStation();
+          .dataFetcher(env -> {
+            Station station = ((StopLocation) env.getSource()).getParentStation();
             if (station != null) {
               return new MonoOrMultiModalStation(
                 station,
-                GqlUtil.getTransitService(environment).getMultiModalStationForStation(station)
+                GqlUtil.getTransitService(env).getMultiModalStationForStation(station)
               );
             } else {
               return null;
@@ -142,9 +133,9 @@ public class QuayType {
           .name("wheelchairAccessible")
           .type(EnumTypes.WHEELCHAIR_BOARDING)
           .description("Whether this quay is suitable for wheelchair boarding.")
-          .dataFetcher(environment ->
+          .dataFetcher(env ->
             Objects.requireNonNullElse(
-              (((StopLocation) environment.getSource()).getWheelchairAccessibility()),
+              (((StopLocation) env.getSource()).getWheelchairAccessibility()),
               Accessibility.NO_INFORMATION
             )
           )
@@ -155,10 +146,8 @@ public class QuayType {
           .newFieldDefinition()
           .name("timeZone")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment ->
-            Optional
-              .ofNullable(((StopLocation) environment.getSource()).getTimeZone())
-              .map(ZoneId::getId)
+          .dataFetcher(env ->
+            Optional.ofNullable(((StopLocation) env.getSource()).getTimeZone()).map(ZoneId::getId)
           )
           .build()
       )
@@ -170,7 +159,7 @@ public class QuayType {
           .description(
             "Public code used to identify this quay within the stop place. For instance a platform code."
           )
-          .dataFetcher(environment -> (((StopLocation) environment.getSource()).getPlatformCode()))
+          .dataFetcher(env -> (((StopLocation) env.getSource()).getPlatformCode()))
           .build()
       )
       .field(
@@ -180,10 +169,10 @@ public class QuayType {
           .withDirective(gqlUtil.timingData)
           .description("List of lines servicing this quay")
           .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(lineType))))
-          .dataFetcher(environment ->
+          .dataFetcher(env ->
             GqlUtil
-              .getTransitService(environment)
-              .getPatternsForStop(environment.getSource(), true)
+              .getTransitService(env)
+              .getPatternsForStop(env.getSource(), true)
               .stream()
               .map(TripPattern::getRoute)
               .distinct()
@@ -198,8 +187,8 @@ public class QuayType {
           .withDirective(gqlUtil.timingData)
           .description("List of journey patterns servicing this quay")
           .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
-          .dataFetcher(environment ->
-            GqlUtil.getTransitService(environment).getPatternsForStop(environment.getSource(), true)
+          .dataFetcher(env ->
+            GqlUtil.getTransitService(env).getPatternsForStop(env.getSource(), true)
           )
           .build()
       )
@@ -361,17 +350,7 @@ public class QuayType {
           .newFieldDefinition()
           .name("stopType")
           .type(Scalars.GraphQLString)
-          .dataFetcher(environment -> {
-            StopLocation stopLocation = environment.getSource();
-            if (stopLocation instanceof RegularStop) {
-              return "regular";
-            } else if (stopLocation instanceof AreaStop) {
-              return "flexible_area";
-            } else if (stopLocation instanceof GroupStop) {
-              return "flexible_group";
-            }
-            return null;
-          })
+          .dataFetcher(env -> ((StopLocation) env.getSource()).getStopType())
           .build()
       )
       .field(
@@ -380,13 +359,11 @@ public class QuayType {
           .name("flexibleArea")
           .description("Geometry for flexible area.")
           .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
-          .dataFetcher(environment -> {
-            if (environment.getSource() instanceof AreaStop areaStop) {
-              return areaStop.getGeometry().getCoordinates();
-            } else if (environment.getSource() instanceof GroupStop groupStop) {
-              return groupStop.getEncompassingAreaGeometry().getCoordinates();
-            }
-            return null;
+          .dataFetcher(env -> {
+            StopLocation stopLocation = env.getSource();
+            return stopLocation.getEncompassingAreaGeometry() == null
+              ? null
+              : stopLocation.getEncompassingAreaGeometry().getCoordinates();
           })
           .build()
       )
@@ -396,13 +373,7 @@ public class QuayType {
           .name("flexibleGroup")
           .description("the Quays part of a flexible group.")
           .type(GraphQLList.list(REF))
-          .dataFetcher(environment ->
-            (
-              environment.getSource() instanceof GroupStop groupStop
-                ? groupStop.getLocations()
-                : null
-            )
-          )
+          .dataFetcher(env -> ((StopLocation) env.getSource()).getChildLocations())
           .build()
       )
       .field(
@@ -410,7 +381,7 @@ public class QuayType {
           .newFieldDefinition()
           .name("tariffZones")
           .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
-          .dataFetcher(environment -> ((StopLocation) environment.getSource()).getFareZones())
+          .dataFetcher(env -> ((StopLocation) env.getSource()).getFareZones())
           .build()
       )
       .build();

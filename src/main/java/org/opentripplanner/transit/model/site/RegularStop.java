@@ -81,6 +81,12 @@ public final class RegularStop
     return url;
   }
 
+  @Nonnull
+  @Override
+  public String getStopType() {
+    return "regular";
+  }
+
   @Override
   @Nullable
   public ZoneId getTimeZone() {

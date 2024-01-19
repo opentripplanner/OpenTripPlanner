@@ -64,6 +64,12 @@ public class GroupStop
   }
 
   @Override
+  @Nonnull
+  public String getStopType() {
+    return "flexible_group";
+  }
+
+  @Override
   public String getFirstZoneAsString() {
     return null;
   }
@@ -86,9 +92,16 @@ public class GroupStop
   }
 
   /**
-   * Returns the geometry of the area that encompasses the bounds of this location group.
+   * Returns the geometry of the area that encompasses the bounds of this StopLocation group. If the
+   * group is defined only as a list of stops, this will return the same as getGeometry. If on the
+   * other hand the group is defined as an area and the stops are inferred from that area, then this
+   * will return the geometry of the area.
    */
+  @Override
   public Geometry getEncompassingAreaGeometry() {
+    if (encompassingAreaGeometry == null) {
+      return geometry;
+    }
     return encompassingAreaGeometry;
   }
 
@@ -105,7 +118,9 @@ public class GroupStop
   /**
    * Returns all the locations belonging to this location group.
    */
-  public Set<StopLocation> getLocations() {
+  @Override
+  @Nonnull
+  public Set<StopLocation> getChildLocations() {
     return stopLocations;
   }
 
@@ -114,7 +129,7 @@ public class GroupStop
     return (
       getId().equals(other.getId()) &&
       Objects.equals(name, other.getName()) &&
-      Objects.equals(stopLocations, other.getLocations())
+      Objects.equals(stopLocations, other.getChildLocations())
     );
   }
 
