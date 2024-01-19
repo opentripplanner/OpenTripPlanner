@@ -3,13 +3,14 @@ package org.opentripplanner.model;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.EnumSet;
+import org.opentripplanner.model.booking.RoutingBookingInfo;
 import org.opentripplanner.transit.model.organization.ContactInfo;
 
 /**
  * Info about how a trip might be booked at a particular stop. All of this is pass-through
  * information, except information about booking time and booking notice.
  */
-public class BookingInfo implements Serializable {
+public class BookingInfo implements Serializable, RoutingBookingInfo {
 
   private final ContactInfo contactInfo;
 

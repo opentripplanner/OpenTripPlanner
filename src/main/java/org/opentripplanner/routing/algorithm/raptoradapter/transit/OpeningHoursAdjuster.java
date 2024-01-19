@@ -6,10 +6,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import org.opentripplanner.framework.time.ServiceDateUtils;
-import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingTime;
+import org.opentripplanner.model.booking.RoutingBookingInfo;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,12 +26,12 @@ public class OpeningHoursAdjuster {
   /**
    * Booking info for the boarding stop.
    */
-  private final BookingInfo boardingBookingInfo;
+  private final RoutingBookingInfo boardingBookingInfo;
 
   /**
    * The original access/egress.
    */
-  private final FlexAccessEgressAdapter delegate;
+  private final RoutingAccessEgress delegate;
 
   /**
    * The earliest time the passenger can book the trip.
@@ -40,8 +39,8 @@ public class OpeningHoursAdjuster {
   private final int earliestBookingTime;
 
   public OpeningHoursAdjuster(
-    BookingInfo boardingBookingInfo,
-    FlexAccessEgressAdapter delegate,
+    RoutingBookingInfo boardingBookingInfo,
+    RoutingAccessEgress delegate,
     Instant earliestBookingTime,
     Instant dateTime,
     ZoneId timeZone
@@ -66,7 +65,7 @@ public class OpeningHoursAdjuster {
     if (edt == RaptorConstants.TIME_NOT_SET) {
       return RaptorConstants.TIME_NOT_SET;
     }
-    BookingTime latestBookingTime = boardingBookingInfo.getLatestBookingTime();
+    var latestBookingTime = boardingBookingInfo.getLatestBookingTime();
     if (latestBookingTime != null) {
       return adjustDepartureTimeWithLatestBookingTime(edt, latestBookingTime);
     }
@@ -74,9 +73,13 @@ public class OpeningHoursAdjuster {
     if (minimumBookingNotice != null) {
       return adjustDepartureTimeWithMinimumBookingNotice(edt, minimumBookingNotice);
     }
+
+    // TODO: Add build time report issue for this - this is not a business rule which should
+    //       be implemented here. Here we should just ignore the error.
     LOG.warn(
-      "Missing both latest booking time and minimum booking notice on trip {}. Falling back to default earliest booking time",
-      delegate.getFlexTrip().getTrip().getId()
+      "Missing both latest booking time and minimum booking notice on trip {}. " +
+      "Falling back to default earliest booking time",
+      ((FlexAccessEgressAdapter) delegate).getFlexTrip().getId()
     );
     return edt;
   }

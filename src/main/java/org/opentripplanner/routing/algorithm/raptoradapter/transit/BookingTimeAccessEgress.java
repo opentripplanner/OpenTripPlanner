@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import javax.annotation.Nullable;
 import org.opentripplanner.framework.model.TimeAndCost;
+import org.opentripplanner.model.booking.RoutingBookingInfo;
 import org.opentripplanner.street.search.state.State;
 
 public class BookingTimeAccessEgress implements RoutingAccessEgress {
@@ -13,18 +14,19 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
   private final OpeningHoursAdjuster openingHoursAdjuster;
 
   public BookingTimeAccessEgress(
-    FlexAccessEgressAdapter delegate,
-    Instant dateTime,
+    RoutingBookingInfo bookingInfo,
+    Instant requestDateTime,
     Instant earliestBookingTime,
-    ZoneId timeZone
+    ZoneId timeZone,
+    RoutingAccessEgress delegate
   ) {
     this.delegate = delegate;
     openingHoursAdjuster =
       new OpeningHoursAdjuster(
-        delegate.getFlexTrip().getPickupBookingInfo(0),
+        bookingInfo,
         delegate,
         earliestBookingTime,
-        dateTime,
+        requestDateTime,
         timeZone
       );
   }
@@ -123,10 +125,5 @@ public class BookingTimeAccessEgress implements RoutingAccessEgress {
   @Override
   public TimeAndCost penalty() {
     return delegate.penalty();
-  }
-
-  @Override
-  public int timeShiftDepartureTimeToActualTime(int computedDepartureTimeIncludingPenalty) {
-    return delegate.timeShiftDepartureTimeToActualTime(computedDepartureTimeIncludingPenalty);
   }
 }

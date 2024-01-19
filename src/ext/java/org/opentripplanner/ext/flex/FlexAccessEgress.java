@@ -4,6 +4,7 @@ import static org.opentripplanner.model.StopTime.MISSING_VALUE;
 
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
+import org.opentripplanner.model.booking.RoutingBookingInfo;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.transit.model.site.RegularStop;
 
@@ -77,6 +78,13 @@ public final class FlexAccessEgress {
       return MISSING_VALUE;
     }
     return pathDurations.mapToRouterArrivalTime(latestArrivalTime);
+  }
+
+  /**
+   * Return routing booking info for the boarding stop.
+   */
+  public RoutingBookingInfo routingBookingInfo() {
+    return trip.getPickupBookingInfo(fromStopIndex);
   }
 
   @Override

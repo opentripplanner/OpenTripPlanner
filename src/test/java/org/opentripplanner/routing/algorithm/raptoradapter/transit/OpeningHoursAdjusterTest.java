@@ -14,10 +14,10 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexPathDurations;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.BookingInfo;
 import org.opentripplanner.model.BookingInfoBuilder;
 import org.opentripplanner.model.BookingTime;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.booking.RoutingBookingInfo;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.TestStateBuilder;
@@ -55,14 +55,14 @@ class OpeningHoursAdjusterTest {
     .atZone(ZoneIds.OSLO)
     .toInstant();
 
-  private static final BookingInfo BOOK_BEFORE_11_H_45 = new BookingInfoBuilder()
+  private static final RoutingBookingInfo BOOK_BEFORE_11_H_45 = new BookingInfoBuilder()
     .withLatestBookingTime(new BookingTime(LocalTime.of(11, 45, 0), 0))
     .build();
 
-  private static final BookingInfo BOOK_BEFORE_21_H_00_PREVIOUS_DAY = new BookingInfoBuilder()
+  private static final RoutingBookingInfo BOOK_BEFORE_21_H_00_PREVIOUS_DAY = new BookingInfoBuilder()
     .withLatestBookingTime(new BookingTime(LocalTime.of(21, 0, 0), 1))
     .build();
-  private static final BookingInfo BOOK_ONE_HOUR_BEFORE = new BookingInfoBuilder()
+  private static final RoutingBookingInfo BOOK_ONE_HOUR_BEFORE = new BookingInfoBuilder()
     .withMinimumBookingNotice(Duration.ofHours(1))
     .build();
   public static final int SECONDS_IN_TWELVE_HOURS = 12 * 60 * 60;
