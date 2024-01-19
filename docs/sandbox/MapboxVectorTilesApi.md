@@ -169,11 +169,12 @@ The path of the vector tile source URLs in `tilejson.json`.
 This is useful if you have a proxy setup and rewrite the path that is passed to OTP.
 
 If you don't configure this optional value then the path returned in `tilejson.json` is
-`/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{x}.pbf`. If you set a value of
-`/otp_test/tiles` then the returned path changes to `/otp_test/tiles/layer1,layer2/{z}/{x}/{x}.pbf`.
+`/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{x}.pbf`. If you, for example, set
+a value of `/otp_test/tiles` then the returned path changes to
+`/otp_test/tiles/layer1,layer2/{z}/{x}/{x}.pbf`.
 
-The protocol and host are read from the incoming HTTP request. If you run OTP behind a proxy
-then make sure to set the headers `X-Forwarded-Proto` and `X-Forwarded-Host` to make OTP
+The protocol and host are always read from the incoming HTTP request. If you run OTP behind
+a proxy then make sure to set the headers `X-Forwarded-Proto` and `X-Forwarded-Host` to make OTP
 return the protocol and host for the original request and not the proxied one.
 
 
