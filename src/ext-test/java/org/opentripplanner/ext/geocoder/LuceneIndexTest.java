@@ -105,6 +105,7 @@ class LuceneIndexTest {
       .of(ALEXANDERPLATZ_STATION, BERLIN_HAUPTBAHNHOF_STATION, FIVE_POINTS_STATION)
       .forEach(stopModel::withStation);
     var transitModel = new TransitModel(stopModel.build(), new Deduplicator());
+    transitModel.index();
     var transitService = new DefaultTransitService(transitModel) {
       private final Multimap<StopLocation, TransitMode> modes = ImmutableMultimap
         .<StopLocation, TransitMode>builder()

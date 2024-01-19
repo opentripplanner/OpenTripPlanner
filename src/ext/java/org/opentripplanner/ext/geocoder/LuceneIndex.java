@@ -42,7 +42,6 @@ import org.apache.lucene.search.suggest.document.SuggestIndexSearcher;
 import org.apache.lucene.store.ByteBuffersDirectory;
 import org.opentripplanner.ext.geocoder.StopCluster.Coordinate;
 import org.opentripplanner.framework.i18n.I18NString;
-import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -67,6 +66,7 @@ public class LuceneIndex implements Serializable {
 
   public LuceneIndex(TransitService transitService) {
     this.transitService = transitService;
+    var stopClusterMapper = new StopClusterMapper(transitService);
 
     this.analyzer =
       new PerFieldAnalyzerWrapper(
@@ -80,7 +80,6 @@ public class LuceneIndex implements Serializable {
 
     var directory = new ByteBuffersDirectory();
 
-    var stopClusterMapper = new StopClusterMapper(transitService);
     try {
       try (
         var directoryWriter = new IndexWriter(
@@ -128,7 +127,7 @@ public class LuceneIndex implements Serializable {
               directoryWriter,
               StopCluster.class,
               stopCluster.id().toString(),
-              new NonLocalizedString(stopCluster.name()),
+              I18NString.of(stopCluster.name()),
               stopCluster.code(),
               stopCluster.coordinate().lat(),
               stopCluster.coordinate().lon(),
@@ -176,17 +175,34 @@ public class LuceneIndex implements Serializable {
    *    one of those is chosen at random and returned.
    */
   public Stream<StopCluster> queryStopClusters(String query) {
-    return matchingDocuments(StopCluster.class, query, false).map(LuceneIndex::toStopCluster);
+    return matchingDocuments(StopCluster.class, query, false).map(this::toStopCluster);
   }
 
-  private static StopCluster toStopCluster(Document document) {
+  private StopCluster toStopCluster(Document document) {
     var id = FeedScopedId.parse(document.get(ID));
     var name = document.get(NAME);
     var code = document.get(CODE);
     var lat = document.getField(LAT).numericValue().doubleValue();
     var lon = document.getField(LON).numericValue().doubleValue();
     var modes = Arrays.asList(document.getValues(MODE));
-    return new StopCluster(id, code, name, new Coordinate(lat, lon), modes);
+    var stopLocation = transitService.getStopLocation(id);
+    var agencies = transitService
+      .getAgenciesForStopLocation(stopLocation)
+      .stream()
+      .map(StopClusterMapper::toAgency)
+      .toList();
+    var feedPublisher = StopClusterMapper.toFeedPublisher(
+      transitService.getFeedInfo(id.getFeedId())
+    );
+    return new StopCluster(
+      id,
+      code,
+      name,
+      new Coordinate(lat, lon),
+      modes,
+      agencies,
+      feedPublisher
+    );
   }
 
   static IndexWriterConfig iwcWithSuggestField(Analyzer analyzer, final Set<String> suggestFields) {

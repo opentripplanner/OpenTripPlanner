@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.opentripplanner.framework.collection.ListUtils;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.I18NString;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.StopLocation;
 import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.service.TransitService;
@@ -62,7 +64,15 @@ class StopClusterMapper {
       null,
       g.getName().toString(),
       toCoordinate(g.getCoordinate()),
-      modes
+      modes,
+      g
+        .getChildStops()
+        .stream()
+        .flatMap(sl -> transitService.getAgenciesForStopLocation(sl).stream())
+        .distinct()
+        .map(StopClusterMapper::toAgency)
+        .toList(),
+      toFeedPublisher(transitService.getFeedInfo(g.getId().getFeedId()))
     );
   }
 
@@ -76,13 +86,31 @@ class StopClusterMapper {
           sl.getCode(),
           name.toString(),
           toCoordinate(sl.getCoordinate()),
-          modes
+          modes,
+          transitService
+            .getAgenciesForStopLocation(sl)
+            .stream()
+            .map(StopClusterMapper::toAgency)
+            .toList(),
+          toFeedPublisher(transitService.getFeedInfo(sl.getId().getFeedId()))
         );
       });
   }
 
   private static StopCluster.Coordinate toCoordinate(WgsCoordinate c) {
     return new StopCluster.Coordinate(c.latitude(), c.longitude());
+  }
+
+  static StopCluster.Agency toAgency(Agency a) {
+    return new StopCluster.Agency(a.getId(), a.getName());
+  }
+
+  static StopCluster.FeedPublisher toFeedPublisher(FeedInfo fi) {
+    if (fi == null) {
+      return null;
+    } else {
+      return new StopCluster.FeedPublisher(fi.getPublisherName());
+    }
   }
 
   private record DeduplicationKey(I18NString name, WgsCoordinate coordinate) {}

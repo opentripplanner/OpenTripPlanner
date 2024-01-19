@@ -572,6 +572,11 @@ public class DefaultTransitService implements TransitEditorService {
     return sortByOccurrenceAndReduce(getPatternModesOfStop(stop)).toList();
   }
 
+  @Override
+  public List<Agency> getAgenciesForStopLocation(StopLocation stop) {
+    return getRoutesForStop(stop).stream().map(Route::getAgency).distinct().toList();
+  }
+
   /**
    * For each pattern visiting this {@link StopLocation} return its {@link TransitMode}
    */
