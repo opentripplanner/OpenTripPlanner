@@ -9,10 +9,14 @@ import java.util.Set;
  * combined presets of routing parameters, except for triangle.
  */
 public enum BicycleOptimizeType {
-  QUICK,/* the fastest trip */
-  SAFE,
-  FLAT,/* needs a rewrite */
-  GREENWAYS,
+  /** This was previously called QUICK */
+  SHORTEST_DURATION,
+  /** This was previously called SAFE */
+  SAFE_STREETS,
+  /** This was previously called FLAT. Needs a rewrite. */
+  FLAT_STREETS,
+  /** This was previously called GREENWAYS. */
+  SAFEST_STREETS,
   TRIANGLE;
 
   private static final Set<BicycleOptimizeType> NON_TRIANGLE_VALUES = Collections.unmodifiableSet(

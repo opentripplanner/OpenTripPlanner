@@ -2,7 +2,6 @@
   "otpFeatures" : {
     "FlexRouting": true,
     "GtfsGraphQlApi": true,
-    "VehicleToStopHeuristics": true,
     "ParallelRouting": true
   }
 }

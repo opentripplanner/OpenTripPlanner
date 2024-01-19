@@ -1,6 +1,5 @@
 package org.opentripplanner.apis.vectortiles.model;
 
-import org.opentripplanner.apis.vectortiles.DebugStyleSpec.VectorSourceLayer;
 import org.opentripplanner.apis.vectortiles.model.TileSource.VectorSource;
 import org.opentripplanner.inspector.vector.LayerParameters;
 

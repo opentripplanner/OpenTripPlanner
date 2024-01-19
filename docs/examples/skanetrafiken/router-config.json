@@ -5,7 +5,9 @@
     },
     "transferSlack": 180,
     "waitReluctance": 0.175,
-    "walkReluctance": 5,
+    "walk": {
+      "reluctance": 5
+    },
     "maxDirectStreetDuration": "3700s"
   },
   "transit": {

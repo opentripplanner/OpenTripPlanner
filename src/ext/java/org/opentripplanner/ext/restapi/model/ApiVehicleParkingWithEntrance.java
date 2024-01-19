@@ -81,7 +81,7 @@ public class ApiVehicleParkingWithEntrance {
   /**
    * True if real-time information is used for checking availability.
    */
-  public final boolean realTime;
+  public final boolean realtime;
 
   ApiVehicleParkingWithEntrance(
     String id,
@@ -114,7 +114,7 @@ public class ApiVehicleParkingWithEntrance {
     this.hasWheelchairAccessibleCarPlaces = hasWheelchairAccessibleCarPlaces;
     this.capacity = capacity;
     this.availability = availability;
-    this.realTime = realTime;
+    this.realtime = realTime;
   }
 
   public static ApiVehicleParkingWithEntranceBuilder builder() {

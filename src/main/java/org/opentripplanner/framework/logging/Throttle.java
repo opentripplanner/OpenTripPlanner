@@ -35,6 +35,10 @@ public class Throttle {
     return new Throttle(1000);
   }
 
+  public static Throttle ofOneMinute() {
+    return new Throttle(1000 * 60);
+  }
+
   public String setupInfo() {
     return setupInfo;
   }

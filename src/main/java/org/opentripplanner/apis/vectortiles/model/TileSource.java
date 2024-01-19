@@ -26,7 +26,7 @@ public sealed interface TileSource {
    * Represents a raster-based source for map tiles. These are used mainly for background
    * map layers with vector data being rendered on top of it.
    */
-  record RasterSource(String id, List<String> tiles, int tileSize, String attribution)
+  record RasterSource(String id, List<String> tiles, int maxzoom, int tileSize, String attribution)
     implements TileSource {
     @Override
     public String type() {

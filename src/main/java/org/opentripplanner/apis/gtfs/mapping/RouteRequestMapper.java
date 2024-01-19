@@ -16,13 +16,16 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.apis.gtfs.GraphQLRequestContext;
+import org.opentripplanner.apis.gtfs.generated.GraphQLTypes;
 import org.opentripplanner.framework.graphql.GraphQLUtils;
+import org.opentripplanner.framework.time.ZoneIdFallback;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
+import org.opentripplanner.routing.api.request.preference.VehicleWalkingPreferences;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
@@ -55,7 +58,7 @@ public class RouteRequestMapper {
     request.setDateTime(
       environment.getArgument("date"),
       environment.getArgument("time"),
-      context.transitService().getTimeZone()
+      ZoneIdFallback.zoneId(context.transitService().getTimeZone())
     );
 
     callWith.argument("wheelchair", request::setWheelchair);
@@ -66,15 +69,15 @@ public class RouteRequestMapper {
     request.withPreferences(preferences -> {
       preferences.withBike(bike -> {
         callWith.argument("bikeReluctance", bike::withReluctance);
-        callWith.argument("bikeWalkingReluctance", bike::withWalkingReluctance);
-        callWith.argument("bikeWalkingSpeed", bike::withWalkingSpeed);
         callWith.argument("bikeSpeed", bike::withSpeed);
-        callWith.argument("bikeSwitchTime", bike::withSwitchTime);
-        callWith.argument("bikeSwitchCost", bike::withSwitchCost);
         callWith.argument("bikeBoardCost", bike::withBoardCost);
 
         if (environment.getArgument("optimize") != null) {
-          bike.withOptimizeType(BicycleOptimizeType.valueOf(environment.getArgument("optimize")));
+          bike.withOptimizeType(
+            OptimizationTypeMapper.map(
+              GraphQLTypes.GraphQLOptimizeType.valueOf(environment.getArgument("optimize"))
+            )
+          );
         }
         if (bike.optimizeType() == BicycleOptimizeType.TRIANGLE) {
           bike.withOptimizeTriangle(triangle -> {
@@ -86,6 +89,7 @@ public class RouteRequestMapper {
 
         bike.withParking(parking -> setParkingPreferences(callWith, parking));
         bike.withRental(rental -> setRentalPreferences(callWith, request, rental));
+        bike.withWalking(walking -> setVehicleWalkingPreferences(callWith, walking));
       });
 
       preferences.withCar(car -> {
@@ -328,6 +332,16 @@ public class RouteRequestMapper {
       "bannedVehicleRentalNetworks",
       (Collection<String> v) -> rental.withBannedNetworks(new HashSet<>(v))
     );
+  }
+
+  private static void setVehicleWalkingPreferences(
+    CallerWithEnvironment callWith,
+    VehicleWalkingPreferences.Builder walking
+  ) {
+    callWith.argument("bikeWalkingReluctance", walking::withReluctance);
+    callWith.argument("bikeWalkingSpeed", walking::withSpeed);
+    callWith.argument("bikeSwitchTime", time -> walking.withHopTime((int) time));
+    callWith.argument("bikeSwitchCost", cost -> walking.withHopCost((int) cost));
   }
 
   private static class CallerWithEnvironment {

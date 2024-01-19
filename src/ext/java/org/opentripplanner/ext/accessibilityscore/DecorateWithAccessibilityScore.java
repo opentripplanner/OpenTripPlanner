@@ -38,7 +38,7 @@ public record DecorateWithAccessibilityScore(double wheelchairMaxSlope)
 
   public static float compute(ScheduledTransitLeg leg) {
     var fromStop = leg.getFrom().stop.getWheelchairAccessibility();
-    var toStop = leg.getFrom().stop.getWheelchairAccessibility();
+    var toStop = leg.getTo().stop.getWheelchairAccessibility();
     var trip = leg.getTripWheelchairAccessibility();
 
     var values = List.of(trip, fromStop, toStop);

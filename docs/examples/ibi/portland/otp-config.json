@@ -1,6 +1,5 @@
 {
   "otpFeatures" : {
-    "GtfsGraphQlApi": true,
-    "VehicleToStopHeuristics": true
+    "GtfsGraphQlApi": true
   }
 }
