@@ -157,6 +157,10 @@ class VertexList extends AbstractListModel<DisplayVertex> {
  * TransitStops only, and allows a user to select stops, examine incoming and outgoing edges, and
  * examine trip patterns. It's meant mainly for debugging, so it's totally OK if it develops (say) a
  * bunch of weird buttons designed to debug specific cases.
+ * <p>
+ * 2024-01-26: We talked about the visualizer in the developer meeting and while the code is a bit
+ * dusty, we decided that we want to keep the option open to build make the visualization of routing
+ * steps work again in the future and won't delete it.
  */
 public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 

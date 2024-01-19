@@ -102,7 +102,7 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
   @Override
   protected void initializeHeuristic(
     RemainingWeightHeuristic<State> heuristic,
-    Set<Vertex> origin,
+    Set<Vertex> ignored,
     Set<Vertex> destination,
     boolean arriveBy
   ) {
@@ -111,7 +111,6 @@ public class StreetSearchBuilder extends AStarBuilder<State, Edge, Vertex, Stree
     } else if (heuristic instanceof EuclideanRemainingWeightHeuristic euclideanHeuristic) {
       euclideanHeuristic.initialize(
         streetRequest.mode(),
-        origin,
         destination,
         arriveBy,
         routeRequest.preferences()

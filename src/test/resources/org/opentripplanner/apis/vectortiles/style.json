@@ -1,0 +1,42 @@
+{
+  "name": "OTP Debug Tiles",
+  "sources": {
+    "background": {
+      "id": "background",
+      "tiles": [
+        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      ],
+      "tileSize": 256,
+      "attribution" : "© OpenStreetMap Contributors",
+      "type": "raster"
+    },
+    "vectorSource": {
+      "id": "vectorSource",
+      "url": "https://example.com",
+      "type": "vector"
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "source": "background",
+      "type": "raster",
+      "maxzoom": 22,
+      "minzoom": 0
+    },
+    {
+      "maxzoom": 22,
+      "paint": {
+        "circle-stroke-width": 2,
+        "circle-color": "#fcf9fa",
+        "circle-stroke-color": "#140d0e"
+      },
+      "id": "regular-stop",
+      "source": "vectorSource",
+      "source-layer": "regularStops",
+      "type": "circle",
+      "minzoom": 13
+    }
+  ],
+  "version": 8
+}

@@ -167,7 +167,7 @@ travel time `x` (in seconds).
           .asFeedScopedIds(request.journey().transit().unpreferredAgencies())
       );
 
-    TransitPriorityGroupConfig.mapTransitRequest(c, request.journey().transit());
+    TransitGroupPriorityConfig.mapTransitRequest(c, request.journey().transit());
 
     // Map preferences
     request.withPreferences(preferences -> mapPreferences(c, preferences));
@@ -292,25 +292,24 @@ ferries, where the check-in process needs to be done in good time before ride.
           .asCostLinearFunction(dft.unpreferredCost())
       );
 
-    String relaxTransitPriorityGroupValue = c
-      .of("relaxTransitPriorityGroup")
+    String relaxTransitGroupPriorityValue = c
+      .of("relaxTransitGroupPriority")
       .since(V2_5)
-      .summary("The relax function for transit-priority-groups")
+      .summary("The relax function for transit-group-priority")
       .description(
         """
-        A path is considered optimal if the generalized-cost is less than the 
-        generalized-cost of another path. If this parameter is set, the comparison is relaxed
-        further if they belong to different transit-priority-groups.
+        A path is considered optimal if the generalized-cost is less than the generalized-cost of
+        another path. If this parameter is set, the comparison is relaxed further if they belong
+        to different transit groups.
         """
       )
-      .asString(dft.relaxTransitPriorityGroup().toString());
+      .asString(dft.relaxTransitGroupPriority().toString());
 
-    if (relaxTransitPriorityGroupValue != null) {
-      builder.withTransitGroupPriorityGeneralizedCostSlack(
-        CostLinearFunction.of(relaxTransitPriorityGroupValue)
-      );
+    if (relaxTransitGroupPriorityValue != null) {
+      builder.withRelaxTransitGroupPriority(CostLinearFunction.of(relaxTransitGroupPriorityValue));
     }
 
+    // TODO REMOVE THIS
     builder.withRaptor(it ->
       c
         .of("relaxTransitSearchGeneralizedCostAtDestination")

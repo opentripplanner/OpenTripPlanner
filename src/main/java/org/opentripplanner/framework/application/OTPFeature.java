@@ -16,20 +16,23 @@ import org.slf4j.LoggerFactory;
 public enum OTPFeature {
   APIBikeRental(true, false, "Enable the bike rental endpoint."),
   APIServerInfo(true, false, "Enable the server info endpoint."),
-  APIGraphInspectorTile(
-    true,
-    false,
-    "Enable the inspector  endpoint for graph information for inspection/debugging purpose."
-  ),
   APIUpdaterStatus(true, false, "Enable endpoint for graph updaters status."),
   ConsiderPatternsForDirectTransfers(
     true,
     false,
     "Enable limiting transfers so that there is only a single transfer to each pattern."
   ),
-  DebugClient(true, false, "Enable the debug web client located at the root of the web server."),
+  DebugUi(
+    true,
+    false,
+    """
+      Enable the debug GraphQL client and web UI and located at the root of the web server as well as the debug map tiles it uses.
+      Be aware that the map tiles are not a stable API and can change without notice.
+      Use the [vector tiles feature if](sandbox/MapboxVectorTilesApi.md) you want a stable map tiles API.
+      """
+  ),
   FloatingBike(true, false, "Enable floating bike routing."),
-  GtfsGraphQlApi(true, false, "Enable GTFS GraphQL API."),
+  GtfsGraphQlApi(true, false, "Enable the [GTFS GraphQL API](apis/GTFS-GraphQL-API.md)."),
   GtfsGraphQlApiRentalStationFuzzyMatching(
     false,
     false,
@@ -63,7 +66,11 @@ public enum OTPFeature {
     false,
     "Enforce transfers to happen according to the _transfers.txt_ (GTFS) and Interchanges (NeTEx). Turning this _off_ will increase the routing performance a little."
   ),
-  TransmodelGraphQlApi(true, true, "Enable Transmodel (NeTEx) GraphQL API."),
+  TransmodelGraphQlApi(
+    true,
+    true,
+    "Enable the [Transmodel (NeTEx) GraphQL API](apis/TransmodelApi.md)."
+  ),
 
   /* Sandbox extension features - Must be turned OFF by default */
 
@@ -82,6 +89,7 @@ public enum OTPFeature {
   FaresV2(false, true, "Enable import of GTFS-Fares v2 data."),
   FlexRouting(false, true, "Enable FLEX routing."),
   GoogleCloudStorage(false, true, "Enable Google Cloud Storage integration."),
+  LegacyRestApi(true, true, "Enable legacy REST API. This API will be removed in the future."),
   RealtimeResolver(
     false,
     true,
