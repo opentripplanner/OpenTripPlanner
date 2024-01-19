@@ -48,16 +48,6 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
     this.lastState = other.getLastState();
   }
 
-  /**
-   * Return a new copy of this with the requested penalty.
-   * <p>
-   * OVERRIDE THIS IF KEEPING THE TYPE IS IMPORTANT!
-   */
-  @Override
-  public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
-    return new DefaultAccessEgress(this, penalty);
-  }
-
   @Override
   public int durationInSeconds() {
     return durationInSeconds;
@@ -101,6 +91,16 @@ public class DefaultAccessEgress implements RoutingAccessEgress {
   @Override
   public TimeAndCost penalty() {
     return penalty;
+  }
+
+  /**
+   * Return a new copy of this with the requested penalty.
+   * <p>
+   * OVERRIDE THIS IF KEEPING THE TYPE IS IMPORTANT!
+   */
+  @Override
+  public DefaultAccessEgress withPenalty(TimeAndCost penalty) {
+    return new DefaultAccessEgress(this, penalty);
   }
 
   @Override
