@@ -175,14 +175,15 @@ class LuceneIndexTest {
       }
     )
     void stopClustersWithTypos(String searchTerm) {
-      var result1 = index.queryStopClusters(searchTerm).toList();
-      assertEquals(List.of(mapper.map(ALEXANDERPLATZ_STATION)), result1);
+      var results = index.queryStopClusters(searchTerm).toList();
+      var ids = results.stream().map(StopCluster::id).toList();
+      assertEquals(List.of(ALEXANDERPLATZ_STATION.getId()), ids);
     }
 
     @Test
     void fuzzyStopClusters() {
-      var result1 = index.queryStopClusters("arts").toList();
-      assertEquals(List.of(mapper.map(ARTS_CENTER).get()), result1);
+      var result1 = index.queryStopClusters("arts").map(StopCluster::id).toList();
+      assertEquals(List.of(ARTS_CENTER.getId()), result1);
     }
 
     @Test
@@ -221,8 +222,8 @@ class LuceneIndexTest {
       }
     )
     void stopClustersWithSpace(String query) {
-      var result = index.queryStopClusters(query).toList();
-      assertEquals(List.of(mapper.map(FIVE_POINTS_STATION)), result);
+      var result = index.queryStopClusters(query).map(StopCluster::id).toList();
+      assertEquals(List.of(FIVE_POINTS_STATION.getId()), result);
     }
 
     @ParameterizedTest

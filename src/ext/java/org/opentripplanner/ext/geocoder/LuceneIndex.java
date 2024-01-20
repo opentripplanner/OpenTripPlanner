@@ -59,14 +59,16 @@ public class LuceneIndex implements Serializable {
   private static final String LAT = "latitude";
   private static final String LON = "longitude";
   private static final String MODE = "mode";
+  private static final String AGENCY_IDS= "agency_ids";
 
   private final TransitService transitService;
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
+  private final StopClusterMapper stopClusterMapper;
 
   public LuceneIndex(TransitService transitService) {
     this.transitService = transitService;
-    var stopClusterMapper = new StopClusterMapper(transitService);
+    this.stopClusterMapper = new StopClusterMapper(transitService);
 
     this.analyzer =
       new PerFieldAnalyzerWrapper(
@@ -98,6 +100,7 @@ public class LuceneIndex implements Serializable {
               stopLocation.getCode(),
               stopLocation.getCoordinate().latitude(),
               stopLocation.getCoordinate().longitude(),
+              Set.of(),
               Set.of()
             )
           );
@@ -113,6 +116,7 @@ public class LuceneIndex implements Serializable {
               null,
               stopLocationsGroup.getCoordinate().latitude(),
               stopLocationsGroup.getCoordinate().longitude(),
+              Set.of(),
               Set.of()
             )
           );
@@ -131,7 +135,8 @@ public class LuceneIndex implements Serializable {
               stopCluster.code(),
               stopCluster.coordinate().lat(),
               stopCluster.coordinate().lon(),
-              stopCluster.modes()
+              stopCluster.modes(),
+              stopCluster.agencies()
             )
           );
       }
@@ -179,23 +184,21 @@ public class LuceneIndex implements Serializable {
   }
 
   private StopCluster toStopCluster(Document document) {
-    var id = FeedScopedId.parse(document.get(ID));
+    var clusterId = FeedScopedId.parse(document.get(ID));
     var name = document.get(NAME);
     var code = document.get(CODE);
     var lat = document.getField(LAT).numericValue().doubleValue();
     var lon = document.getField(LON).numericValue().doubleValue();
     var modes = Arrays.asList(document.getValues(MODE));
-    var stopLocation = transitService.getStopLocation(id);
-    var agencies = transitService
-      .getAgenciesForStopLocation(stopLocation)
-      .stream()
-      .map(StopClusterMapper::toAgency)
-      .toList();
+    var agencies = Arrays.stream(document.getValues(AGENCY_IDS)).map(id -> {
+      var fsid = FeedScopedId.parse(id);
+     return transitService.getAgencyForId(fsid);
+    }).filter(Objects::nonNull).map(StopClusterMapper::toAgency).toList();
     var feedPublisher = StopClusterMapper.toFeedPublisher(
-      transitService.getFeedInfo(id.getFeedId())
+      transitService.getFeedInfo(clusterId.getFeedId())
     );
     return new StopCluster(
-      id,
+      clusterId,
       code,
       name,
       new Coordinate(lat, lon),
@@ -230,7 +233,8 @@ public class LuceneIndex implements Serializable {
     @Nullable String code,
     double latitude,
     double longitude,
-    Collection<String> modes
+    Collection<String> modes,
+    Collection<String> agencyIds
   ) {
     String typeName = type.getSimpleName();
 
@@ -250,6 +254,9 @@ public class LuceneIndex implements Serializable {
 
     for (var mode : modes) {
       document.add(new TextField(MODE, mode, Store.YES));
+    }
+    for (var ids : agencyIds) {
+      document.add(new TextField(AGENCY_IDS, ids, Store.YES));
     }
 
     try {

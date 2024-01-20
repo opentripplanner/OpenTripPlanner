@@ -13,7 +13,7 @@ import org.opentripplanner.transit.model.site.StopLocationsGroup;
 import org.opentripplanner.transit.service.TransitService;
 
 /**
- * Mappers for generating {@link StopCluster} from the transit model.
+ * Mappers for generating {@link LuceneStopCluster} from the transit model.
  */
 class StopClusterMapper {
 
@@ -23,6 +23,7 @@ class StopClusterMapper {
     this.transitService = transitService;
   }
 
+
   /**
    * De-duplicates collections of {@link StopLocation} and {@link StopLocationsGroup} into a stream
    * of {@link StopCluster}.
@@ -31,7 +32,7 @@ class StopClusterMapper {
    * - of "identical" stops which are very close to each other and have an identical name, only one
    *   is chosen (at random)
    */
-  Iterable<StopCluster> generateStopClusters(
+  Iterable<LuceneStopCluster> generateStopClusters(
     Collection<StopLocation> stopLocations,
     Collection<StopLocationsGroup> stopLocationsGroups
   ) {
@@ -57,42 +58,31 @@ class StopClusterMapper {
     return Iterables.concat(deduplicatedStops, stations);
   }
 
-  StopCluster map(StopLocationsGroup g) {
+  LuceneStopCluster map(StopLocationsGroup g) {
     var modes = transitService.getModesOfStopLocationsGroup(g).stream().map(Enum::name).toList();
-    return new StopCluster(
+    var agencies = g.getChildStops().stream().flatMap(s -> transitService.getAgenciesForStopLocation(s).stream()).distinct().map(s ->s.getId().toString()).toList();
+    return new LuceneStopCluster(
       g.getId(),
       null,
       g.getName().toString(),
       toCoordinate(g.getCoordinate()),
       modes,
-      g
-        .getChildStops()
-        .stream()
-        .flatMap(sl -> transitService.getAgenciesForStopLocation(sl).stream())
-        .distinct()
-        .map(StopClusterMapper::toAgency)
-        .toList(),
-      toFeedPublisher(transitService.getFeedInfo(g.getId().getFeedId()))
+      agencies
     );
   }
 
-  Optional<StopCluster> map(StopLocation sl) {
+  Optional<LuceneStopCluster> map(StopLocation sl) {
+    var agencies = transitService.getAgenciesForStopLocation(sl).stream().map(a -> a.getId().toString()).toList();
     return Optional
       .ofNullable(sl.getName())
       .map(name -> {
         var modes = transitService.getModesOfStopLocation(sl).stream().map(Enum::name).toList();
-        return new StopCluster(
+        return new LuceneStopCluster(
           sl.getId(),
           sl.getCode(),
           name.toString(),
           toCoordinate(sl.getCoordinate()),
-          modes,
-          transitService
-            .getAgenciesForStopLocation(sl)
-            .stream()
-            .map(StopClusterMapper::toAgency)
-            .toList(),
-          toFeedPublisher(transitService.getFeedInfo(sl.getId().getFeedId()))
+          modes, agencies
         );
       });
   }
