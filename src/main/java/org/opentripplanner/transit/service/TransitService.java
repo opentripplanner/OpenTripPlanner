@@ -216,5 +216,9 @@ public interface TransitService {
    */
   List<TransitMode> getModesOfStopLocation(StopLocation stop);
 
+  /**
+   * Iterates over all routes that visit this stop location and return a de-duplicated list
+   * of their agencies.
+   */
   List<Agency> getAgenciesForStopLocation(StopLocation stop);
 }

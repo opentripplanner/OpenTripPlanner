@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 /**
- * A package-private helper type for transporting
+ * A package-private helper type for transporting data before serializing.
  */
 record LuceneStopCluster(
   FeedScopedId id,

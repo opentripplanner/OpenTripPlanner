@@ -150,7 +150,15 @@ class LuceneIndexTest {
 
       @Override
       public FeedInfo getFeedInfo(String feedId) {
-        return new FeedInfo("F", "A Publisher", "http://example.com", "de", LocalDate.MIN, LocalDate.MIN, "1");
+        return new FeedInfo(
+          "F",
+          "A Publisher",
+          "http://example.com",
+          "de",
+          LocalDate.MIN,
+          LocalDate.MIN,
+          "1"
+        );
       }
     };
     index = new LuceneIndex(transitService);
