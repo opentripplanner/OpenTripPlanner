@@ -18,6 +18,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.Deduplicator;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
+import org.opentripplanner.transit.model.organization.Agency;
 import org.opentripplanner.transit.model.site.RegularStop;
 import org.opentripplanner.transit.model.site.Station;
 import org.opentripplanner.transit.model.site.StopLocation;
@@ -28,57 +30,63 @@ class LuceneIndexTest {
 
   private static final TransitModelForTest TEST_MODEL = TransitModelForTest.of();
 
+  static final Agency BVG = Agency
+    .of(id("bvg"))
+    .withName("BVG")
+    .withTimezone("Europe/Berlin")
+    .build();
+
   // Berlin
-  static Station BERLIN_HAUPTBAHNHOF_STATION = TEST_MODEL
+  static final Station BERLIN_HAUPTBAHNHOF_STATION = TEST_MODEL
     .station("Hauptbahnhof")
     .withCoordinate(52.52495, 13.36952)
     .build();
-  static Station ALEXANDERPLATZ_STATION = TEST_MODEL
+  static final Station ALEXANDERPLATZ_STATION = TEST_MODEL
     .station("Alexanderplatz")
     .withCoordinate(52.52277, 13.41046)
     .build();
 
-  static RegularStop ALEXANDERPLATZ_BUS = TEST_MODEL
+  static final RegularStop ALEXANDERPLATZ_BUS = TEST_MODEL
     .stop("Alexanderplatz Bus")
     .withCoordinate(52.52277, 13.41046)
     .withVehicleType(BUS)
     .withParentStation(ALEXANDERPLATZ_STATION)
     .build();
 
-  static RegularStop ALEXANDERPLATZ_RAIL = TEST_MODEL
+  static final RegularStop ALEXANDERPLATZ_RAIL = TEST_MODEL
     .stop("Alexanderplatz S-Bahn")
     .withCoordinate(52.52157, 13.41123)
     .withVehicleType(TransitMode.RAIL)
     .withParentStation(ALEXANDERPLATZ_STATION)
     .build();
-  static RegularStop LICHTERFELDE_OST_1 = TEST_MODEL
+  static final RegularStop LICHTERFELDE_OST_1 = TEST_MODEL
     .stop("Lichterfelde Ost")
     .withId(id("lichterfelde-gleis-1"))
     .withCoordinate(52.42986, 13.32808)
     .build();
-  static RegularStop LICHTERFELDE_OST_2 = TEST_MODEL
+  static final RegularStop LICHTERFELDE_OST_2 = TEST_MODEL
     .stop("Lichterfelde Ost")
     .withId(id("lichterfelde-gleis-2"))
     .withCoordinate(52.42985, 13.32807)
     .build();
-  static RegularStop WESTHAFEN = TEST_MODEL
+  static final RegularStop WESTHAFEN = TEST_MODEL
     .stop("Westhafen")
     .withVehicleType(null)
     .withCoordinate(52.42985, 13.32807)
     .build();
 
   // Atlanta
-  static Station FIVE_POINTS_STATION = TEST_MODEL
+  static final Station FIVE_POINTS_STATION = TEST_MODEL
     .station("Five Points")
     .withCoordinate(33.753899, -84.39156)
     .build();
 
-  static RegularStop ARTS_CENTER = TEST_MODEL
+  static final RegularStop ARTS_CENTER = TEST_MODEL
     .stop("Arts Center")
     .withCode("4456")
     .withCoordinate(52.52277, 13.41046)
     .build();
-  static RegularStop ARTHUR = TEST_MODEL
+  static final RegularStop ARTHUR = TEST_MODEL
     .stop("Arthur Langford Jr Pl SW at 220")
     .withCoordinate(52.52277, 13.41046)
     .build();
@@ -119,6 +127,23 @@ class LuceneIndexTest {
         } else {
           return List.copyOf(modes.get(stop));
         }
+      }
+
+      @Override
+      public List<Agency> getAgenciesForStopLocation(StopLocation stop) {
+        if (stop.equals(ALEXANDERPLATZ_BUS)) {
+          return List.of(BVG);
+        } else {
+          return List.of();
+        }
+      }
+
+      @Override
+      public Agency getAgencyForId(FeedScopedId id) {
+        if (id.equals(BVG.getId())) {
+          return BVG;
+        }
+        return null;
       }
     };
     index = new LuceneIndex(transitService);
@@ -241,6 +266,13 @@ class LuceneIndexTest {
       var stop = result.get(0);
       assertEquals(WESTHAFEN.getName().toString(), stop.name());
       assertEquals(List.of(FERRY.name(), BUS.name()), stop.modes());
+    }
+
+    @Test
+    void agencies() {
+      var result = index.queryStopClusters("alexanderplatz").toList().getFirst();
+      assertEquals(ALEXANDERPLATZ_STATION.getName().toString(), result.name());
+      assertEquals(List.of(StopClusterMapper.toAgency(BVG)), result.agencies());
     }
   }
 }

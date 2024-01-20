@@ -9,11 +9,9 @@ import org.opentripplanner.transit.model.framework.FeedScopedId;
  */
 record LuceneStopCluster(
   FeedScopedId id,
-  @Nullable
-  String code,
+  @Nullable String code,
   String name,
   StopCluster.Coordinate coordinate,
   Collection<String> modes,
   Collection<String> agencies
-  ){
-}
+) {}

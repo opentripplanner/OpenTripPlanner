@@ -23,7 +23,6 @@ class StopClusterMapper {
     this.transitService = transitService;
   }
 
-
   /**
    * De-duplicates collections of {@link StopLocation} and {@link StopLocationsGroup} into a stream
    * of {@link StopCluster}.
@@ -60,7 +59,13 @@ class StopClusterMapper {
 
   LuceneStopCluster map(StopLocationsGroup g) {
     var modes = transitService.getModesOfStopLocationsGroup(g).stream().map(Enum::name).toList();
-    var agencies = g.getChildStops().stream().flatMap(s -> transitService.getAgenciesForStopLocation(s).stream()).distinct().map(s ->s.getId().toString()).toList();
+    var agencies = g
+      .getChildStops()
+      .stream()
+      .flatMap(s -> transitService.getAgenciesForStopLocation(s).stream())
+      .distinct()
+      .map(s -> s.getId().toString())
+      .toList();
     return new LuceneStopCluster(
       g.getId(),
       null,
@@ -72,7 +77,11 @@ class StopClusterMapper {
   }
 
   Optional<LuceneStopCluster> map(StopLocation sl) {
-    var agencies = transitService.getAgenciesForStopLocation(sl).stream().map(a -> a.getId().toString()).toList();
+    var agencies = transitService
+      .getAgenciesForStopLocation(sl)
+      .stream()
+      .map(a -> a.getId().toString())
+      .toList();
     return Optional
       .ofNullable(sl.getName())
       .map(name -> {
@@ -82,7 +91,8 @@ class StopClusterMapper {
           sl.getCode(),
           name.toString(),
           toCoordinate(sl.getCoordinate()),
-          modes, agencies
+          modes,
+          agencies
         );
       });
   }

@@ -59,16 +59,15 @@ public class LuceneIndex implements Serializable {
   private static final String LAT = "latitude";
   private static final String LON = "longitude";
   private static final String MODE = "mode";
-  private static final String AGENCY_IDS= "agency_ids";
+  private static final String AGENCY_IDS = "agency_ids";
 
   private final TransitService transitService;
   private final Analyzer analyzer;
   private final SuggestIndexSearcher searcher;
-  private final StopClusterMapper stopClusterMapper;
 
   public LuceneIndex(TransitService transitService) {
     this.transitService = transitService;
-    this.stopClusterMapper = new StopClusterMapper(transitService);
+    StopClusterMapper stopClusterMapper = new StopClusterMapper(transitService);
 
     this.analyzer =
       new PerFieldAnalyzerWrapper(
@@ -190,10 +189,15 @@ public class LuceneIndex implements Serializable {
     var lat = document.getField(LAT).numericValue().doubleValue();
     var lon = document.getField(LON).numericValue().doubleValue();
     var modes = Arrays.asList(document.getValues(MODE));
-    var agencies = Arrays.stream(document.getValues(AGENCY_IDS)).map(id -> {
-      var fsid = FeedScopedId.parse(id);
-     return transitService.getAgencyForId(fsid);
-    }).filter(Objects::nonNull).map(StopClusterMapper::toAgency).toList();
+    var agencies = Arrays
+      .stream(document.getValues(AGENCY_IDS))
+      .map(id -> {
+        var fsid = FeedScopedId.parse(id);
+        return transitService.getAgencyForId(fsid);
+      })
+      .filter(Objects::nonNull)
+      .map(StopClusterMapper::toAgency)
+      .toList();
     var feedPublisher = StopClusterMapper.toFeedPublisher(
       transitService.getFeedInfo(clusterId.getFeedId())
     );
