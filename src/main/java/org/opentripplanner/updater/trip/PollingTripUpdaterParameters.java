@@ -9,9 +9,9 @@ public record PollingTripUpdaterParameters(
   Duration frequency,
   boolean fuzzyTripMatching,
   BackwardsDelayPropagationType backwardsDelayPropagationType,
-
   String feedId,
   String url,
   HttpHeaders headers
+  // Duration timeout
 )
   implements PollingGraphUpdaterParameters, UrlUpdaterParameters {}

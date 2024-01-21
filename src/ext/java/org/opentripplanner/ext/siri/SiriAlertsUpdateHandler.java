@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.opentripplanner.ext.siri.mapper.AffectsMapper;
 import org.opentripplanner.ext.siri.mapper.SiriSeverityMapper;
 import org.opentripplanner.framework.i18n.I18NString;
@@ -29,6 +30,8 @@ import uk.org.siri.siri20.DefaultedTextStructure;
 import uk.org.siri.siri20.HalfOpenTimestampOutputRangeStructure;
 import uk.org.siri.siri20.InfoLinkStructure;
 import uk.org.siri.siri20.NaturalLanguageStringStructure;
+import uk.org.siri.siri20.PtConsequenceStructure;
+import uk.org.siri.siri20.PtConsequencesStructure;
 import uk.org.siri.siri20.PtSituationElement;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
@@ -47,7 +50,9 @@ public class SiriAlertsUpdateHandler {
   private final TransitAlertService transitAlertService;
   /** How long before the posted start of an event it should be displayed to users */
   private final Duration earlyStart;
-  private final AffectsMapper affectsMapper;
+
+  private final List<String> FEED_IDS = List.of("TGV", "IC", "TER");
+  private final List<AffectsMapper> affectsMappers;
 
   public SiriAlertsUpdateHandler(
     String feedId,
@@ -61,7 +66,9 @@ public class SiriAlertsUpdateHandler {
     this.earlyStart = earlyStart;
 
     TransitService transitService = new DefaultTransitService(transitModel);
-    this.affectsMapper = new AffectsMapper(feedId, siriFuzzyTripMatcher, transitService);
+    this.affectsMappers = FEED_IDS.stream()
+      .map(fid -> new AffectsMapper(fid, siriFuzzyTripMatcher, transitService))
+      .collect(Collectors.toList());
   }
 
   public void update(ServiceDelivery delivery) {
@@ -82,8 +89,9 @@ public class SiriAlertsUpdateHandler {
             continue;
           }
           String situationNumber = sxElement.getSituationNumber().getValue();
+          // This ID seems to only be used for internal tracking and removal, so the feedId is
+          // redundant and serves no purpose. We could just index on situation number.
           FeedScopedId id = new FeedScopedId(feedId, situationNumber);
-
           if (expireSituation) {
             alerts.removeIf(transitAlert -> transitAlert.getId().equals(id));
             expiredCounter++;
@@ -105,9 +113,7 @@ public class SiriAlertsUpdateHandler {
             }
           }
         }
-
         transitAlertService.setAlerts(alerts);
-
         LOG.info(
           "Added {} alerts, expired {} alerts based on {} situations, current alert-count: {}, elapsed time {}ms",
           addedCounter,
@@ -173,7 +179,13 @@ public class SiriAlertsUpdateHandler {
       alert.withPriority(situation.getPriority().intValue());
     }
 
-    alert.addEntites(affectsMapper.mapAffects(situation.getAffects()));
+    // AffectsMapper has one feedId. Try calling three of them with three feed IDs.
+    for (AffectsMapper affectsMapper : affectsMappers) {
+      //situation.getAffects();
+      for (PtConsequenceStructure ptc : situation.getConsequences().getConsequences()) {
+        alert.addEntites(affectsMapper.mapAffects(ptc.getAffects()));
+      }
+    }
 
     if (alert.entities().isEmpty()) {
       LOG.info(
@@ -182,6 +194,7 @@ public class SiriAlertsUpdateHandler {
       );
       alert.addEntity(new EntitySelector.Unknown("Alert had no entities that could be handled"));
     }
+    // LOG.info("Alert matched {} entities.", alert.entities().size());
 
     alert.withType(situation.getReportType());
 

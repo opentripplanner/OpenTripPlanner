@@ -33,6 +33,7 @@ public class GtfsRealtimeTripUpdateSource {
     this.url = config.url();
     this.headers = HttpHeaders.of().acceptProtobuf().add(config.headers()).build();
     MfdzRealtimeExtensions.registerAllExtensions(registry);
+    // Unfortunately adding timeout to config requires boilerplate changed to tons of classes.
     otpHttpClient = new OtpHttpClient();
   }
 
