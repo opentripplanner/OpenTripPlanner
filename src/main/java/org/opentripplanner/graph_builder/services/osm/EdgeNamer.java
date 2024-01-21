@@ -65,6 +65,7 @@ public interface EdgeNamer {
 
       return switch (type) {
         case "portland" -> new PortlandCustomNamer();
+        case "osmid" -> new OsmIdNamer();
         default -> throw new IllegalArgumentException(
           String.format("Unknown osmNaming type: '%s'", type)
         );
