@@ -191,10 +191,7 @@ public class LuceneIndex implements Serializable {
     var modes = Arrays.asList(document.getValues(MODE));
     var agencies = Arrays
       .stream(document.getValues(AGENCY_IDS))
-      .map(id -> {
-        var fsid = FeedScopedId.parse(id);
-        return transitService.getAgencyForId(fsid);
-      })
+      .map(id -> transitService.getAgencyForId(FeedScopedId.parse(id)))
       .filter(Objects::nonNull)
       .map(StopClusterMapper::toAgency)
       .toList();
