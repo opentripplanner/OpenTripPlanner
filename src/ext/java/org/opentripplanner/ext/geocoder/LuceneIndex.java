@@ -135,7 +135,7 @@ public class LuceneIndex implements Serializable {
               stopCluster.coordinate().lat(),
               stopCluster.coordinate().lon(),
               stopCluster.modes(),
-              stopCluster.agencies()
+              stopCluster.agencyIds()
             )
           );
       }

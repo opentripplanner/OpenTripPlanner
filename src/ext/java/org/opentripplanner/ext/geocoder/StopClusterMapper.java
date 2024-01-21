@@ -59,11 +59,9 @@ class StopClusterMapper {
 
   LuceneStopCluster map(StopLocationsGroup g) {
     var modes = transitService.getModesOfStopLocationsGroup(g).stream().map(Enum::name).toList();
-    var agencies = g
-      .getChildStops()
+    var agencies = transitService
+      .getAgenciesForStopLocationsGroup(g)
       .stream()
-      .flatMap(s -> transitService.getAgenciesForStopLocation(s).stream())
-      .distinct()
       .map(s -> s.getId().toString())
       .toList();
     return new LuceneStopCluster(

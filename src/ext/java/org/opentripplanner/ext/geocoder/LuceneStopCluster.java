@@ -13,5 +13,5 @@ record LuceneStopCluster(
   String name,
   StopCluster.Coordinate coordinate,
   Collection<String> modes,
-  Collection<String> agencies
+  Collection<String> agencyIds
 ) {}

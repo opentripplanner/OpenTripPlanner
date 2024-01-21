@@ -43,6 +43,8 @@ class DefaultTransitServiceTest {
       .build();
 
     var transitModel = new TransitModel(stopModel, new Deduplicator());
+    transitModel.addTripPattern(RAIL_PATTERN.getId(), RAIL_PATTERN);
+    transitModel.index();
 
     service =
       new DefaultTransitService(transitModel) {
@@ -73,5 +75,12 @@ class DefaultTransitServiceTest {
   void stationModes() {
     var modes = service.getModesOfStopLocationsGroup(STATION);
     assertEquals(List.of(RAIL, FERRY, TRAM), modes);
+  }
+
+  @Test
+  void stopAgencies() {
+    var stop = RAIL_PATTERN.getStopPattern().getStop(0);
+    var agencies = service.getAgenciesForStopLocation(stop);
+    assertEquals("[Agency{F:A1 Agency Test}]", agencies.toString());
   }
 }
