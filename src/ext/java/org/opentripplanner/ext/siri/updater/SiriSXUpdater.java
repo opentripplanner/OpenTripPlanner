@@ -31,6 +31,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
   private final String url;
   private final String originalRequestorRef;
   private final TransitAlertService transitAlertService;
+  // TODO What is this, why does it exist as a persistent instance?
   private final SiriAlertsUpdateHandler updateHandler;
   private WriteToGraphCallback saveResultOnGraph;
   private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
@@ -85,6 +86,7 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
 
   @Override
   public void setGraphUpdaterManager(WriteToGraphCallback saveResultOnGraph) {
+    // TODO REALTIME this callback should have a different name, it is currently too verb-like.
     this.saveResultOnGraph = saveResultOnGraph;
   }
 
@@ -101,6 +103,9 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
     retry.execute(this::updateSiri);
   }
 
+  /**
+   * This part has been factored out to allow repeated retries in case the connection fails etc.
+   */
   private void updateSiri() {
     boolean moreData = false;
     do {
@@ -112,6 +117,27 @@ public class SiriSXUpdater extends PollingGraphUpdater implements TransitAlertPr
         // primitive, because the object moreData persists across iterations.
         final boolean markPrimed = !moreData;
         if (serviceDelivery.getSituationExchangeDeliveries() != null) {
+          // FIXME REALTIME This is submitting a method on a long-lived instance as a runnable.
+          //   These runnables were intended to be small, disposable self-contained update tasks.
+          //   See org/opentripplanner/updater/trip/PollingTripUpdater.java:90
+          //   Clarify why that is passing in so many other references. It should only contain
+          //   what's needed to operate on the graph. This should be illustrated in documentation
+          //   as a little box labeled "change trip ABC123 by making stop 53 late by 2 minutes."
+          //   Also clarify how this works without even using the supplied graph or TransitModel:
+          //   there are multiple TransitAlertServices and they are not versioned along with the\
+          //   Graph, they are attached to updaters.
+          // This is submitting a runnable to an executor, but that runnable only writes back to
+          // objects owned by this updater itself with no versioning. Why is this happening?
+          // If this is an intentional choice to live-patch a single server-wide instance of an
+          // alerts service/index while it's already in use by routing, we should be clear about
+          // this and document why it differs from the graph-writer design. Currently the code
+          // seems to go through the a ritual of following the threadsafe copy-on-write pattern
+          // without actually doing so.
+          // It's understandable to defer the list-of-alerts processing to another thread than this
+          // fetching thread, but I don't think we want that happening on the graph writer thread.
+          // There seems to be a misunderstanding that the tasks are submitted to get them off the
+          // updater thread, but the real reason is to ensure consistent transactions in graph
+          // writing and reading.
           saveResultOnGraph.execute((graph, transitModel) -> {
             updateHandler.update(serviceDelivery);
             if (markPrimed) {

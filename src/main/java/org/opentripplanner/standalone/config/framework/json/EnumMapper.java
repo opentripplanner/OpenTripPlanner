@@ -4,6 +4,14 @@ import java.util.Arrays;
 import java.util.Optional;
 import org.opentripplanner.framework.doc.DocumentedEnum;
 
+/**
+ * This converts strings appearing in configuration files into enum values.
+ * The values appearing in config files are case-insensitive and can use either dashes
+ * or underscores indiscriminately.
+ * Dashes are replaced with underscores, and the string is converted to upper case.
+ * In practice, this serves to convert from kebab-case to SCREAMING_SNAKE_CASE (which is
+ * conventional for Java enum values), leaving the latter unchanged if it's used in the config file.
+ */
 public class EnumMapper {
 
   @SuppressWarnings("unchecked")
@@ -11,6 +19,9 @@ public class EnumMapper {
     return (Optional<E>) mapToEnum2(text, type);
   }
 
+  /**
+   * Maps an individual value from a config file into its corresponding enum value.
+   */
   public static Optional<? extends Enum<?>> mapToEnum2(String text, Class<? extends Enum<?>> type) {
     if (text == null) {
       return Optional.empty();

@@ -35,9 +35,11 @@ import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
 import uk.org.siri.siri20.WorkflowStatusEnumeration;
 
 /**
- * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange feeds. NOTE
- * this cannot handle situations where there are multiple feeds with different IDs (for now it may
- * only work in single-feed regions).
+ * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange feeds.
+ * TODO REALTIME: The name should be clarified, as there is no such thing as "SIRI Alerts", and it
+ *   is referencing the internal model concept of "Alerts" which are derived from GTFS terminology.
+ * NOTE this cannot handle situations where there are multiple feeds with different IDs (for now it
+ * may only work in single-feed regions).
  */
 public class SiriAlertsUpdateHandler {
 
@@ -45,8 +47,14 @@ public class SiriAlertsUpdateHandler {
   private final String feedId;
   private final Set<TransitAlert> alerts = new HashSet<>();
   private final TransitAlertService transitAlertService;
-  /** How long before the posted start of an event it should be displayed to users */
+
+  /** How long before the posted start of an event it should be displayed to users. */
   private final Duration earlyStart;
+
+  /**
+   * This takes the parts of the SIRI SX message saying which transit entities are affected and
+   * maps them to multiple OTP internal model entities.
+   */
   private final AffectsMapper affectsMapper;
 
   public SiriAlertsUpdateHandler(
@@ -120,6 +128,12 @@ public class SiriAlertsUpdateHandler {
     }
   }
 
+  /**
+   * FIXME REALTIME This does not just "handle" an alert, it builds an internal model Alert from
+   *   an incoming SIRI situation exchange element. It is a mapper or factory.
+   * It may return null if all of header, description, and detail text are empty or missing in the
+   * SIRI message. In all other cases it will return a valid TransitAlert instance.
+   */
   private TransitAlert handleAlert(PtSituationElement situation) {
     TransitAlertBuilder alert = createAlertWithTexts(situation);
 
@@ -199,7 +213,9 @@ public class SiriAlertsUpdateHandler {
   }
 
   /*
-   * Creates alert from PtSituation with all textual content
+   * Creates alert from PtSituation with all textual content.
+   * The feed scoped ID of this alert will be the single feed ID associated with this update handler
+   * and the situation number provided in the feed.
    */
   private TransitAlertBuilder createAlertWithTexts(PtSituationElement situation) {
     return TransitAlert

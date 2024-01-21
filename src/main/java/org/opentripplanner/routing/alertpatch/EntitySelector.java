@@ -5,6 +5,14 @@ import java.util.Set;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.timetable.Direction;
 
+/**
+ * Describes which elements in the internal transit data model are affected by a realtime alert.
+ * Note that this is specific to alerts and doesn't seem to be used by anything else.
+ * This is probably because alerts are unique in their ability to attach themselves to many
+ * different routes, stops, etc. at once, while non-alert elements tend to be associated with very
+ * specific single other elements.
+ * @see EntityKey
+ */
 public sealed interface EntitySelector {
   EntityKey key();
 
