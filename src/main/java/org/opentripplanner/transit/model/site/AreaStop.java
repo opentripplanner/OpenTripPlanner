@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.model.site;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -113,8 +114,8 @@ public class AreaStop
    * Returns the geometry of area that defines the stop, in this case the same as getGeometry.
    */
   @Override
-  public Geometry getEncompassingAreaGeometry() {
-    return geometry;
+  public Optional<Geometry> getEncompassingAreaGeometry() {
+    return Optional.of(geometry);
   }
 
   @Override

@@ -361,9 +361,9 @@ public class QuayType {
           .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
           .dataFetcher(env -> {
             StopLocation stopLocation = env.getSource();
-            return stopLocation.getEncompassingAreaGeometry() == null
+            return stopLocation.getEncompassingAreaGeometry().isEmpty()
               ? null
-              : stopLocation.getEncompassingAreaGeometry().getCoordinates();
+              : stopLocation.getEncompassingAreaGeometry().get().getCoordinates();
           })
           .build()
       )

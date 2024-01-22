@@ -2,6 +2,7 @@ package org.opentripplanner.transit.model.site;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -98,11 +99,11 @@ public class GroupStop
    * will return the geometry of the area.
    */
   @Override
-  public Geometry getEncompassingAreaGeometry() {
+  public Optional<Geometry> getEncompassingAreaGeometry() {
     if (encompassingAreaGeometry == null) {
-      return geometry;
+      return Optional.of(geometry);
     }
-    return encompassingAreaGeometry;
+    return Optional.of(encompassingAreaGeometry);
   }
 
   @Override

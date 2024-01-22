@@ -9,7 +9,6 @@ import static org.opentripplanner.netex.mapping.MappingSupport.ID_FACTORY;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import net.opengis.gml._3.AbstractRingPropertyType;
 import net.opengis.gml._3.DirectPositionListType;
 import net.opengis.gml._3.LinearRingType;

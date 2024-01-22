@@ -3,6 +3,7 @@ package org.opentripplanner.transit.model.site;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -128,9 +129,8 @@ public interface StopLocation extends LogInfo {
    * The geometry of the area that encompasses the bounds of the stop area. If the stop is defined
    * as a point, this is null.
    */
-  @Nullable
-  default Geometry getEncompassingAreaGeometry() {
-    return null;
+  default Optional<Geometry> getEncompassingAreaGeometry() {
+    return Optional.empty();
   }
 
   @Nullable
