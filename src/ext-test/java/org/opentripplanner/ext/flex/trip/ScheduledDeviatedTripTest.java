@@ -18,7 +18,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
-import org.opentripplanner.ext.fares.FaresFilter;
+import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.flex.FlexRouter;
 import org.opentripplanner.ext.flex.FlexTest;
 import org.opentripplanner.framework.application.OTPFeature;
@@ -144,9 +144,9 @@ public class ScheduledDeviatedTripTest extends FlexTest {
       List.of(to)
     );
 
-    var filter = new FaresFilter(graph.getFareService());
+    var filter = new DecorateWithFare(graph.getFareService());
 
-    var itineraries = filter.filter(router.createFlexOnlyItineraries().stream().toList());
+    var itineraries = router.createFlexOnlyItineraries().stream().peek(filter::decorate).toList();
 
     var itinerary = itineraries.iterator().next();
     assertFalse(itinerary.getFares().getFareTypes().isEmpty());

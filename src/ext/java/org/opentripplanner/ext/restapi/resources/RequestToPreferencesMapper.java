@@ -2,6 +2,7 @@ package org.opentripplanner.ext.restapi.resources;
 
 import jakarta.validation.constraints.NotNull;
 import java.util.function.Consumer;
+import org.opentripplanner.ext.restapi.mapping.LegacyBicycleOptimizeType;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.routing.algorithm.filterchain.api.TransitGeneralizedCostFilterParams;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
@@ -10,7 +11,6 @@ import org.opentripplanner.routing.api.request.preference.Relax;
 import org.opentripplanner.routing.api.request.preference.RoutingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleParkingPreferences;
 import org.opentripplanner.routing.api.request.preference.VehicleRentalPreferences;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
 
 class RequestToPreferencesMapper {
 
@@ -46,8 +46,8 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.carReluctance, car::withReluctance);
       car.withParking(parking -> {
         mapParking(parking);
-        setIfNotNull(req.carParkCost, parking::withParkCost);
-        setIfNotNull(req.carParkTime, parking::withParkTime);
+        setIfNotNull(req.carParkCost, parking::withCost);
+        setIfNotNull(req.carParkTime, parking::withTime);
       });
       car.withRental(this::mapRental);
     });
@@ -67,13 +67,12 @@ class RequestToPreferencesMapper {
       setIfNotNull(req.bikeSpeed, bike::withSpeed);
       setIfNotNull(req.bikeReluctance, bike::withReluctance);
       setIfNotNull(req.bikeBoardCost, bike::withBoardCost);
-      setIfNotNull(req.bikeWalkingSpeed, bike::withWalkingSpeed);
-      setIfNotNull(req.bikeWalkingReluctance, bike::withWalkingReluctance);
-      setIfNotNull(req.bikeSwitchTime, bike::withSwitchTime);
-      setIfNotNull(req.bikeSwitchCost, bike::withSwitchCost);
-      setIfNotNull(req.bikeOptimizeType, bike::withOptimizeType);
+      setIfNotNull(
+        req.bikeOptimizeType,
+        optimizeType -> bike.withOptimizeType(LegacyBicycleOptimizeType.map(optimizeType))
+      );
 
-      if (req.bikeOptimizeType == BicycleOptimizeType.TRIANGLE) {
+      if (req.bikeOptimizeType == LegacyBicycleOptimizeType.TRIANGLE) {
         bike.withOptimizeTriangle(triangle -> {
           setIfNotNull(req.triangleTimeFactor, triangle::withTime);
           setIfNotNull(req.triangleSlopeFactor, triangle::withSlope);
@@ -83,10 +82,16 @@ class RequestToPreferencesMapper {
 
       bike.withParking(parking -> {
         mapParking(parking);
-        setIfNotNull(req.bikeParkCost, parking::withParkCost);
-        setIfNotNull(req.bikeParkTime, parking::withParkTime);
+        setIfNotNull(req.bikeParkCost, parking::withCost);
+        setIfNotNull(req.bikeParkTime, parking::withTime);
       });
       bike.withRental(this::mapRental);
+      bike.withWalking(walk -> {
+        setIfNotNull(req.bikeWalkingSpeed, walk::withSpeed);
+        setIfNotNull(req.bikeWalkingReluctance, walk::withReluctance);
+        setIfNotNull(req.bikeSwitchTime, walk::withHopTime);
+        setIfNotNull(req.bikeSwitchCost, walk::withHopCost);
+      });
     });
   }
 
@@ -143,7 +148,7 @@ class RequestToPreferencesMapper {
 
     setIfNotNull(
       req.keepingRentedBicycleAtDestinationCost,
-      rental::withArrivingInRentalVehicleAtDestinationCost
+      cost -> rental.withArrivingInRentalVehicleAtDestinationCost((int) Math.round(cost))
     );
     rental.withUseAvailabilityInformation(isPlannedForNow);
   }

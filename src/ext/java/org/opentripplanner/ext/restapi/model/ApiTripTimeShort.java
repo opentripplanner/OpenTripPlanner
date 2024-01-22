@@ -11,13 +11,13 @@ public class ApiTripTimeShort implements Serializable {
   public int stopCount;
   public int scheduledArrival = UNDEFINED;
   public int scheduledDeparture = UNDEFINED;
-  public int realTimeArrival = UNDEFINED;
-  public int realTimeDeparture = UNDEFINED;
+  public int realimeArrival = UNDEFINED;
+  public int realtimeDeparture = UNDEFINED;
   public int arrivalDelay = UNDEFINED;
   public int departureDelay = UNDEFINED;
   public boolean timepoint = false;
-  public boolean realTime = false;
-  public ApiRealTimeState realTimeState = ApiRealTimeState.SCHEDULED;
+  public boolean realtime = false;
+  public ApiRealTimeState realtimeState = ApiRealTimeState.SCHEDULED;
   public long serviceDay;
   public String tripId;
   public String blockId;

@@ -20,6 +20,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.dataoverlay.api.DataOverlayParameters;
+import org.opentripplanner.ext.restapi.mapping.LegacyBicycleOptimizeType;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.lang.StringUtils;
 import org.opentripplanner.framework.time.DurationUtils;
@@ -28,7 +29,6 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugProfile;
 import org.opentripplanner.routing.api.request.request.filter.SelectRequest;
 import org.opentripplanner.routing.api.request.request.filter.TransitFilterRequest;
-import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
@@ -249,7 +249,7 @@ public abstract class RoutingResource {
    */
   @Deprecated
   @QueryParam("optimize")
-  protected BicycleOptimizeType bikeOptimizeType;
+  protected LegacyBicycleOptimizeType bikeOptimizeType;
 
   /**
    * The set of modes that a user is willing to use, with qualifiers stating whether vehicles should

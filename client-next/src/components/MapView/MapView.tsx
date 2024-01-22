@@ -1,4 +1,12 @@
-import { LngLat, Map, MapboxGeoJSONFeature, NavigationControl } from 'react-map-gl';
+import {
+  LngLat,
+  Map,
+  MapEvent,
+  MapGeoJSONFeature,
+  MapMouseEvent,
+  NavigationControl,
+  VectorTileSource,
+} from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { TripPattern, TripQuery, TripQueryVariables } from '../../gql/graphql.ts';
 import { NavigationMarkers } from './NavigationMarkers.tsx';
@@ -7,17 +15,11 @@ import { useMapDoubleClick } from './useMapDoubleClick.ts';
 import { useState } from 'react';
 import { ContextMenuPopup } from './ContextMenuPopup.tsx';
 import { GeometryPropertyPopup } from './GeometryPropertyPopup.tsx';
-
-// TODO: this should be configurable
-const initialViewState = {
-  latitude: 60.7554885,
-  longitude: 10.2332855,
-  zoom: 4,
-};
+import DebugLayerControl from './LayerControl.tsx';
 
 const styleUrl = import.meta.env.VITE_DEBUG_STYLE_URL;
 
-type PopupData = { coordinates: LngLat; feature: MapboxGeoJSONFeature };
+type PopupData = { coordinates: LngLat; feature: MapGeoJSONFeature };
 
 export function MapView({
   tripQueryVariables,
@@ -36,8 +38,8 @@ export function MapView({
   const [showContextPopup, setShowContextPopup] = useState<LngLat | null>(null);
   const [showPropsPopup, setShowPropsPopup] = useState<PopupData | null>(null);
   const showFeaturePropPopup = (
-    e: mapboxgl.MapMouseEvent & {
-      features?: mapboxgl.MapboxGeoJSONFeature[] | undefined;
+    e: MapMouseEvent & {
+      features?: MapGeoJSONFeature[] | undefined;
     },
   ) => {
     if (e.features) {
@@ -48,6 +50,17 @@ export function MapView({
       setShowPropsPopup({ coordinates: e.lngLat, feature: feature });
     }
   };
+  const panToWorldEnvelopeIfRequired = (e: MapEvent) => {
+    const map = e.target;
+    // if we are really far zoomed out and show the entire world it means that we are not starting
+    // in a location selected from the URL hash.
+    // in such a case we pan to the area that is specified in the tile bounds, which is
+    // provided by the WorldEnvelopeService
+    if (map.getZoom() < 2) {
+      const source = map.getSource('stops') as VectorTileSource;
+      map.fitBounds(source.bounds, { maxDuration: 50, linear: true });
+    }
+  };
 
   return (
     <div className="map-container below-content">
@@ -56,18 +69,20 @@ export function MapView({
         mapLib={import('maplibre-gl')}
         // @ts-ignore
         mapStyle={styleUrl}
-        initialViewState={initialViewState}
         onDblClick={onMapDoubleClick}
         onContextMenu={(e) => {
           setShowContextPopup(e.lngLat);
         }}
-        interactiveLayerIds={['regular-stop']}
+        // it's unfortunate that you have to list these layers here.
+        // maybe there is a way around it: https://github.com/visgl/react-map-gl/discussions/2343
+        interactiveLayerIds={['regular-stop', 'vertex', 'edge', 'link']}
         onClick={showFeaturePropPopup}
         // put lat/long in URL and pan to it on page reload
         hash={true}
         // disable pitching and rotating the map
         touchPitch={false}
         dragRotate={false}
+        onLoad={panToWorldEnvelopeIfRequired}
       >
         <NavigationControl position="top-left" />
         <NavigationMarkers
@@ -75,6 +90,7 @@ export function MapView({
           setTripQueryVariables={setTripQueryVariables}
           loading={loading}
         />
+        <DebugLayerControl position="top-right" />
         {tripQueryResult?.trip.tripPatterns.length && (
           <LegLines tripPattern={tripQueryResult.trip.tripPatterns[selectedTripPatternIndex] as TripPattern} />
         )}

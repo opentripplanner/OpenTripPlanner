@@ -4,15 +4,15 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.function.Consumer;
-import org.opentripplanner.ext.emissions.EmissionsFilter;
-import org.opentripplanner.ext.fares.FaresFilter;
-import org.opentripplanner.ext.ridehailing.RideHailingFilter;
-import org.opentripplanner.ext.stopconsolidation.ConsolidatedStopNameFilter;
+import org.opentripplanner.ext.emissions.DecorateWithEmission;
+import org.opentripplanner.ext.fares.DecorateWithFare;
+import org.opentripplanner.ext.ridehailing.DecorateWithRideHailing;
+import org.opentripplanner.ext.stopconsolidation.DecorateConsolidatedStopNames;
 import org.opentripplanner.framework.application.OTPFeature;
-import org.opentripplanner.routing.algorithm.filterchain.GroupBySimilarity;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChainBuilder;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
+import org.opentripplanner.routing.algorithm.filterchain.api.GroupBySimilarity;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
@@ -32,7 +32,7 @@ public class RouteRequestToFilterChainMapper {
     Instant earliestDepartureTimeUsed,
     Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
-    Consumer<NumItinerariesFilterResults> maxLimitFilterResultsSubscriber
+    Consumer<PageCursorInput> pageCursorInputSubscriber
   ) {
     var builder = new ItineraryListFilterChainBuilder(request.itinerariesSortOrder());
 
@@ -89,29 +89,29 @@ public class RouteRequestToFilterChainMapper {
         context.transitService()::getMultiModalStationForStation
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
-      .withNumItinerariesFilterResultsConsumer(maxLimitFilterResultsSubscriber)
+      .withPageCursorInputSubscriber(pageCursorInputSubscriber)
       .withRemoveWalkAllTheWayResults(removeWalkAllTheWayResults)
       .withRemoveTransitIfWalkingIsBetter(true)
       .withDebugEnabled(params.debug());
 
     var fareService = context.graph().getFareService();
     if (fareService != null) {
-      builder.withFaresFilter(new FaresFilter(fareService));
+      builder.withFareDecorator(new DecorateWithFare(fareService));
     }
 
     if (!context.rideHailingServices().isEmpty()) {
-      builder.withRideHailingFilter(
-        new RideHailingFilter(context.rideHailingServices(), request.wheelchair())
+      builder.withRideHailingDecoratingFilter(
+        new DecorateWithRideHailing(context.rideHailingServices(), request.wheelchair())
       );
     }
 
     if (OTPFeature.Co2Emissions.isOn() && context.emissionsService() != null) {
-      builder.withEmissions(new EmissionsFilter(context.emissionsService()));
+      builder.withEmissions(new DecorateWithEmission(context.emissionsService()));
     }
 
     if (context.stopConsolidationService() != null) {
-      builder.withStopConsolidationFilter(
-        new ConsolidatedStopNameFilter(context.stopConsolidationService())
+      builder.withConsolidatedStopNamesDecorator(
+        new DecorateConsolidatedStopNames(context.stopConsolidationService())
       );
     }
 

@@ -64,10 +64,10 @@ public class EnumTypes {
   public static final GraphQLEnumType BICYCLE_OPTIMISATION_METHOD = GraphQLEnumType
     .newEnum()
     .name("BicycleOptimisationMethod")
-    .value("quick", BicycleOptimizeType.QUICK)
-    .value("safe", BicycleOptimizeType.SAFE)
-    .value("flat", BicycleOptimizeType.FLAT)
-    .value("greenways", BicycleOptimizeType.GREENWAYS)
+    .value("quick", BicycleOptimizeType.SHORTEST_DURATION)
+    .value("safe", BicycleOptimizeType.SAFE_STREETS)
+    .value("flat", BicycleOptimizeType.FLAT_STREETS)
+    .value("greenways", BicycleOptimizeType.SAFEST_STREETS)
     .value("triangle", BicycleOptimizeType.TRIANGLE)
     .build();
 

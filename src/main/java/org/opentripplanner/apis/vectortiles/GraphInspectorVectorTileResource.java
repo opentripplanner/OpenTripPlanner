@@ -1,5 +1,9 @@
 package org.opentripplanner.apis.vectortiles;
 
+import static org.opentripplanner.apis.vectortiles.model.LayerType.Edge;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.GeofencingZones;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.RegularStop;
+import static org.opentripplanner.apis.vectortiles.model.LayerType.Vertex;
 import static org.opentripplanner.framework.io.HttpUtils.APPLICATION_X_PROTOBUF;
 
 import jakarta.ws.rs.GET;
@@ -28,8 +32,10 @@ import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.inspector.vector.LayerBuilder;
 import org.opentripplanner.inspector.vector.LayerParameters;
 import org.opentripplanner.inspector.vector.VectorTileResponseFactory;
+import org.opentripplanner.inspector.vector.edge.EdgeLayerBuilder;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
 import org.opentripplanner.inspector.vector.stop.StopLayerBuilder;
+import org.opentripplanner.inspector.vector.vertex.VertexLayerBuilder;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 
@@ -40,19 +46,20 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 @Path("/routers/{ignoreRouterId}/inspector/vectortile")
 public class GraphInspectorVectorTileResource {
 
-  private static final LayerParams REGULAR_STOPS = new LayerParams(
-    "regularStops",
-    LayerType.RegularStop
-  );
+  private static final LayerParams REGULAR_STOPS = new LayerParams("regularStops", RegularStop);
   private static final LayerParams AREA_STOPS = new LayerParams("areaStops", LayerType.AreaStop);
   private static final LayerParams GEOFENCING_ZONES = new LayerParams(
     "geofencingZones",
-    LayerType.GeofencingZones
+    GeofencingZones
   );
+  private static final LayerParams EDGES = new LayerParams("edges", Edge);
+  private static final LayerParams VERTICES = new LayerParams("vertices", Vertex);
   private static final List<LayerParameters<LayerType>> DEBUG_LAYERS = List.of(
     REGULAR_STOPS,
     AREA_STOPS,
-    GEOFENCING_ZONES
+    GEOFENCING_ZONES,
+    EDGES,
+    VERTICES
   );
 
   private final OtpServerRequestContext serverContext;
@@ -119,19 +126,35 @@ public class GraphInspectorVectorTileResource {
   @Produces(MediaType.APPLICATION_JSON)
   public StyleSpec getTileJson(@Context UriInfo uri, @Context HttpHeaders headers) {
     var base = HttpUtils.getBaseAddress(uri, headers);
-    final String allLayers = DEBUG_LAYERS
+
+    // these two could also be loaded together but are put into separate sources because
+    // the stops are fast and the edges are relatively slow
+    var stopsSource = new VectorSource(
+      "stops",
+      tileJsonUrl(base, List.of(REGULAR_STOPS, AREA_STOPS))
+    );
+    var streetSource = new VectorSource(
+      "street",
+      tileJsonUrl(base, List.of(EDGES, GEOFENCING_ZONES, VERTICES))
+    );
+
+    return DebugStyleSpec.build(
+      REGULAR_STOPS.toVectorSourceLayer(stopsSource),
+      EDGES.toVectorSourceLayer(streetSource),
+      VERTICES.toVectorSourceLayer(streetSource)
+    );
+  }
+
+  private String tileJsonUrl(String base, List<LayerParameters<LayerType>> layers) {
+    final String allLayers = layers
       .stream()
       .map(LayerParameters::name)
       .collect(Collectors.joining(","));
-    var url =
-      "%s/otp/routers/%s/inspector/vectortile/%s/tilejson.json".formatted(
-          base,
-          ignoreRouterId,
-          allLayers
-        );
-
-    var vectorSource = new VectorSource("debug", url);
-    return DebugStyleSpec.build(vectorSource, REGULAR_STOPS.toVectorSourceLayer(vectorSource));
+    return "%s/otp/routers/%s/inspector/vectortile/%s/tilejson.json".formatted(
+        base,
+        ignoreRouterId,
+        allLayers
+      );
   }
 
   @Nonnull
@@ -162,6 +185,8 @@ public class GraphInspectorVectorTileResource {
         e -> context.transitService().findAreaStops(e)
       );
       case GeofencingZones -> new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
+      case Edge -> new EdgeLayerBuilder(context.graph(), layerParameters);
+      case Vertex -> new VertexLayerBuilder(context.graph(), layerParameters);
     };
   }
 }

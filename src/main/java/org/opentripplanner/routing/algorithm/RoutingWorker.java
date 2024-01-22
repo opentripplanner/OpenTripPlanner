@@ -16,10 +16,10 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.time.ServiceDateUtils;
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.paging.cursor.PageCursorInput;
 import org.opentripplanner.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.raptor.api.request.SearchParams;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryListFilterChain;
-import org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NumItinerariesFilterResults;
 import org.opentripplanner.routing.algorithm.mapping.PagingServiceFactory;
 import org.opentripplanner.routing.algorithm.mapping.RouteRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.RoutingResponseMapper;
@@ -65,7 +65,7 @@ public class RoutingWorker {
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
   private SearchParams raptorSearchParamsUsed = null;
-  private NumItinerariesFilterResults numItinerariesFilterResults = null;
+  private PageCursorInput pageCursorInput = null;
 
   public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
     request.applyPageCursor();
@@ -137,7 +137,7 @@ public class RoutingWorker {
         searchWindowUsed(),
         emptyDirectModeHandler.removeWalkAllTheWayResults() ||
         removeWalkAllTheWayResultsFromDirectFlex,
-        it -> numItinerariesFilterResults = it
+        it -> pageCursorInput = it
       );
 
       filteredItineraries = filterChain.filter(itineraries);
@@ -283,7 +283,7 @@ public class RoutingWorker {
       serverContext.raptorTuningParameters(),
       request,
       raptorSearchParamsUsed,
-      numItinerariesFilterResults,
+      pageCursorInput,
       itineraries
     );
   }
