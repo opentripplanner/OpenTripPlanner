@@ -6,7 +6,6 @@ import io.micrometer.core.instrument.Tag;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -22,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.opentripplanner.apis.gtfs.GtfsGraphQLAPI;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -30,11 +30,8 @@ import org.opentripplanner.transit.service.TransitModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
-
-@Path("/routers/{ignoreRouterId}/transmodel/index")
-// It would be nice to get rid of the final /index.
-@Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
+@Path("/transmodel/v3")
+@Produces(MediaType.APPLICATION_JSON)
 public class TransmodelAPI {
 
   @SuppressWarnings("unused")
@@ -48,15 +45,24 @@ public class TransmodelAPI {
   private final ObjectMapper deserializer = new ObjectMapper();
 
   public TransmodelAPI(
-    @Context OtpServerRequestContext serverContext,
-    /**
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
+    @Context OtpServerRequestContext serverContext
   ) {
     this.serverContext = serverContext;
     this.index = new TransmodelGraph(schema);
+  }
+
+  /**
+   * This class is only here for backwards-compatibility. It will be removed in the future.
+   */
+  @Path("/routers/{ignoreRouterId}/transmodel/index/graphql")
+  public static class TransmodelAPIOldPath extends GtfsGraphQLAPI {
+
+    public TransmodelAPIOldPath(
+      @Context OtpServerRequestContext serverContext,
+      @PathParam("ignoreRouterId") String ignore
+    ) {
+      super(serverContext);
+    }
   }
 
   /**
@@ -77,17 +83,7 @@ public class TransmodelAPI {
     schema = TransmodelGraphQLSchema.create(defaultRouteRequest, gqlUtil);
   }
 
-  /**
-   * Return 200 when service is loaded.
-   */
-  @GET
-  @Path("/live")
-  public Response isAlive() {
-    return Response.status(Response.Status.NO_CONTENT).build();
-  }
-
   @POST
-  @Path("/graphql")
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getGraphQL(
     HashMap<String, Object> queryParameters,
@@ -130,7 +126,6 @@ public class TransmodelAPI {
   }
 
   @POST
-  @Path("/graphql")
   @Consumes("application/graphql")
   public Response getGraphQL(
     String query,
