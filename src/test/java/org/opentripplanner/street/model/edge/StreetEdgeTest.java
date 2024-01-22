@@ -21,6 +21,12 @@ import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
+import org.opentripplanner.service.vehiclerental.model.RentalVehicleType;
+import org.opentripplanner.service.vehiclerental.model.VehicleRentalVehicle;
+import org.opentripplanner.service.vehiclerental.street.StreetVehicleRentalLink;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
+import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
+import org.opentripplanner.street.model.RentalFormFactor;
 import org.opentripplanner.street.model.StreetTraversalPermission;
 import org.opentripplanner.street.model.TurnRestriction;
 import org.opentripplanner.street.model._data.StreetModelForTest;
@@ -33,6 +39,7 @@ import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.request.StreetSearchRequestBuilder;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.StateData;
+import org.opentripplanner.transit.model.framework.FeedScopedId;
 
 public class StreetEdgeTest {
 
@@ -119,6 +126,88 @@ public class StreetEdgeTest {
     long expectedDuration = (long) Math.ceil(expectedWeight);
     assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
     assertEquals(expectedWeight, s1.getWeight(), 0.0);
+  }
+
+  @Test
+  public void testTraverseFloatingScooter() {
+    // This test does not depend on the setup method - and can probably be simplified
+    Coordinate c1 = new Coordinate(-122.575033, 45.456773);
+    Coordinate c2 = new Coordinate(-122.576668, 45.451426);
+
+    var formFactor = RentalFormFactor.SCOOTER;
+    var rentalVertex = createRentalVertex(formFactor);
+    var vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(rentalVertex, formFactor);
+
+    StreetVertex v1 = StreetModelForTest.intersectionVertex("v1", c1.x, c1.y);
+    StreetVertex v2 = StreetModelForTest.intersectionVertex("v2", c2.x, c2.y);
+
+    var link = StreetVehicleRentalLink.createStreetVehicleRentalLink(rentalVertex, v1);
+
+    GeometryFactory factory = new GeometryFactory();
+    LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });
+
+    double length = 650.0;
+
+    StreetEdge testStreet = new StreetEdgeBuilder<>()
+      .withFromVertex(v1)
+      .withToVertex(v2)
+      .withGeometry(geometry)
+      .withName("Test Lane")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      .buildAndConnect();
+
+    var request = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL);
+
+    request.withPreferences(pref -> pref.withScooter(scooter -> scooter.withSpeed(5)));
+
+    State slowResult = traverseStreetFromRental(
+      testStreet,
+      vehicleRentalEdge,
+      link,
+      rentalVertex,
+      request.build()
+    );
+    request.withPreferences(pref -> pref.withScooter(scooter -> scooter.withSpeed(10)));
+
+    State fastResult = traverseStreetFromRental(
+      testStreet,
+      vehicleRentalEdge,
+      link,
+      rentalVertex,
+      request.build()
+    );
+
+    // Cost and time should be less when scooter speed is higher.
+    assertTrue(slowResult.getWeight() > fastResult.getWeight() + DELTA);
+    assertTrue(slowResult.getElapsedTimeSeconds() > fastResult.getElapsedTimeSeconds());
+
+    request.withPreferences(pref -> pref.withScooter(scooter -> scooter.withReluctance(1)));
+    State lowReluctanceResult = traverseStreetFromRental(
+      testStreet,
+      vehicleRentalEdge,
+      link,
+      rentalVertex,
+      request.build()
+    );
+
+    request.withPreferences(pref -> pref.withScooter(scooter -> scooter.withReluctance(5)));
+
+    State highReluctanceResult = traverseStreetFromRental(
+      testStreet,
+      vehicleRentalEdge,
+      link,
+      rentalVertex,
+      request.build()
+    );
+    // Cost should be more when reluctance is higher but the time should be the same.
+    assertTrue(highReluctanceResult.getWeight() > lowReluctanceResult.getWeight() + DELTA);
+
+    assertEquals(
+      highReluctanceResult.getElapsedTimeSeconds(),
+      lowReluctanceResult.getElapsedTimeSeconds()
+    );
   }
 
   @Test
@@ -399,5 +488,136 @@ public class StreetEdgeTest {
     result = testStreet.traverse(startState)[0];
     double expectedWeight = timeWeight * 0.33 + slopeWeight * 0.33 + safetyWeight * 0.34;
     assertEquals(expectedWeight, result.getWeight(), DELTA);
+  }
+
+  @Test
+  public void testScooterOptimizeTriangle() {
+    // This test does not depend on the setup method - and can probably be simplified
+    Coordinate c1 = new Coordinate(-122.575033, 45.456773);
+    Coordinate c2 = new Coordinate(-122.576668, 45.451426);
+
+    var formFactor = RentalFormFactor.SCOOTER;
+
+    var rentalVertex = createRentalVertex(formFactor);
+    var vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(rentalVertex, formFactor);
+
+    StreetVertex v1 = StreetModelForTest.intersectionVertex("v1", c1.x, c1.y);
+    StreetVertex v2 = StreetModelForTest.intersectionVertex("v2", c2.x, c2.y);
+
+    var link = StreetVehicleRentalLink.createStreetVehicleRentalLink(rentalVertex, v1);
+
+    GeometryFactory factory = new GeometryFactory();
+    LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });
+
+    double length = 650.0;
+
+    StreetEdge testStreet = new StreetEdgeBuilder<>()
+      .withFromVertex(v1)
+      .withToVertex(v2)
+      .withGeometry(geometry)
+      .withName("Test Lane")
+      .withMeterLength(length)
+      .withPermission(StreetTraversalPermission.ALL)
+      .withBack(false)
+      // a safe street
+      .withBicycleSafetyFactor(0.74f)
+      .buildAndConnect();
+
+    Coordinate[] profile = new Coordinate[] {
+      new Coordinate(0, 0), // slope = 0.1
+      new Coordinate(length / 2, length / 20.0),
+      new Coordinate(length, 0), // slope = -0.1
+    };
+    PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
+    StreetElevationExtensionBuilder
+      .of(testStreet)
+      .withElevationProfile(elev)
+      .withComputed(false)
+      .build()
+      .ifPresent(testStreet::setElevationExtension);
+
+    SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
+    double trueLength = costs.lengthMultiplier * length;
+    double slopeWorkLength = testStreet.getEffectiveBikeDistanceForWorkCost();
+    double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
+
+    var request = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL);
+
+    request.withPreferences(pref ->
+      pref
+        .withScooter(scooter ->
+          scooter
+            .withSpeed(SPEED)
+            .withOptimizeType(VehicleRoutingOptimizeType.TRIANGLE)
+            .withOptimizeTriangle(it -> it.withTime(1))
+            .withReluctance(1)
+        )
+        .withWalk(walk -> walk.withReluctance(1))
+        .withCar(car -> car.withReluctance(1))
+    );
+
+    var rentedState = vehicleRentalEdge.traverse(new State(rentalVertex, request.build()));
+    var startState = link.traverse(rentedState[0])[0];
+
+    State result = testStreet.traverse(startState)[0];
+    double expectedTimeWeight = slopeSpeedLength / SPEED;
+    assertEquals(TraverseMode.SCOOTER, result.currentMode());
+    assertEquals(expectedTimeWeight, result.getWeight() - startState.getWeight(), DELTA);
+
+    request.withPreferences(p ->
+      p.withScooter(scooter -> scooter.withOptimizeTriangle(it -> it.withSlope(1)))
+    );
+    rentedState = vehicleRentalEdge.traverse(new State(rentalVertex, request.build()));
+    startState = link.traverse(rentedState[0])[0];
+
+    result = testStreet.traverse(startState)[0];
+    double slopeWeight = result.getWeight();
+    double expectedSlopeWeight = slopeWorkLength / SPEED;
+    assertEquals(expectedSlopeWeight, slopeWeight - startState.getWeight(), DELTA);
+    assertTrue(length * 1.5 / SPEED < slopeWeight);
+    assertTrue(length * 1.5 * 10 / SPEED > slopeWeight);
+
+    request.withPreferences(p ->
+      p.withScooter(scooter -> scooter.withOptimizeTriangle(it -> it.withSafety(1)))
+    );
+    rentedState = vehicleRentalEdge.traverse(new State(rentalVertex, request.build()));
+    startState = link.traverse(rentedState[0])[0];
+
+    result = testStreet.traverse(startState)[0];
+    double slopeSafety = costs.slopeSafetyCost;
+    double safetyWeight = result.getWeight();
+    double expectedSafetyWeight = (trueLength * 0.74 + slopeSafety) / SPEED;
+    assertEquals(expectedSafetyWeight, safetyWeight - startState.getWeight(), DELTA);
+  }
+
+  private VehicleRentalPlaceVertex createRentalVertex(RentalFormFactor formFactor) {
+    VehicleRentalVehicle rentalVehicle = new VehicleRentalVehicle();
+
+    var network = "1";
+    rentalVehicle.latitude = -122.575133;
+    rentalVehicle.longitude = 45.456773;
+    rentalVehicle.id = new FeedScopedId(network, "123");
+    rentalVehicle.vehicleType =
+      new RentalVehicleType(
+        new FeedScopedId(network, "type"),
+        "type",
+        formFactor,
+        RentalVehicleType.PropulsionType.ELECTRIC,
+        100000d
+      );
+
+    return new VehicleRentalPlaceVertex(rentalVehicle);
+  }
+
+  private State traverseStreetFromRental(
+    StreetEdge streetEdge,
+    VehicleRentalEdge rentalEdge,
+    StreetVehicleRentalLink link,
+    VehicleRentalPlaceVertex rentalVertex,
+    StreetSearchRequest request
+  ) {
+    var rentedState = rentalEdge.traverse(new State(rentalVertex, request));
+    var startState = link.traverse(rentedState[0])[0];
+    return streetEdge.traverse(startState)[0];
   }
 }
