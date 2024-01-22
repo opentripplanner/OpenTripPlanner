@@ -360,8 +360,7 @@ come with an extra cost.
 """
 input DestinationBicyclePolicyInput {
     """
-    Is it possible to arrive to the destination without dropping off the rental
-    bicycle first.
+    For networks that require station drop-off, should the routing engine offer results that go directly to the destination without dropping off the rental bicycle first.
     """
     allowKeeping: Boolean
 
@@ -379,8 +378,7 @@ come with an extra cost.
 """
 input DestinationCarPolicyInput {
     """
-    Is it possible to arrive to the destination without dropping off the rental
-    car first.
+    For networks that require station drop-off, should the routing engine offer results that go directly to the destination without dropping off the rental car first.
     """
     allowKeeping: Boolean
 
@@ -398,8 +396,7 @@ come with an extra cost.
 """
 input DestinationScooterPolicyInput {
     """
-    Is it possible to arrive to the destination without dropping off the rental
-    scooter first.
+    For networks that require station drop-off, should the routing engine offer results that go directly to the destination without dropping off the rental scooter first.
     """
     allowKeeping: Boolean
 
@@ -1064,7 +1061,7 @@ input PlanDateTimeInput @oneOf {
     Latest arrival time date time. The returned itineraries should not
     arrive to the destination after this instant unless one is using
     paging to find later itineraries. Note, it is not currently possible
-    to define both  `earliestDeparture` and `latestArrival`.
+    to define both `earliestDeparture` and `latestArrival`.
     """
     latestArrival: OffsetDateTime
 }
@@ -1394,7 +1391,7 @@ input InputPreferred {
 }
 
 """
-Locale in string format. For example, `en` or `en-US`.
+Locale in the format defined in [RFC5646](https://datatracker.ietf.org/doc/html/rfc5646). For example, `en` or `en-US`.
 """
 scalar Locale
 
@@ -1507,8 +1504,8 @@ input ParkingFilter {
 }
 
 """
-Settings that control the behavior of itinerary filtering.  These are advanced settings and
-should not be set by a user through user preferences.
+Settings that control the behavior of itinerary filtering. **These are advanced settings and
+should not be set by a user through user preferences.**
 """
 input PlanItineraryFilterInput {
     """
