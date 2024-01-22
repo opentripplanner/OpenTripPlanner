@@ -2,6 +2,7 @@ package org.opentripplanner.apis.support;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.List;
 import org.glassfish.jersey.server.internal.routing.UriRoutingContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,7 +11,7 @@ import org.opentripplanner.test.support.HttpForTest;
 
 class TileJsonTest {
 
-  private static final String LAYERS = "stops,rentalVehicles";
+  private static final List<String> LAYERS = List.of("stops", "rentalVehicles");
 
   @ParameterizedTest
   @ValueSource(

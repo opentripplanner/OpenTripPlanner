@@ -89,14 +89,16 @@ public class VectorTilesResource {
       .filter(Predicate.not(Objects::isNull))
       .toList();
 
+    List<String> rLayers = Arrays.asList(requestedLayers.split(","));
+
     var url = serverContext
       .vectorTileConfig()
       .basePath()
       .map(overrideBasePath ->
-        TileJson.urlFromOverriddenBasePath(uri, headers, overrideBasePath, requestedLayers)
+        TileJson.urlFromOverriddenBasePath(uri, headers, overrideBasePath, rLayers)
       )
       .orElseGet(() ->
-        TileJson.urlWithDefaultPath(uri, headers, requestedLayers, ignoreRouterId, "vectorTiles")
+        TileJson.urlWithDefaultPath(uri, headers, rLayers, ignoreRouterId, "vectorTiles")
       );
 
     return new TileJson(url, envelope, feedInfos);

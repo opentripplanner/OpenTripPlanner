@@ -4,6 +4,7 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.UriInfo;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.opentripplanner.framework.io.HttpUtils;
@@ -65,7 +66,7 @@ public class TileJson implements Serializable {
   public static String urlWithDefaultPath(
     UriInfo uri,
     HttpHeaders headers,
-    String layers,
+    List<String> layers,
     String ignoreRouterId,
     String path
   ) {
@@ -73,7 +74,7 @@ public class TileJson implements Serializable {
         HttpUtils.getBaseAddress(uri, headers),
         ignoreRouterId,
         path,
-        layers
+        String.join(",", layers)
       );
   }
 
@@ -85,14 +86,14 @@ public class TileJson implements Serializable {
     UriInfo uri,
     HttpHeaders headers,
     String overridePath,
-    String layers
+    List<String> layers
   ) {
     var strippedPath = StringUtils.stripStart(overridePath, "/");
     strippedPath = StringUtils.stripEnd(strippedPath, "/");
     return "%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
         HttpUtils.getBaseAddress(uri, headers),
         strippedPath,
-        layers
+        String.join(",", layers)
       );
   }
 }

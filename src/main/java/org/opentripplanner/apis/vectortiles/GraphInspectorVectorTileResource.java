@@ -102,11 +102,12 @@ public class GraphInspectorVectorTileResource {
   ) {
     var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
     List<FeedInfo> feedInfos = feedInfos();
+    List<String> rlayer = Arrays.asList(requestedLayers.split(","));
 
     var url = TileJson.urlWithDefaultPath(
       uri,
       headers,
-      requestedLayers,
+      rlayer,
       ignoreRouterId,
       "inspector/vectortile"
     );
