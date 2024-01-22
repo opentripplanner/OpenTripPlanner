@@ -211,6 +211,33 @@ public class StreetEdgeTest {
   }
 
   @Test
+  public void testWalkingBeforeScooter() {
+    StreetEdge e1 = streetEdgeBuilder(v1, v2, 100.0, StreetTraversalPermission.ALL)
+      .withCarSpeed(10.0f)
+      .buildAndConnect();
+
+    var request = StreetSearchRequest
+      .copyOf(proto)
+      .withPreferences(pref -> pref.withWalk(walk -> walk.withReluctance(1)))
+      .withMode(StreetMode.SCOOTER_RENTAL);
+
+    State s0 = new State(v1, request.build());
+    State result = e1.traverse(s0)[0];
+
+    request.withPreferences(pref ->
+      pref.withScooter(scooter -> scooter.withReluctance(5).withSpeed(8.5))
+    );
+
+    s0 = new State(v1, request.build());
+    var scooterReluctanceResult = e1.traverse(s0)[0];
+
+    // Scooter preferences shouldn't affect walking when SCOOTER_RENTAL is used as mode
+    assertEquals(TraverseMode.WALK, result.currentMode());
+    assertEquals(result.getWeight(), scooterReluctanceResult.getWeight(), DELTA);
+    assertEquals(result.getElapsedTimeSeconds(), scooterReluctanceResult.getElapsedTimeSeconds());
+  }
+
+  @Test
   public void testModeSetCanTraverse() {
     StreetEdge e = streetEdge(v1, v2, 1.0, StreetTraversalPermission.ALL);
 
