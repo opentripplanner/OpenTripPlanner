@@ -119,7 +119,7 @@ public class DefaultFareService implements FareService {
     ItineraryFares fare = ItineraryFares.empty();
     boolean hasFare = false;
     for (FareType fareType : fareRulesPerType.keySet()) {
-      final Multimap<Leg, FareProductUse> fareProducts = LinkedHashMultimap.create();
+      final Multimap<Leg, FareProductUse> legProducts = LinkedHashMultimap.create();
       List<FareProduct> itineraryProducts = new ArrayList<>();
       for (String feedId : fareLegsByFeed.keySet()) {
         ItineraryFares currentFare = ItineraryFares.empty();
@@ -138,12 +138,12 @@ public class DefaultFareService implements FareService {
 
           hasFare = feedHasFare || hasFare; // Other feeds might still have fare for some legs
 
-          fareProducts.putAll(currentFare.getLegProducts());
+          legProducts.putAll(currentFare.getLegProducts());
           itineraryProducts.addAll(currentFare.getItineraryProducts());
         }
       }
 
-      fare.addFareProductUses(fareProducts);
+      fare.addFareProductUses(legProducts);
       fare.addItineraryProducts(itineraryProducts);
     }
     return hasFare ? fare : null;

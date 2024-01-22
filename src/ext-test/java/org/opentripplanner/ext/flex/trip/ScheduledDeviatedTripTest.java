@@ -33,7 +33,6 @@ import org.opentripplanner.routing.algorithm.raptoradapter.router.AdditionalSear
 import org.opentripplanner.routing.algorithm.raptoradapter.router.TransitRouter;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
-import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
@@ -42,7 +41,6 @@ import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.street.model.vertex.StreetLocation;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
-import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.site.AreaStop;
 import org.opentripplanner.transit.service.DefaultTransitService;
@@ -149,11 +147,11 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var itineraries = router.createFlexOnlyItineraries().stream().peek(filter::decorate).toList();
 
     var itinerary = itineraries.iterator().next();
-    assertFalse(itinerary.getFares().getItineraryProducts().isEmpty());
+    assertFalse(itinerary.getFares().getLegProducts().isEmpty());
 
     assertEquals(
-      Money.usDollars(2.5f),
-      itinerary.getFares().getItineraryProducts().getFirst().price()
+      "[FareProductUse[id=1532715d-bffe-310c-9c76-842f3c74bbd3, product=FareProduct{id: '1:flex-adult', amount: $2.50}]]",
+      itinerary.getFares().getLegProducts().values().toString()
     );
 
     OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));

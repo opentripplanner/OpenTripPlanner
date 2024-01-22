@@ -14,6 +14,7 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -44,8 +45,8 @@ public class FaresIntegrationTest {
 
     ItineraryFares fare = getFare(from, to, start, serverContext);
     assertEquals(
-      "[FareProductUse[id=eec97231-e931-3584-8cc3-e7657a1ff14d, product=FareProduct{id: '1:OW_2', amount: $4.25}]]",
-      fare.getLegProducts().values().toString()
+      "[FareProduct{id: '1:OW_2', amount: $4.25}]",
+      fare.getLegProducts().values().stream().map(FareProductUse::product).toList().toString()
     );
   }
 
