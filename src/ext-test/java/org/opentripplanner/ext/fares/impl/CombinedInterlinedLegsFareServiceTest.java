@@ -72,6 +72,15 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     var secondLeg = itinerary.getTransitLeg(1);
     uses = fare.getLegProducts().get(secondLeg);
     assertEquals(1, uses.size());
+
+    var sum = fare
+      .getLegProducts()
+      .values()
+      .stream()
+      .distinct()
+      .map(p -> p.product().price())
+      .reduce(Money.ZERO_USD, Money::plus);
+    assertEquals(totalPrice, sum);
   }
 
   @Test

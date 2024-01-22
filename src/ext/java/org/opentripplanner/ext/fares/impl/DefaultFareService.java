@@ -75,8 +75,6 @@ public class DefaultFareService implements FareService {
 
   private static final Logger LOG = LoggerFactory.getLogger(DefaultFareService.class);
 
-  private final float UNKNOWN_FARE_PRICE = -0.01f;
-
   /** For each fare type (regular, student, etc...) the collection of rules that apply. */
   protected Map<FareType, Collection<FareRuleSet>> fareRulesPerType;
 
@@ -142,16 +140,11 @@ public class DefaultFareService implements FareService {
 
           fareProducts.putAll(currentFare.getLegProducts());
           itineraryProducts.addAll(currentFare.getItineraryProducts());
-        } else {}
+        }
       }
 
       fare.addFareProductUses(fareProducts);
       fare.addItineraryProducts(itineraryProducts);
-
-      // No fares will be discovered after this point
-      if (!hasFare) {
-        continue;
-      }
     }
     return hasFare ? fare : null;
   }

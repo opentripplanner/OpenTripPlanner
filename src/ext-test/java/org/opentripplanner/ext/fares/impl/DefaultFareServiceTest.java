@@ -49,15 +49,11 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var fare = service.calculateFares(itin);
     assertNotNull(fare);
 
-    var fp = fare.getItineraryProducts().get(0);
-    assertEquals(TEN_DOLLARS, fp.price());
-    assertEquals("F:regular", fp.id().toString());
-
-    // todo
-    var lp = fare.getLegProducts();
-    assertEquals(1, lp.size());
-    var product = lp.values().iterator().next().product();
-    assertEquals(TEN_DOLLARS, product.price());
+    var legProducts = fare.getLegProducts().get(itin.getTransitLeg(0));
+    assertEquals(
+      "[FareProductUse[id=1d270201-412b-3b86-80f6-92ab144fa2e5, product=FareProduct{id: 'F:airport-to-city-center', amount: $10.00}]]",
+      legProducts.toString()
+    );
   }
 
   @Test
@@ -113,16 +109,17 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var legProducts = fare.getLegProducts();
 
     var firstLeg = itin.getLegs().getFirst();
-    var products = List.copyOf(legProducts.get(firstLeg));
 
-    assertEquals(TEN_DOLLARS, products.getFirst().product().price());
+    assertEquals(
+      "[FareProductUse[id=ccadd1d3-f284-31a4-9d58-0a300198950f, product=FareProduct{id: 'F:airport-to-city-center', amount: $10.00}]]",
+      legProducts.get(firstLeg).toString()
+    );
 
     var secondLeg = itin.getLegs().get(1);
-    products = List.copyOf(legProducts.get(secondLeg));
-    assertEquals(TEN_DOLLARS, products.getFirst().product().price());
-
-    assertEquals(1, fare.getItineraryProducts().size());
-    assertEquals(TWENTY_DOLLARS, fare.getItineraryProducts().getFirst().price());
+    assertEquals(
+      "[FareProductUse[id=c58974dd-9a2f-3f42-90ec-c62a7b0dfd51, product=FareProduct{id: 'F:airport-to-city-center', amount: $10.00}]]",
+      legProducts.get(secondLeg).toString()
+    );
   }
 
   @Test
@@ -175,8 +172,17 @@ class DefaultFareServiceTest implements PlanTestConstants {
       fareProductIds
     );
 
-    var resultPrice = result.getFare(FareType.regular);
-    assertEquals(TWENTY_DOLLARS, resultPrice);
+    var legProducts = result.getLegProducts();
+    var firstBusLeg = itin.getTransitLeg(0);
+    assertEquals(
+      "[FareProductUse[id=1d270201-412b-3b86-80f6-92ab144fa2e5, product=FareProduct{id: 'F:airport-to-city-center', amount: $10.00}]]",
+      legProducts.get(firstBusLeg).toString()
+    );
+    var secondBusLeg = itin.getTransitLeg(2);
+    assertEquals(
+      "[FareProductUse[id=678d201c-e839-35c3-ae7b-1bc3834da5e5, product=FareProduct{id: 'F2:other-feed-attribute', amount: $10.00}]]",
+      legProducts.get(secondBusLeg).toString()
+    );
   }
 
   @Test
