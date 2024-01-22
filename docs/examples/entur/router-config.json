@@ -36,6 +36,15 @@
         "dropOffCost": 30
       }
     },
+    "scooter": {
+      "speed": 5,
+      "reluctance": 5.0,
+      "rental": {
+        "pickupCost": 120,
+        "dropOffTime": "30s",
+        "dropOffCost": 30
+      }
+    },
     "walk": {
       "speed": 1.3,
       "reluctance": 4.0,
