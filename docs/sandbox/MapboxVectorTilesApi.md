@@ -3,18 +3,19 @@
 ## Contact Info
 
 - HSL, Finland
-- IBI Arcardis, US
+- Arcadis, US
 
 ## Documentation
 
 This API produces [Mapbox vector tiles](https://docs.mapbox.com/vector-tiles/reference/), which are
-used by eg. [Digitransit-ui](https://github.com/HSLdevcom/digitransit-ui) to show information about
+used by [Digitransit-ui](https://github.com/HSLdevcom/digitransit-ui) and 
+[`otp-react-redux`](https://github.com/opentripplanner/otp-react-redux) to show information about
 public transit entities on the map.
 
 The tiles can be fetched from `/otp/routers/{routerId}/vectorTiles/{layers}/{z}/{x}/{y}.pbf`,
 where `layers` is a comma separated list of layer names from the configuration.
 
-Maplibre/Mapbox GL JS also require a tilejson.json endpoint which is available at
+Maplibre/Mapbox GL JS also requires a tilejson.json endpoint which is available at
 `/otp/routers/{routerId}/vectorTiles/{layers}/tilejson.json`.
 
 Translatable fields in the tiles are translated based on the `accept-language` header in requests.
@@ -37,7 +38,8 @@ The feature must be configured in `router-config.json` as follows
 
 ```JSON
 {
-  "vectorTiles": 
+  "vectorTiles": {
+    "basePath": "/only/configure/if/required",
     "layers": [
       {
         "name": "stops",
@@ -168,9 +170,9 @@ The path of the vector tile source URLs in `tilejson.json`.
 
 This is useful if you have a proxy setup and rewrite the path that is passed to OTP.
 
-If you don't configure this optional value then the path returned in `tilejson.json` is
-`/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{x}.pbf`. If you, for example, set
-a value of `/otp_test/tiles` then the returned path changes to
+If you don't configure this optional value then the path returned in `tilejson.json` is in
+the format `/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{x}.pbf`.
+If you, for example, set a value of `/otp_test/tiles` then the returned path changes to
 `/otp_test/tiles/layer1,layer2/{z}/{x}/{x}.pbf`.
 
 The protocol and host are always read from the incoming HTTP request. If you run OTP behind
@@ -219,8 +221,8 @@ Currently `Digitransit` is supported for all layer types.
 
 ### Extending
 
-If more generic layers are created for this API, it should be moved out from the sandbox, into the
-core code, with potentially leaving specific property mappers in place.
+If more generic layers are created for this API, the code should be moved out from the sandbox, into 
+the core, perhaps potentially leaving specific property mappers in place.
 
 #### Creating a new layer
 

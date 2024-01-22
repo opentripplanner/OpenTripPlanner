@@ -57,9 +57,9 @@ public class VectorTileConfig
           """
           This is useful if you have a proxy setup and rewrite the path that is passed to OTP.
           
-          If you don't configure this optional value then the path returned in `tilejson.json` is
-          `/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{x}.pbf`. If you, for example, set 
-          a value of `/otp_test/tiles` then the returned path changes to 
+          If you don't configure this optional value then the path returned in `tilejson.json` is in 
+          the format `/otp/routers/default/vectorTiles/layer1,layer2/{z}/{x}/{x}.pbf`. 
+          If you, for example, set a value of `/otp_test/tiles` then the returned path changes to 
           `/otp_test/tiles/layer1,layer2/{z}/{x}/{x}.pbf`.
           
           The protocol and host are always read from the incoming HTTP request. If you run OTP behind 

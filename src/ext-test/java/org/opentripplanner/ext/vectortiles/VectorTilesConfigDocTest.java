@@ -32,7 +32,7 @@ public class VectorTilesConfigDocTest {
   public void updateDoc() {
     NodeAdapter node = readVectorTiles();
 
-    // Read and close inout file (same as output file)
+    // Read and close input file (same as output file)
     String template = readFile(TEMPLATE);
     String original = readFile(OUT_FILE);
 

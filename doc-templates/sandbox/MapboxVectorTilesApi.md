@@ -3,18 +3,19 @@
 ## Contact Info
 
 - HSL, Finland
-- IBI Arcardis, US
+- Arcadis, US
 
 ## Documentation
 
 This API produces [Mapbox vector tiles](https://docs.mapbox.com/vector-tiles/reference/), which are
-used by eg. [Digitransit-ui](https://github.com/HSLdevcom/digitransit-ui) to show information about
+used by [Digitransit-ui](https://github.com/HSLdevcom/digitransit-ui) and 
+[`otp-react-redux`](https://github.com/opentripplanner/otp-react-redux) to show information about
 public transit entities on the map.
 
 The tiles can be fetched from `/otp/routers/{routerId}/vectorTiles/{layers}/{z}/{x}/{y}.pbf`,
 where `layers` is a comma separated list of layer names from the configuration.
 
-Maplibre/Mapbox GL JS also require a tilejson.json endpoint which is available at
+Maplibre/Mapbox GL JS also requires a tilejson.json endpoint which is available at
 `/otp/routers/{routerId}/vectorTiles/{layers}/tilejson.json`.
 
 Translatable fields in the tiles are translated based on the `accept-language` header in requests.
@@ -37,7 +38,8 @@ The feature must be configured in `router-config.json` as follows
 
 ```JSON
 {
-  "vectorTiles": 
+  "vectorTiles": {
+    "basePath": "/only/configure/if/required",
     "layers": [
       {
         "name": "stops",
@@ -145,8 +147,8 @@ For each layer, the configuration includes:
 
 ### Extending
 
-If more generic layers are created for this API, it should be moved out from the sandbox, into the
-core code, with potentially leaving specific property mappers in place.
+If more generic layers are created for this API, the code should be moved out from the sandbox, into 
+the core, perhaps potentially leaving specific property mappers in place.
 
 #### Creating a new layer
 
