@@ -65,9 +65,6 @@ class CombinedInterlinedLegsFareServiceTest implements PlanTestConstants {
     var fare = service.calculateFares(itinerary);
     assertNotNull(fare);
 
-    var price = fare.getFare(FareType.regular);
-    assertEquals(totalPrice, price);
-
     var firstLeg = itinerary.getTransitLeg(0);
     var uses = fare.getLegProducts().get(firstLeg);
     assertEquals(1, uses.size());

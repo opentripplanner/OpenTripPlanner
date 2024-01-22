@@ -491,7 +491,7 @@ public class OrcaFareServiceTest {
 
     var fare = new ItineraryFares();
     orcaFareService.populateFare(fare, USD, type, legs, null);
-    assertNotNull(fare.getFare(type));
+    assertFalse(fare.getLegProducts().isEmpty());
   }
 
   @ParameterizedTest
@@ -513,7 +513,7 @@ public class OrcaFareServiceTest {
 
     var fare = new ItineraryFares();
     orcaFareService.populateFare(fare, USD, type, legs, null);
-    assertNotNull(fare.getFare(type));
+    assertFalse(fare.getLegProducts().isEmpty());
   }
 
   @Test

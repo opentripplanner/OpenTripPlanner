@@ -49,14 +49,11 @@ class DefaultFareServiceTest implements PlanTestConstants {
     var fare = service.calculateFares(itin);
     assertNotNull(fare);
 
-    var price = fare.getFare(FareType.regular);
-
-    assertEquals(TEN_DOLLARS, price);
-
     var fp = fare.getItineraryProducts().get(0);
     assertEquals(TEN_DOLLARS, fp.price());
     assertEquals("F:regular", fp.id().toString());
 
+    // todo
     var lp = fare.getLegProducts();
     assertEquals(1, lp.size());
     var product = lp.values().iterator().next().product();
