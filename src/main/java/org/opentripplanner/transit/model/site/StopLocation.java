@@ -3,7 +3,6 @@ package org.opentripplanner.transit.model.site;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.locationtech.jts.geom.Geometry;
@@ -152,7 +151,7 @@ public interface StopLocation extends LogInfo {
    * Returns the child locations of this location, for example StopLocations within a GroupStop.
    */
   @Nullable
-  default Set<StopLocation> getChildLocations() {
+  default List<StopLocation> getChildLocations() {
     return null;
   }
 

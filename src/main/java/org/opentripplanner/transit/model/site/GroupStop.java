@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.model.site;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.IntSupplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,7 +20,7 @@ public class GroupStop
   implements StopLocation {
 
   private final int index;
-  private final Set<StopLocation> stopLocations;
+  private final List<StopLocation> stopLocations;
   private final I18NString name;
   private final GeometryCollection geometry;
 
@@ -120,7 +120,7 @@ public class GroupStop
    */
   @Override
   @Nonnull
-  public Set<StopLocation> getChildLocations() {
+  public List<StopLocation> getChildLocations() {
     return stopLocations;
   }
 

@@ -258,7 +258,7 @@ class FlexStopsMapperTest {
     assertNotNull(groupStop);
 
     // Only one of the stops should be inside the polygon
-    Set<StopLocation> locations = groupStop.getChildLocations();
+    List<StopLocation> locations = groupStop.getChildLocations();
     assertEquals(1, locations.size());
     assertEquals(stop1.getId(), locations.stream().findFirst().orElseThrow().getId());
   }
