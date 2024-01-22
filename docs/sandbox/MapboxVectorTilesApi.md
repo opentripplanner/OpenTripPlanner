@@ -265,3 +265,4 @@ key, and a function to create the mapper, with a `Graph` object as a parameter, 
   * Added DigitransitRealtime for vehicle rental stations
   * Changed old vehicle parking mapper to be Stadtnavi
   * Added a new Digitransit vehicle parking mapper with no real-time information and less fields
+- 2024-01-22: Make `basePath` configurable [#5627](https://github.com/opentripplanner/OpenTripPlanner/pull/5627)
