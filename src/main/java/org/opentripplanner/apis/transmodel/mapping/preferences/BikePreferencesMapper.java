@@ -27,7 +27,7 @@ public class BikePreferencesMapper {
       "walkReluctance",
       r -> {
         bike.withReluctance((double) r);
-        bike.withWalkingReluctance(WALK_BIKE_RELATIVE_RELUCTANCE * (double) r);
+        bike.withWalking(w -> w.withReluctance(WALK_BIKE_RELATIVE_RELUCTANCE * (double) r));
       }
     );
 

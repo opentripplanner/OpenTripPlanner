@@ -5,8 +5,10 @@
     "alightSlack": "0s",
     "transferSlack": 180,
     "waitReluctance": 0.9,
-    "walkReluctance": 1.75,
-    "stairsReluctance": 1.65,
+    "walk": {
+      "reluctance": 1.75,
+      "stairsReluctance": 1.65
+    },
     "numItineraries": 3,
     "geoidElevation": true,
     "streetRoutingTimeout": "7s"

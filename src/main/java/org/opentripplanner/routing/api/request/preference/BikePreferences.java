@@ -2,6 +2,8 @@ package org.opentripplanner.routing.api.request.preference;
 
 import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 import static org.opentripplanner.framework.lang.ObjectUtils.ifNotNull;
+import static org.opentripplanner.routing.core.BicycleOptimizeType.SAFE_STREETS;
+import static org.opentripplanner.routing.core.BicycleOptimizeType.TRIANGLE;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -25,45 +27,32 @@ public final class BikePreferences implements Serializable {
   private final double speed;
   private final double reluctance;
   private final Cost boardCost;
-  private final double walkingSpeed;
-  private final double walkingReluctance;
-  private final int switchTime;
-  private final Cost switchCost;
   private final VehicleParkingPreferences parking;
   private final VehicleRentalPreferences rental;
-  private final double stairsReluctance;
   private final BicycleOptimizeType optimizeType;
   private final TimeSlopeSafetyTriangle optimizeTriangle;
+  private final VehicleWalkingPreferences walking;
 
   private BikePreferences() {
     this.speed = 5;
     this.reluctance = 2.0;
     this.boardCost = Cost.costOfMinutes(10);
-    this.walkingSpeed = 1.33;
-    this.walkingReluctance = 5.0;
-    this.switchTime = 0;
-    this.switchCost = Cost.ZERO;
     this.parking = VehicleParkingPreferences.DEFAULT;
     this.rental = VehicleRentalPreferences.DEFAULT;
-    this.optimizeType = BicycleOptimizeType.SAFE;
+    this.optimizeType = SAFE_STREETS;
     this.optimizeTriangle = TimeSlopeSafetyTriangle.DEFAULT;
-    // very high reluctance to carry the bike up/down a flight of stairs
-    this.stairsReluctance = 10;
+    this.walking = VehicleWalkingPreferences.DEFAULT;
   }
 
   private BikePreferences(Builder builder) {
     this.speed = Units.speed(builder.speed);
     this.reluctance = Units.reluctance(builder.reluctance);
     this.boardCost = builder.boardCost;
-    this.walkingSpeed = Units.speed(builder.walkingSpeed);
-    this.walkingReluctance = Units.reluctance(builder.walkingReluctance);
-    this.switchTime = Units.duration(builder.switchTime);
-    this.switchCost = builder.switchCost;
     this.parking = builder.parking;
     this.rental = builder.rental;
     this.optimizeType = Objects.requireNonNull(builder.optimizeType);
     this.optimizeTriangle = Objects.requireNonNull(builder.optimizeTriangle);
-    this.stairsReluctance = Units.reluctance(builder.stairsReluctance);
+    this.walking = builder.walking;
   }
 
   public static BikePreferences.Builder of() {
@@ -94,36 +83,6 @@ public final class BikePreferences implements Serializable {
     return boardCost.toSeconds();
   }
 
-  /**
-   * The walking speed when walking a bike. Default: 1.33 m/s ~ Same as walkSpeed
-   */
-  public double walkingSpeed() {
-    return walkingSpeed;
-  }
-
-  /**
-   * A multiplier for how bad walking is, compared to being in transit for equal
-   * lengths of time. Empirically, values between 2 and 4 seem to correspond
-   * well to the concept of not wanting to walk too much without asking for
-   * totally ridiculous itineraries, but this observation should in no way be
-   * taken as scientific or definitive. Your mileage may vary. See
-   * https://github.com/opentripplanner/OpenTripPlanner/issues/4090 for impact on
-   * performance with high values. Default value: 2.0
-   */
-  public double walkingReluctance() {
-    return walkingReluctance;
-  }
-
-  /** Time to get on and off your own bike */
-  public int switchTime() {
-    return switchTime;
-  }
-
-  /** Cost of getting on and off your own bike */
-  public int switchCost() {
-    return switchCost.toSeconds();
-  }
-
   /** Parking preferences that can be different per request */
   public VehicleParkingPreferences parking() {
     return parking;
@@ -135,7 +94,7 @@ public final class BikePreferences implements Serializable {
   }
 
   /**
-   * The set of characteristics that the user wants to optimize for -- defaults to SAFE.
+   * The set of characteristics that the user wants to optimize for -- defaults to SAFE_STREETS.
    */
   public BicycleOptimizeType optimizeType() {
     return optimizeType;
@@ -145,8 +104,9 @@ public final class BikePreferences implements Serializable {
     return optimizeTriangle;
   }
 
-  public double stairsReluctance() {
-    return stairsReluctance;
+  /** Bike walking preferences that can be different per request */
+  public VehicleWalkingPreferences walking() {
+    return walking;
   }
 
   @Override
@@ -158,15 +118,11 @@ public final class BikePreferences implements Serializable {
       doubleEquals(that.speed, speed) &&
       doubleEquals(that.reluctance, reluctance) &&
       boardCost.equals(that.boardCost) &&
-      doubleEquals(that.walkingSpeed, walkingSpeed) &&
-      doubleEquals(that.walkingReluctance, walkingReluctance) &&
-      switchTime == that.switchTime &&
-      switchCost.equals(that.switchCost) &&
-      parking.equals(that.parking) &&
-      rental.equals(that.rental) &&
+      Objects.equals(parking, that.parking) &&
+      Objects.equals(rental, that.rental) &&
       optimizeType == that.optimizeType &&
       optimizeTriangle.equals(that.optimizeTriangle) &&
-      doubleEquals(stairsReluctance, that.stairsReluctance)
+      Objects.equals(walking, that.walking)
     );
   }
 
@@ -176,15 +132,11 @@ public final class BikePreferences implements Serializable {
       speed,
       reluctance,
       boardCost,
-      walkingSpeed,
-      walkingReluctance,
-      switchTime,
-      switchCost,
       parking,
       rental,
       optimizeType,
       optimizeTriangle,
-      stairsReluctance
+      walking
     );
   }
 
@@ -195,15 +147,11 @@ public final class BikePreferences implements Serializable {
       .addNum("speed", speed, DEFAULT.speed)
       .addNum("reluctance", reluctance, DEFAULT.reluctance)
       .addObj("boardCost", boardCost, DEFAULT.boardCost)
-      .addNum("walkingSpeed", walkingSpeed, DEFAULT.walkingSpeed)
-      .addNum("walkingReluctance", walkingReluctance, DEFAULT.walkingReluctance)
-      .addDurationSec("switchTime", switchTime, DEFAULT.switchTime)
-      .addObj("switchCost", switchCost, DEFAULT.switchCost)
       .addObj("parking", parking, DEFAULT.parking)
       .addObj("rental", rental, DEFAULT.rental)
       .addEnum("optimizeType", optimizeType, DEFAULT.optimizeType)
       .addObj("optimizeTriangle", optimizeTriangle, DEFAULT.optimizeTriangle)
-      .addNum("stairsReluctance", stairsReluctance, DEFAULT.stairsReluctance)
+      .addObj("walking", walking, DEFAULT.walking)
       .toString();
   }
 
@@ -214,31 +162,22 @@ public final class BikePreferences implements Serializable {
     private double speed;
     private double reluctance;
     private Cost boardCost;
-    private double walkingSpeed;
-    private double walkingReluctance;
-    private int switchTime;
-    private Cost switchCost;
     private VehicleParkingPreferences parking;
     private VehicleRentalPreferences rental;
     private BicycleOptimizeType optimizeType;
     private TimeSlopeSafetyTriangle optimizeTriangle;
-
-    public double stairsReluctance;
+    private VehicleWalkingPreferences walking;
 
     public Builder(BikePreferences original) {
       this.original = original;
       this.speed = original.speed;
       this.reluctance = original.reluctance;
       this.boardCost = original.boardCost;
-      this.walkingSpeed = original.walkingSpeed;
-      this.walkingReluctance = original.walkingReluctance;
-      this.switchTime = original.switchTime;
-      this.switchCost = original.switchCost;
       this.parking = original.parking;
       this.rental = original.rental;
       this.optimizeType = original.optimizeType;
       this.optimizeTriangle = original.optimizeTriangle;
-      this.stairsReluctance = original.stairsReluctance;
+      this.walking = original.walking;
     }
 
     public BikePreferences original() {
@@ -272,42 +211,6 @@ public final class BikePreferences implements Serializable {
       return this;
     }
 
-    public double walkingSpeed() {
-      return walkingSpeed;
-    }
-
-    public Builder withWalkingSpeed(double walkingSpeed) {
-      this.walkingSpeed = walkingSpeed;
-      return this;
-    }
-
-    public double walkingReluctance() {
-      return walkingReluctance;
-    }
-
-    public Builder withWalkingReluctance(double walkingReluctance) {
-      this.walkingReluctance = walkingReluctance;
-      return this;
-    }
-
-    public int switchTime() {
-      return switchTime;
-    }
-
-    public Builder withSwitchTime(int switchTime) {
-      this.switchTime = switchTime;
-      return this;
-    }
-
-    public Cost switchCost() {
-      return switchCost;
-    }
-
-    public Builder withSwitchCost(int switchCost) {
-      this.switchCost = Cost.costOfSeconds(switchCost);
-      return this;
-    }
-
     public Builder withParking(Consumer<VehicleParkingPreferences.Builder> body) {
       this.parking = ifNotNull(this.parking, original.parking).copyOf().apply(body).build();
       return this;
@@ -331,6 +234,17 @@ public final class BikePreferences implements Serializable {
       return optimizeTriangle;
     }
 
+    /** This also sets the optimization type as TRIANGLE if triangle parameters are defined */
+    public Builder withForcedOptimizeTriangle(Consumer<TimeSlopeSafetyTriangle.Builder> body) {
+      var builder = TimeSlopeSafetyTriangle.of();
+      body.accept(builder);
+      this.optimizeTriangle = builder.buildOrDefault(this.optimizeTriangle);
+      if (!builder.isEmpty()) {
+        this.optimizeType = TRIANGLE;
+      }
+      return this;
+    }
+
     public Builder withOptimizeTriangle(Consumer<TimeSlopeSafetyTriangle.Builder> body) {
       var builder = TimeSlopeSafetyTriangle.of();
       body.accept(builder);
@@ -338,8 +252,8 @@ public final class BikePreferences implements Serializable {
       return this;
     }
 
-    public Builder withStairsReluctance(double value) {
-      this.stairsReluctance = value;
+    public Builder withWalking(Consumer<VehicleWalkingPreferences.Builder> body) {
+      this.walking = ifNotNull(this.walking, original.walking).copyOf().apply(body).build();
       return this;
     }
 

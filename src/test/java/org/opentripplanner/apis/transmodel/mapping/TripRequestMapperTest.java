@@ -272,7 +272,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
   @Test
   void testDefaultTriangleFactors() {
     var req2 = TripRequestMapper.createRequest(executionContext(Map.of()));
-    assertEquals(BicycleOptimizeType.SAFE, req2.preferences().bike().optimizeType());
+    assertEquals(BicycleOptimizeType.SAFE_STREETS, req2.preferences().bike().optimizeType());
     assertEquals(TimeSlopeSafetyTriangle.DEFAULT, req2.preferences().bike().optimizeTriangle());
   }
 

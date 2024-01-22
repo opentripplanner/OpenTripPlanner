@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.api.request.preference;
 
+import static org.opentripplanner.framework.lang.DoubleUtils.doubleEquals;
 import static org.opentripplanner.framework.lang.DoubleUtils.roundTo2Decimals;
 
 /**
@@ -107,6 +108,13 @@ public record TimeSlopeSafetyTriangle(double time, double slope, double safety) 
     public Builder withSafety(double safety) {
       this.safety = safety;
       return this;
+    }
+
+    /**
+     * Returns true if none of the values are set (i.e. all values are zero).
+     */
+    public boolean isEmpty() {
+      return doubleEquals(time, ZERO) && doubleEquals(slope, ZERO) && doubleEquals(safety, ZERO);
     }
 
     public TimeSlopeSafetyTriangle build() {
