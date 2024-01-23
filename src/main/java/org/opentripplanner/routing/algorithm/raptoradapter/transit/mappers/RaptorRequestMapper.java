@@ -119,12 +119,14 @@ public class RaptorRequestMapper {
     builder.withMultiCriteria(mcBuilder -> {
       var pt = preferences.transit();
       var r = pt.raptor();
-      if (!pt.relaxTransitGroupPriority().isNormal()) {
-        mcBuilder.withTransitPriorityCalculator(TransitGroupPriority32n.priorityCalculator());
-        mcBuilder.withRelaxC1(mapRelaxCost(pt.relaxTransitGroupPriority()));
-      } else {
+
+      // Note! If a pass-through-point exists, then the transit-group-priority feature is disabled
+      if (!request.getPassThroughPoints().isEmpty()) {
         mcBuilder.withPassThroughPoints(mapPassThroughPoints());
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
+      } else if (!pt.relaxTransitGroupPriority().isNormal()) {
+        mcBuilder.withTransitPriorityCalculator(TransitGroupPriority32n.priorityCalculator());
+        mcBuilder.withRelaxC1(mapRelaxCost(pt.relaxTransitGroupPriority()));
       }
     });
 
