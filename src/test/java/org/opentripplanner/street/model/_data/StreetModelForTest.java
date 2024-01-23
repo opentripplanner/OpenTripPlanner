@@ -98,7 +98,10 @@ public class StreetModelForTest {
   }
 
   public static VehicleRentalPlaceVertex rentalVertex(RentalFormFactor formFactor) {
-    var rentalVehicleBuilder = TestFreeFloatingRentalVehicleBuilder.of().withLatitude(-122.575133).withLongitude(45.456773);
+    var rentalVehicleBuilder = TestFreeFloatingRentalVehicleBuilder
+      .of()
+      .withLatitude(-122.575133)
+      .withLongitude(45.456773);
     if (formFactor == RentalFormFactor.SCOOTER) {
       rentalVehicleBuilder.withVehicleScooter();
     } else if (formFactor == RentalFormFactor.BICYCLE) {
@@ -108,5 +111,4 @@ public class StreetModelForTest {
     }
     return new VehicleRentalPlaceVertex(rentalVehicleBuilder.build());
   }
-
 }

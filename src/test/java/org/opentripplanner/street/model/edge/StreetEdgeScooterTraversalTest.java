@@ -111,7 +111,13 @@ public class StreetEdgeScooterTraversalTest {
 
   @Test
   public void testWalkingBeforeScooter() {
-    StreetEdge e1 = StreetModelForTest.streetEdgeBuilder(StreetModelForTest.V1, StreetModelForTest.V2, 100.0, StreetTraversalPermission.ALL)
+    StreetEdge e1 = StreetModelForTest
+      .streetEdgeBuilder(
+        StreetModelForTest.V1,
+        StreetModelForTest.V2,
+        100.0,
+        StreetTraversalPermission.ALL
+      )
       .withCarSpeed(10.0f)
       .buildAndConnect();
 

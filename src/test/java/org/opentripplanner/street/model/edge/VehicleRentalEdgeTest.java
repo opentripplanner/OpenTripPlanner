@@ -312,7 +312,9 @@ class VehicleRentalEdgeTest {
 
     vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
 
-    Set<String> bannedNetworks = banNetwork ? Set.of(this.vertex.getStation().getNetwork()) : Set.of();
+    Set<String> bannedNetworks = banNetwork
+      ? Set.of(this.vertex.getStation().getNetwork())
+      : Set.of();
 
     this.request =
       StreetSearchRequest
