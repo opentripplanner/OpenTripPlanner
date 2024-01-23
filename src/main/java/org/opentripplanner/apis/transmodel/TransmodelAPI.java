@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-import org.opentripplanner.apis.gtfs.GtfsGraphQLAPI;
 import org.opentripplanner.apis.transmodel.mapping.TransitIdMapper;
 import org.opentripplanner.apis.transmodel.support.GqlUtil;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -34,7 +33,6 @@ import org.slf4j.LoggerFactory;
 @Produces(MediaType.APPLICATION_JSON)
 public class TransmodelAPI {
 
-  @SuppressWarnings("unused")
   private static final Logger LOG = LoggerFactory.getLogger(TransmodelAPI.class);
 
   private static GraphQLSchema schema;
@@ -44,9 +42,7 @@ public class TransmodelAPI {
   private final TransmodelGraph index;
   private final ObjectMapper deserializer = new ObjectMapper();
 
-  public TransmodelAPI(
-    @Context OtpServerRequestContext serverContext
-  ) {
+  public TransmodelAPI(@Context OtpServerRequestContext serverContext) {
     this.serverContext = serverContext;
     this.index = new TransmodelGraph(schema);
   }
@@ -55,7 +51,7 @@ public class TransmodelAPI {
    * This class is only here for backwards-compatibility. It will be removed in the future.
    */
   @Path("/routers/{ignoreRouterId}/transmodel/index/graphql")
-  public static class TransmodelAPIOldPath extends GtfsGraphQLAPI {
+  public static class TransmodelAPIOldPath extends TransmodelAPI {
 
     public TransmodelAPIOldPath(
       @Context OtpServerRequestContext serverContext,
