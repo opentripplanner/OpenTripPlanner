@@ -18,6 +18,7 @@ import org.opentripplanner.service.vehiclerental.street.GeofencingZoneExtension;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalEdge;
 import org.opentripplanner.service.vehiclerental.street.VehicleRentalPlaceVertex;
 import org.opentripplanner.street.model.RentalFormFactor;
+import org.opentripplanner.street.model._data.StreetModelForTest;
 import org.opentripplanner.street.search.request.StreetSearchRequest;
 import org.opentripplanner.street.search.state.State;
 import org.opentripplanner.street.search.state.VehicleRentalState;
@@ -307,27 +308,11 @@ class VehicleRentalEdgeTest {
     RentalFormFactor formFactor,
     boolean banNetwork
   ) {
-    var network = "1";
-
-    VehicleRentalVehicle rentalVehicle = new VehicleRentalVehicle();
-
-    rentalVehicle.latitude = 1;
-    rentalVehicle.longitude = 1;
-    rentalVehicle.id = new FeedScopedId(network, "123");
-    rentalVehicle.vehicleType =
-      new RentalVehicleType(
-        new FeedScopedId(network, "type"),
-        "type",
-        formFactor,
-        RentalVehicleType.PropulsionType.ELECTRIC,
-        100000d
-      );
-
-    this.vertex = new VehicleRentalPlaceVertex(rentalVehicle);
+    this.vertex = StreetModelForTest.rentalVertex(formFactor);
 
     vehicleRentalEdge = VehicleRentalEdge.createVehicleRentalEdge(vertex, formFactor);
 
-    Set<String> bannedNetworks = banNetwork ? Set.of(network) : Set.of();
+    Set<String> bannedNetworks = banNetwork ? Set.of(this.vertex.getStation().getNetwork()) : Set.of();
 
     this.request =
       StreetSearchRequest
