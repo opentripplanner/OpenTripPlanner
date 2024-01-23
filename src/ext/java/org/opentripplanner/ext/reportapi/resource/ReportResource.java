@@ -38,9 +38,12 @@ public class ReportResource {
   private final RouteRequest defaultRequest;
 
   @SuppressWarnings("unused")
-  public ReportResource(@Context OtpServerRequestContext requestContext) {
-    this.transferService = requestContext.transitService().getTransferService();
-    this.transitService = requestContext.transitService();
+  public ReportResource(
+    @Context OtpServerRequestContext requestContext,
+    @Context TransitService transitService
+  ) {
+    this.transferService = transitService.getTransferService();
+    this.transitService = transitService;
     this.defaultRequest = requestContext.defaultRouteRequest();
   }
 
@@ -99,7 +102,7 @@ public class ReportResource {
   public Response stats(@Context OtpServerRequestContext serverRequestContext) {
     return Response
       .status(Response.Status.OK)
-      .entity(cachedStats.get(() -> GraphReportBuilder.build(serverRequestContext)))
+      .entity(cachedStats.get(() -> GraphReportBuilder.build(serverRequestContext, transitService)))
       .type("application/json")
       .build();
   }

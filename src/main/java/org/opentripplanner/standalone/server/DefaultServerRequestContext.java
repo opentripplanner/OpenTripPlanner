@@ -161,7 +161,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Override
   public RoutingService routingService() {
-    return new DefaultRoutingService(this);
+    return new DefaultRoutingService(this, transitService);
   }
 
   @Override

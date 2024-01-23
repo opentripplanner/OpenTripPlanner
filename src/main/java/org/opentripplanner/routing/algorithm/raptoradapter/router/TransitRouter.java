@@ -41,6 +41,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
+import org.opentripplanner.transit.service.TransitService;
 
 public class TransitRouter {
 
@@ -48,6 +49,7 @@ public class TransitRouter {
 
   private final RouteRequest request;
   private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
   private final DebugTimingAggregator debugTimingAggregator;
   private final ZonedDateTime transitSearchTimeZero;
   private final AdditionalSearchDays additionalSearchDays;
@@ -56,12 +58,14 @@ public class TransitRouter {
   private TransitRouter(
     RouteRequest request,
     OtpServerRequestContext serverContext,
+    TransitService transitService,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator
   ) {
     this.request = request;
     this.serverContext = serverContext;
+    this.transitService = transitService;
     this.transitSearchTimeZero = transitSearchTimeZero;
     this.additionalSearchDays = additionalSearchDays;
     this.debugTimingAggregator = debugTimingAggregator;
@@ -71,6 +75,7 @@ public class TransitRouter {
   public static TransitRouterResult route(
     RouteRequest request,
     OtpServerRequestContext serverContext,
+    TransitService transitService,
     ZonedDateTime transitSearchTimeZero,
     AdditionalSearchDays additionalSearchDays,
     DebugTimingAggregator debugTimingAggregator
@@ -78,6 +83,7 @@ public class TransitRouter {
     TransitRouter transitRouter = new TransitRouter(
       request,
       serverContext,
+      transitService,
       transitSearchTimeZero,
       additionalSearchDays,
       debugTimingAggregator
@@ -99,15 +105,15 @@ public class TransitRouter {
       return new TransitRouterResult(List.of(), null);
     }
 
-    if (!serverContext.transitService().transitFeedCovers(request.dateTime())) {
+    if (!transitService.transitFeedCovers(request.dateTime())) {
       throw new RoutingValidationException(
         List.of(new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME))
       );
     }
 
     var transitLayer = request.preferences().transit().ignoreRealtimeUpdates()
-      ? serverContext.transitService().getTransitLayer()
-      : serverContext.transitService().getRealtimeTransitLayer();
+      ? transitService.getTransitLayer()
+      : transitService.getRealtimeTransitLayer();
 
     var requestTransitDataProvider = createRequestTransitDataProvider(transitLayer);
 
@@ -145,7 +151,7 @@ public class TransitRouter {
       var service = TransferOptimizationServiceConfigurator.createOptimizeTransferService(
         transitLayer::getStopByIndex,
         requestTransitDataProvider.stopNameResolver(),
-        serverContext.transitService().getTransferService(),
+        transitService.getTransferService(),
         requestTransitDataProvider,
         transitLayer.getStopBoardAlightCosts(),
         request.preferences().transfer().optimization(),
@@ -158,7 +164,7 @@ public class TransitRouter {
 
     RaptorPathToItineraryMapper<TripSchedule> itineraryMapper = new RaptorPathToItineraryMapper<>(
       serverContext.graph(),
-      serverContext.transitService(),
+      transitService,
       transitLayer,
       transitSearchTimeZero,
       request
@@ -246,7 +252,7 @@ public class TransitRouter {
     var nearbyStops = AccessEgressRouter.streetSearch(
       accessRequest,
       temporaryVerticesContainer,
-      serverContext.transitService(),
+      transitService,
       streetRequest,
       serverContext.dataOverlayContext(accessRequest),
       type.isEgress(),
@@ -265,6 +271,7 @@ public class TransitRouter {
         accessRequest,
         temporaryVerticesContainer,
         serverContext,
+        transitService,
         additionalSearchDays,
         serverContext.flexConfig(),
         serverContext.dataOverlayContext(accessRequest),

@@ -69,6 +69,7 @@ public interface OtpServerRequestContext {
   Graph graph();
 
   @HttpRequestScoped
+  @Deprecated
   TransitService transitService();
 
   /**

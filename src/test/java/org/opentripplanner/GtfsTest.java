@@ -204,7 +204,8 @@ public abstract class GtfsTest {
     gtfsGraphBuilderImpl.buildGraph();
     transitModel.index();
     graph.index(transitModel.getStopModel());
-    serverContext = TestServerContext.createServerContext(graph, transitModel);
+    serverContext =
+      TestServerContextBuilder.of().withGraph(graph).withTransitModel(transitModel).serverContext();
     timetableSnapshotSource =
       new TimetableSnapshotSource(
         TimetableSnapshotSourceParameters.DEFAULT.withPurgeExpiredData(false),

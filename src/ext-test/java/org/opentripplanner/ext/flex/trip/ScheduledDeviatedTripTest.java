@@ -9,14 +9,12 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.TestServerContext;
+import org.opentripplanner.TestServerContextBuilder;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.DecorateWithFare;
 import org.opentripplanner.ext.flex.FlexRouter;
@@ -61,6 +59,13 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   static TransitModel transitModel;
 
   float delta = 0.01f;
+
+  @BeforeAll
+  static void setup() {
+    var model = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
+    graph = model.graph();
+    transitModel = model.transitModel();
+  }
 
   @Test
   void parseCobbCountyAsScheduledDeviatedTrip() {
@@ -126,34 +131,33 @@ public class ScheduledDeviatedTripTest extends FlexTest {
 
   @Test
   void calculateDirectFare() {
-    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, true));
-    var trip = getFlexTrip();
+    OTPFeature.FlexRouting.testOn(() -> {
+      var trip = getFlexTrip();
 
-    var from = getNearbyStop(trip, "from-stop");
-    var to = getNearbyStop(trip, "to-stop");
+      var from = getNearbyStop(trip, "from-stop");
+      var to = getNearbyStop(trip, "to-stop");
 
-    var router = new FlexRouter(
-      graph,
-      new DefaultTransitService(transitModel),
-      FlexConfig.DEFAULT,
-      OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
-      false,
-      1,
-      1,
-      List.of(from),
-      List.of(to)
-    );
+      var router = new FlexRouter(
+        graph,
+        new DefaultTransitService(transitModel),
+        FlexConfig.DEFAULT,
+        OffsetDateTime.parse("2021-11-12T10:15:24-05:00").toInstant(),
+        false,
+        1,
+        1,
+        List.of(from),
+        List.of(to)
+      );
 
-    var filter = new DecorateWithFare(graph.getFareService());
+      var filter = new DecorateWithFare(graph.getFareService());
 
-    var itineraries = router.createFlexOnlyItineraries().stream().peek(filter::decorate).toList();
+      var itineraries = router.createFlexOnlyItineraries().stream().peek(filter::decorate).toList();
 
-    var itinerary = itineraries.iterator().next();
-    assertFalse(itinerary.getFares().getFareTypes().isEmpty());
+      var itinerary = itineraries.iterator().next();
+      assertFalse(itinerary.getFares().getFareTypes().isEmpty());
 
-    assertEquals(Money.usDollars(2.5f), itinerary.getFares().getFare(FareType.regular));
-
-    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
+      assertEquals(Money.usDollars(2.5f), itinerary.getFares().getFare(FareType.regular));
+    });
   }
 
   /**
@@ -166,7 +170,11 @@ public class ScheduledDeviatedTripTest extends FlexTest {
   void flexTripInTransitMode() {
     var feedId = transitModel.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(graph, transitModel);
+    var serverContext = TestServerContextBuilder
+      .of()
+      .withGraph(graph)
+      .withTransitModel(transitModel)
+      .serverContext();
 
     // from zone 3 to zone 2
     var from = GenericLocation.fromStopId("Transfer Point for Route 30", feedId, "cujv");
@@ -227,13 +235,6 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     assertNotNull(lincolnGraph);
   }
 
-  @BeforeAll
-  static void setup() {
-    TestOtpModel model = FlexTest.buildFlexGraph(COBB_FLEX_GTFS);
-    graph = model.graph();
-    transitModel = model.transitModel();
-  }
-
   private static List<Itinerary> getItineraries(
     GenericLocation from,
     GenericLocation to,
@@ -252,6 +253,8 @@ public class ScheduledDeviatedTripTest extends FlexTest {
     var result = TransitRouter.route(
       request,
       serverContext,
+      // TODO: The same instance of DefaultTransitService should be used within the test
+      new DefaultTransitService(transitModel),
       transitStartOfTime,
       additionalSearchDays,
       new DebugTimingAggregator()

@@ -12,8 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.api.parallel.Resources;
-import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.modes.ExcludeAllTransitFilter;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -51,10 +49,13 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
 
   static GenericLocation p4 = new GenericLocation("Sulzer Pump (P4)", null, 45.54549, -122.69659);
 
+  public ElevationSnapshotTest() {
+    super(true);
+  }
+
   @BeforeAll
   public static void beforeClass() {
     Locale.setDefault(Locale.US);
-    loadGraphBeforeClass(true);
   }
 
   @AfterAll
@@ -152,10 +153,5 @@ public class ElevationSnapshotTest extends SnapshotTestBase {
     request.setTo(p1);
 
     expectArriveByToMatchDepartAtAndSnapshot(request);
-  }
-
-  @Override
-  protected TestOtpModel getGraph() {
-    return ConstantsForTests.getInstance().getCachedPortlandGraphWithElevation();
   }
 }

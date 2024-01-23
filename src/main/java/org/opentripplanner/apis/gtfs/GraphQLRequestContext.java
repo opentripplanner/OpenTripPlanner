@@ -21,10 +21,13 @@ public record GraphQLRequestContext(
   GraphFinder graphFinder,
   RouteRequest defaultRouteRequest
 ) {
-  public static GraphQLRequestContext ofServerContext(OtpServerRequestContext context) {
+  public static GraphQLRequestContext ofServerContext(
+    OtpServerRequestContext context,
+    TransitService transitService
+  ) {
     return new GraphQLRequestContext(
       context.routingService(),
-      context.transitService(),
+      transitService,
       context.graph().getFareService(),
       context.graph().getVehicleParkingService(),
       context.vehicleRentalService(),

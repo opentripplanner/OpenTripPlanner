@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.function.Function;
 import javax.annotation.Nonnull;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 
 public class GraphReportBuilder {
 
-  public static GraphStats build(OtpServerRequestContext context) {
-    var transitService = context.transitService();
+  public static GraphStats build(OtpServerRequestContext context, TransitService transitService) {
     var graph = context.graph();
     var constrainedTransfers = transitService.getTransferService().listAll();
 

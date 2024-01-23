@@ -17,6 +17,7 @@ import org.opentripplanner.routing.graphfinder.GraphFinder;
 import org.opentripplanner.routing.vehicle_parking.VehicleParking;
 import org.opentripplanner.routing.vehicle_parking.VehicleParkingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Created by demory on 7/26/18.
@@ -30,6 +31,7 @@ public class ParkAndRideResource {
 
   public ParkAndRideResource(
     @Context OtpServerRequestContext serverContext,
+    @Context TransitService transitService,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
@@ -42,7 +44,7 @@ public class ParkAndRideResource {
     //           - serverContext.graphFinder(). This needs at least a comment!
     //           - This can be replaced with a search done with the StopModel
     //           - if we have a radius search there.
-    this.graphFinder = new DirectGraphFinder(serverContext.transitService()::findRegularStop);
+    this.graphFinder = new DirectGraphFinder(transitService::findRegularStop);
   }
 
   /** Envelopes are in latitude, longitude format */

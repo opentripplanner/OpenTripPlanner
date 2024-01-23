@@ -7,18 +7,21 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.TestServerContext;
+import org.opentripplanner.TestServerContextBuilder;
 import org.opentripplanner.inspector.vector.geofencing.GeofencingZonesLayerBuilder;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
-import org.opentripplanner.transit.service.TransitModel;
+import org.opentripplanner.transit.service.TransitService;
 
 class VectorTileResponseFactoryTest {
 
-  public static final OtpServerRequestContext SERVER_CONTEXT = TestServerContext.createServerContext(
-    new Graph(),
-    new TransitModel()
-  );
+  public static final OtpServerRequestContext SERVER_CONTEXT;
+  private static final TransitService TRANSIT_SERVICE;
+
+  static {
+    var ctxBuilder = TestServerContextBuilder.of();
+    SERVER_CONTEXT = ctxBuilder.serverContext();
+    TRANSIT_SERVICE = ctxBuilder.transitService();
+  }
 
   enum LayerType {
     RED,
@@ -40,7 +43,8 @@ class VectorTileResponseFactoryTest {
   private static LayerBuilder<?> createLayerBuilder(
     LayerParameters<LayerType> layerParameters,
     Locale locale,
-    OtpServerRequestContext context
+    OtpServerRequestContext context,
+    TransitService transitService
   ) {
     return new GeofencingZonesLayerBuilder(context.graph(), layerParameters);
   }
@@ -54,7 +58,8 @@ class VectorTileResponseFactoryTest {
       layers,
       LAYERS,
       VectorTileResponseFactoryTest::createLayerBuilder,
-      SERVER_CONTEXT
+      SERVER_CONTEXT,
+      TRANSIT_SERVICE
     );
   }
 

@@ -46,10 +46,13 @@ public class BikeRentalSnapshotTest extends SnapshotTestBase {
     -122.67525
   );
 
+  public BikeRentalSnapshotTest() {
+    super(false);
+  }
+
   @BeforeAll
   public static void beforeClass() {
     Locale.setDefault(Locale.US);
-    loadGraphBeforeClass(false);
   }
 
   @AfterAll

@@ -7,7 +7,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 
 /**
@@ -18,23 +18,23 @@ import org.opentripplanner.updater.GraphUpdaterStatus;
 @Produces(MediaType.APPLICATION_JSON)
 public class UpdaterStatusResource {
 
-  private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
 
   public UpdaterStatusResource(
-    @Context OtpServerRequestContext serverContext,
+    @Context TransitService transitService,
     /**
      * @deprecated The support for multiple routers are removed from OTP2.
      * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
     @Deprecated @PathParam("ignoreRouterId") String ignoreRouterId
   ) {
-    this.serverContext = serverContext;
+    this.transitService = transitService;
   }
 
   /** Return a list of all agencies in the graph. */
   @GET
   public Response getUpdaters() {
-    GraphUpdaterStatus updaterStatus = serverContext.transitService().getUpdaterStatus();
+    GraphUpdaterStatus updaterStatus = transitService.getUpdaterStatus();
     if (updaterStatus == null) {
       return Response.status(Response.Status.NOT_FOUND).entity("No updaters running.").build();
     }
@@ -48,7 +48,7 @@ public class UpdaterStatusResource {
   @GET
   @Path("/{updaterId}")
   public Response getUpdaters(@PathParam("updaterId") int updaterId) {
-    GraphUpdaterStatus updaterStatus = serverContext.transitService().getUpdaterStatus();
+    GraphUpdaterStatus updaterStatus = transitService.getUpdaterStatus();
     if (updaterStatus == null) {
       return Response.status(Response.Status.NOT_FOUND).entity("No updaters running.").build();
     }

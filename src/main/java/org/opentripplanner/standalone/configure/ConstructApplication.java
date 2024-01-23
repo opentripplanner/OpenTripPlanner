@@ -145,7 +145,7 @@ public class ConstructApplication {
   private Application createApplication() {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();
-    return new OTPWebApplication(routerConfig().server(), this::createServerContext);
+    return new OTPWebApplication(routerConfig().server(), this::createServerContext, factory);
   }
 
   private void setupTransitRoutingServer() {
@@ -177,7 +177,7 @@ public class ConstructApplication {
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Creating debug client geocoder lucene index");
-      LuceneIndex.forServer(createServerContext());
+      LuceneIndex.forServer(createServerContext(), factory.transitService());
     }
   }
 

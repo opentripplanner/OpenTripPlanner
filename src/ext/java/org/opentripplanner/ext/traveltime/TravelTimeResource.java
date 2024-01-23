@@ -75,6 +75,7 @@ public class TravelTimeResource {
 
   public TravelTimeResource(
     @Context OtpServerRequestContext serverContext,
+    @Context TransitService transitService,
     @QueryParam("location") String location,
     @QueryParam("time") String time,
     @QueryParam("cutoff") @DefaultValue("60m") List<String> cutoffs,
@@ -82,7 +83,7 @@ public class TravelTimeResource {
     @QueryParam("arriveBy") @DefaultValue("false") boolean arriveBy
   ) {
     this.graph = serverContext.graph();
-    this.transitService = serverContext.transitService();
+    this.transitService = transitService;
     routingRequest = serverContext.defaultRouteRequest();
     routingRequest.setArriveBy(arriveBy);
 

@@ -12,15 +12,26 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
+import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.street.model.edge.Edge;
 import org.opentripplanner.street.model.vertex.Vertex;
 import org.opentripplanner.street.search.TemporaryVerticesContainer;
 import org.opentripplanner.street.search.state.State;
+import org.opentripplanner.transit.service.TransitService;
 
+@HttpRequestScoped
 public class DirectStreetRouter {
 
-  public static List<Itinerary> route(OtpServerRequestContext serverContext, RouteRequest request) {
+  private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
+
+  public DirectStreetRouter(OtpServerRequestContext serverContext, TransitService transitService) {
+    this.serverContext = serverContext;
+    this.transitService = transitService;
+  }
+
+  public List<Itinerary> route(RouteRequest request) {
     if (request.journey().direct().mode() == StreetMode.NOT_SET) {
       return Collections.emptyList();
     }
@@ -51,7 +62,7 @@ public class DirectStreetRouter {
 
       // Convert the internal GraphPaths to itineraries
       final GraphPathToItineraryMapper graphPathToItineraryMapper = new GraphPathToItineraryMapper(
-        serverContext.transitService().getTimeZone(),
+        transitService.getTimeZone(),
         serverContext.graph().streetNotesService,
         serverContext.graph().ellipsoidToGeoidDifference
       );

@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import au.com.origin.snapshots.junit5.SnapshotExtension;
 import java.util.List;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,9 +57,8 @@ public class TransitSnapshotTest extends SnapshotTestBase {
     -122.64699
   );
 
-  @BeforeAll
-  public static void beforeClass() {
-    loadGraphBeforeClass(false);
+  public TransitSnapshotTest() {
+    super(false);
   }
 
   @Test

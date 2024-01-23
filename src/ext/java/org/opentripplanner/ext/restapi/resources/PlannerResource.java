@@ -20,6 +20,8 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,13 @@ public class PlannerResource extends RoutingResource {
   @Deprecated
   @PathParam("ignoreRouterId")
   private String ignoreRouterId;
+
+  public PlannerResource(
+    @Context OtpServerRequestContext serverContext,
+    @Context TransitService transitService
+  ) {
+    super(serverContext, transitService);
+  }
 
   // We inject info about the incoming request so we can include the incoming query
   // parameters in the outgoing response. This is a TriMet requirement.

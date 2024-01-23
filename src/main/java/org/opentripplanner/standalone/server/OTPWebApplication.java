@@ -21,6 +21,8 @@ import org.opentripplanner.apis.APIEndpoints;
 import org.opentripplanner.ext.restapi.serialization.JSONObjectMapperProvider;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.configure.ConstructApplicationFactory;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 /**
@@ -36,6 +38,8 @@ public class OTPWebApplication extends Application {
   /* This object groups together all the modules for a single running OTP server. */
   private final Supplier<OtpServerRequestContext> contextProvider;
 
+  private final ConstructApplicationFactory factory;
+
   private final List<Class<? extends ContainerResponseFilter>> customFilters;
 
   static {
@@ -48,9 +52,11 @@ public class OTPWebApplication extends Application {
 
   public OTPWebApplication(
     OTPWebApplicationParameters parameters,
-    Supplier<OtpServerRequestContext> contextProvider
+    Supplier<OtpServerRequestContext> contextProvider,
+    ConstructApplicationFactory factory
   ) {
     this.contextProvider = contextProvider;
+    this.factory = factory;
     this.customFilters = createCustomFilters(parameters.traceParameters());
   }
 
@@ -104,6 +110,12 @@ public class OTPWebApplication extends Application {
         new JSONObjectMapperProvider(),
         // Allow injecting the OTP server object into Jersey resource classes
         makeBinder(contextProvider),
+        new AbstractBinder() {
+          @Override
+          protected void configure() {
+            bindFactory(factory::transitService).to(TransitService.class);
+          }
+        },
         // Add performance instrumentation of Jersey requests to micrometer
         getMetricsApplicationEventListener()
       )

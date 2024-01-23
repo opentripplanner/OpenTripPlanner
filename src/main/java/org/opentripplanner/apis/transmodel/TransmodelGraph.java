@@ -25,6 +25,7 @@ import org.opentripplanner.framework.application.OTPRequestTimeoutException;
 import org.opentripplanner.framework.concurrent.OtpRequestThreadFactory;
 import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +47,7 @@ class TransmodelGraph {
   Response executeGraphQL(
     String query,
     OtpServerRequestContext serverContext,
+    TransitService transitService,
     Map<String, Object> variables,
     String operationName,
     int maxResolves,
@@ -54,7 +56,7 @@ class TransmodelGraph {
     try (var executionStrategy = new AbortOnTimeoutExecutionStrategy()) {
       variables = ObjectUtils.ifNotNull(variables, new HashMap<>());
       var instrumentation = createInstrumentation(maxResolves, tracingTags);
-      var transmodelRequestContext = createRequestContext(serverContext);
+      var transmodelRequestContext = createRequestContext(serverContext, transitService);
       var executionInput = createExecutionInput(
         query,
         serverContext,
@@ -92,12 +94,13 @@ class TransmodelGraph {
   }
 
   private static TransmodelRequestContext createRequestContext(
-    OtpServerRequestContext serverContext
+    OtpServerRequestContext serverContext,
+    TransitService transitService
   ) {
     return new TransmodelRequestContext(
       serverContext,
       serverContext.routingService(),
-      serverContext.transitService()
+      transitService
     );
   }
 
