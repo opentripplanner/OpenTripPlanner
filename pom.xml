@@ -56,7 +56,7 @@
 
 
     <properties>
-        <otp.serialization.version.id>135</otp.serialization.version.id>
+        <otp.serialization.version.id>137</otp.serialization.version.id>
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>30.1</geotools.version>
         <google.dagger.version>2.50</google.dagger.version>
@@ -557,20 +557,6 @@
                 <scope>import</scope>
             </dependency>
 
-            <!--
-                this is necessary because async-http-client uses an old netty version that can crash the
-                Java 21 JVM: https://github.com/netty/netty/pull/13640
-
-                when ACH has been upgraded to the (as of now unreleased) version 3, this can be removed again.
-            -->
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-bom</artifactId>
-                <version>4.1.100.Final</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -709,7 +695,7 @@
         <dependency>
             <groupId>org.entur.gbfs</groupId>
             <artifactId>gbfs-java-model</artifactId>
-            <version>3.0.16</version>
+            <version>3.0.20</version>
         </dependency>
 
         <!-- TESTING -->
@@ -734,7 +720,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.8.0</version>
+            <version>5.9.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -855,13 +841,6 @@
             <artifactId>protobuf-java</artifactId>
         </dependency>
 
-        <!-- Asynchronous Websocket-capable client, for message-driven incremental GTFS-RT -->
-        <!-- AsyncHttpClient Websockets need a newer version of Grizzly than Jersey does. -->
-        <dependency>
-            <groupId>org.asynchttpclient</groupId>
-            <artifactId>async-http-client</artifactId>
-            <version>2.12.3</version>
-        </dependency>
         <!-- OBA GTFS loader -->
         <dependency>
             <groupId>org.onebusaway</groupId>

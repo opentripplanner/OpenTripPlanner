@@ -15,13 +15,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.opentripplanner.routing.api.request.request.filter.TransitPriorityGroupSelect;
+import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.basic.TransitMode;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
- * This class turns a {@link TransitPriorityGroupSelect} into a matcher.
+ * This class turns a {@link TransitGroupSelect} into a matcher.
  * <p>
  * Design: It uses the composite design pattern. A matcher is created for each
  * value in the "select", then the list of non-empty matchers is merged into
@@ -42,7 +42,7 @@ public abstract class PriorityGroupMatcher {
     }
   };
 
-  public static PriorityGroupMatcher of(TransitPriorityGroupSelect select) {
+  public static PriorityGroupMatcher of(TransitGroupSelect select) {
     if (select.isEmpty()) {
       return NOOP;
     }
@@ -65,7 +65,7 @@ public abstract class PriorityGroupMatcher {
     return andOf(list);
   }
 
-  static PriorityGroupMatcher[] of(Collection<TransitPriorityGroupSelect> selectors) {
+  static PriorityGroupMatcher[] of(Collection<TransitGroupSelect> selectors) {
     return selectors
       .stream()
       .map(PriorityGroupMatcher::of)

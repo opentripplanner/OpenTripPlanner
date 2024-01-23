@@ -15,10 +15,12 @@
     }
   },
   "routingDefaults": {
-    "walkSpeed": 1.38,
+    "walk": {
+      "speed": 1.38,
+      "reluctance": 5
+    },
     "transferSlack": 180,
     "waitReluctance": 0.175,
-    "walkReluctance": 5,
     "maxDirectStreetDuration": "1h1m",
     "boardSlackForMode": {
       "RAIL": "12m"

@@ -147,7 +147,7 @@ class RaptorRoutingRequestTransitDataCreator {
             tripPattern.getAlightingPossible(),
             BoardAlight.ALIGHT
           ),
-          priorityGroupConfigurator.lookupTransitPriorityGroupId(tripPattern)
+          priorityGroupConfigurator.lookupTransitGroupPriorityId(tripPattern)
         )
       );
     }

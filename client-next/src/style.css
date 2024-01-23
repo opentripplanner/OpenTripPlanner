@@ -119,3 +119,12 @@
   font-size: 14px;
   padding-left: 2px;
 }
+
+/* debug layer selector */
+
+.maplibregl-ctrl-group.layer-select {
+  padding: 10px;
+}
+.maplibregl-ctrl-group.layer-select label {
+  margin-left: 6px;
+}

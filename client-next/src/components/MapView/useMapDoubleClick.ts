@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { TripQueryVariables } from '../../gql/graphql.ts';
-import { LngLat, MapLayerMouseEvent } from 'react-map-gl';
+import { LngLat, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 
 const setCoordinates = (tripQueryVariables: TripQueryVariables, lngLat: LngLat, key: 'from' | 'to') => ({
   ...tripQueryVariables,

@@ -3,7 +3,11 @@ package org.opentripplanner.routing.api.request;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 import org.opentripplanner.framework.tostring.ToStringBuilder;
 import org.slf4j.Logger;
@@ -46,14 +50,16 @@ public class DebugRaptor implements Serializable {
   private List<Integer> stops = List.of();
   private List<Integer> path = List.of();
   private int debugPathFromStopIndex = 0;
+  private Set<DebugEventType> eventTypes = EnumSet.noneOf(DebugEventType.class);
 
   public DebugRaptor() {}
 
-  /** Avoid using clone(), use copy-constructor instead(Josh Bloch). */
+  /** Avoid using clone(), use copy-constructor instead (Josh Bloch). */
   public DebugRaptor(DebugRaptor other) {
     this.stops = List.copyOf(other.stops);
     this.path = List.copyOf(other.path);
     this.debugPathFromStopIndex = other.debugPathFromStopIndex;
+    this.eventTypes = EnumSet.copyOf(other.eventTypes);
   }
 
   public boolean isEnabled() {
@@ -90,12 +96,23 @@ public class DebugRaptor implements Serializable {
     return debugPathFromStopIndex;
   }
 
+  public Set<DebugEventType> eventTypes() {
+    return Collections.unmodifiableSet(eventTypes);
+  }
+
+  public DebugRaptor withEventTypes(Collection<DebugEventType> eventTypes) {
+    this.eventTypes.clear();
+    this.eventTypes.addAll(eventTypes);
+    return this;
+  }
+
   @Override
   public String toString() {
     return ToStringBuilder
       .of(DebugRaptor.class)
       .addObj("stops", toString(stops, FIRST_STOP_INDEX))
       .addObj("path", toString(path, debugPathFromStopIndex))
+      .addCol("eventType", eventTypes)
       .toString();
   }
 
