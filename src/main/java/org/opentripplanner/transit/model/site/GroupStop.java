@@ -99,8 +99,8 @@ public class GroupStop
    * will return the geometry of the area.
    */
   @Override
-  public Optional<Geometry> getEncompassingAreaGeometry() {
-   return Optional.ofNullable(encompassingGeometry).or(Optional.of(geometry));
+  public Optional<? extends Geometry> getEncompassingAreaGeometry() {
+    return Optional.ofNullable(encompassingAreaGeometry).or(() -> Optional.of(geometry));
   }
 
   @Override

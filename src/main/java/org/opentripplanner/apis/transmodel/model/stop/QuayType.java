@@ -15,6 +15,7 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.apis.transmodel.model.EnumTypes;
 import org.opentripplanner.apis.transmodel.model.plan.JourneyWhiteListed;
 import org.opentripplanner.apis.transmodel.model.scalars.GeoJSONCoordinatesScalar;
@@ -361,7 +362,10 @@ public class QuayType {
           .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
           .dataFetcher(env -> {
             StopLocation stopLocation = env.getSource();
-            return stopLocation.getEncompassingAreaGeometry().map(g -> g.getCoordinates()).orElse(null);
+            return stopLocation
+              .getEncompassingAreaGeometry()
+              .map(Geometry::getCoordinates)
+              .orElse(null);
           })
           .build()
       )

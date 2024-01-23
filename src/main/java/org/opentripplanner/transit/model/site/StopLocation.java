@@ -129,7 +129,7 @@ public interface StopLocation extends LogInfo {
    * The geometry of the area that encompasses the bounds of the stop area. If the stop is defined
    * as a point, this is null.
    */
-  default Optional<Geometry> getEncompassingAreaGeometry() {
+  default Optional<? extends Geometry> getEncompassingAreaGeometry() {
     return Optional.empty();
   }
 
