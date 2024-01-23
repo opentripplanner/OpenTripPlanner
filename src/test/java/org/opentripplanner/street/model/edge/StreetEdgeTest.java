@@ -155,7 +155,6 @@ public class StreetEdgeTest {
       .withName("Test Lane")
       .withMeterLength(length)
       .withPermission(StreetTraversalPermission.ALL)
-      .withBack(false)
       .buildAndConnect();
 
     var request = StreetSearchRequest.of().withMode(StreetMode.SCOOTER_RENTAL);
@@ -545,7 +544,6 @@ public class StreetEdgeTest {
       .withName("Test Lane")
       .withMeterLength(length)
       .withPermission(StreetTraversalPermission.ALL)
-      .withBack(false)
       // a safe street
       .withBicycleSafetyFactor(0.74f)
       .buildAndConnect();
