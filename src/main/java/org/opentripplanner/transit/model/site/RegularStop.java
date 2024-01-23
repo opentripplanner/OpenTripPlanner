@@ -83,8 +83,8 @@ public final class RegularStop
 
   @Nonnull
   @Override
-  public String getStopType() {
-    return "regular";
+  public StopType getStopType() {
+    return StopType.REGULAR;
   }
 
   @Override

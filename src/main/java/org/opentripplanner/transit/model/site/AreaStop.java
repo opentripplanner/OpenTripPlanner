@@ -87,8 +87,8 @@ public class AreaStop
 
   @Nonnull
   @Override
-  public String getStopType() {
-    return "flexible_area";
+  public StopType getStopType() {
+    return StopType.FLEXIBLE_AREA;
   }
 
   @Override

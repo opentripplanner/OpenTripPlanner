@@ -66,8 +66,8 @@ public class GroupStop
 
   @Override
   @Nonnull
-  public String getStopType() {
-    return "flexible_group";
+  public StopType getStopType() {
+    return StopType.FLEXIBLE_GROUP;
   }
 
   @Override

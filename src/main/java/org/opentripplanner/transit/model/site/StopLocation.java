@@ -45,7 +45,7 @@ public interface StopLocation extends LogInfo {
   I18NString getUrl();
 
   @Nonnull
-  String getStopType();
+  StopType getStopType();
 
   /**
    * Short text or a number that identifies the location for riders. These codes are often used in
