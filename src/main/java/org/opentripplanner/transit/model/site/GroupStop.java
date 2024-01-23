@@ -100,10 +100,7 @@ public class GroupStop
    */
   @Override
   public Optional<Geometry> getEncompassingAreaGeometry() {
-    if (encompassingAreaGeometry == null) {
-      return Optional.of(geometry);
-    }
-    return Optional.of(encompassingAreaGeometry);
+   return Optional.ofNullable(encompassingGeometry).or(Optional.of(geometry));
   }
 
   @Override
