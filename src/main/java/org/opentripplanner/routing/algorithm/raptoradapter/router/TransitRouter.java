@@ -121,7 +121,7 @@ public class TransitRouter {
     );
 
     // Prepare transit search
-    var raptorRequest = RaptorRequestMapper.mapRequest(
+    var raptorRequest = RaptorRequestMapper.<TripSchedule>mapRequest(
       request,
       transitSearchTimeZero,
       serverContext.raptorConfig().isMultiThreaded(),
