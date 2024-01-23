@@ -17,7 +17,7 @@ import org.opentripplanner.routing.core.VehicleRoutingOptimizeType;
  * related to street and transit routing. The values are normalized(rounded) so the class can used
  * as a cache key.
  *
- * Scooter rental is only supported currently.
+ * Only Scooter rental is supported currently.
  * <p>
  * THIS CLASS IS IMMUTABLE AND THREAD-SAFE.
  */
