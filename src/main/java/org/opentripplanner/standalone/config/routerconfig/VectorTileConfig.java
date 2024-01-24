@@ -42,7 +42,7 @@ public class VectorTileConfig
   }
 
   public static VectorTileConfig mapVectorTilesParameters(NodeAdapter node, String paramName) {
-    var root = node.of(paramName).asObject();
+    var root = node.of(paramName).summary("Vector tile configuration").asObject();
     return new VectorTileConfig(
       root
         .of("layers")
@@ -65,6 +65,10 @@ public class VectorTileConfig
           The protocol and host are always read from the incoming HTTP request. If you run OTP behind 
           a proxy then make sure to set the headers `X-Forwarded-Proto` and `X-Forwarded-Host` to make OTP
           return the protocol and host for the original request and not the proxied one.
+          
+          **Note:** This does _not_ change the path that OTP itself serves the tiles or `tilejson.json`
+          responses but simply changes the URLs listed in `tilejson.json`. The rewriting of the path
+          is expected to be handled by a proxy.
           """
         )
         .asString(DEFAULT.basePath)

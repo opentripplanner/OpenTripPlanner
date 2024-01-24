@@ -67,7 +67,7 @@ A full list of them can be found in the [RouteRequest](RouteRequest.md).
 |    [hideFeedId](#transmodelApi_hideFeedId)                                                |       `boolean`       | Hide the FeedId in all API output, and add it to input.                                               | *Optional* | `false`       |   na  |
 |    [tracingHeaderTags](#transmodelApi_tracingHeaderTags)                                  |       `string[]`      | Used to group requests when monitoring OTP.                                                           | *Optional* |               |   na  |
 | [updaters](UpdaterConfig.md)                                                              |       `object[]`      | Configuration for the updaters that import various types of data into OTP.                            | *Optional* |               |  1.5  |
-| [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | TODO: Add short summary.                                                                              | *Optional* |               |   na  |
+| [vectorTiles](sandbox/MapboxVectorTilesApi.md)                                            |        `object`       | Vector tile configuration                                                                             | *Optional* |               |   na  |
 | [vehicleRentalServiceDirectory](sandbox/VehicleRentalServiceDirectory.md)                 |        `object`       | Configuration for the vehicle rental service directory.                                               | *Optional* |               |  2.0  |
 
 <!-- PARAMETERS-TABLE END -->
