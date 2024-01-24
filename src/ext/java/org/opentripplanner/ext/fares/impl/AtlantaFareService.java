@@ -378,15 +378,14 @@ public class AtlantaFareService extends DefaultFareService {
   }
 
   @Override
-  public boolean populateFare(
-    ItineraryFares fare,
+  public ItineraryFares populateFare(
     Currency currency,
     FareType fareType,
-    List<Leg> rides,
+    List<Leg> legs,
     Collection<FareRuleSet> fareRules
   ) {
     List<ATLTransfer> transfers = new ArrayList<>();
-    for (var ride : rides) {
+    for (var ride : legs) {
       Money defaultFare = getLegPrice(ride, fareType, fareRules);
       if (transfers.isEmpty()) {
         transfers.add(new ATLTransfer(currency, fareType));
@@ -412,8 +411,8 @@ public class AtlantaFareService extends DefaultFareService {
       null,
       null
     );
+    var fare = ItineraryFares.empty();
     fare.addItineraryProducts(List.of(fareProduct));
-
-    return true;
+    return fare;
   }
 }

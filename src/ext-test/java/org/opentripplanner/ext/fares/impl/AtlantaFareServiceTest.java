@@ -21,7 +21,6 @@ import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.framework.geometry.WgsCoordinate;
 import org.opentripplanner.framework.i18n.NonLocalizedString;
-import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -226,8 +225,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
    * used. This will be the same for all cash fare types except when overriden above.
    */
   private static void calculateFare(List<Leg> rides, Money expectedFare) {
-    ItineraryFares fare = new ItineraryFares();
-    atlFareService.populateFare(fare, USD, FareType.electronicRegular, rides, null);
+    var fare = atlFareService.populateFare(USD, FareType.electronicRegular, rides, null);
     assertEquals(
       expectedFare,
       fare
@@ -293,10 +291,9 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
       .build();
 
     int start = (int) (T11_00 + (startTimeMins * 60));
-    var itin = newItinerary(Place.forStop(firstStop), start)
+    return newItinerary(Place.forStop(firstStop), start)
       .bus(route, 1, start, T11_12, Place.forStop(lastStop))
       .build();
-    return itin;
   }
 
   private static class TestAtlantaFareService extends AtlantaFareService {

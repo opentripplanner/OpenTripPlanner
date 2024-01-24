@@ -2,6 +2,7 @@ package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
 import static org.opentripplanner.transit.model.basic.Money.euros;
@@ -450,6 +451,6 @@ public class HSLFareServiceTest implements PlanTestConstants {
       .bus(1, T11_20, T11_30, PlanTestConstants.E)
       .build();
     var result = service.calculateFares(outsideHsl);
-    assertNull(result);
+    assertTrue(result.isEmpty());
   }
 }

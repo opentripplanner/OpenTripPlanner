@@ -48,8 +48,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
    * additional free transfers from there.
    */
   @Override
-  protected boolean populateFare(
-    ItineraryFares fare,
+  protected ItineraryFares populateFare(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
@@ -93,8 +92,11 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
       null,
       null
     );
-    fare.addItineraryProducts(List.of(fp));
-    return cost.greaterThan(zero);
+    var fare = ItineraryFares.empty();
+    if (cost.greaterThan(zero)) {
+      fare.addItineraryProducts(List.of(fp));
+    }
+    return fare;
   }
 
   @Override

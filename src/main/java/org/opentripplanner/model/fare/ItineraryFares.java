@@ -103,4 +103,13 @@ public class ItineraryFares {
   public void addFareProductUses(Multimap<Leg, FareProductUse> fareProducts) {
     legProducts.putAll(fareProducts);
   }
+
+  public void add(ItineraryFares fare) {
+    itineraryProducts.addAll(fare.itineraryProducts);
+    legProducts.putAll(fare.legProducts);
+  }
+
+  public boolean isEmpty() {
+    return itineraryProducts.isEmpty() && legProducts.isEmpty();
+  }
 }

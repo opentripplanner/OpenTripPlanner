@@ -2,7 +2,6 @@ package org.opentripplanner.ext.fares.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_STOP;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.AIRPORT_TO_CITY_CENTER_SET;
 import static org.opentripplanner.ext.fares.impl.FareModelForTest.CITY_CENTER_A_STOP;
@@ -19,6 +18,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
 import org.opentripplanner.routing.core.FareType;
@@ -28,7 +28,6 @@ import org.opentripplanner.transit.model.basic.Money;
 class DefaultFareServiceTest implements PlanTestConstants {
 
   private static final Money TEN_DOLLARS = Money.usDollars(10);
-  private static final Money TWENTY_DOLLARS = Money.usDollars(20);
 
   @Test
   void noRules() {
@@ -36,7 +35,7 @@ class DefaultFareServiceTest implements PlanTestConstants {
     service.addFareRules(FareType.regular, List.of());
     var itin = newItinerary(A, T11_00).bus(1, T11_05, T11_12, B).build();
     var fare = service.calculateFares(itin);
-    assertNull(fare);
+    assertEquals(ItineraryFares.empty(), fare);
   }
 
   @Test
