@@ -15,6 +15,8 @@ queries.
 
 When running OTP locally the endpoint is available at: `http://localhost:8080/otp/transmodel/v3`
 
+Note! Version `v1` and `v2` does not exist in the main OTP git repository, but in the (Entur fork)[https://github.com/entur/OpenTripPlanner] from which this code originate from.
+
 ### Configuration
 
 To turn this API off, add the feature `TransmodelGraphQlApi : false` in `otp-config.json`.
