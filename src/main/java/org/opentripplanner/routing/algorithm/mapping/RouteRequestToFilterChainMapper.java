@@ -17,6 +17,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.request.preference.ItineraryFilterPreferences;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 
 public class RouteRequestToFilterChainMapper {
 
@@ -29,6 +30,7 @@ public class RouteRequestToFilterChainMapper {
   public static ItineraryListFilterChain createFilterChain(
     RouteRequest request,
     OtpServerRequestContext context,
+    TransitService transitService,
     Instant earliestDepartureTimeUsed,
     Duration searchWindowUsed,
     boolean removeWalkAllTheWayResults,
@@ -85,8 +87,8 @@ public class RouteRequestToFilterChainMapper {
         params.removeItinerariesWithSameRoutesAndStops()
       )
       .withTransitAlerts(
-        context.transitService().getTransitAlertService(),
-        context.transitService()::getMultiModalStationForStation
+        transitService.getTransitAlertService(),
+        transitService::getMultiModalStationForStation
       )
       .withSearchWindow(earliestDepartureTimeUsed, searchWindowUsed)
       .withPageCursorInputSubscriber(pageCursorInputSubscriber)

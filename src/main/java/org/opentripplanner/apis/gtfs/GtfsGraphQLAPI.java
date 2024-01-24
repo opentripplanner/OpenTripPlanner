@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,10 +28,15 @@ public class GtfsGraphQLAPI {
   private static final Logger LOG = LoggerFactory.getLogger(GtfsGraphQLAPI.class);
 
   private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
   private final ObjectMapper deserializer = new ObjectMapper();
 
-  public GtfsGraphQLAPI(@Context OtpServerRequestContext serverContext) {
+  public GtfsGraphQLAPI(
+    @Context OtpServerRequestContext serverContext,
+    @Context TransitService transitService
+  ) {
     this.serverContext = serverContext;
+    this.transitService = transitService;
   }
 
   /**
@@ -41,9 +47,10 @@ public class GtfsGraphQLAPI {
 
     public GtfsGraphQLAPIOldPath(
       @Context OtpServerRequestContext serverContext,
+      @Context TransitService transitService,
       @PathParam("ignoreRouterId") String ignore
     ) {
-      super(serverContext);
+      super(serverContext, transitService);
     }
   }
 
@@ -95,7 +102,7 @@ public class GtfsGraphQLAPI {
       maxResolves,
       timeout,
       locale,
-      GraphQLRequestContext.ofServerContext(serverContext)
+      GraphQLRequestContext.ofServerContext(serverContext, transitService)
     );
   }
 
@@ -117,7 +124,7 @@ public class GtfsGraphQLAPI {
       maxResolves,
       timeout,
       locale,
-      GraphQLRequestContext.ofServerContext(serverContext)
+      GraphQLRequestContext.ofServerContext(serverContext, transitService)
     );
   }
 }

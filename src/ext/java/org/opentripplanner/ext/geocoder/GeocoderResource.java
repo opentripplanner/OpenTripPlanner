@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.opentripplanner.ext.restapi.mapping.FeedScopedIdMapper;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.model.site.StopLocation;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * OTP simple built-in geocoder used by the debug client.
@@ -26,6 +27,7 @@ import org.opentripplanner.transit.model.site.StopLocation;
 public class GeocoderResource {
 
   private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
 
   /**
    * @deprecated The support for multiple routers are removed from OTP2. See
@@ -35,8 +37,12 @@ public class GeocoderResource {
   @PathParam("ignoreRouterId")
   private String ignoreRouterId;
 
-  public GeocoderResource(@Context OtpServerRequestContext requestContext) {
-    serverContext = requestContext;
+  public GeocoderResource(
+    @Context OtpServerRequestContext requestContext,
+    @Context TransitService transitService
+  ) {
+    this.serverContext = requestContext;
+    this.transitService = transitService;
   }
 
   /**
@@ -65,7 +71,10 @@ public class GeocoderResource {
   @GET
   @Path("stopClusters")
   public Response stopClusters(@QueryParam("query") String query) {
-    var clusters = LuceneIndex.forServer(serverContext).queryStopClusters(query).toList();
+    var clusters = LuceneIndex
+      .forServer(serverContext, transitService)
+      .queryStopClusters(query)
+      .toList();
 
     return Response.status(Response.Status.OK).entity(clusters).build();
   }
@@ -91,7 +100,7 @@ public class GeocoderResource {
 
   private Collection<SearchResult> queryStopLocations(String query, boolean autocomplete) {
     return LuceneIndex
-      .forServer(serverContext)
+      .forServer(serverContext, transitService)
       .queryStopLocations(query, autocomplete)
       .map(sl ->
         new SearchResult(
@@ -106,7 +115,7 @@ public class GeocoderResource {
 
   private Collection<? extends SearchResult> queryStations(String query, boolean autocomplete) {
     return LuceneIndex
-      .forServer(serverContext)
+      .forServer(serverContext, transitService)
       .queryStopLocationGroups(query, autocomplete)
       .map(sc ->
         new SearchResult(

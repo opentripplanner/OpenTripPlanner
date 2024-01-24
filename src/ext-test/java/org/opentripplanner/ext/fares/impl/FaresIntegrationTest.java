@@ -11,7 +11,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.TestServerContext;
+import org.opentripplanner.TestServerContextBuilder;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.fare.ItineraryFares;
@@ -37,7 +37,11 @@ public class FaresIntegrationTest {
 
     var feedId = transitModel.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(graph, transitModel);
+    var serverContext = TestServerContextBuilder
+      .of()
+      .withGraph(graph)
+      .withTransitModel(transitModel)
+      .serverContext();
 
     var start = LocalDateTime
       .of(2009, Month.AUGUST, 7, 12, 0, 0)
@@ -57,7 +61,11 @@ public class FaresIntegrationTest {
     TransitModel transitModel = model.transitModel();
     var portlandId = transitModel.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(graph, transitModel);
+    var serverContext = TestServerContextBuilder
+      .of()
+      .withGraph(graph)
+      .withTransitModel(transitModel)
+      .serverContext();
 
     // from zone 3 to zone 2
     var from = GenericLocation.fromStopId(
@@ -115,7 +123,11 @@ public class FaresIntegrationTest {
     TransitModel transitModel = model.transitModel();
     String feedId = transitModel.getFeedIds().iterator().next();
 
-    var serverContext = TestServerContext.createServerContext(graph, transitModel);
+    var serverContext = TestServerContextBuilder
+      .of()
+      .withGraph(graph)
+      .withTransitModel(transitModel)
+      .serverContext();
 
     Money tenUSD = Money.usDollars(10);
 

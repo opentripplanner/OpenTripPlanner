@@ -36,6 +36,7 @@ import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugTimingAggregator;
 import org.opentripplanner.service.paging.PagingService;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +54,7 @@ public class RoutingWorker {
 
   private final RouteRequest request;
   private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
   /**
    * The transit service time-zero normalized for the current search. All transit times are relative
    * to a "time-zero". This enables us to use an integer(small memory footprint). The times are
@@ -67,10 +69,16 @@ public class RoutingWorker {
   private SearchParams raptorSearchParamsUsed = null;
   private PageCursorInput pageCursorInput = null;
 
-  public RoutingWorker(OtpServerRequestContext serverContext, RouteRequest request, ZoneId zoneId) {
+  public RoutingWorker(
+    OtpServerRequestContext serverContext,
+    TransitService transitService,
+    RouteRequest request,
+    ZoneId zoneId
+  ) {
     request.applyPageCursor();
     this.request = request;
     this.serverContext = serverContext;
+    this.transitService = transitService;
     this.debugTimingAggregator =
       new DebugTimingAggregator(
         serverContext.meterRegistry(),
@@ -133,6 +141,7 @@ public class RoutingWorker {
       ItineraryListFilterChain filterChain = RouteRequestToFilterChainMapper.createFilterChain(
         request,
         serverContext,
+        transitService,
         earliestDepartureTimeUsed(),
         searchWindowUsed(),
         emptyDirectModeHandler.removeWalkAllTheWayResults() ||
@@ -168,7 +177,7 @@ public class RoutingWorker {
       filteredItineraries,
       routingErrors,
       debugTimingAggregator,
-      serverContext.transitService(),
+      transitService,
       pagingService
     );
   }
@@ -224,7 +233,8 @@ public class RoutingWorker {
   ) {
     debugTimingAggregator.startedDirectStreetRouter();
     try {
-      itineraries.addAll(DirectStreetRouter.route(serverContext, request));
+      var router = new DirectStreetRouter(serverContext, transitService);
+      itineraries.addAll(router.route(request));
     } catch (RoutingValidationException e) {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {
@@ -243,7 +253,9 @@ public class RoutingWorker {
 
     debugTimingAggregator.startedDirectFlexRouter();
     try {
-      itineraries.addAll(DirectFlexRouter.route(serverContext, request, additionalSearchDays));
+      itineraries.addAll(
+        new DirectFlexRouter(serverContext, transitService).route(request, additionalSearchDays)
+      );
     } catch (RoutingValidationException e) {
       routingErrors.addAll(e.getRoutingErrors());
     } finally {
@@ -258,6 +270,7 @@ public class RoutingWorker {
       var transitResults = TransitRouter.route(
         request,
         serverContext,
+        transitService,
         transitSearchTimeZero,
         additionalSearchDays,
         debugTimingAggregator

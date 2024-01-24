@@ -51,12 +51,12 @@ import org.opentripplanner.transit.service.TransitService;
  * for the synchronization. Only request scoped components need to be synchronized - they are
  * potentially lazy initialized.
  */
-@HttpRequestScoped
+@OtpServerRequestScope
 public interface OtpServerRequestContext {
   /**
    * A RouteRequest containing default parameters that will be cloned when handling each request.
    */
-  @HttpRequestScoped
+  @OtpServerRequestScope
   RouteRequest defaultRouteRequest();
 
   /**
@@ -68,7 +68,8 @@ public interface OtpServerRequestContext {
 
   Graph graph();
 
-  @HttpRequestScoped
+  @OtpServerRequestScope
+  @Deprecated
   TransitService transitService();
 
   /**
@@ -77,7 +78,7 @@ public interface OtpServerRequestContext {
    * realtime update that happens during the request will not affect the returned service and will
    * not be visible to the request.
    */
-  @HttpRequestScoped
+  @OtpServerRequestScope
   RoutingService routingService();
 
   /**
@@ -110,7 +111,7 @@ public interface OtpServerRequestContext {
    * Callback which is injected into the {@code DirectStreetRouter}, used to visualize the
    * search.
    */
-  @HttpRequestScoped
+  @OtpServerRequestScope
   TraverseVisitor<State, Edge> traverseVisitor();
 
   default GraphFinder graphFinder() {

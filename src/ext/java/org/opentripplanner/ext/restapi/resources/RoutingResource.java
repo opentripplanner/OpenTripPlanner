@@ -13,6 +13,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
@@ -34,6 +35,7 @@ import org.opentripplanner.standalone.config.framework.file.ConfigFileLoader;
 import org.opentripplanner.standalone.config.framework.json.NodeAdapter;
 import org.opentripplanner.standalone.config.routerequest.RouteRequestConfig;
 import org.opentripplanner.transit.model.basic.MainAndSubMode;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +57,18 @@ import org.slf4j.LoggerFactory;
 public abstract class RoutingResource {
 
   private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
+
+  /**
+   * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones.
+   * this should ideally be done when setting the routing context, but at present departure/ arrival
+   * time is stored in the request as an epoch time with the TZ already resolved, and other code
+   * depends on this behavior. (AMB) Alternatively, we could eliminate the separate RouteRequest
+   * objects and just resolve vertices and timezones here right away, but just ignore them in
+   * semantic equality checks.
+   */
+  protected OtpServerRequestContext serverContext;
+
+  protected TransitService transitService;
 
   /**
    * The start location -- either latitude, longitude pair in degrees or a Vertex label. For
@@ -685,16 +699,13 @@ public abstract class RoutingResource {
   @QueryParam("config")
   private String config;
 
-  /**
-   * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones.
-   * this should ideally be done when setting the routing context, but at present departure/ arrival
-   * time is stored in the request as an epoch time with the TZ already resolved, and other code
-   * depends on this behavior. (AMB) Alternatively, we could eliminate the separate RouteRequest
-   * objects and just resolve vertices and timezones here right away, but just ignore them in
-   * semantic equality checks.
-   */
-  @Context
-  protected OtpServerRequestContext serverContext;
+  public RoutingResource(
+    @Context OtpServerRequestContext serverContext,
+    @Context TransitService transitService
+  ) {
+    this.serverContext = Objects.requireNonNull(serverContext);
+    this.transitService = Objects.requireNonNull(transitService);
+  }
 
   /**
    * Range/sanity check the query parameter fields and build a Request object from them.
@@ -712,7 +723,7 @@ public abstract class RoutingResource {
 
     {
       //FIXME: move into setter method on routing request
-      ZoneId tz = ZoneIdFallback.zoneId(serverContext.transitService().getTimeZone());
+      ZoneId tz = ZoneIdFallback.zoneId(transitService.getTimeZone());
       if (date == null && time != null) { // Time was provided but not date
         LOG.debug("parsing ISO datetime {}", time);
         try {

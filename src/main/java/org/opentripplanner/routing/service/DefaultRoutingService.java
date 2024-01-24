@@ -13,6 +13,7 @@ import org.opentripplanner.routing.api.request.RouteViaRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.ViaRoutingResponse;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +27,16 @@ public class DefaultRoutingService implements RoutingService {
   private static final Logger LOG = LoggerFactory.getLogger(DefaultRoutingService.class);
 
   private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
 
   private final ZoneId timeZone;
 
-  public DefaultRoutingService(OtpServerRequestContext serverContext) {
+  public DefaultRoutingService(
+    OtpServerRequestContext serverContext,
+    TransitService transitService
+  ) {
     this.serverContext = serverContext;
+    this.transitService = transitService;
     this.timeZone = ZoneIdFallback.zoneId(serverContext.transitService().getTimeZone());
   }
 
@@ -39,7 +45,7 @@ public class DefaultRoutingService implements RoutingService {
     LOG.debug("Request: {}", request);
     OTPRequestTimeoutException.checkForTimeout();
     request.validateOriginAndDestination();
-    var worker = new RoutingWorker(serverContext, request, timeZone);
+    var worker = new RoutingWorker(serverContext, transitService, request, timeZone);
     var response = worker.route();
     logResponse(response);
     return response;
@@ -52,7 +58,7 @@ public class DefaultRoutingService implements RoutingService {
     var viaRoutingWorker = new ViaRoutingWorker(
       request,
       req ->
-        new RoutingWorker(serverContext, req, serverContext.transitService().getTimeZone()).route()
+        new RoutingWorker(serverContext, transitService, req, transitService.getTimeZone()).route()
     );
     // TODO: Add output logging here, see route(..) method
     return viaRoutingWorker.route();

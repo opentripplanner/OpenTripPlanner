@@ -24,14 +24,13 @@ public class FlexAccessEgressRouter {
     RouteRequest request,
     TemporaryVerticesContainer verticesContainer,
     OtpServerRequestContext serverContext,
+    TransitService transitService,
     AdditionalSearchDays searchDays,
     FlexConfig config,
     DataOverlayContext dataOverlayContext,
     boolean isEgress
   ) {
     OTPRequestTimeoutException.checkForTimeout();
-
-    TransitService transitService = serverContext.transitService();
 
     Collection<NearbyStop> accessStops = !isEgress
       ? AccessEgressRouter.streetSearch(

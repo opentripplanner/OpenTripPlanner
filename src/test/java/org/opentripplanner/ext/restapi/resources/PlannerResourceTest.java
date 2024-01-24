@@ -9,26 +9,24 @@ import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import java.util.HashMap;
 import org.junit.jupiter.api.Test;
-import org.opentripplanner.TestServerContext;
+import org.opentripplanner.TestServerContextBuilder;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.transit.service.TransitModel;
 
 class PlannerResourceTest {
 
-  static OtpServerRequestContext context() {
+  static TestServerContextBuilder context() {
     var transitModel = new TransitModel();
     transitModel.initTimeZone(ZoneIds.BERLIN);
-    return TestServerContext.createServerContext(new Graph(), transitModel);
+    return TestServerContextBuilder.of().withTransitModel(transitModel);
   }
 
   @Test
   void defaultValues() {
-    var resource = new PlannerResource();
-    resource.serverContext = context();
+    var context = context();
+    var resource = new PlannerResource(context.serverContext(), context.transitService());
 
     MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>(new HashMap<>());
     var req = resource.buildRequest(queryParams);
@@ -38,10 +36,10 @@ class PlannerResourceTest {
 
   @Test
   void bicycleRent() {
-    var resource = new PlannerResource();
+    var context = context();
+    var resource = new PlannerResource(context.serverContext(), context.transitService());
 
     resource.modes = new QualifiedModeSet("BICYCLE_RENT");
-    resource.serverContext = context();
 
     MultivaluedMap<String, String> queryParams = new MultivaluedHashMap<>(new HashMap<>());
     var req = resource.buildRequest(queryParams);

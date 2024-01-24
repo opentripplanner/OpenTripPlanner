@@ -21,13 +21,13 @@ import org.opentripplanner.routing.service.DefaultRoutingService;
 import org.opentripplanner.service.realtimevehicles.RealtimeVehicleService;
 import org.opentripplanner.service.vehiclerental.VehicleRentalService;
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
-import org.opentripplanner.standalone.api.HttpRequestScoped;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.standalone.api.OtpServerRequestScope;
 import org.opentripplanner.standalone.config.routerconfig.TransitRoutingConfig;
 import org.opentripplanner.standalone.config.sandbox.FlexConfig;
 import org.opentripplanner.transit.service.TransitService;
 
-@HttpRequestScoped
+@OtpServerRequestScope
 public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   private final List<RideHailingService> rideHailingServices;
@@ -161,7 +161,7 @@ public class DefaultServerRequestContext implements OtpServerRequestContext {
 
   @Override
   public RoutingService routingService() {
-    return new DefaultRoutingService(this);
+    return new DefaultRoutingService(this, transitService);
   }
 
   @Override

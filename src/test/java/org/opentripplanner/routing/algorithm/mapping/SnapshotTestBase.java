@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.TestServerContext;
+import org.opentripplanner.TestServerContextBuilder;
 import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.Qualifier;
@@ -72,27 +72,26 @@ public abstract class SnapshotTestBase {
 
   static final boolean verbose = Boolean.getBoolean("otp.test.verbose");
 
-  protected OtpServerRequestContext serverContext;
+  private TestServerContextBuilder contextBuilder;
 
-  public static void loadGraphBeforeClass(boolean withElevation) {
-    if (withElevation) {
-      ConstantsForTests.getInstance().getCachedPortlandGraphWithElevation();
-    } else {
-      ConstantsForTests.getInstance().getCachedPortlandGraph();
-    }
+  private final boolean withElevation;
+
+  public SnapshotTestBase(boolean withElevation) {
+    this.withElevation = withElevation;
   }
 
-  protected OtpServerRequestContext serverContext() {
-    if (serverContext == null) {
-      TestOtpModel model = getGraph();
-      serverContext = TestServerContext.createServerContext(model.graph(), model.transitModel());
+  private TestServerContextBuilder contextBuilder() {
+    if (contextBuilder == null) {
+      TestOtpModel model = withElevation
+        ? ConstantsForTests.getInstance().getCachedPortlandGraphWithElevation()
+        : ConstantsForTests.getInstance().getCachedPortlandGraph();
+      contextBuilder =
+        TestServerContextBuilder
+          .of()
+          .withGraph(model.graph())
+          .withTransitModel(model.transitModel());
     }
-
-    return serverContext;
-  }
-
-  protected TestOtpModel getGraph() {
-    return ConstantsForTests.getInstance().getCachedPortlandGraph();
+    return contextBuilder;
   }
 
   protected RouteRequest createTestRequest(
@@ -103,13 +102,13 @@ public abstract class SnapshotTestBase {
     int minute,
     int second
   ) {
-    OtpServerRequestContext serverContext = serverContext();
+    OtpServerRequestContext serverContext = contextBuilder().serverContext();
 
     RouteRequest request = serverContext.defaultRouteRequest();
     request.setDateTime(
       LocalDateTime
         .of(year, month, day, hour, minute, second)
-        .atZone(ZoneId.of(serverContext.transitService().getTimeZone().getId()))
+        .atZone(ZoneId.of(contextBuilder().transitService().getTimeZone().getId()))
         .toInstant()
     );
 
@@ -254,7 +253,7 @@ public abstract class SnapshotTestBase {
 
   private List<Itinerary> retrieveItineraries(RouteRequest request) {
     long startMillis = System.currentTimeMillis();
-    RoutingResponse response = serverContext.routingService().route(request);
+    RoutingResponse response = contextBuilder().serverContext().routingService().route(request);
 
     List<Itinerary> itineraries = response.getTripPlan().itineraries;
 
@@ -263,7 +262,7 @@ public abstract class SnapshotTestBase {
         itineraries,
         startMillis,
         System.currentTimeMillis(),
-        serverContext.transitService().getTimeZone()
+        contextBuilder().transitService().getTimeZone()
       );
     }
     return itineraries;
@@ -272,7 +271,7 @@ public abstract class SnapshotTestBase {
   private String createDebugUrlForRequest(RouteRequest request) {
     var dateTime = Instant
       .ofEpochSecond(request.dateTime().getEpochSecond())
-      .atZone(serverContext().transitService().getTimeZone())
+      .atZone(contextBuilder().transitService().getTimeZone())
       .toLocalDateTime();
 
     // TODO: 2022-12-20 filters: this is for REST so there should not be more than one filter

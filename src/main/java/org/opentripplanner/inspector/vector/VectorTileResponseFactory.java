@@ -7,11 +7,11 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import org.apache.hc.core5.http.ContentType;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.resource.WebMercatorTile;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * Common functionality for creating a vector tile response.
@@ -26,7 +26,8 @@ public class VectorTileResponseFactory {
     List<String> requestedLayers,
     List<LayerParameters<LayerType>> availableLayers,
     LayerBuilderFactory<LayerType> layerBuilderFactory,
-    OtpServerRequestContext context
+    OtpServerRequestContext context,
+    TransitService transitService
   ) {
     VectorTile.Tile.Builder mvtBuilder = VectorTile.Tile.newBuilder();
     Envelope envelope = WebMercatorTile.tile2Envelope(x, y, z);
@@ -58,7 +59,7 @@ public class VectorTileResponseFactory {
       ) {
         cacheMaxSeconds = Math.min(cacheMaxSeconds, layerParameters.cacheMaxSeconds());
         VectorTile.Tile.Layer layer = layerBuilderFactory
-          .createLayerBuilder(layerParameters, locale, context)
+          .createLayerBuilder(layerParameters, locale, context, transitService)
           .build(envelope);
         mvtBuilder.addLayers(layer);
       }
@@ -80,7 +81,8 @@ public class VectorTileResponseFactory {
     LayerBuilder<?> createLayerBuilder(
       LayerParameters<LayerType> layerParameters,
       Locale locale,
-      OtpServerRequestContext context
+      OtpServerRequestContext context,
+      TransitService transitService
     );
   }
 }

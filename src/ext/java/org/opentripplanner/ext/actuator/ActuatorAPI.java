@@ -14,7 +14,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 import org.opentripplanner.updater.GraphUpdaterStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,8 +64,8 @@ public class ActuatorAPI {
   @GET
   @Path("/health")
   @Produces(MediaType.APPLICATION_JSON)
-  public Response health(@Context OtpServerRequestContext serverContext) {
-    GraphUpdaterStatus updaterStatus = serverContext.transitService().getUpdaterStatus();
+  public Response health(@Context TransitService transitService) {
+    GraphUpdaterStatus updaterStatus = transitService.getUpdaterStatus();
     if (updaterStatus != null) {
       var listUnprimedUpdaters = updaterStatus.listUnprimedUpdaters();
 

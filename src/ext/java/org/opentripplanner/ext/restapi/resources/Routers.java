@@ -7,10 +7,12 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
+import java.util.Objects;
 import org.opentripplanner.ext.restapi.model.ApiRouterInfo;
 import org.opentripplanner.ext.restapi.model.ApiRouterList;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.service.TransitService;
 
 /**
  * This REST API endpoint returns some meta-info about a router. OTP2 does no longer support
@@ -29,9 +31,14 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 public class Routers {
 
   private final OtpServerRequestContext serverContext;
+  private final TransitService transitService;
 
-  public Routers(@Context OtpServerRequestContext serverContext) {
-    this.serverContext = serverContext;
+  public Routers(
+    @Context OtpServerRequestContext serverContext,
+    @Context TransitService transitService
+  ) {
+    this.serverContext = Objects.requireNonNull(serverContext);
+    this.transitService = Objects.requireNonNull(transitService);
   }
 
   /**
@@ -64,7 +71,7 @@ public class Routers {
       return new ApiRouterInfo(
         "default",
         serverContext.graph(),
-        serverContext.transitService(),
+        transitService,
         serverContext.vehicleRentalService(),
         serverContext.worldEnvelopeService().envelope().orElseThrow()
       );

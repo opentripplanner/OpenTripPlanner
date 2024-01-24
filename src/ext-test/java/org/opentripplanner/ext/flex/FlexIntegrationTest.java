@@ -19,7 +19,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.TestOtpModel;
-import org.opentripplanner.TestServerContext;
+import org.opentripplanner.TestServerContextBuilder;
 import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.graph_builder.issue.api.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
@@ -65,7 +65,13 @@ public class FlexIntegrationTest {
       transitModel,
       List.of(FlexTest.COBB_BUS_30_GTFS, FlexTest.MARTA_BUS_856_GTFS, FlexTest.COBB_FLEX_GTFS)
     );
-    service = TestServerContext.createServerContext(graph, transitModel).routingService();
+    service =
+      TestServerContextBuilder
+        .of()
+        .withGraph(graph)
+        .withTransitModel(transitModel)
+        .serverContext()
+        .routingService();
   }
 
   @Test
@@ -170,7 +176,7 @@ public class FlexIntegrationTest {
 
   @AfterAll
   static void teardown() {
-    OTPFeature.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
+    OTPFeature.FlexRouting.enableFeatures(Map.of(OTPFeature.FlexRouting, false));
   }
 
   private static void addGtfsToGraph(Graph graph, TransitModel transitModel, List<File> gtfsFiles) {

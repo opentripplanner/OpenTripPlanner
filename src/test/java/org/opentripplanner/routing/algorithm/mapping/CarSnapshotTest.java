@@ -49,10 +49,13 @@ public class CarSnapshotTest extends SnapshotTestBase {
     -122.69771
   );
 
+  public CarSnapshotTest() {
+    super(false);
+  }
+
   @BeforeAll
   public static void beforeClass() {
     Locale.setDefault(Locale.US);
-    loadGraphBeforeClass(false);
   }
 
   @AfterAll

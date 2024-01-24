@@ -60,7 +60,7 @@ public class ConstructApplication {
 
   private final CommandLineParameters cli;
   private final GraphBuilderDataSources graphBuilderDataSources;
-  private final ConstructApplicationFactory factory;
+  private final OtpServerFactory factory;
 
   /**
    * Create a new OTP configuration instance for a given directory.
@@ -84,7 +84,7 @@ public class ConstructApplication {
     var graphVisualizer = cli.visualize ? new GraphVisualizer(graph) : null;
 
     this.factory =
-      DaggerConstructApplicationFactory
+      DaggerOtpServerFactory
         .builder()
         .configModel(config)
         .graph(graph)
@@ -97,7 +97,7 @@ public class ConstructApplication {
         .build();
   }
 
-  public ConstructApplicationFactory getFactory() {
+  public OtpServerFactory getFactory() {
     return factory;
   }
 
@@ -145,7 +145,7 @@ public class ConstructApplication {
   private Application createApplication() {
     LOG.info("Wiring up and configuring server.");
     setupTransitRoutingServer();
-    return new OTPWebApplication(routerConfig().server(), this::createServerContext);
+    return new OTPWebApplication(routerConfig().server(), factory);
   }
 
   private void setupTransitRoutingServer() {
@@ -177,7 +177,7 @@ public class ConstructApplication {
 
     if (OTPFeature.SandboxAPIGeocoder.isOn()) {
       LOG.info("Creating debug client geocoder lucene index");
-      LuceneIndex.forServer(createServerContext());
+      LuceneIndex.forServer(createServerContext(), factory.transitService());
     }
   }
 
