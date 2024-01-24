@@ -15,7 +15,8 @@ queries.
 
 When running OTP locally the endpoint is available at: `http://localhost:8080/otp/transmodel/v3`
 
-Note! Version `v1` and `v2` does not exist in the main OTP git repository, but in the (Entur fork)[https://github.com/entur/OpenTripPlanner] from which this code originate from.
+**Note!** Versions `v1` and `v2` do not exist in the main OTP git repository, but in 
+the [Entur fork](https://github.com/entur/OpenTripPlanner) from which this code originates from.
 
 ### Configuration
 
