@@ -117,7 +117,10 @@ public class TimetableSnapshot {
    * through all these states in order, and cannot return to a previous state.
    */
   private enum TimetableSnapshotState {
-    WRITABLE_CLEAN, WRITBLE_DIRTY, INDEXING, READ_ONLY
+    WRITABLE_CLEAN,
+    WRITBLE_DIRTY,
+    INDEXING,
+    READ_ONLY,
   }
 
   /**

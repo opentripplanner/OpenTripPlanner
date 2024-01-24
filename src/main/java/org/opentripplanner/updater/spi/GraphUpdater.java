@@ -18,7 +18,6 @@ package org.opentripplanner.updater.spi;
  * about concurrent reads and writes to the Graph.
  */
 public interface GraphUpdater {
-
   /**
    * After a GraphUpdater is instantiated, the GraphUpdaterManager that instantiated it will
    * immediately supply a callback via this method. The GraphUpdater will employ that callback
