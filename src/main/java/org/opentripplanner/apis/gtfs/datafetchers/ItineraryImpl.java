@@ -3,6 +3,7 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
@@ -54,7 +55,7 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
           Map<String, Object> result = new HashMap<>();
           result.put("name", fareKey);
           result.put("fare", fare.getFare(fareKey));
-          result.put("details", fare.getComponents(fareKey));
+          result.put("details", List.of());
           return result;
         })
         .collect(Collectors.toList());

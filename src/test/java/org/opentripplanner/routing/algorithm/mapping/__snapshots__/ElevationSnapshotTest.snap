@@ -550,31 +550,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "17"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -585,7 +561,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2305,
       "legs" : [
@@ -946,31 +944,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "20"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -981,7 +955,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2465,
       "legs" : [
@@ -1368,31 +1364,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "77"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -1403,7 +1375,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2396,
       "legs" : [
@@ -1764,31 +1758,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "15"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -1799,7 +1769,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2787,
       "legs" : [
@@ -2238,31 +2230,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "17"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -2273,7 +2241,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2305,
       "legs" : [
@@ -2634,31 +2624,7 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "20"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -2669,7 +2635,29 @@ org.opentripplanner.routing.algorithm.mapping.ElevationSnapshotTest.transit=[
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2525,
       "legs" : [

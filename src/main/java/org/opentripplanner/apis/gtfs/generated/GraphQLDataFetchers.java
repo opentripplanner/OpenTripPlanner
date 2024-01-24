@@ -40,7 +40,6 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
@@ -1239,7 +1238,7 @@ public class GraphQLDataFetchers {
   public interface GraphQLFare {
     public DataFetcher<Integer> cents();
 
-    public DataFetcher<Iterable<FareComponent>> components();
+    public DataFetcher<Iterable<Object>> components();
 
     public DataFetcher<String> currency();
 
