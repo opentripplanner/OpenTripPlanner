@@ -53,7 +53,9 @@ class RouteRequestTransitDataProviderFilterTest {
 
   private static final Route ROUTE = TransitModelForTest.route("1").build();
 
-  private static final FeedScopedId TRIP_ID = TransitModelForTest.id("T1");
+  private static final FeedScopedId TRIP_ID_1 = TransitModelForTest.id("T1");
+
+  private static final FeedScopedId TRIP_ID_2 = TransitModelForTest.id("T2");
 
   private static final RegularStop STOP_FOR_TEST = TEST_MODEL.stop("TEST:STOP", 0, 0).build();
 
@@ -241,7 +243,7 @@ class RouteRequestTransitDataProviderFilterTest {
   @Test
   void bannedTripFilteringTest() {
     TripTimes tripTimes = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -256,7 +258,7 @@ class RouteRequestTransitDataProviderFilterTest {
       DEFAULT_ACCESSIBILITY,
       false,
       false,
-      Set.of(TRIP_ID),
+      Set.of(TRIP_ID_1),
       filterForMode(TransitMode.BUS)
     );
 
@@ -381,7 +383,7 @@ class RouteRequestTransitDataProviderFilterTest {
   @Test
   void transitModeFilteringTest() {
     TripTimes tripTimes = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -407,7 +409,7 @@ class RouteRequestTransitDataProviderFilterTest {
   @Test
   void notFilteringExpectedTripTimesTest() {
     TripTimes tripTimes = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -434,7 +436,7 @@ class RouteRequestTransitDataProviderFilterTest {
   @Test
   void bikesAllowedFilteringTest() {
     TripTimes tripTimes = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -461,7 +463,7 @@ class RouteRequestTransitDataProviderFilterTest {
   @Test
   void removeInaccessibleTrip() {
     TripTimes tripTimes = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -488,7 +490,7 @@ class RouteRequestTransitDataProviderFilterTest {
   @Test
   void keepAccessibleTrip() {
     TripTimes wheelchairAccessibleTrip = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -515,7 +517,7 @@ class RouteRequestTransitDataProviderFilterTest {
   @Test
   void keepRealTimeAccessibleTrip() {
     RealTimeTripTimes realTimeWheelchairAccessibleTrip = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -544,7 +546,7 @@ class RouteRequestTransitDataProviderFilterTest {
   @Test
   void includePlannedCancellationsTest() {
     TripTimes tripTimesWithCancellation = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -553,7 +555,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TripAlteration.CANCELLATION
     );
     TripTimes tripTimesWithReplaced = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -608,7 +610,7 @@ class RouteRequestTransitDataProviderFilterTest {
   @Test
   void includeRealtimeCancellationsTest() {
     TripTimes tripTimes = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -618,7 +620,7 @@ class RouteRequestTransitDataProviderFilterTest {
     );
 
     RealTimeTripTimes tripTimesWithCancellation = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,
@@ -710,7 +712,7 @@ class RouteRequestTransitDataProviderFilterTest {
   @Test
   void multipleFilteringTest() {
     TripTimes matchingTripTimes = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.ALLOWED,
       TransitMode.BUS,
@@ -719,7 +721,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TripAlteration.PLANNED
     );
     TripTimes failingTripTimes1 = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.ALLOWED,
       TransitMode.RAIL,
@@ -728,7 +730,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TripAlteration.PLANNED
     );
     TripTimes failingTripTimes2 = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.RAIL,
@@ -737,7 +739,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TripAlteration.CANCELLATION
     );
     TripTimes failingTripTimes3 = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.RAIL,
@@ -746,7 +748,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TripAlteration.CANCELLATION
     );
     TripTimes failingTripTimes4 = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.ALLOWED,
       TransitMode.BUS,
@@ -755,7 +757,7 @@ class RouteRequestTransitDataProviderFilterTest {
       TripAlteration.PLANNED
     );
     TripTimes failingTripTimes5 = createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.ALLOWED,
       TransitMode.BUS,
@@ -781,6 +783,88 @@ class RouteRequestTransitDataProviderFilterTest {
     assertFalse(filter.tripTimesPredicate(failingTripTimes3, true));
     assertFalse(filter.tripTimesPredicate(failingTripTimes4, true));
     assertFalse(filter.tripTimesPredicate(failingTripTimes5, true));
+  }
+
+  @Test
+  public void selectTripFilteringTest() {
+    TripTimes tripTimes1 = createTestTripTimes(
+      TRIP_ID_1,
+      ROUTE,
+      BikeAccess.NOT_ALLOWED,
+      TransitMode.BUS,
+      null,
+      Accessibility.NOT_POSSIBLE,
+      null
+    );
+
+    TripTimes tripTimes2 = createTestTripTimes(
+      TRIP_ID_2,
+      ROUTE,
+      BikeAccess.NOT_ALLOWED,
+      TransitMode.BUS,
+      null,
+      Accessibility.NOT_POSSIBLE,
+      null
+    );
+
+    var filter = new RouteRequestTransitDataProviderFilter(
+      false,
+      false,
+      DEFAULT_ACCESSIBILITY,
+      false,
+      false,
+      Set.of(),
+      List.of(
+        TransitFilterRequest
+          .of()
+          .addSelect(SelectRequest.of().withTrips(List.of(TRIP_ID_1)).build())
+          .build()
+      )
+    );
+
+    assertTrue(filter.tripTimesPredicate(tripTimes1, true));
+    assertFalse(filter.tripTimesPredicate(tripTimes2, true));
+  }
+
+  @Test
+  public void NotTripFilterTest() {
+    TripTimes tripTimes1 = createTestTripTimes(
+      TRIP_ID_1,
+      ROUTE,
+      BikeAccess.NOT_ALLOWED,
+      TransitMode.BUS,
+      null,
+      Accessibility.NOT_POSSIBLE,
+      null
+    );
+
+    TripTimes tripTimes2 = createTestTripTimes(
+      TRIP_ID_2,
+      ROUTE,
+      BikeAccess.NOT_ALLOWED,
+      TransitMode.BUS,
+      null,
+      Accessibility.NOT_POSSIBLE,
+      null
+    );
+
+    var filter = new RouteRequestTransitDataProviderFilter(
+      false,
+      false,
+      DEFAULT_ACCESSIBILITY,
+      false,
+      false,
+      Set.of(),
+      List.of(
+        TransitFilterRequest
+          .of()
+          .addNot(SelectRequest.of().withTrips(List.of(TRIP_ID_1)).build())
+          .build()
+      )
+    );
+
+    assertFalse(filter.tripTimesPredicate(tripTimes1, true));
+    assertTrue(filter.tripTimesPredicate(tripTimes2, true));
   }
 
   private boolean validateModesOnTripTimes(
@@ -891,7 +975,7 @@ class RouteRequestTransitDataProviderFilterTest {
 
   private TripTimes createTestTripTimesWithSubmode(String submode) {
     return createTestTripTimes(
-      TRIP_ID,
+      TRIP_ID_1,
       ROUTE,
       BikeAccess.NOT_ALLOWED,
       TransitMode.BUS,

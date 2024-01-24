@@ -145,6 +145,11 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
     }
 
     @Override
+    public boolean hasTripFilters() {
+      return false;
+    }
+
+    @Override
     public BitSet filterAvailableStops(
       RoutingTripPattern tripPattern,
       BitSet boardingPossible,

@@ -20,6 +20,8 @@ public interface TransitDataProviderFilter {
 
   boolean hasSubModeFilters();
 
+  boolean hasTripFilters();
+
   boolean tripTimesPredicate(TripTimes tripTimes, boolean withFilters);
 
   /**

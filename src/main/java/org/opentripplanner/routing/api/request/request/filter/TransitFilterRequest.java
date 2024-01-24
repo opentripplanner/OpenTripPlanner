@@ -58,8 +58,26 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
   }
 
   @Override
+  public boolean isTripPredicate() {
+    for (var selectRequest : select) {
+      if (selectRequest.getTrips() != null && !selectRequest.getTrips().isEmpty()) {
+        return true;
+      }
+    }
+
+    for (var selectRequest : not) {
+      if (selectRequest.getTrips() != null && !selectRequest.getTrips().isEmpty()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   public boolean matchTripPattern(TripPattern tripPattern) {
-    if (select.length != 0) {
+    var tripPatternSelect = Arrays.stream(select).filter(s -> !s.isTripsOnly()).toArray();
+
+    if (tripPatternSelect.length != 0) {
       var anyMatch = false;
       for (SelectRequest s : select) {
         if (s.matches(tripPattern)) {
@@ -73,7 +91,8 @@ public class TransitFilterRequest implements Serializable, TransitFilter {
     }
 
     for (SelectRequest s : not) {
-      if (s.matches(tripPattern)) {
+      // We'll filter trips in the next step
+      if (!s.isTripsOnly() && s.matches(tripPattern)) {
         return false;
       }
     }

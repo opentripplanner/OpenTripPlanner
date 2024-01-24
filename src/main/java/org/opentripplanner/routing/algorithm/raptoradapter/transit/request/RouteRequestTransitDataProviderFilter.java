@@ -38,6 +38,8 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
 
   private final boolean hasSubModeFilters;
 
+  private final boolean hasTripFilters;
+
   public RouteRequestTransitDataProviderFilter(RouteRequest request) {
     this(
       request.journey().transfer().mode() == StreetMode.BIKE,
@@ -68,11 +70,17 @@ public class RouteRequestTransitDataProviderFilter implements TransitDataProvide
     this.bannedTrips = bannedTrips;
     this.filters = filters.toArray(TransitFilter[]::new);
     this.hasSubModeFilters = filters.stream().anyMatch(TransitFilter::isSubModePredicate);
+    this.hasTripFilters = filters.stream().anyMatch(TransitFilter::isTripPredicate);
   }
 
   @Override
   public boolean hasSubModeFilters() {
     return hasSubModeFilters;
+  }
+
+  @Override
+  public boolean hasTripFilters() {
+    return hasTripFilters;
   }
 
   public static BikeAccess bikeAccessForTrip(Trip trip) {
