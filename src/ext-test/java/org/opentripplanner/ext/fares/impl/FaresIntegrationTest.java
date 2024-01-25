@@ -45,7 +45,7 @@ public class FaresIntegrationTest {
 
     ItineraryFares fare = getFare(from, to, start, serverContext);
     assertEquals(
-      "[FareProduct{id: '1:OW_2', amount: $4.25}]",
+      "[FareProduct{id: '1:OW_2', name: 'regular', amount: $4.25}]",
       fare.getLegProducts().values().stream().map(FareProductUse::product).toList().toString()
     );
   }
@@ -79,7 +79,7 @@ public class FaresIntegrationTest {
     ItineraryFares fare = getFare(from, to, startTime, serverContext);
 
     assertEquals(
-      "[FareProductUse[id=26a5a5ee-c7db-37ad-be09-fa3afdce748b, product=FareProduct{id: 'prt:19', amount: $2.00}]]",
+      "[FareProductUse[id=26a5a5ee-c7db-37ad-be09-fa3afdce748b, product=FareProduct{id: 'prt:19', name: 'regular', amount: $2.00}]]",
       fare.getLegProducts().values().toString()
     );
 
