@@ -350,8 +350,10 @@ public class QuayType {
         GraphQLFieldDefinition
           .newFieldDefinition()
           .name("stopType")
-          .type(StopTypeMapper.STOP_TYPE)
-          .dataFetcher(env -> ((StopLocation) env.getSource()).getStopType())
+          .type(Scalars.GraphQLString)
+          .dataFetcher(env ->
+            StopTypeMapper.getStopType(((StopLocation) env.getSource()).getStopType())
+          )
           .build()
       )
       .field(

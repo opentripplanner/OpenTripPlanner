@@ -600,7 +600,7 @@ type Quay implements PlaceInterface {
   situations: [PtSituationElement!]!
   "The stop place to which this quay belongs to."
   stopPlace: StopPlace
-  stopType: StopType
+  stopType: String
   tariffZones: [TariffZone]!
   timeZone: String
   "Whether this quay is suitable for wheelchair boarding."
@@ -1695,15 +1695,6 @@ enum StopCondition {
   requestStop
   "Situation applies when stop is the startpoint of the leg."
   startPoint
-}
-
-enum StopType {
-  "Boarding and alighting is allowed anywhere within the geographic area of this stop."
-  flexible_area
-  "A stop that consists of multiple other stops, area or regular."
-  flexible_group
-  "A regular stop defined geographically as a point."
-  regular
 }
 
 enum StreetMode {
