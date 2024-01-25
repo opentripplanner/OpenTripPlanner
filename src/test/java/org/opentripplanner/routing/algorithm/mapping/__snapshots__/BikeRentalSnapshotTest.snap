@@ -22,31 +22,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "17"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -57,7 +33,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              3
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2209,
       "legs" : [
@@ -510,31 +508,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "20"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -545,7 +519,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2539,
       "legs" : [
@@ -956,31 +952,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "77"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -991,7 +963,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 1805,
       "legs" : [
@@ -1298,31 +1292,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "17"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -1333,7 +1303,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              3
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2209,
       "legs" : [
@@ -1786,31 +1778,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "17"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -1821,7 +1789,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              3
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2209,
       "legs" : [
@@ -2274,31 +2264,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "77"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -2309,7 +2275,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.accessBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 1805,
       "legs" : [
@@ -3291,31 +3279,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "17"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -3326,7 +3290,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2119,
       "legs" : [
@@ -3831,31 +3817,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "20"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -3866,7 +3828,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2503,
       "legs" : [
@@ -4251,31 +4235,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "77"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -4286,7 +4246,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2351,
       "legs" : [
@@ -4645,31 +4627,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "17"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -4680,7 +4638,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2119,
       "legs" : [
@@ -5185,31 +5165,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "20"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -5220,7 +5176,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2563,
       "legs" : [
@@ -5605,31 +5583,7 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
             "name" : "regular"
           }
         ],
-        "details" : {
-          "regular" : [
-            {
-              "fareId" : {
-                "feedId" : "prt",
-                "id" : "8"
-              },
-              "price" : {
-                "cents" : 200,
-                "currency" : {
-                  "currency" : "USD",
-                  "currencyCode" : "USD",
-                  "defaultFractionDigits" : 2,
-                  "symbol" : "$"
-                }
-              },
-              "routes" : [
-                {
-                  "feedId" : "prt",
-                  "id" : "77"
-                }
-              ]
-            }
-          ]
-        },
+        "details" : { },
         "fare" : {
           "regular" : {
             "cents" : 200,
@@ -5640,7 +5594,29 @@ org.opentripplanner.routing.algorithm.mapping.BikeRentalSnapshotTest.egressBikeR
               "symbol" : "$"
             }
           }
-        }
+        },
+        "legProducts" : [
+          {
+            "legIndices" : [
+              1
+            ],
+            "products" : [
+              {
+                "amount" : {
+                  "cents" : 200,
+                  "currency" : {
+                    "currency" : "USD",
+                    "currencyCode" : "USD",
+                    "defaultFractionDigits" : 2,
+                    "symbol" : "$"
+                  }
+                },
+                "id" : "prt:8",
+                "name" : "regular"
+              }
+            ]
+          }
+        ]
       },
       "generalizedCost" : 2351,
       "legs" : [

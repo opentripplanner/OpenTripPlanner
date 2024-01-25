@@ -1,5 +1,7 @@
 package org.opentripplanner.ext.fares.impl;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -18,11 +20,11 @@ import org.opentripplanner.ext.fares.model.FareAttribute;
 import org.opentripplanner.ext.fares.model.FareRuleSet;
 import org.opentripplanner.ext.flex.FlexibleTransitLeg;
 import org.opentripplanner.model.fare.FareProduct;
+import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.ScheduledTransitLeg;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model.basic.Money;
@@ -119,7 +121,7 @@ public class DefaultFareService implements FareService {
     ItineraryFares fare = ItineraryFares.empty();
     boolean hasFare = false;
     for (FareType fareType : fareRulesPerType.keySet()) {
-      List<FareComponent> components = new ArrayList<>();
+      final Multimap<Leg, FareProductUse> fareProducts = LinkedHashMultimap.create();
       List<Money> fares = new ArrayList<>();
       boolean legWithoutRulesFound = false;
       boolean legsWithoutMatchingRulesFound = false;
@@ -143,13 +145,8 @@ public class DefaultFareService implements FareService {
           }
           hasFare = feedHasFare || hasFare; // Other feeds might still have fare for some legs
 
-          components.addAll(currentFare.getComponents(fareType));
+          fareProducts.putAll(currentFare.getLegProducts());
           fare.addFare(fareType, currentFare.getFare(fareType));
-
-          currentFare
-            .getLegProducts()
-            .entries()
-            .forEach(entry -> fare.addFareProduct(entry.getKey(), entry.getValue().product()));
 
           fares.add(currentFare.getFare(fareType));
 
@@ -170,7 +167,7 @@ public class DefaultFareService implements FareService {
         }
       }
 
-      fare.addFareComponent(fareType, components);
+      fare.addFareProductUses(fareProducts);
 
       // No fares will be discovered after this point
       if (!hasFare) {
@@ -244,7 +241,7 @@ public class DefaultFareService implements FareService {
   ) {
     FareSearch r = performSearch(fareType, legs, fareRules);
 
-    List<FareComponent> components = new ArrayList<>();
+    Multimap<Leg, FareProductUse> fareProductUses = LinkedHashMultimap.create();
     int count = 0;
     int start = 0;
     int end = legs.size() - 1;
@@ -261,8 +258,11 @@ public class DefaultFareService implements FareService {
       int via = r.next[start][r.endOfComponent[start]];
       float cost = r.resultTable[start][via];
       FeedScopedId fareId = r.fareIds[start][via];
+      var product = FareProduct
+        .of(fareId, fareType.name(), Money.ofFractionalAmount(currency, cost))
+        .build();
 
-      var componentLegs = new ArrayList<Leg>();
+      List<Leg> applicableLegs = new ArrayList<>();
       for (int i = start; i <= via; ++i) {
         final var leg = legs.get(i);
         // if we have a leg that is combined for the purpose of fare calculation we need to
@@ -271,21 +271,29 @@ public class DefaultFareService implements FareService {
         // (remember that the combined leg only exists during fare calculation and is thrown away
         // afterwards to associating fare products with it will result in the API not showing any.)
         if (leg instanceof CombinedInterlinedTransitLeg combinedLeg) {
-          componentLegs.addAll(combinedLeg.originalLegs());
+          applicableLegs.addAll(combinedLeg.originalLegs());
         } else {
-          componentLegs.add(leg);
+          applicableLegs.add(leg);
         }
       }
-      components.add(
-        new FareComponent(fareId, Money.ofFractionalAmount(currency, cost), componentLegs)
-      );
+
+      if (!applicableLegs.isEmpty()) {
+        final var use = new FareProductUse(
+          product.uniqueInstanceId(applicableLegs.getFirst().getStartTime()),
+          product
+        );
+        applicableLegs.forEach(leg -> {
+          fareProductUses.put(leg, use);
+        });
+      }
+
       ++count;
       start = via + 1;
     }
 
     var amount = r.resultTable[0][legs.size() - 1];
     fare.addFare(fareType, Money.ofFractionalAmount(currency, amount));
-    fare.addFareComponent(fareType, components);
+    fare.addFareProductUses(fareProductUses);
     return count > 0;
   }
 
