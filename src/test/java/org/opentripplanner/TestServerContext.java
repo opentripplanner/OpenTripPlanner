@@ -16,6 +16,7 @@ import org.opentripplanner.service.vehiclerental.internal.DefaultVehicleRentalSe
 import org.opentripplanner.service.worldenvelope.WorldEnvelopeService;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeRepository;
 import org.opentripplanner.service.worldenvelope.internal.DefaultWorldEnvelopeService;
+import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.DefaultServerRequestContext;
@@ -42,7 +43,7 @@ public class TestServerContext {
       graph,
       new DefaultTransitService(transitModel),
       Metrics.globalRegistry,
-      routerConfig.vectorTileLayers(),
+      routerConfig.vectorTileConfig(),
       createWorldEnvelopeService(),
       createRealtimeVehicleService(transitService),
       createVehicleRentalService(),
@@ -58,7 +59,14 @@ public class TestServerContext {
 
   /** Static factory method to create a service for test purposes. */
   public static WorldEnvelopeService createWorldEnvelopeService() {
-    return new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository());
+    var repository = new DefaultWorldEnvelopeRepository();
+    var envelope = WorldEnvelope
+      .of()
+      .expandToIncludeStreetEntities(0, 0)
+      .expandToIncludeStreetEntities(1, 1)
+      .build();
+    repository.saveEnvelope(envelope);
+    return new DefaultWorldEnvelopeService(repository);
   }
 
   public static RealtimeVehicleService createRealtimeVehicleService(TransitService transitService) {
