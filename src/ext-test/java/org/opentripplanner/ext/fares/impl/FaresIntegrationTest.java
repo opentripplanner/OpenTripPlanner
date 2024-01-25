@@ -14,7 +14,6 @@ import org.opentripplanner.TestOtpModel;
 import org.opentripplanner.TestServerContext;
 import org.opentripplanner._support.time.ZoneIds;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.fare.FareProductUse;
 import org.opentripplanner.model.fare.ItineraryFares;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.request.RouteRequest;
@@ -22,6 +21,7 @@ import org.opentripplanner.routing.api.request.preference.ItineraryFilterDebugPr
 import org.opentripplanner.routing.api.request.request.filter.AllowAllTransitFilter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.api.OtpServerRequestContext;
+import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.service.TransitModel;
 
 public class FaresIntegrationTest {
@@ -44,10 +44,9 @@ public class FaresIntegrationTest {
     var to = GenericLocation.fromStopId("Destination", feedId, "Mountain View Caltrain");
 
     ItineraryFares fare = getFare(from, to, start, serverContext);
-    assertEquals(
-      "[FareProduct{id: '1:OW_2', name: 'regular', amount: $4.25}]",
-      fare.getLegProducts().values().stream().map(FareProductUse::product).toList().toString()
-    );
+    var product = fare.getLegProducts().values().iterator().next().product();
+    assertEquals(Money.usDollars(4.25f), product.price());
+    assertEquals("1:OW_2", product.id().toString());
   }
 
   @Test

@@ -48,7 +48,7 @@ public class HighestFareInFreeTransferWindowFareService extends DefaultFareServi
    * additional free transfers from there.
    */
   @Override
-  protected ItineraryFares populateFare(
+  protected ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,

@@ -378,7 +378,7 @@ public class AtlantaFareService extends DefaultFareService {
   }
 
   @Override
-  public ItineraryFares populateFare(
+  public ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,

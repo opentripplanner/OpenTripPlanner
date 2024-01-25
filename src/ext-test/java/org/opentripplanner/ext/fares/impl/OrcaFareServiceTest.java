@@ -176,7 +176,7 @@ public class OrcaFareServiceTest {
   @Test
   void calculateFareByLeg() {
     List<Leg> rides = List.of(getLeg(KITSAP_TRANSIT_AGENCY_ID, 0), getLeg(COMM_TRANS_AGENCY_ID, 2));
-    var fares = orcaFareService.populateFare(USD, FareType.electronicRegular, rides, null);
+    var fares = orcaFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
 
     assertLegFareEquals(349, rides.get(0), fares, false);
     assertLegFareEquals(0, rides.get(1), fares, true);
@@ -497,7 +497,7 @@ public class OrcaFareServiceTest {
       )
     );
 
-    var fare = orcaFareService.populateFare(USD, type, legs, null);
+    var fare = orcaFareService.calculateFaresForType(USD, type, legs, null);
     assertFalse(fare.getLegProducts().isEmpty());
   }
 
@@ -518,7 +518,7 @@ public class OrcaFareServiceTest {
       )
     );
 
-    var fare = orcaFareService.populateFare(USD, type, legs, null);
+    var fare = orcaFareService.calculateFaresForType(USD, type, legs, null);
     assertFalse(fare.getLegProducts().isEmpty());
   }
 

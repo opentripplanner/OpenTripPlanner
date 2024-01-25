@@ -124,7 +124,7 @@ public class DefaultFareService implements FareService {
         // Get the currency from the first fareAttribute, assuming that all tickets use the same currency.
         if (fareRules != null && !fareRules.isEmpty()) {
           Currency currency = fareRules.iterator().next().getFareAttribute().getPrice().currency();
-          ItineraryFares computedFaresForType = populateFare(
+          ItineraryFares computedFaresForType = calculateFaresForType(
             currency,
             fareType,
             fareLegsByFeed.get(feedId),
@@ -175,7 +175,7 @@ public class DefaultFareService implements FareService {
    * If our only rule were A-B with a fare of 10, we would have no lowest fare, but we will still
    * have one fare detail with fare 10 for the route A-B. B-C will not just not be listed at all.
    */
-  protected ItineraryFares populateFare(
+  protected ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,

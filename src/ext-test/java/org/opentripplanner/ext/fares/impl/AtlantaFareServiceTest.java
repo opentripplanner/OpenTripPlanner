@@ -225,7 +225,7 @@ public class AtlantaFareServiceTest implements PlanTestConstants {
    * used. This will be the same for all cash fare types except when overriden above.
    */
   private static void calculateFare(List<Leg> rides, Money expectedFare) {
-    var fare = atlFareService.populateFare(USD, FareType.electronicRegular, rides, null);
+    var fare = atlFareService.calculateFaresForType(USD, FareType.electronicRegular, rides, null);
     assertEquals(
       expectedFare,
       fare

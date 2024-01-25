@@ -396,7 +396,7 @@ public class OrcaFareService extends DefaultFareService {
    * one.
    */
   @Override
-  public ItineraryFares populateFare(
+  public ItineraryFares calculateFaresForType(
     Currency currency,
     FareType fareType,
     List<Leg> legs,
