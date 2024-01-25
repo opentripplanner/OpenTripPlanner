@@ -92,3 +92,10 @@ Prefer immutable types over mutable. Use builders where appropriate. See
 ### ADR-13 Records
 [Avoid using records if you can not encapsulate it properly](CODE_CONVENTIONS.md#records)
 
+### ADR-14 Dependency Injection
+OTP will use a dependency injection library or framework to handle object lifecycles (particularly
+request-scoped vs. singleton scoped) and ensure selective availability of components, services,
+context, and configuration at their site of use. Systems that operate via imperative Java code
+(whether hand-written or generated) will be preferred over those operating through reflection or 
+external markup files. See [additional background](https://github.com/opentripplanner/OpenTripPlanner/pull/5360#issuecomment-1910134299).
+
