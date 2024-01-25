@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.opentripplanner.model.plan.PlanTestConstants.A;
 import static org.opentripplanner.model.plan.PlanTestConstants.B;
 import static org.opentripplanner.model.plan.PlanTestConstants.C;
@@ -58,6 +59,12 @@ class ItineraryFaresTest {
       fares.getLegProducts().get(railLeg)
     );
   }
+
+  @Test
+  void empty(){
+    assertTrue(ItineraryFares.empty().isEmpty());
+  }
+
 
   @Nonnull
   private static FareProduct fareProduct(String id) {

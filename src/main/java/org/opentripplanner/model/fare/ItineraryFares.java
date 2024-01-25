@@ -104,11 +104,17 @@ public class ItineraryFares {
     legProducts.putAll(fareProducts);
   }
 
+  /**
+   * Add the contents of another instance to this one.
+   */
   public void add(ItineraryFares fare) {
     itineraryProducts.addAll(fare.itineraryProducts);
     legProducts.putAll(fare.legProducts);
   }
 
+  /**
+   * Does this instance contain any fare products?
+   */
   public boolean isEmpty() {
     return itineraryProducts.isEmpty() && legProducts.isEmpty();
   }
