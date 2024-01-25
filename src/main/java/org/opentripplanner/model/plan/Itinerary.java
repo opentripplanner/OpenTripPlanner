@@ -506,11 +506,12 @@ public class Itinerary implements ItinerarySortKey {
    *
    * @see Itinerary#getGeneralizedCost()
    * @see org.opentripplanner.routing.algorithm.raptoradapter.router.street.AccessEgressPenaltyDecorator
-   * @see org.opentripplanner.routing.algorithm.filterchain.deletionflagger.NonTransitGeneralizedCostFilter
-   * @see org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfStreetOnlyIsBetterFilter
-   * @see org.opentripplanner.routing.algorithm.filterchain.deletionflagger.RemoveTransitIfWalkingIsBetterFilter
+   * @see org.opentripplanner.routing.algorithm.filterchain.filters.street.RemoveNonTransitItinerariesBasedOnGeneralizedCost
+   * @see org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfStreetOnlyIsBetter
+   * @see org.opentripplanner.routing.algorithm.filterchain.filters.transit.RemoveTransitIfWalkingIsBetter
    */
-  public int getGeneralizedCostPlusPenalty() {
+  @Override
+  public int getGeneralizedCostIncludingPenalty() {
     return generalizedCost + penaltyCost(accessPenalty) + penaltyCost(egressPenalty);
   }
 

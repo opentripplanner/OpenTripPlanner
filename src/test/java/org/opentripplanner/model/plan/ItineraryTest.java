@@ -205,7 +205,7 @@ public class ItineraryTest implements PlanTestConstants {
     void noPenalty() {
       var subject = itinerary();
       assertEquals(DEFAULT_COST, subject.getGeneralizedCost());
-      assertEquals(DEFAULT_COST, subject.getGeneralizedCostPlusPenalty());
+      assertEquals(DEFAULT_COST, subject.getGeneralizedCostIncludingPenalty());
     }
 
     @Test
@@ -213,7 +213,7 @@ public class ItineraryTest implements PlanTestConstants {
       var subject = itinerary();
       subject.setAccessPenalty(PENALTY);
       assertEquals(DEFAULT_COST, subject.getGeneralizedCost());
-      assertEquals(COST_PLUS_TWO_MINUTES, subject.getGeneralizedCostPlusPenalty());
+      assertEquals(COST_PLUS_TWO_MINUTES, subject.getGeneralizedCostIncludingPenalty());
     }
 
     @Test
@@ -221,7 +221,7 @@ public class ItineraryTest implements PlanTestConstants {
       var subject = itinerary();
       subject.setEgressPenalty(PENALTY);
       assertEquals(DEFAULT_COST, subject.getGeneralizedCost());
-      assertEquals(COST_PLUS_TWO_MINUTES, subject.getGeneralizedCostPlusPenalty());
+      assertEquals(COST_PLUS_TWO_MINUTES, subject.getGeneralizedCostIncludingPenalty());
     }
 
     @Test
@@ -232,7 +232,7 @@ public class ItineraryTest implements PlanTestConstants {
       assertEquals(DEFAULT_COST, subject.getGeneralizedCost());
       assertEquals(
         DEFAULT_COST + PENALTY.cost().toSeconds() + PENALTY.cost().toSeconds(),
-        subject.getGeneralizedCostPlusPenalty()
+        subject.getGeneralizedCostIncludingPenalty()
       );
     }
 

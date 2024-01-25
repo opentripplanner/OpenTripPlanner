@@ -127,7 +127,7 @@ public class RaptorPathToItineraryMapperTest {
     // Assert
     assertNotNull(itinerary);
     assertEquals(4708, itinerary.getGeneralizedCost());
-    assertNotEquals(4708, itinerary.getGeneralizedCostPlusPenalty());
+    assertNotEquals(4708, itinerary.getGeneralizedCostIncludingPenalty());
   }
 
   /**

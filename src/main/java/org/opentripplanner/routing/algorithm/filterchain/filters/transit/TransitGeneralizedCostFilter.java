@@ -37,7 +37,7 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
     List<Itinerary> transitItineraries = itineraries
       .stream()
       .filter(Itinerary::hasTransit)
-      .sorted(Comparator.comparingInt(Itinerary::getGeneralizedCost))
+      .sorted(Comparator.comparingInt(Itinerary::getGeneralizedCostIncludingPenalty))
       .toList();
 
     return transitItineraries
@@ -47,13 +47,13 @@ public class TransitGeneralizedCostFilter implements RemoveItineraryFlagger {
   }
 
   private boolean generalizedCostExceedsLimit(Itinerary subject, Itinerary transitItinerary) {
-    return subject.getGeneralizedCost() > calculateLimit(subject, transitItinerary);
+    return subject.getGeneralizedCostIncludingPenalty() > calculateLimit(subject, transitItinerary);
   }
 
   private int calculateLimit(Itinerary subject, Itinerary transitItinerary) {
     return (
       costLimitFunction
-        .calculate(Cost.costOfSeconds(transitItinerary.getGeneralizedCost()))
+        .calculate(Cost.costOfSeconds(transitItinerary.getGeneralizedCostIncludingPenalty()))
         .toSeconds() +
       getWaitTimeCost(transitItinerary, subject)
     );

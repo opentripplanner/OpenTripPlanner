@@ -56,7 +56,7 @@ public class RemoveTransitIfStreetOnlyIsBetter implements RemoveItineraryFlagger
       // searches that are only on the street network an unfair advantage (they don't have
       // access/egress so cannot have these penalties)
       .filter(it -> !it.isOnStreetAllTheWay() && it.getGeneralizedCost() >= limit)
-      .collect(Collectors.toList());
+      .toList();
   }
 
   @Override
