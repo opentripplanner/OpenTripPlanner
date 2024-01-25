@@ -142,6 +142,19 @@
       }
     },
     {
+      "id" : "area-stop",
+      "type" : "fill",
+      "source" : "vectorSource",
+      "source-layer" : "stops",
+      "minzoom" : 6,
+      "maxzoom" : 23,
+      "paint" : {
+        "fill-color" : "#22DD9E",
+        "fill-opacity" : 0.5,
+        "fill-outline-color" : "#140d0e"
+      }
+    },
+    {
       "id" : "regular-stop",
       "type" : "circle",
       "source" : "vectorSource",
