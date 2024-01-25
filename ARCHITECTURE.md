@@ -1,6 +1,6 @@
 # OTP Architecture
 
-OTP is developed over more than 15 years, and most of the design documentation is in the code as
+OTP has been developed for more than 15 years, and most of the design documentation is in the code as
 comments and JavaDoc. Over the years the complexity have increased, and the natural developer
 turnover creates a demand for more architecture and design documentation. The new OTP2 documentation
 is put together with the source; hopefully making it easier to maintain. Instead of documenting
