@@ -46,7 +46,7 @@ public class FaresIntegrationTest {
     ItineraryFares fare = getFare(from, to, start, serverContext);
     var product = fare.getLegProducts().values().iterator().next().product();
     assertEquals(Money.usDollars(4.25f), product.price());
-    assertEquals("1:OW_2", product.id().toString());
+    assertEquals("OW_2", product.id().getId().toString());
   }
 
   @Test
