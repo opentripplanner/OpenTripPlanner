@@ -61,10 +61,9 @@ class ItineraryFaresTest {
   }
 
   @Test
-  void empty(){
+  void empty() {
     assertTrue(ItineraryFares.empty().isEmpty());
   }
-
 
   @Nonnull
   private static FareProduct fareProduct(String id) {

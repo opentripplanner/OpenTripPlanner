@@ -402,7 +402,7 @@ public class GraphQLDataFetchers {
 
     public DataFetcher<Long> endTime();
 
-    public DataFetcher<Iterable<Map<String, Object>>> fares();
+    public DataFetcher<Iterable<Object>> fares();
 
     public DataFetcher<Integer> generalizedCost();
 
