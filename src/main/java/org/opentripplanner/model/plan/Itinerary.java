@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -45,8 +46,8 @@ public class Itinerary implements ItinerarySortKey {
   private Double elevationGained = 0.0;
   private int generalizedCost = UNKNOWN;
   private Integer generalizedCost2 = null;
-  private TimeAndCost accessPenalty = null;
-  private TimeAndCost egressPenalty = null;
+  private TimeAndCost accessPenalty = TimeAndCost.ZERO;
+  private TimeAndCost egressPenalty = TimeAndCost.ZERO;
   private int waitTimeOptimizedCost = UNKNOWN;
   private int transferPriorityCost = UNKNOWN;
   private boolean tooSloped = false;
@@ -539,6 +540,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public void setAccessPenalty(TimeAndCost accessPenalty) {
+    Objects.requireNonNull(accessPenalty);
     this.accessPenalty = accessPenalty;
   }
 
@@ -548,6 +550,7 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   public void setEgressPenalty(TimeAndCost egressPenalty) {
+    Objects.requireNonNull(egressPenalty);
     this.egressPenalty = egressPenalty;
   }
 
@@ -678,10 +681,6 @@ public class Itinerary implements ItinerarySortKey {
   }
 
   private static int penaltyCost(TimeAndCost penalty) {
-    if (penalty == null) {
-      return 0;
-    } else {
-      return penalty.cost().toSeconds();
-    }
+    return penalty.cost().toSeconds();
   }
 }
