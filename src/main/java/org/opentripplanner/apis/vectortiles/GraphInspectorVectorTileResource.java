@@ -1,5 +1,6 @@
 package org.opentripplanner.apis.vectortiles;
 
+import static org.opentripplanner.apis.vectortiles.model.LayerType.AreaStop;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.Edge;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.GeofencingZones;
 import static org.opentripplanner.apis.vectortiles.model.LayerType.RegularStop;
@@ -47,7 +48,7 @@ import org.opentripplanner.standalone.api.OtpServerRequestContext;
 public class GraphInspectorVectorTileResource {
 
   private static final LayerParams REGULAR_STOPS = new LayerParams("regularStops", RegularStop);
-  private static final LayerParams AREA_STOPS = new LayerParams("areaStops", LayerType.AreaStop);
+  private static final LayerParams AREA_STOPS = new LayerParams("areaStops", AreaStop);
   private static final LayerParams GEOFENCING_ZONES = new LayerParams(
     "geofencingZones",
     GeofencingZones
@@ -109,16 +110,16 @@ public class GraphInspectorVectorTileResource {
   ) {
     var envelope = serverContext.worldEnvelopeService().envelope().orElseThrow();
     List<FeedInfo> feedInfos = feedInfos();
+    List<String> rlayer = Arrays.asList(requestedLayers.split(","));
 
-    return new TileJson(
+    var url = TileJson.urlWithDefaultPath(
       uri,
       headers,
-      requestedLayers,
+      rlayer,
       ignoreRouterId,
-      "inspector/vectortile",
-      envelope,
-      feedInfos
+      "inspector/vectortile"
     );
+    return new TileJson(url, envelope, feedInfos);
   }
 
   @GET
@@ -140,6 +141,7 @@ public class GraphInspectorVectorTileResource {
 
     return DebugStyleSpec.build(
       REGULAR_STOPS.toVectorSourceLayer(stopsSource),
+      AREA_STOPS.toVectorSourceLayer(stopsSource),
       EDGES.toVectorSourceLayer(streetSource),
       VERTICES.toVectorSourceLayer(streetSource)
     );

@@ -124,7 +124,7 @@ public class TripRequestMapperTest implements PlanTestConstants {
           graph,
           transitService,
           Metrics.globalRegistry,
-          RouterConfig.DEFAULT.vectorTileLayers(),
+          RouterConfig.DEFAULT.vectorTileConfig(),
           new DefaultWorldEnvelopeService(new DefaultWorldEnvelopeRepository()),
           new DefaultRealtimeVehicleService(transitService),
           new DefaultVehicleRentalService(),

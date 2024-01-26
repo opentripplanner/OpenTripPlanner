@@ -40,6 +40,7 @@ public class StyleBuilder {
     Circle,
     Line,
     Raster,
+    Fill,
   }
 
   private StyleBuilder(String id) {
@@ -88,6 +89,11 @@ public class StyleBuilder {
     return this;
   }
 
+  public StyleBuilder typeFill() {
+    type(LayerType.Fill);
+    return this;
+  }
+
   private StyleBuilder type(LayerType type) {
     props.put(TYPE, type.name().toLowerCase());
     return this;
@@ -129,6 +135,21 @@ public class StyleBuilder {
 
   public StyleBuilder lineWidth(ZoomDependentNumber zoomStops) {
     paint.put("line-width", zoomStops.toJson());
+    return this;
+  }
+
+  public StyleBuilder fillColor(String color) {
+    paint.put("fill-color", validateColor(color));
+    return this;
+  }
+
+  public StyleBuilder fillOpacity(float opacity) {
+    paint.put("fill-opacity", opacity);
+    return this;
+  }
+
+  public StyleBuilder fillOutlineColor(String color) {
+    paint.put("fill-outline-color", validateColor(color));
     return this;
   }
 
