@@ -1,6 +1,7 @@
 package org.opentripplanner.framework.lang;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 import javax.annotation.Nullable;
 
 /**
@@ -31,6 +32,18 @@ public class ObjectUtils {
       return defaultValue;
     }
     return ifNotNull(getter.apply(entity), defaultValue);
+  }
+
+  /**
+   * Get the value or {@code null}, ignore any exceptions. This is useful if you must traverse
+   * a long call-chain like {@code a.b().c().d()...} when e.g. logging.
+   */
+  public static <T> T safeGetOrNull(Supplier<T> body) {
+    try {
+      return body.get();
+    } catch (Exception ignore) {
+      return null;
+    }
   }
 
   public static <T> T requireNotInitialized(T oldValue, T newValue) {
