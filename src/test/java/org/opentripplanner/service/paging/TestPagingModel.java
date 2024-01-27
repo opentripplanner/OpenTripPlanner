@@ -13,7 +13,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.SortOrder;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
 import org.opentripplanner.model.plan.paging.cursor.PageCursor;
-import org.opentripplanner.routing.algorithm.filterchain.comparator.SortOrderComparator;
+import org.opentripplanner.routing.algorithm.filterchain.framework.sort.SortOrderComparator;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
 
 class TestPagingModel {

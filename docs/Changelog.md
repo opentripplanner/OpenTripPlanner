@@ -78,6 +78,10 @@ based on merged pull requests. Search GitHub issues and pull requests for smalle
 - Add new path for GTFS GraphQL API, remove batch feature [#5581](https://github.com/opentripplanner/OpenTripPlanner/pull/5581)
 - Restructure walk/bicycle/car preferences in router-config.json [#5582](https://github.com/opentripplanner/OpenTripPlanner/pull/5582)
 - Revert REST API spelling change of real-time [#5629](https://github.com/opentripplanner/OpenTripPlanner/pull/5629)
+- Remove `FareComponent` [#5613](https://github.com/opentripplanner/OpenTripPlanner/pull/5613)
+- Add AreaStop layer to new debug frontend [#5636](https://github.com/opentripplanner/OpenTripPlanner/pull/5636)
+- Allow configuration of vector tiles base path [#5627](https://github.com/opentripplanner/OpenTripPlanner/pull/5627)
+- Change Transmodel API path to `/otp/transmodel/v3` [#5637](https://github.com/opentripplanner/OpenTripPlanner/pull/5637)
 [](AUTOMATIC_CHANGELOG_PLACEHOLDER_DO_NOT_REMOVE)
 
 ## 2.4.0 (2023-09-13)

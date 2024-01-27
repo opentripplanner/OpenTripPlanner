@@ -4,7 +4,9 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.UriInfo;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 import org.opentripplanner.framework.io.HttpUtils;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.service.worldenvelope.model.WorldEnvelope;
@@ -34,15 +36,7 @@ public class TileJson implements Serializable {
   public final double[] bounds;
   public final double[] center;
 
-  public TileJson(
-    UriInfo uri,
-    HttpHeaders headers,
-    String layers,
-    String ignoreRouterId,
-    String path,
-    WorldEnvelope envelope,
-    Collection<FeedInfo> feedInfos
-  ) {
+  public TileJson(String tileUrl, WorldEnvelope envelope, Collection<FeedInfo> feedInfos) {
     attribution =
       feedInfos
         .stream()
@@ -51,15 +45,7 @@ public class TileJson implements Serializable {
         )
         .collect(Collectors.joining(", "));
 
-    tiles =
-      new String[] {
-        "%s/otp/routers/%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
-            HttpUtils.getBaseAddress(uri, headers),
-            ignoreRouterId,
-            path,
-            layers
-          ),
-      };
+    tiles = new String[] { tileUrl };
 
     bounds =
       new double[] {
@@ -71,5 +57,43 @@ public class TileJson implements Serializable {
 
     var c = envelope.center();
     center = new double[] { c.longitude(), c.latitude(), 9 };
+  }
+
+  /**
+   * Creates a vector source layer URL from a hard-coded path plus information from the incoming
+   * HTTP request.
+   */
+  public static String urlWithDefaultPath(
+    UriInfo uri,
+    HttpHeaders headers,
+    List<String> layers,
+    String ignoreRouterId,
+    String path
+  ) {
+    return "%s/otp/routers/%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
+        HttpUtils.getBaseAddress(uri, headers),
+        ignoreRouterId,
+        path,
+        String.join(",", layers)
+      );
+  }
+
+  /**
+   * Creates a vector source layer URL from a configured base path plus information from the incoming
+   * HTTP request.
+   */
+  public static String urlFromOverriddenBasePath(
+    UriInfo uri,
+    HttpHeaders headers,
+    String overridePath,
+    List<String> layers
+  ) {
+    var strippedPath = StringUtils.stripStart(overridePath, "/");
+    strippedPath = StringUtils.stripEnd(strippedPath, "/");
+    return "%s/%s/%s/{z}/{x}/{y}.pbf".formatted(
+        HttpUtils.getBaseAddress(uri, headers),
+        strippedPath,
+        String.join(",", layers)
+      );
   }
 }

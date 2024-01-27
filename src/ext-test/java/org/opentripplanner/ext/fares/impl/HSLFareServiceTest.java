@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.fares.impl;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.transit.model._data.TransitModelForTest.FEED_ID;
@@ -7,7 +8,6 @@ import static org.opentripplanner.transit.model.basic.Money.euros;
 
 import java.util.LinkedList;
 import java.util.List;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -18,7 +18,6 @@ import org.opentripplanner.framework.i18n.NonLocalizedString;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.PlanTestConstants;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.fares.FareService;
 import org.opentripplanner.transit.model._data.TransitModelForTest;
@@ -39,13 +38,14 @@ public class HSLFareServiceTest implements PlanTestConstants {
     Itinerary i,
     List<String> expectedFareIds
   ) {
-    Assertions.assertArrayEquals(
+    assertArrayEquals(
       expectedFareIds.toArray(),
       fareService
         .calculateFares(i)
-        .getComponents(FareType.regular)
+        .getLegProducts()
+        .values()
         .stream()
-        .map(FareComponent::fareId)
+        .map(u -> u.product().id())
         .toArray()
     );
   }
@@ -382,7 +382,7 @@ public class HSLFareServiceTest implements PlanTestConstants {
         "Bus ride within zone A, then another one outside of HSL's area",
         hslFareService,
         A1_A2_F,
-        List.of(fareAttributeAB.getId())
+        List.of(fareAttributeAB.getId(), fareAttributeAB.getId())
       )
     );
 
