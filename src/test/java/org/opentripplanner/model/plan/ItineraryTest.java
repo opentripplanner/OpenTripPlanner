@@ -161,6 +161,28 @@ public class ItineraryTest implements PlanTestConstants {
   }
 
   @Test
+  void walkSeparateFromBike() {
+    var itin = newItinerary(A, T11_00).walk(D2m, B).bicycle(T11_05, T11_15, D).walk(D3m, E).build();
+
+    assertEquals(ofMinutes(15), itin.getNonTransitDuration());
+    assertEquals(ofMinutes(5), itin.walkDuration());
+
+    assertEquals(420, itin.walkDistanceMeters());
+    assertEquals(3420, itin.getNonTransitDistanceMeters());
+  }
+
+  @Test
+  void walkSeparateFromCar() {
+    var itin = newItinerary(A, T11_00).walk(D2m, B).carHail(D10m, D).walk(D3m, E).build();
+
+    assertEquals(ofMinutes(15), itin.getNonTransitDuration());
+    assertEquals(ofMinutes(5), itin.walkDuration());
+
+    assertEquals(420, itin.walkDistanceMeters());
+    assertEquals(15420.0, itin.getNonTransitDistanceMeters());
+  }
+
+  @Test
   void legIndex() {
     var itinerary = newItinerary(A, T11_00)
       .walk(D2m, B)
