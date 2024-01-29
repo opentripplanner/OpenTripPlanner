@@ -44,7 +44,7 @@ class GroupStopTest {
     assertEquals(subject, copy);
 
     assertEquals(ID, copy.getId().getId());
-    assertEquals(STOP_LOCATION, copy.getLocations().iterator().next());
+    assertEquals(STOP_LOCATION, copy.getChildLocations().iterator().next());
     assertEquals("v2", copy.getName().toString());
   }
 
