@@ -19,7 +19,7 @@ import org.opentripplanner.transit.model.basic.TransitMode;
 public class ItineraryTest implements PlanTestConstants {
 
   @Test
-  public void testDerivedFieldsWithWalkingOnly() {
+  void testDerivedFieldsWithWalkingOnly() {
     Itinerary result = newItinerary(A, T11_00).walk(D5m, B).build();
 
     // Expected fields on itinerary set
@@ -43,7 +43,7 @@ public class ItineraryTest implements PlanTestConstants {
   }
 
   @Test
-  public void testDerivedFieldsWithBusAllTheWay() {
+  void testDerivedFieldsWithBusAllTheWay() {
     Itinerary result = newItinerary(A).bus(55, T11_00, T11_10, B).build();
 
     assertEquals(ofMinutes(10), result.getDuration());
@@ -67,7 +67,7 @@ public class ItineraryTest implements PlanTestConstants {
   }
 
   @Test
-  public void testDerivedFieldsWithTrainAllTheWay() {
+  void testDerivedFieldsWithTrainAllTheWay() {
     Itinerary result = newItinerary(A).rail(20, T11_05, T11_15, B).build();
 
     assertEquals(ofMinutes(10), result.getDuration());
@@ -91,7 +91,7 @@ public class ItineraryTest implements PlanTestConstants {
   }
 
   @Test
-  public void testDerivedFieldsWithWalAccessAndTwoTransitLegs() {
+  void testDerivedFieldsWithWalAccessAndTwoTransitLegs() {
     Itinerary itinerary = TestItineraryBuilder
       .newItinerary(A, T11_02)
       .walk(D1m, B)
@@ -112,7 +112,7 @@ public class ItineraryTest implements PlanTestConstants {
   }
 
   @Test
-  public void testDerivedFieldsWithBusAndWalkingAccessAndEgress() {
+  void testDerivedFieldsWithBusAndWalkingAccessAndEgress() {
     Itinerary result = newItinerary(A, T11_05)
       .walk(D2m, B)
       // 3 minutes wait
@@ -133,7 +133,7 @@ public class ItineraryTest implements PlanTestConstants {
   }
 
   @Test
-  public void walkBusBusWalkTrainWalk() {
+  void walkBusBusWalkTrainWalk() {
     Itinerary result = newItinerary(A, T11_00)
       .walk(D2m, B)
       .bus(55, T11_04, T11_14, C)
@@ -161,7 +161,7 @@ public class ItineraryTest implements PlanTestConstants {
   }
 
   @Test
-  public void legIndex() {
+  void legIndex() {
     var itinerary = newItinerary(A, T11_00)
       .walk(D2m, B)
       .bus(55, T11_04, T11_14, C)
@@ -181,7 +181,7 @@ public class ItineraryTest implements PlanTestConstants {
   }
 
   @Test
-  public void hasSystemTag() {
+  void hasSystemTag() {
     var subject = newItinerary(A).bus(1, T11_04, T11_14, B).build();
     subject.flagForDeletion(new SystemNotice("MY-TAG", "Text"));
     assertTrue(subject.hasSystemNoticeTag("MY-TAG"));

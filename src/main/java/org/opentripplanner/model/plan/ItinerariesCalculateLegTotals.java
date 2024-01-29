@@ -44,11 +44,11 @@ class ItinerariesCalculateLegTotals {
         if (!leg.isInterlinedWithPreviousLeg()) {
           ++nTransitLegs;
         }
-      } else if (leg instanceof StreetLeg streetLeg){
+      } else if (leg instanceof StreetLeg streetLeg) {
         nonTransitDuration = nonTransitDuration.plus(dt);
         nonTransitDistanceMeters += leg.getDistanceMeters();
 
-        if(streetLeg.isWalkingLeg()){
+        if (streetLeg.isWalkingLeg()) {
           walkDuration = walkDuration.plus(streetLeg.getDuration());
           walkDistanceMeters = walkDistanceMeters + streetLeg.getDistanceMeters();
         }

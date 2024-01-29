@@ -42,7 +42,6 @@ public class Itinerary implements ItinerarySortKey {
   private final Duration walkDuration;
   private final double walkDistanceMeters;
 
-
   /* mutable primitive properties */
   private Double elevationLost = 0.0;
   private Double elevationGained = 0.0;
@@ -673,7 +672,7 @@ public class Itinerary implements ItinerarySortKey {
    * How much walking this itinerary contains, in meters.
    */
   public double walkDistanceMeters() {
-      return walkDistanceMeters;
+    return walkDistanceMeters;
   }
 
   /**
