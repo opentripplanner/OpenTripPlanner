@@ -94,12 +94,12 @@ public class ItineraryImpl implements GraphQLDataFetchers.GraphQLItinerary {
 
   @Override
   public DataFetcher<Double> walkDistance() {
-    return environment -> getSource(environment).getNonTransitDistanceMeters();
+    return environment -> getSource(environment).walkDistanceMeters();
   }
 
   @Override
   public DataFetcher<Long> walkTime() {
-    return environment -> (long) getSource(environment).getNonTransitDuration().toSeconds();
+    return environment -> (long) getSource(environment).walkDuration().toSeconds();
   }
 
   @Override

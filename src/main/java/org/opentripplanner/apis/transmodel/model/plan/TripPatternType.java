@@ -158,7 +158,7 @@ public class TripPatternType {
           .name("walkDistance")
           .deprecate("Replaced by `streetDistance`.")
           .type(Scalars.GraphQLFloat)
-          .dataFetcher(env -> itinerary(env).getNonTransitDistanceMeters())
+          .dataFetcher(env -> itinerary(env).walkDistanceMeters())
           .build()
       )
       .field(

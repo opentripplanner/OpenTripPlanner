@@ -13,6 +13,8 @@ class ItinerariesCalculateLegTotals {
   int nTransitLegs = 0;
   Duration nonTransitDuration = Duration.ZERO;
   double nonTransitDistanceMeters = 0.0;
+  Duration walkDuration = Duration.ZERO;
+  double walkDistanceMeters = 0.0;
   Duration waitingDuration = Duration.ZERO;
   boolean walkOnly = true;
   boolean streetOnly = true;
@@ -42,9 +44,14 @@ class ItinerariesCalculateLegTotals {
         if (!leg.isInterlinedWithPreviousLeg()) {
           ++nTransitLegs;
         }
-      } else if (leg.isStreetLeg()) {
+      } else if (leg instanceof StreetLeg streetLeg){
         nonTransitDuration = nonTransitDuration.plus(dt);
         nonTransitDistanceMeters += leg.getDistanceMeters();
+
+        if(streetLeg.isWalkingLeg()){
+          walkDuration = walkDuration.plus(streetLeg.getDuration());
+          walkDistanceMeters = walkDistanceMeters + streetLeg.getDistanceMeters();
+        }
       } else if (leg instanceof UnknownTransitPathLeg unknownTransitPathLeg) {
         nTransitLegs += unknownTransitPathLeg.getNumberOfTransfers() + 1;
       }
