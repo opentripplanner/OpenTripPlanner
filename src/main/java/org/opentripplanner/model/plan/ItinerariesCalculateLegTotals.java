@@ -33,8 +33,7 @@ class ItinerariesCalculateLegTotals {
   }
 
   private void calculate(List<Leg> legs) {
-    totalDuration =
-      Duration.between(legs.get(0).getStartTime(), legs.get(legs.size() - 1).getEndTime());
+    totalDuration = Duration.between(legs.getFirst().getStartTime(), legs.getLast().getEndTime());
 
     for (Leg leg : legs) {
       Duration dt = leg.getDuration();
