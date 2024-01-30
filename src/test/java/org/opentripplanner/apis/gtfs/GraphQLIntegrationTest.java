@@ -61,7 +61,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RouteRequest;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graphfinder.GraphFinder;
@@ -185,10 +184,6 @@ class GraphQLIntegrationTest {
 
     var fares = new ItineraryFares();
     fares.addFare(FareType.regular, Money.euros(3.1f));
-    fares.addFareComponent(
-      FareType.regular,
-      List.of(new FareComponent(id("AB"), Money.euros(3.1f), List.of(busLeg)))
-    );
 
     var dayPass = fareProduct("day-pass");
     fares.addItineraryProducts(List.of(dayPass));

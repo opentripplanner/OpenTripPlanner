@@ -374,7 +374,7 @@ public class NetexMapper {
         transitBuilder.stopModel().withAreaStop(areaStop);
       } else if (stopLocation instanceof GroupStop groupStop) {
         transitBuilder.stopModel().withGroupStop(groupStop);
-        for (var child : groupStop.getLocations()) {
+        for (var child : groupStop.getChildLocations()) {
           if (child instanceof AreaStop areaStop) {
             transitBuilder.stopModel().withAreaStop(areaStop);
           }

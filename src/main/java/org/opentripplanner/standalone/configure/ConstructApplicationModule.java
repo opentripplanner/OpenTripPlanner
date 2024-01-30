@@ -49,7 +49,7 @@ public class ConstructApplicationModule {
       graph,
       transitService,
       Metrics.globalRegistry,
-      routerConfig.vectorTileLayers(),
+      routerConfig.vectorTileConfig(),
       worldEnvelopeService,
       realtimeVehicleService,
       vehicleRentalService,

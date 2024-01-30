@@ -11,7 +11,7 @@ import org.opentripplanner.framework.lang.ArrayUtils;
 import org.opentripplanner.routing.algorithm.raptoradapter.transit.cost.grouppriority.TransitGroupPriority32n;
 import org.opentripplanner.routing.api.request.request.filter.TransitGroupSelect;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
-import org.opentripplanner.transit.model.network.RoutingTripPattern;
+import org.opentripplanner.transit.model.network.TripPattern;
 
 /**
  * This class dynamically builds an index of transit-group-ids from the
@@ -94,16 +94,14 @@ public class PriorityGroupConfigurator {
    * <p>
    * @throws IllegalArgumentException if more than 32 group-ids are requested.
    */
-  public int lookupTransitGroupPriorityId(RoutingTripPattern tripPattern) {
+  public int lookupTransitGroupPriorityId(TripPattern tripPattern) {
     if (!enabled || tripPattern == null) {
       return baseGroupId;
     }
 
-    var p = tripPattern.getPattern();
-
     for (var it : agencyMatchersIds) {
-      if (it.matcher().match(p)) {
-        var agencyId = p.getRoute().getAgency().getId();
+      if (it.matcher().match(tripPattern)) {
+        var agencyId = tripPattern.getRoute().getAgency().getId();
         int groupId = it.ids().get(agencyId);
 
         if (groupId < 0) {
@@ -115,7 +113,7 @@ public class PriorityGroupConfigurator {
     }
 
     for (var it : globalMatchersIds) {
-      if (it.matcher.match(p)) {
+      if (it.matcher.match(tripPattern)) {
         return it.groupId();
       }
     }

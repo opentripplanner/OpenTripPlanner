@@ -23,12 +23,8 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.transit.model.basic.Money;
 import org.opentripplanner.transit.model.framework.FeedScopedId;
 import org.opentripplanner.transit.model.network.Route;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OrcaFareService extends DefaultFareService {
-
-  private static final Logger LOG = LoggerFactory.getLogger(OrcaFareService.class);
 
   private static final Duration MAX_TRANSFER_DISCOUNT_DURATION = Duration.ofHours(2);
 

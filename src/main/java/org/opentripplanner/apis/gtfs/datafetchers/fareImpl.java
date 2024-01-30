@@ -2,9 +2,9 @@ package org.opentripplanner.apis.gtfs.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import java.util.List;
 import java.util.Map;
 import org.opentripplanner.apis.gtfs.generated.GraphQLDataFetchers;
-import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.transit.model.basic.Money;
 
 public class fareImpl implements GraphQLDataFetchers.GraphQLFare {
@@ -15,8 +15,8 @@ public class fareImpl implements GraphQLDataFetchers.GraphQLFare {
   }
 
   @Override
-  public DataFetcher<Iterable<FareComponent>> components() {
-    return environment -> (Iterable<FareComponent>) getSource(environment).get("details");
+  public DataFetcher<Iterable<Object>> components() {
+    return environment -> List.of();
   }
 
   @Override

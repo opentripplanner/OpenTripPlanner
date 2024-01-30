@@ -13,9 +13,11 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import org.opentripplanner.framework.lang.ObjectUtils;
 import org.opentripplanner.framework.lang.OtpNumberFormat;
 import org.opentripplanner.framework.time.DurationUtils;
 import org.opentripplanner.framework.time.TimeUtils;
@@ -135,11 +137,19 @@ public class ToStringBuilder {
   }
 
   /**
+   * Add the result of the given supplier. If the supplier return {@code  null} or an exceptions
+   * is thrown, then nothing is added - the result is ignored.
+   */
+  public ToStringBuilder addObjOpSafe(String name, Supplier<?> body) {
+    return addObj(name, ObjectUtils.safeGetOrNull(body));
+  }
+
+  /**
    * Use this if you would like a custom toString function to convert the value. If the given value
    * is null, then the value is not printed.
    * <p>
    * Implementation note! The "Op" (Operation) suffix is necessary to separate this from
-   * {@link #addObj(String, Object, Object)},  when the last argument is null.
+   * {@link #addObj(String, Object, Object)}, when the last argument is null.
    */
   public <T> ToStringBuilder addObjOp(
     String name,
@@ -176,7 +186,7 @@ public class ToStringBuilder {
     return addIt(name, Arrays.toString(value));
   }
 
-  /** Add collection if not null or not empty, all elements are added */
+  /** Add the collection if not null or not empty, all elements are added */
   public ToStringBuilder addCol(String name, Collection<?> c) {
     return addIfNotNull(name, c == null || c.isEmpty() ? null : c);
   }

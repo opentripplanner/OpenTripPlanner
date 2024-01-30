@@ -12,6 +12,7 @@ import org.opentripplanner.framework.application.OTPFeature;
 import org.opentripplanner.raptor.api.model.GeneralizedCostRelaxFunction;
 import org.opentripplanner.raptor.api.model.RaptorAccessEgress;
 import org.opentripplanner.raptor.api.model.RaptorConstants;
+import org.opentripplanner.raptor.api.model.RaptorTripSchedule;
 import org.opentripplanner.raptor.api.model.RelaxFunction;
 import org.opentripplanner.raptor.api.request.DebugRequestBuilder;
 import org.opentripplanner.raptor.api.request.Optimization;
@@ -28,7 +29,7 @@ import org.opentripplanner.routing.api.request.RouteRequest;
 import org.opentripplanner.routing.api.request.framework.CostLinearFunction;
 import org.opentripplanner.transit.model.site.StopLocation;
 
-public class RaptorRequestMapper {
+public class RaptorRequestMapper<T extends RaptorTripSchedule> {
 
   private final RouteRequest request;
   private final Collection<? extends RaptorAccessEgress> accessPaths;
@@ -56,7 +57,7 @@ public class RaptorRequestMapper {
     this.meterRegistry = meterRegistry;
   }
 
-  public static RaptorRequest<TripSchedule> mapRequest(
+  public static <T extends RaptorTripSchedule> RaptorRequest<T> mapRequest(
     RouteRequest request,
     ZonedDateTime transitSearchTimeZero,
     boolean isMultiThreaded,
@@ -65,7 +66,7 @@ public class RaptorRequestMapper {
     Duration searchWindowAccessSlack,
     MeterRegistry meterRegistry
   ) {
-    return new RaptorRequestMapper(
+    return new RaptorRequestMapper<T>(
       request,
       isMultiThreaded,
       accessPaths,
@@ -77,8 +78,8 @@ public class RaptorRequestMapper {
       .doMap();
   }
 
-  private RaptorRequest<TripSchedule> doMap() {
-    var builder = new RaptorRequestBuilder<TripSchedule>();
+  private RaptorRequest<T> doMap() {
+    var builder = new RaptorRequestBuilder<T>();
     var searchParams = builder.searchParams();
 
     var preferences = request.preferences();
@@ -119,12 +120,14 @@ public class RaptorRequestMapper {
     builder.withMultiCriteria(mcBuilder -> {
       var pt = preferences.transit();
       var r = pt.raptor();
-      if (!pt.relaxTransitGroupPriority().isNormal()) {
-        mcBuilder.withTransitPriorityCalculator(TransitGroupPriority32n.priorityCalculator());
-        mcBuilder.withRelaxC1(mapRelaxCost(pt.relaxTransitGroupPriority()));
-      } else {
+
+      // Note! If a pass-through-point exists, then the transit-group-priority feature is disabled
+      if (!request.getPassThroughPoints().isEmpty()) {
         mcBuilder.withPassThroughPoints(mapPassThroughPoints());
         r.relaxGeneralizedCostAtDestination().ifPresent(mcBuilder::withRelaxCostAtDestination);
+      } else if (!pt.relaxTransitGroupPriority().isNormal()) {
+        mcBuilder.withTransitPriorityCalculator(TransitGroupPriority32n.priorityCalculator());
+        mcBuilder.withRelaxC1(mapRelaxCost(pt.relaxTransitGroupPriority()));
       }
     });
 
@@ -174,13 +177,15 @@ public class RaptorRequestMapper {
     }
 
     // Add this last, it depends on generating an alias from the set values
-    builder.performanceTimers(
-      new PerformanceTimersForRaptor(
-        builder.generateAlias(),
-        preferences.system().tags(),
-        meterRegistry
-      )
-    );
+    if (meterRegistry != null) {
+      builder.performanceTimers(
+        new PerformanceTimersForRaptor(
+          builder.generateAlias(),
+          preferences.system().tags(),
+          meterRegistry
+        )
+      );
+    }
 
     return builder.build();
   }
