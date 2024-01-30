@@ -273,10 +273,7 @@ public class NearbyStopFinder {
     var durationSkipEdgeStrategy = new DurationSkipEdgeStrategy(durationLimit);
 
     if (maxStopCount > 0) {
-      var strategy = new MaxCountSkipEdgeStrategy<>(
-        maxStopCount,
-          NearbyStopFinder::hasReachedStop
-      );
+      var strategy = new MaxCountSkipEdgeStrategy<>(maxStopCount, NearbyStopFinder::hasReachedStop);
       return new ComposingSkipEdgeStrategy<>(strategy, durationSkipEdgeStrategy);
     }
     return durationSkipEdgeStrategy;
