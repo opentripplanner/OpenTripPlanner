@@ -5468,7 +5468,7 @@ input BicycleWalkPreferencesInput {
     or when getting on the bicycle again. However, this is not applied when getting
     on a rented bicycle for the first time or off the bicycle when returning the bicycle.
     """
-    hopTime: Duration
+    mountDismountTime: Duration
 }
 
 """
@@ -5480,7 +5480,7 @@ input BicycleWalkPreferencesCostInput {
     bicycle walking. However, this cost is not applied when getting on a rented bicycle
     for the first time or when getting off the bicycle when returning the bicycle.
     """
-    hopCost: Cost
+    mountDismountCost: Cost
 
     """
     A cost multiplier of bicycle walking travel time. The multiplier is for how bad
