@@ -5490,24 +5490,6 @@ input BicycleWalkPreferencesCostInput {
 }
 
 """
-Costs related to walking a scooter.
-"""
-input ScooterWalkPreferencesCostInput {
-    """
-    A static cost that is added each time hopping on or off a scooter to start or end
-    scooter walking. However, this cost is not applied when getting on a rented scooter
-    for the first time or when getting off the scooter when returning the scooter.
-    """
-    hopCost: Cost
-
-    """
-    A cost multiplier of scooter walking travel time. The multiplier is for how bad
-    walking the scooter is compared to being in transit for equal lengths of time.
-    """
-    reluctance: Reluctance
-}
-
-"""
 Preferences related to walking (excluding walking a bicycle or a scooter).
 """
 input WalkPreferencesInput {
