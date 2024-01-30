@@ -57,7 +57,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
     MESSAGE_COUNTER.incrementAndGet();
 
     if (MESSAGE_COUNTER.get() % 100 == 0) {
-      LOG.info("Total SIRI-ET messages received={}", MESSAGE_COUNTER.get());
+      LOG.debug("Total SIRI-ET messages received={}", MESSAGE_COUNTER.get());
     }
 
     processMessage(message.getBody().toString(), message.getMessageId());
@@ -169,7 +169,7 @@ public class SiriAzureETUpdater extends AbstractAzureSiriUpdater {
       siri.getServiceDelivery().getEstimatedTimetableDeliveries().isEmpty()
     ) {
       if (siri.getHeartbeatNotification() != null) {
-        LOG.info("Received SIRI heartbeat message");
+        LOG.debug("Received SIRI heartbeat message");
       } else {
         LOG.warn("Empty Siri message {}: {}", id, message);
       }
